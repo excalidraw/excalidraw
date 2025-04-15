@@ -26,7 +26,7 @@ import {
 
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
-import { paintIcon } from "../../components/icons";
+import { paintIcon } from "../components/icons";
 
 import { t } from "../../i18n";
 import { getSelectedElements } from "../scene";

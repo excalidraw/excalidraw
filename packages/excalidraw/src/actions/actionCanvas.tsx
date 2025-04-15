@@ -24,9 +24,9 @@ import {
   isEraserActive,
   isHandToolActive,
 } from "../../appState";
-import { ColorPicker } from "../../components/ColorPicker/ColorPicker";
-import { ToolButton } from "../../components/ToolButton";
-import { Tooltip } from "../../components/Tooltip";
+import { ColorPicker } from "../components/ColorPicker/ColorPicker";
+import { ToolButton } from "../components/ToolButton";
+import { Tooltip } from "../components/Tooltip";
 import {
   handIcon,
   LassoIcon,
@@ -37,7 +37,7 @@ import {
   ZoomInIcon,
   ZoomOutIcon,
   ZoomResetIcon,
-} from "../../components/icons";
+} from "../components/icons";
 import { setCursor } from "../../cursor";
 
 import { t } from "../../i18n";

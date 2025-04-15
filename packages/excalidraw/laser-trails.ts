@@ -7,7 +7,7 @@ import { getClientColor } from "./clients";
 
 import type { Trail } from "./src/animated-trail";
 import type { AnimationFrameHandler } from "./src/animation-frame-handler";
-import type App from "./components/App";
+import type App from "./src/components/App";
 import type { SocketId } from "./types";
 
 export class LaserTrails implements Trail {

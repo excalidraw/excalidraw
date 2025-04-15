@@ -2,18 +2,18 @@ import React, { useEffect } from "react";
 
 import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
 
-import App from "./components/App";
-import { InitializeApp } from "./components/InitializeApp";
-import Footer from "./components/footer/FooterCenter";
-import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
-import MainMenu from "./components/main-menu/MainMenu";
-import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
+import App from "./src/components/App";
+import { InitializeApp } from "./src/components/InitializeApp";
+import Footer from "./src/components/footer/FooterCenter";
+import LiveCollaborationTrigger from "./src/components/live-collaboration/LiveCollaborationTrigger";
+import MainMenu from "./src/components/main-menu/MainMenu";
+import WelcomeScreen from "./src/components/welcome-screen/WelcomeScreen";
 import { defaultLang } from "./i18n";
 import { EditorJotaiProvider, editorJotaiStore } from "./editor-jotai";
 import polyfill from "./polyfill";
 
-import "./css/app.scss";
-import "./css/styles.scss";
+import "./src/css/app.scss";
+import "./src/css/styles.scss";
 import "./fonts/fonts.css";
 
 import type { AppProps, ExcalidrawProps } from "./types";
@@ -276,18 +276,18 @@ export {
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
-export { Sidebar } from "./components/Sidebar/Sidebar";
-export { Button } from "./components/Button";
+export { Sidebar } from "./src/components/Sidebar/Sidebar";
+export { Button } from "./src/components/Button";
 export { Footer };
 export { MainMenu };
-export { useDevice } from "./components/App";
+export { useDevice } from "./src/components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
-export { Stats } from "./components/Stats";
+export { Stats } from "./src/components/Stats";
 
-export { DefaultSidebar } from "./components/DefaultSidebar";
-export { TTDDialog } from "./components/TTDDialog/TTDDialog";
-export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
+export { DefaultSidebar } from "./src/components/DefaultSidebar";
+export { TTDDialog } from "./src/components/TTDDialog/TTDDialog";
+export { TTDDialogTrigger } from "./src/components/TTDDialog/TTDDialogTrigger";
 
 export { zoomToFitBounds } from "./src/actions/actionCanvas";
 export { convertToExcalidrawElements } from "./src/data/transform";
@@ -302,7 +302,7 @@ export {
   elementPartiallyOverlapsWithOrContainsBBox,
 } from "@excalidraw/utils/withinBounds";
 
-export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
+export { DiagramToCodePlugin } from "./src/components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./src/data/blob";
 export { isElementLink } from "@excalidraw/element/elementLink";
 

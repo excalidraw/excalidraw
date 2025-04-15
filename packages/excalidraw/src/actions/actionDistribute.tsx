@@ -12,11 +12,11 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Distribution } from "@excalidraw/element/distribute";
 
-import { ToolButton } from "../../components/ToolButton";
+import { ToolButton } from "../components/ToolButton";
 import {
   DistributeHorizontallyIcon,
   DistributeVerticallyIcon,
-} from "../../components/icons";
+} from "../components/icons";
 
 import { t } from "../../i18n";
 

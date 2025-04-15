@@ -17,7 +17,7 @@ import { getCommonBounds } from "@excalidraw/element/bounds";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { setCursorForShape } from "../../cursor";
-import { frameToolIcon } from "../../components/icons";
+import { frameToolIcon } from "../components/icons";
 import { getSelectedElements } from "../scene";
 import { CaptureUpdateAction } from "../../store";
 

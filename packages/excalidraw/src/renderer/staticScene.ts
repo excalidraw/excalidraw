@@ -27,7 +27,7 @@ import {
   EXTERNAL_LINK_IMG,
   ELEMENT_LINK_IMG,
   getLinkHandleFromCoords,
-} from "../../components/hyperlink/helpers";
+} from "../components/hyperlink/helpers";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 

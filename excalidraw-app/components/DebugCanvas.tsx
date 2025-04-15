@@ -2,7 +2,7 @@ import {
   ArrowheadArrowIcon,
   CloseIcon,
   TrashIcon,
-} from "@excalidraw/excalidraw/components/icons";
+} from "@excalidraw/excalidraw/src/components/icons";
 import {
   bootstrapCanvas,
   getNormalizedCanvasDimensions,

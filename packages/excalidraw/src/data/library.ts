@@ -34,7 +34,7 @@ import { t } from "../../i18n";
 import { loadLibraryFromBlob } from "./blob";
 import { restoreLibraryItems } from "./restore";
 
-import type App from "../../components/App";
+import type App from "../components/App";
 
 import type {
   LibraryItems,

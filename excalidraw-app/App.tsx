@@ -10,12 +10,12 @@ import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 import {
   CommandPalette,
   DEFAULT_CATEGORIES,
-} from "@excalidraw/excalidraw/components/CommandPalette/CommandPalette";
-import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
-import { OverwriteConfirmDialog } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
-import { openConfirmModal } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirmState";
-import { ShareableLinkDialog } from "@excalidraw/excalidraw/components/ShareableLinkDialog";
-import Trans from "@excalidraw/excalidraw/components/Trans";
+} from "@excalidraw/excalidraw/src/components/CommandPalette/CommandPalette";
+import { ErrorDialog } from "@excalidraw/excalidraw/src/components/ErrorDialog";
+import { OverwriteConfirmDialog } from "@excalidraw/excalidraw/src/components/OverwriteConfirm/OverwriteConfirm";
+import { openConfirmModal } from "@excalidraw/excalidraw/src/components/OverwriteConfirm/OverwriteConfirmState";
+import { ShareableLinkDialog } from "@excalidraw/excalidraw/src/components/ShareableLinkDialog";
+import Trans from "@excalidraw/excalidraw/src/components/Trans";
 import {
   APP_NAME,
   EVENT,
@@ -46,7 +46,7 @@ import {
   exportToPlus,
   share,
   youtubeIcon,
-} from "@excalidraw/excalidraw/components/icons";
+} from "@excalidraw/excalidraw/src/components/icons";
 import { isElementLink } from "@excalidraw/element/elementLink";
 import {
   restore,

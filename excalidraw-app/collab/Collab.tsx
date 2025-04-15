@@ -5,7 +5,7 @@ import {
   zoomToFitBounds,
   reconcileElements,
 } from "@excalidraw/excalidraw";
-import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
+import { ErrorDialog } from "@excalidraw/excalidraw/src/components/ErrorDialog";
 import { APP_NAME, EVENT } from "@excalidraw/common";
 import {
   IDLE_THRESHOLD,

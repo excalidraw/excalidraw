@@ -3,9 +3,9 @@ import { uploadBytes, ref } from "firebase/storage";
 import { nanoid } from "nanoid";
 
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
-import { Card } from "@excalidraw/excalidraw/components/Card";
-import { ExcalidrawLogo } from "@excalidraw/excalidraw/components/ExcalidrawLogo";
-import { ToolButton } from "@excalidraw/excalidraw/components/ToolButton";
+import { Card } from "@excalidraw/excalidraw/src/components/Card";
+import { ExcalidrawLogo } from "@excalidraw/excalidraw/src/components/ExcalidrawLogo";
+import { ToolButton } from "@excalidraw/excalidraw/src/components/ToolButton";
 import { MIME_TYPES, getFrame } from "@excalidraw/common";
 import {
   encryptData,

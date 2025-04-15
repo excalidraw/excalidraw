@@ -18,8 +18,8 @@ import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
 
 import { t } from "../../i18n";
 import { resetCursor } from "../../cursor";
-import { done } from "../../components/icons";
-import { ToolButton } from "../../components/ToolButton";
+import { done } from "../components/icons";
+import { ToolButton } from "../components/ToolButton";
 import { CaptureUpdateAction } from "../../store";
 
 import { register } from "./register";

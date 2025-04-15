@@ -2,8 +2,8 @@ import { isWindows, KEYS, matchKey, arrayToMap } from "@excalidraw/common";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
-import { ToolButton } from "../../components/ToolButton";
-import { UndoIcon, RedoIcon } from "../../components/icons";
+import { ToolButton } from "../components/ToolButton";
+import { UndoIcon, RedoIcon } from "../components/icons";
 import { HistoryChangedEvent } from "../../history";
 import { useEmitter } from "../hooks/useEmitter";
 import { t } from "../../i18n";
