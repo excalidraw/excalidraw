@@ -3,6 +3,6 @@
   "compilerOptions": {
     "outDir": "./dist/types"
   },
-  "include": ["**/*"],
+  "include": ["src/**/*", "css.d.ts", "global.d.ts", "pwacompat.d.ts", "react-app-env.d.ts", "vite-env.d.ts"],
   "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]
 }
