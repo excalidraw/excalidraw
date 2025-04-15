@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 
 import { EditorJotaiProvider } from "../editor-jotai";
-import fallbackLangData from "../locales/en.json";
+import fallbackLangData from "../src/locales/en.json";
 
 import Trans from "./Trans";
 
