@@ -48,7 +48,7 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { getDefaultAppState } from "../appState";
 import { HistoryEntry } from "../history";
 import { Excalidraw } from "../index";
-import * as StaticScene from "../renderer/staticScene";
+import * as StaticScene from "../src/renderer/staticScene";
 import { Snapshot, CaptureUpdateAction } from "../store";
 import { AppStateChange, ElementsChange } from "../change";
 

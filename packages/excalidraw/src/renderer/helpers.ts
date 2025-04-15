@@ -1,7 +1,7 @@
 import { THEME, THEME_FILTER } from "@excalidraw/common";
 
-import type { StaticCanvasRenderConfig } from "../src/scene/types";
-import type { StaticCanvasAppState, AppState } from "../types";
+import type { StaticCanvasRenderConfig } from "../scene/types";
+import type { StaticCanvasAppState, AppState } from "../../types";
 
 export const fillCircle = (
   context: CanvasRenderingContext2D,

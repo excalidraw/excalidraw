@@ -7,7 +7,7 @@ import { setDateTimeForTests } from "@excalidraw/common";
 
 import { copiedStyles } from "../actions/actionStyles";
 import { Excalidraw } from "../index";
-import * as StaticScene from "../renderer/staticScene";
+import * as StaticScene from "../src/renderer/staticScene";
 
 import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";

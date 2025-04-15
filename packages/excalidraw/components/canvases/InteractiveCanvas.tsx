@@ -13,7 +13,7 @@ import type {
 
 import { t } from "../../i18n";
 import { isRenderThrottlingEnabled } from "../../reactUtils";
-import { renderInteractiveScene } from "../../renderer/interactiveScene";
+import { renderInteractiveScene } from "../../src/renderer/interactiveScene";
 
 import type {
   InteractiveCanvasRenderConfig,

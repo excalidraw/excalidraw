@@ -63,8 +63,8 @@ import { serializeAsJSON } from "../../data/json";
 
 import { Fonts } from "../../fonts";
 
-import { renderStaticScene } from "../../renderer/staticScene";
-import { renderSceneToSvg } from "../../renderer/staticSvgScene";
+import { renderStaticScene } from "../renderer/staticScene";
+import { renderSceneToSvg } from "../renderer/staticSvgScene";
 
 import type { RenderableElementsMap } from "./types";
 

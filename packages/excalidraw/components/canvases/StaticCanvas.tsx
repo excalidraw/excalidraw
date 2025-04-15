@@ -8,7 +8,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { isRenderThrottlingEnabled } from "../../reactUtils";
-import { renderStaticScene } from "../../renderer/staticScene";
+import { renderStaticScene } from "../../src/renderer/staticScene";
 
 import type {
   RenderableElementsMap,

@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import type { NonDeletedSceneElementsMap } from "@excalidraw/element/types";
 
 import { isRenderThrottlingEnabled } from "../../reactUtils";
-import { renderNewElementScene } from "../../renderer/renderNewElementScene";
+import { renderNewElementScene } from "../../src/renderer/renderNewElementScene";
 
 import type {
   RenderableElementsMap,

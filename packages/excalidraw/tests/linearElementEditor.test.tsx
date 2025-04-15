@@ -31,8 +31,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import { Excalidraw, mutateElement } from "../index";
-import * as InteractiveCanvas from "../renderer/interactiveScene";
-import * as StaticScene from "../renderer/staticScene";
+import * as InteractiveCanvas from "../src/renderer/interactiveScene";
+import * as StaticScene from "../src/renderer/staticScene";
 import { API } from "../tests/helpers/api";
 
 import { Keyboard, Pointer, UI } from "./helpers/ui";

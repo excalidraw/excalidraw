@@ -27,15 +27,15 @@ import {
   EXTERNAL_LINK_IMG,
   ELEMENT_LINK_IMG,
   getLinkHandleFromCoords,
-} from "../components/hyperlink/helpers";
+} from "../../components/hyperlink/helpers";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 
 import type {
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
-} from "../src/scene/types";
-import type { StaticCanvasAppState, Zoom } from "../types";
+} from "../scene/types";
+import type { StaticCanvasAppState, Zoom } from "../../types";
 
 const GridLineColor = {
   Bold: "#dddddd",

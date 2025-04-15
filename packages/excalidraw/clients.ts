@@ -6,7 +6,7 @@ import {
   UserIdleState,
 } from "@excalidraw/common";
 
-import { roundRect } from "./renderer/roundRect";
+import { roundRect } from "./src/renderer/roundRect";
 
 import type { InteractiveCanvasRenderConfig } from "./src/scene/types";
 import type {
