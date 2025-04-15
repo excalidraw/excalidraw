@@ -16,22 +16,22 @@ import type {
   ExcalidrawTextElementWithContainer,
 } from "@excalidraw/element/types";
 
-import { Excalidraw } from "../index";
-import { API } from "../tests/helpers/api";
-import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
-import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
+import { Excalidraw } from "../../index";
+import { API } from "../../tests/helpers/api";
+import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
+import { getTextEditor, updateTextEditor } from "../../tests/queries/dom";
 import {
   GlobalTestState,
   render,
   screen,
   unmountComponent,
-} from "../tests/test-utils";
+} from "../../tests/test-utils";
 import {
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
-} from "../tests/test-utils";
-import { actionBindText } from "../actions";
+} from "../../tests/test-utils";
+import { actionBindText } from "../../actions";
 
 unmountComponent();
 

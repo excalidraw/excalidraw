@@ -457,7 +457,7 @@ import { Store, CaptureUpdateAction } from "../store";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
-import { textWysiwyg } from "../wysiwyg/textWysiwyg";
+import { textWysiwyg } from "../src/wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../src/scene/scrollbars";
 
 import { isMaybeMermaidDefinition } from "../mermaid";
