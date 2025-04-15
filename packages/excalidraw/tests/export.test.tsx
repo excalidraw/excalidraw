@@ -13,7 +13,7 @@ import {
   decodeSvgBase64Payload,
   encodeSvgBase64Payload,
   exportToSvg,
-} from "../scene/export";
+} from "../src/scene/export";
 
 import { API } from "./helpers/api";
 import { render, waitFor } from "./test-utils";

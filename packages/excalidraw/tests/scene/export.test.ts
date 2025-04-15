@@ -9,7 +9,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { prepareElementsForExport } from "../../data";
-import * as exportUtils from "../../scene/export";
+import * as exportUtils from "../../src/scene/export";
 import {
   diamondFixture,
   ellipseFixture,

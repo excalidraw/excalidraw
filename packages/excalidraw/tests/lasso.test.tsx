@@ -27,7 +27,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
 
-import { getSelectedElements } from "../scene";
+import { getSelectedElements } from "../src/scene";
 
 import { getLassoSelectedElementIds } from "../lasso/utils";
 

@@ -13,7 +13,7 @@ import type {
   ExcalidrawRectangleElement,
 } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/excalidraw/scene/Scene";
+import type Scene from "@excalidraw/excalidraw/src/scene/Scene";
 
 import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
