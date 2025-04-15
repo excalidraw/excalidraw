@@ -58,6 +58,7 @@ import type { LocalPoint } from "@excalidraw/math";
 
 import type {
   Arrowhead,
+  ElementsMap,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -774,7 +775,7 @@ type ChangeFontFamilyData = Partial<
   >
 > & {
   /** cache of selected & editing elements populated on opened popup */
-  cachedElements?: Map<string, ExcalidrawElement>;
+  cachedElements?: ElementsMap;
   /** flag to reset all elements to their cached versions  */
   resetAll?: true;
   /** flag to reset all containers to their cached versions */
@@ -983,7 +984,7 @@ export const actionChangeFontFamily = register({
     return result;
   },
   PanelComponent: ({ elements, appState, app, updateData }) => {
-    const cachedElementsRef = useRef<Map<string, ExcalidrawElement>>(new Map());
+    const cachedElementsRef = useRef<ElementsMap>(new Map());
     const prevSelectedFontFamilyRef = useRef<number | null>(null);
     // relying on state batching as multiple `FontPicker` handlers could be called in rapid succession and we want to combine them
     const [batchedData, setBatchedData] = useState<ChangeFontFamilyData>({});
@@ -992,7 +993,7 @@ export const actionChangeFontFamily = register({
     const selectedFontFamily = useMemo(() => {
       const getFontFamily = (
         elementsArray: readonly ExcalidrawElement[],
-        elementsMap: Map<string, ExcalidrawElement>,
+        elementsMap: ElementsMap,
       ) =>
         getFormValue(
           elementsArray,
@@ -1668,7 +1669,7 @@ export const actionChangeArrowType = register({
             newElement,
             startHoveredElement,
             "start",
-            app.scene.getNonDeletedElementsMap(),
+            elementsMap,
             (...args) => app.scene.mutate(...args),
           );
         endHoveredElement &&
@@ -1676,7 +1677,7 @@ export const actionChangeArrowType = register({
             newElement,
             endHoveredElement,
             "end",
-            app.scene.getNonDeletedElementsMap(),
+            elementsMap,
             (...args) => app.scene.mutate(...args),
           );
 
@@ -1736,7 +1737,7 @@ export const actionChangeArrowType = register({
               newElement,
               startElement,
               "start",
-              app.scene.getNonDeletedElementsMap(),
+              elementsMap,
               (...args) => app.scene.mutate(...args),
             );
           }
@@ -1750,7 +1751,7 @@ export const actionChangeArrowType = register({
               newElement,
               endElement,
               "end",
-              app.scene.getNonDeletedElementsMap(),
+              elementsMap,
               (...args) => app.scene.mutate(...args),
             );
           }

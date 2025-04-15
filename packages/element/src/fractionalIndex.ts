@@ -7,6 +7,7 @@ import { getBoundTextElement } from "./textElement";
 import { hasBoundTextElement } from "./typeChecks";
 
 import type {
+  ElementsMap,
   ExcalidrawElement,
   FractionalIndex,
   OrderedExcalidrawElement,
@@ -152,7 +153,7 @@ export const orderByFractionalIndex = (
  */
 export const syncMovedIndices = (
   elements: readonly ExcalidrawElement[],
-  movedElements: Map<string, ExcalidrawElement>,
+  movedElements: ElementsMap,
 ): OrderedExcalidrawElement[] => {
   try {
     const indicesGroups = getMovedIndicesGroups(elements, movedElements);
@@ -210,7 +211,7 @@ export const syncInvalidIndices = (
  */
 const getMovedIndicesGroups = (
   elements: readonly ExcalidrawElement[],
-  movedElements: Map<string, ExcalidrawElement>,
+  movedElements: ElementsMap,
 ) => {
   const indicesGroups: number[][] = [];
 

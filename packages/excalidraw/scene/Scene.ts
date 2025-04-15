@@ -418,7 +418,6 @@ class Scene {
   };
 
   // TODO_SCENE: should be accessed as app.scene through the API
-  // TODO_SCENE: in theory actions (and most of the App handlers) should not needs this as they are ending with "replaceAllElements" anyway
   // TODO_SCENE: inform mutation false is the new default, meaning all mutateElement with nothing should likely use scene instead
   // TODO_SCENE: think one more time about moving the scene inside element (probably we will end up with it either way)
   // Mutate an element with passed updates and trigger the component to update. Make sure you

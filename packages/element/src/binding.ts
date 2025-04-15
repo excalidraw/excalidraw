@@ -177,6 +177,8 @@ const bindOrUnbindLinearElementEdge = (
   unboundFromElementIds: Set<ExcalidrawBindableElement["id"]>,
   scene: Scene,
 ): void => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+
   // "keep" is for method chaining convenience, a "no-op", so just bail out
   if (bindableElement === "keep") {
     return;
@@ -211,7 +213,7 @@ const bindOrUnbindLinearElementEdge = (
         linearElement,
         bindableElement,
         startOrEnd,
-        scene.getNonDeletedElementsMap(),
+        elementsMap,
         (...args) => scene.mutate(...args),
       );
       boundToElementIds.add(bindableElement.id);
@@ -221,7 +223,7 @@ const bindOrUnbindLinearElementEdge = (
       linearElement,
       bindableElement,
       startOrEnd,
-      scene.getNonDeletedElementsMap(),
+      elementsMap,
       (...args) => scene.mutate(...args),
     );
     boundToElementIds.add(bindableElement.id);
@@ -434,12 +436,14 @@ export const maybeBindLinearElement = (
   pointerCoords: { x: number; y: number },
   scene: Scene,
 ): void => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+
   if (appState.startBoundElement != null) {
     bindLinearElement(
       linearElement,
       appState.startBoundElement,
       "start",
-      scene.getNonDeletedElementsMap(),
+      elementsMap,
       (...args) => scene.mutate(...args),
     );
   }
@@ -447,7 +451,7 @@ export const maybeBindLinearElement = (
   const hoveredElement = getHoveredElementForBinding(
     pointerCoords,
     scene.getNonDeletedElements(),
-    scene.getNonDeletedElementsMap(),
+    elementsMap,
     appState.zoom,
     isElbowArrow(linearElement),
     isElbowArrow(linearElement),
@@ -465,7 +469,7 @@ export const maybeBindLinearElement = (
         linearElement,
         hoveredElement,
         "end",
-        scene.getNonDeletedElementsMap(),
+        elementsMap,
         (...args) => scene.mutate(...args),
       );
     }
@@ -496,7 +500,7 @@ export const bindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
-  elementsMap: Map<string, ExcalidrawElement>,
+  elementsMap: ElementsMap,
   mutator: (
     element: ExcalidrawElement,
     updates: ElementUpdate<ExcalidrawElement>,
@@ -753,7 +757,7 @@ const calculateFocusAndGap = (
 // in explicitly.
 export const updateBoundElements = (
   changedElement: NonDeletedExcalidrawElement,
-  elementsMap: Map<string, ExcalidrawElement>,
+  elementsMap: ElementsMap,
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     newSize?: { width: number; height: number };
@@ -856,19 +860,14 @@ export const updateBoundElements = (
       }> => update !== null,
     );
 
-    LinearElementEditor.movePoints(
-      element,
-      updates,
-      {
-        ...(changedElement.id === element.startBinding?.elementId
-          ? { startBinding: bindings.startBinding }
-          : {}),
-        ...(changedElement.id === element.endBinding?.elementId
-          ? { endBinding: bindings.endBinding }
-          : {}),
-      },
-      elementsMap as NonDeletedSceneElementsMap,
-    );
+    LinearElementEditor.movePoints(element, elementsMap, updates, {
+      ...(changedElement.id === element.startBinding?.elementId
+        ? { startBinding: bindings.startBinding }
+        : {}),
+      ...(changedElement.id === element.endBinding?.elementId
+        ? { endBinding: bindings.endBinding }
+        : {}),
+    });
 
     const boundText = getBoundTextElement(element, elementsMap);
     if (boundText && !boundText.isDeleted) {
@@ -1501,7 +1500,7 @@ export const fixDuplicatedBindingsAfterDuplication = (
 const fixReversedBindingsForBindables = (
   original: ExcalidrawBindableElement,
   duplicate: ExcalidrawBindableElement,
-  originalElements: Map<string, ExcalidrawElement>,
+  originalElements: ElementsMap,
   elementsWithClones: ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
 ) => {
@@ -1589,7 +1588,7 @@ const fixReversedBindingsForBindables = (
 const fixReversedBindingsForArrows = (
   original: ExcalidrawArrowElement,
   duplicate: ExcalidrawArrowElement,
-  originalElements: Map<string, ExcalidrawElement>,
+  originalElements: ElementsMap,
   bindingProp: "startBinding" | "endBinding",
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
   elementsWithClones: ExcalidrawElement[],
@@ -1650,7 +1649,7 @@ const fixReversedBindingsForArrows = (
 };
 
 export const fixReversedBindings = (
-  originalElements: Map<string, ExcalidrawElement>,
+  originalElements: ElementsMap,
   elementsWithClones: ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
 ) => {

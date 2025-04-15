@@ -216,13 +216,12 @@ const StatsDragInput = <
               y: number;
             } | null = null;
 
-            let originalElementsMap: Map<string, ExcalidrawElement> | null =
-              app.scene
-                .getNonDeletedElements()
-                .reduce((acc: ElementsMap, element) => {
-                  acc.set(element.id, deepCopyElement(element));
-                  return acc;
-                }, new Map());
+            let originalElementsMap: ElementsMap | null = app.scene
+              .getNonDeletedElements()
+              .reduce((acc: ElementsMap, element) => {
+                acc.set(element.id, deepCopyElement(element));
+                return acc;
+              }, new Map());
 
             let originalElements: readonly E[] | null = elements.map(
               (element) => originalElementsMap!.get(element.id) as E,
