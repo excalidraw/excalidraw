@@ -11,7 +11,7 @@ import React, {
 
 import { EVENT, isDevEnv, KEYS, updateObject } from "@excalidraw/common";
 
-import { useUIAppState } from "../../context/ui-appState";
+import { useUIAppState } from "../../src/context/ui-appState";
 import { atom, useSetAtom } from "../../editor-jotai";
 import { useOutsideClick } from "../../src/hooks/useOutsideClick";
 import { useDevice, useExcalidrawSetAppState } from "../App";

@@ -9,8 +9,8 @@ import {
 
 import type { MarkOptional, Merge } from "@excalidraw/common/utility-types";
 
-import { useTunnels } from "../context/tunnels";
-import { useUIAppState } from "../context/ui-appState";
+import { useTunnels } from "../src/context/tunnels";
+import { useUIAppState } from "../src/context/ui-appState";
 
 import "../components/dropdownMenu/DropdownMenu.scss";
 

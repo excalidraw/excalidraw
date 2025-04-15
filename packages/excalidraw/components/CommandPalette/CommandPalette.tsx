@@ -24,7 +24,7 @@ import {
 } from "../../actions/actionElementLink";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { trackEvent } from "../../analytics";
-import { useUIAppState } from "../../context/ui-appState";
+import { useUIAppState } from "../../src/context/ui-appState";
 import { deburr } from "../../deburr";
 import { atom, useAtom, editorJotaiStore } from "../../editor-jotai";
 import { t } from "../../i18n";

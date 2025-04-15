@@ -21,8 +21,8 @@ import Scene from "../src/scene/Scene";
 import { actionToggleStats } from "../actions";
 import { trackEvent } from "../analytics";
 import { isHandToolActive } from "../appState";
-import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
-import { UIAppStateContext } from "../context/ui-appState";
+import { TunnelsContext, useInitializeTunnels } from "../src/context/tunnels";
+import { UIAppStateContext } from "../src/context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
 
 import { t } from "../i18n";

@@ -3,7 +3,7 @@ import { useState, useLayoutEffect } from "react";
 import { THEME } from "@excalidraw/common";
 
 import { useDevice, useExcalidrawContainer } from "../../components/App";
-import { useUIAppState } from "../../context/ui-appState";
+import { useUIAppState } from "../context/ui-appState";
 
 export const useCreatePortalContainer = (opts?: {
   className?: string;

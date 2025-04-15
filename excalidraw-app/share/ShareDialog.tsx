@@ -12,7 +12,7 @@ import {
   shareIOS,
   shareWindows,
 } from "@excalidraw/excalidraw/components/icons";
-import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
+import { useUIAppState } from "@excalidraw/excalidraw/src/context/ui-appState";
 import { useCopyStatus } from "@excalidraw/excalidraw/src/hooks/useCopiedIndicator";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { KEYS, getFrame } from "@excalidraw/common";
