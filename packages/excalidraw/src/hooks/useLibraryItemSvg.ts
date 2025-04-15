@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 
 import { COLOR_PALETTE } from "@excalidraw/common";
 
-import { atom, useAtom } from "../editor-jotai";
+import { atom, useAtom } from "../../editor-jotai";
 
-import type { LibraryItem } from "../types";
+import type { LibraryItem } from "../../types";
 
 export type SvgCache = Map<LibraryItem["id"], SVGSVGElement>;
 

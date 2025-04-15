@@ -53,9 +53,9 @@ import {
 
 import { SHAPES } from "../shapes";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
-import { useStableCallback } from "../../hooks/useStableCallback";
+import { useStableCallback } from "../../src/hooks/useStableCallback";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
-import { useStable } from "../../hooks/useStable";
+import { useStable } from "../../src/hooks/useStable";
 
 import * as defaultItems from "./defaultCommandPaletteItems";
 

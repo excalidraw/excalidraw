@@ -8,7 +8,7 @@ import { fileOpen } from "../data/filesystem";
 import { saveLibraryAsJSON } from "../data/json";
 import { libraryItemsAtom } from "../data/library";
 import { useAtom } from "../editor-jotai";
-import { useLibraryCache } from "../hooks/useLibraryItemSvg";
+import { useLibraryCache } from "../src/hooks/useLibraryItemSvg";
 import { t } from "../i18n";
 
 import { useApp, useExcalidrawSetAppState } from "./App";

@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 
 import { KEYS } from "@excalidraw/common";
 
-import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
+import { useCreatePortalContainer } from "../src/hooks/useCreatePortalContainer";
 
 import "./Modal.scss";
 

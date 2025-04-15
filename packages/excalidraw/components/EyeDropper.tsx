@@ -7,9 +7,9 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { useUIAppState } from "../context/ui-appState";
 import { atom } from "../editor-jotai";
-import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
-import { useOutsideClick } from "../hooks/useOutsideClick";
-import { useStable } from "../hooks/useStable";
+import { useCreatePortalContainer } from "../src/hooks/useCreatePortalContainer";
+import { useOutsideClick } from "../src/hooks/useOutsideClick";
+import { useStable } from "../src/hooks/useStable";
 import { getSelectedElements } from "../scene";
 
 import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";

@@ -23,7 +23,7 @@ import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
 import { atom, useAtom } from "../editor-jotai";
 
-import { useStable } from "../hooks/useStable";
+import { useStable } from "../src/hooks/useStable";
 import { t } from "../i18n";
 
 import { useApp, useExcalidrawSetAppState } from "./App";

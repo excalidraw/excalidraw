@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 
 import { copyTextToSystemClipboard } from "../clipboard";
-import { useCopyStatus } from "../hooks/useCopiedIndicator";
+import { useCopyStatus } from "../src/hooks/useCopiedIndicator";
 import { useI18n } from "../i18n";
 
 import { Dialog } from "./Dialog";
