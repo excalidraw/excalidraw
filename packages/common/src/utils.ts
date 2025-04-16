@@ -1,9 +1,10 @@
-import { average } from "@excalidraw/math";
+import { average, pointFrom, type GlobalPoint } from "@excalidraw/math";
 
 import type {
   ExcalidrawBindableElement,
   FontFamilyValues,
   FontString,
+  ExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type {
@@ -738,6 +739,8 @@ export const isTestEnv = () => import.meta.env.MODE === ENV.TEST;
 
 export const isDevEnv = () => import.meta.env.MODE === ENV.DEVELOPMENT;
 
+export const isProdEnv = () => import.meta.env.MODE === ENV.PRODUCTION;
+
 export const isServerEnv = () =>
   typeof process !== "undefined" && !!process?.env?.NODE_ENV;
 
@@ -1201,3 +1204,17 @@ export const escapeDoubleQuotes = (str: string) => {
 
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
+
+export const elementCenterPoint = (
+  element: ExcalidrawElement,
+  xOffset: number = 0,
+  yOffset: number = 0,
+) => {
+  const { x, y, width, height } = element;
+
+  const centerXPoint = x + width / 2 + xOffset;
+
+  const centerYPoint = y + height / 2 + yOffset;
+
+  return pointFrom<GlobalPoint>(centerXPoint, centerYPoint);
+};
