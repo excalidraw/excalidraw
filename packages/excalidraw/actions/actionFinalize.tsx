@@ -17,6 +17,12 @@ import { isPathALoop } from "@excalidraw/element/shapes";
 
 import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
 
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  NonDeleted,
+} from "@excalidraw/element/types";
+
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";
 import { done } from "../components/icons";
@@ -84,13 +90,22 @@ export const actionFinalize = register({
       focusContainer();
     }
 
-    const element = appState.multiElement
-      ? appState.multiElement
-      : appState.newElement?.type === "freedraw"
-      ? appState.newElement
-      : isBindingElement(appState.newElement)
-      ? appState.newElement
-      : null;
+    let element: NonDeleted<ExcalidrawElement> | null = null;
+    if (appState.multiElement) {
+      element = appState.multiElement;
+    } else if (
+      appState.newElement?.type === "freedraw" ||
+      isBindingElement(appState.newElement)
+    ) {
+      element = appState.newElement;
+    } else if (Object.keys(appState.selectedElementIds).length === 1) {
+      const candidate = elementsMap.get(
+        Object.keys(appState.selectedElementIds)[0],
+      ) as NonDeleted<ExcalidrawLinearElement> | undefined;
+      if (candidate) {
+        element = candidate;
+      }
+    }
 
     if (element) {
       // pen and mouse have hover
@@ -112,7 +127,7 @@ export const actionFinalize = register({
 
       if (isInvisiblySmallElement(element)) {
         // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
-        newElements = newElements.filter((el) => el.id !== element.id);
+        newElements = newElements.filter((el) => el.id !== element!.id);
       }
 
       // If the multi point line closes the loop,
