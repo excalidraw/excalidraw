@@ -23,7 +23,7 @@ import type {
   GlobalPoint,
   LineSegment,
 } from "@excalidraw/math/types";
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import { AnimatedTrail } from "../animated-trail";
 
@@ -95,7 +95,7 @@ export class EraserTrail extends AnimatedTrail {
       (el) => !el.locked,
     );
 
-    const visibleElementsMap = arrayToMap(candidateElements);
+    const candidateElementsMap = arrayToMap(candidateElements);
 
     const pathSegments = eraserPath.reduce((acc, point, index) => {
       if (index === 0) {
@@ -117,7 +117,7 @@ export class EraserTrail extends AnimatedTrail {
           element,
           this.segmentsCache,
           this.geometricShapesCache,
-          visibleElementsMap,
+          candidateElementsMap,
           this.app,
         );
 
@@ -155,7 +155,7 @@ export class EraserTrail extends AnimatedTrail {
           element,
           this.segmentsCache,
           this.geometricShapesCache,
-          visibleElementsMap,
+          candidateElementsMap,
           this.app,
         );
 
@@ -207,14 +207,14 @@ const eraserTest = (
   pathSegments: LineSegment<GlobalPoint>[],
   element: ExcalidrawElement,
   elementsSegments: ElementsSegmentsMap,
-  shapesCache = new Map<string, GeometricShape<GlobalPoint>>(),
-  visibleElementsMap = new Map<string, ExcalidrawElement>(),
+  shapesCache: Map<string, GeometricShape<GlobalPoint>>,
+  elementsMap: ElementsMap,
   app: App,
 ): boolean => {
   let shape = shapesCache.get(element.id);
 
   if (!shape) {
-    shape = getElementShape<GlobalPoint>(element, visibleElementsMap);
+    shape = getElementShape<GlobalPoint>(element, elementsMap);
     shapesCache.set(element.id, shape);
   }
 
@@ -226,7 +226,7 @@ const eraserTest = (
   let elementSegments = elementsSegments.get(element.id);
 
   if (!elementSegments) {
-    elementSegments = getElementLineSegments(element, visibleElementsMap);
+    elementSegments = getElementLineSegments(element, elementsMap);
     elementsSegments.set(element.id, elementSegments);
   }
 
