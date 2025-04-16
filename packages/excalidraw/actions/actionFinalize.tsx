@@ -148,7 +148,12 @@ export const actionFinalize = register({
         }
       }
 
-      if (isBindingElement(element) && !isLoop && element.points.length > 1) {
+      if (
+        isBindingElement(element) &&
+        !isLoop &&
+        element.points.length > 1 &&
+        !appState.selectedElementIds[element.id]
+      ) {
         const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
           element,
           -1,
