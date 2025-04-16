@@ -143,7 +143,7 @@ describe("elbow arrow routing", () => {
       elbowed: true,
     }) as ExcalidrawElbowArrowElement;
     scene.insertElement(arrow);
-    h.app.scene.mutate(arrow, {
+    h.app.scene.mutateElement(arrow, {
       points: [
         pointFrom<LocalPoint>(-45 - arrow.x, -100.1 - arrow.y),
         pointFrom<LocalPoint>(45 - arrow.x, 99.9 - arrow.y),
@@ -195,7 +195,7 @@ describe("elbow arrow routing", () => {
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);
 
-    h.app.scene.mutate(arrow, {
+    h.app.scene.mutateElement(arrow, {
       points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
     });
 

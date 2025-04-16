@@ -99,10 +99,10 @@ export class API {
 
   // eslint-disable-next-line prettier/prettier
   static updateElement = <T extends ExcalidrawElement>(
-    ...args: Parameters<typeof h.app.scene.mutate<T>>
+    ...args: Parameters<typeof h.app.scene.mutateElement<T>>
   ) => {
     act(() => {
-      h.app.scene.mutate(...args);
+      h.app.scene.mutateElement(...args);
     });
   };
 
@@ -418,7 +418,7 @@ export class API {
 
     });
 
-    h.app.scene.mutate(
+    h.app.scene.mutateElement(
       rectangle,
       {
         boundElements: [{ type: "text", id: text.id }],
@@ -452,7 +452,7 @@ export class API {
           : opts?.label?.frameId ?? null,
     });
 
-    h.app.scene.mutate(
+    h.app.scene.mutateElement(
       arrow,
       {
         boundElements: [{ type: "text", id: text.id }],

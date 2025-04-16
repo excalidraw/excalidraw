@@ -53,13 +53,13 @@ const handleDegreeChange: DragInputCallbackType<
       if (!element) {
         continue;
       }
-      scene.mutate(element, {
+      scene.mutateElement(element, {
         angle: nextAngle,
       });
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement && !isArrowElement(element)) {
-        scene.mutate(boundTextElement, { angle: nextAngle });
+        scene.mutateElement(boundTextElement, { angle: nextAngle });
       }
     }
 
@@ -87,13 +87,13 @@ const handleDegreeChange: DragInputCallbackType<
 
     const nextAngle = degreesToRadians(nextAngleInDegrees as Degrees);
 
-    scene.mutate(latestElement, {
+    scene.mutateElement(latestElement, {
       angle: nextAngle,
     });
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {
-      scene.mutate(boundTextElement, { angle: nextAngle });
+      scene.mutateElement(boundTextElement, { angle: nextAngle });
     }
   }
   scene.triggerUpdate();

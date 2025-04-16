@@ -30,7 +30,6 @@ import {
   getElementBounds,
 } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
-import { mutateElementWith } from "./mutateElement";
 import {
   getBoundTextElement,
   getBoundTextElementId,
@@ -230,13 +229,13 @@ const rotateSingleElement = (
   }
   const boundTextElementId = getBoundTextElementId(element);
 
-  scene.mutate(element, { angle });
+  scene.mutateElement(element, { angle });
   if (boundTextElementId) {
     const textElement =
       scene.getElement<ExcalidrawTextElementWithContainer>(boundTextElementId);
 
     if (textElement && !isArrowElement(element)) {
-      scene.mutate(textElement, { angle });
+      scene.mutateElement(textElement, { angle });
     }
   }
 };
@@ -391,7 +390,7 @@ const resizeSingleTextElement = (
     );
     const [nextX, nextY] = newTopLeft;
 
-    scene.mutate(element, {
+    scene.mutateElement(element, {
       fontSize: metrics.size,
       width: nextWidth,
       height: nextHeight,
@@ -506,7 +505,7 @@ const resizeSingleTextElement = (
       autoResize: false,
     };
 
-    scene.mutate(element, resizedElement);
+    scene.mutateElement(element, resizedElement);
   }
 };
 
@@ -552,7 +551,7 @@ const rotateMultipleElements = (
             angle: normalizeRadians((centerAngle + origAngle) as Radians),
           };
 
-      scene.mutate(element, updates);
+      scene.mutateElement(element, updates);
 
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: elements,
@@ -560,7 +559,7 @@ const rotateMultipleElements = (
 
       const boundText = getBoundTextElement(element, elementsMap);
       if (boundText && !isArrowElement(element)) {
-        mutateElementWith(boundText, elementsMap, {
+        scene.mutateElement(boundText, {
           x: boundText.x + (rotatedCX - cx),
           y: boundText.y + (rotatedCY - cy),
           angle: normalizeRadians((centerAngle + origAngle) as Radians),
@@ -923,7 +922,7 @@ export const resizeSingleElement = (
   }
 
   if ("scale" in latestElement && "scale" in origElement) {
-    scene.mutate(latestElement, {
+    scene.mutateElement(latestElement, {
       scale: [
         // defaulting because scaleX/Y can be 0/-0
         (Math.sign(nextWidth) || origElement.scale[0]) * origElement.scale[0],
@@ -958,8 +957,9 @@ export const resizeSingleElement = (
       ...rescaledPoints,
     };
 
-    scene.mutate(latestElement, updates, {
+    scene.mutateElement(latestElement, updates, {
       informMutation: shouldInformMutation,
+      isDragging: false,
     });
 
     updateBoundElements(latestElement, scene, {
@@ -968,7 +968,7 @@ export const resizeSingleElement = (
     });
 
     if (boundTextElement && boundTextFont != null) {
-      scene.mutate(boundTextElement, {
+      scene.mutateElement(boundTextElement, {
         fontSize: boundTextFont.fontSize,
       });
     }
@@ -1518,7 +1518,8 @@ export const resizeMultipleElements = (
     } of elementsAndUpdates) {
       const { width, height, angle } = update;
 
-      scene.mutate(element, update, {
+      scene.mutateElement(element, update, {
+        informMutation: true,
         // needed for the fixed binding point udpate to take effect
         isDragging: true,
       });
@@ -1530,7 +1531,7 @@ export const resizeMultipleElements = (
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement && boundTextFontSize) {
-        scene.mutate(boundTextElement, {
+        scene.mutateElement(boundTextElement, {
           fontSize: boundTextFontSize,
           angle: isLinearElement(element) ? undefined : angle,
         });

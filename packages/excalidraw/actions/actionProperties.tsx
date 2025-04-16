@@ -211,7 +211,7 @@ const offsetElementAfterFontResize = (
   if (isBoundToContainer(nextElement) || !nextElement.autoResize) {
     return nextElement;
   }
-  return scene.mutate(nextElement, {
+  return scene.mutateElement(nextElement, {
     x:
       prevElement.textAlign === "left"
         ? prevElement.x
@@ -915,7 +915,7 @@ export const actionChangeFontFamily = register({
 
               if (resetContainers && container && cachedContainer) {
                 // reset the container back to it's cached version
-                app.scene.mutate(container, { ...cachedContainer });
+                app.scene.mutateElement(container, { ...cachedContainer });
               }
 
               if (!skipFontFaceCheck) {

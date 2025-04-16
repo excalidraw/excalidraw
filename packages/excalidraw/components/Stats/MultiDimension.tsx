@@ -81,7 +81,7 @@ const resizeElementInGroup = (
   const elementsMap = scene.getNonDeletedElementsMap();
   const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
 
-  scene.mutate(latestElement, updates);
+  scene.mutateElement(latestElement, updates);
 
   const boundTextElement = getBoundTextElement(
     origElement,
@@ -94,7 +94,7 @@ const resizeElementInGroup = (
     });
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
     if (latestBoundTextElement && isTextElement(latestBoundTextElement)) {
-      scene.mutate(latestBoundTextElement, {
+      scene.mutateElement(latestBoundTextElement, {
         fontSize: newFontSize,
       });
       handleBindTextResize(

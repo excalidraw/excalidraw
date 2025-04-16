@@ -7,7 +7,7 @@ import {
   isPromiseLike,
 } from "@excalidraw/common";
 
-import { mutateElementWith } from "@excalidraw/element/mutateElement";
+import { mutateElement } from "@excalidraw/element/mutateElement";
 import { deepCopyElement } from "@excalidraw/element/duplicate";
 import {
   isFrameLikeElement,
@@ -172,7 +172,7 @@ export const serializeAsClipboardJSON = ({
         !framesToCopy.has(getContainingFrame(element, elementsMap)!)
       ) {
         const copiedElement = deepCopyElement(element);
-        mutateElementWith(copiedElement, elementsMap, {
+        mutateElement(copiedElement, elementsMap, {
           frameId: null,
         });
         return copiedElement;

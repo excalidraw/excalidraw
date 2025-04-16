@@ -46,7 +46,7 @@ import {
   headingForPoint,
 } from "./heading";
 import { type ElementUpdate } from "./mutateElement";
-import { isBindableElement, isElbowArrow } from "./typeChecks";
+import { isBindableElement } from "./typeChecks";
 import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
@@ -60,7 +60,6 @@ import type {
   Arrowhead,
   ElementsMap,
   ExcalidrawBindableElement,
-  ExcalidrawElement,
   FixedPointBinding,
   FixedSegment,
   NonDeletedExcalidrawElement,
@@ -878,27 +877,6 @@ const handleEndpointDrag = (
 };
 
 const MAX_POS = 1e6;
-
-export const elbowArrowNeedsToGetNormalized = (
-  element: Readonly<ExcalidrawElement>,
-  updates: {
-    points?: readonly LocalPoint[];
-    fixedSegments?: readonly FixedSegment[] | null;
-    startBinding?: FixedPointBinding | null;
-    endBinding?: FixedPointBinding | null;
-  },
-) => {
-  const { points, fixedSegments, startBinding, endBinding } = updates;
-
-  return (
-    isElbowArrow(element) &&
-    (Object.keys(updates).length === 0 || // normalization case
-      typeof points !== "undefined" || // repositioning
-      typeof fixedSegments !== "undefined" || // segment fixing
-      typeof startBinding !== "undefined" ||
-      typeof endBinding !== "undefined") // manual binding to element
-  );
-};
 
 /**
  *

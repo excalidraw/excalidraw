@@ -115,7 +115,7 @@ export const Hyperlink = ({
         setAppState({ activeEmbeddable: null });
       }
       if (!link) {
-        scene.mutate(element, {
+        scene.mutateElement(element, {
           link: null,
         });
         updateEmbedValidationStatus(element, false);
@@ -127,7 +127,7 @@ export const Hyperlink = ({
           setToast({ message: t("toast.unableToEmbed"), closable: true });
         }
         element.link && embeddableLinkCache.set(element.id, element.link);
-        scene.mutate(element, {
+        scene.mutateElement(element, {
           link,
         });
         updateEmbedValidationStatus(element, false);
@@ -145,7 +145,7 @@ export const Hyperlink = ({
           : 1;
         const hasLinkChanged =
           embeddableLinkCache.get(element.id) !== element.link;
-        scene.mutate(element, {
+        scene.mutateElement(element, {
           ...(hasLinkChanged
             ? {
                 width:
@@ -170,7 +170,7 @@ export const Hyperlink = ({
         }
       }
     } else {
-      scene.mutate(element, { link });
+      scene.mutateElement(element, { link });
     }
   }, [
     element,
@@ -231,7 +231,7 @@ export const Hyperlink = ({
 
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
-    scene.mutate(element, { link: null });
+    scene.mutateElement(element, { link: null });
     setAppState({ showHyperlinkPopup: false });
   }, [setAppState, element, scene]);
 

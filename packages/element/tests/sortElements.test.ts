@@ -35,7 +35,7 @@ describe("normalizeElementsOrder", () => {
       boundElements: [],
     });
 
-    h.app.scene.mutate(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ type: "text", id: boundText.id }],
     });
 
@@ -352,7 +352,7 @@ describe("normalizeElementsOrder", () => {
       containerId: container.id,
     });
 
-    h.app.scene.mutate(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [
         { type: "text", id: boundText.id },
         { type: "text", id: "xxx" },
@@ -387,7 +387,7 @@ describe("normalizeElementsOrder", () => {
           boundElements: [],
           groupIds: ["C", "A"],
         });
-        h.app.scene.mutate(container, {
+        h.app.scene.mutateElement(container, {
           boundElements: [{ type: "text", id: boundText.id }],
         });
 

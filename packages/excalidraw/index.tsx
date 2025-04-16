@@ -259,7 +259,6 @@ export {
 } from "@excalidraw/common";
 
 export {
-  mutateElementWith,
   mutateElement,
   newElementWith,
   bumpVersion,

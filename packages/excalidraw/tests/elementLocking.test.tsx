@@ -296,7 +296,7 @@ describe("element locking", () => {
       height: textSize,
       containerId: container.id,
     });
-    h.app.scene.mutate(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ id: text.id, type: "text" }],
     });
 
@@ -337,7 +337,7 @@ describe("element locking", () => {
       containerId: container.id,
       locked: true,
     });
-    h.app.scene.mutate(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ id: text.id, type: "text" }],
     });
     API.setElements([container, text]);
@@ -371,7 +371,7 @@ describe("element locking", () => {
       containerId: container.id,
       locked: true,
     });
-    h.app.scene.mutate(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ id: text.id, type: "text" }],
     });
     API.setElements([container, text]);

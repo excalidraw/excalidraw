@@ -20,7 +20,7 @@ import {
 import { getSelectedElements } from "@excalidraw/element/selection";
 
 import {
-  mutateElementWith,
+  mutateElement,
   type ElementUpdate,
 } from "@excalidraw/element/mutateElement";
 
@@ -424,23 +424,22 @@ class Scene {
     return getElementsInGroup(elementsMap, id);
   };
 
-  // TODO_SCENE: should be accessed as app.scene through the API
-  // TODO_SCENE: inform mutation false is the new default, meaning all mutateElement with nothing should likely use scene instead
   // Mutate an element with passed updates and trigger the component to update. Make sure you
   // are calling it either from a React event handler or within unstable_batchedUpdates().
-  mutate<TElement extends Mutable<ExcalidrawElement>>(
+  mutateElement<TElement extends Mutable<ExcalidrawElement>>(
     element: TElement,
     updates: ElementUpdate<TElement>,
     options: {
-      informMutation?: boolean;
-      isDragging?: boolean;
+      informMutation: boolean;
+      isDragging: boolean;
     } = {
       informMutation: true,
+      isDragging: false,
     },
   ) {
     const elementsMap = this.getNonDeletedElementsMap();
 
-    mutateElementWith(element, elementsMap, updates, options);
+    mutateElement(element, elementsMap, updates, options);
 
     if (options.informMutation) {
       this.triggerUpdate();

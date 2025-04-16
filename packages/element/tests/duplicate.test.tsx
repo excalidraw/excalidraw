@@ -62,7 +62,7 @@ describe("duplicating single elements", () => {
     // @ts-ignore
     element.__proto__ = { hello: "world" };
 
-    h.app.scene.mutate(element, {
+    h.app.scene.mutateElement(element, {
       points: [pointFrom<LocalPoint>(1, 2), pointFrom<LocalPoint>(3, 4)],
     });
 

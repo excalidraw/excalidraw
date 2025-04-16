@@ -199,7 +199,7 @@ export const textWysiwyg = ({
             container.type,
           );
 
-          app.scene.mutate(container, { height: targetContainerHeight });
+          app.scene.mutateElement(container, { height: targetContainerHeight });
           return;
         } else if (
           // autoshrink container height until original container height
@@ -212,7 +212,7 @@ export const textWysiwyg = ({
             height,
             container.type,
           );
-          app.scene.mutate(container, { height: targetContainerHeight });
+          app.scene.mutateElement(container, { height: targetContainerHeight });
         } else {
           const { y } = computeBoundTextPosition(
             container,
@@ -285,7 +285,7 @@ export const textWysiwyg = ({
         editable.style.fontFamily = getFontFamilyString(updatedTextElement);
       }
 
-      app.scene.mutate(updatedTextElement, { x: coordX, y: coordY });
+      app.scene.mutateElement(updatedTextElement, { x: coordX, y: coordY });
     }
   };
 
@@ -557,7 +557,7 @@ export const textWysiwyg = ({
       if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
-          app.scene.mutate(container, {
+          app.scene.mutateElement(container, {
             boundElements: (container.boundElements || []).concat({
               type: "text",
               id: element.id,
@@ -568,7 +568,7 @@ export const textWysiwyg = ({
           bumpVersion(container);
         }
       } else {
-        app.scene.mutate(container, {
+        app.scene.mutateElement(container, {
           boundElements: container.boundElements?.filter(
             (ele) =>
               !isTextElement(

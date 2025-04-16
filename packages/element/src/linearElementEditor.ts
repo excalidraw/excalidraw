@@ -47,7 +47,7 @@ import {
 } from "./bounds";
 
 import { headingIsHorizontal, vectorToHeading } from "./heading";
-import { mutateElementWith } from "./mutateElement";
+import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isBindingElement,
@@ -793,7 +793,7 @@ export class LinearElementEditor {
       );
     } else if (event.altKey && appState.editingLinearElement) {
       if (linearElementEditor.lastUncommittedPoint == null) {
-        scene.mutate(element, {
+        scene.mutateElement(element, {
           points: [
             ...element.points,
             LinearElementEditor.createPointAt(
@@ -1165,7 +1165,7 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     elementsMap: ElementsMap,
   ) {
-    mutateElementWith(
+    mutateElement(
       element,
       elementsMap,
       LinearElementEditor.getNormalizedPoints(element),
@@ -1221,7 +1221,7 @@ export class LinearElementEditor {
       return acc;
     }, []);
 
-    scene.mutate(element, { points: nextPoints });
+    scene.mutateElement(element, { points: nextPoints });
 
     // temp hack to ensure the line doesn't move when adding point to the end,
     // potentially expanding the bounding box
@@ -1442,7 +1442,7 @@ export class LinearElementEditor {
       ...element.points.slice(segmentMidpoint.index!),
     ];
 
-    scene.mutate(element, { points });
+    scene.mutateElement(element, { points });
 
     ret.pointerDownState = {
       ...linearElementEditor.pointerDownState,
@@ -1495,8 +1495,9 @@ export class LinearElementEditor {
 
       updates.points = Array.from(nextPoints);
 
-      scene.mutate(element, updates, {
-        isDragging: options?.isDragging,
+      scene.mutateElement(element, updates, {
+        informMutation: true,
+        isDragging: options?.isDragging ?? false,
       });
     } else {
       const nextCoords = getElementPointsCoords(element, nextPoints);
@@ -1512,7 +1513,7 @@ export class LinearElementEditor {
         pointFrom(dX, dY),
         element.angle,
       );
-      scene.mutate(element, {
+      scene.mutateElement(element, {
         ...otherUpdates,
         points: nextPoints,
         x: element.x + rotated[0],
@@ -1571,7 +1572,7 @@ export class LinearElementEditor {
       elementsMap,
     );
     if (points.length < 2) {
-      mutateElementWith(boundTextElement, elementsMap, { isDeleted: true });
+      mutateElement(boundTextElement, elementsMap, { isDeleted: true });
     }
     let x = 0;
     let y = 0;
@@ -1823,7 +1824,7 @@ export class LinearElementEditor {
         .map((segment) => segment.index)
         .reduce((count, idx) => (idx < index ? count + 1 : count), 0);
 
-      scene.mutate(element, {
+      scene.mutateElement(element, {
         fixedSegments: nextFixedSegments,
       });
 
@@ -1860,7 +1861,7 @@ export class LinearElementEditor {
     scene: Scene,
     index: number,
   ): void {
-    scene.mutate(element, {
+    scene.mutateElement(element, {
       fixedSegments: element.fixedSegments?.filter(
         (segment) => segment.index !== index,
       ),

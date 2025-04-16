@@ -71,7 +71,7 @@ const ElementLinkDialog = ({
     if (nextLink && nextLink !== elementsMap.get(sourceElementId)?.link) {
       const elementToLink = elementsMap.get(sourceElementId);
       elementToLink &&
-        scene.mutate(elementToLink, {
+        scene.mutateElement(elementToLink, {
           link: nextLink,
         });
     }
@@ -79,7 +79,7 @@ const ElementLinkDialog = ({
     if (!nextLink && linkEdited && sourceElementId) {
       const elementToLink = elementsMap.get(sourceElementId);
       elementToLink &&
-        scene.mutate(elementToLink, {
+        scene.mutateElement(elementToLink, {
           link: null,
         });
     }

@@ -93,7 +93,7 @@ export const redrawTextBoundingBox = (
         metrics.height,
         container.type,
       );
-      scene.mutate(container, { height: nextHeight });
+      scene.mutateElement(container, { height: nextHeight });
       updateOriginalContainerCache(container.id, nextHeight);
     }
 
@@ -102,7 +102,7 @@ export const redrawTextBoundingBox = (
         metrics.width,
         container.type,
       );
-      scene.mutate(container, { width: nextWidth });
+      scene.mutateElement(container, { width: nextWidth });
     }
 
     const updatedTextElement = {
@@ -120,7 +120,7 @@ export const redrawTextBoundingBox = (
     boundTextUpdates.y = y;
   }
 
-  scene.mutate(textElement, boundTextUpdates);
+  scene.mutateElement(textElement, boundTextUpdates);
 };
 
 export const handleBindTextResize = (
@@ -182,20 +182,20 @@ export const handleBindTextResize = (
           transformHandleType === "n")
           ? container.y - diff
           : container.y;
-      scene.mutate(container, {
+      scene.mutateElement(container, {
         height: containerHeight,
         y: updatedY,
       });
     }
 
-    scene.mutate(textElement, {
+    scene.mutateElement(textElement, {
       text,
       width: nextWidth,
       height: nextHeight,
     });
 
     if (!isArrowElement(container)) {
-      scene.mutate(
+      scene.mutateElement(
         textElement,
         computeBoundTextPosition(container, textElement, elementsMap),
       );

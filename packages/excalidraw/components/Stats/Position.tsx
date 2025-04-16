@@ -100,7 +100,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
         };
       }
 
-      scene.mutate(element, {
+      scene.mutateElement(element, {
         crop: nextCrop,
       });
 
@@ -118,7 +118,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       y: clamp(crop.y + changeInY, 0, crop.naturalHeight - crop.height),
     };
 
-    scene.mutate(element, {
+    scene.mutateElement(element, {
       crop: nextCrop,
     });
 

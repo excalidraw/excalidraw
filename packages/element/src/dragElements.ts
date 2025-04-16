@@ -168,7 +168,7 @@ const updateElementCoords = (
   const nextX = originalElement.x + dragOffset.x;
   const nextY = originalElement.y + dragOffset.y;
 
-  scene.mutate(element, {
+  scene.mutateElement(element, {
     x: nextX,
     y: nextY,
   });
@@ -292,7 +292,7 @@ export const dragNewElement = ({
       };
     }
 
-    scene.mutate(
+    scene.mutateElement(
       newElement,
       {
         x: newX + (originOffset?.x ?? 0),
@@ -302,7 +302,7 @@ export const dragNewElement = ({
         ...textAutoResize,
         ...imageInitialDimension,
       },
-      { informMutation },
+      { informMutation, isDragging: false },
     );
   }
 };

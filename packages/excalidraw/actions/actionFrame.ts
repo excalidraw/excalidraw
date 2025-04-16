@@ -1,5 +1,5 @@
 import { getNonDeletedElements } from "@excalidraw/element";
-import { mutateElementWith } from "@excalidraw/element/mutateElement";
+import { mutateElement } from "@excalidraw/element/mutateElement";
 import { newFrameElement } from "@excalidraw/element/newElement";
 import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
 import {
@@ -194,7 +194,7 @@ export const actionWrapSelectionInFrame = register({
       for (const elementInGroup of elementsInGroup) {
         const index = elementInGroup.groupIds.indexOf(appState.editingGroupId);
 
-        mutateElementWith(elementInGroup, elementsMap, {
+        mutateElement(elementInGroup, elementsMap, {
           groupIds: elementInGroup.groupIds.slice(0, index),
         });
       }

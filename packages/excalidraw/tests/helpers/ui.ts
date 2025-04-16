@@ -518,7 +518,7 @@ export class UI {
 
     if (angle !== 0) {
       act(() => {
-        h.app.scene.mutate(origElement, { angle });
+        h.app.scene.mutateElement(origElement, { angle });
       });
     }
 

@@ -10,12 +10,12 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { ShapeCache } from "./ShapeCache";
 
-import {
-  elbowArrowNeedsToGetNormalized,
-  updateElbowArrowPoints,
-} from "./elbowArrow";
+import { updateElbowArrowPoints } from "./elbowArrow";
+
+import { isElbowArrow } from "./typeChecks";
 
 import type {
+  ElementsMap,
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -26,24 +26,38 @@ export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   "id" | "version" | "versionNonce" | "updated"
 >;
 
-// This function tracks updates of text elements for the purposes for collaboration.
-// The version is used to compare updates when more than one user is working in
-// the same drawing. Note: this won't trigger the component to update, unlike `scene.mutate`.
-export const mutateElementWith = <TElement extends Mutable<ExcalidrawElement>>(
+/**
+ * This function tracks updates of text elements for the purposes for collaboration.
+ * The version is used to compare updates when more than one user is working in
+ * the same drawing.
+ *
+ * WARNING: this won't trigger the component to update, so if you need to trigger component update,
+ * use `scene.mutateElement` or `ExcalidrawImperativeAPI.mutateElement` instead.
+ */
+export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
-  elementsMap: Map<string, ExcalidrawElement>,
+  elementsMap: ElementsMap,
   updates: ElementUpdate<TElement>,
   options?: {
     isDragging?: boolean;
   },
 ) => {
+  let didChange = false;
+
+  // casting to any because can't use `in` operator
+  // (see https://github.com/microsoft/TypeScript/issues/21732)
+  const { points, fixedSegments, startBinding, endBinding, fileId } =
+    updates as any;
+
   if (
-    elbowArrowNeedsToGetNormalized(
-      element,
-      updates as ElementUpdate<ExcalidrawElbowArrowElement>,
-    )
+    isElbowArrow(element) &&
+    (Object.keys(updates).length === 0 || // normalization case
+      typeof points !== "undefined" || // repositioning
+      typeof fixedSegments !== "undefined" || // segment fixing
+      typeof startBinding !== "undefined" ||
+      typeof endBinding !== "undefined") // manual binding to element
   ) {
-    const normalizedUpdates = {
+    updates = {
       ...updates,
       angle: 0 as Radians,
       ...updateElbowArrowPoints(
@@ -52,35 +66,8 @@ export const mutateElementWith = <TElement extends Mutable<ExcalidrawElement>>(
         updates as ElementUpdate<ExcalidrawElbowArrowElement>,
         options,
       ),
-    } as ElementUpdate<ExcalidrawElbowArrowElement>;
-
-    return mutateElement(
-      element as ExcalidrawElbowArrowElement,
-      normalizedUpdates,
-    );
-  }
-
-  return mutateElement(element, updates);
-};
-
-/**
- * This function tracks updates of text elements for the purposes for collaboration.
- * The version is used to compare updates when more than one user is working in
- * the same drawing.
- *
- * @deprecated Use `scene.mutate` as direct equivalent, or  `mutateElementWith` in case you don't need to trigger component update.
- */
-export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
-  element: TElement,
-  updates: ElementUpdate<TElement>,
-): TElement => {
-  let didChange = false;
-
-  // casting to any because can't use `in` operator
-  // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { points, fileId } = updates as any;
-
-  if (typeof points !== "undefined") {
+    };
+  } else if (typeof points !== "undefined") {
     updates = { ...getSizeFromPoints(points), ...updates };
   }
 

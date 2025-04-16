@@ -478,7 +478,7 @@ describe("stats for a non-generic element", () => {
       containerId: container.id,
       fontSize: 20,
     });
-    h.app.scene.mutate(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ type: "text", id: text.id }],
     });
     API.setElements([container, text]);

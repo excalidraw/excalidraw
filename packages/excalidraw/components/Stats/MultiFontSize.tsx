@@ -84,7 +84,7 @@ const handleFontSizeChange: DragInputCallbackType<
     nextFontSize = Math.max(Math.round(nextValue), MIN_FONT_SIZE);
 
     for (const textElement of latestTextElements) {
-      scene.mutate(textElement, {
+      scene.mutateElement(textElement, {
         fontSize: nextFontSize,
       });
 
@@ -112,7 +112,7 @@ const handleFontSizeChange: DragInputCallbackType<
       if (shouldChangeByStepSize) {
         nextFontSize = getStepSizedValue(nextFontSize, STEP_SIZE);
       }
-      scene.mutate(latestElement, {
+      scene.mutateElement(latestElement, {
         fontSize: nextFontSize,
       });
 

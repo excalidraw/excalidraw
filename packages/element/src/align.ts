@@ -32,7 +32,7 @@ export const alignElements = (
     );
     return group.map((element) => {
       // update element
-      const updatedEle = scene.mutate(element, {
+      const updatedEle = scene.mutateElement(element, {
         x: element.x + translation.x,
         y: element.y + translation.y,
       });

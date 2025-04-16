@@ -76,7 +76,7 @@ export const actionUnbindText = register({
           boundTextElement,
           elementsMap,
         );
-        app.scene.mutate(boundTextElement as ExcalidrawTextElement, {
+        app.scene.mutateElement(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
           width,
           height,
@@ -84,7 +84,7 @@ export const actionUnbindText = register({
           x,
           y,
         });
-        app.scene.mutate(element, {
+        app.scene.mutateElement(element, {
           boundElements: element.boundElements?.filter(
             (ele) => ele.id !== boundTextElement.id,
           ),
@@ -149,13 +149,13 @@ export const actionBindText = register({
       textElement = selectedElements[1] as ExcalidrawTextElement;
       container = selectedElements[0] as ExcalidrawTextContainer;
     }
-    app.scene.mutate(textElement, {
+    app.scene.mutateElement(textElement, {
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
       textAlign: TEXT_ALIGN.CENTER,
       autoResize: true,
     });
-    app.scene.mutate(container, {
+    app.scene.mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
         type: "text",
         id: textElement.id,
@@ -292,7 +292,7 @@ export const actionWrapTextInContainer = register({
             }
 
             if (startBinding || endBinding) {
-              app.scene.mutate(ele, {
+              app.scene.mutateElement(ele, {
                 startBinding,
                 endBinding,
               });
@@ -300,7 +300,7 @@ export const actionWrapTextInContainer = register({
           });
         }
 
-        app.scene.mutate(textElement, {
+        app.scene.mutateElement(textElement, {
           containerId: container.id,
           verticalAlign: VERTICAL_ALIGN.MIDDLE,
           boundElements: null,

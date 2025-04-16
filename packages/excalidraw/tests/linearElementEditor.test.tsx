@@ -118,7 +118,7 @@ describe("Test Linear Elements", () => {
       ],
       roundness,
     });
-    h.app.scene.mutate(line, { points: line.points });
+    h.app.scene.mutateElement(line, { points: line.points });
     API.setElements([line]);
     mouse.clickAt(p1[0], p1[1]);
     return line;

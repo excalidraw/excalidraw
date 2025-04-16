@@ -91,7 +91,7 @@ const deleteSelectedElements = (
         el.boundElements.forEach((candidate) => {
           const bound = app.scene.getNonDeletedElementsMap().get(candidate.id);
           if (bound && isElbowArrow(bound)) {
-            app.scene.mutate(bound, {
+            app.scene.mutateElement(bound, {
               startBinding:
                 el.id === bound.startBinding?.elementId
                   ? null

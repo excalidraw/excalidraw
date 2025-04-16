@@ -146,13 +146,13 @@ export const moveElement = (
     -originalElement.angle as Radians,
   );
 
-  scene.mutate(
+  scene.mutateElement(
     latestElement,
     {
       x,
       y,
     },
-    { informMutation: shouldInformMutation },
+    { informMutation: shouldInformMutation, isDragging: false },
   );
   updateBindings(latestElement, scene);
 
@@ -163,13 +163,13 @@ export const moveElement = (
   if (boundTextElement) {
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
     latestBoundTextElement &&
-      scene.mutate(
+      scene.mutateElement(
         latestBoundTextElement,
         {
           x: boundTextElement.x + changeInX,
           y: boundTextElement.y + changeInY,
         },
-        { informMutation: shouldInformMutation },
+        { informMutation: shouldInformMutation, isDragging: false },
       );
   }
 };

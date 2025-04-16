@@ -113,7 +113,7 @@ const handleDimensionChange: DragInputCallbackType<
           };
         }
 
-        scene.mutate(element, {
+        scene.mutateElement(element, {
           crop: nextCrop,
           width: nextCrop.width / (crop.naturalWidth / uncroppedWidth),
           height: nextCrop.height / (crop.naturalHeight / uncroppedHeight),
@@ -144,7 +144,7 @@ const handleDimensionChange: DragInputCallbackType<
         height: nextCropHeight,
       };
 
-      scene.mutate(element, {
+      scene.mutateElement(element, {
         crop: nextCrop,
         width: nextCrop.width / (crop.naturalWidth / uncroppedWidth),
         height: nextCrop.height / (crop.naturalHeight / uncroppedHeight),

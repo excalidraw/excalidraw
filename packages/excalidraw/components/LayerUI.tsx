@@ -10,7 +10,7 @@ import {
   isShallowEqual,
 } from "@excalidraw/common";
 
-import { mutateElementWith } from "@excalidraw/element/mutateElement";
+import { mutateElement } from "@excalidraw/element/mutateElement";
 
 import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeActions";
 
@@ -446,7 +446,7 @@ const LayerUI = ({
 
             if (selectedElements.length) {
               for (const element of selectedElements) {
-                mutateElementWith(element, arrayToMap(elements), {
+                mutateElement(element, arrayToMap(elements), {
                   [altKey && eyeDropperState.swapPreviewOnAlt
                     ? colorPickerType === "elementBackground"
                       ? "strokeColor"

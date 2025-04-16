@@ -15,7 +15,7 @@ import {
 } from "@excalidraw/element/binding";
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import {
-  mutateElementWith,
+  mutateElement,
   newElementWith,
 } from "@excalidraw/element/mutateElement";
 import {
@@ -1344,7 +1344,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
           updates as ElementUpdate<OrderedExcalidrawElement>,
         );
       } else {
-        affectedElement = mutateElementWith(
+        affectedElement = mutateElement(
           nextElement,
           nextElements,
           updates as ElementUpdate<OrderedExcalidrawElement>,

@@ -189,13 +189,13 @@ const flipElements = (
     getCommonBoundingBox(selectedElements);
   const [diffX, diffY] = [midX - newMidX, midY - newMidY];
   otherElements.forEach((element) =>
-    app.scene.mutate(element, {
+    app.scene.mutateElement(element, {
       x: element.x + diffX,
       y: element.y + diffY,
     }),
   );
   elbowArrows.forEach((element) =>
-    app.scene.mutate(element, {
+    app.scene.mutateElement(element, {
       x: element.x + diffX,
       y: element.y + diffY,
     }),

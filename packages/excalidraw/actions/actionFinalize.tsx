@@ -71,10 +71,10 @@ export const actionFinalize = register({
       scene.getElement(appState.pendingImageElementId);
 
     if (pendingImageElement) {
-      scene.mutate(
+      scene.mutateElement(
         pendingImageElement,
         { isDeleted: true },
-        { informMutation: false },
+        { informMutation: false, isDragging: false },
       );
     }
 
@@ -99,7 +99,7 @@ export const actionFinalize = register({
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
         ) {
-          scene.mutate(multiPointElement, {
+          scene.mutateElement(multiPointElement, {
             points: multiPointElement.points.slice(0, -1),
           });
         }
@@ -123,7 +123,7 @@ export const actionFinalize = register({
         if (isLoop) {
           const linePoints = multiPointElement.points;
           const firstPoint = linePoints[0];
-          scene.mutate(multiPointElement, {
+          scene.mutateElement(multiPointElement, {
             points: linePoints.map((p, index) =>
               index === linePoints.length - 1
                 ? pointFrom(firstPoint[0], firstPoint[1])
