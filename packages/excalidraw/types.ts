@@ -204,6 +204,7 @@ export type StaticCanvasAppState = Readonly<
     frameRendering: AppState["frameRendering"];
     linkOpacity: AppState["linkOpacity"]; //zsviczian
     gridColor: AppState["gridColor"]; //zsviczian
+    gridDirection: AppState["gridDirection"]; //zsviczian
     frameColor: AppState["frameColor"]; //zsviczian
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
     hoveredElementIds: AppState["hoveredElementIds"];
@@ -232,6 +233,7 @@ export type InteractiveCanvasAppState = Readonly<
     zenModeEnabled: AppState["zenModeEnabled"];
     editingTextElement: AppState["editingTextElement"];
     gridColor: AppState["gridColor"]; //zsviczian
+    gridDirection: AppState["gridDirection"]; //zsviczian
     highlightSearchResult: AppState["highlightSearchResult"]; //zsviczian
     // Cropping
     isCropping: AppState["isCropping"];
@@ -438,6 +440,7 @@ export interface AppState {
   currentStrokeOptions?: any; //zsviczian
   resetCustomPen?: any; //zsviczian
   gridColor: { Bold: string; Regular: string }; //zsviczian
+  gridDirection: { horizontal: boolean; vertical: boolean }; //zsviczian
   highlightSearchResult: boolean; //zsviczian
   dynamicStyle: { [x: string]: string }; //zsviczian
   frameColor: { stroke: string; fill: string; nameColor: string }; //zsviczian

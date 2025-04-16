@@ -37,7 +37,7 @@ import type {
 } from "../scene/types";
 import type { StaticCanvasAppState, Zoom } from "../types";
 
-/*const GridLineColor = {
+/*const gridLineColor = {
   Bold: "#dddddd",
   Regular: "#e5e5e5",
 } as const;*/ //zsviczian
@@ -53,7 +53,8 @@ const strokeGrid = (
   zoom: Zoom,
   width: number,
   height: number,
-  GridLineColor: { Bold: string; Regular: string }, //zsviczian
+  gridLineColor: { Bold: string; Regular: string }, //zsviczian
+  gridDirection: { horizontal: boolean; vertical: boolean } = { horizontal: true, vertical: true }, //zsviczian
 ) => {
   const offsetX = (scrollX % gridSize) - gridSize;
   const offsetY = (scrollY % gridSize) - gridSize;
@@ -73,43 +74,47 @@ const strokeGrid = (
   }
 
   // vertical lines
-  for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
-    const isBold =
-      gridStep > 1 && Math.round(x - scrollX) % (gridStep * gridSize) === 0;
-    // don't render regular lines when zoomed out and they're barely visible
-    if (!isBold && actualGridSize < 10) {
-      continue;
+  if (gridDirection.vertical) { //zsviczian
+    for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+      const isBold =
+        gridStep > 1 && Math.round(x - scrollX) % (gridStep * gridSize) === 0;
+      // don't render regular lines when zoomed out and they're barely visible
+      if (!isBold && actualGridSize < 10) {
+        continue;
+      }
+
+      const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
+      context.lineWidth = lineWidth;
+      const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
+
+      context.beginPath();
+      context.setLineDash(isBold ? [] : lineDash);
+      context.strokeStyle = isBold ? gridLineColor.Bold : gridLineColor.Regular;
+      context.moveTo(x, offsetY - gridSize);
+      context.lineTo(x, Math.ceil(offsetY + height + gridSize * 2));
+      context.stroke();
     }
-
-    const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
-    context.lineWidth = lineWidth;
-    const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
-
-    context.beginPath();
-    context.setLineDash(isBold ? [] : lineDash);
-    context.strokeStyle = isBold ? GridLineColor.Bold : GridLineColor.Regular;
-    context.moveTo(x, offsetY - gridSize);
-    context.lineTo(x, Math.ceil(offsetY + height + gridSize * 2));
-    context.stroke();
   }
 
-  for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
-    const isBold =
-      gridStep > 1 && Math.round(y - scrollY) % (gridStep * gridSize) === 0;
-    if (!isBold && actualGridSize < 10) {
-      continue;
+  if(gridDirection.horizontal) { //zsviczian
+    for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
+      const isBold =
+        gridStep > 1 && Math.round(y - scrollY) % (gridStep * gridSize) === 0;
+      if (!isBold && actualGridSize < 10) {
+        continue;
+      }
+
+      const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
+      context.lineWidth = lineWidth;
+      const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
+
+      context.beginPath();
+      context.setLineDash(isBold ? [] : lineDash);
+      context.strokeStyle = isBold ? gridLineColor.Bold : gridLineColor.Regular;
+      context.moveTo(offsetX - gridSize, y);
+      context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
+      context.stroke();
     }
-
-    const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
-    context.lineWidth = lineWidth;
-    const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
-
-    context.beginPath();
-    context.setLineDash(isBold ? [] : lineDash);
-    context.strokeStyle = isBold ? GridLineColor.Bold : GridLineColor.Regular;
-    context.moveTo(offsetX - gridSize, y);
-    context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
-    context.stroke();
   }
   context.restore();
 };
@@ -263,6 +268,7 @@ const _renderStaticScene = ({
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
       appState.gridColor, //zsviczian
+      appState.gridDirection, //zsviczian
     );
   }
 

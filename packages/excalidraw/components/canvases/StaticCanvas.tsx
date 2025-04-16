@@ -115,6 +115,7 @@ const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
     croppingElementId: appState.croppingElementId,
     linkOpacity: appState.linkOpacity, //zsviczian
     gridColor: appState.gridColor, //zsviczian
+    gridDirection: appState.gridDirection, //zsviczian
     frameColor: appState.frameColor, //zsviczian
   };
 
