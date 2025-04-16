@@ -758,6 +758,9 @@ export type PointerDownState = Readonly<{
     hasOccurred: boolean;
     // Might change during the pointer interaction
     offset: { x: number; y: number } | null;
+    // by default same as PointerDownState.origin. On alt-duplication, reset
+    // to current pointer position at time of duplication.
+    origin: { x: number; y: number };
   };
   // We need to have these in the state so that we can unsubscribe them
   eventListeners: {

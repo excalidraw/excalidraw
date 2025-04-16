@@ -67,7 +67,7 @@ describe("duplicating single elements", () => {
       points: [pointFrom<LocalPoint>(1, 2), pointFrom<LocalPoint>(3, 4)],
     });
 
-    const copy = duplicateElement(null, new Map(), element, undefined, true);
+    const copy = duplicateElement(null, new Map(), element, true);
 
     assertCloneObjects(element, copy);
 
@@ -173,7 +173,7 @@ describe("duplicating multiple elements", () => {
     // -------------------------------------------------------------------------
 
     const origElements = [rectangle1, text1, arrow1, arrow2, text2] as const;
-    const { newElements: clonedElements } = duplicateElements({
+    const { duplicatedElements } = duplicateElements({
       type: "everything",
       elements: origElements,
     });
@@ -181,10 +181,10 @@ describe("duplicating multiple elements", () => {
     // generic id in-equality checks
     // --------------------------------------------------------------------------
     expect(origElements.map((e) => e.type)).toEqual(
-      clonedElements.map((e) => e.type),
+      duplicatedElements.map((e) => e.type),
     );
     origElements.forEach((origElement, idx) => {
-      const clonedElement = clonedElements[idx];
+      const clonedElement = duplicatedElements[idx];
       expect(origElement).toEqual(
         expect.objectContaining({
           id: expect.not.stringMatching(clonedElement.id),
@@ -217,12 +217,12 @@ describe("duplicating multiple elements", () => {
     });
     // --------------------------------------------------------------------------
 
-    const clonedArrows = clonedElements.filter(
+    const clonedArrows = duplicatedElements.filter(
       (e) => e.type === "arrow",
     ) as ExcalidrawLinearElement[];
 
     const [clonedRectangle, clonedText1, , clonedArrow2, clonedArrowLabel] =
-      clonedElements as any as typeof origElements;
+      duplicatedElements as any as typeof origElements;
 
     expect(clonedText1.containerId).toBe(clonedRectangle.id);
     expect(
@@ -327,10 +327,10 @@ describe("duplicating multiple elements", () => {
     // -------------------------------------------------------------------------
 
     const origElements = [rectangle1, text1, arrow1, arrow2, arrow3] as const;
-    const { newElements: clonedElements } = duplicateElements({
+    const duplicatedElements = duplicateElements({
       type: "everything",
       elements: origElements,
-    }) as any as { newElements: typeof origElements };
+    }).duplicatedElements as any as typeof origElements;
 
     const [
       clonedRectangle,
@@ -338,7 +338,7 @@ describe("duplicating multiple elements", () => {
       clonedArrow1,
       clonedArrow2,
       clonedArrow3,
-    ] = clonedElements;
+    ] = duplicatedElements;
 
     expect(clonedRectangle.boundElements).toEqual([
       { id: clonedArrow1.id, type: "arrow" },
@@ -374,12 +374,12 @@ describe("duplicating multiple elements", () => {
       });
 
       const origElements = [rectangle1, rectangle2, rectangle3] as const;
-      const { newElements: clonedElements } = duplicateElements({
+      const { duplicatedElements } = duplicateElements({
         type: "everything",
         elements: origElements,
-      }) as any as { newElements: typeof origElements };
+      });
       const [clonedRectangle1, clonedRectangle2, clonedRectangle3] =
-        clonedElements;
+        duplicatedElements;
 
       expect(rectangle1.groupIds[0]).not.toBe(clonedRectangle1.groupIds[0]);
       expect(rectangle2.groupIds[0]).not.toBe(clonedRectangle2.groupIds[0]);
@@ -399,7 +399,7 @@ describe("duplicating multiple elements", () => {
       });
 
       const {
-        newElements: [clonedRectangle1],
+        duplicatedElements: [clonedRectangle1],
       } = duplicateElements({ type: "everything", elements: [rectangle1] });
 
       expect(typeof clonedRectangle1.groupIds[0]).toBe("string");
@@ -503,8 +503,8 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: rectangle1.id },
-      { id: rectangle1.id, selected: true },
+      { id: rectangle1.id },
+      { [ORIG_ID]: rectangle1.id, selected: true },
       { id: rectangle2.id },
       { id: rectangle3.id },
     ]);
@@ -538,8 +538,8 @@ describe("duplication z-order", () => {
     assertElements(h.elements, [
       { id: rectangle1.id },
       { id: rectangle2.id },
-      { [ORIG_ID]: rectangle3.id },
-      { id: rectangle3.id, selected: true },
+      { id: rectangle3.id },
+      { [ORIG_ID]: rectangle3.id, selected: true },
     ]);
   });
 
@@ -569,8 +569,8 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: rectangle1.id },
-      { id: rectangle1.id, selected: true },
+      { id: rectangle1.id },
+      { [ORIG_ID]: rectangle1.id, selected: true },
       { id: rectangle2.id },
       { id: rectangle3.id },
     ]);
@@ -605,12 +605,12 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: rectangle1.id },
-      { [ORIG_ID]: rectangle2.id },
-      { [ORIG_ID]: rectangle3.id },
-      { id: rectangle1.id, selected: true },
-      { id: rectangle2.id, selected: true },
-      { id: rectangle3.id, selected: true },
+      { id: rectangle1.id },
+      { id: rectangle2.id },
+      { id: rectangle3.id },
+      { [ORIG_ID]: rectangle1.id, selected: true },
+      { [ORIG_ID]: rectangle2.id, selected: true },
+      { [ORIG_ID]: rectangle3.id, selected: true },
     ]);
   });
 
@@ -625,13 +625,14 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: rectangle.id },
+      { id: rectangle.id },
+      { id: text.id, containerId: rectangle.id },
+      { [ORIG_ID]: rectangle.id, selected: true },
       {
         [ORIG_ID]: text.id,
         containerId: getCloneByOrigId(rectangle.id)?.id,
+        selected: true,
       },
-      { id: rectangle.id, selected: true },
-      { id: text.id, containerId: rectangle.id, selected: true },
     ]);
   });
 
@@ -646,13 +647,14 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: rectangle.id },
+      { id: rectangle.id },
+      { id: text.id, containerId: rectangle.id },
+      { [ORIG_ID]: rectangle.id, selected: true },
       {
         [ORIG_ID]: text.id,
         containerId: getCloneByOrigId(rectangle.id)?.id,
+        selected: true,
       },
-      { id: rectangle.id, selected: true },
-      { id: text.id, containerId: rectangle.id, selected: true },
     ]);
   });
 
@@ -668,13 +670,14 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: arrow.id },
+      { id: arrow.id },
+      { id: text.id, containerId: arrow.id },
+      { [ORIG_ID]: arrow.id, selected: true },
       {
         [ORIG_ID]: text.id,
         containerId: getCloneByOrigId(arrow.id)?.id,
+        selected: true,
       },
-      { id: arrow.id, selected: true },
-      { id: text.id, containerId: arrow.id, selected: true },
     ]);
   });
 
@@ -690,13 +693,14 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: arrow.id },
+      { id: arrow.id },
+      { id: text.id, containerId: arrow.id },
+      { [ORIG_ID]: arrow.id, selected: true },
       {
         [ORIG_ID]: text.id,
         containerId: getCloneByOrigId(arrow.id)?.id,
+        selected: true,
       },
-      { id: arrow.id, selected: true },
-      { id: text.id, containerId: arrow.id, selected: true },
     ]);
   });
 
