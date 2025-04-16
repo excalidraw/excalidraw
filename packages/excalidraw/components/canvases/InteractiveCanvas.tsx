@@ -143,7 +143,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           remotePointerUsernames,
           remotePointerUserStates,
           selectionColor,
-          renderScrollbars: false,
+          renderScrollbars: props.appState.renderScrollbars,
         },
         device: props.device,
         callback: props.renderInteractiveSceneCallback,
@@ -214,6 +214,7 @@ const getRelevantAppStateProps = (
   isCropping: appState.isCropping,
   croppingElementId: appState.croppingElementId,
   searchMatches: appState.searchMatches,
+  renderScrollbars: appState.renderScrollbars,
 });
 
 const areEqual = (
