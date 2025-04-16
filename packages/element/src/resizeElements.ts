@@ -1378,8 +1378,21 @@ export const resizeMultipleElements = (
       );
 
     if (keepAspectRatio) {
-      scaleX = scale;
-      scaleY = scale;
+      // If the elements are in a group and shouldMaintainAspectRatio is true(meaning user is holding shift),
+      // we need to adjust the scaleX or scaleY based on the handleDirection
+      if(targetElements.some(item => isInGroup(item.latest)) && shouldMaintainAspectRatio) {
+        if(handleDirection.length === 1) {
+          if(handleDirection.includes("e") || handleDirection.includes("w")) {
+            scaleX = scale;
+          } else if (handleDirection.includes("n") || handleDirection.includes("s")) {
+            scaleY = scale;
+          }
+        }
+      }
+      else {
+        scaleX = scale;
+        scaleY = scale;
+      }
     }
 
     /**
