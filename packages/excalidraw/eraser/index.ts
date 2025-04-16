@@ -91,7 +91,11 @@ export class EraserTrail extends AnimatedTrail {
     // take only POINTS_ON_TRAIL points to form some number of segments
     eraserPath = eraserPath?.slice(eraserPath.length - POINTS_ON_TRAIL);
 
-    const visibleElementsMap = arrayToMap(this.app.visibleElements);
+    const candidateElements = this.app.visibleElements.filter(
+      (el) => !el.locked,
+    );
+
+    const visibleElementsMap = arrayToMap(candidateElements);
 
     const pathSegments = eraserPath.reduce((acc, point, index) => {
       if (index === 0) {
@@ -105,7 +109,7 @@ export class EraserTrail extends AnimatedTrail {
       return [];
     }
 
-    for (const element of this.app.visibleElements) {
+    for (const element of candidateElements) {
       // restore only if already added to the to-be-erased set
       if (restoreToErase && this.elementsToErase.has(element.id)) {
         const intersects = eraserTest(
