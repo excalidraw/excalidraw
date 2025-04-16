@@ -25,7 +25,7 @@
       "development": "./dist/dev/index.css",
       "production": "./dist/prod/index.css"
     },
-    ".": {
+    "./src": {
       "types": "./dist/types/excalidraw/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
