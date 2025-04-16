@@ -23,18 +23,7 @@ const getConfig = (outdir) => ({
   splitting: true,
   format: "esm",
   packages: "external",
-  plugins: [
-    sassPlugin({
-      // filter deprecation warnings
-      logger: {
-        warn: (message, { deprecation }) => {
-          if (!deprecation) {
-            console.warn(message);
-          }
-        },
-      },
-    }),
-  ],
+  plugins: [sassPlugin()],
   target: "es2020",
   assetNames: "[dir]/[name]",
   chunkNames: "[dir]/[name]-[hash]",
