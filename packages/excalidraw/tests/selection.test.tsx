@@ -256,7 +256,7 @@ describe("selection element", () => {
     fireEvent.pointerMove(canvas, { clientX: 150, clientY: 30 });
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(4);
-    expect(renderStaticScene).toHaveBeenCalledTimes(3);
+    expect(renderStaticScene).toHaveBeenCalledTimes(4);
     const selectionElement = h.state.selectionElement!;
     expect(selectionElement).not.toBeNull();
     expect(selectionElement.type).toEqual("selection");
@@ -279,7 +279,7 @@ describe("selection element", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
-    expect(renderStaticScene).toHaveBeenCalledTimes(3);
+    expect(renderStaticScene).toHaveBeenCalledTimes(4);
     expect(h.state.selectionElement).toBeNull();
   });
 });

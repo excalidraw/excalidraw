@@ -166,8 +166,6 @@ describe("duplicate element on move when ALT is clicked", () => {
     fireEvent.pointerMove(canvas, { clientX: 10, clientY: 60 });
     fireEvent.pointerUp(canvas);
 
-    // TODO: This used to be 4, but binding made it go up to 5. Do we need
-    // that additional render?
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`4`);
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`3`);
     expect(h.state.selectionElement).toBeNull();

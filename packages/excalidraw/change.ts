@@ -1136,14 +1136,6 @@ export class ElementsChange implements Change<SceneElementsMap> {
     }
 
     try {
-      // we don't have an up-to-date scene, as we can be just in the middle of applying history entry
-      // we also don't have a scene on the server
-      // so we are creating a temp scene just to query and mutate elements
-      const tempScene = new Scene(nextElements);
-
-      // TODO: #7348 refactor away mutations below, so that we couldn't end up in an incosistent state
-      ElementsChange.redrawTextBoundingBoxes(tempScene, changedElements);
-
       // the following reorder performs also mutations, but only on new instances of changed elements
       // (unless something goes really bad and it fallbacks to fixing all invalid indices)
       nextElements = ElementsChange.reorderElements(
@@ -1152,6 +1144,12 @@ export class ElementsChange implements Change<SceneElementsMap> {
         flags,
       );
 
+      // we don't have an up-to-date scene, as we can be just in the middle of applying history entry
+      // we also don't have a scene on the server
+      // so we are creating a temp scene just to query and mutate elements
+      const tempScene = new Scene(nextElements);
+
+      ElementsChange.redrawTextBoundingBoxes(tempScene, changedElements);
       // Need ordered nextElements to avoid z-index binding issues
       ElementsChange.redrawBoundArrows(tempScene, changedElements);
     } catch (e) {

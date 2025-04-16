@@ -156,6 +156,7 @@ export const syncMovedIndices = (
   movedElements: ElementsMap,
 ): OrderedExcalidrawElement[] => {
   try {
+    const elementsMap = arrayToMap(elements);
     const indicesGroups = getMovedIndicesGroups(elements, movedElements);
 
     // try generatating indices, throws on invalid movedElements
@@ -177,7 +178,7 @@ export const syncMovedIndices = (
 
     // split mutation so we don't end up in an incosistent state
     for (const [element, update] of elementsUpdates) {
-      mutateElement(element, arrayToMap(elements), update);
+      mutateElement(element, elementsMap, update);
     }
   } catch (e) {
     // fallback to default sync
@@ -195,10 +196,12 @@ export const syncMovedIndices = (
 export const syncInvalidIndices = (
   elements: readonly ExcalidrawElement[],
 ): OrderedExcalidrawElement[] => {
+  const elementsMap = arrayToMap(elements);
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
+
   for (const [element, update] of elementsUpdates) {
-    mutateElement(element, arrayToMap(elements), update);
+    mutateElement(element, elementsMap, update);
   }
 
   return elements as OrderedExcalidrawElement[];

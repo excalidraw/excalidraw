@@ -1,5 +1,7 @@
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
+import { mutateElement } from "@excalidraw/element/mutateElement";
+
 import { normalizeElementOrder } from "../src/sortElements";
 
 import type { ExcalidrawElement } from "../src/types";
@@ -35,7 +37,7 @@ describe("normalizeElementsOrder", () => {
       boundElements: [],
     });
 
-    h.app.scene.mutateElement(container, {
+    mutateElement(container, new Map(), {
       boundElements: [{ type: "text", id: boundText.id }],
     });
 

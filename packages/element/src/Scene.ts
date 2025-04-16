@@ -12,6 +12,7 @@ import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
 import { getElementsInGroup } from "@excalidraw/element/groups";
 
 import {
+  orderByFractionalIndex,
   syncInvalidIndices,
   syncMovedIndices,
   validateFractionalIndices,
@@ -34,7 +35,6 @@ import type {
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   Ordered,
-  ElementsMap,
 } from "@excalidraw/element/types";
 
 import type {
@@ -167,9 +167,9 @@ class Scene {
     return this.frames;
   }
 
-  constructor(elementsMap: ElementsMap | null = null) {
-    if (elementsMap) {
-      this.replaceAllElements(elementsMap);
+  constructor(elements: ElementsMapOrArray | null = null) {
+    if (elements) {
+      this.replaceAllElements(elements);
     }
   }
 
@@ -267,16 +267,19 @@ class Scene {
   }
 
   replaceAllElements(nextElements: ElementsMapOrArray) {
-    const _nextElements =
-      // ts doesn't like `Array.isArray` of `instanceof Map`
-      nextElements instanceof Array
-        ? nextElements
-        : Array.from(nextElements.values());
+    // ts doesn't like `Array.isArray` of `instanceof Map`
+    if (!(nextElements instanceof Array)) {
+      // need to order by fractional indices to get the correct order
+      nextElements = orderByFractionalIndex(
+        Array.from(nextElements.values()) as OrderedExcalidrawElement[],
+      );
+    }
+
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
 
-    validateIndicesThrottled(_nextElements);
+    validateIndicesThrottled(nextElements);
 
-    this.elements = syncInvalidIndices(_nextElements);
+    this.elements = syncInvalidIndices(nextElements);
     this.elementsMap.clear();
     this.elements.forEach((element) => {
       if (isFrameLikeElement(element)) {
@@ -439,7 +442,18 @@ class Scene {
   ) {
     const elementsMap = this.getNonDeletedElementsMap();
 
-    mutateElement(element, elementsMap, updates, options);
+    const { version: prevVersion } = element;
+    const { version: nextVersion } = mutateElement(
+      element,
+      elementsMap,
+      updates,
+      options,
+    );
+
+    // skip triggerUpdate if the element version hasn't changed
+    if (prevVersion === nextVersion) {
+      return element;
+    }
 
     if (options.informMutation) {
       this.triggerUpdate();

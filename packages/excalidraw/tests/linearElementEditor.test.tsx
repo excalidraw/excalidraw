@@ -1271,7 +1271,7 @@ describe("Test Linear Elements", () => {
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(
         h.elements[0],
-        arrayToMap(h.elements),
+        h.app.scene,
         "nw",
         false,
       );
