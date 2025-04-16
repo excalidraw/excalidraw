@@ -3,10 +3,12 @@ import {
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
+import { pointsEqual } from "@excalidraw/math";
+
 import type { AppState, Offsets, Zoom } from "@excalidraw/excalidraw/types";
 
 import { getCommonBounds, getElementBounds } from "./bounds";
-import { isFreeDrawElement, isLinearElement } from "./typeChecks";
+import { isElbowArrow, isFreeDrawElement, isLinearElement } from "./typeChecks";
 
 import type { ElementsMap, ExcalidrawElement } from "./types";
 
@@ -16,6 +18,12 @@ import type { ElementsMap, ExcalidrawElement } from "./types";
 export const isInvisiblySmallElement = (
   element: ExcalidrawElement,
 ): boolean => {
+  if (isElbowArrow(element)) {
+    return (
+      element.points.length < 2 ||
+      pointsEqual(element.points[0], element.points[element.points.length - 1])
+    );
+  }
   if (isLinearElement(element) || isFreeDrawElement(element)) {
     return element.points.length < 2;
   }
