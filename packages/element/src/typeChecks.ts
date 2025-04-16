@@ -379,8 +379,29 @@ export const getSwitchableTypeFromElements = (
   }
 
   if (onlyLinear) {
+    // check at least some linear element is switchable
+    // for a linear to be swtichable:
+    // - no labels
+    // - not bound to anything
+
+    let linear = true;
+
+    for (const element of elements) {
+      if (
+        isArrowElement(element) &&
+        (element.startBinding !== null || element.endBinding !== null)
+      ) {
+        linear = false;
+      } else if (element.boundElements && element.boundElements.length > 0) {
+        linear = false;
+      } else {
+        linear = true;
+        break;
+      }
+    }
+
     return {
-      linear: true,
+      linear,
       generic: false,
     };
   }

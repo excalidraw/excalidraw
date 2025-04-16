@@ -6,6 +6,7 @@ import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import {
   getSwitchableTypeFromElements,
+  isArrowElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element/typeChecks";
 import {
@@ -223,13 +224,14 @@ const Panel = ({
   const { generic, linear } = getSwitchableTypeFromElements(elements);
 
   const genericElements = generic ? getGenericSwitchableElements(elements) : [];
+  const linearElements = linear ? getLinearSwitchableElements(elements) : [];
 
   const sameType = generic
     ? genericElements.every(
         (element) => element.type === genericElements[0].type,
       )
     : linear
-    ? elements.every((element) => element.type === elements[0].type)
+    ? linearElements.every((element) => element.type === linearElements[0].type)
     : false;
 
   if (elements.length === 1) {
@@ -289,7 +291,7 @@ const Panel = ({
         const isSelected =
           sameType &&
           ((generic && genericElements[0].type === type) ||
-            (linear && elements[0].type === type));
+            (linear && linearElements[0].type === type));
 
         return (
           <ToolButton
@@ -303,11 +305,6 @@ const Panel = ({
             keyBindingLabel={""}
             aria-label={type}
             data-testid={`toolbar-${type}`}
-            onPointerDown={({ pointerType }) => {
-              if (!app.state.penDetected && pointerType === "pen") {
-                app.togglePenMode(true);
-              }
-            }}
             onChange={() => {
               if (app.state.activeTool.type !== type) {
                 trackEvent("shape-switch", type, "ui");
@@ -487,11 +484,16 @@ export const switchShapes = (
   }
 
   if (linear) {
-    const sameType = selectedElements.every(
-      (element) => element.type === selectedElements[0].type,
+    const selectedLinearSwitchableElements =
+      getLinearSwitchableElements(selectedElements);
+
+    const sameType = selectedLinearSwitchableElements.every(
+      (element) => element.type === selectedLinearSwitchableElements[0].type,
     );
     const index = sameType
-      ? LINEAR_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type)
+      ? LINEAR_SWITCHABLE_SHAPES.indexOf(
+          selectedLinearSwitchableElements[0].type,
+        )
       : -1;
     nextType =
       nextType ??
@@ -500,7 +502,7 @@ export const switchShapes = (
           LINEAR_SWITCHABLE_SHAPES.length
       ] as LinearSwitchableToolType);
 
-    selectedElements.forEach((element) => {
+    selectedLinearSwitchableElements.forEach((element) => {
       ShapeCache.delete(element);
 
       mutateElement(
@@ -513,12 +515,12 @@ export const switchShapes = (
         false,
       );
     });
-    const firstElement = selectedElements[0];
+    const firstElement = selectedLinearSwitchableElements[0];
 
     app.setState((prevState) => ({
       selectedElementIds,
       selectedLinearElement:
-        selectedElements.length === 1
+        selectedLinearSwitchableElements.length === 1
           ? new LinearElementEditor(firstElement as ExcalidrawLinearElement)
           : null,
       activeTool: updateActiveTool(prevState, {
@@ -533,6 +535,17 @@ export const switchShapes = (
 const getGenericSwitchableElements = (elements: ExcalidrawElement[]) =>
   elements.filter((element) =>
     GENERIC_SWITCHABLE_SHAPES.includes(element.type),
+  );
+
+const getLinearSwitchableElements = (elements: ExcalidrawElement[]) =>
+  elements.filter(
+    (element) =>
+      LINEAR_SWITCHABLE_SHAPES.includes(element.type) &&
+      !(
+        isArrowElement(element) &&
+        (element.startBinding !== null || element.endBinding !== null)
+      ) &&
+      (!element.boundElements || element.boundElements.length === 0),
   );
 
 export default ShapeSwitch;
