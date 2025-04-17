@@ -166,7 +166,7 @@ export default function LibraryMenuItems({
             type: "everything",
             elements: item.elements,
             randomizeSeed: true,
-          }).newElements,
+          }).duplicatedElements,
         };
       });
     },

@@ -41,30 +41,28 @@ import type {
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
   nextElements: readonly ExcalidrawElement[],
-  oldElements: readonly ExcalidrawElement[],
-  oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
+  origElements: readonly ExcalidrawElement[],
+  origIdToDuplicateId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
 ) => {
   const nextElementMap = arrayToMap(nextElements) as Map<
     ExcalidrawElement["id"],
     ExcalidrawElement
   >;
 
-  for (const element of oldElements) {
+  for (const element of origElements) {
     if (element.frameId) {
       // use its frameId to get the new frameId
-      const nextElementId = oldIdToDuplicatedId.get(element.id);
-      const nextFrameId = oldIdToDuplicatedId.get(element.frameId);
-      if (nextElementId) {
-        const nextElement = nextElementMap.get(nextElementId);
-        if (nextElement) {
-          mutateElement(
-            nextElement,
-            {
-              frameId: nextFrameId ?? element.frameId,
-            },
-            false,
-          );
-        }
+      const nextElementId = origIdToDuplicateId.get(element.id);
+      const nextFrameId = origIdToDuplicateId.get(element.frameId);
+      const nextElement = nextElementId && nextElementMap.get(nextElementId);
+      if (nextElement) {
+        mutateElement(
+          nextElement,
+          {
+            frameId: nextFrameId ?? null,
+          },
+          false,
+        );
       }
     }
   }

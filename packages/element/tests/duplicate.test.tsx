@@ -67,7 +67,7 @@ describe("duplicating single elements", () => {
       points: [pointFrom<LocalPoint>(1, 2), pointFrom<LocalPoint>(3, 4)],
     });
 
-    const copy = duplicateElement(null, new Map(), element, undefined, true);
+    const copy = duplicateElement(null, new Map(), element, true);
 
     assertCloneObjects(element, copy);
 
@@ -173,7 +173,7 @@ describe("duplicating multiple elements", () => {
     // -------------------------------------------------------------------------
 
     const origElements = [rectangle1, text1, arrow1, arrow2, text2] as const;
-    const { newElements: clonedElements } = duplicateElements({
+    const { duplicatedElements } = duplicateElements({
       type: "everything",
       elements: origElements,
     });
@@ -181,10 +181,10 @@ describe("duplicating multiple elements", () => {
     // generic id in-equality checks
     // --------------------------------------------------------------------------
     expect(origElements.map((e) => e.type)).toEqual(
-      clonedElements.map((e) => e.type),
+      duplicatedElements.map((e) => e.type),
     );
     origElements.forEach((origElement, idx) => {
-      const clonedElement = clonedElements[idx];
+      const clonedElement = duplicatedElements[idx];
       expect(origElement).toEqual(
         expect.objectContaining({
           id: expect.not.stringMatching(clonedElement.id),
@@ -217,12 +217,12 @@ describe("duplicating multiple elements", () => {
     });
     // --------------------------------------------------------------------------
 
-    const clonedArrows = clonedElements.filter(
+    const clonedArrows = duplicatedElements.filter(
       (e) => e.type === "arrow",
     ) as ExcalidrawLinearElement[];
 
     const [clonedRectangle, clonedText1, , clonedArrow2, clonedArrowLabel] =
-      clonedElements as any as typeof origElements;
+      duplicatedElements as any as typeof origElements;
 
     expect(clonedText1.containerId).toBe(clonedRectangle.id);
     expect(
@@ -327,10 +327,10 @@ describe("duplicating multiple elements", () => {
     // -------------------------------------------------------------------------
 
     const origElements = [rectangle1, text1, arrow1, arrow2, arrow3] as const;
-    const { newElements: clonedElements } = duplicateElements({
+    const duplicatedElements = duplicateElements({
       type: "everything",
       elements: origElements,
-    }) as any as { newElements: typeof origElements };
+    }).duplicatedElements as any as typeof origElements;
 
     const [
       clonedRectangle,
@@ -338,7 +338,7 @@ describe("duplicating multiple elements", () => {
       clonedArrow1,
       clonedArrow2,
       clonedArrow3,
-    ] = clonedElements;
+    ] = duplicatedElements;
 
     expect(clonedRectangle.boundElements).toEqual([
       { id: clonedArrow1.id, type: "arrow" },
@@ -374,12 +374,12 @@ describe("duplicating multiple elements", () => {
       });
 
       const origElements = [rectangle1, rectangle2, rectangle3] as const;
-      const { newElements: clonedElements } = duplicateElements({
+      const { duplicatedElements } = duplicateElements({
         type: "everything",
         elements: origElements,
-      }) as any as { newElements: typeof origElements };
+      });
       const [clonedRectangle1, clonedRectangle2, clonedRectangle3] =
-        clonedElements;
+        duplicatedElements;
 
       expect(rectangle1.groupIds[0]).not.toBe(clonedRectangle1.groupIds[0]);
       expect(rectangle2.groupIds[0]).not.toBe(clonedRectangle2.groupIds[0]);
@@ -399,12 +399,123 @@ describe("duplicating multiple elements", () => {
       });
 
       const {
-        newElements: [clonedRectangle1],
+        duplicatedElements: [clonedRectangle1],
       } = duplicateElements({ type: "everything", elements: [rectangle1] });
 
       expect(typeof clonedRectangle1.groupIds[0]).toBe("string");
       expect(rectangle1.groupIds[0]).not.toBe(clonedRectangle1.groupIds[0]);
     });
+  });
+});
+
+describe("group-related duplication", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("action-duplicating within group", async () => {
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      groupIds: ["group1"],
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      groupIds: ["group1"],
+    });
+
+    API.setElements([rectangle1, rectangle2]);
+    API.setSelectedElements([rectangle2], "group1");
+
+    act(() => {
+      h.app.actionManager.executeAction(actionDuplicateSelection);
+    });
+
+    assertElements(h.elements, [
+      { id: rectangle1.id },
+      { id: rectangle2.id },
+      { [ORIG_ID]: rectangle2.id, selected: true, groupIds: ["group1"] },
+    ]);
+    expect(h.state.editingGroupId).toBe("group1");
+  });
+
+  it("alt-duplicating within group", async () => {
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      groupIds: ["group1"],
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      groupIds: ["group1"],
+    });
+
+    API.setElements([rectangle1, rectangle2]);
+    API.setSelectedElements([rectangle2], "group1");
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(rectangle2.x + 5, rectangle2.y + 5);
+      mouse.up(rectangle2.x + 50, rectangle2.y + 50);
+    });
+
+    assertElements(h.elements, [
+      { id: rectangle1.id },
+      { id: rectangle2.id },
+      { [ORIG_ID]: rectangle2.id, selected: true, groupIds: ["group1"] },
+    ]);
+    expect(h.state.editingGroupId).toBe("group1");
+  });
+
+  it.skip("alt-duplicating within group away outside frame", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["group1"],
+      frameId: frame.id,
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 50,
+      height: 50,
+      groupIds: ["group1"],
+      frameId: frame.id,
+    });
+
+    API.setElements([frame, rectangle1, rectangle2]);
+    API.setSelectedElements([rectangle2], "group1");
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(rectangle2.x + 5, rectangle2.y + 5);
+      mouse.up(frame.x + frame.width + 50, frame.y + frame.height + 50);
+    });
+
+    // console.log(h.elements);
+
+    assertElements(h.elements, [
+      { id: frame.id },
+      { id: rectangle1.id, frameId: frame.id },
+      { id: rectangle2.id, frameId: frame.id },
+      { [ORIG_ID]: rectangle2.id, selected: true, groupIds: [], frameId: null },
+    ]);
+    expect(h.state.editingGroupId).toBe(null);
   });
 });
 
@@ -503,8 +614,8 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: rectangle1.id },
-      { id: rectangle1.id, selected: true },
+      { id: rectangle1.id },
+      { [ORIG_ID]: rectangle1.id, selected: true },
       { id: rectangle2.id },
       { id: rectangle3.id },
     ]);
@@ -538,8 +649,8 @@ describe("duplication z-order", () => {
     assertElements(h.elements, [
       { id: rectangle1.id },
       { id: rectangle2.id },
-      { [ORIG_ID]: rectangle3.id },
-      { id: rectangle3.id, selected: true },
+      { id: rectangle3.id },
+      { [ORIG_ID]: rectangle3.id, selected: true },
     ]);
   });
 
@@ -569,8 +680,8 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: rectangle1.id },
-      { id: rectangle1.id, selected: true },
+      { id: rectangle1.id },
+      { [ORIG_ID]: rectangle1.id, selected: true },
       { id: rectangle2.id },
       { id: rectangle3.id },
     ]);
@@ -605,19 +716,19 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: rectangle1.id },
-      { [ORIG_ID]: rectangle2.id },
-      { [ORIG_ID]: rectangle3.id },
-      { id: rectangle1.id, selected: true },
-      { id: rectangle2.id, selected: true },
-      { id: rectangle3.id, selected: true },
+      { id: rectangle1.id },
+      { id: rectangle2.id },
+      { id: rectangle3.id },
+      { [ORIG_ID]: rectangle1.id, selected: true },
+      { [ORIG_ID]: rectangle2.id, selected: true },
+      { [ORIG_ID]: rectangle3.id, selected: true },
     ]);
   });
 
-  it("reverse-duplicating text container (in-order)", async () => {
+  it("alt-duplicating text container (in-order)", async () => {
     const [rectangle, text] = API.createTextContainer();
     API.setElements([rectangle, text]);
-    API.setSelectedElements([rectangle, text]);
+    API.setSelectedElements([rectangle]);
 
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(rectangle.x + 5, rectangle.y + 5);
@@ -625,20 +736,20 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: rectangle.id },
+      { id: rectangle.id },
+      { id: text.id, containerId: rectangle.id },
+      { [ORIG_ID]: rectangle.id, selected: true },
       {
         [ORIG_ID]: text.id,
         containerId: getCloneByOrigId(rectangle.id)?.id,
       },
-      { id: rectangle.id, selected: true },
-      { id: text.id, containerId: rectangle.id, selected: true },
     ]);
   });
 
-  it("reverse-duplicating text container (out-of-order)", async () => {
+  it("alt-duplicating text container (out-of-order)", async () => {
     const [rectangle, text] = API.createTextContainer();
     API.setElements([text, rectangle]);
-    API.setSelectedElements([rectangle, text]);
+    API.setSelectedElements([rectangle]);
 
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(rectangle.x + 5, rectangle.y + 5);
@@ -646,21 +757,21 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: rectangle.id },
+      { id: rectangle.id },
+      { id: text.id, containerId: rectangle.id },
+      { [ORIG_ID]: rectangle.id, selected: true },
       {
         [ORIG_ID]: text.id,
         containerId: getCloneByOrigId(rectangle.id)?.id,
       },
-      { id: rectangle.id, selected: true },
-      { id: text.id, containerId: rectangle.id, selected: true },
     ]);
   });
 
-  it("reverse-duplicating labeled arrows (in-order)", async () => {
+  it("alt-duplicating labeled arrows (in-order)", async () => {
     const [arrow, text] = API.createLabeledArrow();
 
     API.setElements([arrow, text]);
-    API.setSelectedElements([arrow, text]);
+    API.setSelectedElements([arrow]);
 
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(arrow.x + 5, arrow.y + 5);
@@ -668,21 +779,24 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: arrow.id },
+      { id: arrow.id },
+      { id: text.id, containerId: arrow.id },
+      { [ORIG_ID]: arrow.id, selected: true },
       {
         [ORIG_ID]: text.id,
         containerId: getCloneByOrigId(arrow.id)?.id,
       },
-      { id: arrow.id, selected: true },
-      { id: text.id, containerId: arrow.id, selected: true },
     ]);
+    expect(h.state.selectedLinearElement).toEqual(
+      expect.objectContaining({ elementId: getCloneByOrigId(arrow.id)?.id }),
+    );
   });
 
-  it("reverse-duplicating labeled arrows (out-of-order)", async () => {
+  it("alt-duplicating labeled arrows (out-of-order)", async () => {
     const [arrow, text] = API.createLabeledArrow();
 
     API.setElements([text, arrow]);
-    API.setSelectedElements([arrow, text]);
+    API.setSelectedElements([arrow]);
 
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(arrow.x + 5, arrow.y + 5);
@@ -690,17 +804,17 @@ describe("duplication z-order", () => {
     });
 
     assertElements(h.elements, [
-      { [ORIG_ID]: arrow.id },
+      { id: arrow.id },
+      { id: text.id, containerId: arrow.id },
+      { [ORIG_ID]: arrow.id, selected: true },
       {
         [ORIG_ID]: text.id,
         containerId: getCloneByOrigId(arrow.id)?.id,
       },
-      { id: arrow.id, selected: true },
-      { id: text.id, containerId: arrow.id, selected: true },
     ]);
   });
 
-  it("reverse-duplicating bindable element with bound arrow should keep the arrow on the duplicate", () => {
+  it("alt-duplicating bindable element with bound arrow should keep the arrow on the duplicate", async () => {
     const rect = UI.createElement("rectangle", {
       x: 0,
       y: 0,
@@ -722,11 +836,18 @@ describe("duplication z-order", () => {
       mouse.up(15, 15);
     });
 
-    expect(window.h.elements).toHaveLength(3);
-
-    const newRect = window.h.elements[0];
-
-    expect(arrow.endBinding?.elementId).toBe(newRect.id);
-    expect(newRect.boundElements?.[0]?.id).toBe(arrow.id);
+    assertElements(h.elements, [
+      {
+        id: rect.id,
+        boundElements: expect.arrayContaining([
+          expect.objectContaining({ id: arrow.id }),
+        ]),
+      },
+      { [ORIG_ID]: rect.id, boundElements: [], selected: true },
+      {
+        id: arrow.id,
+        endBinding: expect.objectContaining({ elementId: rect.id }),
+      },
+    ]);
   });
 });

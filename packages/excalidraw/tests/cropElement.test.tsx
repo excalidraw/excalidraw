@@ -218,7 +218,7 @@ describe("Cropping and other features", async () => {
       initialHeight / 2,
     ]);
     Keyboard.keyDown(KEYS.ESCAPE);
-    const duplicatedImage = duplicateElement(null, new Map(), image, {});
+    const duplicatedImage = duplicateElement(null, new Map(), image);
     act(() => {
       h.app.scene.insertElement(duplicatedImage);
     });
