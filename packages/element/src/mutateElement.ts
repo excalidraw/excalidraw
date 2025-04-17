@@ -61,7 +61,11 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
       ...updates,
       angle: 0 as Radians,
       ...updateElbowArrowPoints(
-        element as ExcalidrawElbowArrowElement,
+        {
+          ...element,
+          x: updates.x || element.x,
+          y: updates.y || element.y,
+        },
         elementsMap as NonDeletedSceneElementsMap,
         updates as ElementUpdate<ExcalidrawElbowArrowElement>,
         options,
