@@ -307,6 +307,41 @@ describe("pasting & frames", () => {
     });
   });
 
+  it("should remove element from frame when pasted outside", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+    const rect = API.createElement({
+      type: "rectangle",
+      frameId: frame.id,
+      x: 10,
+      y: 10,
+      width: 50,
+      height: 50,
+    });
+
+    API.setElements([frame]);
+
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [rect],
+      files: null,
+    });
+
+    mouse.moveTo(150, 150);
+
+    pasteWithCtrlCmdV(clipboardJSON);
+
+    await waitFor(() => {
+      expect(h.elements.length).toBe(2);
+      expect(h.elements[1].type).toBe(rect.type);
+      expect(h.elements[1].frameId).toBe(null);
+    });
+  });
+
   it("should filter out elements not overlapping frame", async () => {
     const frame = API.createElement({
       type: "frame",
