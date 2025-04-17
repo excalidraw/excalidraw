@@ -423,6 +423,7 @@ export const maybeBindLinearElement = (
   pointerCoords: { x: number; y: number },
   scene: Scene,
 ): void => {
+  const elements = scene.getNonDeletedElements();
   const elementsMap = scene.getNonDeletedElementsMap();
 
   if (appState.startBoundElement != null) {
@@ -436,7 +437,7 @@ export const maybeBindLinearElement = (
 
   const hoveredElement = getHoveredElementForBinding(
     pointerCoords,
-    scene.getNonDeletedElements(),
+    elements,
     elementsMap,
     appState.zoom,
     isElbowArrow(linearElement),

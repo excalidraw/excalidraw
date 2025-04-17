@@ -10510,7 +10510,7 @@ class App extends React.Component<AppProps, AppState> {
         shouldResizeFromCenter: false,
         scene: this.scene,
         zoom: this.state.zoom.value,
-        informMutation,
+        informMutation: false,
       });
       return;
     }

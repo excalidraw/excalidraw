@@ -450,12 +450,13 @@ class Scene {
       options,
     );
 
-    // skip triggerUpdate if the element version hasn't changed
-    if (prevVersion === nextVersion) {
-      return element;
-    }
-
-    if (options.informMutation) {
+    if (
+      // skip if the element is not in the scene (i.e. selection)
+      this.elementsMap.has(element.id) &&
+      // skip if the element's version hasn't changed, as mutateElement returned the same element
+      prevVersion !== nextVersion &&
+      options.informMutation
+    ) {
       this.triggerUpdate();
     }
 
