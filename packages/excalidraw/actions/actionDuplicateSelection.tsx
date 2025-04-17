@@ -7,25 +7,16 @@ import {
 
 import { getNonDeletedElements } from "@excalidraw/element";
 
-import {
-  isBoundToContainer,
-  isLinearElement,
-} from "@excalidraw/element/typeChecks";
-
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 
-import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
-
 import {
-  excludeElementsInFramesFromSelection,
   getSelectedElements,
+  getSelectionStateForElements,
 } from "@excalidraw/element/selection";
 
 import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
 
 import { duplicateElements } from "@excalidraw/element/duplicate";
-
-import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { ToolButton } from "../components/ToolButton";
 import { DuplicateIcon } from "../components/icons";
@@ -104,22 +95,10 @@ export const actionDuplicateSelection = register({
       ),
       appState: {
         ...appState,
-        ...updateLinearElementEditors(duplicatedElements),
-        ...selectGroupsForSelectedElements(
-          {
-            editingGroupId: appState.editingGroupId,
-            selectedElementIds: excludeElementsInFramesFromSelection(
-              duplicatedElements,
-            ).reduce((acc: Record<ExcalidrawElement["id"], true>, element) => {
-              if (!isBoundToContainer(element)) {
-                acc[element.id] = true;
-              }
-              return acc;
-            }, {}),
-          },
+        ...getSelectionStateForElements(
+          duplicatedElements,
           getNonDeletedElements(elementsWithDuplicates),
           appState,
-          null,
         ),
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -139,24 +118,3 @@ export const actionDuplicateSelection = register({
     />
   ),
 });
-
-const updateLinearElementEditors = (clonedElements: ExcalidrawElement[]) => {
-  const linears = clonedElements.filter(isLinearElement);
-  if (linears.length === 1) {
-    const linear = linears[0];
-    const boundElements = linear.boundElements?.map((def) => def.id) ?? [];
-    const onlySingleLinearSelected = clonedElements.every(
-      (el) => el.id === linear.id || boundElements.includes(el.id),
-    );
-
-    if (onlySingleLinearSelected) {
-      return {
-        selectedLinearElement: new LinearElementEditor(linear),
-      };
-    }
-  }
-
-  return {
-    selectedLinearElement: null,
-  };
-};

@@ -279,6 +279,7 @@ import {
 
 import {
   excludeElementsInFramesFromSelection,
+  getSelectionStateForElements,
   makeNextSelectedElementIds,
 } from "@excalidraw/element/selection";
 
@@ -8457,9 +8458,6 @@ class App extends React.Component<AppProps, AppState> {
               );
             });
 
-            const nextSelectedElementIds: Record<string, true> =
-              Object.fromEntries(duplicatedElements.map((el) => [el.id, true]));
-
             const mappedClonedElements = elementsWithDuplicates.map((el) => {
               if (idsOfElementsToDuplicate.has(el.id)) {
                 const origEl = pointerDownState.originalElements.get(el.id);
@@ -8487,6 +8485,15 @@ class App extends React.Component<AppProps, AppState> {
             // we need to update synchronously so as to keep pointerDownState,
             // appState, and scene elements in sync
             flushSync(() => {
+              // swap hit element with the duplicated one
+              if (pointerDownState.hit.element) {
+                const cloneId = origIdToDuplicateId.get(
+                  pointerDownState.hit.element.id,
+                );
+                const clonedElement =
+                  cloneId && duplicateElementsMap.get(cloneId);
+                pointerDownState.hit.element = clonedElement || null;
+              }
               // swap hit elements with the duplicated ones
               pointerDownState.hit.allHitElements =
                 pointerDownState.hit.allHitElements.reduce(
@@ -8515,14 +8522,10 @@ class App extends React.Component<AppProps, AppState> {
 
               // switch selected elements to the duplicated ones
               this.setState((prevState) => ({
-                ...selectGroupsForSelectedElements(
-                  {
-                    editingGroupId: prevState.editingGroupId,
-                    selectedElementIds: nextSelectedElementIds,
-                  },
+                ...getSelectionStateForElements(
+                  duplicatedElements,
                   this.scene.getNonDeletedElements(),
                   prevState,
-                  this,
                 ),
               }));
 

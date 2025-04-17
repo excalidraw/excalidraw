@@ -614,10 +614,10 @@ describe("duplication z-order", () => {
     ]);
   });
 
-  it("reverse-duplicating text container (in-order)", async () => {
+  it("alt-duplicating text container (in-order)", async () => {
     const [rectangle, text] = API.createTextContainer();
     API.setElements([rectangle, text]);
-    API.setSelectedElements([rectangle, text]);
+    API.setSelectedElements([rectangle]);
 
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(rectangle.x + 5, rectangle.y + 5);
@@ -631,15 +631,14 @@ describe("duplication z-order", () => {
       {
         [ORIG_ID]: text.id,
         containerId: getCloneByOrigId(rectangle.id)?.id,
-        selected: true,
       },
     ]);
   });
 
-  it("reverse-duplicating text container (out-of-order)", async () => {
+  it("alt-duplicating text container (out-of-order)", async () => {
     const [rectangle, text] = API.createTextContainer();
     API.setElements([text, rectangle]);
-    API.setSelectedElements([rectangle, text]);
+    API.setSelectedElements([rectangle]);
 
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(rectangle.x + 5, rectangle.y + 5);
@@ -653,16 +652,15 @@ describe("duplication z-order", () => {
       {
         [ORIG_ID]: text.id,
         containerId: getCloneByOrigId(rectangle.id)?.id,
-        selected: true,
       },
     ]);
   });
 
-  it("reverse-duplicating labeled arrows (in-order)", async () => {
+  it("alt-duplicating labeled arrows (in-order)", async () => {
     const [arrow, text] = API.createLabeledArrow();
 
     API.setElements([arrow, text]);
-    API.setSelectedElements([arrow, text]);
+    API.setSelectedElements([arrow]);
 
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(arrow.x + 5, arrow.y + 5);
@@ -676,16 +674,18 @@ describe("duplication z-order", () => {
       {
         [ORIG_ID]: text.id,
         containerId: getCloneByOrigId(arrow.id)?.id,
-        selected: true,
       },
     ]);
+    expect(h.state.selectedLinearElement).toEqual(
+      expect.objectContaining({ elementId: getCloneByOrigId(arrow.id)?.id }),
+    );
   });
 
-  it("reverse-duplicating labeled arrows (out-of-order)", async () => {
+  it("alt-duplicating labeled arrows (out-of-order)", async () => {
     const [arrow, text] = API.createLabeledArrow();
 
     API.setElements([text, arrow]);
-    API.setSelectedElements([arrow, text]);
+    API.setSelectedElements([arrow]);
 
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(arrow.x + 5, arrow.y + 5);
@@ -699,12 +699,11 @@ describe("duplication z-order", () => {
       {
         [ORIG_ID]: text.id,
         containerId: getCloneByOrigId(arrow.id)?.id,
-        selected: true,
       },
     ]);
   });
 
-  it("reverse-duplicating bindable element with bound arrow should keep the arrow on the duplicate", () => {
+  it("alt-duplicating bindable element with bound arrow should keep the arrow on the duplicate", () => {
     const rect = UI.createElement("rectangle", {
       x: 0,
       y: 0,
