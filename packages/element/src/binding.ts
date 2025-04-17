@@ -56,7 +56,6 @@ import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isArrowElement,
   isBindableElement,
-  isBindingElement,
   isBoundToContainer,
   isElbowArrow,
   isFixedPointBinding,
@@ -1409,19 +1408,19 @@ const getLinearElementEdgeCoors = (
 };
 
 export const fixDuplicatedBindingsAfterDuplication = (
-  newElements: ExcalidrawElement[],
-  oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
-  duplicatedElementsMap: NonDeletedSceneElementsMap,
+  duplicatedElements: ExcalidrawElement[],
+  origIdToDuplicateId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
+  duplicateElementsMap: NonDeletedSceneElementsMap,
 ) => {
-  for (const element of newElements) {
-    if ("boundElements" in element && element.boundElements) {
-      Object.assign(element, {
-        boundElements: element.boundElements.reduce(
+  for (const duplicateElement of duplicatedElements) {
+    if ("boundElements" in duplicateElement && duplicateElement.boundElements) {
+      Object.assign(duplicateElement, {
+        boundElements: duplicateElement.boundElements.reduce(
           (
             acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
             binding,
           ) => {
-            const newBindingId = oldIdToDuplicatedId.get(binding.id);
+            const newBindingId = origIdToDuplicateId.get(binding.id);
             if (newBindingId) {
               acc.push({ ...binding, id: newBindingId });
             }
@@ -1432,238 +1431,49 @@ export const fixDuplicatedBindingsAfterDuplication = (
       });
     }
 
-    if ("containerId" in element && element.containerId) {
-      Object.assign(element, {
-        containerId: oldIdToDuplicatedId.get(element.containerId) ?? null,
+    if ("containerId" in duplicateElement && duplicateElement.containerId) {
+      Object.assign(duplicateElement, {
+        containerId:
+          origIdToDuplicateId.get(duplicateElement.containerId) ?? null,
       });
     }
 
-    if ("endBinding" in element && element.endBinding) {
-      const newEndBindingId = oldIdToDuplicatedId.get(
-        element.endBinding.elementId,
+    if ("endBinding" in duplicateElement && duplicateElement.endBinding) {
+      const newEndBindingId = origIdToDuplicateId.get(
+        duplicateElement.endBinding.elementId,
       );
-      Object.assign(element, {
+      Object.assign(duplicateElement, {
         endBinding: newEndBindingId
           ? {
-              ...element.endBinding,
+              ...duplicateElement.endBinding,
               elementId: newEndBindingId,
             }
           : null,
       });
     }
-    if ("startBinding" in element && element.startBinding) {
-      const newEndBindingId = oldIdToDuplicatedId.get(
-        element.startBinding.elementId,
+    if ("startBinding" in duplicateElement && duplicateElement.startBinding) {
+      const newEndBindingId = origIdToDuplicateId.get(
+        duplicateElement.startBinding.elementId,
       );
-      Object.assign(element, {
+      Object.assign(duplicateElement, {
         startBinding: newEndBindingId
           ? {
-              ...element.startBinding,
+              ...duplicateElement.startBinding,
               elementId: newEndBindingId,
             }
           : null,
       });
     }
 
-    if (isElbowArrow(element)) {
+    if (isElbowArrow(duplicateElement)) {
       Object.assign(
-        element,
-        updateElbowArrowPoints(element, duplicatedElementsMap, {
+        duplicateElement,
+        updateElbowArrowPoints(duplicateElement, duplicateElementsMap, {
           points: [
-            element.points[0],
-            element.points[element.points.length - 1],
+            duplicateElement.points[0],
+            duplicateElement.points[duplicateElement.points.length - 1],
           ],
         }),
-      );
-    }
-  }
-};
-
-const fixReversedBindingsForBindables = (
-  original: ExcalidrawBindableElement,
-  duplicate: ExcalidrawBindableElement,
-  originalElements: Map<string, ExcalidrawElement>,
-  elementsWithClones: ExcalidrawElement[],
-  oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
-) => {
-  original.boundElements?.forEach((binding, idx) => {
-    if (binding.type !== "arrow") {
-      return;
-    }
-
-    const oldArrow = elementsWithClones.find((el) => el.id === binding.id);
-
-    if (!isBindingElement(oldArrow)) {
-      return;
-    }
-
-    if (originalElements.has(binding.id)) {
-      // Linked arrow is in the selection, so find the duplicate pair
-      const newArrowId = oldIdToDuplicatedId.get(binding.id) ?? binding.id;
-      const newArrow = elementsWithClones.find(
-        (el) => el.id === newArrowId,
-      )! as ExcalidrawArrowElement;
-
-      mutateElement(newArrow, {
-        startBinding:
-          oldArrow.startBinding?.elementId === binding.id
-            ? {
-                ...oldArrow.startBinding,
-                elementId: duplicate.id,
-              }
-            : newArrow.startBinding,
-        endBinding:
-          oldArrow.endBinding?.elementId === binding.id
-            ? {
-                ...oldArrow.endBinding,
-                elementId: duplicate.id,
-              }
-            : newArrow.endBinding,
-      });
-      mutateElement(duplicate, {
-        boundElements: [
-          ...(duplicate.boundElements ?? []).filter(
-            (el) => el.id !== binding.id && el.id !== newArrowId,
-          ),
-          {
-            type: "arrow",
-            id: newArrowId,
-          },
-        ],
-      });
-    } else {
-      // Linked arrow is outside the selection,
-      // so we move the binding to the duplicate
-      mutateElement(oldArrow, {
-        startBinding:
-          oldArrow.startBinding?.elementId === original.id
-            ? {
-                ...oldArrow.startBinding,
-                elementId: duplicate.id,
-              }
-            : oldArrow.startBinding,
-        endBinding:
-          oldArrow.endBinding?.elementId === original.id
-            ? {
-                ...oldArrow.endBinding,
-                elementId: duplicate.id,
-              }
-            : oldArrow.endBinding,
-      });
-      mutateElement(duplicate, {
-        boundElements: [
-          ...(duplicate.boundElements ?? []),
-          {
-            type: "arrow",
-            id: oldArrow.id,
-          },
-        ],
-      });
-      mutateElement(original, {
-        boundElements:
-          original.boundElements?.filter((_, i) => i !== idx) ?? null,
-      });
-    }
-  });
-};
-
-const fixReversedBindingsForArrows = (
-  original: ExcalidrawArrowElement,
-  duplicate: ExcalidrawArrowElement,
-  originalElements: Map<string, ExcalidrawElement>,
-  bindingProp: "startBinding" | "endBinding",
-  oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
-  elementsWithClones: ExcalidrawElement[],
-) => {
-  const oldBindableId = original[bindingProp]?.elementId;
-
-  if (oldBindableId) {
-    if (originalElements.has(oldBindableId)) {
-      // Linked element is in the selection
-      const newBindableId =
-        oldIdToDuplicatedId.get(oldBindableId) ?? oldBindableId;
-      const newBindable = elementsWithClones.find(
-        (el) => el.id === newBindableId,
-      ) as ExcalidrawBindableElement;
-      mutateElement(duplicate, {
-        [bindingProp]: {
-          ...original[bindingProp],
-          elementId: newBindableId,
-        },
-      });
-      mutateElement(newBindable, {
-        boundElements: [
-          ...(newBindable.boundElements ?? []).filter(
-            (el) => el.id !== original.id && el.id !== duplicate.id,
-          ),
-          {
-            id: duplicate.id,
-            type: "arrow",
-          },
-        ],
-      });
-    } else {
-      // Linked element is outside the selection
-      const originalBindable = elementsWithClones.find(
-        (el) => el.id === oldBindableId,
-      );
-      if (originalBindable) {
-        mutateElement(duplicate, {
-          [bindingProp]: original[bindingProp],
-        });
-        mutateElement(original, {
-          [bindingProp]: null,
-        });
-        mutateElement(originalBindable, {
-          boundElements: [
-            ...(originalBindable.boundElements?.filter(
-              (el) => el.id !== original.id,
-            ) ?? []),
-            {
-              id: duplicate.id,
-              type: "arrow",
-            },
-          ],
-        });
-      }
-    }
-  }
-};
-
-export const fixReversedBindings = (
-  originalElements: Map<string, ExcalidrawElement>,
-  elementsWithClones: ExcalidrawElement[],
-  oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
-) => {
-  for (const original of originalElements.values()) {
-    const duplicate = elementsWithClones.find(
-      (el) => el.id === oldIdToDuplicatedId.get(original.id),
-    )!;
-
-    if (isBindableElement(original) && isBindableElement(duplicate)) {
-      fixReversedBindingsForBindables(
-        original,
-        duplicate,
-        originalElements,
-        elementsWithClones,
-        oldIdToDuplicatedId,
-      );
-    } else if (isArrowElement(original) && isArrowElement(duplicate)) {
-      fixReversedBindingsForArrows(
-        original,
-        duplicate,
-        originalElements,
-        "startBinding",
-        oldIdToDuplicatedId,
-        elementsWithClones,
-      );
-      fixReversedBindingsForArrows(
-        original,
-        duplicate,
-        originalElements,
-        "endBinding",
-        oldIdToDuplicatedId,
-        elementsWithClones,
       );
     }
   }
