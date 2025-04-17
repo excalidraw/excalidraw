@@ -37,26 +37,28 @@ export const isElementInViewport = (
   elementsMap: ElementsMap,
 ) => {
   const [x1, y1, x2, y2] = getElementBounds(element, elementsMap); // scene coordinates
-  const topLeftSceneCoords = viewportCoordsToSceneCoords(
-    {
-      clientX: viewTransformations.offsetLeft,
-      clientY: viewTransformations.offsetTop,
-    },
-    viewTransformations,
-  );
-  const bottomRightSceneCoords = viewportCoordsToSceneCoords(
-    {
-      clientX: viewTransformations.offsetLeft + width,
-      clientY: viewTransformations.offsetTop + height,
-    },
-    viewTransformations,
-  );
+  const [topLeftSceneCoordsX, topLeftSceneCoordsY] =
+    viewportCoordsToSceneCoords(
+      {
+        clientX: viewTransformations.offsetLeft,
+        clientY: viewTransformations.offsetTop,
+      },
+      viewTransformations,
+    );
+  const [bottomRightSceneCoordsX, bottomRightSceneCoordsY] =
+    viewportCoordsToSceneCoords(
+      {
+        clientX: viewTransformations.offsetLeft + width,
+        clientY: viewTransformations.offsetTop + height,
+      },
+      viewTransformations,
+    );
 
   return (
-    topLeftSceneCoords.x <= x2 &&
-    topLeftSceneCoords.y <= y2 &&
-    bottomRightSceneCoords.x >= x1 &&
-    bottomRightSceneCoords.y >= y1
+    topLeftSceneCoordsX <= x2 &&
+    topLeftSceneCoordsY <= y2 &&
+    bottomRightSceneCoordsX >= x1 &&
+    bottomRightSceneCoordsY >= y1
   );
 };
 
@@ -75,26 +77,29 @@ export const isElementCompletelyInViewport = (
   padding?: Offsets,
 ) => {
   const [x1, y1, x2, y2] = getCommonBounds(elements, elementsMap); // scene coordinates
-  const topLeftSceneCoords = viewportCoordsToSceneCoords(
-    {
-      clientX: viewTransformations.offsetLeft + (padding?.left || 0),
-      clientY: viewTransformations.offsetTop + (padding?.top || 0),
-    },
-    viewTransformations,
-  );
-  const bottomRightSceneCoords = viewportCoordsToSceneCoords(
-    {
-      clientX: viewTransformations.offsetLeft + width - (padding?.right || 0),
-      clientY: viewTransformations.offsetTop + height - (padding?.bottom || 0),
-    },
-    viewTransformations,
-  );
+  const [topLeftSceneCoordsX, topLeftSceneCoordsY] =
+    viewportCoordsToSceneCoords(
+      {
+        clientX: viewTransformations.offsetLeft + (padding?.left || 0),
+        clientY: viewTransformations.offsetTop + (padding?.top || 0),
+      },
+      viewTransformations,
+    );
+  const [bottomRightSceneCoordsX, bottomRightSceneCoordsY] =
+    viewportCoordsToSceneCoords(
+      {
+        clientX: viewTransformations.offsetLeft + width - (padding?.right || 0),
+        clientY:
+          viewTransformations.offsetTop + height - (padding?.bottom || 0),
+      },
+      viewTransformations,
+    );
 
   return (
-    x1 >= topLeftSceneCoords.x &&
-    y1 >= topLeftSceneCoords.y &&
-    x2 <= bottomRightSceneCoords.x &&
-    y2 <= bottomRightSceneCoords.y
+    x1 >= topLeftSceneCoordsX &&
+    y1 >= topLeftSceneCoordsY &&
+    x2 <= bottomRightSceneCoordsX &&
+    y2 <= bottomRightSceneCoordsY
   );
 };
 

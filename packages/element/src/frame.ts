@@ -1,5 +1,9 @@
 import { arrayToMap } from "@excalidraw/common";
-import { isPointWithinBounds, pointFrom } from "@excalidraw/math";
+import {
+  type GenericPoint,
+  isPointWithinBounds,
+  pointFrom,
+} from "@excalidraw/math";
 import { doLineSegmentsIntersect } from "@excalidraw/utils/bbox";
 import { elementsOverlappingBBox } from "@excalidraw/utils/withinBounds";
 
@@ -154,11 +158,8 @@ export const elementOverlapsWithFrame = (
   );
 };
 
-export const isCursorInFrame = (
-  cursorCoords: {
-    x: number;
-    y: number;
-  },
+export const isCursorInFrame = <Point extends GenericPoint>(
+  cursorCoords: Point,
   frame: NonDeleted<ExcalidrawFrameLikeElement>,
   elementsMap: ElementsMap,
 ) => {
@@ -166,7 +167,7 @@ export const isCursorInFrame = (
 
   return isPointWithinBounds(
     pointFrom(fx1, fy1),
-    pointFrom(cursorCoords.x, cursorCoords.y),
+    cursorCoords,
     pointFrom(fx2, fy2),
   );
 };

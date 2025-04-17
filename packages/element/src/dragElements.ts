@@ -12,6 +12,7 @@ import type {
 } from "@excalidraw/excalidraw/types";
 
 import type Scene from "@excalidraw/excalidraw/scene/Scene";
+import type { GenericPoint } from "@excalidraw/math";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
@@ -208,10 +209,7 @@ export const dragNewElement = ({
   /** whether to keep given aspect ratio when `isResizeWithSidesSameLength` is
       true */
   widthAspectRatio?: number | null;
-  originOffset?: {
-    x: number;
-    y: number;
-  } | null;
+  originOffset?: GenericPoint | null;
   informMutation?: boolean;
 }) => {
   if (shouldMaintainAspectRatio && newElement.type !== "selection") {
@@ -285,11 +283,12 @@ export const dragNewElement = ({
       };
     }
 
+    const [originOffsetX, originOffsetY] = originOffset ?? [0, 0];
     mutateElement(
       newElement,
       {
-        x: newX + (originOffset?.x ?? 0),
-        y: newY + (originOffset?.y ?? 0),
+        x: newX + originOffsetX,
+        y: newY + originOffsetY,
         width,
         height,
         ...textAutoResize,

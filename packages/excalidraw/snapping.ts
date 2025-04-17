@@ -1327,7 +1327,7 @@ export const getSnapLinesAtPointer = (
 ) => {
   if (!isSnappingEnabled({ event, selectedElements: [], app })) {
     return {
-      originOffset: { x: 0, y: 0 },
+      originOffset: pointFrom(0, 0),
       snapLines: [],
     };
   }
@@ -1388,16 +1388,14 @@ export const getSnapLinesAtPointer = (
   }
 
   return {
-    originOffset: {
-      x:
-        verticalSnapLines.length > 0
-          ? verticalSnapLines[0].points[0][0] - pointer.x
-          : 0,
-      y:
-        horizontalSnapLines.length > 0
-          ? horizontalSnapLines[0].points[0][1] - pointer.y
-          : 0,
-    },
+    originOffset: pointFrom(
+      verticalSnapLines.length > 0
+        ? verticalSnapLines[0].points[0][0] - pointer.x
+        : 0,
+      horizontalSnapLines.length > 0
+        ? horizontalSnapLines[0].points[0][1] - pointer.y
+        : 0,
+    ),
     snapLines: [...verticalSnapLines, ...horizontalSnapLines],
   };
 };

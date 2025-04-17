@@ -143,7 +143,7 @@ export const actionFinalize = register({
         maybeBindLinearElement(
           multiPointElement,
           appState,
-          { x, y },
+          pointFrom(x, y),
           elementsMap,
           elements,
         );

@@ -1,4 +1,10 @@
-import { average, pointFrom, type GlobalPoint } from "@excalidraw/math";
+import {
+  average,
+  pointFrom,
+  type ViewportPoint,
+  type GlobalPoint,
+  type GenericPoint,
+} from "@excalidraw/math";
 
 import type {
   ExcalidrawBindableElement,
@@ -448,11 +454,11 @@ export const viewportCoordsToSceneCoords = (
     scrollX: number;
     scrollY: number;
   },
-) => {
+): ViewportPoint => {
   const x = (clientX - offsetLeft) / zoom.value - scrollX;
   const y = (clientY - offsetTop) / zoom.value - scrollY;
 
-  return { x, y };
+  return pointFrom<ViewportPoint>(x, y);
 };
 
 export const sceneCoordsToViewportCoords = (
@@ -470,10 +476,10 @@ export const sceneCoordsToViewportCoords = (
     scrollX: number;
     scrollY: number;
   },
-) => {
+): ViewportPoint => {
   const x = (sceneX + scrollX) * zoom.value + offsetLeft;
   const y = (sceneY + scrollY) * zoom.value + offsetTop;
-  return { x, y };
+  return pointFrom<ViewportPoint>(x, y);
 };
 
 export const getGlobalCSSVariable = (name: string) =>
@@ -492,11 +498,11 @@ const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
  */
 export const isRTL = (text: string) => RE_RTL_CHECK.test(text);
 
-export const tupleToCoors = (
+export const tupleToCoors = <Point extends GenericPoint>(
   xyTuple: readonly [number, number],
-): { x: number; y: number } => {
+): Point => {
   const [x, y] = xyTuple;
-  return { x, y };
+  return pointFrom(x, y);
 };
 
 /** use as a rejectionHandler to mute filesystem Abort errors */

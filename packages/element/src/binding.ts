@@ -29,7 +29,7 @@ import {
 
 import { isPointOnShape } from "@excalidraw/utils/collision";
 
-import type { LocalPoint, Radians } from "@excalidraw/math";
+import type { GenericPoint, LocalPoint, Radians } from "@excalidraw/math";
 
 import type Scene from "@excalidraw/excalidraw/scene/Scene";
 
@@ -426,10 +426,10 @@ export const getSuggestedBindingsForArrows = (
   );
 };
 
-export const maybeBindLinearElement = (
+export const maybeBindLinearElement = <Point extends GenericPoint>(
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   appState: AppState,
-  pointerCoords: { x: number; y: number },
+  pointerCoords: Point,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly NonDeletedExcalidrawElement[],
 ): void => {
@@ -577,11 +577,8 @@ const unbindLinearElement = (
   return binding.elementId;
 };
 
-export const getHoveredElementForBinding = (
-  pointerCoords: {
-    x: number;
-    y: number;
-  },
+export const getHoveredElementForBinding = <Point extends GenericPoint>(
+  pointerCoords: Point,
   elements: readonly NonDeletedExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   zoom?: AppState["zoom"],
@@ -1393,11 +1390,11 @@ const getElligibleElementForBindingElement = (
   );
 };
 
-const getLinearElementEdgeCoors = (
+const getLinearElementEdgeCoors = <Point extends GenericPoint>(
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
-): { x: number; y: number } => {
+): Point => {
   const index = startOrEnd === "start" ? 0 : -1;
   return tupleToCoors(
     LinearElementEditor.getPointAtIndexGlobalCoordinates(
@@ -1706,9 +1703,9 @@ const newBoundElements = (
   return nextBoundElements;
 };
 
-export const bindingBorderTest = (
+export const bindingBorderTest = <Point extends GenericPoint>(
   element: NonDeleted<ExcalidrawBindableElement>,
-  { x, y }: { x: number; y: number },
+  [x, y]: Point,
   elementsMap: NonDeletedSceneElementsMap,
   zoom?: AppState["zoom"],
   fullShape?: boolean,

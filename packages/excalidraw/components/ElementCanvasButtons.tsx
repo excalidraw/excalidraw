@@ -20,7 +20,7 @@ const getContainerCoords = (
   elementsMap: ElementsMap,
 ) => {
   const [x1, y1] = getElementAbsoluteCoords(element, elementsMap);
-  const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
+  const [viewportX, viewportY] = sceneCoordsToViewportCoords(
     { sceneX: x1 + element.width, sceneY: y1 },
     appState,
   );

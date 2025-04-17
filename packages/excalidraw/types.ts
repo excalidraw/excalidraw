@@ -42,6 +42,7 @@ import type {
   ValueOf,
   MakeBrand,
 } from "@excalidraw/common/utility-types";
+import type { GenericPoint } from "@excalidraw/math";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
@@ -413,10 +414,7 @@ export interface AppState {
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
   snapLines: readonly SnapLine[];
-  originSnapOffset: {
-    x: number;
-    y: number;
-  } | null;
+  originSnapOffset: GenericPoint | null;
   objectsSnapModeEnabled: boolean;
   /** the user's socket id & username who is being followed on the canvas */
   userToFollow: UserToFollow | null;
@@ -456,14 +454,11 @@ export type Zoom = Readonly<{
   value: NormalizedZoomValue;
 }>;
 
-export type PointerCoords = Readonly<{
-  x: number;
-  y: number;
-}>;
+export type PointerCoords = Readonly<GenericPoint>;
 
 export type Gesture = {
   pointers: Map<number, PointerCoords>;
-  lastCenter: { x: number; y: number } | null;
+  lastCenter: PointerCoords | null;
   initialDistance: number | null;
   initialScale: number | null;
 };
@@ -717,13 +712,13 @@ export type AppClassProperties = {
 
 export type PointerDownState = Readonly<{
   // The first position at which pointerDown happened
-  origin: Readonly<{ x: number; y: number }>;
+  origin: Readonly<GenericPoint>;
   // Same as "origin" but snapped to the grid, if grid is on
-  originInGrid: Readonly<{ x: number; y: number }>;
+  originInGrid: Readonly<GenericPoint>;
   // Scrollbar checks
   scrollbars: ReturnType<typeof isOverScrollBars>;
   // The previous pointer position
-  lastCoords: { x: number; y: number };
+  lastCoords: GenericPoint;
   // map of original elements data
   originalElements: Map<string, NonDeleted<ExcalidrawElement>>;
   resize: {
@@ -732,11 +727,11 @@ export type PointerDownState = Readonly<{
     // This is determined on the initial pointer down event
     isResizing: boolean;
     // This is determined on the initial pointer down event
-    offset: { x: number; y: number };
+    offset: GenericPoint;
     // This is determined on the initial pointer down event
     arrowDirection: "origin" | "end";
     // This is a center point of selected elements determined on the initial pointer down event (for rotation only)
-    center: { x: number; y: number };
+    center: GenericPoint;
   };
   hit: {
     // The element the pointer is "hitting", is determined on the initial
@@ -757,7 +752,7 @@ export type PointerDownState = Readonly<{
     // Might change during the pointer interaction
     hasOccurred: boolean;
     // Might change during the pointer interaction
-    offset: { x: number; y: number } | null;
+    offset: GenericPoint | null;
   };
   // We need to have these in the state so that we can unsubscribe them
   eventListeners: {
