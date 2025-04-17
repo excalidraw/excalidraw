@@ -6213,13 +6213,12 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleEraser = <Point extends GenericPoint>(
     event: PointerEvent,
-    pointerDownState: PointerDownState,
     scenePointer: Point,
-    scenePointer: { x: number; y: number },
   ) => {
+    const [scenePointerX, scenePointerY] = scenePointer;
     const elementsToErase = this.eraserTrail.addPointToPath(
-      scenePointer.x,
-      scenePointer.y,
+      scenePointerX,
+      scenePointerY,
       event.altKey,
     );
 
