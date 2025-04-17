@@ -2,12 +2,7 @@ import {
   getSizeFromPoints,
   randomInteger,
   getUpdatedTimestamp,
-  toBrandedType,
 } from "@excalidraw/common";
-
-// TODO: remove direct dependency on the scene, should be passed in or injected instead
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import Scene from "@excalidraw/excalidraw/scene/Scene";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -16,35 +11,42 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 import { ShapeCache } from "./ShapeCache";
 
 import { updateElbowArrowPoints } from "./elbowArrow";
+
 import { isElbowArrow } from "./typeChecks";
 
-import type { ExcalidrawElement, NonDeletedSceneElementsMap } from "./types";
+import type {
+  ElementsMap,
+  ExcalidrawElbowArrowElement,
+  ExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "./types";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
   "id" | "version" | "versionNonce" | "updated"
 >;
 
-// This function tracks updates of text elements for the purposes for collaboration.
-// The version is used to compare updates when more than one user is working in
-// the same drawing. Note: this will trigger the component to update. Make sure you
-// are calling it either from a React event handler or within unstable_batchedUpdates().
+/**
+ * This function tracks updates of text elements for the purposes for collaboration.
+ * The version is used to compare updates when more than one user is working in
+ * the same drawing.
+ *
+ * WARNING: this won't trigger the component to update, so if you need to trigger component update,
+ * use `scene.mutateElement` or `ExcalidrawImperativeAPI.mutateElement` instead.
+ */
 export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
+  elementsMap: ElementsMap,
   updates: ElementUpdate<TElement>,
-  informMutation = true,
   options?: {
-    // Currently only for elbow arrows.
-    // If true, the elbow arrow tries to bind to the nearest element. If false
-    // it tries to keep the same bound element, if any.
     isDragging?: boolean;
   },
-): TElement => {
+) => {
   let didChange = false;
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { points, fixedSegments, fileId, startBinding, endBinding } =
+  const { points, fixedSegments, startBinding, endBinding, fileId } =
     updates as any;
 
   if (
@@ -55,10 +57,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
       typeof startBinding !== "undefined" ||
       typeof endBinding !== "undefined") // manual binding to element
   ) {
-    const elementsMap = toBrandedType<NonDeletedSceneElementsMap>(
-      Scene.getScene(element)?.getNonDeletedElementsMap() ?? new Map(),
-    );
-
     updates = {
       ...updates,
       angle: 0 as Radians,
@@ -68,16 +66,9 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
           x: updates.x || element.x,
           y: updates.y || element.y,
         },
-        elementsMap,
-        {
-          fixedSegments,
-          points,
-          startBinding,
-          endBinding,
-        },
-        {
-          isDragging: options?.isDragging,
-        },
+        elementsMap as NonDeletedSceneElementsMap,
+        updates as ElementUpdate<ExcalidrawElbowArrowElement>,
+        options,
       ),
     };
   } else if (typeof points !== "undefined") {
@@ -149,10 +140,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element.version++;
   element.versionNonce = randomInteger();
   element.updated = getUpdatedTimestamp();
-
-  if (informMutation) {
-    Scene.getScene(element)?.triggerUpdate();
-  }
 
   return element;
 };

@@ -1,8 +1,7 @@
 import { ARROW_TYPE } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
-import { Excalidraw, mutateElement } from "@excalidraw/excalidraw";
+import { Excalidraw } from "@excalidraw/excalidraw";
 
-import Scene from "@excalidraw/excalidraw/scene/Scene";
 import { actionSelectAll } from "@excalidraw/excalidraw/actions";
 import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions/actionDuplicateSelection";
 
@@ -22,6 +21,8 @@ import "@excalidraw/utils/test-utils";
 import type { LocalPoint } from "@excalidraw/math";
 
 import { bindLinearElement } from "../src/binding";
+
+import Scene from "../src/Scene";
 
 import type {
   ExcalidrawArrowElement,
@@ -142,7 +143,7 @@ describe("elbow arrow routing", () => {
       elbowed: true,
     }) as ExcalidrawElbowArrowElement;
     scene.insertElement(arrow);
-    mutateElement(arrow, {
+    h.app.scene.mutateElement(arrow, {
       points: [
         pointFrom<LocalPoint>(-45 - arrow.x, -100.1 - arrow.y),
         pointFrom<LocalPoint>(45 - arrow.x, 99.9 - arrow.y),
@@ -187,14 +188,14 @@ describe("elbow arrow routing", () => {
     scene.insertElement(rectangle1);
     scene.insertElement(rectangle2);
     scene.insertElement(arrow);
-    const elementsMap = scene.getNonDeletedElementsMap();
-    bindLinearElement(arrow, rectangle1, "start", elementsMap);
-    bindLinearElement(arrow, rectangle2, "end", elementsMap);
+
+    bindLinearElement(arrow, rectangle1, "start", scene);
+    bindLinearElement(arrow, rectangle2, "end", scene);
 
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);
 
-    mutateElement(arrow, {
+    h.app.scene.mutateElement(arrow, {
       points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
     });
 

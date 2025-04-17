@@ -38,10 +38,13 @@ import { redrawTextBoundingBox } from "@excalidraw/element/textElement";
 
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 
+import { getCommonBounds } from "@excalidraw/element/bounds";
+
+import Scene from "@excalidraw/element/Scene";
+
 import type { ElementConstructorOpts } from "@excalidraw/element/newElement";
 
 import type {
-  ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -62,8 +65,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
-
-import { getCommonBounds } from "..";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -221,7 +222,7 @@ const DEFAULT_DIMENSION = 100;
 const bindTextToContainer = (
   container: ExcalidrawElement,
   textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
-  elementsMap: ElementsMap,
+  scene: Scene,
 ) => {
   const textElement: ExcalidrawTextElement = newTextElement({
     x: 0,
@@ -240,7 +241,8 @@ const bindTextToContainer = (
     }),
   });
 
-  redrawTextBoundingBox(textElement, container, elementsMap);
+  redrawTextBoundingBox(textElement, container, scene);
+
   return [container, textElement] as const;
 };
 
@@ -249,7 +251,7 @@ const bindLinearElementToElement = (
   start: ValidLinearElement["start"],
   end: ValidLinearElement["end"],
   elementStore: ElementStore,
-  elementsMap: NonDeletedSceneElementsMap,
+  scene: Scene,
 ): {
   linearElement: ExcalidrawLinearElement;
   startBoundElement?: ExcalidrawElement;
@@ -335,7 +337,7 @@ const bindLinearElementToElement = (
         linearElement,
         startBoundElement as ExcalidrawBindableElement,
         "start",
-        elementsMap,
+        scene,
       );
     }
   }
@@ -410,7 +412,7 @@ const bindLinearElementToElement = (
         linearElement,
         endBoundElement as ExcalidrawBindableElement,
         "end",
-        elementsMap,
+        scene,
       );
     }
   }
@@ -651,6 +653,9 @@ export const convertToExcalidrawElements = (
   }
 
   const elementsMap = elementStore.getElementsMap();
+  // we don't have a real scene, so we just use a temp scene to query and mutate elements
+  const scene = new Scene(elementsMap);
+
   // Add labels and arrow bindings
   for (const [id, element] of elementsWithIds) {
     const excalidrawElement = elementStore.getElement(id)!;
@@ -664,7 +669,7 @@ export const convertToExcalidrawElements = (
           let [container, text] = bindTextToContainer(
             excalidrawElement,
             element?.label,
-            elementsMap,
+            scene,
           );
           elementStore.add(container);
           elementStore.add(text);
@@ -692,7 +697,7 @@ export const convertToExcalidrawElements = (
                 originalStart,
                 originalEnd,
                 elementStore,
-                elementsMap,
+                scene,
               );
             container = linearElement;
             elementStore.add(linearElement);
@@ -717,7 +722,7 @@ export const convertToExcalidrawElements = (
                   start,
                   end,
                   elementStore,
-                  elementsMap,
+                  scene,
                 );
 
               elementStore.add(linearElement);

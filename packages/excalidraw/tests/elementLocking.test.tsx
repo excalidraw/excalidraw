@@ -1,7 +1,5 @@
 import React from "react";
 
-import { mutateElement } from "@excalidraw/element/mutateElement";
-
 import { KEYS } from "@excalidraw/common";
 
 import { actionSelectAll } from "../actions";
@@ -298,7 +296,7 @@ describe("element locking", () => {
       height: textSize,
       containerId: container.id,
     });
-    mutateElement(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ id: text.id, type: "text" }],
     });
 
@@ -339,7 +337,7 @@ describe("element locking", () => {
       containerId: container.id,
       locked: true,
     });
-    mutateElement(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ id: text.id, type: "text" }],
     });
     API.setElements([container, text]);
@@ -373,7 +371,7 @@ describe("element locking", () => {
       containerId: container.id,
       locked: true,
     });
-    mutateElement(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ id: text.id, type: "text" }],
     });
     API.setElements([container, text]);

@@ -172,7 +172,7 @@ export const serializeAsClipboardJSON = ({
         !framesToCopy.has(getContainingFrame(element, elementsMap)!)
       ) {
         const copiedElement = deepCopyElement(element);
-        mutateElement(copiedElement, {
+        mutateElement(copiedElement, elementsMap, {
           frameId: null,
         });
         return copiedElement;
