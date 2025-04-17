@@ -945,10 +945,10 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -7758,10 +7758,10 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -9754,10 +9754,10 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,

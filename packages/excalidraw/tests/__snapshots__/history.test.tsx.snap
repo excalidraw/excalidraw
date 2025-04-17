@@ -1178,10 +1178,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -1550,10 +1550,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -1923,10 +1923,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -2634,10 +2634,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -2937,10 +2937,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -3225,10 +3225,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -3523,10 +3523,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -3813,10 +3813,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -4052,10 +4052,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -4315,10 +4315,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -4592,10 +4592,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -4827,10 +4827,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -5062,10 +5062,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -5295,10 +5295,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -5528,10 +5528,10 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -6937,10 +6937,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -9984,10 +9984,10 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -10872,10 +10872,10 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -12476,10 +12476,10 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -13804,10 +13804,10 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -14272,10 +14272,10 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -14822,10 +14822,10 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
