@@ -1,6 +1,6 @@
 import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 
 import {
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
@@ -19,6 +19,11 @@ import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
 
+import {
+  ExcalidrawPropsCustomOptionsContext,
+  type AppState,
+} from "../../types";
+
 import { ColorInput } from "./ColorInput";
 import { Picker } from "./Picker";
 import PickerHeading from "./PickerHeading";
@@ -28,8 +33,6 @@ import { activeColorPickerSectionAtom, isColorDark } from "./colorPickerUtils";
 import "./ColorPicker.scss";
 
 import type { ColorPickerType } from "./colorPickerUtils";
-
-import type { AppState } from "../../types";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;
@@ -220,6 +223,46 @@ export const ColorPicker = ({
   updateData,
   appState,
 }: ColorPickerProps) => {
+  const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+  const renderPopover = () => {
+    if (customOptions?.pickerRenders?.colorPickerPopoverRender) {
+      return customOptions.pickerRenders.colorPickerPopoverRender({
+        color,
+        label,
+        type,
+        onChange,
+        elements,
+        palette,
+        updateData,
+      });
+    }
+
+    return (
+      <Popover.Root
+        open={appState.openPopup === type}
+        onOpenChange={(open) => {
+          updateData({ openPopup: open ? type : null });
+        }}
+      >
+        {/* serves as an active color indicator as well */}
+        <ColorPickerTrigger color={color} label={label} type={type} />
+        {/* popup content */}
+        {appState.openPopup === type && (
+          <ColorPickerPopupContent
+            type={type}
+            color={color}
+            onChange={onChange}
+            label={label}
+            elements={elements}
+            palette={palette}
+            updateData={updateData}
+          />
+        )}
+      </Popover.Root>
+    );
+  };
+
   return (
     <div>
       <div role="dialog" aria-modal="true" className="color-picker-container">
@@ -230,27 +273,7 @@ export const ColorPicker = ({
           topPicks={topPicks}
         />
         <ButtonSeparator />
-        <Popover.Root
-          open={appState.openPopup === type}
-          onOpenChange={(open) => {
-            updateData({ openPopup: open ? type : null });
-          }}
-        >
-          {/* serves as an active color indicator as well */}
-          <ColorPickerTrigger color={color} label={label} type={type} />
-          {/* popup content */}
-          {appState.openPopup === type && (
-            <ColorPickerPopupContent
-              type={type}
-              color={color}
-              onChange={onChange}
-              label={label}
-              elements={elements}
-              palette={palette}
-              updateData={updateData}
-            />
-          )}
-        </Popover.Root>
+        {renderPopover()}
       </div>
     </div>
   );

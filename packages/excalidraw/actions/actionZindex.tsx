@@ -7,6 +7,8 @@ import {
   moveAllRight,
 } from "@excalidraw/element/zindex";
 
+import { useContext } from "react";
+
 import {
   BringForwardIcon,
   BringToFrontIcon,
@@ -15,6 +17,8 @@ import {
 } from "../components/icons";
 import { t } from "../i18n";
 import { CaptureUpdateAction } from "../store";
+
+import { ExcalidrawPropsCustomOptionsContext } from "../types";
 
 import { register } from "./register";
 
@@ -36,16 +40,29 @@ export const actionSendBackward = register({
     event[KEYS.CTRL_OR_CMD] &&
     !event.shiftKey &&
     event.code === CODES.BRACKET_LEFT,
-  PanelComponent: ({ updateData, appState }) => (
-    <button
-      type="button"
-      className="zIndexButton"
-      onClick={() => updateData(null)}
-      title={`${t("labels.sendBackward")} — ${getShortcutKey("CtrlOrCmd+[")}`}
-    >
-      {SendBackwardIcon}
-    </button>
-  ),
+  PanelComponent: ({ updateData, appState }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.sendBackward")}`,
+        children: SendBackwardIcon,
+        name: "sendBackward",
+      });
+    }
+
+    return (
+      <button
+        type="button"
+        className="zIndexButton"
+        onClick={() => updateData(null)}
+        title={`${t("labels.sendBackward")} — ${getShortcutKey("CtrlOrCmd+[")}`}
+      >
+        {SendBackwardIcon}
+      </button>
+    );
+  },
 });
 
 export const actionBringForward = register({
@@ -66,16 +83,29 @@ export const actionBringForward = register({
     event[KEYS.CTRL_OR_CMD] &&
     !event.shiftKey &&
     event.code === CODES.BRACKET_RIGHT,
-  PanelComponent: ({ updateData, appState }) => (
-    <button
-      type="button"
-      className="zIndexButton"
-      onClick={() => updateData(null)}
-      title={`${t("labels.bringForward")} — ${getShortcutKey("CtrlOrCmd+]")}`}
-    >
-      {BringForwardIcon}
-    </button>
-  ),
+  PanelComponent: ({ updateData, appState }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.bringForward")}`,
+        children: BringForwardIcon,
+        name: "bringForward",
+      });
+    }
+
+    return (
+      <button
+        type="button"
+        className="zIndexButton"
+        onClick={() => updateData(null)}
+        title={`${t("labels.bringForward")} — ${getShortcutKey("CtrlOrCmd+]")}`}
+      >
+        {BringForwardIcon}
+      </button>
+    );
+  },
 });
 
 export const actionSendToBack = register({
@@ -99,20 +129,33 @@ export const actionSendToBack = register({
       : event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
         event.code === CODES.BRACKET_LEFT,
-  PanelComponent: ({ updateData, appState }) => (
-    <button
-      type="button"
-      className="zIndexButton"
-      onClick={() => updateData(null)}
-      title={`${t("labels.sendToBack")} — ${
-        isDarwin
-          ? getShortcutKey("CtrlOrCmd+Alt+[")
-          : getShortcutKey("CtrlOrCmd+Shift+[")
-      }`}
-    >
-      {SendToBackIcon}
-    </button>
-  ),
+  PanelComponent: ({ updateData, appState }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.sendToBack")}`,
+        children: SendToBackIcon,
+        name: "sendToBack",
+      });
+    }
+
+    return (
+      <button
+        type="button"
+        className="zIndexButton"
+        onClick={() => updateData(null)}
+        title={`${t("labels.sendToBack")} — ${
+          isDarwin
+            ? getShortcutKey("CtrlOrCmd+Alt+[")
+            : getShortcutKey("CtrlOrCmd+Shift+[")
+        }`}
+      >
+        {SendToBackIcon}
+      </button>
+    );
+  },
 });
 
 export const actionBringToFront = register({
@@ -137,18 +180,31 @@ export const actionBringToFront = register({
       : event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
         event.code === CODES.BRACKET_RIGHT,
-  PanelComponent: ({ updateData, appState }) => (
-    <button
-      type="button"
-      className="zIndexButton"
-      onClick={(event) => updateData(null)}
-      title={`${t("labels.bringToFront")} — ${
-        isDarwin
-          ? getShortcutKey("CtrlOrCmd+Alt+]")
-          : getShortcutKey("CtrlOrCmd+Shift+]")
-      }`}
-    >
-      {BringToFrontIcon}
-    </button>
-  ),
+  PanelComponent: ({ updateData, appState }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.bringToFront")}`,
+        children: BringToFrontIcon,
+        name: "bringToFront",
+      });
+    }
+
+    return (
+      <button
+        type="button"
+        className="zIndexButton"
+        onClick={(event) => updateData(null)}
+        title={`${t("labels.bringToFront")} — ${
+          isDarwin
+            ? getShortcutKey("CtrlOrCmd+Alt+]")
+            : getShortcutKey("CtrlOrCmd+Shift+]")
+        }`}
+      >
+        {BringToFrontIcon}
+      </button>
+    );
+  },
 });

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useState, useContext } from "react";
 
 import {
   CLASSES,
@@ -45,6 +45,8 @@ import {
   hasStrokeStyle,
   hasStrokeWidth,
 } from "../scene";
+
+import { ExcalidrawPropsCustomOptionsContext } from "../types";
 
 import { SHAPES } from "./shapes";
 
@@ -112,6 +114,8 @@ export const SelectedShapeActions = ({
   renderAction: ActionManager["renderAction"];
   app: AppClassProperties;
 }) => {
+  const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
   const targetElements = getTargetElements(elementsMap, appState);
 
   let isSingleElementBoundContainer = false;
@@ -212,12 +216,22 @@ export const SelectedShapeActions = ({
 
       <fieldset>
         <legend>{t("labels.layers")}</legend>
-        <div className="buttonList">
-          {renderAction("sendToBack")}
-          {renderAction("sendBackward")}
-          {renderAction("bringForward")}
-          {renderAction("bringToFront")}
-        </div>
+        {!customOptions?.pickerRenders?.ButtonList && (
+          <div className={"buttonList"}>
+            {renderAction("sendToBack")}
+            {renderAction("sendBackward")}
+            {renderAction("bringForward")}
+            {renderAction("bringToFront")}
+          </div>
+        )}
+        {customOptions?.pickerRenders?.ButtonList && (
+          <customOptions.pickerRenders.ButtonList>
+            {renderAction("sendToBack")}
+            {renderAction("sendBackward")}
+            {renderAction("bringForward")}
+            {renderAction("bringToFront")}
+          </customOptions.pickerRenders.ButtonList>
+        )}
       </fieldset>
 
       {showAlignActions && !isSingleElementBoundContainer && (

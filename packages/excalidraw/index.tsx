@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useImperativeHandle, useRef } from "react";
 
 import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
 
@@ -16,7 +16,8 @@ import "./css/app.scss";
 import "./css/styles.scss";
 import "./fonts/fonts.css";
 
-import type { AppProps, ExcalidrawProps } from "./types";
+import { ExcalidrawPropsCustomOptionsContext, type AppProps, type ExcalidrawProps } from "./types";
+import type { ActionResult } from "./actions/types";
 
 polyfill();
 
@@ -53,6 +54,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     renderEmbeddable,
     aiEnabled,
     showDeprecatedFonts,
+    customOptions,
+    actionRef,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -108,46 +111,61 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     };
   }, []);
 
+  const appRef = useRef<App>(null);
+  useImperativeHandle(
+    actionRef,
+    () => ({
+      syncActionResult: (actionResult: ActionResult) => {
+        appRef.current?.syncActionResult(actionResult);
+      },
+    }),
+    [],
+  );
+
   return (
-    <EditorJotaiProvider store={editorJotaiStore}>
-      <InitializeApp langCode={langCode} theme={theme}>
-        <App
-          onChange={onChange}
-          initialData={initialData}
-          excalidrawAPI={excalidrawAPI}
-          isCollaborating={isCollaborating}
-          onPointerUpdate={onPointerUpdate}
-          renderTopRightUI={renderTopRightUI}
-          langCode={langCode}
-          viewModeEnabled={viewModeEnabled}
-          zenModeEnabled={zenModeEnabled}
-          gridModeEnabled={gridModeEnabled}
-          libraryReturnUrl={libraryReturnUrl}
-          theme={theme}
-          name={name}
-          renderCustomStats={renderCustomStats}
-          UIOptions={UIOptions}
-          onPaste={onPaste}
-          detectScroll={detectScroll}
-          handleKeyboardGlobally={handleKeyboardGlobally}
-          onLibraryChange={onLibraryChange}
-          autoFocus={autoFocus}
-          generateIdForFile={generateIdForFile}
-          onLinkOpen={onLinkOpen}
-          generateLinkForSelection={generateLinkForSelection}
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-          onScrollChange={onScrollChange}
-          onDuplicate={onDuplicate}
-          validateEmbeddable={validateEmbeddable}
-          renderEmbeddable={renderEmbeddable}
-          aiEnabled={aiEnabled !== false}
-          showDeprecatedFonts={showDeprecatedFonts}
-        >
-          {children}
-        </App>
-      </InitializeApp>
-    </EditorJotaiProvider>
+    <ExcalidrawPropsCustomOptionsContext.Provider value={customOptions}>
+      <EditorJotaiProvider store={editorJotaiStore}>
+        <InitializeApp langCode={langCode} theme={theme}>
+          <App
+            ref={appRef}
+            onChange={onChange}
+            initialData={initialData}
+            excalidrawAPI={excalidrawAPI}
+            isCollaborating={isCollaborating}
+            onPointerUpdate={onPointerUpdate}
+            renderTopRightUI={renderTopRightUI}
+            langCode={langCode}
+            viewModeEnabled={viewModeEnabled}
+            zenModeEnabled={zenModeEnabled}
+            gridModeEnabled={gridModeEnabled}
+            libraryReturnUrl={libraryReturnUrl}
+            theme={theme}
+            name={name}
+            renderCustomStats={renderCustomStats}
+            UIOptions={UIOptions}
+            onPaste={onPaste}
+            detectScroll={detectScroll}
+            handleKeyboardGlobally={handleKeyboardGlobally}
+            onLibraryChange={onLibraryChange}
+            autoFocus={autoFocus}
+            generateIdForFile={generateIdForFile}
+            onLinkOpen={onLinkOpen}
+            generateLinkForSelection={generateLinkForSelection}
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
+            onScrollChange={onScrollChange}
+            onDuplicate={onDuplicate}
+            validateEmbeddable={validateEmbeddable}
+            renderEmbeddable={renderEmbeddable}
+            aiEnabled={aiEnabled !== false}
+            showDeprecatedFonts={showDeprecatedFonts}
+            customOptions={customOptions}
+          >
+            {children}
+          </App>
+        </InitializeApp>
+      </EditorJotaiProvider>
+    </ExcalidrawPropsCustomOptionsContext.Provider>
   );
 };
 

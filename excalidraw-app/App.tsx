@@ -848,6 +848,13 @@ const ExcalidrawWrapper = () => {
         handleKeyboardGlobally={true}
         autoFocus={true}
         theme={editorTheme}
+        customOptions={{
+          disableKeyEvents: true,
+          //   hideMainToolbar: true,
+          //   hideMenu: true,
+          //   hideFooter: true,
+          hideContextMenu: true,
+        }}
         renderTopRightUI={(isMobile) => {
           if (isMobile || !collabAPI || isCollabDisabled) {
             return null;

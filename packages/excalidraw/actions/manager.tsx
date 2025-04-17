@@ -160,7 +160,6 @@ export class ActionManager {
       const appState = this.getAppState();
       const updateData = (formState?: any) => {
         trackAction(action, "ui", appState, elements, this.app, formState);
-
         this.updater(
           action.perform(
             this.getElementsIncludingDeleted(),

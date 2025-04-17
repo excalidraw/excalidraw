@@ -1,8 +1,12 @@
+import { createContext, type JSX } from "react";
+
 import type {
   IMAGE_MIME_TYPES,
   UserIdleState,
   throttleRAF,
   MIME_TYPES,
+  ColorPaletteCustom,
+  ColorTuple,
 } from "@excalidraw/common";
 
 import type { SuggestedBinding } from "@excalidraw/element/binding";
@@ -43,7 +47,9 @@ import type {
   MakeBrand,
 } from "@excalidraw/common/utility-types";
 
-import type { Action } from "./actions/types";
+import type { ColorPickerType } from "./components/ColorPicker/colorPickerUtils";
+
+import type { Action, ActionResult } from "./actions/types";
 import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
 import type App from "./components/App";
@@ -57,7 +63,8 @@ import type { ImportedDataState } from "./data/types";
 import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
-import type { JSX } from "react";
+import type { ButtonIconSelectProps } from "./components/ButtonIconSelect";
+import type { ButtonIcon } from "./components/ButtonIcon";
 
 export type SocketId = string & { _brand: "SocketId" };
 
@@ -512,6 +519,83 @@ export type OnUserFollowedPayload = {
   action: "FOLLOW" | "UNFOLLOW";
 };
 
+export interface ExcalidrawPropsCustomOptions {
+  disableKeyEvents?: boolean;
+  hideMainToolbar?: boolean;
+  hideMenu?: boolean;
+  hideFooter?: boolean;
+  hideContextMenu?: boolean;
+  shouldResizeFromCenter?: (event: MouseEvent | KeyboardEvent) => boolean;
+  shouldMaintainAspectRatio?: (event: MouseEvent | KeyboardEvent) => boolean;
+  shouldRotateWithDiscreteAngle?: (
+    event: MouseEvent | KeyboardEvent | React.PointerEvent<HTMLCanvasElement>,
+  ) => boolean;
+  shouldSnapping?: (event: KeyboardModifiersObject) => boolean;
+  layoutRenders?: {
+    menuRender?: (props: { children: React.ReactNode }) => React.ReactNode;
+  };
+  pickerRenders?: {
+    ButtonList?: React.ComponentType<{ children: React.ReactNode }>;
+    elementStrokeColors?: ColorTuple;
+    elementBackgroundColors?: ColorTuple;
+    buttonIconSelectRender?: <T extends Object>(
+      props: ButtonIconSelectProps<T>,
+    ) => JSX.Element;
+    buttonIconSelectRadioRender?: (props: {
+      key: string;
+      active: boolean;
+      title: string;
+      name: string;
+      onChange: () => void;
+      checked: boolean;
+      dataTestid?: string;
+      children: React.ReactNode;
+      value: any;
+    }) => JSX.Element;
+    CustomButtonIcon?: typeof ButtonIcon;
+    layerButtonRender?: (props: {
+      onClick: () => void;
+      title: string;
+      children: React.ReactNode;
+      name: string;
+    }) => JSX.Element;
+    rangeRender?: (props: {
+      value: number;
+      onChange: (value: number) => void;
+      min: number;
+      max: number;
+      step: number;
+    }) => React.ReactNode;
+    colorPickerTopPickesButtonRender?: (props: {
+      active: boolean;
+      color: string;
+      isTransparent: boolean;
+      hasOutline: boolean;
+      onClick: () => void;
+      dataTestid: string;
+      children: React.ReactNode;
+      key: string;
+    }) => React.ReactNode;
+    colorPickerPopoverRender?: (props: {
+      color: string;
+      label: string;
+      type: ColorPickerType;
+      onChange: (color: string) => void;
+      elements: readonly ExcalidrawElement[];
+      palette: ColorPaletteCustom | null;
+      updateData: (formData?: any) => void;
+    }) => React.ReactNode;
+  };
+}
+
+export const ExcalidrawPropsCustomOptionsContext = createContext<
+  ExcalidrawPropsCustomOptions | undefined
+>({});
+
+export interface ExcalidrawActionType {
+  syncActionResult: (actionResult: ActionResult) => void;
+}
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
@@ -601,6 +685,8 @@ export interface ExcalidrawProps {
   ) => JSX.Element | null;
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
+  customOptions?: ExcalidrawPropsCustomOptions;
+  actionRef?: React.RefObject<ExcalidrawActionType | undefined>;
 }
 
 export type SceneData = {
