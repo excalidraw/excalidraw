@@ -19,9 +19,9 @@ import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
 import { type GeometricShape, getPolygonShape } from "@excalidraw/utils/shape";
 
 import type {
+  GenericPoint,
   GlobalPoint,
   LineSegment,
-  LocalPoint,
   Polygon,
   Radians,
 } from "@excalidraw/math";
@@ -72,7 +72,7 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
   return isDraggableFromInside || isImageElement(element);
 };
 
-export type HitTestArgs<Point extends GlobalPoint | LocalPoint> = {
+export type HitTestArgs<Point extends GenericPoint> = {
   x: number;
   y: number;
   element: ExcalidrawElement;
@@ -81,7 +81,7 @@ export type HitTestArgs<Point extends GlobalPoint | LocalPoint> = {
   frameNameBound?: FrameNameBounds | null;
 };
 
-export const hitElementItself = <Point extends GlobalPoint | LocalPoint>({
+export const hitElementItself = <Point extends GenericPoint>({
   x,
   y,
   element,
@@ -127,9 +127,7 @@ export const hitElementBoundingBox = (
   );
 };
 
-export const hitElementBoundingBoxOnly = <
-  Point extends GlobalPoint | LocalPoint,
->(
+export const hitElementBoundingBoxOnly = <Point extends GenericPoint>(
   hitArgs: HitTestArgs<Point>,
   elementsMap: ElementsMap,
 ) => {
@@ -145,7 +143,7 @@ export const hitElementBoundingBoxOnly = <
   );
 };
 
-export const hitElementBoundText = <Point extends GlobalPoint | LocalPoint>(
+export const hitElementBoundText = <Point extends GenericPoint>(
   x: number,
   y: number,
   textShape: GeometricShape<Point> | null,

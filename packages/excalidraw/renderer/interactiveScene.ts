@@ -2,8 +2,8 @@ import oc from "open-color";
 import {
   pointFrom,
   type GlobalPoint,
-  type LocalPoint,
   type Radians,
+  type GenericPoint,
 } from "@excalidraw/math";
 
 import {
@@ -144,7 +144,7 @@ const renderLinearElementPointHighlight = (
   context.restore();
 };
 
-const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
+const highlightPoint = <Point extends GenericPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -211,7 +211,7 @@ const strokeDiamondWithRotation = (
   context.restore();
 };
 
-const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
+const renderSingleLinearPoint = <Point extends GenericPoint>(
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   point: Point,

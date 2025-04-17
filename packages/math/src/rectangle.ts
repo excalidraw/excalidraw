@@ -1,18 +1,19 @@
 import { pointFrom } from "./point";
 import { lineSegment, lineSegmentIntersectionPoints } from "./segment";
 
-import type { GlobalPoint, LineSegment, LocalPoint, Rectangle } from "./types";
+import type { GenericPoint, LineSegment, Rectangle } from "./types";
 
-export function rectangle<P extends GlobalPoint | LocalPoint>(
+export function rectangle<P extends GenericPoint>(
   topLeft: P,
   bottomRight: P,
 ): Rectangle<P> {
   return [topLeft, bottomRight] as Rectangle<P>;
 }
 
-export function rectangleIntersectLineSegment<
-  Point extends LocalPoint | GlobalPoint,
->(r: Rectangle<Point>, l: LineSegment<Point>): Point[] {
+export function rectangleIntersectLineSegment<Point extends GenericPoint>(
+  r: Rectangle<Point>,
+  l: LineSegment<Point>,
+): Point[] {
   return [
     lineSegment(r[0], pointFrom(r[1][0], r[0][1])),
     lineSegment(pointFrom(r[1][0], r[0][1]), r[1]),

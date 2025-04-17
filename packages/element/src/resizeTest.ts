@@ -7,7 +7,7 @@ import {
 
 import { SIDE_RESIZING_THRESHOLD } from "@excalidraw/common";
 
-import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
+import type { GenericPoint, LineSegment } from "@excalidraw/math";
 
 import type { AppState, Device, Zoom } from "@excalidraw/excalidraw/types";
 
@@ -43,7 +43,7 @@ const isInsideTransformHandle = (
   y >= transformHandle[1] &&
   y <= transformHandle[1] + transformHandle[3];
 
-export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
+export const resizeTest = <Point extends GenericPoint>(
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
   appState: AppState,
@@ -152,9 +152,7 @@ export const getElementWithTransformHandleType = (
   }, null as { element: NonDeletedExcalidrawElement; transformHandleType: MaybeTransformHandleType } | null);
 };
 
-export const getTransformHandleTypeFromCoords = <
-  Point extends GlobalPoint | LocalPoint,
->(
+export const getTransformHandleTypeFromCoords = <Point extends GenericPoint>(
   [x1, y1, x2, y2]: Bounds,
   scenePointerX: number,
   scenePointerY: number,
@@ -271,7 +269,7 @@ export const getCursorForResizingElement = (resizingElement: {
   return cursor ? `${cursor}-resize` : "";
 };
 
-const getSelectionBorders = <Point extends LocalPoint | GlobalPoint>(
+const getSelectionBorders = <Point extends GenericPoint>(
   [x1, y1]: Point,
   [x2, y2]: Point,
   center: Point,
