@@ -6,6 +6,8 @@ import {
   TEXT_ALIGN,
   VERTICAL_ALIGN,
   getFontString,
+  isProdEnv,
+  invariant,
 } from "@excalidraw/common";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -26,6 +28,8 @@ import {
   isTextElement,
 } from "./typeChecks";
 
+import type { Radians } from "../../math/src";
+
 import type { MaybeTransformHandleType } from "./transformHandles";
 import type {
   ElementsMap,
@@ -44,13 +48,25 @@ export const redrawTextBoundingBox = (
   informMutation = true,
 ) => {
   let maxWidth = undefined;
+
+  if (!isProdEnv()) {
+    invariant(
+      !container || !isArrowElement(container) || textElement.angle === 0,
+      "text element angle must be 0 if bound to arrow container",
+    );
+  }
+
   const boundTextUpdates = {
     x: textElement.x,
     y: textElement.y,
     text: textElement.text,
     width: textElement.width,
     height: textElement.height,
-    angle: container?.angle ?? textElement.angle,
+    angle: (container
+      ? isArrowElement(container)
+        ? 0
+        : container.angle
+      : textElement.angle) as Radians,
   };
 
   boundTextUpdates.text = textElement.text;
@@ -335,7 +351,10 @@ export const getTextElementAngle = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawTextContainer | null,
 ) => {
-  if (!container || isArrowElement(container)) {
+  if (isArrowElement(container)) {
+    return 0;
+  }
+  if (!container) {
     return textElement.angle;
   }
   return container.angle;
