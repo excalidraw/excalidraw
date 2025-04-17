@@ -8203,10 +8203,11 @@ class App extends React.Component<AppProps, AppState> {
           ...pointerDownState,
           lastCoords: pointFrom(pointerCoordsX, pointerCoordsY),
         };
-        if (this.maybeHandleCrop(updatedPointerDownState, event)) {
+        pointerDownState = updatedPointerDownState;
+        if (this.maybeHandleCrop(pointerDownState, event)) {
           return true;
         }
-        if (this.maybeHandleResize(updatedPointerDownState, event)) {
+        if (this.maybeHandleResize(pointerDownState, event)) {
           return true;
         }
       }
@@ -8610,6 +8611,7 @@ class App extends React.Component<AppProps, AppState> {
           ...pointerDownState,
           lastCoords: pointFrom(pointerCoordsX, pointerCoordsY),
         };
+        pointerDownState = updatedPointerDownState;
         if (event.altKey) {
           this.setActiveTool(
             { type: "lasso", fromSelection: true },
@@ -8626,7 +8628,7 @@ class App extends React.Component<AppProps, AppState> {
             selectionElement: null,
           });
         } else {
-          this.maybeDragNewGenericElement(updatedPointerDownState, event);
+          this.maybeDragNewGenericElement(pointerDownState, event);
         }
       } else if (this.state.activeTool.type === "lasso") {
         if (!event.altKey && this.state.activeTool.fromSelection) {
@@ -8637,7 +8639,8 @@ class App extends React.Component<AppProps, AppState> {
             ...pointerDownState,
             lastCoords: pointFrom(pointerCoordsX, pointerCoordsY),
           };
-          this.maybeDragNewGenericElement(updatedPointerDownState, event);
+          pointerDownState = updatedPointerDownState;
+          this.maybeDragNewGenericElement(pointerDownState, event);
           this.lassoTrail.endPath();
         } else {
           this.lassoTrail.addPointToPath(
@@ -8736,11 +8739,8 @@ class App extends React.Component<AppProps, AppState> {
             ...pointerDownState,
             lastCoords: pointFrom(pointerCoordsX, pointerCoordsY),
           };
-          this.maybeDragNewGenericElement(
-            updatedPointerDownState,
-            event,
-            false,
-          );
+          pointerDownState = updatedPointerDownState;
+          this.maybeDragNewGenericElement(pointerDownState, event, false);
         }
       }
 
