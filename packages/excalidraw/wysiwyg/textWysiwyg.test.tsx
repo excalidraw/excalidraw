@@ -31,6 +31,7 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
+import { actionBindText } from "../actions";
 
 unmountComponent();
 
@@ -1567,6 +1568,102 @@ describe("textWysiwyg", () => {
       text = h.elements[2] as ExcalidrawTextElementWithContainer;
       expect(text.containerId).toBe(null);
       expect(text.text).toBe("Excalidraw");
+    });
+
+    it("should reset the text element angle to the container's when binding to rotated non-arrow container", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "Hello World!",
+        angle: 45,
+      });
+      const rectangle = API.createElement({
+        type: "rectangle",
+        width: 90,
+        height: 75,
+        angle: 30,
+      });
+
+      API.setElements([rectangle, text]);
+
+      API.setSelectedElements([rectangle, text]);
+
+      h.app.actionManager.executeAction(actionBindText);
+
+      expect(text.angle).toBe(30);
+      expect(rectangle.angle).toBe(30);
+    });
+
+    it("should reset the text element angle to 0 when binding to rotated arrow container", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "Hello World!",
+        angle: 45,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        width: 90,
+        height: 75,
+        angle: 30,
+      });
+
+      API.setElements([arrow, text]);
+
+      API.setSelectedElements([arrow, text]);
+
+      h.app.actionManager.executeAction(actionBindText);
+
+      expect(text.angle).toBe(0);
+      expect(arrow.angle).toBe(30);
+    });
+
+    it("should keep the text label at 0 degrees when used as an arrow label", async () => {
+      const arrow = API.createElement({
+        type: "arrow",
+        width: 90,
+        height: 75,
+        angle: 30,
+      });
+
+      API.setElements([arrow]);
+      API.setSelectedElements([arrow]);
+
+      mouse.doubleClickAt(
+        arrow.x + arrow.width / 2,
+        arrow.y + arrow.height / 2,
+      );
+
+      const editor = await getTextEditor(textEditorSelector, true);
+
+      updateTextEditor(editor, "Hello World!");
+
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements[1].angle).toBe(0);
+    });
+
+    it("should keep the text label at the same degrees when used as a non-arrow label", async () => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        width: 90,
+        height: 75,
+        angle: 30,
+      });
+
+      API.setElements([rectangle]);
+      API.setSelectedElements([rectangle]);
+
+      mouse.doubleClickAt(
+        rectangle.x + rectangle.width / 2,
+        rectangle.y + rectangle.height / 2,
+      );
+
+      const editor = await getTextEditor(textEditorSelector, true);
+
+      updateTextEditor(editor, "Hello World!");
+
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements[1].angle).toBe(30);
     });
   });
 });

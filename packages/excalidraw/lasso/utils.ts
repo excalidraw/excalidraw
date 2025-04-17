@@ -7,10 +7,12 @@ import {
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
-import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
+import type {
+  ElementsSegmentsMap,
+  GlobalPoint,
+  LineSegment,
+} from "@excalidraw/math/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
-
-export type ElementsSegmentsMap = Map<string, LineSegment<GlobalPoint>[]>;
 
 export const getLassoSelectedElementIds = (input: {
   lassoPath: GlobalPoint[];
