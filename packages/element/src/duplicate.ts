@@ -95,6 +95,7 @@ export const duplicateElements = (
     elements: readonly ExcalidrawElement[];
     randomizeSeed?: boolean;
     overrides?: (data: {
+      duplicateElement: ExcalidrawElement;
       origElement: ExcalidrawElement;
       origIdToDuplicateId: Map<
         ExcalidrawElement["id"],
@@ -377,12 +378,13 @@ export const duplicateElements = (
   );
 
   if (opts.overrides) {
-    for (const copy of duplicatedElements) {
-      const origElement = duplicateIdToOrigElement.get(copy.id);
+    for (const duplicateElement of duplicatedElements) {
+      const origElement = duplicateIdToOrigElement.get(duplicateElement.id);
       if (origElement) {
         Object.assign(
-          copy,
+          duplicateElement,
           opts.overrides({
+            duplicateElement,
             origElement,
             origIdToDuplicateId,
           }),

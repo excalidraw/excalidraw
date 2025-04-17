@@ -408,6 +408,117 @@ describe("duplicating multiple elements", () => {
   });
 });
 
+describe("group-related duplication", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("action-duplicating within group", async () => {
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      groupIds: ["group1"],
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      groupIds: ["group1"],
+    });
+
+    API.setElements([rectangle1, rectangle2]);
+    API.setSelectedElements([rectangle2], "group1");
+
+    act(() => {
+      h.app.actionManager.executeAction(actionDuplicateSelection);
+    });
+
+    assertElements(h.elements, [
+      { id: rectangle1.id },
+      { id: rectangle2.id },
+      { [ORIG_ID]: rectangle2.id, selected: true, groupIds: ["group1"] },
+    ]);
+    expect(h.state.editingGroupId).toBe("group1");
+  });
+
+  it("alt-duplicating within group", async () => {
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      groupIds: ["group1"],
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      groupIds: ["group1"],
+    });
+
+    API.setElements([rectangle1, rectangle2]);
+    API.setSelectedElements([rectangle2], "group1");
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(rectangle2.x + 5, rectangle2.y + 5);
+      mouse.up(rectangle2.x + 50, rectangle2.y + 50);
+    });
+
+    assertElements(h.elements, [
+      { id: rectangle1.id },
+      { id: rectangle2.id },
+      { [ORIG_ID]: rectangle2.id, selected: true, groupIds: ["group1"] },
+    ]);
+    expect(h.state.editingGroupId).toBe("group1");
+  });
+
+  it.skip("alt-duplicating within group away outside frame", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["group1"],
+      frameId: frame.id,
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 50,
+      height: 50,
+      groupIds: ["group1"],
+      frameId: frame.id,
+    });
+
+    API.setElements([frame, rectangle1, rectangle2]);
+    API.setSelectedElements([rectangle2], "group1");
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(rectangle2.x + 5, rectangle2.y + 5);
+      mouse.up(frame.x + frame.width + 50, frame.y + frame.height + 50);
+    });
+
+    // console.log(h.elements);
+
+    assertElements(h.elements, [
+      { id: frame.id },
+      { id: rectangle1.id, frameId: frame.id },
+      { id: rectangle2.id, frameId: frame.id },
+      { [ORIG_ID]: rectangle2.id, selected: true, groupIds: [], frameId: null },
+    ]);
+    expect(h.state.editingGroupId).toBe(null);
+  });
+});
+
 describe("duplication z-order", () => {
   beforeEach(async () => {
     await render(<Excalidraw />);
@@ -703,7 +814,7 @@ describe("duplication z-order", () => {
     ]);
   });
 
-  it("alt-duplicating bindable element with bound arrow should keep the arrow on the duplicate", () => {
+  it("alt-duplicating bindable element with bound arrow should keep the arrow on the duplicate", async () => {
     const rect = UI.createElement("rectangle", {
       x: 0,
       y: 0,
@@ -725,11 +836,18 @@ describe("duplication z-order", () => {
       mouse.up(15, 15);
     });
 
-    expect(window.h.elements).toHaveLength(3);
-
-    const newRect = window.h.elements[0];
-
-    expect(arrow.endBinding?.elementId).toBe(newRect.id);
-    expect(newRect.boundElements?.[0]?.id).toBe(arrow.id);
+    assertElements(h.elements, [
+      {
+        id: rect.id,
+        boundElements: expect.arrayContaining([
+          expect.objectContaining({ id: arrow.id }),
+        ]),
+      },
+      { [ORIG_ID]: rect.id, boundElements: [], selected: true },
+      {
+        id: arrow.id,
+        endBinding: expect.objectContaining({ elementId: rect.id }),
+      },
+    ]);
   });
 });

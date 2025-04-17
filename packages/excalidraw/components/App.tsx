@@ -8445,8 +8445,15 @@ class App extends React.Component<AppProps, AppState> {
               appState: this.state,
               randomizeSeed: true,
               idsOfElementsToDuplicate,
-              overrides: () => {
+              overrides: ({ duplicateElement, origElement }) => {
                 return {
+                  // reset to the original element's frameId (unless we've
+                  // duplicated alongside a frame in which case we need to
+                  // keep the duplicate frame's id) so that the element
+                  // frame membership is refreshed on pointerup
+                  // NOTE this is a hacky solution and should be done
+                  // differently
+                  frameId: duplicateElement.frameId ?? origElement.frameId,
                   seed: randomInteger(),
                 };
               },
