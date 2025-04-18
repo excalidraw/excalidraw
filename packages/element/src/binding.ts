@@ -980,6 +980,7 @@ export const bindPointToSnapToElementOutline = (
           otherPoint,
         ),
       ),
+      0.1,
     )[0];
   } else {
     intersection = intersectElementWithLineSegment(

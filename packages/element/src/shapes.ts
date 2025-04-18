@@ -282,6 +282,15 @@ export const mapIntervalToBezierT = <P extends GlobalPoint | LocalPoint>(
   );
 };
 
+export const aabbForPoints = <Point extends GlobalPoint | LocalPoint>(
+  points: Point[],
+): Bounds => [
+  Math.min(...points.map((point) => point[0])),
+  Math.min(...points.map((point) => point[1])),
+  Math.max(...points.map((point) => point[0])),
+  Math.max(...points.map((point) => point[1])),
+];
+
 /**
  * Get the axis-aligned bounding box for a given element
  */
