@@ -171,7 +171,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 19,
+  "version": 9,
   "width": 100,
   "x": 100,
   "y": -50,
@@ -198,7 +198,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "102.35417",
+  "height": "102.45605",
   "id": "id172",
   "index": "a2",
   "isDeleted": false,
@@ -212,8 +212,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      "101.77517",
-      "102.35417",
+      "102.80179",
+      "102.45605",
     ],
   ],
   "roughness": 1,
@@ -227,9 +227,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 40,
-  "width": "101.77517",
-  "x": "0.70711",
+  "version": 37,
+  "width": "102.80179",
+  "x": "-0.42182",
   "y": 0,
 }
 `;
@@ -264,7 +264,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 6,
+  "version": 14,
   "width": 50,
   "x": 100,
   "y": 100,
@@ -291,22 +291,39 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
+          "id171" => Delta {
+            "deleted": {
+              "boundElements": [],
+            },
+            "inserted": {
+              "boundElements": [
+                {
+                  "id": "id172",
+                  "type": "arrow",
+                },
+              ],
+            },
+          },
           "id172" => Delta {
             "deleted": {
               "endBinding": {
-                "elementId": "id171",
-                "focus": "0.00990",
+                "elementId": "id175",
+                "fixedPoint": [
+                  "0.50000",
+                  1,
+                ],
+                "focus": 0,
                 "gap": 1,
               },
-              "height": "0.98586",
+              "height": "70.45017",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  "98.58579",
-                  "-0.98586",
+                  "100.70774",
+                  "70.45017",
                 ],
               ],
               "startBinding": {
@@ -321,7 +338,7 @@ History {
                 "focus": "-0.02000",
                 "gap": 1,
               },
-              "height": "0.00000",
+              "height": "0.09250",
               "points": [
                 [
                   0,
@@ -329,7 +346,7 @@ History {
                 ],
                 [
                   "98.58579",
-                  "0.00000",
+                  "0.09250",
                 ],
               ],
               "startBinding": {
@@ -337,6 +354,19 @@ History {
                 "focus": "0.02000",
                 "gap": 1,
               },
+            },
+          },
+          "id175" => Delta {
+            "deleted": {
+              "boundElements": [
+                {
+                  "id": "id172",
+                  "type": "arrow",
+                },
+              ],
+            },
+            "inserted": {
+              "boundElements": [],
             },
           },
         },
@@ -366,59 +396,32 @@ History {
               ],
             },
           },
-          "id171" => Delta {
-            "deleted": {
-              "boundElements": [],
-            },
-            "inserted": {
-              "boundElements": [
-                {
-                  "id": "id172",
-                  "type": "arrow",
-                },
-              ],
-            },
-          },
           "id172" => Delta {
             "deleted": {
-              "endBinding": {
-                "elementId": "id175",
-                "fixedPoint": [
-                  "0.50000",
-                  1,
-                ],
-                "focus": 0,
-                "gap": 1,
-              },
-              "height": "102.35417",
+              "height": "102.45584",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  "101.77517",
-                  "102.35417",
+                  "102.79971",
+                  "102.45584",
                 ],
               ],
               "startBinding": null,
               "y": 0,
             },
             "inserted": {
-              "endBinding": {
-                "elementId": "id171",
-                "focus": "0.00990",
-                "gap": 1,
-              },
-              "height": "0.98586",
+              "height": "70.33521",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  "98.58579",
-                  "-0.98586",
+                  "100.78887",
+                  "70.33521",
                 ],
               ],
               "startBinding": {
@@ -426,20 +429,7 @@ History {
                 "focus": "0.02970",
                 "gap": 1,
               },
-              "y": "0.99364",
-            },
-          },
-          "id175" => Delta {
-            "deleted": {
-              "boundElements": [
-                {
-                  "id": "id172",
-                  "type": "arrow",
-                },
-              ],
-            },
-            "inserted": {
-              "boundElements": [],
+              "y": "35.20327",
             },
           },
         },
@@ -739,7 +729,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 9,
+  "version": 19,
   "width": 100,
   "x": 150,
   "y": -50,
@@ -819,8 +809,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 30,
-  "width": 0,
+  "version": 33,
+  "width": 100,
   "x": "149.29289",
   "y": 0,
 }
@@ -846,20 +836,22 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id167" => Delta {
+          "id166" => Delta {
             "deleted": {
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  0,
-                  0,
-                ],
-              ],
+              "boundElements": [],
             },
             "inserted": {
+              "boundElements": [
+                {
+                  "id": "id167",
+                  "type": "arrow",
+                },
+              ],
+            },
+          },
+          "id167" => Delta {
+            "deleted": {
+              "endBinding": null,
               "points": [
                 [
                   0,
@@ -867,6 +859,23 @@ History {
                 ],
                 [
                   100,
+                  0,
+                ],
+              ],
+            },
+            "inserted": {
+              "endBinding": {
+                "elementId": "id166",
+                "focus": -0,
+                "gap": 1,
+              },
+              "points": [
+                [
+                  0,
+                  0,
+                ],
+                [
+                  0,
                   0,
                 ],
               ],
@@ -899,22 +908,8 @@ History {
               ],
             },
           },
-          "id166" => Delta {
-            "deleted": {
-              "boundElements": [],
-            },
-            "inserted": {
-              "boundElements": [
-                {
-                  "id": "id167",
-                  "type": "arrow",
-                },
-              ],
-            },
-          },
           "id167" => Delta {
             "deleted": {
-              "endBinding": null,
               "points": [
                 [
                   0,
@@ -928,18 +923,13 @@ History {
               "startBinding": null,
             },
             "inserted": {
-              "endBinding": {
-                "elementId": "id166",
-                "focus": -0,
-                "gap": 1,
-              },
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  0,
+                  100,
                   0,
                 ],
               ],
