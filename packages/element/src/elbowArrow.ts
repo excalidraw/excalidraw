@@ -31,6 +31,7 @@ import {
   getGlobalFixedPointForBindableElement,
   snapToMid,
   getHoveredElementForBinding,
+  getDistanceForBinding,
 } from "./binding";
 import { distanceToBindableElement } from "./distance";
 import {
@@ -50,7 +51,6 @@ import { isBindableElement } from "./typeChecks";
 import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
-  type SceneElementsMap,
 } from "./types";
 
 import { aabbForElement, pointInsideBounds } from "./shapes";
@@ -1256,6 +1256,7 @@ const getElbowArrowData = (
     origStartGlobalPoint,
     hoveredStartElement,
     options?.isDragging,
+    options?.zoom,
   );
   const endGlobalPoint = getGlobalPoint(
     {
@@ -1269,18 +1270,17 @@ const getElbowArrowData = (
     origEndGlobalPoint,
     hoveredEndElement,
     options?.isDragging,
+    options?.zoom,
   );
   const startHeading = getBindPointHeading(
     startGlobalPoint,
     endGlobalPoint,
-    elementsMap,
     hoveredStartElement,
     origStartGlobalPoint,
   );
   const endHeading = getBindPointHeading(
     endGlobalPoint,
     startGlobalPoint,
-    elementsMap,
     hoveredEndElement,
     origEndGlobalPoint,
   );
@@ -2214,16 +2214,14 @@ const getGlobalPoint = (
   initialPoint: GlobalPoint,
   element?: ExcalidrawBindableElement | null,
   isDragging?: boolean,
+  zoom?: AppState["zoom"],
 ): GlobalPoint => {
   if (isDragging) {
-    if (element) {
-      const snapPoint = bindPointToSnapToElementOutline(
-        arrow,
+    if (element && getDistanceForBinding(initialPoint, element, true, zoom)) {
+      return snapToMid(
         element,
-        startOrEnd,
+        bindPointToSnapToElementOutline(arrow, element, startOrEnd),
       );
-
-      return snapToMid(element, snapPoint);
     }
 
     return initialPoint;
@@ -2250,7 +2248,6 @@ const getGlobalPoint = (
 const getBindPointHeading = (
   p: GlobalPoint,
   otherPoint: GlobalPoint,
-  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   hoveredElement: ExcalidrawBindableElement | null | undefined,
   origPoint: GlobalPoint,
 ): Heading =>
@@ -2268,7 +2265,6 @@ const getBindPointHeading = (
           number,
         ],
       ),
-    elementsMap,
     origPoint,
   );
 

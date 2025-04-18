@@ -7,6 +7,7 @@ import {
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
+  isArrowElement,
   isBindingElement,
   isLinearElement,
 } from "@excalidraw/element/typeChecks";
@@ -15,6 +16,12 @@ import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element/shapes";
 
 import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  NonDeleted,
+} from "@excalidraw/element/types";
 
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";
@@ -63,6 +70,7 @@ export const actionFinalize = register({
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
       }
+    } else if (isArrowElement(appState.newElement)) {
     }
 
     let newElements = elements;
@@ -79,48 +87,55 @@ export const actionFinalize = register({
       focusContainer();
     }
 
-    const multiPointElement = appState.multiElement
-      ? appState.multiElement
-      : appState.newElement?.type === "freedraw"
-      ? appState.newElement
-      : null;
+    let element: NonDeleted<ExcalidrawElement> | null = null;
+    if (appState.multiElement) {
+      element = appState.multiElement;
+    } else if (
+      appState.newElement?.type === "freedraw" ||
+      isBindingElement(appState.newElement)
+    ) {
+      element = appState.newElement;
+    } else if (Object.keys(appState.selectedElementIds).length === 1) {
+      const candidate = elementsMap.get(
+        Object.keys(appState.selectedElementIds)[0],
+      ) as NonDeleted<ExcalidrawLinearElement> | undefined;
+      if (candidate) {
+        element = candidate;
+      }
+    }
 
-    if (multiPointElement) {
+    if (element) {
       // pen and mouse have hover
       if (
-        multiPointElement.type !== "freedraw" &&
+        appState.multiElement &&
+        element.type !== "freedraw" &&
         appState.lastPointerDownWith !== "touch"
       ) {
-        const { points, lastCommittedPoint } = multiPointElement;
+        const { points, lastCommittedPoint } = element;
         if (
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
         ) {
-          mutateElement(multiPointElement, {
-            points: multiPointElement.points.slice(0, -1),
+          mutateElement(element, {
+            points: element.points.slice(0, -1),
           });
         }
       }
 
-      if (isInvisiblySmallElement(multiPointElement)) {
+      if (isInvisiblySmallElement(element)) {
         // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
-        newElements = newElements.filter(
-          (el) => el.id !== multiPointElement.id,
-        );
+        newElements = newElements.filter((el) => el.id !== element!.id);
       }
 
       // If the multi point line closes the loop,
       // set the last point to first point.
       // This ensures that loop remains closed at different scales.
-      const isLoop = isPathALoop(multiPointElement.points, appState.zoom.value);
-      if (
-        multiPointElement.type === "line" ||
-        multiPointElement.type === "freedraw"
-      ) {
+      const isLoop = isPathALoop(element.points, appState.zoom.value);
+      if (element.type === "line" || element.type === "freedraw") {
         if (isLoop) {
-          const linePoints = multiPointElement.points;
+          const linePoints = element.points;
           const firstPoint = linePoints[0];
-          mutateElement(multiPointElement, {
+          mutateElement(element, {
             points: linePoints.map((p, index) =>
               index === linePoints.length - 1
                 ? pointFrom(firstPoint[0], firstPoint[1])
@@ -131,17 +146,18 @@ export const actionFinalize = register({
       }
 
       if (
-        isBindingElement(multiPointElement) &&
+        isBindingElement(element) &&
         !isLoop &&
-        multiPointElement.points.length > 1
+        element.points.length > 1 &&
+        !appState.selectedElementIds[element.id]
       ) {
         const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          multiPointElement,
+          element,
           -1,
           arrayToMap(elements),
         );
         maybeBindLinearElement(
-          multiPointElement,
+          element,
           appState,
           { x, y },
           elementsMap,
@@ -153,7 +169,7 @@ export const actionFinalize = register({
     if (
       (!appState.activeTool.locked &&
         appState.activeTool.type !== "freedraw") ||
-      !multiPointElement
+      !element
     ) {
       resetCursor(interactiveCanvas);
     }
@@ -180,7 +196,7 @@ export const actionFinalize = register({
         activeTool:
           (appState.activeTool.locked ||
             appState.activeTool.type === "freedraw") &&
-          multiPointElement
+          element
             ? appState.activeTool
             : activeTool,
         activeEmbeddable: null,
@@ -191,18 +207,18 @@ export const actionFinalize = register({
         startBoundElement: null,
         suggestedBindings: [],
         selectedElementIds:
-          multiPointElement &&
+          element &&
           !appState.activeTool.locked &&
           appState.activeTool.type !== "freedraw"
             ? {
                 ...appState.selectedElementIds,
-                [multiPointElement.id]: true,
+                [element.id]: true,
               }
             : appState.selectedElementIds,
         // To select the linear element when user has finished mutipoint editing
         selectedLinearElement:
-          multiPointElement && isLinearElement(multiPointElement)
-            ? new LinearElementEditor(multiPointElement)
+          element && isLinearElement(element)
+            ? new LinearElementEditor(element)
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },

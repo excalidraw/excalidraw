@@ -27,7 +27,9 @@ import {
   PRECISION,
 } from "@excalidraw/math";
 
-import { isPointOnShape } from "@excalidraw/utils/collision";
+import { isPointInShape } from "@excalidraw/utils/collision";
+
+import { getEllipseShape, getPolygonShape } from "@excalidraw/utils/shape";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
@@ -46,7 +48,6 @@ import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
 import {
   headingForPointFromElement,
-  headingIsHorizontal,
   vectorToHeading,
   type Heading,
 } from "./heading";
@@ -65,7 +66,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import { aabbForElement, getElementShape, pointInsideBounds } from "./shapes";
+import { aabbForElement } from "./shapes";
 import { updateElbowArrowPoints } from "./elbowArrow";
 
 import type { Bounds } from "./bounds";
@@ -109,7 +110,7 @@ export const isBindingEnabled = (appState: AppState): boolean => {
 };
 
 export const FIXED_BINDING_DISTANCE = 5;
-export const BINDING_HIGHLIGHT_THICKNESS = 10;
+const BINDING_HIGHLIGHT_THICKNESS = 10;
 export const BINDING_HIGHLIGHT_OFFSET = 4;
 
 const getNonDeletedElements = (
@@ -467,19 +468,15 @@ const normalizePointBinding = (
   binding: { focus: number; gap: number },
   hoveredElement: ExcalidrawBindableElement,
 ) => {
-  let gap = binding.gap;
   const maxGap = maxBindingGap(
     hoveredElement,
     hoveredElement.width,
     hoveredElement.height,
   );
 
-  if (gap > maxGap) {
-    gap = BINDING_HIGHLIGHT_THICKNESS + BINDING_HIGHLIGHT_OFFSET;
-  }
   return {
     ...binding,
-    gap,
+    gap: Math.min(binding.gap, maxGap),
   };
 };
 
@@ -591,21 +588,25 @@ export const getHoveredElementForBinding = (
     let cullRest = false;
     const candidateElements = getAllElementsAtPositionForBinding(
       elements,
-      (element) =>
-        isBindableElement(element, false) &&
-        bindingBorderTest(
-          element,
-          pointerCoords,
-          elementsMap,
-          zoom,
-          (fullShape ||
-            !isBindingFallthroughEnabled(
-              element as ExcalidrawBindableElement,
-            )) &&
-            // disable fullshape snapping for frame elements so we
-            // can bind to frame children
-            !isFrameLikeElement(element),
-        ),
+      (element) => {
+        const result =
+          isBindableElement(element, false) &&
+          bindingBorderTest(
+            element,
+            pointerCoords,
+            elementsMap,
+            zoom,
+            (fullShape ||
+              !isBindingFallthroughEnabled(
+                element as ExcalidrawBindableElement,
+              )) &&
+              // disable fullshape snapping for frame elements so we
+              // can bind to frame children
+              !isFrameLikeElement(element),
+          );
+
+        return result;
+      },
     ).filter((element) => {
       if (cullRest) {
         return false;
@@ -885,7 +886,6 @@ export const getHeadingForElbowArrowSnap = (
   otherPoint: Readonly<GlobalPoint>,
   bindableElement: ExcalidrawBindableElement | undefined | null,
   aabb: Bounds | undefined | null,
-  elementsMap: ElementsMap,
   origPoint: GlobalPoint,
   zoom?: AppState["zoom"],
 ): Heading => {
@@ -898,7 +898,7 @@ export const getHeadingForElbowArrowSnap = (
   const distance = getDistanceForBinding(
     origPoint,
     bindableElement,
-    elementsMap,
+    true,
     zoom,
   );
 
@@ -911,10 +911,10 @@ export const getHeadingForElbowArrowSnap = (
   return headingForPointFromElement(bindableElement, aabb, p);
 };
 
-const getDistanceForBinding = (
+export const getDistanceForBinding = (
   point: Readonly<GlobalPoint>,
   bindableElement: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
+  fullShape: boolean,
   zoom?: AppState["zoom"],
 ) => {
   const distance = distanceToBindableElement(bindableElement, point);
@@ -924,8 +924,16 @@ const getDistanceForBinding = (
     bindableElement.height,
     zoom,
   );
+  const isInside = fullShape
+    ? isPointInShape(
+        point,
+        bindableElement.type === "ellipse"
+          ? getEllipseShape(bindableElement)
+          : getPolygonShape(bindableElement),
+      )
+    : false;
 
-  return distance > bindDistance ? null : distance;
+  return distance > bindDistance && !isInside ? null : distance;
 };
 
 export const bindPointToSnapToElementOutline = (
@@ -961,23 +969,16 @@ export const bindPointToSnapToElementOutline = (
 
   let intersection: GlobalPoint | null = null;
   if (elbowed) {
-    const isHorizontal = headingIsHorizontal(
-      headingForPointFromElement(bindableElement, aabb, globalP),
-    );
-    const otherPoint = pointFrom<GlobalPoint>(
-      isHorizontal ? center[0] : edgePoint[0],
-      !isHorizontal ? center[1] : edgePoint[1],
-    );
     intersection = intersectElementWithLineSegment(
       bindableElement,
       lineSegment(
-        otherPoint,
+        center,
         pointFromVector(
           vectorScale(
-            vectorNormalize(vectorFromPoint(edgePoint, otherPoint)),
+            vectorNormalize(vectorFromPoint(edgePoint, center)),
             Math.max(bindableElement.width, bindableElement.height) * 2,
           ),
-          otherPoint,
+          center,
         ),
       ),
     )[0];
@@ -1185,6 +1186,48 @@ export const snapToMid = (
       center,
       angle,
     );
+  } else if (element.type === "diamond") {
+    const distance = FIXED_BINDING_DISTANCE - 1;
+    const topLeft = pointFrom<GlobalPoint>(
+      x + width / 4 - distance,
+      y + height / 4 - distance,
+    );
+    const topRight = pointFrom<GlobalPoint>(
+      x + (3 * width) / 4 + distance,
+      y + height / 4 - distance,
+    );
+    const bottomLeft = pointFrom<GlobalPoint>(
+      x + width / 4 - distance,
+      y + (3 * height) / 4 + distance,
+    );
+    const bottomRight = pointFrom<GlobalPoint>(
+      x + (3 * width) / 4 + distance,
+      y + (3 * height) / 4 + distance,
+    );
+    if (
+      pointDistance(topLeft, nonRotated) <
+      Math.max(horizontalThrehsold, verticalThrehsold)
+    ) {
+      return pointRotateRads(topLeft, center, angle);
+    }
+    if (
+      pointDistance(topRight, nonRotated) <
+      Math.max(horizontalThrehsold, verticalThrehsold)
+    ) {
+      return pointRotateRads(topRight, center, angle);
+    }
+    if (
+      pointDistance(bottomLeft, nonRotated) <
+      Math.max(horizontalThrehsold, verticalThrehsold)
+    ) {
+      return pointRotateRads(bottomLeft, center, angle);
+    }
+    if (
+      pointDistance(bottomRight, nonRotated) <
+      Math.max(horizontalThrehsold, verticalThrehsold)
+    ) {
+      return pointRotateRads(bottomRight, center, angle);
+    }
   }
 
   return p;
@@ -1523,14 +1566,14 @@ export const bindingBorderTest = (
   zoom?: AppState["zoom"],
   fullShape?: boolean,
 ): boolean => {
-  const threshold = maxBindingGap(element, element.width, element.height, zoom);
-
-  const shape = getElementShape(element, elementsMap);
-  return (
-    isPointOnShape(pointFrom(x, y), shape, threshold) ||
-    (fullShape === true &&
-      pointInsideBounds(pointFrom(x, y), aabbForElement(element)))
+  const distance = getDistanceForBinding(
+    pointFrom(x, y),
+    element,
+    !!fullShape,
+    zoom,
   );
+
+  return !!distance;
 };
 
 export const maxBindingGap = (
