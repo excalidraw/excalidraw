@@ -444,7 +444,6 @@ export class API {
 
     const text = API.createElement({
       type: "text",
-      id: "text2",
       width: 50,
       height: 20,
       containerId: arrow.id,

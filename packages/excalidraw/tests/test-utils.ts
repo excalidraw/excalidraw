@@ -19,7 +19,7 @@ import type { AllPossibleKeys } from "@excalidraw/common/utility-types";
 
 import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
 
-import { UI } from "./helpers/ui";
+import { Pointer, UI } from "./helpers/ui";
 import * as toolQueries from "./queries/toolQueries";
 
 import type { RenderResult, RenderOptions } from "@testing-library/react";
@@ -42,6 +42,10 @@ type TestRenderFn = (
 ) => Promise<RenderResult<typeof customQueries>>;
 
 const renderApp: TestRenderFn = async (ui, options) => {
+  // when tests reuse Pointer instances let's reset the last
+  // pointer poisitions so there's no leak between tests
+  Pointer.resetAll();
+
   if (options?.localStorageData) {
     initLocalStorage(options.localStorageData);
     delete options.localStorageData;
