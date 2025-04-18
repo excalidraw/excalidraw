@@ -3,6 +3,7 @@ import type {
   UserIdleState,
   throttleRAF,
   MIME_TYPES,
+  ColorTuple,
 } from "@excalidraw/common";
 
 import type { SuggestedBinding } from "@excalidraw/element/binding";
@@ -601,6 +602,8 @@ export interface ExcalidrawProps {
   ) => JSX.Element | null;
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
+  strokeColorTopPicks?: ColorTuple;
+  backgroundColorTopPicks?: ColorTuple;
 }
 
 export type SceneData = {
