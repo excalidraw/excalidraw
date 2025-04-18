@@ -94,11 +94,6 @@ vi.mock(
   },
 );
 
-vi.mock("nanoid", () => {
-  return {
-    nanoid: vi.fn(() => "test-id"),
-  };
-});
 // ReactDOM is located inside index.tsx file
 // as a result, we need a place for it to render into
 const element = document.createElement("div");

@@ -1,4 +1,3 @@
-import React from "react";
 import { pointFrom } from "@excalidraw/math";
 
 import {
@@ -472,7 +471,7 @@ describe("group-related duplication", () => {
     expect(h.state.editingGroupId).toBe("group1");
   });
 
-  it.skip("alt-duplicating within group away outside frame", () => {
+  it("alt-duplicating within group away outside frame", () => {
     const frame = API.createElement({
       type: "frame",
       x: 0,
