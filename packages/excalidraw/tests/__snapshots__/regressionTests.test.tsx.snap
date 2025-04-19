@@ -2044,7 +2044,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   "scrolledOutside": false,
   "searchMatches": [],
   "selectedElementIds": {
-    "id0": true,
+    "id2": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2134,8 +2134,16 @@ History {
     HistoryEntry {
       "appStateChange": AppStateChange {
         "delta": Delta {
-          "deleted": {},
-          "inserted": {},
+          "deleted": {
+            "selectedElementIds": {
+              "id2": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id0": true,
+            },
+          },
         },
       },
       "elementsChange": ElementsChange {
@@ -2151,7 +2159,7 @@ History {
               "frameId": null,
               "groupIds": [],
               "height": 10,
-              "index": "Zz",
+              "index": "a1",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -2165,26 +2173,15 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 10,
-              "y": 10,
+              "x": 20,
+              "y": 20,
             },
             "inserted": {
               "isDeleted": true,
             },
           },
         },
-        "updated": Map {
-          "id0" => Delta {
-            "deleted": {
-              "x": 20,
-              "y": 20,
-            },
-            "inserted": {
-              "x": 10,
-              "y": 10,
-            },
-          },
-        },
+        "updated": Map {},
       },
     },
   ],
@@ -10416,13 +10413,13 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
   "scrolledOutside": false,
   "searchMatches": [],
   "selectedElementIds": {
-    "id0": true,
-    "id1": true,
-    "id2": true,
+    "id6": true,
+    "id8": true,
+    "id9": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {
-    "id4": true,
+    "id7": true,
   },
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -10686,8 +10683,26 @@ History {
     HistoryEntry {
       "appStateChange": AppStateChange {
         "delta": Delta {
-          "deleted": {},
-          "inserted": {},
+          "deleted": {
+            "selectedElementIds": {
+              "id6": true,
+              "id8": true,
+              "id9": true,
+            },
+            "selectedGroupIds": {
+              "id7": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id0": true,
+              "id1": true,
+              "id2": true,
+            },
+            "selectedGroupIds": {
+              "id4": true,
+            },
+          },
         },
       },
       "elementsChange": ElementsChange {
@@ -10705,7 +10720,7 @@ History {
                 "id7",
               ],
               "height": 10,
-              "index": "Zx",
+              "index": "a3",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -10719,8 +10734,8 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 10,
-              "y": 10,
+              "x": 20,
+              "y": 20,
             },
             "inserted": {
               "isDeleted": true,
@@ -10738,7 +10753,7 @@ History {
                 "id7",
               ],
               "height": 10,
-              "index": "Zy",
+              "index": "a4",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -10752,8 +10767,8 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 30,
-              "y": 10,
+              "x": 40,
+              "y": 20,
             },
             "inserted": {
               "isDeleted": true,
@@ -10771,7 +10786,7 @@ History {
                 "id7",
               ],
               "height": 10,
-              "index": "Zz",
+              "index": "a5",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -10785,46 +10800,15 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 50,
-              "y": 10,
+              "x": 60,
+              "y": 20,
             },
             "inserted": {
               "isDeleted": true,
             },
           },
         },
-        "updated": Map {
-          "id0" => Delta {
-            "deleted": {
-              "x": 20,
-              "y": 20,
-            },
-            "inserted": {
-              "x": 10,
-              "y": 10,
-            },
-          },
-          "id1" => Delta {
-            "deleted": {
-              "x": 40,
-              "y": 20,
-            },
-            "inserted": {
-              "x": 30,
-              "y": 10,
-            },
-          },
-          "id2" => Delta {
-            "deleted": {
-              "x": 60,
-              "y": 20,
-            },
-            "inserted": {
-              "x": 50,
-              "y": 10,
-            },
-          },
-        },
+        "updated": Map {},
       },
     },
   ],

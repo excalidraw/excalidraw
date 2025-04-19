@@ -7371,8 +7371,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "updated": 1,
   "version": 7,
   "width": 10,
-  "x": -10,
-  "y": -10,
+  "x": 0,
+  "y": 0,
 }
 `;
 
@@ -7445,8 +7445,8 @@ History {
               "strokeWidth": 2,
               "type": "arrow",
               "width": 10,
-              "x": -10,
-              "y": -10,
+              "x": 0,
+              "y": 0,
             },
             "inserted": {
               "isDeleted": true,
@@ -12177,8 +12177,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "updated": 1,
   "version": 3,
   "width": 10,
-  "x": 10,
-  "y": 10,
+  "x": -10,
+  "y": -10,
 }
 `;
 
@@ -12231,8 +12231,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "updated": 1,
   "version": 5,
   "width": 50,
-  "x": 60,
-  "y": 0,
+  "x": 40,
+  "y": -20,
 }
 `;
 
@@ -12285,8 +12285,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "updated": 1,
   "version": 4,
   "width": 50,
-  "x": 150,
-  "y": -10,
+  "x": 130,
+  "y": -30,
 }
 `;
 
@@ -12340,8 +12340,8 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 10,
-              "y": 10,
+              "x": -10,
+              "y": -10,
             },
             "inserted": {
               "isDeleted": true,
@@ -12426,8 +12426,8 @@ History {
               "strokeWidth": 2,
               "type": "freedraw",
               "width": 50,
-              "x": 150,
-              "y": -10,
+              "x": 130,
+              "y": -30,
             },
             "inserted": {
               "isDeleted": true,
