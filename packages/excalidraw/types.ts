@@ -718,7 +718,7 @@ export type PointerDownState = Readonly<{
   // Scrollbar checks
   scrollbars: ReturnType<typeof isOverScrollBars>;
   // The previous pointer position
-  lastCoords: { x: number; y: number };
+  lastCoords: GenericPoint;
   // original element frozen snapshots so we can access the original
   // element attribute values at time of pointerdown
   originalElements: Map<string, NonDeleted<ExcalidrawElement>>;
@@ -753,10 +753,10 @@ export type PointerDownState = Readonly<{
     // Might change during the pointer interaction
     hasOccurred: boolean;
     // Might change during the pointer interaction
-    offset: { x: number; y: number } | null;
+    offset: GenericPoint | null;
     // by default same as PointerDownState.origin. On alt-duplication, reset
     // to current pointer position at time of duplication.
-    origin: { x: number; y: number };
+    origin: GenericPoint;
   };
   // We need to have these in the state so that we can unsubscribe them
   eventListeners: {

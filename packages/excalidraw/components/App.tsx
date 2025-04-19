@@ -6913,13 +6913,14 @@ class App extends React.Component<AppProps, AppState> {
   private initialPointerDownState(
     event: React.PointerEvent<HTMLElement>,
   ): PointerDownState {
-    const [originX, originY] = viewportCoordsToSceneCoords(event, this.state);
+    const originCoords = viewportCoordsToSceneCoords(event, this.state);
+    const [originX, originY] = originCoords;
     const selectedElements = this.scene.getSelectedElements(this.state);
     const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
     const isElbowArrowOnly = selectedElements.findIndex(isElbowArrow) === 0;
 
     return {
-      origin: pointFrom(originX, originY),
+      origin: originCoords,
       withCmdOrCtrl: event[KEYS.CTRL_OR_CMD],
       originInGrid: tupleToCoors(
         getGridPoint(
@@ -6936,7 +6937,7 @@ class App extends React.Component<AppProps, AppState> {
         event.clientY - this.state.offsetTop,
       ),
       // we need to duplicate because we'll be updating this state
-      lastCoords: pointFrom(originX, originY),
+      lastCoords: originCoords,
       originalElements: this.scene
         .getNonDeletedElements()
         .reduce((acc, element) => {
@@ -6957,14 +6958,14 @@ class App extends React.Component<AppProps, AppState> {
         hasBeenDuplicated: false,
         hasHitCommonBoundingBoxOfSelectedElements:
           this.isHittingCommonBoundingBoxOfSelectedElements(
-            pointFrom(originX, originY),
+            originCoords,
             selectedElements,
           ),
       },
       drag: {
         hasOccurred: false,
         offset: null,
-        origin: { ...origin },
+        origin: originCoords,
       },
       eventListeners: {
         onMove: null,
