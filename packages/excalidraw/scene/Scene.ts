@@ -6,6 +6,7 @@ import {
   toBrandedType,
   isDevEnv,
   isTestEnv,
+  isReadonlyArray,
 } from "@excalidraw/common";
 import { isNonDeletedElement } from "@excalidraw/element";
 import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
@@ -292,11 +293,9 @@ class Scene {
   }
 
   replaceAllElements(nextElements: ElementsMapOrArray) {
-    const _nextElements =
-      // ts doesn't like `Array.isArray` of `instanceof Map`
-      nextElements instanceof Array
-        ? nextElements
-        : Array.from(nextElements.values());
+    const _nextElements = isReadonlyArray(nextElements)
+      ? nextElements
+      : Array.from(nextElements.values());
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
 
     validateIndicesThrottled(_nextElements);

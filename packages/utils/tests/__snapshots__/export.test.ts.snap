@@ -81,6 +81,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "penMode": false,
   "pendingImageElementId": null,
   "previousSelectedElementIds": {},
+  "renderScrollbars": false,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
