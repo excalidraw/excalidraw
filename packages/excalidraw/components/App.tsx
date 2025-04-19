@@ -722,7 +722,6 @@ class App extends React.Component<AppProps, AppState> {
       zenModeEnabled = false,
       gridModeEnabled = false,
       objectsSnapModeEnabled = false,
-      renderScrollbars = false,
       theme = defaultAppState.theme,
       name = `${t("labels.untitled")}-${getDateTime()}`,
     } = props;
