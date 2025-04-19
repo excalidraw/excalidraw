@@ -8566,10 +8566,10 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
         "value": null,
       },
     },
-    "pointerOffset": {
-      "x": 0,
-      "y": 0,
-    },
+    "pointerOffset": [
+      0,
+      0,
+    ],
     "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
@@ -8790,10 +8790,10 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
         "value": null,
       },
     },
-    "pointerOffset": {
-      "x": 0,
-      "y": 0,
-    },
+    "pointerOffset": [
+      0,
+      0,
+    ],
     "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
@@ -9208,10 +9208,10 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
         "value": null,
       },
     },
-    "pointerOffset": {
-      "x": 0,
-      "y": 0,
-    },
+    "pointerOffset": [
+      0,
+      0,
+    ],
     "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
@@ -9613,10 +9613,10 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
         "value": null,
       },
     },
-    "pointerOffset": {
-      "x": 0,
-      "y": 0,
-    },
+    "pointerOffset": [
+      0,
+      0,
+    ],
     "segmentMidPointHoveredCoords": null,
     "selectedPointsIndices": null,
     "startBindingElement": "keep",
@@ -12796,10 +12796,10 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -14750,10 +14750,10 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,

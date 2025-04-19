@@ -182,12 +182,12 @@ export class AnimatedTrail implements Trail {
     const _stroke = trail
       .getStrokeOutline(trail.options.size / state.zoom.value)
       .map(([x, y]) => {
-        const result = sceneCoordsToViewportCoords(
+        const [resultX, resultY] = sceneCoordsToViewportCoords(
           { sceneX: x, sceneY: y },
           state,
         );
 
-        return [result.x, result.y];
+        return [resultX, resultY];
       });
 
     const stroke = this.trailAnimation

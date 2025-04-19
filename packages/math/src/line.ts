@@ -1,6 +1,6 @@
 import { pointFrom } from "./point";
 
-import type { GlobalPoint, Line, LocalPoint } from "./types";
+import type { GenericPoint, Line } from "./types";
 
 /**
  * Create a line from two points.
@@ -8,7 +8,7 @@ import type { GlobalPoint, Line, LocalPoint } from "./types";
  * @param points The two points lying on the line
  * @returns The line on which the points lie
  */
-export function line<P extends GlobalPoint | LocalPoint>(a: P, b: P): Line<P> {
+export function line<P extends GenericPoint>(a: P, b: P): Line<P> {
   return [a, b] as Line<P>;
 }
 
@@ -20,7 +20,7 @@ export function line<P extends GlobalPoint | LocalPoint>(a: P, b: P): Line<P> {
  * @param b
  * @returns
  */
-export function linesIntersectAt<Point extends GlobalPoint | LocalPoint>(
+export function linesIntersectAt<Point extends GenericPoint>(
   a: Line<Point>,
   b: Line<Point>,
 ): Point | null {

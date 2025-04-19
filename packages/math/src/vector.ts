@@ -1,4 +1,4 @@
-import type { GlobalPoint, LocalPoint, Vector } from "./types";
+import type { GenericPoint, Vector } from "./types";
 
 /**
  * Create a vector from the x and y coordiante elements.
@@ -23,7 +23,7 @@ export function vector(
  * @param origin The origin point in a given coordiante system
  * @returns The created vector from the point and the origin
  */
-export function vectorFromPoint<Point extends GlobalPoint | LocalPoint>(
+export function vectorFromPoint<Point extends GenericPoint>(
   p: Point,
   origin: Point = [0, 0] as Point,
 ): Vector {

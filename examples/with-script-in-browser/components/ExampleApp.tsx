@@ -422,7 +422,7 @@ export default function ExampleApp({
       if (!excalidrawAPI) {
         return false;
       }
-      const { x, y } = viewportCoordsToSceneCoords(
+      const [x, y] = viewportCoordsToSceneCoords(
         {
           clientX: event.clientX - pointerDownState.hitElementOffsets.x,
           clientY: event.clientY - pointerDownState.hitElementOffsets.y,

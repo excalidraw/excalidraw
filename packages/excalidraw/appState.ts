@@ -12,6 +12,8 @@ import {
   DEFAULT_GRID_STEP,
 } from "@excalidraw/common";
 
+import { pointFrom } from "@excalidraw/math";
+
 import type { AppState, NormalizedZoomValue } from "./types";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
@@ -112,10 +114,7 @@ export const getDefaultAppState = (): Omit<
     showHyperlinkPopup: false,
     selectedLinearElement: null,
     snapLines: [],
-    originSnapOffset: {
-      x: 0,
-      y: 0,
-    },
+    originSnapOffset: pointFrom(0, 0),
     objectsSnapModeEnabled: false,
     userToFollow: null,
     followedBy: new Set(),
