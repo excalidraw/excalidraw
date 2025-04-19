@@ -34,6 +34,7 @@ type InteractiveCanvasProps = {
   selectionNonce: number | undefined;
   scale: number;
   appState: InteractiveCanvasAppState;
+  renderScrollbars: boolean;
   device: Device;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
@@ -143,7 +144,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           remotePointerUsernames,
           remotePointerUserStates,
           selectionColor,
-          renderScrollbars: props.appState.renderScrollbars,
+          renderScrollbars: props.renderScrollbars,
         },
         device: props.device,
         callback: props.renderInteractiveSceneCallback,
@@ -214,7 +215,6 @@ const getRelevantAppStateProps = (
   isCropping: appState.isCropping,
   croppingElementId: appState.croppingElementId,
   searchMatches: appState.searchMatches,
-  renderScrollbars: appState.renderScrollbars,
 });
 
 const areEqual = (
@@ -231,7 +231,8 @@ const areEqual = (
     // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||
-    prevProps.selectedElements !== nextProps.selectedElements
+    prevProps.selectedElements !== nextProps.selectedElements ||
+    prevProps.renderScrollbars !== nextProps.renderScrollbars
   ) {
     return false;
   }

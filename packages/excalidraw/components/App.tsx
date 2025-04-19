@@ -733,7 +733,6 @@ class App extends React.Component<AppProps, AppState> {
       ...this.getCanvasOffsets(),
       viewModeEnabled,
       zenModeEnabled,
-      renderScrollbars,
       objectsSnapModeEnabled,
       gridModeEnabled: gridModeEnabled ?? defaultAppState.gridModeEnabled,
       name,
@@ -1832,6 +1831,9 @@ class App extends React.Component<AppProps, AppState> {
                           }
                           scale={window.devicePixelRatio}
                           appState={this.state}
+                          renderScrollbars={
+                            this.props.renderScrollbars === true
+                          }
                           device={this.device}
                           renderInteractiveSceneCallback={
                             this.renderInteractiveSceneCallback
@@ -2209,7 +2211,6 @@ class App extends React.Component<AppProps, AppState> {
     if (actionResult.appState || editingTextElement || this.state.contextMenu) {
       let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
       let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
-      let renderScrollbars = actionResult?.appState?.renderScrollbars || false;
       const theme =
         actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
       const name = actionResult?.appState?.name ?? this.state.name;
@@ -2221,10 +2222,6 @@ class App extends React.Component<AppProps, AppState> {
 
       if (typeof this.props.zenModeEnabled !== "undefined") {
         zenModeEnabled = this.props.zenModeEnabled;
-      }
-
-      if (typeof this.props.renderScrollbars !== "undefined") {
-        renderScrollbars = this.props.renderScrollbars;
       }
 
       editingTextElement = actionResult.appState?.editingTextElement || null;
@@ -2260,7 +2257,6 @@ class App extends React.Component<AppProps, AppState> {
           editingTextElement,
           viewModeEnabled,
           zenModeEnabled,
-          renderScrollbars,
           theme,
           name,
           errorMessage,
@@ -2870,10 +2866,6 @@ class App extends React.Component<AppProps, AppState> {
 
     if (prevProps.theme !== this.props.theme && this.props.theme) {
       this.setState({ theme: this.props.theme });
-    }
-
-    if (prevProps.renderScrollbars !== this.props.renderScrollbars) {
-      this.setState({ renderScrollbars: !!this.props.renderScrollbars });
     }
 
     this.excalidrawContainerRef.current?.classList.toggle(
