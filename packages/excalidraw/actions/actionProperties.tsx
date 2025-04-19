@@ -121,6 +121,7 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  StrokeWidthFineIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -491,6 +492,12 @@ export const actionChangeStrokeWidth = register({
       <ButtonIconSelect
         group="stroke-width"
         options={[
+          {
+            value: 0.5,
+            text: t("labels.fine"),
+            icon: StrokeWidthFineIcon,
+            testId: "strokeWidth-fine",
+          },
           {
             value: STROKE_WIDTH.thin,
             text: t("labels.thin"),
