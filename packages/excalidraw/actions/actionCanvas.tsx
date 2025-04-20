@@ -1,4 +1,4 @@
-import { clamp, roundToStep } from "@excalidraw/math";
+import { clamp, pointFrom, roundToStep } from "@excalidraw/math";
 
 import {
   DEFAULT_CANVAS_BACKGROUND_PICKS,
@@ -333,7 +333,7 @@ export const zoomToFitBounds = ({
   );
 
   const centerScroll = centerScrollOn({
-    scenePoint: { x: centerX, y: centerY },
+    scenePoint: pointFrom(centerX, centerY),
     viewportDimensions: {
       width: appState.width,
       height: appState.height,

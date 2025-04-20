@@ -3,7 +3,7 @@ import type { Bounds } from "@excalidraw/element/bounds";
 import { isPoint, pointDistance, pointFrom } from "./point";
 import { rectangle, rectangleIntersectLineSegment } from "./rectangle";
 
-import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
+import type { Curve, GenericPoint, LineSegment } from "./types";
 
 /**
  *
@@ -13,7 +13,7 @@ import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
  * @param d
  * @returns
  */
-export function curve<Point extends GlobalPoint | LocalPoint>(
+export function curve<Point extends GenericPoint>(
   a: Point,
   b: Point,
   c: Point,
@@ -82,7 +82,7 @@ function solve(
   return [t0, s0];
 }
 
-const bezierEquation = <Point extends GlobalPoint | LocalPoint>(
+const bezierEquation = <Point extends GenericPoint>(
   c: Curve<Point>,
   t: number,
 ) =>
@@ -100,9 +100,10 @@ const bezierEquation = <Point extends GlobalPoint | LocalPoint>(
 /**
  * Computes the intersection between a cubic spline and a line segment.
  */
-export function curveIntersectLineSegment<
-  Point extends GlobalPoint | LocalPoint,
->(c: Curve<Point>, l: LineSegment<Point>): Point[] {
+export function curveIntersectLineSegment<Point extends GenericPoint>(
+  c: Curve<Point>,
+  l: LineSegment<Point>,
+): Point[] {
   // Optimize by doing a cheap bounding box check first
   const bounds = curveBounds(c);
   if (
@@ -188,7 +189,7 @@ export function curveIntersectLineSegment<
  * @param maxLevel
  * @returns
  */
-export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
+export function curveClosestPoint<Point extends GenericPoint>(
   c: Curve<Point>,
   p: Point,
   tolerance: number = 1e-3,
@@ -245,7 +246,7 @@ export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
  * @param c The curve to test
  * @param p The point to measure from
  */
-export function curvePointDistance<Point extends GlobalPoint | LocalPoint>(
+export function curvePointDistance<Point extends GenericPoint>(
   c: Curve<Point>,
   p: Point,
 ) {
@@ -261,9 +262,7 @@ export function curvePointDistance<Point extends GlobalPoint | LocalPoint>(
 /**
  * Determines if the parameter is a Curve
  */
-export function isCurve<P extends GlobalPoint | LocalPoint>(
-  v: unknown,
-): v is Curve<P> {
+export function isCurve<P extends GenericPoint>(v: unknown): v is Curve<P> {
   return (
     Array.isArray(v) &&
     v.length === 4 &&
@@ -274,9 +273,7 @@ export function isCurve<P extends GlobalPoint | LocalPoint>(
   );
 }
 
-function curveBounds<Point extends GlobalPoint | LocalPoint>(
-  c: Curve<Point>,
-): Bounds {
+function curveBounds<Point extends GenericPoint>(c: Curve<Point>): Bounds {
   const [P0, P1, P2, P3] = c;
   const x = [P0[0], P1[0], P2[0], P3[0]];
   const y = [P0[1], P1[1], P2[1], P3[1]];

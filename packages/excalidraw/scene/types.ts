@@ -7,6 +7,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { MakeBrand } from "@excalidraw/common/utility-types";
+import type { GenericPoint } from "@excalidraw/math";
 
 import type {
   AppClassProperties,
@@ -61,7 +62,7 @@ export type InteractiveCanvasRenderConfig = {
   // collab-related state
   // ---------------------------------------------------------------------------
   remoteSelectedElementIds: Map<ExcalidrawElement["id"], SocketId[]>;
-  remotePointerViewportCoords: Map<SocketId, { x: number; y: number }>;
+  remotePointerViewportCoords: Map<SocketId, GenericPoint>;
   remotePointerUserStates: Map<SocketId, UserIdleState>;
   remotePointerUsernames: Map<SocketId, string>;
   remotePointerButton: Map<SocketId, string | undefined>;

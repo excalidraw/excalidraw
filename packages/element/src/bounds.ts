@@ -23,6 +23,7 @@ import { pointsOnBezierCurves } from "points-on-curve";
 import type {
   Curve,
   Degrees,
+  GenericPoint,
   GlobalPoint,
   LineSegment,
   LocalPoint,
@@ -1057,7 +1058,7 @@ export const getElementPointsCoords = (
 
 export const getClosestElementBounds = (
   elements: readonly ExcalidrawElement[],
-  from: { x: number; y: number },
+  from: GenericPoint,
 ): Bounds => {
   if (!elements.length) {
     return [0, 0, 0, 0];
@@ -1070,7 +1071,7 @@ export const getClosestElementBounds = (
     const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
     const distance = pointDistance(
       pointFrom((x1 + x2) / 2, (y1 + y2) / 2),
-      pointFrom(from.x, from.y),
+      from,
     );
 
     if (distance < minDistance) {

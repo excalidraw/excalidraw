@@ -1,14 +1,9 @@
-import {
-  pointFromPair,
-  type GlobalPoint,
-  type LocalPoint,
-} from "@excalidraw/math";
+import { type GenericPoint, pointFromPair } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw/math";
 
 import type { NullableGridSize } from "@excalidraw/excalidraw/types";
 
-export const getSizeFromPoints = (
-  points: readonly (GlobalPoint | LocalPoint)[],
-) => {
+export const getSizeFromPoints = (points: readonly GenericPoint[]) => {
   const xs = points.map((point) => point[0]);
   const ys = points.map((point) => point[1]);
   return {
@@ -18,7 +13,7 @@ export const getSizeFromPoints = (
 };
 
 /** @arg dimension, 0 for rescaling only x, 1 for y */
-export const rescalePoints = <Point extends GlobalPoint | LocalPoint>(
+export const rescalePoints = <Point extends GenericPoint>(
   dimension: 0 | 1,
   newSize: number,
   points: readonly Point[],
@@ -65,16 +60,16 @@ export const rescalePoints = <Point extends GlobalPoint | LocalPoint>(
 };
 
 // TODO: Rounding this point causes some shake when free drawing
-export const getGridPoint = (
+export const getGridPoint = <Point extends GenericPoint>(
   x: number,
   y: number,
   gridSize: NullableGridSize,
-): [number, number] => {
+): Point => {
   if (gridSize) {
-    return [
+    return pointFrom(
       Math.round(x / gridSize) * gridSize,
       Math.round(y / gridSize) * gridSize,
-    ];
+    );
   }
-  return [x, y];
+  return pointFrom(x, y);
 };

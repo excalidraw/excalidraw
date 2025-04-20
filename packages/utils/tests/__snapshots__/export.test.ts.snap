@@ -69,10 +69,10 @@ exports[`exportToSvg > with default arguments 1`] = `
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": [
+    0,
+    0,
+  ],
   "pasteDialog": {
     "data": null,
     "shown": false,

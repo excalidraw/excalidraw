@@ -13,8 +13,7 @@ import {
   pointFromPair,
   pointRotateRads,
   pointsEqual,
-  type GlobalPoint,
-  type LocalPoint,
+  type GenericPoint,
 } from "@excalidraw/math";
 import {
   getClosedCurveShape,
@@ -46,7 +45,7 @@ import type {
  * get the pure geometric shape of an excalidraw elementw
  * which is then used for hit detection
  */
-export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
+export const getElementShape = <Point extends GenericPoint>(
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
 ): GeometricShape<Point> => {
@@ -98,7 +97,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   }
 };
 
-export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
+export const getBoundTextShape = <Point extends GenericPoint>(
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
 ): GeometricShape<Point> | null => {
@@ -126,9 +125,7 @@ export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
   return null;
 };
 
-export const getControlPointsForBezierCurve = <
-  P extends GlobalPoint | LocalPoint,
->(
+export const getControlPointsForBezierCurve = <P extends GenericPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: P,
 ) => {
@@ -170,7 +167,7 @@ export const getControlPointsForBezierCurve = <
   return controlPoints;
 };
 
-export const getBezierXY = <P extends GlobalPoint | LocalPoint>(
+export const getBezierXY = <P extends GenericPoint>(
   p0: P,
   p1: P,
   p2: P,
@@ -187,7 +184,7 @@ export const getBezierXY = <P extends GlobalPoint | LocalPoint>(
   return pointFrom(tx, ty);
 };
 
-const getPointsInBezierCurve = <P extends GlobalPoint | LocalPoint>(
+const getPointsInBezierCurve = <P extends GenericPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: P,
 ) => {
@@ -217,7 +214,7 @@ const getPointsInBezierCurve = <P extends GlobalPoint | LocalPoint>(
   return pointsOnCurve;
 };
 
-const getBezierCurveArcLengths = <P extends GlobalPoint | LocalPoint>(
+const getBezierCurveArcLengths = <P extends GenericPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: P,
 ) => {
@@ -236,7 +233,7 @@ const getBezierCurveArcLengths = <P extends GlobalPoint | LocalPoint>(
   return arcLengths;
 };
 
-export const getBezierCurveLength = <P extends GlobalPoint | LocalPoint>(
+export const getBezierCurveLength = <P extends GenericPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: P,
 ) => {
@@ -245,7 +242,7 @@ export const getBezierCurveLength = <P extends GlobalPoint | LocalPoint>(
 };
 
 // This maps interval to actual interval t on the curve so that when t = 0.5, its actually the point at 50% of the length
-export const mapIntervalToBezierT = <P extends GlobalPoint | LocalPoint>(
+export const mapIntervalToBezierT = <P extends GenericPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: P,
   interval: number, // The interval between 0 to 1 for which you want to find the point on the curve,
@@ -340,7 +337,7 @@ export const aabbForElement = (
   return bounds;
 };
 
-export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
+export const pointInsideBounds = <P extends GenericPoint>(
   p: P,
   bounds: Bounds,
 ): boolean =>

@@ -360,7 +360,7 @@ const getCoordsForPopover = (
   elementsMap: ElementsMap,
 ) => {
   const [x1, y1] = getElementAbsoluteCoords(element, elementsMap);
-  const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
+  const [viewportX, viewportY] = sceneCoordsToViewportCoords(
     { sceneX: x1 + element.width / 2, sceneY: y1 },
     appState,
   );
@@ -422,7 +422,7 @@ const renderTooltip = (
     appState,
   );
 
-  const linkViewportCoords = sceneCoordsToViewportCoords(
+  const [linkViewportCoordX, linkViewportCoordY] = sceneCoordsToViewportCoords(
     { sceneX: linkX, sceneY: linkY },
     appState,
   );
@@ -430,8 +430,8 @@ const renderTooltip = (
   updateTooltipPosition(
     tooltipDiv,
     {
-      left: linkViewportCoords.x,
-      top: linkViewportCoords.y,
+      left: linkViewportCoordX,
+      top: linkViewportCoordY,
       width: linkWidth,
       height: linkHeight,
     },
@@ -457,7 +457,7 @@ const shouldHideLinkPopup = (
   appState: AppState,
   [clientX, clientY]: GlobalPoint,
 ): Boolean => {
-  const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+  const [sceneX, sceneY] = viewportCoordsToSceneCoords(
     { clientX, clientY },
     appState,
   );
