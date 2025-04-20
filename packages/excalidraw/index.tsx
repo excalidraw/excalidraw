@@ -65,6 +65,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     aiEnabled,
     showDeprecatedFonts,
     insertLinkAction, //zsviczian
+    renderScrollbars,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -167,6 +168,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           aiEnabled={aiEnabled !== false}
           showDeprecatedFonts={showDeprecatedFonts}
           insertLinkAction={insertLinkAction} //zsviczian
+          renderScrollbars={renderScrollbars}
         >
           {children}
         </App>
