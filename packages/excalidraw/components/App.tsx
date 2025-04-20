@@ -8787,7 +8787,10 @@ class App extends React.Component<AppProps, AppState> {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
       this.translateCanvas({
-        scrollX: this.state.scrollX - dx / this.state.zoom.value,
+        scrollX:
+          this.state.scrollX -
+          (dx * (currentScrollBars.horizontal?.deltaMultiplier || 1)) /
+            this.state.zoom.value,
       });
       pointerDownState.lastCoords.x = x;
       return true;
@@ -8797,7 +8800,10 @@ class App extends React.Component<AppProps, AppState> {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
       this.translateCanvas({
-        scrollY: this.state.scrollY - dy / this.state.zoom.value,
+        scrollY:
+          this.state.scrollY -
+          (dy * (currentScrollBars.vertical?.deltaMultiplier || 1)) /
+            this.state.zoom.value,
       });
       pointerDownState.lastCoords.y = y;
       return true;
