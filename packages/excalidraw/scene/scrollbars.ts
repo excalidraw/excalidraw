@@ -61,26 +61,35 @@ export const getScrollBars = (
   const extendedSceneWidth = sceneMaxX - sceneMinX;
   const extendedSceneHeight = sceneMaxY - sceneMinY;
 
+  const scrollWidthOffset =
+    Math.max(SCROLLBAR_MARGIN * 2, safeArea.left + safeArea.right) +
+    SCROLLBAR_WIDTH * 2;
+
   const scrollbarWidth =
     viewportWidth * (viewportWidthWithZoom / extendedSceneWidth) -
-    Math.max(SCROLLBAR_MARGIN * 2, safeArea.left + safeArea.right);
+    scrollWidthOffset;
+
+  const scrollbarHeightOffset =
+    Math.max(SCROLLBAR_MARGIN * 2, safeArea.top + safeArea.bottom) +
+    SCROLLBAR_WIDTH * 2;
 
   const scrollbarHeight =
     viewportHeight * (viewportHeightWithZoom / extendedSceneHeight) -
-    Math.max(SCROLLBAR_MARGIN * 2, safeArea.top + safeArea.bottom);
-
+    scrollbarHeightOffset;
   // NOTE the delta multiplier calculation isn't quite correct when viewport
   // is extended outside the scene (elements) bbox as there's some small
   // accumulation error. I'll let this be an exercise for others to fix. ^^
   const horizontalDeltaMultiplier =
     extendedSceneWidth > sceneWidth
-      ? (extendedSceneWidth * appState.zoom.value) / scrollbarWidth
-      : viewportWidth / scrollbarWidth;
+      ? (extendedSceneWidth * appState.zoom.value) /
+        (scrollbarWidth + scrollWidthOffset)
+      : viewportWidth / (scrollbarWidth + scrollWidthOffset);
 
   const verticalDeltaMultiplier =
     extendedSceneHeight > sceneHeight
-      ? (extendedSceneHeight * appState.zoom.value) / scrollbarHeight
-      : viewportHeight / scrollbarHeight;
+      ? (extendedSceneHeight * appState.zoom.value) /
+        (scrollbarHeight + scrollbarHeightOffset)
+      : viewportHeight / (scrollbarHeight + scrollbarHeightOffset);
   return {
     horizontal:
       viewportMinX === sceneMinX && viewportMaxX === sceneMaxX
@@ -88,6 +97,7 @@ export const getScrollBars = (
         : {
             x:
               Math.max(safeArea.left, SCROLLBAR_MARGIN) +
+              SCROLLBAR_WIDTH +
               ((viewportMinX - sceneMinX) / extendedSceneWidth) * viewportWidth,
             y:
               viewportHeight -
@@ -109,6 +119,7 @@ export const getScrollBars = (
                 Math.max(safeArea.right, SCROLLBAR_MARGIN),
             y:
               Math.max(safeArea.top, SCROLLBAR_MARGIN) +
+              SCROLLBAR_WIDTH +
               ((viewportMinY - sceneMinY) / extendedSceneHeight) *
                 viewportHeight,
             width: SCROLLBAR_WIDTH,
