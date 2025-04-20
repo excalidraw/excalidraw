@@ -1510,6 +1510,16 @@ export const resizeMultipleElements = (
         ];
       }
 
+      //zsviczian (shift resize embeddable to scale resize)
+      if (isIframeLikeElement(orig)) {
+        if (shouldMaintainAspectRatio) {
+          update.scale = [
+            Math.abs(width / (orig.width / orig.scale[0])),
+            Math.abs(height / (orig.height / orig.scale[1])),
+          ];
+        }
+      }
+
       if (isTextElement(orig)) {
         const metrics = measureFontSizeFromWidth(orig, elementsMap, width);
         if (!metrics) {
