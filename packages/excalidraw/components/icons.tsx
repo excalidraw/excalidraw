@@ -2236,3 +2236,19 @@ export const elementLinkIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+// Generated with copilot
+export const TableCellsIcon = createIcon(
+  <g strokeWidth="1.25">
+    <rect x="4" y="4" width="4" height="4" rx="1" />
+    <rect x="10" y="4" width="4" height="4" rx="1" />
+    <rect x="16" y="4" width="4" height="4" rx="1" />
+    <rect x="4" y="10" width="4" height="4" rx="1" />
+    <rect x="10" y="10" width="4" height="4" rx="1" />
+    <rect x="16" y="10" width="4" height="4" rx="1" />
+    <rect x="4" y="16" width="4" height="4" rx="1" />
+    <rect x="10" y="16" width="4" height="4" rx="1" />
+    <rect x="16" y="16" width="4" height="4" rx="1" />
+  </g>,
+  tablerIconProps,
+);
