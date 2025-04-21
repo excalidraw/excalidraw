@@ -66,8 +66,6 @@ import type {
   NonDeletedExcalidrawElement,
 } from "./types";
 
-import { debugDrawBounds } from "@excalidraw/utils/visualdebug";
-
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 
 type Node = {
@@ -1425,10 +1423,6 @@ const getElbowArrowData = (
       : startPointBounds,
     hoveredEndElement ? aabbForElement(hoveredEndElement) : endPointBounds,
   );
-  debugDrawBounds(endElementBounds);
-  // dynamicAABBs.forEach((aabb) => {
-  //   debugDrawBounds(aabb);
-  // });
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
