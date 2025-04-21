@@ -124,6 +124,8 @@ export const CLASSES = {
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
+export const SERIF_FONT_FAMILY = "serif";
+
 /**
  * // TODO: shouldn't be really `const`, likely neither have integers as values, due to value for the custom fonts, which should likely be some hash.
  *
@@ -143,6 +145,14 @@ export const FONT_FAMILY = {
   "Comic Shanns": 8,
   "Liberation Sans": 9,
 };
+
+// Fonts to use as fallback before FONT_FAMILY_FALLBACKS
+// FONT_FAMILY_FALLBACKS's Segoe UI Emoji fails to properly fallback
+// for some glyphs: ∞, ∫, ≠
+// so we need to have generic font fallback before it
+export const GENERIC_FONT_FAMILIES = [SERIF_FONT_FAMILY];
+export const getGenericFontsForFallbacks: () => string[] = () =>
+  GENERIC_FONT_FAMILIES;
 
 export const FONT_FAMILY_FALLBACKS = {
   [CJK_HAND_DRAWN_FALLBACK_FONT]: 100,
