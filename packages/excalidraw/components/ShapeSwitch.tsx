@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useMemo, useRef } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
@@ -118,13 +118,14 @@ const Panel = ({
   app: App;
   elements: ExcalidrawElement[];
 }) => {
-  let [x1, y2, cx, cy] = [0, 0, 0, 0];
-  let rotatedBottomLeft = [0, 0];
-
   const { generic, linear } = getSwitchableTypeFromElements(elements);
 
-  const genericElements = generic ? getGenericSwitchableElements(elements) : [];
-  const linearElements = linear ? getLinearSwitchableElements(elements) : [];
+  const genericElements = useMemo(() => {
+    return generic ? getGenericSwitchableElements(elements) : [];
+  }, [generic, elements]);
+  const linearElements = useMemo(() => {
+    return linear ? getLinearSwitchableElements(elements) : [];
+  }, [linear, elements]);
 
   const sameType = generic
     ? genericElements.every(
@@ -134,33 +135,45 @@ const Panel = ({
     ? linearElements.every((element) => element.type === linearElements[0].type)
     : false;
 
-  if (elements.length === 1) {
-    [x1, , , y2, cx, cy] = getElementAbsoluteCoords(
-      elements[0],
-      app.scene.getNonDeletedElementsMap(),
+  const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
+  const selectedElementsRef = useRef("");
+
+  useEffect(() => {
+    const elements = [...genericElements, ...linearElements].sort((a, b) =>
+      a.id.localeCompare(b.id),
+    );
+    const elementsRef = elements.join(",");
+
+    if (elementsRef === selectedElementsRef.current) {
+      return;
+    }
+
+    selectedElementsRef.current = elementsRef;
+
+    let bottomLeft;
+
+    if (elements.length === 1) {
+      const [x1, , , y2, cx, cy] = getElementAbsoluteCoords(
+        elements[0],
+        app.scene.getNonDeletedElementsMap(),
+      );
+      bottomLeft = pointRotateRads(
+        pointFrom(x1, y2),
+        pointFrom(cx, cy),
+        elements[0].angle,
+      );
+    } else {
+      const { minX, maxY } = getCommonBoundingBox(elements);
+      bottomLeft = pointFrom(minX, maxY);
+    }
+
+    const { x, y } = sceneCoordsToViewportCoords(
+      { sceneX: bottomLeft[0], sceneY: bottomLeft[1] },
+      app.state,
     );
 
-    rotatedBottomLeft = pointRotateRads(
-      pointFrom(x1, y2),
-      pointFrom(cx, cy),
-      elements[0].angle,
-    );
-  } else {
-    const { minX, maxY, midX, midY } = getCommonBoundingBox(elements);
-    x1 = minX;
-    y2 = maxY;
-    cx = midX;
-    cy = midY;
-    rotatedBottomLeft = pointFrom(x1, y2);
-  }
-
-  const { x, y } = sceneCoordsToViewportCoords(
-    {
-      sceneX: rotatedBottomLeft[0],
-      sceneY: rotatedBottomLeft[1],
-    },
-    app.state,
-  );
+    setPanelPosition({ x, y });
+  }, [genericElements, linearElements, app.scene, app.state]);
 
   const SHAPES: [string, string, ReactNode][] = linear
     ? [
@@ -180,9 +193,11 @@ const Panel = ({
       style={{
         position: "absolute",
         top: `${
-          y + (GAP_VERTICAL + 8) * app.state.zoom.value - app.state.offsetTop
+          panelPosition.y +
+          (GAP_VERTICAL + 8) * app.state.zoom.value -
+          app.state.offsetTop
         }px`,
-        left: `${x - app.state.offsetLeft - GAP_HORIZONTAL}px`,
+        left: `${panelPosition.x - app.state.offsetLeft - GAP_HORIZONTAL}px`,
         zIndex: 2,
       }}
       className="ShapeSwitch__Panel"
