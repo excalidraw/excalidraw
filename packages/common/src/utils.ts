@@ -1218,3 +1218,18 @@ export const elementCenterPoint = (
 
   return pointFrom<GlobalPoint>(centerXPoint, centerYPoint);
 };
+
+/** hack for Array.isArray type guard not working with readonly value[] */
+export const isReadonlyArray = (value?: any): value is readonly any[] => {
+  return Array.isArray(value);
+};
+
+export const sizeOf = (
+  value: readonly number[] | Readonly<Map<any, any>> | Record<any, any>,
+): number => {
+  return isReadonlyArray(value)
+    ? value.length
+    : value instanceof Map
+    ? value.size
+    : Object.keys(value).length;
+};
