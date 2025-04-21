@@ -4763,11 +4763,6 @@ class App extends React.Component<AppProps, AppState> {
               canvasOffsets: this.getEditorUIOffsets(),
             });
           }
-
-          editorJotaiStore.set(shapeSwitchAtom, {
-            type: "hint",
-            id: firstNode.id,
-          });
         }
 
         this.flowChartCreator.clear();

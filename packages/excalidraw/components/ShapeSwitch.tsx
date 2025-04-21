@@ -1,7 +1,5 @@
 import { type ReactNode, useEffect, useMemo, useRef } from "react";
 
-import clsx from "clsx";
-
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import {
@@ -38,7 +36,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import { mutateElement, ROUNDNESS, sceneCoordsToViewportCoords } from "..";
-import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
 import { trackEvent } from "../analytics";
 import { atom, editorJotaiStore, useAtom } from "../editor-jotai";
@@ -62,16 +59,10 @@ export const GENERIC_SWITCHABLE_SHAPES = ["rectangle", "diamond", "ellipse"];
 
 export const LINEAR_SWITCHABLE_SHAPES = ["line", "arrow"];
 
-export const shapeSwitchAtom = atom<
-  | {
-      type: "hint";
-      id: string;
-    }
-  | {
-      type: "panel";
-    }
-  | null
->(null);
+export const shapeSwitchAtom = atom<{
+  type: "panel";
+} | null>(null);
+
 export const shapeSwitchFontSizeAtom = atom<{
   [id: string]: {
     fontSize: number;
@@ -112,103 +103,12 @@ const ShapeSwitch = ({ app }: { app: App }) => {
     return null;
   }
 
-  // clear if hint target no longer matches
-  if (
-    shapeSwitch.type === "hint" &&
-    selectedElements[0]?.id !== shapeSwitch.id
-  ) {
-    setShapeSwitch(null);
-    return null;
-  }
-
   if (selectedElements.length === 0) {
     setShapeSwitch(null);
     return null;
   }
 
-  const props = { app, elements: selectedElements };
-
-  switch (shapeSwitch.type) {
-    case "hint":
-      return <Hint {...props} />;
-    case "panel":
-      return <Panel {...props} />;
-    default:
-      return null;
-  }
-};
-
-const Hint = ({
-  app,
-  elements,
-}: {
-  app: App;
-  elements: ExcalidrawElement[];
-}) => {
-  const [, setShapeSwitch] = useAtom(shapeSwitchAtom);
-  const hintRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const hint = hintRef.current;
-    if (!hint) {
-      return;
-    }
-
-    const handleAnimationEnd = () => {
-      hint.classList.remove("animation");
-      setShapeSwitch(null);
-    };
-
-    hint.addEventListener("animationend", handleAnimationEnd, { once: true });
-
-    return () => {
-      hint.removeEventListener("animationend", handleAnimationEnd);
-    };
-  }, [setShapeSwitch]);
-
-  const [x1, y1, , , cx, cy] = getElementAbsoluteCoords(
-    elements[0],
-    app.scene.getNonDeletedElementsMap(),
-  );
-
-  const rotatedTopLeft = pointRotateRads(
-    pointFrom(x1, y1),
-    pointFrom(cx, cy),
-    elements[0].angle,
-  );
-
-  const { x, y } = sceneCoordsToViewportCoords(
-    {
-      sceneX: rotatedTopLeft[0],
-      sceneY: rotatedTopLeft[1],
-    },
-    app.state,
-  );
-
-  return (
-    <div
-      ref={hintRef}
-      // key={element.id}
-      style={{
-        position: "absolute",
-        bottom: `${
-          app.state.height +
-          GAP_VERTICAL * app.state.zoom.value -
-          y -
-          app.state.offsetTop
-        }px`,
-        left: `${x - app.state.offsetLeft - GAP_HORIZONTAL}px`,
-        zIndex: 2,
-
-        display: "flex",
-        flexDirection: "row",
-      }}
-      className={clsx("ShapeSwitch__Hint", "animation")}
-    >
-      <div className="key">&#47;</div>
-      <div className="text">{t("labels.tab")}</div>
-    </div>
-  );
+  return <Panel app={app} elements={selectedElements} />;
 };
 
 const Panel = ({
