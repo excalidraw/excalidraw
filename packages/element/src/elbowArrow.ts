@@ -110,18 +110,30 @@ type ElbowArrowData = {
 const calculateDedupTreshhold = <Point extends GlobalPoint | LocalPoint>(
   a: Point,
   b: Point,
-) => 1 + pointDistance(a, b) / 100;
+) => 1 + pointDistance(a, b) / 300;
 
 const calculatePadding = (
   aabb: Bounds,
-  startHeading: Heading,
-  endHeading: Heading,
+  startBoundingBox: Bounds,
+  endBoundingBox: Bounds,
 ) => {
   const width = aabb[2] - aabb[0];
   const height = aabb[3] - aabb[1];
   const size = Math.max(width, height);
+  const startExtent = Math.max(
+    startBoundingBox[2] - startBoundingBox[0],
+    startBoundingBox[3] - startBoundingBox[1],
+    10,
+  );
+  const endExtent = Math.max(
+    endBoundingBox[2] - endBoundingBox[0],
+    endBoundingBox[3] - endBoundingBox[1],
+    10,
+  );
 
-  return size > 75
+  return Math.min(startExtent, endExtent) < 80
+    ? Math.min(startExtent, endExtent) / 2
+    : size > 75
     ? 40
     : Math.min(Math.max(Math.min(width / 2 - 1, height / 2 - 1), 10), 40);
 };
@@ -486,8 +498,10 @@ const handleSegmentMove = (
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   const BASE_PADDING = calculatePadding(
     aabbForElement(arrow),
-    startHeading,
-    endHeading,
+    hoveredStartElement
+      ? aabbForElement(hoveredStartElement)
+      : [10, 10, 10, 10],
+    hoveredEndElement ? aabbForElement(hoveredEndElement) : [10, 10, 10, 10],
   );
   const activelyModifiedSegmentIdx = fixedSegments
     .map((segment, i) => {
@@ -735,8 +749,10 @@ const handleEndpointDrag = (
 ) => {
   const BASE_PADDING = calculatePadding(
     aabbForPoints([startGlobalPoint, endGlobalPoint]),
-    startHeading,
-    endHeading,
+    hoveredStartElement
+      ? aabbForElement(hoveredStartElement)
+      : [10, 10, 10, 10],
+    hoveredEndElement ? aabbForElement(hoveredEndElement) : [10, 10, 10, 10],
   );
   let startIsSpecial = arrow.startIsSpecial ?? null;
   let endIsSpecial = arrow.endIsSpecial ?? null;
@@ -1330,8 +1346,10 @@ const getElbowArrowData = (
   ] as Bounds;
   const BASE_PADDING = calculatePadding(
     aabbForPoints([startGlobalPoint, endGlobalPoint]),
-    startHeading,
-    endHeading,
+    hoveredStartElement
+      ? aabbForElement(hoveredStartElement)
+      : [10, 10, 10, 10],
+    hoveredEndElement ? aabbForElement(hoveredEndElement) : [10, 10, 10, 10],
   );
   const startElementBounds = hoveredStartElement
     ? aabbForElement(
