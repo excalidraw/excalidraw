@@ -296,8 +296,8 @@ describe("elbow arrow ui", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [34.9292, 0],
-      [34.48768, 164.6246],
+      [34.7084, 0],
+      [34.7084, 164.6246],
       [104.333, 164.6246],
     ]);
   });

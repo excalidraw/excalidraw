@@ -66,6 +66,8 @@ import type {
   NonDeletedExcalidrawElement,
 } from "./types";
 
+import { debugDrawBounds } from "@excalidraw/utils/visualdebug";
+
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 
 type Node = {
@@ -1418,9 +1420,15 @@ const getElbowArrowData = (
           BASE_PADDING,
         ),
     boundsOverlap,
-    hoveredStartElement && aabbForElement(hoveredStartElement),
-    hoveredEndElement && aabbForElement(hoveredEndElement),
+    hoveredStartElement
+      ? aabbForElement(hoveredStartElement)
+      : startPointBounds,
+    hoveredEndElement ? aabbForElement(hoveredEndElement) : endPointBounds,
   );
+  debugDrawBounds(endElementBounds);
+  // dynamicAABBs.forEach((aabb) => {
+  //   debugDrawBounds(aabb);
+  // });
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -1691,11 +1699,11 @@ const generateDynamicAABBs = (
   a: Bounds,
   b: Bounds,
   common: Bounds,
-  startDifference?: [number, number, number, number],
-  endDifference?: [number, number, number, number],
-  disableSideHack?: boolean,
-  startElementBounds?: Bounds | null,
-  endElementBounds?: Bounds | null,
+  startDifference: [number, number, number, number],
+  endDifference: [number, number, number, number],
+  disableSideHack: boolean,
+  startElementBounds: Bounds,
+  endElementBounds: Bounds,
 ): Bounds[] => {
   const startEl = startElementBounds ?? a;
   const endEl = endElementBounds ?? b;
@@ -1775,15 +1783,24 @@ const generateDynamicAABBs = (
       (second[0] + second[2]) / 2,
       (second[1] + second[3]) / 2,
     ];
-    if (b[0] > a[2] && a[1] > b[3]) {
+    if (
+      endElementBounds[0] > startElementBounds[2] &&
+      startElementBounds[1] > endElementBounds[3]
+    ) {
       // BOTTOM LEFT
       const cX = first[2] + (second[0] - first[2]) / 2;
       const cY = second[3] + (first[1] - second[3]) / 2;
 
       if (
         vectorCross(
-          vector(a[2] - endCenterX, a[1] - endCenterY),
-          vector(a[0] - endCenterX, a[3] - endCenterY),
+          vector(
+            startElementBounds[2] - endCenterX,
+            startElementBounds[1] - endCenterY,
+          ),
+          vector(
+            startElementBounds[0] - endCenterX,
+            startElementBounds[3] - endCenterY,
+          ),
         ) > 0
       ) {
         return [
@@ -1796,15 +1813,24 @@ const generateDynamicAABBs = (
         [first[0], cY, first[2], first[3]],
         [second[0], second[1], second[2], cY],
       ];
-    } else if (a[2] < b[0] && a[3] < b[1]) {
+    } else if (
+      startElementBounds[2] < endElementBounds[0] &&
+      startElementBounds[3] < endElementBounds[1]
+    ) {
       // TOP LEFT
       const cX = first[2] + (second[0] - first[2]) / 2;
       const cY = first[3] + (second[1] - first[3]) / 2;
 
       if (
         vectorCross(
-          vector(a[0] - endCenterX, a[1] - endCenterY),
-          vector(a[2] - endCenterX, a[3] - endCenterY),
+          vector(
+            startElementBounds[0] - endCenterX,
+            startElementBounds[1] - endCenterY,
+          ),
+          vector(
+            startElementBounds[2] - endCenterX,
+            startElementBounds[3] - endCenterY,
+          ),
         ) > 0
       ) {
         return [
@@ -1817,15 +1843,24 @@ const generateDynamicAABBs = (
         [first[0], first[1], cX, first[3]],
         [cX, second[1], second[2], second[3]],
       ];
-    } else if (a[0] > b[2] && a[3] < b[1]) {
+    } else if (
+      startElementBounds[0] > endElementBounds[2] &&
+      startElementBounds[3] < endElementBounds[1]
+    ) {
       // TOP RIGHT
       const cX = second[2] + (first[0] - second[2]) / 2;
       const cY = first[3] + (second[1] - first[3]) / 2;
 
       if (
         vectorCross(
-          vector(a[2] - endCenterX, a[1] - endCenterY),
-          vector(a[0] - endCenterX, a[3] - endCenterY),
+          vector(
+            startElementBounds[2] - endCenterX,
+            startElementBounds[1] - endCenterY,
+          ),
+          vector(
+            startElementBounds[0] - endCenterX,
+            startElementBounds[3] - endCenterY,
+          ),
         ) > 0
       ) {
         return [
@@ -1838,15 +1873,24 @@ const generateDynamicAABBs = (
         [first[0], first[1], first[2], cY],
         [second[0], cY, second[2], second[3]],
       ];
-    } else if (a[0] > b[2] && a[1] > b[3]) {
+    } else if (
+      startElementBounds[0] > endElementBounds[2] &&
+      startElementBounds[1] > endElementBounds[3]
+    ) {
       // BOTTOM RIGHT
       const cX = second[2] + (first[0] - second[2]) / 2;
       const cY = second[3] + (first[1] - second[3]) / 2;
 
       if (
         vectorCross(
-          vector(a[0] - endCenterX, a[1] - endCenterY),
-          vector(a[2] - endCenterX, a[3] - endCenterY),
+          vector(
+            startElementBounds[0] - endCenterX,
+            startElementBounds[1] - endCenterY,
+          ),
+          vector(
+            startElementBounds[2] - endCenterX,
+            startElementBounds[3] - endCenterY,
+          ),
         ) > 0
       ) {
         return [
