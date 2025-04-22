@@ -31,6 +31,7 @@ import {
   getGlobalFixedPointForBindableElement,
   snapToMid,
   getHoveredElementForBinding,
+  getDistanceForBinding,
 } from "./binding";
 import { distanceToBindableElement } from "./distance";
 import {
@@ -52,7 +53,7 @@ import {
   type NonDeletedSceneElementsMap,
 } from "./types";
 
-import { aabbForElement, pointInsideBounds } from "./shapes";
+import { aabbForElement, getElementShape, pointInsideBounds } from "./shapes";
 
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
@@ -64,6 +65,7 @@ import type {
   FixedSegment,
   NonDeletedExcalidrawElement,
 } from "./types";
+import { isPointInShape } from "@excalidraw/utils/collision";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 
@@ -1253,8 +1255,10 @@ const getElbowArrowData = (
     "start",
     arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
+    elementsMap,
     hoveredStartElement,
     options?.isDragging,
+    options?.zoom,
   );
   const endGlobalPoint = getGlobalPoint(
     {
@@ -1266,8 +1270,10 @@ const getElbowArrowData = (
     "end",
     arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
+    elementsMap,
     hoveredEndElement,
     options?.isDragging,
+    options?.zoom,
   );
   const startHeading = getBindPointHeading(
     startGlobalPoint,
@@ -2209,11 +2215,17 @@ const getGlobalPoint = (
   startOrEnd: "start" | "end",
   fixedPointRatio: [number, number] | undefined | null,
   initialPoint: GlobalPoint,
+  elementsMap: ElementsMap,
   element?: ExcalidrawBindableElement | null,
   isDragging?: boolean,
+  zoom?: AppState["zoom"],
 ): GlobalPoint => {
   if (isDragging) {
-    if (element) {
+    if (
+      element &&
+      (getDistanceForBinding(initialPoint, element, zoom) ||
+        isPointInShape(initialPoint, getElementShape(element, elementsMap)))
+    ) {
       const snapPoint = bindPointToSnapToElementOutline(
         arrow,
         element,
