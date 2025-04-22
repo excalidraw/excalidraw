@@ -35,6 +35,7 @@ import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 
 import type {
   ElementsMap,
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextContainer,
@@ -432,15 +433,48 @@ export const switchShapes = (
     selectedLinearSwitchableElements.forEach((element) => {
       ShapeCache.delete(element);
 
-      mutateElement(
-        element as ExcalidrawLinearElement,
-        {
-          type: nextType as LinearSwitchableToolType,
-          startArrowhead: null,
-          endArrowhead: nextType === "arrow" ? "arrow" : null,
-        },
-        false,
-      );
+      // TODO: maybe add a separate function for safe type conversion
+      //       without overloading mutateElement
+      if (nextType === "arrow") {
+        mutateElement(
+          element as ExcalidrawArrowElement,
+          {
+            type: "arrow",
+            startArrowhead: app.state.currentItemStartArrowhead,
+            endArrowhead: app.state.currentItemEndArrowhead,
+            startBinding: null,
+            endBinding: null,
+            ...(app.state.currentItemArrowType === "elbow"
+              ? { elbowed: true }
+              : {}),
+          },
+          false,
+        );
+      }
+
+      if (nextType === "line") {
+        if (isElbowArrow(element)) {
+          mutateElement(
+            element as ExcalidrawLinearElement,
+            {
+              type: "line",
+              startArrowhead: null,
+              endArrowhead: null,
+              startBinding: null,
+              endBinding: null,
+            },
+            false,
+            {
+              propertiesToDrop: [
+                "elbowed",
+                "startIsSpecial",
+                "endIsSpecial",
+                "fixedSegments",
+              ],
+            },
+          );
+        }
+      }
 
       if (isElbowArrow(element)) {
         const nextPoints = convertLineToElbow(element);

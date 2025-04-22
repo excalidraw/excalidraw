@@ -38,6 +38,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     // If true, the elbow arrow tries to bind to the nearest element. If false
     // it tries to keep the same bound element, if any.
     isDragging?: boolean;
+    propertiesToDrop?: string[];
   },
 ): TElement => {
   let didChange = false;
@@ -126,6 +127,12 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
             continue;
           }
         }
+      }
+
+      if (options?.propertiesToDrop?.includes(key)) {
+        delete (element as any)[key];
+        didChange = true;
+        continue;
       }
 
       (element as any)[key] = value;
