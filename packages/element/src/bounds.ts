@@ -476,7 +476,11 @@ export const getRectangleBoxAbsoluteCoords = (boxSceneCoords: RectangleBox) => {
   ];
 };
 
-export const getDiamondPoints = (element: ExcalidrawElement) => {
+export const getDiamondPoints = (
+  element: ExcalidrawElement,
+  wPadding: number = 0,
+  hPadding: number = 0,
+) => {
   // Here we add +1 to avoid these numbers to be 0
   // otherwise rough.js will throw an error complaining about it
   const topX = Math.floor(element.width / 2) + 1;
@@ -488,7 +492,16 @@ export const getDiamondPoints = (element: ExcalidrawElement) => {
   const leftX = 0;
   const leftY = rightY;
 
-  return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
+  return [
+    topX,
+    topY - hPadding,
+    rightX + wPadding,
+    rightY,
+    bottomX,
+    bottomY + hPadding,
+    leftX - wPadding,
+    leftY,
+  ];
 };
 
 // reference: https://eliot-jones.com/2019/12/cubic-bezier-curve-bounding-boxes
