@@ -1503,11 +1503,15 @@ export const resizeMultipleElements = (
       }
 
       if (isTextElement(orig)) {
-        const metrics = measureFontSizeFromWidth(orig, elementsMap, width);
-        if (!metrics) {
-          return;
+        if (!shouldMaintainAspectRatio) {
+          const metrics = measureFontSizeFromWidth(orig, elementsMap, width);
+          if (!metrics) {
+            return;
+          }
+          update.fontSize = metrics.size;
+        } else {
+          update.fontSize = orig.fontSize;
         }
-        update.fontSize = metrics.size;
       }
 
       const boundTextElement = originalElementsMap.get(
@@ -1515,7 +1519,7 @@ export const resizeMultipleElements = (
       ) as ExcalidrawTextElementWithContainer | undefined;
 
       if (boundTextElement) {
-        if (keepAspectRatio) {
+        if (keepAspectRatio && !shouldMaintainAspectRatio) {
           const newFontSize = boundTextElement.fontSize * scale;
           if (newFontSize < MIN_FONT_SIZE) {
             return;
