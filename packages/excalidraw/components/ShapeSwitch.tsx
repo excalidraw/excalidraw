@@ -464,16 +464,6 @@ export const switchShapes = (
           },
         );
         mutateElement(element, updates, false);
-      } else if (isArrowElement(element)) {
-        const nextPoints = convertLineToElbow(element);
-
-        mutateElement(
-          element,
-          {
-            points: nextPoints,
-          },
-          false,
-        );
       }
     });
     const firstElement = selectedLinearSwitchableElements[0];
