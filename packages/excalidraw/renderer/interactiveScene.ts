@@ -321,9 +321,9 @@ const strokeDiamondWithRotation = (
       );
     } else {
       context.moveTo(topX, topY);
-      context.lineTo(rightX, rightY);
-      context.lineTo(bottomX, bottomY);
       context.lineTo(leftX, leftY);
+      context.lineTo(bottomX, bottomY);
+      context.lineTo(rightX, rightY);
     }
 
     context.closePath();
