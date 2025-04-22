@@ -1,12 +1,16 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
-import { pointFrom, pointRotateRads } from "@excalidraw/math";
+import { updateElbowArrowPoints } from "@excalidraw/element/elbowArrow";
+
+import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
 
 import {
   getSwitchableTypeFromElements,
   isArrowElement,
+  isElbowArrow,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element/typeChecks";
+
 import {
   getCommonBoundingBox,
   getElementAbsoluteCoords,
@@ -18,9 +22,13 @@ import {
   getBoundTextMaxWidth,
   redrawTextBoundingBox,
 } from "@excalidraw/element/textElement";
+
 import { wrapText } from "@excalidraw/element/textWrapping";
+
 import { getFontString, updateActiveTool } from "@excalidraw/common";
+
 import { measureText } from "@excalidraw/element/textMeasurements";
+
 import { ShapeCache } from "@excalidraw/element/ShapeCache";
 
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
@@ -31,6 +39,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
+  FixedSegment,
   GenericSwitchableToolType,
   LinearSwitchableToolType,
 } from "@excalidraw/element/types";
@@ -136,19 +145,22 @@ const Panel = ({
     : false;
 
   const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
-  const selectedElementsRef = useRef("");
+  const positionRef = useRef("");
 
   useEffect(() => {
     const elements = [...genericElements, ...linearElements].sort((a, b) =>
       a.id.localeCompare(b.id),
     );
-    const elementsRef = elements.join(",");
+    const newPositionRef = `
+      ${app.state.scrollX}${app.state.scrollY}${app.state.offsetTop}${
+      app.state.offsetLeft
+    }${app.state.zoom.value}${elements.map((el) => el.id).join(",")}`;
 
-    if (elementsRef === selectedElementsRef.current) {
+    if (newPositionRef === positionRef.current) {
       return;
     }
 
-    selectedElementsRef.current = elementsRef;
+    positionRef.current = newPositionRef;
 
     let bottomLeft;
 
@@ -429,6 +441,40 @@ export const switchShapes = (
         },
         false,
       );
+
+      if (isElbowArrow(element)) {
+        const nextPoints = convertLineToElbow(element);
+
+        const fixedSegments: FixedSegment[] = [];
+
+        for (let i = 0; i < nextPoints.length - 1; i++) {
+          fixedSegments.push({
+            start: nextPoints[i],
+            end: nextPoints[i + 1],
+            index: i,
+          });
+        }
+
+        const updates = updateElbowArrowPoints(
+          element,
+          app.scene.getNonDeletedElementsMap(),
+          {
+            points: nextPoints,
+            fixedSegments,
+          },
+        );
+        mutateElement(element, updates, false);
+      } else if (isArrowElement(element)) {
+        const nextPoints = convertLineToElbow(element);
+
+        mutateElement(
+          element,
+          {
+            points: nextPoints,
+          },
+          false,
+        );
+      }
     });
     const firstElement = selectedLinearSwitchableElements[0];
 
@@ -462,5 +508,66 @@ const getLinearSwitchableElements = (elements: ExcalidrawElement[]) =>
       ) &&
       (!element.boundElements || element.boundElements.length === 0),
   );
+
+const convertLineToElbow = (line: ExcalidrawLinearElement) => {
+  const linePoints = sanitizePoints(line.points);
+  const nextPoints: LocalPoint[] = [linePoints[0]];
+
+  let i = 1;
+
+  // add bend points to consideration as we go through the line
+  // so as to make sure the resulting points form valid segments
+  while (i < linePoints.length) {
+    const start = nextPoints[nextPoints.length - 1];
+    const end = linePoints[i];
+
+    if (isAxisAligned(start, end)) {
+      pushSimplified(nextPoints, end);
+      i++;
+    } else {
+      const bend = pointFrom<LocalPoint>(end[0], start[1]);
+      pushSimplified(nextPoints, bend);
+      // NOTE: we do not increment the counter `i`
+      //       so that bend -> end in the next loop
+    }
+  }
+
+  return nextPoints;
+};
+
+const isAxisAligned = (a: LocalPoint, b: LocalPoint) =>
+  a[0] === b[0] || a[1] === b[1];
+
+const areColinear = (a: LocalPoint, b: LocalPoint, c: LocalPoint) =>
+  (a[0] === b[0] && b[0] === c[0]) || (a[1] === b[1] && b[1] === c[1]);
+
+const pushSimplified = (points: LocalPoint[], point: LocalPoint) => {
+  const len = points.length;
+  if (len >= 2 && areColinear(points[len - 2], points[len - 1], point)) {
+    // replace the previous point with the new one
+    points[len - 1] = point;
+  } else {
+    points.push(point);
+  }
+};
+
+const sanitizePoints = (points: readonly LocalPoint[]): LocalPoint[] => {
+  if (points.length === 0) {
+    return [];
+  }
+
+  const sanitized: LocalPoint[] = [points[0]];
+
+  for (let i = 1; i < points.length; i++) {
+    const [x1, y1] = sanitized[sanitized.length - 1];
+    const [x2, y2] = points[i];
+
+    if (x1 !== x2 || y1 !== y2) {
+      sanitized.push(points[i]);
+    }
+  }
+
+  return sanitized;
+};
 
 export default ShapeSwitch;
