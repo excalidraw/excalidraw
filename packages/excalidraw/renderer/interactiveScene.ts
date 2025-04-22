@@ -204,8 +204,8 @@ const strokeDiamondWithRotation = (
 ) => {
   const { width, height } = element;
   const side = Math.hypot(width, height);
-  const wPaddingMax = (1.8 * (padding * side)) / height;
-  const hPaddingMax = (1.8 * (padding * side)) / width;
+  const wPaddingMax = (1.5 * (padding * side)) / height;
+  const hPaddingMax = (1.5 * (padding * side)) / width;
   const [x, y] = pointRotateRads(
     pointFrom<GlobalPoint>(element.x, element.y),
     elementCenterPoint(element),
