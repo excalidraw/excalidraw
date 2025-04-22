@@ -107,7 +107,7 @@ export const isBindingEnabled = (appState: AppState): boolean => {
 };
 
 export const FIXED_BINDING_DISTANCE = 5;
-export const BINDING_HIGHLIGHT_THICKNESS = 10;
+const BINDING_HIGHLIGHT_THICKNESS = 10;
 export const BINDING_HIGHLIGHT_OFFSET = 4;
 
 const getNonDeletedElements = (
@@ -446,22 +446,13 @@ export const maybeBindLinearElement = (
 const normalizePointBinding = (
   binding: { focus: number; gap: number },
   hoveredElement: ExcalidrawBindableElement,
-) => {
-  let gap = binding.gap;
-  const maxGap = maxBindingGap(
-    hoveredElement,
-    hoveredElement.width,
-    hoveredElement.height,
-  );
-
-  if (gap > maxGap) {
-    gap = BINDING_HIGHLIGHT_THICKNESS + BINDING_HIGHLIGHT_OFFSET;
-  }
-  return {
-    ...binding,
-    gap,
-  };
-};
+) => ({
+  ...binding,
+  gap: Math.min(
+    binding.gap,
+    maxBindingGap(hoveredElement, hoveredElement.width, hoveredElement.height),
+  ),
+});
 
 export const bindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
