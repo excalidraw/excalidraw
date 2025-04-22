@@ -27,7 +27,7 @@ import {
   PRECISION,
 } from "@excalidraw/math";
 
-import { isPointOnShape } from "@excalidraw/utils/collision";
+import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
@@ -63,7 +63,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import { aabbForElement, getElementShape, pointInsideBounds } from "./shapes";
+import { aabbForElement, getElementShape } from "./shapes";
 import { updateElbowArrowPoints } from "./elbowArrow";
 
 import type Scene from "./Scene";
@@ -230,7 +230,13 @@ const getOriginalBindingIfStillCloseOfLinearElementEdge = (
     const element = elementsMap.get(elementId);
     if (
       isBindableElement(element) &&
-      bindingBorderTest(element, coors, elementsMap, zoom)
+      bindingBorderTest(
+        element,
+        coors,
+        elementsMap,
+        zoom,
+        isElbowArrow(element),
+      )
     ) {
       return element;
     }
@@ -567,19 +573,7 @@ export const getHoveredElementForBinding = (
       elements,
       (element) =>
         isBindableElement(element, false) &&
-        bindingBorderTest(
-          element,
-          pointerCoords,
-          elementsMap,
-          zoom,
-          (fullShape ||
-            !isBindingFallthroughEnabled(
-              element as ExcalidrawBindableElement,
-            )) &&
-            // disable fullshape snapping for frame elements so we
-            // can bind to frame children
-            !isFrameLikeElement(element),
-        ),
+        bindingBorderTest(element, pointerCoords, elementsMap, zoom, fullShape),
     ).filter((element) => {
       if (cullRest) {
         return false;
@@ -621,16 +615,7 @@ export const getHoveredElementForBinding = (
     elements,
     (element) =>
       isBindableElement(element, false) &&
-      bindingBorderTest(
-        element,
-        pointerCoords,
-        elementsMap,
-        zoom,
-        // disable fullshape snapping for frame elements so we
-        // can bind to frame children
-        (fullShape || !isBindingFallthroughEnabled(element)) &&
-          !isFrameLikeElement(element),
-      ),
+      bindingBorderTest(element, pointerCoords, elementsMap, zoom, fullShape),
   );
 
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
@@ -1554,13 +1539,19 @@ export const bindingBorderTest = (
   fullShape?: boolean,
 ): boolean => {
   const threshold = maxBindingGap(element, element.width, element.height, zoom);
-
   const shape = getElementShape(element, elementsMap);
-  return (
-    isPointOnShape(pointFrom(x, y), shape, threshold) ||
-    (fullShape === true &&
-      pointInsideBounds(pointFrom(x, y), aabbForElement(element)))
-  );
+  const shouldTestInside =
+    // disable fullshape snapping for frame elements so we
+    // can bind to frame children
+    (fullShape || !isBindingFallthroughEnabled(element)) &&
+    !isFrameLikeElement(element);
+
+  return shouldTestInside
+    ? // Since `inShape` tests STRICTLY againt the insides of a shape
+      // we would need `onShape` as well to include the "borders"
+      isPointInShape(pointFrom(x, y), shape) ||
+        isPointOnShape(pointFrom(x, y), shape, threshold)
+    : isPointOnShape(pointFrom(x, y), shape, threshold);
 };
 
 export const maxBindingGap = (
