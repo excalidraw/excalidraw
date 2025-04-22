@@ -106,13 +106,11 @@ export const getFontFamilyString = ({
 
       // Fallback to generic family names first, then to specific font family names
       // currently only serif is added as a generic font family
-      return `${fontFamilyString}
-            ${getGenericFontsForFallbacks()
-              .map((x) => `, ${x}`)
-              .join("")}
-            ${getFontFamilyFallbacks(fontFamily)
-              .map((x) => `, ${x}`)
-              .join("")}`;
+      return `${fontFamilyString}${getGenericFontsForFallbacks()
+        .map((x) => `, ${x}`)
+        .join("")}${getFontFamilyFallbacks(fontFamily)
+        .map((x) => `, ${x}`)
+        .join("")}`;
     }
   }
   return WINDOWS_EMOJI_FALLBACK_FONT;
