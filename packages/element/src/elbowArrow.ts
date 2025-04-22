@@ -22,6 +22,8 @@ import {
   isDevEnv,
 } from "@excalidraw/common";
 
+import { isPointInShape } from "@excalidraw/utils/collision";
+
 import type { AppState } from "@excalidraw/excalidraw/types";
 
 import {
@@ -48,6 +50,7 @@ import {
 } from "./heading";
 import { type ElementUpdate } from "./mutateElement";
 import { isBindableElement } from "./typeChecks";
+
 import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
@@ -65,7 +68,6 @@ import type {
   FixedSegment,
   NonDeletedExcalidrawElement,
 } from "./types";
-import { isPointInShape } from "@excalidraw/utils/collision";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 
