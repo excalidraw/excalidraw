@@ -57,7 +57,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import { mutateElement, sceneCoordsToViewportCoords } from "..";
-import { getSelectedElements } from "../scene";
 import { trackEvent } from "../analytics";
 import { atom, editorJotaiStore, useAtom } from "../editor-jotai";
 
@@ -104,7 +103,7 @@ const ShapeSwitch = ({ app }: { app: App }) => {
   const [, setShapeSwitchLinear] = useAtom(shapeSwitchLinearAtom);
 
   const selectedElements = useMemo(
-    () => getSelectedElements(app.scene.getNonDeletedElementsMap(), app.state),
+    () => app.scene.getSelectedElements(app.state),
     [app.scene, app.state],
   );
   const selectedElementsTypeRef = useRef<"generic" | "linear">(null);
@@ -394,10 +393,7 @@ export const switchShapes = (
     return false;
   }
 
-  const selectedElements = getSelectedElements(
-    app.scene.getNonDeletedElementsMap(),
-    app.state,
-  );
+  const selectedElements = app.scene.getSelectedElements(app.state);
 
   const selectedElementIds = selectedElements.reduce(
     (acc, element) => ({ ...acc, [element.id]: true }),
@@ -428,9 +424,31 @@ export const switchShapes = (
       ];
 
     if (nextType && isConvertibleGenericType(nextType)) {
-      for (const element of selectedGenericSwitchableElements) {
-        convertElementType(element, nextType, app, false);
+      const convertedElements: Record<string, ExcalidrawElement> = {};
 
+      for (const element of selectedGenericSwitchableElements) {
+        const convertedElement = convertElementType(
+          element,
+          nextType,
+          app,
+          false,
+        );
+        convertedElements[convertedElement.id] = convertedElement;
+      }
+
+      const nextElements = [];
+
+      for (const element of app.scene.getElementsIncludingDeleted()) {
+        if (convertedElements[element.id]) {
+          nextElements.push(convertedElements[element.id]);
+        } else {
+          nextElements.push(element);
+        }
+      }
+
+      app.scene.replaceAllElements(nextElements);
+
+      for (const element of Object.values(convertedElements)) {
         const boundText = getBoundTextElement(
           element,
           app.scene.getNonDeletedElementsMap(),
@@ -489,9 +507,25 @@ export const switchShapes = (
       ];
 
     if (nextType && isConvertibleLinearType(nextType)) {
+      const convertedElements: Record<string, ExcalidrawElement> = {};
       for (const element of selectedLinearSwitchableElements) {
-        convertElementType(element, nextType, app, false);
+        const converted = convertElementType(element, nextType, app, false);
+        convertedElements[converted.id] = converted;
+      }
 
+      const nextElements = [];
+
+      for (const element of app.scene.getElementsIncludingDeleted()) {
+        if (convertedElements[element.id]) {
+          nextElements.push(convertedElements[element.id]);
+        } else {
+          nextElements.push(element);
+        }
+      }
+
+      app.scene.replaceAllElements(nextElements);
+
+      for (const element of Object.values(convertedElements)) {
         const cachedLinear = editorJotaiStore.get(shapeSwitchLinearAtom)?.[
           element.id
         ];

@@ -27,15 +27,14 @@ import {
   isUsingAdaptiveRadius,
 } from "./typeChecks";
 
+import { newArrowElement, newElement, newLinearElement } from "./newElement";
+
 import type {
   ConvertibleGenericTypes,
   ConvertibleLinearTypes,
-  ExcalidrawArrowElement,
   ExcalidrawDiamondElement,
-  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
-  ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
   NonDeletedSceneElementsMap,
@@ -241,17 +240,6 @@ export const CONVERTIBLE_GENERIC_TYPES: readonly ConvertibleGenericTypes[] = [
   "ellipse",
 ];
 
-const ELBOW_ARROW_SPECIFIC_PROPERTIES: Array<
-  keyof ExcalidrawElbowArrowElement
-> = ["elbowed", "fixedSegments", "startIsSpecial", "endIsSpecial"];
-
-const ARROW_TO_LINE_CLEAR_PROPERTIES: Array<keyof ExcalidrawArrowElement> = [
-  "startArrowhead",
-  "endArrowhead",
-  "startBinding",
-  "endBinding",
-];
-
 export const CONVERTIBLE_LINEAR_TYPES: readonly ConvertibleLinearTypes[] = [
   "line",
   "sharpArrow",
@@ -313,106 +301,82 @@ export const convertElementType = <
 
   ShapeCache.delete(element);
 
-  const update = () => {
-    (element as any).version++;
-    (element as any).versionNonce = randomInteger();
-    (element as any).updated = getUpdatedTimestamp();
-
-    if (informMutation) {
-      app.scene.triggerUpdate();
-    }
-  };
-
   if (
     isConvertibleGenericType(startType) &&
     isConvertibleGenericType(newType)
   ) {
-    (element as any).type = newType;
+    const nextElement = bumpVersion(
+      newElement({
+        ...element,
+        type: newType,
+        roundness:
+          newType === "diamond" && element.roundness
+            ? {
+                type: isUsingAdaptiveRadius(newType)
+                  ? ROUNDNESS.ADAPTIVE_RADIUS
+                  : ROUNDNESS.PROPORTIONAL_RADIUS,
+              }
+            : element.roundness,
+      }),
+    );
 
-    if (newType === "diamond" && element.roundness) {
-      (element as any).roundness = {
-        type: isUsingAdaptiveRadius(newType)
-          ? ROUNDNESS.ADAPTIVE_RADIUS
-          : ROUNDNESS.PROPORTIONAL_RADIUS,
-      };
-    }
-
-    update();
-
-    switch (element.type) {
+    switch (nextElement.type) {
       case "rectangle":
-        return element as ExcalidrawRectangleElement;
+        return nextElement as ExcalidrawRectangleElement;
       case "diamond":
-        return element as ExcalidrawDiamondElement;
+        return nextElement as ExcalidrawDiamondElement;
       case "ellipse":
-        return element as ExcalidrawEllipseElement;
+        return nextElement as ExcalidrawEllipseElement;
     }
   }
 
   if (isConvertibleLinearType(element.type)) {
     if (newType === "line") {
-      for (const key of ELBOW_ARROW_SPECIFIC_PROPERTIES) {
-        delete (element as any)[key];
-      }
-      for (const key of ARROW_TO_LINE_CLEAR_PROPERTIES) {
-        if (key in element) {
-          (element as any)[key] = null;
-        }
-      }
+      const nextElement = newLinearElement({
+        ...element,
+        type: "line",
+      });
 
-      (element as any).type = newType;
+      return bumpVersion(nextElement);
     }
 
     if (newType === "sharpArrow") {
-      if (startType === "elbowArrow") {
-        // drop elbow arrow specific properties
-        for (const key of ELBOW_ARROW_SPECIFIC_PROPERTIES) {
-          delete (element as any)[key];
-        }
-      }
+      const nextElement = newArrowElement({
+        ...element,
+        type: "arrow",
+        elbowed: false,
+        roundness: null,
+        startArrowhead: app.state.currentItemStartArrowhead,
+        endArrowhead: app.state.currentItemEndArrowhead,
+      });
 
-      (element as any).type = "arrow";
-      (element as any).elbowed = false;
-      (element as any).roundness = null;
-      (element as any).startArrowhead = app.state.currentItemStartArrowhead;
-      (element as any).endArrowhead = app.state.currentItemEndArrowhead;
+      return bumpVersion(nextElement);
     }
 
     if (newType === "curvedArrow") {
-      if (startType === "elbowArrow") {
-        // drop elbow arrow specific properties
-        for (const key of ELBOW_ARROW_SPECIFIC_PROPERTIES) {
-          delete (element as any)[key];
-        }
-      }
-      (element as any).type = "arrow";
-      (element as any).elbowed = false;
-      (element as any).roundness = {
-        type: ROUNDNESS.PROPORTIONAL_RADIUS,
-      };
-      (element as any).startArrowhead = app.state.currentItemStartArrowhead;
-      (element as any).endArrowhead = app.state.currentItemEndArrowhead;
+      const nextElement = newArrowElement({
+        ...element,
+        type: "arrow",
+        elbowed: false,
+        roundness: {
+          type: ROUNDNESS.PROPORTIONAL_RADIUS,
+        },
+        startArrowhead: app.state.currentItemStartArrowhead,
+        endArrowhead: app.state.currentItemEndArrowhead,
+      });
+
+      return bumpVersion(nextElement);
     }
 
     if (newType === "elbowArrow") {
-      (element as any).type = "arrow";
-      (element as any).elbowed = true;
-      (element as any).fixedSegments = null;
-      (element as any).startIsSpecial = null;
-      (element as any).endIsSpecial = null;
-    }
+      const nextElement = newArrowElement({
+        ...element,
+        type: "arrow",
+        elbowed: true,
+        fixedSegments: null,
+      });
 
-    update();
-
-    switch (newType) {
-      case "line":
-        return element as ExcalidrawLinearElement;
-      case "sharpArrow":
-        return element as ExcalidrawArrowElement;
-      case "curvedArrow":
-        return element as ExcalidrawArrowElement;
-      case "elbowArrow":
-        return element as ExcalidrawElbowArrowElement;
+      return bumpVersion(nextElement);
     }
   }
 
