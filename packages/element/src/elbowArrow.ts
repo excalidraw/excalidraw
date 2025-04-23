@@ -22,8 +22,6 @@ import {
   isDevEnv,
 } from "@excalidraw/common";
 
-import { isPointInShape } from "@excalidraw/utils/collision";
-
 import type { AppState } from "@excalidraw/excalidraw/types";
 
 import {
@@ -55,7 +53,7 @@ import {
   type NonDeletedSceneElementsMap,
 } from "./types";
 
-import { aabbForElement, getElementShape, pointInsideBounds } from "./shapes";
+import { aabbForElement, pointInsideBounds } from "./shapes";
 
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
@@ -2222,10 +2220,7 @@ const getGlobalPoint = (
   zoom?: AppState["zoom"],
 ): GlobalPoint => {
   if (isDragging) {
-    if (
-      element &&
-      isPointInShape(initialPoint, getElementShape(element, elementsMap))
-    ) {
+    if (element) {
       const snapPoint = bindPointToSnapToElementOutline(
         arrow,
         element,
