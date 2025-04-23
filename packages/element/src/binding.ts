@@ -1104,9 +1104,11 @@ export const snapToMid = (
   const horizontalThrehsold = clamp(tolerance * width, 5, 80);
 
   if (
-    nonRotated[0] <= x + width / 2 &&
-    nonRotated[1] > center[1] - verticalThrehsold &&
-    nonRotated[1] < center[1] + verticalThrehsold
+    element.type === "diamond"
+      ? nonRotated[0] <= x + width * (element.roundness ? 0.035 : 1)
+      : nonRotated[0] <= x + width / 2 &&
+        nonRotated[1] > center[1] - verticalThrehsold &&
+        nonRotated[1] < center[1] + verticalThrehsold
   ) {
     // LEFT
     return pointRotateRads(
@@ -1115,9 +1117,11 @@ export const snapToMid = (
       angle,
     );
   } else if (
-    nonRotated[1] <= y + height / 2 &&
-    nonRotated[0] > center[0] - horizontalThrehsold &&
-    nonRotated[0] < center[0] + horizontalThrehsold
+    element.type === "diamond"
+      ? nonRotated[1] <= y + height * (element.roundness ? 0.035 : 1)
+      : nonRotated[1] <= y + height / 2 &&
+        nonRotated[0] > center[0] - horizontalThrehsold &&
+        nonRotated[0] < center[0] + horizontalThrehsold
   ) {
     // TOP
     return pointRotateRads(
@@ -1126,9 +1130,11 @@ export const snapToMid = (
       angle,
     );
   } else if (
-    nonRotated[0] >= x + width / 2 &&
-    nonRotated[1] > center[1] - verticalThrehsold &&
-    nonRotated[1] < center[1] + verticalThrehsold
+    element.type === "diamond"
+      ? nonRotated[0] >= x + width * (element.roundness ? 0.035 : 1)
+      : nonRotated[0] >= x + width / 2 &&
+        nonRotated[1] > center[1] - verticalThrehsold &&
+        nonRotated[1] < center[1] + verticalThrehsold
   ) {
     // RIGHT
     return pointRotateRads(
@@ -1137,9 +1143,11 @@ export const snapToMid = (
       angle,
     );
   } else if (
-    nonRotated[1] >= y + height / 2 &&
-    nonRotated[0] > center[0] - horizontalThrehsold &&
-    nonRotated[0] < center[0] + horizontalThrehsold
+    element.type === "diamond"
+      ? nonRotated[1] >= y - height * (element.roundness ? 0.035 : 1)
+      : nonRotated[1] >= y + height / 2 &&
+        nonRotated[0] > center[0] - horizontalThrehsold &&
+        nonRotated[0] < center[0] + horizontalThrehsold
   ) {
     // DOWN
     return pointRotateRads(
