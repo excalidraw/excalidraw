@@ -680,7 +680,7 @@ export const arrayToMap = <T extends { id: string } | string>(
   return items.reduce((acc: Map<string, T>, element) => {
     acc.set(typeof element === "string" ? element : element.id, element);
     return acc;
-  }, new Map());
+  }, new Map() as Map<string, T>);
 };
 
 export const arrayToMapWithIndex = <T extends { id: string }>(
@@ -1217,4 +1217,19 @@ export const elementCenterPoint = (
   const centerYPoint = y + height / 2 + yOffset;
 
   return pointFrom<GlobalPoint>(centerXPoint, centerYPoint);
+};
+
+/** hack for Array.isArray type guard not working with readonly value[] */
+export const isReadonlyArray = (value?: any): value is readonly any[] => {
+  return Array.isArray(value);
+};
+
+export const sizeOf = (
+  value: readonly number[] | Readonly<Map<any, any>> | Record<any, any>,
+): number => {
+  return isReadonlyArray(value)
+    ? value.length
+    : value instanceof Map
+    ? value.size
+    : Object.keys(value).length;
 };

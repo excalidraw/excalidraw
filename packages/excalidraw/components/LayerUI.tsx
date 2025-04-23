@@ -5,6 +5,7 @@ import {
   CLASSES,
   DEFAULT_SIDEBAR,
   TOOL_TYPE,
+  arrayToMap,
   capitalizeString,
   isShallowEqual,
 } from "@excalidraw/common";
@@ -17,7 +18,6 @@ import { ShapeCache } from "@excalidraw/element/ShapeCache";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import Scene from "../scene/Scene";
 import { actionToggleStats } from "../actions";
 import { trackEvent } from "../analytics";
 import { isHandToolActive } from "../appState";
@@ -463,22 +463,18 @@ const LayerUI = ({
 
             if (selectedElements.length) {
               for (const element of selectedElements) {
-                mutateElement(
-                  element,
-                  {
-                    [altKey && eyeDropperState.swapPreviewOnAlt
-                      ? colorPickerType === "elementBackground"
-                        ? "strokeColor"
-                        : "backgroundColor"
-                      : colorPickerType === "elementBackground"
-                      ? "backgroundColor"
-                      : "strokeColor"]: color,
-                  },
-                  false,
-                );
+                mutateElement(element, arrayToMap(elements), {
+                  [altKey && eyeDropperState.swapPreviewOnAlt
+                    ? colorPickerType === "elementBackground"
+                      ? "strokeColor"
+                      : "backgroundColor"
+                    : colorPickerType === "elementBackground"
+                    ? "backgroundColor"
+                    : "strokeColor"]: color,
+                });
                 ShapeCache.delete(element);
               }
-              Scene.getScene(selectedElements[0])?.triggerUpdate();
+              app.scene.triggerUpdate();
             } else if (colorPickerType === "elementBackground") {
               setAppState({
                 currentItemBackgroundColor: color,
@@ -511,7 +507,7 @@ const LayerUI = ({
               openDialog: null,
             });
           }}
-          elementsMap={app.scene.getNonDeletedElementsMap()}
+          scene={app.scene}
           appState={appState}
           generateLinkForSelection={generateLinkForSelection}
         />

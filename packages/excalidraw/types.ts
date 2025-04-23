@@ -710,6 +710,7 @@ export interface ExcalidrawProps {
   showDeprecatedFonts?: boolean;
   customOptions?: ExcalidrawPropsCustomOptions;
   actionRef?: React.RefObject<ExcalidrawActionType | undefined>;
+  renderScrollbars?: boolean;
 }
 
 export type SceneData = {
@@ -892,6 +893,7 @@ export type UnsubscribeCallback = () => void;
 
 export interface ExcalidrawImperativeAPI {
   updateScene: InstanceType<typeof App>["updateScene"];
+  mutateElement: InstanceType<typeof App>["mutateElement"];
   updateLibrary: InstanceType<typeof Library>["updateLibrary"];
   resetScene: InstanceType<typeof App>["resetScene"];
   getSceneElementsIncludingDeleted: InstanceType<
