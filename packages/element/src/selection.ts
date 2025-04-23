@@ -1,4 +1,4 @@
-import { isShallowEqual } from "@excalidraw/common";
+import { arrayToMap, isShallowEqual } from "@excalidraw/common";
 
 import type {
   AppState,
@@ -264,6 +264,7 @@ export const makeNextSelectedElementIds = (
 
 const _getLinearElementEditor = (
   targetElements: readonly ExcalidrawElement[],
+  allElements: readonly NonDeletedExcalidrawElement[],
 ) => {
   const linears = targetElements.filter(isLinearElement);
   if (linears.length === 1) {
@@ -274,7 +275,7 @@ const _getLinearElementEditor = (
     );
 
     if (onlySingleLinearSelected) {
-      return new LinearElementEditor(linear);
+      return new LinearElementEditor(linear, arrayToMap(allElements));
     }
   }
 
@@ -287,7 +288,7 @@ export const getSelectionStateForElements = (
   appState: AppState,
 ) => {
   return {
-    selectedLinearElement: _getLinearElementEditor(targetElements),
+    selectedLinearElement: _getLinearElementEditor(targetElements, allElements),
     ...selectGroupsForSelectedElements(
       {
         editingGroupId: appState.editingGroupId,

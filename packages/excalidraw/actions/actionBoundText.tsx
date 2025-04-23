@@ -27,7 +27,6 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element/typeChecks";
 
-import { mutateElement } from "@excalidraw/element/mutateElement";
 import { measureText } from "@excalidraw/element/textMeasurements";
 
 import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
@@ -43,11 +42,11 @@ import type {
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
+import type { Radians } from "@excalidraw/math";
+
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
-
-import type { Radians } from "../../math/src";
 
 import type { AppState } from "../types";
 
@@ -80,7 +79,7 @@ export const actionUnbindText = register({
           boundTextElement,
           elementsMap,
         );
-        mutateElement(boundTextElement as ExcalidrawTextElement, {
+        app.scene.mutateElement(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
           width,
           height,
@@ -88,7 +87,7 @@ export const actionUnbindText = register({
           x,
           y,
         });
-        mutateElement(element, {
+        app.scene.mutateElement(element, {
           boundElements: element.boundElements?.filter(
             (ele) => ele.id !== boundTextElement.id,
           ),
@@ -153,25 +152,21 @@ export const actionBindText = register({
       textElement = selectedElements[1] as ExcalidrawTextElement;
       container = selectedElements[0] as ExcalidrawTextContainer;
     }
-    mutateElement(textElement, {
+    app.scene.mutateElement(textElement, {
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
       textAlign: TEXT_ALIGN.CENTER,
       autoResize: true,
       angle: (isArrowElement(container) ? 0 : container?.angle ?? 0) as Radians,
     });
-    mutateElement(container, {
+    app.scene.mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
         type: "text",
         id: textElement.id,
       }),
     });
     const originalContainerHeight = container.height;
-    redrawTextBoundingBox(
-      textElement,
-      container,
-      app.scene.getNonDeletedElementsMap(),
-    );
+    redrawTextBoundingBox(textElement, container, app.scene);
     // overwritting the cache with original container height so
     // it can be restored when unbind
     updateOriginalContainerCache(container.id, originalContainerHeight);
@@ -301,27 +296,23 @@ export const actionWrapTextInContainer = register({
             }
 
             if (startBinding || endBinding) {
-              mutateElement(ele, { startBinding, endBinding }, false);
+              app.scene.mutateElement(ele, {
+                startBinding,
+                endBinding,
+              });
             }
           });
         }
 
-        mutateElement(
-          textElement,
-          {
-            containerId: container.id,
-            verticalAlign: VERTICAL_ALIGN.MIDDLE,
-            boundElements: null,
-            textAlign: TEXT_ALIGN.CENTER,
-            autoResize: true,
-          },
-          false,
-        );
-        redrawTextBoundingBox(
-          textElement,
-          container,
-          app.scene.getNonDeletedElementsMap(),
-        );
+        app.scene.mutateElement(textElement, {
+          containerId: container.id,
+          verticalAlign: VERTICAL_ALIGN.MIDDLE,
+          boundElements: null,
+          textAlign: TEXT_ALIGN.CENTER,
+          autoResize: true,
+        });
+
+        redrawTextBoundingBox(textElement, container, app.scene);
 
         updatedElements = pushContainerBelowText(
           [...updatedElements, container],

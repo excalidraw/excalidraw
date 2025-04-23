@@ -6,9 +6,10 @@ import {
   defaultGetElementLinkFromSelection,
   getLinkIdAndTypeFromSelection,
 } from "@excalidraw/element/elementLink";
-import { mutateElement } from "@excalidraw/element/mutateElement";
 
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type Scene from "@excalidraw/element/Scene";
 
 import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
@@ -21,20 +22,20 @@ import { TrashIcon } from "./icons";
 import "./ElementLinkDialog.scss";
 
 import type { AppProps, AppState, UIAppState } from "../types";
-
 const ElementLinkDialog = ({
   sourceElementId,
   onClose,
-  elementsMap,
   appState,
+  scene,
   generateLinkForSelection = defaultGetElementLinkFromSelection,
 }: {
   sourceElementId: ExcalidrawElement["id"];
-  elementsMap: ElementsMap;
   appState: UIAppState;
+  scene: Scene;
   onClose?: () => void;
   generateLinkForSelection: AppProps["generateLinkForSelection"];
 }) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
   const originalLink = elementsMap.get(sourceElementId)?.link ?? null;
 
   const [nextLink, setNextLink] = useState<string | null>(originalLink);
@@ -70,7 +71,7 @@ const ElementLinkDialog = ({
     if (nextLink && nextLink !== elementsMap.get(sourceElementId)?.link) {
       const elementToLink = elementsMap.get(sourceElementId);
       elementToLink &&
-        mutateElement(elementToLink, {
+        scene.mutateElement(elementToLink, {
           link: nextLink,
         });
     }
@@ -78,13 +79,13 @@ const ElementLinkDialog = ({
     if (!nextLink && linkEdited && sourceElementId) {
       const elementToLink = elementsMap.get(sourceElementId);
       elementToLink &&
-        mutateElement(elementToLink, {
+        scene.mutateElement(elementToLink, {
           link: null,
         });
     }
 
     onClose?.();
-  }, [sourceElementId, nextLink, elementsMap, linkEdited, onClose]);
+  }, [sourceElementId, nextLink, elementsMap, linkEdited, scene, onClose]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

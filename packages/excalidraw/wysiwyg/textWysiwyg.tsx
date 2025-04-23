@@ -15,7 +15,7 @@ import {
 } from "@excalidraw/element/containerCache";
 
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import { bumpVersion, mutateElement } from "@excalidraw/element/mutateElement";
+import { bumpVersion } from "@excalidraw/element/mutateElement";
 import {
   getBoundTextElementId,
   getContainerElement,
@@ -45,7 +45,6 @@ import type {
 
 import { actionSaveToActiveFile } from "../actions";
 
-import Scene from "../scene/Scene";
 import { parseClipboard } from "../clipboard";
 import {
   actionDecreaseFontSize,
@@ -130,8 +129,7 @@ export const textWysiwyg = ({
 
   const updateWysiwygStyle = () => {
     const appState = app.state;
-    const updatedTextElement =
-      Scene.getScene(element)?.getElement<ExcalidrawTextElement>(id);
+    const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
 
     if (!updatedTextElement) {
       return;
@@ -201,7 +199,7 @@ export const textWysiwyg = ({
             container.type,
           );
 
-          mutateElement(container, { height: targetContainerHeight });
+          app.scene.mutateElement(container, { height: targetContainerHeight });
           return;
         } else if (
           // autoshrink container height until original container height
@@ -214,7 +212,7 @@ export const textWysiwyg = ({
             height,
             container.type,
           );
-          mutateElement(container, { height: targetContainerHeight });
+          app.scene.mutateElement(container, { height: targetContainerHeight });
         } else {
           const { y } = computeBoundTextPosition(
             container,
@@ -287,7 +285,7 @@ export const textWysiwyg = ({
         editable.style.fontFamily = getFontFamilyString(updatedTextElement);
       }
 
-      mutateElement(updatedTextElement, { x: coordX, y: coordY });
+      app.scene.mutateElement(updatedTextElement, { x: coordX, y: coordY });
     }
   };
 
@@ -544,7 +542,7 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
-    const updateElement = Scene.getScene(element)?.getElement(
+    const updateElement = app.scene.getElement(
       element.id,
     ) as ExcalidrawTextElement;
     if (!updateElement) {
@@ -559,7 +557,7 @@ export const textWysiwyg = ({
       if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
-          mutateElement(container, {
+          app.scene.mutateElement(container, {
             boundElements: (container.boundElements || []).concat({
               type: "text",
               id: element.id,
@@ -570,7 +568,7 @@ export const textWysiwyg = ({
           bumpVersion(container);
         }
       } else {
-        mutateElement(container, {
+        app.scene.mutateElement(container, {
           boundElements: container.boundElements?.filter(
             (ele) =>
               !isTextElement(
@@ -579,11 +577,8 @@ export const textWysiwyg = ({
           ),
         });
       }
-      redrawTextBoundingBox(
-        updateElement,
-        container,
-        app.scene.getNonDeletedElementsMap(),
-      );
+
+      redrawTextBoundingBox(updateElement, container, app.scene);
     }
 
     onSubmit({
