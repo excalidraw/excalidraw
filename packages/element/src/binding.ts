@@ -1131,7 +1131,7 @@ export const snapToMid = (
     );
   } else if (
     element.type === "diamond"
-      ? nonRotated[0] >= x + width * (element.roundness ? 0.035 : 1)
+      ? nonRotated[0] >= x + width * (element.roundness ? 1 - 0.035 : 1)
       : nonRotated[0] >= x + width / 2 &&
         nonRotated[1] > center[1] - verticalThrehsold &&
         nonRotated[1] < center[1] + verticalThrehsold
@@ -1144,7 +1144,7 @@ export const snapToMid = (
     );
   } else if (
     element.type === "diamond"
-      ? nonRotated[1] >= y - height * (element.roundness ? 0.035 : 1)
+      ? nonRotated[1] >= y + height * (element.roundness ? 1 - 0.035 : 1)
       : nonRotated[1] >= y + height / 2 &&
         nonRotated[0] > center[0] - horizontalThrehsold &&
         nonRotated[0] < center[0] + horizontalThrehsold
