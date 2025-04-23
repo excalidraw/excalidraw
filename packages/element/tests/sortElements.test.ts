@@ -1,10 +1,12 @@
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import { mutateElement } from "../src/mutateElement";
+import { mutateElement } from "@excalidraw/element/mutateElement";
+
 import { normalizeElementOrder } from "../src/sortElements";
 
 import type { ExcalidrawElement } from "../src/types";
 
+const { h } = window;
 const assertOrder = (
   elements: readonly ExcalidrawElement[],
   expectedOrder: string[],
@@ -35,7 +37,7 @@ describe("normalizeElementsOrder", () => {
       boundElements: [],
     });
 
-    mutateElement(container, {
+    mutateElement(container, new Map(), {
       boundElements: [{ type: "text", id: boundText.id }],
     });
 
@@ -352,7 +354,7 @@ describe("normalizeElementsOrder", () => {
       containerId: container.id,
     });
 
-    mutateElement(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [
         { type: "text", id: boundText.id },
         { type: "text", id: "xxx" },
@@ -387,7 +389,7 @@ describe("normalizeElementsOrder", () => {
           boundElements: [],
           groupIds: ["C", "A"],
         });
-        mutateElement(container, {
+        h.app.scene.mutateElement(container, {
           boundElements: [{ type: "text", id: boundText.id }],
         });
 

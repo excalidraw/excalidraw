@@ -4,10 +4,7 @@ import {
   isBindingEnabled,
 } from "@excalidraw/element/binding";
 import { getCommonBoundingBox } from "@excalidraw/element/bounds";
-import {
-  mutateElement,
-  newElementWith,
-} from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element/mutateElement";
 import { deepCopyElement } from "@excalidraw/element/duplicate";
 import { resizeMultipleElements } from "@excalidraw/element/resizeElements";
 import {
@@ -162,11 +159,9 @@ const flipElements = (
 
   bindOrUnbindLinearElements(
     selectedElements.filter(isLinearElement),
-    elementsMap,
-    app.scene.getNonDeletedElements(),
-    app.scene,
     isBindingEnabled(appState),
     [],
+    app.scene,
     appState.zoom,
   );
 
@@ -194,13 +189,13 @@ const flipElements = (
     getCommonBoundingBox(selectedElements);
   const [diffX, diffY] = [midX - newMidX, midY - newMidY];
   otherElements.forEach((element) =>
-    mutateElement(element, {
+    app.scene.mutateElement(element, {
       x: element.x + diffX,
       y: element.y + diffY,
     }),
   );
   elbowArrows.forEach((element) =>
-    mutateElement(element, {
+    app.scene.mutateElement(element, {
       x: element.x + diffX,
       y: element.y + diffY,
     }),

@@ -1,7 +1,5 @@
 import { degreesToRadians, radiansToDegrees } from "@excalidraw/math";
 
-import { mutateElement } from "@excalidraw/element/mutateElement";
-
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import { isArrowElement } from "@excalidraw/element/typeChecks";
 
@@ -11,13 +9,14 @@ import type { Degrees } from "@excalidraw/math";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
+import type Scene from "@excalidraw/element/Scene";
+
 import { angleIcon } from "../icons";
 
 import DragInput from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
-import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
 interface MultiAngleProps {
@@ -54,17 +53,13 @@ const handleDegreeChange: DragInputCallbackType<
       if (!element) {
         continue;
       }
-      mutateElement(
-        element,
-        {
-          angle: nextAngle,
-        },
-        false,
-      );
+      scene.mutateElement(element, {
+        angle: nextAngle,
+      });
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement && !isArrowElement(element)) {
-        mutateElement(boundTextElement, { angle: nextAngle }, false);
+        scene.mutateElement(boundTextElement, { angle: nextAngle });
       }
     }
 
@@ -92,17 +87,13 @@ const handleDegreeChange: DragInputCallbackType<
 
     const nextAngle = degreesToRadians(nextAngleInDegrees as Degrees);
 
-    mutateElement(
-      latestElement,
-      {
-        angle: nextAngle,
-      },
-      false,
-    );
+    scene.mutateElement(latestElement, {
+      angle: nextAngle,
+    });
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {
-      mutateElement(boundTextElement, { angle: nextAngle }, false);
+      scene.mutateElement(boundTextElement, { angle: nextAngle });
     }
   }
   scene.triggerUpdate();

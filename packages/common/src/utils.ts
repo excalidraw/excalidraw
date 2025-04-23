@@ -680,7 +680,7 @@ export const arrayToMap = <T extends { id: string } | string>(
   return items.reduce((acc: Map<string, T>, element) => {
     acc.set(typeof element === "string" ? element : element.id, element);
     return acc;
-  }, new Map());
+  }, new Map() as Map<string, T>);
 };
 
 export const arrayToMapWithIndex = <T extends { id: string }>(

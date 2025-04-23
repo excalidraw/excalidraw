@@ -6832,7 +6832,7 @@ History {
 
 exports[`regression tests > draw every type of shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `33`;
+exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `31`;
 
 exports[`regression tests > given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up > [end of test] appState 1`] = `
 {
@@ -14550,7 +14550,7 @@ History {
 
 exports[`regression tests > undo/redo drawing an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `20`;
+exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests > updates fontSize & fontFamily appState > [end of test] appState 1`] = `
 {

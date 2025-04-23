@@ -2,8 +2,6 @@ import { arrayToMap, findIndex, findLastIndex } from "@excalidraw/common";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
-import type Scene from "@excalidraw/excalidraw/scene/Scene";
-
 import { isFrameLikeElement } from "./typeChecks";
 
 import { getElementsInGroup } from "./groups";
@@ -11,6 +9,8 @@ import { getElementsInGroup } from "./groups";
 import { syncMovedIndices } from "./fractionalIndex";
 
 import { getSelectedElements } from "./selection";
+
+import type Scene from "./Scene";
 
 import type { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./types";
 

@@ -2,7 +2,7 @@ import { getNonDeletedElements } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import { isLinearElement, isTextElement } from "@excalidraw/element/typeChecks";
 
-import { KEYS } from "@excalidraw/common";
+import { arrayToMap, KEYS } from "@excalidraw/common";
 
 import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
 
@@ -53,7 +53,7 @@ export const actionSelectAll = register({
           // single linear element selected
           Object.keys(selectedElementIds).length === 1 &&
           isLinearElement(elements[0])
-            ? new LinearElementEditor(elements[0])
+            ? new LinearElementEditor(elements[0], arrayToMap(elements))
             : null,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,

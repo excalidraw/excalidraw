@@ -50,14 +50,8 @@ const alignSelectedElements = (
   alignment: Alignment,
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
-  const elementsMap = arrayToMap(elements);
 
-  const updatedElements = alignElements(
-    selectedElements,
-    elementsMap,
-    alignment,
-    app.scene,
-  );
+  const updatedElements = alignElements(selectedElements, alignment, app.scene);
 
   const updatedElementsMap = arrayToMap(updatedElements);
 
