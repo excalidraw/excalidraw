@@ -122,10 +122,7 @@ import {
 
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 
-import {
-  mutateElement,
-  newElementWith,
-} from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element/mutateElement";
 
 import {
   newFrameElement,
@@ -303,6 +300,10 @@ import {
 
 import { isNonDeletedElement } from "@excalidraw/element";
 
+import Scene from "@excalidraw/element/Scene";
+
+import type { ElementUpdate } from "@excalidraw/element/mutateElement";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -328,9 +329,10 @@ import type {
   MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
 } from "@excalidraw/element/types";
 
-import type { ValueOf } from "@excalidraw/common/utility-types";
+import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
 import {
   actionAddToLibrary,
@@ -403,7 +405,6 @@ import {
   hasBackground,
   isSomeElementSelected,
 } from "../scene";
-import Scene from "../scene/Scene";
 import { getStateForZoom } from "../scene/zoom";
 import {
   dataURLToFile,
@@ -765,6 +766,7 @@ class App extends React.Component<AppProps, AppState> {
     if (excalidrawAPI) {
       const api: ExcalidrawImperativeAPI = {
         updateScene: this.updateScene,
+        mutateElement: this.mutateElement,
         updateLibrary: this.library.updateLibrary,
         addFiles: this.addFiles,
         resetScene: this.resetScene,
@@ -1392,7 +1394,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private resetEditingFrame = (frame: ExcalidrawFrameLikeElement | null) => {
     if (frame) {
-      mutateElement(frame, { name: frame.name?.trim() || null });
+      this.scene.mutateElement(frame, { name: frame.name?.trim() || null });
     }
     this.setState({ editingFrame: null });
   };
@@ -1449,7 +1451,7 @@ class App extends React.Component<AppProps, AppState> {
             autoFocus
             value={frameNameInEdit}
             onChange={(e) => {
-              mutateElement(f, {
+              this.scene.mutateElement(f, {
                 name: e.target.value,
               });
             }}
@@ -1675,7 +1677,7 @@ class App extends React.Component<AppProps, AppState> {
                             <Hyperlink
                               key={firstSelectedElement.id}
                               element={firstSelectedElement}
-                              elementsMap={allElementsMap}
+                              scene={this.scene}
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
                               setToast={this.setToast}
@@ -1944,16 +1946,20 @@ class App extends React.Component<AppProps, AppState> {
       // state only.
       // Thus reset so that we prefer local cache (if there was some
       // generationData set previously)
-      mutateElement(
+      this.scene.mutateElement(
         frameElement,
-        { customData: { generationData: undefined } },
-        false,
+        {
+          customData: { generationData: undefined },
+        },
+        { informMutation: false, isDragging: false },
       );
     } else {
-      mutateElement(
+      this.scene.mutateElement(
         frameElement,
-        { customData: { generationData: data } },
-        false,
+        {
+          customData: { generationData: data },
+        },
+        { informMutation: false, isDragging: false },
       );
     }
     this.magicGenerations.set(frameElement.id, data);
@@ -2125,7 +2131,7 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.insertElement(frame);
 
         for (const child of selectedElements) {
-          mutateElement(child, { frameId: frame.id });
+          this.scene.mutateElement(child, { frameId: frame.id });
         }
 
         this.setState({
@@ -2924,8 +2930,7 @@ class App extends React.Component<AppProps, AppState> {
             nonDeletedElementsMap,
           ),
         ),
-        this.scene.getNonDeletedElementsMap(),
-        this.scene.getNonDeletedElements(),
+        this.scene,
       );
     }
 
@@ -3323,11 +3328,7 @@ class App extends React.Component<AppProps, AppState> {
           newElement,
           this.scene.getElementsMapIncludingDeleted(),
         );
-        redrawTextBoundingBox(
-          newElement,
-          container,
-          this.scene.getElementsMapIncludingDeleted(),
-        );
+        redrawTextBoundingBox(newElement, container, this.scene);
       }
     });
 
@@ -3450,7 +3451,11 @@ class App extends React.Component<AppProps, AppState> {
             }
             // hack to reset the `y` coord because we vertically center during
             // insertImageElement
-            mutateElement(initializedImageElement, { y }, false);
+            this.scene.mutateElement(
+              initializedImageElement,
+              { y },
+              { informMutation: false, isDragging: false },
+            );
 
             y = imageElement.y + imageElement.height + 25;
 
@@ -4004,6 +4009,17 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
+  public mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
+    element: TElement,
+    updates: ElementUpdate<TElement>,
+    informMutation = true,
+  ) => {
+    return this.scene.mutateElement(element, updates, {
+      informMutation,
+      isDragging: false,
+    });
+  };
+
   private triggerRender = (
     /** force always re-renders canvas even if no change */
     force?: boolean,
@@ -4202,9 +4218,9 @@ class App extends React.Component<AppProps, AppState> {
           ) {
             this.flowChartCreator.createNodes(
               selectedElements[0],
-              this.scene.getNonDeletedElementsMap(),
               this.state,
               getLinkDirectionFromKey(event.key),
+              this.scene,
             );
           }
 
@@ -4446,16 +4462,16 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         selectedElements.forEach((element) => {
-          mutateElement(
+          this.scene.mutateElement(
             element,
             {
               x: element.x + offsetX,
               y: element.y + offsetY,
             },
-            false,
+            { informMutation: false, isDragging: false },
           );
 
-          updateBoundElements(element, this.scene.getNonDeletedElementsMap(), {
+          updateBoundElements(element, this.scene, {
             simultaneouslyUpdated: selectedElements,
           });
         });
@@ -4489,6 +4505,7 @@ class App extends React.Component<AppProps, AppState> {
                   this.setState({
                     editingLinearElement: new LinearElementEditor(
                       selectedElement,
+                      this.scene.getNonDeletedElementsMap(),
                     ),
                   });
                 }
@@ -4682,11 +4699,9 @@ class App extends React.Component<AppProps, AppState> {
     if (isArrowKey(event.key)) {
       bindOrUnbindLinearElements(
         this.scene.getSelectedElements(this.state).filter(isLinearElement),
-        this.scene.getNonDeletedElementsMap(),
-        this.scene.getNonDeletedElements(),
-        this.scene,
         isBindingEnabled(this.state),
         this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+        this.scene,
         this.state.zoom,
       );
       this.setState({ suggestedBindings: [] });
@@ -4993,7 +5008,7 @@ class App extends React.Component<AppProps, AppState> {
       onChange: withBatchedUpdates((nextOriginalText) => {
         updateElement(nextOriginalText, false);
         if (isNonDeletedElement(element)) {
-          updateBoundElements(element, this.scene.getNonDeletedElementsMap());
+          updateBoundElements(element, this.scene);
         }
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
@@ -5356,7 +5371,10 @@ class App extends React.Component<AppProps, AppState> {
       const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
       const newHeight = Math.max(container.height, minHeight);
       const newWidth = Math.max(container.width, minWidth);
-      mutateElement(container, { height: newHeight, width: newWidth });
+      this.scene.mutateElement(container, {
+        height: newHeight,
+        width: newWidth,
+      });
       sceneX = container.x + newWidth / 2;
       sceneY = container.y + newHeight / 2;
       if (parentCenterPosition) {
@@ -5407,7 +5425,7 @@ class App extends React.Component<AppProps, AppState> {
       });
 
     if (!existingTextElement && shouldBindToContainer && container) {
-      mutateElement(container, {
+      this.scene.mutateElement(container, {
         boundElements: (container.boundElements || []).concat({
           type: "text",
           id: element.id,
@@ -5483,7 +5501,10 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.store.shouldCaptureIncrement();
         this.setState({
-          editingLinearElement: new LinearElementEditor(selectedElements[0]),
+          editingLinearElement: new LinearElementEditor(
+            selectedElements[0],
+            this.scene.getNonDeletedElementsMap(),
+          ),
         });
         return;
       } else if (
@@ -5507,7 +5528,11 @@ class App extends React.Component<AppProps, AppState> {
 
         if (midPoint && midPoint > -1) {
           this.store.shouldCaptureIncrement();
-          LinearElementEditor.deleteFixedSegment(selectedElements[0], midPoint);
+          LinearElementEditor.deleteFixedSegment(
+            selectedElements[0],
+            this.scene,
+            midPoint,
+          );
 
           const nextCoords = LinearElementEditor.getSegmentMidpointHitCoords(
             {
@@ -5890,7 +5915,6 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerX,
         scenePointerY,
         this,
-        this.scene.getNonDeletedElementsMap(),
       );
 
       if (
@@ -5952,7 +5976,7 @@ class App extends React.Component<AppProps, AppState> {
             lastPoint,
           ) >= LINE_CONFIRM_THRESHOLD
         ) {
-          mutateElement(
+          this.scene.mutateElement(
             multiElement,
             {
               points: [
@@ -5960,7 +5984,7 @@ class App extends React.Component<AppProps, AppState> {
                 pointFrom<LocalPoint>(scenePointerX - rx, scenePointerY - ry),
               ],
             },
-            false,
+            { informMutation: false, isDragging: false },
           );
         } else {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
@@ -5976,12 +6000,12 @@ class App extends React.Component<AppProps, AppState> {
         ) < LINE_CONFIRM_THRESHOLD
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-        mutateElement(
+        this.scene.mutateElement(
           multiElement,
           {
             points: points.slice(0, -1),
           },
-          false,
+          { informMutation: false, isDragging: false },
         );
       } else {
         const [gridX, gridY] = getGridPoint(
@@ -6013,8 +6037,9 @@ class App extends React.Component<AppProps, AppState> {
         if (isPathALoop(points, this.state.zoom.value)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
+
         // update last uncommitted point
-        mutateElement(
+        this.scene.mutateElement(
           multiElement,
           {
             points: [
@@ -6025,9 +6050,9 @@ class App extends React.Component<AppProps, AppState> {
               ),
             ],
           },
-          false,
           {
             isDragging: true,
+            informMutation: false,
           },
         );
 
@@ -6618,7 +6643,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const frame = this.getTopLayerFrameAtSceneCoords({ x, y });
 
-      mutateElement(pendingImageElement, {
+      this.scene.mutateElement(pendingImageElement, {
         x,
         y,
         frameId: frame ? frame.id : null,
@@ -7673,7 +7698,7 @@ class App extends React.Component<AppProps, AppState> {
         multiElement.type === "line" &&
         isPathALoop(multiElement.points, this.state.zoom.value)
       ) {
-        mutateElement(multiElement, {
+        this.scene.mutateElement(multiElement, {
           lastCommittedPoint:
             multiElement.points[multiElement.points.length - 1],
         });
@@ -7684,7 +7709,7 @@ class App extends React.Component<AppProps, AppState> {
       // Elbow arrows cannot be created by putting down points
       // only the start and end points can be defined
       if (isElbowArrow(multiElement) && multiElement.points.length > 1) {
-        mutateElement(multiElement, {
+        this.scene.mutateElement(multiElement, {
           lastCommittedPoint:
             multiElement.points[multiElement.points.length - 1],
         });
@@ -7721,7 +7746,7 @@ class App extends React.Component<AppProps, AppState> {
       }));
       // clicking outside commit zone → update reference for last committed
       // point
-      mutateElement(multiElement, {
+      this.scene.mutateElement(multiElement, {
         lastCommittedPoint: multiElement.points[multiElement.points.length - 1],
       });
       setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
@@ -7807,7 +7832,7 @@ class App extends React.Component<AppProps, AppState> {
           ),
         };
       });
-      mutateElement(element, {
+      this.scene.mutateElement(element, {
         points: [...element.points, pointFrom<LocalPoint>(0, 0)],
       });
       const boundElement = getHoveredElementForBinding(
@@ -8057,7 +8082,7 @@ class App extends React.Component<AppProps, AppState> {
           index,
           gridX,
           gridY,
-          this.scene.getNonDeletedElementsMap(),
+          this.scene,
         );
 
         flushSync(() => {
@@ -8162,7 +8187,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerCoords,
             this,
             !event[KEYS.CTRL_OR_CMD],
-            elementsMap,
+            this.scene,
           );
           if (!ret) {
             return;
@@ -8389,7 +8414,7 @@ class App extends React.Component<AppProps, AppState> {
                   ),
                 };
 
-                mutateElement(croppingElement, {
+                this.scene.mutateElement(croppingElement, {
                   crop: nextCrop,
                 });
 
@@ -8646,13 +8671,16 @@ class App extends React.Component<AppProps, AppState> {
               ? newElement.pressures
               : [...newElement.pressures, event.pressure];
 
-            mutateElement(
+            this.scene.mutateElement(
               newElement,
               {
                 points: [...points, pointFrom<LocalPoint>(dx, dy)],
                 pressures,
               },
-              false,
+              {
+                informMutation: false,
+                isDragging: false,
+              },
             );
 
             this.setState({
@@ -8675,24 +8703,23 @@ class App extends React.Component<AppProps, AppState> {
           }
 
           if (points.length === 1) {
-            mutateElement(
+            this.scene.mutateElement(
               newElement,
               {
                 points: [...points, pointFrom<LocalPoint>(dx, dy)],
               },
-              false,
+              { informMutation: false, isDragging: false },
             );
           } else if (
             points.length === 2 ||
             (points.length > 1 && isElbowArrow(newElement))
           ) {
-            mutateElement(
+            this.scene.mutateElement(
               newElement,
               {
                 points: [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
               },
-              false,
-              { isDragging: true },
+              { isDragging: true, informMutation: false },
             );
           }
 
@@ -8803,7 +8830,10 @@ class App extends React.Component<AppProps, AppState> {
               selectedLinearElement:
                 elementsWithinSelection.length === 1 &&
                 isLinearElement(elementsWithinSelection[0])
-                  ? new LinearElementEditor(elementsWithinSelection[0])
+                  ? new LinearElementEditor(
+                      elementsWithinSelection[0],
+                      this.scene.getNonDeletedElementsMap(),
+                    )
                   : null,
               showHyperlinkPopup:
                 elementsWithinSelection.length === 1 &&
@@ -8909,7 +8939,7 @@ class App extends React.Component<AppProps, AppState> {
             .map((e) => elementsMap.get(e.id))
             .filter((e) => isElbowArrow(e))
             .forEach((e) => {
-              !!e && mutateElement(e, {}, true);
+              !!e && this.scene.mutateElement(e, {});
             });
         }
       }
@@ -8945,7 +8975,10 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
           if (element) {
-            mutateElement(element, {}, true);
+            this.scene.mutateElement(
+              element as ExcalidrawElbowArrowElement,
+              {},
+            );
           }
         }
 
@@ -8974,7 +9007,6 @@ class App extends React.Component<AppProps, AppState> {
               element,
               startBindingElement,
               endBindingElement,
-              elementsMap,
               this.scene,
             );
           }
@@ -9041,7 +9073,7 @@ class App extends React.Component<AppProps, AppState> {
           ? []
           : [...newElement.pressures, childEvent.pressure];
 
-        mutateElement(newElement, {
+        this.scene.mutateElement(newElement, {
           points: [...points, pointFrom<LocalPoint>(dx, dy)],
           pressures,
           lastCommittedPoint: pointFrom<LocalPoint>(dx, dy),
@@ -9088,15 +9120,20 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (!pointerDownState.drag.hasOccurred && newElement && !multiElement) {
-          mutateElement(newElement, {
-            points: [
-              ...newElement.points,
-              pointFrom<LocalPoint>(
-                pointerCoords.x - newElement.x,
-                pointerCoords.y - newElement.y,
-              ),
-            ],
-          });
+          this.scene.mutateElement(
+            newElement,
+            {
+              points: [
+                ...newElement.points,
+                pointFrom<LocalPoint>(
+                  pointerCoords.x - newElement.x,
+                  pointerCoords.y - newElement.y,
+                ),
+              ],
+            },
+            { informMutation: false, isDragging: false },
+          );
+
           this.setState({
             multiElement: newElement,
             newElement,
@@ -9110,8 +9147,7 @@ class App extends React.Component<AppProps, AppState> {
               newElement,
               this.state,
               pointerCoords,
-              this.scene.getNonDeletedElementsMap(),
-              this.scene.getNonDeletedElements(),
+              this.scene,
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
@@ -9129,7 +9165,10 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 prevState,
               ),
-              selectedLinearElement: new LinearElementEditor(newElement),
+              selectedLinearElement: new LinearElementEditor(
+                newElement,
+                this.scene.getNonDeletedElementsMap(),
+              ),
             }));
           } else {
             this.setState((prevState) => ({
@@ -9152,7 +9191,7 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (newElement.width < minWidth) {
-          mutateElement(newElement, {
+          this.scene.mutateElement(newElement, {
             autoResize: true,
           });
         }
@@ -9202,7 +9241,14 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (newElement) {
-        mutateElement(newElement, getNormalizedDimensions(newElement));
+        this.scene.mutateElement(
+          newElement,
+          getNormalizedDimensions(newElement),
+          {
+            informMutation: false,
+            isDragging: false,
+          },
+        );
         // the above does not guarantee the scene to be rendered again, hence the trigger below
         this.scene.triggerUpdate();
       }
@@ -9234,7 +9280,7 @@ class App extends React.Component<AppProps, AppState> {
               ) {
                 // remove the linear element from all groups
                 // before removing it from the frame as well
-                mutateElement(linearElement, {
+                this.scene.mutateElement(linearElement, {
                   groupIds: [],
                 });
 
@@ -9263,12 +9309,12 @@ class App extends React.Component<AppProps, AppState> {
                   this.state.editingGroupId!,
                 );
 
-                mutateElement(
+                this.scene.mutateElement(
                   element,
                   {
                     groupIds: element.groupIds.slice(0, index),
                   },
-                  false,
+                  { informMutation: false, isDragging: false },
                 );
               }
 
@@ -9280,12 +9326,12 @@ class App extends React.Component<AppProps, AppState> {
                     element.groupIds[element.groupIds.length - 1],
                   ).length < 2
                 ) {
-                  mutateElement(
+                  this.scene.mutateElement(
                     element,
                     {
                       groupIds: [],
                     },
-                    false,
+                    { informMutation: false, isDragging: false },
                   );
                 }
               });
@@ -9395,7 +9441,10 @@ class App extends React.Component<AppProps, AppState> {
         // the one we've hit
         if (selectedElements.length === 1) {
           this.setState({
-            selectedLinearElement: new LinearElementEditor(hitElement),
+            selectedLinearElement: new LinearElementEditor(
+              hitElement,
+              this.scene.getNonDeletedElementsMap(),
+            ),
           });
         }
       }
@@ -9520,7 +9569,10 @@ class App extends React.Component<AppProps, AppState> {
                   selectedLinearElement:
                     newSelectedElements.length === 1 &&
                     isLinearElement(newSelectedElements[0])
-                      ? new LinearElementEditor(newSelectedElements[0])
+                      ? new LinearElementEditor(
+                          newSelectedElements[0],
+                          this.scene.getNonDeletedElementsMap(),
+                        )
                       : prevState.selectedLinearElement,
                 };
               });
@@ -9594,7 +9646,10 @@ class App extends React.Component<AppProps, AppState> {
               // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
               // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
               prevState.selectedLinearElement?.elementId !== hitElement.id
-                ? new LinearElementEditor(hitElement)
+                ? new LinearElementEditor(
+                    hitElement,
+                    this.scene.getNonDeletedElementsMap(),
+                  )
                 : prevState.selectedLinearElement,
           }));
         }
@@ -9687,11 +9742,9 @@ class App extends React.Component<AppProps, AppState> {
 
         bindOrUnbindLinearElements(
           linearElements,
-          this.scene.getNonDeletedElementsMap(),
-          this.scene.getNonDeletedElements(),
-          this.scene,
           isBindingEnabled(this.state),
           this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+          this.scene,
           this.state.zoom,
         );
       }
@@ -9848,12 +9901,12 @@ class App extends React.Component<AppProps, AppState> {
     const dataURL =
       this.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
-    const imageElement = mutateElement(
+    const imageElement = this.scene.mutateElement(
       _imageElement,
       {
         fileId,
       },
-      false,
+      { informMutation: false, isDragging: false },
     ) as NonDeleted<InitializedExcalidrawImageElement>;
 
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
@@ -9919,7 +9972,7 @@ class App extends React.Component<AppProps, AppState> {
         showCursorImagePreview,
       });
     } catch (error: any) {
-      mutateElement(imageElement, {
+      this.scene.mutateElement(imageElement, {
         isDeleted: true,
       });
       this.actionManager.executeAction(actionFinalize);
@@ -10065,7 +10118,7 @@ class App extends React.Component<AppProps, AppState> {
         imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
       ) {
         const placeholderSize = 100 / this.state.zoom.value;
-        mutateElement(imageElement, {
+        this.scene.mutateElement(imageElement, {
           x: imageElement.x - placeholderSize / 2,
           y: imageElement.y - placeholderSize / 2,
           width: placeholderSize,
@@ -10099,7 +10152,7 @@ class App extends React.Component<AppProps, AppState> {
       const x = imageElement.x + imageElement.width / 2 - width / 2;
       const y = imageElement.y + imageElement.height / 2 - height / 2;
 
-      mutateElement(imageElement, {
+      this.scene.mutateElement(imageElement, {
         x,
         y,
         width,
@@ -10530,7 +10583,10 @@ class App extends React.Component<AppProps, AppState> {
                 this,
               ),
               selectedLinearElement: isLinearElement(element)
-                ? new LinearElementEditor(element)
+                ? new LinearElementEditor(
+                    element,
+                    this.scene.getNonDeletedElementsMap(),
+                  )
                 : null,
             }
           : this.state),
@@ -10563,8 +10619,9 @@ class App extends React.Component<AppProps, AppState> {
         height: distance(pointerDownState.origin.y, pointerCoords.y),
         shouldMaintainAspectRatio: shouldMaintainAspectRatio(event),
         shouldResizeFromCenter: false,
+        scene: this.scene,
         zoom: this.state.zoom.value,
-        informMutation,
+        informMutation: false,
       });
       return;
     }
@@ -10628,6 +10685,7 @@ class App extends React.Component<AppProps, AppState> {
         : shouldMaintainAspectRatio(event),
       shouldResizeFromCenter: shouldResizeFromCenter(event),
       zoom: this.state.zoom.value,
+      scene: this.scene,
       widthAspectRatio: aspectRatio,
       originOffset: this.state.originSnapOffset,
       informMutation,
@@ -10715,7 +10773,7 @@ class App extends React.Component<AppProps, AppState> {
           transformHandleType,
         );
 
-        mutateElement(
+        this.scene.mutateElement(
           croppingElement,
           cropElement(
             croppingElement,
@@ -10730,16 +10788,12 @@ class App extends React.Component<AppProps, AppState> {
           ),
         );
 
-        updateBoundElements(
-          croppingElement,
-          this.scene.getNonDeletedElementsMap(),
-          {
-            newSize: {
-              width: croppingElement.width,
-              height: croppingElement.height,
-            },
+        updateBoundElements(croppingElement, this.scene, {
+          newSize: {
+            width: croppingElement.width,
+            height: croppingElement.height,
           },
-        );
+        });
 
         this.setState({
           isCropping: transformHandleType && transformHandleType !== "rotation",
@@ -10853,7 +10907,6 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.originalElements,
         transformHandleType,
         selectedElements,
-        this.scene.getElementsMapIncludingDeleted(),
         this.scene,
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),

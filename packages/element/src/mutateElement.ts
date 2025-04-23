@@ -2,16 +2,7 @@ import {
   getSizeFromPoints,
   randomInteger,
   getUpdatedTimestamp,
-  toBrandedType,
-  isDevEnv,
-  ROUNDNESS,
 } from "@excalidraw/common";
-
-// TODO: remove direct dependency on the scene, should be passed in or injected instead
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import Scene from "@excalidraw/excalidraw/scene/Scene";
-
-import type { AppClassProperties } from "@excalidraw/excalidraw/types";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -20,23 +11,13 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 import { ShapeCache } from "./ShapeCache";
 
 import { updateElbowArrowPoints } from "./elbowArrow";
-import {
-  isCurvedArrow,
-  isElbowArrow,
-  isSharpArrow,
-  isUsingAdaptiveRadius,
-} from "./typeChecks";
 
-import { newArrowElement, newElement, newLinearElement } from "./newElement";
+import { isElbowArrow } from "./typeChecks";
 
 import type {
-  ConvertibleGenericTypes,
-  ConvertibleLinearTypes,
-  ExcalidrawDiamondElement,
+  ElementsMap,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
-  ExcalidrawEllipseElement,
-  ExcalidrawRectangleElement,
-  ExcalidrawSelectionElement,
   NonDeletedSceneElementsMap,
 } from "./types";
 
@@ -45,27 +26,27 @@ export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   "id" | "version" | "versionNonce" | "updated"
 >;
 
-// This function tracks updates of text elements for the purposes for collaboration.
-// The version is used to compare updates when more than one user is working in
-// the same drawing. Note: this will trigger the component to update. Make sure you
-// are calling it either from a React event handler or within unstable_batchedUpdates().
+/**
+ * This function tracks updates of text elements for the purposes for collaboration.
+ * The version is used to compare updates when more than one user is working in
+ * the same drawing.
+ *
+ * WARNING: this won't trigger the component to update, so if you need to trigger component update,
+ * use `scene.mutateElement` or `ExcalidrawImperativeAPI.mutateElement` instead.
+ */
 export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
+  elementsMap: ElementsMap,
   updates: ElementUpdate<TElement>,
-  informMutation = true,
   options?: {
-    // Currently only for elbow arrows.
-    // If true, the elbow arrow tries to bind to the nearest element. If false
-    // it tries to keep the same bound element, if any.
     isDragging?: boolean;
-    propertiesToDrop?: string[];
   },
-): TElement => {
+) => {
   let didChange = false;
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { points, fixedSegments, fileId, startBinding, endBinding } =
+  const { points, fixedSegments, startBinding, endBinding, fileId } =
     updates as any;
 
   if (
@@ -76,10 +57,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
       typeof startBinding !== "undefined" ||
       typeof endBinding !== "undefined") // manual binding to element
   ) {
-    const elementsMap = toBrandedType<NonDeletedSceneElementsMap>(
-      Scene.getScene(element)?.getNonDeletedElementsMap() ?? new Map(),
-    );
-
     updates = {
       ...updates,
       angle: 0 as Radians,
@@ -89,16 +66,9 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
           x: updates.x || element.x,
           y: updates.y || element.y,
         },
-        elementsMap,
-        {
-          fixedSegments,
-          points,
-          startBinding,
-          endBinding,
-        },
-        {
-          isDragging: options?.isDragging,
-        },
+        elementsMap as NonDeletedSceneElementsMap,
+        updates as ElementUpdate<ExcalidrawElbowArrowElement>,
+        options,
       ),
     };
   } else if (typeof points !== "undefined") {
@@ -149,12 +119,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
         }
       }
 
-      if (options?.propertiesToDrop?.includes(key)) {
-        delete (element as any)[key];
-        didChange = true;
-        continue;
-      }
-
       (element as any)[key] = value;
       didChange = true;
     }
@@ -176,10 +140,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element.version++;
   element.versionNonce = randomInteger();
   element.updated = getUpdatedTimestamp();
-
-  if (informMutation) {
-    Scene.getScene(element)?.triggerUpdate();
-  }
 
   return element;
 };
@@ -231,177 +191,4 @@ export const bumpVersion = <T extends Mutable<ExcalidrawElement>>(
   element.versionNonce = randomInteger();
   element.updated = getUpdatedTimestamp();
   return element;
-};
-
-// Declare the constant array with a read-only type so that its values can only be one of the valid union.
-export const CONVERTIBLE_GENERIC_TYPES: readonly ConvertibleGenericTypes[] = [
-  "rectangle",
-  "diamond",
-  "ellipse",
-];
-
-export const CONVERTIBLE_LINEAR_TYPES: readonly ConvertibleLinearTypes[] = [
-  "line",
-  "sharpArrow",
-  "curvedArrow",
-  "elbowArrow",
-];
-
-type NewElementType = ConvertibleGenericTypes | ConvertibleLinearTypes;
-
-export const isConvertibleGenericType = (
-  elementType: string,
-): elementType is ConvertibleGenericTypes =>
-  CONVERTIBLE_GENERIC_TYPES.includes(elementType as ConvertibleGenericTypes);
-
-export const isConvertibleLinearType = (
-  elementType: string,
-): elementType is ConvertibleLinearTypes =>
-  elementType === "arrow" ||
-  CONVERTIBLE_LINEAR_TYPES.includes(elementType as ConvertibleLinearTypes);
-
-/**
- * Converts an element to a new type, adding or removing properties as needed
- * so that the element object is always valid.
- *
- * Valid conversions at this point:
- * - switching between generic elements
- *   e.g. rectangle -> diamond
- * - switching between linear elements
- *   e.g. elbow arrow -> line
- */
-export const convertElementType = <
-  TElement extends Mutable<
-    Exclude<ExcalidrawElement, ExcalidrawSelectionElement>
-  >,
->(
-  element: TElement,
-  newType: NewElementType,
-  app: AppClassProperties,
-  informMutation = true,
-): ExcalidrawElement => {
-  if (!isValidConversion(element.type, newType)) {
-    if (isDevEnv()) {
-      throw Error(`Invalid conversion from ${element.type} to ${newType}.`);
-    }
-    return element;
-  }
-
-  const startType = isSharpArrow(element)
-    ? "sharpArrow"
-    : isCurvedArrow(element)
-    ? "curvedArrow"
-    : isElbowArrow(element)
-    ? "elbowArrow"
-    : element.type;
-
-  if (element.type === newType) {
-    return element;
-  }
-
-  ShapeCache.delete(element);
-
-  if (
-    isConvertibleGenericType(startType) &&
-    isConvertibleGenericType(newType)
-  ) {
-    const nextElement = bumpVersion(
-      newElement({
-        ...element,
-        type: newType,
-        roundness:
-          newType === "diamond" && element.roundness
-            ? {
-                type: isUsingAdaptiveRadius(newType)
-                  ? ROUNDNESS.ADAPTIVE_RADIUS
-                  : ROUNDNESS.PROPORTIONAL_RADIUS,
-              }
-            : element.roundness,
-      }),
-    );
-
-    switch (nextElement.type) {
-      case "rectangle":
-        return nextElement as ExcalidrawRectangleElement;
-      case "diamond":
-        return nextElement as ExcalidrawDiamondElement;
-      case "ellipse":
-        return nextElement as ExcalidrawEllipseElement;
-    }
-  }
-
-  if (isConvertibleLinearType(element.type)) {
-    if (newType === "line") {
-      const nextElement = newLinearElement({
-        ...element,
-        type: "line",
-      });
-
-      return bumpVersion(nextElement);
-    }
-
-    if (newType === "sharpArrow") {
-      const nextElement = newArrowElement({
-        ...element,
-        type: "arrow",
-        elbowed: false,
-        roundness: null,
-        startArrowhead: app.state.currentItemStartArrowhead,
-        endArrowhead: app.state.currentItemEndArrowhead,
-      });
-
-      return bumpVersion(nextElement);
-    }
-
-    if (newType === "curvedArrow") {
-      const nextElement = newArrowElement({
-        ...element,
-        type: "arrow",
-        elbowed: false,
-        roundness: {
-          type: ROUNDNESS.PROPORTIONAL_RADIUS,
-        },
-        startArrowhead: app.state.currentItemStartArrowhead,
-        endArrowhead: app.state.currentItemEndArrowhead,
-      });
-
-      return bumpVersion(nextElement);
-    }
-
-    if (newType === "elbowArrow") {
-      const nextElement = newArrowElement({
-        ...element,
-        type: "arrow",
-        elbowed: true,
-        fixedSegments: null,
-      });
-
-      return bumpVersion(nextElement);
-    }
-  }
-
-  return element;
-};
-
-const isValidConversion = (
-  startType: string,
-  targetType: NewElementType,
-): startType is NewElementType => {
-  if (
-    isConvertibleGenericType(startType) &&
-    isConvertibleGenericType(targetType)
-  ) {
-    return true;
-  }
-
-  if (
-    isConvertibleLinearType(startType) &&
-    isConvertibleLinearType(targetType)
-  ) {
-    return true;
-  }
-
-  // NOTE: add more conversions when needed
-
-  return false;
 };

@@ -10,6 +10,7 @@ import {
   isElbowArrow,
   isLinearElement,
   isSharpArrow,
+  isUsingAdaptiveRadius,
 } from "@excalidraw/element/typeChecks";
 
 import {
@@ -26,24 +27,23 @@ import {
 
 import { wrapText } from "@excalidraw/element/textWrapping";
 
-import { getFontString, updateActiveTool } from "@excalidraw/common";
+import { getFontString, isDevEnv, updateActiveTool } from "@excalidraw/common";
 
 import { measureText } from "@excalidraw/element/textMeasurements";
 
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 
 import {
-  convertElementType,
-  CONVERTIBLE_GENERIC_TYPES,
-  CONVERTIBLE_LINEAR_TYPES,
-  isConvertibleGenericType,
-  isConvertibleLinearType,
-} from "@excalidraw/element/mutateElement";
+  newArrowElement,
+  newElement,
+  newLinearElement,
+} from "@excalidraw/element/newElement";
+
+import { ShapeCache } from "@excalidraw/element/ShapeCache";
 
 import type {
   ConvertibleGenericTypes,
   ConvertibleLinearTypes,
-  ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawDiamondElement,
   ExcalidrawElbowArrowElement,
@@ -51,12 +51,22 @@ import type {
   ExcalidrawEllipseElement,
   ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
+  ExcalidrawSelectionElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   FixedSegment,
 } from "@excalidraw/element/types";
 
-import { mutateElement, sceneCoordsToViewportCoords } from "..";
+import type { Mutable } from "@excalidraw/common/utility-types";
+
+import type Scene from "@excalidraw/element/Scene";
+
+import {
+  bumpVersion,
+  mutateElement,
+  ROUNDNESS,
+  sceneCoordsToViewportCoords,
+} from "..";
 import { trackEvent } from "../analytics";
 import { atom, editorJotaiStore, useAtom } from "../editor-jotai";
 
@@ -73,6 +83,8 @@ import {
 } from "./icons";
 
 import type App from "./App";
+
+import type { AppClassProperties } from "../types";
 
 const GAP_HORIZONTAL = 8;
 const GAP_VERTICAL = 10;
@@ -328,7 +340,7 @@ const Panel = ({
 export const adjustBoundTextSize = (
   container: ExcalidrawTextContainer,
   boundText: ExcalidrawTextElementWithContainer,
-  elementsMap: ElementsMap,
+  scene: Scene,
 ) => {
   const maxWidth = getBoundTextMaxWidth(container, boundText);
   const maxHeight = getBoundTextMaxHeight(container, boundText);
@@ -362,17 +374,13 @@ export const adjustBoundTextSize = (
     );
   }
 
-  mutateElement(
-    boundText,
-    {
-      fontSize: nextFontSize,
-      width: metrics.width,
-      height: metrics.height,
-    },
-    false,
-  );
+  mutateElement(boundText, scene.getNonDeletedElementsMap(), {
+    fontSize: nextFontSize,
+    width: metrics.width,
+    height: metrics.height,
+  });
 
-  redrawTextBoundingBox(boundText, container, elementsMap, false);
+  redrawTextBoundingBox(boundText, container, scene);
 };
 
 export const switchShapes = (
@@ -427,12 +435,7 @@ export const switchShapes = (
       const convertedElements: Record<string, ExcalidrawElement> = {};
 
       for (const element of selectedGenericSwitchableElements) {
-        const convertedElement = convertElementType(
-          element,
-          nextType,
-          app,
-          false,
-        );
+        const convertedElement = convertElementType(element, nextType, app);
         convertedElements[convertedElement.id] = convertedElement;
       }
 
@@ -458,21 +461,17 @@ export const switchShapes = (
             editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
               ?.elementType === nextType
           ) {
-            mutateElement(
-              boundText,
-              {
-                fontSize:
-                  editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
-                    ?.fontSize ?? boundText.fontSize,
-              },
-              false,
-            );
+            mutateElement(boundText, app.scene.getNonDeletedElementsMap(), {
+              fontSize:
+                editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
+                  ?.fontSize ?? boundText.fontSize,
+            });
           }
 
           adjustBoundTextSize(
             element as ExcalidrawTextContainer,
             boundText,
-            app.scene.getNonDeletedElementsMap(),
+            app.scene,
           );
         }
       }
@@ -509,7 +508,7 @@ export const switchShapes = (
     if (nextType && isConvertibleLinearType(nextType)) {
       const convertedElements: Record<string, ExcalidrawElement> = {};
       for (const element of selectedLinearSwitchableElements) {
-        const converted = convertElementType(element, nextType, app, false);
+        const converted = convertElementType(element, nextType, app);
         convertedElements[converted.id] = converted;
       }
 
@@ -534,7 +533,11 @@ export const switchShapes = (
           const { properties, initialType } = cachedLinear;
 
           if (initialType === nextType) {
-            mutateElement(element, properties, false);
+            mutateElement(
+              element,
+              app.scene.getNonDeletedElementsMap(),
+              properties,
+            );
             continue;
           }
         }
@@ -560,7 +563,7 @@ export const switchShapes = (
               fixedSegments,
             },
           );
-          mutateElement(element, updates, false);
+          mutateElement(element, app.scene.getNonDeletedElementsMap(), updates);
         }
       }
     }
@@ -570,7 +573,10 @@ export const switchShapes = (
       selectedElementIds,
       selectedLinearElement:
         selectedLinearSwitchableElements.length === 1
-          ? new LinearElementEditor(firstElement as ExcalidrawLinearElement)
+          ? new LinearElementEditor(
+              firstElement as ExcalidrawLinearElement,
+              app.scene.getNonDeletedElementsMap(),
+            )
           : null,
       activeTool: updateActiveTool(prevState, {
         type: "selection",
@@ -810,6 +816,178 @@ const sanitizePoints = (points: readonly LocalPoint[]): LocalPoint[] => {
   }
 
   return sanitized;
+};
+
+// Declare the constant array with a read-only type so that its values can only be one of the valid union.
+const CONVERTIBLE_GENERIC_TYPES: readonly ConvertibleGenericTypes[] = [
+  "rectangle",
+  "diamond",
+  "ellipse",
+];
+
+const CONVERTIBLE_LINEAR_TYPES: readonly ConvertibleLinearTypes[] = [
+  "line",
+  "sharpArrow",
+  "curvedArrow",
+  "elbowArrow",
+];
+
+type NewElementType = ConvertibleGenericTypes | ConvertibleLinearTypes;
+
+const isConvertibleGenericType = (
+  elementType: string,
+): elementType is ConvertibleGenericTypes =>
+  CONVERTIBLE_GENERIC_TYPES.includes(elementType as ConvertibleGenericTypes);
+
+const isConvertibleLinearType = (
+  elementType: string,
+): elementType is ConvertibleLinearTypes =>
+  elementType === "arrow" ||
+  CONVERTIBLE_LINEAR_TYPES.includes(elementType as ConvertibleLinearTypes);
+
+/**
+ * Converts an element to a new type, adding or removing properties as needed
+ * so that the element object is always valid.
+ *
+ * Valid conversions at this point:
+ * - switching between generic elements
+ *   e.g. rectangle -> diamond
+ * - switching between linear elements
+ *   e.g. elbow arrow -> line
+ */
+export const convertElementType = <
+  TElement extends Mutable<
+    Exclude<ExcalidrawElement, ExcalidrawSelectionElement>
+  >,
+>(
+  element: TElement,
+  newType: NewElementType,
+  app: AppClassProperties,
+): ExcalidrawElement => {
+  if (!isValidConversion(element.type, newType)) {
+    if (isDevEnv()) {
+      throw Error(`Invalid conversion from ${element.type} to ${newType}.`);
+    }
+    return element;
+  }
+
+  const startType = isSharpArrow(element)
+    ? "sharpArrow"
+    : isCurvedArrow(element)
+    ? "curvedArrow"
+    : isElbowArrow(element)
+    ? "elbowArrow"
+    : element.type;
+
+  if (element.type === newType) {
+    return element;
+  }
+
+  ShapeCache.delete(element);
+
+  if (
+    isConvertibleGenericType(startType) &&
+    isConvertibleGenericType(newType)
+  ) {
+    const nextElement = bumpVersion(
+      newElement({
+        ...element,
+        type: newType,
+        roundness:
+          newType === "diamond" && element.roundness
+            ? {
+                type: isUsingAdaptiveRadius(newType)
+                  ? ROUNDNESS.ADAPTIVE_RADIUS
+                  : ROUNDNESS.PROPORTIONAL_RADIUS,
+              }
+            : element.roundness,
+      }),
+    );
+
+    switch (nextElement.type) {
+      case "rectangle":
+        return nextElement as ExcalidrawRectangleElement;
+      case "diamond":
+        return nextElement as ExcalidrawDiamondElement;
+      case "ellipse":
+        return nextElement as ExcalidrawEllipseElement;
+    }
+  }
+
+  if (isConvertibleLinearType(element.type)) {
+    if (newType === "line") {
+      const nextElement = newLinearElement({
+        ...element,
+        type: "line",
+      });
+
+      return bumpVersion(nextElement);
+    }
+
+    if (newType === "sharpArrow") {
+      const nextElement = newArrowElement({
+        ...element,
+        type: "arrow",
+        elbowed: false,
+        roundness: null,
+        startArrowhead: app.state.currentItemStartArrowhead,
+        endArrowhead: app.state.currentItemEndArrowhead,
+      });
+
+      return bumpVersion(nextElement);
+    }
+
+    if (newType === "curvedArrow") {
+      const nextElement = newArrowElement({
+        ...element,
+        type: "arrow",
+        elbowed: false,
+        roundness: {
+          type: ROUNDNESS.PROPORTIONAL_RADIUS,
+        },
+        startArrowhead: app.state.currentItemStartArrowhead,
+        endArrowhead: app.state.currentItemEndArrowhead,
+      });
+
+      return bumpVersion(nextElement);
+    }
+
+    if (newType === "elbowArrow") {
+      const nextElement = newArrowElement({
+        ...element,
+        type: "arrow",
+        elbowed: true,
+        fixedSegments: null,
+      });
+
+      return bumpVersion(nextElement);
+    }
+  }
+
+  return element;
+};
+
+const isValidConversion = (
+  startType: string,
+  targetType: NewElementType,
+): startType is NewElementType => {
+  if (
+    isConvertibleGenericType(startType) &&
+    isConvertibleGenericType(targetType)
+  ) {
+    return true;
+  }
+
+  if (
+    isConvertibleLinearType(startType) &&
+    isConvertibleLinearType(targetType)
+  ) {
+    return true;
+  }
+
+  // NOTE: add more conversions when needed
+
+  return false;
 };
 
 export default ShapeSwitch;
