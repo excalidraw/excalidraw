@@ -149,6 +149,7 @@ export class LassoTrail extends AnimatedTrail {
                 this.app.scene.getNonDeletedElement(
                   selectedIds[0],
                 ) as NonDeleted<ExcalidrawLinearElement>,
+                this.app.scene.getNonDeletedElementsMap(),
               )
             : null,
       };
