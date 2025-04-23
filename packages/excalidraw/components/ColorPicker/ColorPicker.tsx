@@ -2,7 +2,11 @@ import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
 import { useRef } from "react";
 
-import { COLOR_PALETTE, isTransparent } from "@excalidraw/common";
+import {
+  COLOR_OUTLINE_CONTRAST_THRESHOLD,
+  COLOR_PALETTE,
+  isTransparent,
+} from "@excalidraw/common";
 
 import type { ColorTuple, ColorPaletteCustom } from "@excalidraw/common";
 
@@ -19,7 +23,7 @@ import { ColorInput } from "./ColorInput";
 import { Picker } from "./Picker";
 import PickerHeading from "./PickerHeading";
 import { TopPicks } from "./TopPicks";
-import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import { activeColorPickerSectionAtom, isColorDark } from "./colorPickerUtils";
 
 import "./ColorPicker.scss";
 
@@ -190,6 +194,7 @@ const ColorPickerTrigger = ({
       type="button"
       className={clsx("color-picker__button active-color properties-trigger", {
         "is-transparent": color === "transparent" || !color,
+        "has-outline": !isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD),
       })}
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}

@@ -21,6 +21,7 @@ import {
 
 import {
   hasBoundTextElement,
+  isArrowElement,
   isTextBindableContainer,
   isTextElement,
   isUsingAdaptiveRadius,
@@ -45,6 +46,8 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
+
+import type { Radians } from "../../math/src";
 
 import type { AppState } from "../types";
 
@@ -155,6 +158,7 @@ export const actionBindText = register({
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
       textAlign: TEXT_ALIGN.CENTER,
       autoResize: true,
+      angle: (isArrowElement(container) ? 0 : container?.angle ?? 0) as Radians,
     });
     mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
@@ -226,8 +230,8 @@ export const actionWrapTextInContainer = register({
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
-    const areTextElements = selectedElements.every((el) => isTextElement(el));
-    return selectedElements.length > 0 && areTextElements;
+    const someTextElements = selectedElements.some((el) => isTextElement(el));
+    return selectedElements.length > 0 && someTextElements;
   },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);

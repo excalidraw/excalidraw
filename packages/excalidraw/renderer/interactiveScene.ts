@@ -1182,7 +1182,7 @@ const _renderInteractiveScene = ({
   let scrollBars;
   if (renderConfig.renderScrollbars) {
     scrollBars = getScrollBars(
-      visibleElements,
+      elementsMap,
       normalizedWidth,
       normalizedHeight,
       appState,

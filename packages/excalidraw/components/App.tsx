@@ -99,6 +99,7 @@ import {
   isShallowEqual,
   arrayToMap,
   type EXPORT_IMAGE_TYPES,
+  randomInteger,
 } from "@excalidraw/common";
 
 import {
@@ -278,6 +279,7 @@ import {
 
 import {
   excludeElementsInFramesFromSelection,
+  getSelectionStateForElements,
   makeNextSelectedElementIds,
 } from "@excalidraw/element/selection";
 
@@ -453,13 +455,16 @@ import {
 import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
 import { Store, CaptureUpdateAction } from "../store";
-import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 
 import { isMaybeMermaidDefinition } from "../mermaid";
+
+import { LassoTrail } from "../lasso";
+
+import { EraserTrail } from "../eraser";
 
 import ShapeSwitch, {
   getSwitchableTypeFromElements,
@@ -677,26 +682,8 @@ class App extends React.Component<AppProps, AppState> {
   animationFrameHandler = new AnimationFrameHandler();
 
   laserTrails = new LaserTrails(this.animationFrameHandler, this);
-  eraserTrail = new AnimatedTrail(this.animationFrameHandler, this, {
-    streamline: 0.2,
-    size: 5,
-    keepHead: true,
-    sizeMapping: (c) => {
-      const DECAY_TIME = 200;
-      const DECAY_LENGTH = 10;
-      const t = Math.max(0, 1 - (performance.now() - c.pressure) / DECAY_TIME);
-      const l =
-        (DECAY_LENGTH -
-          Math.min(DECAY_LENGTH, c.totalLength - c.currentIndex)) /
-        DECAY_LENGTH;
-
-      return Math.min(easeOut(l), easeOut(t));
-    },
-    fill: () =>
-      this.state.theme === THEME.LIGHT
-        ? "rgba(0, 0, 0, 0.2)"
-        : "rgba(255, 255, 255, 0.2)",
-  });
+  eraserTrail = new EraserTrail(this.animationFrameHandler, this);
+  lassoTrail = new LassoTrail(this.animationFrameHandler, this);
 
   onChangeEmitter = new Emitter<
     [
@@ -1675,7 +1662,11 @@ class App extends React.Component<AppProps, AppState> {
                         <div className="excalidraw-contextMenuContainer" />
                         <div className="excalidraw-eye-dropper-container" />
                         <SVGLayer
-                          trails={[this.laserTrails, this.eraserTrail]}
+                          trails={[
+                            this.laserTrails,
+                            this.lassoTrail,
+                            this.eraserTrail,
+                          ]}
                         />
                         {selectedElements.length === 1 &&
                           this.state.openDialog?.name !==
@@ -1844,6 +1835,9 @@ class App extends React.Component<AppProps, AppState> {
                           }
                           scale={window.devicePixelRatio}
                           appState={this.state}
+                          renderScrollbars={
+                            this.props.renderScrollbars === true
+                          }
                           device={this.device}
                           renderInteractiveSceneCallback={
                             this.renderInteractiveSceneCallback
@@ -3283,7 +3277,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.getEffectiveGridSize());
 
-    const { newElements } = duplicateElements({
+    const { duplicatedElements } = duplicateElements({
       type: "everything",
       elements: elements.map((element) => {
         return newElementWith(element, {
@@ -3295,7 +3289,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     const prevElements = this.scene.getElementsIncludingDeleted();
-    let nextElements = [...prevElements, ...newElements];
+    let nextElements = [...prevElements, ...duplicatedElements];
 
     const mappedNewSceneElements = this.props.onDuplicate?.(
       nextElements,
@@ -3304,13 +3298,13 @@ class App extends React.Component<AppProps, AppState> {
 
     nextElements = mappedNewSceneElements || nextElements;
 
-    syncMovedIndices(nextElements, arrayToMap(newElements));
+    syncMovedIndices(nextElements, arrayToMap(duplicatedElements));
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({ x, y });
 
     if (topLayerFrame) {
       const eligibleElements = filterElementsEligibleAsFrameChildren(
-        newElements,
+        duplicatedElements,
         topLayerFrame,
       );
       addElementsToFrame(
@@ -3323,7 +3317,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene.replaceAllElements(nextElements);
 
-    newElements.forEach((newElement) => {
+    duplicatedElements.forEach((newElement) => {
       if (isTextElement(newElement) && isBoundToContainer(newElement)) {
         const container = getContainerElement(
           newElement,
@@ -3339,7 +3333,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
     if (isSafari) {
-      Fonts.loadElementsFonts(newElements).then((fontFaces) => {
+      Fonts.loadElementsFonts(duplicatedElements).then((fontFaces) => {
         this.fonts.onLoaded(fontFaces);
       });
     }
@@ -3351,7 +3345,7 @@ class App extends React.Component<AppProps, AppState> {
     this.store.shouldCaptureIncrement();
 
     const nextElementsToSelect =
-      excludeElementsInFramesFromSelection(newElements);
+      excludeElementsInFramesFromSelection(duplicatedElements);
 
     this.setState(
       {
@@ -3394,7 +3388,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setActiveTool({ type: "selection" });
 
     if (opts.fitToContent) {
-      this.scrollToContent(newElements, {
+      this.scrollToContent(duplicatedElements, {
         fitToContent: true,
         canvasOffsets: this.getEditorUIOffsets(),
       });
@@ -4666,7 +4660,10 @@ class App extends React.Component<AppProps, AppState> {
         this.state.openDialog?.name === "elementLinkSelector"
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-      } else if (this.state.activeTool.type === "selection") {
+      } else if (
+        this.state.activeTool.type === "selection" ||
+        this.state.activeTool.type === "lasso"
+      ) {
         resetCursor(this.interactiveCanvas);
       } else {
         setCursorForShape(this.interactiveCanvas, this.state);
@@ -4774,7 +4771,8 @@ class App extends React.Component<AppProps, AppState> {
             }
         )
       | { type: "custom"; customType: string }
-    ) & { locked?: boolean },
+    ) & { locked?: boolean; fromSelection?: boolean },
+    keepSelection = false,
   ) => {
     if (!this.isToolSupported(tool.type)) {
       console.warn(
@@ -4816,7 +4814,21 @@ class App extends React.Component<AppProps, AppState> {
         this.store.shouldCaptureIncrement();
       }
 
-      if (nextActiveTool.type !== "selection") {
+      if (nextActiveTool.type === "lasso") {
+        return {
+          ...prevState,
+          activeTool: nextActiveTool,
+          ...(keepSelection
+            ? {}
+            : {
+                selectedElementIds: makeNextSelectedElementIds({}, prevState),
+                selectedGroupIds: makeNextSelectedElementIds({}, prevState),
+                editingGroupId: null,
+                multiElement: null,
+              }),
+          ...commonResets,
+        };
+      } else if (nextActiveTool.type !== "selection") {
         return {
           ...prevState,
           activeTool: nextActiveTool,
@@ -5173,7 +5185,7 @@ class App extends React.Component<AppProps, AppState> {
     return elements;
   }
 
-  private getElementHitThreshold() {
+  getElementHitThreshold() {
     return DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value;
   }
 
@@ -5362,37 +5374,37 @@ class App extends React.Component<AppProps, AppState> {
       y: sceneY,
     });
 
-    const element = existingTextElement
-      ? existingTextElement
-      : newTextElement({
-          x: parentCenterPosition
-            ? parentCenterPosition.elementCenterX
-            : sceneX,
-          y: parentCenterPosition
-            ? parentCenterPosition.elementCenterY
-            : sceneY,
-          strokeColor: this.state.currentItemStrokeColor,
-          backgroundColor: this.state.currentItemBackgroundColor,
-          fillStyle: this.state.currentItemFillStyle,
-          strokeWidth: this.state.currentItemStrokeWidth,
-          strokeStyle: this.state.currentItemStrokeStyle,
-          roughness: this.state.currentItemRoughness,
-          opacity: this.state.currentItemOpacity,
-          text: "",
-          fontSize,
-          fontFamily,
-          textAlign: parentCenterPosition
-            ? "center"
-            : this.state.currentItemTextAlign,
-          verticalAlign: parentCenterPosition
-            ? VERTICAL_ALIGN.MIDDLE
-            : DEFAULT_VERTICAL_ALIGN,
-          containerId: shouldBindToContainer ? container?.id : undefined,
-          groupIds: container?.groupIds ?? [],
-          lineHeight,
-          angle: container?.angle ?? (0 as Radians),
-          frameId: topLayerFrame ? topLayerFrame.id : null,
-        });
+    const element =
+      existingTextElement ||
+      newTextElement({
+        x: parentCenterPosition ? parentCenterPosition.elementCenterX : sceneX,
+        y: parentCenterPosition ? parentCenterPosition.elementCenterY : sceneY,
+        strokeColor: this.state.currentItemStrokeColor,
+        backgroundColor: this.state.currentItemBackgroundColor,
+        fillStyle: this.state.currentItemFillStyle,
+        strokeWidth: this.state.currentItemStrokeWidth,
+        strokeStyle: this.state.currentItemStrokeStyle,
+        roughness: this.state.currentItemRoughness,
+        opacity: this.state.currentItemOpacity,
+        text: "",
+        fontSize,
+        fontFamily,
+        textAlign: parentCenterPosition
+          ? "center"
+          : this.state.currentItemTextAlign,
+        verticalAlign: parentCenterPosition
+          ? VERTICAL_ALIGN.MIDDLE
+          : DEFAULT_VERTICAL_ALIGN,
+        containerId: shouldBindToContainer ? container?.id : undefined,
+        groupIds: container?.groupIds ?? [],
+        lineHeight,
+        angle: container
+          ? isArrowElement(container)
+            ? (0 as Radians)
+            : container.angle
+          : (0 as Radians),
+        frameId: topLayerFrame ? topLayerFrame.id : null,
+      });
 
     if (!existingTextElement && shouldBindToContainer && container) {
       mutateElement(container, {
@@ -6229,101 +6241,16 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleEraser = (
     event: PointerEvent,
-    pointerDownState: PointerDownState,
     scenePointer: { x: number; y: number },
   ) => {
-    this.eraserTrail.addPointToPath(scenePointer.x, scenePointer.y);
-
-    let didChange = false;
-
-    const processedGroups = new Set<ExcalidrawElement["id"]>();
-    const nonDeletedElements = this.scene.getNonDeletedElements();
-
-    const processElements = (elements: ExcalidrawElement[]) => {
-      for (const element of elements) {
-        if (element.locked) {
-          return;
-        }
-
-        if (event.altKey) {
-          if (this.elementsPendingErasure.delete(element.id)) {
-            didChange = true;
-          }
-        } else if (!this.elementsPendingErasure.has(element.id)) {
-          didChange = true;
-          this.elementsPendingErasure.add(element.id);
-        }
-
-        // (un)erase groups atomically
-        if (didChange && element.groupIds?.length) {
-          const shallowestGroupId = element.groupIds.at(-1)!;
-          if (!processedGroups.has(shallowestGroupId)) {
-            processedGroups.add(shallowestGroupId);
-            const elems = getElementsInGroup(
-              nonDeletedElements,
-              shallowestGroupId,
-            );
-            for (const elem of elems) {
-              if (event.altKey) {
-                this.elementsPendingErasure.delete(elem.id);
-              } else {
-                this.elementsPendingErasure.add(elem.id);
-              }
-            }
-          }
-        }
-      }
-    };
-
-    const distance = pointDistance(
-      pointFrom(pointerDownState.lastCoords.x, pointerDownState.lastCoords.y),
-      pointFrom(scenePointer.x, scenePointer.y),
+    const elementsToErase = this.eraserTrail.addPointToPath(
+      scenePointer.x,
+      scenePointer.y,
+      event.altKey,
     );
-    const threshold = this.getElementHitThreshold();
-    const p = { ...pointerDownState.lastCoords };
-    let samplingInterval = 0;
-    while (samplingInterval <= distance) {
-      const hitElements = this.getElementsAtPosition(p.x, p.y);
-      processElements(hitElements);
 
-      // Exit since we reached current point
-      if (samplingInterval === distance) {
-        break;
-      }
-
-      // Calculate next point in the line at a distance of sampling interval
-      samplingInterval = Math.min(samplingInterval + threshold, distance);
-
-      const distanceRatio = samplingInterval / distance;
-      const nextX = (1 - distanceRatio) * p.x + distanceRatio * scenePointer.x;
-      const nextY = (1 - distanceRatio) * p.y + distanceRatio * scenePointer.y;
-      p.x = nextX;
-      p.y = nextY;
-    }
-
-    pointerDownState.lastCoords.x = scenePointer.x;
-    pointerDownState.lastCoords.y = scenePointer.y;
-
-    if (didChange) {
-      for (const element of this.scene.getNonDeletedElements()) {
-        if (
-          isBoundToContainer(element) &&
-          (this.elementsPendingErasure.has(element.id) ||
-            this.elementsPendingErasure.has(element.containerId))
-        ) {
-          if (event.altKey) {
-            this.elementsPendingErasure.delete(element.id);
-            this.elementsPendingErasure.delete(element.containerId);
-          } else {
-            this.elementsPendingErasure.add(element.id);
-            this.elementsPendingErasure.add(element.containerId);
-          }
-        }
-      }
-
-      this.elementsPendingErasure = new Set(this.elementsPendingErasure);
-      this.triggerRender();
-    }
+    this.elementsPendingErasure = new Set(elementsToErase);
+    this.triggerRender();
   };
 
   // set touch moving for mobile context menu
@@ -6643,6 +6570,7 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.penMode ||
       event.pointerType !== "touch" ||
       this.state.activeTool.type === "selection" ||
+      this.state.activeTool.type === "lasso" ||
       this.state.activeTool.type === "text" ||
       this.state.activeTool.type === "image";
 
@@ -6650,7 +6578,13 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (this.state.activeTool.type === "text") {
+    if (this.state.activeTool.type === "lasso") {
+      this.lassoTrail.startPath(
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+        event.shiftKey,
+      );
+    } else if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
     } else if (
       this.state.activeTool.type === "arrow" ||
@@ -7052,6 +6986,7 @@ class App extends React.Component<AppProps, AppState> {
       drag: {
         hasOccurred: false,
         offset: null,
+        origin: { ...origin },
       },
       eventListeners: {
         onMove: null,
@@ -7107,7 +7042,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private clearSelectionIfNotUsingSelection = (): void => {
-    if (this.state.activeTool.type !== "selection") {
+    if (
+      this.state.activeTool.type !== "selection" &&
+      this.state.activeTool.type !== "lasso"
+    ) {
       this.setState({
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
         selectedGroupIds: {},
@@ -8163,7 +8101,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (isEraserActive(this.state)) {
-        this.handleEraser(event, pointerDownState, pointerCoords);
+        this.handleEraser(event, pointerCoords);
         return;
       }
 
@@ -8307,7 +8245,8 @@ class App extends React.Component<AppProps, AppState> {
       if (
         (hasHitASelectedElement ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
-        !isSelectingPointsInLineEditor
+        !isSelectingPointsInLineEditor &&
+        this.state.activeTool.type !== "lasso"
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
 
@@ -8342,8 +8281,8 @@ class App extends React.Component<AppProps, AppState> {
           this.state.activeEmbeddable?.state !== "active"
         ) {
           const dragOffset = {
-            x: pointerCoords.x - pointerDownState.origin.x,
-            y: pointerCoords.y - pointerDownState.origin.y,
+            x: pointerCoords.x - pointerDownState.drag.origin.x,
+            y: pointerCoords.y - pointerDownState.drag.origin.y,
           };
 
           const originalElements = [
@@ -8525,51 +8464,125 @@ class App extends React.Component<AppProps, AppState> {
             });
             if (
               hitElement &&
+              // hit element may not end up being selected
+              // if we're alt-dragging a common bounding box
+              // over the hit element
+              pointerDownState.hit.wasAddedToSelection &&
               !selectedElements.find((el) => el.id === hitElement.id)
             ) {
               selectedElements.push(hitElement);
             }
 
-            const { newElements: clonedElements, elementsWithClones } =
-              duplicateElements({
-                type: "in-place",
-                elements,
-                appState: this.state,
-                randomizeSeed: true,
-                idsOfElementsToDuplicate: new Map(
-                  selectedElements.map((el) => [el.id, el]),
-                ),
-                overrides: (el) => {
-                  const origEl = pointerDownState.originalElements.get(el.id);
+            const idsOfElementsToDuplicate = new Map(
+              selectedElements.map((el) => [el.id, el]),
+            );
 
-                  if (origEl) {
-                    return {
-                      x: origEl.x,
-                      y: origEl.y,
-                    };
-                  }
+            const {
+              duplicatedElements,
+              duplicateElementsMap,
+              elementsWithDuplicates,
+              origIdToDuplicateId,
+            } = duplicateElements({
+              type: "in-place",
+              elements,
+              appState: this.state,
+              randomizeSeed: true,
+              idsOfElementsToDuplicate,
+              overrides: ({ duplicateElement, origElement }) => {
+                return {
+                  // reset to the original element's frameId (unless we've
+                  // duplicated alongside a frame in which case we need to
+                  // keep the duplicate frame's id) so that the element
+                  // frame membership is refreshed on pointerup
+                  // NOTE this is a hacky solution and should be done
+                  // differently
+                  frameId: duplicateElement.frameId ?? origElement.frameId,
+                  seed: randomInteger(),
+                };
+              },
+            });
+            duplicatedElements.forEach((element) => {
+              pointerDownState.originalElements.set(
+                element.id,
+                deepCopyElement(element),
+              );
+            });
 
-                  return {};
-                },
-                reverseOrder: true,
-              });
-            clonedElements.forEach((element) => {
-              pointerDownState.originalElements.set(element.id, element);
+            const mappedClonedElements = elementsWithDuplicates.map((el) => {
+              if (idsOfElementsToDuplicate.has(el.id)) {
+                const origEl = pointerDownState.originalElements.get(el.id);
+
+                if (origEl) {
+                  return newElementWith(el, {
+                    x: origEl.x,
+                    y: origEl.y,
+                  });
+                }
+              }
+              return el;
             });
 
             const mappedNewSceneElements = this.props.onDuplicate?.(
-              elementsWithClones,
+              mappedClonedElements,
               elements,
             );
 
-            const nextSceneElements = syncMovedIndices(
-              mappedNewSceneElements || elementsWithClones,
-              arrayToMap(clonedElements),
+            const elementsWithIndices = syncMovedIndices(
+              mappedNewSceneElements || mappedClonedElements,
+              arrayToMap(duplicatedElements),
             );
 
-            this.scene.replaceAllElements(nextSceneElements);
-            this.maybeCacheVisibleGaps(event, selectedElements, true);
-            this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
+            // we need to update synchronously so as to keep pointerDownState,
+            // appState, and scene elements in sync
+            flushSync(() => {
+              // swap hit element with the duplicated one
+              if (pointerDownState.hit.element) {
+                const cloneId = origIdToDuplicateId.get(
+                  pointerDownState.hit.element.id,
+                );
+                const clonedElement =
+                  cloneId && duplicateElementsMap.get(cloneId);
+                pointerDownState.hit.element = clonedElement || null;
+              }
+              // swap hit elements with the duplicated ones
+              pointerDownState.hit.allHitElements =
+                pointerDownState.hit.allHitElements.reduce(
+                  (
+                    acc: typeof pointerDownState.hit.allHitElements,
+                    origHitElement,
+                  ) => {
+                    const cloneId = origIdToDuplicateId.get(origHitElement.id);
+                    const clonedElement =
+                      cloneId && duplicateElementsMap.get(cloneId);
+                    if (clonedElement) {
+                      acc.push(clonedElement);
+                    }
+
+                    return acc;
+                  },
+                  [],
+                );
+
+              // update drag origin to the position at which we started
+              // the duplication so that the drag offset is correct
+              pointerDownState.drag.origin = viewportCoordsToSceneCoords(
+                event,
+                this.state,
+              );
+
+              // switch selected elements to the duplicated ones
+              this.setState((prevState) => ({
+                ...getSelectionStateForElements(
+                  duplicatedElements,
+                  this.scene.getNonDeletedElements(),
+                  prevState,
+                ),
+              }));
+
+              this.scene.replaceAllElements(elementsWithIndices);
+              this.maybeCacheVisibleGaps(event, selectedElements, true);
+              this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
+            });
           }
 
           return;
@@ -8579,7 +8592,37 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.selectionElement) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
-        this.maybeDragNewGenericElement(pointerDownState, event);
+        if (event.altKey) {
+          this.setActiveTool(
+            { type: "lasso", fromSelection: true },
+            event.shiftKey,
+          );
+          this.lassoTrail.startPath(
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            event.shiftKey,
+          );
+          this.setAppState({
+            selectionElement: null,
+          });
+        } else {
+          this.maybeDragNewGenericElement(pointerDownState, event);
+        }
+      } else if (this.state.activeTool.type === "lasso") {
+        if (!event.altKey && this.state.activeTool.fromSelection) {
+          this.setActiveTool({ type: "selection" });
+          this.createGenericElementOnPointerDown("selection", pointerDownState);
+          pointerDownState.lastCoords.x = pointerCoords.x;
+          pointerDownState.lastCoords.y = pointerCoords.y;
+          this.maybeDragNewGenericElement(pointerDownState, event);
+          this.lassoTrail.endPath();
+        } else {
+          this.lassoTrail.addPointToPath(
+            pointerCoords.x,
+            pointerCoords.y,
+            event.shiftKey,
+          );
+        }
       } else {
         // It is very important to read this.state within each move event,
         // otherwise we would read a stale one!
@@ -8784,7 +8827,10 @@ class App extends React.Component<AppProps, AppState> {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
       this.translateCanvas({
-        scrollX: this.state.scrollX - dx / this.state.zoom.value,
+        scrollX:
+          this.state.scrollX -
+          (dx * (currentScrollBars.horizontal?.deltaMultiplier || 1)) /
+            this.state.zoom.value,
       });
       pointerDownState.lastCoords.x = x;
       return true;
@@ -8794,7 +8840,10 @@ class App extends React.Component<AppProps, AppState> {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
       this.translateCanvas({
-        scrollY: this.state.scrollY - dy / this.state.zoom.value,
+        scrollY:
+          this.state.scrollY -
+          (dy * (currentScrollBars.vertical?.deltaMultiplier || 1)) /
+            this.state.zoom.value,
       });
       pointerDownState.lastCoords.y = y;
       return true;
@@ -8834,6 +8883,8 @@ class App extends React.Component<AppProps, AppState> {
         originSnapOffset: null,
       }));
 
+      // just in case, tool changes mid drag, always clean up
+      this.lassoTrail.endPath();
       this.lastPointerMoveCoords = null;
 
       SnapCache.setReferenceSnapPoints(null);
@@ -9550,6 +9601,8 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        // do not clear selection if lasso is active
+        this.state.activeTool.type !== "lasso" &&
         // not elbow midpoint dragged
         !(hitElement && isElbowArrow(hitElement)) &&
         // not dragged
@@ -9648,7 +9701,13 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (!activeTool.locked && activeTool.type !== "freedraw") {
+      if (
+        !activeTool.locked &&
+        activeTool.type !== "freedraw" &&
+        (activeTool.type !== "lasso" ||
+          // if lasso is turned on but from selection => reset to selection
+          (activeTool.type === "lasso" && activeTool.fromSelection))
+      ) {
         resetCursor(this.interactiveCanvas);
         this.setState({
           newElement: null,
@@ -10503,7 +10562,7 @@ class App extends React.Component<AppProps, AppState> {
         width: distance(pointerDownState.origin.x, pointerCoords.x),
         height: distance(pointerDownState.origin.y, pointerCoords.y),
         shouldMaintainAspectRatio: shouldMaintainAspectRatio(event),
-        shouldResizeFromCenter: shouldResizeFromCenter(event),
+        shouldResizeFromCenter: false,
         zoom: this.state.zoom.value,
         informMutation,
       });
