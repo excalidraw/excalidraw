@@ -276,6 +276,7 @@ import {
 
 import {
   excludeElementsInFramesFromSelection,
+  getSelectionStateForElements,
   makeNextSelectedElementIds,
 } from "@excalidraw/element/selection";
 
@@ -1831,6 +1832,9 @@ class App extends React.Component<AppProps, AppState> {
                           }
                           scale={window.devicePixelRatio}
                           appState={this.state}
+                          renderScrollbars={
+                            this.props.renderScrollbars === true
+                          }
                           device={this.device}
                           renderInteractiveSceneCallback={
                             this.renderInteractiveSceneCallback
@@ -3272,7 +3276,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.getEffectiveGridSize());
 
-    const { newElements } = duplicateElements({
+    const { duplicatedElements } = duplicateElements({
       type: "everything",
       elements: elements.map((element) => {
         return newElementWith(element, {
@@ -3284,7 +3288,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     const prevElements = this.scene.getElementsIncludingDeleted();
-    let nextElements = [...prevElements, ...newElements];
+    let nextElements = [...prevElements, ...duplicatedElements];
 
     const mappedNewSceneElements = this.props.onDuplicate?.(
       nextElements,
@@ -3293,13 +3297,13 @@ class App extends React.Component<AppProps, AppState> {
 
     nextElements = mappedNewSceneElements || nextElements;
 
-    syncMovedIndices(nextElements, arrayToMap(newElements));
+    syncMovedIndices(nextElements, arrayToMap(duplicatedElements));
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({ x, y });
 
     if (topLayerFrame) {
       const eligibleElements = filterElementsEligibleAsFrameChildren(
-        newElements,
+        duplicatedElements,
         topLayerFrame,
       );
       addElementsToFrame(
@@ -3312,7 +3316,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene.replaceAllElements(nextElements);
 
-    newElements.forEach((newElement) => {
+    duplicatedElements.forEach((newElement) => {
       if (isTextElement(newElement) && isBoundToContainer(newElement)) {
         const container = getContainerElement(
           newElement,
@@ -3324,7 +3328,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
     if (isSafari) {
-      Fonts.loadElementsFonts(newElements).then((fontFaces) => {
+      Fonts.loadElementsFonts(duplicatedElements).then((fontFaces) => {
         this.fonts.onLoaded(fontFaces);
       });
     }
@@ -3336,7 +3340,7 @@ class App extends React.Component<AppProps, AppState> {
     this.store.shouldCaptureIncrement();
 
     const nextElementsToSelect =
-      excludeElementsInFramesFromSelection(newElements);
+      excludeElementsInFramesFromSelection(duplicatedElements);
 
     this.setState(
       {
@@ -3379,7 +3383,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setActiveTool({ type: "selection" });
 
     if (opts.fitToContent) {
-      this.scrollToContent(newElements, {
+      this.scrollToContent(duplicatedElements, {
         fitToContent: true,
         canvasOffsets: this.getEditorUIOffsets(),
       });
@@ -6967,6 +6971,7 @@ class App extends React.Component<AppProps, AppState> {
       drag: {
         hasOccurred: false,
         offset: null,
+        origin: { ...origin },
       },
       eventListeners: {
         onMove: null,
@@ -8261,8 +8266,8 @@ class App extends React.Component<AppProps, AppState> {
           this.state.activeEmbeddable?.state !== "active"
         ) {
           const dragOffset = {
-            x: pointerCoords.x - pointerDownState.origin.x,
-            y: pointerCoords.y - pointerDownState.origin.y,
+            x: pointerCoords.x - pointerDownState.drag.origin.x,
+            y: pointerCoords.y - pointerDownState.drag.origin.y,
           };
 
           const originalElements = [
@@ -8457,52 +8462,112 @@ class App extends React.Component<AppProps, AppState> {
               selectedElements.map((el) => [el.id, el]),
             );
 
-            const { newElements: clonedElements, elementsWithClones } =
-              duplicateElements({
-                type: "in-place",
-                elements,
-                appState: this.state,
-                randomizeSeed: true,
-                idsOfElementsToDuplicate,
-                overrides: (el) => {
-                  const origEl = pointerDownState.originalElements.get(el.id);
-
-                  if (origEl) {
-                    return {
-                      x: origEl.x,
-                      y: origEl.y,
-                      seed: origEl.seed,
-                    };
-                  }
-
-                  return {};
-                },
-                reverseOrder: true,
-              });
-            clonedElements.forEach((element) => {
-              pointerDownState.originalElements.set(element.id, element);
+            const {
+              duplicatedElements,
+              duplicateElementsMap,
+              elementsWithDuplicates,
+              origIdToDuplicateId,
+            } = duplicateElements({
+              type: "in-place",
+              elements,
+              appState: this.state,
+              randomizeSeed: true,
+              idsOfElementsToDuplicate,
+              overrides: ({ duplicateElement, origElement }) => {
+                return {
+                  // reset to the original element's frameId (unless we've
+                  // duplicated alongside a frame in which case we need to
+                  // keep the duplicate frame's id) so that the element
+                  // frame membership is refreshed on pointerup
+                  // NOTE this is a hacky solution and should be done
+                  // differently
+                  frameId: duplicateElement.frameId ?? origElement.frameId,
+                  seed: randomInteger(),
+                };
+              },
+            });
+            duplicatedElements.forEach((element) => {
+              pointerDownState.originalElements.set(
+                element.id,
+                deepCopyElement(element),
+              );
             });
 
-            const mappedNewSceneElements = this.props.onDuplicate?.(
-              elementsWithClones,
-              elements,
-            );
-
-            const nextSceneElements = syncMovedIndices(
-              mappedNewSceneElements || elementsWithClones,
-              arrayToMap(clonedElements),
-            ).map((el) => {
+            const mappedClonedElements = elementsWithDuplicates.map((el) => {
               if (idsOfElementsToDuplicate.has(el.id)) {
-                return newElementWith(el, {
-                  seed: randomInteger(),
-                });
+                const origEl = pointerDownState.originalElements.get(el.id);
+
+                if (origEl) {
+                  return newElementWith(el, {
+                    x: origEl.x,
+                    y: origEl.y,
+                  });
+                }
               }
               return el;
             });
 
-            this.scene.replaceAllElements(nextSceneElements);
-            this.maybeCacheVisibleGaps(event, selectedElements, true);
-            this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
+            const mappedNewSceneElements = this.props.onDuplicate?.(
+              mappedClonedElements,
+              elements,
+            );
+
+            const elementsWithIndices = syncMovedIndices(
+              mappedNewSceneElements || mappedClonedElements,
+              arrayToMap(duplicatedElements),
+            );
+
+            // we need to update synchronously so as to keep pointerDownState,
+            // appState, and scene elements in sync
+            flushSync(() => {
+              // swap hit element with the duplicated one
+              if (pointerDownState.hit.element) {
+                const cloneId = origIdToDuplicateId.get(
+                  pointerDownState.hit.element.id,
+                );
+                const clonedElement =
+                  cloneId && duplicateElementsMap.get(cloneId);
+                pointerDownState.hit.element = clonedElement || null;
+              }
+              // swap hit elements with the duplicated ones
+              pointerDownState.hit.allHitElements =
+                pointerDownState.hit.allHitElements.reduce(
+                  (
+                    acc: typeof pointerDownState.hit.allHitElements,
+                    origHitElement,
+                  ) => {
+                    const cloneId = origIdToDuplicateId.get(origHitElement.id);
+                    const clonedElement =
+                      cloneId && duplicateElementsMap.get(cloneId);
+                    if (clonedElement) {
+                      acc.push(clonedElement);
+                    }
+
+                    return acc;
+                  },
+                  [],
+                );
+
+              // update drag origin to the position at which we started
+              // the duplication so that the drag offset is correct
+              pointerDownState.drag.origin = viewportCoordsToSceneCoords(
+                event,
+                this.state,
+              );
+
+              // switch selected elements to the duplicated ones
+              this.setState((prevState) => ({
+                ...getSelectionStateForElements(
+                  duplicatedElements,
+                  this.scene.getNonDeletedElements(),
+                  prevState,
+                ),
+              }));
+
+              this.scene.replaceAllElements(elementsWithIndices);
+              this.maybeCacheVisibleGaps(event, selectedElements, true);
+              this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
+            });
           }
 
           return;
@@ -8752,7 +8817,10 @@ class App extends React.Component<AppProps, AppState> {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
       this.translateCanvas({
-        scrollX: this.state.scrollX - dx / this.state.zoom.value,
+        scrollX:
+          this.state.scrollX -
+          (dx * (currentScrollBars.horizontal?.deltaMultiplier || 1)) /
+            this.state.zoom.value,
       });
       pointerDownState.lastCoords.x = x;
       return true;
@@ -8762,7 +8830,10 @@ class App extends React.Component<AppProps, AppState> {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
       this.translateCanvas({
-        scrollY: this.state.scrollY - dy / this.state.zoom.value,
+        scrollY:
+          this.state.scrollY -
+          (dy * (currentScrollBars.vertical?.deltaMultiplier || 1)) /
+            this.state.zoom.value,
       });
       pointerDownState.lastCoords.y = y;
       return true;

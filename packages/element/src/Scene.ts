@@ -6,6 +6,7 @@ import {
   toBrandedType,
   isDevEnv,
   isTestEnv,
+  isReadonlyArray,
 } from "@excalidraw/common";
 import { isNonDeletedElement } from "@excalidraw/element";
 import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
@@ -268,7 +269,7 @@ class Scene {
 
   replaceAllElements(nextElements: ElementsMapOrArray) {
     // ts doesn't like `Array.isArray` of `instanceof Map`
-    if (!(nextElements instanceof Array)) {
+    if (!isReadonlyArray(nextElements)) {
       // need to order by fractional indices to get the correct order
       nextElements = orderByFractionalIndex(
         Array.from(nextElements.values()) as OrderedExcalidrawElement[],
