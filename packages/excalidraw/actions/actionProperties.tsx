@@ -134,15 +134,16 @@ import {
 } from "../scene";
 import { CaptureUpdateAction } from "../store";
 
-import { register } from "./register";
-
-import type { CaptureUpdateActionType } from "../store";
 import {
   ExcalidrawPropsCustomOptionsContext,
   type AppClassProperties,
   type AppState,
   type Primitive,
 } from "../types";
+
+import { register } from "./register";
+
+import type { CaptureUpdateActionType } from "../store";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 

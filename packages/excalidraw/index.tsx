@@ -1,4 +1,4 @@
-import React, { useEffect, useImperativeHandle, useRef } from "react";
+import React, { useEffect, useImperativeHandle, useMemo, useRef } from "react";
 
 import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
 
@@ -16,7 +16,15 @@ import "./css/app.scss";
 import "./css/styles.scss";
 import "./fonts/fonts.css";
 
-import { ExcalidrawPropsCustomOptionsContext, type AppProps, type ExcalidrawProps } from "./types";
+import {
+  ExcalidrawHistoryContext,
+  ExcalidrawPropsCustomOptionsContext,
+  type AppProps,
+  type ExcalidrawProps,
+} from "./types";
+
+import type { ExcalidrawHistoryContextType } from "./types";
+
 import type { ActionResult } from "./actions/types";
 
 polyfill();
@@ -112,60 +120,81 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   }, []);
 
   const appRef = useRef<App>(null);
+
+  const historyRedoRef = useRef<() => void>(undefined);
+  const historyUndoRef = useRef<() => void>(undefined);
+
   useImperativeHandle(
     actionRef,
     () => ({
       syncActionResult: (actionResult: ActionResult) => {
         appRef.current?.syncActionResult(actionResult);
       },
+      getHistory: () => appRef.current?.getHistory(),
+      historyRedo: () => {
+        historyRedoRef.current?.();
+      },
+      historyUndo: () => {
+        historyUndoRef.current?.();
+      },
+    }),
+    [],
+  );
+
+  const historyContextValue = useMemo<ExcalidrawHistoryContextType>(
+    () => ({
+      undoRef: historyUndoRef,
+      redoRef: historyRedoRef,
     }),
     [],
   );
 
   return (
-    <ExcalidrawPropsCustomOptionsContext.Provider value={customOptions}>
-      <EditorJotaiProvider store={editorJotaiStore}>
-        <InitializeApp langCode={langCode} theme={theme}>
-          <App
-            ref={appRef}
-            onChange={onChange}
-            initialData={initialData}
-            excalidrawAPI={excalidrawAPI}
-            isCollaborating={isCollaborating}
-            onPointerUpdate={onPointerUpdate}
-            renderTopRightUI={renderTopRightUI}
-            langCode={langCode}
-            viewModeEnabled={viewModeEnabled}
-            zenModeEnabled={zenModeEnabled}
-            gridModeEnabled={gridModeEnabled}
-            libraryReturnUrl={libraryReturnUrl}
-            theme={theme}
-            name={name}
-            renderCustomStats={renderCustomStats}
-            UIOptions={UIOptions}
-            onPaste={onPaste}
-            detectScroll={detectScroll}
-            handleKeyboardGlobally={handleKeyboardGlobally}
-            onLibraryChange={onLibraryChange}
-            autoFocus={autoFocus}
-            generateIdForFile={generateIdForFile}
-            onLinkOpen={onLinkOpen}
-            generateLinkForSelection={generateLinkForSelection}
-            onPointerDown={onPointerDown}
-            onPointerUp={onPointerUp}
-            onScrollChange={onScrollChange}
-            onDuplicate={onDuplicate}
-            validateEmbeddable={validateEmbeddable}
-            renderEmbeddable={renderEmbeddable}
-            aiEnabled={aiEnabled !== false}
-            showDeprecatedFonts={showDeprecatedFonts}
-            customOptions={customOptions}
-          >
-            {children}
-          </App>
-        </InitializeApp>
-      </EditorJotaiProvider>
-    </ExcalidrawPropsCustomOptionsContext.Provider>
+    <ExcalidrawHistoryContext.Provider value={historyContextValue}>
+      <ExcalidrawPropsCustomOptionsContext.Provider value={customOptions}>
+        <EditorJotaiProvider store={editorJotaiStore}>
+          <InitializeApp langCode={langCode} theme={theme}>
+            <App
+              ref={appRef}
+              onChange={onChange}
+              initialData={initialData}
+              excalidrawAPI={excalidrawAPI}
+              isCollaborating={isCollaborating}
+              onPointerUpdate={onPointerUpdate}
+              renderTopRightUI={renderTopRightUI}
+              langCode={langCode}
+              viewModeEnabled={viewModeEnabled}
+              zenModeEnabled={zenModeEnabled}
+              gridModeEnabled={gridModeEnabled}
+              libraryReturnUrl={libraryReturnUrl}
+              theme={theme}
+              name={name}
+              renderCustomStats={renderCustomStats}
+              UIOptions={UIOptions}
+              onPaste={onPaste}
+              detectScroll={detectScroll}
+              handleKeyboardGlobally={handleKeyboardGlobally}
+              onLibraryChange={onLibraryChange}
+              autoFocus={autoFocus}
+              generateIdForFile={generateIdForFile}
+              onLinkOpen={onLinkOpen}
+              generateLinkForSelection={generateLinkForSelection}
+              onPointerDown={onPointerDown}
+              onPointerUp={onPointerUp}
+              onScrollChange={onScrollChange}
+              onDuplicate={onDuplicate}
+              validateEmbeddable={validateEmbeddable}
+              renderEmbeddable={renderEmbeddable}
+              aiEnabled={aiEnabled !== false}
+              showDeprecatedFonts={showDeprecatedFonts}
+              customOptions={customOptions}
+            >
+              {children}
+            </App>
+          </InitializeApp>
+        </EditorJotaiProvider>
+      </ExcalidrawPropsCustomOptionsContext.Provider>
+    </ExcalidrawHistoryContext.Provider>
   );
 };
 

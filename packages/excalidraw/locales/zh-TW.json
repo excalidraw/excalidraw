@@ -113,6 +113,7 @@
     "unbindText": "取消綁定文字",
     "bindText": "結合文字至容器",
     "createContainerFromText": "將文字包於容器中",
+    "blur": "強度",
     "link": {
       "edit": "編輯連結",
       "editEmbed": "編輯連結&嵌入",
@@ -237,6 +238,7 @@
     "selection": "選取",
     "image": "插入圖片",
     "rectangle": "長方形",
+    "blur": "模糊",
     "diamond": "菱形",
     "ellipse": "橢圓",
     "arrow": "箭頭",

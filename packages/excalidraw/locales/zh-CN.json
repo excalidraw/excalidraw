@@ -44,6 +44,7 @@
     "arrowhead_triangle_outline": "三角箭头（空心）",
     "arrowhead_diamond": "菱形",
     "arrowhead_diamond_outline": "菱形（空心）",
+    "arrowtypes": "箭头类型",
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
@@ -113,6 +114,7 @@
     "unbindText": "取消文本绑定",
     "bindText": "将文本绑定到容器",
     "createContainerFromText": "将文本包围在容器中",
+    "blur": "强度",
     "link": {
       "edit": "编辑链接",
       "editEmbed": "编辑链接与嵌入",
@@ -237,6 +239,7 @@
     "selection": "选择",
     "image": "插入图像",
     "rectangle": "矩形",
+    "blur": "模糊",
     "diamond": "菱形",
     "ellipse": "椭圆",
     "arrow": "箭头",

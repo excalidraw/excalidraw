@@ -2,6 +2,8 @@ import { isEmbeddableElement } from "@excalidraw/element/typeChecks";
 
 import { KEYS, getShortcutKey } from "@excalidraw/common";
 
+import { useContext } from "react";
+
 import { ToolButton } from "../components/ToolButton";
 import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";
 import { LinkIcon } from "../components/icons";
@@ -9,6 +11,8 @@ import { t } from "../i18n";
 
 import { getSelectedElements } from "../scene";
 import { CaptureUpdateAction } from "../store";
+
+import { ExcalidrawPropsCustomOptionsContext } from "../types";
 
 import { register } from "./register";
 
@@ -39,6 +43,20 @@ export const actionLink = register({
   },
   PanelComponent: ({ elements, appState, updateData }) => {
     const selectedElements = getSelectedElements(elements, appState);
+
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: isEmbeddableElement(elements[0])
+          ? t("labels.link.labelEmbed")
+          : t("labels.link.label"),
+        children: LinkIcon,
+        name: "link",
+        visible: selectedElements.length === 1 && !!selectedElements[0].link,
+      });
+    }
 
     return (
       <ToolButton

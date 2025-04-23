@@ -20,6 +20,13 @@ export class History {
     [HistoryChangedEvent]
   >();
 
+  constructor(
+    private readonly onChange: (
+      history: History,
+      type: "undo" | "redo" | "record" | "clear",
+    ) => void = () => {},
+  ) {}
+
   private readonly undoStack: HistoryStack = [];
   private readonly redoStack: HistoryStack = [];
 
@@ -34,6 +41,8 @@ export class History {
   public clear() {
     this.undoStack.length = 0;
     this.redoStack.length = 0;
+
+    this.onChange(this, "clear");
   }
 
   /**
@@ -43,6 +52,8 @@ export class History {
     elementsChange: ElementsChange,
     appStateChange: AppStateChange,
   ) {
+    this.onChange(this, "record");
+
     const entry = HistoryEntry.create(appStateChange, elementsChange);
 
     if (!entry.isEmpty()) {
@@ -67,6 +78,8 @@ export class History {
     appState: AppState,
     snapshot: Readonly<Snapshot>,
   ) {
+    this.onChange(this, "undo");
+
     return this.perform(
       elements,
       appState,
@@ -81,6 +94,8 @@ export class History {
     appState: AppState,
     snapshot: Readonly<Snapshot>,
   ) {
+    this.onChange(this, "redo");
+
     return this.perform(
       elements,
       appState,

@@ -404,6 +404,8 @@ const drawElementOnCanvas = (
       rc.draw(ShapeCache.get(element)!);
       break;
     }
+    case "blur":
+      break;
     case "arrow":
     case "line": {
       context.lineJoin = "round";
@@ -814,6 +816,7 @@ export const renderElement = (
     case "image":
     case "text":
     case "iframe":
+    case "blur":
     case "embeddable": {
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)

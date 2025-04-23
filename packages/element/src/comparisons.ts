@@ -10,7 +10,10 @@ export const hasBackground = (type: ElementOrToolType) =>
   type === "freedraw";
 
 export const hasStrokeColor = (type: ElementOrToolType) =>
-  type !== "image" && type !== "frame" && type !== "magicframe";
+  type !== "image" &&
+  type !== "frame" &&
+  type !== "magicframe" &&
+  type !== "blur";
 
 export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "rectangle" ||
@@ -38,6 +41,10 @@ export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "line" ||
   type === "diamond" ||
   type === "image";
+
+export const canChangeBlur = (type: ElementOrToolType) => type === "blur";
+
+export const canChangeLayer = (type: ElementOrToolType) => type !== "blur";
 
 export const toolIsArrow = (type: ElementOrToolType) => type === "arrow";
 

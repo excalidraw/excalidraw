@@ -21,7 +21,12 @@ import {
   isTextElement,
 } from "@excalidraw/element/typeChecks";
 
-import { hasStrokeColor, toolIsArrow } from "@excalidraw/element/comparisons";
+import {
+  canChangeBlur,
+  canChangeLayer,
+  hasStrokeColor,
+  toolIsArrow,
+} from "@excalidraw/element/comparisons";
 
 import type {
   ExcalidrawElement,
@@ -88,6 +93,7 @@ export const canChangeStrokeColor = (
     (hasStrokeColor(appState.activeTool.type) &&
       commonSelectedType !== "image" &&
       commonSelectedType !== "frame" &&
+      commonSelectedType !== "blur" &&
       commonSelectedType !== "magicframe") ||
     targetElements.some((element) => hasStrokeColor(element.type))
   );
@@ -157,6 +163,12 @@ export const SelectedShapeActions = ({
   const showAlignActions =
     !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
 
+  const showLayerActions =
+    appState.activeTool.type === "selection"
+      ? !targetElements.some((element) => !canChangeLayer(element.type))
+      : canChangeLayer(appState.activeTool.type) ||
+        targetElements.some((element) => canChangeLayer(element.type));
+
   return (
     <div className="panelColumn">
       <div>
@@ -212,82 +224,138 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeArrowhead")}</>
       )}
 
+      {(canChangeBlur(appState.activeTool.type) ||
+        targetElements.some((element) => canChangeBlur(element.type))) &&
+        renderAction("changeBlur")}
+
       {renderAction("changeOpacity")}
 
-      <fieldset>
-        <legend>{t("labels.layers")}</legend>
-        {!customOptions?.pickerRenders?.ButtonList && (
-          <div className={"buttonList"}>
-            {renderAction("sendToBack")}
-            {renderAction("sendBackward")}
-            {renderAction("bringForward")}
-            {renderAction("bringToFront")}
-          </div>
-        )}
-        {customOptions?.pickerRenders?.ButtonList && (
-          <customOptions.pickerRenders.ButtonList>
-            {renderAction("sendToBack")}
-            {renderAction("sendBackward")}
-            {renderAction("bringForward")}
-            {renderAction("bringToFront")}
-          </customOptions.pickerRenders.ButtonList>
-        )}
-      </fieldset>
+      {showLayerActions && (
+        <fieldset>
+          <legend>{t("labels.layers")}</legend>
+          {!customOptions?.pickerRenders?.ButtonList && (
+            <div className={"buttonList"}>
+              {renderAction("sendToBack")}
+              {renderAction("sendBackward")}
+              {renderAction("bringForward")}
+              {renderAction("bringToFront")}
+            </div>
+          )}
+          {customOptions?.pickerRenders?.ButtonList && (
+            <customOptions.pickerRenders.ButtonList>
+              {renderAction("sendToBack")}
+              {renderAction("sendBackward")}
+              {renderAction("bringForward")}
+              {renderAction("bringToFront")}
+            </customOptions.pickerRenders.ButtonList>
+          )}
+        </fieldset>
+      )}
 
       {showAlignActions && !isSingleElementBoundContainer && (
         <fieldset>
           <legend>{t("labels.align")}</legend>
-          <div className="buttonList">
-            {
-              // swap this order for RTL so the button positions always match their action
-              // (i.e. the leftmost button aligns left)
-            }
-            {isRTL ? (
-              <>
-                {renderAction("alignRight")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignLeft")}
-              </>
-            ) : (
-              <>
-                {renderAction("alignLeft")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignRight")}
-              </>
-            )}
-            {targetElements.length > 2 &&
-              renderAction("distributeHorizontally")}
-            {/* breaks the row ˇˇ */}
-            <div style={{ flexBasis: "100%", height: 0 }} />
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: ".5rem",
-                marginTop: "-0.5rem",
-              }}
-            >
-              {renderAction("alignTop")}
-              {renderAction("alignVerticallyCentered")}
-              {renderAction("alignBottom")}
+          {!customOptions?.pickerRenders?.ButtonList && (
+            <div className="buttonList">
+              {
+                // swap this order for RTL so the button positions always match their action
+                // (i.e. the leftmost button aligns left)
+              }
+              {isRTL ? (
+                <>
+                  {renderAction("alignRight")}
+                  {renderAction("alignHorizontallyCentered")}
+                  {renderAction("alignLeft")}
+                </>
+              ) : (
+                <>
+                  {renderAction("alignLeft")}
+                  {renderAction("alignHorizontallyCentered")}
+                  {renderAction("alignRight")}
+                </>
+              )}
               {targetElements.length > 2 &&
-                renderAction("distributeVertically")}
+                renderAction("distributeHorizontally")}
+              {/* breaks the row ˇˇ */}
+              <div style={{ flexBasis: "100%", height: 0 }} />
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: ".5rem",
+                  marginTop: "-0.5rem",
+                }}
+              >
+                {renderAction("alignTop")}
+                {renderAction("alignVerticallyCentered")}
+                {renderAction("alignBottom")}
+                {targetElements.length > 2 &&
+                  renderAction("distributeVertically")}
+              </div>
             </div>
-          </div>
+          )}
+          {customOptions?.pickerRenders?.ButtonList && (
+            <>
+              <customOptions.pickerRenders.ButtonList>
+                {
+                  // swap this order for RTL so the button positions always match their action
+                  // (i.e. the leftmost button aligns left)
+                }
+                {isRTL ? (
+                  <>
+                    {renderAction("alignRight")}
+                    {renderAction("alignHorizontallyCentered")}
+                    {renderAction("alignLeft")}
+                  </>
+                ) : (
+                  <>
+                    {renderAction("alignLeft")}
+                    {renderAction("alignHorizontallyCentered")}
+                    {renderAction("alignRight")}
+                  </>
+                )}
+                {targetElements.length > 2 &&
+                  renderAction("distributeHorizontally")}
+              </customOptions.pickerRenders.ButtonList>
+              <customOptions.pickerRenders.ButtonList>
+                {renderAction("alignTop")}
+                {renderAction("alignVerticallyCentered")}
+                {renderAction("alignBottom")}
+
+                {targetElements.length > 2 &&
+                  renderAction("distributeVertically")}
+              </customOptions.pickerRenders.ButtonList>
+            </>
+          )}
         </fieldset>
       )}
       {!isEditingTextOrNewElement && targetElements.length > 0 && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
-          <div className="buttonList">
-            {!device.editor.isMobile && renderAction("duplicateSelection")}
-            {!device.editor.isMobile && renderAction("deleteSelectedElements")}
-            {renderAction("group")}
-            {renderAction("ungroup")}
-            {showLinkIcon && renderAction("hyperlink")}
-            {showCropEditorAction && renderAction("cropEditor")}
-            {showLineEditorAction && renderAction("toggleLinearEditor")}
-          </div>
+          {!customOptions?.pickerRenders?.ButtonList && (
+            <div className="buttonList">
+              {!device.editor.isMobile && renderAction("duplicateSelection")}
+              {!device.editor.isMobile &&
+                renderAction("deleteSelectedElements")}
+              {renderAction("group")}
+              {renderAction("ungroup")}
+              {showLinkIcon && renderAction("hyperlink")}
+              {showCropEditorAction && renderAction("cropEditor")}
+              {showLineEditorAction && renderAction("toggleLinearEditor")}
+            </div>
+          )}
+          {customOptions?.pickerRenders?.ButtonList && (
+            <customOptions.pickerRenders.ButtonList>
+              {!device.editor.isMobile && renderAction("duplicateSelection")}
+              {!device.editor.isMobile &&
+                renderAction("deleteSelectedElements")}
+              {renderAction("group")}
+              {renderAction("ungroup")}
+              {showLinkIcon && renderAction("hyperlink")}
+              {showCropEditorAction && renderAction("cropEditor")}
+              {showLineEditorAction && renderAction("toggleLinearEditor")}
+            </customOptions.pickerRenders.ButtonList>
+          )}
         </fieldset>
       )}
     </div>

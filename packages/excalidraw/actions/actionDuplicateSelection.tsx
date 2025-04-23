@@ -18,12 +18,16 @@ import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
 
 import { duplicateElements } from "@excalidraw/element/duplicate";
 
+import { useContext } from "react";
+
 import { ToolButton } from "../components/ToolButton";
 import { DuplicateIcon } from "../components/icons";
 
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 import { CaptureUpdateAction } from "../store";
+
+import { ExcalidrawPropsCustomOptionsContext } from "../types";
 
 import { register } from "./register";
 
@@ -105,16 +109,36 @@ export const actionDuplicateSelection = register({
     };
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <ToolButton
-      type="button"
-      icon={DuplicateIcon}
-      title={`${t("labels.duplicateSelection")} — ${getShortcutKey(
-        "CtrlOrCmd+D",
-      )}`}
-      aria-label={t("labels.duplicateSelection")}
-      onClick={() => updateData(null)}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.duplicateSelection")}`,
+        children: DuplicateIcon,
+        name: "duplicateSelection",
+        visible: isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
+      });
+    }
+
+    return (
+      <ToolButton
+        type="button"
+        icon={DuplicateIcon}
+        title={`${t("labels.duplicateSelection")} — ${getShortcutKey(
+          "CtrlOrCmd+D",
+        )}`}
+        aria-label={t("labels.duplicateSelection")}
+        onClick={() => updateData(null)}
+        visible={isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        )}
+      />
+    );
+  },
 });

@@ -66,6 +66,8 @@ import type React from "react";
 import type { ButtonIconSelectProps } from "./components/ButtonIconSelect";
 import type { ButtonIcon } from "./components/ButtonIcon";
 
+import type { History } from "./history";
+
 export type SocketId = string & { _brand: "SocketId" };
 
 export type Collaborator = Readonly<{
@@ -157,7 +159,8 @@ export type ToolType =
   | "frame"
   | "magicframe"
   | "embeddable"
-  | "laser";
+  | "laser"
+  | "blur";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
@@ -332,6 +335,7 @@ export interface AppState {
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemOpacity: number;
+  currentItemBlur: number;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
@@ -525,12 +529,17 @@ export interface ExcalidrawPropsCustomOptions {
   hideMenu?: boolean;
   hideFooter?: boolean;
   hideContextMenu?: boolean;
+  onHistoryChange?: (
+    history: History,
+    type: "undo" | "redo" | "record" | "clear",
+  ) => void;
   shouldResizeFromCenter?: (event: MouseEvent | KeyboardEvent) => boolean;
   shouldMaintainAspectRatio?: (event: MouseEvent | KeyboardEvent) => boolean;
   shouldRotateWithDiscreteAngle?: (
     event: MouseEvent | KeyboardEvent | React.PointerEvent<HTMLCanvasElement>,
   ) => boolean;
   shouldSnapping?: (event: KeyboardModifiersObject) => boolean;
+  onHandleEraser?: (elements: Set<ExcalidrawElement["id"]>) => void;
   layoutRenders?: {
     menuRender?: (props: { children: React.ReactNode }) => React.ReactNode;
   };
@@ -558,6 +567,8 @@ export interface ExcalidrawPropsCustomOptions {
       title: string;
       children: React.ReactNode;
       name: string;
+      visible?: boolean;
+      hidden?: boolean;
     }) => JSX.Element;
     rangeRender?: (props: {
       value: number;
@@ -594,7 +605,19 @@ export const ExcalidrawPropsCustomOptionsContext = createContext<
 
 export interface ExcalidrawActionType {
   syncActionResult: (actionResult: ActionResult) => void;
+  getHistory: () => History | undefined;
+  historyRedo: () => void;
+  historyUndo: () => void;
 }
+
+export interface ExcalidrawHistoryContextType {
+  undoRef: React.RefObject<(() => void) | undefined>;
+  redoRef: React.RefObject<(() => void) | undefined>;
+}
+
+export const ExcalidrawHistoryContext = createContext<
+  ExcalidrawHistoryContextType | undefined
+>(undefined);
 
 export interface ExcalidrawProps {
   onChange?: (

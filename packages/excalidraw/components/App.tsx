@@ -143,6 +143,7 @@ import {
   newLinearElement,
   newTextElement,
   refreshTextDimensions,
+  newBlurElement,
 } from "@excalidraw/element/newElement";
 
 import {
@@ -646,6 +647,9 @@ class App extends React.Component<AppProps, AppState> {
   public id: string;
   private store: Store;
   private history: History;
+
+  public getHistory = () => this.history;
+
   public excalidrawContainerValue: {
     container: HTMLDivElement | null;
     id: string;
@@ -806,7 +810,7 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.fonts = new Fonts(this.scene);
-    this.history = new History();
+    this.history = new History(this.props.customOptions?.onHistoryChange);
 
     this.actionManager.registerAll(actions);
     this.actionManager.registerAction(
@@ -2287,19 +2291,6 @@ class App extends React.Component<AppProps, AppState> {
           name,
           errorMessage,
         };
-
-        // Print differences between prevAppState and res
-        const differences = Object.keys(res).filter((key) => {
-          return (prevAppState as any)[key] !== (res as any)[key];
-        });
-        console.log(
-          "State differences:",
-          differences.map((key) => ({
-            key,
-            prev: (prevAppState as any)[key],
-            new: (res as any)[key],
-          })),
-        );
 
         return res;
       });
@@ -6270,6 +6261,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.elementsPendingErasure = new Set(elementsToErase);
     this.triggerRender();
+    this.props.customOptions?.onHandleEraser?.(this.elementsPendingErasure);
   };
 
   // set touch moving for mobile context menu
@@ -7850,7 +7842,8 @@ class App extends React.Component<AppProps, AppState> {
       | "diamond"
       | "ellipse"
       | "iframe"
-      | "embeddable",
+      | "embeddable"
+      | "blur",
   ) {
     return this.state.currentItemRoundness === "round"
       ? {
@@ -7862,7 +7855,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private createGenericElementOnPointerDown = (
-    elementType: ExcalidrawGenericElement["type"] | "embeddable",
+    elementType: ExcalidrawGenericElement["type"] | "embeddable" | "blur",
     pointerDownState: PointerDownState,
   ): void => {
     const [gridX, gridY] = getGridPoint(
@@ -7898,6 +7891,11 @@ class App extends React.Component<AppProps, AppState> {
       element = newEmbeddableElement({
         type: "embeddable",
         ...baseElementAttributes,
+      });
+    } else if (elementType === "blur") {
+      element = newBlurElement({
+        ...baseElementAttributes,
+        blur: this.state.currentItemBlur,
       });
     } else {
       element = newElement({

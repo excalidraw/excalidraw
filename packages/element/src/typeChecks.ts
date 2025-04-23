@@ -28,6 +28,7 @@ import type {
   PointBinding,
   FixedPointBinding,
   ExcalidrawFlowchartNodeElement,
+  ExcalidrawBlurElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -107,6 +108,12 @@ export const isLinearElement = (
   return element != null && isLinearElementType(element.type);
 };
 
+export const isBlurElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawBlurElement => {
+  return element != null && isBlurElementType(element.type);
+};
+
 export const isArrowElement = (
   element?: ExcalidrawElement | null,
 ): element is ExcalidrawArrowElement => {
@@ -125,6 +132,10 @@ export const isLinearElementType = (
   return (
     elementType === "arrow" || elementType === "line" // || elementType === "freedraw"
   );
+};
+
+export const isBlurElementType = (elementType: ElementOrToolType): boolean => {
+  return elementType === "blur";
 };
 
 export const isBindingElement = (
@@ -231,6 +242,7 @@ export const isExcalidrawElement = (
     case "frame":
     case "magicframe":
     case "image":
+    case "blur":
     case "selection": {
       return true;
     }
