@@ -47,7 +47,6 @@ import {
 } from "./heading";
 import { type ElementUpdate } from "./mutateElement";
 import { isBindableElement } from "./typeChecks";
-
 import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
@@ -1254,10 +1253,8 @@ const getElbowArrowData = (
     "start",
     arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
-    elementsMap,
     hoveredStartElement,
     options?.isDragging,
-    options?.zoom,
   );
   const endGlobalPoint = getGlobalPoint(
     {
@@ -1269,10 +1266,8 @@ const getElbowArrowData = (
     "end",
     arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
-    elementsMap,
     hoveredEndElement,
     options?.isDragging,
-    options?.zoom,
   );
   const startHeading = getBindPointHeading(
     startGlobalPoint,
@@ -2214,10 +2209,8 @@ const getGlobalPoint = (
   startOrEnd: "start" | "end",
   fixedPointRatio: [number, number] | undefined | null,
   initialPoint: GlobalPoint,
-  elementsMap: ElementsMap,
   element?: ExcalidrawBindableElement | null,
   isDragging?: boolean,
-  zoom?: AppState["zoom"],
 ): GlobalPoint => {
   if (isDragging) {
     if (element) {
