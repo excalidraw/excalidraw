@@ -326,7 +326,6 @@ import type {
   MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
-  ConvertibleGenericTypes,
 } from "@excalidraw/element/types";
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
@@ -465,7 +464,6 @@ import { isMaybeMermaidDefinition } from "../mermaid";
 import ShapeSwitch, {
   getSwitchableTypeFromElements,
   shapeSwitchAtom,
-  shapeSwitchFontSizeAtom,
   switchShapes,
 } from "./ShapeSwitch";
 
@@ -4182,23 +4180,6 @@ class App extends React.Component<AppProps, AppState> {
             editorJotaiStore.set(shapeSwitchAtom, {
               type: "panel",
             });
-            if (!editorJotaiStore.get(shapeSwitchFontSizeAtom)) {
-              selectedElements.forEach((element) => {
-                const boundText = getBoundTextElement(
-                  element,
-                  this.scene.getNonDeletedElementsMap(),
-                );
-                if (boundText && generic && element) {
-                  editorJotaiStore.set(shapeSwitchFontSizeAtom, {
-                    ...editorJotaiStore.get(shapeSwitchFontSizeAtom),
-                    [element.id]: {
-                      fontSize: boundText.fontSize,
-                      elementType: element.type as ConvertibleGenericTypes,
-                    },
-                  });
-                }
-              });
-            }
           }
         }
 
@@ -6468,6 +6449,10 @@ class App extends React.Component<AppProps, AppState> {
         })),
       }));
       editorJotaiStore.set(searchItemInFocusAtom, null);
+    }
+
+    if (editorJotaiStore.get(shapeSwitchAtom)) {
+      editorJotaiStore.set(shapeSwitchAtom, null);
     }
 
     // since contextMenu options are potentially evaluated on each render,

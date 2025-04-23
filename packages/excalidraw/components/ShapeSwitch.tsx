@@ -44,7 +44,9 @@ import type {
   ConvertibleGenericTypes,
   ConvertibleLinearTypes,
   ElementsMap,
+  ExcalidrawArrowElement,
   ExcalidrawDiamondElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
   ExcalidrawLinearElement,
@@ -87,9 +89,19 @@ export const shapeSwitchFontSizeAtom = atom<{
   };
 } | null>(null);
 
+export const shapeSwitchLinearAtom = atom<{
+  [id: string]: {
+    properties:
+      | Partial<ExcalidrawLinearElement>
+      | Partial<ExcalidrawElbowArrowElement>;
+    initialType: ConvertibleLinearTypes;
+  };
+} | null>(null);
+
 const ShapeSwitch = ({ app }: { app: App }) => {
   const [shapeSwitch, setShapeSwitch] = useAtom(shapeSwitchAtom);
   const [, setShapeSwitchFontSize] = useAtom(shapeSwitchFontSizeAtom);
+  const [, setShapeSwitchLinear] = useAtom(shapeSwitchLinearAtom);
 
   const selectedElements = useMemo(
     () => getSelectedElements(app.scene.getNonDeletedElementsMap(), app.state),
@@ -117,6 +129,7 @@ const ShapeSwitch = ({ app }: { app: App }) => {
   // clear if not active
   if (!shapeSwitch) {
     setShapeSwitchFontSize(null);
+    setShapeSwitchLinear(null);
     return null;
   }
 
@@ -196,6 +209,56 @@ const Panel = ({
 
     setPanelPosition({ x, y });
   }, [genericElements, linearElements, app.scene, app.state]);
+
+  useEffect(() => {
+    if (editorJotaiStore.get(shapeSwitchLinearAtom)) {
+      return;
+    }
+
+    for (const linearElement of linearElements) {
+      const initialType = getArrowType(linearElement);
+      const cachedProperties =
+        initialType === "line"
+          ? getLineProperties(linearElement)
+          : initialType === "sharpArrow"
+          ? getSharpArrowProperties(linearElement)
+          : initialType === "curvedArrow"
+          ? getCurvedArrowProperties(linearElement)
+          : initialType === "elbowArrow"
+          ? getElbowArrowProperties(linearElement)
+          : {};
+
+      editorJotaiStore.set(shapeSwitchLinearAtom, {
+        ...editorJotaiStore.get(shapeSwitchLinearAtom),
+        [linearElement.id]: {
+          properties: cachedProperties,
+          initialType,
+        },
+      });
+    }
+  }, [linearElements]);
+
+  useEffect(() => {
+    if (editorJotaiStore.get(shapeSwitchFontSizeAtom)) {
+      return;
+    }
+
+    for (const element of genericElements) {
+      const boundText = getBoundTextElement(
+        element,
+        app.scene.getNonDeletedElementsMap(),
+      );
+      if (boundText) {
+        editorJotaiStore.set(shapeSwitchFontSizeAtom, {
+          ...editorJotaiStore.get(shapeSwitchFontSizeAtom),
+          [element.id]: {
+            fontSize: boundText.fontSize,
+            elementType: element.type as ConvertibleGenericTypes,
+          },
+        });
+      }
+    }
+  }, [genericElements, app.scene]);
 
   const SHAPES: [string, ReactNode][] = linear
     ? [
@@ -429,6 +492,19 @@ export const switchShapes = (
       for (const element of selectedLinearSwitchableElements) {
         convertElementType(element, nextType, app, false);
 
+        const cachedLinear = editorJotaiStore.get(shapeSwitchLinearAtom)?.[
+          element.id
+        ];
+
+        if (cachedLinear) {
+          const { properties, initialType } = cachedLinear;
+
+          if (initialType === nextType) {
+            mutateElement(element, properties, false);
+            continue;
+          }
+        }
+
         if (isElbowArrow(element)) {
           const nextPoints = convertLineToElbow(element);
 
@@ -555,6 +631,72 @@ const getArrowType = (element: ExcalidrawLinearElement) => {
     return "elbowArrow";
   }
   return "line";
+};
+
+const getLineProperties = (
+  element: ExcalidrawLinearElement,
+): Partial<ExcalidrawLinearElement> => {
+  if (element.type === "line") {
+    return {
+      points: element.points,
+      roundness: element.roundness,
+    };
+  }
+  return {};
+};
+
+const getSharpArrowProperties = (
+  element: ExcalidrawLinearElement,
+): Partial<ExcalidrawArrowElement> => {
+  if (isSharpArrow(element)) {
+    return {
+      points: element.points,
+      startArrowhead: element.startArrowhead,
+      endArrowhead: element.endArrowhead,
+      startBinding: element.startBinding,
+      endBinding: element.endBinding,
+      roundness: null,
+    };
+  }
+
+  return {};
+};
+
+const getCurvedArrowProperties = (
+  element: ExcalidrawLinearElement,
+): Partial<ExcalidrawArrowElement> => {
+  if (isCurvedArrow(element)) {
+    return {
+      points: element.points,
+      startArrowhead: element.startArrowhead,
+      endArrowhead: element.endArrowhead,
+      startBinding: element.startBinding,
+      endBinding: element.endBinding,
+      roundness: element.roundness,
+    };
+  }
+
+  return {};
+};
+
+const getElbowArrowProperties = (
+  element: ExcalidrawLinearElement,
+): Partial<ExcalidrawElbowArrowElement> => {
+  if (isElbowArrow(element)) {
+    return {
+      points: element.points,
+      startArrowhead: element.startArrowhead,
+      endArrowhead: element.endArrowhead,
+      startBinding: element.startBinding,
+      endBinding: element.endBinding,
+      roundness: element.roundness,
+      fixedSegments: element.fixedSegments,
+      startIsSpecial: element.startIsSpecial,
+      endIsSpecial: element.endIsSpecial,
+    };
+  }
+
+  return {};
 };
 
 const getGenericSwitchableElements = (elements: ExcalidrawElement[]) =>
