@@ -413,5 +413,9 @@ export type ElementsMapOrArray =
   | readonly ExcalidrawElement[]
   | Readonly<ElementsMap>;
 
-export type GenericSwitchableToolType = "rectangle" | "ellipse" | "diamond";
-export type LinearSwitchableToolType = "line" | "arrow";
+export type ConvertibleGenericTypes = "rectangle" | "diamond" | "ellipse";
+export type ConvertibleLinearTypes =
+  | "line"
+  | "sharpArrow"
+  | "curvedArrow"
+  | "elbowArrow";

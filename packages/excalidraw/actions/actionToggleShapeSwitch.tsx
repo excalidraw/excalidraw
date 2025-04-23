@@ -1,8 +1,9 @@
-import { getSwitchableTypeFromElements } from "@excalidraw/element/typeChecks";
-
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { shapeSwitchAtom } from "../components/ShapeSwitch";
+import {
+  getSwitchableTypeFromElements,
+  shapeSwitchAtom,
+} from "../components/ShapeSwitch";
 import { editorJotaiStore } from "../editor-jotai";
 import { CaptureUpdateAction } from "../store";
 

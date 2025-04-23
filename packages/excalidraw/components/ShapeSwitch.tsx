@@ -5,10 +5,11 @@ import { updateElbowArrowPoints } from "@excalidraw/element/elbowArrow";
 import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
 
 import {
-  getSwitchableTypeFromElements,
   isArrowElement,
+  isCurvedArrow,
   isElbowArrow,
-  isUsingAdaptiveRadius,
+  isLinearElement,
+  isSharpArrow,
 } from "@excalidraw/element/typeChecks";
 
 import {
@@ -29,23 +30,31 @@ import { getFontString, updateActiveTool } from "@excalidraw/common";
 
 import { measureText } from "@excalidraw/element/textMeasurements";
 
-import { ShapeCache } from "@excalidraw/element/ShapeCache";
-
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 
+import {
+  convertElementType,
+  CONVERTIBLE_GENERIC_TYPES,
+  CONVERTIBLE_LINEAR_TYPES,
+  isConvertibleGenericType,
+  isConvertibleLinearType,
+} from "@excalidraw/element/mutateElement";
+
 import type {
+  ConvertibleGenericTypes,
+  ConvertibleLinearTypes,
   ElementsMap,
-  ExcalidrawArrowElement,
+  ExcalidrawDiamondElement,
   ExcalidrawElement,
+  ExcalidrawEllipseElement,
   ExcalidrawLinearElement,
+  ExcalidrawRectangleElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   FixedSegment,
-  GenericSwitchableToolType,
-  LinearSwitchableToolType,
 } from "@excalidraw/element/types";
 
-import { mutateElement, ROUNDNESS, sceneCoordsToViewportCoords } from "..";
+import { mutateElement, sceneCoordsToViewportCoords } from "..";
 import { getSelectedElements } from "../scene";
 import { trackEvent } from "../analytics";
 import { atom, editorJotaiStore, useAtom } from "../editor-jotai";
@@ -53,21 +62,19 @@ import { atom, editorJotaiStore, useAtom } from "../editor-jotai";
 import "./ShapeSwitch.scss";
 import { ToolButton } from "./ToolButton";
 import {
-  ArrowIcon,
   DiamondIcon,
+  elbowArrowIcon,
   EllipseIcon,
   LineIcon,
   RectangleIcon,
+  roundArrowIcon,
+  sharpArrowIcon,
 } from "./icons";
 
 import type App from "./App";
 
 const GAP_HORIZONTAL = 8;
 const GAP_VERTICAL = 10;
-
-export const GENERIC_SWITCHABLE_SHAPES = ["rectangle", "diamond", "ellipse"];
-
-export const LINEAR_SWITCHABLE_SHAPES = ["line", "arrow"];
 
 export const shapeSwitchAtom = atom<{
   type: "panel";
@@ -76,7 +83,7 @@ export const shapeSwitchAtom = atom<{
 export const shapeSwitchFontSizeAtom = atom<{
   [id: string]: {
     fontSize: number;
-    elementType: GenericSwitchableToolType;
+    elementType: ConvertibleGenericTypes;
   };
 } | null>(null);
 
@@ -142,7 +149,9 @@ const Panel = ({
         (element) => element.type === genericElements[0].type,
       )
     : linear
-    ? linearElements.every((element) => element.type === linearElements[0].type)
+    ? linearElements.every(
+        (element) => getArrowType(element) === getArrowType(linearElements[0]),
+      )
     : false;
 
   const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
@@ -188,16 +197,18 @@ const Panel = ({
     setPanelPosition({ x, y });
   }, [genericElements, linearElements, app.scene, app.state]);
 
-  const SHAPES: [string, string, ReactNode][] = linear
+  const SHAPES: [string, ReactNode][] = linear
     ? [
-        ["arrow", "5", ArrowIcon],
-        ["line", "6", LineIcon],
+        ["line", LineIcon],
+        ["sharpArrow", sharpArrowIcon],
+        ["curvedArrow", roundArrowIcon],
+        ["elbowArrow", elbowArrowIcon],
       ]
     : generic
     ? [
-        ["rectangle", "2", RectangleIcon],
-        ["diamond", "3", DiamondIcon],
-        ["ellipse", "4", EllipseIcon],
+        ["rectangle", RectangleIcon],
+        ["diamond", DiamondIcon],
+        ["ellipse", EllipseIcon],
       ]
     : [];
 
@@ -215,16 +226,16 @@ const Panel = ({
       }}
       className="ShapeSwitch__Panel"
     >
-      {SHAPES.map(([type, shortcut, icon]) => {
+      {SHAPES.map(([type, icon]) => {
         const isSelected =
           sameType &&
           ((generic && genericElements[0].type === type) ||
-            (linear && linearElements[0].type === type));
+            (linear && getArrowType(linearElements[0]) === type));
 
         return (
           <ToolButton
             className="Shape"
-            key={`${elements[0].version}_${type}`}
+            key={`${elements[0].id}${elements[0].version}_${type}`}
             type="radio"
             icon={icon}
             checked={isSelected}
@@ -238,11 +249,11 @@ const Panel = ({
                 trackEvent("shape-switch", type, "ui");
               }
               switchShapes(app, {
-                generic: GENERIC_SWITCHABLE_SHAPES.includes(type),
-                linear: LINEAR_SWITCHABLE_SHAPES.includes(type),
+                generic: isConvertibleGenericType(type),
+                linear: isConvertibleLinearType(type),
                 nextType: type as
-                  | GenericSwitchableToolType
-                  | LinearSwitchableToolType,
+                  | ConvertibleGenericTypes
+                  | ConvertibleLinearTypes,
               });
             }}
           />
@@ -312,7 +323,7 @@ export const switchShapes = (
   }: {
     generic?: boolean;
     linear?: boolean;
-    nextType?: GenericSwitchableToolType | LinearSwitchableToolType;
+    nextType?: ConvertibleGenericTypes | ConvertibleLinearTypes;
     direction?: "left" | "right";
   } = {},
 ): boolean => {
@@ -341,165 +352,108 @@ export const switchShapes = (
     );
 
     const index = sameType
-      ? GENERIC_SWITCHABLE_SHAPES.indexOf(
+      ? CONVERTIBLE_GENERIC_TYPES.indexOf(
           selectedGenericSwitchableElements[0].type,
         )
       : -1;
 
     nextType =
       nextType ??
-      (GENERIC_SWITCHABLE_SHAPES[
-        (index + GENERIC_SWITCHABLE_SHAPES.length + advancement) %
-          GENERIC_SWITCHABLE_SHAPES.length
-      ] as GenericSwitchableToolType);
+      CONVERTIBLE_GENERIC_TYPES[
+        (index + CONVERTIBLE_GENERIC_TYPES.length + advancement) %
+          CONVERTIBLE_GENERIC_TYPES.length
+      ];
 
-    selectedGenericSwitchableElements.forEach((element) => {
-      ShapeCache.delete(element);
+    if (nextType && isConvertibleGenericType(nextType)) {
+      for (const element of selectedGenericSwitchableElements) {
+        convertElementType(element, nextType, app, false);
 
-      mutateElement(
-        element,
-        {
-          type: nextType as GenericSwitchableToolType,
-          roundness:
-            nextType === "diamond" && element.roundness
-              ? {
-                  type: isUsingAdaptiveRadius(nextType)
-                    ? ROUNDNESS.ADAPTIVE_RADIUS
-                    : ROUNDNESS.PROPORTIONAL_RADIUS,
-                  value: ROUNDNESS.PROPORTIONAL_RADIUS,
-                }
-              : element.roundness,
-        },
-        false,
-      );
-
-      const boundText = getBoundTextElement(
-        element,
-        app.scene.getNonDeletedElementsMap(),
-      );
-      if (boundText) {
-        if (
-          editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
-            ?.elementType === nextType
-        ) {
-          mutateElement(
-            boundText,
-            {
-              fontSize:
-                editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
-                  ?.fontSize ?? boundText.fontSize,
-            },
-            false,
-          );
-        }
-
-        adjustBoundTextSize(
-          element as ExcalidrawTextContainer,
-          boundText,
+        const boundText = getBoundTextElement(
+          element,
           app.scene.getNonDeletedElementsMap(),
         );
-      }
-    });
+        if (boundText) {
+          if (
+            editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
+              ?.elementType === nextType
+          ) {
+            mutateElement(
+              boundText,
+              {
+                fontSize:
+                  editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
+                    ?.fontSize ?? boundText.fontSize,
+              },
+              false,
+            );
+          }
 
-    app.setState((prevState) => {
-      return {
-        selectedElementIds,
-        activeTool: updateActiveTool(prevState, {
-          type: "selection",
-        }),
-      };
-    });
+          adjustBoundTextSize(
+            element as ExcalidrawTextContainer,
+            boundText,
+            app.scene.getNonDeletedElementsMap(),
+          );
+        }
+      }
+
+      app.setState((prevState) => {
+        return {
+          selectedElementIds,
+          activeTool: updateActiveTool(prevState, {
+            type: "selection",
+          }),
+        };
+      });
+    }
   }
 
   if (linear) {
-    const selectedLinearSwitchableElements =
-      getLinearSwitchableElements(selectedElements);
+    const selectedLinearSwitchableElements = getLinearSwitchableElements(
+      selectedElements,
+    ) as ExcalidrawLinearElement[];
 
+    const arrowType = getArrowType(selectedLinearSwitchableElements[0]);
     const sameType = selectedLinearSwitchableElements.every(
-      (element) => element.type === selectedLinearSwitchableElements[0].type,
+      (element) => getArrowType(element) === arrowType,
     );
-    const index = sameType
-      ? LINEAR_SWITCHABLE_SHAPES.indexOf(
-          selectedLinearSwitchableElements[0].type,
-        )
-      : -1;
+
+    const index = sameType ? CONVERTIBLE_LINEAR_TYPES.indexOf(arrowType) : -1;
     nextType =
       nextType ??
-      (LINEAR_SWITCHABLE_SHAPES[
-        (index + LINEAR_SWITCHABLE_SHAPES.length + advancement) %
-          LINEAR_SWITCHABLE_SHAPES.length
-      ] as LinearSwitchableToolType);
+      CONVERTIBLE_LINEAR_TYPES[
+        (index + CONVERTIBLE_LINEAR_TYPES.length + advancement) %
+          CONVERTIBLE_LINEAR_TYPES.length
+      ];
 
-    selectedLinearSwitchableElements.forEach((element) => {
-      ShapeCache.delete(element);
+    if (nextType && isConvertibleLinearType(nextType)) {
+      for (const element of selectedLinearSwitchableElements) {
+        convertElementType(element, nextType, app, false);
 
-      // TODO: maybe add a separate function for safe type conversion
-      //       without overloading mutateElement
-      if (nextType === "arrow") {
-        mutateElement(
-          element as ExcalidrawArrowElement,
-          {
-            type: "arrow",
-            startArrowhead: app.state.currentItemStartArrowhead,
-            endArrowhead: app.state.currentItemEndArrowhead,
-            startBinding: null,
-            endBinding: null,
-            ...(app.state.currentItemArrowType === "elbow"
-              ? { elbowed: true }
-              : {}),
-          },
-          false,
-        );
-      }
-
-      if (nextType === "line") {
         if (isElbowArrow(element)) {
-          mutateElement(
-            element as ExcalidrawLinearElement,
+          const nextPoints = convertLineToElbow(element);
+
+          const fixedSegments: FixedSegment[] = [];
+
+          for (let i = 0; i < nextPoints.length - 1; i++) {
+            fixedSegments.push({
+              start: nextPoints[i],
+              end: nextPoints[i + 1],
+              index: i,
+            });
+          }
+
+          const updates = updateElbowArrowPoints(
+            element,
+            app.scene.getNonDeletedElementsMap(),
             {
-              type: "line",
-              startArrowhead: null,
-              endArrowhead: null,
-              startBinding: null,
-              endBinding: null,
-            },
-            false,
-            {
-              propertiesToDrop: [
-                "elbowed",
-                "startIsSpecial",
-                "endIsSpecial",
-                "fixedSegments",
-              ],
+              points: nextPoints,
+              fixedSegments,
             },
           );
+          mutateElement(element, updates, false);
         }
       }
-
-      if (isElbowArrow(element)) {
-        const nextPoints = convertLineToElbow(element);
-
-        const fixedSegments: FixedSegment[] = [];
-
-        for (let i = 0; i < nextPoints.length - 1; i++) {
-          fixedSegments.push({
-            start: nextPoints[i],
-            end: nextPoints[i + 1],
-            index: i,
-          });
-        }
-
-        const updates = updateElbowArrowPoints(
-          element,
-          app.scene.getNonDeletedElementsMap(),
-          {
-            points: nextPoints,
-            fixedSegments,
-          },
-        );
-        mutateElement(element, updates, false);
-      }
-    });
+    }
     const firstElement = selectedLinearSwitchableElements[0];
 
     app.setState((prevState) => ({
@@ -517,21 +471,109 @@ export const switchShapes = (
   return true;
 };
 
+export const getSwitchableTypeFromElements = (
+  elements: ExcalidrawElement[],
+):
+  | {
+      generic: true;
+      linear: false;
+    }
+  | {
+      linear: true;
+      generic: false;
+    }
+  | {
+      generic: false;
+      linear: false;
+    } => {
+  if (elements.length === 0) {
+    return {
+      generic: false,
+      linear: false,
+    };
+  }
+
+  let onlyLinear = true;
+  for (const element of elements) {
+    if (
+      element.type === "rectangle" ||
+      element.type === "ellipse" ||
+      element.type === "diamond"
+    ) {
+      return {
+        generic: true,
+        linear: false,
+      };
+    }
+    if (element.type !== "arrow" && element.type !== "line") {
+      onlyLinear = false;
+    }
+  }
+
+  if (onlyLinear) {
+    // check at least some linear element is switchable
+    // for a linear to be swtichable:
+    // - no labels
+    // - not bound to anything
+
+    let linear = true;
+
+    for (const element of elements) {
+      if (
+        isArrowElement(element) &&
+        (element.startBinding !== null || element.endBinding !== null)
+      ) {
+        linear = false;
+      } else if (element.boundElements && element.boundElements.length > 0) {
+        linear = false;
+      } else {
+        linear = true;
+        break;
+      }
+    }
+
+    return {
+      linear,
+      generic: false,
+    };
+  }
+
+  return {
+    generic: false,
+    linear: false,
+  };
+};
+
+const getArrowType = (element: ExcalidrawLinearElement) => {
+  if (isSharpArrow(element)) {
+    return "sharpArrow";
+  }
+  if (isCurvedArrow(element)) {
+    return "curvedArrow";
+  }
+  if (isElbowArrow(element)) {
+    return "elbowArrow";
+  }
+  return "line";
+};
+
 const getGenericSwitchableElements = (elements: ExcalidrawElement[]) =>
-  elements.filter((element) =>
-    GENERIC_SWITCHABLE_SHAPES.includes(element.type),
-  );
+  elements.filter((element) => isConvertibleGenericType(element.type)) as Array<
+    | ExcalidrawRectangleElement
+    | ExcalidrawDiamondElement
+    | ExcalidrawEllipseElement
+  >;
 
 const getLinearSwitchableElements = (elements: ExcalidrawElement[]) =>
   elements.filter(
     (element) =>
-      LINEAR_SWITCHABLE_SHAPES.includes(element.type) &&
+      isLinearElement(element) &&
       !(
         isArrowElement(element) &&
         (element.startBinding !== null || element.endBinding !== null)
       ) &&
       (!element.boundElements || element.boundElements.length === 0),
-  );
+  ) as ExcalidrawLinearElement[];
 
 const convertLineToElbow = (line: ExcalidrawLinearElement) => {
   const linePoints = sanitizePoints(line.points);

@@ -119,6 +119,20 @@ export const isElbowArrow = (
   return isArrowElement(element) && element.elbowed;
 };
 
+export const isSharpArrow = (
+  element?: ExcalidrawElement,
+): element is ExcalidrawArrowElement => {
+  return isArrowElement(element) && !element.elbowed && !element.roundness;
+};
+
+export const isCurvedArrow = (
+  element?: ExcalidrawElement,
+): element is ExcalidrawArrowElement => {
+  return (
+    isArrowElement(element) && !element.elbowed && element.roundness !== null
+  );
+};
+
 export const isLinearElementType = (
   elementType: ElementOrToolType,
 ): boolean => {
@@ -338,76 +352,3 @@ export const isBounds = (box: unknown): box is Bounds =>
   typeof box[1] === "number" &&
   typeof box[2] === "number" &&
   typeof box[3] === "number";
-
-export const getSwitchableTypeFromElements = (
-  elements: ExcalidrawElement[],
-):
-  | {
-      generic: true;
-      linear: false;
-    }
-  | {
-      linear: true;
-      generic: false;
-    }
-  | {
-      generic: false;
-      linear: false;
-    } => {
-  if (elements.length === 0) {
-    return {
-      generic: false,
-      linear: false,
-    };
-  }
-
-  let onlyLinear = true;
-  for (const element of elements) {
-    if (
-      element.type === "rectangle" ||
-      element.type === "ellipse" ||
-      element.type === "diamond"
-    ) {
-      return {
-        generic: true,
-        linear: false,
-      };
-    }
-    if (element.type !== "arrow" && element.type !== "line") {
-      onlyLinear = false;
-    }
-  }
-
-  if (onlyLinear) {
-    // check at least some linear element is switchable
-    // for a linear to be swtichable:
-    // - no labels
-    // - not bound to anything
-
-    let linear = true;
-
-    for (const element of elements) {
-      if (
-        isArrowElement(element) &&
-        (element.startBinding !== null || element.endBinding !== null)
-      ) {
-        linear = false;
-      } else if (element.boundElements && element.boundElements.length > 0) {
-        linear = false;
-      } else {
-        linear = true;
-        break;
-      }
-    }
-
-    return {
-      linear,
-      generic: false,
-    };
-  }
-
-  return {
-    generic: false,
-    linear: false,
-  };
-};

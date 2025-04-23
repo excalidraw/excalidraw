@@ -166,7 +166,6 @@ import {
   isFlowchartNodeElement,
   isBindableElement,
   isTextElement,
-  getSwitchableTypeFromElements,
 } from "@excalidraw/element/typeChecks";
 
 import {
@@ -327,7 +326,7 @@ import type {
   MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
-  GenericSwitchableToolType,
+  ConvertibleGenericTypes,
 } from "@excalidraw/element/types";
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
@@ -464,6 +463,7 @@ import { isOverScrollBars } from "../scene/scrollbars";
 import { isMaybeMermaidDefinition } from "../mermaid";
 
 import ShapeSwitch, {
+  getSwitchableTypeFromElements,
   shapeSwitchAtom,
   shapeSwitchFontSizeAtom,
   switchShapes,
@@ -4193,7 +4193,7 @@ class App extends React.Component<AppProps, AppState> {
                     ...editorJotaiStore.get(shapeSwitchFontSizeAtom),
                     [element.id]: {
                       fontSize: boundText.fontSize,
-                      elementType: element.type as GenericSwitchableToolType,
+                      elementType: element.type as ConvertibleGenericTypes,
                     },
                   });
                 }
