@@ -33,7 +33,6 @@ import {
   getGlobalFixedPointForBindableElement,
   snapToMid,
   getHoveredElementForBinding,
-  getDistanceForBinding,
 } from "./binding";
 import { distanceToBindableElement } from "./distance";
 import {
@@ -2225,8 +2224,7 @@ const getGlobalPoint = (
   if (isDragging) {
     if (
       element &&
-      (getDistanceForBinding(initialPoint, element, zoom) ||
-        isPointInShape(initialPoint, getElementShape(element, elementsMap)))
+      isPointInShape(initialPoint, getElementShape(element, elementsMap))
     ) {
       const snapPoint = bindPointToSnapToElementOutline(
         arrow,
