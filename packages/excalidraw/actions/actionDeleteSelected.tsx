@@ -3,10 +3,7 @@ import { KEYS, updateActiveTool } from "@excalidraw/common";
 import { getNonDeletedElements } from "@excalidraw/element";
 import { fixBindingsAfterDeletion } from "@excalidraw/element/binding";
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import {
-  mutateElement,
-  newElementWith,
-} from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element/mutateElement";
 import { getContainerElement } from "@excalidraw/element/textElement";
 import {
   isBoundToContainer,
@@ -94,7 +91,7 @@ const deleteSelectedElements = (
         el.boundElements.forEach((candidate) => {
           const bound = app.scene.getNonDeletedElementsMap().get(candidate.id);
           if (bound && isElbowArrow(bound)) {
-            mutateElement(bound, {
+            app.scene.mutateElement(bound, {
               startBinding:
                 el.id === bound.startBinding?.elementId
                   ? null
@@ -102,7 +99,6 @@ const deleteSelectedElements = (
               endBinding:
                 el.id === bound.endBinding?.elementId ? null : bound.endBinding,
             });
-            mutateElement(bound, { points: bound.points });
           }
         });
       }
@@ -261,7 +257,11 @@ export const actionDeleteSelected = register({
           : endBindingElement,
       };
 
-      LinearElementEditor.deletePoints(element, selectedPointsIndices);
+      LinearElementEditor.deletePoints(
+        element,
+        app.scene,
+        selectedPointsIndices,
+      );
 
       return {
         elements,

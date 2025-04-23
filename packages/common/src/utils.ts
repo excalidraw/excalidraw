@@ -1,9 +1,10 @@
-import { average } from "@excalidraw/math";
+import { average, pointFrom, type GlobalPoint } from "@excalidraw/math";
 
 import type {
   ExcalidrawBindableElement,
   FontFamilyValues,
   FontString,
+  ExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type {
@@ -385,7 +386,7 @@ export const updateActiveTool = (
         type: ToolType;
       }
     | { type: "custom"; customType: string }
-  ) & { locked?: boolean }) & {
+  ) & { locked?: boolean; fromSelection?: boolean }) & {
     lastActiveToolBeforeEraser?: ActiveTool | null;
   },
 ): AppState["activeTool"] => {
@@ -407,6 +408,7 @@ export const updateActiveTool = (
     type: data.type,
     customType: null,
     locked: data.locked ?? appState.activeTool.locked,
+    fromSelection: data.fromSelection ?? false,
   };
 };
 
@@ -678,7 +680,7 @@ export const arrayToMap = <T extends { id: string } | string>(
   return items.reduce((acc: Map<string, T>, element) => {
     acc.set(typeof element === "string" ? element : element.id, element);
     return acc;
-  }, new Map());
+  }, new Map() as Map<string, T>);
 };
 
 export const arrayToMapWithIndex = <T extends { id: string }>(
@@ -736,6 +738,8 @@ export const arrayToList = <T>(array: readonly T[]): Node<T>[] =>
 export const isTestEnv = () => import.meta.env.MODE === ENV.TEST;
 
 export const isDevEnv = () => import.meta.env.MODE === ENV.DEVELOPMENT;
+
+export const isProdEnv = () => import.meta.env.MODE === ENV.PRODUCTION;
 
 export const isServerEnv = () =>
   typeof process !== "undefined" && !!process?.env?.NODE_ENV;
@@ -1200,3 +1204,32 @@ export const escapeDoubleQuotes = (str: string) => {
 
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
+
+export const elementCenterPoint = (
+  element: ExcalidrawElement,
+  xOffset: number = 0,
+  yOffset: number = 0,
+) => {
+  const { x, y, width, height } = element;
+
+  const centerXPoint = x + width / 2 + xOffset;
+
+  const centerYPoint = y + height / 2 + yOffset;
+
+  return pointFrom<GlobalPoint>(centerXPoint, centerYPoint);
+};
+
+/** hack for Array.isArray type guard not working with readonly value[] */
+export const isReadonlyArray = (value?: any): value is readonly any[] => {
+  return Array.isArray(value);
+};
+
+export const sizeOf = (
+  value: readonly number[] | Readonly<Map<any, any>> | Record<any, any>,
+): number => {
+  return isReadonlyArray(value)
+    ? value.length
+    : value instanceof Map
+    ? value.size
+    : Object.keys(value).length;
+};

@@ -139,11 +139,8 @@ export const actionPasteStyles = register({
                     element.id === newElement.containerId,
                 ) || null;
             }
-            redrawTextBoundingBox(
-              newElement,
-              container,
-              app.scene.getNonDeletedElementsMap(),
-            );
+
+            redrawTextBoundingBox(newElement, container, app.scene);
           }
 
           if (

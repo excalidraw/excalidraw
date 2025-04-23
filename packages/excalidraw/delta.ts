@@ -37,6 +37,8 @@ import {
   syncMovedIndices,
 } from "@excalidraw/element/fractionalIndex";
 
+import Scene from "@excalidraw/element/Scene";
+
 import type { BindableProp, BindingProp } from "@excalidraw/element/binding";
 
 import type { ElementUpdate } from "@excalidraw/element/mutateElement";
@@ -497,6 +499,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
               nextElements.get(
                 selectedLinearElementId,
               ) as NonDeleted<ExcalidrawLinearElement>,
+              nextElements,
             )
           : null;
 
@@ -506,6 +509,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
               nextElements.get(
                 editingLinearElementId,
               ) as NonDeleted<ExcalidrawLinearElement>,
+              nextElements,
             )
           : null;
 
@@ -1159,9 +1163,6 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     }
 
     try {
-      // TODO: #7348 refactor away mutations below, so that we couldn't end up in an incosistent state
-      ElementsDelta.redrawTextBoundingBoxes(nextElements, changedElements);
-
       // the following reorder performs also mutations, but only on new instances of changed elements
       // (unless something goes really bad and it fallbacks to fixing all invalid indices)
       nextElements = ElementsDelta.reorderElements(
@@ -1170,8 +1171,14 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         flags,
       );
 
+      // we don't have an up-to-date scene, as we can be just in the middle of applying history entry
+      // we also don't have a scene on the server
+      // so we are creating a temp scene just to query and mutate elements
+      const tempScene = new Scene(nextElements);
+
+      ElementsDelta.redrawTextBoundingBoxes(tempScene, changedElements);
       // Need ordered nextElements to avoid z-index binding issues
-      ElementsDelta.redrawBoundArrows(nextElements, changedElements);
+      ElementsDelta.redrawBoundArrows(tempScene, changedElements);
     } catch (e) {
       console.error(
         `Couldn't mutate elements after applying elements change`,
@@ -1384,8 +1391,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       } else {
         affectedElement = mutateElement(
           nextElement,
+          nextElements,
           updates as ElementUpdate<OrderedExcalidrawElement>,
-        );
+        ) as OrderedExcalidrawElement;
       }
 
       nextAffectedElements.set(affectedElement.id, affectedElement);
@@ -1504,9 +1512,10 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   }
 
   private static redrawTextBoundingBoxes(
-    elements: SceneElementsMap,
+    scene: Scene,
     changed: Map<string, OrderedExcalidrawElement>,
   ) {
+    const elements = scene.getNonDeletedElementsMap();
     const boxesToRedraw = new Map<
       string,
       { container: OrderedExcalidrawElement; boundText: ExcalidrawTextElement }
@@ -1546,17 +1555,17 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         continue;
       }
 
-      redrawTextBoundingBox(boundText, container, elements, false);
+      redrawTextBoundingBox(boundText, container, scene);
     }
   }
 
   private static redrawBoundArrows(
-    elements: SceneElementsMap,
+    scene: Scene,
     changed: Map<string, OrderedExcalidrawElement>,
   ) {
     for (const element of changed.values()) {
       if (!element.isDeleted && isBindableElement(element)) {
-        updateBoundElements(element, elements, {
+        updateBoundElements(element, scene, {
           changedElements: changed,
         });
       }

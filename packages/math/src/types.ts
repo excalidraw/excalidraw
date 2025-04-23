@@ -138,3 +138,5 @@ export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
 } & {
   _brand: "excalimath_ellipse";
 };
+
+export type ElementsSegmentsMap = Map<string, LineSegment<GlobalPoint>[]>;

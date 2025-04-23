@@ -104,6 +104,7 @@ export default function ExampleApp({
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
+  const [renderScrollbars, setRenderScrollbars] = useState(false);
   const [blobUrl, setBlobUrl] = useState<string>("");
   const [canvasUrl, setCanvasUrl] = useState<string>("");
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
@@ -192,6 +193,7 @@ export default function ExampleApp({
         }) => setPointerData(payload),
         viewModeEnabled,
         zenModeEnabled,
+        renderScrollbars,
         gridModeEnabled,
         theme,
         name: "Custom name of drawing",
@@ -709,6 +711,14 @@ export default function ExampleApp({
               onChange={() => setGridModeEnabled(!gridModeEnabled)}
             />
             Grid mode
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={renderScrollbars}
+              onChange={() => setRenderScrollbars(!renderScrollbars)}
+            />
+            Render scrollbars
           </label>
           <label>
             <input

@@ -5,7 +5,6 @@ import {
   getElementPointsCoords,
 } from "@excalidraw/element/bounds";
 import { cropElement } from "@excalidraw/element/cropElement";
-import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
   getTransformHandles,
   getTransformHandlesFromCoords,
@@ -20,7 +19,7 @@ import {
   isTextElement,
   isFrameLikeElement,
 } from "@excalidraw/element/typeChecks";
-import { KEYS, arrayToMap } from "@excalidraw/common";
+import { KEYS, arrayToMap, elementCenterPoint } from "@excalidraw/common";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 
@@ -151,7 +150,7 @@ export class Keyboard {
 const getElementPointForSelection = (
   element: ExcalidrawElement,
 ): GlobalPoint => {
-  const { x, y, width, height, angle } = element;
+  const { x, y, width, angle } = element;
   const target = pointFrom<GlobalPoint>(
     x +
       (isLinearElement(element) || isFreeDrawElement(element) ? 0 : width / 2),
@@ -166,7 +165,7 @@ const getElementPointForSelection = (
       (bounds[1] + bounds[3]) / 2,
     );
   } else {
-    center = pointFrom(x + width / 2, y + height / 2);
+    center = elementCenterPoint(element);
   }
 
   if (isTextElement(element)) {
@@ -180,10 +179,17 @@ export class Pointer {
   public clientX = 0;
   public clientY = 0;
 
+  static activePointers: Pointer[] = [];
+  static resetAll() {
+    Pointer.activePointers.forEach((pointer) => pointer.reset());
+  }
+
   constructor(
     private readonly pointerType: "mouse" | "touch" | "pen",
     private readonly pointerId = 1,
-  ) {}
+  ) {
+    Pointer.activePointers.push(this);
+  }
 
   reset() {
     this.clientX = 0;
@@ -402,7 +408,10 @@ const proxy = <T extends ExcalidrawElement>(
 };
 
 /** Tools that can be used to draw shapes */
-type DrawingToolName = Exclude<ToolType, "lock" | "selection" | "eraser">;
+type DrawingToolName = Exclude<
+  ToolType,
+  "lock" | "selection" | "eraser" | "lasso"
+>;
 
 type Element<T extends DrawingToolName> = T extends "line" | "freedraw"
   ? ExcalidrawLinearElement
@@ -516,7 +525,7 @@ export class UI {
 
     if (angle !== 0) {
       act(() => {
-        mutateElement(origElement, { angle });
+        h.app.scene.mutateElement(origElement, { angle });
       });
     }
 

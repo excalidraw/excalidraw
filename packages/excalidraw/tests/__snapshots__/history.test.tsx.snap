@@ -5,6 +5,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -934,6 +935,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -1720,6 +1722,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -2133,6 +2136,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -2568,6 +2572,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -2922,6 +2927,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -3552,6 +3558,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -3915,6 +3922,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -4248,6 +4256,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -4601,6 +4610,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -4946,6 +4956,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -5227,6 +5238,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -5493,6 +5505,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -5766,6 +5779,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -6034,6 +6048,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -6302,6 +6317,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -6571,6 +6587,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -6835,6 +6852,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -7173,6 +7191,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -7654,6 +7673,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -8297,6 +8317,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -8841,6 +8862,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -9220,6 +9242,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -9372,8 +9395,8 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "updated": 1,
   "version": 7,
   "width": 10,
-  "x": -10,
-  "y": -10,
+  "x": 0,
+  "y": 0,
 }
 `;
 
@@ -9446,8 +9469,8 @@ History {
               "strokeWidth": 2,
               "type": "arrow",
               "width": 10,
-              "x": -10,
-              "y": -10,
+              "x": 0,
+              "y": 0,
             },
             "inserted": {
               "isDeleted": true,
@@ -9514,7 +9537,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should iterate through the history when selected or editing linear element was remotely deleted > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should iterate through the history when selected or editing linear element was remotely deleted > [end of test] number of renders 1`] = `10`;
+exports[`history > multiplayer undo/redo > should iterate through the history when selected or editing linear element was remotely deleted > [end of test] number of renders 1`] = `9`;
 
 exports[`history > multiplayer undo/redo > should iterate through the history when selected or editing linear element was remotely deleted > [end of test] redo stack 1`] = `[]`;
 
@@ -9653,6 +9676,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -9967,6 +9991,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -10469,6 +10494,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -10971,6 +10997,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -11568,6 +11595,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "freedraw",
@@ -11938,6 +11966,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -12290,6 +12319,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -12642,6 +12672,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -12958,6 +12989,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -13306,6 +13338,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -13642,7 +13675,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] number of renders 1`] = `15`;
+exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] number of renders 1`] = `14`;
 
 exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] redo stack 1`] = `[]`;
 
@@ -13810,6 +13843,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -14136,6 +14170,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -14781,6 +14816,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -15146,6 +15182,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -15447,6 +15484,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -15685,6 +15723,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "freedraw",
@@ -15816,8 +15855,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "updated": 1,
   "version": 3,
   "width": 10,
-  "x": 10,
-  "y": 10,
+  "x": -10,
+  "y": -10,
 }
 `;
 
@@ -15870,8 +15909,8 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "updated": 1,
   "version": 5,
   "width": 50,
-  "x": 60,
-  "y": 0,
+  "x": 40,
+  "y": -20,
 }
 `;
 
@@ -15924,8 +15963,159 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "updated": 1,
   "version": 4,
   "width": 50,
-  "x": 150,
-  "y": -10,
+  "x": 130,
+  "y": -30,
+}
+`;
+
+exports[`history > singleplayer undo/redo > should create entry when selecting freedraw > [end of test] history 1`] = `
+History {
+  "onHistoryChangedEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id32": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {},
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {
+          "id32" => Delta {
+            "deleted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": -10,
+              "y": -10,
+            },
+            "inserted": {
+              "isDeleted": true,
+            },
+          },
+        },
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id32": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {
+          "id34" => Delta {
+            "deleted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a2",
+              "isDeleted": false,
+              "lastCommittedPoint": [
+                50,
+                10,
+              ],
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "points": [
+                [
+                  0,
+                  0,
+                ],
+                [
+                  50,
+                  10,
+                ],
+                [
+                  50,
+                  10,
+                ],
+              ],
+              "pressures": [
+                0,
+                0,
+                0,
+              ],
+              "roughness": 1,
+              "roundness": null,
+              "simulatePressure": false,
+              "strokeColor": "#e03131",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "freedraw",
+              "width": 50,
+              "x": 130,
+              "y": -30,
+            },
+            "inserted": {
+              "isDeleted": true,
+            },
+          },
+        },
+        "updated": Map {},
+      },
+    },
+  ],
 }
 `;
 
@@ -16085,6 +16275,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -16329,6 +16520,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -16632,6 +16824,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -16870,6 +17063,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -17116,6 +17310,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -17448,6 +17643,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -17617,6 +17813,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -17902,6 +18099,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -18166,6 +18364,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -18443,6 +18642,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -18602,6 +18802,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -19299,6 +19500,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -19918,6 +20120,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -20537,6 +20740,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -21672,6 +21876,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -22880,6 +23085,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -23620,6 +23826,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -24341,6 +24548,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -25256,6 +25464,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -25421,242 +25630,4 @@ exports[`history > singleplayer undo/redo > should support linear element creati
 
 exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of elements 1`] = `1`;
 
-exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of renders 1`] = `21`;
-
-exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] redo stack 1`] = `[]`;
-
-exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] undo stack 1`] = `
-[
-  {
-    "appStateChange": AppStateChange {
-      "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id117": true,
-          },
-        },
-        "inserted": {
-          "selectedElementIds": {},
-        },
-      },
-    },
-    "elementsChange": {
-      "added": {},
-      "removed": {},
-      "updated": {
-        "id117": {
-          "deleted": {
-            "angle": 0,
-            "backgroundColor": "transparent",
-            "boundElements": null,
-            "customData": undefined,
-            "elbowed": false,
-            "endArrowhead": "arrow",
-            "endBinding": null,
-            "fillStyle": "solid",
-            "frameId": null,
-            "groupIds": [],
-            "height": 10,
-            "index": "a0",
-            "isDeleted": false,
-            "lastCommittedPoint": [
-              10,
-              10,
-            ],
-            "link": null,
-            "locked": false,
-            "opacity": 100,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                10,
-                10,
-              ],
-            ],
-            "roughness": 1,
-            "roundness": {
-              "type": 2,
-            },
-            "startArrowhead": null,
-            "startBinding": null,
-            "strokeColor": "#1e1e1e",
-            "strokeStyle": "solid",
-            "strokeWidth": 2,
-            "type": "arrow",
-            "width": 10,
-            "x": 0,
-            "y": 0,
-          },
-          "inserted": {
-            "isDeleted": true,
-          },
-        },
-      },
-    },
-    "id": "id140",
-  },
-  {
-    "appStateChange": AppStateChange {
-      "delta": Delta {
-        "deleted": {},
-        "inserted": {},
-      },
-    },
-    "elementsChange": {
-      "added": {},
-      "removed": {
-        "id117": {
-          "deleted": {
-            "lastCommittedPoint": [
-              20,
-              0,
-            ],
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                10,
-                10,
-              ],
-              [
-                20,
-                0,
-              ],
-            ],
-            "width": 20,
-          },
-          "inserted": {
-            "lastCommittedPoint": [
-              10,
-              10,
-            ],
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                10,
-                10,
-              ],
-            ],
-            "width": 10,
-          },
-        },
-      },
-      "updated": {},
-    },
-    "id": "id141",
-  },
-  {
-    "appStateChange": AppStateChange {
-      "delta": Delta {
-        "deleted": {
-          "selectedLinearElementId": "id117",
-        },
-        "inserted": {
-          "selectedLinearElementId": null,
-        },
-      },
-    },
-    "elementsChange": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id142",
-  },
-  {
-    "appStateChange": AppStateChange {
-      "delta": Delta {
-        "deleted": {
-          "editingLinearElementId": "id117",
-        },
-        "inserted": {
-          "editingLinearElementId": null,
-        },
-      },
-    },
-    "elementsChange": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id143",
-  },
-  {
-    "appStateChange": AppStateChange {
-      "delta": Delta {
-        "deleted": {},
-        "inserted": {},
-      },
-    },
-    "elementsChange": {
-      "added": {},
-      "removed": {
-        "id117": {
-          "deleted": {
-            "height": 20,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                10,
-                10,
-              ],
-              [
-                20,
-                20,
-              ],
-            ],
-          },
-          "inserted": {
-            "height": 10,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                10,
-                10,
-              ],
-              [
-                20,
-                0,
-              ],
-            ],
-          },
-        },
-      },
-      "updated": {},
-    },
-    "id": "id144",
-  },
-  {
-    "appStateChange": AppStateChange {
-      "delta": Delta {
-        "deleted": {
-          "editingLinearElementId": null,
-        },
-        "inserted": {
-          "editingLinearElementId": "id117",
-        },
-      },
-    },
-    "elementsChange": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id145",
-  },
-]
-`;
+exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of renders 1`] = `20`;

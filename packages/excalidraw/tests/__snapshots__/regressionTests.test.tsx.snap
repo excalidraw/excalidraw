@@ -5,6 +5,7 @@ exports[`given element A and group of elements B and given both are selected whe
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -420,6 +421,7 @@ exports[`given element A and group of elements B and given both are selected whe
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -826,6 +828,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -1371,6 +1374,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -1575,6 +1579,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -1950,6 +1955,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -2032,7 +2038,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   "scrolledOutside": false,
   "searchMatches": [],
   "selectedElementIds": {
-    "id0": true,
+    "id2": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2122,8 +2128,16 @@ History {
     HistoryEntry {
       "appStateChange": AppStateChange {
         "delta": Delta {
-          "deleted": {},
-          "inserted": {},
+          "deleted": {
+            "selectedElementIds": {
+              "id2": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id0": true,
+            },
+          },
         },
       },
       "elementsChange": ElementsChange {
@@ -2139,7 +2153,7 @@ History {
               "frameId": null,
               "groupIds": [],
               "height": 10,
-              "index": "Zz",
+              "index": "a1",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -2153,26 +2167,15 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 10,
-              "y": 10,
+              "x": 20,
+              "y": 20,
             },
             "inserted": {
               "isDeleted": true,
             },
           },
         },
-        "updated": Map {
-          "id0" => Delta {
-            "deleted": {
-              "x": 20,
-              "y": 20,
-            },
-            "inserted": {
-              "x": 10,
-              "y": 10,
-            },
-          },
-        },
+        "updated": Map {},
       },
     },
   ],
@@ -2188,6 +2191,7 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -2368,6 +2372,7 @@ exports[`regression tests > can drag element that covers another element, while 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -2688,6 +2693,7 @@ exports[`regression tests > change the properties of a shape > [end of test] app
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -2934,6 +2940,7 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -3177,6 +3184,7 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -3407,6 +3415,7 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -3663,6 +3672,7 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -3974,6 +3984,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -4396,6 +4407,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -4679,6 +4691,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -4932,6 +4945,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -5142,6 +5156,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -5341,6 +5356,7 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -5723,6 +5739,7 @@ exports[`regression tests > drags selected elements from point inside common bou
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -6013,6 +6030,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "freedraw",
@@ -6814,13 +6832,14 @@ History {
 
 exports[`regression tests > draw every type of shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `33`;
+exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `31`;
 
 exports[`regression tests > given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -7151,6 +7170,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -7427,6 +7447,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -7661,6 +7682,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -7898,6 +7920,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -8078,6 +8101,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -8258,6 +8282,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -8438,6 +8463,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -8661,6 +8687,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -8883,6 +8910,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "freedraw",
@@ -9077,6 +9105,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -9300,6 +9329,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -9480,6 +9510,7 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -9702,6 +9733,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -9882,6 +9914,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "freedraw",
@@ -10076,6 +10109,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -10256,6 +10290,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -10340,13 +10375,13 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
   "scrolledOutside": false,
   "searchMatches": [],
   "selectedElementIds": {
-    "id0": true,
-    "id1": true,
-    "id2": true,
+    "id6": true,
+    "id8": true,
+    "id9": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {
-    "id4": true,
+    "id7": true,
   },
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -10610,8 +10645,26 @@ History {
     HistoryEntry {
       "appStateChange": AppStateChange {
         "delta": Delta {
-          "deleted": {},
-          "inserted": {},
+          "deleted": {
+            "selectedElementIds": {
+              "id6": true,
+              "id8": true,
+              "id9": true,
+            },
+            "selectedGroupIds": {
+              "id7": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id0": true,
+              "id1": true,
+              "id2": true,
+            },
+            "selectedGroupIds": {
+              "id4": true,
+            },
+          },
         },
       },
       "elementsChange": ElementsChange {
@@ -10629,7 +10682,7 @@ History {
                 "id7",
               ],
               "height": 10,
-              "index": "Zx",
+              "index": "a3",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -10643,8 +10696,8 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 10,
-              "y": 10,
+              "x": 20,
+              "y": 20,
             },
             "inserted": {
               "isDeleted": true,
@@ -10662,7 +10715,7 @@ History {
                 "id7",
               ],
               "height": 10,
-              "index": "Zy",
+              "index": "a4",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -10676,8 +10729,8 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 30,
-              "y": 10,
+              "x": 40,
+              "y": 20,
             },
             "inserted": {
               "isDeleted": true,
@@ -10695,7 +10748,7 @@ History {
                 "id7",
               ],
               "height": 10,
-              "index": "Zz",
+              "index": "a5",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -10709,46 +10762,15 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 50,
-              "y": 10,
+              "x": 60,
+              "y": 20,
             },
             "inserted": {
               "isDeleted": true,
             },
           },
         },
-        "updated": Map {
-          "id0" => Delta {
-            "deleted": {
-              "x": 20,
-              "y": 20,
-            },
-            "inserted": {
-              "x": 10,
-              "y": 10,
-            },
-          },
-          "id1" => Delta {
-            "deleted": {
-              "x": 40,
-              "y": 20,
-            },
-            "inserted": {
-              "x": 30,
-              "y": 10,
-            },
-          },
-          "id2" => Delta {
-            "deleted": {
-              "x": 60,
-              "y": 20,
-            },
-            "inserted": {
-              "x": 50,
-              "y": 10,
-            },
-          },
-        },
+        "updated": Map {},
       },
     },
   ],
@@ -10764,6 +10786,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -11041,6 +11064,7 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -11167,6 +11191,7 @@ exports[`regression tests > shift click on selected element should deselect it o
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -11366,6 +11391,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -11677,6 +11703,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -12089,6 +12116,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -12702,6 +12730,7 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -12831,6 +12860,7 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -13415,6 +13445,7 @@ exports[`regression tests > switches from group of selected elements to another 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -13753,6 +13784,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -14018,6 +14050,7 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -14144,6 +14177,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -14516,13 +14550,14 @@ History {
 
 exports[`regression tests > undo/redo drawing an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `20`;
+exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests > updates fontSize & fontFamily appState > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "text",
@@ -14649,6 +14684,7 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
