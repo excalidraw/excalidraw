@@ -14,9 +14,8 @@ import type Scene from "@excalidraw/element/Scene";
 import { angleIcon } from "../icons";
 
 import DragInput from "./DragInput";
-import { getStepSizedValue, isPropertyEditable } from "./utils";
+import { DragInputCallbackType, getStepSizedValue, isPropertyEditable } from "./utils";
 
-import type { DragInputCallbackType } from "./DragInput";
 import type { AppState } from "../../types";
 
 interface MultiAngleProps {

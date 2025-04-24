@@ -89,6 +89,12 @@ export const isFrameLikeElement = (
   );
 };
 
+export const isFrameChildElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawElement & { frameId: string } => {
+  return element !== null && element.frameId !== null;
+};
+
 export const isFreeDrawElement = (
   element?: ExcalidrawElement | null,
 ): element is ExcalidrawFreeDrawElement => {
