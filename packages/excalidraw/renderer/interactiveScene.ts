@@ -211,7 +211,7 @@ const strokeDiamondWithRotation = (
   context.save();
   context.translate(x, y);
   context.rotate(element.angle);
-  padding = 45;
+
   {
     context.beginPath();
 
@@ -219,10 +219,10 @@ const strokeDiamondWithRotation = (
       getDiamondPoints(element);
     const verticalRadius = element.roundness
       ? getCornerRadius(Math.abs(topX - leftX), element)
-      : 1;
+      : (topX - leftX) * 0.01;
     const horizontalRadius = element.roundness
       ? getCornerRadius(Math.abs(rightY - topY), element)
-      : 1;
+      : (rightY - topY) * 0.01;
     const topApprox = offsetBezier(
       pointFrom(topX - verticalRadius, topY + horizontalRadius),
       pointFrom(topX, topY),
@@ -274,10 +274,10 @@ const strokeDiamondWithRotation = (
       getDiamondPoints(element);
     const verticalRadius = element.roundness
       ? getCornerRadius(Math.abs(topX - leftX), element)
-      : 1;
+      : (topX - leftX) * 0.01;
     const horizontalRadius = element.roundness
       ? getCornerRadius(Math.abs(rightY - topY), element)
-      : 1;
+      : (rightY - topY) * 0.01;
     const topApprox = offsetBezier(
       pointFrom(topX + verticalRadius, topY + horizontalRadius),
       pointFrom(topX, topY),
