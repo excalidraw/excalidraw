@@ -19,10 +19,7 @@ import {
   throttleRAF,
 } from "@excalidraw/common";
 
-import {
-  BINDING_HIGHLIGHT_OFFSET,
-  maxBindingGap,
-} from "@excalidraw/element/binding";
+import { maxBindingGap } from "@excalidraw/element/binding";
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import {
   getOmitSidesForDevice,
@@ -364,9 +361,12 @@ const renderBindingHighlightForBindableElement = (
   context.strokeStyle = "rgba(0,0,0,.05)";
   context.fillStyle = "rgba(0,0,0,.05)";
   // When zooming out, make line width greater for visibility
-  context.lineWidth =
-    maxBindingGap(element, element.width, element.height, zoom) -
-    BINDING_HIGHLIGHT_OFFSET;
+  context.lineWidth = maxBindingGap(
+    element,
+    element.width,
+    element.height,
+    zoom,
+  );
   // To ensure the binding highlight doesn't overlap the element itself
   const padding = maxBindingGap(element, element.width, element.height, zoom);
   //context.lineWidth / 2 + BINDING_HIGHLIGHT_OFFSET;

@@ -108,7 +108,6 @@ export const isBindingEnabled = (appState: AppState): boolean => {
 
 export const FIXED_BINDING_DISTANCE = 5;
 const BINDING_HIGHLIGHT_THICKNESS = 10;
-export const BINDING_HIGHLIGHT_OFFSET = 4;
 
 const getNonDeletedElements = (
   scene: Scene,
@@ -1105,7 +1104,7 @@ export const snapToMid = (
 
   if (
     element.type === "diamond"
-      ? nonRotated[0] <= x + width * (element.roundness ? 0.035 : 1)
+      ? nonRotated[0] <= x + width * (element.roundness ? 0.035 : 0)
       : nonRotated[0] <= x + width / 2 &&
         nonRotated[1] > center[1] - verticalThrehsold &&
         nonRotated[1] < center[1] + verticalThrehsold
@@ -1118,7 +1117,7 @@ export const snapToMid = (
     );
   } else if (
     element.type === "diamond"
-      ? nonRotated[1] <= y + height * (element.roundness ? 0.035 : 1)
+      ? nonRotated[1] <= y + height * (element.roundness ? 0.035 : 0)
       : nonRotated[1] <= y + height / 2 &&
         nonRotated[0] > center[0] - horizontalThrehsold &&
         nonRotated[0] < center[0] + horizontalThrehsold
@@ -1570,7 +1569,7 @@ export const maxBindingGap = (
     // bigger bindable boundary for bigger elements
     Math.min(0.25 * smallerDimension, 32),
     // keep in sync with the zoomed highlight
-    BINDING_HIGHLIGHT_THICKNESS / zoomValue + BINDING_HIGHLIGHT_OFFSET,
+    BINDING_HIGHLIGHT_THICKNESS / zoomValue + FIXED_BINDING_DISTANCE,
   );
 };
 
