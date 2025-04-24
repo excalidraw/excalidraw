@@ -89,9 +89,9 @@ describe("elbow arrow segment move", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [115, 0],
-      [115, 199.9],
-      [195, 199.9],
+      [110, 0],
+      [110, 200],
+      [190, 200],
     ]);
   });
 
