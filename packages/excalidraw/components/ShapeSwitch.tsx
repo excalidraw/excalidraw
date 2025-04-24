@@ -832,7 +832,7 @@ const CONVERTIBLE_LINEAR_TYPES: readonly ConvertibleLinearTypes[] = [
   "elbowArrow",
 ];
 
-type NewElementType = ConvertibleGenericTypes | ConvertibleLinearTypes;
+type ConvertibleType = ConvertibleGenericTypes | ConvertibleLinearTypes;
 
 const isConvertibleGenericType = (
   elementType: string,
@@ -861,7 +861,7 @@ export const convertElementType = <
   >,
 >(
   element: TElement,
-  newType: NewElementType,
+  newType: ConvertibleType,
   app: AppClassProperties,
 ): ExcalidrawElement => {
   if (!isValidConversion(element.type, newType)) {
@@ -969,8 +969,8 @@ export const convertElementType = <
 
 const isValidConversion = (
   startType: string,
-  targetType: NewElementType,
-): startType is NewElementType => {
+  targetType: ConvertibleType,
+): startType is ConvertibleType => {
   if (
     isConvertibleGenericType(startType) &&
     isConvertibleGenericType(targetType)
