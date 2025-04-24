@@ -211,65 +211,59 @@ const strokeDiamondWithRotation = (
   context.save();
   context.translate(x, y);
   context.rotate(element.angle);
-
+  padding = 45;
   {
     context.beginPath();
 
     const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
       getDiamondPoints(element);
-    if (element.roundness) {
-      const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
-      const horizontalRadius = getCornerRadius(
-        Math.abs(rightY - topY),
-        element,
-      );
-      const topApprox = offsetBezier(
-        pointFrom(topX - verticalRadius, topY + horizontalRadius),
-        pointFrom(topX, topY),
-        pointFrom(topX, topY),
-        pointFrom(topX + verticalRadius, topY + horizontalRadius),
-        padding,
-      );
-      const rightApprox = offsetBezier(
-        pointFrom(rightX - verticalRadius, rightY - horizontalRadius),
-        pointFrom(rightX, rightY),
-        pointFrom(rightX, rightY),
-        pointFrom(rightX - verticalRadius, rightY + horizontalRadius),
-        padding,
-      );
-      const bottomApprox = offsetBezier(
-        pointFrom(bottomX + verticalRadius, bottomY - horizontalRadius),
-        pointFrom(bottomX, bottomY),
-        pointFrom(bottomX, bottomY),
-        pointFrom(bottomX - verticalRadius, bottomY - horizontalRadius),
-        padding,
-      );
-      const leftApprox = offsetBezier(
-        pointFrom(leftX + verticalRadius, leftY + horizontalRadius),
-        pointFrom(leftX, leftY),
-        pointFrom(leftX, leftY),
-        pointFrom(leftX + verticalRadius, leftY - horizontalRadius),
-        padding,
-      );
+    const verticalRadius = element.roundness
+      ? getCornerRadius(Math.abs(topX - leftX), element)
+      : 1;
+    const horizontalRadius = element.roundness
+      ? getCornerRadius(Math.abs(rightY - topY), element)
+      : 1;
+    const topApprox = offsetBezier(
+      pointFrom(topX - verticalRadius, topY + horizontalRadius),
+      pointFrom(topX, topY),
+      pointFrom(topX, topY),
+      pointFrom(topX + verticalRadius, topY + horizontalRadius),
+      padding,
+    );
+    const rightApprox = offsetBezier(
+      pointFrom(rightX - verticalRadius, rightY - horizontalRadius),
+      pointFrom(rightX, rightY),
+      pointFrom(rightX, rightY),
+      pointFrom(rightX - verticalRadius, rightY + horizontalRadius),
+      padding,
+    );
+    const bottomApprox = offsetBezier(
+      pointFrom(bottomX + verticalRadius, bottomY - horizontalRadius),
+      pointFrom(bottomX, bottomY),
+      pointFrom(bottomX, bottomY),
+      pointFrom(bottomX - verticalRadius, bottomY - horizontalRadius),
+      padding,
+    );
+    const leftApprox = offsetBezier(
+      pointFrom(leftX + verticalRadius, leftY + horizontalRadius),
+      pointFrom(leftX, leftY),
+      pointFrom(leftX, leftY),
+      pointFrom(leftX + verticalRadius, leftY - horizontalRadius),
+      padding,
+    );
 
-      context.moveTo(
-        topApprox[topApprox.length - 1][0],
-        topApprox[topApprox.length - 1][1],
-      );
-      context.lineTo(rightApprox[0][0], rightApprox[0][1]);
-      drawCatmullRom(context, rightApprox);
-      context.lineTo(bottomApprox[0][0], bottomApprox[0][1]);
-      drawCatmullRom(context, bottomApprox);
-      context.lineTo(leftApprox[0][0], leftApprox[0][1]);
-      drawCatmullRom(context, leftApprox);
-      context.lineTo(topApprox[0][0], topApprox[0][1]);
-      drawCatmullRom(context, topApprox);
-    } else {
-      context.moveTo(topX, topY - padding);
-      context.lineTo(rightX + padding, rightY);
-      context.lineTo(bottomX, bottomY + padding);
-      context.lineTo(leftX - padding, leftY);
-    }
+    context.moveTo(
+      topApprox[topApprox.length - 1][0],
+      topApprox[topApprox.length - 1][1],
+    );
+    context.lineTo(rightApprox[0][0], rightApprox[0][1]);
+    drawCatmullRom(context, rightApprox);
+    context.lineTo(bottomApprox[0][0], bottomApprox[0][1]);
+    drawCatmullRom(context, bottomApprox);
+    context.lineTo(leftApprox[0][0], leftApprox[0][1]);
+    drawCatmullRom(context, leftApprox);
+    context.lineTo(topApprox[0][0], topApprox[0][1]);
+    drawCatmullRom(context, topApprox);
   }
 
   // Counter-clockwise for the cutout in the middle. We need to have an "inverse
@@ -278,59 +272,53 @@ const strokeDiamondWithRotation = (
   {
     const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
       getDiamondPoints(element);
-    if (element.roundness) {
-      const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
-      const horizontalRadius = getCornerRadius(
-        Math.abs(rightY - topY),
-        element,
-      );
-      const topApprox = offsetBezier(
-        pointFrom(topX + verticalRadius, topY + horizontalRadius),
-        pointFrom(topX, topY),
-        pointFrom(topX, topY),
-        pointFrom(topX - verticalRadius, topY + horizontalRadius),
-        -5,
-      );
-      const rightApprox = offsetBezier(
-        pointFrom(rightX - verticalRadius, rightY + horizontalRadius),
-        pointFrom(rightX, rightY),
-        pointFrom(rightX, rightY),
-        pointFrom(rightX - verticalRadius, rightY - horizontalRadius),
-        -5,
-      );
-      const bottomApprox = offsetBezier(
-        pointFrom(bottomX - verticalRadius, bottomY - horizontalRadius),
-        pointFrom(bottomX, bottomY),
-        pointFrom(bottomX, bottomY),
-        pointFrom(bottomX + verticalRadius, bottomY - horizontalRadius),
-        -5,
-      );
-      const leftApprox = offsetBezier(
-        pointFrom(leftX + verticalRadius, leftY - horizontalRadius),
-        pointFrom(leftX, leftY),
-        pointFrom(leftX, leftY),
-        pointFrom(leftX + verticalRadius, leftY + horizontalRadius),
-        -5,
-      );
+    const verticalRadius = element.roundness
+      ? getCornerRadius(Math.abs(topX - leftX), element)
+      : 1;
+    const horizontalRadius = element.roundness
+      ? getCornerRadius(Math.abs(rightY - topY), element)
+      : 1;
+    const topApprox = offsetBezier(
+      pointFrom(topX + verticalRadius, topY + horizontalRadius),
+      pointFrom(topX, topY),
+      pointFrom(topX, topY),
+      pointFrom(topX - verticalRadius, topY + horizontalRadius),
+      -5,
+    );
+    const rightApprox = offsetBezier(
+      pointFrom(rightX - verticalRadius, rightY + horizontalRadius),
+      pointFrom(rightX, rightY),
+      pointFrom(rightX, rightY),
+      pointFrom(rightX - verticalRadius, rightY - horizontalRadius),
+      -5,
+    );
+    const bottomApprox = offsetBezier(
+      pointFrom(bottomX - verticalRadius, bottomY - horizontalRadius),
+      pointFrom(bottomX, bottomY),
+      pointFrom(bottomX, bottomY),
+      pointFrom(bottomX + verticalRadius, bottomY - horizontalRadius),
+      -5,
+    );
+    const leftApprox = offsetBezier(
+      pointFrom(leftX + verticalRadius, leftY - horizontalRadius),
+      pointFrom(leftX, leftY),
+      pointFrom(leftX, leftY),
+      pointFrom(leftX + verticalRadius, leftY + horizontalRadius),
+      -5,
+    );
 
-      context.moveTo(
-        topApprox[topApprox.length - 1][0],
-        topApprox[topApprox.length - 1][1],
-      );
-      context.lineTo(leftApprox[0][0], leftApprox[0][1]);
-      drawCatmullRom(context, leftApprox);
-      context.lineTo(bottomApprox[0][0], bottomApprox[0][1]);
-      drawCatmullRom(context, bottomApprox);
-      context.lineTo(rightApprox[0][0], rightApprox[0][1]);
-      drawCatmullRom(context, rightApprox);
-      context.lineTo(topApprox[0][0], topApprox[0][1]);
-      drawCatmullRom(context, topApprox);
-    } else {
-      context.moveTo(topX, topY - 5);
-      context.lineTo(leftX + 5, leftY);
-      context.lineTo(bottomX, bottomY + 5);
-      context.lineTo(rightX - 5, rightY);
-    }
+    context.moveTo(
+      topApprox[topApprox.length - 1][0],
+      topApprox[topApprox.length - 1][1],
+    );
+    context.lineTo(leftApprox[0][0], leftApprox[0][1]);
+    drawCatmullRom(context, leftApprox);
+    context.lineTo(bottomApprox[0][0], bottomApprox[0][1]);
+    drawCatmullRom(context, bottomApprox);
+    context.lineTo(rightApprox[0][0], rightApprox[0][1]);
+    drawCatmullRom(context, rightApprox);
+    context.lineTo(topApprox[0][0], topApprox[0][1]);
+    drawCatmullRom(context, topApprox);
   }
   context.closePath();
   context.fill();
