@@ -58,17 +58,13 @@ const MultiPosition = ({
       }),
     [atomicUnits, elementsMap, property],
   );
-  const elementsWithFramesChildren = elements.reduce((accumulator: ExcalidrawElement[], element: ExcalidrawElement) => {
-    if (!isFrameLikeElement(element)) return [...accumulator, element];
-    return [...accumulator, element, ...getFrameChildren(elementsMap, element.id)];
-  }, []);
 
   const value = new Set(positions).size === 1 ? positions[0] : "Mixed";
 
   return (
     <StatsDragInput
       label={property === "x" ? "X" : "Y"}
-      elements={elementsWithFramesChildren}
+      elements={elements}
       dragInputCallback={handlePositionChange}
       value={value}
       property={property}

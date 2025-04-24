@@ -30,6 +30,7 @@ import type {
 import type Scene from "@excalidraw/element/Scene";
 
 import type { AppState } from "../../types";
+import { getFrameChildren } from "@excalidraw/element/frame";
 
 export type StatsInputProperty =
   | "x"
@@ -190,6 +191,60 @@ export const moveElement = (
         },
         { informMutation: shouldInformMutation, isDragging: false },
       );
+  }
+
+  if (isFrameLikeElement(originalElement)) {
+    getFrameChildren(originalElementsMap, originalElement.id).forEach(child => {
+      const latestChildElement = elementsMap.get(child.id);
+
+      if (!latestChildElement) return;
+
+      const [childCX, childCY] = [
+        child.x + child.width / 2,
+        child.y + child.height / 2,
+      ];
+      const [childTopLeftX, childTopLeftY] = pointRotateRads(
+        pointFrom(child.x, child.y),
+        pointFrom(childCX, childCY),
+        child.angle,
+      );
+
+      const childNewTopLeftX = Math.round(childTopLeftX + changeInX);
+      const childNewTopLeftY = Math.round(childTopLeftY + changeInY);
+
+      const [childX, childY] = pointRotateRads(
+        pointFrom(childNewTopLeftX, childNewTopLeftY),
+        pointFrom(childCX + changeInX, childCY + changeInY),
+        -child.angle as Radians,
+      );
+
+      scene.mutateElement(
+        latestChildElement,
+        {
+          x: childX,
+          y: childY,
+        },
+        { informMutation: shouldInformMutation, isDragging: false },
+      );
+      updateBindings(latestChildElement, scene);
+
+      const boundTextElement = getBoundTextElement(
+        latestChildElement,
+        originalElementsMap,
+      );
+      if (boundTextElement) {
+        const latestBoundTextElement = elementsMap.get(boundTextElement.id);
+        latestBoundTextElement &&
+          scene.mutateElement(
+            latestBoundTextElement,
+            {
+              x: boundTextElement.x + changeInX,
+              y: boundTextElement.y + changeInY,
+            },
+            { informMutation: shouldInformMutation, isDragging: false },
+          );
+      }
+    })
   }
 };
 
@@ -371,34 +426,17 @@ export const handlePositionChange: DragInputCallbackType<
               origElement.angle,
             );
 
-            if (isFrameChildElement(origElement)) {
-              const childNewTopLeftX = property === "x" ? nextValue + Math.abs(topLeftX) : topLeftX;
-              const childNewTopLeftY = property === "y" ? nextValue + Math.abs(topLeftY) : topLeftY;
+            const newTopLeftX = property === "x" ? nextValue : topLeftX;
+            const newTopLeftY = property === "y" ? nextValue : topLeftY;
 
-              moveElement(
-                childNewTopLeftX,
-                childNewTopLeftY,
-                origElement,
-                scene,
-                originalElementsMap,
-                false,
-              );
-
-              scene.triggerUpdate();
-              return;
-            } else {
-              const newTopLeftX = property === "x" ? nextValue : topLeftX;
-              const newTopLeftY = property === "y" ? nextValue : topLeftY;
-
-              moveElement(
-                newTopLeftX,
-                newTopLeftY,
-                origElement,
-                scene,
-                originalElementsMap,
-                false,
-              );
-            }
+            moveElement(
+              newTopLeftX,
+              newTopLeftY,
+              origElement,
+              scene,
+              originalElementsMap,
+              false,
+            );
           }
         }
       }

@@ -35,8 +35,6 @@ const Position = ({
     pointFrom(element.x + element.width / 2, element.y + element.height / 2),
     element.angle,
   );
-  const children = isFrameLikeElement(element) ? getFrameChildren(elementsMap, element.id) : [];
-  const elements = children.length > 0 ? [element, ...children] : [element];
   let value = round(property === "x" ? topLeftX : topLeftY, 2);
 
   if (
@@ -57,7 +55,7 @@ const Position = ({
   return (
     <StatsDragInput
       label={property === "x" ? "X" : "Y"}
-      elements={elements}
+      elements={[element]}
       dragInputCallback={handlePositionChange}
       scene={scene}
       value={value}
