@@ -4,6 +4,8 @@ import { isPoint, pointDistance, pointFrom } from "./point";
 import { rectangle, rectangleIntersectLineSegment } from "./rectangle";
 import { vector } from "./vector";
 
+import { vector } from "./vector";
+
 import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
 
 /**

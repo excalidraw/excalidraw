@@ -14,6 +14,13 @@ import {
   pointFrom,
   pointFromArray,
   pointRotateRads,
+  bezierEquation,
+  curve,
+  curveTangent,
+  vectorNormalize,
+  vectorNormal,
+  vectorScale,
+  pointFromVector,
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/shape";
@@ -476,11 +483,7 @@ export const getRectangleBoxAbsoluteCoords = (boxSceneCoords: RectangleBox) => {
   ];
 };
 
-export const getDiamondPoints = (
-  element: ExcalidrawElement,
-  wPadding: number = 0,
-  hPadding: number = 0,
-) => {
+export const getDiamondPoints = (element: ExcalidrawElement) => {
   // Here we add +1 to avoid these numbers to be 0
   // otherwise rough.js will throw an error complaining about it
   const topX = Math.floor(element.width / 2) + 1;
@@ -492,16 +495,7 @@ export const getDiamondPoints = (
   const leftX = 0;
   const leftY = rightY;
 
-  return [
-    topX,
-    topY - hPadding,
-    rightX + wPadding,
-    rightY,
-    bottomX,
-    bottomY + hPadding,
-    leftX - wPadding,
-    leftY,
-  ];
+  return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 };
 
 // reference: https://eliot-jones.com/2019/12/cubic-bezier-curve-bounding-boxes
@@ -1159,3 +1153,26 @@ export const doBoundsIntersect = (
 
   return minX1 < maxX2 && maxX1 > minX2 && minY1 < maxY2 && maxY1 > minY2;
 };
+
+export function offsetBezier(
+  p0: GlobalPoint,
+  p1: GlobalPoint,
+  p2: GlobalPoint,
+  p3: GlobalPoint,
+  offsetDist: number,
+  steps = 20,
+) {
+  const offsetPoints = [];
+
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const c = curve(p0, p1, p2, p3);
+    const point = bezierEquation(c, t);
+    const tangent = vectorNormalize(curveTangent(c, t));
+    const normal = vectorNormal(tangent);
+
+    offsetPoints.push(pointFromVector(vectorScale(normal, offsetDist), point));
+  }
+
+  return offsetPoints;
+}
