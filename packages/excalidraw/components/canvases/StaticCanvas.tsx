@@ -47,6 +47,7 @@ const StaticCanvas = (props: StaticCanvasProps) => {
 
       wrapper.replaceChildren(canvas);
       canvas.classList.add("excalidraw__canvas", "static");
+      canvas.id = "excalidraw__content-canvas";
     }
 
     const widthString = `${props.appState.width}px`;

@@ -1542,46 +1542,92 @@ export const actionChangeArrowhead = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
     const isRTL = getLanguage().rtl;
 
     return (
       <fieldset>
         <legend>{t("labels.arrowheads")}</legend>
-        <div className="iconSelectList buttonList">
-          <IconPicker
-            label="arrowhead_start"
-            options={getArrowheadOptions(!isRTL)}
-            value={getFormValue<Arrowhead | null>(
-              elements,
-              appState,
-              (element) =>
-                isLinearElement(element) && canHaveArrowheads(element.type)
-                  ? element.startArrowhead
-                  : appState.currentItemStartArrowhead,
-              true,
-              appState.currentItemStartArrowhead,
-            )}
-            onChange={(value) => updateData({ position: "start", type: value })}
-            numberOfOptionsToAlwaysShow={4}
-          />
-          <IconPicker
-            label="arrowhead_end"
-            group="arrowheads"
-            options={getArrowheadOptions(!!isRTL)}
-            value={getFormValue<Arrowhead | null>(
-              elements,
-              appState,
-              (element) =>
-                isLinearElement(element) && canHaveArrowheads(element.type)
-                  ? element.endArrowhead
-                  : appState.currentItemEndArrowhead,
-              true,
-              appState.currentItemEndArrowhead,
-            )}
-            onChange={(value) => updateData({ position: "end", type: value })}
-            numberOfOptionsToAlwaysShow={4}
-          />
-        </div>
+        {customOptions?.pickerRenders?.ButtonList && (
+          <customOptions.pickerRenders.ButtonList className="iconPickerList">
+            <IconPicker
+              label="arrowhead_start"
+              options={getArrowheadOptions(!isRTL)}
+              value={getFormValue<Arrowhead | null>(
+                elements,
+                appState,
+                (element) =>
+                  isLinearElement(element) && canHaveArrowheads(element.type)
+                    ? element.startArrowhead
+                    : appState.currentItemStartArrowhead,
+                true,
+                appState.currentItemStartArrowhead,
+              )}
+              onChange={(value) =>
+                updateData({ position: "start", type: value })
+              }
+              numberOfOptionsToAlwaysShow={4}
+            />
+            <IconPicker
+              label="arrowhead_end"
+              group="arrowheads"
+              options={getArrowheadOptions(!!isRTL)}
+              value={getFormValue<Arrowhead | null>(
+                elements,
+                appState,
+                (element) =>
+                  isLinearElement(element) && canHaveArrowheads(element.type)
+                    ? element.endArrowhead
+                    : appState.currentItemEndArrowhead,
+                true,
+                appState.currentItemEndArrowhead,
+              )}
+              onChange={(value) => updateData({ position: "end", type: value })}
+              numberOfOptionsToAlwaysShow={4}
+            />
+          </customOptions.pickerRenders.ButtonList>
+        )}
+
+        {!customOptions?.pickerRenders?.ButtonList && (
+          <div className="iconSelectList buttonList">
+            <IconPicker
+              label="arrowhead_start"
+              options={getArrowheadOptions(!isRTL)}
+              value={getFormValue<Arrowhead | null>(
+                elements,
+                appState,
+                (element) =>
+                  isLinearElement(element) && canHaveArrowheads(element.type)
+                    ? element.startArrowhead
+                    : appState.currentItemStartArrowhead,
+                true,
+                appState.currentItemStartArrowhead,
+              )}
+              onChange={(value) =>
+                updateData({ position: "start", type: value })
+              }
+              numberOfOptionsToAlwaysShow={4}
+            />
+            <IconPicker
+              label="arrowhead_end"
+              group="arrowheads"
+              options={getArrowheadOptions(!!isRTL)}
+              value={getFormValue<Arrowhead | null>(
+                elements,
+                appState,
+                (element) =>
+                  isLinearElement(element) && canHaveArrowheads(element.type)
+                    ? element.endArrowhead
+                    : appState.currentItemEndArrowhead,
+                true,
+                appState.currentItemEndArrowhead,
+              )}
+              onChange={(value) => updateData({ position: "end", type: value })}
+              numberOfOptionsToAlwaysShow={4}
+            />
+          </div>
+        )}
       </fieldset>
     );
   },

@@ -544,7 +544,7 @@ export interface ExcalidrawPropsCustomOptions {
     menuRender?: (props: { children: React.ReactNode }) => React.ReactNode;
   };
   pickerRenders?: {
-    ButtonList?: React.ComponentType<{ children: React.ReactNode }>;
+    ButtonList?: React.ComponentType<{ children: React.ReactNode; className?: string }>;
     elementStrokeColors?: ColorTuple;
     elementBackgroundColors?: ColorTuple;
     buttonIconSelectRender?: <T extends Object>(
@@ -569,6 +569,8 @@ export interface ExcalidrawPropsCustomOptions {
       name: string;
       visible?: boolean;
       hidden?: boolean;
+      key?: string;
+      active?: boolean;
     }) => JSX.Element;
     rangeRender?: (props: {
       value: number;
