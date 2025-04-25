@@ -3,8 +3,6 @@ import { isPointWithinBounds, pointFrom } from "@excalidraw/math";
 import { doLineSegmentsIntersect } from "@excalidraw/utils/bbox";
 import { elementsOverlappingBBox } from "@excalidraw/utils/withinBounds";
 
-import type { ExcalidrawElementsIncludingDeleted } from "@excalidraw/excalidraw/scene/Scene";
-
 import type {
   AppClassProperties,
   AppState,
@@ -29,6 +27,8 @@ import {
   isTextElement,
 } from "./typeChecks";
 
+import type { ExcalidrawElementsIncludingDeleted } from "./Scene";
+
 import type {
   ElementsMap,
   ElementsMapOrArray,
@@ -41,30 +41,24 @@ import type {
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
   nextElements: readonly ExcalidrawElement[],
-  oldElements: readonly ExcalidrawElement[],
-  oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
+  origElements: readonly ExcalidrawElement[],
+  origIdToDuplicateId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
 ) => {
   const nextElementMap = arrayToMap(nextElements) as Map<
     ExcalidrawElement["id"],
     ExcalidrawElement
   >;
 
-  for (const element of oldElements) {
+  for (const element of origElements) {
     if (element.frameId) {
       // use its frameId to get the new frameId
-      const nextElementId = oldIdToDuplicatedId.get(element.id);
-      const nextFrameId = oldIdToDuplicatedId.get(element.frameId);
-      if (nextElementId) {
-        const nextElement = nextElementMap.get(nextElementId);
-        if (nextElement) {
-          mutateElement(
-            nextElement,
-            {
-              frameId: nextFrameId ?? element.frameId,
-            },
-            false,
-          );
-        }
+      const nextElementId = origIdToDuplicateId.get(element.id);
+      const nextFrameId = origIdToDuplicateId.get(element.frameId);
+      const nextElement = nextElementId && nextElementMap.get(nextElementId);
+      if (nextElement) {
+        mutateElement(nextElement, nextElementMap, {
+          frameId: nextFrameId ?? null,
+        });
       }
     }
   }
@@ -567,13 +561,9 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
   }
 
   for (const element of finalElementsToAdd) {
-    mutateElement(
-      element,
-      {
-        frameId: frame.id,
-      },
-      false,
-    );
+    mutateElement(element, elementsMap, {
+      frameId: frame.id,
+    });
   }
 
   return allElements;
@@ -611,13 +601,9 @@ export const removeElementsFromFrame = (
   }
 
   for (const [, element] of _elementsToRemove) {
-    mutateElement(
-      element,
-      {
-        frameId: null,
-      },
-      false,
-    );
+    mutateElement(element, elementsMap, {
+      frameId: null,
+    });
   }
 };
 
