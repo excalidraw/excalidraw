@@ -2,12 +2,7 @@ import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import { updateElbowArrowPoints } from "@excalidraw/element/elbowArrow";
 
-import {
-  pointDistance,
-  pointFrom,
-  pointRotateRads,
-  type LocalPoint,
-} from "@excalidraw/math";
+import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
 
 import {
   isArrowElement,
@@ -804,46 +799,102 @@ const getLinearSwitchableElements = (elements: ExcalidrawElement[]) =>
       (!element.boundElements || element.boundElements.length === 0),
   ) as ExcalidrawLinearElement[];
 
-const convertLineToElbow = (line: ExcalidrawLinearElement) => {
-  const linePoints = sanitizePoints(line.points);
-  const nextPoints: LocalPoint[] = [linePoints[0]];
+const THRESHOLD = 20;
+const isVert = (a: LocalPoint, b: LocalPoint) => a[0] === b[0];
+const isHorz = (a: LocalPoint, b: LocalPoint) => a[1] === b[1];
+const dist = (a: LocalPoint, b: LocalPoint) =>
+  isVert(a, b) ? Math.abs(a[1] - b[1]) : Math.abs(a[0] - b[0]);
 
-  let i = 1;
+const convertLineToElbow = (line: ExcalidrawLinearElement): LocalPoint[] => {
+  // 1. build an *orthogonal* route, snapping offsets < SNAP
+  const ortho: LocalPoint[] = [line.points[0]];
+  const src = sanitizePoints(line.points);
 
-  // add bend points to consideration as we go through the line
-  // so as to make sure the resulting points form valid segments
-  while (i < linePoints.length) {
-    const start = nextPoints[nextPoints.length - 1];
-    const end = linePoints[i];
+  for (let i = 1; i < src.length; ++i) {
+    const start = ortho[ortho.length - 1];
+    const end = [...src[i]] as LocalPoint; // clone
 
-    if (isAxisAligned(start, end)) {
-      pushSimplified(nextPoints, end);
-      i++;
+    // snap tiny offsets onto the current axis
+    if (Math.abs(end[0] - start[0]) < THRESHOLD) {
+      end[0] = start[0];
+    } else if (Math.abs(end[1] - start[1]) < THRESHOLD) {
+      end[1] = start[1];
+    }
+
+    // straight or needs a 90 ° bend?
+    if (isVert(start, end) || isHorz(start, end)) {
+      ortho.push(end);
     } else {
-      const bend = pointFrom<LocalPoint>(end[0], start[1]);
-      pushSimplified(nextPoints, bend);
-      // NOTE: we do not increment the counter `i`
-      //       so that bend -> end in the next loop
+      ortho.push(pointFrom<LocalPoint>(start[0], end[1]));
+      ortho.push(end);
     }
   }
 
-  return nextPoints;
-};
-
-const isAxisAligned = (a: LocalPoint, b: LocalPoint) =>
-  a[0] === b[0] || a[1] === b[1];
-
-const areColinear = (a: LocalPoint, b: LocalPoint, c: LocalPoint) =>
-  (a[0] === b[0] && b[0] === c[0]) || (a[1] === b[1] && b[1] === c[1]);
-
-const pushSimplified = (points: LocalPoint[], point: LocalPoint) => {
-  const len = points.length;
-  if (len >= 2 && areColinear(points[len - 2], points[len - 1], point)) {
-    // replace the previous point with the new one
-    points[len - 1] = point;
-  } else {
-    points.push(point);
+  // 2. drop obviously colinear middle points
+  const trimmed: LocalPoint[] = [ortho[0]];
+  for (let i = 1; i < ortho.length - 1; ++i) {
+    if (
+      !(
+        (isVert(ortho[i - 1], ortho[i]) && isVert(ortho[i], ortho[i + 1])) ||
+        (isHorz(ortho[i - 1], ortho[i]) && isHorz(ortho[i], ortho[i + 1]))
+      )
+    ) {
+      trimmed.push(ortho[i]);
+    }
   }
+  trimmed.push(ortho[ortho.length - 1]);
+
+  // 3. collapse micro “jogs” (V-H-V / H-V-H whose short leg < SNAP)
+  const clean: LocalPoint[] = [trimmed[0]];
+  for (let i = 1; i < trimmed.length - 1; ++i) {
+    const a = clean[clean.length - 1];
+    const b = trimmed[i];
+    const c = trimmed[i + 1];
+
+    const v1 = isVert(a, b);
+    const v2 = isVert(b, c);
+    if (v1 !== v2) {
+      const d1 = dist(a, b);
+      const d2 = dist(b, c);
+
+      if (d1 < THRESHOLD || d2 < THRESHOLD) {
+        // pick the shorter leg to remove
+        if (d2 < d1) {
+          // … absorb leg 2 – pull *c* onto axis of *a-b*
+          if (v1) {
+            c[0] = a[0];
+          } else {
+            c[1] = a[1];
+          }
+        } else {
+          // … absorb leg 1 – slide the whole first leg onto *b-c* axis
+          // eslint-disable-next-line no-lonely-if
+          if (v2) {
+            for (
+              let k = clean.length - 1;
+              k >= 0 && clean[k][0] === a[0];
+              --k
+            ) {
+              clean[k][0] = b[0];
+            }
+          } else {
+            for (
+              let k = clean.length - 1;
+              k >= 0 && clean[k][1] === a[1];
+              --k
+            ) {
+              clean[k][1] = b[1];
+            }
+          }
+        }
+        // *b* is gone, don’t add it
+        continue;
+      }
+    }
+    clean.push(b);
+  }
+  clean.push(trimmed[trimmed.length - 1]);
+  return clean;
 };
 
 const sanitizePoints = (points: readonly LocalPoint[]): LocalPoint[] => {
