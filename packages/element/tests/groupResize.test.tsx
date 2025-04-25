@@ -61,7 +61,7 @@ describe("group resize", () => {
     originalWidth = h.elements[0].width;
     originalHeight = h.elements[0].height;
 
-    UI.resize(h.elements[0], "nw", [-50, -50], { shift: true });
+    UI.resize(h.elements[0], "e", [50, 0], { shift: true });
 
     expect(h.elements[0].width).toBe(originalWidth - 50);
     expect(h.elements[0].height).toBe(originalHeight - 50);
