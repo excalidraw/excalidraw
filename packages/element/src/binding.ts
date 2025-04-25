@@ -93,7 +93,6 @@ import type {
   SceneElementsMap,
   FixedPointBinding,
 } from "./types";
-import { debugDrawLine, debugDrawPoint } from "@excalidraw/utils/visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
