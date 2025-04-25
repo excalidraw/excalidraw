@@ -508,8 +508,47 @@ export const switchShapes = (
     if (nextType && isConvertibleLinearType(nextType)) {
       const convertedElements: Record<string, ExcalidrawElement> = {};
       for (const element of selectedLinearSwitchableElements) {
-        const converted = convertElementType(element, nextType, app);
-        convertedElements[converted.id] = converted;
+        const { properties, initialType } =
+          editorJotaiStore.get(shapeSwitchLinearAtom)?.[element.id] || {};
+
+        // If the initial type is not elbow, and when we switch to elbow,
+        // the linear line might be "bent" and the points would likely be different.
+        // When we then switch to other non elbow types from this converted elbow,
+        // we still want to use the original points instead.
+        if (
+          initialType &&
+          properties &&
+          isElbowArrow(element) &&
+          initialType !== "elbowArrow" &&
+          nextType !== "elbowArrow"
+        ) {
+          // first convert back to the original type
+          const originalType = convertElementType(
+            element,
+            initialType,
+            app,
+          ) as ExcalidrawLinearElement;
+          // then convert to the target type
+          const converted = convertElementType(
+            initialType === "line"
+              ? newLinearElement({
+                  ...originalType,
+                  ...properties,
+                  type: "line",
+                })
+              : newArrowElement({
+                  ...originalType,
+                  ...properties,
+                  type: "arrow",
+                }),
+            nextType,
+            app,
+          );
+          convertedElements[converted.id] = converted;
+        } else {
+          const converted = convertElementType(element, nextType, app);
+          convertedElements[converted.id] = converted;
+        }
       }
 
       const nextElements = [];
