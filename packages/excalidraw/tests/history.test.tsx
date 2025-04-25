@@ -23,6 +23,10 @@ import {
 
 import "@excalidraw/utils/test-utils";
 
+import { ElementsDelta, AppStateDelta } from "@excalidraw/element/delta";
+
+import { CaptureUpdateAction, StoreDelta } from "@excalidraw/element/store";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -46,11 +50,8 @@ import {
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { getDefaultAppState } from "../appState";
-import { HistoryEntry } from "../history";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
-import { Snapshot, CaptureUpdateAction } from "../store";
-import { AppStateChange, ElementsChange } from "../change";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -82,13 +83,52 @@ const checkpoint = (name: string) => {
     ...strippedAppState
   } = h.state;
   expect(strippedAppState).toMatchSnapshot(`[${name}] appState`);
-  expect(h.history).toMatchSnapshot(`[${name}] history`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
   h.elements
     .map(({ seed, versionNonce, ...strippedElement }) => strippedElement)
     .forEach((element, i) =>
       expect(element).toMatchSnapshot(`[${name}] element ${i}`),
     );
+
+  const stripSeed = (deltas: Record<string, { deleted: any; inserted: any }>) =>
+    Object.entries(deltas).reduce((acc, curr) => {
+      const { inserted, deleted, ...rest } = curr[1];
+
+      delete inserted.seed;
+      delete deleted.seed;
+
+      acc[curr[0]] = {
+        inserted,
+        deleted,
+        ...rest,
+      };
+
+      return acc;
+    }, {} as Record<string, any>);
+
+  expect(
+    h.history.undoStack.map((x) => ({
+      ...x,
+      elementsChange: {
+        ...x.elements,
+        added: stripSeed(x.elements.added),
+        removed: stripSeed(x.elements.updated),
+        updated: stripSeed(x.elements.removed),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] undo stack`);
+
+  expect(
+    h.history.redoStack.map((x) => ({
+      ...x,
+      elementsChange: {
+        ...x.elements,
+        added: stripSeed(x.elements.added),
+        removed: stripSeed(x.elements.updated),
+        updated: stripSeed(x.elements.removed),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] redo stack`);
 };
 
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
@@ -116,12 +156,12 @@ describe("history", () => {
 
       API.setElements([rect]);
 
-      const corrupedEntry = HistoryEntry.create(
-        AppStateChange.empty(),
-        ElementsChange.empty(),
+      const corrupedEntry = StoreDelta.create(
+        ElementsDelta.empty(),
+        AppStateDelta.empty(),
       );
 
-      vi.spyOn(corrupedEntry, "applyTo").mockImplementation(() => {
+      vi.spyOn(corrupedEntry.elements, "applyTo").mockImplementation(() => {
         throw new Error("Oh no, I am corrupted!");
       });
 
@@ -136,7 +176,6 @@ describe("history", () => {
             h.history.undo(
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
-              Snapshot.empty(),
             ) as any,
         );
       } catch (e) {
@@ -157,7 +196,6 @@ describe("history", () => {
             h.history.redo(
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
-              Snapshot.empty(),
             ) as any,
         );
       } catch (e) {
@@ -454,8 +492,8 @@ describe("history", () => {
         expect(h.history.isUndoStackEmpty).toBeTruthy();
       });
 
-      const undoAction = createUndoAction(h.history, h.store);
-      const redoAction = createRedoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history);
+      const redoAction = createRedoAction(h.history);
       // noop
       API.executeAction(undoAction);
       expect(h.elements).toEqual([
@@ -531,8 +569,8 @@ describe("history", () => {
         expect.objectContaining({ id: "B", isDeleted: false }),
       ]);
 
-      const undoAction = createUndoAction(h.history, h.store);
-      const redoAction = createRedoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history);
+      const redoAction = createRedoAction(h.history);
       API.executeAction(undoAction);
 
       expect(API.getSnapshot()).toEqual([
@@ -1713,8 +1751,8 @@ describe("history", () => {
         />,
       );
 
-      const undoAction = createUndoAction(h.history, h.store);
-      const redoAction = createRedoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history);
+      const redoAction = createRedoAction(h.history);
 
       await waitFor(() => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
@@ -1763,7 +1801,7 @@ describe("history", () => {
         />,
       );
 
-      const undoAction = createUndoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history);
 
       await waitFor(() => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
