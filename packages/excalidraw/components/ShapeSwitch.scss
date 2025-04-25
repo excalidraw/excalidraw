@@ -43,5 +43,9 @@
     background: var(--island-bg-color);
     box-shadow: var(--shadow-island);
     padding: 0.5rem;
+
+    &:focus {
+      outline: none;
+    }
   }
 }

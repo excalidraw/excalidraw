@@ -469,6 +469,7 @@ import { EraserTrail } from "../eraser";
 
 import ShapeSwitch, {
   getSwitchableTypeFromElements,
+  SHAPE_SWITCH_PANEL_CLASSNAME,
   shapeSwitchAtom,
   switchShapes,
 } from "./ShapeSwitch";
@@ -4168,7 +4169,10 @@ class App extends React.Component<AppProps, AppState> {
           editorJotaiStore.set(shapeSwitchAtom, null);
         } else if (
           event.key === KEYS.TAB &&
-          document.activeElement === this.excalidrawContainerRef?.current
+          (document.activeElement === this.excalidrawContainerRef?.current ||
+            document.activeElement?.classList.contains(
+              SHAPE_SWITCH_PANEL_CLASSNAME,
+            ))
         ) {
           event.preventDefault();
 

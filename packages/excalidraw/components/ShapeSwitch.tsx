@@ -88,6 +88,7 @@ import type { AppClassProperties } from "../types";
 
 const GAP_HORIZONTAL = 8;
 const GAP_VERTICAL = 10;
+export const SHAPE_SWITCH_PANEL_CLASSNAME = "ShapeSwitch__Panel";
 
 export const shapeSwitchAtom = atom<{
   type: "panel";
@@ -180,6 +181,7 @@ const Panel = ({
 
   const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
   const positionRef = useRef("");
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const elements = [...genericElements, ...linearElements].sort((a, b) =>
@@ -288,6 +290,8 @@ const Panel = ({
 
   return (
     <div
+      ref={panelRef}
+      tabIndex={-1}
       style={{
         position: "absolute",
         top: `${
@@ -298,7 +302,7 @@ const Panel = ({
         left: `${panelPosition.x - app.state.offsetLeft - GAP_HORIZONTAL}px`,
         zIndex: 2,
       }}
-      className="ShapeSwitch__Panel"
+      className={SHAPE_SWITCH_PANEL_CLASSNAME}
     >
       {SHAPES.map(([type, icon]) => {
         const isSelected =
@@ -329,6 +333,7 @@ const Panel = ({
                   | ConvertibleGenericTypes
                   | ConvertibleLinearTypes,
               });
+              panelRef.current?.focus();
             }}
           />
         );
