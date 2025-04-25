@@ -583,17 +583,18 @@ export const switchShapes = (
 
         if (isElbowArrow(element)) {
           const nextPoints = convertLineToElbow(element);
-
+          if (nextPoints.length < 2) {
+            // skip if not enough points to form valid segments
+            continue;
+          }
           const fixedSegments: FixedSegment[] = [];
-
           for (let i = 0; i < nextPoints.length - 1; i++) {
             fixedSegments.push({
               start: nextPoints[i],
               end: nextPoints[i + 1],
-              index: i,
+              index: i + 1,
             });
           }
-
           const updates = updateElbowArrowPoints(
             element,
             app.scene.getNonDeletedElementsMap(),
