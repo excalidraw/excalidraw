@@ -78,9 +78,9 @@ describe("elbow arrow segment move", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [109.92, 0],
-      [109.92, 200],
-      [189.85, 200],
+      [110, 0],
+      [110, 200],
+      [190, 200],
     ]);
 
     mouse.reset();
@@ -89,9 +89,9 @@ describe("elbow arrow segment move", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [109.92, 0],
-      [109.92, 200],
-      [189.85, 200],
+      [110, 0],
+      [110, 200],
+      [190, 200],
     ]);
   });
 
@@ -201,9 +201,9 @@ describe("elbow arrow routing", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [44.9292, 0],
-      [44.9292, 200],
-      [89.8585, 200],
+      [45, 0],
+      [45, 200],
+      [90, 200],
     ]);
   });
 });
@@ -255,9 +255,9 @@ describe("elbow arrow ui", () => {
     expect(arrow.elbowed).toBe(true);
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [44.92, 0],
-      [44.92, 200],
-      [89.85, 200],
+      [45, 0],
+      [45, 200],
+      [90, 200],
     ]);
   });
 
@@ -297,9 +297,9 @@ describe("elbow arrow ui", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [34.7084, 0],
-      [34.7084, 164.6246],
-      [104.333, 164.6246],
+      [34.7791, 0],
+      [34.7791, 164.67],
+      [102.931, 164.67],
     ]);
   });
 
@@ -353,9 +353,9 @@ describe("elbow arrow ui", () => {
     expect(duplicatedArrow.elbowed).toBe(true);
     expect(duplicatedArrow.points).toCloselyEqualPoints([
       [0, 0],
-      [44.92, 0],
-      [44.92, 200],
-      [89.85, 200],
+      [45, 0],
+      [45, 200],
+      [90, 200],
     ]);
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);
@@ -408,8 +408,8 @@ describe("elbow arrow ui", () => {
     expect(duplicatedArrow.points).toCloselyEqualPoints([
       [0, 0],
       [0, 100],
-      [89.85, 100],
-      [89.85, 200],
+      [90, 100],
+      [90, 200],
     ]);
   });
 });

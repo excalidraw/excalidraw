@@ -951,7 +951,6 @@ export const bindPointToSnapToElementOutline = (
           otherPoint,
         ),
       ),
-      0.1,
     )[0];
   } else {
     intersection = intersectElementWithLineSegment(
@@ -1114,6 +1113,17 @@ export const avoidRectangularCorner = (
       center,
       element.angle,
     );
+  }
+
+  // Break up explicit border bindings to have better elbow arrow routing
+  if (p[0] === element.x) {
+    return pointFrom(p[0] - FIXED_BINDING_DISTANCE, p[1]);
+  } else if (p[0] === element.x + element.width) {
+    return pointFrom(p[0] + FIXED_BINDING_DISTANCE, p[1]);
+  } else if (p[1] === element.y) {
+    return pointFrom(p[0], p[1] - FIXED_BINDING_DISTANCE);
+  } else if (p[1] === element.y + element.height) {
+    return pointFrom(p[0], p[1] + FIXED_BINDING_DISTANCE);
   }
 
   return p;

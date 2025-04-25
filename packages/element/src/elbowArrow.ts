@@ -391,6 +391,10 @@ const handleSegmentRelease = (
     null,
   );
 
+  if (!restoredPoints) {
+    return {};
+  }
+
   const nextPoints: GlobalPoint[] = [];
 
   // First part of the arrow are the old points
@@ -2181,16 +2185,11 @@ const normalizeArrowElementUpdate = (
   nextFixedSegments: readonly FixedSegment[] | null,
   startIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"],
   endIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"],
-): {
-  points: LocalPoint[];
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  fixedSegments: readonly FixedSegment[] | null;
-  startIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"];
-  endIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"];
-} => {
+): ElementUpdate<ExcalidrawElbowArrowElement> => {
+  if (global.length === 0) {
+    return {};
+  }
+
   const offsetX = global[0][0];
   const offsetY = global[0][1];
   let points = global.map((p) =>
