@@ -17,7 +17,7 @@ import type {
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
-import { Excalidraw, getCommonBounds, mutateElement } from "../..";
+import { Excalidraw, getCommonBounds } from "../..";
 import { actionGroup } from "../../actions";
 import { t } from "../../i18n";
 import * as StaticScene from "../../renderer/staticScene";
@@ -478,7 +478,7 @@ describe("stats for a non-generic element", () => {
       containerId: container.id,
       fontSize: 20,
     });
-    mutateElement(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ type: "text", id: text.id }],
     });
     API.setElements([container, text]);

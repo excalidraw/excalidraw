@@ -4,7 +4,6 @@ import {
   bindOrUnbindLinearElements,
   updateBoundElements,
 } from "@excalidraw/element/binding";
-import { mutateElement } from "@excalidraw/element/mutateElement";
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import {
   isFrameLikeElement,
@@ -24,10 +23,10 @@ import type {
   ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
-  NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type Scene from "../../scene/Scene";
+import type Scene from "@excalidraw/element/Scene";
+
 import type { AppState } from "../../types";
 
 export type StatsInputProperty =
@@ -119,12 +118,11 @@ export const moveElement = (
   newTopLeftX: number,
   newTopLeftY: number,
   originalElement: ExcalidrawElement,
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
   scene: Scene,
   originalElementsMap: ElementsMap,
   shouldInformMutation = true,
 ) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
   const latestElement = elementsMap.get(originalElement.id);
   if (!latestElement) {
     return;
@@ -148,15 +146,15 @@ export const moveElement = (
     -originalElement.angle as Radians,
   );
 
-  mutateElement(
+  scene.mutateElement(
     latestElement,
     {
       x,
       y,
     },
-    shouldInformMutation,
+    { informMutation: shouldInformMutation, isDragging: false },
   );
-  updateBindings(latestElement, elementsMap, elements, scene);
+  updateBindings(latestElement, scene);
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -165,13 +163,13 @@ export const moveElement = (
   if (boundTextElement) {
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
     latestBoundTextElement &&
-      mutateElement(
+      scene.mutateElement(
         latestBoundTextElement,
         {
           x: boundTextElement.x + changeInX,
           y: boundTextElement.y + changeInY,
         },
-        shouldInformMutation,
+        { informMutation: shouldInformMutation, isDragging: false },
       );
   }
 };
@@ -199,8 +197,6 @@ export const getAtomicUnits = (
 
 export const updateBindings = (
   latestElement: ExcalidrawElement,
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
   scene: Scene,
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
@@ -209,16 +205,8 @@ export const updateBindings = (
   },
 ) => {
   if (isLinearElement(latestElement)) {
-    bindOrUnbindLinearElements(
-      [latestElement],
-      elementsMap,
-      elements,
-      scene,
-      true,
-      [],
-      options?.zoom,
-    );
+    bindOrUnbindLinearElements([latestElement], true, [], scene, options?.zoom);
   } else {
-    updateBoundElements(latestElement, elementsMap, options);
+    updateBoundElements(latestElement, scene, options);
   }
 };

@@ -333,7 +333,7 @@ describe("line element", () => {
       element,
       element,
       h.app.scene.getNonDeletedElementsMap(),
-      h.app.scene.getNonDeletedElementsMap(),
+      h.app.scene,
       "ne",
     );
 
@@ -369,7 +369,7 @@ describe("line element", () => {
       element,
       element,
       h.app.scene.getNonDeletedElementsMap(),
-      h.app.scene.getNonDeletedElementsMap(),
+      h.app.scene,
       "se",
     );
 
@@ -424,7 +424,7 @@ describe("line element", () => {
       element,
       element,
       h.app.scene.getNonDeletedElementsMap(),
-      h.app.scene.getNonDeletedElementsMap(),
+      h.app.scene,
       "e",
       {
         shouldResizeFromCenter: true,
