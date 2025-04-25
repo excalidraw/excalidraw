@@ -608,7 +608,9 @@ export const switchShapes = (
               fixedSegments,
             },
           );
-          mutateElement(element, app.scene.getNonDeletedElementsMap(), updates);
+          mutateElement(element, app.scene.getNonDeletedElementsMap(), {
+            ...updates,
+          });
         }
       }
     }
@@ -776,7 +778,7 @@ const getElbowArrowProperties = (
       endArrowhead: element.endArrowhead,
       startBinding: element.startBinding,
       endBinding: element.endBinding,
-      roundness: element.roundness,
+      roundness: null,
       fixedSegments: element.fixedSegments,
       startIsSpecial: element.startIsSpecial,
       endIsSpecial: element.endIsSpecial,
@@ -1061,6 +1063,7 @@ export const convertElementType = <
         type: "arrow",
         elbowed: true,
         fixedSegments: null,
+        roundness: null,
       });
 
       return bumpVersion(nextElement);
