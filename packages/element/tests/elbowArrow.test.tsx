@@ -199,7 +199,7 @@ describe("elbow arrow routing", () => {
       points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
     });
 
-    expect(arrow.points).toCloselyEqualPoints([
+    expect(arrow.points).toEqual([
       [0, 0],
       [45, 0],
       [45, 200],
@@ -253,7 +253,7 @@ describe("elbow arrow ui", () => {
 
     expect(arrow.type).toBe("arrow");
     expect(arrow.elbowed).toBe(true);
-    expect(arrow.points).toCloselyEqualPoints([
+    expect(arrow.points).toEqual([
       [0, 0],
       [45, 0],
       [45, 200],
@@ -351,7 +351,7 @@ describe("elbow arrow ui", () => {
     expect(duplicatedArrow.id).not.toBe(originalArrowId);
     expect(duplicatedArrow.type).toBe("arrow");
     expect(duplicatedArrow.elbowed).toBe(true);
-    expect(duplicatedArrow.points).toCloselyEqualPoints([
+    expect(duplicatedArrow.points).toEqual([
       [0, 0],
       [45, 0],
       [45, 200],
@@ -405,7 +405,7 @@ describe("elbow arrow ui", () => {
     expect(duplicatedArrow.id).not.toBe(originalArrowId);
     expect(duplicatedArrow.type).toBe("arrow");
     expect(duplicatedArrow.elbowed).toBe(true);
-    expect(duplicatedArrow.points).toCloselyEqualPoints([
+    expect(duplicatedArrow.points).toEqual([
       [0, 0],
       [0, 100],
       [90, 100],
