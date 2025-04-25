@@ -45,6 +45,12 @@ import {
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
 import {
+  compareHeading,
+  HEADING_DOWN,
+  HEADING_LEFT,
+  HEADING_RIGHT,
+  HEADING_UP,
+  headingForPoint,
   headingForPointFromElement,
   headingIsHorizontal,
   vectorToHeading,
@@ -87,6 +93,7 @@ import type {
   SceneElementsMap,
   FixedPointBinding,
 } from "./types";
+import { debugDrawLine, debugDrawPoint } from "@excalidraw/utils/visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -1040,7 +1047,14 @@ export const avoidRectangularCorner = (
 
   if (nonRotatedPoint[0] < element.x && nonRotatedPoint[1] < element.y) {
     // Top left
-    if (nonRotatedPoint[1] - element.y > -FIXED_BINDING_DISTANCE) {
+    const heading = headingForPoint(
+      nonRotatedPoint,
+      pointFrom(element.x, element.y),
+    );
+    if (
+      compareHeading(heading, HEADING_DOWN) ||
+      compareHeading(heading, HEADING_LEFT)
+    ) {
       return pointRotateRads<GlobalPoint>(
         pointFrom(element.x - FIXED_BINDING_DISTANCE, element.y),
         center,
@@ -1057,7 +1071,14 @@ export const avoidRectangularCorner = (
     nonRotatedPoint[1] > element.y + element.height
   ) {
     // Bottom left
-    if (nonRotatedPoint[0] - element.x > -FIXED_BINDING_DISTANCE) {
+    const heading = headingForPoint(
+      nonRotatedPoint,
+      pointFrom(element.x, element.y + element.height),
+    );
+    if (
+      compareHeading(heading, HEADING_DOWN) ||
+      compareHeading(heading, HEADING_RIGHT)
+    ) {
       return pointRotateRads(
         pointFrom(
           element.x,
@@ -1077,9 +1098,13 @@ export const avoidRectangularCorner = (
     nonRotatedPoint[1] > element.y + element.height
   ) {
     // Bottom right
+    const heading = headingForPoint(
+      nonRotatedPoint,
+      pointFrom(element.x + element.width, element.y + element.height),
+    );
     if (
-      nonRotatedPoint[0] - element.x <
-      element.width + FIXED_BINDING_DISTANCE
+      compareHeading(heading, HEADING_DOWN) ||
+      compareHeading(heading, HEADING_LEFT)
     ) {
       return pointRotateRads(
         pointFrom(
@@ -1103,9 +1128,13 @@ export const avoidRectangularCorner = (
     nonRotatedPoint[1] < element.y
   ) {
     // Top right
+    const heading = headingForPoint(
+      nonRotatedPoint,
+      pointFrom(element.x + element.width, element.y),
+    );
     if (
-      nonRotatedPoint[0] - element.x <
-      element.width + FIXED_BINDING_DISTANCE
+      compareHeading(heading, HEADING_UP) ||
+      compareHeading(heading, HEADING_LEFT)
     ) {
       return pointRotateRads(
         pointFrom(
