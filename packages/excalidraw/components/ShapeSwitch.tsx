@@ -2,7 +2,12 @@ import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import { updateElbowArrowPoints } from "@excalidraw/element/elbowArrow";
 
-import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
+import {
+  pointDistance,
+  pointFrom,
+  pointRotateRads,
+  type LocalPoint,
+} from "@excalidraw/math";
 
 import {
   isArrowElement,
@@ -607,14 +612,16 @@ export const switchShapes = (
         }
       }
     }
-    const firstElement = selectedLinearSwitchableElements[0];
+    const convertedSelectedLinearElements = getLinearSwitchableElements(
+      app.scene.getSelectedElements(app.state),
+    );
 
     app.setState((prevState) => ({
       selectedElementIds,
       selectedLinearElement:
-        selectedLinearSwitchableElements.length === 1
+        convertedSelectedLinearElements.length === 1
           ? new LinearElementEditor(
-              firstElement as ExcalidrawLinearElement,
+              convertedSelectedLinearElements[0],
               app.scene.getNonDeletedElementsMap(),
             )
           : null,
