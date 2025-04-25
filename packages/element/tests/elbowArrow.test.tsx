@@ -195,15 +195,15 @@ describe("elbow arrow routing", () => {
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);
 
-    h.app.scene.mutateElement(arrow, {
+    scene.mutateElement(arrow, {
       points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
     });
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [44.92, 0],
-      [44.92, 200],
-      [89.85, 200],
+      [44.9292, 0],
+      [44.9292, 200],
+      [89.8585, 200],
     ]);
   });
 });
