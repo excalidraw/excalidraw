@@ -9262,6 +9262,29 @@ class App extends React.Component<AppProps, AppState> {
                   },
                   false,
                 );
+
+                const boundTextElementToContainer = getBoundTextElement(
+                  element,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+
+                if (
+                  boundTextElementToContainer &&
+                  this.state.editingGroupId &&
+                  boundTextElementToContainer.groupIds.includes(
+                    this.state.editingGroupId,
+                  )
+                ) {
+                  mutateElement(
+                    boundTextElementToContainer,
+                    {
+                      groupIds: boundTextElementToContainer.groupIds.filter(
+                        (id) => id !== this.state.editingGroupId,
+                      ),
+                    },
+                    false,
+                  );
+                }
               }
 
               nextElements.forEach((element) => {
