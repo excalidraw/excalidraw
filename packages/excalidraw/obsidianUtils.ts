@@ -207,3 +207,8 @@ export const intersectElementWithLine = (
 ): GlobalPoint[] | undefined => {
   return intersectElementWithLineSegment(element, lineSegment(a, b), gap);
 };
+
+//disable double click
+export const disableDoubleClickTextEditing = () => {
+  return getHostPlugin().settings.disableDoubleClickTextEditing ?? false;
+}

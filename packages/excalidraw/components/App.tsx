@@ -533,7 +533,7 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionName, ActionResult } from "../actions/types";
-import { allowDoubleTapEraser, getExcalidrawContentEl, getMaxZoom, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode } from "../obsidianUtils";
+import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode } from "../obsidianUtils";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
 
@@ -6130,6 +6130,31 @@ class App extends React.Component<AppProps, AppState> {
 
           sceneX = midPoint.x;
           sceneY = midPoint.y;
+        }
+      }
+
+      //zsviczian Disable double click text create, but allow double click edit
+      if(disableDoubleClickTextEditing()) {
+        let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
+
+        const selectedElements = this.scene.getSelectedElements(this.state);
+    
+        if (selectedElements.length === 1) {
+          if (isTextElement(selectedElements[0])) {
+            existingTextElement = selectedElements[0];
+          } else if (container) {
+            existingTextElement = getBoundTextElement(
+              selectedElements[0],
+              this.scene.getNonDeletedElementsMap(),
+            );
+          } else {
+            existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
+          }
+        } else {
+          existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
+        }
+        if (!existingTextElement) {
+          return;
         }
       }
 
