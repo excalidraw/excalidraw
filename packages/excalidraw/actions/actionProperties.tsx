@@ -34,10 +34,7 @@ import {
 
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 
-import {
-  mutateElement,
-  newElementWith,
-} from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element/mutateElement";
 
 import {
   getBoundTextElement,
@@ -61,6 +58,7 @@ import type { LocalPoint } from "@excalidraw/math";
 
 import type {
   Arrowhead,
+  ElementsMap,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -68,8 +66,9 @@ import type {
   FontFamilyValues,
   TextAlign,
   VerticalAlign,
-  NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
+
+import type Scene from "@excalidraw/element/Scene";
 
 import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
@@ -208,25 +207,22 @@ export const getFormValue = function <T extends Primitive>(
 const offsetElementAfterFontResize = (
   prevElement: ExcalidrawTextElement,
   nextElement: ExcalidrawTextElement,
+  scene: Scene,
 ) => {
   if (isBoundToContainer(nextElement) || !nextElement.autoResize) {
     return nextElement;
   }
-  return mutateElement(
-    nextElement,
-    {
-      x:
-        prevElement.textAlign === "left"
-          ? prevElement.x
-          : prevElement.x +
-            (prevElement.width - nextElement.width) /
-              (prevElement.textAlign === "center" ? 2 : 1),
-      // centering vertically is non-standard, but for Excalidraw I think
-      // it makes sense
-      y: prevElement.y + (prevElement.height - nextElement.height) / 2,
-    },
-    false,
-  );
+  return scene.mutateElement(nextElement, {
+    x:
+      prevElement.textAlign === "left"
+        ? prevElement.x
+        : prevElement.x +
+          (prevElement.width - nextElement.width) /
+            (prevElement.textAlign === "center" ? 2 : 1),
+    // centering vertically is non-standard, but for Excalidraw I think
+    // it makes sense
+    y: prevElement.y + (prevElement.height - nextElement.height) / 2,
+  });
 };
 
 const changeFontSize = (
@@ -252,10 +248,14 @@ const changeFontSize = (
         redrawTextBoundingBox(
           newElement,
           app.scene.getContainerElement(oldElement),
-          app.scene.getNonDeletedElementsMap(),
+          app.scene,
         );
 
-        newElement = offsetElementAfterFontResize(oldElement, newElement);
+        newElement = offsetElementAfterFontResize(
+          oldElement,
+          newElement,
+          app.scene,
+        );
 
         return newElement;
       }
@@ -265,15 +265,11 @@ const changeFontSize = (
   );
 
   // Update arrow elements after text elements have been updated
-  const updatedElementsMap = arrayToMap(updatedElements);
   getSelectedElements(elements, appState, {
     includeBoundTextElement: true,
   }).forEach((element) => {
     if (isTextElement(element)) {
-      updateBoundElements(
-        element,
-        updatedElementsMap as NonDeletedSceneElementsMap,
-      );
+      updateBoundElements(element, app.scene);
     }
   });
 
@@ -1000,7 +996,7 @@ type ChangeFontFamilyData = Partial<
   >
 > & {
   /** cache of selected & editing elements populated on opened popup */
-  cachedElements?: Map<string, ExcalidrawElement>;
+  cachedElements?: ElementsMap;
   /** flag to reset all elements to their cached versions  */
   resetAll?: true;
   /** flag to reset all containers to their cached versions */
@@ -1141,7 +1137,7 @@ export const actionChangeFontFamily = register({
 
               if (resetContainers && container && cachedContainer) {
                 // reset the container back to it's cached version
-                mutateElement(container, { ...cachedContainer }, false);
+                app.scene.mutateElement(container, { ...cachedContainer });
               }
 
               if (!skipFontFaceCheck) {
@@ -1172,12 +1168,7 @@ export const actionChangeFontFamily = register({
         // we either skip the check (have at least one font face loaded) or do the check and find out all the font faces have loaded
         for (const [element, container] of elementContainerMapping) {
           // trigger synchronous redraw
-          redrawTextBoundingBox(
-            element,
-            container,
-            app.scene.getNonDeletedElementsMap(),
-            false,
-          );
+          redrawTextBoundingBox(element, container, app.scene);
         }
       } else {
         // otherwise try to load all font faces for the given chars and redraw elements once our font faces loaded
@@ -1194,8 +1185,7 @@ export const actionChangeFontFamily = register({
               redrawTextBoundingBox(
                 latestElement as ExcalidrawTextElement,
                 latestContainer,
-                app.scene.getNonDeletedElementsMap(),
-                false,
+                app.scene,
               );
             }
           }
@@ -1209,7 +1199,7 @@ export const actionChangeFontFamily = register({
     return result;
   },
   PanelComponent: ({ elements, appState, app, updateData }) => {
-    const cachedElementsRef = useRef<Map<string, ExcalidrawElement>>(new Map());
+    const cachedElementsRef = useRef<ElementsMap>(new Map());
     const prevSelectedFontFamilyRef = useRef<number | null>(null);
     // relying on state batching as multiple `FontPicker` handlers could be called in rapid succession and we want to combine them
     const [batchedData, setBatchedData] = useState<ChangeFontFamilyData>({});
@@ -1218,7 +1208,7 @@ export const actionChangeFontFamily = register({
     const selectedFontFamily = useMemo(() => {
       const getFontFamily = (
         elementsArray: readonly ExcalidrawElement[],
-        elementsMap: Map<string, ExcalidrawElement>,
+        elementsMap: ElementsMap,
       ) =>
         getFormValue(
           elementsArray,
@@ -1401,7 +1391,7 @@ export const actionChangeTextAlign = register({
             redrawTextBoundingBox(
               newElement,
               app.scene.getContainerElement(oldElement),
-              app.scene.getNonDeletedElementsMap(),
+              app.scene,
             );
             return newElement;
           }
@@ -1492,7 +1482,7 @@ export const actionChangeVerticalAlign = register({
             redrawTextBoundingBox(
               newElement,
               app.scene.getContainerElement(oldElement),
-              app.scene.getNonDeletedElementsMap(),
+              app.scene,
             );
             return newElement;
           }
@@ -1892,10 +1882,10 @@ export const actionChangeArrowType = register({
             newElement,
             startHoveredElement,
             "start",
-            elementsMap,
+            app.scene,
           );
         endHoveredElement &&
-          bindLinearElement(newElement, endHoveredElement, "end", elementsMap);
+          bindLinearElement(newElement, endHoveredElement, "end", app.scene);
 
         const startBinding =
           startElement && newElement.startBinding
@@ -1906,7 +1896,6 @@ export const actionChangeArrowType = register({
                   newElement,
                   startElement,
                   "start",
-                  elementsMap,
                 ),
               }
             : null;
@@ -1919,7 +1908,6 @@ export const actionChangeArrowType = register({
                   newElement,
                   endElement,
                   "end",
-                  elementsMap,
                 ),
               }
             : null;
@@ -1951,7 +1939,7 @@ export const actionChangeArrowType = register({
             newElement.startBinding.elementId,
           ) as ExcalidrawBindableElement;
           if (startElement) {
-            bindLinearElement(newElement, startElement, "start", elementsMap);
+            bindLinearElement(newElement, startElement, "start", app.scene);
           }
         }
         if (newElement.endBinding) {
@@ -1959,7 +1947,7 @@ export const actionChangeArrowType = register({
             newElement.endBinding.elementId,
           ) as ExcalidrawBindableElement;
           if (endElement) {
-            bindLinearElement(newElement, endElement, "end", elementsMap);
+            bindLinearElement(newElement, endElement, "end", app.scene);
           }
         }
       }
@@ -1980,6 +1968,7 @@ export const actionChangeArrowType = register({
       if (selected) {
         newState.selectedLinearElement = new LinearElementEditor(
           selected as ExcalidrawLinearElement,
+          arrayToMap(elements),
         );
       }
     }
