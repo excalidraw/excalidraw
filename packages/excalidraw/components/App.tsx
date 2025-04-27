@@ -9231,7 +9231,10 @@ class App extends React.Component<AppProps, AppState> {
                   false,
                 );
 
-                const boundText = getBoundTextElement(element, this.scene.getNonDeletedElementsMap())
+                const boundText = getBoundTextElement(
+                  element,
+                  this.scene.getNonDeletedElementsMap(),
+                );
 
                 if (boundText) {
                   const boundTextIndex = boundText.groupIds.indexOf(
