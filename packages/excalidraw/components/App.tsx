@@ -4105,7 +4105,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!el || !isLinearElement(el)) {
       return;
     }
-    const editingLinearElement = new LinearElementEditor(el);
+    const editingLinearElement = new LinearElementEditor(el, this.scene.getNonDeletedElementsMap());
     this.setState({
       selectedLinearElement: editingLinearElement,
       editingLinearElement: {
@@ -4138,8 +4138,6 @@ class App extends React.Component<AppProps, AppState> {
           getNextSingleWidthAndHeightFromPointer(
             element,
             element,
-            this.scene.getElementsMapIncludingDeleted(),
-            this.scene.getElementsMapIncludingDeleted(),
             "se",
             pointerX,
             pointerY,
@@ -4151,7 +4149,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           element,
           this.scene.getElementsMapIncludingDeleted(),
-          this.scene.getElementsMapIncludingDeleted(),
+          this.scene,
           "se",
           {
             shouldMaintainAspectRatio: true,
