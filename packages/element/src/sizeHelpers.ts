@@ -6,7 +6,6 @@ import {
 import type { AppState, Offsets, Zoom } from "@excalidraw/excalidraw/types";
 
 import { getCommonBounds, getElementBounds } from "./bounds";
-import { mutateElement } from "./mutateElement";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 
 import type { ElementsMap, ExcalidrawElement } from "./types";
@@ -168,41 +167,6 @@ export const getLockedLinearCursorAlignSize = (
   }
 
   return { width, height };
-};
-
-export const resizePerfectLineForNWHandler = (
-  element: ExcalidrawElement,
-  x: number,
-  y: number,
-) => {
-  const anchorX = element.x + element.width;
-  const anchorY = element.y + element.height;
-  const distanceToAnchorX = x - anchorX;
-  const distanceToAnchorY = y - anchorY;
-  if (Math.abs(distanceToAnchorX) < Math.abs(distanceToAnchorY) / 2) {
-    mutateElement(element, {
-      x: anchorX,
-      width: 0,
-      y,
-      height: -distanceToAnchorY,
-    });
-  } else if (Math.abs(distanceToAnchorY) < Math.abs(element.width) / 2) {
-    mutateElement(element, {
-      y: anchorY,
-      height: 0,
-    });
-  } else {
-    const nextHeight =
-      Math.sign(distanceToAnchorY) *
-      Math.sign(distanceToAnchorX) *
-      element.width;
-    mutateElement(element, {
-      x,
-      y: anchorY - nextHeight,
-      width: -distanceToAnchorX,
-      height: nextHeight,
-    });
-  }
 };
 
 export const getNormalizedDimensions = (

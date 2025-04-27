@@ -21,8 +21,6 @@ import {
   embeddableURLValidator,
 } from "@excalidraw/element/embeddable";
 
-import { mutateElement } from "@excalidraw/element/mutateElement";
-
 import {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
@@ -32,6 +30,8 @@ import {
 } from "@excalidraw/common";
 
 import { isEmbeddableElement } from "@excalidraw/element/typeChecks";
+
+import type Scene from "@excalidraw/element/Scene";
 
 import type {
   ElementsMap,
@@ -70,14 +70,14 @@ const embeddableLinkCache = new Map<
 
 export const Hyperlink = ({
   element,
-  elementsMap,
+  scene,
   setAppState,
   onLinkOpen,
   setToast,
   updateEmbedValidationStatus,
 }: {
   element: NonDeletedExcalidrawElement;
-  elementsMap: ElementsMap;
+  scene: Scene;
   setAppState: React.Component<any, AppState>["setState"];
   onLinkOpen: ExcalidrawProps["onLinkOpen"];
   setToast: (
@@ -88,6 +88,7 @@ export const Hyperlink = ({
     status: boolean,
   ) => void;
 }) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
   const appState = useExcalidrawAppState();
   const appProps = useAppProps();
   const device = useDevice();
@@ -114,7 +115,7 @@ export const Hyperlink = ({
         setAppState({ activeEmbeddable: null });
       }
       if (!link) {
-        mutateElement(element, {
+        scene.mutateElement(element, {
           link: null,
         });
         updateEmbedValidationStatus(element, false);
@@ -126,7 +127,7 @@ export const Hyperlink = ({
           setToast({ message: t("toast.unableToEmbed"), closable: true });
         }
         element.link && embeddableLinkCache.set(element.id, element.link);
-        mutateElement(element, {
+        scene.mutateElement(element, {
           link,
         });
         updateEmbedValidationStatus(element, false);
@@ -144,7 +145,7 @@ export const Hyperlink = ({
           : 1;
         const hasLinkChanged =
           embeddableLinkCache.get(element.id) !== element.link;
-        mutateElement(element, {
+        scene.mutateElement(element, {
           ...(hasLinkChanged
             ? {
                 width:
@@ -169,10 +170,11 @@ export const Hyperlink = ({
         }
       }
     } else {
-      mutateElement(element, { link });
+      scene.mutateElement(element, { link });
     }
   }, [
     element,
+    scene,
     setToast,
     appProps.validateEmbeddable,
     appState.activeEmbeddable,
@@ -229,9 +231,9 @@ export const Hyperlink = ({
 
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
-    mutateElement(element, { link: null });
+    scene.mutateElement(element, { link: null });
     setAppState({ showHyperlinkPopup: false });
-  }, [setAppState, element]);
+  }, [setAppState, element, scene]);
 
   const onEdit = () => {
     trackEvent("hyperlink", "edit", "popup-ui");
