@@ -145,7 +145,7 @@ const frameClip = (
   );
 };
 
-type LinkIconCanvas = HTMLCanvasElement & { zoom: number };
+type LinkIconCanvas = HTMLCanvasElement & { zoom: number, linkOpacity: number }; //zsviczian (linkOpacity)
 
 const linkIconCanvasCache: {
   regularLink: LinkIconCanvas | null;
@@ -180,9 +180,14 @@ const renderLinkIcon = (
 
     let linkCanvas = linkIconCanvasCache[canvasKey];
 
-    if (!linkCanvas || linkCanvas.zoom !== appState.zoom.value) {
+    if (
+      !linkCanvas ||
+      linkCanvas.zoom !== appState.zoom.value || 
+      linkCanvas.linkOpacity !== appState.linkOpacity //zsviczian
+  ) {
       linkCanvas = Object.assign(document.createElement("canvas"), {
         zoom: appState.zoom.value,
+        linkOpacity: appState.linkOpacity, //zsviczian
       });
       linkCanvas.width = width * window.devicePixelRatio * appState.zoom.value;
       linkCanvas.height =

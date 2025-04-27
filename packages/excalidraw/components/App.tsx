@@ -650,6 +650,7 @@ class App extends React.Component<AppProps, AppState> {
   public id: string;
   private store: Store;
   private history: History;
+  private shouldRenderAllEmbeddables: boolean = false; //zsviczian
   public excalidrawContainerValue: {
     container: HTMLDivElement | null;
     id: string;
@@ -780,6 +781,7 @@ class App extends React.Component<AppProps, AppState> {
           clear: this.resetHistory,
         },
         scrollToContent: this.scrollToContent,
+        setForceRenderAllEmbeddables: this.setForceRenderAllEmbeddables, //zsviczian
         zoomToFit: this.zoomToFit, //zsviczian
         getColorAtScenePoint: this.getColorAtScenePoint, //zsviczian
         startLineEditor: this.startLineEditor, //zsviczian
@@ -1094,7 +1096,8 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           );
 
-          const isVisible = isElementInViewport(
+          //zsviczian - shouldRenderAllEmbeddables
+          const isVisible = this.shouldRenderAllEmbeddables || isElementInViewport(
             el,
             normalizedWidth,
             normalizedHeight,
@@ -4020,6 +4023,14 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeUnfollowRemoteUser();
     this.setState(state);
   };
+
+  //zsviczian
+  setForceRenderAllEmbeddables = (force: boolean) => {
+    this.shouldRenderAllEmbeddables = force;
+    if(force) {
+      this.setState({});
+    }
+  }
 
   //zsviczian
   zoomToFit = (
