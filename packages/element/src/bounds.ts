@@ -1,11 +1,6 @@
 import rough from "roughjs/bin/rough";
 
-import {
-  rescalePoints,
-  arrayToMap,
-  invariant,
-  sizeOf,
-} from "@excalidraw/common";
+import { rescalePoints, arrayToMap, invariant } from "@excalidraw/common";
 
 import {
   degreesToRadians,
@@ -62,7 +57,7 @@ import type {
   ElementsMap,
   ExcalidrawRectanguloidElement,
   ExcalidrawEllipseElement,
-  ElementsMapOrArray,
+  ExcalidrawRegularPolygonElement,
 } from "./types";
 import type { Drawable, Op } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -944,10 +939,10 @@ export const getElementBounds = (
 };
 
 export const getCommonBounds = (
-  elements: ElementsMapOrArray,
+  elements: readonly ExcalidrawElement[],
   elementsMap?: ElementsMap,
 ): Bounds => {
-  if (!sizeOf(elements)) {
+  if (!elements.length) {
     return [0, 0, 0, 0];
   }
 

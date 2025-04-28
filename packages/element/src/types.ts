@@ -165,6 +165,12 @@ export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
   name: string | null;
 };
 
+export type ExcalidrawRegularPolygonElement = _ExcalidrawElementBase & {
+  type: "regularPolygon";
+  /** Number of sides in the regular polygon */
+  sides: number;
+};
+
 export type ExcalidrawMagicFrameElement = _ExcalidrawElementBase & {
   type: "magicframe";
   name: string | null;
@@ -195,7 +201,8 @@ export type ExcalidrawRectanguloidElement =
   | ExcalidrawFreeDrawElement
   | ExcalidrawIframeLikeElement
   | ExcalidrawFrameLikeElement
-  | ExcalidrawEmbeddableElement;
+  | ExcalidrawEmbeddableElement
+  | ExcalidrawRegularPolygonElement;
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
@@ -212,7 +219,8 @@ export type ExcalidrawElement =
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement
   | ExcalidrawIframeElement
-  | ExcalidrawEmbeddableElement;
+  | ExcalidrawEmbeddableElement
+  | ExcalidrawRegularPolygonElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<
   ExcalidrawElement,
@@ -264,7 +272,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement
   | ExcalidrawFrameElement
-  | ExcalidrawMagicFrameElement;
+  | ExcalidrawMagicFrameElement
+  | ExcalidrawRegularPolygonElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement

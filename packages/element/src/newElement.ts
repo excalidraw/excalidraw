@@ -46,6 +46,7 @@ import type {
   ExcalidrawArrowElement,
   FixedSegment,
   ExcalidrawElbowArrowElement,
+  ExcalidrawRegularPolygonElement,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -468,6 +469,28 @@ export const newLinearElement = (
     endBinding: null,
     startArrowhead: null,
     endArrowhead: null,
+  };
+};
+
+export const newRegularPolygonElement = (
+  opts: {
+    type: "regularPolygon";
+    sides?: number;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawRegularPolygonElement> => {
+  // create base element
+  const base = _newElementBase<ExcalidrawRegularPolygonElement>(
+    "regularPolygon",
+    opts,
+  );
+  // set default size if none provided
+  const width = opts.width ?? 100;
+  const height = opts.height ?? 100;
+  return {
+    ...base,
+    sides: opts.sides ?? 6, // default to hexagon
+    width,
+    height,
   };
 };
 

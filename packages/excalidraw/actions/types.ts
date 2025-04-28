@@ -140,7 +140,8 @@ export type ActionName =
   | "linkToElement"
   | "cropEditor"
   | "wrapSelectionInFrame"
-  | "toggleLassoTool";
+  | "toggleLassoTool"
+  | "changeRegularPolygonSides";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

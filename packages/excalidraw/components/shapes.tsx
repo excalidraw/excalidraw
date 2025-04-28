@@ -11,6 +11,7 @@ import {
   TextIcon,
   ImageIcon,
   EraserIcon,
+  RegularPolygonIcon,
 } from "./icons";
 
 export const SHAPES = [
@@ -76,6 +77,13 @@ export const SHAPES = [
     key: null,
     numericKey: KEYS["9"],
     fillable: false,
+  },
+  {
+    icon: RegularPolygonIcon,
+    value: "regularPolygon",
+    key: null, // TODO: Assign a unique letter key if needed
+    numericKey: null, // Removed conflicting key
+    fillable: true,
   },
   {
     icon: EraserIcon,

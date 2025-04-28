@@ -39,7 +39,11 @@ export const distanceToBindableElement = (
       return distanceToDiamondElement(element, p);
     case "ellipse":
       return distanceToEllipseElement(element, p);
+    case "regularPolygon":
+      // For regularPolygon, use the same distance calculation as rectangle
+      return distanceToRectanguloidElement(element, p);
   }
+  return Infinity;
 };
 
 /**

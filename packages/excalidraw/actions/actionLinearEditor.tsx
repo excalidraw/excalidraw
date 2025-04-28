@@ -2,8 +2,6 @@ import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 
 import { isElbowArrow, isLinearElement } from "@excalidraw/element/typeChecks";
 
-import { arrayToMap } from "@excalidraw/common";
-
 import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
 
 import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
@@ -52,7 +50,7 @@ export const actionToggleLinearEditor = register({
     const editingLinearElement =
       appState.editingLinearElement?.elementId === selectedElement.id
         ? null
-        : new LinearElementEditor(selectedElement, arrayToMap(elements));
+        : new LinearElementEditor(selectedElement);
     return {
       appState: {
         ...appState,
@@ -79,6 +77,42 @@ export const actionToggleLinearEditor = register({
         aria-label={label}
         onClick={() => updateData(null)}
       />
+    );
+  },
+});
+export const actionChangeRegularPolygonSides = register({
+  name: "changeRegularPolygonSides",
+  label: "labels.regularPolygonSides",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: elements.map((el) =>
+        el.type === "regularPolygon"
+          ? { ...el, sides: value }
+          : el
+      ),
+      appState,
+      commitToHistory: true,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, updateData }) => {
+    const selected = elements.find((el) => el.type === "regularPolygon");
+    if (!selected) return null;
+    // Type guard for ExcalidrawRegularPolygonElement
+    if (selected.type !== "regularPolygon") return null;
+    return (
+      <fieldset>
+        <legend>{t("labels.regularPolygonSides") /* Add this key to your translation files, e.g., "Number of sides" */}</legend>
+        <input
+          type="range"
+          min={3}
+          max={12}
+          value={selected.sides}
+          onChange={(e) => updateData(Number(e.target.value))}
+        />
+        <span>{selected.sides}</span>
+      </fieldset>
     );
   },
 });

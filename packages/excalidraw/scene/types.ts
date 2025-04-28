@@ -130,14 +130,12 @@ export type ScrollBars = {
     y: number;
     width: number;
     height: number;
-    deltaMultiplier: number;
   } | null;
   vertical: {
     x: number;
     y: number;
     width: number;
     height: number;
-    deltaMultiplier: number;
   } | null;
 };
 
@@ -156,4 +154,5 @@ export type ElementShapes = {
   image: null;
   frame: null;
   magicframe: null;
+  regularPolygon: Drawable;
 };

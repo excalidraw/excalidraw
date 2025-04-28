@@ -484,7 +484,7 @@ function CommandPaletteInner({
           const command: CommandPaletteItem = {
             label: t(`toolBar.${value}`),
             category: DEFAULT_CATEGORIES.tools,
-            shortcut,
+            shortcut: shortcut === null ? undefined : String(shortcut),
             icon,
             keywords: ["toolbar"],
             viewMode: false,
