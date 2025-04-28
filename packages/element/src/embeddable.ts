@@ -54,6 +54,15 @@ const RE_REDDIT =
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
+
+  const RE_TWITCH = /^(?:https?:\/\/)?(?:www\.|clips\.)?twitch\.tv\/(?:[\w-]+\/clip\/|embed\?clip=)([\w-]+)/i;
+const RE_TWITCH_EMBED = /<iframe src="https?:\/\/clips\.twitch\.tv\/embed\?clip=([\w-]+)/i;
+const RE_NOTION = /^(?:https?:\/\/)?(?:www\.)?notion\.(?:site|so)\/([\w-]+)/i;
+const RE_DROPBOX = /^(?:https?:\/\/)?(?:www\.)?dropbox\.com\/(?:s|sh)\/([\w-]+)/i;
+const RE_POWER_BI = /^(?:https?:\/\/)?app\.powerbi\.com\/view\?/i;
+const RE_BILIBILI = /^(?:https?:\/\/)?(?:www\.)?bilibili\.com\/video\/(?:av(\d+)|BV([\w-]+))/i;
+const RE_LOOM = /^(?:https?:\/\/)?(?:www\.)?loom\.com\/(?:share|embed)\/([\w-]+)/i;
+
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
   "youtu.be",
@@ -69,6 +78,7 @@ const ALLOWED_DOMAINS = new Set([
   "val.town",
   "giphy.com",
   "reddit.com",
+  "twitch.tv",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -82,6 +92,8 @@ const ALLOW_SAME_ORIGIN = new Set([
   "*.simplepdf.eu",
   "stackblitz.com",
   "reddit.com",
+  "twitch.tv",
+
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -185,6 +197,19 @@ export const getEmbedLink = (
       intrinsicSize: aspectRatio,
       type,
       sandbox: { allowSameOrigin },
+    };
+  }
+
+  const twitchMatch = link.match(RE_TWITCH);
+  if (twitchMatch?.[1]) {
+    const twitchClipId = twitchMatch[1];
+    const twitchEmbedUrl = `https://clips.twitch.tv/embed?clip=${twitchClipId}&parent=${window.location.hostname}`;
+    return {
+      link: twitchEmbedUrl,
+      intrinsicSize: { w: 550, h: 550 },
+      type: "video",
+      sandbox: { allowSameOrigin: true }
+      // love to get your feedback on here should i change anything
     };
   }
 
