@@ -116,25 +116,18 @@ const calculatePadding = (
   startBoundingBox: Bounds,
   endBoundingBox: Bounds,
 ) => {
-  const width = aabb[2] - aabb[0];
-  const height = aabb[3] - aabb[1];
-  const size = Math.max(width, height);
-  const startExtent = Math.max(
-    startBoundingBox[2] - startBoundingBox[0],
-    startBoundingBox[3] - startBoundingBox[1],
-    10,
+  return Math.min(
+    Math.hypot(
+      startBoundingBox[2] - startBoundingBox[0],
+      startBoundingBox[3] - startBoundingBox[1],
+    ) / 4,
+    Math.hypot(
+      endBoundingBox[2] - endBoundingBox[0],
+      endBoundingBox[3] - endBoundingBox[1],
+    ) / 4,
+    Math.hypot(aabb[2] - aabb[0], aabb[3] - aabb[1]) / 4,
+    40,
   );
-  const endExtent = Math.max(
-    endBoundingBox[2] - endBoundingBox[0],
-    endBoundingBox[3] - endBoundingBox[1],
-    10,
-  );
-
-  return Math.min(startExtent, endExtent) < 80
-    ? Math.min(startExtent, endExtent) / 2
-    : size > 75
-    ? 40
-    : Math.min(Math.max(Math.min(width / 2 - 1, height / 2 - 1), 10), 40);
 };
 
 const handleSegmentRenormalization = (
