@@ -1351,7 +1351,7 @@ const getElbowArrowData = (
         offsetFromHeading(
           startHeading,
           arrow.startArrowhead
-            ? FIXED_BINDING_DISTANCE * 6
+            ? FIXED_BINDING_DISTANCE
             : FIXED_BINDING_DISTANCE * 2,
           1,
         ),
@@ -1363,7 +1363,7 @@ const getElbowArrowData = (
         offsetFromHeading(
           endHeading,
           arrow.endArrowhead
-            ? FIXED_BINDING_DISTANCE * 6
+            ? FIXED_BINDING_DISTANCE
             : FIXED_BINDING_DISTANCE * 2,
           1,
         ),
