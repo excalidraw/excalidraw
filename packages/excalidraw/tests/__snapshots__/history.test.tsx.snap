@@ -6176,7 +6176,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -6208,7 +6208,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -6240,7 +6240,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -6297,7 +6297,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -6351,7 +6351,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -6426,7 +6426,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -7610,7 +7610,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -7668,7 +7668,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -8567,7 +8567,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -8599,7 +8599,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -8688,7 +8688,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -8741,7 +8741,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -9262,7 +9262,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -9351,7 +9351,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -9531,7 +9531,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -9643,7 +9643,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -9799,7 +9799,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#ffec99",
   "strokeStyle": "solid",
@@ -9856,7 +9856,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -10681,7 +10681,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -10738,7 +10738,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -11375,7 +11375,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -11477,7 +11477,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -11663,7 +11663,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -11721,7 +11721,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -11876,7 +11876,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -11908,7 +11908,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -11965,7 +11965,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -12119,7 +12119,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -12284,7 +12284,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -12809,7 +12809,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -12866,7 +12866,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -13054,7 +13054,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -13111,7 +13111,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -13267,7 +13267,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -13363,7 +13363,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -13518,7 +13518,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -13550,7 +13550,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -13607,7 +13607,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -13698,7 +13698,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -14595,7 +14595,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -14716,7 +14716,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -18437,7 +18437,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -18469,7 +18469,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -18501,7 +18501,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -18558,7 +18558,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -18611,7 +18611,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -18664,7 +18664,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -19438,7 +19438,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -19470,7 +19470,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -19502,7 +19502,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -19559,7 +19559,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -19612,7 +19612,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -19665,7 +19665,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",

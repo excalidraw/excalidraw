@@ -193,7 +193,7 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",

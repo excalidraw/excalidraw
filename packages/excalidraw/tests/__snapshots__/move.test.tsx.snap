@@ -18,7 +18,7 @@ exports[`duplicate element on move when ALT is clicked > rectangle 5`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
@@ -52,7 +52,7 @@ exports[`duplicate element on move when ALT is clicked > rectangle 6`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1604849351,
   "strokeColor": "#1e1e1e",
@@ -86,7 +86,7 @@ exports[`move element > rectangle 5`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
@@ -125,7 +125,7 @@ exports[`move element > rectangles with binding arrow 5`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
@@ -164,7 +164,7 @@ exports[`move element > rectangles with binding arrow 6`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1150084233,
   "strokeColor": "#1e1e1e",

@@ -162,7 +162,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -215,7 +215,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -268,7 +268,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -580,7 +580,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -633,7 +633,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -686,7 +686,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -978,7 +978,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -1031,7 +1031,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -1191,7 +1191,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -1734,7 +1734,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -1787,7 +1787,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -1840,7 +1840,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -2107,7 +2107,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -2160,7 +2160,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -2341,7 +2341,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -2524,7 +2524,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -2577,7 +2577,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -2843,7 +2843,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -3070,7 +3070,7 @@ exports[`regression tests > click on an element and drag it > [dragged] element 
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
@@ -3129,7 +3129,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -3336,7 +3336,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -3567,7 +3567,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -3620,7 +3620,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -3825,7 +3825,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -3878,7 +3878,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -3931,7 +3931,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -4136,7 +4136,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -4189,7 +4189,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -4588,7 +4588,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -4842,7 +4842,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -5125,7 +5125,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -5506,7 +5506,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -5559,7 +5559,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -5612,7 +5612,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -5893,7 +5893,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -6178,7 +6178,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -6992,7 +6992,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -7323,7 +7323,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -8070,7 +8070,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -10259,7 +10259,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -10448,7 +10448,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -10501,7 +10501,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -10554,7 +10554,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -10689,7 +10689,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -10722,7 +10722,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -10755,7 +10755,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -10938,7 +10938,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -10991,7 +10991,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -11341,7 +11341,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -11545,7 +11545,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -11598,7 +11598,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -11859,7 +11859,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -11912,7 +11912,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -11965,7 +11965,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -12276,7 +12276,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -12329,7 +12329,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -12467,7 +12467,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -12520,7 +12520,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -13012,7 +13012,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -13065,7 +13065,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -13118,7 +13118,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -13628,7 +13628,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -13966,7 +13966,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -14473,7 +14473,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -14526,7 +14526,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",

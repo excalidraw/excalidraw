@@ -185,7 +185,7 @@ exports[`select single element on the scene > rectangle 1`] = `
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
