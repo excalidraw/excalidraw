@@ -1345,29 +1345,25 @@ const getElbowArrowData = (
       : [10, 10, 10, 10],
     hoveredEndElement ? aabbForElement(hoveredEndElement) : [10, 10, 10, 10],
   );
+  const startOffsets = offsetFromHeading(
+    startHeading,
+    arrow.startArrowhead
+      ? FIXED_BINDING_DISTANCE * 4
+      : FIXED_BINDING_DISTANCE * 2,
+    1,
+  );
+  const endOffsets = offsetFromHeading(
+    endHeading,
+    arrow.endArrowhead
+      ? FIXED_BINDING_DISTANCE * 4
+      : FIXED_BINDING_DISTANCE * 2,
+    1,
+  );
   const startElementBounds = hoveredStartElement
-    ? aabbForElement(
-        hoveredStartElement,
-        offsetFromHeading(
-          startHeading,
-          arrow.startArrowhead
-            ? FIXED_BINDING_DISTANCE
-            : FIXED_BINDING_DISTANCE * 2,
-          1,
-        ),
-      )
+    ? aabbForElement(hoveredStartElement, startOffsets)
     : startPointBounds;
   const endElementBounds = hoveredEndElement
-    ? aabbForElement(
-        hoveredEndElement,
-        offsetFromHeading(
-          endHeading,
-          arrow.endArrowhead
-            ? FIXED_BINDING_DISTANCE
-            : FIXED_BINDING_DISTANCE * 2,
-          1,
-        ),
-      )
+    ? aabbForElement(hoveredEndElement, endOffsets)
     : endPointBounds;
   const boundsOverlap =
     pointInsideBounds(
