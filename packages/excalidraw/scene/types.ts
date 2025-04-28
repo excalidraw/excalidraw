@@ -50,7 +50,7 @@ export type SVGRenderConfig = {
   embedsValidationStatus: EmbedsValidationStatus;
   /**
    * whether to attempt to reuse images as much as possible through symbols
-   * (reduces SVG size, but may be incompoatible with some SVG renderers)
+   * (reduces SVG size, but may be incompatible with some SVG renderers)
    *
    * @default true
    */

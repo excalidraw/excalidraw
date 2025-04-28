@@ -5,7 +5,7 @@
     @include outlineButtonIconStyles;
 
     & > * {
-      // dissalow pointer events on children, so we always have event.target on the button itself
+      // disallow pointer events on children, so we always have event.target on the button itself
       pointer-events: none;
     }
   }
