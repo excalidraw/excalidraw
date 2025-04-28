@@ -8,6 +8,7 @@ import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/comm
 
 import {
   newArrowElement,
+  newBlurElement,
   newElement,
   newEmbeddableElement,
   newFrameElement,
@@ -355,12 +356,15 @@ export class API {
           scale: rest.scale || [1, 1],
         });
         break;
-      case "frame":
-        element = newFrameElement({ ...base, width, height });
-        break;
+        case "frame":
+            element = newFrameElement({ ...base, width, height });
+            break;
       case "magicframe":
         element = newMagicFrameElement({ ...base, width, height });
         break;
+      case "blur":
+            element = newBlurElement({ ...base, width, height, blur: appState.currentItemBlur});
+            break;
       default:
         assertNever(
           type,

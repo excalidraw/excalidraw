@@ -1,6 +1,9 @@
+import type { KeyboardModifiersObject } from "@excalidraw/excalidraw/types";
+
 import { isDarwin } from "./constants";
 
 import type { ValueOf } from "./utility-types";
+
 
 export const CODES = {
   EQUAL: "Equal",
@@ -140,12 +143,60 @@ export const isArrowKey = (key: string) =>
   key === KEYS.ARROW_DOWN ||
   key === KEYS.ARROW_UP;
 
-export const shouldResizeFromCenter = (event: MouseEvent | KeyboardEvent) =>
+const shouldResizeFromCenterDefault = (event: MouseEvent | KeyboardEvent) =>
   event.altKey;
 
-export const shouldMaintainAspectRatio = (event: MouseEvent | KeyboardEvent) =>
+const shouldMaintainAspectRatioDefault = (event: MouseEvent | KeyboardEvent) =>
   event.shiftKey;
+
+const shouldRotateWithDiscreteAngleDefault = (
+  event: MouseEvent | KeyboardEvent | React.PointerEvent<HTMLCanvasElement>,
+) => event.shiftKey;
+
+const shouldSnappingDefault = (event: KeyboardModifiersObject) =>
+  event[KEYS.CTRL_OR_CMD];
+
+let shouldResizeFromCenterFunction = shouldResizeFromCenterDefault;
+let shouldMaintainAspectRatioFunction = shouldMaintainAspectRatioDefault;
+let shouldRotateWithDiscreteAngleFunction =
+  shouldRotateWithDiscreteAngleDefault;
+let shouldSnappingFunction = shouldSnappingDefault;
+
+export const setShouldResizeFromCenter = (
+  shouldResizeFromCenter: (event: MouseEvent | KeyboardEvent) => boolean,
+) => {
+  shouldResizeFromCenterFunction = shouldResizeFromCenter;
+};
+
+export const setShouldMaintainAspectRatio = (
+  shouldMaintainAspectRatio: (event: MouseEvent | KeyboardEvent) => boolean,
+) => {
+  shouldMaintainAspectRatioFunction = shouldMaintainAspectRatio;
+};
+
+export const setShouldRotateWithDiscreteAngle = (
+  shouldRotateWithDiscreteAngle: (
+    event: MouseEvent | KeyboardEvent | React.PointerEvent<HTMLCanvasElement>,
+  ) => boolean,
+) => {
+  shouldRotateWithDiscreteAngleFunction = shouldRotateWithDiscreteAngle;
+};
+
+export const setShouldSnapping = (
+  shouldSnapping: (event: KeyboardModifiersObject) => boolean,
+) => {
+  shouldSnappingFunction = shouldSnapping;
+};
+
+export const shouldResizeFromCenter = (event: MouseEvent | KeyboardEvent) =>
+  shouldResizeFromCenterFunction(event);
+
+export const shouldMaintainAspectRatio = (event: MouseEvent | KeyboardEvent) =>
+  shouldMaintainAspectRatioFunction(event);
 
 export const shouldRotateWithDiscreteAngle = (
   event: MouseEvent | KeyboardEvent | React.PointerEvent<HTMLCanvasElement>,
-) => event.shiftKey;
+) => shouldRotateWithDiscreteAngleFunction(event);
+
+export const shouldSnapping = (event: KeyboardModifiersObject) =>
+  shouldSnappingFunction(event);

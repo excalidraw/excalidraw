@@ -8,6 +8,8 @@ import { KEYS, arrayToMap, getShortcutKey } from "@excalidraw/common";
 
 import { alignElements } from "@excalidraw/element/align";
 
+import { useContext } from "react";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Alignment } from "@excalidraw/element/align";
@@ -27,9 +29,14 @@ import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 import { CaptureUpdateAction } from "../store";
 
-import { register } from "./register";
+import {
+  ExcalidrawPropsCustomOptionsContext,
+  type AppClassProperties,
+  type AppState,
+  type UIAppState,
+} from "../types";
 
-import type { AppClassProperties, AppState, UIAppState } from "../types";
+import { register } from "./register";
 
 export const alignActionsPredicate = (
   appState: UIAppState,
@@ -81,19 +88,40 @@ export const actionAlignTop = register({
   },
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_UP,
-  PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
-      hidden={!alignActionsPredicate(appState, app)}
-      type="button"
-      icon={AlignTopIcon}
-      onClick={() => updateData(null)}
-      title={`${t("labels.alignTop")} — ${getShortcutKey(
-        "CtrlOrCmd+Shift+Up",
-      )}`}
-      aria-label={t("labels.alignTop")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.alignTop")}`,
+        children: AlignTopIcon,
+        name: "alignTop",
+        visible: isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
+        hidden: !alignActionsPredicate(appState, app),
+      });
+    }
+
+    return (
+      <ToolButton
+        hidden={!alignActionsPredicate(appState, app)}
+        type="button"
+        icon={AlignTopIcon}
+        onClick={() => updateData(null)}
+        title={`${t("labels.alignTop")} — ${getShortcutKey(
+          "CtrlOrCmd+Shift+Up",
+        )}`}
+        aria-label={t("labels.alignTop")}
+        visible={isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        )}
+      />
+    );
+  },
 });
 
 export const actionAlignBottom = register({
@@ -115,19 +143,40 @@ export const actionAlignBottom = register({
   },
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_DOWN,
-  PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
-      hidden={!alignActionsPredicate(appState, app)}
-      type="button"
-      icon={AlignBottomIcon}
-      onClick={() => updateData(null)}
-      title={`${t("labels.alignBottom")} — ${getShortcutKey(
-        "CtrlOrCmd+Shift+Down",
-      )}`}
-      aria-label={t("labels.alignBottom")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.alignBottom")}`,
+        children: AlignBottomIcon,
+        name: "alignBottom",
+        visible: isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
+        hidden: !alignActionsPredicate(appState, app),
+      });
+    }
+
+    return (
+      <ToolButton
+        hidden={!alignActionsPredicate(appState, app)}
+        type="button"
+        icon={AlignBottomIcon}
+        onClick={() => updateData(null)}
+        title={`${t("labels.alignBottom")} — ${getShortcutKey(
+          "CtrlOrCmd+Shift+Down",
+        )}`}
+        aria-label={t("labels.alignBottom")}
+        visible={isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        )}
+      />
+    );
+  },
 });
 
 export const actionAlignLeft = register({
@@ -149,19 +198,40 @@ export const actionAlignLeft = register({
   },
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_LEFT,
-  PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
-      hidden={!alignActionsPredicate(appState, app)}
-      type="button"
-      icon={AlignLeftIcon}
-      onClick={() => updateData(null)}
-      title={`${t("labels.alignLeft")} — ${getShortcutKey(
-        "CtrlOrCmd+Shift+Left",
-      )}`}
-      aria-label={t("labels.alignLeft")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.alignLeft")}`,
+        children: AlignLeftIcon,
+        name: "alignLeft",
+        visible: isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
+        hidden: !alignActionsPredicate(appState, app),
+      });
+    }
+
+    return (
+      <ToolButton
+        hidden={!alignActionsPredicate(appState, app)}
+        type="button"
+        icon={AlignLeftIcon}
+        onClick={() => updateData(null)}
+        title={`${t("labels.alignLeft")} — ${getShortcutKey(
+          "CtrlOrCmd+Shift+Left",
+        )}`}
+        aria-label={t("labels.alignLeft")}
+        visible={isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        )}
+      />
+    );
+  },
 });
 
 export const actionAlignRight = register({
@@ -183,19 +253,39 @@ export const actionAlignRight = register({
   },
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_RIGHT,
-  PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
-      hidden={!alignActionsPredicate(appState, app)}
-      type="button"
-      icon={AlignRightIcon}
-      onClick={() => updateData(null)}
-      title={`${t("labels.alignRight")} — ${getShortcutKey(
-        "CtrlOrCmd+Shift+Right",
-      )}`}
-      aria-label={t("labels.alignRight")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.alignRight")}`,
+        children: AlignRightIcon,
+        name: "alignRight",
+        visible: isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
+        hidden: !alignActionsPredicate(appState, app),
+      });
+    }
+    return (
+      <ToolButton
+        hidden={!alignActionsPredicate(appState, app)}
+        type="button"
+        icon={AlignRightIcon}
+        onClick={() => updateData(null)}
+        title={`${t("labels.alignRight")} — ${getShortcutKey(
+          "CtrlOrCmd+Shift+Right",
+        )}`}
+        aria-label={t("labels.alignRight")}
+        visible={isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        )}
+      />
+    );
+  },
 });
 
 export const actionAlignVerticallyCentered = register({
@@ -215,17 +305,38 @@ export const actionAlignVerticallyCentered = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
-      hidden={!alignActionsPredicate(appState, app)}
-      type="button"
-      icon={CenterVerticallyIcon}
-      onClick={() => updateData(null)}
-      title={t("labels.centerVertically")}
-      aria-label={t("labels.centerVertically")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.centerVertically")}`,
+        children: CenterVerticallyIcon,
+        name: "alignVerticallyCentered",
+        visible: isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
+        hidden: !alignActionsPredicate(appState, app),
+      });
+    }
+
+    return (
+      <ToolButton
+        hidden={!alignActionsPredicate(appState, app)}
+        type="button"
+        icon={CenterVerticallyIcon}
+        onClick={() => updateData(null)}
+        title={t("labels.centerVertically")}
+        aria-label={t("labels.centerVertically")}
+        visible={isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        )}
+      />
+    );
+  },
 });
 
 export const actionAlignHorizontallyCentered = register({
@@ -245,15 +356,36 @@ export const actionAlignHorizontallyCentered = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
-      hidden={!alignActionsPredicate(appState, app)}
-      type="button"
-      icon={CenterHorizontallyIcon}
-      onClick={() => updateData(null)}
-      title={t("labels.centerHorizontally")}
-      aria-label={t("labels.centerHorizontally")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.centerHorizontally")}`,
+        children: CenterHorizontallyIcon,
+        name: "alignHorizontallyCentered",
+        visible: isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
+        hidden: !alignActionsPredicate(appState, app),
+      });
+    }
+
+    return (
+      <ToolButton
+        hidden={!alignActionsPredicate(appState, app)}
+        type="button"
+        icon={CenterHorizontallyIcon}
+        onClick={() => updateData(null)}
+        title={t("labels.centerHorizontally")}
+        aria-label={t("labels.centerHorizontally")}
+        visible={isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        )}
+      />
+    );
+  },
 });

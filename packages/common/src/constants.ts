@@ -438,6 +438,7 @@ export const TOOL_TYPE = {
   magicframe: "magicframe",
   embeddable: "embeddable",
   laser: "laser",
+  blur: "blur",
 } as const;
 
 export const EDITOR_LS_KEYS = {

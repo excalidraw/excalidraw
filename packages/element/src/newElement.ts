@@ -46,6 +46,7 @@ import type {
   ExcalidrawArrowElement,
   FixedSegment,
   ExcalidrawElbowArrowElement,
+  ExcalidrawBlurElement,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -210,6 +211,25 @@ export const newMagicFrameElement = (
   );
 
   return frameElement;
+};
+
+export const newBlurElement = (
+  opts: {
+    blur: number;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawBlurElement> => {
+  const blurElement = newElementWith(
+    {
+      ..._newElementBase<ExcalidrawBlurElement>("blur", opts),
+      type: "blur",
+      blur: opts.blur,
+      fillStyle: "solid",
+      backgroundColor: "#000000",
+    },
+    {},
+  );
+
+  return blurElement;
 };
 
 /** computes element x/y offset based on textAlign/verticalAlign */

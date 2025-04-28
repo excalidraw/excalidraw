@@ -17,6 +17,8 @@ import {
   selectGroupsForSelectedElements,
 } from "@excalidraw/element/groups";
 
+import { useContext } from "react";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
@@ -24,6 +26,8 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { CaptureUpdateAction } from "../store";
 import { TrashIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
+
+import { ExcalidrawPropsCustomOptionsContext } from "../types";
 
 import { register } from "./register";
 
@@ -310,14 +314,34 @@ export const actionDeleteSelected = register({
   keyTest: (event, appState, elements) =>
     (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
     !event[KEYS.CTRL_OR_CMD],
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <ToolButton
-      type="button"
-      icon={TrashIcon}
-      title={t("labels.delete")}
-      aria-label={t("labels.delete")}
-      onClick={() => updateData(null)}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.delete")}`,
+        children: TrashIcon,
+        name: "deleteSelectedElements",
+        visible: isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
+      });
+    }
+
+    return (
+      <ToolButton
+        type="button"
+        icon={TrashIcon}
+        title={t("labels.delete")}
+        aria-label={t("labels.delete")}
+        onClick={() => updateData(null)}
+        visible={isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        )}
+      />
+    );
+  },
 });

@@ -89,6 +89,11 @@ export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
   type: "rectangle";
 };
 
+export type ExcalidrawBlurElement = _ExcalidrawElementBase & {
+  type: "blur";
+  blur: number;
+};
+
 export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
   type: "diamond";
 };
@@ -212,7 +217,8 @@ export type ExcalidrawElement =
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement
   | ExcalidrawIframeElement
-  | ExcalidrawEmbeddableElement;
+  | ExcalidrawEmbeddableElement
+  | ExcalidrawBlurElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<
   ExcalidrawElement,

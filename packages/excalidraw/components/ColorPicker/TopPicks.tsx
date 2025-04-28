@@ -7,10 +7,13 @@ import {
   DEFAULT_ELEMENT_STROKE_PICKS,
 } from "@excalidraw/common";
 
+import { useContext } from "react";
+
+import { ExcalidrawPropsCustomOptionsContext } from "@excalidraw/excalidraw/types";
+
 import { isColorDark } from "./colorPickerUtils";
 
 import type { ColorPickerType } from "./colorPickerUtils";
-
 interface TopPicksProps {
   onChange: (color: string) => void;
   type: ColorPickerType;
@@ -24,13 +27,19 @@ export const TopPicks = ({
   activeColor,
   topPicks,
 }: TopPicksProps) => {
+  const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
   let colors;
   if (type === "elementStroke") {
-    colors = DEFAULT_ELEMENT_STROKE_PICKS;
+    colors =
+      customOptions?.pickerRenders?.elementStrokeColors ??
+      DEFAULT_ELEMENT_STROKE_PICKS;
   }
 
   if (type === "elementBackground") {
-    colors = DEFAULT_ELEMENT_BACKGROUND_PICKS;
+    colors =
+      customOptions?.pickerRenders?.elementBackgroundColors ??
+      DEFAULT_ELEMENT_BACKGROUND_PICKS;
   }
 
   if (type === "canvasBackground") {
@@ -49,26 +58,41 @@ export const TopPicks = ({
 
   return (
     <div className="color-picker__top-picks">
-      {colors.map((color: string) => (
-        <button
-          className={clsx("color-picker__button", {
+      {colors.map((color: string) => {
+        if (customOptions?.pickerRenders?.colorPickerTopPickesButtonRender) {
+          return customOptions.pickerRenders.colorPickerTopPickesButtonRender({
             active: color === activeColor,
-            "is-transparent": color === "transparent" || !color,
-            "has-outline": !isColorDark(
-              color,
-              COLOR_OUTLINE_CONTRAST_THRESHOLD,
-            ),
-          })}
-          style={{ "--swatch-color": color }}
-          key={color}
-          type="button"
-          title={color}
-          onClick={() => onChange(color)}
-          data-testid={`color-top-pick-${color}`}
-        >
-          <div className="color-picker__button-outline" />
-        </button>
-      ))}
+            color,
+            isTransparent: color === "transparent" || !color,
+            hasOutline: !isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD),
+            onClick: () => onChange(color),
+            dataTestid: `color-top-pick-${color}`,
+            children: <div className="color-picker__button-outline" />,
+            key: color,
+          });
+        }
+
+        return (
+          <button
+            className={clsx("color-picker__button", {
+              active: color === activeColor,
+              "is-transparent": color === "transparent" || !color,
+              "has-outline": !isColorDark(
+                color,
+                COLOR_OUTLINE_CONTRAST_THRESHOLD,
+              ),
+            })}
+            style={{ "--swatch-color": color }}
+            key={color}
+            type="button"
+            title={color}
+            onClick={() => onChange(color)}
+            data-testid={`color-top-pick-${color}`}
+          >
+            <div className="color-picker__button-outline" />
+          </button>
+        );
+      })}
     </div>
   );
 };

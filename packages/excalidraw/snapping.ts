@@ -7,7 +7,7 @@ import {
   type GlobalPoint,
 } from "@excalidraw/math";
 
-import { TOOL_TYPE, KEYS } from "@excalidraw/common";
+import { TOOL_TYPE, KEYS, shouldSnapping } from "@excalidraw/common";
 import {
   getCommonBounds,
   getDraggedElementsBounds,
@@ -173,9 +173,9 @@ export const isSnappingEnabled = ({
 }) => {
   if (event) {
     return (
-      (app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
+      (app.state.objectsSnapModeEnabled && !shouldSnapping(event)) ||
       (!app.state.objectsSnapModeEnabled &&
-        event[KEYS.CTRL_OR_CMD] &&
+        shouldSnapping(event) &&
         !isGridModeEnabled(app))
     );
   }

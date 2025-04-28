@@ -1,5 +1,5 @@
 import { pointFrom } from "@excalidraw/math";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
@@ -133,10 +133,16 @@ import {
 } from "../scene";
 import { CaptureUpdateAction } from "../store";
 
+import {
+  ExcalidrawPropsCustomOptionsContext,
+  type AppClassProperties,
+  type AppState,
+  type Primitive,
+} from "../types";
+
 import { register } from "./register";
 
 import type { CaptureUpdateActionType } from "../store";
-import type { AppClassProperties, AppState, Primitive } from "../types";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -318,28 +324,35 @@ export const actionChangeStrokeColor = register({
         : CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, appProps }) => (
-    <>
-      <h3 aria-hidden="true">{t("labels.stroke")}</h3>
-      <ColorPicker
-        topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
-        palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
-        type="elementStroke"
-        label={t("labels.stroke")}
-        color={getFormValue(
-          elements,
-          appState,
-          (element) => element.strokeColor,
-          true,
-          appState.currentItemStrokeColor,
-        )}
-        onChange={(color) => updateData({ currentItemStrokeColor: color })}
-        elements={elements}
-        appState={appState}
-        updateData={updateData}
-      />
-    </>
-  ),
+  PanelComponent: ({ elements, appState, updateData, appProps }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    return (
+      <>
+        <h3 aria-hidden="true">{t("labels.stroke")}</h3>
+        <ColorPicker
+          topPicks={
+            customOptions?.pickerRenders?.elementStrokeColors ??
+            DEFAULT_ELEMENT_STROKE_PICKS
+          }
+          palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
+          type="elementStroke"
+          label={t("labels.stroke")}
+          color={getFormValue(
+            elements,
+            appState,
+            (element) => element.strokeColor,
+            true,
+            appState.currentItemStrokeColor,
+          )}
+          onChange={(color) => updateData({ currentItemStrokeColor: color })}
+          elements={elements}
+          appState={appState}
+          updateData={updateData}
+        />
+      </>
+    );
+  },
 });
 
 export const actionChangeBackgroundColor = register({
@@ -364,28 +377,37 @@ export const actionChangeBackgroundColor = register({
         : CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, appProps }) => (
-    <>
-      <h3 aria-hidden="true">{t("labels.background")}</h3>
-      <ColorPicker
-        topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
-        palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
-        type="elementBackground"
-        label={t("labels.background")}
-        color={getFormValue(
-          elements,
-          appState,
-          (element) => element.backgroundColor,
-          true,
-          appState.currentItemBackgroundColor,
-        )}
-        onChange={(color) => updateData({ currentItemBackgroundColor: color })}
-        elements={elements}
-        appState={appState}
-        updateData={updateData}
-      />
-    </>
-  ),
+  PanelComponent: ({ elements, appState, updateData, appProps }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    return (
+      <>
+        <h3 aria-hidden="true">{t("labels.background")}</h3>
+        <ColorPicker
+          topPicks={
+            customOptions?.pickerRenders?.elementBackgroundColors ??
+            DEFAULT_ELEMENT_BACKGROUND_PICKS
+          }
+          palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
+          type="elementBackground"
+          label={t("labels.background")}
+          color={getFormValue(
+            elements,
+            appState,
+            (element) => element.backgroundColor,
+            true,
+            appState.currentItemBackgroundColor,
+          )}
+          onChange={(color) =>
+            updateData({ currentItemBackgroundColor: color })
+          }
+          elements={elements}
+          appState={appState}
+          updateData={updateData}
+        />
+      </>
+    );
+  },
 });
 
 export const actionChangeFillStyle = register({
@@ -1520,46 +1542,92 @@ export const actionChangeArrowhead = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
     const isRTL = getLanguage().rtl;
 
     return (
       <fieldset>
         <legend>{t("labels.arrowheads")}</legend>
-        <div className="iconSelectList buttonList">
-          <IconPicker
-            label="arrowhead_start"
-            options={getArrowheadOptions(!isRTL)}
-            value={getFormValue<Arrowhead | null>(
-              elements,
-              appState,
-              (element) =>
-                isLinearElement(element) && canHaveArrowheads(element.type)
-                  ? element.startArrowhead
-                  : appState.currentItemStartArrowhead,
-              true,
-              appState.currentItemStartArrowhead,
-            )}
-            onChange={(value) => updateData({ position: "start", type: value })}
-            numberOfOptionsToAlwaysShow={4}
-          />
-          <IconPicker
-            label="arrowhead_end"
-            group="arrowheads"
-            options={getArrowheadOptions(!!isRTL)}
-            value={getFormValue<Arrowhead | null>(
-              elements,
-              appState,
-              (element) =>
-                isLinearElement(element) && canHaveArrowheads(element.type)
-                  ? element.endArrowhead
-                  : appState.currentItemEndArrowhead,
-              true,
-              appState.currentItemEndArrowhead,
-            )}
-            onChange={(value) => updateData({ position: "end", type: value })}
-            numberOfOptionsToAlwaysShow={4}
-          />
-        </div>
+        {customOptions?.pickerRenders?.ButtonList && (
+          <customOptions.pickerRenders.ButtonList className="iconPickerList">
+            <IconPicker
+              label="arrowhead_start"
+              options={getArrowheadOptions(!isRTL)}
+              value={getFormValue<Arrowhead | null>(
+                elements,
+                appState,
+                (element) =>
+                  isLinearElement(element) && canHaveArrowheads(element.type)
+                    ? element.startArrowhead
+                    : appState.currentItemStartArrowhead,
+                true,
+                appState.currentItemStartArrowhead,
+              )}
+              onChange={(value) =>
+                updateData({ position: "start", type: value })
+              }
+              numberOfOptionsToAlwaysShow={4}
+            />
+            <IconPicker
+              label="arrowhead_end"
+              group="arrowheads"
+              options={getArrowheadOptions(!!isRTL)}
+              value={getFormValue<Arrowhead | null>(
+                elements,
+                appState,
+                (element) =>
+                  isLinearElement(element) && canHaveArrowheads(element.type)
+                    ? element.endArrowhead
+                    : appState.currentItemEndArrowhead,
+                true,
+                appState.currentItemEndArrowhead,
+              )}
+              onChange={(value) => updateData({ position: "end", type: value })}
+              numberOfOptionsToAlwaysShow={4}
+            />
+          </customOptions.pickerRenders.ButtonList>
+        )}
+
+        {!customOptions?.pickerRenders?.ButtonList && (
+          <div className="iconSelectList buttonList">
+            <IconPicker
+              label="arrowhead_start"
+              options={getArrowheadOptions(!isRTL)}
+              value={getFormValue<Arrowhead | null>(
+                elements,
+                appState,
+                (element) =>
+                  isLinearElement(element) && canHaveArrowheads(element.type)
+                    ? element.startArrowhead
+                    : appState.currentItemStartArrowhead,
+                true,
+                appState.currentItemStartArrowhead,
+              )}
+              onChange={(value) =>
+                updateData({ position: "start", type: value })
+              }
+              numberOfOptionsToAlwaysShow={4}
+            />
+            <IconPicker
+              label="arrowhead_end"
+              group="arrowheads"
+              options={getArrowheadOptions(!!isRTL)}
+              value={getFormValue<Arrowhead | null>(
+                elements,
+                appState,
+                (element) =>
+                  isLinearElement(element) && canHaveArrowheads(element.type)
+                    ? element.endArrowhead
+                    : appState.currentItemEndArrowhead,
+                true,
+                appState.currentItemEndArrowhead,
+              )}
+              onChange={(value) => updateData({ position: "end", type: value })}
+              numberOfOptionsToAlwaysShow={4}
+            />
+          </div>
+        )}
       </fieldset>
     );
   },

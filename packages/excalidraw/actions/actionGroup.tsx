@@ -28,6 +28,8 @@ import {
 
 import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
 
+import { useContext } from "react";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -42,9 +44,13 @@ import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 import { CaptureUpdateAction } from "../store";
 
-import { register } from "./register";
+import {
+  ExcalidrawPropsCustomOptionsContext,
+  type AppClassProperties,
+  type AppState,
+} from "../types";
 
-import type { AppClassProperties, AppState } from "../types";
+import { register } from "./register";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -195,17 +201,38 @@ export const actionGroup = register({
     enableActionGroup(elements, appState, app),
   keyTest: (event) =>
     !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G,
-  PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
-      hidden={!enableActionGroup(elements, appState, app)}
-      type="button"
-      icon={<GroupIcon theme={appState.theme} />}
-      onClick={() => updateData(null)}
-      title={`${t("labels.group")} — ${getShortcutKey("CtrlOrCmd+G")}`}
-      aria-label={t("labels.group")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    ></ToolButton>
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.group")}`,
+        children: <GroupIcon theme={appState.theme} />,
+        name: "group",
+        visible: isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
+        hidden: !enableActionGroup(elements, appState, app),
+      });
+    }
+
+    return (
+      <ToolButton
+        hidden={!enableActionGroup(elements, appState, app)}
+        type="button"
+        icon={<GroupIcon theme={appState.theme} />}
+        onClick={() => updateData(null)}
+        title={`${t("labels.group")} — ${getShortcutKey("CtrlOrCmd+G")}`}
+        aria-label={t("labels.group")}
+        visible={isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        )}
+      ></ToolButton>
+    );
+  },
 });
 
 export const actionUngroup = register({
@@ -304,15 +331,38 @@ export const actionUngroup = register({
     event.key === KEYS.G.toUpperCase(),
   predicate: (elements, appState) => getSelectedGroupIds(appState).length > 0,
 
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <ToolButton
-      type="button"
-      hidden={getSelectedGroupIds(appState).length === 0}
-      icon={<UngroupIcon theme={appState.theme} />}
-      onClick={() => updateData(null)}
-      title={`${t("labels.ungroup")} — ${getShortcutKey("CtrlOrCmd+Shift+G")}`}
-      aria-label={t("labels.ungroup")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    ></ToolButton>
-  ),
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.ungroup")}`,
+        children: <UngroupIcon theme={appState.theme} />,
+        name: "ungroup",
+        visible: isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
+        hidden: getSelectedGroupIds(appState).length === 0,
+      });
+    }
+
+    return (
+      <ToolButton
+        type="button"
+        hidden={getSelectedGroupIds(appState).length === 0}
+        icon={<UngroupIcon theme={appState.theme} />}
+        onClick={() => updateData(null)}
+        title={`${t("labels.ungroup")} — ${getShortcutKey(
+          "CtrlOrCmd+Shift+G",
+        )}`}
+        aria-label={t("labels.ungroup")}
+        visible={isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        )}
+      ></ToolButton>
+    );
+  },
 });

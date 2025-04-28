@@ -1,5 +1,7 @@
 import { isWindows, KEYS, matchKey, arrayToMap } from "@excalidraw/common";
 
+import { useContext, useEffect } from "react";
+
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
 import { ToolButton } from "../components/ToolButton";
@@ -9,9 +11,14 @@ import { useEmitter } from "../hooks/useEmitter";
 import { t } from "../i18n";
 import { CaptureUpdateAction } from "../store";
 
+import {
+  ExcalidrawHistoryContext,
+  type AppClassProperties,
+  type AppState,
+} from "../types";
+
 import type { History } from "../history";
 import type { Store } from "../store";
-import type { AppClassProperties, AppState } from "../types";
 import type { Action, ActionResult } from "./types";
 
 const executeHistoryAction = (
@@ -74,6 +81,12 @@ export const createUndoAction: ActionCreator = (history, store) => ({
       ),
     );
 
+    const historyContext = useContext(ExcalidrawHistoryContext);
+    historyContext &&
+      (historyContext.undoRef.current = () => {
+        updateData();
+      });
+
     return (
       <ToolButton
         type="button"
@@ -113,6 +126,12 @@ export const createRedoAction: ActionCreator = (history, store) => ({
         history.isRedoStackEmpty,
       ),
     );
+
+    const historyContext = useContext(ExcalidrawHistoryContext);
+    historyContext &&
+      (historyContext.redoRef.current = () => {
+        updateData();
+      });
 
     return (
       <ToolButton

@@ -127,6 +127,7 @@
     "unbindText": "Unbind text",
     "bindText": "Bind text to the container",
     "createContainerFromText": "Wrap text in a container",
+    "blur": "Strength",
     "link": {
       "edit": "Edit link",
       "editEmbed": "Edit embeddable link",
@@ -279,6 +280,7 @@
     "lasso": "Lasso selection",
     "image": "Insert image",
     "rectangle": "Rectangle",
+    "blur": "Blur",
     "diamond": "Diamond",
     "ellipse": "Ellipse",
     "arrow": "Arrow",
@@ -312,6 +314,7 @@
     "magicframe": "Wireframe to code",
     "embeddable": "Web Embed",
     "selection": "Selection",
+    "blur": "Blur",
     "iframe": "IFrame"
   },
   "headings": {

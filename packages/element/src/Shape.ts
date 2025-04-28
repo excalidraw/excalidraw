@@ -98,6 +98,7 @@ export const generateRoughOptions = (
     case "iframe":
     case "embeddable":
     case "diamond":
+    case "blur":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
@@ -326,6 +327,7 @@ export const _generateElementShape = (
   switch (element.type) {
     case "rectangle":
     case "iframe":
+    case "blur":
     case "embeddable": {
       let shape: ElementShapes[typeof element.type];
       // this is for rendering the stroke/bg of the embeddable, especially

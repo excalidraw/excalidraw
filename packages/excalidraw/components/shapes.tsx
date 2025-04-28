@@ -9,8 +9,8 @@ import {
   LineIcon,
   FreedrawIcon,
   TextIcon,
-  ImageIcon,
   EraserIcon,
+  ImageIcon,
 } from "./icons";
 
 export const SHAPES = [
@@ -74,6 +74,13 @@ export const SHAPES = [
     icon: ImageIcon,
     value: "image",
     key: null,
+    numericKey: KEYS["9"],
+    fillable: false,
+  },
+  {
+    icon: RectangleIcon,
+    key: null,
+    value: "blur",
     numericKey: KEYS["9"],
     fillable: false,
   },

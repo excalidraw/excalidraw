@@ -72,6 +72,7 @@ import type {
   BinaryFiles,
   UIAppState,
   AppClassProperties,
+  ExcalidrawPropsCustomOptions,
 } from "../types";
 
 interface LayerUIProps {
@@ -95,6 +96,7 @@ interface LayerUIProps {
   app: AppClassProperties;
   isCollaborating: boolean;
   generateLinkForSelection?: AppProps["generateLinkForSelection"];
+  customOptions?: ExcalidrawPropsCustomOptions;
 }
 
 const DefaultMainMenu: React.FC<{
@@ -153,6 +155,7 @@ const LayerUI = ({
   app,
   isCollaborating,
   generateLinkForSelection,
+  customOptions,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
@@ -209,13 +212,8 @@ const LayerUI = ({
     </div>
   );
 
-  const renderSelectedShapeActions = () => (
-    <Section
-      heading="selectedShapeActions"
-      className={clsx("selected-shape-actions zen-mode-transition", {
-        "transition-left": appState.zenModeEnabled,
-      })}
-    >
+  const renderSelectedShapeActions = () => {
+    const children = (
       <Island
         className={CLASSES.SHAPE_ACTIONS_MENU}
         padding={2}
@@ -232,8 +230,19 @@ const LayerUI = ({
           app={app}
         />
       </Island>
-    </Section>
-  );
+    );
+
+    return (
+      <Section
+        heading="selectedShapeActions"
+        className={clsx("selected-shape-actions zen-mode-transition", {
+          "transition-left": appState.zenModeEnabled,
+        })}
+      >
+        {customOptions?.layoutRenders?.menuRender?.({ children }) ?? children}
+      </Section>
+    );
+  };
 
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
@@ -249,7 +258,10 @@ const LayerUI = ({
 
     return (
       <FixedSideContainer side="top">
-        <div className="App-menu App-menu_top">
+        <div
+          className="App-menu App-menu_top"
+          style={{ display: customOptions?.hideMenu ? "none" : undefined }}
+        >
           <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
             {renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
@@ -274,6 +286,11 @@ const LayerUI = ({
                           className={clsx("App-toolbar", {
                             "zen-mode": appState.zenModeEnabled,
                           })}
+                          style={{
+                            display: customOptions?.hideMainToolbar
+                              ? "none"
+                              : undefined,
+                          }}
                         >
                           <HintViewer
                             appState={appState}
@@ -543,12 +560,14 @@ const LayerUI = ({
           >
             {renderWelcomeScreen && <tunnels.WelcomeScreenCenterTunnel.Out />}
             {renderFixedSideContainer()}
-            <Footer
-              appState={appState}
-              actionManager={actionManager}
-              showExitZenModeBtn={showExitZenModeBtn}
-              renderWelcomeScreen={renderWelcomeScreen}
-            />
+            {!customOptions?.hideFooter && (
+              <Footer
+                appState={appState}
+                actionManager={actionManager}
+                showExitZenModeBtn={showExitZenModeBtn}
+                renderWelcomeScreen={renderWelcomeScreen}
+              />
+            )}
             {appState.scrolledOutside && (
               <button
                 type="button"

@@ -20,6 +20,8 @@ export {
   actionChangeVerticalAlign,
 } from "./actionProperties";
 
+export { actionChangeBlur } from "./actionBlur";
+
 export {
   actionChangeViewBackgroundColor,
   actionClearCanvas,

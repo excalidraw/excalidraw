@@ -8,6 +8,8 @@ import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/fra
 
 import { distributeElements } from "@excalidraw/element/distribute";
 
+import { useContext } from "react";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Distribution } from "@excalidraw/element/distribute";
@@ -23,9 +25,13 @@ import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 import { CaptureUpdateAction } from "../store";
 
-import { register } from "./register";
+import {
+  ExcalidrawPropsCustomOptionsContext,
+  type AppClassProperties,
+  type AppState,
+} from "../types";
 
-import type { AppClassProperties, AppState } from "../types";
+import { register } from "./register";
 
 const enableActionGroup = (appState: AppState, app: AppClassProperties) => {
   const selectedElements = app.scene.getSelectedElements(appState);
@@ -75,19 +81,40 @@ export const distributeHorizontally = register({
   },
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.H,
-  PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
-      hidden={!enableActionGroup(appState, app)}
-      type="button"
-      icon={DistributeHorizontallyIcon}
-      onClick={() => updateData(null)}
-      title={`${t("labels.distributeHorizontally")} — ${getShortcutKey(
-        "Alt+H",
-      )}`}
-      aria-label={t("labels.distributeHorizontally")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.distributeHorizontally")}`,
+        children: DistributeHorizontallyIcon,
+        name: "distributeHorizontally",
+        visible: isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
+        hidden: !enableActionGroup(appState, app),
+      });
+    }
+
+    return (
+      <ToolButton
+        hidden={!enableActionGroup(appState, app)}
+        type="button"
+        icon={DistributeHorizontallyIcon}
+        onClick={() => updateData(null)}
+        title={`${t("labels.distributeHorizontally")} — ${getShortcutKey(
+          "Alt+H",
+        )}`}
+        aria-label={t("labels.distributeHorizontally")}
+        visible={isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        )}
+      />
+    );
+  },
 });
 
 export const distributeVertically = register({
@@ -106,15 +133,38 @@ export const distributeVertically = register({
   },
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.V,
-  PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
-      hidden={!enableActionGroup(appState, app)}
-      type="button"
-      icon={DistributeVerticallyIcon}
-      onClick={() => updateData(null)}
-      title={`${t("labels.distributeVertically")} — ${getShortcutKey("Alt+V")}`}
-      aria-label={t("labels.distributeVertically")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: `${t("labels.distributeVertically")}`,
+        children: DistributeVerticallyIcon,
+        name: "distributeVertically",
+        visible: isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        ),
+        hidden: !enableActionGroup(appState, app),
+      });
+    }
+
+    return (
+      <ToolButton
+        hidden={!enableActionGroup(appState, app)}
+        type="button"
+        icon={DistributeVerticallyIcon}
+        onClick={() => updateData(null)}
+        title={`${t("labels.distributeVertically")} — ${getShortcutKey(
+          "Alt+V",
+        )}`}
+        aria-label={t("labels.distributeVertically")}
+        visible={isSomeElementSelected(
+          getNonDeletedElements(elements),
+          appState,
+        )}
+      />
+    );
+  },
 });

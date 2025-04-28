@@ -1,11 +1,13 @@
 import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 
 import { isArrowKey, KEYS } from "@excalidraw/common";
 
 import { atom, useAtom } from "../editor-jotai";
 import { getLanguage, t } from "../i18n";
+
+import { ExcalidrawPropsCustomOptionsContext } from "../types";
 
 import Collapsible from "./Stats/Collapsible";
 import { useDevice } from "./App";
@@ -115,39 +117,63 @@ function Picker<T>({
     }
   }, [value, alwaysVisibleOptions, setShowMoreOptions]);
 
+  const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
   const renderOptions = (options: Option<T>[]) => {
     return (
       <div className="picker-content">
-        {options.map((option, i) => (
-          <button
-            type="button"
-            className={clsx("picker-option", {
+        {options.map((option, i) => {
+          if (customOptions?.pickerRenders?.layerButtonRender) {
+            return customOptions.pickerRenders.layerButtonRender({
               active: value === option.value,
-            })}
-            onClick={(event) => {
-              onChange(option.value);
-            }}
-            title={`${option.text} ${
-              option.keyBinding && `— ${option.keyBinding.toUpperCase()}`
-            }`}
-            aria-label={option.text || "none"}
-            aria-keyshortcuts={option.keyBinding || undefined}
-            key={option.text}
-            ref={(ref) => {
-              if (value === option.value) {
-                // Use a timeout here to render focus properly
-                setTimeout(() => {
-                  ref?.focus();
-                }, 0);
-              }
-            }}
-          >
-            {option.icon}
-            {option.keyBinding && (
-              <span className="picker-keybinding">{option.keyBinding}</span>
-            )}
-          </button>
-        ))}
+              title: option.text,
+              children: (
+                <>
+                  {option.icon}
+                  {/* {option.keyBinding && (
+                    <span className="picker-keybinding">
+                      {option.keyBinding}
+                    </span>
+                  )} */}
+                </>
+              ),
+              key: option.text,
+              onClick: () => onChange(option.value),
+              name: option.text,
+            });
+          }
+
+          return (
+            <button
+              type="button"
+              className={clsx("picker-option", {
+                active: value === option.value,
+              })}
+              onClick={(event) => {
+                onChange(option.value);
+              }}
+              title={`${option.text} ${
+                option.keyBinding && `— ${option.keyBinding.toUpperCase()}`
+              }`}
+              aria-label={option.text || "none"}
+              aria-keyshortcuts={option.keyBinding || undefined}
+              key={option.text}
+              ref={(ref) => {
+                if (value === option.value) {
+                  // Use a timeout here to render focus properly
+                  setTimeout(() => {
+                    ref?.focus();
+                  }, 0);
+                }
+              }}
+            >
+              {option.icon}
+              {option.keyBinding && (
+                <span className="picker-keybinding">{option.keyBinding}</span>
+              )}
+            </button>
+          );
+        })}
       </div>
     );
   };
@@ -162,7 +188,7 @@ function Picker<T>({
       align="start"
       sideOffset={12}
       style={{ zIndex: "var(--zIndex-popup)" }}
-      onKeyDown={handleKeyDown}
+      onKeyDown={customOptions?.disableKeyEvents ? undefined : handleKeyDown}
     >
       <div
         className={`picker`}
@@ -209,22 +235,46 @@ export function IconPicker<T>({
   numberOfOptionsToAlwaysShow?: number;
   group?: string;
 }) {
+  const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
   const [isActive, setActive] = React.useState(false);
   const rPickerButton = React.useRef<any>(null);
+
+  const renderTrigger = () => {
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return (
+        <>
+          <Popover.Trigger
+            name={group}
+            type="button"
+            aria-label={label}
+            onClick={() => setActive(!isActive)}
+            ref={rPickerButton}
+            className={isActive ? "active" : ""}
+            style={{
+              padding: 0,
+              border: "unset",
+              width: 0,
+            }}
+          >
+            {options.find((option) => option.value === value)?.icon}
+          </Popover.Trigger>
+          {customOptions.pickerRenders.layerButtonRender({
+            name: group,
+            title: "",
+            onClick: () => setActive(!isActive),
+            children: options.find((option) => option.value === value)?.icon,
+            active: isActive,
+          })}
+        </>
+      );
+    }
+  };
 
   return (
     <div>
       <Popover.Root open={isActive} onOpenChange={(open) => setActive(open)}>
-        <Popover.Trigger
-          name={group}
-          type="button"
-          aria-label={label}
-          onClick={() => setActive(!isActive)}
-          ref={rPickerButton}
-          className={isActive ? "active" : ""}
-        >
-          {options.find((option) => option.value === value)?.icon}
-        </Popover.Trigger>
+        {renderTrigger()}
         {isActive && (
           <Picker
             options={options}
