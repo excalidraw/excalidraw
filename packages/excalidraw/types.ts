@@ -138,6 +138,7 @@ export type ToolType =
   | "selection"
   | "lasso"
   | "rectangle"
+  | "regularPolygon"
   | "diamond"
   | "ellipse"
   | "arrow"

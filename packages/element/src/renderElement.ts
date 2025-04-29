@@ -394,6 +394,7 @@ const drawElementOnCanvas = (
   appState: StaticCanvasAppState,
 ) => {
   switch (element.type) {
+    case "regularPolygon":
     case "rectangle":
     case "iframe":
     case "embeddable":
@@ -806,6 +807,7 @@ export const renderElement = (
 
       break;
     }
+    case "regularPolygon":
     case "rectangle":
     case "diamond":
     case "ellipse":

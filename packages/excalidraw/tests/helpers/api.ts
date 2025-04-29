@@ -17,6 +17,7 @@ import {
   newLinearElement,
   newMagicFrameElement,
   newTextElement,
+  newRegularPolygonElement,
 } from "@excalidraw/element/newElement";
 
 import { isLinearElementType } from "@excalidraw/element/typeChecks";
@@ -361,10 +362,19 @@ export class API {
       case "magicframe":
         element = newMagicFrameElement({ ...base, width, height });
         break;
+      case "regularPolygon":
+        element = newRegularPolygonElement({
+          type: type as "regularPolygon",
+          ...base,
+        });
+        break;
       default:
+        // This check ensures all TOOL_TYPE values are handled.
+        // If a new tool type is added without updating this switch,
+        // TypeScript will error here.
         assertNever(
           type,
-          `API.createElement: unimplemented element type ${type}}`,
+          `API.createElement: unimplemented element type ${type as string}}`,
         );
         break;
     }

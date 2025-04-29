@@ -28,6 +28,7 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawLinearElement,
   Arrowhead,
+  ExcalidrawRegularPolygonElement,
 } from "./types";
 
 import type { Drawable, Options } from "roughjs/bin/core";
@@ -108,6 +109,14 @@ export const generateRoughOptions = (
       }
       return options;
     }
+    case "regularPolygon": {
+      options.fillStyle = element.fillStyle;
+      options.fill = isTransparent(element.backgroundColor)
+        ? undefined
+        : element.backgroundColor;
+      // Add any specific options for polygons if needed, otherwise just return
+      return options;
+    }
     case "line":
     case "freedraw": {
       if (isPathALoop(element.points)) {
@@ -125,6 +134,50 @@ export const generateRoughOptions = (
       throw new Error(`Unimplemented type ${element.type}`);
     }
   }
+};
+
+/**
+ * Returns the points for a regular polygon with the specified number of sides,
+ * centered within the element's bounds.
+ */
+export const getRegularPolygonPoints = (
+  element: ExcalidrawElement,
+  sides: number = 6
+): [number, number][] => {
+  // Minimum number of sides for a polygon is 3
+  if (sides < 3) {
+    sides = 3;
+  }
+
+  const width = element.width;
+  const height = element.height;
+  
+  // Center of the element
+  const cx = width / 2;
+  const cy = height / 2;
+  
+  // Use the smaller dimension to ensure polygon fits within the element bounds
+  const radius = Math.min(width, height) / 2;
+  
+  // Calculate points for the regular polygon
+  const points: [number, number][] = [];
+  
+  // For regular polygons, we want to start from the top (angle = -π/2)
+  // so that polygons like hexagons have a flat top
+  const startAngle = -Math.PI / 2;
+  
+  for (let i = 0; i < sides; i++) {
+    // Calculate angle for this vertex
+    const angle = startAngle + (2 * Math.PI * i) / sides;
+    
+    // Calculate x and y for this vertex
+    const x = cx + radius * Math.cos(angle);
+    const y = cy + radius * Math.sin(angle);
+    
+    points.push([x, y]);
+  }
+  
+  return points;
 };
 
 const modifyIframeLikeForRoughOptions = (
@@ -535,6 +588,75 @@ export const _generateElementShape = (
       const shape: ElementShapes[typeof element.type] = null;
       // we return (and cache) `null` to make sure we don't regenerate
       // `element.canvas` on rerenders
+      return shape;
+    }
+    case "regularPolygon": {
+      let shape: ElementShapes[typeof element.type];
+      
+      const points = getRegularPolygonPoints(
+        element, 
+        (element as ExcalidrawRegularPolygonElement).sides
+      );
+      
+      if (element.roundness) {
+        // For rounded corners, we create a path with smooth corners
+        // using quadratic Bézier curves, similar to the diamond shape
+        const options = generateRoughOptions(element, true);
+        
+        // Calculate appropriate corner radius based on element size
+        const radius = getCornerRadius(
+          Math.min(element.width, element.height) / 4,
+          element
+        );
+        
+        const pathData: string[] = [];
+        
+        // Process each vertex to create rounded corners between edges
+        for (let i = 0; i < points.length; i++) {
+          const current = points[i];
+          const next = points[(i + 1) % points.length];
+          const prev = points[(i - 1 + points.length) % points.length];
+          
+          // Calculate vectors to previous and next points
+          const toPrev = [prev[0] - current[0], prev[1] - current[1]];
+          const toNext = [next[0] - current[0], next[1] - current[1]];
+          
+          // Normalize vectors and calculate corner points
+          const toPrevLength = Math.sqrt(toPrev[0] * toPrev[0] + toPrev[1] * toPrev[1]);
+          const toNextLength = Math.sqrt(toNext[0] * toNext[0] + toNext[1] * toNext[1]);
+          
+          // Move inward from vertex toward previous point (limited by half the distance)
+          const prevCorner = [
+            current[0] + (toPrev[0] / toPrevLength) * Math.min(radius, toPrevLength / 2),
+            current[1] + (toPrev[1] / toPrevLength) * Math.min(radius, toPrevLength / 2)
+          ];
+          
+          // Move inward from vertex toward next point (limited by half the distance)
+          const nextCorner = [
+            current[0] + (toNext[0] / toNextLength) * Math.min(radius, toNextLength / 2),
+            current[1] + (toNext[1] / toNextLength) * Math.min(radius, toNextLength / 2)
+          ];
+          
+          // First point needs a move command, others need line commands
+          if (i === 0) {
+            pathData.push(`M ${nextCorner[0]} ${nextCorner[1]}`);
+          } else {
+            // Draw line to the corner coming from previous point
+            pathData.push(`L ${prevCorner[0]} ${prevCorner[1]}`);
+            // Draw a quadratic curve around the current vertex to the corner going to next point
+            pathData.push(`Q ${current[0]} ${current[1]}, ${nextCorner[0]} ${nextCorner[1]}`);
+          }
+        }
+        
+        // Close the path to create a complete shape
+        pathData.push("Z");
+        
+        shape = generator.path(pathData.join(" "), options);
+      } else {
+        // For non-rounded corners, use the simple polygon generator
+        shape = generator.polygon(points, generateRoughOptions(element));
+      }
+      
       return shape;
     }
     default: {

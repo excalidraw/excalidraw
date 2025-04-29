@@ -63,6 +63,7 @@ import type {
   ExcalidrawRectanguloidElement,
   ExcalidrawEllipseElement,
   ElementsMapOrArray,
+  ExcalidrawRegularPolygonElement,
 } from "./types";
 import type { Drawable, Op } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";

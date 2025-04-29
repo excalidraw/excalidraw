@@ -82,3 +82,39 @@ export const actionToggleLinearEditor = register({
     );
   },
 });
+export const actionChangeRegularPolygonSides = register({
+  name: "changeRegularPolygonSides",
+  label: "labels.regularPolygonSides",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: elements.map((el) =>
+        el.type === "regularPolygon"
+          ? { ...el, sides: value }
+          : el
+      ),
+      appState,
+      commitToHistory: true,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, updateData }) => {
+    const selected = elements.find((el) => el.type === "regularPolygon");
+    if (!selected) return null;
+    // Type guard for ExcalidrawRegularPolygonElement
+    if (selected.type !== "regularPolygon") return null;
+    return (
+      <fieldset>
+        <legend>{t("labels.regularPolygonSides") /* Add this key to your translation files, e.g., "Number of sides" */}</legend>
+        <input
+          type="range"
+          min={3}
+          max={12}
+          value={selected.sides}
+          onChange={(e) => updateData(Number(e.target.value))}
+        />
+        <span>{selected.sides}</span>
+      </fieldset>
+    );
+  },
+});

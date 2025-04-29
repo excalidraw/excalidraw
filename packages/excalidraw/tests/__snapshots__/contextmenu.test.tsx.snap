@@ -1219,7 +1219,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
@@ -1278,7 +1278,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -1437,7 +1437,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1014066025,
   "strokeColor": "#1e1e1e",
@@ -1471,7 +1471,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
@@ -1530,7 +1530,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -1583,7 +1583,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -1772,7 +1772,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1014066025,
   "strokeColor": "#1e1e1e",
@@ -1806,7 +1806,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
@@ -1865,7 +1865,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -1918,7 +1918,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -2109,7 +2109,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
@@ -2168,7 +2168,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -2325,7 +2325,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
@@ -2384,7 +2384,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -2571,7 +2571,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
@@ -2605,7 +2605,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1014066025,
   "strokeColor": "#1e1e1e",
@@ -2664,7 +2664,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -2717,7 +2717,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -2883,7 +2883,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
@@ -2919,7 +2919,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1014066025,
   "strokeColor": "#1e1e1e",
@@ -2978,7 +2978,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -3031,7 +3031,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -3285,7 +3285,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "opacity": 60,
   "roughness": 2,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 289600103,
   "strokeColor": "#e03131",
@@ -3344,7 +3344,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -3397,7 +3397,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -3572,6 +3572,9 @@ History {
               "fillStyle": "cross-hatch",
               "opacity": 60,
               "roughness": 2,
+              "roundness": {
+                "type": 3,
+              },
               "strokeColor": "#e03131",
               "strokeStyle": "dotted",
             },
@@ -3580,6 +3583,9 @@ History {
               "fillStyle": "solid",
               "opacity": 100,
               "roughness": 1,
+              "roundness": {
+                "type": 2,
+              },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
             },
@@ -3728,7 +3734,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1014066025,
   "strokeColor": "#1e1e1e",
@@ -3762,7 +3768,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
@@ -3821,7 +3827,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -3874,7 +3880,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -4055,7 +4061,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 1014066025,
   "strokeColor": "#1e1e1e",
@@ -4089,7 +4095,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
@@ -4148,7 +4154,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -4201,7 +4207,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -4385,7 +4391,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
@@ -4419,7 +4425,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 238820263,
   "strokeColor": "#1e1e1e",
@@ -4478,7 +4484,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -4531,7 +4537,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -5666,7 +5672,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 453191,
   "strokeColor": "#1e1e1e",
@@ -5700,7 +5706,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 400692809,
   "strokeColor": "#1e1e1e",
@@ -5759,7 +5765,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -5812,7 +5818,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -6892,7 +6898,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
@@ -6928,7 +6934,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 238820263,
   "strokeColor": "#1e1e1e",
@@ -6987,7 +6993,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -7040,7 +7046,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",
@@ -9819,7 +9825,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] el
   "opacity": 100,
   "roughness": 1,
   "roundness": {
-    "type": 3,
+    "type": 2,
   },
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
@@ -9946,7 +9952,7 @@ History {
               "opacity": 100,
               "roughness": 1,
               "roundness": {
-                "type": 3,
+                "type": 2,
               },
               "strokeColor": "#1e1e1e",
               "strokeStyle": "solid",

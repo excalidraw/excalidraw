@@ -126,6 +126,7 @@
     "increaseFontSize": "Increase font size",
     "unbindText": "Unbind text",
     "bindText": "Bind text to the container",
+    "regularPolygonSides": "Number of sides",
     "createContainerFromText": "Wrap text in a container",
     "link": {
       "edit": "Edit link",
@@ -283,6 +284,7 @@
     "ellipse": "Ellipse",
     "arrow": "Arrow",
     "line": "Line",
+    "regularPolygon": "Regular Polygon",
     "freedraw": "Draw",
     "text": "Text",
     "library": "Library",

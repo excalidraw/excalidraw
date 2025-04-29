@@ -150,6 +150,7 @@ const renderElementToSvg = (
       // this should not happen
       throw new Error("Selection rendering is not supported for SVG");
     }
+    case "regularPolygon": // <-- Add this line
     case "rectangle":
     case "diamond":
     case "ellipse": {

@@ -28,6 +28,8 @@ import type {
   PointBinding,
   FixedPointBinding,
   ExcalidrawFlowchartNodeElement,
+  ExcalidrawRegularPolygonElement,
+
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -159,6 +161,7 @@ export const isBindableElement = (
       element.type === "embeddable" ||
       element.type === "frame" ||
       element.type === "magicframe" ||
+      element.type === "regularPolygon" ||
       (element.type === "text" && !element.containerId))
   );
 };
@@ -175,8 +178,15 @@ export const isRectanguloidElement = (
       element.type === "embeddable" ||
       element.type === "frame" ||
       element.type === "magicframe" ||
+      element.type === "regularPolygon" ||
       (element.type === "text" && !element.containerId))
   );
+};
+
+export const isRegularPolygonElement = (
+  element: unknown
+): element is ExcalidrawRegularPolygonElement => {
+  return element != null && (element as any).type === "regularPolygon";
 };
 
 // TODO: Remove this when proper distance calculation is introduced
@@ -231,7 +241,8 @@ export const isExcalidrawElement = (
     case "frame":
     case "magicframe":
     case "image":
-    case "selection": {
+    case "selection": 
+    case "regularPolygon": {
       return true;
     }
     default: {

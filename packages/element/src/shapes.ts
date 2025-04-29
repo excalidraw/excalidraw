@@ -40,6 +40,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
+  ExcalidrawRegularPolygonElement,
 } from "./types";
 
 /**
@@ -95,7 +96,12 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
         shouldTestInside(element),
       );
     }
-  }
+    case "regularPolygon": 
+    return getPolygonShape(element as any);
+}
+
+// Add this throw to fix the "no return statement" error
+throw new Error(`Unsupported element type: ${(element as any).type}`);
 };
 
 export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
@@ -280,6 +286,16 @@ export const mapIntervalToBezierT = <P extends GlobalPoint | LocalPoint>(
         (arcLengths[index + 1] - arcLengths[index])) /
       pointsCount
   );
+};
+
+/**
+ * Returns geometric shape for regular polygon
+ */
+export const getRegularPolygonShapePoints = <Point extends GlobalPoint | LocalPoint>(
+  element: ExcalidrawRegularPolygonElement,
+): GeometricShape<Point> => {
+  // We'll use the same shape calculation as other polygon-like elements
+  return getPolygonShape<Point>(element as any);
 };
 
 /**

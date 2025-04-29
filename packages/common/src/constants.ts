@@ -432,12 +432,12 @@ export const TOOL_TYPE = {
   freedraw: "freedraw",
   text: "text",
   image: "image",
+  regularPolygon: "regularPolygon",
   eraser: "eraser",
   hand: "hand",
+  laser: "laser",
   frame: "frame",
   magicframe: "magicframe",
-  embeddable: "embeddable",
-  laser: "laser",
 } as const;
 
 export const EDITOR_LS_KEYS = {
