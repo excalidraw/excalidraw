@@ -62,6 +62,7 @@ import {
   render,
   togglePopover,
   getCloneByOrigId,
+  checkpointHistory,
 } from "./test-utils";
 
 import type { AppState } from "../types";
@@ -84,51 +85,14 @@ const checkpoint = (name: string) => {
   } = h.state;
   expect(strippedAppState).toMatchSnapshot(`[${name}] appState`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
+
   h.elements
     .map(({ seed, versionNonce, ...strippedElement }) => strippedElement)
     .forEach((element, i) =>
       expect(element).toMatchSnapshot(`[${name}] element ${i}`),
     );
 
-  const stripSeed = (deltas: Record<string, { deleted: any; inserted: any }>) =>
-    Object.entries(deltas).reduce((acc, curr) => {
-      const { inserted, deleted, ...rest } = curr[1];
-
-      delete inserted.seed;
-      delete deleted.seed;
-
-      acc[curr[0]] = {
-        inserted,
-        deleted,
-        ...rest,
-      };
-
-      return acc;
-    }, {} as Record<string, any>);
-
-  expect(
-    h.history.undoStack.map((x) => ({
-      ...x,
-      elementsChange: {
-        ...x.elements,
-        added: stripSeed(x.elements.added),
-        removed: stripSeed(x.elements.updated),
-        updated: stripSeed(x.elements.removed),
-      },
-    })),
-  ).toMatchSnapshot(`[${name}] undo stack`);
-
-  expect(
-    h.history.redoStack.map((x) => ({
-      ...x,
-      elementsChange: {
-        ...x.elements,
-        added: stripSeed(x.elements.added),
-        removed: stripSeed(x.elements.updated),
-        updated: stripSeed(x.elements.removed),
-      },
-    })),
-  ).toMatchSnapshot(`[${name}] redo stack`);
+  checkpointHistory(h.history, name);
 };
 
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");

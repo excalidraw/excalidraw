@@ -6,7 +6,6 @@ import {
   isTestEnv,
   randomId,
   Emitter,
-  deepFreeze,
 } from "@excalidraw/common";
 
 import type { DTO, ValueOf } from "@excalidraw/common/utility-types";
@@ -427,7 +426,6 @@ export class DurableIncrement extends StoreIncrement {
     public readonly delta: StoreDelta,
   ) {
     super("durable", change);
-    deepFreeze(this);
   }
 }
 
@@ -437,7 +435,6 @@ export class DurableIncrement extends StoreIncrement {
 export class EphemeralIncrement extends StoreIncrement {
   constructor(public readonly change: StoreChange) {
     super("ephemeral", change);
-    deepFreeze(this);
   }
 }
 
