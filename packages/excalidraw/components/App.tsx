@@ -9028,12 +9028,13 @@ class App extends React.Component<AppProps, AppState> {
             linearElementEditor;
           const element = this.scene.getElement(linearElementEditor.elementId);
           if (isBindingElement(element)) {
-            bindOrUnbindLinearElement(
-              element,
-              startBindingElement,
-              endBindingElement,
-              this.scene,
-            );
+            this.actionManager.executeAction(actionFinalize);
+            // bindOrUnbindLinearElement(
+            //   element,
+            //   startBindingElement,
+            //   endBindingElement,
+            //   this.scene,
+            // );
           }
 
           if (linearElementEditor !== this.state.selectedLinearElement) {
@@ -9168,12 +9169,7 @@ class App extends React.Component<AppProps, AppState> {
             isBindingEnabled(this.state) &&
             isBindingElement(newElement, false)
           ) {
-            maybeBindLinearElement(
-              newElement,
-              this.state,
-              pointerCoords,
-              this.scene,
-            );
+            this.actionManager.executeAction(actionFinalize);
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
           if (!activeTool.locked) {
