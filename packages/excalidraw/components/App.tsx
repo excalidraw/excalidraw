@@ -9029,12 +9029,12 @@ class App extends React.Component<AppProps, AppState> {
           const element = this.scene.getElement(linearElementEditor.elementId);
           if (isBindingElement(element)) {
             this.actionManager.executeAction(actionFinalize);
-            // bindOrUnbindLinearElement(
-            //   element,
-            //   startBindingElement,
-            //   endBindingElement,
-            //   this.scene,
-            // );
+            bindOrUnbindLinearElement(
+              element,
+              startBindingElement,
+              endBindingElement,
+              this.scene,
+            );
           }
 
           if (linearElementEditor !== this.state.selectedLinearElement) {
