@@ -21,7 +21,7 @@ const Header = () => (
       className="HelpDialog__btn"
       href="https://docs.excalidraw.com"
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener"
     >
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
       {t("helpDialog.documentation")}
@@ -30,7 +30,7 @@ const Header = () => (
       className="HelpDialog__btn"
       href="https://plus.excalidraw.com/blog"
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener"
     >
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
       {t("helpDialog.blog")}
