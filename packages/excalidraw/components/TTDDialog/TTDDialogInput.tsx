@@ -28,6 +28,7 @@ export const TTDDialogInput = ({
     }
     const textarea = ref.current;
     if (textarea) {
+      textarea.focus();
       const handleKeyDown = (event: KeyboardEvent) => {
         if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.ENTER) {
           event.preventDefault();
@@ -47,7 +48,6 @@ export const TTDDialogInput = ({
       onChange={onChange}
       value={input}
       placeholder={placeholder}
-      autoFocus
       ref={ref}
     />
   );

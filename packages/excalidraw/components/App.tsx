@@ -2960,7 +2960,8 @@ class App extends React.Component<AppProps, AppState> {
     this.scheduleImageRefresh();
   };
 
-  private onScroll = debounce(() => {
+  private onScroll = () => {
+    debugger;
     const { offsetTop, offsetLeft } = this.getCanvasOffsets();
     this.setState((state) => {
       if (state.offsetLeft === offsetLeft && state.offsetTop === offsetTop) {
@@ -2968,7 +2969,7 @@ class App extends React.Component<AppProps, AppState> {
       }
       return { offsetTop, offsetLeft };
     });
-  }, SCROLL_TIMEOUT);
+  };
 
   // Copy/paste
 
