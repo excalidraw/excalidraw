@@ -32,6 +32,12 @@
         "name": "jotai",
         "message": "Do not import from \"jotai\" directly. Use our app-specific modules (\"editor-jotai\" or \"app-jotai\")."
       }
+    ],
+    "react/jsx-no-target-blank": [
+      "error",
+      {
+        "allowReferrer": true
+      }
     ]
   }
 }
