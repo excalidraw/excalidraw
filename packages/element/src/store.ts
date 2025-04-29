@@ -6,6 +6,7 @@ import {
   isTestEnv,
   randomId,
   Emitter,
+  deepFreeze,
 } from "@excalidraw/common";
 
 import type { DTO, ValueOf } from "@excalidraw/common/utility-types";
@@ -21,6 +22,7 @@ import { ElementsDelta, AppStateDelta, Delta } from "./delta";
 import { hashElementsVersion, hashString } from "./index";
 
 import type {
+  ElementsMap,
   ExcalidrawElement,
   OrderedExcalidrawElement,
   SceneElementsMap,
@@ -102,7 +104,7 @@ export class Store {
    */
   public scheduleMicroAction(
     action: CaptureUpdateActionType,
-    elements: Map<string, OrderedExcalidrawElement> | undefined,
+    elements: SceneElementsMap | undefined,
     appState: AppState | ObservedAppState | undefined = undefined,
     /** delta is only relevant for `CaptureUpdateAction.IMMEDIATELY`, as it's the only action producing `DurableStoreIncrement` containing a delta */
     delta: StoreDelta | undefined = undefined,
@@ -126,7 +128,7 @@ export class Store {
    * @emits StoreIncrement
    */
   public commit(
-    elements: Map<string, OrderedExcalidrawElement> | undefined,
+    elements: SceneElementsMap | undefined,
     appState: AppState | ObservedAppState | undefined,
   ): void {
     // execute all scheduled micro actions first
@@ -157,36 +159,14 @@ export class Store {
   }
 
   /**
-   * Apply the increment to the passed elements and appState, does not modify the snapshot.
-   */
-  public applyDeltaTo(
-    delta: StoreDelta,
-    elements: SceneElementsMap,
-    appState: AppState,
-  ): [SceneElementsMap, AppState, boolean] {
-    const [nextElements, elementsContainVisibleChange] = delta.elements.applyTo(
-      elements,
-      this.snapshot.elements,
-    );
-
-    const [nextAppState, appStateContainsVisibleChange] =
-      delta.appState.applyTo(appState, nextElements);
-
-    const appliedVisibleChanges =
-      elementsContainVisibleChange || appStateContainsVisibleChange;
-
-    return [nextElements, nextAppState, appliedVisibleChanges];
-  }
-
-  /**
    * Filters out yet uncomitted elements from `nextElements`, which are part of in-progress local async actions (ephemerals) and thus were not yet commited to the snapshot.
    *
    * This is necessary in updates in which we receive reconciled elements, already containing elements which were not yet captured by the local store (i.e. collab).
    */
   public filterUncomittedElements(
-    prevElements: Map<string, ExcalidrawElement>,
-    nextElements: Map<string, ExcalidrawElement>,
-  ): Map<string, OrderedExcalidrawElement> {
+    prevElements: ElementsMap,
+    nextElements: ElementsMap,
+  ): SceneElementsMap {
     const movedElements = new Map<string, ExcalidrawElement>();
 
     for (const [id, prevElement] of prevElements.entries()) {
@@ -217,7 +197,7 @@ export class Store {
       movedElements,
     );
 
-    return arrayToMap(syncedElements);
+    return arrayToMap(syncedElements) as SceneElementsMap;
   }
   /**
    * Clears the store instance.
@@ -274,24 +254,28 @@ export class Store {
   ) {
     const prevSnapshot = this.snapshot;
 
-    // Calculate the deltas based on the previous and next snapshot
-    // We might have the delta already (i.e. when applying history entry), thus we don't need to calculate it again
-    const elementsDelta = delta
-      ? delta.elements
-      : snapshot.metadata.didElementsChange
-      ? ElementsDelta.calculate(prevSnapshot.elements, snapshot.elements)
-      : ElementsDelta.empty();
+    let storeDelta: StoreDelta;
 
-    const appStateDelta = delta
-      ? delta.appState
-      : snapshot.metadata.didAppStateChange
-      ? AppStateDelta.calculate(prevSnapshot.appState, snapshot.appState)
-      : AppStateDelta.empty();
+    if (delta) {
+      // we might have the delta already (i.e. when applying history entry), thus we don't need to calculate it again
+      // using the same instance, since in history we have a check against `HistoryEntry`, so that we don't re-record the same delta again
+      storeDelta = delta;
+    } else {
+      // calculate the deltas based on the previous and next snapshot
+      const elementsDelta = snapshot.metadata.didElementsChange
+        ? ElementsDelta.calculate(prevSnapshot.elements, snapshot.elements)
+        : ElementsDelta.empty();
 
-    if (!elementsDelta.isEmpty() || !appStateDelta.isEmpty()) {
-      const delta = StoreDelta.create(elementsDelta, appStateDelta);
+      const appStateDelta = snapshot.metadata.didAppStateChange
+        ? AppStateDelta.calculate(prevSnapshot.appState, snapshot.appState)
+        : AppStateDelta.empty();
+
+      storeDelta = StoreDelta.create(elementsDelta, appStateDelta);
+    }
+
+    if (!storeDelta.isEmpty()) {
       const change = StoreChange.create(prevSnapshot, snapshot);
-      const increment = new DurableIncrement(change, delta);
+      const increment = new DurableIncrement(change, storeDelta);
 
       // Notify listeners with the increment
       this.onStoreIncrementEmitter.trigger(increment);
@@ -317,7 +301,7 @@ export class Store {
    */
   private maybeCloneSnapshot(
     action: CaptureUpdateActionType,
-    elements: Map<string, OrderedExcalidrawElement> | undefined,
+    elements: SceneElementsMap | undefined,
     appState: AppState | ObservedAppState | undefined,
   ) {
     if (!elements && !appState) {
@@ -395,6 +379,7 @@ export class Store {
  */
 export class StoreChange {
   // so figuring out what has changed should ideally be just quick reference checks
+  // TODO: we might need to have binary files here as well, in order to be drop-in replacement for `onChange`
   private constructor(
     public readonly elements: Record<string, OrderedExcalidrawElement>,
     public readonly appState: Partial<ObservedAppState>,
@@ -442,6 +427,7 @@ export class DurableIncrement extends StoreIncrement {
     public readonly delta: StoreDelta,
   ) {
     super("durable", change);
+    deepFreeze(this);
   }
 }
 
@@ -451,6 +437,7 @@ export class DurableIncrement extends StoreIncrement {
 export class EphemeralIncrement extends StoreIncrement {
   constructor(public readonly change: StoreChange) {
     super("ephemeral", change);
+    deepFreeze(this);
   }
 }
 
@@ -529,6 +516,29 @@ export class StoreDelta {
     );
   }
 
+  /**
+   * Apply the delta to the passed elements and appState, does not modify the snapshot.
+   */
+  public static applyTo(
+    delta: StoreDelta,
+    elements: SceneElementsMap,
+    appState: AppState,
+    snapshot: StoreSnapshot = StoreSnapshot.empty(),
+  ): [SceneElementsMap, AppState, boolean] {
+    const [nextElements, elementsContainVisibleChange] = delta.elements.applyTo(
+      elements,
+      snapshot.elements,
+    );
+
+    const [nextAppState, appStateContainsVisibleChange] =
+      delta.appState.applyTo(appState, nextElements);
+
+    const appliedVisibleChanges =
+      elementsContainVisibleChange || appStateContainsVisibleChange;
+
+    return [nextElements, nextAppState, appliedVisibleChanges];
+  }
+
   public isEmpty() {
     return this.elements.isEmpty() && this.appState.isEmpty();
   }
@@ -543,7 +553,7 @@ export class StoreSnapshot {
   private _lastChangedAppStateHash: number = 0;
 
   private constructor(
-    public readonly elements: Map<string, OrderedExcalidrawElement>,
+    public readonly elements: SceneElementsMap,
     public readonly appState: ObservedAppState,
     public readonly metadata: {
       didElementsChange: boolean;
@@ -557,11 +567,15 @@ export class StoreSnapshot {
   ) {}
 
   public static empty() {
-    return new StoreSnapshot(new Map(), getDefaultObservedAppState(), {
-      didElementsChange: false,
-      didAppStateChange: false,
-      isEmpty: true,
-    });
+    return new StoreSnapshot(
+      new Map() as SceneElementsMap,
+      getDefaultObservedAppState(),
+      {
+        didElementsChange: false,
+        didAppStateChange: false,
+        isEmpty: true,
+      },
+    );
   }
 
   public getChangedElements(prevSnapshot: StoreSnapshot) {
@@ -603,7 +617,7 @@ export class StoreSnapshot {
    */
   public maybeClone(
     action: CaptureUpdateActionType,
-    elements: Map<string, OrderedExcalidrawElement> | undefined,
+    elements: SceneElementsMap | undefined,
     appState: AppState | ObservedAppState | undefined,
   ) {
     const options = {
@@ -660,7 +674,7 @@ export class StoreSnapshot {
     } = {
       shouldCompareHashes: false,
     },
-  ) {
+  ): ObservedAppState {
     if (!appState) {
       return this.appState;
     }
@@ -670,12 +684,12 @@ export class StoreSnapshot {
       ? getObservedAppState(appState)
       : appState;
 
-    const changedAppState = this.detectChangedAppState(
+    const didAppStateChange = this.detectChangedAppState(
       nextAppStateSnapshot,
       options,
     );
 
-    if (!changedAppState) {
+    if (!didAppStateChange) {
       return this.appState;
     }
 
@@ -683,13 +697,13 @@ export class StoreSnapshot {
   }
 
   private maybeCreateElementsSnapshot(
-    elements: Map<string, OrderedExcalidrawElement> | undefined,
+    elements: SceneElementsMap | undefined,
     options: {
       shouldCompareHashes: boolean;
     } = {
       shouldCompareHashes: false,
     },
-  ) {
+  ): SceneElementsMap {
     if (!elements) {
       return this.elements;
     }
@@ -711,17 +725,17 @@ export class StoreSnapshot {
     } = {
       shouldCompareHashes: false,
     },
-  ) {
+  ): boolean | undefined {
     if (this.appState === nextObservedAppState) {
       return;
     }
 
-    const changedAppState = Delta.getRightDifferences(
+    const didAppStateChange = Delta.isRightDifferent(
       this.appState,
       nextObservedAppState,
     );
 
-    if (!changedAppState.length) {
+    if (!didAppStateChange) {
       return;
     }
 
@@ -738,7 +752,7 @@ export class StoreSnapshot {
 
     this._lastChangedElementsHash = changedAppStateHash;
 
-    return changedAppState;
+    return didAppStateChange;
   }
 
   /**
@@ -747,7 +761,7 @@ export class StoreSnapshot {
    * NOTE: we shouldn't just use `sceneVersionNonce` instead, as we need to call this before the scene updates.
    */
   private detectChangedElements(
-    nextElements: Map<string, OrderedExcalidrawElement>,
+    nextElements: SceneElementsMap,
     options: {
       shouldCompareHashes: boolean;
     } = {
@@ -758,7 +772,7 @@ export class StoreSnapshot {
       return;
     }
 
-    const changedElements: Map<string, OrderedExcalidrawElement> = new Map();
+    const changedElements: SceneElementsMap = new Map() as SceneElementsMap;
 
     for (const [id, prevElement] of this.elements) {
       const nextElement = nextElements.get(id);
@@ -806,10 +820,8 @@ export class StoreSnapshot {
   /**
    * Perform structural clone, deep cloning only elements that changed.
    */
-  private createElementsSnapshot(
-    changedElements: Map<string, OrderedExcalidrawElement>,
-  ) {
-    const clonedElements = new Map();
+  private createElementsSnapshot(changedElements: SceneElementsMap) {
+    const clonedElements = new Map() as SceneElementsMap;
 
     for (const [id, prevElement] of this.elements) {
       // Clone previous elements, never delete, in case nextElements would be just a subset of previous elements

@@ -338,6 +338,7 @@ import type {
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
+  SceneElementsMap,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -10516,7 +10517,7 @@ class App extends React.Component<AppProps, AppState> {
         // otherwise we would end up with duplicated fractional indices on undo
         this.store.scheduleMicroAction(
           CaptureUpdateAction.NEVER,
-          arrayToMap(elements),
+          arrayToMap(elements) as SceneElementsMap,
         );
 
         this.setState({ isLoading: true });

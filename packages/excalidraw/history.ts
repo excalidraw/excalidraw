@@ -2,8 +2,8 @@ import { Emitter } from "@excalidraw/common";
 
 import {
   CaptureUpdateAction,
-  type Store,
   StoreDelta,
+  type Store,
 } from "@excalidraw/element/store";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
@@ -108,7 +108,12 @@ export class History {
         try {
           // creating iteration-scoped variables, so that we can use them in the unstable_scheduleCallback
           [nextElements, nextAppState, containsVisibleChange] =
-            this.store.applyDeltaTo(historyEntry, nextElements, nextAppState);
+            StoreDelta.applyTo(
+              historyEntry,
+              nextElements,
+              nextAppState,
+              this.store.snapshot,
+            );
 
           // schedule immediate capture, so that it's emitted for the sync purposes
           this.store.scheduleMicroAction(

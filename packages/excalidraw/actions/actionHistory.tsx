@@ -2,6 +2,8 @@ import { isWindows, KEYS, matchKey, arrayToMap } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element/store";
 
+import { orderByFractionalIndex } from "@excalidraw/element/fractionalIndex";
+
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
 import { ToolButton } from "../components/ToolButton";
@@ -35,7 +37,11 @@ const executeHistoryAction = (
     }
 
     const [nextElementsMap, nextAppState] = result;
-    const nextElements = Array.from(nextElementsMap.values());
+
+    // order by fractional indices in case the map was accidently modified in the meantime
+    const nextElements = orderByFractionalIndex(
+      Array.from(nextElementsMap.values()),
+    );
 
     return {
       appState: nextAppState,

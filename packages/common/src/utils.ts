@@ -1233,3 +1233,27 @@ export const sizeOf = (
     ? value.size
     : Object.keys(value).length;
 };
+
+/**
+ * Deep freeze an object to prevent any modifications to the object or its nested properties.
+ */
+export const deepFreeze = <T>(obj: T): T => {
+  // Return if obj is null or not an object
+  if (obj === null || typeof obj !== "object") {
+    return obj;
+  }
+
+  // Freeze the object itself
+  Object.freeze(obj);
+
+  // Freeze all properties
+  Object.getOwnPropertyNames(obj).forEach((prop) => {
+    const value = (obj as any)[prop];
+
+    if (value && typeof value === "object") {
+      deepFreeze(value);
+    }
+  });
+
+  return obj;
+};
