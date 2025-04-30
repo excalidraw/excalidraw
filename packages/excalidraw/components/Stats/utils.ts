@@ -1,13 +1,8 @@
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
-import {
-  bindOrUnbindLinearElements,
-  updateBoundElements,
-} from "@excalidraw/element/binding";
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import {
   isFrameLikeElement,
-  isLinearElement,
   isTextElement,
 } from "@excalidraw/element/typeChecks";
 
@@ -26,6 +21,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import type Scene from "@excalidraw/element/Scene";
+
+import { updateBindings } from "../../../element/src/binding";
 
 import type { AppState } from "../../types";
 
@@ -193,20 +190,4 @@ export const getAtomicUnits = (
       });
     });
   return _atomicUnits;
-};
-
-export const updateBindings = (
-  latestElement: ExcalidrawElement,
-  scene: Scene,
-  options?: {
-    simultaneouslyUpdated?: readonly ExcalidrawElement[];
-    newSize?: { width: number; height: number };
-    zoom?: AppState["zoom"];
-  },
-) => {
-  if (isLinearElement(latestElement)) {
-    bindOrUnbindLinearElements([latestElement], true, [], scene, options?.zoom);
-  } else {
-    updateBoundElements(latestElement, scene, options);
-  }
 };

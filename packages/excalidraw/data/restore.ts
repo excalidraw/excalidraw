@@ -29,6 +29,7 @@ import { bumpVersion } from "@excalidraw/element/mutateElement";
 import { getContainerElement } from "@excalidraw/element/textElement";
 import { detectLineHeight } from "@excalidraw/element/textMeasurements";
 import {
+  isArrowBoundToElement,
   isArrowElement,
   isElbowArrow,
   isFixedPointBinding,
@@ -594,8 +595,7 @@ export const restoreElements = (
   return restoredElements.map((element) => {
     if (
       isElbowArrow(element) &&
-      element.startBinding == null &&
-      element.endBinding == null &&
+      !isArrowBoundToElement(element) &&
       !validateElbowPoints(element.points)
     ) {
       return {

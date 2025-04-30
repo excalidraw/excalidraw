@@ -119,6 +119,20 @@ export const isElbowArrow = (
   return isArrowElement(element) && element.elbowed;
 };
 
+export const isSharpArrow = (
+  element?: ExcalidrawElement,
+): element is ExcalidrawArrowElement => {
+  return isArrowElement(element) && !element.elbowed && !element.roundness;
+};
+
+export const isCurvedArrow = (
+  element?: ExcalidrawElement,
+): element is ExcalidrawArrowElement => {
+  return (
+    isArrowElement(element) && !element.elbowed && element.roundness !== null
+  );
+};
+
 export const isLinearElementType = (
   elementType: ElementOrToolType,
 ): boolean => {
@@ -269,6 +283,10 @@ export const isBoundToContainer = (
     element.containerId !== null &&
     isTextElement(element)
   );
+};
+
+export const isArrowBoundToElement = (element: ExcalidrawArrowElement) => {
+  return !!element.startBinding || !!element.endBinding;
 };
 
 export const isUsingAdaptiveRadius = (type: string) =>
