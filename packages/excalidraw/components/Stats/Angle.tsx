@@ -11,8 +11,10 @@ import type Scene from "@excalidraw/element/Scene";
 
 import { angleIcon } from "../icons";
 
+import { updateBindings } from "../../../element/src/binding";
+
 import DragInput from "./DragInput";
-import { getStepSizedValue, isPropertyEditable, updateBindings } from "./utils";
+import { getStepSizedValue, isPropertyEditable } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
 import type { AppState } from "../../types";

@@ -121,6 +121,7 @@ export const CLASSES = {
   MOBILE_TOOLBAR: "App-toolbar-content", //zsviczian
   ZOOM_ACTIONS: "zoom-actions",
   SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
+  CONVERT_ELEMENT_TYPE_POPUP: "ConvertElementTypePopup",
 };
 
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";

@@ -198,7 +198,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
     <a
       class="welcome-screen-menu-item "
       href="undefined/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"
-      rel="noreferrer"
+      rel="noopener"
       target="_blank"
     >
       <div

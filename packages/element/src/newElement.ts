@@ -45,7 +45,6 @@ import type {
   ExcalidrawIframeElement,
   ElementsMap,
   ExcalidrawArrowElement,
-  FixedSegment,
   ExcalidrawElbowArrowElement,
 } from "./types";
 
@@ -488,7 +487,7 @@ export const newArrowElement = <T extends boolean>(
     endArrowhead?: Arrowhead | null;
     points?: ExcalidrawArrowElement["points"];
     elbowed?: T;
-    fixedSegments?: FixedSegment[] | null;
+    fixedSegments?: ExcalidrawElbowArrowElement["fixedSegments"] | null;
   } & ElementConstructorOpts,
 ): T extends true
   ? NonDeleted<ExcalidrawElbowArrowElement>
