@@ -643,7 +643,6 @@ export const getSwitchCategoryFromElements = (
     return null;
   }
 
-  let onlyLinear = true;
   let canBeLinear = false;
   for (const element of elements) {
     if (
@@ -653,15 +652,8 @@ export const getSwitchCategoryFromElements = (
     ) {
       return "generic";
     }
-    if (element.type !== "arrow" && element.type !== "line") {
-      onlyLinear = false;
-      canBeLinear = false;
-    }
-
-    if (onlyLinear) {
-      if (isLinearElement(element) && isLinearElementElligible(element)) {
-        canBeLinear = true;
-      }
+    if (isLinearElement(element) && isLinearElementElligible(element)) {
+      canBeLinear = true;
     }
   }
 
