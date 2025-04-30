@@ -276,15 +276,6 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           zoom,
         )
       : null // If binding is disabled and start is dragged, break all binds
-    : !isElbowArrow(selectedElement)
-    ? // We have to update the focus and gap of the binding, so let's rebind
-      getElligibleElementForBindingElement(
-        selectedElement,
-        "start",
-        elementsMap,
-        elements,
-        zoom,
-      )
     : "keep";
   const end = endDragged
     ? isBindingEnabled
@@ -296,15 +287,6 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           zoom,
         )
       : null // If binding is disabled and end is dragged, break all binds
-    : !isElbowArrow(selectedElement)
-    ? // We have to update the focus and gap of the binding, so let's rebind
-      getElligibleElementForBindingElement(
-        selectedElement,
-        "end",
-        elementsMap,
-        elements,
-        zoom,
-      )
     : "keep";
 
   return [start, end];
