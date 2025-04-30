@@ -32,7 +32,7 @@ import { wrapText } from "@excalidraw/element/textWrapping";
 import {
   CLASSES,
   getFontString,
-  isDevEnv,
+  isProdEnv,
   updateActiveTool,
 } from "@excalidraw/common";
 
@@ -931,7 +931,7 @@ const convertElementType = <
   app: AppClassProperties,
 ): ExcalidrawElement => {
   if (!isValidConversion(element.type, targetType)) {
-    if (isDevEnv()) {
+    if (!isProdEnv()) {
       throw Error(`Invalid conversion from ${element.type} to ${targetType}.`);
     }
     return element;
