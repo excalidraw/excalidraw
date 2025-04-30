@@ -3,8 +3,9 @@ import { pointFrom } from "@excalidraw/math";
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
-} from "@excalidraw/element";
-import { LinearElementEditor } from "@excalidraw/element";
+  isBindingEnabled,
+} from "@excalidraw/element/binding";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 
 import { isBindingElement, isLinearElement } from "@excalidraw/element";
 
@@ -34,10 +35,43 @@ export const actionFinalize = register({
   name: "finalize",
   label: "",
   trackEvent: false,
-  perform: (elements, appState, _, app) => {
+  perform: (elements, appState, data, app) => {
     const { interactiveCanvas, focusContainer, scene } = app;
 
     const elementsMap = scene.getNonDeletedElementsMap();
+
+    if (data?.event && appState.selectedLinearElement) {
+      const linearElementEditor = LinearElementEditor.handlePointerUp(
+        data.event,
+        appState.selectedLinearElement,
+        appState,
+        app.scene,
+      );
+
+      const { startBindingElement, endBindingElement } = linearElementEditor;
+      const element = app.scene.getElement(linearElementEditor.elementId);
+      if (isBindingElement(element)) {
+        bindOrUnbindLinearElement(
+          element,
+          startBindingElement,
+          endBindingElement,
+          app.scene,
+        );
+      }
+
+      if (linearElementEditor !== appState.selectedLinearElement) {
+        return {
+          appState: {
+            selectedLinearElement: {
+              ...linearElementEditor,
+              selectedPointsIndices: null,
+            },
+            suggestedBindings: [],
+          },
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        };
+      }
+    }
 
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =
@@ -123,7 +157,7 @@ export const actionFinalize = register({
 
       if (element && isInvisiblySmallElement(element)) {
         // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
-        newElements = newElements.filter((el) => el.id !== element.id);
+        newElements = newElements.filter((el) => el.id !== element!.id);
       }
 
       // If the multi point line closes the loop,
@@ -148,7 +182,8 @@ export const actionFinalize = register({
         isBindingElement(element) &&
         !isLoop &&
         element.points.length > 1 &&
-        !appState.selectedElementIds[element.id]
+        !appState.selectedElementIds[element.id] &&
+        isBindingEnabled(appState)
       ) {
         const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
           element,
