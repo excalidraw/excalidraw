@@ -105,7 +105,7 @@ export class Store {
     action: CaptureUpdateActionType,
     elements: SceneElementsMap | undefined,
     appState: AppState | ObservedAppState | undefined = undefined,
-    /** delta is only relevant for `CaptureUpdateAction.IMMEDIATELY`, as it's the only action producing `DurableStoreIncrement` containing a delta */
+    /** delta is only relevant for `CaptureUpdateAction.IMMEDIATELY`, as it's the only action producing `DurableStoreIncrement` containing a delta and it's also expected to be immutable! */
     delta: StoreDelta | undefined = undefined,
   ) {
     // create a snapshot first, so that it couldn't mutate in the meantime
@@ -135,21 +135,9 @@ export class Store {
     this.flushMicroActions();
 
     try {
-      const macroAction = this.getScheduledMacroAction();
-      const nextSnapshot = this.maybeCloneSnapshot(
-        macroAction,
-        elements,
-        appState,
-      );
-
-      if (!nextSnapshot) {
-        // don't continue if there is not change detected
-        return;
-      }
-
       // execute a single scheduled "macro" function
-      // similar to macro tasks, there can be only one within a single commit
-      this.executeAction(macroAction, nextSnapshot);
+      // similar to macro tasks, there can be only one within a single commit (loop)
+      this.processMacroAction(elements, appState);
     } finally {
       this.satisfiesScheduledActionsInvariant();
       // defensively reset all scheduled "macro" actions, possibly cleans up other runtime garbage
@@ -231,7 +219,7 @@ export class Store {
           assertNever(action, `Unknown store action`);
       }
     } finally {
-      // update the snpashot no-matter what, as it would mess up with the next action
+      // update the snapshot no-matter what, as it would mess up with the next action
       switch (action) {
         // both immediately and never update the snapshot, unlike eventually
         case CaptureUpdateAction.IMMEDIATELY:
@@ -330,6 +318,27 @@ export class Store {
         console.error(`Failed to execute scheduled micro action`, error);
       }
     }
+  }
+
+  private processMacroAction(
+    elements: SceneElementsMap | undefined,
+    appState: AppState | ObservedAppState | undefined,
+  ) {
+    const macroAction = this.getScheduledMacroAction();
+    const nextSnapshot = this.maybeCloneSnapshot(
+      macroAction,
+      elements,
+      appState,
+    );
+
+    if (!nextSnapshot) {
+      // don't continue if there is not change detected
+      return;
+    }
+
+    // execute a single scheduled "macro" function
+    // similar to macro tasks, there can be only one within a single commit
+    this.executeAction(macroAction, nextSnapshot);
   }
 
   /**
@@ -747,7 +756,7 @@ export class StoreSnapshot {
       return;
     }
 
-    this._lastChangedElementsHash = changedAppStateHash;
+    this._lastChangedAppStateHash = changedAppStateHash;
 
     return didAppStateChange;
   }
@@ -827,6 +836,7 @@ export class StoreSnapshot {
     }
 
     for (const [id, changedElement] of changedElements) {
+      // TODO: consider just creating new instance, once we can ensure that all reference properties on every element are immutable
       clonedElements.set(id, deepCopyElement(changedElement));
     }
 
