@@ -65,6 +65,8 @@ import type {
   NonDeletedExcalidrawElement,
 } from "./types";
 
+import { debugDrawBounds } from "@excalidraw/utils/visualdebug";
+
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 
 type Node = {
@@ -116,17 +118,20 @@ const calculatePadding = (
   startBoundingBox: Bounds,
   endBoundingBox: Bounds,
 ) => {
-  return Math.min(
-    Math.hypot(
-      startBoundingBox[2] - startBoundingBox[0],
-      startBoundingBox[3] - startBoundingBox[1],
-    ) / 4,
-    Math.hypot(
-      endBoundingBox[2] - endBoundingBox[0],
-      endBoundingBox[3] - endBoundingBox[1],
-    ) / 4,
-    Math.hypot(aabb[2] - aabb[0], aabb[3] - aabb[1]) / 4,
-    40,
+  return Math.max(
+    Math.min(
+      Math.hypot(
+        startBoundingBox[2] - startBoundingBox[0],
+        startBoundingBox[3] - startBoundingBox[1],
+      ) / 4,
+      Math.hypot(
+        endBoundingBox[2] - endBoundingBox[0],
+        endBoundingBox[3] - endBoundingBox[1],
+      ) / 4,
+      Math.hypot(aabb[2] - aabb[0], aabb[3] - aabb[1]) / 4,
+      40,
+    ),
+    30,
   );
 };
 
@@ -1347,16 +1352,12 @@ const getElbowArrowData = (
   );
   const startOffsets = offsetFromHeading(
     startHeading,
-    arrow.startArrowhead
-      ? FIXED_BINDING_DISTANCE * 4
-      : FIXED_BINDING_DISTANCE * 2,
+    arrow.startArrowhead ? FIXED_BINDING_DISTANCE * 4 : FIXED_BINDING_DISTANCE,
     1,
   );
   const endOffsets = offsetFromHeading(
     endHeading,
-    arrow.endArrowhead
-      ? FIXED_BINDING_DISTANCE * 4
-      : FIXED_BINDING_DISTANCE * 2,
+    arrow.endArrowhead ? FIXED_BINDING_DISTANCE * 4 : FIXED_BINDING_DISTANCE,
     1,
   );
   const startElementBounds = hoveredStartElement
@@ -1406,7 +1407,7 @@ const getElbowArrowData = (
             : BASE_PADDING -
                 (arrow.startArrowhead
                   ? FIXED_BINDING_DISTANCE * 6
-                  : FIXED_BINDING_DISTANCE * 2),
+                  : FIXED_BINDING_DISTANCE),
           BASE_PADDING,
         ),
     boundsOverlap
@@ -1422,7 +1423,7 @@ const getElbowArrowData = (
             : BASE_PADDING -
                 (arrow.endArrowhead
                   ? FIXED_BINDING_DISTANCE * 6
-                  : FIXED_BINDING_DISTANCE * 2),
+                  : FIXED_BINDING_DISTANCE),
           BASE_PADDING,
         ),
     boundsOverlap,
@@ -1431,6 +1432,20 @@ const getElbowArrowData = (
       : startPointBounds,
     hoveredEndElement ? aabbForElement(hoveredEndElement) : endPointBounds,
   );
+
+  debugDrawBounds(startElementBounds, {
+    permanent: false,
+    color: "red",
+  });
+  debugDrawBounds(endElementBounds, {
+    permanent: false,
+    color: "green",
+  });
+  debugDrawBounds(dynamicAABBs, {
+    permanent: false,
+    color: "blue",
+  });
+
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
