@@ -431,7 +431,7 @@ import {
 } from "../components/hyperlink/Hyperlink";
 
 import { Fonts } from "../fonts";
-import { editorJotaiStore } from "../editor-jotai";
+import { editorJotaiStore, type WritableAtom } from "../editor-jotai";
 import { ImageSceneDataError } from "../errors";
 import {
   getSnapLinesAtPointer,
@@ -820,6 +820,15 @@ class App extends React.Component<AppProps, AppState> {
       createRedoAction(this.history, this.store),
     );
   }
+
+  updateEditorAtom = <Value, Args extends unknown[], Result>(
+    atom: WritableAtom<Value, Args, Result>,
+    ...args: Args
+  ): Result => {
+    const result = editorJotaiStore.set(atom, ...args);
+    this.triggerRender();
+    return result;
+  };
 
   private onWindowMessage(event: MessageEvent) {
     if (
@@ -2148,7 +2157,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private openEyeDropper = ({ type }: { type: "stroke" | "background" }) => {
-    editorJotaiStore.set(activeEyeDropperAtom, {
+    this.updateEditorAtom(activeEyeDropperAtom, {
       swapPreviewOnAlt: true,
       colorPickerType:
         type === "stroke" ? "elementStroke" : "elementBackground",
@@ -4169,7 +4178,7 @@ class App extends React.Component<AppProps, AppState> {
 
         // Shape switching
         if (event.key === KEYS.ESCAPE) {
-          editorJotaiStore.set(shapeSwitchAtom, null);
+          this.updateEditorAtom(shapeSwitchAtom, null);
         } else if (
           event.key === KEYS.TAB &&
           (document.activeElement === this.excalidrawContainerRef?.current ||
@@ -4193,10 +4202,9 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
           if (switchCategory) {
-            editorJotaiStore.set(shapeSwitchAtom, {
+            this.updateEditorAtom(shapeSwitchAtom, {
               type: "panel",
             });
-            this.triggerRender();
           }
         }
 
@@ -4658,7 +4666,7 @@ class App extends React.Component<AppProps, AppState> {
         event[KEYS.CTRL_OR_CMD] &&
         (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
       ) {
-        editorJotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
+        this.updateEditorAtom(activeConfirmDialogAtom, "clearCanvas");
       }
 
       // eye dropper
@@ -6407,11 +6415,11 @@ class App extends React.Component<AppProps, AppState> {
           focus: false,
         })),
       }));
-      editorJotaiStore.set(searchItemInFocusAtom, null);
+      this.updateEditorAtom(searchItemInFocusAtom, null);
     }
 
     if (editorJotaiStore.get(shapeSwitchAtom)) {
-      editorJotaiStore.set(shapeSwitchAtom, null);
+      this.updateEditorAtom(shapeSwitchAtom, null);
     }
 
     // since contextMenu options are potentially evaluated on each render,

@@ -25,8 +25,6 @@ export const actionToggleShapeSwitch = register({
     });
 
     return {
-      appState,
-      commitToHistory: false,
       captureUpdate: CaptureUpdateAction.NEVER,
     };
   },

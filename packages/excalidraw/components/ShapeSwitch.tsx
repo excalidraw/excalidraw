@@ -68,7 +68,7 @@ import {
   sceneCoordsToViewportCoords,
 } from "..";
 import { trackEvent } from "../analytics";
-import { atom, editorJotaiStore, useAtom } from "../editor-jotai";
+import { atom, editorJotaiStore, useSetAtom } from "../editor-jotai";
 
 import "./ShapeSwitch.scss";
 import { ToolButton } from "./ToolButton";
@@ -94,6 +94,7 @@ export const shapeSwitchAtom = atom<{
   type: "panel";
 } | null>(null);
 
+// NOTE doesn't need to be an atom. Review once we integrate with properties panel.
 export const shapeSwitchFontSizeAtom = atom<{
   [id: string]: {
     fontSize: number;
@@ -101,6 +102,7 @@ export const shapeSwitchFontSizeAtom = atom<{
   };
 } | null>(null);
 
+// NOTE doesn't need to be an atom. Review once we integrate with properties panel.
 export const shapeSwitchLinearAtom = atom<{
   [id: string]: {
     properties:
@@ -111,18 +113,19 @@ export const shapeSwitchLinearAtom = atom<{
 } | null>(null);
 
 const ShapeSwitch = ({ app }: { app: App }) => {
-  const [shapeSwitch, setShapeSwitch] = useAtom(shapeSwitchAtom);
-  const [, setShapeSwitchFontSize] = useAtom(shapeSwitchFontSizeAtom);
-  const [, setShapeSwitchLinear] = useAtom(shapeSwitchLinearAtom);
+  const setShapeSwitchFontSize = useSetAtom(shapeSwitchFontSizeAtom);
+  const setShapeSwitchLinear = useSetAtom(shapeSwitchLinearAtom);
 
-  const selectedElements = useMemo(
-    () => app.scene.getSelectedElements(app.state),
-    [app.scene, app.state],
-  );
+  const selectedElements = app.scene.getSelectedElements(app.state);
   const elementsCategoryRef = useRef<SwitchShapeCategory>(null);
 
   // close shape switch panel if selecting different "types" of elements
   useEffect(() => {
+    if (selectedElements.length === 0) {
+      app.updateEditorAtom(shapeSwitchAtom, null);
+      return;
+    }
+
     const switchCategory = getSwitchCategoryFromElements(selectedElements);
 
     if (switchCategory && !elementsCategoryRef.current) {
@@ -132,22 +135,17 @@ const ShapeSwitch = ({ app }: { app: App }) => {
       (elementsCategoryRef.current &&
         switchCategory !== elementsCategoryRef.current)
     ) {
-      setShapeSwitch(null);
+      app.updateEditorAtom(shapeSwitchAtom, null);
       elementsCategoryRef.current = null;
     }
-  }, [selectedElements, app.state.selectedElementIds, setShapeSwitch]);
+  }, [selectedElements, app]);
 
-  // clear if not active
-  if (!shapeSwitch) {
-    setShapeSwitchFontSize(null);
-    setShapeSwitchLinear(null);
-    return null;
-  }
-
-  if (selectedElements.length === 0) {
-    setShapeSwitch(null);
-    return null;
-  }
+  useEffect(() => {
+    return () => {
+      setShapeSwitchFontSize(null);
+      setShapeSwitchLinear(null);
+    };
+  }, [setShapeSwitchFontSize, setShapeSwitchLinear]);
 
   return <Panel app={app} elements={selectedElements} />;
 };
