@@ -30,6 +30,7 @@ import {
 import { wrapText } from "@excalidraw/element/textWrapping";
 
 import {
+  assertNever,
   CLASSES,
   getFontString,
   isProdEnv,
@@ -937,25 +938,14 @@ const convertElementType = <
     return element;
   }
 
-  const origType = isSharpArrow(element)
-    ? "sharpArrow"
-    : isCurvedArrow(element)
-    ? "curvedArrow"
-    : isElbowArrow(element)
-    ? "elbowArrow"
-    : element.type;
-
   if (element.type === targetType) {
     return element;
   }
 
   ShapeCache.delete(element);
 
-  if (
-    isConvertibleGenericType(origType) &&
-    isConvertibleGenericType(targetType)
-  ) {
-    const nextElement = bumpVersion(
+  if (isConvertibleGenericType(targetType)) {
+    return bumpVersion(
       newElement({
         ...element,
         type: targetType,
@@ -969,67 +959,59 @@ const convertElementType = <
             : element.roundness,
       }),
     );
+  }
 
-    switch (nextElement.type) {
-      case "rectangle":
-        return nextElement as ExcalidrawRectangleElement;
-      case "diamond":
-        return nextElement as ExcalidrawDiamondElement;
-      case "ellipse":
-        return nextElement as ExcalidrawEllipseElement;
+  if (isConvertibleLinearType(targetType)) {
+    switch (targetType) {
+      case "line": {
+        return bumpVersion(
+          newLinearElement({
+            ...element,
+            type: "line",
+          }),
+        );
+      }
+      case "sharpArrow": {
+        return bumpVersion(
+          newArrowElement({
+            ...element,
+            type: "arrow",
+            elbowed: false,
+            roundness: null,
+            startArrowhead: app.state.currentItemStartArrowhead,
+            endArrowhead: app.state.currentItemEndArrowhead,
+          }),
+        );
+      }
+      case "curvedArrow": {
+        return bumpVersion(
+          newArrowElement({
+            ...element,
+            type: "arrow",
+            elbowed: false,
+            roundness: {
+              type: ROUNDNESS.PROPORTIONAL_RADIUS,
+            },
+            startArrowhead: app.state.currentItemStartArrowhead,
+            endArrowhead: app.state.currentItemEndArrowhead,
+          }),
+        );
+      }
+      case "elbowArrow": {
+        return bumpVersion(
+          newArrowElement({
+            ...element,
+            type: "arrow",
+            elbowed: true,
+            fixedSegments: null,
+            roundness: null,
+          }),
+        );
+      }
     }
   }
 
-  if (isConvertibleLinearType(element.type)) {
-    if (targetType === "line") {
-      const nextElement = newLinearElement({
-        ...element,
-        type: "line",
-      });
-
-      return bumpVersion(nextElement);
-    }
-
-    if (targetType === "sharpArrow") {
-      const nextElement = newArrowElement({
-        ...element,
-        type: "arrow",
-        elbowed: false,
-        roundness: null,
-        startArrowhead: app.state.currentItemStartArrowhead,
-        endArrowhead: app.state.currentItemEndArrowhead,
-      });
-
-      return bumpVersion(nextElement);
-    }
-
-    if (targetType === "curvedArrow") {
-      const nextElement = newArrowElement({
-        ...element,
-        type: "arrow",
-        elbowed: false,
-        roundness: {
-          type: ROUNDNESS.PROPORTIONAL_RADIUS,
-        },
-        startArrowhead: app.state.currentItemStartArrowhead,
-        endArrowhead: app.state.currentItemEndArrowhead,
-      });
-
-      return bumpVersion(nextElement);
-    }
-
-    if (targetType === "elbowArrow") {
-      const nextElement = newArrowElement({
-        ...element,
-        type: "arrow",
-        elbowed: true,
-        fixedSegments: null,
-        roundness: null,
-      });
-
-      return bumpVersion(nextElement);
-    }
-  }
+  assertNever(targetType, `unhandled conversion type: ${targetType}`);
 
   return element;
 };
