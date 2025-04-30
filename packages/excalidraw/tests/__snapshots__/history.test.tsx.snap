@@ -199,7 +199,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": "102.45605",
-  "id": "id172",
+  "id": "id689",
   "index": "a2",
   "isDeleted": false,
   "lastCommittedPoint": null,
@@ -271,321 +271,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 }
 `;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id171" => Delta {
-            "deleted": {
-              "boundElements": [],
-            },
-            "inserted": {
-              "boundElements": [
-                {
-                  "id": "id172",
-                  "type": "arrow",
-                },
-              ],
-            },
-          },
-          "id172" => Delta {
-            "deleted": {
-              "endBinding": {
-                "elementId": "id175",
-                "fixedPoint": [
-                  "0.50000",
-                  1,
-                ],
-                "focus": 0,
-                "gap": 1,
-              },
-              "height": "70.45017",
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  "100.70774",
-                  "70.45017",
-                ],
-              ],
-              "startBinding": {
-                "elementId": "id170",
-                "focus": "0.02970",
-                "gap": 1,
-              },
-            },
-            "inserted": {
-              "endBinding": {
-                "elementId": "id171",
-                "focus": "-0.02000",
-                "gap": 1,
-              },
-              "height": "0.09250",
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  "98.58579",
-                  "0.09250",
-                ],
-              ],
-              "startBinding": {
-                "elementId": "id170",
-                "focus": "0.02000",
-                "gap": 1,
-              },
-            },
-          },
-          "id175" => Delta {
-            "deleted": {
-              "boundElements": [
-                {
-                  "id": "id172",
-                  "type": "arrow",
-                },
-              ],
-            },
-            "inserted": {
-              "boundElements": [],
-            },
-          },
-        },
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id170" => Delta {
-            "deleted": {
-              "boundElements": [],
-            },
-            "inserted": {
-              "boundElements": [
-                {
-                  "id": "id172",
-                  "type": "arrow",
-                },
-              ],
-            },
-          },
-          "id172" => Delta {
-            "deleted": {
-              "height": "102.45584",
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  "102.79971",
-                  "102.45584",
-                ],
-              ],
-              "startBinding": null,
-              "y": 0,
-            },
-            "inserted": {
-              "height": "70.33521",
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  "100.78887",
-                  "70.33521",
-                ],
-              ],
-              "startBinding": {
-                "elementId": "id170",
-                "focus": "0.02970",
-                "gap": 1,
-              },
-              "y": "35.20327",
-            },
-          },
-        },
-      },
-    },
-  ],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id170" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 100,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 100,
-              "x": -100,
-              "y": -50,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-          "id171" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 100,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 100,
-              "x": 100,
-              "y": -50,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id172": true,
-            },
-            "selectedLinearElementId": "id172",
-          },
-          "inserted": {
-            "selectedElementIds": {},
-            "selectedLinearElementId": null,
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id172" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "elbowed": false,
-              "endArrowhead": "arrow",
-              "endBinding": null,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 0,
-              "index": "a2",
-              "isDeleted": false,
-              "lastCommittedPoint": null,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  100,
-                  0,
-                ],
-              ],
-              "roughness": 1,
-              "roundness": {
-                "type": 2,
-              },
-              "startArrowhead": null,
-              "startBinding": null,
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "arrow",
-              "width": 100,
-              "x": 0,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-  ],
-}
-`;
-
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of elements 1`] = `4`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of renders 1`] = `21`;
@@ -603,22 +288,39 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "added": {},
       "removed": {},
       "updated": {
+        "id686": {
+          "deleted": {
+            "boundElements": [],
+          },
+          "inserted": {
+            "boundElements": [
+              {
+                "id": "id689",
+                "type": "arrow",
+              },
+            ],
+          },
+        },
         "id689": {
           "deleted": {
             "endBinding": {
-              "elementId": "id686",
-              "focus": "0.00990",
+              "elementId": "id700",
+              "fixedPoint": [
+                "0.50000",
+                1,
+              ],
+              "focus": 0,
               "gap": 1,
             },
-            "height": "0.98586",
+            "height": "70.45017",
             "points": [
               [
                 0,
                 0,
               ],
               [
-                "98.58579",
-                "-0.98586",
+                "100.70774",
+                "70.45017",
               ],
             ],
             "startBinding": {
@@ -633,7 +335,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               "focus": "-0.02000",
               "gap": 1,
             },
-            "height": "0.00000",
+            "height": "0.09250",
             "points": [
               [
                 0,
@@ -641,7 +343,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
               [
                 "98.58579",
-                "0.00000",
+                "0.09250",
               ],
             ],
             "startBinding": {
@@ -649,6 +351,19 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               "focus": "0.02000",
               "gap": 1,
             },
+          },
+        },
+        "id700": {
+          "deleted": {
+            "boundElements": [
+              {
+                "id": "id689",
+                "type": "arrow",
+              },
+            ],
+          },
+          "inserted": {
+            "boundElements": [],
           },
         },
       },
@@ -679,59 +394,32 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             ],
           },
         },
-        "id686": {
-          "deleted": {
-            "boundElements": [],
-          },
-          "inserted": {
-            "boundElements": [
-              {
-                "id": "id689",
-                "type": "arrow",
-              },
-            ],
-          },
-        },
         "id689": {
           "deleted": {
-            "endBinding": {
-              "elementId": "id700",
-              "fixedPoint": [
-                "0.50000",
-                1,
-              ],
-              "focus": 0,
-              "gap": 1,
-            },
-            "height": "102.35417",
+            "height": "102.45584",
             "points": [
               [
                 0,
                 0,
               ],
               [
-                "101.77517",
-                "102.35417",
+                "102.79971",
+                "102.45584",
               ],
             ],
             "startBinding": null,
             "y": 0,
           },
           "inserted": {
-            "endBinding": {
-              "elementId": "id686",
-              "focus": "0.00990",
-              "gap": 1,
-            },
-            "height": "0.98586",
+            "height": "70.33521",
             "points": [
               [
                 0,
                 0,
               ],
               [
-                "98.58579",
-                "-0.98586",
+                "100.78887",
+                "70.33521",
               ],
             ],
             "startBinding": {
@@ -739,20 +427,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               "focus": "0.02970",
               "gap": 1,
             },
-            "y": "0.99364",
-          },
-        },
-        "id700": {
-          "deleted": {
-            "boundElements": [
-              {
-                "id": "id689",
-                "type": "arrow",
-              },
-            ],
-          },
-          "inserted": {
-            "boundElements": [],
+            "y": "35.20327",
           },
         },
       },
@@ -1140,284 +815,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 }
 `;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id166" => Delta {
-            "deleted": {
-              "boundElements": [],
-            },
-            "inserted": {
-              "boundElements": [
-                {
-                  "id": "id167",
-                  "type": "arrow",
-                },
-              ],
-            },
-          },
-          "id167" => Delta {
-            "deleted": {
-              "endBinding": null,
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  100,
-                  0,
-                ],
-              ],
-            },
-            "inserted": {
-              "endBinding": {
-                "elementId": "id166",
-                "focus": -0,
-                "gap": 1,
-              },
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  0,
-                  0,
-                ],
-              ],
-            },
-          },
-        },
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id165" => Delta {
-            "deleted": {
-              "boundElements": [],
-            },
-            "inserted": {
-              "boundElements": [
-                {
-                  "id": "id167",
-                  "type": "arrow",
-                },
-              ],
-            },
-          },
-          "id167" => Delta {
-            "deleted": {
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  100,
-                  0,
-                ],
-              ],
-              "startBinding": null,
-            },
-            "inserted": {
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  100,
-                  0,
-                ],
-              ],
-              "startBinding": {
-                "elementId": "id165",
-                "focus": 0,
-                "gap": 1,
-              },
-            },
-          },
-        },
-      },
-    },
-  ],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id165" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 100,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 100,
-              "x": -100,
-              "y": -50,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-          "id166" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 100,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 100,
-              "x": 100,
-              "y": -50,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id167": true,
-            },
-            "selectedLinearElementId": "id167",
-          },
-          "inserted": {
-            "selectedElementIds": {},
-            "selectedLinearElementId": null,
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id167" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "elbowed": false,
-              "endArrowhead": "arrow",
-              "endBinding": null,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 0,
-              "index": "a2",
-              "isDeleted": false,
-              "lastCommittedPoint": null,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  100,
-                  0,
-                ],
-              ],
-              "roughness": 1,
-              "roundness": {
-                "type": 2,
-              },
-              "startArrowhead": null,
-              "startBinding": null,
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "arrow",
-              "width": 100,
-              "x": 0,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-  ],
-}
-`;
-
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of elements 1`] = `3`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of renders 1`] = `23`;
@@ -1435,20 +832,22 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "added": {},
       "removed": {},
       "updated": {
-        "id666": {
+        "id663": {
           "deleted": {
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                0,
-                0,
-              ],
-            ],
+            "boundElements": [],
           },
           "inserted": {
+            "boundElements": [
+              {
+                "id": "id666",
+                "type": "arrow",
+              },
+            ],
+          },
+        },
+        "id666": {
+          "deleted": {
+            "endBinding": null,
             "points": [
               [
                 0,
@@ -1456,6 +855,23 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
               [
                 100,
+                0,
+              ],
+            ],
+          },
+          "inserted": {
+            "endBinding": {
+              "elementId": "id663",
+              "focus": -0,
+              "gap": 1,
+            },
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                0,
                 0,
               ],
             ],
@@ -1489,22 +905,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             ],
           },
         },
-        "id663": {
-          "deleted": {
-            "boundElements": [],
-          },
-          "inserted": {
-            "boundElements": [
-              {
-                "id": "id666",
-                "type": "arrow",
-              },
-            ],
-          },
-        },
         "id666": {
           "deleted": {
-            "endBinding": null,
             "points": [
               [
                 0,
@@ -1518,18 +920,13 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "startBinding": null,
           },
           "inserted": {
-            "endBinding": {
-              "elementId": "id663",
-              "focus": -0,
-              "gap": 1,
-            },
             "points": [
               [
                 0,
                 0,
               ],
               [
-                0,
+                100,
                 0,
               ],
             ],
