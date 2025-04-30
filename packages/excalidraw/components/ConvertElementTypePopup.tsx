@@ -76,6 +76,7 @@ import {
 } from "..";
 import { trackEvent } from "../analytics";
 import { atom, editorJotaiStore, useSetAtom } from "../editor-jotai";
+import { updateBindings } from "../../element/src/binding";
 
 import "./ConvertElementTypePopup.scss";
 import { ToolButton } from "./ToolButton";
@@ -945,7 +946,7 @@ const convertElementType = <
   ShapeCache.delete(element);
 
   if (isConvertibleGenericType(targetType)) {
-    return bumpVersion(
+    const nextElement = bumpVersion(
       newElement({
         ...element,
         type: targetType,
@@ -958,7 +959,11 @@ const convertElementType = <
               }
             : element.roundness,
       }),
-    );
+    ) as typeof element;
+
+    updateBindings(nextElement, app.scene);
+
+    return nextElement;
   }
 
   if (isConvertibleLinearType(targetType)) {
