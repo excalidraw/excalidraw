@@ -285,6 +285,10 @@ export const isBoundToContainer = (
   );
 };
 
+export const isArrowBoundToElement = (element: ExcalidrawArrowElement) => {
+  return !!element.startBinding || !!element.endBinding;
+};
+
 export const isUsingAdaptiveRadius = (type: string) =>
   type === "rectangle" ||
   type === "embeddable" ||
