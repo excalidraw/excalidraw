@@ -17,6 +17,7 @@ const getConfig = (outdir) => ({
     "@excalidraw/math": path.resolve(__dirname, "../packages/math/src"),
     "@excalidraw/utils": path.resolve(__dirname, "../packages/utils/src"),
   },
+  external: ["react", "react-dom"],
 });
 
 function buildDev(config) {
