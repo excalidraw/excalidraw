@@ -325,8 +325,8 @@ const Panel = ({
                 trackEvent("shape-switch", type, "ui");
               }
               switchShapes(app, {
-                generic: isConvertibleGenericType(type),
-                linear: isConvertibleLinearType(type),
+                generic,
+                linear,
                 nextType: type as
                   | ConvertibleGenericTypes
                   | ConvertibleLinearTypes,
