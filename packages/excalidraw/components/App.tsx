@@ -2547,13 +2547,18 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    this.store.onStoreIncrementEmitter.on((increment) => {
-      if (StoreIncrement.isDurable(increment)) {
-        this.history.record(increment.delta);
-      }
-
-      this.props.onIncrement?.(increment);
+    this.store.onDurableIncrementEmitter.on((increment) => {
+      this.history.record(increment.delta);
     });
+
+    const { onIncrement } = this.props;
+
+    // per. optimmisation, only subscribe if there is the `onIncrement` prop registered, to avoid unnecessary computation
+    if (onIncrement) {
+      this.store.onStoreIncrementEmitter.on((increment) => {
+        onIncrement(increment);
+      });
+    }
 
     this.scene.onUpdate(this.triggerRender);
     this.addEventListeners();
@@ -2614,6 +2619,7 @@ class App extends React.Component<AppProps, AppState> {
     this.eraserTrail.stop();
     this.onChangeEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
+    this.store.onDurableIncrementEmitter.clear();
     ShapeCache.destroy();
     SnapCache.destroy();
     clearTimeout(touchTimeout);

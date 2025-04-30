@@ -68,6 +68,8 @@ type MicroActionsQueue = (() => void)[];
  * Store which captures the observed changes and emits them as `StoreIncrement` events.
  */
 export class Store {
+  // internally used by history
+  public readonly onDurableIncrementEmitter = new Emitter<[DurableIncrement]>();
   public readonly onStoreIncrementEmitter = new Emitter<
     [DurableIncrement | EphemeralIncrement]
   >();
@@ -265,6 +267,7 @@ export class Store {
       const increment = new DurableIncrement(change, storeDelta);
 
       // Notify listeners with the increment
+      this.onDurableIncrementEmitter.trigger(increment);
       this.onStoreIncrementEmitter.trigger(increment);
     }
   }
@@ -325,6 +328,17 @@ export class Store {
     appState: AppState | ObservedAppState | undefined,
   ) {
     const macroAction = this.getScheduledMacroAction();
+
+    // perf. optimisation, since "EVENTUALLY" does not update the snapshot,
+    // so if nobody is listening for increments, we don't need to even clone the snapshot
+    // as it's only needed for `StoreChange` computation inside `EphemeralIncrement`
+    if (
+      macroAction === CaptureUpdateAction.EVENTUALLY &&
+      !this.onStoreIncrementEmitter.subscribers.length
+    ) {
+      return;
+    }
+
     const nextSnapshot = this.maybeCloneSnapshot(
       macroAction,
       elements,
