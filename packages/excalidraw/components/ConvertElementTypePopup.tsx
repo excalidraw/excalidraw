@@ -192,25 +192,29 @@ const Panel = ({
   elements: ExcalidrawElement[];
 }) => {
   const conversionType = getConversionTypeFromElements(elements);
-  const generic = conversionType === "generic";
-  const linear = conversionType === "linear";
 
   const genericElements = useMemo(() => {
-    return generic ? filterGenericConvetibleElements(elements) : [];
-  }, [generic, elements]);
+    return conversionType === "generic"
+      ? filterGenericConvetibleElements(elements)
+      : [];
+  }, [conversionType, elements]);
   const linearElements = useMemo(() => {
-    return linear ? filterLinearConvertibleElements(elements) : [];
-  }, [linear, elements]);
+    return conversionType === "linear"
+      ? filterLinearConvertibleElements(elements)
+      : [];
+  }, [conversionType, elements]);
 
-  const sameType = generic
-    ? genericElements.every(
-        (element) => element.type === genericElements[0].type,
-      )
-    : linear
-    ? linearElements.every(
-        (element) => getArrowType(element) === getArrowType(linearElements[0]),
-      )
-    : false;
+  const sameType =
+    conversionType === "generic"
+      ? genericElements.every(
+          (element) => element.type === genericElements[0].type,
+        )
+      : conversionType === "linear"
+      ? linearElements.every(
+          (element) =>
+            getArrowType(element) === getArrowType(linearElements[0]),
+        )
+      : false;
 
   const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
   const positionRef = useRef("");
@@ -306,20 +310,21 @@ const Panel = ({
     }
   }, [genericElements, app.scene]);
 
-  const SHAPES: [string, ReactNode][] = linear
-    ? [
-        ["line", LineIcon],
-        ["sharpArrow", sharpArrowIcon],
-        ["curvedArrow", roundArrowIcon],
-        ["elbowArrow", elbowArrowIcon],
-      ]
-    : generic
-    ? [
-        ["rectangle", RectangleIcon],
-        ["diamond", DiamondIcon],
-        ["ellipse", EllipseIcon],
-      ]
-    : [];
+  const SHAPES: [string, ReactNode][] =
+    conversionType === "linear"
+      ? [
+          ["line", LineIcon],
+          ["sharpArrow", sharpArrowIcon],
+          ["curvedArrow", roundArrowIcon],
+          ["elbowArrow", elbowArrowIcon],
+        ]
+      : conversionType === "generic"
+      ? [
+          ["rectangle", RectangleIcon],
+          ["diamond", DiamondIcon],
+          ["ellipse", EllipseIcon],
+        ]
+      : [];
 
   return (
     <div
@@ -340,8 +345,9 @@ const Panel = ({
       {SHAPES.map(([type, icon]) => {
         const isSelected =
           sameType &&
-          ((generic && genericElements[0].type === type) ||
-            (linear && getArrowType(linearElements[0]) === type));
+          ((conversionType === "generic" && genericElements[0].type === type) ||
+            (conversionType === "linear" &&
+              getArrowType(linearElements[0]) === type));
 
         return (
           <ToolButton
@@ -921,17 +927,17 @@ const convertElementType = <
   TElement extends Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
 >(
   element: TElement,
-  newType: ConvertibleTypes,
+  targetType: ConvertibleTypes,
   app: AppClassProperties,
 ): ExcalidrawElement => {
-  if (!isValidConversion(element.type, newType)) {
+  if (!isValidConversion(element.type, targetType)) {
     if (isDevEnv()) {
-      throw Error(`Invalid conversion from ${element.type} to ${newType}.`);
+      throw Error(`Invalid conversion from ${element.type} to ${targetType}.`);
     }
     return element;
   }
 
-  const startType = isSharpArrow(element)
+  const origType = isSharpArrow(element)
     ? "sharpArrow"
     : isCurvedArrow(element)
     ? "curvedArrow"
@@ -939,24 +945,24 @@ const convertElementType = <
     ? "elbowArrow"
     : element.type;
 
-  if (element.type === newType) {
+  if (element.type === targetType) {
     return element;
   }
 
   ShapeCache.delete(element);
 
   if (
-    isConvertibleGenericType(startType) &&
-    isConvertibleGenericType(newType)
+    isConvertibleGenericType(origType) &&
+    isConvertibleGenericType(targetType)
   ) {
     const nextElement = bumpVersion(
       newElement({
         ...element,
-        type: newType,
+        type: targetType,
         roundness:
-          newType === "diamond" && element.roundness
+          targetType === "diamond" && element.roundness
             ? {
-                type: isUsingAdaptiveRadius(newType)
+                type: isUsingAdaptiveRadius(targetType)
                   ? ROUNDNESS.ADAPTIVE_RADIUS
                   : ROUNDNESS.PROPORTIONAL_RADIUS,
               }
@@ -975,7 +981,7 @@ const convertElementType = <
   }
 
   if (isConvertibleLinearType(element.type)) {
-    if (newType === "line") {
+    if (targetType === "line") {
       const nextElement = newLinearElement({
         ...element,
         type: "line",
@@ -984,7 +990,7 @@ const convertElementType = <
       return bumpVersion(nextElement);
     }
 
-    if (newType === "sharpArrow") {
+    if (targetType === "sharpArrow") {
       const nextElement = newArrowElement({
         ...element,
         type: "arrow",
@@ -997,7 +1003,7 @@ const convertElementType = <
       return bumpVersion(nextElement);
     }
 
-    if (newType === "curvedArrow") {
+    if (targetType === "curvedArrow") {
       const nextElement = newArrowElement({
         ...element,
         type: "arrow",
@@ -1012,7 +1018,7 @@ const convertElementType = <
       return bumpVersion(nextElement);
     }
 
-    if (newType === "elbowArrow") {
+    if (targetType === "elbowArrow") {
       const nextElement = newArrowElement({
         ...element,
         type: "arrow",
