@@ -57,8 +57,6 @@ import type {
   FixedSegment,
 } from "@excalidraw/element/types";
 
-import type { Mutable } from "@excalidraw/common/utility-types";
-
 import type Scene from "@excalidraw/element/Scene";
 
 import {
@@ -961,9 +959,7 @@ const isConvertibleLinearType = (
  *   e.g. elbow arrow -> line
  */
 export const convertElementType = <
-  TElement extends Mutable<
-    Exclude<ExcalidrawElement, ExcalidrawSelectionElement>
-  >,
+  TElement extends Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
 >(
   element: TElement,
   newType: ConvertibleType,
