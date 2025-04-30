@@ -419,3 +419,4 @@ export type ConvertibleLinearTypes =
   | "sharpArrow"
   | "curvedArrow"
   | "elbowArrow";
+export type ConvertibleTypes = ConvertibleGenericTypes | ConvertibleLinearTypes;

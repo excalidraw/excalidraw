@@ -1,7 +1,7 @@
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import {
-  getSwitchableTypeFromElements,
+  getSwitchCategoryFromElements,
   shapeSwitchAtom,
 } from "../components/ShapeSwitch";
 import { editorJotaiStore } from "../editor-jotai";
@@ -31,11 +31,6 @@ export const actionToggleShapeSwitch = register({
     };
   },
   checked: (appState) => appState.gridModeEnabled,
-  predicate: (elements, appState, props) => {
-    const { generic, linear } = getSwitchableTypeFromElements(
-      elements as ExcalidrawElement[],
-    );
-
-    return generic || linear;
-  },
+  predicate: (elements, appState, props) =>
+    getSwitchCategoryFromElements(elements as ExcalidrawElement[]) !== null,
 });

@@ -468,7 +468,7 @@ import { LassoTrail } from "../lasso";
 import { EraserTrail } from "../eraser";
 
 import ShapeSwitch, {
-  getSwitchableTypeFromElements,
+  getSwitchCategoryFromElements,
   SHAPE_SWITCH_PANEL_CLASSNAME,
   shapeSwitchAtom,
   switchShapes,
@@ -4179,21 +4179,20 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           event.preventDefault();
 
-          const { generic, linear } =
-            getSwitchableTypeFromElements(selectedElements);
+          const switchCategory =
+            getSwitchCategoryFromElements(selectedElements);
 
           if (editorJotaiStore.get(shapeSwitchAtom)?.type === "panel") {
             if (
               switchShapes(this, {
-                generic,
-                linear,
+                switchCategory,
                 direction: event.shiftKey ? "left" : "right",
               })
             ) {
               this.store.shouldCaptureIncrement();
             }
           }
-          if (generic || linear) {
+          if (switchCategory) {
             editorJotaiStore.set(shapeSwitchAtom, {
               type: "panel",
             });

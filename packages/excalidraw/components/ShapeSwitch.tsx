@@ -5,6 +5,7 @@ import { updateElbowArrowPoints } from "@excalidraw/element/elbowArrow";
 import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
 
 import {
+  isArrowBoundToElement,
   isArrowElement,
   isCurvedArrow,
   isElbowArrow,
@@ -44,6 +45,7 @@ import { ShapeCache } from "@excalidraw/element/ShapeCache";
 import type {
   ConvertibleGenericTypes,
   ConvertibleLinearTypes,
+  ConvertibleTypes,
   ExcalidrawArrowElement,
   ExcalidrawDiamondElement,
   ExcalidrawElbowArrowElement,
@@ -117,22 +119,21 @@ const ShapeSwitch = ({ app }: { app: App }) => {
     () => app.scene.getSelectedElements(app.state),
     [app.scene, app.state],
   );
-  const selectedElementsTypeRef = useRef<"generic" | "linear">(null);
+  const elementsCategoryRef = useRef<SwitchShapeCategory>(null);
 
   // close shape switch panel if selecting different "types" of elements
   useEffect(() => {
-    const { generic, linear } = getSwitchableTypeFromElements(selectedElements);
-    const type = generic ? "generic" : linear ? "linear" : null;
+    const switchCategory = getSwitchCategoryFromElements(selectedElements);
 
-    if (type && !selectedElementsTypeRef.current) {
-      selectedElementsTypeRef.current = type;
+    if (switchCategory && !elementsCategoryRef.current) {
+      elementsCategoryRef.current = switchCategory;
     } else if (
-      (selectedElementsTypeRef.current && !type) ||
-      (selectedElementsTypeRef.current &&
-        type !== selectedElementsTypeRef.current)
+      (elementsCategoryRef.current && !switchCategory) ||
+      (elementsCategoryRef.current &&
+        switchCategory !== elementsCategoryRef.current)
     ) {
       setShapeSwitch(null);
-      selectedElementsTypeRef.current = null;
+      elementsCategoryRef.current = null;
     }
   }, [selectedElements, app.state.selectedElementIds, setShapeSwitch]);
 
@@ -158,7 +159,9 @@ const Panel = ({
   app: App;
   elements: ExcalidrawElement[];
 }) => {
-  const { generic, linear } = getSwitchableTypeFromElements(elements);
+  const switchCategory = getSwitchCategoryFromElements(elements);
+  const generic = switchCategory === "generic";
+  const linear = switchCategory === "linear";
 
   const genericElements = useMemo(() => {
     return generic ? getGenericSwitchableElements(elements) : [];
@@ -325,8 +328,7 @@ const Panel = ({
                 trackEvent("shape-switch", type, "ui");
               }
               switchShapes(app, {
-                generic,
-                linear,
+                switchCategory,
                 nextType: type as
                   | ConvertibleGenericTypes
                   | ConvertibleLinearTypes,
@@ -386,21 +388,21 @@ export const adjustBoundTextSize = (
   redrawTextBoundingBox(boundText, container, scene);
 };
 
+type SwitchShapeCategory = "generic" | "linear" | null;
+
 export const switchShapes = (
   app: App,
   {
-    generic,
-    linear,
+    switchCategory,
     nextType,
     direction = "right",
   }: {
-    generic?: boolean;
-    linear?: boolean;
-    nextType?: ConvertibleGenericTypes | ConvertibleLinearTypes;
+    switchCategory: SwitchShapeCategory;
+    nextType?: ConvertibleTypes;
     direction?: "left" | "right";
-  } = {},
+  },
 ): boolean => {
-  if (!generic && !linear) {
+  if (!switchCategory) {
     return false;
   }
 
@@ -413,7 +415,7 @@ export const switchShapes = (
 
   const advancement = direction === "right" ? 1 : -1;
 
-  if (generic) {
+  if (switchCategory === "generic") {
     const selectedGenericSwitchableElements =
       getGenericSwitchableElements(selectedElements);
 
@@ -490,7 +492,7 @@ export const switchShapes = (
     }
   }
 
-  if (linear) {
+  if (switchCategory === "linear") {
     const selectedLinearSwitchableElements = getLinearSwitchableElements(
       selectedElements,
     ) as ExcalidrawLinearElement[];
@@ -634,77 +636,47 @@ export const switchShapes = (
   return true;
 };
 
-export const getSwitchableTypeFromElements = (
+export const getSwitchCategoryFromElements = (
   elements: ExcalidrawElement[],
-):
-  | {
-      generic: true;
-      linear: false;
-    }
-  | {
-      linear: true;
-      generic: false;
-    }
-  | {
-      generic: false;
-      linear: false;
-    } => {
+): SwitchShapeCategory => {
   if (elements.length === 0) {
-    return {
-      generic: false,
-      linear: false,
-    };
+    return null;
   }
 
   let onlyLinear = true;
+  let canBeLinear = false;
   for (const element of elements) {
     if (
       element.type === "rectangle" ||
       element.type === "ellipse" ||
       element.type === "diamond"
     ) {
-      return {
-        generic: true,
-        linear: false,
-      };
+      return "generic";
     }
     if (element.type !== "arrow" && element.type !== "line") {
       onlyLinear = false;
+      canBeLinear = false;
     }
-  }
 
-  if (onlyLinear) {
-    // check at least some linear element is switchable
-    // for a linear to be swtichable:
-    // - no labels
-    // - not bound to anything
-
-    let linear = true;
-
-    for (const element of elements) {
-      if (
-        isArrowElement(element) &&
-        (element.startBinding !== null || element.endBinding !== null)
-      ) {
-        linear = false;
-      } else if (element.boundElements && element.boundElements.length > 0) {
-        linear = false;
-      } else {
-        linear = true;
-        break;
+    if (onlyLinear) {
+      if (isLinearElement(element) && isLinearElementElligible(element)) {
+        canBeLinear = true;
       }
     }
-
-    return {
-      linear,
-      generic: false,
-    };
   }
 
-  return {
-    generic: false,
-    linear: false,
-  };
+  if (canBeLinear) {
+    return "linear";
+  }
+
+  return null;
+};
+
+const isLinearElementElligible = (linear: ExcalidrawLinearElement) => {
+  return (
+    !(isArrowElement(linear) && isArrowBoundToElement(linear)) &&
+    !(linear.boundElements && linear.boundElements.length > 0)
+  );
 };
 
 const getArrowType = (element: ExcalidrawLinearElement) => {
@@ -795,13 +767,7 @@ const getGenericSwitchableElements = (elements: ExcalidrawElement[]) =>
 
 const getLinearSwitchableElements = (elements: ExcalidrawElement[]) =>
   elements.filter(
-    (element) =>
-      isLinearElement(element) &&
-      !(
-        isArrowElement(element) &&
-        (element.startBinding !== null || element.endBinding !== null)
-      ) &&
-      (!element.boundElements || element.boundElements.length === 0),
+    (element) => isLinearElement(element) && isLinearElementElligible(element),
   ) as ExcalidrawLinearElement[];
 
 const THRESHOLD = 20;
@@ -935,8 +901,6 @@ const CONVERTIBLE_LINEAR_TYPES: readonly ConvertibleLinearTypes[] = [
   "elbowArrow",
 ];
 
-type ConvertibleType = ConvertibleGenericTypes | ConvertibleLinearTypes;
-
 const isConvertibleGenericType = (
   elementType: string,
 ): elementType is ConvertibleGenericTypes =>
@@ -962,7 +926,7 @@ export const convertElementType = <
   TElement extends Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
 >(
   element: TElement,
-  newType: ConvertibleType,
+  newType: ConvertibleTypes,
   app: AppClassProperties,
 ): ExcalidrawElement => {
   if (!isValidConversion(element.type, newType)) {
@@ -1071,8 +1035,8 @@ export const convertElementType = <
 
 const isValidConversion = (
   startType: string,
-  targetType: ConvertibleType,
-): startType is ConvertibleType => {
+  targetType: ConvertibleTypes,
+): startType is ConvertibleTypes => {
   if (
     isConvertibleGenericType(startType) &&
     isConvertibleGenericType(targetType)
