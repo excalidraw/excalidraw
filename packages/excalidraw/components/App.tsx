@@ -100,6 +100,7 @@ import {
   arrayToMap,
   type EXPORT_IMAGE_TYPES,
   randomInteger,
+  CLASSES,
 } from "@excalidraw/common";
 
 import {
@@ -431,7 +432,7 @@ import {
 } from "../components/hyperlink/Hyperlink";
 
 import { Fonts } from "../fonts";
-import { editorJotaiStore } from "../editor-jotai";
+import { editorJotaiStore, type WritableAtom } from "../editor-jotai";
 import { ImageSceneDataError } from "../errors";
 import {
   getSnapLinesAtPointer,
@@ -467,6 +468,12 @@ import { LassoTrail } from "../lasso";
 
 import { EraserTrail } from "../eraser";
 
+import ConvertElementTypePopup, {
+  getConversionTypeFromElements,
+  convertElementTypePopupAtom,
+  convertElementTypes,
+} from "./ConvertElementTypePopup";
+
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
@@ -498,7 +505,6 @@ import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
 import type { FileSystemHandle } from "../data/filesystem";
 import type { ExcalidrawElementSkeleton } from "../data/transform";
-
 import type {
   AppClassProperties,
   AppProps,
@@ -814,6 +820,15 @@ class App extends React.Component<AppProps, AppState> {
       createRedoAction(this.history, this.store),
     );
   }
+
+  updateEditorAtom = <Value, Args extends unknown[], Result>(
+    atom: WritableAtom<Value, Args, Result>,
+    ...args: Args
+  ): Result => {
+    const result = editorJotaiStore.set(atom, ...args);
+    this.triggerRender();
+    return result;
+  };
 
   private onWindowMessage(event: MessageEvent) {
     if (
@@ -1583,6 +1598,9 @@ class App extends React.Component<AppProps, AppState> {
 
     const firstSelectedElement = selectedElements[0];
 
+    const showShapeSwitchPanel =
+      editorJotaiStore.get(convertElementTypePopupAtom)?.type === "panel";
+
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -1857,6 +1875,9 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
+                        {showShapeSwitchPanel && (
+                          <ConvertElementTypePopup app={this} />
+                        )}
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
                     </ExcalidrawElementsContext.Provider>
@@ -2138,7 +2159,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private openEyeDropper = ({ type }: { type: "stroke" | "background" }) => {
-    editorJotaiStore.set(activeEyeDropperAtom, {
+    this.updateEditorAtom(activeEyeDropperAtom, {
       swapPreviewOnAlt: true,
       colorPickerType:
         type === "stroke" ? "elementStroke" : "elementBackground",
@@ -4157,6 +4178,40 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
+        // Shape switching
+        if (event.key === KEYS.ESCAPE) {
+          this.updateEditorAtom(convertElementTypePopupAtom, null);
+        } else if (
+          event.key === KEYS.TAB &&
+          (document.activeElement === this.excalidrawContainerRef?.current ||
+            document.activeElement?.classList.contains(
+              CLASSES.CONVERT_ELEMENT_TYPE_POPUP,
+            ))
+        ) {
+          event.preventDefault();
+
+          const conversionType =
+            getConversionTypeFromElements(selectedElements);
+
+          if (
+            editorJotaiStore.get(convertElementTypePopupAtom)?.type === "panel"
+          ) {
+            if (
+              convertElementTypes(this, {
+                conversionType,
+                direction: event.shiftKey ? "left" : "right",
+              })
+            ) {
+              this.store.shouldCaptureIncrement();
+            }
+          }
+          if (conversionType) {
+            this.updateEditorAtom(convertElementTypePopupAtom, {
+              type: "panel",
+            });
+          }
+        }
+
         if (
           event.key === KEYS.ESCAPE &&
           this.flowChartCreator.isCreatingChart
@@ -4615,7 +4670,7 @@ class App extends React.Component<AppProps, AppState> {
         event[KEYS.CTRL_OR_CMD] &&
         (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
       ) {
-        editorJotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
+        this.updateEditorAtom(activeConfirmDialogAtom, "clearCanvas");
       }
 
       // eye dropper
@@ -6364,7 +6419,11 @@ class App extends React.Component<AppProps, AppState> {
           focus: false,
         })),
       }));
-      editorJotaiStore.set(searchItemInFocusAtom, null);
+      this.updateEditorAtom(searchItemInFocusAtom, null);
+    }
+
+    if (editorJotaiStore.get(convertElementTypePopupAtom)) {
+      this.updateEditorAtom(convertElementTypePopupAtom, null);
     }
 
     // since contextMenu options are potentially evaluated on each render,
