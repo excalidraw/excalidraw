@@ -80,6 +80,7 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: "build",
       rollupOptions: {
+        external: ["react-dom"], // Mark react-dom as an external dependency
         output: {
           assetFileNames(chunkInfo) {
             if (chunkInfo?.name?.endsWith(".woff2")) {
