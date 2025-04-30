@@ -106,7 +106,6 @@ export class History {
       // iterate through the history entries in case they result in no visible changes
       while (historyEntry) {
         try {
-          // creating iteration-scoped variables, so that we can use them in the unstable_scheduleCallback
           [nextElements, nextAppState, containsVisibleChange] =
             StoreDelta.applyTo(
               historyEntry,
@@ -120,8 +119,7 @@ export class History {
             CaptureUpdateAction.IMMEDIATELY,
             nextElements,
             nextAppState,
-            // create a new instance of the history entry, so that it's not mutated in the meantime
-            HistoryEntry.restore(historyEntry),
+            historyEntry,
           );
         } finally {
           // make sure to always push, even if the delta is corrupted

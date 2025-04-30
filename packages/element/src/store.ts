@@ -529,11 +529,11 @@ export class StoreDelta {
     delta: StoreDelta,
     elements: SceneElementsMap,
     appState: AppState,
-    snapshot: StoreSnapshot = StoreSnapshot.empty(),
+    prevSnapshot: StoreSnapshot = StoreSnapshot.empty(),
   ): [SceneElementsMap, AppState, boolean] {
     const [nextElements, elementsContainVisibleChange] = delta.elements.applyTo(
       elements,
-      snapshot.elements,
+      prevSnapshot.elements,
     );
 
     const [nextAppState, appStateContainsVisibleChange] =

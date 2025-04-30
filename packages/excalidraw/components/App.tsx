@@ -778,7 +778,6 @@ class App extends React.Component<AppProps, AppState> {
         addFiles: this.addFiles,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
-        store: this.store,
         history: {
           clear: this.resetHistory,
         },
