@@ -28,7 +28,12 @@ import {
 
 import { wrapText } from "@excalidraw/element/textWrapping";
 
-import { getFontString, isDevEnv, updateActiveTool } from "@excalidraw/common";
+import {
+  CLASSES,
+  getFontString,
+  isDevEnv,
+  updateActiveTool,
+} from "@excalidraw/common";
 
 import { measureText } from "@excalidraw/element/textMeasurements";
 
@@ -301,7 +306,7 @@ const Panel = ({
         left: `${panelPosition.x - app.state.offsetLeft - GAP_HORIZONTAL}px`,
         zIndex: 2,
       }}
-      className={SHAPE_SWITCH_PANEL_CLASSNAME}
+      className={CLASSES.SHAPE_SWITCH_PANEL_CLASSNAME}
     >
       {SHAPES.map(([type, icon]) => {
         const isSelected =

@@ -100,6 +100,7 @@ import {
   arrayToMap,
   type EXPORT_IMAGE_TYPES,
   randomInteger,
+  CLASSES,
 } from "@excalidraw/common";
 
 import {
@@ -469,7 +470,6 @@ import { EraserTrail } from "../eraser";
 
 import ShapeSwitch, {
   getSwitchCategoryFromElements,
-  SHAPE_SWITCH_PANEL_CLASSNAME,
   shapeSwitchAtom,
   switchShapes,
 } from "./ShapeSwitch";
@@ -4183,7 +4183,7 @@ class App extends React.Component<AppProps, AppState> {
           event.key === KEYS.TAB &&
           (document.activeElement === this.excalidrawContainerRef?.current ||
             document.activeElement?.classList.contains(
-              SHAPE_SWITCH_PANEL_CLASSNAME,
+              CLASSES.SHAPE_SWITCH_PANEL_CLASSNAME,
             ))
         ) {
           event.preventDefault();
