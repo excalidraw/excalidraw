@@ -415,3 +415,11 @@ export type NonDeletedSceneElementsMap = Map<
 export type ElementsMapOrArray =
   | readonly ExcalidrawElement[]
   | Readonly<ElementsMap>;
+
+export type ConvertibleGenericTypes = "rectangle" | "diamond" | "ellipse";
+export type ConvertibleLinearTypes =
+  | "line"
+  | "sharpArrow"
+  | "curvedArrow"
+  | "elbowArrow";
+export type ConvertibleTypes = ConvertibleGenericTypes | ConvertibleLinearTypes;

@@ -21,7 +21,7 @@ const Header = () => (
       className="HelpDialog__btn" //zsviczian
       href="https://github.com/zsviczian/obsidian-excalidraw-plugin/#readme"
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener"
     >
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
       {t("helpDialog.documentation")}
@@ -30,7 +30,7 @@ const Header = () => (
       className="HelpDialog__btn"
       href="https://www.youtube.com/@VisualPKM" //zsviczian
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener"
     >
       {"Visual PKM YouTube"}
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
