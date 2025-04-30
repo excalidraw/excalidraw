@@ -1589,6 +1589,9 @@ class App extends React.Component<AppProps, AppState> {
 
     const firstSelectedElement = selectedElements[0];
 
+    const showShapeSwitchPanel =
+      editorJotaiStore.get(shapeSwitchAtom)?.type === "panel";
+
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -1863,7 +1866,7 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
-                        <ShapeSwitch app={this} />
+                        {showShapeSwitchPanel && <ShapeSwitch app={this} />}
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
                     </ExcalidrawElementsContext.Provider>
@@ -4194,6 +4197,7 @@ class App extends React.Component<AppProps, AppState> {
             editorJotaiStore.set(shapeSwitchAtom, {
               type: "panel",
             });
+            this.triggerRender();
           }
         }
 
