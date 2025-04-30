@@ -5,7 +5,7 @@ import { isDevEnv } from "@excalidraw/common";
 import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { saveDebugState } from "./DebugCanvas";
-import type { Theme } from "../../packages/element/src/types";
+import type { Theme } from "@excalidraw/element/types";
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
