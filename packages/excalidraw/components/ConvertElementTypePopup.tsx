@@ -69,11 +69,9 @@ import type {
 import type Scene from "@excalidraw/element/Scene";
 
 import {
-  bumpVersion,
-  mutateElement,
   ROUNDNESS,
   sceneCoordsToViewportCoords,
-} from "..";
+} from "@excalidraw/common";
 import { trackEvent } from "../analytics";
 import { atom, editorJotaiStore, useSetAtom } from "../editor-jotai";
 import { updateBindings } from "../../element/src/binding";
@@ -93,6 +91,7 @@ import {
 import type App from "./App";
 
 import type { AppClassProperties } from "../types";
+import { bumpVersion, mutateElement } from "@excalidraw/element/mutateElement";
 
 const GAP_HORIZONTAL = 8;
 const GAP_VERTICAL = 10;
