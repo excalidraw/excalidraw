@@ -5,6 +5,7 @@ import { updateElbowArrowPoints } from "@excalidraw/element/elbowArrow";
 import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
 
 import {
+  hasBoundTextElement,
   isArrowBoundToElement,
   isArrowElement,
   isCurvedArrow,
@@ -93,7 +94,35 @@ import type { AppClassProperties } from "../types";
 
 const GAP_HORIZONTAL = 8;
 const GAP_VERTICAL = 10;
-export const SHAPE_SWITCH_PANEL_CLASSNAME = "ShapeSwitch__Panel";
+
+// indicates order of switching
+const GENERIC_TYPES = ["rectangle", "diamond", "ellipse"] as const;
+// indicates order of switching
+const LINEAR_TYPES = [
+  "line",
+  "sharpArrow",
+  "curvedArrow",
+  "elbowArrow",
+] as const;
+
+const CONVERTIBLE_GENERIC_TYPES: ReadonlySet<ConvertibleGenericTypes> = new Set(
+  GENERIC_TYPES,
+);
+
+const CONVERTIBLE_LINEAR_TYPES: ReadonlySet<ConvertibleLinearTypes> = new Set(
+  LINEAR_TYPES,
+);
+
+const isConvertibleGenericType = (
+  elementType: string,
+): elementType is ConvertibleGenericTypes =>
+  CONVERTIBLE_GENERIC_TYPES.has(elementType as ConvertibleGenericTypes);
+
+const isConvertibleLinearType = (
+  elementType: string,
+): elementType is ConvertibleLinearTypes =>
+  elementType === "arrow" ||
+  CONVERTIBLE_LINEAR_TYPES.has(elementType as ConvertibleLinearTypes);
 
 export const shapeSwitchAtom = atom<{
   type: "panel";
@@ -427,16 +456,13 @@ export const switchShapes = (
     );
 
     const index = sameType
-      ? CONVERTIBLE_GENERIC_TYPES.indexOf(
-          selectedGenericSwitchableElements[0].type,
-        )
+      ? GENERIC_TYPES.indexOf(selectedGenericSwitchableElements[0].type)
       : -1;
 
     nextType =
       nextType ??
-      CONVERTIBLE_GENERIC_TYPES[
-        (index + CONVERTIBLE_GENERIC_TYPES.length + advancement) %
-          CONVERTIBLE_GENERIC_TYPES.length
+      GENERIC_TYPES[
+        (index + GENERIC_TYPES.length + advancement) % GENERIC_TYPES.length
       ];
 
     if (nextType && isConvertibleGenericType(nextType)) {
@@ -505,12 +531,11 @@ export const switchShapes = (
       (element) => getArrowType(element) === arrowType,
     );
 
-    const index = sameType ? CONVERTIBLE_LINEAR_TYPES.indexOf(arrowType) : -1;
+    const index = sameType ? LINEAR_TYPES.indexOf(arrowType) : -1;
     nextType =
       nextType ??
-      CONVERTIBLE_LINEAR_TYPES[
-        (index + CONVERTIBLE_LINEAR_TYPES.length + advancement) %
-          CONVERTIBLE_LINEAR_TYPES.length
+      LINEAR_TYPES[
+        (index + LINEAR_TYPES.length + advancement) % LINEAR_TYPES.length
       ];
 
     if (nextType && isConvertibleLinearType(nextType)) {
@@ -648,14 +673,11 @@ export const getSwitchCategoryFromElements = (
 
   let canBeLinear = false;
   for (const element of elements) {
-    if (
-      element.type === "rectangle" ||
-      element.type === "ellipse" ||
-      element.type === "diamond"
-    ) {
+    if (isConvertibleGenericType(element.type)) {
+      // generic type conversion have preference
       return "generic";
     }
-    if (isLinearElement(element) && isLinearElementElligible(element)) {
+    if (isEligibleLinearElement(element)) {
       canBeLinear = true;
     }
   }
@@ -667,10 +689,11 @@ export const getSwitchCategoryFromElements = (
   return null;
 };
 
-const isLinearElementElligible = (linear: ExcalidrawLinearElement) => {
+const isEligibleLinearElement = (element: ExcalidrawElement) => {
   return (
-    !(isArrowElement(linear) && isArrowBoundToElement(linear)) &&
-    !(linear.boundElements && linear.boundElements.length > 0)
+    isLinearElement(element) &&
+    (!isArrowElement(element) ||
+      (!isArrowBoundToElement(element) && !hasBoundTextElement(element)))
   );
 };
 
@@ -761,8 +784,8 @@ const getGenericSwitchableElements = (elements: ExcalidrawElement[]) =>
   >;
 
 const getLinearSwitchableElements = (elements: ExcalidrawElement[]) =>
-  elements.filter(
-    (element) => isLinearElement(element) && isLinearElementElligible(element),
+  elements.filter((element) =>
+    isEligibleLinearElement(element),
   ) as ExcalidrawLinearElement[];
 
 const THRESHOLD = 20;
@@ -882,31 +905,6 @@ const sanitizePoints = (points: readonly LocalPoint[]): LocalPoint[] => {
   return sanitized;
 };
 
-// Declare the constant array with a read-only type so that its values can only be one of the valid union.
-const CONVERTIBLE_GENERIC_TYPES: readonly ConvertibleGenericTypes[] = [
-  "rectangle",
-  "diamond",
-  "ellipse",
-];
-
-const CONVERTIBLE_LINEAR_TYPES: readonly ConvertibleLinearTypes[] = [
-  "line",
-  "sharpArrow",
-  "curvedArrow",
-  "elbowArrow",
-];
-
-const isConvertibleGenericType = (
-  elementType: string,
-): elementType is ConvertibleGenericTypes =>
-  CONVERTIBLE_GENERIC_TYPES.includes(elementType as ConvertibleGenericTypes);
-
-const isConvertibleLinearType = (
-  elementType: string,
-): elementType is ConvertibleLinearTypes =>
-  elementType === "arrow" ||
-  CONVERTIBLE_LINEAR_TYPES.includes(elementType as ConvertibleLinearTypes);
-
 /**
  * Converts an element to a new type, adding or removing properties as needed
  * so that the element object is always valid.
@@ -917,7 +915,7 @@ const isConvertibleLinearType = (
  * - switching between linear elements
  *   e.g. elbow arrow -> line
  */
-export const convertElementType = <
+const convertElementType = <
   TElement extends Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
 >(
   element: TElement,
