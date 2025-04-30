@@ -1,9 +1,9 @@
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import {
-  getSwitchCategoryFromElements,
-  shapeSwitchAtom,
-} from "../components/ShapeSwitch";
+  getConversionTypeFromElements,
+  convertElementTypePopupAtom,
+} from "../components/ConvertElementTypePopup";
 import { editorJotaiStore } from "../editor-jotai";
 import { CaptureUpdateAction } from "../store";
 
@@ -20,7 +20,7 @@ export const actionToggleShapeSwitch = register({
   },
   keywords: ["change", "switch", "swap"],
   perform(elements, appState, _, app) {
-    editorJotaiStore.set(shapeSwitchAtom, {
+    editorJotaiStore.set(convertElementTypePopupAtom, {
       type: "panel",
     });
 
@@ -30,5 +30,5 @@ export const actionToggleShapeSwitch = register({
   },
   checked: (appState) => appState.gridModeEnabled,
   predicate: (elements, appState, props) =>
-    getSwitchCategoryFromElements(elements as ExcalidrawElement[]) !== null,
+    getConversionTypeFromElements(elements as ExcalidrawElement[]) !== null,
 });

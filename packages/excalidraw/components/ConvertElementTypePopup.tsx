@@ -76,7 +76,7 @@ import {
 import { trackEvent } from "../analytics";
 import { atom, editorJotaiStore, useSetAtom } from "../editor-jotai";
 
-import "./ShapeSwitch.scss";
+import "./ConvertElementTypePopup.scss";
 import { ToolButton } from "./ToolButton";
 import {
   DiamondIcon,
@@ -124,12 +124,12 @@ const isConvertibleLinearType = (
   elementType === "arrow" ||
   CONVERTIBLE_LINEAR_TYPES.has(elementType as ConvertibleLinearTypes);
 
-export const shapeSwitchAtom = atom<{
+export const convertElementTypePopupAtom = atom<{
   type: "panel";
 } | null>(null);
 
 // NOTE doesn't need to be an atom. Review once we integrate with properties panel.
-export const shapeSwitchFontSizeAtom = atom<{
+export const fontSize_conversionCacheAtom = atom<{
   [id: string]: {
     fontSize: number;
     elementType: ConvertibleGenericTypes;
@@ -137,7 +137,7 @@ export const shapeSwitchFontSizeAtom = atom<{
 } | null>(null);
 
 // NOTE doesn't need to be an atom. Review once we integrate with properties panel.
-export const shapeSwitchLinearAtom = atom<{
+export const linearElement_conversionCacheAtom = atom<{
   [id: string]: {
     properties:
       | Partial<ExcalidrawLinearElement>
@@ -146,40 +146,40 @@ export const shapeSwitchLinearAtom = atom<{
   };
 } | null>(null);
 
-const ShapeSwitch = ({ app }: { app: App }) => {
-  const setShapeSwitchFontSize = useSetAtom(shapeSwitchFontSizeAtom);
-  const setShapeSwitchLinear = useSetAtom(shapeSwitchLinearAtom);
+const ConvertElementTypePopup = ({ app }: { app: App }) => {
+  const setFontSizeCache = useSetAtom(fontSize_conversionCacheAtom);
+  const setLinearElementCache = useSetAtom(linearElement_conversionCacheAtom);
 
   const selectedElements = app.scene.getSelectedElements(app.state);
-  const elementsCategoryRef = useRef<SwitchShapeCategory>(null);
+  const elementsCategoryRef = useRef<ConversionType>(null);
 
   // close shape switch panel if selecting different "types" of elements
   useEffect(() => {
     if (selectedElements.length === 0) {
-      app.updateEditorAtom(shapeSwitchAtom, null);
+      app.updateEditorAtom(convertElementTypePopupAtom, null);
       return;
     }
 
-    const switchCategory = getSwitchCategoryFromElements(selectedElements);
+    const conversionType = getConversionTypeFromElements(selectedElements);
 
-    if (switchCategory && !elementsCategoryRef.current) {
-      elementsCategoryRef.current = switchCategory;
+    if (conversionType && !elementsCategoryRef.current) {
+      elementsCategoryRef.current = conversionType;
     } else if (
-      (elementsCategoryRef.current && !switchCategory) ||
+      (elementsCategoryRef.current && !conversionType) ||
       (elementsCategoryRef.current &&
-        switchCategory !== elementsCategoryRef.current)
+        conversionType !== elementsCategoryRef.current)
     ) {
-      app.updateEditorAtom(shapeSwitchAtom, null);
+      app.updateEditorAtom(convertElementTypePopupAtom, null);
       elementsCategoryRef.current = null;
     }
   }, [selectedElements, app]);
 
   useEffect(() => {
     return () => {
-      setShapeSwitchFontSize(null);
-      setShapeSwitchLinear(null);
+      setFontSizeCache(null);
+      setLinearElementCache(null);
     };
-  }, [setShapeSwitchFontSize, setShapeSwitchLinear]);
+  }, [setFontSizeCache, setLinearElementCache]);
 
   return <Panel app={app} elements={selectedElements} />;
 };
@@ -191,15 +191,15 @@ const Panel = ({
   app: App;
   elements: ExcalidrawElement[];
 }) => {
-  const switchCategory = getSwitchCategoryFromElements(elements);
-  const generic = switchCategory === "generic";
-  const linear = switchCategory === "linear";
+  const conversionType = getConversionTypeFromElements(elements);
+  const generic = conversionType === "generic";
+  const linear = conversionType === "linear";
 
   const genericElements = useMemo(() => {
-    return generic ? getGenericSwitchableElements(elements) : [];
+    return generic ? filterGenericConvetibleElements(elements) : [];
   }, [generic, elements]);
   const linearElements = useMemo(() => {
-    return linear ? getLinearSwitchableElements(elements) : [];
+    return linear ? filterLinearConvertibleElements(elements) : [];
   }, [linear, elements]);
 
   const sameType = generic
@@ -257,7 +257,7 @@ const Panel = ({
   }, [genericElements, linearElements, app.scene, app.state]);
 
   useEffect(() => {
-    if (editorJotaiStore.get(shapeSwitchLinearAtom)) {
+    if (editorJotaiStore.get(linearElement_conversionCacheAtom)) {
       return;
     }
 
@@ -274,8 +274,8 @@ const Panel = ({
           ? getElbowArrowProperties(linearElement)
           : {};
 
-      editorJotaiStore.set(shapeSwitchLinearAtom, {
-        ...editorJotaiStore.get(shapeSwitchLinearAtom),
+      editorJotaiStore.set(linearElement_conversionCacheAtom, {
+        ...editorJotaiStore.get(linearElement_conversionCacheAtom),
         [linearElement.id]: {
           properties: cachedProperties,
           initialType,
@@ -285,7 +285,7 @@ const Panel = ({
   }, [linearElements]);
 
   useEffect(() => {
-    if (editorJotaiStore.get(shapeSwitchFontSizeAtom)) {
+    if (editorJotaiStore.get(fontSize_conversionCacheAtom)) {
       return;
     }
 
@@ -295,8 +295,8 @@ const Panel = ({
         app.scene.getNonDeletedElementsMap(),
       );
       if (boundText) {
-        editorJotaiStore.set(shapeSwitchFontSizeAtom, {
-          ...editorJotaiStore.get(shapeSwitchFontSizeAtom),
+        editorJotaiStore.set(fontSize_conversionCacheAtom, {
+          ...editorJotaiStore.get(fontSize_conversionCacheAtom),
           [element.id]: {
             fontSize: boundText.fontSize,
             elementType: element.type as ConvertibleGenericTypes,
@@ -335,7 +335,7 @@ const Panel = ({
         left: `${panelPosition.x - app.state.offsetLeft - GAP_HORIZONTAL}px`,
         zIndex: 2,
       }}
-      className={CLASSES.SHAPE_SWITCH_PANEL_CLASSNAME}
+      className={CLASSES.CONVERT_ELEMENT_TYPE_POPUP}
     >
       {SHAPES.map(([type, icon]) => {
         const isSelected =
@@ -350,17 +350,17 @@ const Panel = ({
             type="radio"
             icon={icon}
             checked={isSelected}
-            name="shape-switch-option"
+            name="convertElementType-option"
             title={type}
             keyBindingLabel={""}
             aria-label={type}
             data-testid={`toolbar-${type}`}
             onChange={() => {
               if (app.state.activeTool.type !== type) {
-                trackEvent("shape-switch", type, "ui");
+                trackEvent("convertElementType", type, "ui");
               }
-              switchShapes(app, {
-                switchCategory,
+              convertElementTypes(app, {
+                conversionType,
                 nextType: type as
                   | ConvertibleGenericTypes
                   | ConvertibleLinearTypes,
@@ -420,21 +420,21 @@ export const adjustBoundTextSize = (
   redrawTextBoundingBox(boundText, container, scene);
 };
 
-type SwitchShapeCategory = "generic" | "linear" | null;
+type ConversionType = "generic" | "linear" | null;
 
-export const switchShapes = (
+export const convertElementTypes = (
   app: App,
   {
-    switchCategory,
+    conversionType,
     nextType,
     direction = "right",
   }: {
-    switchCategory: SwitchShapeCategory;
+    conversionType: ConversionType;
     nextType?: ConvertibleTypes;
     direction?: "left" | "right";
   },
 ): boolean => {
-  if (!switchCategory) {
+  if (!conversionType) {
     return false;
   }
 
@@ -447,16 +447,16 @@ export const switchShapes = (
 
   const advancement = direction === "right" ? 1 : -1;
 
-  if (switchCategory === "generic") {
-    const selectedGenericSwitchableElements =
-      getGenericSwitchableElements(selectedElements);
+  if (conversionType === "generic") {
+    const convertibleGenericElements =
+      filterGenericConvetibleElements(selectedElements);
 
-    const sameType = selectedGenericSwitchableElements.every(
-      (element) => element.type === selectedGenericSwitchableElements[0].type,
+    const sameType = convertibleGenericElements.every(
+      (element) => element.type === convertibleGenericElements[0].type,
     );
 
     const index = sameType
-      ? GENERIC_TYPES.indexOf(selectedGenericSwitchableElements[0].type)
+      ? GENERIC_TYPES.indexOf(convertibleGenericElements[0].type)
       : -1;
 
     nextType =
@@ -468,7 +468,7 @@ export const switchShapes = (
     if (nextType && isConvertibleGenericType(nextType)) {
       const convertedElements: Record<string, ExcalidrawElement> = {};
 
-      for (const element of selectedGenericSwitchableElements) {
+      for (const element of convertibleGenericElements) {
         const convertedElement = convertElementType(element, nextType, app);
         convertedElements[convertedElement.id] = convertedElement;
       }
@@ -492,12 +492,12 @@ export const switchShapes = (
         );
         if (boundText) {
           if (
-            editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
+            editorJotaiStore.get(fontSize_conversionCacheAtom)?.[element.id]
               ?.elementType === nextType
           ) {
             mutateElement(boundText, app.scene.getNonDeletedElementsMap(), {
               fontSize:
-                editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
+                editorJotaiStore.get(fontSize_conversionCacheAtom)?.[element.id]
                   ?.fontSize ?? boundText.fontSize,
             });
           }
@@ -521,13 +521,13 @@ export const switchShapes = (
     }
   }
 
-  if (switchCategory === "linear") {
-    const selectedLinearSwitchableElements = getLinearSwitchableElements(
+  if (conversionType === "linear") {
+    const convertibleLinearElements = filterLinearConvertibleElements(
       selectedElements,
     ) as ExcalidrawLinearElement[];
 
-    const arrowType = getArrowType(selectedLinearSwitchableElements[0]);
-    const sameType = selectedLinearSwitchableElements.every(
+    const arrowType = getArrowType(convertibleLinearElements[0]);
+    const sameType = convertibleLinearElements.every(
       (element) => getArrowType(element) === arrowType,
     );
 
@@ -540,9 +540,11 @@ export const switchShapes = (
 
     if (nextType && isConvertibleLinearType(nextType)) {
       const convertedElements: Record<string, ExcalidrawElement> = {};
-      for (const element of selectedLinearSwitchableElements) {
+      for (const element of convertibleLinearElements) {
         const { properties, initialType } =
-          editorJotaiStore.get(shapeSwitchLinearAtom)?.[element.id] || {};
+          editorJotaiStore.get(linearElement_conversionCacheAtom)?.[
+            element.id
+          ] || {};
 
         // If the initial type is not elbow, and when we switch to elbow,
         // the linear line might be "bent" and the points would likely be different.
@@ -597,9 +599,9 @@ export const switchShapes = (
       app.scene.replaceAllElements(nextElements);
 
       for (const element of Object.values(convertedElements)) {
-        const cachedLinear = editorJotaiStore.get(shapeSwitchLinearAtom)?.[
-          element.id
-        ];
+        const cachedLinear = editorJotaiStore.get(
+          linearElement_conversionCacheAtom,
+        )?.[element.id];
 
         if (cachedLinear) {
           const { properties, initialType } = cachedLinear;
@@ -642,7 +644,7 @@ export const switchShapes = (
         }
       }
     }
-    const convertedSelectedLinearElements = getLinearSwitchableElements(
+    const convertedSelectedLinearElements = filterLinearConvertibleElements(
       app.scene.getSelectedElements(app.state),
     );
 
@@ -664,9 +666,9 @@ export const switchShapes = (
   return true;
 };
 
-export const getSwitchCategoryFromElements = (
+export const getConversionTypeFromElements = (
   elements: ExcalidrawElement[],
-): SwitchShapeCategory => {
+): ConversionType => {
   if (elements.length === 0) {
     return null;
   }
@@ -776,14 +778,14 @@ const getElbowArrowProperties = (
   return {};
 };
 
-const getGenericSwitchableElements = (elements: ExcalidrawElement[]) =>
+const filterGenericConvetibleElements = (elements: ExcalidrawElement[]) =>
   elements.filter((element) => isConvertibleGenericType(element.type)) as Array<
     | ExcalidrawRectangleElement
     | ExcalidrawDiamondElement
     | ExcalidrawEllipseElement
   >;
 
-const getLinearSwitchableElements = (elements: ExcalidrawElement[]) =>
+const filterLinearConvertibleElements = (elements: ExcalidrawElement[]) =>
   elements.filter((element) =>
     isEligibleLinearElement(element),
   ) as ExcalidrawLinearElement[];
@@ -1049,4 +1051,4 @@ const isValidConversion = (
   return false;
 };
 
-export default ShapeSwitch;
+export default ConvertElementTypePopup;

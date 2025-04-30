@@ -468,11 +468,11 @@ import { LassoTrail } from "../lasso";
 
 import { EraserTrail } from "../eraser";
 
-import ShapeSwitch, {
-  getSwitchCategoryFromElements,
-  shapeSwitchAtom,
-  switchShapes,
-} from "./ShapeSwitch";
+import ConvertElementTypePopup, {
+  getConversionTypeFromElements,
+  convertElementTypePopupAtom,
+  convertElementTypes,
+} from "./ConvertElementTypePopup";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";
@@ -1599,7 +1599,7 @@ class App extends React.Component<AppProps, AppState> {
     const firstSelectedElement = selectedElements[0];
 
     const showShapeSwitchPanel =
-      editorJotaiStore.get(shapeSwitchAtom)?.type === "panel";
+      editorJotaiStore.get(convertElementTypePopupAtom)?.type === "panel";
 
     return (
       <div
@@ -1875,7 +1875,9 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
-                        {showShapeSwitchPanel && <ShapeSwitch app={this} />}
+                        {showShapeSwitchPanel && (
+                          <ConvertElementTypePopup app={this} />
+                        )}
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
                     </ExcalidrawElementsContext.Provider>
@@ -4178,31 +4180,33 @@ class App extends React.Component<AppProps, AppState> {
 
         // Shape switching
         if (event.key === KEYS.ESCAPE) {
-          this.updateEditorAtom(shapeSwitchAtom, null);
+          this.updateEditorAtom(convertElementTypePopupAtom, null);
         } else if (
           event.key === KEYS.TAB &&
           (document.activeElement === this.excalidrawContainerRef?.current ||
             document.activeElement?.classList.contains(
-              CLASSES.SHAPE_SWITCH_PANEL_CLASSNAME,
+              CLASSES.CONVERT_ELEMENT_TYPE_POPUP,
             ))
         ) {
           event.preventDefault();
 
-          const switchCategory =
-            getSwitchCategoryFromElements(selectedElements);
+          const conversionType =
+            getConversionTypeFromElements(selectedElements);
 
-          if (editorJotaiStore.get(shapeSwitchAtom)?.type === "panel") {
+          if (
+            editorJotaiStore.get(convertElementTypePopupAtom)?.type === "panel"
+          ) {
             if (
-              switchShapes(this, {
-                switchCategory,
+              convertElementTypes(this, {
+                conversionType,
                 direction: event.shiftKey ? "left" : "right",
               })
             ) {
               this.store.shouldCaptureIncrement();
             }
           }
-          if (switchCategory) {
-            this.updateEditorAtom(shapeSwitchAtom, {
+          if (conversionType) {
+            this.updateEditorAtom(convertElementTypePopupAtom, {
               type: "panel",
             });
           }
@@ -6418,8 +6422,8 @@ class App extends React.Component<AppProps, AppState> {
       this.updateEditorAtom(searchItemInFocusAtom, null);
     }
 
-    if (editorJotaiStore.get(shapeSwitchAtom)) {
-      this.updateEditorAtom(shapeSwitchAtom, null);
+    if (editorJotaiStore.get(convertElementTypePopupAtom)) {
+      this.updateEditorAtom(convertElementTypePopupAtom, null);
     }
 
     // since contextMenu options are potentially evaluated on each render,
