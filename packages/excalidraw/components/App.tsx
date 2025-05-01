@@ -9022,7 +9022,6 @@ class App extends React.Component<AppProps, AppState> {
             linearElementEditor;
           const element = this.scene.getElement(linearElementEditor.elementId);
           if (isBindingElement(element)) {
-            this.actionManager.executeAction(actionFinalize);
             bindOrUnbindLinearElement(
               element,
               startBindingElement,

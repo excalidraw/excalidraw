@@ -7,7 +7,6 @@ import {
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 
 import {
-  isArrowElement,
   isBindingElement,
   isLinearElement,
 } from "@excalidraw/element/typeChecks";
@@ -16,12 +15,6 @@ import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element/shapes";
 
 import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
-
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  NonDeleted,
-} from "@excalidraw/element/types";
 
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";
@@ -69,7 +62,6 @@ export const actionFinalize = register({
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
       }
-    } else if (isArrowElement(appState.newElement)) {
     }
 
     let newElements = elements;
@@ -90,55 +82,48 @@ export const actionFinalize = register({
       focusContainer();
     }
 
-    let element: NonDeleted<ExcalidrawElement> | null = null;
-    if (appState.multiElement) {
-      element = appState.multiElement;
-    } else if (
-      appState.newElement?.type === "freedraw" ||
-      isBindingElement(appState.newElement)
-    ) {
-      element = appState.newElement;
-    } else if (Object.keys(appState.selectedElementIds).length === 1) {
-      const candidate = elementsMap.get(
-        Object.keys(appState.selectedElementIds)[0],
-      ) as NonDeleted<ExcalidrawLinearElement> | undefined;
-      if (candidate) {
-        element = candidate;
-      }
-    }
+    const multiPointElement = appState.multiElement
+      ? appState.multiElement
+      : appState.newElement?.type === "freedraw"
+      ? appState.newElement
+      : null;
 
-    if (element) {
+    if (multiPointElement) {
       // pen and mouse have hover
       if (
-        appState.multiElement &&
-        element.type !== "freedraw" &&
+        multiPointElement.type !== "freedraw" &&
         appState.lastPointerDownWith !== "touch"
       ) {
-        const { points, lastCommittedPoint } = element;
+        const { points, lastCommittedPoint } = multiPointElement;
         if (
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
         ) {
-          scene.mutateElement(element, {
-            points: element.points.slice(0, -1),
+          scene.mutateElement(multiPointElement, {
+            points: multiPointElement.points.slice(0, -1),
           });
         }
       }
 
-      if (isInvisiblySmallElement(element)) {
+      if (isInvisiblySmallElement(multiPointElement)) {
         // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
-        newElements = newElements.filter((el) => el.id !== element!.id);
+        newElements = newElements.filter(
+          (el) => el.id !== multiPointElement.id,
+        );
       }
 
       // If the multi point line closes the loop,
       // set the last point to first point.
       // This ensures that loop remains closed at different scales.
-      const isLoop = isPathALoop(element.points, appState.zoom.value);
-      if (element.type === "line" || element.type === "freedraw") {
+      const isLoop = isPathALoop(multiPointElement.points, appState.zoom.value);
+      if (
+        multiPointElement.type === "line" ||
+        multiPointElement.type === "freedraw"
+      ) {
         if (isLoop) {
-          const linePoints = element.points;
+          const linePoints = multiPointElement.points;
           const firstPoint = linePoints[0];
-          scene.mutateElement(element, {
+          scene.mutateElement(multiPointElement, {
             points: linePoints.map((p, index) =>
               index === linePoints.length - 1
                 ? pointFrom(firstPoint[0], firstPoint[1])
@@ -149,24 +134,23 @@ export const actionFinalize = register({
       }
 
       if (
-        isBindingElement(element) &&
+        isBindingElement(multiPointElement) &&
         !isLoop &&
-        element.points.length > 1 &&
-        !appState.selectedElementIds[element.id]
+        multiPointElement.points.length > 1
       ) {
         const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          element,
+          multiPointElement,
           -1,
           arrayToMap(elements),
         );
-        maybeBindLinearElement(element, appState, { x, y }, scene);
+        maybeBindLinearElement(multiPointElement, appState, { x, y }, scene);
       }
     }
 
     if (
       (!appState.activeTool.locked &&
         appState.activeTool.type !== "freedraw") ||
-      !element
+      !multiPointElement
     ) {
       resetCursor(interactiveCanvas);
     }
@@ -193,7 +177,7 @@ export const actionFinalize = register({
         activeTool:
           (appState.activeTool.locked ||
             appState.activeTool.type === "freedraw") &&
-          element
+          multiPointElement
             ? appState.activeTool
             : activeTool,
         activeEmbeddable: null,
@@ -204,18 +188,21 @@ export const actionFinalize = register({
         startBoundElement: null,
         suggestedBindings: [],
         selectedElementIds:
-          element &&
+          multiPointElement &&
           !appState.activeTool.locked &&
           appState.activeTool.type !== "freedraw"
             ? {
                 ...appState.selectedElementIds,
-                [element.id]: true,
+                [multiPointElement.id]: true,
               }
             : appState.selectedElementIds,
         // To select the linear element when user has finished mutipoint editing
         selectedLinearElement:
-          element && isLinearElement(element)
-            ? new LinearElementEditor(element, arrayToMap(newElements))
+          multiPointElement && isLinearElement(multiPointElement)
+            ? new LinearElementEditor(
+                multiPointElement,
+                arrayToMap(newElements),
+              )
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },

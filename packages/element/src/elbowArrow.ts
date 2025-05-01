@@ -31,7 +31,6 @@ import {
   getGlobalFixedPointForBindableElement,
   snapToMid,
   getHoveredElementForBinding,
-  getDistanceForBinding,
 } from "./binding";
 import { distanceToBindableElement } from "./distance";
 import {
@@ -1256,7 +1255,6 @@ const getElbowArrowData = (
     origStartGlobalPoint,
     hoveredStartElement,
     options?.isDragging,
-    options?.zoom,
   );
   const endGlobalPoint = getGlobalPoint(
     {
@@ -1270,7 +1268,6 @@ const getElbowArrowData = (
     origEndGlobalPoint,
     hoveredEndElement,
     options?.isDragging,
-    options?.zoom,
   );
   const startHeading = getBindPointHeading(
     startGlobalPoint,
@@ -2214,14 +2211,16 @@ const getGlobalPoint = (
   initialPoint: GlobalPoint,
   element?: ExcalidrawBindableElement | null,
   isDragging?: boolean,
-  zoom?: AppState["zoom"],
 ): GlobalPoint => {
   if (isDragging) {
-    if (element && getDistanceForBinding(initialPoint, element, true, zoom)) {
-      return snapToMid(
+    if (element) {
+      const snapPoint = bindPointToSnapToElementOutline(
+        arrow,
         element,
-        bindPointToSnapToElementOutline(arrow, element, startOrEnd),
+        startOrEnd,
       );
+
+      return snapToMid(element, snapPoint);
     }
 
     return initialPoint;
