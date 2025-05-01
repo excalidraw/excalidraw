@@ -299,7 +299,7 @@
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
-    "shapeSwitch": "Cycle through shapes"
+    "convertElementType": "Toggle shape type"
   },
   "element": {
     "rectangle": "Rectangle",
