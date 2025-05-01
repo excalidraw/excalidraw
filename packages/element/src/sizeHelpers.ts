@@ -23,13 +23,15 @@ export const isInvisiblySmallElement = (
   if (isLinearElement(element) || isFreeDrawElement(element)) {
     return (
       element.points.length < 2 ||
-      pointsEqual(
-        element.points[0],
-        element.points[element.points.length - 1],
-        INVISIBLY_SMALL_ELEMENT_SIZE,
-      )
+      (element.points.length === 2 &&
+        pointsEqual(
+          element.points[0],
+          element.points[element.points.length - 1],
+          INVISIBLY_SMALL_ELEMENT_SIZE,
+        ))
     );
   }
+
   return element.width === 0 && element.height === 0;
 };
 
