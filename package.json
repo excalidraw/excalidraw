@@ -79,8 +79,8 @@
     "autorelease": "node scripts/autorelease.js",
     "prerelease:excalidraw": "node scripts/prerelease.js",
     "release:excalidraw": "node scripts/release.js",
-    "rm:build": "rimraf excalidraw-app/{build,dist,dev-dist} && rimraf packages/*/{dist,build} && rimraf examples/*/{build,dist}",
-    "rm:node_modules": "rimraf node_modules && rimraf excalidraw-app/node_modules && rimraf packages/*/node_modules",
+    "rm:build": "rimraf --glob excalidraw-app/build excalidraw-app/dist excalidraw-app/dev-dist packages/*/dist packages/*/build examples/*/build examples/*/dist",
+    "rm:node_modules": "rimraf --glob node_modules excalidraw-app/node_modules packages/*/node_modules",
     "clean-install": "yarn rm:node_modules && yarn install"
   },
   "resolutions": {
