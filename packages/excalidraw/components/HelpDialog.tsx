@@ -248,7 +248,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("CtrlOrCmd+K")]}
             />
             <Shortcut
-              label={t("toolBar.shapeSwitch")}
+              label={t("toolBar.convertElementType")}
               shortcuts={["Tab", "Shift+Tab"]}
               isOr={true}
             />
