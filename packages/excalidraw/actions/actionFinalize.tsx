@@ -60,7 +60,13 @@ export const actionFinalize = register({
       }
 
       if (linearElementEditor !== appState.selectedLinearElement) {
+        let newElements = elements;
+        if (element && isInvisiblySmallElement(element)) {
+          // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
+          newElements = newElements.filter((el) => el.id !== element!.id);
+        }
         return {
+          elements: newElements,
           appState: {
             selectedLinearElement: {
               ...linearElementEditor,
