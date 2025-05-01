@@ -39,7 +39,7 @@ import {
   type OrderedExcalidrawElement,
 } from "./types";
 
-import type Scene from "./Scene";
+import type { Scene } from "./Scene";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 

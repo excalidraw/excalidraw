@@ -1,8 +1,8 @@
 import { elementCenterPoint, THEME, THEME_FILTER } from "@excalidraw/common";
 
-import { FIXED_BINDING_DISTANCE } from "@excalidraw/element/binding";
-import { getDiamondPoints } from "@excalidraw/element/bounds";
-import { getCornerRadius } from "@excalidraw/element/shapes";
+import { FIXED_BINDING_DISTANCE } from "@excalidraw/element";
+import { getDiamondPoints } from "@excalidraw/element";
+import { getCornerRadius } from "@excalidraw/element";
 
 import {
   bezierEquation,

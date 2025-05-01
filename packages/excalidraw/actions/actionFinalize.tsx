@@ -3,20 +3,17 @@ import { pointFrom } from "@excalidraw/math";
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
-} from "@excalidraw/element/binding";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+} from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
 
-import {
-  isBindingElement,
-  isLinearElement,
-} from "@excalidraw/element/typeChecks";
+import { isBindingElement, isLinearElement } from "@excalidraw/element";
 
 import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
-import { isPathALoop } from "@excalidraw/element/shapes";
+import { isPathALoop } from "@excalidraw/element";
 
-import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
+import { isInvisiblySmallElement } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";

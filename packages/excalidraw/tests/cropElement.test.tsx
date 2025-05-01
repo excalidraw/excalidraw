@@ -3,7 +3,7 @@ import { vi } from "vitest";
 
 import { KEYS, cloneJSON } from "@excalidraw/common";
 
-import { duplicateElement } from "@excalidraw/element/duplicate";
+import { duplicateElement } from "@excalidraw/element";
 
 import type {
   ExcalidrawImageElement,

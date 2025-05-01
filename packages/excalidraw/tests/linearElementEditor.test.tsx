@@ -1,4 +1,4 @@
-import { newArrowElement } from "@excalidraw/element/newElement";
+import { newArrowElement } from "@excalidraw/element";
 
 import { pointCenter, pointFrom } from "@excalidraw/math";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
@@ -13,13 +13,13 @@ import {
   arrayToMap,
 } from "@excalidraw/common";
 
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { LinearElementEditor } from "@excalidraw/element";
 import {
   getBoundTextElementPosition,
   getBoundTextMaxWidth,
-} from "@excalidraw/element/textElement";
-import * as textElementUtils from "@excalidraw/element/textElement";
-import { wrapText } from "@excalidraw/element/textWrapping";
+} from "@excalidraw/element";
+import * as textElementUtils from "@excalidraw/element";
+import { wrapText } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
