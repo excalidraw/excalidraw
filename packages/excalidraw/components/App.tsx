@@ -2933,28 +2933,6 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ selectedLinearElement: null });
     }
 
-    const { multiElement } = prevState;
-    if (
-      prevState.activeTool !== this.state.activeTool &&
-      multiElement != null &&
-      isBindingEnabled(this.state) &&
-      isBindingElement(multiElement, false)
-    ) {
-      this.actionManager.executeAction(actionFinalize);
-      // maybeBindLinearElement(
-      //   multiElement,
-      //   this.state,
-      //   tupleToCoors(
-      //     LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      //       multiElement,
-      //       -1,
-      //       nonDeletedElementsMap,
-      //     ),
-      //   ),
-      //   this.scene,
-      // );
-    }
-
     this.store.commit(elementsMap, this.state);
 
     // Do not notify consumers if we're still loading the scene. Among other

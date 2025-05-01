@@ -160,37 +160,38 @@ export const actionFinalize = register({
         newElements = newElements.filter((el) => el.id !== element!.id);
       }
 
-      // If the multi point line closes the loop,
-      // set the last point to first point.
-      // This ensures that loop remains closed at different scales.
-      const isLoop = isPathALoop(element.points, appState.zoom.value);
-      if (element.type === "line" || element.type === "freedraw") {
-        if (isLoop) {
-          const linePoints = element.points;
-          const firstPoint = linePoints[0];
-          scene.mutateElement(element, {
-            points: linePoints.map((p, index) =>
-              index === linePoints.length - 1
-                ? pointFrom(firstPoint[0], firstPoint[1])
-                : p,
-            ),
-          });
+      if (isLinearElement(element) || element.type === "freedraw") {
+        // If the multi point line closes the loop,
+        // set the last point to first point.
+        // This ensures that loop remains closed at different scales.
+        const isLoop = isPathALoop(element.points, appState.zoom.value);
+        if (element.type === "line" || element.type === "freedraw") {
+          if (isLoop) {
+            const linePoints = element.points;
+            const firstPoint = linePoints[0];
+            scene.mutateElement(element, {
+              points: linePoints.map((p, index) =>
+                index === linePoints.length - 1
+                  ? pointFrom(firstPoint[0], firstPoint[1])
+                  : p,
+              ),
+            });
+          }
         }
-      }
 
-      if (
-        isBindingElement(element) &&
-        !isLoop &&
-        element.points.length > 1 &&
-        !appState.selectedElementIds[element.id] &&
-        isBindingEnabled(appState)
-      ) {
-        const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          element,
-          -1,
-          arrayToMap(elements),
-        );
-        maybeBindLinearElement(element, appState, { x, y }, scene);
+        if (
+          isBindingElement(element) &&
+          !isLoop &&
+          element.points.length > 1 &&
+          isBindingEnabled(appState)
+        ) {
+          const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            element,
+            -1,
+            arrayToMap(elements),
+          );
+          maybeBindLinearElement(element, appState, { x, y }, scene);
+        }
       }
     }
 
