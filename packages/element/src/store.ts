@@ -6,6 +6,7 @@ import {
   isTestEnv,
   randomId,
   Emitter,
+  toIterable,
 } from "@excalidraw/common";
 
 import type { DTO, ValueOf } from "@excalidraw/common/utility-types";
@@ -158,25 +159,25 @@ export class Store {
   ): SceneElementsMap {
     const movedElements = new Map<string, ExcalidrawElement>();
 
-    for (const [id, prevElement] of prevElements.entries()) {
-      const nextElement = nextElements.get(id);
+    for (const prevElement of toIterable(prevElements)) {
+      const nextElement = nextElements.get(prevElement.id);
 
       if (!nextElement) {
         // Nothing to care about here, element was forcefully deleted
         continue;
       }
 
-      const elementSnapshot = this.snapshot.elements.get(id);
+      const elementSnapshot = this.snapshot.elements.get(prevElement.id);
 
       // Checks for in progress async user action
       if (!elementSnapshot) {
         // Detected yet uncomitted local element
-        nextElements.delete(id);
+        nextElements.delete(prevElement.id);
       } else if (elementSnapshot.version < prevElement.version) {
         // Element was already commited, but the snapshot version is lower than current local version
-        nextElements.set(id, elementSnapshot);
+        nextElements.set(prevElement.id, elementSnapshot);
         // Mark the element as potentially moved, as it could have
-        movedElements.set(id, elementSnapshot);
+        movedElements.set(prevElement.id, elementSnapshot);
       }
     }
 
@@ -601,10 +602,10 @@ export class StoreSnapshot {
   public getChangedElements(prevSnapshot: StoreSnapshot) {
     const changedElements: Record<string, OrderedExcalidrawElement> = {};
 
-    for (const [id, nextElement] of this.elements.entries()) {
+    for (const nextElement of toIterable(this.elements)) {
       // Due to the structural clone inside `maybeClone`, we can perform just these reference checks
-      if (prevSnapshot.elements.get(id) !== nextElement) {
-        changedElements[id] = nextElement;
+      if (prevSnapshot.elements.get(nextElement.id) !== nextElement) {
+        changedElements[nextElement.id] = nextElement;
       }
     }
 
@@ -794,26 +795,26 @@ export class StoreSnapshot {
 
     const changedElements: SceneElementsMap = new Map() as SceneElementsMap;
 
-    for (const [id, prevElement] of this.elements) {
-      const nextElement = nextElements.get(id);
+    for (const prevElement of toIterable(this.elements)) {
+      const nextElement = nextElements.get(prevElement.id);
 
       if (!nextElement) {
         // element was deleted
         changedElements.set(
-          id,
+          prevElement.id,
           newElementWith(prevElement, { isDeleted: true }),
         );
       }
     }
 
-    for (const [id, nextElement] of nextElements) {
-      const prevElement = this.elements.get(id);
+    for (const nextElement of toIterable(nextElements)) {
+      const prevElement = this.elements.get(nextElement.id);
 
       if (
         !prevElement || // element was added
         prevElement.version < nextElement.version // element was updated
       ) {
-        changedElements.set(id, nextElement);
+        changedElements.set(nextElement.id, nextElement);
       }
     }
 
@@ -821,9 +822,7 @@ export class StoreSnapshot {
       return;
     }
 
-    const changedElementsHash = hashElementsVersion(
-      Array.from(changedElements.values()),
-    );
+    const changedElementsHash = hashElementsVersion(changedElements);
 
     if (
       options.shouldCompareHashes &&
@@ -843,15 +842,15 @@ export class StoreSnapshot {
   private createElementsSnapshot(changedElements: SceneElementsMap) {
     const clonedElements = new Map() as SceneElementsMap;
 
-    for (const [id, prevElement] of this.elements) {
+    for (const prevElement of toIterable(this.elements)) {
       // Clone previous elements, never delete, in case nextElements would be just a subset of previous elements
       // i.e. during collab, persist or whenenever isDeleted elements get cleared
-      clonedElements.set(id, prevElement);
+      clonedElements.set(prevElement.id, prevElement);
     }
 
-    for (const [id, changedElement] of changedElements) {
+    for (const changedElement of toIterable(changedElements)) {
       // TODO: consider just creating new instance, once we can ensure that all reference properties on every element are immutable
-      clonedElements.set(id, deepCopyElement(changedElement));
+      clonedElements.set(changedElement.id, deepCopyElement(changedElement));
     }
 
     return clonedElements;

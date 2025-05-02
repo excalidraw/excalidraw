@@ -307,7 +307,6 @@ import Scene from "@excalidraw/element/Scene";
 import {
   Store,
   CaptureUpdateAction,
-  StoreIncrement,
 } from "@excalidraw/element/store";
 
 import type { ElementUpdate } from "@excalidraw/element/mutateElement";

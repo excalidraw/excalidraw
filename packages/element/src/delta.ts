@@ -316,7 +316,7 @@ export class Delta<T> {
   }
 
   /**
-   * Returns all the object1 keys that have distinct values.
+   * Returns sorted object1 keys that have distinct values.
    */
   public static getLeftDifferences<T extends {}>(
     object1: T,
@@ -325,11 +325,11 @@ export class Delta<T> {
   ) {
     return Array.from(
       this.distinctKeysIterator("left", object1, object2, skipShallowCompare),
-    );
+    ).sort();
   }
 
   /**
-   * Returns all the object2 keys that have distinct values.
+   * Returns sorted object2 keys that have distinct values.
    */
   public static getRightDifferences<T extends {}>(
     object1: T,
@@ -338,7 +338,7 @@ export class Delta<T> {
   ) {
     return Array.from(
       this.distinctKeysIterator("right", object1, object2, skipShallowCompare),
-    );
+    ).sort();
   }
 
   /**
@@ -430,7 +430,8 @@ export class AppStateDelta implements DeltaContainer<AppState> {
     const delta = Delta.calculate(
       prevAppState,
       nextAppState,
-      undefined,
+      // making the order of keys in deltas stable for hashing purposes
+      AppStateDelta.orderAppStateKeys,
       AppStateDelta.postProcess,
     );
 
@@ -537,40 +538,6 @@ export class AppStateDelta implements DeltaContainer<AppState> {
 
   public isEmpty(): boolean {
     return Delta.isEmpty(this.delta);
-  }
-
-  /**
-   * It is necessary to post process the partials in case of reference values,
-   * for which we need to calculate the real diff between `deleted` and `inserted`.
-   */
-  private static postProcess<T extends ObservedAppState>(
-    deleted: Partial<T>,
-    inserted: Partial<T>,
-  ): [Partial<T>, Partial<T>] {
-    try {
-      Delta.diffObjects(
-        deleted,
-        inserted,
-        "selectedElementIds",
-        // ts language server has a bit trouble resolving this, so we are giving it a little push
-        (_) => true as ValueOf<T["selectedElementIds"]>,
-      );
-      Delta.diffObjects(
-        deleted,
-        inserted,
-        "selectedGroupIds",
-        (prevValue) => (prevValue ?? false) as ValueOf<T["selectedGroupIds"]>,
-      );
-    } catch (e) {
-      // if postprocessing fails it does not make sense to bubble up, but let's make sure we know about it
-      console.error(`Couldn't postprocess appstate change deltas.`);
-
-      if (isTestEnv() || isDevEnv()) {
-        throw e;
-      }
-    } finally {
-      return [deleted, inserted];
-    }
   }
 
   /**
@@ -806,6 +773,51 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       typeof elementsProps,
       ObservedElementsAppState
     >;
+  }
+
+  /**
+   * It is necessary to post process the partials in case of reference values,
+   * for which we need to calculate the real diff between `deleted` and `inserted`.
+   */
+  private static postProcess<T extends ObservedAppState>(
+    deleted: Partial<T>,
+    inserted: Partial<T>,
+  ): [Partial<T>, Partial<T>] {
+    try {
+      Delta.diffObjects(
+        deleted,
+        inserted,
+        "selectedElementIds",
+        // ts language server has a bit trouble resolving this, so we are giving it a little push
+        (_) => true as ValueOf<T["selectedElementIds"]>,
+      );
+      Delta.diffObjects(
+        deleted,
+        inserted,
+        "selectedGroupIds",
+        (prevValue) => (prevValue ?? false) as ValueOf<T["selectedGroupIds"]>,
+      );
+    } catch (e) {
+      // if postprocessing fails it does not make sense to bubble up, but let's make sure we know about it
+      console.error(`Couldn't postprocess appstate change deltas.`);
+
+      if (isTestEnv() || isDevEnv()) {
+        throw e;
+      }
+    } finally {
+      return [deleted, inserted];
+    }
+  }
+
+  private static orderAppStateKeys(partial: Partial<ObservedAppState>) {
+    const orderedPartial: { [key: string]: unknown } = {};
+
+    for (const key of Object.keys(partial).sort()) {
+      // relying on insertion order
+      orderedPartial[key] = partial[key as keyof ObservedAppState];
+    }
+
+    return orderedPartial as Partial<ObservedAppState>;
   }
 }
 
