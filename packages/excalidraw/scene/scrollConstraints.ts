@@ -66,6 +66,67 @@ export const calculateConstrainedScrollCenter = (
   };
 };
 
+interface EncodedConstraints {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  l: boolean;
+  v: number;
+}
+
+/**
+ * Encodes scroll constraints into a compact string.
+ * @param constraints - The scroll constraints to encode.
+ * @returns A compact encoded string representing the scroll constraints.
+ */
+export const encodeConstraints = (constraints: ScrollConstraints): string => {
+  const payload: EncodedConstraints = {
+    x: constraints.x,
+    y: constraints.y,
+    w: constraints.width,
+    h: constraints.height,
+    l: !!constraints.lockZoom,
+    v: constraints.viewportZoomFactor ?? 1,
+  };
+
+  const serialized = JSON.stringify(payload);
+
+  return encodeURIComponent(window.btoa(serialized).replace(/=+/, ""));
+};
+
+/**
+ * Decodes a compact string back into scroll constraints.
+ * @param encoded - The encoded string representing the scroll constraints.
+ * @returns The decoded scroll constraints object.
+ */
+export const decodeConstraints = (encoded: string): ScrollConstraints => {
+  try {
+    const decodedStr = window.atob(decodeURIComponent(encoded));
+    const parsed = JSON.parse(decodedStr) as EncodedConstraints;
+    return {
+      x: parsed.x ?? 0,
+      y: parsed.y ?? 0,
+      width: parsed.w ?? 0,
+      height: parsed.h ?? 0,
+      lockZoom: parsed.l ?? false,
+      viewportZoomFactor: parsed.v ?? 1,
+      animateOnNextUpdate: false,
+    };
+  } catch (error) {
+    // return safe defaults if decoding fails
+    return {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      lockZoom: false,
+      viewportZoomFactor: 1,
+      animateOnNextUpdate: false,
+    };
+  }
+};
+
 /**
  * Calculates the zoom levels necessary to fit the constrained scrollable area within the viewport on the X and Y axes.
  *
