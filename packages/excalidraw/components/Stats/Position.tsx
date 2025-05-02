@@ -11,7 +11,7 @@ import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 import type Scene from "@excalidraw/element/Scene";
 
 import StatsDragInput from "./DragInput";
-import { getStepSizedValue, moveElement } from "./utils";
+import { getStepSizedValue, moveElement, STEP_SIZE } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
 import type { AppState } from "../../types";
@@ -23,8 +23,6 @@ interface PositionProps {
   scene: Scene;
   appState: AppState;
 }
-
-const STEP_SIZE = 10;
 
 const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
   accumulatedChange,
