@@ -185,10 +185,13 @@ const drawHighlightForRectWithRotation = (
   context.translate(x, y);
   context.rotate(element.angle);
 
-  const radius = getCornerRadius(
+  let radius = getCornerRadius(
     Math.min(element.width, element.height),
     element,
   );
+  if (radius === 0) {
+    radius = 0.01;
+  }
 
   context.beginPath();
 
@@ -231,70 +234,6 @@ const drawHighlightForRectWithRotation = (
     context.lineTo(topLeftApprox[0][0], topLeftApprox[0][1]);
     drawCatmullRomQuadraticApprox(context, topLeftApprox);
   }
-
-  // context.moveTo(-padding + radius, -padding);
-  // context.lineTo(element.width + padding - radius, -padding);
-  // context.quadraticCurveTo(
-  //   element.width + padding,
-  //   -padding,
-  //   element.width + padding,
-  //   -padding + radius,
-  // );
-  // context.lineTo(element.width + padding, element.height + padding - radius);
-  // context.quadraticCurveTo(
-  //   element.width + padding,
-  //   element.height + padding,
-  //   element.width + padding - radius,
-  //   element.height + padding,
-  // );
-  // context.lineTo(-padding + radius, element.height + padding);
-  // context.quadraticCurveTo(
-  //   -padding,
-  //   element.height + padding,
-  //   -padding,
-  //   element.height + padding - radius,
-  // );
-  // context.lineTo(-padding, -padding + radius);
-  // context.quadraticCurveTo(-padding, -padding, -padding + radius, -padding);
-
-  // context.moveTo(-FIXED_BINDING_DISTANCE + radius, -FIXED_BINDING_DISTANCE);
-  // context.quadraticCurveTo(
-  //   -FIXED_BINDING_DISTANCE,
-  //   -FIXED_BINDING_DISTANCE,
-  //   -FIXED_BINDING_DISTANCE,
-  //   -FIXED_BINDING_DISTANCE + radius,
-  // );
-  // context.lineTo(
-  //   -FIXED_BINDING_DISTANCE,
-  //   element.height + FIXED_BINDING_DISTANCE - radius,
-  // );
-  // context.quadraticCurveTo(
-  //   -FIXED_BINDING_DISTANCE,
-  //   element.height + FIXED_BINDING_DISTANCE,
-  //   -FIXED_BINDING_DISTANCE + radius,
-  //   element.height + FIXED_BINDING_DISTANCE,
-  // );
-  // context.lineTo(
-  //   element.width + FIXED_BINDING_DISTANCE - radius,
-  //   element.height + FIXED_BINDING_DISTANCE,
-  // );
-  // context.quadraticCurveTo(
-  //   element.width + FIXED_BINDING_DISTANCE,
-  //   element.height + FIXED_BINDING_DISTANCE,
-  //   element.width + FIXED_BINDING_DISTANCE,
-  //   element.height + FIXED_BINDING_DISTANCE - radius,
-  // );
-  // context.lineTo(
-  //   element.width + FIXED_BINDING_DISTANCE,
-  //   -FIXED_BINDING_DISTANCE + radius,
-  // );
-  // context.quadraticCurveTo(
-  //   element.width + FIXED_BINDING_DISTANCE,
-  //   -FIXED_BINDING_DISTANCE,
-  //   element.width + FIXED_BINDING_DISTANCE - radius,
-  //   -FIXED_BINDING_DISTANCE,
-  // );
-  // context.lineTo(-FIXED_BINDING_DISTANCE + radius, -FIXED_BINDING_DISTANCE);
 
   {
     const topLeftApprox = offsetQuadraticBezier(
@@ -372,7 +311,7 @@ const strokeRectWithRotation = (
   context.restore();
 };
 
-const strokeDiamondWithRotation = (
+const drawHighlightForDiamondWithRotation = (
   context: CanvasRenderingContext2D,
   padding: number,
   element: ExcalidrawDiamondElement,
@@ -558,7 +497,7 @@ const renderBindingHighlightForBindableElement = (
       drawHighlightForRectWithRotation(context, element, padding);
       break;
     case "diamond":
-      strokeDiamondWithRotation(context, padding, element);
+      drawHighlightForDiamondWithRotation(context, padding, element);
       break;
     case "ellipse":
       context.lineWidth =
