@@ -78,7 +78,7 @@ const WelcomeScreenMenuItemLink = ({
       className={`welcome-screen-menu-item ${className}`}
       href={href}
       target="_blank"
-      rel="noreferrer"
+      rel="noopener"
     >
       <WelcomeScreenMenuItemContent icon={icon} shortcut={shortcut}>
         {children}
