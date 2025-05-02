@@ -178,61 +178,65 @@ export const moveElement = (
   }
 
   if (isFrameLikeElement(originalElement)) {
-    getFrameChildren(originalElementsMap, originalElement.id).forEach(
-      (child) => {
-        const latestChildElement = elementsMap.get(child.id);
-
-        if (!latestChildElement) {
-          return;
-        }
-
-        const [childCX, childCY] = [
-          child.x + child.width / 2,
-          child.y + child.height / 2,
-        ];
-        const [childTopLeftX, childTopLeftY] = pointRotateRads(
-          pointFrom(child.x, child.y),
-          pointFrom(childCX, childCY),
-          child.angle,
-        );
-
-        const childNewTopLeftX = Math.round(childTopLeftX + changeInX);
-        const childNewTopLeftY = Math.round(childTopLeftY + changeInY);
-
-        const [childX, childY] = pointRotateRads(
-          pointFrom(childNewTopLeftX, childNewTopLeftY),
-          pointFrom(childCX + changeInX, childCY + changeInY),
-          -child.angle as Radians,
-        );
-
-        scene.mutateElement(
-          latestChildElement,
-          {
-            x: childX,
-            y: childY,
-          },
-          { informMutation: shouldInformMutation, isDragging: false },
-        );
-        updateBindings(latestChildElement, scene);
-
-        const boundTextElement = getBoundTextElement(
-          latestChildElement,
-          originalElementsMap,
-        );
-        if (boundTextElement) {
-          const latestBoundTextElement = elementsMap.get(boundTextElement.id);
-          latestBoundTextElement &&
-            scene.mutateElement(
-              latestBoundTextElement,
-              {
-                x: boundTextElement.x + changeInX,
-                y: boundTextElement.y + changeInY,
-              },
-              { informMutation: shouldInformMutation, isDragging: false },
-            );
-        }
-      },
+    const originalChildren = getFrameChildren(
+      originalElementsMap,
+      originalElement.id,
     );
+    originalChildren.forEach((child) => {
+      const latestChildElement = elementsMap.get(child.id);
+
+      if (!latestChildElement) {
+        return;
+      }
+
+      const [childCX, childCY] = [
+        child.x + child.width / 2,
+        child.y + child.height / 2,
+      ];
+      const [childTopLeftX, childTopLeftY] = pointRotateRads(
+        pointFrom(child.x, child.y),
+        pointFrom(childCX, childCY),
+        child.angle,
+      );
+
+      const childNewTopLeftX = Math.round(childTopLeftX + changeInX);
+      const childNewTopLeftY = Math.round(childTopLeftY + changeInY);
+
+      const [childX, childY] = pointRotateRads(
+        pointFrom(childNewTopLeftX, childNewTopLeftY),
+        pointFrom(childCX + changeInX, childCY + changeInY),
+        -child.angle as Radians,
+      );
+
+      scene.mutateElement(
+        latestChildElement,
+        {
+          x: childX,
+          y: childY,
+        },
+        { informMutation: shouldInformMutation, isDragging: false },
+      );
+      updateBindings(latestChildElement, scene, {
+        simultaneouslyUpdated: originalChildren,
+      });
+
+      const boundTextElement = getBoundTextElement(
+        latestChildElement,
+        originalElementsMap,
+      );
+      if (boundTextElement) {
+        const latestBoundTextElement = elementsMap.get(boundTextElement.id);
+        latestBoundTextElement &&
+          scene.mutateElement(
+            latestBoundTextElement,
+            {
+              x: boundTextElement.x + changeInX,
+              y: boundTextElement.y + changeInY,
+            },
+            { informMutation: shouldInformMutation, isDragging: false },
+          );
+      }
+    });
   }
 };
 
