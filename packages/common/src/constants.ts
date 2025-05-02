@@ -124,8 +124,6 @@ export const CLASSES = {
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
-export const SERIF_FONT_FAMILY = "serif";
-
 /**
  * // TODO: shouldn't be really `const`, likely neither have integers as values, due to value for the custom fonts, which should likely be some hash.
  *
@@ -146,27 +144,58 @@ export const FONT_FAMILY = {
   "Liberation Sans": 9,
 };
 
-// Fonts to use as fallback before FONT_FAMILY_FALLBACKS
-// FONT_FAMILY_FALLBACKS's Segoe UI Emoji fails to properly fallback
-// for some glyphs: ∞, ∫, ≠
+// Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
 // so we need to have generic font fallback before it
-export const GENERIC_FONT_FAMILIES = [SERIF_FONT_FAMILY];
-export const getGenericFontsForFallbacks: () => string[] = () =>
-  GENERIC_FONT_FAMILIES;
+export const SERIF_GENERIC_FONT = "serif";
+export const SANS_SERIF_GENERIC_FONT = "sans-serif";
+export const MONOSPACE_GENERIC_FONT = "monospace";
+export const FANTASY_GENERIC_FONT = "fantasy";
+
+export const FONT_FAMILY_GENERIC_FALLBACKS = {
+  [SERIF_GENERIC_FONT]: 996,
+  [SANS_SERIF_GENERIC_FONT]: 997,
+  [MONOSPACE_GENERIC_FONT]: 998,
+  [FANTASY_GENERIC_FONT]: 999,
+};
 
 export const FONT_FAMILY_FALLBACKS = {
   [CJK_HAND_DRAWN_FALLBACK_FONT]: 100,
+  ...FONT_FAMILY_GENERIC_FALLBACKS,
   [WINDOWS_EMOJI_FALLBACK_FONT]: 1000,
 };
+
+export function getGenericFontFamilyFallback(
+  fontFamily: number,
+): keyof typeof FONT_FAMILY_GENERIC_FALLBACKS {
+  switch (fontFamily) {
+    case FONT_FAMILY.Excalifont:
+      return SERIF_GENERIC_FONT;
+    case FONT_FAMILY["Lilita One"]:
+      return FANTASY_GENERIC_FONT;
+
+    case FONT_FAMILY.Cascadia:
+    case FONT_FAMILY["Comic Shanns"]:
+      return MONOSPACE_GENERIC_FONT;
+
+    default:
+      return SANS_SERIF_GENERIC_FONT;
+  }
+}
 
 export const getFontFamilyFallbacks = (
   fontFamily: number,
 ): Array<keyof typeof FONT_FAMILY_FALLBACKS> => {
+  const genericFallbackFont = getGenericFontFamilyFallback(fontFamily);
+
   switch (fontFamily) {
     case FONT_FAMILY.Excalifont:
-      return [CJK_HAND_DRAWN_FALLBACK_FONT, WINDOWS_EMOJI_FALLBACK_FONT];
+      return [
+        CJK_HAND_DRAWN_FALLBACK_FONT,
+        genericFallbackFont,
+        WINDOWS_EMOJI_FALLBACK_FONT,
+      ];
     default:
-      return [WINDOWS_EMOJI_FALLBACK_FONT];
+      return [genericFallbackFont, WINDOWS_EMOJI_FALLBACK_FONT];
   }
 };
 

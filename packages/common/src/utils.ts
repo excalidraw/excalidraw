@@ -23,7 +23,6 @@ import {
   getFontFamilyFallbacks,
   isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
-  getGenericFontsForFallbacks,
 } from "./constants";
 
 import type { MaybePromise, ResolutionType } from "./utility-types";
@@ -103,12 +102,7 @@ export const getFontFamilyString = ({
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
       // TODO: we should fallback first to generic family names first
-
-      // Fallback to generic family names first, then to specific font family names
-      // currently only serif is added as a generic font family
-      return `${fontFamilyString}${getGenericFontsForFallbacks()
-        .map((x) => `, ${x}`)
-        .join("")}${getFontFamilyFallbacks(fontFamily)
+      return `${fontFamilyString}${getFontFamilyFallbacks(id)
         .map((x) => `, ${x}`)
         .join("")}`;
     }
