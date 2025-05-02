@@ -5,7 +5,6 @@ import {
   updateBoundElements,
 } from "@excalidraw/element/binding";
 import { getBoundTextElement } from "@excalidraw/element/textElement";
-import { getCommonBounds } from "@excalidraw/element/bounds";
 import {
   isFrameLikeElement,
   isLinearElement,
@@ -237,89 +236,6 @@ export const moveElement = (
           );
       }
     });
-  }
-};
-
-export const moveElements = (
-  property: "x" | "y",
-  changeInTopX: number,
-  changeInTopY: number,
-  originalElements: readonly ExcalidrawElement[],
-  originalElementsMap: ElementsMap,
-  scene: Scene,
-) => {
-  for (let i = 0; i < originalElements.length; i++) {
-    const origElement = originalElements[i];
-
-    const [cx, cy] = [
-      origElement.x + origElement.width / 2,
-      origElement.y + origElement.height / 2,
-    ];
-    const [topLeftX, topLeftY] = pointRotateRads(
-      pointFrom(origElement.x, origElement.y),
-      pointFrom(cx, cy),
-      origElement.angle,
-    );
-
-    const newTopLeftX =
-      property === "x" ? Math.round(topLeftX + changeInTopX) : topLeftX;
-
-    const newTopLeftY =
-      property === "y" ? Math.round(topLeftY + changeInTopY) : topLeftY;
-
-    moveElement(
-      newTopLeftX,
-      newTopLeftY,
-      origElement,
-      scene,
-      originalElementsMap,
-      false,
-    );
-  }
-};
-
-export const moveGroupTo = (
-  nextX: number,
-  nextY: number,
-  originalElements: ExcalidrawElement[],
-  originalElementsMap: ElementsMap,
-  scene: Scene,
-) => {
-  const elementsMap = scene.getNonDeletedElementsMap();
-  const [x1, y1, ,] = getCommonBounds(originalElements);
-  const offsetX = nextX - x1;
-  const offsetY = nextY - y1;
-
-  for (let i = 0; i < originalElements.length; i++) {
-    const origElement = originalElements[i];
-
-    const latestElement = elementsMap.get(origElement.id);
-    if (!latestElement) {
-      continue;
-    }
-
-    // bound texts are moved with their containers
-    if (!isTextElement(latestElement) || !latestElement.containerId) {
-      const [cx, cy] = [
-        latestElement.x + latestElement.width / 2,
-        latestElement.y + latestElement.height / 2,
-      ];
-
-      const [topLeftX, topLeftY] = pointRotateRads(
-        pointFrom(latestElement.x, latestElement.y),
-        pointFrom(cx, cy),
-        latestElement.angle,
-      );
-
-      moveElement(
-        topLeftX + offsetX,
-        topLeftY + offsetY,
-        origElement,
-        scene,
-        originalElementsMap,
-        false,
-      );
-    }
   }
 };
 
