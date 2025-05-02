@@ -19,7 +19,10 @@ import {
   throttleRAF,
 } from "@excalidraw/common";
 
-import { maxBindingGap } from "@excalidraw/element/binding";
+import {
+  FIXED_BINDING_DISTANCE,
+  maxBindingGap,
+} from "@excalidraw/element/binding";
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import {
   getOmitSidesForDevice,
@@ -69,6 +72,7 @@ import type {
   ExcalidrawFrameLikeElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
+  ExcalidrawRectanguloidElement,
   ExcalidrawTextElement,
   GroupId,
   NonDeleted,
@@ -163,6 +167,186 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
     LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value,
     false,
   );
+};
+
+const drawHighlightForRectWithRotation = (
+  context: CanvasRenderingContext2D,
+  element: ExcalidrawRectanguloidElement,
+  padding: number,
+) => {
+  const [x, y] = pointRotateRads(
+    pointFrom<GlobalPoint>(element.x, element.y),
+    elementCenterPoint(element),
+    element.angle,
+  );
+
+  context.save();
+  context.translate(x, y);
+  context.rotate(element.angle);
+
+  const radius = getCornerRadius(
+    Math.min(element.width, element.height),
+    element,
+  );
+
+  context.beginPath();
+
+  // {
+  //   const topLeftApprox = offsetBezier(
+  //     pointFrom(0, 0 + radius),
+  //     pointFrom(0, 0),
+  //     pointFrom(0, 0),
+  //     pointFrom(0 + radius, 0),
+  //     padding,
+  //   );
+  //   const topRightApprox = offsetBezier(
+  //     pointFrom(element.width - radius, 0),
+  //     pointFrom(element.width, 0),
+  //     pointFrom(element.width, 0),
+  //     pointFrom(element.width, radius),
+  //     padding,
+  //   );
+  //   const bottomRightApprox = offsetBezier(
+  //     pointFrom(element.width, element.height - radius),
+  //     pointFrom(element.width, element.height),
+  //     pointFrom(element.width, element.height),
+  //     pointFrom(element.width - radius, element.height),
+  //     padding,
+  //   );
+  //   const bottomLeftApprox = offsetBezier(
+  //     pointFrom(radius, element.height),
+  //     pointFrom(0, element.height),
+  //     pointFrom(0, element.height),
+  //     pointFrom(0, element.height - radius),
+  //     padding,
+  //   );
+
+  //   context.moveTo(
+  //     topLeftApprox[topLeftApprox.length - 1][0],
+  //     topLeftApprox[topLeftApprox.length - 1][1],
+  //   );
+  //   context.lineTo(topRightApprox[0][0], topRightApprox[0][1]);
+  //   drawCatmullRom(context, topRightApprox);
+  //   context.lineTo(bottomRightApprox[0][0], bottomRightApprox[0][1]);
+  //   drawCatmullRom(context, bottomRightApprox);
+  //   context.lineTo(bottomLeftApprox[0][0], bottomLeftApprox[0][1]);
+  //   drawCatmullRom(context, bottomLeftApprox);
+  //   context.lineTo(topLeftApprox[0][0], topLeftApprox[0][1]);
+  //   drawCatmullRom(context, topLeftApprox);
+  // }
+
+  context.moveTo(-padding + radius, -padding);
+  context.lineTo(element.width + padding - radius, -padding);
+  context.quadraticCurveTo(
+    element.width + padding,
+    -padding,
+    element.width + padding,
+    -padding + radius,
+  );
+  context.lineTo(element.width + padding, element.height + padding - radius);
+  context.quadraticCurveTo(
+    element.width + padding,
+    element.height + padding,
+    element.width + padding - radius,
+    element.height + padding,
+  );
+  context.lineTo(-padding + radius, element.height + padding);
+  context.quadraticCurveTo(
+    -padding,
+    element.height + padding,
+    -padding,
+    element.height + padding - radius,
+  );
+  context.lineTo(-padding, -padding + radius);
+  context.quadraticCurveTo(-padding, -padding, -padding + radius, -padding);
+
+  context.moveTo(-FIXED_BINDING_DISTANCE + radius, -FIXED_BINDING_DISTANCE);
+  context.quadraticCurveTo(
+    -FIXED_BINDING_DISTANCE,
+    -FIXED_BINDING_DISTANCE,
+    -FIXED_BINDING_DISTANCE,
+    -FIXED_BINDING_DISTANCE + radius,
+  );
+  context.lineTo(
+    -FIXED_BINDING_DISTANCE,
+    element.height + FIXED_BINDING_DISTANCE - radius,
+  );
+  context.quadraticCurveTo(
+    -FIXED_BINDING_DISTANCE,
+    element.height + FIXED_BINDING_DISTANCE,
+    -FIXED_BINDING_DISTANCE + radius,
+    element.height + FIXED_BINDING_DISTANCE,
+  );
+  context.lineTo(
+    element.width + FIXED_BINDING_DISTANCE - radius,
+    element.height + FIXED_BINDING_DISTANCE,
+  );
+  context.quadraticCurveTo(
+    element.width + FIXED_BINDING_DISTANCE,
+    element.height + FIXED_BINDING_DISTANCE,
+    element.width + FIXED_BINDING_DISTANCE,
+    element.height + FIXED_BINDING_DISTANCE - radius,
+  );
+  context.lineTo(
+    element.width + FIXED_BINDING_DISTANCE,
+    -FIXED_BINDING_DISTANCE + radius,
+  );
+  context.quadraticCurveTo(
+    element.width + FIXED_BINDING_DISTANCE,
+    -FIXED_BINDING_DISTANCE,
+    element.width + FIXED_BINDING_DISTANCE - radius,
+    -FIXED_BINDING_DISTANCE,
+  );
+  context.lineTo(-FIXED_BINDING_DISTANCE + radius, -FIXED_BINDING_DISTANCE);
+
+  // {
+  //   const topLeftApprox = offsetBezier(
+  //     pointFrom(0 + radius, 0),
+  //     pointFrom(0, 0),
+  //     pointFrom(0, 0),
+  //     pointFrom(0, 0 + radius),
+  //     -FIXED_BINDING_DISTANCE,
+  //   );
+  //   const topRightApprox = offsetBezier(
+  //     pointFrom(element.width, radius),
+  //     pointFrom(element.width, 0),
+  //     pointFrom(element.width, 0),
+  //     pointFrom(element.width - radius, 0),
+  //     -FIXED_BINDING_DISTANCE,
+  //   );
+  //   const bottomRightApprox = offsetBezier(
+  //     pointFrom(element.width - radius, element.height),
+  //     pointFrom(element.width, element.height),
+  //     pointFrom(element.width, element.height),
+  //     pointFrom(element.width, element.height - radius),
+  //     -FIXED_BINDING_DISTANCE,
+  //   );
+  //   const bottomLeftApprox = offsetBezier(
+  //     pointFrom(0, element.height - radius),
+  //     pointFrom(0, element.height),
+  //     pointFrom(0, element.height),
+  //     pointFrom(radius, element.height),
+  //     -FIXED_BINDING_DISTANCE,
+  //   );
+
+  //   context.moveTo(
+  //     topLeftApprox[topLeftApprox.length - 1][0],
+  //     topLeftApprox[topLeftApprox.length - 1][1],
+  //   );
+  //   context.lineTo(bottomLeftApprox[0][0], bottomLeftApprox[0][1]);
+  //   drawCatmullRom(context, bottomLeftApprox);
+  //   context.lineTo(bottomRightApprox[0][0], bottomRightApprox[0][1]);
+  //   drawCatmullRom(context, bottomRightApprox);
+  //   context.lineTo(topRightApprox[0][0], topRightApprox[0][1]);
+  //   drawCatmullRom(context, topRightApprox);
+  //   context.lineTo(topLeftApprox[0][0], topLeftApprox[0][1]);
+  //   drawCatmullRom(context, topLeftApprox);
+  // }
+
+  context.closePath();
+  context.fill();
+
+  context.restore();
 };
 
 const strokeRectWithRotation = (
@@ -280,28 +464,28 @@ const strokeDiamondWithRotation = (
       pointFrom(topX, topY),
       pointFrom(topX, topY),
       pointFrom(topX - verticalRadius, topY + horizontalRadius),
-      -5,
+      -FIXED_BINDING_DISTANCE,
     );
     const rightApprox = offsetBezier(
       pointFrom(rightX - verticalRadius, rightY + horizontalRadius),
       pointFrom(rightX, rightY),
       pointFrom(rightX, rightY),
       pointFrom(rightX - verticalRadius, rightY - horizontalRadius),
-      -5,
+      -FIXED_BINDING_DISTANCE,
     );
     const bottomApprox = offsetBezier(
       pointFrom(bottomX - verticalRadius, bottomY - horizontalRadius),
       pointFrom(bottomX, bottomY),
       pointFrom(bottomX, bottomY),
       pointFrom(bottomX + verticalRadius, bottomY - horizontalRadius),
-      -5,
+      -FIXED_BINDING_DISTANCE,
     );
     const leftApprox = offsetBezier(
       pointFrom(leftX + verticalRadius, leftY - horizontalRadius),
       pointFrom(leftX, leftY),
       pointFrom(leftX, leftY),
       pointFrom(leftX + verticalRadius, leftY + horizontalRadius),
-      -5,
+      -FIXED_BINDING_DISTANCE,
     );
 
     context.moveTo(
@@ -367,10 +551,6 @@ const renderBindingHighlightForBindableElement = (
     element.height,
     zoom,
   );
-  // To ensure the binding highlight doesn't overlap the element itself
-  const padding = maxBindingGap(element, element.width, element.height, zoom);
-  //context.lineWidth / 2 + BINDING_HIGHLIGHT_OFFSET;
-
   // To ensure the binding highlight doesn't overlap the element itself
   const padding = maxBindingGap(element, element.width, element.height, zoom);
 
