@@ -8,9 +8,18 @@ import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 import type Scene from "@excalidraw/element/Scene";
 
 import StatsDragInput from "./DragInput";
-import { handlePositionChange } from "./utils";
+import {
+  getAtomicUnits,
+  getStepSizedValue,
+  isPropertyEditable,
+  moveElements,
+  moveGroupTo,
+  STEP_SIZE,
+  type AtomicUnit,
+} from "./utils";
+import { getElementsInAtomicUnit, moveElement } from "./utils";
 
-import type { AtomicUnit } from "./utils";
+import type { DragInputCallbackType } from "./DragInput";
 import type { AppState } from "../../types";
 
 interface MultiPositionProps {
@@ -21,6 +30,100 @@ interface MultiPositionProps {
   scene: Scene;
   appState: AppState;
 }
+
+const handlePositionChange: DragInputCallbackType<
+  MultiPositionProps["property"]
+> = ({
+  accumulatedChange,
+  originalElements,
+  originalElementsMap,
+  shouldChangeByStepSize,
+  nextValue,
+  property,
+  scene,
+  originalAppState,
+}) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+
+  if (nextValue !== undefined) {
+    for (const atomicUnit of getAtomicUnits(
+      originalElements,
+      originalAppState,
+    )) {
+      const elementsInUnit = getElementsInAtomicUnit(
+        atomicUnit,
+        elementsMap,
+        originalElementsMap,
+      );
+
+      if (elementsInUnit.length > 1) {
+        const [x1, y1, ,] = getCommonBounds(
+          elementsInUnit.map((el) => el.latest!),
+        );
+        const newTopLeftX = property === "x" ? nextValue : x1;
+        const newTopLeftY = property === "y" ? nextValue : y1;
+
+        moveGroupTo(
+          newTopLeftX,
+          newTopLeftY,
+          elementsInUnit.map((el) => el.original),
+          originalElementsMap,
+          scene,
+        );
+      } else {
+        const origElement = elementsInUnit[0]?.original;
+        const latestElement = elementsInUnit[0]?.latest;
+        if (
+          origElement &&
+          latestElement &&
+          isPropertyEditable(latestElement, property)
+        ) {
+          const [cx, cy] = [
+            origElement.x + origElement.width / 2,
+            origElement.y + origElement.height / 2,
+          ];
+          const [topLeftX, topLeftY] = pointRotateRads(
+            pointFrom(origElement.x, origElement.y),
+            pointFrom(cx, cy),
+            origElement.angle,
+          );
+
+          const newTopLeftX = property === "x" ? nextValue : topLeftX;
+          const newTopLeftY = property === "y" ? nextValue : topLeftY;
+          moveElement(
+            newTopLeftX,
+            newTopLeftY,
+            origElement,
+            scene,
+            originalElementsMap,
+            false,
+          );
+        }
+      }
+    }
+
+    scene.triggerUpdate();
+    return;
+  }
+
+  const change = shouldChangeByStepSize
+    ? getStepSizedValue(accumulatedChange, STEP_SIZE)
+    : accumulatedChange;
+
+  const changeInTopX = property === "x" ? change : 0;
+  const changeInTopY = property === "y" ? change : 0;
+
+  moveElements(
+    property,
+    changeInTopX,
+    changeInTopY,
+    originalElements,
+    originalElementsMap,
+    scene,
+  );
+
+  scene.triggerUpdate();
+};
 
 const MultiPosition = ({
   property,
