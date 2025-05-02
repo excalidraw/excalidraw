@@ -24,10 +24,11 @@ import type {
 
 import type Scene from "@excalidraw/element/Scene";
 
-import DragInput, { type DragInputCallbackType } from "./DragInput";
+import DragInput from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
 import { getElementsInAtomicUnit } from "./utils";
 
+import type { DragInputCallbackType } from "./DragInput";
 import type { AtomicUnit } from "./utils";
 import type { AppState } from "../../types";
 

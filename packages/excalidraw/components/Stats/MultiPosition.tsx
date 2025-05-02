@@ -10,8 +10,8 @@ import type Scene from "@excalidraw/element/Scene";
 import StatsDragInput from "./DragInput";
 import { handlePositionChange } from "./utils";
 
-import type { AppState } from "../../types";
 import type { AtomicUnit } from "./utils";
+import type { AppState } from "../../types";
 
 interface MultiPositionProps {
   property: "x" | "y";
