@@ -21,6 +21,7 @@ import {
   vectorNormal,
   vectorScale,
   pointFromVector,
+  vector,
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/shape";
@@ -1154,7 +1155,7 @@ export const doBoundsIntersect = (
   return minX1 < maxX2 && maxX1 > minX2 && minY1 < maxY2 && maxY1 > minY2;
 };
 
-export function offsetBezier(
+export function offsetCubicBezier(
   p0: GlobalPoint,
   p1: GlobalPoint,
   p2: GlobalPoint,
@@ -1169,6 +1170,33 @@ export function offsetBezier(
     const c = curve(p0, p1, p2, p3);
     const point = bezierEquation(c, t);
     const tangent = vectorNormalize(curveTangent(c, t));
+    const normal = vectorNormal(tangent);
+
+    offsetPoints.push(pointFromVector(vectorScale(normal, offsetDist), point));
+  }
+
+  return offsetPoints;
+}
+
+export function offsetQuadraticBezier(
+  p0: GlobalPoint,
+  p1: GlobalPoint,
+  p2: GlobalPoint,
+  offsetDist: number,
+  steps = 20,
+) {
+  const offsetPoints = [];
+
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const t1 = 1 - t;
+    const point = pointFrom<GlobalPoint>(
+      t1 * t1 * p0[0] + 2 * t1 * t * p1[0] + t * t * p2[0],
+      t1 * t1 * p0[1] + 2 * t1 * t * p1[1] + t * t * p2[1],
+    );
+    const tangentX = 2 * (1 - t) * (p1[0] - p0[0]) + 2 * t * (p2[0] - p1[0]);
+    const tangentY = 2 * (1 - t) * (p1[1] - p0[1]) + 2 * t * (p2[1] - p1[1]);
+    const tangent = vectorNormalize(vector(tangentX, tangentY));
     const normal = vectorNormal(tangent);
 
     offsetPoints.push(pointFromVector(vectorScale(normal, offsetDist), point));

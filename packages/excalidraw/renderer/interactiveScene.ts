@@ -51,7 +51,8 @@ import {
   getCommonBounds,
   getDiamondPoints,
   getElementAbsoluteCoords,
-  offsetBezier,
+  offsetCubicBezier,
+  offsetQuadraticBezier,
 } from "@excalidraw/element/bounds";
 
 import type {
@@ -191,157 +192,149 @@ const drawHighlightForRectWithRotation = (
 
   context.beginPath();
 
-  // {
-  //   const topLeftApprox = offsetBezier(
-  //     pointFrom(0, 0 + radius),
-  //     pointFrom(0, 0),
-  //     pointFrom(0, 0),
-  //     pointFrom(0 + radius, 0),
-  //     padding,
-  //   );
-  //   const topRightApprox = offsetBezier(
-  //     pointFrom(element.width - radius, 0),
-  //     pointFrom(element.width, 0),
-  //     pointFrom(element.width, 0),
-  //     pointFrom(element.width, radius),
-  //     padding,
-  //   );
-  //   const bottomRightApprox = offsetBezier(
-  //     pointFrom(element.width, element.height - radius),
-  //     pointFrom(element.width, element.height),
-  //     pointFrom(element.width, element.height),
-  //     pointFrom(element.width - radius, element.height),
-  //     padding,
-  //   );
-  //   const bottomLeftApprox = offsetBezier(
-  //     pointFrom(radius, element.height),
-  //     pointFrom(0, element.height),
-  //     pointFrom(0, element.height),
-  //     pointFrom(0, element.height - radius),
-  //     padding,
-  //   );
+  {
+    const topLeftApprox = offsetQuadraticBezier(
+      pointFrom(0, 0 + radius),
+      pointFrom(0, 0),
+      pointFrom(0 + radius, 0),
+      padding,
+    );
+    const topRightApprox = offsetQuadraticBezier(
+      pointFrom(element.width - radius, 0),
+      pointFrom(element.width, 0),
+      pointFrom(element.width, radius),
+      padding,
+    );
+    const bottomRightApprox = offsetQuadraticBezier(
+      pointFrom(element.width, element.height - radius),
+      pointFrom(element.width, element.height),
+      pointFrom(element.width - radius, element.height),
+      padding,
+    );
+    const bottomLeftApprox = offsetQuadraticBezier(
+      pointFrom(radius, element.height),
+      pointFrom(0, element.height),
+      pointFrom(0, element.height - radius),
+      padding,
+    );
 
-  //   context.moveTo(
-  //     topLeftApprox[topLeftApprox.length - 1][0],
-  //     topLeftApprox[topLeftApprox.length - 1][1],
-  //   );
-  //   context.lineTo(topRightApprox[0][0], topRightApprox[0][1]);
-  //   drawCatmullRom(context, topRightApprox);
-  //   context.lineTo(bottomRightApprox[0][0], bottomRightApprox[0][1]);
-  //   drawCatmullRom(context, bottomRightApprox);
-  //   context.lineTo(bottomLeftApprox[0][0], bottomLeftApprox[0][1]);
-  //   drawCatmullRom(context, bottomLeftApprox);
-  //   context.lineTo(topLeftApprox[0][0], topLeftApprox[0][1]);
-  //   drawCatmullRom(context, topLeftApprox);
-  // }
+    context.moveTo(
+      topLeftApprox[topLeftApprox.length - 1][0],
+      topLeftApprox[topLeftApprox.length - 1][1],
+    );
+    context.lineTo(topRightApprox[0][0], topRightApprox[0][1]);
+    drawCatmullRomQuadraticApprox(context, topRightApprox);
+    context.lineTo(bottomRightApprox[0][0], bottomRightApprox[0][1]);
+    drawCatmullRomQuadraticApprox(context, bottomRightApprox);
+    context.lineTo(bottomLeftApprox[0][0], bottomLeftApprox[0][1]);
+    drawCatmullRomQuadraticApprox(context, bottomLeftApprox);
+    context.lineTo(topLeftApprox[0][0], topLeftApprox[0][1]);
+    drawCatmullRomQuadraticApprox(context, topLeftApprox);
+  }
 
-  context.moveTo(-padding + radius, -padding);
-  context.lineTo(element.width + padding - radius, -padding);
-  context.quadraticCurveTo(
-    element.width + padding,
-    -padding,
-    element.width + padding,
-    -padding + radius,
-  );
-  context.lineTo(element.width + padding, element.height + padding - radius);
-  context.quadraticCurveTo(
-    element.width + padding,
-    element.height + padding,
-    element.width + padding - radius,
-    element.height + padding,
-  );
-  context.lineTo(-padding + radius, element.height + padding);
-  context.quadraticCurveTo(
-    -padding,
-    element.height + padding,
-    -padding,
-    element.height + padding - radius,
-  );
-  context.lineTo(-padding, -padding + radius);
-  context.quadraticCurveTo(-padding, -padding, -padding + radius, -padding);
+  // context.moveTo(-padding + radius, -padding);
+  // context.lineTo(element.width + padding - radius, -padding);
+  // context.quadraticCurveTo(
+  //   element.width + padding,
+  //   -padding,
+  //   element.width + padding,
+  //   -padding + radius,
+  // );
+  // context.lineTo(element.width + padding, element.height + padding - radius);
+  // context.quadraticCurveTo(
+  //   element.width + padding,
+  //   element.height + padding,
+  //   element.width + padding - radius,
+  //   element.height + padding,
+  // );
+  // context.lineTo(-padding + radius, element.height + padding);
+  // context.quadraticCurveTo(
+  //   -padding,
+  //   element.height + padding,
+  //   -padding,
+  //   element.height + padding - radius,
+  // );
+  // context.lineTo(-padding, -padding + radius);
+  // context.quadraticCurveTo(-padding, -padding, -padding + radius, -padding);
 
-  context.moveTo(-FIXED_BINDING_DISTANCE + radius, -FIXED_BINDING_DISTANCE);
-  context.quadraticCurveTo(
-    -FIXED_BINDING_DISTANCE,
-    -FIXED_BINDING_DISTANCE,
-    -FIXED_BINDING_DISTANCE,
-    -FIXED_BINDING_DISTANCE + radius,
-  );
-  context.lineTo(
-    -FIXED_BINDING_DISTANCE,
-    element.height + FIXED_BINDING_DISTANCE - radius,
-  );
-  context.quadraticCurveTo(
-    -FIXED_BINDING_DISTANCE,
-    element.height + FIXED_BINDING_DISTANCE,
-    -FIXED_BINDING_DISTANCE + radius,
-    element.height + FIXED_BINDING_DISTANCE,
-  );
-  context.lineTo(
-    element.width + FIXED_BINDING_DISTANCE - radius,
-    element.height + FIXED_BINDING_DISTANCE,
-  );
-  context.quadraticCurveTo(
-    element.width + FIXED_BINDING_DISTANCE,
-    element.height + FIXED_BINDING_DISTANCE,
-    element.width + FIXED_BINDING_DISTANCE,
-    element.height + FIXED_BINDING_DISTANCE - radius,
-  );
-  context.lineTo(
-    element.width + FIXED_BINDING_DISTANCE,
-    -FIXED_BINDING_DISTANCE + radius,
-  );
-  context.quadraticCurveTo(
-    element.width + FIXED_BINDING_DISTANCE,
-    -FIXED_BINDING_DISTANCE,
-    element.width + FIXED_BINDING_DISTANCE - radius,
-    -FIXED_BINDING_DISTANCE,
-  );
-  context.lineTo(-FIXED_BINDING_DISTANCE + radius, -FIXED_BINDING_DISTANCE);
+  // context.moveTo(-FIXED_BINDING_DISTANCE + radius, -FIXED_BINDING_DISTANCE);
+  // context.quadraticCurveTo(
+  //   -FIXED_BINDING_DISTANCE,
+  //   -FIXED_BINDING_DISTANCE,
+  //   -FIXED_BINDING_DISTANCE,
+  //   -FIXED_BINDING_DISTANCE + radius,
+  // );
+  // context.lineTo(
+  //   -FIXED_BINDING_DISTANCE,
+  //   element.height + FIXED_BINDING_DISTANCE - radius,
+  // );
+  // context.quadraticCurveTo(
+  //   -FIXED_BINDING_DISTANCE,
+  //   element.height + FIXED_BINDING_DISTANCE,
+  //   -FIXED_BINDING_DISTANCE + radius,
+  //   element.height + FIXED_BINDING_DISTANCE,
+  // );
+  // context.lineTo(
+  //   element.width + FIXED_BINDING_DISTANCE - radius,
+  //   element.height + FIXED_BINDING_DISTANCE,
+  // );
+  // context.quadraticCurveTo(
+  //   element.width + FIXED_BINDING_DISTANCE,
+  //   element.height + FIXED_BINDING_DISTANCE,
+  //   element.width + FIXED_BINDING_DISTANCE,
+  //   element.height + FIXED_BINDING_DISTANCE - radius,
+  // );
+  // context.lineTo(
+  //   element.width + FIXED_BINDING_DISTANCE,
+  //   -FIXED_BINDING_DISTANCE + radius,
+  // );
+  // context.quadraticCurveTo(
+  //   element.width + FIXED_BINDING_DISTANCE,
+  //   -FIXED_BINDING_DISTANCE,
+  //   element.width + FIXED_BINDING_DISTANCE - radius,
+  //   -FIXED_BINDING_DISTANCE,
+  // );
+  // context.lineTo(-FIXED_BINDING_DISTANCE + radius, -FIXED_BINDING_DISTANCE);
 
-  // {
-  //   const topLeftApprox = offsetBezier(
-  //     pointFrom(0 + radius, 0),
-  //     pointFrom(0, 0),
-  //     pointFrom(0, 0),
-  //     pointFrom(0, 0 + radius),
-  //     -FIXED_BINDING_DISTANCE,
-  //   );
-  //   const topRightApprox = offsetBezier(
-  //     pointFrom(element.width, radius),
-  //     pointFrom(element.width, 0),
-  //     pointFrom(element.width, 0),
-  //     pointFrom(element.width - radius, 0),
-  //     -FIXED_BINDING_DISTANCE,
-  //   );
-  //   const bottomRightApprox = offsetBezier(
-  //     pointFrom(element.width - radius, element.height),
-  //     pointFrom(element.width, element.height),
-  //     pointFrom(element.width, element.height),
-  //     pointFrom(element.width, element.height - radius),
-  //     -FIXED_BINDING_DISTANCE,
-  //   );
-  //   const bottomLeftApprox = offsetBezier(
-  //     pointFrom(0, element.height - radius),
-  //     pointFrom(0, element.height),
-  //     pointFrom(0, element.height),
-  //     pointFrom(radius, element.height),
-  //     -FIXED_BINDING_DISTANCE,
-  //   );
+  {
+    const topLeftApprox = offsetQuadraticBezier(
+      pointFrom(0 + radius, 0),
+      pointFrom(0, 0),
+      pointFrom(0, 0 + radius),
+      -FIXED_BINDING_DISTANCE,
+    );
+    const topRightApprox = offsetQuadraticBezier(
+      pointFrom(element.width, radius),
+      pointFrom(element.width, 0),
+      pointFrom(element.width - radius, 0),
+      -FIXED_BINDING_DISTANCE,
+    );
+    const bottomRightApprox = offsetQuadraticBezier(
+      pointFrom(element.width - radius, element.height),
+      pointFrom(element.width, element.height),
+      pointFrom(element.width, element.height - radius),
+      -FIXED_BINDING_DISTANCE,
+    );
+    const bottomLeftApprox = offsetQuadraticBezier(
+      pointFrom(0, element.height - radius),
+      pointFrom(0, element.height),
+      pointFrom(radius, element.height),
+      -FIXED_BINDING_DISTANCE,
+    );
 
-  //   context.moveTo(
-  //     topLeftApprox[topLeftApprox.length - 1][0],
-  //     topLeftApprox[topLeftApprox.length - 1][1],
-  //   );
-  //   context.lineTo(bottomLeftApprox[0][0], bottomLeftApprox[0][1]);
-  //   drawCatmullRom(context, bottomLeftApprox);
-  //   context.lineTo(bottomRightApprox[0][0], bottomRightApprox[0][1]);
-  //   drawCatmullRom(context, bottomRightApprox);
-  //   context.lineTo(topRightApprox[0][0], topRightApprox[0][1]);
-  //   drawCatmullRom(context, topRightApprox);
-  //   context.lineTo(topLeftApprox[0][0], topLeftApprox[0][1]);
-  //   drawCatmullRom(context, topLeftApprox);
-  // }
+    context.moveTo(
+      topLeftApprox[topLeftApprox.length - 1][0],
+      topLeftApprox[topLeftApprox.length - 1][1],
+    );
+    context.lineTo(bottomLeftApprox[0][0], bottomLeftApprox[0][1]);
+    drawCatmullRomQuadraticApprox(context, bottomLeftApprox);
+    context.lineTo(bottomRightApprox[0][0], bottomRightApprox[0][1]);
+    drawCatmullRomQuadraticApprox(context, bottomRightApprox);
+    context.lineTo(topRightApprox[0][0], topRightApprox[0][1]);
+    drawCatmullRomQuadraticApprox(context, topRightApprox);
+    context.lineTo(topLeftApprox[0][0], topLeftApprox[0][1]);
+    drawCatmullRomQuadraticApprox(context, topLeftApprox);
+  }
 
   context.closePath();
   context.fill();
@@ -404,28 +397,28 @@ const strokeDiamondWithRotation = (
     const horizontalRadius = element.roundness
       ? getCornerRadius(Math.abs(rightY - topY), element)
       : (rightY - topY) * 0.01;
-    const topApprox = offsetBezier(
+    const topApprox = offsetCubicBezier(
       pointFrom(topX - verticalRadius, topY + horizontalRadius),
       pointFrom(topX, topY),
       pointFrom(topX, topY),
       pointFrom(topX + verticalRadius, topY + horizontalRadius),
       padding,
     );
-    const rightApprox = offsetBezier(
+    const rightApprox = offsetCubicBezier(
       pointFrom(rightX - verticalRadius, rightY - horizontalRadius),
       pointFrom(rightX, rightY),
       pointFrom(rightX, rightY),
       pointFrom(rightX - verticalRadius, rightY + horizontalRadius),
       padding,
     );
-    const bottomApprox = offsetBezier(
+    const bottomApprox = offsetCubicBezier(
       pointFrom(bottomX + verticalRadius, bottomY - horizontalRadius),
       pointFrom(bottomX, bottomY),
       pointFrom(bottomX, bottomY),
       pointFrom(bottomX - verticalRadius, bottomY - horizontalRadius),
       padding,
     );
-    const leftApprox = offsetBezier(
+    const leftApprox = offsetCubicBezier(
       pointFrom(leftX + verticalRadius, leftY + horizontalRadius),
       pointFrom(leftX, leftY),
       pointFrom(leftX, leftY),
@@ -438,13 +431,13 @@ const strokeDiamondWithRotation = (
       topApprox[topApprox.length - 1][1],
     );
     context.lineTo(rightApprox[0][0], rightApprox[0][1]);
-    drawCatmullRom(context, rightApprox);
+    drawCatmullRomCubicApprox(context, rightApprox);
     context.lineTo(bottomApprox[0][0], bottomApprox[0][1]);
-    drawCatmullRom(context, bottomApprox);
+    drawCatmullRomCubicApprox(context, bottomApprox);
     context.lineTo(leftApprox[0][0], leftApprox[0][1]);
-    drawCatmullRom(context, leftApprox);
+    drawCatmullRomCubicApprox(context, leftApprox);
     context.lineTo(topApprox[0][0], topApprox[0][1]);
-    drawCatmullRom(context, topApprox);
+    drawCatmullRomCubicApprox(context, topApprox);
   }
 
   // Counter-clockwise for the cutout in the middle. We need to have an "inverse
@@ -459,28 +452,28 @@ const strokeDiamondWithRotation = (
     const horizontalRadius = element.roundness
       ? getCornerRadius(Math.abs(rightY - topY), element)
       : (rightY - topY) * 0.01;
-    const topApprox = offsetBezier(
+    const topApprox = offsetCubicBezier(
       pointFrom(topX + verticalRadius, topY + horizontalRadius),
       pointFrom(topX, topY),
       pointFrom(topX, topY),
       pointFrom(topX - verticalRadius, topY + horizontalRadius),
       -FIXED_BINDING_DISTANCE,
     );
-    const rightApprox = offsetBezier(
+    const rightApprox = offsetCubicBezier(
       pointFrom(rightX - verticalRadius, rightY + horizontalRadius),
       pointFrom(rightX, rightY),
       pointFrom(rightX, rightY),
       pointFrom(rightX - verticalRadius, rightY - horizontalRadius),
       -FIXED_BINDING_DISTANCE,
     );
-    const bottomApprox = offsetBezier(
+    const bottomApprox = offsetCubicBezier(
       pointFrom(bottomX - verticalRadius, bottomY - horizontalRadius),
       pointFrom(bottomX, bottomY),
       pointFrom(bottomX, bottomY),
       pointFrom(bottomX + verticalRadius, bottomY - horizontalRadius),
       -FIXED_BINDING_DISTANCE,
     );
-    const leftApprox = offsetBezier(
+    const leftApprox = offsetCubicBezier(
       pointFrom(leftX + verticalRadius, leftY - horizontalRadius),
       pointFrom(leftX, leftY),
       pointFrom(leftX, leftY),
@@ -493,13 +486,13 @@ const strokeDiamondWithRotation = (
       topApprox[topApprox.length - 1][1],
     );
     context.lineTo(leftApprox[0][0], leftApprox[0][1]);
-    drawCatmullRom(context, leftApprox);
+    drawCatmullRomCubicApprox(context, leftApprox);
     context.lineTo(bottomApprox[0][0], bottomApprox[0][1]);
-    drawCatmullRom(context, bottomApprox);
+    drawCatmullRomCubicApprox(context, bottomApprox);
     context.lineTo(rightApprox[0][0], rightApprox[0][1]);
-    drawCatmullRom(context, rightApprox);
+    drawCatmullRomCubicApprox(context, rightApprox);
     context.lineTo(topApprox[0][0], topApprox[0][1]);
-    drawCatmullRom(context, topApprox);
+    drawCatmullRomCubicApprox(context, topApprox);
   }
   context.closePath();
   context.fill();
@@ -1507,7 +1500,33 @@ export const renderInteractiveScene = <
   return ret as T extends true ? void : ReturnType<U>;
 };
 
-function drawCatmullRom(
+function drawCatmullRomQuadraticApprox(
+  ctx: CanvasRenderingContext2D,
+  points: GlobalPoint[],
+  segments = 20,
+) {
+  ctx.lineTo(points[0][0], points[0][1]);
+
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1 < 0 ? 0 : i - 1];
+    const p1 = points[i];
+    const p2 = points[i + 1 >= points.length ? points.length - 1 : i + 1];
+
+    for (let t = 0; t <= 1; t += 1 / segments) {
+      const t2 = t * t;
+
+      const x =
+        (1 - t) * (1 - t) * p0[0] + 2 * (1 - t) * t * p1[0] + t2 * p2[0];
+
+      const y =
+        (1 - t) * (1 - t) * p0[1] + 2 * (1 - t) * t * p1[1] + t2 * p2[1];
+
+      ctx.lineTo(x, y);
+    }
+  }
+}
+
+function drawCatmullRomCubicApprox(
   ctx: CanvasRenderingContext2D,
   points: GlobalPoint[],
   segments = 20,
