@@ -81,7 +81,6 @@ import type {
   NonDeletedSceneElementsMap,
   ExcalidrawTextElement,
   ExcalidrawArrowElement,
-  OrderedExcalidrawElement,
   ExcalidrawElbowArrowElement,
   FixedPoint,
   FixedPointBinding,
@@ -276,15 +275,6 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           zoom,
         )
       : null // If binding is disabled and start is dragged, break all binds
-    : !isElbowArrow(selectedElement)
-    ? // We have to update the focus and gap of the binding, so let's rebind
-      getElligibleElementForBindingElement(
-        selectedElement,
-        "start",
-        elementsMap,
-        elements,
-        zoom,
-      )
     : "keep";
   const end = endDragged
     ? isBindingEnabled
@@ -296,15 +286,6 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           zoom,
         )
       : null // If binding is disabled and end is dragged, break all binds
-    : !isElbowArrow(selectedElement)
-    ? // We have to update the focus and gap of the binding, so let's rebind
-      getElligibleElementForBindingElement(
-        selectedElement,
-        "end",
-        elementsMap,
-        elements,
-        zoom,
-      )
     : "keep";
 
   return [start, end];
@@ -728,28 +709,31 @@ const calculateFocusAndGap = (
 
 // Supports translating, rotating and scaling `changedElement` with bound
 // linear elements.
-// Because scaling involves moving the focus points as well, it is
-// done before the `changedElement` is updated, and the `newSize` is passed
-// in explicitly.
 export const updateBoundElements = (
   changedElement: NonDeletedExcalidrawElement,
   scene: Scene,
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     newSize?: { width: number; height: number };
-    changedElements?: Map<string, OrderedExcalidrawElement>;
+    changedElements?: Map<string, ExcalidrawElement>;
   },
 ) => {
+  if (!isBindableElement(changedElement)) {
+    return;
+  }
+
   const { newSize, simultaneouslyUpdated } = options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
 
-  if (!isBindableElement(changedElement)) {
-    return;
+  let elementsMap: ElementsMap = scene.getNonDeletedElementsMap();
+  if (options?.changedElements) {
+    elementsMap = new Map(elementsMap) as typeof elementsMap;
+    options.changedElements.forEach((element) => {
+      elementsMap.set(element.id, element);
+    });
   }
-
-  const elementsMap = scene.getNonDeletedElementsMap();
 
   boundElementsVisitor(elementsMap, changedElement, (element) => {
     if (!isLinearElement(element) || element.isDeleted) {
@@ -852,6 +836,25 @@ export const updateBoundElements = (
       handleBindTextResize(element, scene, false);
     }
   });
+};
+
+export const updateBindings = (
+  latestElement: ExcalidrawElement,
+  scene: Scene,
+  options?: {
+    simultaneouslyUpdated?: readonly ExcalidrawElement[];
+    newSize?: { width: number; height: number };
+    zoom?: AppState["zoom"];
+  },
+) => {
+  if (isLinearElement(latestElement)) {
+    bindOrUnbindLinearElements([latestElement], true, [], scene, options?.zoom);
+  } else {
+    updateBoundElements(latestElement, scene, {
+      ...options,
+      changedElements: new Map([[latestElement.id, latestElement]]),
+    });
+  }
 };
 
 const doesNeedUpdate = (

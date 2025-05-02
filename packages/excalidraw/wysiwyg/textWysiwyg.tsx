@@ -80,6 +80,8 @@ const getTransform = (
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
+type SubmitHandler = () => void;
+
 export const textWysiwyg = ({
   id,
   onChange,
@@ -106,7 +108,7 @@ export const textWysiwyg = ({
   excalidrawContainer: HTMLDivElement | null;
   app: App;
   autoSelect?: boolean;
-}) => {
+}): SubmitHandler => {
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
@@ -186,7 +188,6 @@ export const textWysiwyg = ({
         }
 
         maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
-
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -735,4 +736,6 @@ export const textWysiwyg = ({
   excalidrawContainer
     ?.querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);
+
+  return handleSubmit;
 };
