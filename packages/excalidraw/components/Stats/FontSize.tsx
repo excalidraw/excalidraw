@@ -17,7 +17,7 @@ import type Scene from "@excalidraw/element/Scene";
 import { fontSizeIcon } from "../icons";
 
 import StatsDragInput from "./DragInput";
-import { DragInputCallbackType, getStepSizedValue } from "./utils";
+import { type DragInputCallbackType, getStepSizedValue } from "./utils";
 
 import type { AppState } from "../../types";
 

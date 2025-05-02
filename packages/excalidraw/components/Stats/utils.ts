@@ -7,7 +7,6 @@ import {
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import { getCommonBounds } from "@excalidraw/element/bounds";
 import {
-  isFrameChildElement,
   isFrameLikeElement,
   isLinearElement,
   isTextElement,
@@ -18,6 +17,8 @@ import {
   getElementsInGroup,
   isInGroup,
 } from "@excalidraw/element/groups";
+
+import { getFrameChildren } from "@excalidraw/element/frame";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -30,7 +31,6 @@ import type {
 import type Scene from "@excalidraw/element/Scene";
 
 import type { AppState } from "../../types";
-import { getFrameChildren } from "@excalidraw/element/frame";
 
 export type StatsInputProperty =
   | "x"
@@ -93,9 +93,9 @@ export const getElementsInAtomicUnit = (
       latest: elementsMap.get(id),
     }))
     .filter((el) => el.original !== undefined && el.latest !== undefined) as {
-      original: NonDeletedExcalidrawElement;
-      latest: NonDeletedExcalidrawElement;
-    }[];
+    original: NonDeletedExcalidrawElement;
+    latest: NonDeletedExcalidrawElement;
+  }[];
 };
 
 export const newOrigin = (
@@ -194,57 +194,61 @@ export const moveElement = (
   }
 
   if (isFrameLikeElement(originalElement)) {
-    getFrameChildren(originalElementsMap, originalElement.id).forEach(child => {
-      const latestChildElement = elementsMap.get(child.id);
+    getFrameChildren(originalElementsMap, originalElement.id).forEach(
+      (child) => {
+        const latestChildElement = elementsMap.get(child.id);
 
-      if (!latestChildElement) return;
+        if (!latestChildElement) {
+          return;
+        }
 
-      const [childCX, childCY] = [
-        child.x + child.width / 2,
-        child.y + child.height / 2,
-      ];
-      const [childTopLeftX, childTopLeftY] = pointRotateRads(
-        pointFrom(child.x, child.y),
-        pointFrom(childCX, childCY),
-        child.angle,
-      );
+        const [childCX, childCY] = [
+          child.x + child.width / 2,
+          child.y + child.height / 2,
+        ];
+        const [childTopLeftX, childTopLeftY] = pointRotateRads(
+          pointFrom(child.x, child.y),
+          pointFrom(childCX, childCY),
+          child.angle,
+        );
 
-      const childNewTopLeftX = Math.round(childTopLeftX + changeInX);
-      const childNewTopLeftY = Math.round(childTopLeftY + changeInY);
+        const childNewTopLeftX = Math.round(childTopLeftX + changeInX);
+        const childNewTopLeftY = Math.round(childTopLeftY + changeInY);
 
-      const [childX, childY] = pointRotateRads(
-        pointFrom(childNewTopLeftX, childNewTopLeftY),
-        pointFrom(childCX + changeInX, childCY + changeInY),
-        -child.angle as Radians,
-      );
+        const [childX, childY] = pointRotateRads(
+          pointFrom(childNewTopLeftX, childNewTopLeftY),
+          pointFrom(childCX + changeInX, childCY + changeInY),
+          -child.angle as Radians,
+        );
 
-      scene.mutateElement(
-        latestChildElement,
-        {
-          x: childX,
-          y: childY,
-        },
-        { informMutation: shouldInformMutation, isDragging: false },
-      );
-      updateBindings(latestChildElement, scene);
+        scene.mutateElement(
+          latestChildElement,
+          {
+            x: childX,
+            y: childY,
+          },
+          { informMutation: shouldInformMutation, isDragging: false },
+        );
+        updateBindings(latestChildElement, scene);
 
-      const boundTextElement = getBoundTextElement(
-        latestChildElement,
-        originalElementsMap,
-      );
-      if (boundTextElement) {
-        const latestBoundTextElement = elementsMap.get(boundTextElement.id);
-        latestBoundTextElement &&
-          scene.mutateElement(
-            latestBoundTextElement,
-            {
-              x: boundTextElement.x + changeInX,
-              y: boundTextElement.y + changeInY,
-            },
-            { informMutation: shouldInformMutation, isDragging: false },
-          );
-      }
-    })
+        const boundTextElement = getBoundTextElement(
+          latestChildElement,
+          originalElementsMap,
+        );
+        if (boundTextElement) {
+          const latestBoundTextElement = elementsMap.get(boundTextElement.id);
+          latestBoundTextElement &&
+            scene.mutateElement(
+              latestBoundTextElement,
+              {
+                x: boundTextElement.x + changeInX,
+                y: boundTextElement.y + changeInY,
+              },
+              { informMutation: shouldInformMutation, isDragging: false },
+            );
+        }
+      },
+    );
   }
 };
 
@@ -368,9 +372,7 @@ export const updateBindings = (
   }
 };
 
-export const handlePositionChange: DragInputCallbackType<
-  "x" | "y"
-> = ({
+export const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
   accumulatedChange,
   originalElements,
   originalElementsMap,
@@ -380,86 +382,86 @@ export const handlePositionChange: DragInputCallbackType<
   scene,
   originalAppState,
 }) => {
-    const STEP_SIZE = 10;
-    const elementsMap = scene.getNonDeletedElementsMap();
+  const STEP_SIZE = 10;
+  const elementsMap = scene.getNonDeletedElementsMap();
 
-    if (nextValue !== undefined) {
-      for (const atomicUnit of getAtomicUnits(
-        originalElements,
-        originalAppState,
-      )) {
-        const elementsInUnit = getElementsInAtomicUnit(
-          atomicUnit,
-          elementsMap,
-          originalElementsMap,
+  if (nextValue !== undefined) {
+    for (const atomicUnit of getAtomicUnits(
+      originalElements,
+      originalAppState,
+    )) {
+      const elementsInUnit = getElementsInAtomicUnit(
+        atomicUnit,
+        elementsMap,
+        originalElementsMap,
+      );
+
+      if (elementsInUnit.length > 1) {
+        const [x1, y1, ,] = getCommonBounds(
+          elementsInUnit.map((el) => el.latest!),
         );
+        const newTopLeftX = property === "x" ? nextValue : x1;
+        const newTopLeftY = property === "y" ? nextValue : y1;
 
-        if (elementsInUnit.length > 1) {
-          const [x1, y1, ,] = getCommonBounds(
-            elementsInUnit.map((el) => el.latest!),
+        moveGroup(
+          newTopLeftX,
+          newTopLeftY,
+          elementsInUnit.map((el) => el.original),
+          originalElementsMap,
+          scene,
+        );
+      } else {
+        const origElement = elementsInUnit[0]?.original;
+        const latestElement = elementsInUnit[0]?.latest;
+        if (
+          origElement &&
+          latestElement &&
+          isPropertyEditable(latestElement, property)
+        ) {
+          const [cx, cy] = [
+            origElement.x + origElement.width / 2,
+            origElement.y + origElement.height / 2,
+          ];
+          const [topLeftX, topLeftY] = pointRotateRads(
+            pointFrom(origElement.x, origElement.y),
+            pointFrom(cx, cy),
+            origElement.angle,
           );
-          const newTopLeftX = property === "x" ? nextValue : x1;
-          const newTopLeftY = property === "y" ? nextValue : y1;
 
-          moveGroup(
+          const newTopLeftX = property === "x" ? nextValue : topLeftX;
+          const newTopLeftY = property === "y" ? nextValue : topLeftY;
+
+          moveElement(
             newTopLeftX,
             newTopLeftY,
-            elementsInUnit.map((el) => el.original),
-            originalElementsMap,
+            origElement,
             scene,
+            originalElementsMap,
+            false,
           );
-        } else {
-          const origElement = elementsInUnit[0]?.original;
-          const latestElement = elementsInUnit[0]?.latest;
-          if (
-            origElement &&
-            latestElement &&
-            isPropertyEditable(latestElement, property)
-          ) {
-            const [cx, cy] = [
-              origElement.x + origElement.width / 2,
-              origElement.y + origElement.height / 2,
-            ];
-            const [topLeftX, topLeftY] = pointRotateRads(
-              pointFrom(origElement.x, origElement.y),
-              pointFrom(cx, cy),
-              origElement.angle,
-            );
-
-            const newTopLeftX = property === "x" ? nextValue : topLeftX;
-            const newTopLeftY = property === "y" ? nextValue : topLeftY;
-
-            moveElement(
-              newTopLeftX,
-              newTopLeftY,
-              origElement,
-              scene,
-              originalElementsMap,
-              false,
-            );
-          }
         }
       }
-
-      scene.triggerUpdate();
-      return;
     }
 
-    const change = shouldChangeByStepSize
-      ? getStepSizedValue(accumulatedChange, STEP_SIZE)
-      : accumulatedChange;
-
-    const changeInTopX = property === "x" ? change : 0;
-    const changeInTopY = property === "y" ? change : 0;
-
-    moveElements(
-      property,
-      changeInTopX,
-      changeInTopY,
-      originalElements,
-      originalElementsMap,
-      scene,
-    );
-
     scene.triggerUpdate();
-  };
+    return;
+  }
+
+  const change = shouldChangeByStepSize
+    ? getStepSizedValue(accumulatedChange, STEP_SIZE)
+    : accumulatedChange;
+
+  const changeInTopX = property === "x" ? change : 0;
+  const changeInTopY = property === "y" ? change : 0;
+
+  moveElements(
+    property,
+    changeInTopX,
+    changeInTopY,
+    originalElements,
+    originalElementsMap,
+    scene,
+  );
+
+  scene.triggerUpdate();
+};

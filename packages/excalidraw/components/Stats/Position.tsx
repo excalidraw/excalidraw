@@ -1,9 +1,7 @@
 import { pointFrom, pointRotateRads, round } from "@excalidraw/math";
 
-import {
-  getFlipAdjustedCropPosition,
-} from "@excalidraw/element/cropElement";
-import { isFrameLikeElement, isImageElement } from "@excalidraw/element/typeChecks";
+import { getFlipAdjustedCropPosition } from "@excalidraw/element/cropElement";
+import { isImageElement } from "@excalidraw/element/typeChecks";
 
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -13,7 +11,6 @@ import StatsDragInput from "./DragInput";
 import { handlePositionChange } from "./utils";
 
 import type { AppState } from "../../types";
-import { getFrameChildren } from "@excalidraw/element/frame";
 
 interface PositionProps {
   property: "x" | "y";

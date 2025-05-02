@@ -13,7 +13,7 @@ import { CaptureUpdateAction } from "../../store";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
 
-import { DragInputCallbackType, SMALLEST_DELTA } from "./utils";
+import { type DragInputCallbackType, SMALLEST_DELTA } from "./utils";
 
 import "./DragInput.scss";
 
