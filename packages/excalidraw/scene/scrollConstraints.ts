@@ -11,6 +11,7 @@ import { getNormalizedZoom } from "./normalize";
  *
  * @param scrollConstraints - The constraints of the scrollable area including width, height, and position.
  * @param appState - An object containing the current horizontal and vertical scroll positions.
+ * @param overscrollAllowance - Optional parameter to specify the overscroll allowance percentage.
  * @returns An object containing the calculated optimal horizontal and vertical scroll positions and zoom level.
  *
  * @example
@@ -20,6 +21,7 @@ import { getNormalizedZoom } from "./normalize";
 export const calculateConstrainedScrollCenter = (
   state: AppState,
   { scrollX, scrollY }: Pick<AppState, "scrollX" | "scrollY">,
+  overscrollAllowance?: number,
 ): {
   scrollX: AppState["scrollX"];
   scrollY: AppState["scrollY"];
@@ -57,6 +59,7 @@ export const calculateConstrainedScrollCenter = (
     height,
     zoom: _zoom,
     allowOverscroll: false,
+    overscrollAllowance,
   });
 
   return {
@@ -167,15 +170,22 @@ const calculateConstraints = ({
   height,
   zoom,
   allowOverscroll,
+  overscrollAllowance,
 }: {
   scrollConstraints: ScrollConstraints;
   width: AppState["width"];
   height: AppState["height"];
   zoom: AppState["zoom"];
   allowOverscroll: boolean;
+  overscrollAllowance?: number;
 }) => {
-  // Set the overscroll allowance percentage
-  const OVERSCROLL_ALLOWANCE_PERCENTAGE = 0.2;
+  // Validate the overscroll allowance percentage
+  const validatedOverscroll =
+    overscrollAllowance != null &&
+    overscrollAllowance >= 0 &&
+    overscrollAllowance <= 1
+      ? overscrollAllowance
+      : 0.2;
 
   /**
    * Calculates the center position of the constrained scroll area.
@@ -194,10 +204,8 @@ const calculateConstraints = ({
    * @returns The overscroll allowance values for the X and Y axes.
    */
   const calculateOverscrollAllowance = () => {
-    const overscrollAllowanceX =
-      OVERSCROLL_ALLOWANCE_PERCENTAGE * scrollConstraints.width;
-    const overscrollAllowanceY =
-      OVERSCROLL_ALLOWANCE_PERCENTAGE * scrollConstraints.height;
+    const overscrollAllowanceX = validatedOverscroll * scrollConstraints.width;
+    const overscrollAllowanceY = validatedOverscroll * scrollConstraints.height;
 
     return Math.min(overscrollAllowanceX, overscrollAllowanceY);
   };
@@ -284,14 +292,14 @@ const calculateConstraints = ({
   );
   const { constrainedScrollCenterX, constrainedScrollCenterY } =
     calculateConstrainedScrollCenter(constrainedZoom);
-  const overscrollAllowance = calculateOverscrollAllowance();
+  const overscrollAllowanceValue = calculateOverscrollAllowance();
   const shouldAdjustForCenteredViewX = constrainedZoom <= zoomLevelX;
   const shouldAdjustForCenteredViewY = constrainedZoom <= zoomLevelY;
   const { maxScrollX, minScrollX, maxScrollY, minScrollY } =
     calculateMinMaxScrollValues(
       shouldAdjustForCenteredViewX,
       shouldAdjustForCenteredViewY,
-      overscrollAllowance,
+      overscrollAllowanceValue,
       constrainedScrollCenterX,
       constrainedScrollCenterY,
       constrainedZoom,
