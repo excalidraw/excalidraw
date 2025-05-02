@@ -807,9 +807,6 @@ const ExcalidrawWrapper = () => {
       <Excalidraw
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
-        onIncrement={(increment) => {
-          console.log(increment);
-        }}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}

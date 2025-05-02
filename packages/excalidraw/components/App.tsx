@@ -304,10 +304,7 @@ import { isNonDeletedElement } from "@excalidraw/element";
 
 import Scene from "@excalidraw/element/Scene";
 
-import {
-  Store,
-  CaptureUpdateAction,
-} from "@excalidraw/element/store";
+import { Store, CaptureUpdateAction } from "@excalidraw/element/store";
 
 import type { ElementUpdate } from "@excalidraw/element/mutateElement";
 
