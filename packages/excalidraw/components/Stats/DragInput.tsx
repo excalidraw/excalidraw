@@ -13,12 +13,29 @@ import { CaptureUpdateAction } from "../../store";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
 
-import { type DragInputCallbackType, SMALLEST_DELTA } from "./utils";
+import { SMALLEST_DELTA } from "./utils";
 
 import "./DragInput.scss";
 
 import type { StatsInputProperty } from "./utils";
 import type { AppState } from "../../types";
+
+export type DragInputCallbackType<
+  P extends StatsInputProperty,
+  E = ExcalidrawElement,
+> = (props: {
+  accumulatedChange: number;
+  instantChange: number;
+  originalElements: readonly E[];
+  originalElementsMap: ElementsMap;
+  shouldKeepAspectRatio: boolean;
+  shouldChangeByStepSize: boolean;
+  scene: Scene;
+  nextValue?: number;
+  property: P;
+  originalAppState: AppState;
+  setInputValue: (value: number) => void;
+}) => void;
 
 interface StatsDragInputProps<
   T extends StatsInputProperty,

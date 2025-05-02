@@ -31,6 +31,7 @@ import type {
 import type Scene from "@excalidraw/element/Scene";
 
 import type { AppState } from "../../types";
+import type { DragInputCallbackType } from "./DragInput";
 
 export type StatsInputProperty =
   | "x"
@@ -40,23 +41,6 @@ export type StatsInputProperty =
   | "angle"
   | "fontSize"
   | "gridStep";
-
-export type DragInputCallbackType<
-  P extends StatsInputProperty,
-  E = ExcalidrawElement,
-> = (props: {
-  accumulatedChange: number;
-  instantChange: number;
-  originalElements: readonly E[];
-  originalElementsMap: ElementsMap;
-  shouldKeepAspectRatio: boolean;
-  shouldChangeByStepSize: boolean;
-  scene: Scene;
-  nextValue?: number;
-  property: P;
-  originalAppState: AppState;
-  setInputValue: (value: number) => void;
-}) => void;
 
 export const SMALLEST_DELTA = 0.01;
 
