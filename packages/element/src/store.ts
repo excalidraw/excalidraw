@@ -310,12 +310,7 @@ export class Store {
   }
 
   private flushMicroActions() {
-    const microActions = [...this.scheduledMicroActions];
-
-    // clear the queue first, in case it mutates in the meantime
-    this.scheduledMicroActions = [];
-
-    for (const microAction of microActions) {
+    for (const microAction of this.scheduledMicroActions) {
       try {
         microAction();
       } catch (error) {

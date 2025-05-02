@@ -751,7 +751,7 @@ export const toIterable = <T>(
 export const toArray = <T>(
   values: readonly T[] | ReadonlyMap<string, T>,
 ): T[] => {
-  return Array.from(toIterable(values));
+  return Array.isArray(values) ? values : Array.from(toIterable(values));
 };
 
 export const isTestEnv = () => import.meta.env.MODE === ENV.TEST;
