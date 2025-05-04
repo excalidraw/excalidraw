@@ -321,6 +321,12 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     endArrowhead: Arrowhead | null;
   }>;
 
+export type ExcalidrawLineElement = ExcalidrawLinearElement &
+  Readonly<{
+    type: "line";
+    loopLock: boolean;
+  }>;
+
 export type FixedSegment = {
   start: LocalPoint;
   end: LocalPoint;

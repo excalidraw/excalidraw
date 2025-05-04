@@ -475,3 +475,5 @@ export enum UserIdleState {
   AWAY = "away",
   IDLE = "idle",
 }
+
+export const MIN_LOOP_LOCK_DISTANCE = 20;

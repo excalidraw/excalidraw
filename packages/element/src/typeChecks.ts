@@ -25,6 +25,7 @@ import type {
   ExcalidrawMagicFrameElement,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
+  ExcalidrawLineElement,
   PointBinding,
   FixedPointBinding,
   ExcalidrawFlowchartNodeElement,
@@ -356,3 +357,9 @@ export const isBounds = (box: unknown): box is Bounds =>
   typeof box[1] === "number" &&
   typeof box[2] === "number" &&
   typeof box[3] === "number";
+
+export const isLineElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawLineElement => {
+  return element != null && element.type === "line";
+};

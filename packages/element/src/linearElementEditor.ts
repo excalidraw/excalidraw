@@ -67,6 +67,8 @@ import {
 
 import { getLockedLinearCursorAlignSize } from "./sizeHelpers";
 
+import { isLineElement } from "./typeChecks";
+
 import type Scene from "./Scene";
 
 import type { Bounds } from "./bounds";
@@ -1249,6 +1251,16 @@ export class LinearElementEditor {
     scene: Scene,
     pointIndices: readonly number[],
   ) {
+    // Handle loop lock behavior
+    if (isLineElement(element) && element.loopLock) {
+      if (
+        pointIndices.includes(0) ||
+        pointIndices.includes(element.points.length - 1)
+      ) {
+        scene.mutateElement(element, { loopLock: false });
+      }
+    }
+
     let offsetX = 0;
     let offsetY = 0;
 
@@ -1314,6 +1326,31 @@ export class LinearElementEditor {
     },
   ) {
     const { points } = element;
+
+    // Handle loop lock behavior
+    if (isLineElement(element) && element.loopLock) {
+      const firstPointUpdate = targetPoints.find(({ index }) => index === 0);
+      const lastPointUpdate = targetPoints.find(
+        ({ index }) => index === points.length - 1,
+      );
+
+      if (firstPointUpdate) {
+        targetPoints.push({
+          index: points.length - 1,
+          point: pointFrom(
+            firstPointUpdate.point[0],
+            firstPointUpdate.point[1],
+          ),
+          isDragging: firstPointUpdate.isDragging,
+        });
+      } else if (lastPointUpdate) {
+        targetPoints.push({
+          index: 0,
+          point: pointFrom(lastPointUpdate.point[0], lastPointUpdate.point[1]),
+          isDragging: lastPointUpdate.isDragging,
+        });
+      }
+    }
 
     // in case we're moving start point, instead of modifying its position
     // which would break the invariant of it being at [0,0], we move

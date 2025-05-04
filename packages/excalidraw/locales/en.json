@@ -141,6 +141,10 @@
       "edit": "Edit line",
       "editArrow": "Edit arrow"
     },
+    "loopLock": {
+      "unlock": "Unlock loop",
+      "lock": "Lock loop"
+    },
     "elementLock": {
       "lock": "Lock",
       "unlock": "Unlock",
