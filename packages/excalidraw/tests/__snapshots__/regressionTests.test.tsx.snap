@@ -6410,6 +6410,7 @@ History {
               "lastCommittedPoint": null,
               "link": null,
               "locked": false,
+              "loopLock": false,
               "opacity": 100,
               "points": [
                 [
@@ -6630,6 +6631,7 @@ History {
               ],
               "link": null,
               "locked": false,
+              "loopLock": false,
               "opacity": 100,
               "points": [
                 [
@@ -8864,6 +8866,7 @@ History {
               "lastCommittedPoint": null,
               "link": null,
               "locked": false,
+              "loopLock": false,
               "opacity": 100,
               "points": [
                 [
@@ -9687,6 +9690,7 @@ History {
               "lastCommittedPoint": null,
               "link": null,
               "locked": false,
+              "loopLock": false,
               "opacity": 100,
               "points": [
                 [

@@ -45,7 +45,9 @@ import type {
   ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
+  ExcalidrawLineElement,
 } from "./types";
+import { isLineElement } from "./typeChecks";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -459,7 +461,7 @@ export const newLinearElement = (
     points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
-  return {
+  const element = {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: opts.points || [],
     lastCommittedPoint: null,
@@ -468,6 +470,15 @@ export const newLinearElement = (
     startArrowhead: null,
     endArrowhead: null,
   };
+
+  if (isLineElement(element)) {
+    return {
+      ...element,
+      loopLock: false,
+    } as NonDeleted<ExcalidrawLineElement>;
+  }
+
+  return element;
 };
 
 export const newArrowElement = <T extends boolean>(
