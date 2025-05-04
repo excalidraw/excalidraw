@@ -20,6 +20,7 @@ import {
   getShortcutKey,
   tupleToCoors,
   getLineHeight,
+  isTransparent,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -46,6 +47,7 @@ import {
   isBoundToContainer,
   isElbowArrow,
   isLinearElement,
+  isLineElement,
   isTextElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element/typeChecks";
@@ -132,6 +134,8 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { CaptureUpdateAction } from "../store";
+
+import { toggleLinePolygonState } from "../../element/src/shapes";
 
 import { register } from "./register";
 
@@ -346,22 +350,50 @@ export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
   label: "labels.changeBackground",
   trackEvent: false,
-  perform: (elements, appState, value) => {
-    return {
-      ...(value.currentItemBackgroundColor && {
-        elements: changeProperty(elements, appState, (el) =>
-          newElementWith(el, {
+  perform: (elements, appState, value, app) => {
+    if (!value.currentItemBackgroundColor) {
+      return {
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    }
+
+    const selectedElements = app.scene.getSelectedElements(appState);
+    const shouldEnablePolygon = selectedElements.every((el) =>
+      isLineElement(el),
+    );
+
+    let nextElements;
+
+    if (
+      shouldEnablePolygon &&
+      value.currentItemBackgroundColor &&
+      !isTransparent(value.currentItemBackgroundColor)
+    ) {
+      const selectedElementsMap = arrayToMap(selectedElements);
+      nextElements = elements.map((el) => {
+        if (selectedElementsMap.has(el.id) && isLineElement(el)) {
+          return newElementWith(el, {
             backgroundColor: value.currentItemBackgroundColor,
-          }),
-        ),
-      }),
+            ...toggleLinePolygonState(el, true),
+          });
+        }
+        return el;
+      });
+    } else {
+      nextElements = changeProperty(elements, appState, (el) =>
+        newElementWith(el, {
+          backgroundColor: value.currentItemBackgroundColor,
+        }),
+      );
+    }
+
+    return {
+      elements: nextElements,
       appState: {
         ...appState,
         ...value,
       },
-      captureUpdate: !!value.currentItemBackgroundColor
-        ? CaptureUpdateAction.IMMEDIATELY
-        : CaptureUpdateAction.EVENTUALLY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => (

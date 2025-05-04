@@ -5,9 +5,6 @@ import {
   isLineElement,
 } from "@excalidraw/element/typeChecks";
 import { arrayToMap } from "@excalidraw/common";
-import { MIN_LOOP_LOCK_DISTANCE } from "@excalidraw/common";
-
-import { pointFrom } from "@excalidraw/math";
 
 import type {
   ExcalidrawLinearElement,
@@ -25,6 +22,10 @@ import { t } from "../i18n";
 import { CaptureUpdateAction } from "../store";
 
 import { ButtonIcon } from "../components/ButtonIcon";
+
+import { newElementWith } from "../../element/src/mutateElement";
+
+import { toggleLinePolygonState } from "../../element/src/shapes";
 
 import { register } from "./register";
 
@@ -96,85 +97,6 @@ export const actionToggleLinearEditor = register({
   },
 });
 
-const updateLoopLock = (
-  element: ExcalidrawLineElement,
-  newLoopLockState: boolean,
-  app: any,
-) => {
-  const updatedPoints = [...element.points];
-
-  if (newLoopLockState) {
-    const firstPoint = updatedPoints[0];
-    const lastPoint = updatedPoints[updatedPoints.length - 1];
-
-    const distance = Math.hypot(
-      firstPoint[0] - lastPoint[0],
-      firstPoint[1] - lastPoint[1],
-    );
-
-    if (distance > MIN_LOOP_LOCK_DISTANCE) {
-      updatedPoints.push(pointFrom(firstPoint[0], firstPoint[1]));
-    } else {
-      updatedPoints[updatedPoints.length - 1] = pointFrom(
-        firstPoint[0],
-        firstPoint[1],
-      );
-    }
-  } else if (element.loopLock) {
-    // When toggling from loopLock=true to loopLock=false
-    // We need to dislocate the end point by 15 points
-
-    // When loopLock is true, the last point is the same as the first point
-    // We'll use the direction from second-to-last point to first point
-    const firstPoint = updatedPoints[0];
-
-    if (updatedPoints.length >= 3) {
-      const secondLastPoint = updatedPoints[updatedPoints.length - 2];
-
-      // Get direction from second-last to first
-      const dx = firstPoint[0] - secondLastPoint[0];
-      const dy = firstPoint[1] - secondLastPoint[1];
-
-      // Calculate perpendicular direction (rotate 90 degrees)
-      // This creates a visible gap perpendicular to the line direction
-      const perpDx = dy;
-      const perpDy = -dx;
-
-      // Normalize the perpendicular direction vector
-      const perpLength = Math.sqrt(perpDx * perpDx + perpDy * perpDy);
-      let normalizedPerpDx = 0;
-      let normalizedPerpDy = 0;
-
-      if (perpLength > 0) {
-        normalizedPerpDx = perpDx / perpLength;
-        normalizedPerpDy = perpDy / perpLength;
-      } else {
-        // Default perpendicular if points are the same
-        normalizedPerpDx = -0.7071;
-        normalizedPerpDy = 0.7071;
-      }
-
-      // Move the end point perpendicular to the line direction
-      updatedPoints[updatedPoints.length - 1] = pointFrom(
-        firstPoint[0] + normalizedPerpDx * 15,
-        firstPoint[1] + normalizedPerpDy * 15,
-      );
-    } else {
-      // For simple lines with fewer than 3 points
-      // Just move away from the first point at a 45-degree angle
-      updatedPoints[updatedPoints.length - 1] = pointFrom(
-        firstPoint[0] + 10.6,
-        firstPoint[1] - 10.6, // Different direction to avoid crossing
-      );
-    }
-  }
-
-  app.scene.mutateElement(element, {
-    loopLock: newLoopLockState,
-    points: updatedPoints,
-  });
-};
-
 export const actionToggleLoopLock = register({
   name: "toggleLoopLock",
   category: DEFAULT_CATEGORIES.elements,
@@ -208,28 +130,33 @@ export const actionToggleLoopLock = register({
     );
   },
   perform(elements, appState, _, app) {
-    const selectedElements = app.scene
-      .getSelectedElements({
-        selectedElementIds: appState.selectedElementIds,
-      })
-      .filter((element) => isLineElement(element)) as ExcalidrawLineElement[];
+    const selectedElements = app.scene.getSelectedElements(appState);
 
-    if (!selectedElements.length) {
+    if (selectedElements.some((element) => !isLineElement(element))) {
       return false;
     }
 
+    const targetElements = selectedElements as ExcalidrawLineElement[];
+
     // Check if we should lock or unlock based on current state
     // If all elements are locked, unlock all. Otherwise, lock all.
-    const allLocked = selectedElements.every((element) => element.loopLock);
+    const allLocked = targetElements.every((element) => element.loopLock);
     const newLoopLockState = !allLocked;
 
-    selectedElements.forEach((element) => {
-      updateLoopLock(element, newLoopLockState, app);
-    });
+    const targetElementsMap = arrayToMap(targetElements);
 
     return {
+      elements: elements.map((element) => {
+        if (!targetElementsMap.has(element.id) || !isLineElement(element)) {
+          return element;
+        }
+
+        return newElementWith(
+          element,
+          toggleLinePolygonState(element, newLoopLockState),
+        );
+      }),
       appState,
-      elements,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
