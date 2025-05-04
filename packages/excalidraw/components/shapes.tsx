@@ -43,6 +43,13 @@ export const SHAPES = [
     fillable: true,
   },
   {
+    icon: TriangleIcon,
+    value: "triangle",
+    key: KEYS.T,
+    numericKey: KEYS["5"],
+    fillable: true,
+  },
+  {
     icon: ArrowIcon,
     value: "arrow",
     key: KEYS.A,

@@ -392,6 +392,11 @@ export const EraserIcon = createIcon(
   tablerIconProps,
 );
 
+// Traingle Icon
+export const TriangleIcon = createIcon(
+  <path d="M7.9,4.41l12.54,20.8c0.35,0.59,0.38,1.31,0.06,1.93s-0.95,0.97-1.63,0.97H6.14c-0.68,0-1.31-0.36-1.63-0.97 s-0.29-1.35,0.06-1.93L17.1,4.41c0.32-0.54,0.91-0.87,1.54-0.87h1.08C20.39,3.54,20.98,3.87,7.9,4.41z" strokeWidth={2} />
+);
+
 export const ZoomInIcon = createIcon(
   <path strokeWidth="1.25" d="M10 4.167v11.666M4.167 10h11.666" />,
   modifiedTablerIconProps,
