@@ -102,6 +102,7 @@ export const AllowedExcalidrawActiveTools: Record<
   hand: true,
   laser: false,
   magicframe: false,
+  audio: false,
 };
 
 export type RestoredDataState = {
@@ -135,12 +136,12 @@ const repairBinding = <T extends ExcalidrawLinearElement>(
     const fixedPointBinding:
       | ExcalidrawElbowArrowElement["startBinding"]
       | ExcalidrawElbowArrowElement["endBinding"] = isFixedPointBinding(binding)
-      ? {
+        ? {
           ...binding,
           focus,
           fixedPoint: normalizeFixedPoint(binding.fixedPoint ?? [0, 0]),
         }
-      : null;
+        : null;
 
     return fixedPointBinding;
   }
@@ -201,14 +202,14 @@ const restoreElementWithProperties = <
     roundness: element.roundness
       ? element.roundness
       : element.strokeSharpness === "round"
-      ? {
+        ? {
           // for old elements that would now use adaptive radius algo,
           // use legacy algo instead
           type: isUsingAdaptiveRadius(element.type)
             ? ROUNDNESS.LEGACY
             : ROUNDNESS.PROPORTIONAL_RADIUS,
         }
-      : null,
+        : null,
     boundElements: element.boundElementIds
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
@@ -270,10 +271,10 @@ const restoreElement = (
         element.lineHeight ||
         (element.height
           ? // detect line-height from current element height and font-size
-            detectLineHeight(element)
+          detectLineHeight(element)
           : // no element height likely means programmatic use, so default
-            // to a fixed line height
-            getLineHeight(element.fontFamily));
+          // to a fixed line height
+          getLineHeight(element.fontFamily));
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
@@ -370,14 +371,14 @@ const restoreElement = (
       // TODO: Separate arrow from linear element
       return isElbowArrow(element)
         ? restoreElementWithProperties(element as ExcalidrawElbowArrowElement, {
-            ...base,
-            elbowed: true,
-            startBinding: repairBinding(element, element.startBinding),
-            endBinding: repairBinding(element, element.endBinding),
-            fixedSegments: element.fixedSegments,
-            startIsSpecial: element.startIsSpecial,
-            endIsSpecial: element.endIsSpecial,
-          })
+          ...base,
+          elbowed: true,
+          startBinding: repairBinding(element, element.startBinding),
+          endBinding: repairBinding(element, element.endBinding),
+          fixedSegments: element.fixedSegments,
+          startIsSpecial: element.startIsSpecial,
+          endIsSpecial: element.endIsSpecial,
+        })
         : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
     }
 
@@ -680,11 +681,11 @@ const LegacyAppStateMigrations: {
     return [
       "defaultSidebarDockedPreference",
       appState.isSidebarDocked ??
-        coalesceAppStateValue(
-          "defaultSidebarDockedPreference",
-          appState,
-          defaultAppState,
-        ),
+      coalesceAppStateValue(
+        "defaultSidebarDockedPreference",
+        appState,
+        defaultAppState,
+      ),
     ];
   },
 };
@@ -725,8 +726,8 @@ export const restoreAppState = (
       suppliedValue !== undefined
         ? suppliedValue
         : localValue !== undefined
-        ? localValue
-        : defaultValue;
+          ? localValue
+          : defaultValue;
   }
 
   return {
