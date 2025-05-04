@@ -142,8 +142,8 @@
       "editArrow": "Edit arrow"
     },
     "loopLock": {
-      "unlock": "Unlock loop",
-      "lock": "Lock loop"
+      "unlock": "Disable polygon",
+      "lock": "Make into polygon"
     },
     "elementLock": {
       "lock": "Lock",

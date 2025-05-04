@@ -17,6 +17,7 @@ export const ButtonIconSelect = <T extends Object>(
     }[];
     value: T | null;
     type?: "radio" | "button";
+    children?: React.ReactNode;
   } & (
     | { type?: "radio"; group: string; onChange: (value: T) => void }
     | {
@@ -56,5 +57,6 @@ export const ButtonIconSelect = <T extends Object>(
         </label>
       ),
     )}
+    {props.children}
   </div>
 );

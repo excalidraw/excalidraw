@@ -19,7 +19,6 @@ import {
   isImageElement,
   isLinearElement,
   isTextElement,
-  isLineElement,
 } from "@excalidraw/element/typeChecks";
 
 import { hasStrokeColor, toolIsArrow } from "@excalidraw/element/comparisons";
@@ -27,7 +26,6 @@ import { hasStrokeColor, toolIsArrow } from "@excalidraw/element/comparisons";
 import type {
   ExcalidrawElement,
   ExcalidrawElementType,
-  ExcalidrawLineElement,
   NonDeletedElementsMap,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
@@ -146,17 +144,6 @@ export const SelectedShapeActions = ({
     targetElements.length === 1 &&
     isLinearElement(targetElements[0]) &&
     !isElbowArrow(targetElements[0]);
-
-  const showLoopLockAction =
-    targetElements.length > 0 &&
-    isLineElement(targetElements[0]) &&
-    targetElements.every(
-      (element) =>
-        isLineElement(element) &&
-        element.points.length >= 4 &&
-        element.loopLock ===
-          (targetElements[0] as ExcalidrawLineElement).loopLock,
-    );
 
   const showCropEditorAction =
     !appState.croppingElementId &&
@@ -286,7 +273,6 @@ export const SelectedShapeActions = ({
             {showLinkIcon && renderAction("hyperlink")}
             {showCropEditorAction && renderAction("cropEditor")}
             {showLineEditorAction && renderAction("toggleLinearEditor")}
-            {showLoopLockAction && renderAction("toggleLoopLock")}
           </div>
         </fieldset>
       )}

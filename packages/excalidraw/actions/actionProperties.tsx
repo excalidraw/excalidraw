@@ -1360,7 +1360,7 @@ export const actionChangeRoundness = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData, renderAction }) => {
     const targetElements = getTargetElements(
       getNonDeletedElements(elements),
       appState,
@@ -1398,7 +1398,9 @@ export const actionChangeRoundness = register({
               hasSelection ? null : appState.currentItemRoundness,
           )}
           onChange={(value) => updateData(value)}
-        />
+        >
+          {renderAction("toggleLoopLock")}
+        </ButtonIconSelect>
       </fieldset>
     );
   },

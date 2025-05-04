@@ -24,6 +24,8 @@ import {
 import { t } from "../i18n";
 import { CaptureUpdateAction } from "../store";
 
+import { ButtonIcon } from "../components/ButtonIcon";
+
 import { register } from "./register";
 
 export const actionToggleLinearEditor = register({
@@ -238,8 +240,8 @@ export const actionToggleLoopLock = register({
 
     if (
       selectedElements.length === 0 ||
-      !selectedElements.every(
-        (element) => isLineElement(element) && element.points.length >= 4,
+      selectedElements.some(
+        (element) => !isLineElement(element) || element.points.length < 3,
       )
     ) {
       return null;
@@ -255,12 +257,13 @@ export const actionToggleLoopLock = register({
     );
 
     return (
-      <ToolButton
-        type="button"
+      <ButtonIcon
         icon={allLocked ? LoopLockedIcon : LoopUnlockedIcon}
         title={label}
         aria-label={label}
+        active={allLocked}
         onClick={() => updateData(null)}
+        style={{ marginLeft: "auto" }}
       />
     );
   },
