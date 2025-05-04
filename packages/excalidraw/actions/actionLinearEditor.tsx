@@ -122,7 +122,7 @@ export const actionToggleLoopLock = register({
     return (
       selectedElements.length > 0 &&
       selectedElements.every(
-        (element) => isLineElement(element) && element.points.length >= 3,
+        (element) => isLineElement(element) && element.points.length >= 4,
       )
     );
   },
@@ -184,7 +184,7 @@ export const actionToggleLoopLock = register({
     if (
       selectedElements.length === 0 ||
       !selectedElements.every(
-        (element) => isLineElement(element) && element.points.length >= 3,
+        (element) => isLineElement(element) && element.points.length >= 4,
       )
     ) {
       return null;
