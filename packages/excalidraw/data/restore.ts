@@ -34,6 +34,7 @@ import {
   isElbowArrow,
   isFixedPointBinding,
   isLinearElement,
+  isLineElement,
   isTextElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element/typeChecks";
@@ -339,6 +340,9 @@ const restoreElement = (
         points,
         x,
         y,
+        ...(isLineElement(element) && element.loopLock === undefined
+          ? { loopLock: false }
+          : {}),
         ...getSizeFromPoints(points),
       });
     case "arrow": {
