@@ -16,6 +16,8 @@ import { isPathALoop } from "@excalidraw/element/shapes";
 
 import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
 
+import type { LocalPoint } from "@excalidraw/math";
+
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";
 import { done } from "../components/icons";
@@ -64,8 +66,6 @@ export const actionFinalize = register({
       }
     }
 
-    let newElements = elements;
-
     const pendingImageElement =
       appState.pendingImageElementId &&
       scene.getElement(appState.pendingImageElementId);
@@ -106,10 +106,12 @@ export const actionFinalize = register({
       }
 
       if (isInvisiblySmallElement(multiPointElement)) {
-        // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
-        newElements = newElements.filter(
-          (el) => el.id !== multiPointElement.id,
-        );
+        const [x, y] = multiPointElement.points[0];
+        const extraPoint = [x + Math.random() * 60, y + Math.random() * 60];
+        scene.mutateElement(multiPointElement, {
+          points: [...multiPointElement.points, extraPoint] as LocalPoint[],
+          isDeleted: true,
+        });
       }
 
       // If the multi point line closes the loop,
@@ -170,7 +172,7 @@ export const actionFinalize = register({
     }
 
     return {
-      elements: newElements,
+      elements,
       appState: {
         ...appState,
         cursorButton: "up",
@@ -199,10 +201,7 @@ export const actionFinalize = register({
         // To select the linear element when user has finished mutipoint editing
         selectedLinearElement:
           multiPointElement && isLinearElement(multiPointElement)
-            ? new LinearElementEditor(
-                multiPointElement,
-                arrayToMap(newElements),
-              )
+            ? new LinearElementEditor(multiPointElement, arrayToMap(elements))
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },
