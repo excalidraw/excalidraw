@@ -54,6 +54,9 @@ const RE_REDDIT =
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
+const RE_LOOM =
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?loom\.com\/(?:share|embed)\/([a-f0-9]{32})/;
+
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
   "youtu.be",
@@ -69,6 +72,7 @@ const ALLOWED_DOMAINS = new Set([
   "val.town",
   "giphy.com",
   "reddit.com",
+  "loom.com"
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -82,6 +86,7 @@ const ALLOW_SAME_ORIGIN = new Set([
   "*.simplepdf.eu",
   "stackblitz.com",
   "reddit.com",
+  "loom.com"
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -268,6 +273,30 @@ export const getEmbedLink = (
     };
     embeddedLinkCache.set(link, ret);
     return ret;
+  }
+
+  const loomLink = link.match(RE_LOOM);
+  if (loomLink?.[1]) {
+    const target = loomLink?.[1];
+    const error = !/^\d+$/.test(target)
+      ? new URIError("Invalid embed link format")
+      : undefined;
+    type = "video";
+    link = `https://www.loom.com/embed/${target}`;
+    aspectRatio = { w: 560, h: 315 };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      error,
+      sandbox: { allowSameOrigin },
+    };
   }
 
   embeddedLinkCache.set(link, {
