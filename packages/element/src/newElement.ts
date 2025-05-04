@@ -25,6 +25,8 @@ import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 
+import { isLineElement } from "./typeChecks";
+
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
@@ -47,7 +49,6 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
 } from "./types";
-import { isLineElement } from "./typeChecks";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
