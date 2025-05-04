@@ -94,6 +94,38 @@ export const actionToggleLinearEditor = register({
   },
 });
 
+const updateLoopLock = (
+  element: ExcalidrawLineElement,
+  newLoopLockState: boolean,
+  app: any,
+) => {
+  const updatedPoints = [...element.points];
+
+  if (newLoopLockState) {
+    const firstPoint = updatedPoints[0];
+    const lastPoint = updatedPoints[updatedPoints.length - 1];
+
+    const distance = Math.hypot(
+      firstPoint[0] - lastPoint[0],
+      firstPoint[1] - lastPoint[1],
+    );
+
+    if (distance > MIN_LOOP_LOCK_DISTANCE) {
+      updatedPoints.push(pointFrom(firstPoint[0], firstPoint[1]));
+    } else {
+      updatedPoints[updatedPoints.length - 1] = pointFrom(
+        firstPoint[0],
+        firstPoint[1],
+      );
+    }
+  }
+
+  app.scene.mutateElement(element, {
+    loopLock: newLoopLockState,
+    points: updatedPoints,
+  });
+};
+
 export const actionToggleLoopLock = register({
   name: "toggleLoopLock",
   category: DEFAULT_CATEGORIES.elements,
@@ -143,31 +175,7 @@ export const actionToggleLoopLock = register({
     const newLoopLockState = !allLocked;
 
     selectedElements.forEach((element) => {
-      const updatedPoints = [...element.points];
-
-      if (newLoopLockState) {
-        const firstPoint = updatedPoints[0];
-        const lastPoint = updatedPoints[updatedPoints.length - 1];
-
-        const distance = Math.hypot(
-          firstPoint[0] - lastPoint[0],
-          firstPoint[1] - lastPoint[1],
-        );
-
-        if (distance > MIN_LOOP_LOCK_DISTANCE) {
-          updatedPoints.push(pointFrom(firstPoint[0], firstPoint[1]));
-        } else {
-          updatedPoints[updatedPoints.length - 1] = pointFrom(
-            firstPoint[0],
-            firstPoint[1],
-          );
-        }
-      }
-
-      app.scene.mutateElement(element, {
-        loopLock: newLoopLockState,
-        points: updatedPoints,
-      });
+      updateLoopLock(element, newLoopLockState, app);
     });
 
     return {
