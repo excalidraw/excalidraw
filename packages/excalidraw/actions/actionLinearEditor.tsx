@@ -13,11 +13,7 @@ import type {
 
 import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
 import { ToolButton } from "../components/ToolButton";
-import {
-  lineEditorIcon,
-  LoopUnlockedIcon,
-  LoopLockedIcon,
-} from "../components/icons";
+import { lineEditorIcon, polygonIcon } from "../components/icons";
 import { t } from "../i18n";
 import { CaptureUpdateAction } from "../store";
 
@@ -185,7 +181,7 @@ export const actionToggleLoopLock = register({
 
     return (
       <ButtonIcon
-        icon={allLocked ? LoopLockedIcon : LoopUnlockedIcon}
+        icon={polygonIcon}
         title={label}
         aria-label={label}
         active={allLocked}
