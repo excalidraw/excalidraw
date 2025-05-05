@@ -143,3 +143,8 @@ export const vectorNormalize = (v: Vector): Vector => {
 
   return vector(v[0] / m, v[1] / m);
 };
+
+/**
+ * Calculate the right-hand normal of the vector.
+ */
+export const vectorNormal = (v: Vector): Vector => vector(v[1], -v[0]);

@@ -2,6 +2,7 @@ import type { Bounds } from "@excalidraw/element/bounds";
 
 import { isPoint, pointDistance, pointFrom } from "./point";
 import { rectangle, rectangleIntersectLineSegment } from "./rectangle";
+import { vector } from "./vector";
 
 import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
 
@@ -82,7 +83,7 @@ function solve(
   return [t0, s0];
 }
 
-const bezierEquation = <Point extends GlobalPoint | LocalPoint>(
+export const bezierEquation = <Point extends GlobalPoint | LocalPoint>(
   c: Curve<Point>,
   t: number,
 ) =>
@@ -271,6 +272,26 @@ export function isCurve<P extends GlobalPoint | LocalPoint>(
     isPoint(v[1]) &&
     isPoint(v[2]) &&
     isPoint(v[3])
+  );
+}
+
+export function curveTangent<Point extends GlobalPoint | LocalPoint>(
+  [p0, p1, p2, p3]: Curve<Point>,
+  t: number,
+) {
+  return vector(
+    -3 * (1 - t) * (1 - t) * p0[0] +
+      3 * (1 - t) * (1 - t) * p1[0] -
+      6 * t * (1 - t) * p1[0] -
+      3 * t * t * p2[0] +
+      6 * t * (1 - t) * p2[0] +
+      3 * t * t * p3[0],
+    -3 * (1 - t) * (1 - t) * p0[1] +
+      3 * (1 - t) * (1 - t) * p1[1] -
+      6 * t * (1 - t) * p1[1] -
+      3 * t * t * p2[1] +
+      6 * t * (1 - t) * p2[1] +
+      3 * t * t * p3[1],
   );
 }
 
