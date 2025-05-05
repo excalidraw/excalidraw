@@ -284,18 +284,19 @@ export const getEmbedLink = (
     type = "video";
     link = `https://www.loom.com/embed/${target}`;
     aspectRatio = { w: 560, h: 315 };
-    embeddedLinkCache.set(originalLink, {
+
+    const embedData = {
       link,
       intrinsicSize: aspectRatio,
       type,
       sandbox: { allowSameOrigin },
-    });
+    };
+
+    embeddedLinkCache.set(originalLink, embedData);
+
     return {
-      link,
-      intrinsicSize: aspectRatio,
-      type,
+      ...embedData,
       error,
-      sandbox: { allowSameOrigin },
     };
   }
 
