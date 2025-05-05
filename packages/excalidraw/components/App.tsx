@@ -689,6 +689,7 @@ class App extends React.Component<AppProps, AppState> {
     this.audioContext.sampleRate * 10,
     this.audioContext.sampleRate,
   ); // channel = 2, duration = 10;
+  private recordingStartTime: number = 0;
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Float32Array[] = [];
   private isRecording = false;
@@ -7524,14 +7525,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  // Start recording audio
   handleStartRecording = async () => {
     try {
+      this.recordingStartTime = performance.now();
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const audioContext = new AudioContext();
       const source = audioContext.createMediaStreamSource(stream);
 
-      // Create a script processor to capture audio data
       const processor = audioContext.createScriptProcessor(4096, 1, 1);
       this.audioChunks = [];
 
@@ -7574,7 +7575,6 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  // Stop recording audio
   handleStopRecording = () => {
     if (this.mediaRecorder && this.isRecording) {
       this.isRecording = false;
@@ -7582,9 +7582,10 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  // Play recorded audio
   handlePlayAudio = () => {
-    if (!this.audioBuffer) return;
+    if (!this.audioBuffer) {
+      return;
+    }
 
     const audioContext = new AudioContext();
     this.audioSource = audioContext.createBufferSource();
@@ -7609,46 +7610,63 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.activeTool.type !== "audio") {
       this.setActiveTool({ type: "audio" });
       if (this.laserRecorded) {
-        // Play audio while replaying laser trails
         this.handlePlayAudio();
 
-        this.laserTrails.startPath(
-          this.recordedLaserTrails[0].x,
-          this.recordedLaserTrails[0].y,
-        );
+        if (this.recordedLaserTrails.length > 0) {
+          this.laserTrails.startPath(
+            this.recordedLaserTrails[0].x,
+            this.recordedLaserTrails[0].y,
+          );
 
-        const sleep = (ms: number) =>
-          new Promise((resolve) => setTimeout(resolve, ms));
+          const startTime = performance.now();
+          let lastDrawnIndex = 0;
 
-        for (let i = 1; i < this.recordedLaserTrails.length; i++) {
-          const prev = this.recordedLaserTrails[i - 1];
-          const current = this.recordedLaserTrails[i];
-          const timeDiff = current.timestamp - prev.timestamp;
+          const animate = async () => {
+            const currentTime = performance.now() - startTime;
 
-          await sleep(timeDiff);
-          if (timeDiff < 100) {
-            this.laserTrails.addPointToPath(current.x, current.y);
-          } else {
-            this.laserTrails.endPath();
-            this.laserTrails.startPath(current.x, current.y);
-          }
+            for (
+              let i = lastDrawnIndex + 1;
+              i < this.recordedLaserTrails.length;
+              i++
+            ) {
+              if (this.recordedLaserTrails[i].timestamp <= currentTime) {
+                const current = this.recordedLaserTrails[i];
+                const prev = this.recordedLaserTrails[i - 1];
+
+                if (current.timestamp - prev.timestamp < 100) {
+                  this.laserTrails.addPointToPath(current.x, current.y);
+                } else {
+                  this.laserTrails.endPath();
+                  this.laserTrails.startPath(current.x, current.y);
+                }
+
+                lastDrawnIndex = i;
+              } else {
+                break;
+              }
+            }
+
+            if (lastDrawnIndex < this.recordedLaserTrails.length - 1) {
+              requestAnimationFrame(animate);
+            } else {
+              this.laserTrails.endPath();
+              this.setActiveTool({ type: "selection" });
+              this.handleStopAudio();
+            }
+          };
+
+          requestAnimationFrame(animate);
         }
-
-        this.laserTrails.endPath();
-        this.setActiveTool({ type: "selection" });
-        this.handleStopAudio();
       } else {
-        // Start recording audio
+        this.recordedLaserTrails = [];
         this.handleStartRecording();
       }
     } else {
-      // Stop recording audio and set flag
       this.handleStopRecording();
       this.laserRecorded = true;
       this.setActiveTool({ type: "selection" });
     }
   };
-
   public insertIframeElement = ({
     sceneX,
     sceneY,
@@ -11282,7 +11300,7 @@ class App extends React.Component<AppProps, AppState> {
       this.recordedLaserTrails.push({
         x: sceneX,
         y: sceneY,
-        timestamp: Date.now(),
+        timestamp: performance.now() - this.recordingStartTime,
       });
     }
 
