@@ -9,6 +9,8 @@ import {
   toIterable,
 } from "@excalidraw/common";
 
+import type App from "@excalidraw/excalidraw/components/App";
+
 import type { DTO, ValueOf } from "@excalidraw/common/utility-types";
 
 import type { AppState, ObservedAppState } from "@excalidraw/excalidraw/types";
@@ -22,8 +24,6 @@ import { ElementsDelta, AppStateDelta, Delta } from "./delta";
 import { hashElementsVersion, hashString } from "./index";
 
 import type {
-  ElementsMap,
-  ExcalidrawElement,
   OrderedExcalidrawElement,
   SceneElementsMap,
 } from "./types";
@@ -88,6 +88,8 @@ export class Store {
     this._snapshot = snapshot;
   }
 
+  constructor(private readonly app: App) {}
+
   public scheduleAction(action: CaptureUpdateActionType) {
     this.scheduledMacroActions.add(action);
     this.satisfiesScheduledActionsInvariant();
@@ -108,19 +110,38 @@ export class Store {
     action: CaptureUpdateActionType,
     elements: SceneElementsMap | undefined,
     appState: AppState | ObservedAppState | undefined = undefined,
-    /** delta is only relevant for `CaptureUpdateAction.IMMEDIATELY`, as it's the only action producing `DurableStoreIncrement` containing a delta and it's also expected to be immutable! */
+    /**
+     * delta is only relevant for `CaptureUpdateAction.IMMEDIATELY` (but not required!),
+     * as it's the only action producing `DurableStoreIncrement` containing a delta
+     */
     delta: StoreDelta | undefined = undefined,
   ) {
-    // create a snapshot first, so that it couldn't mutate in the meantime
-    const snapshot = this.maybeCloneSnapshot(action, elements, appState);
-
-    if (!snapshot) {
-      return;
-    }
-
-    this.scheduledMicroActions.push(() =>
-      this.executeAction(action, snapshot, delta),
+    // immediately create an immutable change of the scheduled updates,
+    // compared to the current state, so that they won't mutate later on during batching
+    const currentSnapshot = StoreSnapshot.create(
+      this.app.scene.getElementsMapIncludingDeleted(),
+      this.app.state,
     );
+    const scheduledSnapshot = currentSnapshot.maybeClone(
+      action,
+      elements,
+      appState,
+    );
+
+    const change = StoreChange.create(currentSnapshot, scheduledSnapshot);
+
+    this.scheduledMicroActions.push(() => {
+      // at this point just merge the deep cloned changes with the current snapshot
+      const [nextElements, nextAppState] = this.mergeChangeWithSnapshot(change);
+
+      return this.processAction(
+        action,
+        nextElements,
+        nextAppState,
+        change,
+        delta,
+      );
+    });
   }
 
   /**
@@ -140,7 +161,8 @@ export class Store {
     try {
       // execute a single scheduled "macro" function
       // similar to macro tasks, there can be only one within a single commit (loop)
-      this.processMacroAction(elements, appState);
+      const macroAction = this.getScheduledMacroAction();
+      this.processAction(macroAction, elements, appState);
     } finally {
       this.satisfiesScheduledActionsInvariant();
       // defensively reset all scheduled "macro" actions, possibly cleans up other runtime garbage
@@ -148,47 +170,6 @@ export class Store {
     }
   }
 
-  /**
-   * Filters out yet uncomitted elements from `nextElements`, which are part of in-progress local async actions (ephemerals) and thus were not yet commited to the snapshot.
-   *
-   * This is necessary in updates in which we receive reconciled elements, already containing elements which were not yet captured by the local store (i.e. collab).
-   */
-  public filterUncomittedElements(
-    prevElements: ElementsMap,
-    nextElements: ElementsMap,
-  ): SceneElementsMap {
-    const movedElements = new Map<string, ExcalidrawElement>();
-
-    for (const prevElement of toIterable(prevElements)) {
-      const nextElement = nextElements.get(prevElement.id);
-
-      if (!nextElement) {
-        // Nothing to care about here, element was forcefully deleted
-        continue;
-      }
-
-      const elementSnapshot = this.snapshot.elements.get(prevElement.id);
-
-      // Checks for in progress async user action
-      if (!elementSnapshot) {
-        // Detected yet uncomitted local element
-        nextElements.delete(prevElement.id);
-      } else if (elementSnapshot.version < prevElement.version) {
-        // Element was already commited, but the snapshot version is lower than current local version
-        nextElements.set(prevElement.id, elementSnapshot);
-        // Mark the element as potentially moved, as it could have
-        movedElements.set(prevElement.id, elementSnapshot);
-      }
-    }
-
-    // Make sure to sync only potentially invalid indices for all elements restored from the snapshot
-    const syncedElements = syncMovedIndices(
-      Array.from(nextElements.values()),
-      movedElements,
-    );
-
-    return arrayToMap(syncedElements) as SceneElementsMap;
-  }
   /**
    * Clears the store instance.
    */
@@ -198,53 +179,25 @@ export class Store {
   }
 
   /**
-   * Executes the incoming `CaptureUpdateAction`, emits the corresponding `StoreIncrement` and maybe updates the snapshot.
-   *
-   * @emits StoreIncrement
-   */
-  private executeAction(
-    action: CaptureUpdateActionType,
-    snapshot: StoreSnapshot,
-    delta: StoreDelta | undefined = undefined,
-  ) {
-    try {
-      switch (action) {
-        // only immediately emits a durable increment
-        case CaptureUpdateAction.IMMEDIATELY:
-          this.emitDurableIncrement(snapshot, delta);
-          break;
-        // both never and eventually emit an ephemeral increment
-        case CaptureUpdateAction.NEVER:
-        case CaptureUpdateAction.EVENTUALLY:
-          this.emitEphemeralIncrement(snapshot);
-          break;
-        default:
-          assertNever(action, `Unknown store action`);
-      }
-    } finally {
-      // update the snapshot no-matter what, as it would mess up with the next action
-      switch (action) {
-        // both immediately and never update the snapshot, unlike eventually
-        case CaptureUpdateAction.IMMEDIATELY:
-        case CaptureUpdateAction.NEVER:
-          this.snapshot = snapshot;
-          break;
-      }
-    }
-  }
-
-  /**
    * Performs delta & change calculation and emits a durable increment.
    *
    * @emits StoreIncrement.
    */
   private emitDurableIncrement(
     snapshot: StoreSnapshot,
+    change: StoreChange | undefined = undefined,
     delta: StoreDelta | undefined = undefined,
   ) {
     const prevSnapshot = this.snapshot;
 
+    let storeChange: StoreChange;
     let storeDelta: StoreDelta;
+
+    if (change) {
+      storeChange = change;
+    } else {
+      storeChange = StoreChange.create(prevSnapshot, snapshot);
+    }
 
     if (delta) {
       // we might have the delta already (i.e. when applying history entry), thus we don't need to calculate it again
@@ -264,8 +217,7 @@ export class Store {
     }
 
     if (!storeDelta.isEmpty()) {
-      const change = StoreChange.create(prevSnapshot, snapshot);
-      const increment = new DurableIncrement(change, storeDelta);
+      const increment = new DurableIncrement(storeChange, storeDelta);
 
       // Notify listeners with the increment
       this.onDurableIncrementEmitter.trigger(increment);
@@ -278,10 +230,20 @@ export class Store {
    *
    * @emits EphemeralStoreIncrement
    */
-  private emitEphemeralIncrement(snapshot: StoreSnapshot) {
-    const prevSnapshot = this.snapshot;
-    const change = StoreChange.create(prevSnapshot, snapshot);
-    const increment = new EphemeralIncrement(change);
+  private emitEphemeralIncrement(
+    snapshot: StoreSnapshot,
+    change: StoreChange | undefined = undefined,
+  ) {
+    let storeChange: StoreChange;
+
+    if (change) {
+      storeChange = change;
+    } else {
+      const prevSnapshot = this.snapshot;
+      storeChange = StoreChange.create(prevSnapshot, snapshot);
+    }
+
+    const increment = new EphemeralIncrement(storeChange);
 
     // Notify listeners with the increment
     this.onStoreIncrementEmitter.trigger(increment);
@@ -317,38 +279,58 @@ export class Store {
         console.error(`Failed to execute scheduled micro action`, error);
       }
     }
+
+    this.scheduledMicroActions = [];
   }
 
-  private processMacroAction(
+  private processAction(
+    action: CaptureUpdateActionType,
     elements: SceneElementsMap | undefined,
     appState: AppState | ObservedAppState | undefined,
+    change: StoreChange | undefined = undefined,
+    delta: StoreDelta | undefined = undefined,
   ) {
-    const macroAction = this.getScheduledMacroAction();
-
     // perf. optimisation, since "EVENTUALLY" does not update the snapshot,
     // so if nobody is listening for increments, we don't need to even clone the snapshot
     // as it's only needed for `StoreChange` computation inside `EphemeralIncrement`
     if (
-      macroAction === CaptureUpdateAction.EVENTUALLY &&
+      action === CaptureUpdateAction.EVENTUALLY &&
       !this.onStoreIncrementEmitter.subscribers.length
     ) {
       return;
     }
 
-    const nextSnapshot = this.maybeCloneSnapshot(
-      macroAction,
-      elements,
-      appState,
-    );
+    const nextSnapshot = this.maybeCloneSnapshot(action, elements, appState);
 
     if (!nextSnapshot) {
       // don't continue if there is not change detected
       return;
     }
 
-    // execute a single scheduled "macro" function
-    // similar to macro tasks, there can be only one within a single commit
-    this.executeAction(macroAction, nextSnapshot);
+    try {
+      switch (action) {
+        // only immediately emits a durable increment
+        case CaptureUpdateAction.IMMEDIATELY:
+          this.emitDurableIncrement(nextSnapshot, change, delta);
+          break;
+        // both never and eventually emit an ephemeral increment
+        case CaptureUpdateAction.NEVER:
+        case CaptureUpdateAction.EVENTUALLY:
+          this.emitEphemeralIncrement(nextSnapshot, change);
+          break;
+        default:
+          assertNever(action, `Unknown store action`);
+      }
+    } finally {
+      // update the snapshot no-matter what, as it would mess up with the next action
+      switch (action) {
+        // both immediately and never update the snapshot, unlike eventually
+        case CaptureUpdateAction.IMMEDIATELY:
+        case CaptureUpdateAction.NEVER:
+          this.snapshot = nextSnapshot;
+          break;
+      }
+    }
   }
 
   /**
@@ -369,6 +351,27 @@ export class Store {
     }
 
     return scheduledAction;
+  }
+
+  /**
+   * Merges the change into the current snapshot.
+   */
+  private mergeChangeWithSnapshot(
+    change: StoreChange,
+  ): [SceneElementsMap, ObservedAppState] {
+    const nextElements = this.snapshot.elements;
+
+    for (const [id, changedElement] of Object.entries(change.elements)) {
+      nextElements.set(id, changedElement);
+    }
+
+    const nextAppState = Object.assign(
+      {},
+      this.snapshot.appState,
+      change.appState,
+    );
+
+    return [nextElements, nextAppState];
   }
 
   /**
@@ -582,6 +585,10 @@ export class StoreSnapshot {
     },
   ) {}
 
+  public static create(elements: SceneElementsMap, appState: AppState) {
+    return new StoreSnapshot(elements, getObservedAppState(appState));
+  }
+
   public static empty() {
     return new StoreSnapshot(
       new Map() as SceneElementsMap,
@@ -771,10 +778,9 @@ export class StoreSnapshot {
     return didAppStateChange;
   }
 
+
   /**
    * Detect if there any changed elements.
-   *
-   * NOTE: we shouldn't just use `sceneVersionNonce` instead, as we need to call this before the scene updates.
    */
   private detectChangedElements(
     nextElements: SceneElementsMap,
@@ -783,7 +789,7 @@ export class StoreSnapshot {
     } = {
       shouldCompareHashes: false,
     },
-  ) {
+  ): SceneElementsMap | undefined {
     if (this.elements === nextElements) {
       return;
     }

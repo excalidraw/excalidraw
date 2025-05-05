@@ -763,7 +763,7 @@ class App extends React.Component<AppProps, AppState> {
     this.renderer = new Renderer(this.scene);
     this.visibleElements = [];
 
-    this.store = new Store();
+    this.store = new Store(this);
     this.history = new History(this.store);
 
     if (excalidrawAPI) {
@@ -3986,24 +3986,19 @@ class App extends React.Component<AppProps, AppState> {
       const nextElements = elements ? syncInvalidIndices(elements) : undefined;
 
       if (captureUpdate) {
-        const prevCommittedAppState = this.store.snapshot.appState;
-        const prevCommittedElements = this.store.snapshot.elements;
+        const nextElementsMap = elements
+          ? (arrayToMap(nextElements ?? []) as SceneElementsMap)
+          : undefined;
 
-        const nextCommittedAppState = appState
-          ? Object.assign({}, prevCommittedAppState, appState) // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
-          : prevCommittedAppState;
-
-        const nextCommittedElements = elements
-          ? this.store.filterUncomittedElements(
-              this.scene.getElementsMapIncludingDeleted(), // only used to detect uncomitted local elements
-              arrayToMap(nextElements ?? []), // we expect all (already reconciled) elements
-            )
-          : prevCommittedElements;
+        const nextAppState = appState
+          ? // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
+            Object.assign({}, this.store.snapshot.appState, appState)
+          : undefined;
 
         this.store.scheduleMicroAction(
           captureUpdate,
-          nextCommittedElements,
-          nextCommittedAppState,
+          nextElementsMap,
+          nextAppState,
         );
       }
 
