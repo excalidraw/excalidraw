@@ -1,6 +1,7 @@
 import oc from "open-color";
 import {
   pointFrom,
+  pointsEqual,
   type GlobalPoint,
   type LocalPoint,
   type Radians,
@@ -32,6 +33,7 @@ import {
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
+  isLineElement,
   isTextElement,
 } from "@excalidraw/element/typeChecks";
 
@@ -217,7 +219,8 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   point: Point,
   radius: number,
   isSelected: boolean,
-  isPhantomPoint = false,
+  isPhantomPoint: boolean,
+  isOverlappingPoint: boolean,
 ) => {
   context.strokeStyle = "#5e5ad8";
   context.setLineDash([]);
@@ -232,8 +235,9 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
     context,
     point[0],
     point[1],
-    radius / appState.zoom.value,
+    (isOverlappingPoint ? radius * 2 : radius) / appState.zoom.value,
     !isPhantomPoint,
+    !isOverlappingPoint,
   );
 };
 
@@ -345,7 +349,7 @@ const renderBindingHighlightForSuggestedPointBinding = (
       index,
       elementsMap,
     );
-    fillCircle(context, x, y, threshold);
+    fillCircle(context, x, y, threshold, true);
   });
 };
 
@@ -532,15 +536,36 @@ const renderLinearPointHandles = (
   const radius = appState.editingLinearElement
     ? POINT_HANDLE_SIZE
     : POINT_HANDLE_SIZE / 2;
+
+  const _isElbowArrow = isElbowArrow(element);
+  const _isLineElement = isLineElement(element);
+
   points.forEach((point, idx) => {
-    if (isElbowArrow(element) && idx !== 0 && idx !== points.length - 1) {
+    if (_isElbowArrow && idx !== 0 && idx !== points.length - 1) {
       return;
     }
 
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
-    renderSingleLinearPoint(context, appState, point, radius, isSelected);
+    const isOverlappingPoint =
+      idx > 0 &&
+      (idx !== points.length - 1 || !_isLineElement || !element.loopLock) &&
+      pointsEqual(
+        point,
+        idx === points.length - 1 ? points[0] : points[idx - 1],
+        2 / appState.zoom.value,
+      );
+
+    renderSingleLinearPoint(
+      context,
+      appState,
+      point,
+      radius,
+      isSelected,
+      false,
+      isOverlappingPoint,
+    );
   });
 
   // Rendering segment mid points
@@ -567,6 +592,7 @@ const renderLinearPointHandles = (
           POINT_HANDLE_SIZE / 2,
           false,
           !fixedSegments.includes(idx + 1),
+          false,
         );
       }
     });
@@ -590,6 +616,7 @@ const renderLinearPointHandles = (
           POINT_HANDLE_SIZE / 2,
           false,
           true,
+          false,
         );
       }
     });
@@ -616,7 +643,7 @@ const renderTransformHandles = (
         context.strokeStyle = renderConfig.selectionColor;
       }
       if (key === "rotation") {
-        fillCircle(context, x + width / 2, y + height / 2, width / 2);
+        fillCircle(context, x + width / 2, y + height / 2, width / 2, true);
         // prefer round corners if roundRect API is available
       } else if (context.roundRect) {
         context.beginPath();
