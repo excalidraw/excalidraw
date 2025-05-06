@@ -100,6 +100,15 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     },
     serverSide: true,
   },
+  [FONT_FAMILY.Assistant]: {
+    metrics: {
+      unitsPerEm: 2048,
+      ascender: 1021,
+      descender: -287,
+      lineHeight: 1.25,
+    },
+    serverSide: true,
+  },
   [FONT_FAMILY_FALLBACKS.Xiaolai]: {
     metrics: {
       unitsPerEm: 1000,
