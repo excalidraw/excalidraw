@@ -6,7 +6,10 @@ import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "@excalidraw/common";
 import { newElementWith } from "@excalidraw/element/mutateElement";
 import * as sizeHelpers from "@excalidraw/element/sizeHelpers";
 
+import type { LocalPoint } from "@excalidraw/math";
+
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
@@ -161,6 +164,78 @@ describe("restoreElements", () => {
       seed: expect.any(Number),
       versionNonce: expect.any(Number),
     });
+  });
+
+  it("should remove imperceptibly small elements", () => {
+    const arrowElement = API.createElement({
+      type: "arrow",
+      points: [
+        [0, 0],
+        [0.02, 0.05],
+      ] as LocalPoint[],
+      x: 0,
+      y: 0,
+    });
+
+    const restoredElements = restore.restoreElements([arrowElement], null);
+
+    const restoredArrow = restoredElements[0] as
+      | ExcalidrawArrowElement
+      | undefined;
+
+    expect(restoredArrow).toBeUndefined();
+  });
+
+  it("should restore loop linears correctly", () => {
+    const linearElement = API.createElement({
+      type: "line",
+      points: [
+        [0, 0],
+        [100, 100],
+        [100, 200],
+        [0, 0],
+      ] as LocalPoint[],
+      x: 0,
+      y: 0,
+    });
+    const arrowElement = API.createElement({
+      type: "arrow",
+      points: [
+        [0, 0],
+        [100, 100],
+        [100, 200],
+        [0, 0],
+      ] as LocalPoint[],
+      x: 500,
+      y: 500,
+    });
+
+    const restoredElements = restore.restoreElements(
+      [linearElement, arrowElement],
+      null,
+    );
+
+    const restoredLinear = restoredElements[0] as
+      | ExcalidrawLinearElement
+      | undefined;
+    const restoredArrow = restoredElements[1] as
+      | ExcalidrawArrowElement
+      | undefined;
+
+    expect(restoredLinear?.type).toBe("line");
+    expect(restoredLinear?.points).toEqual([
+      [0, 0],
+      [100, 100],
+      [100, 200],
+      [0, 0],
+    ] as LocalPoint[]);
+    expect(restoredArrow?.type).toBe("arrow");
+    expect(restoredArrow?.points).toEqual([
+      [0, 0],
+      [100, 100],
+      [100, 200],
+      [0, 0],
+    ] as LocalPoint[]);
   });
 
   it('should set arrow element endArrowHead as "arrow" when arrow element endArrowHead is null', () => {

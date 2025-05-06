@@ -109,13 +109,11 @@ import {
 } from "@excalidraw/element/bounds";
 
 import {
-  bindOrUnbindLinearElement,
   bindOrUnbindLinearElements,
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
   isBindingEnabled,
   isLinearElementSimpleAndAlreadyBound,
-  maybeBindLinearElement,
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
   getSuggestedBindingsForArrows,
@@ -2781,7 +2779,6 @@ class App extends React.Component<AppProps, AppState> {
     this.updateEmbeddables();
     const elements = this.scene.getElementsIncludingDeleted();
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
-    const nonDeletedElementsMap = this.scene.getNonDeletedElementsMap();
 
     if (!this.state.showWelcomeScreen && !elements.length) {
       this.setState({ showWelcomeScreen: true });
@@ -2926,27 +2923,6 @@ class App extends React.Component<AppProps, AppState> {
       // To make sure `selectedLinearElement` is in sync with `selectedElementIds`, however this shouldn't be needed once
       // we have a single API to update `selectedElementIds`
       this.setState({ selectedLinearElement: null });
-    }
-
-    const { multiElement } = prevState;
-    if (
-      prevState.activeTool !== this.state.activeTool &&
-      multiElement != null &&
-      isBindingEnabled(this.state) &&
-      isBindingElement(multiElement, false)
-    ) {
-      maybeBindLinearElement(
-        multiElement,
-        this.state,
-        tupleToCoors(
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            multiElement,
-            -1,
-            nonDeletedElementsMap,
-          ),
-        ),
-        this.scene,
-      );
     }
 
     this.store.commit(elementsMap, this.state);
@@ -9011,34 +8987,9 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({ selectedLinearElement: null });
           }
         } else {
-          const linearElementEditor = LinearElementEditor.handlePointerUp(
-            childEvent,
-            this.state.selectedLinearElement,
-            this.state,
-            this.scene,
-          );
-
-          const { startBindingElement, endBindingElement } =
-            linearElementEditor;
-          const element = this.scene.getElement(linearElementEditor.elementId);
-          if (isBindingElement(element)) {
-            bindOrUnbindLinearElement(
-              element,
-              startBindingElement,
-              endBindingElement,
-              this.scene,
-            );
-          }
-
-          if (linearElementEditor !== this.state.selectedLinearElement) {
-            this.setState({
-              selectedLinearElement: {
-                ...linearElementEditor,
-                selectedPointsIndices: null,
-              },
-              suggestedBindings: [],
-            });
-          }
+          this.actionManager.executeAction(actionFinalize, "ui", {
+            event: childEvent,
+          });
         }
       }
 
@@ -9162,12 +9113,7 @@ class App extends React.Component<AppProps, AppState> {
             isBindingEnabled(this.state) &&
             isBindingElement(newElement, false)
           ) {
-            maybeBindLinearElement(
-              newElement,
-              this.state,
-              pointerCoords,
-              this.scene,
-            );
+            this.actionManager.executeAction(actionFinalize);
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
           if (!activeTool.locked) {
