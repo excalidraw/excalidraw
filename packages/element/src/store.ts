@@ -638,6 +638,14 @@ export class StoreSnapshot {
   public getChangedElements(prevSnapshot: StoreSnapshot) {
     const changedElements: Record<string, OrderedExcalidrawElement> = {};
 
+    for (const prevElement of toIterable(prevSnapshot.elements)) {
+      const nextElement = this.elements.get(prevElement.id);
+
+      if (!nextElement) {
+        changedElements[prevElement.id] = newElementWith(prevElement, { isDeleted: true });
+      }
+    }
+
     for (const nextElement of toIterable(this.elements)) {
       // Due to the structural clone inside `maybeClone`, we can perform just these reference checks
       if (prevSnapshot.elements.get(nextElement.id) !== nextElement) {

@@ -103,7 +103,7 @@ export class History {
 
       const action = CaptureUpdateAction.IMMEDIATELY;
 
-      let prevSnapshot = StoreSnapshot.create(elements, appState);
+      let prevSnapshot = this.store.snapshot;
 
       let nextElements = elements;
       let nextAppState = appState;
