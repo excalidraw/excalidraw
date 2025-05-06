@@ -15,6 +15,8 @@ import {
 import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/frame";
 import { CODES, KEYS, arrayToMap } from "@excalidraw/common";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
@@ -24,7 +26,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { flipHorizontal, flipVertical } from "../components/icons";
 
