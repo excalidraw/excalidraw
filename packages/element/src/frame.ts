@@ -9,7 +9,13 @@ import type {
   StaticCanvasAppState,
 } from "@excalidraw/excalidraw/types";
 
-import type { ReadonlySetLike } from "@excalidraw/common/utility-types";
+import type {
+  ArrayAccumulator,
+  GenericAccumulator,
+  ReadonlyArrayOrMap,
+  ReadonlySetLike,
+  OutputAccumulator,
+} from "@excalidraw/common/utility-types";
 
 import { getElementsWithinSelection, getSelectedElements } from "./selection";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
@@ -26,6 +32,8 @@ import {
   isFrameLikeElement,
   isTextElement,
 } from "./typeChecks";
+
+import { filterElements } from "./utils";
 
 import type { ExcalidrawElementsIncludingDeleted } from "./Scene";
 
@@ -230,17 +238,30 @@ export const groupByFrameLikes = (elements: readonly ExcalidrawElement[]) => {
   return frameElementsMap;
 };
 
-export const getFrameChildren = (
-  allElements: ElementsMapOrArray,
-  frameId: string,
-) => {
-  const frameChildren: ExcalidrawElement[] = [];
-  for (const element of allElements.values()) {
-    if (element.frameId === frameId) {
-      frameChildren.push(element);
-    }
+export const getFrameChildren = <
+  K extends ExcalidrawElement,
+  O extends GenericAccumulator = ArrayAccumulator,
+>(
+  allElements: ReadonlyArrayOrMap<K>,
+  frameId: K["id"] | Set<string>,
+  output?: O,
+): OutputAccumulator<O, K> => {
+  if (frameId instanceof Set && frameId.size === 0) {
+    return (output || []) as any as OutputAccumulator<O, K>;
   }
-  return frameChildren;
+
+  return filterElements(
+    allElements,
+    (element): element is K => {
+      if (!element.frameId) {
+        return false;
+      }
+      return typeof frameId === "string"
+        ? element.frameId === frameId
+        : frameId.has(element.frameId);
+    },
+    output || [],
+  ) as any as OutputAccumulator<O, K>;
 };
 
 export const getFrameLikeElements = (

@@ -68,3 +68,28 @@ export type MaybePromise<T> = T | Promise<T>;
 
 // get union of all keys from the union of types
 export type AllPossibleKeys<T> = T extends any ? keyof T : never;
+
+// utlity types for filter helper and related data structures
+// -----------------------------------------------------------------------------
+export type ReadonlyArrayOrMap<
+  T,
+  K = T extends { id: string } ? T["id"] : string,
+> = readonly T[] | ReadonlyMap<K, T>;
+
+export type GenericAccumulator<T = unknown> = Set<T> | Map<T, T> | Array<T>;
+export type ArrayAccumulator<T = unknown> = Array<T>;
+export type MapAccumulator<T = unknown, K = unknown> = Map<T, K>;
+export type SetAccumulator<T = unknown> = Set<T>;
+export type OutputAccumulator<
+  Accumulator,
+  OutputType,
+  Attr extends keyof OutputType = never,
+> = Accumulator extends SetAccumulator
+  ? Set<[Attr] extends [never] ? OutputType : Attr>
+  : Accumulator extends MapAccumulator
+  ? Map<
+      OutputType extends { id: string } ? OutputType["id"] : string,
+      OutputType
+    >
+  : Array<OutputType>;
+// -----------------------------------------------------------------------------
