@@ -89,7 +89,7 @@ export type OutputAccumulator<
   : Accumulator extends MapAccumulator
   ? Map<
       OutputType extends { id: string } ? OutputType["id"] : string,
-      OutputType
+      [Attr] extends [never] ? OutputType : Attr
     >
   : Array<OutputType>;
 // -----------------------------------------------------------------------------
