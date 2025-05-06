@@ -7,7 +7,10 @@ import {
   KEYS,
 } from "@excalidraw/common";
 
-import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawFrameLikeElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
 
@@ -151,6 +154,40 @@ describe("search", () => {
     await waitFor(() => {
       expect(h.app.state.searchMatches.length).toBe(1);
       expect(h.app.state.searchMatches[0]?.matchedLines?.length).toBe(6);
+    });
+  });
+
+  it("should match frame names", async () => {
+    const scrollIntoViewMock = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+    API.setElements([
+      API.createElement({
+        type: "frame",
+      }),
+    ]);
+
+    API.updateElement(h.elements[0] as ExcalidrawFrameLikeElement, {
+      name: "Frame: name test for frame, yes, frame!",
+    });
+
+    expect(h.app.state.openSidebar).toBeNull();
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+    expect(h.app.state.openSidebar).not.toBeNull();
+    expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+    expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
+
+    const searchInput = await querySearchInput();
+
+    expect(searchInput.matches(":focus")).toBe(true);
+
+    updateTextEditor(searchInput, "frame");
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches.length).toBe(3);
     });
   });
 });
