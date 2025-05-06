@@ -3995,11 +3995,11 @@ class App extends React.Component<AppProps, AppState> {
             Object.assign({}, this.store.snapshot.appState, appState)
           : undefined;
 
-        this.store.scheduleMicroAction(
-          captureUpdate,
-          nextElementsMap,
-          nextAppState,
-        );
+        this.store.scheduleMicroAction({
+          action: captureUpdate,
+          elements: nextElementsMap,
+          appState: nextAppState,
+        });
       }
 
       if (appState) {
@@ -10511,10 +10511,11 @@ class App extends React.Component<AppProps, AppState> {
 
         // don't capture and only update the store snapshot for old elements,
         // otherwise we would end up with duplicated fractional indices on undo
-        this.store.scheduleMicroAction(
-          CaptureUpdateAction.NEVER,
-          arrayToMap(elements) as SceneElementsMap,
-        );
+        this.store.scheduleMicroAction({
+          action: CaptureUpdateAction.NEVER,
+          elements: arrayToMap(elements) as SceneElementsMap,
+          appState: undefined,
+        });
 
         this.setState({ isLoading: true });
         this.syncActionResult({

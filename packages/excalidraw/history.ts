@@ -2,7 +2,9 @@ import { Emitter } from "@excalidraw/common";
 
 import {
   CaptureUpdateAction,
+  StoreChange,
   StoreDelta,
+  StoreSnapshot,
   type Store,
 } from "@excalidraw/element/store";
 
@@ -99,6 +101,10 @@ export class History {
         return;
       }
 
+      const action = CaptureUpdateAction.IMMEDIATELY;
+
+      let prevSnapshot = StoreSnapshot.create(elements, appState);
+
       let nextElements = elements;
       let nextAppState = appState;
       let containsVisibleChange = false;
@@ -111,16 +117,23 @@ export class History {
               historyEntry,
               nextElements,
               nextAppState,
-              this.store.snapshot,
+              prevSnapshot,
             );
 
-          // schedule immediate capture, so that it's emitted for the sync purposes
-          this.store.scheduleMicroAction(
-            CaptureUpdateAction.IMMEDIATELY,
+          const nextSnapshot = prevSnapshot.maybeClone(
+            action,
             nextElements,
             nextAppState,
-            historyEntry,
           );
+
+          // schedule immediate capture, so that it's emitted for the sync purposes
+          this.store.scheduleMicroAction({
+            action,
+            change: StoreChange.create(prevSnapshot, nextSnapshot),
+            delta: historyEntry,
+          });
+
+          prevSnapshot = nextSnapshot;
         } finally {
           // make sure to always push, even if the delta is corrupted
           push(historyEntry);
