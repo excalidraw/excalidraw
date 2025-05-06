@@ -8,6 +8,8 @@ import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/fra
 
 import { distributeElements } from "@excalidraw/element/distribute";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Distribution } from "@excalidraw/element/distribute";
@@ -21,7 +23,6 @@ import {
 import { t } from "../i18n";
 
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

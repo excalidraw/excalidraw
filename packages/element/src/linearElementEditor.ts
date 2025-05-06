@@ -20,7 +20,7 @@ import {
   tupleToCoors,
 } from "@excalidraw/common";
 
-import type { Store } from "@excalidraw/excalidraw/store";
+import type { Store } from "@excalidraw/element/store";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -807,7 +807,7 @@ export class LinearElementEditor {
         });
         ret.didAddPoint = true;
       }
-      store.shouldCaptureIncrement();
+      store.scheduleCapture();
       ret.linearElementEditor = {
         ...linearElementEditor,
         pointerDownState: {

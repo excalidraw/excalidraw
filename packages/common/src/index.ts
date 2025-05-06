@@ -9,3 +9,4 @@ export * from "./promise-pool";
 export * from "./random";
 export * from "./url";
 export * from "./utils";
+export * from "./emitter";

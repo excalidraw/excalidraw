@@ -23,6 +23,7 @@ import {
   waitFor,
   togglePopover,
   unmountComponent,
+  checkpointHistory,
 } from "./test-utils";
 
 import type { ShortcutName } from "../actions/shortcuts";
@@ -33,11 +34,12 @@ const checkpoint = (name: string) => {
     `[${name}] number of renders`,
   );
   expect(h.state).toMatchSnapshot(`[${name}] appState`);
-  expect(h.history).toMatchSnapshot(`[${name}] history`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
   h.elements.forEach((element, i) =>
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
   );
+
+  checkpointHistory(h.history, name);
 };
 
 const mouse = new Pointer("mouse");

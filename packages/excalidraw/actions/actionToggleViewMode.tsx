@@ -1,7 +1,8 @@
 import { CODES, KEYS } from "@excalidraw/common";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import { eyeIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

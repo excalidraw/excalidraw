@@ -54,6 +54,8 @@ import { hasStrokeColor } from "@excalidraw/element/comparisons";
 
 import { updateElbowArrowPoints } from "@excalidraw/element/elbowArrow";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import type {
@@ -69,6 +71,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import type Scene from "@excalidraw/element/Scene";
+
+import type { CaptureUpdateActionType } from "@excalidraw/element/store";
 
 import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
@@ -131,11 +135,9 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
-import type { CaptureUpdateActionType } from "../store";
 import type { AppClassProperties, AppState, Primitive } from "../types";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;

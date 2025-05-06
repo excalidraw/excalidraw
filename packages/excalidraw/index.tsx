@@ -23,6 +23,7 @@ polyfill();
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
     onChange,
+    onIncrement,
     initialData,
     excalidrawAPI,
     isCollaborating = false,
@@ -114,6 +115,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
       <InitializeApp langCode={langCode} theme={theme}>
         <App
           onChange={onChange}
+          onIncrement={onIncrement}
           initialData={initialData}
           excalidrawAPI={excalidrawAPI}
           isCollaborating={isCollaborating}
@@ -266,7 +268,7 @@ export {
   bumpVersion,
 } from "@excalidraw/element/mutateElement";
 
-export { CaptureUpdateAction } from "./store";
+export { CaptureUpdateAction } from "@excalidraw/element/store";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 

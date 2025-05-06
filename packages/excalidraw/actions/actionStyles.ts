@@ -24,13 +24,14 @@ import {
   redrawTextBoundingBox,
 } from "@excalidraw/element/textElement";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
 import { paintIcon } from "../components/icons";
 
 import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

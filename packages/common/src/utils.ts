@@ -735,6 +735,25 @@ export const arrayToList = <T>(array: readonly T[]): Node<T>[] =>
     return acc;
   }, [] as Node<T>[]);
 
+/**
+ * Converts a readonly array or map into an iterable.
+ * Useful for avoiding entry allocations when iterating object / map on each iteration.
+ */
+export const toIterable = <T>(
+  values: readonly T[] | ReadonlyMap<string, T>,
+): Iterable<T> => {
+  return Array.isArray(values) ? values : values.values();
+};
+
+/**
+ * Converts a readonly array or map into an array.
+ */
+export const toArray = <T>(
+  values: readonly T[] | ReadonlyMap<string, T>,
+): T[] => {
+  return Array.isArray(values) ? values : Array.from(toIterable(values));
+};
+
 export const isTestEnv = () => import.meta.env.MODE === ENV.TEST;
 
 export const isDevEnv = () => import.meta.env.MODE === ENV.DEVELOPMENT;
