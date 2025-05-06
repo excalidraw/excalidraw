@@ -18,12 +18,13 @@ import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
 
 import { duplicateElements } from "@excalidraw/element/duplicate";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import { ToolButton } from "../components/ToolButton";
 import { DuplicateIcon } from "../components/icons";
 
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

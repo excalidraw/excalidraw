@@ -6,9 +6,9 @@ import { arrayToMap, KEYS } from "@excalidraw/common";
 
 import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import { CaptureUpdateAction } from "@excalidraw/element/store";
 
-import { CaptureUpdateAction } from "../store";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { selectAllIcon } from "../components/icons";
 

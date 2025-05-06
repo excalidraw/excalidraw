@@ -14,6 +14,7 @@ import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
   assertSelectedElements,
+  checkpointHistory,
   fireEvent,
   render,
   screen,
@@ -39,11 +40,12 @@ const checkpoint = (name: string) => {
     `[${name}] number of renders`,
   );
   expect(h.state).toMatchSnapshot(`[${name}] appState`);
-  expect(h.history).toMatchSnapshot(`[${name}] history`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
   h.elements.forEach((element, i) =>
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
   );
+
+  checkpointHistory(h.history, name);
 };
 beforeEach(async () => {
   unmountComponent();
