@@ -642,7 +642,9 @@ export class StoreSnapshot {
       const nextElement = this.elements.get(prevElement.id);
 
       if (!nextElement) {
-        changedElements[prevElement.id] = newElementWith(prevElement, { isDeleted: true });
+        changedElements[prevElement.id] = newElementWith(prevElement, {
+          isDeleted: true,
+        });
       }
     }
 

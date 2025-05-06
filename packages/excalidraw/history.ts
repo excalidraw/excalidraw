@@ -4,7 +4,6 @@ import {
   CaptureUpdateAction,
   StoreChange,
   StoreDelta,
-  StoreSnapshot,
   type Store,
 } from "@excalidraw/element/store";
 
