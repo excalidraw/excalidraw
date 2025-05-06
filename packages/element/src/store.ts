@@ -918,6 +918,7 @@ export class StoreSnapshot {
 
     for (const changedElement of toIterable(changedElements)) {
       // TODO: consider just creating new instance, once we can ensure that all reference properties on every element are immutable
+      // TODO: consider creating a lazy deep clone, having a one-time-usage proxy over the snapshotted element and deep cloning only if it gets mutated
       clonedElements.set(changedElement.id, deepCopyElement(changedElement));
     }
 
