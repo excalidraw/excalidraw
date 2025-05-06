@@ -16,24 +16,18 @@ import {
 } from "@excalidraw/math/ellipse";
 
 import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
-import { type GeometricShape, getPolygonShape } from "@excalidraw/utils/shape";
 
-import type {
-  GlobalPoint,
-  LineSegment,
-  LocalPoint,
-  Polygon,
-  Radians,
-} from "@excalidraw/math";
+import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
 
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
-import { getBoundTextShape, isPathALoop } from "./shapes";
+import { isPathALoop } from "./shapes";
 import { getElementBounds } from "./bounds";
 import {
   hasBoundTextElement,
   isIframeLikeElement,
   isImageElement,
+  isLinearElement,
   isTextElement,
 } from "./typeChecks";
 import {
@@ -41,12 +35,15 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 
+import { getBoundTextElement } from "./textElement";
+
+import { LinearElementEditor } from "./linearElementEditor";
+
 import type {
   ElementsMap,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
-  ExcalidrawRectangleElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
 
@@ -72,45 +69,40 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
   return isDraggableFromInside || isImageElement(element);
 };
 
-export type HitTestArgs<Point extends GlobalPoint | LocalPoint> = {
-  x: number;
-  y: number;
+export type HitTestArgs = {
+  point: GlobalPoint;
   element: ExcalidrawElement;
-  shape: GeometricShape<Point>;
   threshold?: number;
   frameNameBound?: FrameNameBounds | null;
 };
 
-export const hitElementItself = <Point extends GlobalPoint | LocalPoint>({
-  x,
-  y,
+export const hitElementItself = ({
+  point,
   element,
-  shape,
   threshold = 10,
   frameNameBound = null,
-}: HitTestArgs<Point>) => {
+}: HitTestArgs) => {
   let hit = shouldTestInside(element)
     ? // Since `inShape` tests STRICTLY againt the insides of a shape
       // we would need `onShape` as well to include the "borders"
-      isPointInShape(pointFrom(x, y), shape) ||
-      isPointOnShape(pointFrom(x, y), shape, threshold)
-    : isPointOnShape(pointFrom(x, y), shape, threshold);
+      isPointInShape(point, element) ||
+      isPointOnShape(point, element, threshold)
+    : isPointOnShape(point, element, threshold);
 
   // hit test against a frame's name
   if (!hit && frameNameBound) {
-    hit = isPointInShape(pointFrom(x, y), {
-      type: "polygon",
-      data: getPolygonShape(frameNameBound as ExcalidrawRectangleElement)
-        .data as Polygon<Point>,
-    });
+    const x1 = frameNameBound.x - threshold;
+    const y1 = frameNameBound.y - threshold;
+    const x2 = frameNameBound.x + frameNameBound.width + threshold;
+    const y2 = frameNameBound.y + frameNameBound.height + threshold;
+    hit = isPointWithinBounds(pointFrom(x1, y1), point, pointFrom(x2, y2));
   }
 
   return hit;
 };
 
 export const hitElementBoundingBox = (
-  x: number,
-  y: number,
+  point: GlobalPoint,
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
   tolerance = 0,
@@ -120,37 +112,45 @@ export const hitElementBoundingBox = (
   y1 -= tolerance;
   x2 += tolerance;
   y2 += tolerance;
-  return isPointWithinBounds(
-    pointFrom(x1, y1),
-    pointFrom(x, y),
-    pointFrom(x2, y2),
-  );
+  return isPointWithinBounds(pointFrom(x1, y1), point, pointFrom(x2, y2));
 };
 
-export const hitElementBoundingBoxOnly = <
-  Point extends GlobalPoint | LocalPoint,
->(
-  hitArgs: HitTestArgs<Point>,
+export const hitElementBoundingBoxOnly = (
+  hitArgs: HitTestArgs,
   elementsMap: ElementsMap,
 ) => {
   return (
     !hitElementItself(hitArgs) &&
     // bound text is considered part of the element (even if it's outside the bounding box)
-    !hitElementBoundText(
-      hitArgs.x,
-      hitArgs.y,
-      getBoundTextShape(hitArgs.element, elementsMap),
-    ) &&
-    hitElementBoundingBox(hitArgs.x, hitArgs.y, hitArgs.element, elementsMap)
+    !hitElementBoundText(hitArgs.point, hitArgs.element, elementsMap) &&
+    hitElementBoundingBox(hitArgs.point, hitArgs.element, elementsMap)
   );
 };
 
-export const hitElementBoundText = <Point extends GlobalPoint | LocalPoint>(
-  x: number,
-  y: number,
-  textShape: GeometricShape<Point> | null,
+export const hitElementBoundText = (
+  point: GlobalPoint,
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
 ): boolean => {
-  return !!textShape && isPointInShape(pointFrom(x, y), textShape);
+  const boundTextElementCandidate = getBoundTextElement(element, elementsMap);
+
+  if (!boundTextElementCandidate) {
+    return false;
+  }
+  const boundTextElement = isLinearElement(element)
+    ? {
+        ...boundTextElementCandidate,
+        // arrow's bound text accurate position is not stored in the element's property
+        // but rather calculated and returned from the following static method
+        ...LinearElementEditor.getBoundTextElementPosition(
+          element,
+          boundTextElementCandidate,
+          elementsMap,
+        ),
+      }
+    : boundTextElementCandidate;
+
+  return isPointInShape(point, boundTextElement);
 };
 
 /**

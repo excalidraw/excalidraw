@@ -8,7 +8,6 @@ import {
 
 import { getElementsInGroup } from "@excalidraw/element/groups";
 
-import { getElementShape } from "@excalidraw/element/shapes";
 import { shouldTestInside } from "@excalidraw/element/collision";
 import { isPointInShape } from "@excalidraw/utils/collision";
 import {
@@ -211,15 +210,8 @@ const eraserTest = (
   elementsMap: ElementsMap,
   app: App,
 ): boolean => {
-  let shape = shapesCache.get(element.id);
-
-  if (!shape) {
-    shape = getElementShape<GlobalPoint>(element, elementsMap);
-    shapesCache.set(element.id, shape);
-  }
-
   const lastPoint = pathSegments[pathSegments.length - 1][1];
-  if (shouldTestInside(element) && isPointInShape(lastPoint, shape)) {
+  if (shouldTestInside(element) && isPointInShape(lastPoint, element)) {
     return true;
   }
 
