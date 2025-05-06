@@ -17,12 +17,12 @@ import { isPathALoop } from "@excalidraw/element/shapes";
 import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
 
 import type { LocalPoint } from "@excalidraw/math";
+import { CaptureUpdateAction } from "@excalidraw/element/store";
 
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";
 import { done } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
