@@ -1,8 +1,5 @@
 import React, { useEffect } from "react";
 
-import { getFormValue } from "../actions/actionProperties";
-import { t } from "../i18n";
-
 import "./Range.scss";
 
 export type RangeProps = {
@@ -17,16 +14,21 @@ export const Range = ({
   appState,
   elements,
   testId,
-}: RangeProps) => {
+  min,
+  max,
+  step,
+  value,
+  label,
+}: RangeProps & {
+  label: string;
+  min: number;
+  max: number;
+  step: number;
+  value: number;
+}) => {
   const rangeRef = React.useRef<HTMLInputElement>(null);
   const valueRef = React.useRef<HTMLDivElement>(null);
-  const value = getFormValue(
-    elements,
-    appState,
-    (element) => element.opacity,
-    true,
-    appState.currentItemOpacity,
-  );
+
   useEffect(() => {
     if (rangeRef.current && valueRef.current) {
       const rangeElement = rangeRef.current;
@@ -34,33 +36,36 @@ export const Range = ({
       const inputWidth = rangeElement.offsetWidth;
       const thumbWidth = 15; // 15 is the width of the thumb
       const position =
-        (value / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
+        (value / (max - min)) * (inputWidth - thumbWidth) + thumbWidth / 2;
       valueElement.style.left = `${position}px`;
-      rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
+      rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${
+        ((value - min) * 100) / (max - min)
+      }%, var(--button-bg) ${
+        ((value - min) * 100) / (max - min)
+      }%, var(--button-bg) 100%)`;
     }
-  }, [value]);
+  }, [value, max, min]);
 
   return (
     <label className="control-label">
-      {t("labels.opacity")}
+      {label}
       <div className="range-wrapper">
         <input
           ref={rangeRef}
           type="range"
-          min="0"
-          max="100"
-          step="10"
+          min={min}
+          max={max}
+          step={step}
           onChange={(event) => {
-            updateData(+event.target.value);
+            updateData(parseFloat(event.target.value));
           }}
           value={value}
           className="range-input"
           data-testid={testId}
         />
         <div className="value-bubble" ref={valueRef}>
-          {value !== 0 ? value : null}
+          {value !== 0 ? value.toFixed(1) : null} {}
         </div>
-        <div className="zero-label">0</div>
       </div>
     </label>
   );

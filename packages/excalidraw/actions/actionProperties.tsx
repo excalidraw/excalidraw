@@ -1,25 +1,25 @@
 import { pointFrom } from "@excalidraw/math";
-import { useEffect, useMemo, useRef, useState } from "react";
+
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  arrayToMap,
+  ARROW_TYPE,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
   DEFAULT_ELEMENT_STROKE_PICKS,
-  ARROW_TYPE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
-  ROUNDNESS,
-  STROKE_WIDTH,
-  VERTICAL_ALIGN,
+  getFontFamilyString,
+  getLineHeight,
+  getShortcutKey,
   KEYS,
   randomInteger,
-  arrayToMap,
-  getFontFamilyString,
-  getShortcutKey,
+  ROUNDNESS,
   tupleToCoors,
-  getLineHeight,
+  VERTICAL_ALIGN,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -70,6 +70,49 @@ import type {
 
 import type Scene from "@excalidraw/element/Scene";
 
+import type { PanelComponentProps } from "@excalidraw/excalidraw/actions/types";
+
+import {
+  ArrowheadArrowIcon,
+  ArrowheadBarIcon,
+  ArrowheadCircleIcon,
+  ArrowheadCircleOutlineIcon,
+  ArrowheadCrowfootIcon,
+  ArrowheadCrowfootOneIcon,
+  ArrowheadCrowfootOneOrManyIcon,
+  ArrowheadDiamondIcon,
+  ArrowheadDiamondOutlineIcon,
+  ArrowheadNoneIcon,
+  ArrowheadTriangleIcon,
+  ArrowheadTriangleOutlineIcon,
+  EdgeRoundIcon,
+  EdgeSharpIcon,
+  elbowArrowIcon,
+  FillCrossHatchIcon,
+  FillHachureIcon,
+  FillSolidIcon,
+  FillZigZagIcon,
+  FontSizeExtraLargeIcon,
+  fontSizeIcon,
+  FontSizeLargeIcon,
+  FontSizeMediumIcon,
+  FontSizeSmallIcon,
+  roundArrowIcon,
+  sharpArrowIcon,
+  SloppinessArchitectIcon,
+  SloppinessArtistIcon,
+  SloppinessCartoonistIcon,
+  StrokeStyleDashedIcon,
+  StrokeStyleDottedIcon,
+  StrokeWidthBaseIcon,
+  TextAlignBottomIcon,
+  TextAlignCenterIcon,
+  TextAlignLeftIcon,
+  TextAlignMiddleIcon,
+  TextAlignRightIcon,
+  TextAlignTopIcon,
+} from "../components/icons";
+
 import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
@@ -79,48 +122,6 @@ import { IconPicker } from "../components/IconPicker";
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
 // ArrowHead icons
 import { Range } from "../components/Range";
-import {
-  ArrowheadArrowIcon,
-  ArrowheadBarIcon,
-  ArrowheadCircleIcon,
-  ArrowheadTriangleIcon,
-  ArrowheadNoneIcon,
-  StrokeStyleDashedIcon,
-  StrokeStyleDottedIcon,
-  TextAlignTopIcon,
-  TextAlignBottomIcon,
-  TextAlignMiddleIcon,
-  FillHachureIcon,
-  FillCrossHatchIcon,
-  FillSolidIcon,
-  SloppinessArchitectIcon,
-  SloppinessArtistIcon,
-  SloppinessCartoonistIcon,
-  StrokeWidthBaseIcon,
-  StrokeWidthBoldIcon,
-  StrokeWidthExtraBoldIcon,
-  FontSizeSmallIcon,
-  FontSizeMediumIcon,
-  FontSizeLargeIcon,
-  FontSizeExtraLargeIcon,
-  EdgeSharpIcon,
-  EdgeRoundIcon,
-  TextAlignLeftIcon,
-  TextAlignCenterIcon,
-  TextAlignRightIcon,
-  FillZigZagIcon,
-  ArrowheadTriangleOutlineIcon,
-  ArrowheadCircleOutlineIcon,
-  ArrowheadDiamondIcon,
-  ArrowheadDiamondOutlineIcon,
-  fontSizeIcon,
-  sharpArrowIcon,
-  roundArrowIcon,
-  elbowArrowIcon,
-  ArrowheadCrowfootIcon,
-  ArrowheadCrowfootOneIcon,
-  ArrowheadCrowfootOneOrManyIcon,
-} from "../components/icons";
 
 import { Fonts } from "../fonts";
 import { getLanguage, t } from "../i18n";
@@ -131,11 +132,13 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
+
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
 import type { CaptureUpdateActionType } from "../store";
+
 import type { AppClassProperties, AppState, Primitive } from "../types";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
@@ -472,52 +475,42 @@ export const actionChangeStrokeWidth = register({
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          strokeWidth: value,
-        }),
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) =>
+          newElementWith(el, {
+            strokeWidth: value,
+          }),
+        true,
       ),
       appState: { ...appState, currentItemStrokeWidth: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.strokeWidth")}</legend>
-      <ButtonIconSelect
-        group="stroke-width"
-        options={[
-          {
-            value: STROKE_WIDTH.thin,
-            text: t("labels.thin"),
-            icon: StrokeWidthBaseIcon,
-            testId: "strokeWidth-thin",
-          },
-          {
-            value: STROKE_WIDTH.bold,
-            text: t("labels.bold"),
-            icon: StrokeWidthBoldIcon,
-            testId: "strokeWidth-bold",
-          },
-          {
-            value: STROKE_WIDTH.extraBold,
-            text: t("labels.extraBold"),
-            icon: StrokeWidthExtraBoldIcon,
-            testId: "strokeWidth-extraBold",
-          },
-        ]}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => element.strokeWidth,
-          (element) => element.hasOwnProperty("strokeWidth"),
-          (hasSelection) =>
-            hasSelection ? null : appState.currentItemStrokeWidth,
-        )}
-        onChange={(value) => updateData(value)}
+  PanelComponent: ({ elements, appState, updateData }: PanelComponentProps) => {
+    const strokeWidthValue = getFormValue(
+      elements,
+      appState,
+      (element) => element.strokeWidth,
+      true,
+      appState.currentItemStrokeWidth,
+    );
+
+    return (
+      <Range
+        updateData={updateData}
+        elements={elements}
+        appState={appState}
+        testId="strokeWidth"
+        min={0.1}
+        max={10}
+        step={0.1}
+        value={strokeWidthValue}
+        label={t("labels.strokeWidth")}
       />
-    </fieldset>
-  ),
+    );
+  },
 });
 
 export const actionChangeSloppiness = register({
@@ -642,14 +635,29 @@ export const actionChangeOpacity = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <Range
-      updateData={updateData}
-      elements={elements}
-      appState={appState}
-      testId="opacity"
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData }: PanelComponentProps) => {
+    const opacityValue = getFormValue(
+      elements,
+      appState,
+      (element) => element.opacity,
+      true,
+      appState.currentItemOpacity,
+    );
+
+    return (
+      <Range
+        updateData={updateData}
+        elements={elements}
+        appState={appState}
+        testId="opacity"
+        min={0}
+        max={100}
+        step={1}
+        value={opacityValue}
+        label={t("labels.opacity")}
+      />
+    );
+  },
 });
 
 export const actionChangeFontSize = register({
