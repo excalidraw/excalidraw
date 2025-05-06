@@ -20,7 +20,7 @@ import {
   tupleToCoors,
 } from "@excalidraw/common";
 
-import type { Store } from "@excalidraw/element";
+import { isPathALoop, type Store } from "@excalidraw/element";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -55,20 +55,20 @@ import {
   isFixedPointBinding,
 } from "./typeChecks";
 
-import { ShapeCache } from "./ShapeCache";
-
 import {
-  isPathALoop,
-  getBezierCurveLength,
+  ShapeCache,
   getControlPointsForBezierCurve,
-  mapIntervalToBezierT,
-  getBezierXY,
   toggleLinePolygonState,
-} from "./shapes";
+} from "./shape";
 
 import { getLockedLinearCursorAlignSize } from "./sizeHelpers";
 
 import { isLineElement } from "./typeChecks";
+import {
+  getBezierCurveLength,
+  getBezierXY,
+  mapIntervalToBezierT,
+} from "./shape";
 
 import type { Scene } from "./Scene";
 

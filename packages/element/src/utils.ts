@@ -1,8 +1,16 @@
 import {
+  DEFAULT_ADAPTIVE_RADIUS,
+  DEFAULT_PROPORTIONAL_RADIUS,
+  LINE_CONFIRM_THRESHOLD,
+  ROUNDNESS,
+} from "@excalidraw/common";
+
+import {
   curve,
   curveCatmullRomCubicApproxPoints,
   curveOffsetPoints,
   lineSegment,
+  pointDistance,
   pointFrom,
   pointFromArray,
   rectangle,
@@ -11,11 +19,11 @@ import {
 
 import type { Curve, LineSegment, LocalPoint } from "@excalidraw/math";
 
-import { getCornerRadius } from "./shapes";
+import type { NormalizedZoomValue, Zoom } from "@excalidraw/excalidraw/types";
 
 import { getDiamondPoints } from "./bounds";
 
-import { generateLinearCollisionShape } from "./Shape";
+import { generateLinearCollisionShape } from "./shape";
 
 import type {
   ElementsMap,
@@ -428,3 +436,44 @@ export function deconstructDiamondElement(
 
   return shape;
 }
+
+// Checks if the first and last point are close enough
+// to be considered a loop
+export const isPathALoop = (
+  points: ExcalidrawLinearElement["points"],
+  /** supply if you want the loop detection to account for current zoom */
+  zoomValue: Zoom["value"] = 1 as NormalizedZoomValue,
+): boolean => {
+  if (points.length >= 3) {
+    const [first, last] = [points[0], points[points.length - 1]];
+    const distance = pointDistance(first, last);
+
+    // Adjusting LINE_CONFIRM_THRESHOLD to current zoom so that when zoomed in
+    // really close we make the threshold smaller, and vice versa.
+    return distance <= LINE_CONFIRM_THRESHOLD / zoomValue;
+  }
+  return false;
+};
+
+export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
+  if (
+    element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS ||
+    element.roundness?.type === ROUNDNESS.LEGACY
+  ) {
+    return x * DEFAULT_PROPORTIONAL_RADIUS;
+  }
+
+  if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
+    const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
+
+    const CUTOFF_SIZE = fixedRadiusSize / DEFAULT_PROPORTIONAL_RADIUS;
+
+    if (x <= CUTOFF_SIZE) {
+      return x * DEFAULT_PROPORTIONAL_RADIUS;
+    }
+
+    return fixedRadiusSize;
+  }
+
+  return 0;
+};

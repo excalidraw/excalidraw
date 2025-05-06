@@ -22,7 +22,7 @@ import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
 
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
-import { isPathALoop } from "./shapes";
+import { isPathALoop } from "./utils";
 import {
   type Bounds,
   doBoundsIntersect,
