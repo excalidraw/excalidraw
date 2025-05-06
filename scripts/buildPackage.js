@@ -37,6 +37,7 @@ const getConfig = (outdir) => ({
   loader: {
     ".woff2": "file",
   },
+  external: ["react", "react-dom"], // Explicitly externalize react and react-dom
 });
 
 function buildDev(config) {
