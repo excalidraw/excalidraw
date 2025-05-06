@@ -3,69 +3,45 @@ import {
   pointFrom,
   polygonIncludesPoint,
   pointOnLineSegment,
-  pointOnPolygon,
-  polygonFromPoints,
   type GlobalPoint,
   type LocalPoint,
   type Polygon,
 } from "@excalidraw/math";
 
+import { intersectElementWithLineSegment } from "@excalidraw/element/collision";
+
+import { elementCenterPoint } from "@excalidraw/common";
+
+import { distanceToElement } from "@excalidraw/element/distance";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import type { Curve } from "@excalidraw/math";
 
-import { pointInEllipse, pointOnEllipse } from "./shape";
-
-import type { Polycurve, Polyline, GeometricShape } from "./shape";
+import type { Polyline } from "./shape";
 
 // check if the given point is considered on the given shape's border
-export const isPointOnShape = <Point extends GlobalPoint | LocalPoint>(
-  point: Point,
-  shape: GeometricShape<Point>,
-  tolerance = 0,
+export const isPointOnShape = (
+  point: GlobalPoint,
+  element: ExcalidrawElement,
+  tolerance = 1,
 ) => {
-  // get the distance from the given point to the given element
-  // check if the distance is within the given epsilon range
-  switch (shape.type) {
-    case "polygon":
-      return pointOnPolygon(point, shape.data, tolerance);
-    case "ellipse":
-      return pointOnEllipse(point, shape.data, tolerance);
-    case "line":
-      return pointOnLineSegment(point, shape.data, tolerance);
-    case "polyline":
-      return pointOnPolyline(point, shape.data, tolerance);
-    case "curve":
-      return pointOnCurve(point, shape.data, tolerance);
-    case "polycurve":
-      return pointOnPolycurve(point, shape.data, tolerance);
-    default:
-      throw Error(`shape ${shape} is not implemented`);
-  }
+  const distance = distanceToElement(element, point);
+
+  return distance <= tolerance;
 };
 
 // check if the given point is considered inside the element's border
-export const isPointInShape = <Point extends GlobalPoint | LocalPoint>(
-  point: Point,
-  shape: GeometricShape<Point>,
+export const isPointInShape = (
+  point: GlobalPoint,
+  element: ExcalidrawElement,
 ) => {
-  switch (shape.type) {
-    case "polygon":
-      return polygonIncludesPoint(point, shape.data);
-    case "line":
-      return false;
-    case "curve":
-      return false;
-    case "ellipse":
-      return pointInEllipse(point, shape.data);
-    case "polyline": {
-      const polygon = polygonFromPoints(shape.data.flat());
-      return polygonIncludesPoint(point, polygon);
-    }
-    case "polycurve": {
-      return false;
-    }
-    default:
-      throw Error(`shape ${shape} is not implemented`);
-  }
+  const intersections = intersectElementWithLineSegment(
+    element,
+    lineSegment(elementCenterPoint(element), point),
+  );
+
+  return intersections.length === 0;
 };
 
 // check if the given element is in the given bounds
@@ -74,14 +50,6 @@ export const isPointInBounds = <Point extends GlobalPoint | LocalPoint>(
   bounds: Polygon<Point>,
 ) => {
   return polygonIncludesPoint(point, bounds);
-};
-
-const pointOnPolycurve = <Point extends LocalPoint | GlobalPoint>(
-  point: Point,
-  polycurve: Polycurve<Point>,
-  tolerance: number,
-) => {
-  return polycurve.some((curve) => pointOnCurve(point, curve, tolerance));
 };
 
 const cubicBezierEquation = <Point extends LocalPoint | GlobalPoint>(

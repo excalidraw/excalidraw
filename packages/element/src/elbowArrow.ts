@@ -32,7 +32,7 @@ import {
   snapToMid,
   getHoveredElementForBinding,
 } from "./binding";
-import { distanceToBindableElement } from "./distance";
+import { distanceToElement } from "./distance";
 import {
   compareHeading,
   flipHeading,
@@ -2253,8 +2253,7 @@ const getGlobalPoint = (
 
     // NOTE: Resize scales the binding position point too, so we need to update it
     return Math.abs(
-      distanceToBindableElement(element, fixedGlobalPoint) -
-        FIXED_BINDING_DISTANCE,
+      distanceToElement(element, fixedGlobalPoint) - FIXED_BINDING_DISTANCE,
     ) > 0.01
       ? bindPointToSnapToElementOutline(arrow, element, startOrEnd)
       : fixedGlobalPoint;
@@ -2276,7 +2275,7 @@ const getBindPointHeading = (
     hoveredElement &&
       aabbForElement(
         hoveredElement,
-        Array(4).fill(distanceToBindableElement(hoveredElement, p)) as [
+        Array(4).fill(distanceToElement(hoveredElement, p)) as [
           number,
           number,
           number,

@@ -27,8 +27,6 @@ import {
   PRECISION,
 } from "@excalidraw/math";
 
-import { isPointOnShape } from "@excalidraw/utils/collision";
-
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -41,7 +39,7 @@ import {
   doBoundsIntersect,
 } from "./bounds";
 import { intersectElementWithLineSegment } from "./collision";
-import { distanceToBindableElement } from "./distance";
+import { distanceToElement } from "./distance";
 import {
   headingForPointFromElement,
   headingIsHorizontal,
@@ -63,7 +61,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import { aabbForElement, getElementShape, pointInsideBounds } from "./shapes";
+import { aabbForElement } from "./shapes";
 import { updateElbowArrowPoints } from "./elbowArrow";
 
 import type { Scene } from "./Scene";
@@ -704,7 +702,7 @@ const calculateFocusAndGap = (
 
   return {
     focus: determineFocusDistance(hoveredElement, adjacentPoint, edgePoint),
-    gap: Math.max(1, distanceToBindableElement(hoveredElement, edgePoint)),
+    gap: Math.max(1, distanceToElement(hoveredElement, edgePoint)),
   };
 };
 
@@ -898,7 +896,7 @@ const getDistanceForBinding = (
   bindableElement: ExcalidrawBindableElement,
   zoom?: AppState["zoom"],
 ) => {
-  const distance = distanceToBindableElement(bindableElement, point);
+  const distance = distanceToElement(bindableElement, point);
   const bindDistance = maxBindingGap(
     bindableElement,
     bindableElement.width,
@@ -1548,14 +1546,22 @@ export const bindingBorderTest = (
   zoom?: AppState["zoom"],
   fullShape?: boolean,
 ): boolean => {
+  const p = pointFrom<GlobalPoint>(x, y);
   const threshold = maxBindingGap(element, element.width, element.height, zoom);
-
-  const shape = getElementShape(element, elementsMap);
-  return (
-    isPointOnShape(pointFrom(x, y), shape, threshold) ||
-    (fullShape === true &&
-      pointInsideBounds(pointFrom(x, y), aabbForElement(element)))
+  const shouldTestInside =
+    // disable fullshape snapping for frame elements so we
+    // can bind to frame children
+    (fullShape || !isBindingFallthroughEnabled(element)) &&
+    !isFrameLikeElement(element);
+  const intersections = intersectElementWithLineSegment(
+    element,
+    lineSegment(elementCenterPoint(element), p),
   );
+  const distance = distanceToElement(element, p);
+
+  return shouldTestInside
+    ? intersections.length === 0 || distance <= threshold
+    : intersections.length > 0 && distance <= threshold;
 };
 
 export const maxBindingGap = (

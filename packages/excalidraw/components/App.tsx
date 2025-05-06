@@ -18,7 +18,6 @@ import {
   vectorNormalize,
 } from "@excalidraw/math";
 import { isPointInShape } from "@excalidraw/utils/collision";
-import { getSelectionBoxShape } from "@excalidraw/utils/shape";
 
 import {
   COLOR_PALETTE,
@@ -168,12 +167,7 @@ import {
   isInvisiblySmallElement,
 } from "@excalidraw/element";
 
-import {
-  getBoundTextShape,
-  getCornerRadius,
-  getElementShape,
-  isPathALoop,
-} from "@excalidraw/element";
+import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
 import {
   createSrcDoc,
@@ -5134,13 +5128,8 @@ class App extends React.Component<AppProps, AppState> {
       // If we're hitting element with highest z-index only on its bounding box
       // while also hitting other element figure, the latter should be considered.
       return hitElementItself({
-        x,
-        y,
+        point: pointFrom(x, y),
         element: elementWithHighestZIndex,
-        shape: getElementShape(
-          elementWithHighestZIndex,
-          this.scene.getNonDeletedElementsMap(),
-        ),
         // when overlapping, we would like to be more precise
         // this also avoids the need to update past tests
         threshold: this.getElementHitThreshold() / 2,
@@ -5224,34 +5213,26 @@ class App extends React.Component<AppProps, AppState> {
       this.state.selectedElementIds[element.id] &&
       shouldShowBoundingBox([element], this.state)
     ) {
-      const selectionShape = getSelectionBoxShape(
-        element,
-        this.scene.getNonDeletedElementsMap(),
-        isImageElement(element) ? 0 : this.getElementHitThreshold(),
-      );
-
       // if hitting the bounding box, return early
       // but if not, we should check for other cases as well (e.g. frame name)
-      if (isPointInShape(pointFrom(x, y), selectionShape)) {
+      if (isPointInShape(pointFrom(x, y), element)) {
         return true;
       }
     }
 
     // take bound text element into consideration for hit collision as well
     const hitBoundTextOfElement = hitElementBoundText(
-      x,
-      y,
-      getBoundTextShape(element, this.scene.getNonDeletedElementsMap()),
+      pointFrom(x, y),
+      element,
+      this.scene.getNonDeletedElementsMap(),
     );
     if (hitBoundTextOfElement) {
       return true;
     }
 
     return hitElementItself({
-      x,
-      y,
+      point: pointFrom(x, y),
       element,
-      shape: getElementShape(element, this.scene.getNonDeletedElementsMap()),
       threshold: this.getElementHitThreshold(),
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
@@ -5280,13 +5261,8 @@ class App extends React.Component<AppProps, AppState> {
       if (
         isArrowElement(elements[index]) &&
         hitElementItself({
-          x,
-          y,
+          point: pointFrom(x, y),
           element: elements[index],
-          shape: getElementShape(
-            elements[index],
-            this.scene.getNonDeletedElementsMap(),
-          ),
           threshold: this.getElementHitThreshold(),
         })
       ) {
@@ -5632,13 +5608,8 @@ class App extends React.Component<AppProps, AppState> {
           hasBoundTextElement(container) ||
           !isTransparent(container.backgroundColor) ||
           hitElementItself({
-            x: sceneX,
-            y: sceneY,
+            point: pointFrom(sceneX, sceneY),
             element: container,
-            shape: getElementShape(
-              container,
-              this.scene.getNonDeletedElementsMap(),
-            ),
             threshold: this.getElementHitThreshold(),
           })
         ) {
@@ -6329,13 +6300,8 @@ class App extends React.Component<AppProps, AppState> {
       let segmentMidPointHoveredCoords = null;
       if (
         hitElementItself({
-          x: scenePointerX,
-          y: scenePointerY,
+          point: pointFrom(scenePointerX, scenePointerY),
           element,
-          shape: getElementShape(
-            element,
-            this.scene.getNonDeletedElementsMap(),
-          ),
         })
       ) {
         hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
@@ -9768,13 +9734,11 @@ class App extends React.Component<AppProps, AppState> {
         ((hitElement &&
           hitElementBoundingBoxOnly(
             {
-              x: pointerDownState.origin.x,
-              y: pointerDownState.origin.y,
-              element: hitElement,
-              shape: getElementShape(
-                hitElement,
-                this.scene.getNonDeletedElementsMap(),
+              point: pointFrom(
+                pointerDownState.origin.x,
+                pointerDownState.origin.y,
               ),
+              element: hitElement,
               threshold: this.getElementHitThreshold(),
               frameNameBound: isFrameLikeElement(hitElement)
                 ? this.frameNameBoundsCache.get(hitElement)
