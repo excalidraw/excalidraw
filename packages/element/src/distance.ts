@@ -1,6 +1,8 @@
 import {
   curvePointDistance,
   distanceToLineSegment,
+  lineSegment,
+  pointFrom,
   pointRotateRads,
 } from "@excalidraw/math";
 
@@ -16,17 +18,18 @@ import {
 } from "./utils";
 
 import type {
-  ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
+  ExcalidrawElement,
   ExcalidrawEllipseElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
 
-export const distanceToBindableElement = (
-  element: ExcalidrawBindableElement,
+export const distanceToElement = (
+  element: ExcalidrawElement,
   p: GlobalPoint,
 ): number => {
   switch (element.type) {
+    case "selection":
     case "rectangle":
     case "image":
     case "text":
@@ -39,6 +42,23 @@ export const distanceToBindableElement = (
       return distanceToDiamondElement(element, p);
     case "ellipse":
       return distanceToEllipseElement(element, p);
+    case "line":
+    case "arrow":
+    case "freedraw":
+      return element.points.reduce((acc, point, idx) => {
+        if (idx === 0) {
+          return acc;
+        }
+        const prevPoint = element.points[idx - 1];
+        const segment = lineSegment(
+          pointFrom<GlobalPoint>(
+            element.x + prevPoint[0],
+            element.y + prevPoint[1],
+          ),
+          pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+        );
+        return Math.min(acc, distanceToLineSegment(p, segment));
+      }, Infinity);
   }
 };
 
