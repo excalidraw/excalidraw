@@ -678,7 +678,7 @@ export class StoreSnapshot {
   }
 
   /**
-   * Merges the change into the current snapshot.
+   * Apply the change and return a new snapshot instance.
    */
   public applyChange(change: StoreChange): StoreSnapshot {
     const nextElements = new Map(this.elements) as SceneElementsMap;
