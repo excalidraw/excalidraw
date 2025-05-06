@@ -26,6 +26,10 @@ import {
   isTextElement,
 } from "./typeChecks";
 
+import { filterElements } from "./utils";
+
+import { getFrameChildren } from "./frame";
+
 import type Scene from "./Scene";
 
 import type { Bounds } from "./bounds";
@@ -65,23 +69,13 @@ export const dragSelectedElements = (
     return true;
   });
 
-  // we do not want a frame and its elements to be selected at the same time
-  // but when it happens (due to some bug), we want to avoid updating element
-  // in the frame twice, hence the use of set
-  const elementsToUpdate = new Set<NonDeletedExcalidrawElement>(
-    selectedElements,
+  // update frames and their children (use a set to make sure we avoid
+  // duplicates in case the user already selected the frame's children)
+  const elementsToUpdate = getFrameChildren(
+    scene.getNonDeletedElements(),
+    filterElements(selectedElements, isFrameLikeElement, new Set(), "id"),
+    new Set(selectedElements),
   );
-  const frames = selectedElements
-    .filter((e) => isFrameLikeElement(e))
-    .map((f) => f.id);
-
-  if (frames.length > 0) {
-    for (const element of scene.getNonDeletedElements()) {
-      if (element.frameId !== null && frames.includes(element.frameId)) {
-        elementsToUpdate.add(element);
-      }
-    }
-  }
 
   const origElements: ExcalidrawElement[] = [];
 

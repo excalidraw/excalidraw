@@ -10,7 +10,7 @@ import {
   type GlobalPoint,
 } from "@excalidraw/math";
 
-import { elementCenterPoint } from "@excalidraw/common";
+import { elementCenterPoint, isReadonlyArray } from "@excalidraw/common";
 
 import type { Curve, LineSegment } from "@excalidraw/math";
 
@@ -19,7 +19,14 @@ import { getCornerRadius } from "./shapes";
 import { getDiamondPoints } from "./bounds";
 
 import type {
+  GenericAccumulator,
+  OutputAccumulator,
+  ReadonlyArrayOrMap,
+} from "../../common/src/utility-types";
+
+import type {
   ExcalidrawDiamondElement,
+  ExcalidrawElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
 
@@ -353,3 +360,35 @@ export function deconstructDiamondElement(
 
   return [sides, corners];
 }
+
+export const filterElements = <
+  InputType extends ExcalidrawElement,
+  PredicateOutputType extends InputType,
+  AccumulatorType extends GenericAccumulator,
+  Attr extends keyof PredicateOutputType = never,
+>(
+  elements: ReadonlyArrayOrMap<InputType>,
+  predicate: (elem: InputType) => elem is PredicateOutputType,
+  accumulator: AccumulatorType,
+  attr?: Attr,
+): OutputAccumulator<AccumulatorType, PredicateOutputType, Attr> => {
+  for (const element of isReadonlyArray(elements)
+    ? elements
+    : elements.values()) {
+    if (predicate(element)) {
+      if (accumulator instanceof Set) {
+        accumulator.add(attr ? element[attr] : element);
+      } else if (accumulator instanceof Map) {
+        accumulator.set(element.id, attr ? element[attr] : element);
+      } else {
+        accumulator.push(element);
+      }
+    }
+  }
+
+  return accumulator as any as OutputAccumulator<
+    AccumulatorType,
+    PredicateOutputType,
+    Attr
+  >;
+};
