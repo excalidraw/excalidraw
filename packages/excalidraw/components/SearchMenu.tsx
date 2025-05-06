@@ -3,7 +3,13 @@ import clsx from "clsx";
 import debounce from "lodash.debounce";
 import { Fragment, memo, useEffect, useRef, useState } from "react";
 
-import { CLASSES, EVENT } from "@excalidraw/common";
+import {
+  CLASSES,
+  EVENT,
+  FONT_FAMILY,
+  FRAME_STYLE,
+  getLineHeight,
+} from "@excalidraw/common";
 
 import { isElementCompletelyInViewport } from "@excalidraw/element/sizeHelpers";
 
@@ -17,9 +23,17 @@ import {
 } from "@excalidraw/common";
 
 import { newTextElement } from "@excalidraw/element/newElement";
-import { isTextElement } from "@excalidraw/element/typeChecks";
+import {
+  isFrameLikeElement,
+  isTextElement,
+} from "@excalidraw/element/typeChecks";
 
-import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+import { getDefaultFrameName } from "@excalidraw/element/frame";
+
+import type {
+  ExcalidrawFrameLikeElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
 
 import { atom, useAtom } from "../editor-jotai";
 
@@ -33,7 +47,7 @@ import { collapseDownIcon, upIcon, searchIcon } from "./icons";
 
 import "./SearchMenu.scss";
 
-import type { AppClassProperties } from "../types";
+import type { AppClassProperties, SearchMatch } from "../types";
 
 const searchQueryAtom = atom<string>("");
 export const searchItemInFocusAtom = atom<number | null>(null);
@@ -41,7 +55,7 @@ export const searchItemInFocusAtom = atom<number | null>(null);
 const SEARCH_DEBOUNCE = 350;
 
 type SearchMatchItem = {
-  textElement: ExcalidrawTextElement;
+  element: ExcalidrawTextElement | ExcalidrawFrameLikeElement;
   searchQuery: SearchQuery;
   index: number;
   preview: {
@@ -50,12 +64,7 @@ type SearchMatchItem = {
     moreBefore: boolean;
     moreAfter: boolean;
   };
-  matchedLines: {
-    offsetX: number;
-    offsetY: number;
-    width: number;
-    height: number;
-  }[];
+  matchedLines: SearchMatch["matchedLines"];
 };
 
 type SearchMatches = {
@@ -81,6 +90,7 @@ export const SearchMenu = () => {
     items: [],
   });
   const searchedQueryRef = useRef<SearchQuery | null>(null);
+  const appZoomRef = useRef(app.state.zoom.value);
   const lastSceneNonceRef = useRef<number | undefined>(undefined);
 
   const [focusIndex, setFocusIndex] = useAtom(searchItemInFocusAtom);
@@ -92,19 +102,22 @@ export const SearchMenu = () => {
     }
     if (
       searchQuery !== searchedQueryRef.current ||
-      app.scene.getSceneNonce() !== lastSceneNonceRef.current
+      app.scene.getSceneNonce() !== lastSceneNonceRef.current ||
+      app.state.zoom.value !== appZoomRef.current
     ) {
       searchedQueryRef.current = null;
+      appZoomRef.current = app.state.zoom.value;
       handleSearch(searchQuery, app, (matchItems, index) => {
         setSearchMatches({
           nonce: randomInteger(),
           items: matchItems,
         });
         searchedQueryRef.current = searchQuery;
+        appZoomRef.current = app.state.zoom.value;
         lastSceneNonceRef.current = app.scene.getSceneNonce();
         setAppState({
           searchMatches: matchItems.map((searchMatch) => ({
-            id: searchMatch.textElement.id,
+            id: searchMatch.element.id,
             focus: false,
             matchedLines: searchMatch.matchedLines,
           })),
@@ -119,6 +132,7 @@ export const SearchMenu = () => {
     setAppState,
     setFocusIndex,
     lastSceneNonceRef,
+    app.state.zoom,
   ]);
 
   const goToNextItem = () => {
@@ -169,17 +183,21 @@ export const SearchMenu = () => {
 
         const matchAsElement = newTextElement({
           text: match.searchQuery,
-          x: match.textElement.x + (match.matchedLines[0]?.offsetX ?? 0),
-          y: match.textElement.y + (match.matchedLines[0]?.offsetY ?? 0),
+          x: match.element.x + (match.matchedLines[0]?.offsetX ?? 0),
+          y: match.element.y + (match.matchedLines[0]?.offsetY ?? 0),
           width: match.matchedLines[0]?.width,
           height: match.matchedLines[0]?.height,
-          fontSize: match.textElement.fontSize,
-          fontFamily: match.textElement.fontFamily,
+          fontSize: isFrameLikeElement(match.element)
+            ? FRAME_STYLE.nameFontSize
+            : match.element.fontSize,
+          fontFamily: isFrameLikeElement(match.element)
+            ? FONT_FAMILY.Assistant
+            : match.element.fontFamily,
         });
 
         const FONT_SIZE_LEGIBILITY_THRESHOLD = 14;
 
-        const fontSize = match.textElement.fontSize;
+        const fontSize = matchAsElement.fontSize;
         const isTextTiny =
           fontSize * zoomValue < FONT_SIZE_LEGIBILITY_THRESHOLD;
 
@@ -337,7 +355,7 @@ export const SearchMenu = () => {
               lastSceneNonceRef.current = app.scene.getSceneNonce();
               setAppState({
                 searchMatches: matchItems.map((searchMatch) => ({
-                  id: searchMatch.textElement.id,
+                  id: searchMatch.element.id,
                   focus: false,
                   matchedLines: searchMatch.matchedLines,
                 })),
@@ -451,7 +469,7 @@ const MatchListBase = (props: MatchListProps) => {
     <div className="layer-ui__search-result-container">
       {props.matches.items.map((searchMatch, index) => (
         <ListItem
-          key={searchMatch.textElement.id + searchMatch.index}
+          key={searchMatch.element.id + searchMatch.index}
           searchQuery={props.searchQuery}
           preview={searchMatch.preview}
           highlighted={index === props.focusIndex}
@@ -592,12 +610,7 @@ const getMatchedLines = (
     index,
     index + searchQuery.length,
   );
-  const matchedLines: {
-    offsetX: number;
-    offsetY: number;
-    width: number;
-    height: number;
-  }[] = [];
+  const matchedLines: SearchMatch["matchedLines"] = [];
 
   for (const lineIndexRange of lineIndexRanges) {
     if (remainingQuery === "") {
@@ -657,6 +670,7 @@ const getMatchedLines = (
         offsetY,
         width,
         height,
+        showOnCanvas: true,
       });
 
       startIndex += matchCapacity;
@@ -664,6 +678,47 @@ const getMatchedLines = (
   }
 
   return matchedLines;
+};
+
+const getMatchInFrame = (
+  frame: ExcalidrawFrameLikeElement,
+  searchQuery: SearchQuery,
+  index: number,
+  zoomValue: number,
+): SearchMatch["matchedLines"] => {
+  const text = frame.name ?? getDefaultFrameName(frame);
+  const matchedText = text.slice(index, index + searchQuery.length);
+
+  const prefixText = text.slice(0, index);
+  const font = getFontString({
+    fontSize: FRAME_STYLE.nameFontSize,
+    fontFamily: FONT_FAMILY.Assistant,
+  });
+
+  const lineHeight = getLineHeight(FONT_FAMILY.Assistant);
+
+  const offset = measureText(prefixText, font, lineHeight);
+
+  // Correct non-zero width for empty string
+  if (prefixText === "") {
+    offset.width = 0;
+  }
+
+  const matchedMetrics = measureText(matchedText, font, lineHeight);
+
+  const offsetX = offset.width;
+  const offsetY = -offset.height - FRAME_STYLE.strokeWidth;
+  const width = matchedMetrics.width;
+
+  return [
+    {
+      offsetX,
+      offsetY,
+      width,
+      height: matchedMetrics.height,
+      showOnCanvas: offsetX + width <= frame.width * zoomValue,
+    },
+  ];
 };
 
 const escapeSpecialCharacters = (string: string) => {
@@ -686,7 +741,12 @@ const handleSearch = debounce(
       isTextElement(el),
     ) as ExcalidrawTextElement[];
 
+    const frames = elements.filter((el) =>
+      isFrameLikeElement(el),
+    ) as ExcalidrawFrameLikeElement[];
+
     texts.sort((a, b) => a.y - b.y);
+    frames.sort((a, b) => a.y - b.y);
 
     const matchItems: SearchMatchItem[] = [];
 
@@ -702,7 +762,32 @@ const handleSearch = debounce(
 
         if (matchedLines.length > 0) {
           matchItems.push({
-            textElement: textEl,
+            element: textEl,
+            searchQuery,
+            preview,
+            index: match.index,
+            matchedLines,
+          });
+        }
+      }
+    }
+
+    for (const frame of frames) {
+      let match = null;
+      const name = frame.name ?? getDefaultFrameName(frame);
+
+      while ((match = regex.exec(name)) !== null) {
+        const preview = getMatchPreview(name, match.index, searchQuery);
+        const matchedLines = getMatchInFrame(
+          frame,
+          searchQuery,
+          match.index,
+          app.state.zoom.value,
+        );
+
+        if (matchedLines.length > 0) {
+          matchItems.push({
+            element: frame,
             searchQuery,
             preview,
             index: match.index,
@@ -718,7 +803,7 @@ const handleSearch = debounce(
 
     const focusIndex =
       matchItems.findIndex((matchItem) =>
-        visibleIds.has(matchItem.textElement.id),
+        visibleIds.has(matchItem.element.id),
       ) ?? null;
 
     cb(matchItems, focusIndex);

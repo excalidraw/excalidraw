@@ -1129,7 +1129,7 @@ const _renderInteractiveScene = ({
   appState.searchMatches.forEach(({ id, focus, matchedLines }) => {
     const element = elementsMap.get(id);
 
-    if (element && isTextElement(element)) {
+    if (element && (isTextElement(element) || isFrameLikeElement(element))) {
       const [elementX1, elementY1, , , cx, cy] = getElementAbsoluteCoords(
         element,
         elementsMap,
@@ -1149,17 +1149,20 @@ const _renderInteractiveScene = ({
         context.fillStyle = "rgba(99, 52, 0, 0.4)";
       }
 
+      const zoomFactor = isFrameLikeElement(element) ? appState.zoom.value : 1;
+
       context.translate(appState.scrollX, appState.scrollY);
       context.translate(cx, cy);
       context.rotate(element.angle);
 
       matchedLines.forEach((matchedLine) => {
-        context.fillRect(
-          elementX1 + matchedLine.offsetX - cx,
-          elementY1 + matchedLine.offsetY - cy,
-          matchedLine.width,
-          matchedLine.height,
-        );
+        (matchedLine.showOnCanvas || focus) &&
+          context.fillRect(
+            elementX1 + matchedLine.offsetX / zoomFactor - cx,
+            elementY1 + matchedLine.offsetY / zoomFactor - cy,
+            matchedLine.width / zoomFactor,
+            matchedLine.height / zoomFactor,
+          );
       });
 
       context.restore();

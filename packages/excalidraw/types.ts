@@ -430,7 +430,7 @@ export interface AppState {
   searchMatches: readonly SearchMatch[];
 }
 
-type SearchMatch = {
+export type SearchMatch = {
   id: string;
   focus: boolean;
   matchedLines: {
@@ -438,6 +438,7 @@ type SearchMatch = {
     offsetY: number;
     width: number;
     height: number;
+    showOnCanvas: boolean;
   }[];
 };
 
