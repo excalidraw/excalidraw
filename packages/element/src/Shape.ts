@@ -1,7 +1,15 @@
 import { simplify } from "points-on-curve";
 
-import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
+import {
+  pointFrom,
+  pointDistance,
+  type LocalPoint,
+  curve,
+  pointFromArray,
+} from "@excalidraw/math";
 import { ROUGHNESS, isTransparent, assertNever } from "@excalidraw/common";
+
+import { RoughGenerator } from "roughjs/bin/generator";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
@@ -31,7 +39,6 @@ import type {
 } from "./types";
 
 import type { Drawable, Options } from "roughjs/bin/core";
-import type { RoughGenerator } from "roughjs/bin/generator";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
@@ -60,6 +67,37 @@ function adjustRoughness(element: ExcalidrawElement): number {
 
   return Math.min(roughness / (maxSize < 10 ? 3 : 2), 2.5);
 }
+
+export const generateRoughOptionsForCollision = (
+  element: ExcalidrawElement,
+): Options => {
+  const options: Options = {
+    seed: element.seed,
+    disableMultiStroke: true,
+    roughness: 0,
+    preserveVertices: true,
+  };
+
+  switch (element.type) {
+    case "rectangle":
+    case "iframe":
+    case "embeddable":
+    case "diamond":
+    case "ellipse": {
+      if (element.type === "ellipse") {
+        options.curveFitting = 1;
+      }
+      return options;
+    }
+    case "line":
+    case "freedraw":
+    case "arrow":
+      return options;
+    default: {
+      throw new Error(`Unimplemented type ${element.type}`);
+    }
+  }
+};
 
 export const generateRoughOptions = (
   element: ExcalidrawElement,
@@ -299,6 +337,111 @@ const getArrowheadShapes = (
             )
           : []),
       ];
+    }
+  }
+};
+
+export const generateComponentsForCollision = (element: ExcalidrawElement) => {
+  const ops = generateRoughOpsForCollision(element) as {
+    op: string;
+    data: number[];
+  }[];
+  const components = [];
+
+  for (let idx = 0; idx < ops.length; idx += 1) {
+    const op = ops[idx];
+    const prevPoint =
+      ops[idx - 1] && pointFromArray<LocalPoint>(ops[idx - 1].data.slice(-2));
+    switch (op.op) {
+      case "move":
+        continue;
+      case "bcurveTo":
+        if (!prevPoint) {
+          throw new Error("prevPoint is undefined");
+        }
+
+        components.push(
+          curve(
+            prevPoint,
+            pointFrom<LocalPoint>(op.data[0], op.data[1]),
+            pointFrom<LocalPoint>(op.data[2], op.data[3]),
+            pointFrom<LocalPoint>(op.data[4], op.data[5]),
+          ),
+        );
+        continue;
+      default: {
+        console.error("Unknown op type", op.op);
+      }
+    }
+  }
+
+  return components;
+};
+
+const generateRoughOpsForCollision = (element: ExcalidrawElement) => {
+  const generator = new RoughGenerator();
+  switch (element.type) {
+    case "line":
+    case "arrow": {
+      let shape: any;
+      const options = generateRoughOptions(element);
+
+      // points array can be empty in the beginning, so it is important to add
+      // initial position to it
+      const points = element.points.length
+        ? element.points
+        : [pointFrom<LocalPoint>(0, 0)];
+
+      if (isElbowArrow(element)) {
+        // NOTE (mtolmacs): Temporary fix for extremely big arrow shapes
+        if (
+          !points.every(
+            (point) => Math.abs(point[0]) <= 1e6 && Math.abs(point[1]) <= 1e6,
+          )
+        ) {
+          console.error(
+            `Elbow arrow with extreme point positions detected. Arrow not rendered.`,
+            element.id,
+            JSON.stringify(points),
+          );
+          shape = [];
+        } else {
+          shape = generator.path(
+            generateElbowArrowShape(points, 16),
+            generateRoughOptionsForCollision(element),
+          ).sets[0].ops;
+        }
+      } else if (!element.roundness) {
+        // curve is always the first element
+        // this simplifies finding the curve for an element
+        if (options.fill) {
+          shape = generator.polygon(points as unknown as RoughPoint[], options)
+            .sets[0].ops;
+        } else {
+          shape = generator.linearPath(
+            points as unknown as RoughPoint[],
+            options,
+          ).sets[0].ops;
+        }
+      } else {
+        shape = generator.curve(points as unknown as RoughPoint[], options)
+          .sets[0].ops;
+      }
+
+      return shape.slice(0, element.points.length);
+    }
+    case "freedraw": {
+      const simplifiedPoints = simplify(
+        element.points as Mutable<LocalPoint[]>,
+        0.75,
+      );
+
+      return generator
+        .curve(
+          simplifiedPoints as [number, number][],
+          generateRoughOptionsForCollision(element),
+        )
+        .sets[0].ops.slice(0, element.points.length);
     }
   }
 };
