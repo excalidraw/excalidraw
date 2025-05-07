@@ -335,7 +335,8 @@ export const actionChangeStrokeColor = register({
           appState,
           (element) => element.strokeColor,
           true,
-          appState.currentItemStrokeColor,
+          (hasSelection) =>
+            !hasSelection ? appState.currentItemStrokeColor : null,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
         elements={elements}
@@ -353,6 +354,10 @@ export const actionChangeBackgroundColor = register({
   perform: (elements, appState, value, app) => {
     if (!value.currentItemBackgroundColor) {
       return {
+        appState: {
+          ...appState,
+          ...value,
+        },
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
@@ -409,7 +414,8 @@ export const actionChangeBackgroundColor = register({
           appState,
           (element) => element.backgroundColor,
           true,
-          appState.currentItemBackgroundColor,
+          (hasSelection) =>
+            !hasSelection ? appState.currentItemBackgroundColor : null,
         )}
         onChange={(color) => updateData({ currentItemBackgroundColor: color })}
         elements={elements}
