@@ -529,6 +529,7 @@ const MatchListBase = (props: MatchListProps) => {
             openTrigger={() => {
               setFrameNameMatchesOpen((prev) => !prev);
             }}
+            showCollapsedIcon={false}
           >
             {frameNameMatches.map((searchMatch, index) => (
               <ListItem
@@ -555,6 +556,7 @@ const MatchListBase = (props: MatchListProps) => {
             openTrigger={() => {
               setTextMatchesOpen((prev) => !prev);
             }}
+            showCollapsedIcon={false}
           >
             {textMatches.map((searchMatch, index) => (
               <ListItem
