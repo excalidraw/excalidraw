@@ -166,7 +166,13 @@ export const actionToggleLoopLock = register({
     if (
       selectedElements.length === 0 ||
       selectedElements.some(
-        (element) => !isLineElement(element) || element.points.length < 3,
+        (element) =>
+          !isLineElement(element) ||
+          // only show polygon button if every selected element is already
+          // a polygon, effectively showing this button only to allow for
+          // disabling the polygon state
+          !element.loopLock ||
+          element.points.length < 3,
       )
     ) {
       return null;
