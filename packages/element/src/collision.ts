@@ -4,9 +4,9 @@ import {
   arrayToMap,
 } from "@excalidraw/common";
 import {
-  curve,
   curveIntersectLineSegment,
   isCurve,
+  isLineSegment,
   isPointWithinBounds,
   lineSegment,
   lineSegmentIntersectionPoints,
@@ -22,7 +22,12 @@ import {
 
 import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
 
-import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
+import type {
+  Curve,
+  GlobalPoint,
+  LineSegment,
+  Radians,
+} from "@excalidraw/math";
 
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
@@ -37,6 +42,7 @@ import {
 } from "./typeChecks";
 import {
   deconstructDiamondElement,
+  deconstructLinearOrFreeDrawElement,
   deconstructRectanguloidElement,
 } from "./utils";
 
@@ -44,17 +50,15 @@ import { getBoundTextElement } from "./textElement";
 
 import { LinearElementEditor } from "./linearElementEditor";
 
-import { generateComponentsForCollision } from "./Shape";
-
 import type {
   ElementsMap,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
-
-import { debugDrawCubicBezier } from "@excalidraw/excalidraw/visualdebug";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {
@@ -106,21 +110,6 @@ export const hitElementItself = ({
         isPointOnShape(point, element, threshold)
       : isPointOnShape(point, element, threshold)
     : false;
-
-  element.type === "freedraw" &&
-    generateComponentsForCollision(element).forEach((c) => {
-      if (isCurve(c)) {
-        debugDrawCubicBezier(
-          curve(
-            pointFrom<GlobalPoint>(element.x + c[0][0], element.y + c[0][1]),
-            pointFrom<GlobalPoint>(element.x + c[1][0], element.y + c[1][1]),
-            pointFrom<GlobalPoint>(element.x + c[2][0], element.y + c[2][1]),
-            pointFrom<GlobalPoint>(element.x + c[3][0], element.y + c[3][1]),
-          ),
-          { color: "red" },
-        );
-      }
-    });
 
   // hit test against a frame's name
   if (!hit && frameNameBound) {
@@ -216,9 +205,39 @@ export const intersectElementWithLineSegment = (
     case "line":
     case "freedraw":
     case "arrow":
-      return [];
-    //throw new Error(`Unimplemented element type '${element.type}'`);
+      return intersectLinearOrFreeDrawWithLineSegment(element, line);
   }
+};
+
+const intersectLinearOrFreeDrawWithLineSegment = (
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  segment: LineSegment<GlobalPoint>,
+): GlobalPoint[] => {
+  const shapes = deconstructLinearOrFreeDrawElement(element);
+  const intersections: GlobalPoint[] = [];
+
+  for (const shape of shapes) {
+    switch (true) {
+      case isCurve(shape):
+        intersections.push(
+          ...curveIntersectLineSegment(shape as Curve<GlobalPoint>, segment),
+        );
+        continue;
+      case isLineSegment(shape):
+        const point = lineSegmentIntersectionPoints(
+          segment,
+          shape as LineSegment<GlobalPoint>,
+        );
+
+        if (point) {
+          intersections.push(point);
+        }
+
+        continue;
+    }
+  }
+
+  return intersections;
 };
 
 const intersectRectanguloidWithLineSegment = (
