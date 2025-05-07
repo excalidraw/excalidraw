@@ -950,9 +950,7 @@ export class LinearElementEditor {
 
     if (!event.altKey) {
       if (lastPoint === lastUncommittedPoint) {
-        LinearElementEditor.deletePoints(element, app.scene, [
-          points.length - 1,
-        ]);
+        LinearElementEditor.deletePoints(element, app, [points.length - 1]);
       }
       return {
         ...appState.editingLinearElement,
@@ -1248,16 +1246,19 @@ export class LinearElementEditor {
 
   static deletePoints(
     element: NonDeleted<ExcalidrawLinearElement>,
-    scene: Scene,
+    app: AppClassProperties,
     pointIndices: readonly number[],
   ) {
     // Handle loop lock behavior
     if (isLineElement(element) && element.loopLock) {
       if (
         pointIndices.includes(0) ||
-        pointIndices.includes(element.points.length - 1)
+        (pointIndices.includes(element.points.length - 1) &&
+          // don't disable polygon if cleaning up uncommitted point
+          app.state.editingLinearElement?.lastUncommittedPoint !==
+            element.points[element.points.length - 1])
       ) {
-        scene.mutateElement(element, { loopLock: false });
+        app.scene.mutateElement(element, { loopLock: false });
       }
     }
 
@@ -1291,7 +1292,7 @@ export class LinearElementEditor {
 
     LinearElementEditor._updatePoints(
       element,
-      scene,
+      app.scene,
       nextPoints,
       offsetX,
       offsetY,
