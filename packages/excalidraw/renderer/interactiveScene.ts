@@ -235,9 +235,11 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
     context,
     point[0],
     point[1],
-    (isOverlappingPoint ? radius * 2 : radius) / appState.zoom.value,
+    (isOverlappingPoint
+      ? radius * (appState.editingLinearElement ? 1.5 : 2)
+      : radius) / appState.zoom.value,
     !isPhantomPoint,
-    !isOverlappingPoint,
+    !isOverlappingPoint || isSelected,
   );
 };
 
@@ -545,17 +547,20 @@ const renderLinearPointHandles = (
       return;
     }
 
-    const isSelected =
-      !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
-
     const isOverlappingPoint =
       idx > 0 &&
-      (idx !== points.length - 1 || !_isLineElement || !element.loopLock) &&
+      (idx !== points.length - 1 ||
+        appState.editingLinearElement ||
+        !_isLineElement ||
+        !element.loopLock) &&
       pointsEqual(
         point,
         idx === points.length - 1 ? points[0] : points[idx - 1],
         2 / appState.zoom.value,
       );
+
+    const isSelected =
+      !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
     renderSingleLinearPoint(
       context,
