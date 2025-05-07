@@ -63,6 +63,7 @@ import {
   getControlPointsForBezierCurve,
   mapIntervalToBezierT,
   getBezierXY,
+  toggleLinePolygonState,
 } from "./shapes";
 
 import { getLockedLinearCursorAlignSize } from "./sizeHelpers";
@@ -453,6 +454,18 @@ export class LinearElementEditor {
           selectedPoint === element.points.length - 1
         ) {
           if (isPathALoop(element.points, appState.zoom.value)) {
+            if (isLineElement(element)) {
+              scene.mutateElement(
+                element,
+                {
+                  ...toggleLinePolygonState(element, true),
+                },
+                {
+                  informMutation: false,
+                  isDragging: false,
+                },
+              );
+            }
             LinearElementEditor.movePoints(element, scene, [
               {
                 index: selectedPoint,
