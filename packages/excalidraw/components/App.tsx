@@ -1418,10 +1418,19 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const isDarkTheme = this.state.theme === THEME.DARK;
+    const nonDeletedFramesLikes = this.scene.getNonDeletedFramesLikes();
 
-    const focusedSearchMatch = this.state.searchMatches.find((sm) => sm.focus);
+    const focusedSearchMatch =
+      nonDeletedFramesLikes.length > 0
+        ? this.state.searchMatches.focusedId &&
+          isFrameLikeElement(
+            this.scene.getElement(this.state.searchMatches.focusedId),
+          )
+          ? this.state.searchMatches.matches.find((sm) => sm.focus)
+          : null
+        : null;
 
-    return this.scene.getNonDeletedFramesLikes().map((f) => {
+    return nonDeletedFramesLikes.map((f) => {
       if (
         !isElementInViewport(
           f,
@@ -6419,10 +6428,13 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.searchMatches) {
       this.setState((state) => ({
-        searchMatches: state.searchMatches.map((searchMatch) => ({
-          ...searchMatch,
-          focus: false,
-        })),
+        searchMatches: {
+          focusedId: null,
+          matches: state.searchMatches.matches.map((searchMatch) => ({
+            ...searchMatch,
+            focus: false,
+          })),
+        },
       }));
       this.updateEditorAtom(searchItemInFocusAtom, null);
     }

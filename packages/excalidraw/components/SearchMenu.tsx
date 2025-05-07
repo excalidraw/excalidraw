@@ -118,11 +118,14 @@ export const SearchMenu = () => {
         appZoomRef.current = app.state.zoom.value;
         lastSceneNonceRef.current = app.scene.getSceneNonce();
         setAppState({
-          searchMatches: matchItems.map((searchMatch) => ({
-            id: searchMatch.element.id,
-            focus: false,
-            matchedLines: searchMatch.matchedLines,
-          })),
+          searchMatches: {
+            focusedId: null,
+            matches: matchItems.map((searchMatch) => ({
+              id: searchMatch.element.id,
+              focus: false,
+              matchedLines: searchMatch.matchedLines,
+            })),
+          },
         });
       });
     }
@@ -165,13 +168,21 @@ export const SearchMenu = () => {
 
   useEffect(() => {
     setAppState((state) => {
+      const focusedId =
+        focusIndex !== null
+          ? state.searchMatches.matches[focusIndex]?.id || null
+          : null;
+
       return {
-        searchMatches: state.searchMatches.map((match, index) => {
-          if (index === focusIndex) {
-            return { ...match, focus: true };
-          }
-          return { ...match, focus: false };
-        }),
+        searchMatches: {
+          focusedId,
+          matches: state.searchMatches.matches.map((match, index) => {
+            if (index === focusIndex) {
+              return { ...match, focus: true };
+            }
+            return { ...match, focus: false };
+          }),
+        },
       };
     });
   }, [focusIndex, setAppState]);
@@ -253,7 +264,10 @@ export const SearchMenu = () => {
       searchedQueryRef.current = null;
       lastSceneNonceRef.current = undefined;
       setAppState({
-        searchMatches: [],
+        searchMatches: {
+          focusedId: null,
+          matches: [],
+        },
       });
       setIsSearching(false);
     };
@@ -356,11 +370,14 @@ export const SearchMenu = () => {
               searchedQueryRef.current = searchQuery;
               lastSceneNonceRef.current = app.scene.getSceneNonce();
               setAppState({
-                searchMatches: matchItems.map((searchMatch) => ({
-                  id: searchMatch.element.id,
-                  focus: false,
-                  matchedLines: searchMatch.matchedLines,
-                })),
+                searchMatches: {
+                  focusedId: null,
+                  matches: matchItems.map((searchMatch) => ({
+                    id: searchMatch.element.id,
+                    focus: false,
+                    matchedLines: searchMatch.matchedLines,
+                  })),
+                },
               });
 
               setIsSearching(false);

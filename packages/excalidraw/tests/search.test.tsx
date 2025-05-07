@@ -100,17 +100,17 @@ describe("search", () => {
     updateTextEditor(searchInput, "test");
 
     await waitFor(() => {
-      expect(h.app.state.searchMatches.length).toBe(2);
-      expect(h.app.state.searchMatches[0].focus).toBe(true);
+      expect(h.app.state.searchMatches.matches.length).toBe(2);
+      expect(h.app.state.searchMatches.matches[0].focus).toBe(true);
     });
 
     Keyboard.keyPress(KEYS.ENTER, searchInput);
-    expect(h.app.state.searchMatches[0].focus).toBe(false);
-    expect(h.app.state.searchMatches[1].focus).toBe(true);
+    expect(h.app.state.searchMatches.matches[0].focus).toBe(false);
+    expect(h.app.state.searchMatches.matches[1].focus).toBe(true);
 
     Keyboard.keyPress(KEYS.ENTER, searchInput);
-    expect(h.app.state.searchMatches[0].focus).toBe(true);
-    expect(h.app.state.searchMatches[1].focus).toBe(false);
+    expect(h.app.state.searchMatches.matches[0].focus).toBe(true);
+    expect(h.app.state.searchMatches.matches[1].focus).toBe(false);
   });
 
   it("should match text split across multiple lines", async () => {
@@ -145,15 +145,19 @@ describe("search", () => {
     updateTextEditor(searchInput, "test");
 
     await waitFor(() => {
-      expect(h.app.state.searchMatches.length).toBe(1);
-      expect(h.app.state.searchMatches[0]?.matchedLines?.length).toBe(4);
+      expect(h.app.state.searchMatches.matches.length).toBe(1);
+      expect(h.app.state.searchMatches.matches[0]?.matchedLines?.length).toBe(
+        4,
+      );
     });
 
     updateTextEditor(searchInput, "ext spli");
 
     await waitFor(() => {
-      expect(h.app.state.searchMatches.length).toBe(1);
-      expect(h.app.state.searchMatches[0]?.matchedLines?.length).toBe(6);
+      expect(h.app.state.searchMatches.matches.length).toBe(1);
+      expect(h.app.state.searchMatches.matches[0]?.matchedLines?.length).toBe(
+        6,
+      );
     });
   });
 
@@ -187,7 +191,7 @@ describe("search", () => {
     updateTextEditor(searchInput, "frame");
 
     await waitFor(() => {
-      expect(h.app.state.searchMatches.length).toBe(3);
+      expect(h.app.state.searchMatches.matches.length).toBe(3);
     });
   });
 });

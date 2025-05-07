@@ -427,7 +427,10 @@ export interface AppState {
   isCropping: boolean;
   croppingElementId: ExcalidrawElement["id"] | null;
 
-  searchMatches: readonly SearchMatch[];
+  searchMatches: {
+    focusedId: ExcalidrawElement["id"] | null;
+    matches: readonly SearchMatch[];
+  };
 }
 
 export type SearchMatch = {
