@@ -1,8 +1,11 @@
-import { isTransparent, elementCenterPoint } from "@excalidraw/common";
+import {
+  isTransparent,
+  elementCenterPoint,
+  arrayToMap,
+} from "@excalidraw/common";
 import {
   curveIntersectLineSegment,
   isPointWithinBounds,
-  line,
   lineSegment,
   lineSegmentIntersectionPoints,
   pointFrom,
@@ -12,7 +15,7 @@ import {
 
 import {
   ellipse,
-  ellipseLineIntersectionPoints,
+  ellipseSegmentInterceptPoints,
 } from "@excalidraw/math/ellipse";
 
 import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
@@ -22,7 +25,7 @@ import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./shapes";
-import { getElementBounds } from "./bounds";
+import { getCommonBounds, getElementBounds } from "./bounds";
 import {
   hasBoundTextElement,
   isIframeLikeElement,
@@ -82,12 +85,21 @@ export const hitElementItself = ({
   threshold = 10,
   frameNameBound = null,
 }: HitTestArgs) => {
-  let hit = shouldTestInside(element)
-    ? // Since `inShape` tests STRICTLY againt the insides of a shape
-      // we would need `onShape` as well to include the "borders"
-      isPointInShape(point, element) ||
-      isPointOnShape(point, element, threshold)
-    : isPointOnShape(point, element, threshold);
+  // First check if the element is in the bounding box because it's MUCH faster
+  // than checking if the point is in the element's shape
+  let hit = hitElementBoundingBox(
+    point,
+    element,
+    arrayToMap([element]),
+    threshold,
+  )
+    ? shouldTestInside(element)
+      ? // Since `inShape` tests STRICTLY againt the insides of a shape
+        // we would need `onShape` as well to include the "borders"
+        isPointInShape(point, element) ||
+        isPointOnShape(point, element, threshold)
+      : isPointOnShape(point, element, threshold)
+    : false;
 
   // hit test against a frame's name
   if (!hit && frameNameBound) {
@@ -173,13 +185,16 @@ export const intersectElementWithLineSegment = (
     case "iframe":
     case "embeddable":
     case "frame":
+    case "selection":
     case "magicframe":
       return intersectRectanguloidWithLineSegment(element, line, offset);
     case "diamond":
       return intersectDiamondWithLineSegment(element, line, offset);
     case "ellipse":
       return intersectEllipseWithLineSegment(element, line, offset);
-    default:
+    case "line":
+    case "freedraw":
+    case "arrow":
       throw new Error(`Unimplemented element type '${element.type}'`);
   }
 };
@@ -301,8 +316,8 @@ const intersectEllipseWithLineSegment = (
   const rotatedA = pointRotateRads(l[0], center, -element.angle as Radians);
   const rotatedB = pointRotateRads(l[1], center, -element.angle as Radians);
 
-  return ellipseLineIntersectionPoints(
+  return ellipseSegmentInterceptPoints(
     ellipse(center, element.width / 2 + offset, element.height / 2 + offset),
-    line(rotatedA, rotatedB),
+    lineSegment(rotatedA, rotatedB),
   ).map((p) => pointRotateRads(p, center, element.angle));
 };
