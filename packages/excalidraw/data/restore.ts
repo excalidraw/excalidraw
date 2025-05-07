@@ -340,8 +340,8 @@ const restoreElement = (
         points,
         x,
         y,
-        ...(isLineElement(element) && element.loopLock === undefined
-          ? { loopLock: false }
+        ...(isLineElement(element)
+          ? { loopLock: element.loopLock ?? false }
           : {}),
         ...getSizeFromPoints(points),
       });

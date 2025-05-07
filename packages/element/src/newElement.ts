@@ -473,10 +473,12 @@ export const newLinearElement = (
   };
 
   if (isLineElement(element)) {
-    return {
+    const lineElement: NonDeleted<ExcalidrawLineElement> = {
       ...element,
       loopLock: false,
-    } as NonDeleted<ExcalidrawLineElement>;
+    };
+
+    return lineElement;
   }
 
   return element;
