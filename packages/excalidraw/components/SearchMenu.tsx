@@ -1,7 +1,7 @@
 import { round } from "@excalidraw/math";
 import clsx from "clsx";
 import debounce from "lodash.debounce";
-import { Fragment, memo, useEffect, useRef, useState } from "react";
+import { Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   CLASSES,
@@ -46,6 +46,8 @@ import { TextField } from "./TextField";
 import { collapseDownIcon, upIcon, searchIcon } from "./icons";
 
 import "./SearchMenu.scss";
+
+import Collapsible from "./Stats/Collapsible";
 
 import type { AppClassProperties, SearchMatch } from "../types";
 
@@ -465,17 +467,94 @@ interface MatchListProps {
 }
 
 const MatchListBase = (props: MatchListProps) => {
+  const [frameNameMatchesOpen, setFrameNameMatchesOpen] = useState(true);
+  const frameNameMatches = useMemo(
+    () =>
+      props.matches.items.filter((match) => isFrameLikeElement(match.element)),
+    [props.matches],
+  );
+
+  const [textMatchesOpen, setTextMatchesOpen] = useState(true);
+  const textMatches = useMemo(
+    () => props.matches.items.filter((match) => isTextElement(match.element)),
+    [props.matches],
+  );
+
+  useEffect(() => {
+    if (
+      props.focusIndex !== null &&
+      props.focusIndex < frameNameMatches.length
+    ) {
+      setFrameNameMatchesOpen(true);
+    }
+  }, [frameNameMatches, props.focusIndex]);
+
+  useEffect(() => {
+    if (
+      props.focusIndex !== null &&
+      props.focusIndex >= frameNameMatches.length
+    ) {
+      setTextMatchesOpen(true);
+    }
+  }, [frameNameMatches, props.focusIndex]);
+
   return (
-    <div className="layer-ui__search-result-container">
-      {props.matches.items.map((searchMatch, index) => (
-        <ListItem
-          key={searchMatch.element.id + searchMatch.index}
-          searchQuery={props.searchQuery}
-          preview={searchMatch.preview}
-          highlighted={index === props.focusIndex}
-          onClick={() => props.onItemClick(index)}
-        />
-      ))}
+    <div>
+      {frameNameMatches.length > 0 && (
+        <div className="layer-ui__search-result-container">
+          <Collapsible
+            open={frameNameMatchesOpen}
+            label={
+              <div className="layer-ui__search-result-title">
+                Frame name matches
+              </div>
+            }
+            openTrigger={() => {
+              setFrameNameMatchesOpen((prev) => !prev);
+            }}
+          >
+            {frameNameMatches.map((searchMatch, index) => (
+              <ListItem
+                key={searchMatch.element.id + searchMatch.index}
+                searchQuery={props.searchQuery}
+                preview={searchMatch.preview}
+                highlighted={index === props.focusIndex}
+                onClick={() => props.onItemClick(index)}
+              />
+            ))}
+          </Collapsible>
+
+          {textMatches.length > 0 && <div className="layer-ui__divider" />}
+        </div>
+      )}
+
+      {textMatches.length > 0 && (
+        <div className="layer-ui__search-result-container">
+          <Collapsible
+            open={textMatchesOpen}
+            label={
+              <div className="layer-ui__search-result-title">Text matches</div>
+            }
+            openTrigger={() => {
+              setTextMatchesOpen((prev) => !prev);
+            }}
+          >
+            {textMatches.map((searchMatch, index) => (
+              <ListItem
+                key={searchMatch.element.id + searchMatch.index}
+                searchQuery={props.searchQuery}
+                preview={searchMatch.preview}
+                highlighted={
+                  index + frameNameMatches.length === props.focusIndex
+                }
+                onClick={() =>
+                  props.onItemClick(index + frameNameMatches.length)
+                }
+              />
+            ))}
+          </Collapsible>
+        </div>
+      )}
     </div>
   );
 };
@@ -748,7 +827,7 @@ const handleSearch = debounce(
     texts.sort((a, b) => a.y - b.y);
     frames.sort((a, b) => a.y - b.y);
 
-    const matchItems: SearchMatchItem[] = [];
+    const textMatches: SearchMatchItem[] = [];
 
     const regex = new RegExp(escapeSpecialCharacters(searchQuery), "gi");
 
@@ -761,7 +840,7 @@ const handleSearch = debounce(
         const matchedLines = getMatchedLines(textEl, searchQuery, match.index);
 
         if (matchedLines.length > 0) {
-          matchItems.push({
+          textMatches.push({
             element: textEl,
             searchQuery,
             preview,
@@ -771,6 +850,8 @@ const handleSearch = debounce(
         }
       }
     }
+
+    const frameMatches: SearchMatchItem[] = [];
 
     for (const frame of frames) {
       let match = null;
@@ -786,7 +867,7 @@ const handleSearch = debounce(
         );
 
         if (matchedLines.length > 0) {
-          matchItems.push({
+          frameMatches.push({
             element: frame,
             searchQuery,
             preview,
@@ -800,6 +881,9 @@ const handleSearch = debounce(
     const visibleIds = new Set(
       app.visibleElements.map((visibleElement) => visibleElement.id),
     );
+
+    // putting frame matches first
+    const matchItems: SearchMatchItem[] = [...frameMatches, ...textMatches];
 
     const focusIndex =
       matchItems.findIndex((matchItem) =>
