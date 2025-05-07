@@ -147,10 +147,12 @@ export const actionToggleLoopLock = register({
           return element;
         }
 
-        return newElementWith(
-          element,
-          toggleLinePolygonState(element, newLoopLockState),
-        );
+        return newElementWith(element, {
+          backgroundColor: newLoopLockState
+            ? element.backgroundColor
+            : "transparent",
+          ...toggleLinePolygonState(element, newLoopLockState),
+        });
       }),
       appState,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
