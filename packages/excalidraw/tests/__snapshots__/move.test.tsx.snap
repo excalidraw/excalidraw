@@ -44,7 +44,7 @@ exports[`duplicate element on move when ALT is clicked > rectangle 6`] = `
   "frameId": null,
   "groupIds": [],
   "height": 50,
-  "id": "id2",
+  "id": "id4",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -108,7 +108,7 @@ exports[`move element > rectangles with binding arrow 5`] = `
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id2",
+      "id": "id6",
       "type": "arrow",
     },
   ],
@@ -147,7 +147,7 @@ exports[`move element > rectangles with binding arrow 6`] = `
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id2",
+      "id": "id6",
       "type": "arrow",
     },
   ],
@@ -156,7 +156,7 @@ exports[`move element > rectangles with binding arrow 6`] = `
   "frameId": null,
   "groupIds": [],
   "height": 300,
-  "id": "id1",
+  "id": "id3",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -189,7 +189,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id1",
+    "elementId": "id3",
     "focus": "-0.46667",
     "gap": 10,
   },
@@ -197,7 +197,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "frameId": null,
   "groupIds": [],
   "height": "87.29887",
-  "id": "id2",
+  "id": "id6",
   "index": "a2",
   "isDeleted": false,
   "lastCommittedPoint": null,
