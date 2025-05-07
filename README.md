@@ -63,7 +63,7 @@ The Excalidraw editor (npm package) supports:
 - 🏗️&nbsp;Customizable.
 - 📷&nbsp;Image support.
 - 😀&nbsp;Shape libraries support.
-- 👅&nbsp;Localization (i18n) support.
+- 🌐&nbsp;Localization (i18n) support.
 - 🖼️&nbsp;Export to PNG, SVG & clipboard.
 - 💾&nbsp;Open format - export drawings as an `.excalidraw` json file.
 - ⚒️&nbsp;Wide range of tools - rectangle, circle, diamond, arrow, line, free-draw, eraser...
