@@ -1531,9 +1531,10 @@ class App extends React.Component<AppProps, AppState> {
               : FRAME_STYLE.nameColorLightTheme,
             lineHeight: FRAME_STYLE.nameLineHeight,
             width: "max-content",
-            maxWidth: focusedSearchMatch?.focus
-              ? "none"
-              : `${f.width * this.state.zoom.value}px`,
+            maxWidth:
+              focusedSearchMatch?.id === f.id && focusedSearchMatch?.focus
+                ? "none"
+                : `${f.width * this.state.zoom.value}px`,
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
