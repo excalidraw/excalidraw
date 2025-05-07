@@ -43,7 +43,13 @@ import { t } from "../i18n";
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { Button } from "./Button";
 import { TextField } from "./TextField";
-import { collapseDownIcon, upIcon, searchIcon } from "./icons";
+import {
+  collapseDownIcon,
+  upIcon,
+  searchIcon,
+  frameToolIcon,
+  TextIcon,
+} from "./icons";
 
 import "./SearchMenu.scss";
 
@@ -523,7 +529,8 @@ const MatchListBase = (props: MatchListProps) => {
             open={frameNameMatchesOpen}
             label={
               <div className="layer-ui__search-result-title">
-                Frame name matches
+                <div className="title-icon">{frameToolIcon}</div>
+                {t("search.frames")}
               </div>
             }
             openTrigger={() => {
@@ -551,7 +558,10 @@ const MatchListBase = (props: MatchListProps) => {
           <Collapsible
             open={textMatchesOpen}
             label={
-              <div className="layer-ui__search-result-title">Text matches</div>
+              <div className="layer-ui__search-result-title">
+                <div className="title-icon">{TextIcon}</div>
+                {t("search.texts")}
+              </div>
             }
             openTrigger={() => {
               setTextMatchesOpen((prev) => !prev);

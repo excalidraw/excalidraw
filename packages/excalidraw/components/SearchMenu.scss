@@ -72,8 +72,15 @@
 
   .layer-ui__search-result-title {
     font-size: 1rem;
-    font-weight: 600;
     margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    .title-icon {
+      width: 1rem;
+      height: 1rem;
+    }
   }
 
   .layer-ui__divider {
