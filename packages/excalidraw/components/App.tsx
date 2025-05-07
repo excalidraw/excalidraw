@@ -1419,6 +1419,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const isDarkTheme = this.state.theme === THEME.DARK;
 
+    const focusedSearchMatch = this.state.searchMatches.find((sm) => sm.focus);
+
     return this.scene.getNonDeletedFramesLikes().map((f) => {
       if (
         !isElementInViewport(
@@ -1529,9 +1531,7 @@ class App extends React.Component<AppProps, AppState> {
               : FRAME_STYLE.nameColorLightTheme,
             lineHeight: FRAME_STYLE.nameLineHeight,
             width: "max-content",
-            maxWidth: this.state.searchMatches.find(
-              (sm) => sm.id === f.id && sm.focus,
-            )
+            maxWidth: focusedSearchMatch?.focus
               ? "none"
               : `${f.width * this.state.zoom.value}px`,
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
