@@ -462,12 +462,18 @@ const createBindingArrow = (
     bindingArrow as OrderedExcalidrawElement,
   );
 
-  LinearElementEditor.movePoints(bindingArrow, scene, [
-    {
-      index: 1,
-      point: bindingArrow.points[1],
-    },
-  ]);
+  LinearElementEditor.movePoints(
+    bindingArrow,
+    scene,
+    new Map([
+      [
+        1,
+        {
+          point: bindingArrow.points[1],
+        },
+      ],
+    ]),
+  );
 
   const update = updateElbowArrowPoints(
     bindingArrow,

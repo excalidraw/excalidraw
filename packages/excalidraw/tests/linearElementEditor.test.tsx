@@ -1384,19 +1384,30 @@ describe("Test Linear Elements", () => {
       const [origStartX, origStartY] = [line.x, line.y];
 
       act(() => {
-        LinearElementEditor.movePoints(line, h.app.scene, [
-          {
-            index: 0,
-            point: pointFrom(line.points[0][0] + 10, line.points[0][1] + 10),
-          },
-          {
-            index: line.points.length - 1,
-            point: pointFrom(
-              line.points[line.points.length - 1][0] - 10,
-              line.points[line.points.length - 1][1] - 10,
-            ),
-          },
-        ]);
+        LinearElementEditor.movePoints(
+          line,
+          h.app.scene,
+          new Map([
+            [
+              0,
+              {
+                point: pointFrom(
+                  line.points[0][0] + 10,
+                  line.points[0][1] + 10,
+                ),
+              },
+            ],
+            [
+              line.points.length - 1,
+              {
+                point: pointFrom(
+                  line.points[line.points.length - 1][0] - 10,
+                  line.points[line.points.length - 1][1] - 10,
+                ),
+              },
+            ],
+          ]),
+        );
       });
       expect(line.x).toBe(origStartX + 10);
       expect(line.y).toBe(origStartY + 10);

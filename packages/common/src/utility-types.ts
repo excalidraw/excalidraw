@@ -73,3 +73,7 @@ export type AllPossibleKeys<T> = T extends any ? keyof T : never;
 export type DTO<T> = {
   [K in keyof T as T[K] extends Function ? never : K]: T[K];
 };
+
+export type MapEntry<M extends Map<any, any>> = M extends Map<infer K, infer V>
+  ? [K, V]
+  : never;
