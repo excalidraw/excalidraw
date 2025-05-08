@@ -97,6 +97,8 @@ export const actionToggleLinearEditor = register({
 export const actionToggleLoopLock = register({
   name: "toggleLoopLock",
   category: DEFAULT_CATEGORIES.elements,
+  icon: polygonIcon,
+  keywords: ["loop"],
   label: (elements, appState, app) => {
     const selectedElements = app.scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
