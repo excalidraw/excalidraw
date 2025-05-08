@@ -2465,7 +2465,7 @@ exports[`regression tests > can drag element that covers another element, while 
   "scrolledOutside": false,
   "searchMatches": null,
   "selectedElementIds": {
-    "id3": true,
+    "id0": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2667,7 +2667,7 @@ exports[`regression tests > can drag element that covers another element, while 
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id3": true,
+            "id0": true,
           },
         },
         "inserted": {
@@ -2681,7 +2681,7 @@ exports[`regression tests > can drag element that covers another element, while 
       "added": {},
       "removed": {},
       "updated": {
-        "id3": {
+        "id0": {
           "deleted": {
             "x": 300,
             "y": 300,
