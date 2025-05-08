@@ -14,6 +14,10 @@ import { elementCenterPoint } from "@excalidraw/common";
 
 import { distanceToElement } from "@excalidraw/element/distance";
 
+import { isLinearElement } from "@excalidraw/excalidraw";
+import { isFreeDrawElement } from "@excalidraw/element/typeChecks";
+import { isPathALoop } from "@excalidraw/element/shapes";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Curve } from "@excalidraw/math";
@@ -36,6 +40,14 @@ export const isPointInShape = (
   point: GlobalPoint,
   element: ExcalidrawElement,
 ) => {
+  if (
+    (isLinearElement(element) || isFreeDrawElement(element)) &&
+    !isPathALoop(element.points)
+  ) {
+    // There isn't any "inside" for a non-looping path
+    return false;
+  }
+
   const intersections = intersectElementWithLineSegment(
     element,
     lineSegment(elementCenterPoint(element), point),
