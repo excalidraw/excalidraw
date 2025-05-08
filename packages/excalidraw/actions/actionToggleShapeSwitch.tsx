@@ -1,3 +1,5 @@
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import {
@@ -5,7 +7,6 @@ import {
   convertElementTypePopupAtom,
 } from "../components/ConvertElementTypePopup";
 import { editorJotaiStore } from "../editor-jotai";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
