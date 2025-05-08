@@ -324,7 +324,8 @@ const restoreElement = (
           : element.points;
 
       if (points[0][0] !== 0 || points[0][1] !== 0) {
-        ({ points, x, y } = LinearElementEditor.getNormalizedPoints(element));
+        ({ points, x, y } =
+          LinearElementEditor.getNormalizeElementPointsAndCoords(element));
       }
 
       return restoreElementWithProperties(element, {
@@ -355,7 +356,8 @@ const restoreElement = (
           : element.points;
 
       if (points[0][0] !== 0 || points[0][1] !== 0) {
-        ({ points, x, y } = LinearElementEditor.getNormalizedPoints(element));
+        ({ points, x, y } =
+          LinearElementEditor.getNormalizeElementPointsAndCoords(element));
       }
 
       const base = {
