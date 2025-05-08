@@ -72,9 +72,15 @@ const DEFAULT_OVERSCROLL_ALLOWANCE = 0.2;
 interface EncodedConstraints {
   x: number;
   y: number;
+  // width
   w: number;
+  // height
   h: number;
+  // animateOnNextUpdate
+  a: boolean;
+  // lockZoom
   l: boolean;
+  // viewportZoomFactor
   v: number;
   // overscrollAllowance
   oa: number;
@@ -91,6 +97,7 @@ export const encodeConstraints = (constraints: ScrollConstraints): string => {
     y: constraints.y,
     w: constraints.width,
     h: constraints.height,
+    a: !!constraints.animateOnNextUpdate,
     l: !!constraints.lockZoom,
     v: constraints.viewportZoomFactor ?? 1,
     oa: constraints.overscrollAllowance ?? DEFAULT_OVERSCROLL_ALLOWANCE,
@@ -111,14 +118,14 @@ export const decodeConstraints = (encoded: string): ScrollConstraints => {
     const decodedStr = window.atob(decodeURIComponent(encoded));
     const parsed = JSON.parse(decodedStr) as EncodedConstraints;
     return {
-      x: parsed.x ?? 0,
-      y: parsed.y ?? 0,
-      width: parsed.w ?? 0,
-      height: parsed.h ?? 0,
-      lockZoom: parsed.l ?? false,
-      viewportZoomFactor: parsed.v ?? 1,
-      animateOnNextUpdate: false,
-      overscrollAllowance: parsed.oa ?? DEFAULT_OVERSCROLL_ALLOWANCE,
+      x: parsed.x || 0,
+      y: parsed.y || 0,
+      width: parsed.w || 0,
+      height: parsed.h || 0,
+      lockZoom: parsed.l || false,
+      viewportZoomFactor: parsed.v || 1,
+      animateOnNextUpdate: parsed.a || false,
+      overscrollAllowance: parsed.oa || DEFAULT_OVERSCROLL_ALLOWANCE,
     };
   } catch (error) {
     // return safe defaults if decoding fails
@@ -127,9 +134,10 @@ export const decodeConstraints = (encoded: string): ScrollConstraints => {
       y: 0,
       width: 0,
       height: 0,
+      animateOnNextUpdate: false,
       lockZoom: false,
       viewportZoomFactor: 1,
-      animateOnNextUpdate: false,
+      overscrollAllowance: DEFAULT_OVERSCROLL_ALLOWANCE,
     };
   }
 };
