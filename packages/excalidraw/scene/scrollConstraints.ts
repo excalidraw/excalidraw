@@ -21,7 +21,6 @@ import { getNormalizedZoom } from "./normalize";
 export const calculateConstrainedScrollCenter = (
   state: AppState,
   { scrollX, scrollY }: Pick<AppState, "scrollX" | "scrollY">,
-  overscrollAllowance?: number,
 ): {
   scrollX: AppState["scrollX"];
   scrollY: AppState["scrollY"];
@@ -59,7 +58,6 @@ export const calculateConstrainedScrollCenter = (
     height,
     zoom: _zoom,
     allowOverscroll: false,
-    overscrollAllowance,
   });
 
   return {
@@ -69,6 +67,8 @@ export const calculateConstrainedScrollCenter = (
   };
 };
 
+const DEFAULT_OVERSCROLL_ALLOWANCE = 0.2;
+
 interface EncodedConstraints {
   x: number;
   y: number;
@@ -76,6 +76,8 @@ interface EncodedConstraints {
   h: number;
   l: boolean;
   v: number;
+  // overscrollAllowance
+  oa: number;
 }
 
 /**
@@ -91,6 +93,7 @@ export const encodeConstraints = (constraints: ScrollConstraints): string => {
     h: constraints.height,
     l: !!constraints.lockZoom,
     v: constraints.viewportZoomFactor ?? 1,
+    oa: constraints.overscrollAllowance ?? DEFAULT_OVERSCROLL_ALLOWANCE,
   };
 
   const serialized = JSON.stringify(payload);
@@ -115,6 +118,7 @@ export const decodeConstraints = (encoded: string): ScrollConstraints => {
       lockZoom: parsed.l ?? false,
       viewportZoomFactor: parsed.v ?? 1,
       animateOnNextUpdate: false,
+      overscrollAllowance: parsed.oa ?? DEFAULT_OVERSCROLL_ALLOWANCE,
     };
   } catch (error) {
     // return safe defaults if decoding fails
@@ -170,22 +174,21 @@ const calculateConstraints = ({
   height,
   zoom,
   allowOverscroll,
-  overscrollAllowance,
 }: {
   scrollConstraints: ScrollConstraints;
   width: AppState["width"];
   height: AppState["height"];
   zoom: AppState["zoom"];
   allowOverscroll: boolean;
-  overscrollAllowance?: number;
 }) => {
   // Validate the overscroll allowance percentage
+  const overscrollAllowance = scrollConstraints.overscrollAllowance;
   const validatedOverscroll =
     overscrollAllowance != null &&
     overscrollAllowance >= 0 &&
     overscrollAllowance <= 1
       ? overscrollAllowance
-      : 0.2;
+      : DEFAULT_OVERSCROLL_ALLOWANCE;
 
   /**
    * Calculates the center position of the constrained scroll area.

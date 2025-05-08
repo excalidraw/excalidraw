@@ -51,7 +51,10 @@ import {
 import { isElementLink } from "@excalidraw/element/elementLink";
 import { restore, restoreAppState } from "@excalidraw/excalidraw/data/restore";
 import { newElementWith } from "@excalidraw/element/mutateElement";
-import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
+import {
+  isFrameLikeElement,
+  isInitializedImageElement,
+} from "@excalidraw/element/typeChecks";
 import clsx from "clsx";
 import {
   parseLibraryTokensFromUrl,
@@ -142,6 +145,10 @@ import "./index.scss";
 
 import type { CollabAPI } from "./collab/Collab";
 import { getSelectedElements } from "@excalidraw/element/selection";
+import {
+  decodeConstraints,
+  encodeConstraints,
+} from "@excalidraw/excalidraw/scene/scrollConstraints";
 
 polyfill();
 
@@ -160,18 +167,36 @@ const ConstraintsSettings = ({
   const [constraints, setConstraints] =
     useState<DebugScrollConstraints>(initialConstraints);
 
+  const frames = excalidrawAPI
+    .getSceneElements()
+    .filter((e) => isFrameLikeElement(e));
+  const [activeFrameId, setActiveFrameId] = useState<string | null>(null);
+
   useEffect(() => {
-    // add JSON-stringified constraints into url hash for easy sharing
     const hash = new URLSearchParams(window.location.hash.slice(1));
-    hash.set(
-      "constraints",
-      encodeURIComponent(
-        window.btoa(JSON.stringify(constraints)).replace(/=+/, ""),
-      ),
-    );
+    hash.set("constraints", encodeConstraints(constraints));
     window.location.hash = decodeURIComponent(hash.toString());
-    excalidrawAPI.setScrollConstraints(constraints);
+
+    constraints.enabled
+      ? excalidrawAPI.setScrollConstraints(constraints)
+      : excalidrawAPI.setScrollConstraints(null);
   }, [constraints]);
+
+  useEffect(() => {
+    const frame = frames.find((frame) => frame.id === activeFrameId);
+    if (frame) {
+      const { x, y, width, height } = frame;
+      setConstraints((s) => ({
+        x: Math.round(x),
+        y: Math.round(y),
+        width: Math.round(width),
+        height: Math.round(height),
+        enabled: s.enabled,
+        viewportZoomFactor: s.viewportZoomFactor,
+        lockZoom: s.lockZoom,
+      }));
+    }
+  }, [activeFrameId]);
 
   const [selection, setSelection] = useState<ExcalidrawElement[]>([]);
   useEffect(() => {
@@ -183,109 +208,179 @@ const ConstraintsSettings = ({
   return (
     <div
       style={{
-        display: "flex",
         position: "fixed",
         bottom: 10,
         left: "calc(50%)",
         transform: "translateX(-50%)",
-        gap: "0.6rem",
         zIndex: 999999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+        gap: "0.5rem",
       }}
     >
-      enabled:{" "}
-      <input
-        type="checkbox"
-        defaultChecked={!!constraints.enabled}
-        onChange={(e) =>
-          setConstraints((s) => ({ ...s, enabled: e.target.checked }))
-        }
-      />
-      x:{" "}
-      <input
-        placeholder="x"
-        size={4}
-        value={constraints.x.toString()}
-        onChange={(e) =>
-          setConstraints((s) => ({
-            ...s,
-            x: parseInt(e.target.value) ?? 0,
-          }))
-        }
-      />
-      y:{" "}
-      <input
-        placeholder="y"
-        size={4}
-        value={constraints.y.toString()}
-        onChange={(e) =>
-          setConstraints((s) => ({
-            ...s,
-            y: parseInt(e.target.value) ?? 0,
-          }))
-        }
-      />
-      w:{" "}
-      <input
-        placeholder="width"
-        size={4}
-        value={constraints.width.toString()}
-        onChange={(e) =>
-          setConstraints((s) => ({
-            ...s,
-            width: parseInt(e.target.value) ?? 200,
-          }))
-        }
-      />
-      h:{" "}
-      <input
-        placeholder="height"
-        size={4}
-        value={constraints.height.toString()}
-        onChange={(e) =>
-          setConstraints((s) => ({
-            ...s,
-            height: parseInt(e.target.value) ?? 200,
-          }))
-        }
-      />
-      zoomFactor:
-      <input
-        placeholder="height"
-        type="number"
-        min="0.1"
-        max="1"
-        step="0.1"
-        value={constraints.viewportZoomFactor.toString()}
-        onChange={(e) =>
-          setConstraints((s) => ({
-            ...s,
-            viewportZoomFactor: parseFloat(e.target.value.toString()) ?? 0.7,
-          }))
-        }
-      />
-      lockZoom:{" "}
-      <input
-        type="checkbox"
-        defaultChecked={!!constraints.lockZoom}
-        onChange={(e) =>
-          setConstraints((s) => ({ ...s, lockZoom: e.target.checked }))
-        }
-      />
-      {selection.length > 0 && (
-        <button
-          onClick={() => {
-            const bbox = getCommonBounds(selection);
+      <div
+        style={{
+          display: "flex",
+          gap: "0.6rem",
+        }}
+      >
+        enabled:{" "}
+        <input
+          type="checkbox"
+          defaultChecked={!!constraints.enabled}
+          onChange={(e) =>
+            setConstraints((s) => ({ ...s, enabled: e.target.checked }))
+          }
+        />
+        x:{" "}
+        <input
+          placeholder="x"
+          size={4}
+          value={constraints.x.toString()}
+          onChange={(e) =>
             setConstraints((s) => ({
               ...s,
-              x: Math.round(bbox[0]),
-              y: Math.round(bbox[1]),
-              width: Math.round(bbox[2] - bbox[0]),
-              height: Math.round(bbox[3] - bbox[1]),
-            }));
+              x: parseInt(e.target.value) ?? 0,
+            }))
+          }
+        />
+        y:{" "}
+        <input
+          placeholder="y"
+          size={4}
+          value={constraints.y.toString()}
+          onChange={(e) =>
+            setConstraints((s) => ({
+              ...s,
+              y: parseInt(e.target.value) ?? 0,
+            }))
+          }
+        />
+        w:{" "}
+        <input
+          placeholder="width"
+          size={4}
+          value={constraints.width.toString()}
+          onChange={(e) =>
+            setConstraints((s) => ({
+              ...s,
+              width: parseInt(e.target.value) ?? 200,
+            }))
+          }
+        />
+        h:{" "}
+        <input
+          placeholder="height"
+          size={4}
+          value={constraints.height.toString()}
+          onChange={(e) =>
+            setConstraints((s) => ({
+              ...s,
+              height: parseInt(e.target.value) ?? 200,
+            }))
+          }
+        />
+        zoomFactor:
+        <input
+          placeholder="height"
+          type="number"
+          min="0.1"
+          max="1"
+          step="0.1"
+          value={constraints.viewportZoomFactor.toString()}
+          onChange={(e) =>
+            setConstraints((s) => ({
+              ...s,
+              viewportZoomFactor: parseFloat(e.target.value.toString()) ?? 0.7,
+            }))
+          }
+        />
+        overscrollAllowance:
+        <input
+          placeholder="height"
+          type="number"
+          min="0"
+          max="1"
+          step="0.1"
+          value={constraints.overscrollAllowance?.toString()}
+          onChange={(e) =>
+            setConstraints((s) => ({
+              ...s,
+              overscrollAllowance: parseFloat(e.target.value.toString()) ?? 0.5,
+            }))
+          }
+        />
+        lockZoom:{" "}
+        <input
+          type="checkbox"
+          defaultChecked={!!constraints.lockZoom}
+          onChange={(e) =>
+            setConstraints((s) => ({ ...s, lockZoom: e.target.checked }))
+          }
+          value={constraints.lockZoom?.toString()}
+        />
+        {selection.length > 0 && (
+          <button
+            onClick={() => {
+              const bbox = getCommonBounds(selection);
+              setConstraints((s) => ({
+                ...s,
+                x: Math.round(bbox[0]),
+                y: Math.round(bbox[1]),
+                width: Math.round(bbox[2] - bbox[0]),
+                height: Math.round(bbox[3] - bbox[1]),
+              }));
+            }}
+          >
+            use selection
+          </button>
+        )}
+      </div>
+
+      {frames.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            gap: "0.6rem",
+            flexDirection: "row",
           }}
         >
-          use selection
-        </button>
+          <button
+            onClick={() => {
+              const currentIndex = frames.findIndex(
+                (frame) => frame.id === activeFrameId,
+              );
+
+              if (currentIndex === -1) {
+                setActiveFrameId(frames[frames.length - 1].id);
+              } else {
+                const nextIndex =
+                  (currentIndex - 1 + frames.length) % frames.length;
+                setActiveFrameId(frames[nextIndex].id);
+              }
+            }}
+          >
+            Prev
+          </button>
+          <button
+            onClick={() => {
+              const currentIndex = frames.findIndex(
+                (frame) => frame.id === activeFrameId,
+              );
+
+              if (currentIndex === -1) {
+                setActiveFrameId(frames[0].id);
+              } else {
+                const nextIndex = (currentIndex + 1) % frames.length;
+                setActiveFrameId(frames[nextIndex].id);
+              }
+            }}
+          >
+            Next
+          </button>
+        </div>
       )}
     </div>
   );
@@ -909,8 +1004,10 @@ const ExcalidrawWrapper = () => {
     let storedConstraints = {};
     if (stored) {
       try {
-        storedConstraints = JSON.parse(window.atob(stored));
-      } catch {}
+        storedConstraints = decodeConstraints(stored);
+      } catch {
+        console.error("Invalid scroll constraints in URL");
+      }
     }
 
     return {
@@ -920,12 +1017,11 @@ const ExcalidrawWrapper = () => {
       height: document.body.clientHeight,
       lockZoom: false,
       viewportZoomFactor: 0.7,
+      overscrollAllowance: 0.5,
       enabled: true,
       ...storedConstraints,
     };
   });
-
-  console.log(constraints);
 
   // browsers generally prevent infinite self-embedding, there are
   // cases where it still happens, and while we disallow self-embedding

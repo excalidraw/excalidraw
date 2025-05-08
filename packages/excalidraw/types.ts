@@ -911,6 +911,7 @@ export type ScrollConstraints = {
   animateOnNextUpdate?: boolean;
   viewportZoomFactor?: number;
   lockZoom?: boolean;
+  overscrollAllowance?: number;
 };
 export type PendingExcalidrawElements = ExcalidrawElement[];
 
