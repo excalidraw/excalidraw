@@ -1,12 +1,11 @@
-import type Scene from "@excalidraw/excalidraw/scene/Scene";
-
 import { updateBoundElements } from "./binding";
 import { getCommonBoundingBox } from "./bounds";
-import { mutateElement } from "./mutateElement";
 import { getMaximumGroups } from "./groups";
 
+import type Scene from "./Scene";
+
 import type { BoundingBox } from "./bounds";
-import type { ElementsMap, ExcalidrawElement } from "./types";
+import type { ExcalidrawElement } from "./types";
 
 export interface Alignment {
   position: "start" | "center" | "end";
@@ -15,10 +14,10 @@ export interface Alignment {
 
 export const alignElements = (
   selectedElements: ExcalidrawElement[],
-  elementsMap: ElementsMap,
   alignment: Alignment,
   scene: Scene,
 ): ExcalidrawElement[] => {
+  const elementsMap = scene.getNonDeletedElementsMap();
   const groups: ExcalidrawElement[][] = getMaximumGroups(
     selectedElements,
     elementsMap,
@@ -33,12 +32,13 @@ export const alignElements = (
     );
     return group.map((element) => {
       // update element
-      const updatedEle = mutateElement(element, {
+      const updatedEle = scene.mutateElement(element, {
         x: element.x + translation.x,
         y: element.y + translation.y,
       });
+
       // update bound elements
-      updateBoundElements(element, scene.getNonDeletedElementsMap(), {
+      updateBoundElements(element, scene, {
         simultaneouslyUpdated: group,
       });
       return updatedEle;

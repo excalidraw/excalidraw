@@ -112,12 +112,14 @@ export const YOUTUBE_STATES = {
 export const ENV = {
   TEST: "test",
   DEVELOPMENT: "development",
+  PRODUCTION: "production",
 };
 
 export const CLASSES = {
   SHAPE_ACTIONS_MENU: "App-menu__left",
   ZOOM_ACTIONS: "zoom-actions",
   SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
+  CONVERT_ELEMENT_TYPE_POPUP: "ConvertElementTypePopup",
 };
 
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
@@ -318,6 +320,9 @@ export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 export const MAX_ALLOWED_FILE_BYTES = 4 * 1024 * 1024;
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
+export const SVG_DOCUMENT_PREAMBLE = `<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+`;
 
 export const ENCRYPTION_KEY_BITS = 128;
 

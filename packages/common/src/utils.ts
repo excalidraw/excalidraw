@@ -680,7 +680,7 @@ export const arrayToMap = <T extends { id: string } | string>(
   return items.reduce((acc: Map<string, T>, element) => {
     acc.set(typeof element === "string" ? element : element.id, element);
     return acc;
-  }, new Map());
+  }, new Map() as Map<string, T>);
 };
 
 export const arrayToMapWithIndex = <T extends { id: string }>(
@@ -735,9 +735,30 @@ export const arrayToList = <T>(array: readonly T[]): Node<T>[] =>
     return acc;
   }, [] as Node<T>[]);
 
+/**
+ * Converts a readonly array or map into an iterable.
+ * Useful for avoiding entry allocations when iterating object / map on each iteration.
+ */
+export const toIterable = <T>(
+  values: readonly T[] | ReadonlyMap<string, T>,
+): Iterable<T> => {
+  return Array.isArray(values) ? values : values.values();
+};
+
+/**
+ * Converts a readonly array or map into an array.
+ */
+export const toArray = <T>(
+  values: readonly T[] | ReadonlyMap<string, T>,
+): T[] => {
+  return Array.isArray(values) ? values : Array.from(toIterable(values));
+};
+
 export const isTestEnv = () => import.meta.env.MODE === ENV.TEST;
 
 export const isDevEnv = () => import.meta.env.MODE === ENV.DEVELOPMENT;
+
+export const isProdEnv = () => import.meta.env.MODE === ENV.PRODUCTION;
 
 export const isServerEnv = () =>
   typeof process !== "undefined" && !!process?.env?.NODE_ENV;
@@ -1215,4 +1236,19 @@ export const elementCenterPoint = (
   const centerYPoint = y + height / 2 + yOffset;
 
   return pointFrom<GlobalPoint>(centerXPoint, centerYPoint);
+};
+
+/** hack for Array.isArray type guard not working with readonly value[] */
+export const isReadonlyArray = (value?: any): value is readonly any[] => {
+  return Array.isArray(value);
+};
+
+export const sizeOf = (
+  value: readonly number[] | Readonly<Map<any, any>> | Record<any, any>,
+): number => {
+  return isReadonlyArray(value)
+    ? value.length
+    : value instanceof Map
+    ? value.size
+    : Object.keys(value).length;
 };

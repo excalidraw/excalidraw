@@ -4,10 +4,7 @@ import {
   isBindingEnabled,
 } from "@excalidraw/element/binding";
 import { getCommonBoundingBox } from "@excalidraw/element/bounds";
-import {
-  mutateElement,
-  newElementWith,
-} from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element/mutateElement";
 import { deepCopyElement } from "@excalidraw/element/duplicate";
 import { resizeMultipleElements } from "@excalidraw/element/resizeElements";
 import {
@@ -18,6 +15,8 @@ import {
 import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/frame";
 import { CODES, KEYS, arrayToMap } from "@excalidraw/common";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
@@ -27,7 +26,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { flipHorizontal, flipVertical } from "../components/icons";
 
@@ -162,11 +160,9 @@ const flipElements = (
 
   bindOrUnbindLinearElements(
     selectedElements.filter(isLinearElement),
-    elementsMap,
-    app.scene.getNonDeletedElements(),
-    app.scene,
     isBindingEnabled(appState),
     [],
+    app.scene,
     appState.zoom,
   );
 
@@ -194,13 +190,13 @@ const flipElements = (
     getCommonBoundingBox(selectedElements);
   const [diffX, diffY] = [midX - newMidX, midY - newMidY];
   otherElements.forEach((element) =>
-    mutateElement(element, {
+    app.scene.mutateElement(element, {
       x: element.x + diffX,
       y: element.y + diffY,
     }),
   );
   elbowArrows.forEach((element) =>
-    mutateElement(element, {
+    app.scene.mutateElement(element, {
       x: element.x + diffX,
       y: element.y + diffY,
     }),

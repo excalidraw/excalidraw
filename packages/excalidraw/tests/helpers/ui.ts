@@ -5,7 +5,6 @@ import {
   getElementPointsCoords,
 } from "@excalidraw/element/bounds";
 import { cropElement } from "@excalidraw/element/cropElement";
-import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
   getTransformHandles,
   getTransformHandlesFromCoords,
@@ -180,10 +179,17 @@ export class Pointer {
   public clientX = 0;
   public clientY = 0;
 
+  static activePointers: Pointer[] = [];
+  static resetAll() {
+    Pointer.activePointers.forEach((pointer) => pointer.reset());
+  }
+
   constructor(
     private readonly pointerType: "mouse" | "touch" | "pen",
     private readonly pointerId = 1,
-  ) {}
+  ) {
+    Pointer.activePointers.push(this);
+  }
 
   reset() {
     this.clientX = 0;
@@ -519,7 +525,7 @@ export class UI {
 
     if (angle !== 0) {
       act(() => {
-        mutateElement(origElement, { angle });
+        h.app.scene.mutateElement(origElement, { angle });
       });
     }
 

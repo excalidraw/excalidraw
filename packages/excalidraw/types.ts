@@ -43,6 +43,12 @@ import type {
   MakeBrand,
 } from "@excalidraw/common/utility-types";
 
+import type {
+  CaptureUpdateActionType,
+  DurableIncrement,
+  EphemeralIncrement,
+} from "@excalidraw/element/store";
+
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
@@ -51,7 +57,6 @@ import type Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
-import type { CaptureUpdateActionType } from "./store";
 import type { ImportedDataState } from "./data/types";
 
 import type { Language } from "./i18n";
@@ -518,6 +523,7 @@ export interface ExcalidrawProps {
     appState: AppState,
     files: BinaryFiles,
   ) => void;
+  onIncrement?: (event: DurableIncrement | EphemeralIncrement) => void;
   initialData?:
     | (() => MaybePromise<ExcalidrawInitialDataState | null>)
     | MaybePromise<ExcalidrawInitialDataState | null>;
@@ -601,6 +607,7 @@ export interface ExcalidrawProps {
   ) => JSX.Element | null;
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
+  renderScrollbars?: boolean;
 }
 
 export type SceneData = {
@@ -713,6 +720,7 @@ export type AppClassProperties = {
   excalidrawContainerValue: App["excalidrawContainerValue"];
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
+  updateEditorAtom: App["updateEditorAtom"];
 };
 
 export type PointerDownState = Readonly<{
@@ -724,7 +732,8 @@ export type PointerDownState = Readonly<{
   scrollbars: ReturnType<typeof isOverScrollBars>;
   // The previous pointer position
   lastCoords: { x: number; y: number };
-  // map of original elements data
+  // original element frozen snapshots so we can access the original
+  // element attribute values at time of pointerdown
   originalElements: Map<string, NonDeleted<ExcalidrawElement>>;
   resize: {
     // Handle when resizing, might change during the pointer interaction
@@ -758,6 +767,9 @@ export type PointerDownState = Readonly<{
     hasOccurred: boolean;
     // Might change during the pointer interaction
     offset: { x: number; y: number } | null;
+    // by default same as PointerDownState.origin. On alt-duplication, reset
+    // to current pointer position at time of duplication.
+    origin: { x: number; y: number };
   };
   // We need to have these in the state so that we can unsubscribe them
   eventListeners: {
@@ -779,6 +791,7 @@ export type UnsubscribeCallback = () => void;
 
 export interface ExcalidrawImperativeAPI {
   updateScene: InstanceType<typeof App>["updateScene"];
+  mutateElement: InstanceType<typeof App>["mutateElement"];
   updateLibrary: InstanceType<typeof Library>["updateLibrary"];
   resetScene: InstanceType<typeof App>["resetScene"];
   getSceneElementsIncludingDeleted: InstanceType<
@@ -813,6 +826,9 @@ export interface ExcalidrawImperativeAPI {
       appState: AppState,
       files: BinaryFiles,
     ) => void,
+  ) => UnsubscribeCallback;
+  onIncrement: (
+    callback: (event: DurableIncrement | EphemeralIncrement) => void,
   ) => UnsubscribeCallback;
   onPointerDown: (
     callback: (

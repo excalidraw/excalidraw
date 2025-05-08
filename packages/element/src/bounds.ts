@@ -1,12 +1,17 @@
 import rough from "roughjs/bin/rough";
 
-import { rescalePoints, arrayToMap, invariant } from "@excalidraw/common";
+import {
+  arrayToMap,
+  invariant,
+  rescalePoints,
+  sizeOf,
+} from "@excalidraw/common";
 
 import {
   degreesToRadians,
   lineSegment,
-  pointFrom,
   pointDistance,
+  pointFrom,
   pointFromArray,
   pointRotateRads,
 } from "@excalidraw/math";
@@ -28,8 +33,8 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { ShapeCache } from "./ShapeCache";
 import { generateRoughOptions } from "./Shape";
+import { ShapeCache } from "./ShapeCache";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
@@ -47,19 +52,20 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  Arrowhead,
-  ExcalidrawFreeDrawElement,
-  NonDeleted,
-  ExcalidrawTextElementWithContainer,
-  ElementsMap,
-  ExcalidrawRectanguloidElement,
-  ExcalidrawEllipseElement,
-} from "./types";
 import type { Drawable, Op } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+import type {
+  Arrowhead,
+  ElementsMap,
+  ElementsMapOrArray,
+  ExcalidrawElement,
+  ExcalidrawEllipseElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawRectanguloidElement,
+  ExcalidrawTextElementWithContainer,
+  NonDeleted,
+} from "./types";
 
 export type RectangleBox = {
   x: number;
@@ -938,10 +944,10 @@ export const getElementBounds = (
 };
 
 export const getCommonBounds = (
-  elements: readonly ExcalidrawElement[],
+  elements: ElementsMapOrArray,
   elementsMap?: ElementsMap,
 ): Bounds => {
-  if (!elements.length) {
+  if (!sizeOf(elements)) {
     return [0, 0, 0, 0];
   }
 

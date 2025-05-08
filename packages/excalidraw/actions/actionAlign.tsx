@@ -8,6 +8,8 @@ import { KEYS, arrayToMap, getShortcutKey } from "@excalidraw/common";
 
 import { alignElements } from "@excalidraw/element/align";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Alignment } from "@excalidraw/element/align";
@@ -25,7 +27,6 @@ import {
 import { t } from "../i18n";
 
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
@@ -50,14 +51,8 @@ const alignSelectedElements = (
   alignment: Alignment,
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
-  const elementsMap = arrayToMap(elements);
 
-  const updatedElements = alignElements(
-    selectedElements,
-    elementsMap,
-    alignment,
-    app.scene,
-  );
+  const updatedElements = alignElements(selectedElements, alignment, app.scene);
 
   const updatedElementsMap = arrayToMap(updatedElements);
 

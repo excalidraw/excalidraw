@@ -17,6 +17,8 @@ import { getNonDeletedElements } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element/mutateElement";
 import { getCommonBounds, type SceneBounds } from "@excalidraw/element/bounds";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import {
@@ -44,7 +46,6 @@ import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

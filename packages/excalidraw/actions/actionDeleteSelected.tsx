@@ -3,10 +3,7 @@ import { KEYS, updateActiveTool } from "@excalidraw/common";
 import { getNonDeletedElements } from "@excalidraw/element";
 import { fixBindingsAfterDeletion } from "@excalidraw/element/binding";
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import {
-  mutateElement,
-  newElementWith,
-} from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element/mutateElement";
 import { getContainerElement } from "@excalidraw/element/textElement";
 import {
   isBoundToContainer,
@@ -20,11 +17,12 @@ import {
   selectGroupsForSelectedElements,
 } from "@excalidraw/element/groups";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
 import { TrashIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 
@@ -94,7 +92,7 @@ const deleteSelectedElements = (
         el.boundElements.forEach((candidate) => {
           const bound = app.scene.getNonDeletedElementsMap().get(candidate.id);
           if (bound && isElbowArrow(bound)) {
-            mutateElement(bound, {
+            app.scene.mutateElement(bound, {
               startBinding:
                 el.id === bound.startBinding?.elementId
                   ? null
@@ -102,7 +100,6 @@ const deleteSelectedElements = (
               endBinding:
                 el.id === bound.endBinding?.elementId ? null : bound.endBinding,
             });
-            mutateElement(bound, { points: bound.points });
           }
         });
       }
@@ -261,7 +258,11 @@ export const actionDeleteSelected = register({
           : endBindingElement,
       };
 
-      LinearElementEditor.deletePoints(element, selectedPointsIndices);
+      LinearElementEditor.deletePoints(
+        element,
+        app.scene,
+        selectedPointsIndices,
+      );
 
       return {
         elements,

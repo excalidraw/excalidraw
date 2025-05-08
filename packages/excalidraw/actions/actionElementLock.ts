@@ -4,12 +4,13 @@ import { newElementWith } from "@excalidraw/element/mutateElement";
 
 import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { LockedIcon, UnlockedIcon } from "../components/icons";
 
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

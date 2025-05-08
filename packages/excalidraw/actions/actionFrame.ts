@@ -14,12 +14,13 @@ import { getElementsInGroup } from "@excalidraw/element/groups";
 
 import { getCommonBounds } from "@excalidraw/element/bounds";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { setCursorForShape } from "../cursor";
 import { frameToolIcon } from "../components/icons";
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
@@ -173,11 +174,9 @@ export const actionWrapSelectionInFrame = register({
   },
   perform: (elements, appState, _, app) => {
     const selectedElements = getSelectedElements(elements, appState);
+    const elementsMap = app.scene.getNonDeletedElementsMap();
 
-    const [x1, y1, x2, y2] = getCommonBounds(
-      selectedElements,
-      app.scene.getNonDeletedElementsMap(),
-    );
+    const [x1, y1, x2, y2] = getCommonBounds(selectedElements, elementsMap);
     const PADDING = 16;
     const frame = newFrameElement({
       x: x1 - PADDING,
@@ -196,13 +195,9 @@ export const actionWrapSelectionInFrame = register({
       for (const elementInGroup of elementsInGroup) {
         const index = elementInGroup.groupIds.indexOf(appState.editingGroupId);
 
-        mutateElement(
-          elementInGroup,
-          {
-            groupIds: elementInGroup.groupIds.slice(0, index),
-          },
-          false,
-        );
+        mutateElement(elementInGroup, elementsMap, {
+          groupIds: elementInGroup.groupIds.slice(0, index),
+        });
       }
     }
 
