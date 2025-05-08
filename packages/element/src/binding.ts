@@ -33,7 +33,7 @@ import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
-import type { Mutable } from "@excalidraw/common/utility-types";
+import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 
 import {
   getCenterForBounds,
@@ -84,6 +84,7 @@ import type {
   ExcalidrawElbowArrowElement,
   FixedPoint,
   FixedPointBinding,
+  PointsPositionUpdates,
 } from "./types";
 
 export type SuggestedBinding =
@@ -801,28 +802,22 @@ export const updateBoundElements = (
             bindableElement,
             elementsMap,
           );
+
           if (point) {
-            return {
-              index:
-                bindingProp === "startBinding" ? 0 : element.points.length - 1,
-              point,
-            };
+            return [
+              bindingProp === "startBinding" ? 0 : element.points.length - 1,
+              { point },
+            ] as MapEntry<PointsPositionUpdates>;
           }
         }
 
         return null;
       },
     ).filter(
-      (
-        update,
-      ): update is NonNullable<{
-        index: number;
-        point: LocalPoint;
-        isDragging?: boolean;
-      }> => update !== null,
+      (update): update is MapEntry<PointsPositionUpdates> => update !== null,
     );
 
-    LinearElementEditor.movePoints(element, scene, updates, {
+    LinearElementEditor.movePoints(element, scene, new Map(updates), {
       ...(changedElement.id === element.startBinding?.elementId
         ? { startBinding: bindings.startBinding }
         : {}),
