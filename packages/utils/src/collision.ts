@@ -6,6 +6,8 @@ import {
   type GlobalPoint,
   type LocalPoint,
   type Polygon,
+  vectorCross,
+  vectorFromPoint,
 } from "@excalidraw/math";
 
 import { intersectElementWithLineSegment } from "@excalidraw/element/collision";
@@ -40,10 +42,19 @@ export const isPointInShape = (
   point: GlobalPoint,
   element: ExcalidrawElement,
 ) => {
-  if (
-    (isLinearElement(element) || isFreeDrawElement(element)) &&
-    !isPathALoop(element.points)
-  ) {
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    if (isPathALoop(element.points)) {
+      // for a closed path, we need to check if the point is inside the path
+      const r = isPointInClosedPath(
+        element.points.map((p) =>
+          pointFrom<GlobalPoint>(element.x + p[0], element.y + p[1]),
+        ),
+        point,
+      );
+      //console.log(r);
+      return r;
+    }
+
     // There isn't any "inside" for a non-looping path
     return false;
   }
@@ -54,6 +65,36 @@ export const isPointInShape = (
   );
 
   return intersections.length === 0;
+};
+
+/**
+ * Determine if a closed path contains a point.
+ *
+ * Implementation notes: We'll use the fact that the path is a consecutive
+ * sequence of line segments, these line segments have a winding order and
+ * the fact that if a point is inside the closed path, the cross product of the
+ * start point of a line segment to the point p and the end point of the line
+ * segment will be negative for all segments.
+ *
+ * @param points
+ * @param p
+ */
+const isPointInClosedPath = (
+  points: readonly GlobalPoint[],
+  p: GlobalPoint,
+) => {
+  const segments = points.slice(1).map((point, i) => {
+    return lineSegment(points[i], point);
+  });
+
+  return segments.every((segment) => {
+    const c = vectorCross(
+      vectorFromPoint(segment[0], p),
+      vectorFromPoint(segment[0], segment[1]),
+    );
+
+    return c < 0;
+  });
 };
 
 // check if the given element is in the given bounds
