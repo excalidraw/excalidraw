@@ -299,6 +299,11 @@ export type FixedPointBinding = Merge<
   }
 >;
 
+export type PointsPositionUpdates = Map<
+  number,
+  { point: LocalPoint; isDragging?: boolean }
+>;
+
 export type Arrowhead =
   | "arrow"
   | "bar"

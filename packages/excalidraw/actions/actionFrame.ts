@@ -14,12 +14,13 @@ import { getElementsInGroup } from "@excalidraw/element/groups";
 
 import { getCommonBounds } from "@excalidraw/element/bounds";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { setCursorForShape } from "../cursor";
 import { frameToolIcon } from "../components/icons";
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
