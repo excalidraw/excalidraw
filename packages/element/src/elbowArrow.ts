@@ -52,7 +52,7 @@ import {
   type NonDeletedSceneElementsMap,
 } from "./types";
 
-import { aabbForElement, pointInsideBounds } from "./shapes";
+import { aabbForElement, aabbForPoints, pointInsideBounds } from "./shapes";
 
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
@@ -64,6 +64,8 @@ import type {
   FixedSegment,
   NonDeletedExcalidrawElement,
 } from "./types";
+
+import { debugDrawBounds } from "@excalidraw/utils/visualdebug";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 
@@ -106,8 +108,32 @@ type ElbowArrowData = {
   hoveredEndElement: ExcalidrawBindableElement | null;
 };
 
-const DEDUP_TRESHOLD = 1;
-export const BASE_PADDING = 40;
+const calculateDedupTreshhold = <Point extends GlobalPoint | LocalPoint>(
+  a: Point,
+  b: Point,
+) => 1 + pointDistance(a, b) / 300;
+
+const calculatePadding = (
+  aabb: Bounds,
+  startBoundingBox: Bounds,
+  endBoundingBox: Bounds,
+) => {
+  return Math.max(
+    Math.min(
+      Math.hypot(
+        startBoundingBox[2] - startBoundingBox[0],
+        startBoundingBox[3] - startBoundingBox[1],
+      ) / 4,
+      Math.hypot(
+        endBoundingBox[2] - endBoundingBox[0],
+        endBoundingBox[3] - endBoundingBox[1],
+      ) / 4,
+      Math.hypot(aabb[2] - aabb[0], aabb[3] - aabb[1]) / 4,
+      40,
+    ),
+    30,
+  );
+};
 
 const handleSegmentRenormalization = (
   arrow: ExcalidrawElbowArrowElement,
@@ -183,7 +209,11 @@ const handleSegmentRenormalization = (
 
       if (
         // Remove segments that are too short
-        pointDistance(points[i - 2], points[i - 1]) < DEDUP_TRESHOLD
+        pointDistance(points[i - 2], points[i - 1]) <
+        calculateDedupTreshhold(
+          points[i - 3] ?? points[i - 3],
+          points[i] ?? points[i - 1],
+        )
       ) {
         const prevPrevSegmentIdx =
           nextFixedSegments?.findIndex((segment) => segment.index === i - 2) ??
@@ -359,6 +389,10 @@ const handleSegmentRelease = (
     null,
   );
 
+  if (!restoredPoints) {
+    return {};
+  }
+
   const nextPoints: GlobalPoint[] = [];
 
   // First part of the arrow are the old points
@@ -463,6 +497,13 @@ const handleSegmentMove = (
   hoveredStartElement: ExcalidrawBindableElement | null,
   hoveredEndElement: ExcalidrawBindableElement | null,
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
+  const BASE_PADDING = calculatePadding(
+    aabbForElement(arrow),
+    hoveredStartElement
+      ? aabbForElement(hoveredStartElement)
+      : [10, 10, 10, 10],
+    hoveredEndElement ? aabbForElement(hoveredEndElement) : [10, 10, 10, 10],
+  );
   const activelyModifiedSegmentIdx = fixedSegments
     .map((segment, i) => {
       if (
@@ -707,6 +748,13 @@ const handleEndpointDrag = (
   hoveredStartElement: ExcalidrawBindableElement | null,
   hoveredEndElement: ExcalidrawBindableElement | null,
 ) => {
+  const BASE_PADDING = calculatePadding(
+    aabbForPoints([startGlobalPoint, endGlobalPoint]),
+    hoveredStartElement
+      ? aabbForElement(hoveredStartElement)
+      : [10, 10, 10, 10],
+    hoveredEndElement ? aabbForElement(hoveredEndElement) : [10, 10, 10, 10],
+  );
   let startIsSpecial = arrow.startIsSpecial ?? null;
   let endIsSpecial = arrow.endIsSpecial ?? null;
   const globalUpdatedPoints = updatedPoints.map((p, i) =>
@@ -741,6 +789,7 @@ const handleEndpointDrag = (
 
   // Calculate the moving second point connection and add the start point
   {
+    startIsSpecial = arrow.startIsSpecial && globalUpdatedPoints.length > 2;
     const secondPoint = globalUpdatedPoints[startIsSpecial ? 2 : 1];
     const thirdPoint = globalUpdatedPoints[startIsSpecial ? 3 : 2];
     const startIsHorizontal = headingIsHorizontal(startHeading);
@@ -801,6 +850,7 @@ const handleEndpointDrag = (
 
   // Calculate the moving second to last point connection
   {
+    endIsSpecial = arrow.endIsSpecial && globalUpdatedPoints.length > 2;
     const secondToLastPoint =
       globalUpdatedPoints[globalUpdatedPoints.length - (endIsSpecial ? 3 : 2)];
     const thirdToLastPoint =
@@ -1293,29 +1343,28 @@ const getElbowArrowData = (
     endGlobalPoint[0] + 2,
     endGlobalPoint[1] + 2,
   ] as Bounds;
+  const BASE_PADDING = calculatePadding(
+    aabbForPoints([startGlobalPoint, endGlobalPoint]),
+    hoveredStartElement
+      ? aabbForElement(hoveredStartElement)
+      : [10, 10, 10, 10],
+    hoveredEndElement ? aabbForElement(hoveredEndElement) : [10, 10, 10, 10],
+  );
+  const startOffsets = offsetFromHeading(
+    startHeading,
+    arrow.startArrowhead ? FIXED_BINDING_DISTANCE * 4 : FIXED_BINDING_DISTANCE,
+    1,
+  );
+  const endOffsets = offsetFromHeading(
+    endHeading,
+    arrow.endArrowhead ? FIXED_BINDING_DISTANCE * 4 : FIXED_BINDING_DISTANCE,
+    1,
+  );
   const startElementBounds = hoveredStartElement
-    ? aabbForElement(
-        hoveredStartElement,
-        offsetFromHeading(
-          startHeading,
-          arrow.startArrowhead
-            ? FIXED_BINDING_DISTANCE * 6
-            : FIXED_BINDING_DISTANCE * 2,
-          1,
-        ),
-      )
+    ? aabbForElement(hoveredStartElement, startOffsets)
     : startPointBounds;
   const endElementBounds = hoveredEndElement
-    ? aabbForElement(
-        hoveredEndElement,
-        offsetFromHeading(
-          endHeading,
-          arrow.endArrowhead
-            ? FIXED_BINDING_DISTANCE * 6
-            : FIXED_BINDING_DISTANCE * 2,
-          1,
-        ),
-      )
+    ? aabbForElement(hoveredEndElement, endOffsets)
     : endPointBounds;
   const boundsOverlap =
     pointInsideBounds(
@@ -1358,7 +1407,7 @@ const getElbowArrowData = (
             : BASE_PADDING -
                 (arrow.startArrowhead
                   ? FIXED_BINDING_DISTANCE * 6
-                  : FIXED_BINDING_DISTANCE * 2),
+                  : FIXED_BINDING_DISTANCE),
           BASE_PADDING,
         ),
     boundsOverlap
@@ -1374,13 +1423,29 @@ const getElbowArrowData = (
             : BASE_PADDING -
                 (arrow.endArrowhead
                   ? FIXED_BINDING_DISTANCE * 6
-                  : FIXED_BINDING_DISTANCE * 2),
+                  : FIXED_BINDING_DISTANCE),
           BASE_PADDING,
         ),
     boundsOverlap,
-    hoveredStartElement && aabbForElement(hoveredStartElement),
-    hoveredEndElement && aabbForElement(hoveredEndElement),
+    hoveredStartElement
+      ? aabbForElement(hoveredStartElement)
+      : startPointBounds,
+    hoveredEndElement ? aabbForElement(hoveredEndElement) : endPointBounds,
   );
+
+  debugDrawBounds(startElementBounds, {
+    permanent: false,
+    color: "red",
+  });
+  debugDrawBounds(endElementBounds, {
+    permanent: false,
+    color: "green",
+  });
+  debugDrawBounds(dynamicAABBs, {
+    permanent: false,
+    color: "blue",
+  });
+
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -1651,11 +1716,11 @@ const generateDynamicAABBs = (
   a: Bounds,
   b: Bounds,
   common: Bounds,
-  startDifference?: [number, number, number, number],
-  endDifference?: [number, number, number, number],
-  disableSideHack?: boolean,
-  startElementBounds?: Bounds | null,
-  endElementBounds?: Bounds | null,
+  startDifference: [number, number, number, number],
+  endDifference: [number, number, number, number],
+  disableSideHack: boolean,
+  startElementBounds: Bounds,
+  endElementBounds: Bounds,
 ): Bounds[] => {
   const startEl = startElementBounds ?? a;
   const endEl = endElementBounds ?? b;
@@ -1735,15 +1800,24 @@ const generateDynamicAABBs = (
       (second[0] + second[2]) / 2,
       (second[1] + second[3]) / 2,
     ];
-    if (b[0] > a[2] && a[1] > b[3]) {
+    if (
+      endElementBounds[0] > startElementBounds[2] &&
+      startElementBounds[1] > endElementBounds[3]
+    ) {
       // BOTTOM LEFT
       const cX = first[2] + (second[0] - first[2]) / 2;
       const cY = second[3] + (first[1] - second[3]) / 2;
 
       if (
         vectorCross(
-          vector(a[2] - endCenterX, a[1] - endCenterY),
-          vector(a[0] - endCenterX, a[3] - endCenterY),
+          vector(
+            startElementBounds[2] - endCenterX,
+            startElementBounds[1] - endCenterY,
+          ),
+          vector(
+            startElementBounds[0] - endCenterX,
+            startElementBounds[3] - endCenterY,
+          ),
         ) > 0
       ) {
         return [
@@ -1756,15 +1830,24 @@ const generateDynamicAABBs = (
         [first[0], cY, first[2], first[3]],
         [second[0], second[1], second[2], cY],
       ];
-    } else if (a[2] < b[0] && a[3] < b[1]) {
+    } else if (
+      startElementBounds[2] < endElementBounds[0] &&
+      startElementBounds[3] < endElementBounds[1]
+    ) {
       // TOP LEFT
       const cX = first[2] + (second[0] - first[2]) / 2;
       const cY = first[3] + (second[1] - first[3]) / 2;
 
       if (
         vectorCross(
-          vector(a[0] - endCenterX, a[1] - endCenterY),
-          vector(a[2] - endCenterX, a[3] - endCenterY),
+          vector(
+            startElementBounds[0] - endCenterX,
+            startElementBounds[1] - endCenterY,
+          ),
+          vector(
+            startElementBounds[2] - endCenterX,
+            startElementBounds[3] - endCenterY,
+          ),
         ) > 0
       ) {
         return [
@@ -1777,15 +1860,24 @@ const generateDynamicAABBs = (
         [first[0], first[1], cX, first[3]],
         [cX, second[1], second[2], second[3]],
       ];
-    } else if (a[0] > b[2] && a[3] < b[1]) {
+    } else if (
+      startElementBounds[0] > endElementBounds[2] &&
+      startElementBounds[3] < endElementBounds[1]
+    ) {
       // TOP RIGHT
       const cX = second[2] + (first[0] - second[2]) / 2;
       const cY = first[3] + (second[1] - first[3]) / 2;
 
       if (
         vectorCross(
-          vector(a[2] - endCenterX, a[1] - endCenterY),
-          vector(a[0] - endCenterX, a[3] - endCenterY),
+          vector(
+            startElementBounds[2] - endCenterX,
+            startElementBounds[1] - endCenterY,
+          ),
+          vector(
+            startElementBounds[0] - endCenterX,
+            startElementBounds[3] - endCenterY,
+          ),
         ) > 0
       ) {
         return [
@@ -1798,15 +1890,24 @@ const generateDynamicAABBs = (
         [first[0], first[1], first[2], cY],
         [second[0], cY, second[2], second[3]],
       ];
-    } else if (a[0] > b[2] && a[1] > b[3]) {
+    } else if (
+      startElementBounds[0] > endElementBounds[2] &&
+      startElementBounds[1] > endElementBounds[3]
+    ) {
       // BOTTOM RIGHT
       const cX = second[2] + (first[0] - second[2]) / 2;
       const cY = second[3] + (first[1] - second[3]) / 2;
 
       if (
         vectorCross(
-          vector(a[0] - endCenterX, a[1] - endCenterY),
-          vector(a[2] - endCenterX, a[3] - endCenterY),
+          vector(
+            startElementBounds[0] - endCenterX,
+            startElementBounds[1] - endCenterY,
+          ),
+          vector(
+            startElementBounds[2] - endCenterX,
+            startElementBounds[3] - endCenterY,
+          ),
         ) > 0
       ) {
         return [
@@ -2088,16 +2189,11 @@ const normalizeArrowElementUpdate = (
   nextFixedSegments: readonly FixedSegment[] | null,
   startIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"],
   endIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"],
-): {
-  points: LocalPoint[];
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  fixedSegments: readonly FixedSegment[] | null;
-  startIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"];
-  endIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"];
-} => {
+): ElementUpdate<ExcalidrawElbowArrowElement> => {
+  if (global.length === 0) {
+    return {};
+  }
+
   const offsetX = global[0][0];
   const offsetY = global[0][1];
   let points = global.map((p) =>
@@ -2185,7 +2281,10 @@ const removeElbowArrowShortSegments = (
 
       const prev = points[idx - 1];
       const prevDist = pointDistance(prev, p);
-      return prevDist > DEDUP_TRESHOLD;
+      return (
+        prevDist >
+        calculateDedupTreshhold(points[idx - 2] ?? prev, points[idx + 1] ?? p)
+      );
     });
   }
 
@@ -2288,13 +2387,16 @@ const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>
 
 export const validateElbowPoints = <P extends GlobalPoint | LocalPoint>(
   points: readonly P[],
-  tolerance: number = DEDUP_TRESHOLD,
+  tolerance?: number,
 ) =>
   points
     .slice(1)
-    .map(
-      (p, i) =>
-        Math.abs(p[0] - points[i][0]) < tolerance ||
-        Math.abs(p[1] - points[i][1]) < tolerance,
-    )
+    .map((p, i) => {
+      const t =
+        tolerance ??
+        calculateDedupTreshhold(points[i - 1] ?? points[i], points[i + 2] ?? p);
+      return (
+        Math.abs(p[0] - points[i][0]) < t || Math.abs(p[1] - points[i][1]) < t
+      );
+    })
     .every(Boolean);

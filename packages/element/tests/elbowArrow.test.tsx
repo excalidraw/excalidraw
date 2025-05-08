@@ -195,7 +195,7 @@ describe("elbow arrow routing", () => {
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);
 
-    h.app.scene.mutateElement(arrow, {
+    scene.mutateElement(arrow, {
       points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
     });
 
@@ -295,11 +295,11 @@ describe("elbow arrow ui", () => {
     ) as HTMLInputElement;
     UI.updateInput(inputAngle, String("40"));
 
-    expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
+    expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [35, 0],
-      [35, 165],
-      [103, 165],
+      [34.7791, 0],
+      [34.7791, 164.67],
+      [102.931, 164.67],
     ]);
   });
 
