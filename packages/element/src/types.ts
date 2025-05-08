@@ -331,7 +331,7 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
 export type ExcalidrawLineElement = ExcalidrawLinearElement &
   Readonly<{
     type: "line";
-    loopLock: boolean;
+    polygon: boolean;
   }>;
 
 export type FixedSegment = {

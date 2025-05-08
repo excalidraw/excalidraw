@@ -1313,14 +1313,14 @@ export class LinearElementEditor {
       element.points[element.points.length - 1];
 
     // break polygon if deleting start/end point
-    if (isLineElement(element) && element.loopLock) {
+    if (isLineElement(element) && element.polygon) {
       if (
         pointIndices.includes(0) ||
         (pointIndices.includes(element.points.length - 1) &&
           // don't disable polygon if cleaning up uncommitted point
           !isUncommittedPoint)
       ) {
-        app.scene.mutateElement(element, { loopLock: false });
+        app.scene.mutateElement(element, { polygon: false });
       }
     }
 
@@ -1328,7 +1328,7 @@ export class LinearElementEditor {
       return !pointIndices.includes(idx);
     });
 
-    if (isUncommittedPoint && isLineElement(element) && element.loopLock) {
+    if (isUncommittedPoint && isLineElement(element) && element.polygon) {
       nextPoints[0] = pointFrom(
         nextPoints[nextPoints.length - 1][0],
         nextPoints[nextPoints.length - 1][1],
@@ -1357,7 +1357,7 @@ export class LinearElementEditor {
   ) {
     const nextPoints = [...element.points, ...addedPoints];
 
-    if (isLineElement(element) && element.loopLock) {
+    if (isLineElement(element) && element.polygon) {
       nextPoints[0] = pointFrom(
         nextPoints[nextPoints.length - 1][0],
         nextPoints[nextPoints.length - 1][1],
@@ -1391,7 +1391,7 @@ export class LinearElementEditor {
     const { points } = element;
 
     // Handle loop lock behavior
-    if (isLineElement(element) && element.loopLock) {
+    if (isLineElement(element) && element.polygon) {
       const firstPointUpdate = pointUpdates.get(0);
       const lastPointUpdate = pointUpdates.get(points.length - 1);
 

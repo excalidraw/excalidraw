@@ -94,8 +94,8 @@ export const actionToggleLinearEditor = register({
   },
 });
 
-export const actionToggleLoopLock = register({
-  name: "toggleLoopLock",
+export const actionTogglePolygon = register({
+  name: "togglePolygon",
   category: DEFAULT_CATEGORIES.elements,
   icon: polygonIcon,
   keywords: ["loop"],
@@ -108,10 +108,12 @@ export const actionToggleLoopLock = register({
     const allLocked =
       selectedElements.length > 0 &&
       selectedElements.every(
-        (element) => isLineElement(element) && element.loopLock,
+        (element) => isLineElement(element) && element.polygon,
       );
 
-    return allLocked ? "labels.loopLock.unlock" : "labels.loopLock.lock";
+    return allLocked
+      ? "labels.polygon.breakPolygon"
+      : "labels.polygon.convertToPolygon";
   },
   trackEvent: {
     category: "element",
@@ -137,10 +139,8 @@ export const actionToggleLoopLock = register({
 
     const targetElements = selectedElements as ExcalidrawLineElement[];
 
-    // Check if we should lock or unlock based on current state
-    // If all elements are locked, unlock all. Otherwise, lock all.
-    const allLocked = targetElements.every((element) => element.loopLock);
-    const newLoopLockState = !allLocked;
+    // if one element not a polygon, convert all to polygon
+    const nextPolygonState = targetElements.some((element) => !element.polygon);
 
     const targetElementsMap = arrayToMap(targetElements);
 
@@ -151,10 +151,10 @@ export const actionToggleLoopLock = register({
         }
 
         return newElementWith(element, {
-          backgroundColor: newLoopLockState
+          backgroundColor: nextPolygonState
             ? element.backgroundColor
             : "transparent",
-          ...toggleLinePolygonState(element, newLoopLockState),
+          ...toggleLinePolygonState(element, nextPolygonState),
         });
       }),
       appState,
@@ -174,20 +174,21 @@ export const actionToggleLoopLock = register({
           // only show polygon button if every selected element is already
           // a polygon, effectively showing this button only to allow for
           // disabling the polygon state
-          !element.loopLock ||
+          !element.polygon ||
           element.points.length < 3,
       )
     ) {
       return null;
     }
 
-    // If all are locked, show locked icon. Otherwise show unlocked
-    const allLocked = selectedElements.every(
-      (element) => isLineElement(element) && element.loopLock,
+    const allPolygon = selectedElements.every(
+      (element) => isLineElement(element) && element.polygon,
     );
 
     const label = t(
-      allLocked ? "labels.loopLock.unlock" : "labels.loopLock.lock",
+      allPolygon
+        ? "labels.polygon.breakPolygon"
+        : "labels.polygon.convertToPolygon",
     );
 
     return (
@@ -195,7 +196,7 @@ export const actionToggleLoopLock = register({
         icon={polygonIcon}
         title={label}
         aria-label={label}
-        active={allLocked}
+        active={allPolygon}
         onClick={() => updateData(null)}
         style={{ marginLeft: "auto" }}
       />

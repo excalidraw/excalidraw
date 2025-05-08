@@ -466,7 +466,7 @@ const renderLinearPointHandles = (
       (idx !== points.length - 1 ||
         appState.editingLinearElement ||
         !_isLineElement ||
-        !element.loopLock) &&
+        !element.polygon) &&
       pointsEqual(
         point,
         idx === points.length - 1 ? points[0] : points[idx - 1],

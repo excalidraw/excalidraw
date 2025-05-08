@@ -141,9 +141,9 @@
       "edit": "Edit line",
       "editArrow": "Edit arrow"
     },
-    "loopLock": {
-      "unlock": "Break polygon",
-      "lock": "Convert to polygon"
+    "polygon": {
+      "breakPolygon": "Break polygon",
+      "convertToPolygon": "Convert to polygon"
     },
     "elementLock": {
       "lock": "Lock",

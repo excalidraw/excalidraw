@@ -342,7 +342,7 @@ const restoreElement = (
         x,
         y,
         ...(isLineElement(element)
-          ? { loopLock: element.loopLock ?? false }
+          ? { polygon: element.polygon ?? false }
           : {}),
         ...getSizeFromPoints(points),
       });

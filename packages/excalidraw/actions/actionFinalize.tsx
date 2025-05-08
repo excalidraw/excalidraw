@@ -136,7 +136,7 @@ export const actionFinalize = register({
           if (isLineElement(multiPointElement)) {
             scene.mutateElement(multiPointElement, {
               points,
-              loopLock: true,
+              polygon: true,
             });
           } else {
             scene.mutateElement(multiPointElement, {

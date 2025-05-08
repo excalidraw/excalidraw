@@ -426,7 +426,7 @@ export const toggleLinePolygonState = (
 
   // TODO: satisfies ElementUpdate<ExcalidrawLineElement>
   const ret = {
-    loopLock: nextPolygonState,
+    polygon: nextPolygonState,
     points: updatedPoints,
   };
 

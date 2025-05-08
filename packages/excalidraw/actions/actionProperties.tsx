@@ -1439,7 +1439,7 @@ export const actionChangeRoundness = register({
           )}
           onChange={(value) => updateData(value)}
         >
-          {renderAction("toggleLoopLock")}
+          {renderAction("togglePolygon")}
         </ButtonIconSelect>
       </fieldset>
     );

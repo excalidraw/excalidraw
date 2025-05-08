@@ -475,7 +475,7 @@ export const newLinearElement = (
   if (isLineElement(element)) {
     const lineElement: NonDeleted<ExcalidrawLineElement> = {
       ...element,
-      loopLock: false,
+      polygon: false,
     };
 
     return lineElement;
