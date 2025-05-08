@@ -5,11 +5,12 @@ import { EVENT, KEYS, cloneJSON } from "@excalidraw/common";
 
 import { deepCopyElement } from "@excalidraw/element/duplicate";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import type Scene from "@excalidraw/element/Scene";
 
-import { CaptureUpdateAction } from "../../store";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
 

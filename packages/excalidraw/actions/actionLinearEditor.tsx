@@ -6,6 +6,8 @@ import {
 } from "@excalidraw/element/typeChecks";
 import { arrayToMap } from "@excalidraw/common";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type {
   ExcalidrawLinearElement,
   ExcalidrawLineElement,
@@ -15,7 +17,6 @@ import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette"
 import { ToolButton } from "../components/ToolButton";
 import { lineEditorIcon, polygonIcon } from "../components/icons";
 import { t } from "../i18n";
-import { CaptureUpdateAction } from "../store";
 
 import { ButtonIcon } from "../components/ButtonIcon";
 

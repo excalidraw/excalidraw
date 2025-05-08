@@ -33,6 +33,8 @@ import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
 
 import { newElement } from "@excalidraw/element/newElement";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -43,8 +45,6 @@ import type {
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import type { Radians } from "@excalidraw/math";
-
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

@@ -22,6 +22,8 @@ import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
 import { Pointer, UI } from "./helpers/ui";
 import * as toolQueries from "./queries/toolQueries";
 
+import type { History } from "../history";
+
 import type { RenderResult, RenderOptions } from "@testing-library/react";
 
 import type { ImportedDataState } from "../data/types";
@@ -431,4 +433,46 @@ export const assertElements = <T extends AllPossibleKeys<ExcalidrawElement>>(
   );
 
   expect(h.state.selectedElementIds).toEqual(selectedElementIds);
+};
+
+const stripSeed = (deltas: Record<string, { deleted: any; inserted: any }>) =>
+  Object.entries(deltas).reduce((acc, curr) => {
+    const { inserted, deleted, ...rest } = curr[1];
+
+    delete inserted.seed;
+    delete deleted.seed;
+
+    acc[curr[0]] = {
+      inserted,
+      deleted,
+      ...rest,
+    };
+
+    return acc;
+  }, {} as Record<string, any>);
+
+export const checkpointHistory = (history: History, name: string) => {
+  expect(
+    history.undoStack.map((x) => ({
+      ...x,
+      elements: {
+        ...x.elements,
+        added: stripSeed(x.elements.added),
+        removed: stripSeed(x.elements.removed),
+        updated: stripSeed(x.elements.updated),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] undo stack`);
+
+  expect(
+    history.redoStack.map((x) => ({
+      ...x,
+      elements: {
+        ...x.elements,
+        added: stripSeed(x.elements.added),
+        removed: stripSeed(x.elements.removed),
+        updated: stripSeed(x.elements.updated),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] redo stack`);
 };
