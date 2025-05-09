@@ -6,11 +6,11 @@ import {
   isLinearElement,
   isTextBindableContainer,
   isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
 import { getShortcutKey } from "@excalidraw/common";
 
-import { isNodeInFlowchart } from "@excalidraw/element/flowchart";
+import { isNodeInFlowchart } from "@excalidraw/element";
 
 import { t } from "../i18n";
 import { isEraserActive } from "../appState";

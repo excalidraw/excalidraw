@@ -30,16 +30,16 @@ import {
   calculateFixedPointForElbowArrowBinding,
   getHoveredElementForBinding,
   updateBoundElements,
-} from "@excalidraw/element/binding";
+} from "@excalidraw/element";
 
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { LinearElementEditor } from "@excalidraw/element";
 
-import { newElementWith } from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element";
 
 import {
   getBoundTextElement,
   redrawTextBoundingBox,
-} from "@excalidraw/element/textElement";
+} from "@excalidraw/element";
 
 import {
   isArrowElement,
@@ -48,13 +48,13 @@ import {
   isLinearElement,
   isTextElement,
   isUsingAdaptiveRadius,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
-import { hasStrokeColor } from "@excalidraw/element/comparisons";
+import { hasStrokeColor } from "@excalidraw/element";
 
-import { updateElbowArrowPoints } from "@excalidraw/element/elbowArrow";
+import { updateElbowArrowPoints } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { LocalPoint } from "@excalidraw/math";
 
@@ -70,9 +70,9 @@ import type {
   VerticalAlign,
 } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 
-import type { CaptureUpdateActionType } from "@excalidraw/element/store";
+import type { CaptureUpdateActionType } from "@excalidraw/element";
 
 import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
