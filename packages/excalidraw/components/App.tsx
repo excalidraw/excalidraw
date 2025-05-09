@@ -17,7 +17,7 @@ import {
   vectorDot,
   vectorNormalize,
 } from "@excalidraw/math";
-import { isPointInShape } from "@excalidraw/utils/collision";
+import { isPointInShape } from "@excalidraw/element/collision";
 
 import {
   COLOR_PALETTE,

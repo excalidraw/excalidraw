@@ -1,9 +1,16 @@
 import { simplify } from "points-on-curve";
 
-import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
+import {
+  pointFrom,
+  pointDistance,
+  type LocalPoint,
+  pointRotateRads,
+} from "@excalidraw/math";
 import { ROUGHNESS, isTransparent, assertNever } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
+
+import type { GlobalPoint, Radians } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
@@ -22,7 +29,11 @@ import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
 import { generateFreeDrawShape } from "./renderElement";
-import { getArrowheadPoints, getDiamondPoints } from "./bounds";
+import {
+  getArrowheadPoints,
+  getDiamondPoints,
+  getElementBounds,
+} from "./bounds";
 
 import type {
   ExcalidrawElement,
@@ -320,33 +331,92 @@ export const generateLinearCollisionShape = (
   switch (element.type) {
     case "line":
     case "arrow": {
-      let shape: any;
-
       // points array can be empty in the beginning, so it is important to add
       // initial position to it
       const points = element.points.length
         ? element.points
         : [pointFrom<LocalPoint>(0, 0)];
+      const [x1, y1, x2, y2] = getElementBounds(
+        {
+          ...element,
+          angle: 0 as Radians,
+        },
+        new Map(),
+      );
+      const center = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
 
       if (isElbowArrow(element)) {
-        shape = generator.path(generateElbowArrowShape(points, 16), options)
+        return generator.path(generateElbowArrowShape(points, 16), options)
           .sets[0].ops;
       } else if (!element.roundness) {
-        shape = points.map((point, idx) => {
-          return idx === 0
-            ? { op: "move", data: point }
-            : {
-                op: "lineTo",
-                data: [point[0], point[1]],
-              };
+        return points.map((point, idx) => {
+          const p = pointRotateRads(
+            pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+            center,
+            element.angle,
+          );
+
+          return {
+            op: idx === 0 ? "move" : "lineTo",
+            data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+          };
         });
-      } else {
-        shape = generator
-          .curve(points as unknown as RoughPoint[], options)
-          .sets[0].ops.slice(0, element.points.length);
       }
 
-      return shape;
+      return generator
+        .curve(points as unknown as RoughPoint[], options)
+        .sets[0].ops.slice(0, element.points.length)
+        .map((op, i, arr) => {
+          if (i === 0) {
+            const p = pointRotateRads<GlobalPoint>(
+              pointFrom<GlobalPoint>(
+                element.x + op.data[0],
+                element.y + op.data[1],
+              ),
+              center,
+              element.angle,
+            );
+
+            return {
+              op: "move",
+              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+            };
+          }
+
+          return {
+            op: "bcurveTo",
+            data: [
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[0],
+                  element.y + op.data[1],
+                ),
+                center,
+                element.angle,
+              ),
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[2],
+                  element.y + op.data[3],
+                ),
+                center,
+                element.angle,
+              ),
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[4],
+                  element.y + op.data[5],
+                ),
+                center,
+                element.angle,
+              ),
+            ]
+              .map((p) =>
+                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+              )
+              .flat(),
+          };
+        });
     }
     case "freedraw": {
       const simplifiedPoints = simplify(

@@ -11,16 +11,18 @@ import {
   lineSegment,
   lineSegmentIntersectionPoints,
   pointFrom,
+  pointFromVector,
   pointRotateRads,
   pointsEqual,
+  vectorFromPoint,
+  vectorNormalize,
+  vectorScale,
 } from "@excalidraw/math";
 
 import {
   ellipse,
   ellipseSegmentInterceptPoints,
 } from "@excalidraw/math/ellipse";
-
-import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
 
 import type {
   Curve,
@@ -35,6 +37,7 @@ import { isPathALoop } from "./shapes";
 import { getElementBounds } from "./bounds";
 import {
   hasBoundTextElement,
+  isFreeDrawElement,
   isIframeLikeElement,
   isImageElement,
   isLinearElement,
@@ -49,6 +52,8 @@ import {
 import { getBoundTextElement } from "./textElement";
 
 import { LinearElementEditor } from "./linearElementEditor";
+
+import { distanceToElement } from "./distance";
 
 import type {
   ElementsMap,
@@ -219,11 +224,13 @@ const intersectLinearOrFreeDrawWithLineSegment = (
   for (const shape of shapes) {
     switch (true) {
       case isCurve(shape):
+        //debugDrawCubicBezier(shape);
         intersections.push(
           ...curveIntersectLineSegment(shape as Curve<GlobalPoint>, segment),
         );
         continue;
       case isLineSegment(shape):
+        //debugDrawLine(shape);
         const point = lineSegmentIntersectionPoints(
           segment,
           shape as LineSegment<GlobalPoint>,
@@ -361,4 +368,42 @@ const intersectEllipseWithLineSegment = (
     ellipse(center, element.width / 2 + offset, element.height / 2 + offset),
     lineSegment(rotatedA, rotatedB),
   ).map((p) => pointRotateRads(p, center, element.angle));
+};
+
+// check if the given point is considered on the given shape's border
+const isPointOnShape = (
+  point: GlobalPoint,
+  element: ExcalidrawElement,
+  tolerance = 1,
+) => distanceToElement(element, point) <= tolerance;
+
+// check if the given point is considered inside the element's border
+export const isPointInShape = (
+  point: GlobalPoint,
+  element: ExcalidrawElement,
+) => {
+  if (
+    (isLinearElement(element) || isFreeDrawElement(element)) &&
+    !isPathALoop(element.points)
+  ) {
+    // There isn't any "inside" for a non-looping path
+    return false;
+  }
+
+  const [x1, y1, x2, y2] = getElementBounds(element, new Map());
+  const center = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
+  const otherPoint = pointFromVector(
+    vectorScale(
+      vectorNormalize(vectorFromPoint(point, center, 0.1)),
+      Math.max(element.width, element.height) * 2,
+    ),
+    center,
+  );
+  const intersector = lineSegment(point, otherPoint);
+  const intersections = intersectElementWithLineSegment(
+    element,
+    intersector,
+  ).filter((item, pos, arr) => arr.indexOf(item) === pos);
+
+  return intersections.length % 2 === 1;
 };

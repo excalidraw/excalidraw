@@ -1,5 +1,5 @@
 import { arrayToMap, easeOut, THEME } from "@excalidraw/common";
-import { getElementLineSegments } from "@excalidraw/element";
+import { getElementLineSegments, isPointInShape } from "@excalidraw/element";
 import {
   lineSegment,
   lineSegmentIntersectionPoints,
@@ -9,7 +9,6 @@ import {
 import { getElementsInGroup } from "@excalidraw/element";
 
 import { shouldTestInside } from "@excalidraw/element";
-import { isPointInShape } from "@excalidraw/utils/collision";
 import { hasBoundTextElement, isBoundToContainer } from "@excalidraw/element";
 import { getBoundTextElementId } from "@excalidraw/element";
 
