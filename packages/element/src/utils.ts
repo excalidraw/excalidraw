@@ -2,6 +2,7 @@ import {
   curve,
   lineSegment,
   pointFrom,
+  pointFromArray,
   pointFromVector,
   rectangle,
   vectorFromPoint,
@@ -12,16 +13,89 @@ import {
 
 import { elementCenterPoint } from "@excalidraw/common";
 
-import type { Curve, LineSegment } from "@excalidraw/math";
+import type { Curve, LineSegment, LocalPoint } from "@excalidraw/math";
 
 import { getCornerRadius } from "./shapes";
 
 import { getDiamondPoints } from "./bounds";
 
+import { generateLinearCollisionShape } from "./Shape";
+
 import type {
   ExcalidrawDiamondElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
+
+export function deconstructLinearOrFreeDrawElement(
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+): (Curve<GlobalPoint> | LineSegment<GlobalPoint>)[] {
+  const ops = generateLinearCollisionShape(element) as {
+    op: string;
+    data: number[];
+  }[];
+  const components = [];
+
+  for (let idx = 0; idx < ops.length; idx += 1) {
+    const op = ops[idx];
+    const prevPoint =
+      ops[idx - 1] && pointFromArray<LocalPoint>(ops[idx - 1].data.slice(-2));
+    switch (op.op) {
+      case "move":
+        continue;
+      case "lineTo":
+        if (!prevPoint) {
+          throw new Error("prevPoint is undefined");
+        }
+
+        components.push(
+          lineSegment<GlobalPoint>(
+            pointFrom<GlobalPoint>(
+              element.x + prevPoint[0],
+              element.y + prevPoint[1],
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + op.data[0],
+              element.y + op.data[1],
+            ),
+          ),
+        );
+        continue;
+      case "bcurveTo":
+        if (!prevPoint) {
+          throw new Error("prevPoint is undefined");
+        }
+
+        components.push(
+          curve<GlobalPoint>(
+            pointFrom<GlobalPoint>(
+              element.x + prevPoint[0],
+              element.y + prevPoint[1],
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + op.data[0],
+              element.y + op.data[1],
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + op.data[2],
+              element.y + op.data[3],
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + op.data[4],
+              element.y + op.data[5],
+            ),
+          ),
+        );
+        continue;
+      default: {
+        console.error("Unknown op type", op.op);
+      }
+    }
+  }
+
+  return components;
+}
 
 /**
  * Get the building components of a rectanguloid element in the form of
