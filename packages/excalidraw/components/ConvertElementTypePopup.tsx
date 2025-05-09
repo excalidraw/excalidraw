@@ -15,10 +15,8 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element/typeChecks";
 
-import {
-  getCommonBoundingBox,
-  getElementAbsoluteCoords,
-} from "@excalidraw/element/bounds";
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+import { getCommonBoundingBox } from "@excalidraw/element/boundingBox";
 
 import {
   getBoundTextElement,

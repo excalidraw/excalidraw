@@ -3,7 +3,7 @@ import {
   bindOrUnbindLinearElements,
   isBindingEnabled,
 } from "@excalidraw/element/binding";
-import { getCommonBoundingBox } from "@excalidraw/element/bounds";
+import { getCommonBoundingBox } from "@excalidraw/element/boundingBox";
 import { newElementWith } from "@excalidraw/element/mutateElement";
 import { deepCopyElement } from "@excalidraw/element/duplicate";
 import { resizeMultipleElements } from "@excalidraw/element/resizeElements";

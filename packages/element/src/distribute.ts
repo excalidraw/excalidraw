@@ -1,4 +1,4 @@
-import { getCommonBoundingBox } from "./bounds";
+import { getCommonBoundingBox } from "./boundingBox";
 import { newElementWith } from "./mutateElement";
 
 import { getMaximumGroups } from "./groups";

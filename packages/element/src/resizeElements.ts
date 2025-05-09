@@ -26,9 +26,9 @@ import {
   getElementAbsoluteCoords,
   getCommonBounds,
   getResizedElementAbsoluteCoords,
-  getCommonBoundingBox,
   getElementBounds,
 } from "./bounds";
+import { getCommonBoundingBox } from "./boundingBox";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
   getBoundTextElement,
@@ -59,7 +59,7 @@ import { isInGroup } from "./groups";
 
 import type Scene from "./Scene";
 
-import type { BoundingBox } from "./bounds";
+import type { BoundingBox } from "./boundingBox";
 import type {
   MaybeTransformHandleType,
   TransformHandleDirection,
