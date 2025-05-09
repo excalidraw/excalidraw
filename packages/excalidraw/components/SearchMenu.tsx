@@ -53,8 +53,6 @@ import {
 
 import "./SearchMenu.scss";
 
-import Collapsible from "./Stats/Collapsible";
-
 import type { AppClassProperties, SearchMatch } from "../types";
 
 const searchQueryAtom = atom<string>("");
@@ -481,64 +479,34 @@ interface MatchListProps {
 }
 
 const MatchListBase = (props: MatchListProps) => {
-  const [frameNameMatchesOpen, setFrameNameMatchesOpen] = useState(true);
   const frameNameMatches = useMemo(
     () =>
       props.matches.items.filter((match) => isFrameLikeElement(match.element)),
     [props.matches],
   );
 
-  const [textMatchesOpen, setTextMatchesOpen] = useState(true);
   const textMatches = useMemo(
     () => props.matches.items.filter((match) => isTextElement(match.element)),
     [props.matches],
   );
 
-  useEffect(() => {
-    if (
-      props.focusIndex !== null &&
-      props.focusIndex < frameNameMatches.length
-    ) {
-      setFrameNameMatchesOpen(true);
-    }
-  }, [frameNameMatches, props.focusIndex]);
-
-  useEffect(() => {
-    if (
-      props.focusIndex !== null &&
-      props.focusIndex >= frameNameMatches.length
-    ) {
-      setTextMatchesOpen(true);
-    }
-  }, [frameNameMatches, props.focusIndex]);
-
   return (
     <div>
       {frameNameMatches.length > 0 && (
         <div className="layer-ui__search-result-container">
-          <Collapsible
-            open={frameNameMatchesOpen}
-            label={
-              <div className="layer-ui__search-result-title">
-                <div className="title-icon">{frameToolIcon}</div>
-                <div>{t("search.frames")}</div>
-              </div>
-            }
-            openTrigger={() => {
-              setFrameNameMatchesOpen((prev) => !prev);
-            }}
-            showCollapsedIcon={false}
-          >
-            {frameNameMatches.map((searchMatch, index) => (
-              <ListItem
-                key={searchMatch.element.id + searchMatch.index}
-                searchQuery={props.searchQuery}
-                preview={searchMatch.preview}
-                highlighted={index === props.focusIndex}
-                onClick={() => props.onItemClick(index)}
-              />
-            ))}
-          </Collapsible>
+          <div className="layer-ui__search-result-title">
+            <div className="title-icon">{frameToolIcon}</div>
+            <div>{t("search.frames")}</div>
+          </div>
+          {frameNameMatches.map((searchMatch, index) => (
+            <ListItem
+              key={searchMatch.element.id + searchMatch.index}
+              searchQuery={props.searchQuery}
+              preview={searchMatch.preview}
+              highlighted={index === props.focusIndex}
+              onClick={() => props.onItemClick(index)}
+            />
+          ))}
 
           {textMatches.length > 0 && <div className="layer-ui__divider" />}
         </div>
@@ -546,33 +514,19 @@ const MatchListBase = (props: MatchListProps) => {
 
       {textMatches.length > 0 && (
         <div className="layer-ui__search-result-container">
-          <Collapsible
-            open={textMatchesOpen}
-            label={
-              <div className="layer-ui__search-result-title">
-                <div className="title-icon">{TextIcon}</div>
-                <div>{t("search.texts")}</div>
-              </div>
-            }
-            openTrigger={() => {
-              setTextMatchesOpen((prev) => !prev);
-            }}
-            showCollapsedIcon={false}
-          >
-            {textMatches.map((searchMatch, index) => (
-              <ListItem
-                key={searchMatch.element.id + searchMatch.index}
-                searchQuery={props.searchQuery}
-                preview={searchMatch.preview}
-                highlighted={
-                  index + frameNameMatches.length === props.focusIndex
-                }
-                onClick={() =>
-                  props.onItemClick(index + frameNameMatches.length)
-                }
-              />
-            ))}
-          </Collapsible>
+          <div className="layer-ui__search-result-title">
+            <div className="title-icon">{TextIcon}</div>
+            <div>{t("search.texts")}</div>
+          </div>
+          {textMatches.map((searchMatch, index) => (
+            <ListItem
+              key={searchMatch.element.id + searchMatch.index}
+              searchQuery={props.searchQuery}
+              preview={searchMatch.preview}
+              highlighted={index + frameNameMatches.length === props.focusIndex}
+              onClick={() => props.onItemClick(index + frameNameMatches.length)}
+            />
+          ))}
         </div>
       )}
     </div>
