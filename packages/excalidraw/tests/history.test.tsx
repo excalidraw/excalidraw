@@ -8,7 +8,7 @@ import {
 import { vi } from "vitest";
 import { pointFrom } from "@excalidraw/math";
 
-import { newElementWith } from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element";
 
 import {
   EXPORT_DATA_TYPES,
@@ -23,9 +23,9 @@ import {
 
 import "@excalidraw/utils/test-utils";
 
-import { ElementsDelta, AppStateDelta } from "@excalidraw/element/delta";
+import { ElementsDelta, AppStateDelta } from "@excalidraw/element";
 
-import { CaptureUpdateAction, StoreDelta } from "@excalidraw/element/store";
+import { CaptureUpdateAction, StoreDelta } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 

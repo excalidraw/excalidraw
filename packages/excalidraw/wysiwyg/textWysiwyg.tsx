@@ -12,10 +12,10 @@ import {
 import {
   originalContainerCache,
   updateOriginalContainerCache,
-} from "@excalidraw/element/containerCache";
+} from "@excalidraw/element";
 
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import { bumpVersion } from "@excalidraw/element/mutateElement";
+import { LinearElementEditor } from "@excalidraw/element";
+import { bumpVersion } from "@excalidraw/element";
 import {
   getBoundTextElementId,
   getContainerElement,
@@ -26,15 +26,15 @@ import {
   computeContainerDimensionForBoundText,
   computeBoundTextPosition,
   getBoundTextElement,
-} from "@excalidraw/element/textElement";
-import { getTextWidth } from "@excalidraw/element/textMeasurements";
-import { normalizeText } from "@excalidraw/element/textMeasurements";
-import { wrapText } from "@excalidraw/element/textWrapping";
+} from "@excalidraw/element";
+import { getTextWidth } from "@excalidraw/element";
+import { normalizeText } from "@excalidraw/element";
+import { wrapText } from "@excalidraw/element";
 import {
   isArrowElement,
   isBoundToContainer,
   isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,

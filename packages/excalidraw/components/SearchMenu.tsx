@@ -11,9 +11,9 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import { isElementCompletelyInViewport } from "@excalidraw/element/sizeHelpers";
+import { isElementCompletelyInViewport } from "@excalidraw/element";
 
-import { measureText } from "@excalidraw/element/textMeasurements";
+import { measureText } from "@excalidraw/element";
 
 import {
   KEYS,
@@ -22,11 +22,8 @@ import {
   getFontString,
 } from "@excalidraw/common";
 
-import { newTextElement } from "@excalidraw/element/newElement";
-import {
-  isFrameLikeElement,
-  isTextElement,
-} from "@excalidraw/element/typeChecks";
+import { newTextElement } from "@excalidraw/element";
+import { isTextElement, isFrameLikeElement } from "@excalidraw/element";
 
 import { getDefaultFrameName } from "@excalidraw/element/frame";
 

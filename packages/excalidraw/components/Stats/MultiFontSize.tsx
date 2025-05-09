@@ -1,13 +1,10 @@
 import {
   getBoundTextElement,
   redrawTextBoundingBox,
-} from "@excalidraw/element/textElement";
-import {
-  hasBoundTextElement,
-  isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
+import { hasBoundTextElement, isTextElement } from "@excalidraw/element";
 
-import { isInGroup } from "@excalidraw/element/groups";
+import { isInGroup } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
@@ -15,7 +12,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 
 import { fontSizeIcon } from "../icons";
 

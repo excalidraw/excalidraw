@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
-import { updateElbowArrowPoints } from "@excalidraw/element/elbowArrow";
+import { updateElbowArrowPoints } from "@excalidraw/element";
 
 import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
 
@@ -13,21 +13,21 @@ import {
   isLinearElement,
   isSharpArrow,
   isUsingAdaptiveRadius,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
 import {
   getCommonBoundingBox,
   getElementAbsoluteCoords,
-} from "@excalidraw/element/bounds";
+} from "@excalidraw/element";
 
 import {
   getBoundTextElement,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
   redrawTextBoundingBox,
-} from "@excalidraw/element/textElement";
+} from "@excalidraw/element";
 
-import { wrapText } from "@excalidraw/element/textWrapping";
+import { wrapText } from "@excalidraw/element";
 
 import {
   assertNever,
@@ -37,17 +37,19 @@ import {
   updateActiveTool,
 } from "@excalidraw/common";
 
-import { measureText } from "@excalidraw/element/textMeasurements";
+import { measureText } from "@excalidraw/element";
 
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { LinearElementEditor } from "@excalidraw/element";
 
 import {
   newArrowElement,
   newElement,
   newLinearElement,
-} from "@excalidraw/element/newElement";
+} from "@excalidraw/element";
 
-import { ShapeCache } from "@excalidraw/element/ShapeCache";
+import { ShapeCache } from "@excalidraw/element";
+
+import { updateBindings } from "@excalidraw/element";
 
 import type {
   ConvertibleGenericTypes,
@@ -66,7 +68,7 @@ import type {
   FixedSegment,
 } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 
 import {
   bumpVersion,
@@ -76,7 +78,6 @@ import {
 } from "..";
 import { trackEvent } from "../analytics";
 import { atom, editorJotaiStore, useSetAtom } from "../editor-jotai";
-import { updateBindings } from "../../element/src/binding";
 
 import "./ConvertElementTypePopup.scss";
 import { ToolButton } from "./ToolButton";

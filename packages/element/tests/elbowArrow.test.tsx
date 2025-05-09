@@ -22,7 +22,7 @@ import type { LocalPoint } from "@excalidraw/math";
 
 import { bindLinearElement } from "../src/binding";
 
-import Scene from "../src/Scene";
+import { Scene } from "../src/Scene";
 
 import type {
   ExcalidrawArrowElement,
