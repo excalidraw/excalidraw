@@ -98,7 +98,6 @@ export const SearchMenu = () => {
     items: [],
   });
   const searchedQueryRef = useRef<SearchQuery | null>(null);
-  const appZoomRef = useRef(app.state.zoom.value);
   const lastSceneNonceRef = useRef<number | undefined>(undefined);
 
   const [focusIndex, setFocusIndex] = useAtom(searchItemInFocusAtom);
@@ -110,18 +109,15 @@ export const SearchMenu = () => {
     }
     if (
       searchQuery !== searchedQueryRef.current ||
-      app.scene.getSceneNonce() !== lastSceneNonceRef.current ||
-      app.state.zoom.value !== appZoomRef.current
+      app.scene.getSceneNonce() !== lastSceneNonceRef.current
     ) {
       searchedQueryRef.current = null;
-      appZoomRef.current = app.state.zoom.value;
       handleSearch(searchQuery, app, (matchItems, index) => {
         setSearchMatches({
           nonce: randomInteger(),
           items: matchItems,
         });
         searchedQueryRef.current = searchQuery;
-        appZoomRef.current = app.state.zoom.value;
         lastSceneNonceRef.current = app.scene.getSceneNonce();
         setAppState({
           searchMatches: {
@@ -143,7 +139,6 @@ export const SearchMenu = () => {
     setAppState,
     setFocusIndex,
     lastSceneNonceRef,
-    app.state.zoom,
   ]);
 
   const goToNextItem = () => {
