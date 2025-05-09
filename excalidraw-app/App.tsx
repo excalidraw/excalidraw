@@ -51,15 +51,21 @@ import {
 import { isElementLink } from "@excalidraw/element/elementLink";
 import { restore, restoreAppState } from "@excalidraw/excalidraw/data/restore";
 import { newElementWith } from "@excalidraw/element/mutateElement";
-import {
-  isFrameLikeElement,
-  isInitializedImageElement,
-} from "@excalidraw/element/typeChecks";
+import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
 import clsx from "clsx";
 import {
   parseLibraryTokensFromUrl,
   useHandleLibrary,
 } from "@excalidraw/excalidraw/data/library";
+
+import { getSelectedElements } from "@excalidraw/element/selection";
+
+import {
+  decodeConstraints,
+  encodeConstraints,
+} from "@excalidraw/excalidraw/scene/scrollConstraints";
+
+import { useApp } from "@excalidraw/excalidraw/components/App";
 
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
@@ -144,11 +150,6 @@ import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 import "./index.scss";
 
 import type { CollabAPI } from "./collab/Collab";
-import { getSelectedElements } from "@excalidraw/element/selection";
-import {
-  decodeConstraints,
-  encodeConstraints,
-} from "@excalidraw/excalidraw/scene/scrollConstraints";
 
 polyfill();
 
@@ -167,9 +168,8 @@ const ConstraintsSettings = ({
   const [constraints, setConstraints] =
     useState<DebugScrollConstraints>(initialConstraints);
 
-  const frames = excalidrawAPI
-    .getSceneElements()
-    .filter((e) => isFrameLikeElement(e));
+  const app = useApp();
+  const frames = app.scene.getNonDeletedFramesLikes();
   const [activeFrameId, setActiveFrameId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -180,7 +180,7 @@ const ConstraintsSettings = ({
     constraints.enabled
       ? excalidrawAPI.setScrollConstraints(constraints)
       : excalidrawAPI.setScrollConstraints(null);
-  }, [constraints]);
+  }, [constraints, excalidrawAPI]);
 
   useEffect(() => {
     const frame = frames.find((frame) => frame.id === activeFrameId);
@@ -196,7 +196,7 @@ const ConstraintsSettings = ({
         lockZoom: s.lockZoom,
       }));
     }
-  }, [activeFrameId]);
+  }, [activeFrameId, frames]);
 
   const [selection, setSelection] = useState<ExcalidrawElement[]>([]);
   useEffect(() => {
@@ -471,8 +471,6 @@ const initializeScene = async (opts: {
     );
   }
 
-  console.log({ shareableLink });
-
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
@@ -498,7 +496,6 @@ const initializeScene = async (opts: {
           shareableLink[1],
           localDataState,
         );
-        console.log(">>>>", scene);
       }
       scene.scrollToContent = true;
       if (!roomLinkData) {

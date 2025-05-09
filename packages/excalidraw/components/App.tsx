@@ -464,6 +464,12 @@ import { isMaybeMermaidDefinition } from "../mermaid";
 
 import { LassoTrail } from "../lasso";
 
+import {
+  constrainScrollState,
+  calculateConstrainedScrollCenter,
+  areCanvasTranslatesClose,
+} from "../scene/scrollConstraints";
+
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
@@ -528,11 +534,6 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
-import {
-  constrainScrollState,
-  calculateConstrainedScrollCenter,
-  areCanvasTranslatesClose,
-} from "../scene/scrollConstraints";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);

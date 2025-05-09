@@ -1,10 +1,12 @@
 import { isShallowEqual } from "@excalidraw/common";
-import {
+
+import { getNormalizedZoom } from "./normalize";
+
+import type {
   AnimateTranslateCanvasValues,
   AppState,
   ScrollConstraints,
 } from "../types";
-import { getNormalizedZoom } from "./normalize";
 
 /**
  * Calculates the scroll center coordinates and the optimal zoom level to fit the constrained scrollable area within the viewport.
