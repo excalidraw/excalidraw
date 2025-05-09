@@ -4,7 +4,7 @@ export {
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
   getTargetElements,
-} from "@excalidraw/element/selection";
+} from "@excalidraw/element";
 export { calculateScrollCenter } from "./scroll";
 export {
   hasBackground,
@@ -12,7 +12,7 @@ export {
   hasStrokeStyle,
   canHaveArrowheads,
   canChangeRoundness,
-} from "@excalidraw/element/comparisons";
+} from "@excalidraw/element";
 export {
   getNormalizedZoom,
   getNormalizedGridSize,

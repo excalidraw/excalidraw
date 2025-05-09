@@ -1,7 +1,7 @@
 import { queryByText } from "@testing-library/react";
 
 import { pointFrom } from "@excalidraw/math";
-import { getOriginalContainerHeightFromCache } from "@excalidraw/element/containerCache";
+import { getOriginalContainerHeightFromCache } from "@excalidraw/element";
 
 import {
   CODES,

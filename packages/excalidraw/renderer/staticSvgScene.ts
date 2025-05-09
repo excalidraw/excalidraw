@@ -10,36 +10,30 @@ import {
 } from "@excalidraw/common";
 import { normalizeLink, toValidURL } from "@excalidraw/common";
 import { hashString } from "@excalidraw/element";
-import { getUncroppedWidthAndHeight } from "@excalidraw/element/cropElement";
+import { getUncroppedWidthAndHeight } from "@excalidraw/element";
 import {
   createPlaceholderEmbeddableLabel,
   getEmbedLink,
-} from "@excalidraw/element/embeddable";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import {
-  getBoundTextElement,
-  getContainerElement,
-} from "@excalidraw/element/textElement";
-import { getLineHeightInPx } from "@excalidraw/element/textMeasurements";
+} from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
+import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
+import { getLineHeightInPx } from "@excalidraw/element";
 import {
   isArrowElement,
   isIframeLikeElement,
   isInitializedImageElement,
   isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
-import { getContainingFrame } from "@excalidraw/element/frame";
+import { getContainingFrame } from "@excalidraw/element";
 
-import { getCornerRadius, isPathALoop } from "@excalidraw/element/shapes";
+import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
-import { ShapeCache } from "@excalidraw/element/ShapeCache";
+import { ShapeCache } from "@excalidraw/element";
 
-import {
-  getFreeDrawSvgPath,
-  IMAGE_INVERT_FILTER,
-} from "@excalidraw/element/renderElement";
+import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "@excalidraw/element";
 
-import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+import { getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,

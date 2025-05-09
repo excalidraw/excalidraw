@@ -1,14 +1,14 @@
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import { MIME_TYPES } from "@excalidraw/common";
-import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
-import { hitElementBoundingBox } from "@excalidraw/element/collision";
+import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { hitElementBoundingBox } from "@excalidraw/element";
 
-import { DEFAULT_LINK_SIZE } from "@excalidraw/element/renderElement";
+import { DEFAULT_LINK_SIZE } from "@excalidraw/element";
 
 import type { GlobalPoint, Radians } from "@excalidraw/math";
 
-import type { Bounds } from "@excalidraw/element/bounds";
+import type { Bounds } from "@excalidraw/element";
 import type {
   ElementsMap,
   NonDeletedExcalidrawElement,

@@ -30,7 +30,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import type Scene from "./Scene";
+import type { Scene } from "./Scene";
 
 import type { MaybeTransformHandleType } from "./transformHandles";
 import type {

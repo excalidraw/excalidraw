@@ -7,9 +7,9 @@ import {
   syncInvalidIndices,
   syncMovedIndices,
   validateFractionalIndices,
-} from "@excalidraw/element/fractionalIndex";
+} from "@excalidraw/element";
 
-import { deepCopyElement } from "@excalidraw/element/duplicate";
+import { deepCopyElement } from "@excalidraw/element";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 

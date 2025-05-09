@@ -1,6 +1,6 @@
 import { CODES, KEYS } from "@excalidraw/common";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import { magnetIcon } from "../components/icons";
 

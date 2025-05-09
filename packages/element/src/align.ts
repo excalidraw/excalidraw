@@ -2,7 +2,7 @@ import { updateBoundElements } from "./binding";
 import { getCommonBoundingBox } from "./bounds";
 import { getMaximumGroups } from "./groups";
 
-import type Scene from "./Scene";
+import type { Scene } from "./Scene";
 
 import type { BoundingBox } from "./bounds";
 import type { ExcalidrawElement } from "./types";

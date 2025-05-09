@@ -5,11 +5,11 @@ import type {
   MIME_TYPES,
 } from "@excalidraw/common";
 
-import type { SuggestedBinding } from "@excalidraw/element/binding";
+import type { SuggestedBinding } from "@excalidraw/element";
 
-import type { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import type { LinearElementEditor } from "@excalidraw/element";
 
-import type { MaybeTransformHandleType } from "@excalidraw/element/transformHandles";
+import type { MaybeTransformHandleType } from "@excalidraw/element";
 
 import type {
   PointerType,
@@ -47,7 +47,7 @@ import type {
   CaptureUpdateActionType,
   DurableIncrement,
   EphemeralIncrement,
-} from "@excalidraw/element/store";
+} from "@excalidraw/element";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";

@@ -5,9 +5,9 @@ import { ROUNDNESS, KEYS, arrayToMap, cloneJSON } from "@excalidraw/common";
 
 import { pointFrom, type Radians } from "@excalidraw/math";
 
-import { getBoundTextElementPosition } from "@excalidraw/element/textElement";
-import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
-import { newLinearElement } from "@excalidraw/element/newElement";
+import { getBoundTextElementPosition } from "@excalidraw/element";
+import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { newLinearElement } from "@excalidraw/element";
 
 import type { LocalPoint } from "@excalidraw/math";
 

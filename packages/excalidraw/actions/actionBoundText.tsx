@@ -10,14 +10,14 @@ import {
   getOriginalContainerHeightFromCache,
   resetOriginalContainerCache,
   updateOriginalContainerCache,
-} from "@excalidraw/element/containerCache";
+} from "@excalidraw/element";
 
 import {
   computeBoundTextPosition,
   computeContainerDimensionForBoundText,
   getBoundTextElement,
   redrawTextBoundingBox,
-} from "@excalidraw/element/textElement";
+} from "@excalidraw/element";
 
 import {
   hasBoundTextElement,
@@ -25,15 +25,15 @@ import {
   isTextBindableContainer,
   isTextElement,
   isUsingAdaptiveRadius,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
-import { measureText } from "@excalidraw/element/textMeasurements";
+import { measureText } from "@excalidraw/element";
 
-import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
+import { syncMovedIndices } from "@excalidraw/element";
 
-import { newElement } from "@excalidraw/element/newElement";
+import { newElement } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,

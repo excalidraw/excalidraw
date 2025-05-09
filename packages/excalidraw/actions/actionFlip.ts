@@ -2,20 +2,20 @@ import { getNonDeletedElements } from "@excalidraw/element";
 import {
   bindOrUnbindLinearElements,
   isBindingEnabled,
-} from "@excalidraw/element/binding";
-import { getCommonBoundingBox } from "@excalidraw/element/bounds";
-import { newElementWith } from "@excalidraw/element/mutateElement";
-import { deepCopyElement } from "@excalidraw/element/duplicate";
-import { resizeMultipleElements } from "@excalidraw/element/resizeElements";
+} from "@excalidraw/element";
+import { getCommonBoundingBox } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element";
+import { deepCopyElement } from "@excalidraw/element";
+import { resizeMultipleElements } from "@excalidraw/element";
 import {
   isArrowElement,
   isElbowArrow,
   isLinearElement,
-} from "@excalidraw/element/typeChecks";
-import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/frame";
+} from "@excalidraw/element";
+import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
 import { CODES, KEYS, arrayToMap } from "@excalidraw/common";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type {
   ExcalidrawArrowElement,

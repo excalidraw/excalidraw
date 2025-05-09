@@ -10,11 +10,11 @@ import {
   isShallowEqual,
 } from "@excalidraw/common";
 
-import { mutateElement } from "@excalidraw/element/mutateElement";
+import { mutateElement } from "@excalidraw/element";
 
-import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeActions";
+import { showSelectedShapeActions } from "@excalidraw/element";
 
-import { ShapeCache } from "@excalidraw/element/ShapeCache";
+import { ShapeCache } from "@excalidraw/element";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 

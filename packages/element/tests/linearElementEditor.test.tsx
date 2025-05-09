@@ -1,5 +1,3 @@
-import { newArrowElement } from "@excalidraw/element/newElement";
-
 import { pointCenter, pointFrom } from "@excalidraw/math";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
 import React from "react";
@@ -13,36 +11,34 @@ import {
   arrayToMap,
 } from "@excalidraw/common";
 
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import {
-  getBoundTextElementPosition,
-  getBoundTextMaxWidth,
-} from "@excalidraw/element/textElement";
-import * as textElementUtils from "@excalidraw/element/textElement";
-import { wrapText } from "@excalidraw/element/textWrapping";
+import { Excalidraw } from "@excalidraw/excalidraw";
+import * as InteractiveCanvas from "@excalidraw/excalidraw/renderer/interactiveScene";
+import * as StaticScene from "@excalidraw/excalidraw/renderer/staticScene";
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
-
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElementWithContainer,
-  FontString,
-} from "@excalidraw/element/types";
-
-import { Excalidraw } from "../index";
-import * as InteractiveCanvas from "../renderer/interactiveScene";
-import * as StaticScene from "../renderer/staticScene";
-import { API } from "../tests/helpers/api";
-
-import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   screen,
   render,
   fireEvent,
   GlobalTestState,
   unmountComponent,
-} from "./test-utils";
+} from "@excalidraw/excalidraw/tests/test-utils";
+
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
+
+import { wrapText } from "../src";
+import * as textElementUtils from "../src/textElement";
+import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
+import { LinearElementEditor } from "../src";
+import { newArrowElement } from "../src";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
+  FontString,
+} from "../src/types";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,

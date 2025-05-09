@@ -22,7 +22,7 @@ import {
   type ElementsSegmentsMap,
 } from "@excalidraw/math";
 
-import { getElementLineSegments } from "@excalidraw/element/bounds";
+import { getElementLineSegments } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 

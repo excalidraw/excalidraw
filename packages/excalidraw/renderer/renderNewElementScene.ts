@@ -1,6 +1,6 @@
 import { throttleRAF } from "@excalidraw/common";
 
-import { renderElement } from "@excalidraw/element/renderElement";
+import { renderElement } from "@excalidraw/element";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 

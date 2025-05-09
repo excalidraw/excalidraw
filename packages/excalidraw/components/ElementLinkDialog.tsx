@@ -5,11 +5,11 @@ import { normalizeLink, KEYS } from "@excalidraw/common";
 import {
   defaultGetElementLinkFromSelection,
   getLinkIdAndTypeFromSelection,
-} from "@excalidraw/element/elementLink";
+} from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 
 import { t } from "../i18n";
 import { getSelectedElements } from "../scene";

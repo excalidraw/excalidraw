@@ -26,7 +26,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import type Scene from "./Scene";
+import type { Scene } from "./Scene";
 
 import type { Bounds } from "./bounds";
 import type { ExcalidrawElement } from "./types";

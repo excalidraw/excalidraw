@@ -4,13 +4,13 @@ import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
 import {
   MINIMAL_CROP_SIZE,
   getUncroppedWidthAndHeight,
-} from "@excalidraw/element/cropElement";
-import { resizeSingleElement } from "@excalidraw/element/resizeElements";
-import { isImageElement } from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
+import { resizeSingleElement } from "@excalidraw/element";
+import { isImageElement } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 
 import DragInput from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";

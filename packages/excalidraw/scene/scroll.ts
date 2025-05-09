@@ -4,9 +4,9 @@ import {
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
-import { getClosestElementBounds } from "@excalidraw/element/bounds";
+import { getClosestElementBounds } from "@excalidraw/element";
 
-import { getCommonBounds } from "@excalidraw/element/bounds";
+import { getCommonBounds } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 

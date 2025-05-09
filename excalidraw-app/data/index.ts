@@ -9,14 +9,14 @@ import {
 } from "@excalidraw/excalidraw/data/encryption";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import { restore } from "@excalidraw/excalidraw/data/restore";
-import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
-import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
+import { isInvisiblySmallElement } from "@excalidraw/element";
+import { isInitializedImageElement } from "@excalidraw/element";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { bytesToHexString } from "@excalidraw/common";
 
 import type { UserIdleState } from "@excalidraw/common";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
-import type { SceneBounds } from "@excalidraw/element/bounds";
+import type { SceneBounds } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   FileId,

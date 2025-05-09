@@ -16,7 +16,7 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import { bindLinearElement } from "@excalidraw/element/binding";
+import { bindLinearElement } from "@excalidraw/element";
 import {
   newArrowElement,
   newElement,
@@ -25,24 +25,21 @@ import {
   newLinearElement,
   newMagicFrameElement,
   newTextElement,
-} from "@excalidraw/element/newElement";
-import {
-  measureText,
-  normalizeText,
-} from "@excalidraw/element/textMeasurements";
-import { isArrowElement } from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
+import { measureText, normalizeText } from "@excalidraw/element";
+import { isArrowElement } from "@excalidraw/element";
 
-import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+import { syncInvalidIndices } from "@excalidraw/element";
 
-import { redrawTextBoundingBox } from "@excalidraw/element/textElement";
+import { redrawTextBoundingBox } from "@excalidraw/element";
 
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { LinearElementEditor } from "@excalidraw/element";
 
-import { getCommonBounds } from "@excalidraw/element/bounds";
+import { getCommonBounds } from "@excalidraw/element";
 
-import Scene from "@excalidraw/element/Scene";
+import { Scene } from "@excalidraw/element";
 
-import type { ElementConstructorOpts } from "@excalidraw/element/newElement";
+import type { ElementConstructorOpts } from "@excalidraw/element";
 
 import type {
   ExcalidrawArrowElement,

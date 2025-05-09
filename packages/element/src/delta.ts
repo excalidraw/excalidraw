@@ -49,7 +49,7 @@ import { getNonDeletedGroupIds } from "./groups";
 
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 
-import Scene from "./Scene";
+import { Scene } from "./Scene";
 
 import type { BindableProp, BindingProp } from "./binding";
 

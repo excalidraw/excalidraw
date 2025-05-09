@@ -12,7 +12,7 @@ import {
   generateEncryptionKey,
 } from "@excalidraw/excalidraw/data/encryption";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
-import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
+import { isInitializedImageElement } from "@excalidraw/element";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 
 import type {

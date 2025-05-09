@@ -10,7 +10,7 @@ import { syncMovedIndices } from "./fractionalIndex";
 
 import { getSelectedElements } from "./selection";
 
-import type Scene from "./Scene";
+import type { Scene } from "./Scene";
 
 import type { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./types";
 

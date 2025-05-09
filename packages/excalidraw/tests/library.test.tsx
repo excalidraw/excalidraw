@@ -4,7 +4,7 @@ import { vi } from "vitest";
 
 import { MIME_TYPES, ORIG_ID } from "@excalidraw/common";
 
-import { getCommonBoundingBox } from "@excalidraw/element/bounds";
+import { getCommonBoundingBox } from "@excalidraw/element";
 
 import type { ExcalidrawGenericElement } from "@excalidraw/element/types";
 
