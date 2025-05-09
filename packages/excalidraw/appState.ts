@@ -121,10 +121,7 @@ export const getDefaultAppState = (): Omit<
     followedBy: new Set(),
     isCropping: false,
     croppingElementId: null,
-    searchMatches: {
-      matches: [],
-      focusedId: null,
-    },
+    searchMatches: null,
   };
 };
 

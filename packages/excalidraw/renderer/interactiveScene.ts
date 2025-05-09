@@ -1126,7 +1126,7 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
-  appState.searchMatches.matches.forEach(({ id, focus, matchedLines }) => {
+  appState.searchMatches?.matches.forEach(({ id, focus, matchedLines }) => {
     const element = elementsMap.get(id);
 
     if (element) {

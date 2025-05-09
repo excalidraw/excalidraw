@@ -84,10 +84,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id172": true,
   },
@@ -677,10 +674,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id167": true,
   },
@@ -1189,10 +1183,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -1564,10 +1555,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -1940,10 +1928,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2211,10 +2196,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id186": true,
   },
@@ -2657,10 +2639,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2963,10 +2942,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -3254,10 +3230,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -3555,10 +3528,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -3848,10 +3818,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -4090,10 +4057,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -4356,10 +4320,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -4636,10 +4597,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -4874,10 +4832,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -5112,10 +5067,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -5348,10 +5300,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -5584,10 +5533,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -5849,10 +5795,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -6187,10 +6130,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -6619,10 +6559,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id106": true,
     "id107": true,
@@ -7005,10 +6942,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id111": true,
     "id112": true,
@@ -7328,10 +7262,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id119": true,
   },
@@ -7633,10 +7564,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -7869,10 +7797,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8231,10 +8156,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8596,10 +8518,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id133": true,
     "id134": true,
@@ -9004,10 +8923,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -9298,10 +9214,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id130": true,
   },
@@ -9570,10 +9483,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id87": true,
   },
@@ -9841,10 +9751,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id89": true,
   },
@@ -10082,10 +9989,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -10387,10 +10291,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id98": true,
   },
@@ -10734,10 +10635,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -10979,10 +10877,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -11432,10 +11327,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id90": true,
   },
@@ -11693,10 +11585,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -11939,10 +11828,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id14": true,
   },
@@ -12187,10 +12073,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -12598,10 +12481,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "resizingElement": null,
   "scrollX": -50,
   "scrollY": -50,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -12849,10 +12729,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id84": true,
   },
@@ -13097,10 +12974,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id19": true,
   },
@@ -13347,10 +13221,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -13599,10 +13470,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id8": true,
   },
@@ -13941,10 +13809,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -14117,10 +13982,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id1": true,
     "id2": true,
@@ -14415,10 +14277,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -14688,10 +14547,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id11": true,
   },
@@ -14971,10 +14827,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -15138,10 +14991,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id61": true,
   },
@@ -15839,10 +15689,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id55": true,
   },
@@ -16462,10 +16309,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id67": true,
   },
@@ -17083,10 +16927,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id68": true,
   },
@@ -17799,10 +17640,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id75": true,
     "id77": true,
@@ -18550,10 +18388,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id45": true,
     "id47": true,
@@ -19031,10 +18866,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id42": true,
     "id44": true,
@@ -19560,10 +19392,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -20023,10 +19852,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "searchMatches": {
-    "focusedId": null,
-    "matches": [],
-  },
+  "searchMatches": null,
   "selectedElementIds": {
     "id27": true,
   },

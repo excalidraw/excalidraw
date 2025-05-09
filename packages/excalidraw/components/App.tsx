@@ -1422,7 +1422,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const focusedSearchMatch =
       nonDeletedFramesLikes.length > 0
-        ? this.state.searchMatches.focusedId &&
+        ? this.state.searchMatches?.focusedId &&
           isFrameLikeElement(
             this.scene.getElement(this.state.searchMatches.focusedId),
           )
@@ -6427,15 +6427,17 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeUnfollowRemoteUser();
 
     if (this.state.searchMatches) {
-      this.setState((state) => ({
-        searchMatches: {
-          focusedId: null,
-          matches: state.searchMatches.matches.map((searchMatch) => ({
-            ...searchMatch,
-            focus: false,
-          })),
-        },
-      }));
+      this.setState((state) => {
+        return {
+          searchMatches: state.searchMatches && {
+            focusedId: null,
+            matches: state.searchMatches.matches.map((searchMatch) => ({
+              ...searchMatch,
+              focus: false,
+            })),
+          },
+        };
+      });
       this.updateEditorAtom(searchItemInFocusAtom, null);
     }
 
