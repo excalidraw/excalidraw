@@ -525,7 +525,7 @@ export const constrainScrollState = (
   };
 };
 
-export const areCanvasViewsClose = (
+export const areCanvasTranslatesClose = (
   from: AnimateTranslateCanvasValues,
   to: AnimateTranslateCanvasValues,
 ): boolean => {

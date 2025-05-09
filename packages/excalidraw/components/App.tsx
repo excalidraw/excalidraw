@@ -531,7 +531,7 @@ import type { Action, ActionResult } from "../actions/types";
 import {
   constrainScrollState,
   calculateConstrainedScrollCenter,
-  areCanvasViewsClose,
+  areCanvasTranslatesClose,
 } from "../scene/scrollConstraints";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -2987,7 +2987,7 @@ class App extends React.Component<AppProps, AppState> {
         zoom: newState.zoom.value,
       };
 
-      if (areCanvasViewsClose(fromValues, toValues)) {
+      if (areCanvasTranslatesClose(fromValues, toValues)) {
         return;
       }
 
