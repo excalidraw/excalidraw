@@ -417,10 +417,19 @@ export const decodeConstraints = (encoded: string): ScrollConstraints => {
   }
 };
 
-type Options = { allowOverscroll?: boolean; disableAnimation?: boolean };
+type Options = { allowOverscroll: boolean; disableAnimation: boolean };
+const DEFAULT_OPTION: Options = {
+  allowOverscroll: true,
+  disableAnimation: false,
+};
 
 /**
  * Constrains the AppState scroll values within the defined scroll constraints.
+ *
+ * constraintMode can be "elastic", "rigid", or "loose":
+ * - "elastic": snaps to constraints but allows overscroll
+ * - "rigid": snaps to constraints without overscroll
+ * - "loose": allows overscroll and disables animation/snapping to constraints
  *
  * @param state - The original AppState.
  * @param options - Options for allowing overscroll and disabling animation.
@@ -428,7 +437,7 @@ type Options = { allowOverscroll?: boolean; disableAnimation?: boolean };
  */
 export const constrainScrollState = (
   state: AppState,
-  options?: Options,
+  constraintMode: "elastic" | "rigid" | "loose" = "elastic",
 ): AppState => {
   if (!state.scrollConstraints) {
     return state;
@@ -442,7 +451,25 @@ export const constrainScrollState = (
     zoom,
   } = state;
 
-  const { allowOverscroll = true, disableAnimation = false } = options || {};
+  let allowOverscroll: boolean;
+  let disableAnimation: boolean;
+
+  switch (constraintMode) {
+    case "elastic":
+      ({ allowOverscroll, disableAnimation } = DEFAULT_OPTION);
+      break;
+    case "rigid":
+      allowOverscroll = false;
+      disableAnimation = false;
+      break;
+    case "loose":
+      allowOverscroll = true;
+      disableAnimation = true;
+      break;
+    default:
+      ({ allowOverscroll, disableAnimation } = DEFAULT_OPTION);
+      break;
+  }
 
   const scrollConstraints = alignScrollConstraints(inverseScrollConstraints);
 

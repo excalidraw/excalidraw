@@ -2974,9 +2974,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (this.state.scrollConstraints?.animateOnNextUpdate) {
-      const newState = constrainScrollState(this.state, {
-        allowOverscroll: false,
-      });
+      const newState = constrainScrollState(this.state, "rigid");
       const fromValues = {
         scrollX: this.state.scrollX,
         scrollY: this.state.scrollY,
@@ -5041,7 +5039,7 @@ class App extends React.Component<AppProps, AppState> {
               state,
             ),
           },
-          { disableAnimation: true },
+          "loose",
         ),
       );
     }
@@ -11353,7 +11351,7 @@ class App extends React.Component<AppProps, AppState> {
               ...this.state,
               scrollConstraints,
             },
-            { allowOverscroll: false },
+            "rigid",
           );
 
           this.animateToConstrainedArea(
