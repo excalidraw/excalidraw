@@ -5,9 +5,9 @@ import { newElementWith } from "@excalidraw/element/mutateElement";
 // ArrowHead icons
 import { isBlurElement } from "@excalidraw/element/typeChecks";
 
-import { BlurRange } from "../components/Range";
+import { CaptureUpdateAction } from "@excalidraw/element/store";
 
-import { CaptureUpdateAction } from "../store";
+import { BlurRange } from "../components/Range";
 
 import { register } from "./register";
 

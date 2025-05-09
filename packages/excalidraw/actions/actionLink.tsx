@@ -4,17 +4,16 @@ import { KEYS, getShortcutKey } from "@excalidraw/common";
 
 import { useContext } from "react";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import { ToolButton } from "../components/ToolButton";
 import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";
 import { LinkIcon } from "../components/icons";
 import { t } from "../i18n";
 
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../store";
-
-import { ExcalidrawPropsCustomOptionsContext } from "../types";
-
 import { register } from "./register";
+import { ExcalidrawPropsCustomOptionsContext } from "../types";
 
 export const actionLink = register({
   name: "hyperlink",

@@ -105,6 +105,7 @@ import {
   setShouldRotateWithDiscreteAngle,
   setShouldSnapping,
   CLASSES,
+  Emitter,
 } from "@excalidraw/common";
 
 import {
@@ -308,6 +309,8 @@ import { isNonDeletedElement } from "@excalidraw/element";
 
 import Scene from "@excalidraw/element/Scene";
 
+import { Store, CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type { ElementUpdate } from "@excalidraw/element/mutateElement";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -336,6 +339,7 @@ import type {
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
+  SceneElementsMap,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -459,9 +463,7 @@ import {
   resetCursor,
   setCursorForShape,
 } from "../cursor";
-import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
-import { Store, CaptureUpdateAction } from "../store";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
@@ -769,8 +771,8 @@ class App extends React.Component<AppProps, AppState> {
     this.renderer = new Renderer(this.scene);
     this.visibleElements = [];
 
-    this.store = new Store();
-    this.history = new History();
+    this.store = new Store(this);
+    this.history = new History(this.store);
 
     if (excalidrawAPI) {
       const api: ExcalidrawImperativeAPI = {
@@ -800,6 +802,7 @@ class App extends React.Component<AppProps, AppState> {
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
         onChange: (cb) => this.onChangeEmitter.on(cb),
+        onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
         onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
@@ -818,15 +821,14 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.fonts = new Fonts(this.scene);
-    this.history = new History(this.props.customOptions?.onHistoryChange);
+    this.history = new History(
+      this.store,
+      this.props.customOptions?.onHistoryChange,
+    );
 
     this.actionManager.registerAll(actions);
-    this.actionManager.registerAction(
-      createUndoAction(this.history, this.store),
-    );
-    this.actionManager.registerAction(
-      createRedoAction(this.history, this.store),
-    );
+    this.actionManager.registerAction(createUndoAction(this.history));
+    this.actionManager.registerAction(createRedoAction(this.history));
   }
 
   updateEditorAtom = <Value, Args extends unknown[], Result>(
@@ -1913,6 +1915,10 @@ class App extends React.Component<AppProps, AppState> {
     return this.scene.getElementsIncludingDeleted();
   };
 
+  public getSceneElementsMapIncludingDeleted = () => {
+    return this.scene.getElementsMapIncludingDeleted();
+  };
+
   public getSceneElements = () => {
     return this.scene.getNonDeletedElements();
   };
@@ -2229,11 +2235,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (actionResult.captureUpdate === CaptureUpdateAction.NEVER) {
-      this.store.shouldUpdateSnapshot();
-    } else if (actionResult.captureUpdate === CaptureUpdateAction.IMMEDIATELY) {
-      this.store.shouldCaptureIncrement();
-    }
+    this.store.scheduleAction(actionResult.captureUpdate);
 
     let didUpdate = false;
 
@@ -2308,10 +2310,7 @@ class App extends React.Component<AppProps, AppState> {
       didUpdate = true;
     }
 
-    if (
-      !didUpdate &&
-      actionResult.captureUpdate !== CaptureUpdateAction.EVENTUALLY
-    ) {
+    if (!didUpdate) {
       this.scene.triggerUpdate();
     }
   });
@@ -2563,9 +2562,18 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    this.store.onStoreIncrementEmitter.on((increment) => {
-      this.history.record(increment.elementsChange, increment.appStateChange);
+    this.store.onDurableIncrementEmitter.on((increment) => {
+      this.history.record(increment.delta);
     });
+
+    const { onIncrement } = this.props;
+
+    // per. optimmisation, only subscribe if there is the `onIncrement` prop registered, to avoid unnecessary computation
+    if (onIncrement) {
+      this.store.onStoreIncrementEmitter.on((increment) => {
+        onIncrement(increment);
+      });
+    }
 
     this.scene.onUpdate(this.triggerRender);
     this.addEventListeners();
@@ -2626,6 +2634,7 @@ class App extends React.Component<AppProps, AppState> {
     this.eraserTrail.stop();
     this.onChangeEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
+    this.store.onDurableIncrementEmitter.clear();
     ShapeCache.destroy();
     SnapCache.destroy();
     clearTimeout(touchTimeout);
@@ -2919,7 +2928,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state.editingLinearElement &&
       !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
     ) {
-      // defer so that the shouldCaptureIncrement flag isn't reset via current update
+      // defer so that the scheduleCapture flag isn't reset via current update
       setTimeout(() => {
         // execute only if the condition still holds when the deferred callback
         // executes (it can be scheduled multiple times depending on how
@@ -3378,7 +3387,7 @@ class App extends React.Component<AppProps, AppState> {
       this.addMissingFiles(opts.files);
     }
 
-    this.store.shouldCaptureIncrement();
+    this.store.scheduleCapture();
 
     const nextElementsToSelect =
       excludeElementsInFramesFromSelection(duplicatedElements);
@@ -3639,7 +3648,7 @@ class App extends React.Component<AppProps, AppState> {
       PLAIN_PASTE_TOAST_SHOWN = true;
     }
 
-    this.store.shouldCaptureIncrement();
+    this.store.scheduleCapture();
   }
 
   setAppState: React.Component<any, AppState>["setState"] = (
@@ -3995,51 +4004,37 @@ class App extends React.Component<AppProps, AppState> {
        */
       captureUpdate?: SceneData["captureUpdate"];
     }) => {
-      const nextElements = syncInvalidIndices(sceneData.elements ?? []);
+      const { elements, appState, collaborators, captureUpdate } = sceneData;
 
-      if (
-        sceneData.captureUpdate &&
-        sceneData.captureUpdate !== CaptureUpdateAction.EVENTUALLY
-      ) {
-        const prevCommittedAppState = this.store.snapshot.appState;
-        const prevCommittedElements = this.store.snapshot.elements;
+      const nextElements = elements ? syncInvalidIndices(elements) : undefined;
 
-        const nextCommittedAppState = sceneData.appState
-          ? Object.assign({}, prevCommittedAppState, sceneData.appState) // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
-          : prevCommittedAppState;
+      if (captureUpdate) {
+        const nextElementsMap = elements
+          ? (arrayToMap(nextElements ?? []) as SceneElementsMap)
+          : undefined;
 
-        const nextCommittedElements = sceneData.elements
-          ? this.store.filterUncomittedElements(
-              this.scene.getElementsMapIncludingDeleted(), // Only used to detect uncomitted local elements
-              arrayToMap(nextElements), // We expect all (already reconciled) elements
-            )
-          : prevCommittedElements;
+        const nextAppState = appState
+          ? // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
+            Object.assign({}, this.store.snapshot.appState, appState)
+          : undefined;
 
-        // WARN: store action always performs deep clone of changed elements, for ephemeral remote updates (i.e. remote dragging, resizing, drawing) we might consider doing something smarter
-        // do NOT schedule store actions (execute after re-render), as it might cause unexpected concurrency issues if not handled well
-        if (sceneData.captureUpdate === CaptureUpdateAction.IMMEDIATELY) {
-          this.store.captureIncrement(
-            nextCommittedElements,
-            nextCommittedAppState,
-          );
-        } else if (sceneData.captureUpdate === CaptureUpdateAction.NEVER) {
-          this.store.updateSnapshot(
-            nextCommittedElements,
-            nextCommittedAppState,
-          );
-        }
+        this.store.scheduleMicroAction({
+          action: captureUpdate,
+          elements: nextElementsMap,
+          appState: nextAppState,
+        });
       }
 
-      if (sceneData.appState) {
-        this.setState(sceneData.appState);
+      if (appState) {
+        this.setState(appState);
       }
 
-      if (sceneData.elements) {
+      if (nextElements) {
         this.scene.replaceAllElements(nextElements);
       }
 
-      if (sceneData.collaborators) {
-        this.setState({ collaborators: sceneData.collaborators });
+      if (collaborators) {
+        this.setState({ collaborators });
       }
     },
   );
@@ -4226,7 +4221,7 @@ class App extends React.Component<AppProps, AppState> {
                 direction: event.shiftKey ? "left" : "right",
               })
             ) {
-              this.store.shouldCaptureIncrement();
+              this.store.scheduleCapture();
             }
           }
           if (conversionType) {
@@ -4543,7 +4538,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.state.editingLinearElement.elementId !==
                   selectedElements[0].id
               ) {
-                this.store.shouldCaptureIncrement();
+                this.store.scheduleCapture();
                 if (!isElbowArrow(selectedElement)) {
                   this.setState({
                     editingLinearElement: new LinearElementEditor(
@@ -4869,7 +4864,7 @@ class App extends React.Component<AppProps, AppState> {
       } as const;
 
       if (nextActiveTool.type === "freedraw") {
-        this.store.shouldCaptureIncrement();
+        this.store.scheduleCapture();
       }
 
       if (nextActiveTool.type === "lasso") {
@@ -5086,7 +5081,7 @@ class App extends React.Component<AppProps, AppState> {
           ]);
         }
         if (!isDeleted || isExistingElement) {
-          this.store.shouldCaptureIncrement();
+          this.store.scheduleCapture();
         }
 
         flushSync(() => {
@@ -5499,7 +5494,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private startImageCropping = (image: ExcalidrawImageElement) => {
-    this.store.shouldCaptureIncrement();
+    this.store.scheduleCapture();
     this.setState({
       croppingElementId: image.id,
     });
@@ -5507,7 +5502,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private finishImageCropping = () => {
     if (this.state.croppingElementId) {
-      this.store.shouldCaptureIncrement();
+      this.store.scheduleCapture();
       this.setState({
         croppingElementId: null,
       });
@@ -5542,7 +5537,7 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements[0].id) &&
         !isElbowArrow(selectedElements[0])
       ) {
-        this.store.shouldCaptureIncrement();
+        this.store.scheduleCapture();
         this.setState({
           editingLinearElement: new LinearElementEditor(
             selectedElements[0],
@@ -5570,7 +5565,7 @@ class App extends React.Component<AppProps, AppState> {
           : -1;
 
         if (midPoint && midPoint > -1) {
-          this.store.shouldCaptureIncrement();
+          this.store.scheduleCapture();
           LinearElementEditor.deleteFixedSegment(
             selectedElements[0],
             this.scene,
@@ -5632,7 +5627,7 @@ class App extends React.Component<AppProps, AppState> {
         getSelectedGroupIdForElement(hitElement, this.state.selectedGroupIds);
 
       if (selectedGroupId) {
-        this.store.shouldCaptureIncrement();
+        this.store.scheduleCapture();
         this.setState((prevState) => ({
           ...prevState,
           ...selectGroupsForSelectedElements(
@@ -9173,7 +9168,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (isLinearElement(newElement)) {
         if (newElement!.points.length > 1) {
-          this.store.shouldCaptureIncrement();
+          this.store.scheduleCapture();
         }
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
@@ -9446,7 +9441,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (resizingElement) {
-        this.store.shouldCaptureIncrement();
+        this.store.scheduleCapture();
       }
 
       if (resizingElement && isInvisiblySmallElement(resizingElement)) {
@@ -9786,7 +9781,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state.selectedElementIds,
         )
       ) {
-        this.store.shouldCaptureIncrement();
+        this.store.scheduleCapture();
       }
 
       if (
@@ -9879,7 +9874,7 @@ class App extends React.Component<AppProps, AppState> {
     this.elementsPendingErasure = new Set();
 
     if (didChange) {
-      this.store.shouldCaptureIncrement();
+      this.store.scheduleCapture();
       this.scene.replaceAllElements(elements);
     }
   };
@@ -10559,8 +10554,13 @@ class App extends React.Component<AppProps, AppState> {
         // restore the fractional indices by mutating elements
         syncInvalidIndices(elements.concat(ret.data.elements));
 
-        // update the store snapshot for old elements, otherwise we would end up with duplicated fractional indices on undo
-        this.store.updateSnapshot(arrayToMap(elements), this.state);
+        // don't capture and only update the store snapshot for old elements,
+        // otherwise we would end up with duplicated fractional indices on undo
+        this.store.scheduleMicroAction({
+          action: CaptureUpdateAction.NEVER,
+          elements: arrayToMap(elements) as SceneElementsMap,
+          appState: undefined,
+        });
 
         this.setState({ isLoading: true });
         this.syncActionResult({

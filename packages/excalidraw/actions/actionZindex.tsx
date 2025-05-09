@@ -9,6 +9,8 @@ import {
 
 import { useContext } from "react";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import {
   BringForwardIcon,
   BringToFrontIcon,
@@ -16,7 +18,6 @@ import {
   SendToBackIcon,
 } from "../components/icons";
 import { t } from "../i18n";
-import { CaptureUpdateAction } from "../store";
 
 import { ExcalidrawPropsCustomOptionsContext } from "../types";
 
