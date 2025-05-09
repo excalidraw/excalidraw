@@ -1,6 +1,5 @@
 import {
   lineSegment,
-  pointFrom,
   type GlobalPoint,
   vectorFromPoint,
   vectorNormalize,
@@ -14,18 +13,26 @@ import { elementCenterPoint } from "@excalidraw/common";
 
 import { distanceToElement } from "@excalidraw/element/distance";
 
-import { getCommonBounds, isLinearElement } from "@excalidraw/excalidraw";
+import { isLinearElement } from "@excalidraw/excalidraw";
 import { isFreeDrawElement } from "@excalidraw/element/typeChecks";
 import { isPathALoop } from "@excalidraw/element/shapes";
 
 import {
+  debugClear,
   debugDrawLine,
   debugDrawPoint,
 } from "@excalidraw/excalidraw/visualdebug";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-// check if the given point is considered on the given shape's border
+/**
+ * Check if the given point is considered on the given shape's border
+ *
+ * @param point
+ * @param element
+ * @param tolerance
+ * @returns
+ */
 export const isPointOnShape = (
   point: GlobalPoint,
   element: ExcalidrawElement,
@@ -36,50 +43,46 @@ export const isPointOnShape = (
   return distance <= tolerance;
 };
 
-// check if the given point is considered inside the element's border
+/**
+ * Check if the given point is considered inside the element's border
+ *
+ * @param point
+ * @param element
+ * @returns
+ */
 export const isPointInShape = (
   point: GlobalPoint,
   element: ExcalidrawElement,
 ) => {
-  if (isLinearElement(element) || isFreeDrawElement(element)) {
-    if (isPathALoop(element.points)) {
-      const [minX, minY, maxX, maxY] = getCommonBounds([element]);
-      const center = pointFrom<GlobalPoint>(
-        (maxX + minX) / 2,
-        (maxY + minY) / 2,
-      );
-      const otherPoint = pointFromVector(
-        vectorScale(
-          vectorNormalize(vectorFromPoint(point, center, 0.1)),
-          Math.max(element.width, element.height) * 2,
-        ),
-        center,
-      );
-      const intersector = lineSegment(point, otherPoint);
-
-      // What about being on the center exactly?
-      const intersections = intersectElementWithLineSegment(
-        element,
-        intersector,
-      );
-
-      const hit = intersections.length % 2 === 1;
-
-      debugDrawLine(intersector, { color: hit ? "green" : "red" });
-      debugDrawPoint(point, { color: "black" });
-      debugDrawPoint(otherPoint, { color: "blue" });
-
-      return hit;
-    }
-
+  if (
+    (isLinearElement(element) || isFreeDrawElement(element)) &&
+    !isPathALoop(element.points)
+  ) {
     // There isn't any "inside" for a non-looping path
     return false;
   }
 
+  const center = elementCenterPoint(element);
+  const otherPoint = pointFromVector(
+    vectorScale(
+      vectorNormalize(vectorFromPoint(point, center, 0.1)),
+      Math.max(element.width, element.height) * 2,
+    ),
+    center,
+  );
+  const intersector = lineSegment(point, otherPoint);
   const intersections = intersectElementWithLineSegment(
     element,
-    lineSegment(elementCenterPoint(element), point),
-  );
+    intersector,
+  ).filter((item, pos, arr) => arr.indexOf(item) === pos);
+  const hit = intersections.length % 2 === 1;
 
-  return intersections.length === 0;
+  //debugClear();
+  // debugDrawLine(intersector, { color: hit ? "green" : "red", permanent: true });
+  // debugDrawPoint(point, { color: "black", permanent: true });
+  // debugDrawPoint(otherPoint, { color: "blue", permanent: true });
+
+  //console.log(intersections);
+
+  return hit;
 };

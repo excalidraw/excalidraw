@@ -2,6 +2,7 @@ import rough from "roughjs/bin/rough";
 
 import {
   arrayToMap,
+  elementCenterPoint,
   invariant,
   rescalePoints,
   sizeOf,
@@ -553,7 +554,7 @@ const solveQuadratic = (
   return [s1, s2];
 };
 
-const getCubicBezierCurveBound = (
+export const getCubicBezierCurveBound = (
   p0: GlobalPoint,
   p1: GlobalPoint,
   p2: GlobalPoint,
@@ -1146,3 +1147,153 @@ export const doBoundsIntersect = (
 
   return minX1 < maxX2 && maxX1 > minX2 && minY1 < maxY2 && maxY1 > minY2;
 };
+
+export const aabbForCubicBezierCurve = ([
+  [x0, y0],
+  [x1, y1],
+  [x2, y2],
+  [x3, y3],
+]: Curve<GlobalPoint>): Bounds => {
+  // Solving for X dimension
+  const solX = solveQuadratic(x0, x1, x2, x3);
+  // Solving for Y dimension
+  const solY = solveQuadratic(y0, y1, y2, y3);
+
+  // Start with the bounds of the start and end points
+  let minX = Math.min(x0, x3);
+  let maxX = Math.max(x0, x3);
+
+  // Add potential extrema points in X dimension
+  if (solX) {
+    const xs = solX.filter((x) => x !== null) as number[];
+    minX = Math.min(minX, ...xs);
+    maxX = Math.max(maxX, ...xs);
+  }
+
+  // Start with the bounds of the start and end points
+  let minY = Math.min(y0, y3);
+  let maxY = Math.max(y0, y3);
+
+  // Add potential extrema points in Y dimension
+  if (solY) {
+    const ys = solY.filter((y) => y !== null) as number[];
+    minY = Math.min(minY, ...ys);
+    maxY = Math.max(maxY, ...ys);
+  }
+
+  return [minX, minY, maxX, maxY];
+};
+
+const aabbForLinearOrFreeDraw = (
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+): Bounds => {
+  let [xs, ys] = element.points.reduce<[number[], number[]]>(
+    (acc, point) => {
+      acc[0].push(element.x + point[0]);
+      acc[1].push(element.y + point[1]);
+      return acc;
+    },
+    [[], []],
+  );
+
+  if (element.angle !== 0) {
+    const cx = (Math.min(...xs, element.x) + Math.max(...xs, element.x)) / 2;
+    const cy = (Math.min(...ys, element.y) + Math.max(...ys, element.y)) / 2;
+    const cos = Math.cos(element.angle);
+    const sin = Math.sin(element.angle);
+
+    [xs, ys] = [
+      xs.map((x, i) => (x - cx) * cos - (ys[i] - cy) * sin + cx),
+      ys.map((y, i) => (xs[i] - cx) * sin + (y - cy) * cos + cy),
+    ];
+  }
+
+  return [
+    Math.min(...xs, element.x),
+    Math.min(...ys, element.y),
+    Math.max(...xs, element.x),
+    Math.max(...ys, element.y),
+  ];
+};
+
+const aabbForNonLinearAndNonFreeDrawElement = <E>(
+  element: E extends ExcalidrawLinearElement | ExcalidrawFreeDrawElement
+    ? never
+    : ExcalidrawElement,
+): Bounds => {
+  const bbox = {
+    minX: element.x,
+    minY: element.y,
+    maxX: element.x + element.width,
+    maxY: element.y + element.height,
+  };
+
+  const center = elementCenterPoint(element);
+  const [topLeftX, topLeftY] = pointRotateRads(
+    pointFrom(bbox.minX, bbox.minY),
+    center,
+    element.angle,
+  );
+  const [topRightX, topRightY] = pointRotateRads(
+    pointFrom(bbox.maxX, bbox.minY),
+    center,
+    element.angle,
+  );
+  const [bottomRightX, bottomRightY] = pointRotateRads(
+    pointFrom(bbox.maxX, bbox.maxY),
+    center,
+    element.angle,
+  );
+  const [bottomLeftX, bottomLeftY] = pointRotateRads(
+    pointFrom(bbox.minX, bbox.maxY),
+    center,
+    element.angle,
+  );
+
+  const bounds = [
+    Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX),
+    Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY),
+    Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX),
+    Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY),
+  ] as Bounds;
+
+  return bounds;
+};
+
+/**
+ * Get the axis-aligned bounding box for a given element
+ */
+export const aabbForElement = (
+  element: Readonly<ExcalidrawElement>,
+  offset?: [number, number, number, number],
+) => {
+  const bounds =
+    isLinearElement(element) || isFreeDrawElement(element)
+      ? aabbForLinearOrFreeDraw(element)
+      : aabbForNonLinearAndNonFreeDrawElement(element);
+
+  if (offset) {
+    const [topOffset, rightOffset, downOffset, leftOffset] = offset;
+    return [
+      bounds[0] - leftOffset,
+      bounds[1] - topOffset,
+      bounds[2] + rightOffset,
+      bounds[3] + downOffset,
+    ] as Bounds;
+  }
+
+  return bounds;
+};
+
+/**
+ * Determine if a point is inside a given axis-aligned bounding box
+ *
+ * @param p
+ * @param bounds
+ * @returns
+ */
+export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  bounds: Bounds,
+): boolean =>
+  p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];

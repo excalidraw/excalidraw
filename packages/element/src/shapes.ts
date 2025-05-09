@@ -4,14 +4,12 @@ import {
   LINE_CONFIRM_THRESHOLD,
   ROUNDNESS,
   invariant,
-  elementCenterPoint,
 } from "@excalidraw/common";
 import {
   isPoint,
   pointFrom,
   pointDistance,
   pointFromPair,
-  pointRotateRads,
   pointsEqual,
   type GlobalPoint,
   type LocalPoint,
@@ -33,7 +31,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement } from "./textElement";
 import { ShapeCache } from "./ShapeCache";
 
-import { getElementAbsoluteCoords, type Bounds } from "./bounds";
+import { getElementAbsoluteCoords } from "./bounds";
 
 import type {
   ElementsMap,
@@ -281,80 +279,6 @@ export const mapIntervalToBezierT = <P extends GlobalPoint | LocalPoint>(
       pointsCount
   );
 };
-
-/**
- * Get the axis-aligned bounding box for a given element
- */
-export const aabbForElement = (
-  element: Readonly<ExcalidrawElement>,
-  offset?: [number, number, number, number],
-) => {
-  const bbox = {
-    minX: element.x,
-    minY: element.y,
-    maxX: element.x + element.width,
-    maxY: element.y + element.height,
-    midX: element.x + element.width / 2,
-    midY: element.y + element.height / 2,
-  };
-
-  const center = elementCenterPoint(element);
-  const [topLeftX, topLeftY] = pointRotateRads(
-    pointFrom(bbox.minX, bbox.minY),
-    center,
-    element.angle,
-  );
-  const [topRightX, topRightY] = pointRotateRads(
-    pointFrom(bbox.maxX, bbox.minY),
-    center,
-    element.angle,
-  );
-  const [bottomRightX, bottomRightY] = pointRotateRads(
-    pointFrom(bbox.maxX, bbox.maxY),
-    center,
-    element.angle,
-  );
-  const [bottomLeftX, bottomLeftY] = pointRotateRads(
-    pointFrom(bbox.minX, bbox.maxY),
-    center,
-    element.angle,
-  );
-
-  const bounds = [
-    Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX),
-    Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY),
-    Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX),
-    Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY),
-  ] as Bounds;
-
-  if (offset) {
-    const [topOffset, rightOffset, downOffset, leftOffset] = offset;
-    return [
-      bounds[0] - leftOffset,
-      bounds[1] - topOffset,
-      bounds[2] + rightOffset,
-      bounds[3] + downOffset,
-    ] as Bounds;
-  }
-
-  return bounds;
-};
-
-export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
-  p: P,
-  bounds: Bounds,
-): boolean =>
-  p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
-
-export const aabbsOverlapping = (a: Bounds, b: Bounds) =>
-  pointInsideBounds(pointFrom(a[0], a[1]), b) ||
-  pointInsideBounds(pointFrom(a[2], a[1]), b) ||
-  pointInsideBounds(pointFrom(a[2], a[3]), b) ||
-  pointInsideBounds(pointFrom(a[0], a[3]), b) ||
-  pointInsideBounds(pointFrom(b[0], b[1]), a) ||
-  pointInsideBounds(pointFrom(b[2], b[1]), a) ||
-  pointInsideBounds(pointFrom(b[2], b[3]), a) ||
-  pointInsideBounds(pointFrom(b[0], b[3]), a);
 
 export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   if (

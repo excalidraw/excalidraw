@@ -32,7 +32,13 @@ import type {
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./shapes";
-import { getElementBounds } from "./bounds";
+import {
+  aabbForCubicBezierCurve,
+  aabbForElement,
+  Bounds,
+  getCubicBezierCurveBound,
+  getElementBounds,
+} from "./bounds";
 import {
   hasBoundTextElement,
   isIframeLikeElement,
@@ -59,6 +65,14 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
+
+import {
+  debugClear,
+  debugDrawBounds,
+  debugDrawCubicBezier,
+  debugDrawLine,
+  debugDrawPoint,
+} from "@excalidraw/excalidraw/visualdebug";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {
@@ -219,11 +233,13 @@ const intersectLinearOrFreeDrawWithLineSegment = (
   for (const shape of shapes) {
     switch (true) {
       case isCurve(shape):
+        debugDrawCubicBezier(shape as Curve<GlobalPoint>);
         intersections.push(
           ...curveIntersectLineSegment(shape as Curve<GlobalPoint>, segment),
         );
         continue;
       case isLineSegment(shape):
+        debugDrawLine(shape as LineSegment<GlobalPoint>);
         const point = lineSegmentIntersectionPoints(
           segment,
           shape as LineSegment<GlobalPoint>,

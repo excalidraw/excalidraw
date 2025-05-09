@@ -1,7 +1,20 @@
 import { simplify } from "points-on-curve";
 
-import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
-import { ROUGHNESS, isTransparent, assertNever } from "@excalidraw/common";
+import {
+  pointFrom,
+  pointDistance,
+  type LocalPoint,
+  pointRotateRads,
+  type GlobalPoint,
+  curve,
+  degreesToRadians,
+} from "@excalidraw/math";
+import {
+  ROUGHNESS,
+  isTransparent,
+  assertNever,
+  elementCenterPoint,
+} from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
 
@@ -22,7 +35,14 @@ import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
 import { generateFreeDrawShape } from "./renderElement";
-import { getArrowheadPoints, getDiamondPoints } from "./bounds";
+import {
+  aabbForCubicBezierCurve,
+  aabbForElement,
+  getArrowheadPoints,
+  getCubicBezierCurveBound,
+  getDiamondPoints,
+  getElementBounds,
+} from "./bounds";
 
 import type {
   ExcalidrawElement,
@@ -35,6 +55,13 @@ import type {
 
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+
+import {
+  debugClear,
+  debugDrawBounds,
+  debugDrawLine,
+  debugDrawPoint,
+} from "@excalidraw/excalidraw/visualdebug";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -320,33 +347,124 @@ export const generateLinearCollisionShape = (
   switch (element.type) {
     case "line":
     case "arrow": {
-      let shape: any;
-
-      // points array can be empty in the beginning, so it is important to add
-      // initial position to it
-      const points = element.points.length
-        ? element.points
-        : [pointFrom<LocalPoint>(0, 0)];
-
       if (isElbowArrow(element)) {
-        shape = generator.path(generateElbowArrowShape(points, 16), options)
+        const points = element.points.length
+          ? element.points
+          : [pointFrom<LocalPoint>(0, 0)];
+
+        return generator.path(generateElbowArrowShape(points, 16), options)
           .sets[0].ops;
       } else if (!element.roundness) {
-        shape = points.map((point, idx) => {
-          return idx === 0
-            ? { op: "move", data: point }
-            : {
-                op: "lineTo",
-                data: [point[0], point[1]],
-              };
-        });
-      } else {
-        shape = generator
-          .curve(points as unknown as RoughPoint[], options)
-          .sets[0].ops.slice(0, element.points.length);
+        // Sharp linear line
+
+        let [xs, ys] = element.points.reduce<[number[], number[]]>(
+          (acc, point) => {
+            acc[0].push(element.x + point[0]);
+            acc[1].push(element.y + point[1]);
+            return acc;
+          },
+          [[], []],
+        );
+
+        if (element.angle !== 0) {
+          const cx =
+            (Math.min(...xs, element.x) + Math.max(...xs, element.x)) / 2;
+          const cy =
+            (Math.min(...ys, element.y) + Math.max(...ys, element.y)) / 2;
+          const cos = Math.cos(element.angle);
+          const sin = Math.sin(element.angle);
+
+          [xs, ys] = [
+            xs.map((x, i) => (x - cx) * cos - (ys[i] - cy) * sin + cx),
+            ys.map((y, i) => (xs[i] - cx) * sin + (y - cy) * cos + cy),
+          ];
+        }
+
+        const points = element.points.length
+          ? xs.map((x, i) =>
+              pointFrom<LocalPoint>(x - element.x, ys[i] - element.y),
+            )
+          : [pointFrom<LocalPoint>(0, 0)];
+
+        return points.map((point, idx) => ({
+          op: idx === 0 ? "move" : "lineTo",
+          data: point,
+        }));
       }
 
-      return shape;
+      // Ronded lines
+
+      const shape = generator
+        .curve(element.points as unknown as RoughPoint[], options)
+        .sets[0].ops.slice(0, element.points.length);
+      const bounds = getElementBounds(element, new Map());
+      debugDrawBounds(bounds, { color: "red", permanent: true });
+      debugDrawPoint(pointFrom<GlobalPoint>(bounds[0], bounds[1]), {
+        color: "yellow",
+        permanent: true,
+      });
+      debugDrawPoint(pointFrom<GlobalPoint>(bounds[2], bounds[3]), {
+        color: "yellow",
+        permanent: true,
+      });
+      const center = pointFrom<GlobalPoint>(
+        (bounds[2] + bounds[0]) / 2,
+        (bounds[3] + bounds[1]) / 2,
+      );
+
+      debugDrawPoint(center, { color: "blue", permanent: true });
+
+      return shape.map((c, i) => {
+        if (i === 0) {
+          const p = pointRotateRads(
+            pointFrom<GlobalPoint>(
+              element.x + c.data[0],
+              element.y + c.data[1],
+            ),
+            center,
+            element.angle,
+          );
+
+          return {
+            op: "move",
+            data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+          };
+        }
+
+        return {
+          op: "bcurveTo",
+          data: [
+            pointRotateRads(
+              pointFrom<GlobalPoint>(
+                element.x + c.data[0],
+                element.y + c.data[1],
+              ),
+              center,
+              element.angle,
+            ),
+            pointRotateRads(
+              pointFrom<GlobalPoint>(
+                element.x + c.data[2],
+                element.y + c.data[3],
+              ),
+              center,
+              element.angle,
+            ),
+            pointRotateRads(
+              pointFrom<GlobalPoint>(
+                element.x + c.data[4],
+                element.y + c.data[5],
+              ),
+              center,
+              element.angle,
+            ),
+          ]
+            .map((p) =>
+              pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+            )
+            .flat(),
+        };
+      });
     }
     case "freedraw": {
       const simplifiedPoints = simplify(

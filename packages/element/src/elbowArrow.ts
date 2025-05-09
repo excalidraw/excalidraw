@@ -52,9 +52,8 @@ import {
   type NonDeletedSceneElementsMap,
 } from "./types";
 
-import { aabbForElement, pointInsideBounds } from "./shapes";
+import { aabbForElement, pointInsideBounds, type Bounds } from "./bounds";
 
-import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
 import type {
   Arrowhead,

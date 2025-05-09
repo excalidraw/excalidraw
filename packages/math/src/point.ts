@@ -109,9 +109,12 @@ export function pointRotateRads<Point extends GlobalPoint | LocalPoint>(
   [cx, cy]: Point,
   angle: Radians,
 ): Point {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+
   return pointFrom(
-    (x - cx) * Math.cos(angle) - (y - cy) * Math.sin(angle) + cx,
-    (x - cx) * Math.sin(angle) + (y - cy) * Math.cos(angle) + cy,
+    (x - cx) * cos - (y - cy) * sin + cx,
+    (x - cx) * sin + (y - cy) * cos + cy,
   );
 }
 
