@@ -34,13 +34,6 @@ export const actionToggleSearchMenu = register({
           `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
         );
 
-      if (searchInput?.matches(":focus")) {
-        return {
-          appState: { ...appState, openSidebar: null },
-          captureUpdate: CaptureUpdateAction.EVENTUALLY,
-        };
-      }
-
       searchInput?.focus();
       searchInput?.select();
       return false;

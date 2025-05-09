@@ -905,13 +905,16 @@ export const shouldApplyFrameClip = (
   return false;
 };
 
-export const getFrameLikeTitle = (element: ExcalidrawFrameLikeElement) => {
+const DEFAULT_FRAME_NAME = "Frame";
+const DEFAULT_AI_FRAME_NAME = "AI Frame";
+
+export const getDefaultFrameName = (element: ExcalidrawFrameLikeElement) => {
   // TODO name frames "AI" only if specific to AI frames
-  return element.name === null
-    ? isFrameElement(element)
-      ? "Frame"
-      : "AI Frame"
-    : element.name;
+  return isFrameElement(element) ? DEFAULT_FRAME_NAME : DEFAULT_AI_FRAME_NAME;
+};
+
+export const getFrameLikeTitle = (element: ExcalidrawFrameLikeElement) => {
+  return element.name === null ? getDefaultFrameName(element) : element.name;
 };
 
 export const getElementsOverlappingFrame = (
