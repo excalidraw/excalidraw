@@ -1417,8 +1417,19 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const isDarkTheme = this.state.theme === THEME.DARK;
+    const nonDeletedFramesLikes = this.scene.getNonDeletedFramesLikes();
 
-    return this.scene.getNonDeletedFramesLikes().map((f) => {
+    const focusedSearchMatch =
+      nonDeletedFramesLikes.length > 0
+        ? this.state.searchMatches?.focusedId &&
+          isFrameLikeElement(
+            this.scene.getElement(this.state.searchMatches.focusedId),
+          )
+          ? this.state.searchMatches.matches.find((sm) => sm.focus)
+          : null
+        : null;
+
+    return nonDeletedFramesLikes.map((f) => {
       if (
         !isElementInViewport(
           f,
@@ -1484,7 +1495,7 @@ class App extends React.Component<AppProps, AppState> {
               borderRadius: 4,
               boxShadow: "inset 0 0 0 1px var(--color-primary)",
               fontFamily: "Assistant",
-              fontSize: "14px",
+              fontSize: `${FRAME_STYLE.nameFontSize}px`,
               transform: `translate(-${FRAME_NAME_EDIT_PADDING}px, ${FRAME_NAME_EDIT_PADDING}px)`,
               color: "var(--color-gray-80)",
               overflow: "hidden",
@@ -1528,7 +1539,10 @@ class App extends React.Component<AppProps, AppState> {
               : FRAME_STYLE.nameColorLightTheme,
             lineHeight: FRAME_STYLE.nameLineHeight,
             width: "max-content",
-            maxWidth: `${f.width}px`,
+            maxWidth:
+              focusedSearchMatch?.id === f.id && focusedSearchMatch?.focus
+                ? "none"
+                : `${f.width * this.state.zoom.value}px`,
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
@@ -6405,12 +6419,17 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeUnfollowRemoteUser();
 
     if (this.state.searchMatches) {
-      this.setState((state) => ({
-        searchMatches: state.searchMatches.map((searchMatch) => ({
-          ...searchMatch,
-          focus: false,
-        })),
-      }));
+      this.setState((state) => {
+        return {
+          searchMatches: state.searchMatches && {
+            focusedId: null,
+            matches: state.searchMatches.matches.map((searchMatch) => ({
+              ...searchMatch,
+              focus: false,
+            })),
+          },
+        };
+      });
       this.updateEditorAtom(searchItemInFocusAtom, null);
     }
 
