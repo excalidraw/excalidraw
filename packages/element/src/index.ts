@@ -1,3 +1,5 @@
+import { toIterable } from "@excalidraw/common";
+
 import { isInvisiblySmallElement } from "./sizeHelpers";
 import { isLinearElementType } from "./typeChecks";
 
@@ -5,6 +7,7 @@ import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
+  ElementsMapOrArray,
 } from "./types";
 
 /**
@@ -16,12 +19,10 @@ export const getSceneVersion = (elements: readonly ExcalidrawElement[]) =>
 /**
  * Hashes elements' versionNonce (using djb2 algo). Order of elements matters.
  */
-export const hashElementsVersion = (
-  elements: readonly ExcalidrawElement[],
-): number => {
+export const hashElementsVersion = (elements: ElementsMapOrArray): number => {
   let hash = 5381;
-  for (let i = 0; i < elements.length; i++) {
-    hash = (hash << 5) + hash + elements[i].versionNonce;
+  for (const element of toIterable(elements)) {
+    hash = (hash << 5) + hash + element.versionNonce;
   }
   return hash >>> 0; // Ensure unsigned 32-bit integer
 };

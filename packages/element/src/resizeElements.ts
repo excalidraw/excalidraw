@@ -962,11 +962,6 @@ export const resizeSingleElement = (
       isDragging: false,
     });
 
-    updateBoundElements(latestElement, scene, {
-      // TODO: confirm with MARK if this actually makes sense
-      newSize: { width: nextWidth, height: nextHeight },
-    });
-
     if (boundTextElement && boundTextFont != null) {
       scene.mutateElement(boundTextElement, {
         fontSize: boundTextFont.fontSize,
@@ -978,6 +973,11 @@ export const resizeSingleElement = (
       handleDirection,
       shouldMaintainAspectRatio,
     );
+
+    updateBoundElements(latestElement, scene, {
+      // TODO: confirm with MARK if this actually makes sense
+      newSize: { width: nextWidth, height: nextHeight },
+    });
   }
 };
 

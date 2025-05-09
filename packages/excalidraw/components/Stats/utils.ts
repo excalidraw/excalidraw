@@ -215,23 +215,6 @@ export const moveElement = (
       updateBindings(latestChildElement, scene, {
         simultaneouslyUpdated: originalChildren,
       });
-
-      const boundTextElement = getBoundTextElement(
-        latestChildElement,
-        originalElementsMap,
-      );
-      if (boundTextElement) {
-        const latestBoundTextElement = elementsMap.get(boundTextElement.id);
-        latestBoundTextElement &&
-          scene.mutateElement(
-            latestBoundTextElement,
-            {
-              x: boundTextElement.x + changeInX,
-              y: boundTextElement.y + changeInY,
-            },
-            { informMutation: shouldInformMutation, isDragging: false },
-          );
-      }
     });
   }
 };

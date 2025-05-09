@@ -30,6 +30,8 @@ import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
 
 import { useContext } from "react";
 
+import { CaptureUpdateAction } from "@excalidraw/element/store";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -42,7 +44,6 @@ import { UngroupIcon, GroupIcon } from "../components/icons";
 import { t } from "../i18n";
 
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import {
   ExcalidrawPropsCustomOptionsContext,

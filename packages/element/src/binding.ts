@@ -33,7 +33,7 @@ import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
-import type { Mutable } from "@excalidraw/common/utility-types";
+import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 
 import {
   getCenterForBounds,
@@ -84,6 +84,7 @@ import type {
   ExcalidrawElbowArrowElement,
   FixedPoint,
   FixedPointBinding,
+  PointsPositionUpdates,
 } from "./types";
 
 export type SuggestedBinding =
@@ -801,28 +802,22 @@ export const updateBoundElements = (
             bindableElement,
             elementsMap,
           );
+
           if (point) {
-            return {
-              index:
-                bindingProp === "startBinding" ? 0 : element.points.length - 1,
-              point,
-            };
+            return [
+              bindingProp === "startBinding" ? 0 : element.points.length - 1,
+              { point },
+            ] as MapEntry<PointsPositionUpdates>;
           }
         }
 
         return null;
       },
     ).filter(
-      (
-        update,
-      ): update is NonNullable<{
-        index: number;
-        point: LocalPoint;
-        isDragging?: boolean;
-      }> => update !== null,
+      (update): update is MapEntry<PointsPositionUpdates> => update !== null,
     );
 
-    LinearElementEditor.movePoints(element, scene, updates, {
+    LinearElementEditor.movePoints(element, scene, new Map(updates), {
       ...(changedElement.id === element.startBinding?.elementId
         ? { startBinding: bindings.startBinding }
         : {}),
@@ -1171,6 +1166,48 @@ export const snapToMid = (
       center,
       angle,
     );
+  } else if (element.type === "diamond") {
+    const distance = FIXED_BINDING_DISTANCE - 1;
+    const topLeft = pointFrom<GlobalPoint>(
+      x + width / 4 - distance,
+      y + height / 4 - distance,
+    );
+    const topRight = pointFrom<GlobalPoint>(
+      x + (3 * width) / 4 + distance,
+      y + height / 4 - distance,
+    );
+    const bottomLeft = pointFrom<GlobalPoint>(
+      x + width / 4 - distance,
+      y + (3 * height) / 4 + distance,
+    );
+    const bottomRight = pointFrom<GlobalPoint>(
+      x + (3 * width) / 4 + distance,
+      y + (3 * height) / 4 + distance,
+    );
+    if (
+      pointDistance(topLeft, nonRotated) <
+      Math.max(horizontalThrehsold, verticalThrehsold)
+    ) {
+      return pointRotateRads(topLeft, center, angle);
+    }
+    if (
+      pointDistance(topRight, nonRotated) <
+      Math.max(horizontalThrehsold, verticalThrehsold)
+    ) {
+      return pointRotateRads(topRight, center, angle);
+    }
+    if (
+      pointDistance(bottomLeft, nonRotated) <
+      Math.max(horizontalThrehsold, verticalThrehsold)
+    ) {
+      return pointRotateRads(bottomLeft, center, angle);
+    }
+    if (
+      pointDistance(bottomRight, nonRotated) <
+      Math.max(horizontalThrehsold, verticalThrehsold)
+    ) {
+      return pointRotateRads(bottomRight, center, angle);
+    }
   }
 
   return p;
