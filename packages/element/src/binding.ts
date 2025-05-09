@@ -27,7 +27,7 @@ import {
   PRECISION,
 } from "@excalidraw/math";
 
-import { isPointOnShape } from "@excalidraw/utils/collision";
+import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
@@ -63,7 +63,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import { aabbForElement, getElementShape, pointInsideBounds } from "./shapes";
+import { aabbForElement, getElementShape } from "./shapes";
 import { updateElbowArrowPoints } from "./elbowArrow";
 
 import type Scene from "./Scene";
@@ -108,8 +108,7 @@ export const isBindingEnabled = (appState: AppState): boolean => {
 };
 
 export const FIXED_BINDING_DISTANCE = 5;
-export const BINDING_HIGHLIGHT_THICKNESS = 10;
-export const BINDING_HIGHLIGHT_OFFSET = 4;
+const BINDING_HIGHLIGHT_THICKNESS = 10;
 
 const getNonDeletedElements = (
   scene: Scene,
@@ -231,7 +230,13 @@ const getOriginalBindingIfStillCloseOfLinearElementEdge = (
     const element = elementsMap.get(elementId);
     if (
       isBindableElement(element) &&
-      bindingBorderTest(element, coors, elementsMap, zoom)
+      bindingBorderTest(
+        element,
+        coors,
+        elementsMap,
+        zoom,
+        isElbowArrow(element),
+      )
     ) {
       return element;
     }
@@ -441,22 +446,13 @@ export const maybeBindLinearElement = (
 const normalizePointBinding = (
   binding: { focus: number; gap: number },
   hoveredElement: ExcalidrawBindableElement,
-) => {
-  let gap = binding.gap;
-  const maxGap = maxBindingGap(
-    hoveredElement,
-    hoveredElement.width,
-    hoveredElement.height,
-  );
-
-  if (gap > maxGap) {
-    gap = BINDING_HIGHLIGHT_THICKNESS + BINDING_HIGHLIGHT_OFFSET;
-  }
-  return {
-    ...binding,
-    gap,
-  };
-};
+) => ({
+  ...binding,
+  gap: Math.min(
+    binding.gap,
+    maxBindingGap(hoveredElement, hoveredElement.width, hoveredElement.height),
+  ),
+});
 
 export const bindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
@@ -568,19 +564,7 @@ export const getHoveredElementForBinding = (
       elements,
       (element) =>
         isBindableElement(element, false) &&
-        bindingBorderTest(
-          element,
-          pointerCoords,
-          elementsMap,
-          zoom,
-          (fullShape ||
-            !isBindingFallthroughEnabled(
-              element as ExcalidrawBindableElement,
-            )) &&
-            // disable fullshape snapping for frame elements so we
-            // can bind to frame children
-            !isFrameLikeElement(element),
-        ),
+        bindingBorderTest(element, pointerCoords, elementsMap, zoom, fullShape),
     ).filter((element) => {
       if (cullRest) {
         return false;
@@ -622,16 +606,7 @@ export const getHoveredElementForBinding = (
     elements,
     (element) =>
       isBindableElement(element, false) &&
-      bindingBorderTest(
-        element,
-        pointerCoords,
-        elementsMap,
-        zoom,
-        // disable fullshape snapping for frame elements so we
-        // can bind to frame children
-        (fullShape || !isBindingFallthroughEnabled(element)) &&
-          !isFrameLikeElement(element),
-      ),
+      bindingBorderTest(element, pointerCoords, elementsMap, zoom, fullShape),
   );
 
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
@@ -1123,9 +1098,11 @@ export const snapToMid = (
   const horizontalThrehsold = clamp(tolerance * width, 5, 80);
 
   if (
-    nonRotated[0] <= x + width / 2 &&
-    nonRotated[1] > center[1] - verticalThrehsold &&
-    nonRotated[1] < center[1] + verticalThrehsold
+    element.type === "diamond"
+      ? nonRotated[0] <= x + width * (element.roundness ? 0.035 : 0)
+      : nonRotated[0] <= x + width / 2 &&
+        nonRotated[1] > center[1] - verticalThrehsold &&
+        nonRotated[1] < center[1] + verticalThrehsold
   ) {
     // LEFT
     return pointRotateRads(
@@ -1134,9 +1111,11 @@ export const snapToMid = (
       angle,
     );
   } else if (
-    nonRotated[1] <= y + height / 2 &&
-    nonRotated[0] > center[0] - horizontalThrehsold &&
-    nonRotated[0] < center[0] + horizontalThrehsold
+    element.type === "diamond"
+      ? nonRotated[1] <= y + height * (element.roundness ? 0.035 : 0)
+      : nonRotated[1] <= y + height / 2 &&
+        nonRotated[0] > center[0] - horizontalThrehsold &&
+        nonRotated[0] < center[0] + horizontalThrehsold
   ) {
     // TOP
     return pointRotateRads(
@@ -1145,9 +1124,11 @@ export const snapToMid = (
       angle,
     );
   } else if (
-    nonRotated[0] >= x + width / 2 &&
-    nonRotated[1] > center[1] - verticalThrehsold &&
-    nonRotated[1] < center[1] + verticalThrehsold
+    element.type === "diamond"
+      ? nonRotated[0] >= x + width * (element.roundness ? 1 - 0.035 : 1)
+      : nonRotated[0] >= x + width / 2 &&
+        nonRotated[1] > center[1] - verticalThrehsold &&
+        nonRotated[1] < center[1] + verticalThrehsold
   ) {
     // RIGHT
     return pointRotateRads(
@@ -1156,9 +1137,11 @@ export const snapToMid = (
       angle,
     );
   } else if (
-    nonRotated[1] >= y + height / 2 &&
-    nonRotated[0] > center[0] - horizontalThrehsold &&
-    nonRotated[0] < center[0] + horizontalThrehsold
+    element.type === "diamond"
+      ? nonRotated[1] >= y + height * (element.roundness ? 1 - 0.035 : 1)
+      : nonRotated[1] >= y + height / 2 &&
+        nonRotated[0] > center[0] - horizontalThrehsold &&
+        nonRotated[0] < center[0] + horizontalThrehsold
   ) {
     // DOWN
     return pointRotateRads(
@@ -1549,13 +1532,19 @@ export const bindingBorderTest = (
   fullShape?: boolean,
 ): boolean => {
   const threshold = maxBindingGap(element, element.width, element.height, zoom);
-
   const shape = getElementShape(element, elementsMap);
-  return (
-    isPointOnShape(pointFrom(x, y), shape, threshold) ||
-    (fullShape === true &&
-      pointInsideBounds(pointFrom(x, y), aabbForElement(element)))
-  );
+  const shouldTestInside =
+    // disable fullshape snapping for frame elements so we
+    // can bind to frame children
+    (fullShape || !isBindingFallthroughEnabled(element)) &&
+    !isFrameLikeElement(element);
+
+  return shouldTestInside
+    ? // Since `inShape` tests STRICTLY againt the insides of a shape
+      // we would need `onShape` as well to include the "borders"
+      isPointInShape(pointFrom(x, y), shape) ||
+        isPointOnShape(pointFrom(x, y), shape, threshold)
+    : isPointOnShape(pointFrom(x, y), shape, threshold);
 };
 
 export const maxBindingGap = (
@@ -1575,7 +1564,7 @@ export const maxBindingGap = (
     // bigger bindable boundary for bigger elements
     Math.min(0.25 * smallerDimension, 32),
     // keep in sync with the zoomed highlight
-    BINDING_HIGHLIGHT_THICKNESS / zoomValue + BINDING_HIGHLIGHT_OFFSET,
+    BINDING_HIGHLIGHT_THICKNESS / zoomValue + FIXED_BINDING_DISTANCE,
   );
 };
 
