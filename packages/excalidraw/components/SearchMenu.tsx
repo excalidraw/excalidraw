@@ -307,10 +307,6 @@ export const SearchMenu = () => {
           }
           searchInputRef.current?.focus();
           searchInputRef.current?.select();
-        } else {
-          setAppState({
-            openSidebar: null,
-          });
         }
       }
 
