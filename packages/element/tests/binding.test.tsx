@@ -172,14 +172,15 @@ describe("element binding", () => {
     const arrow = UI.createElement("arrow", {
       x: 0,
       y: 0,
-      size: 50,
+      size: 49,
     });
 
     expect(arrow.endBinding).toBe(null);
 
     mouse.downAt(50, 50);
-    mouse.moveTo(51, 0);
+    mouse.moveTo(57, 0);
     mouse.up(0, 0);
+    console.log(JSON.stringify(h.elements));
 
     // Test sticky connection
     expect(API.getSelectedElement().type).toBe("arrow");
