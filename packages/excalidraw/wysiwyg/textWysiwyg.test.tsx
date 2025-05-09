@@ -790,7 +790,7 @@ describe("textWysiwyg", () => {
         freedraw.x + freedraw.width / 2,
         freedraw.y + freedraw.height / 2,
       );
-
+      console.log(JSON.stringify(h.elements));
       const editor = await getTextEditor(textEditorSelector, true);
       updateTextEditor(editor, "Hello World!");
       Keyboard.exitTextEditor(editor);
