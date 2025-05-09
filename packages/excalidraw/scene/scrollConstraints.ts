@@ -8,144 +8,23 @@ import type {
   ScrollConstraints,
 } from "../types";
 
-/**
- * Calculates the scroll center coordinates and the optimal zoom level to fit the constrained scrollable area within the viewport.
- *
- * This method first calculates the necessary zoom level to fit the entire constrained scrollable area within the viewport.
- * Then it calculates the constraints for the viewport given the new zoom level and the current scrollable area dimensions.
- * The function returns an object containing the optimal scroll positions and zoom level.
- *
- * @param scrollConstraints - The constraints of the scrollable area including width, height, and position.
- * @param appState - An object containing the current horizontal and vertical scroll positions.
- * @param overscrollAllowance - Optional parameter to specify the overscroll allowance percentage.
- * @returns An object containing the calculated optimal horizontal and vertical scroll positions and zoom level.
- *
- * @example
- *
- * const { scrollX, scrollY, zoom } = this.calculateConstrainedScrollCenter(scrollConstraints, { scrollX, scrollY });
- */
-
-type CanvasTranslate = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
-
-export const calculateConstrainedScrollCenter = (
-  state: AppState,
-  { scrollX, scrollY }: Pick<AppState, "scrollX" | "scrollY">,
-): CanvasTranslate => {
-  const {
-    width,
-    height,
-    zoom,
-    scrollConstraints: inverseScrollConstraints,
-  } = state;
-
-  if (!inverseScrollConstraints) {
-    return { scrollX, scrollY, zoom };
-  }
-
-  const scrollConstraints = alignScrollConstraints(inverseScrollConstraints);
-
-  const { zoomLevelX, zoomLevelY, initialZoomLevel } = calculateZoomLevel(
-    scrollConstraints,
-    width,
-    height,
-  );
-
-  // The zoom level to contain the whole constrained area in view
-  const _zoom = {
-    value: getNormalizedZoom(
-      initialZoomLevel ?? Math.min(zoomLevelX, zoomLevelY),
-    ),
-  };
-
-  const constraints = calculateConstraints({
-    scrollConstraints,
-    width,
-    height,
-    zoom: _zoom,
-    allowOverscroll: false,
-  });
-
-  return {
-    scrollX: constraints.minScrollX,
-    scrollY: constraints.minScrollY,
-    zoom: constraints.constrainedZoom,
-  };
-};
-
+// Constants for viewport zoom factor and overscroll allowance
+const MIN_VIEWPORT_ZOOM_FACTOR = 0.1;
+const MAX_VIEWPORT_ZOOM_FACTOR = 1;
+const DEFAULT_VIEWPORT_ZOOM_FACTOR = 0.2;
 const DEFAULT_OVERSCROLL_ALLOWANCE = 0.2;
 
-interface EncodedConstraints {
-  x: number;
-  y: number;
-  // width
-  w: number;
-  // height
-  h: number;
-  // animateOnNextUpdate
-  a: boolean;
-  // lockZoom
-  l: boolean;
-  // viewportZoomFactor
-  v: number;
-  // overscrollAllowance
-  oa: number;
-}
+// Memoization variable to cache constraints for performance optimization
+let memoizedValues: {
+  previousState: Pick<
+    AppState,
+    "zoom" | "width" | "height" | "scrollConstraints"
+  >;
+  constraints: ReturnType<typeof calculateConstraints>;
+  allowOverscroll: boolean;
+} | null = null;
 
-/**
- * Encodes scroll constraints into a compact string.
- * @param constraints - The scroll constraints to encode.
- * @returns A compact encoded string representing the scroll constraints.
- */
-export const encodeConstraints = (constraints: ScrollConstraints): string => {
-  const payload: EncodedConstraints = {
-    x: constraints.x,
-    y: constraints.y,
-    w: constraints.width,
-    h: constraints.height,
-    a: !!constraints.animateOnNextUpdate,
-    l: !!constraints.lockZoom,
-    v: constraints.viewportZoomFactor ?? 1,
-    oa: constraints.overscrollAllowance ?? DEFAULT_OVERSCROLL_ALLOWANCE,
-  };
-
-  const serialized = JSON.stringify(payload);
-
-  return encodeURIComponent(window.btoa(serialized).replace(/=+/, ""));
-};
-
-/**
- * Decodes a compact string back into scroll constraints.
- * @param encoded - The encoded string representing the scroll constraints.
- * @returns The decoded scroll constraints object.
- */
-export const decodeConstraints = (encoded: string): ScrollConstraints => {
-  try {
-    const decodedStr = window.atob(decodeURIComponent(encoded));
-    const parsed = JSON.parse(decodedStr) as EncodedConstraints;
-    return {
-      x: parsed.x || 0,
-      y: parsed.y || 0,
-      width: parsed.w || 0,
-      height: parsed.h || 0,
-      lockZoom: parsed.l || false,
-      viewportZoomFactor: parsed.v || 1,
-      animateOnNextUpdate: parsed.a || false,
-      overscrollAllowance: parsed.oa || DEFAULT_OVERSCROLL_ALLOWANCE,
-    };
-  } catch (error) {
-    // return safe defaults if decoding fails
-    return {
-      x: 0,
-      y: 0,
-      width: 0,
-      height: 0,
-      animateOnNextUpdate: false,
-      lockZoom: false,
-      viewportZoomFactor: 1,
-      overscrollAllowance: DEFAULT_OVERSCROLL_ALLOWANCE,
-    };
-  }
-};
+type CanvasTranslate = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
 
 /**
  * Calculates the zoom levels necessary to fit the constrained scrollable area within the viewport on the X and Y axes.
@@ -158,17 +37,21 @@ export const decodeConstraints = (encoded: string): ScrollConstraints => {
  * @param scrollConstraints - The constraints of the scrollable area including width, height, and position.
  * @param width - The width of the viewport.
  * @param height - The height of the viewport.
- * @returns An object containing the calculated zoom levels for the X and Y axes, and the maximum zoom level if applicable.
+ * @returns An object containing the calculated zoom levels for the X and Y axes, and the initial zoom level.
  */
 const calculateZoomLevel = (
   scrollConstraints: ScrollConstraints,
   width: AppState["width"],
   height: AppState["height"],
 ) => {
-  const DEFAULT_VIEWPORT_ZOOM_FACTOR = 0.2;
-
   const viewportZoomFactor = scrollConstraints.viewportZoomFactor
-    ? Math.min(1, Math.max(scrollConstraints.viewportZoomFactor, 0.1))
+    ? Math.min(
+        MAX_VIEWPORT_ZOOM_FACTOR,
+        Math.max(
+          scrollConstraints.viewportZoomFactor,
+          MIN_VIEWPORT_ZOOM_FACTOR,
+        ),
+      )
     : DEFAULT_VIEWPORT_ZOOM_FACTOR;
 
   const scrollableWidth = scrollConstraints.width;
@@ -181,6 +64,141 @@ const calculateZoomLevel = (
   return { zoomLevelX, zoomLevelY, initialZoomLevel };
 };
 
+/**
+ * Calculates the effective zoom level based on the scroll constraints and current zoom.
+ *
+ * @param params - Object containing scrollConstraints, width, height, and zoom.
+ * @returns An object with the effective zoom level, initial zoom level, and zoom levels for X and Y axes.
+ */
+const calculateZoom = ({
+  scrollConstraints,
+  width,
+  height,
+  zoom,
+}: {
+  scrollConstraints: ScrollConstraints;
+  width: AppState["width"];
+  height: AppState["height"];
+  zoom: AppState["zoom"];
+}) => {
+  const { zoomLevelX, zoomLevelY, initialZoomLevel } = calculateZoomLevel(
+    scrollConstraints,
+    width,
+    height,
+  );
+  const effectiveZoom = scrollConstraints.lockZoom
+    ? Math.max(initialZoomLevel, zoom.value)
+    : zoom.value;
+  return {
+    effectiveZoom: getNormalizedZoom(effectiveZoom),
+    initialZoomLevel,
+    zoomLevelX,
+    zoomLevelY,
+  };
+};
+
+/**
+ * Calculates the scroll bounds (min and max scroll values) based on the scroll constraints and zoom level.
+ *
+ * @param params - Object containing scrollConstraints, width, height, effectiveZoom, zoomLevelX, zoomLevelY, and allowOverscroll.
+ * @returns An object with min and max scroll values for X and Y axes.
+ */
+const calculateScrollBounds = ({
+  scrollConstraints,
+  width,
+  height,
+  effectiveZoom,
+  zoomLevelX,
+  zoomLevelY,
+  allowOverscroll,
+}: {
+  scrollConstraints: ScrollConstraints;
+  width: AppState["width"];
+  height: AppState["height"];
+  effectiveZoom: number;
+  zoomLevelX: number;
+  zoomLevelY: number;
+  allowOverscroll: boolean;
+}) => {
+  const overscrollAllowance =
+    scrollConstraints.overscrollAllowance ?? DEFAULT_OVERSCROLL_ALLOWANCE;
+  const validatedOverscroll = Math.min(Math.max(overscrollAllowance, 0), 1);
+
+  const calculateCenter = (zoom: number) => {
+    const centerX =
+      scrollConstraints.x + (scrollConstraints.width - width / zoom) / -2;
+    const centerY =
+      scrollConstraints.y + (scrollConstraints.height - height / zoom) / -2;
+    return { centerX, centerY };
+  };
+
+  const { centerX, centerY } = calculateCenter(effectiveZoom);
+
+  const overscrollValue = Math.min(
+    validatedOverscroll * scrollConstraints.width,
+    validatedOverscroll * scrollConstraints.height,
+  );
+
+  const fitsX = effectiveZoom <= zoomLevelX;
+  const fitsY = effectiveZoom <= zoomLevelY;
+
+  const getScrollRange = (
+    axis: "x" | "y",
+    fits: boolean,
+    constraint: ScrollConstraints,
+    viewportSize: number,
+    zoom: number,
+    overscroll: number,
+  ) => {
+    const { pos, size } =
+      axis === "x"
+        ? { pos: constraint.x, size: constraint.width }
+        : { pos: constraint.y, size: constraint.height };
+    const center = axis === "x" ? centerX : centerY;
+    if (allowOverscroll) {
+      return fits
+        ? { min: center - overscroll, max: center + overscroll }
+        : {
+            min: pos - size + viewportSize / zoom - overscroll,
+            max: pos + overscroll,
+          };
+    }
+    return fits
+      ? { min: center, max: center }
+      : { min: pos - size + viewportSize / zoom, max: pos };
+  };
+
+  const xRange = getScrollRange(
+    "x",
+    fitsX,
+    scrollConstraints,
+    width,
+    effectiveZoom,
+    overscrollValue,
+  );
+  const yRange = getScrollRange(
+    "y",
+    fitsY,
+    scrollConstraints,
+    height,
+    effectiveZoom,
+    overscrollValue,
+  );
+
+  return {
+    minScrollX: xRange.min,
+    maxScrollX: xRange.max,
+    minScrollY: yRange.min,
+    maxScrollY: yRange.max,
+  };
+};
+
+/**
+ * Calculates the scroll constraints including min and max scroll values and the effective zoom level.
+ *
+ * @param params - Object containing scrollConstraints, width, height, zoom, and allowOverscroll.
+ * @returns An object with min and max scroll values, effective zoom, and initial zoom level.
+ */
 const calculateConstraints = ({
   scrollConstraints,
   width,
@@ -194,168 +212,46 @@ const calculateConstraints = ({
   zoom: AppState["zoom"];
   allowOverscroll: boolean;
 }) => {
-  // Validate the overscroll allowance percentage
-  const overscrollAllowance = scrollConstraints.overscrollAllowance;
-  const validatedOverscroll =
-    overscrollAllowance != null &&
-    overscrollAllowance >= 0 &&
-    overscrollAllowance <= 1
-      ? overscrollAllowance
-      : DEFAULT_OVERSCROLL_ALLOWANCE;
-
-  /**
-   * Calculates the center position of the constrained scroll area.
-   * @returns The X and Y coordinates of the center position.
-   */
-  const calculateConstrainedScrollCenter = (zoom: number) => {
-    const constrainedScrollCenterX =
-      scrollConstraints.x + (scrollConstraints.width - width / zoom) / -2;
-    const constrainedScrollCenterY =
-      scrollConstraints.y + (scrollConstraints.height - height / zoom) / -2;
-    return { constrainedScrollCenterX, constrainedScrollCenterY };
-  };
-
-  /**
-   * Calculates the overscroll allowance values for the constrained area.
-   * @returns The overscroll allowance values for the X and Y axes.
-   */
-  const calculateOverscrollAllowance = () => {
-    const overscrollAllowanceX = validatedOverscroll * scrollConstraints.width;
-    const overscrollAllowanceY = validatedOverscroll * scrollConstraints.height;
-
-    return Math.min(overscrollAllowanceX, overscrollAllowanceY);
-  };
-
-  /**
-   * Calculates the minimum and maximum scroll values based on the current state.
-   * @param shouldAdjustForCenteredViewX - Whether the view should be adjusted for centered view on X axis - when constrained area width fits the viewport.
-   * @param shouldAdjustForCenteredViewY - Whether the view should be adjusted for centered view on Y axis - when constrained area height fits the viewport.
-   * @param overscrollAllowanceX - The overscroll allowance value for the X axis.
-   * @param overscrollAllowanceY - The overscroll allowance value for the Y axis.
-   * @param constrainedScrollCenterX - The X coordinate of the constrained scroll area center.
-   * @param constrainedScrollCenterY - The Y coordinate of the constrained scroll area center.
-   * @returns The minimum and maximum scroll values for the X and Y axes.
-   */
-  const calculateMinMaxScrollValues = (
-    shouldAdjustForCenteredViewX: boolean,
-    shouldAdjustForCenteredViewY: boolean,
-    overscrollAllowance: number,
-    constrainedScrollCenterX: number,
-    constrainedScrollCenterY: number,
-    zoom: number,
-  ) => {
-    let maxScrollX;
-    let minScrollX;
-    let maxScrollY;
-    let minScrollY;
-
-    // Handling the X-axis
-    if (allowOverscroll) {
-      if (shouldAdjustForCenteredViewX) {
-        maxScrollX = constrainedScrollCenterX + overscrollAllowance;
-        minScrollX = constrainedScrollCenterX - overscrollAllowance;
-      } else {
-        maxScrollX = scrollConstraints.x + overscrollAllowance;
-        minScrollX =
-          scrollConstraints.x -
-          scrollConstraints.width +
-          width / zoom -
-          overscrollAllowance;
-      }
-    } else if (shouldAdjustForCenteredViewX) {
-      maxScrollX = constrainedScrollCenterX;
-      minScrollX = constrainedScrollCenterX;
-    } else {
-      maxScrollX = scrollConstraints.x;
-      minScrollX = scrollConstraints.x - scrollConstraints.width + width / zoom;
-    }
-
-    // Handling the Y-axis
-    if (allowOverscroll) {
-      if (shouldAdjustForCenteredViewY) {
-        maxScrollY = constrainedScrollCenterY + overscrollAllowance;
-        minScrollY = constrainedScrollCenterY - overscrollAllowance;
-      } else {
-        maxScrollY = scrollConstraints.y + overscrollAllowance;
-        minScrollY =
-          scrollConstraints.y -
-          scrollConstraints.height +
-          height / zoom -
-          overscrollAllowance;
-      }
-    } else if (shouldAdjustForCenteredViewY) {
-      maxScrollY = constrainedScrollCenterY;
-      minScrollY = constrainedScrollCenterY;
-    } else {
-      maxScrollY = scrollConstraints.y;
-      minScrollY =
-        scrollConstraints.y - scrollConstraints.height + height / zoom;
-    }
-
-    return { maxScrollX, minScrollX, maxScrollY, minScrollY };
-  };
-
-  const { zoomLevelX, zoomLevelY, initialZoomLevel } = calculateZoomLevel(
+  const { effectiveZoom, initialZoomLevel, zoomLevelX, zoomLevelY } =
+    calculateZoom({ scrollConstraints, width, height, zoom });
+  const scrollBounds = calculateScrollBounds({
     scrollConstraints,
     width,
     height,
-  );
-
-  const constrainedZoom = getNormalizedZoom(
-    scrollConstraints.lockZoom
-      ? Math.max(initialZoomLevel, zoom.value)
-      : zoom.value,
-  );
-  const { constrainedScrollCenterX, constrainedScrollCenterY } =
-    calculateConstrainedScrollCenter(constrainedZoom);
-  const overscrollAllowanceValue = calculateOverscrollAllowance();
-  const shouldAdjustForCenteredViewX = constrainedZoom <= zoomLevelX;
-  const shouldAdjustForCenteredViewY = constrainedZoom <= zoomLevelY;
-  const { maxScrollX, minScrollX, maxScrollY, minScrollY } =
-    calculateMinMaxScrollValues(
-      shouldAdjustForCenteredViewX,
-      shouldAdjustForCenteredViewY,
-      overscrollAllowanceValue,
-      constrainedScrollCenterX,
-      constrainedScrollCenterY,
-      constrainedZoom,
-    );
+    effectiveZoom,
+    zoomLevelX,
+    zoomLevelY,
+    allowOverscroll,
+  });
 
   return {
-    maxScrollX,
-    minScrollX,
-    maxScrollY,
-    minScrollY,
-    constrainedZoom: {
-      value: constrainedZoom,
-    },
+    ...scrollBounds,
+    effectiveZoom: { value: effectiveZoom },
     initialZoomLevel,
   };
 };
 
 /**
- * Constrains the scroll values within the constrained area.
- * @param maxScrollX - The maximum scroll value for the X axis.
- * @param minScrollX - The minimum scroll value for the X axis.
- * @param maxScrollY - The maximum scroll value for the Y axis.
- * @param minScrollY - The minimum scroll value for the Y axis.
- * @returns The constrained scroll values for the X and Y axes.
+ * Constrains the scroll values within the provided min and max bounds.
+ *
+ * @param params - Object containing scrollX, scrollY, minScrollX, maxScrollX, minScrollY, maxScrollY, and constrainedZoom.
+ * @returns An object with constrained scrollX, scrollY, and zoom.
  */
 const constrainScrollValues = ({
   scrollX,
   scrollY,
-  maxScrollX,
   minScrollX,
-  maxScrollY,
+  maxScrollX,
   minScrollY,
+  maxScrollY,
   constrainedZoom,
 }: {
   scrollX: number;
   scrollY: number;
-  maxScrollX: number;
   minScrollX: number;
-  maxScrollY: number;
+  maxScrollX: number;
   minScrollY: number;
+  maxScrollY: number;
   constrainedZoom: AppState["zoom"];
 }): CanvasTranslate => {
   const constrainedScrollX = Math.min(
@@ -375,28 +271,28 @@ const constrainScrollValues = ({
 
 /**
  * Inverts the scroll constraints to align with the state scrollX and scrollY values, which are inverted.
- * This should be removed once the https://github.com/excalidraw/excalidraw/issues/5965 is resolved.
+ * This is a temporary fix and should be removed once issue #5965 is resolved.
  *
- * @param originalScrollContraints - The scroll constraints with the original coordinates.
+ * @param originalScrollConstraints - The original scroll constraints.
+ * @returns The aligned scroll constraints with inverted x and y coordinates.
  */
-// BUG: remove this function once the #5965 is resolved
 const alignScrollConstraints = (
-  originalScrollContraints: ScrollConstraints,
-) => {
+  originalScrollConstraints: ScrollConstraints,
+): ScrollConstraints => {
   return {
-    ...originalScrollContraints,
-    x: originalScrollContraints.x * -1,
-    y: originalScrollContraints.y * -1,
+    ...originalScrollConstraints,
+    x: originalScrollConstraints.x * -1,
+    y: originalScrollConstraints.y * -1,
   };
 };
 
 /**
- * Determines whether the current viewport is outside the constrained area defined in the AppState.
+ * Determines whether the current viewport is outside the constrained area.
  *
- * @param state - The application state containing scroll, zoom, and constraint information.
+ * @param state - The application state.
  * @returns True if the viewport is outside the constrained area, false otherwise.
  */
-const isViewportOutsideOfConstrainedArea = (state: AppState) => {
+const isViewportOutsideOfConstrainedArea = (state: AppState): boolean => {
   if (!state.scrollConstraints) {
     return false;
   }
@@ -412,7 +308,6 @@ const isViewportOutsideOfConstrainedArea = (state: AppState) => {
 
   const scrollConstraints = alignScrollConstraints(inverseScrollConstraints);
 
-  // Adjust scroll and dimensions according to the zoom level
   const adjustedWidth = width / zoom.value;
   const adjustedHeight = height / zoom.value;
 
@@ -424,22 +319,112 @@ const isViewportOutsideOfConstrainedArea = (state: AppState) => {
   );
 };
 
-let memoizedValues: {
-  previousState: Pick<
-    AppState,
-    "zoom" | "width" | "height" | "scrollConstraints"
-  >;
-  constraints: ReturnType<typeof calculateConstraints>;
-  allowOverscroll: boolean;
-} | null = null;
+/**
+ * Calculates the scroll center coordinates and the optimal zoom level to fit the constrained scrollable area within the viewport.
+ *
+ * @param state - The application state.
+ * @param scroll - Object containing current scrollX and scrollY.
+ * @returns An object with the calculated scrollX, scrollY, and zoom.
+ */
+export const calculateConstrainedScrollCenter = (
+  state: AppState,
+  { scrollX, scrollY }: Pick<AppState, "scrollX" | "scrollY">,
+): CanvasTranslate => {
+  const { width, height, scrollConstraints } = state;
+  if (!scrollConstraints) {
+    return { scrollX, scrollY, zoom: state.zoom };
+  }
+
+  const adjustedConstraints = alignScrollConstraints(scrollConstraints);
+  const zoomLevels = calculateZoomLevel(adjustedConstraints, width, height);
+  const initialZoom = { value: zoomLevels.initialZoomLevel };
+  const constraints = calculateConstraints({
+    scrollConstraints: adjustedConstraints,
+    width,
+    height,
+    zoom: initialZoom,
+    allowOverscroll: false,
+  });
+
+  return {
+    scrollX: constraints.minScrollX,
+    scrollY: constraints.minScrollY,
+    zoom: constraints.effectiveZoom,
+  };
+};
+
+/**
+ * Encodes scroll constraints into a compact string.
+ *
+ * @param constraints - The scroll constraints to encode.
+ * @returns A compact encoded string representing the scroll constraints.
+ */
+export const encodeConstraints = (constraints: ScrollConstraints): string => {
+  const payload = {
+    x: constraints.x,
+    y: constraints.y,
+    w: constraints.width,
+    h: constraints.height,
+    a: !!constraints.animateOnNextUpdate,
+    l: !!constraints.lockZoom,
+    v: constraints.viewportZoomFactor ?? 1,
+    oa: constraints.overscrollAllowance ?? DEFAULT_OVERSCROLL_ALLOWANCE,
+  };
+  const serialized = JSON.stringify(payload);
+  return encodeURIComponent(window.btoa(serialized).replace(/=+/, ""));
+};
+
+/**
+ * Decodes a compact string back into scroll constraints.
+ *
+ * @param encoded - The encoded string representing the scroll constraints.
+ * @returns The decoded scroll constraints object.
+ */
+export const decodeConstraints = (encoded: string): ScrollConstraints => {
+  try {
+    const decodedStr = window.atob(decodeURIComponent(encoded));
+    const parsed = JSON.parse(decodedStr) as {
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+      a: boolean;
+      l: boolean;
+      v: number;
+      oa: number;
+    };
+    return {
+      x: parsed.x || 0,
+      y: parsed.y || 0,
+      width: parsed.w || 0,
+      height: parsed.h || 0,
+      lockZoom: parsed.l || false,
+      viewportZoomFactor: parsed.v || 1,
+      animateOnNextUpdate: parsed.a || false,
+      overscrollAllowance: parsed.oa || DEFAULT_OVERSCROLL_ALLOWANCE,
+    };
+  } catch (error) {
+    return {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      animateOnNextUpdate: false,
+      lockZoom: false,
+      viewportZoomFactor: 1,
+      overscrollAllowance: DEFAULT_OVERSCROLL_ALLOWANCE,
+    };
+  }
+};
 
 type Options = { allowOverscroll?: boolean; disableAnimation?: boolean };
+
 /**
  * Constrains the AppState scroll values within the defined scroll constraints.
  *
- * @param state - The original AppState with the current scroll position, dimensions, and constraints.
- * @param options - An object containing options for the method: allowOverscroll and disableAnimation.
- * @returns A new AppState object with scroll values constrained as per the defined constraints.
+ * @param state - The original AppState.
+ * @param options - Options for allowing overscroll and disabling animation.
+ * @returns A new AppState object with constrained scroll values.
  */
 export const constrainScrollState = (
   state: AppState,
@@ -462,15 +447,13 @@ export const constrainScrollState = (
   const scrollConstraints = alignScrollConstraints(inverseScrollConstraints);
 
   const canUseMemoizedValues =
-    memoizedValues && // there are memoized values
-    memoizedValues.previousState.scrollConstraints && // can't use memoized values if there were no scrollConstraints in memoizedValues
-    memoizedValues.allowOverscroll === allowOverscroll && // allowOverscroll is the same as in memoizedValues
-    // current scrollConstraints are the same as in memoizedValues
+    memoizedValues &&
+    memoizedValues.previousState.scrollConstraints &&
+    memoizedValues.allowOverscroll === allowOverscroll &&
     isShallowEqual(
       state.scrollConstraints,
-      memoizedValues.previousState.scrollConstraints!,
+      memoizedValues.previousState.scrollConstraints,
     ) &&
-    // current zoom and window dimensions are equal to those in memoizedValues
     isShallowEqual(
       { zoom: zoom.value, width, height },
       {
@@ -490,18 +473,6 @@ export const constrainScrollState = (
         allowOverscroll,
       });
 
-  const constrainedValues =
-    zoom.value >= constraints.constrainedZoom.value // when trying to zoom out of the constrained area we want to keep the viewport centered and prevent jumping caused by change of scrollX and scrollY values when zooming
-      ? constrainScrollValues({
-          ...constraints,
-          scrollX,
-          scrollY,
-        })
-      : calculateConstrainedScrollCenter(state, {
-          scrollX,
-          scrollY,
-        });
-
   if (!canUseMemoizedValues) {
     memoizedValues = {
       previousState: {
@@ -515,6 +486,19 @@ export const constrainScrollState = (
     };
   }
 
+  const constrainedValues =
+    zoom.value >= constraints.effectiveZoom.value
+      ? constrainScrollValues({
+          scrollX,
+          scrollY,
+          minScrollX: constraints.minScrollX,
+          maxScrollX: constraints.maxScrollX,
+          minScrollY: constraints.minScrollY,
+          maxScrollY: constraints.maxScrollY,
+          constrainedZoom: constraints.effectiveZoom,
+        })
+      : calculateConstrainedScrollCenter(state, { scrollX, scrollY });
+
   return {
     ...state,
     scrollConstraints: {
@@ -527,11 +511,18 @@ export const constrainScrollState = (
   };
 };
 
+/**
+ * Checks if two canvas translate values are close within a threshold.
+ *
+ * @param from - First set of canvas translate values.
+ * @param to - Second set of canvas translate values.
+ * @returns True if the values are close, false otherwise.
+ */
 export const areCanvasTranslatesClose = (
   from: AnimateTranslateCanvasValues,
   to: AnimateTranslateCanvasValues,
 ): boolean => {
-  const threshold = 0.1; // Adjust based on your needs
+  const threshold = 0.1;
   return (
     Math.abs(from.scrollX - to.scrollX) < threshold &&
     Math.abs(from.scrollY - to.scrollY) < threshold &&
