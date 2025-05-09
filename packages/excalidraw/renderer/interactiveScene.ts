@@ -1129,7 +1129,7 @@ const _renderInteractiveScene = ({
   appState.searchMatches.matches.forEach(({ id, focus, matchedLines }) => {
     const element = elementsMap.get(id);
 
-    if (element && (isTextElement(element) || isFrameLikeElement(element))) {
+    if (element) {
       const [elementX1, elementY1, , , cx, cy] = getElementAbsoluteCoords(
         element,
         elementsMap,
