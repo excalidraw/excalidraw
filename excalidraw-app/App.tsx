@@ -1015,7 +1015,7 @@ const ExcalidrawWrapper = () => {
       lockZoom: false,
       viewportZoomFactor: 0.7,
       overscrollAllowance: 0.5,
-      enabled: true,
+      enabled: !isTestEnv(),
       ...storedConstraints,
     };
   });
@@ -1153,7 +1153,7 @@ const ExcalidrawWrapper = () => {
           }
         }}
       >
-        {excalidrawAPI && (
+        {excalidrawAPI && !isTestEnv() && (
           <ConstraintsSettings
             excalidrawAPI={excalidrawAPI}
             initialConstraints={constraints}
