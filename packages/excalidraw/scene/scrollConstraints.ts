@@ -1,5 +1,9 @@
 import { isShallowEqual } from "@excalidraw/common";
-import { AppState, ScrollConstraints } from "../types";
+import {
+  AnimateTranslateCanvasValues,
+  AppState,
+  ScrollConstraints,
+} from "../types";
 import { getNormalizedZoom } from "./normalize";
 
 /**
@@ -18,14 +22,13 @@ import { getNormalizedZoom } from "./normalize";
  *
  * const { scrollX, scrollY, zoom } = this.calculateConstrainedScrollCenter(scrollConstraints, { scrollX, scrollY });
  */
+
+type CanvasTranslate = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
+
 export const calculateConstrainedScrollCenter = (
   state: AppState,
   { scrollX, scrollY }: Pick<AppState, "scrollX" | "scrollY">,
-): {
-  scrollX: AppState["scrollX"];
-  scrollY: AppState["scrollY"];
-  zoom: AppState["zoom"];
-} => {
+): CanvasTranslate => {
   const {
     width,
     height,
@@ -352,7 +355,7 @@ const constrainScrollValues = ({
   maxScrollY: number;
   minScrollY: number;
   constrainedZoom: AppState["zoom"];
-}) => {
+}): CanvasTranslate => {
   const constrainedScrollX = Math.min(
     maxScrollX,
     Math.max(scrollX, minScrollX),
@@ -389,7 +392,7 @@ const alignScrollConstraints = (
  * Determines whether the current viewport is outside the constrained area defined in the AppState.
  *
  * @param state - The application state containing scroll, zoom, and constraint information.
- * @returns True if the viewport is outside the constrained area; otherwise undefined.
+ * @returns True if the viewport is outside the constrained area, false otherwise.
  */
 const isViewportOutsideOfConstrainedArea = (state: AppState) => {
   if (!state.scrollConstraints) {
@@ -520,4 +523,16 @@ export const constrainScrollState = (
     },
     ...constrainedValues,
   };
+};
+
+export const areCanvasViewsClose = (
+  from: AnimateTranslateCanvasValues,
+  to: AnimateTranslateCanvasValues,
+): boolean => {
+  const threshold = 0.1; // Adjust based on your needs
+  return (
+    Math.abs(from.scrollX - to.scrollX) < threshold &&
+    Math.abs(from.scrollY - to.scrollY) < threshold &&
+    Math.abs(from.zoom - to.zoom) < threshold
+  );
 };

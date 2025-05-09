@@ -531,6 +531,7 @@ import type { Action, ActionResult } from "../actions/types";
 import {
   constrainScrollState,
   calculateConstrainedScrollCenter,
+  areCanvasViewsClose,
 } from "../scene/scrollConstraints";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -2975,20 +2976,27 @@ class App extends React.Component<AppProps, AppState> {
       const newState = constrainScrollState(this.state, {
         allowOverscroll: false,
       });
+      const fromValues = {
+        scrollX: this.state.scrollX,
+        scrollY: this.state.scrollY,
+        zoom: this.state.zoom.value,
+      };
+      const toValues = {
+        scrollX: newState.scrollX,
+        scrollY: newState.scrollY,
+        zoom: newState.zoom.value,
+      };
+
+      if (areCanvasViewsClose(fromValues, toValues)) {
+        return;
+      }
+
+      if (scrollConstraintsAnimationTimeout) {
+        clearTimeout(scrollConstraintsAnimationTimeout);
+      }
 
       scrollConstraintsAnimationTimeout = setTimeout(() => {
         this.cancelInProgressAnimation?.();
-        const fromValues = {
-          scrollX: this.state.scrollX,
-          scrollY: this.state.scrollY,
-          zoom: this.state.zoom.value,
-        };
-        const toValues = {
-          scrollX: newState.scrollX,
-          scrollY: newState.scrollY,
-          zoom: newState.zoom.value,
-        };
-
         this.animateToConstrainedArea(fromValues, toValues);
       }, 200);
     }
