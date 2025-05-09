@@ -9,7 +9,7 @@ import {
 import { getElementsInGroup } from "@excalidraw/element/groups";
 
 import { shouldTestInside } from "@excalidraw/element/collision";
-import { isPointInShape } from "@excalidraw/utils/collision";
+import { isPointInShape } from "@excalidraw/element/collision";
 import {
   hasBoundTextElement,
   isBoundToContainer,
