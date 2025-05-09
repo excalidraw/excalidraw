@@ -99,7 +99,7 @@ export const FontPickerList = React.memo(
       () =>
         Array.from(Fonts.registered.entries())
           .filter(
-            ([_, { metadata }]) => !metadata.serverSide && !metadata.fallback,
+            ([_, { metadata }]) => !metadata.private && !metadata.fallback,
           )
           .map(([familyId, { metadata, fontFaces }]) => {
             const fontDescriptor = {

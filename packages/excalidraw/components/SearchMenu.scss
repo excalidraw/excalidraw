@@ -1,4 +1,5 @@
 @import "open-color/open-color";
+@import "../css//variables.module.scss";
 
 .excalidraw {
   .layer-ui__search {
@@ -64,21 +65,51 @@
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
+    padding: 0 0.75rem;
 
     gap: 0.125rem;
+  }
+
+  .layer-ui__search .collapsible-items {
+    gap: 2px;
+  }
+
+  .layer-ui__search-result-title {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-weight: 700;
+
+    .title-icon {
+      width: 0.875rem;
+      height: 0.875rem;
+      margin-right: 0.25rem;
+      svg g {
+        stroke-width: 1.25;
+      }
+    }
+  }
+
+  .layer-ui__divider {
+    width: 100%;
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+    position: relative;
   }
 
   .layer-ui__result-item {
     display: flex;
     align-items: center;
-    min-height: 2rem;
+    min-height: 1.875rem;
     flex: 0 0 auto;
     padding: 0.25rem 0.75rem;
     cursor: pointer;
     border: 1px solid transparent;
     outline: none;
+    font-size: 16px;
 
-    margin: 0 0.75rem;
     border-radius: var(--border-radius-md);
 
     .text-icon {
