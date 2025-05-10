@@ -1,4 +1,8 @@
-import { isTransparent, reduceToCommonValue } from "@excalidraw/common";
+import {
+  isTransparent,
+  mapFind,
+  reduceToCommonValue,
+} from "@excalidraw/common";
 
 describe("@excalidraw/common/utils", () => {
   describe("isTransparent()", () => {
@@ -49,6 +53,30 @@ describe("@excalidraw/common/utils", () => {
       expect(reduceToCommonValue([null])).toEqual(null);
       expect(reduceToCommonValue([undefined])).toEqual(null);
       expect(reduceToCommonValue([])).toEqual(null);
+    });
+  });
+
+  describe("mapFind()", () => {
+    it("should return the first mapped non-null element", () => {
+      {
+        let counter = 0;
+
+        const result = mapFind(["a", "b", "c"], (value) => {
+          counter++;
+          return value === "b" ? 42 : null;
+        });
+        expect(result).toEqual(42);
+        expect(counter).toBe(2);
+      }
+
+      expect(mapFind([1, 2], (value) => value * 0)).toBe(0);
+      expect(mapFind([1, 2], () => false)).toBe(false);
+      expect(mapFind([1, 2], () => "")).toBe("");
+    });
+
+    it("should return undefined if no mapped element is found", () => {
+      expect(mapFind([1, 2], () => undefined)).toBe(undefined);
+      expect(mapFind([1, 2], () => null)).toBe(undefined);
     });
   });
 });

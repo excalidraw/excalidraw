@@ -544,6 +544,20 @@ export const findLastIndex = <T>(
   return -1;
 };
 
+/** returns the first non-null mapped value */
+export const mapFind = <T, K>(
+  collection: readonly T[],
+  iteratee: (value: T, index: number) => K | undefined | null,
+): K | undefined => {
+  for (let idx = 0; idx < collection.length; idx++) {
+    const result = iteratee(collection[idx], idx);
+    if (result != null) {
+      return result;
+    }
+  }
+  return undefined;
+};
+
 export const isTransparent = (color: string) => {
   const isRGBTransparent = color.length === 5 && color.substr(4, 1) === "0";
   const isRRGGBBTransparent = color.length === 9 && color.substr(7, 2) === "00";
