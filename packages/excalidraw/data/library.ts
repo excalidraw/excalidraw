@@ -19,7 +19,7 @@ import {
 
 import { hashElementsVersion, hashString } from "@excalidraw/element";
 
-import { getCommonBoundingBox } from "@excalidraw/element/bounds";
+import { getCommonBoundingBox } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 

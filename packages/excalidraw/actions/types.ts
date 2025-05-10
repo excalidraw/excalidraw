@@ -3,7 +3,7 @@ import type {
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type { CaptureUpdateActionType } from "@excalidraw/element/store";
+import type { CaptureUpdateActionType } from "@excalidraw/element";
 
 import type {
   AppClassProperties,

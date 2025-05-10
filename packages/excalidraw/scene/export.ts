@@ -15,34 +15,31 @@ import {
   toBrandedType,
 } from "@excalidraw/common";
 
-import {
-  getCommonBounds,
-  getElementAbsoluteCoords,
-} from "@excalidraw/element/bounds";
+import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
   updateImageCache,
-} from "@excalidraw/element/image";
+} from "@excalidraw/element";
 
-import { newElementWith } from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element";
 
-import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import { isFrameLikeElement } from "@excalidraw/element";
 
 import {
   getElementsOverlappingFrame,
   getFrameLikeElements,
   getFrameLikeTitle,
   getRootElements,
-} from "@excalidraw/element/frame";
+} from "@excalidraw/element";
 
-import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+import { syncInvalidIndices } from "@excalidraw/element";
 
 import { type Mutable } from "@excalidraw/common/utility-types";
 
-import { newTextElement } from "@excalidraw/element/newElement";
+import { newTextElement } from "@excalidraw/element";
 
-import type { Bounds } from "@excalidraw/element/bounds";
+import type { Bounds } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,

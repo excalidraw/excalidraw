@@ -1,20 +1,20 @@
 import { getNonDeletedElements } from "@excalidraw/element";
-import { mutateElement } from "@excalidraw/element/mutateElement";
-import { newFrameElement } from "@excalidraw/element/newElement";
-import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import { mutateElement } from "@excalidraw/element";
+import { newFrameElement } from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element";
 import {
   addElementsToFrame,
   removeAllElementsFromFrame,
-} from "@excalidraw/element/frame";
-import { getFrameChildren } from "@excalidraw/element/frame";
+} from "@excalidraw/element";
+import { getFrameChildren } from "@excalidraw/element";
 
 import { KEYS, updateActiveTool } from "@excalidraw/common";
 
-import { getElementsInGroup } from "@excalidraw/element/groups";
+import { getElementsInGroup } from "@excalidraw/element";
 
-import { getCommonBounds } from "@excalidraw/element/bounds";
+import { getCommonBounds } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 

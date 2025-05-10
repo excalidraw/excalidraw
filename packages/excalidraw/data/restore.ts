@@ -19,15 +19,15 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 import { getNonDeletedElements } from "@excalidraw/element";
-import { normalizeFixedPoint } from "@excalidraw/element/binding";
+import { normalizeFixedPoint } from "@excalidraw/element";
 import {
   updateElbowArrowPoints,
   validateElbowPoints,
-} from "@excalidraw/element/elbowArrow";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import { bumpVersion } from "@excalidraw/element/mutateElement";
-import { getContainerElement } from "@excalidraw/element/textElement";
-import { detectLineHeight } from "@excalidraw/element/textMeasurements";
+} from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
+import { bumpVersion } from "@excalidraw/element";
+import { getContainerElement } from "@excalidraw/element";
+import { detectLineHeight } from "@excalidraw/element";
 import {
   isArrowBoundToElement,
   isArrowElement,
@@ -36,15 +36,15 @@ import {
   isLinearElement,
   isTextElement,
   isUsingAdaptiveRadius,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
-import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+import { syncInvalidIndices } from "@excalidraw/element";
 
-import { refreshTextDimensions } from "@excalidraw/element/newElement";
+import { refreshTextDimensions } from "@excalidraw/element";
 
-import { getNormalizedDimensions } from "@excalidraw/element/sizeHelpers";
+import { getNormalizedDimensions } from "@excalidraw/element";
 
-import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
+import { isInvisiblySmallElement } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 

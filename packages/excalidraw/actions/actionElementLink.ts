@@ -2,9 +2,9 @@ import {
   canCreateLinkFromElements,
   defaultGetElementLinkFromSelection,
   getLinkIdAndTypeFromSelection,
-} from "@excalidraw/element/elementLink";
+} from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import { copyTextToSystemClipboard } from "../clipboard";
 import { copyIcon, elementLinkIcon } from "../components/icons";
