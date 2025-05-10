@@ -144,7 +144,6 @@ const FONT_SIZE_CONVERSION_CACHE = new Map<
   ExcalidrawElement["id"],
   {
     fontSize: number;
-    elementType: ConvertibleGenericTypes;
   }
 >();
 
@@ -287,7 +286,6 @@ const Panel = ({
         if (boundText) {
           FONT_SIZE_CONVERSION_CACHE.set(element.id, {
             fontSize: boundText.fontSize,
-            elementType: element.type as ConvertibleGenericTypes,
           });
         }
       }
@@ -481,9 +479,7 @@ export const convertElementTypes = (
           app.scene.getNonDeletedElementsMap(),
         );
         if (boundText) {
-          if (
-            FONT_SIZE_CONVERSION_CACHE.get(element.id)?.elementType === nextType
-          ) {
+          if (FONT_SIZE_CONVERSION_CACHE.get(element.id)) {
             mutateElement(boundText, app.scene.getNonDeletedElementsMap(), {
               fontSize:
                 FONT_SIZE_CONVERSION_CACHE.get(element.id)?.fontSize ??
