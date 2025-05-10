@@ -460,6 +460,7 @@ export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
     points?: ExcalidrawLinearElement["points"];
+    polygon?: ExcalidrawLineElement["polygon"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
   const element = {
@@ -475,7 +476,7 @@ export const newLinearElement = (
   if (isLineElement(element)) {
     const lineElement: NonDeleted<ExcalidrawLineElement> = {
       ...element,
-      polygon: false,
+      polygon: opts.polygon ?? false,
     };
 
     return lineElement;
