@@ -78,7 +78,7 @@ import {
   sceneCoordsToViewportCoords,
 } from "..";
 import { trackEvent } from "../analytics";
-import { atom, editorJotaiStore, useSetAtom } from "../editor-jotai";
+import { atom } from "../editor-jotai";
 
 import "./ConvertElementTypePopup.scss";
 import { ToolButton } from "./ToolButton";
@@ -140,23 +140,20 @@ export const convertElementTypePopupAtom = atom<{
 
 type CacheKey = string & { _brand: "CacheKey" };
 
-// NOTE doesn't need to be an atom. Review once we integrate with properties panel.
-export const fontSize_conversionCacheAtom = atom<{
-  [id: string]: {
+const FONT_SIZE_CONVERSION_CACHE = new Map<
+  ExcalidrawElement["id"],
+  {
     fontSize: number;
     elementType: ConvertibleGenericTypes;
-  };
-} | null>(null);
+  }
+>();
 
-// NOTE doesn't need to be an atom. Review once we integrate with properties panel.
-export const linearElement_conversionCacheAtom = atom<{
-  [id: CacheKey]: ExcalidrawLinearElement;
-}>({});
+const LINEAR_ELEMENT_CONVERSION_CACHE = new Map<
+  CacheKey,
+  ExcalidrawLinearElement
+>();
 
 const ConvertElementTypePopup = ({ app }: { app: App }) => {
-  const setFontSizeCache = useSetAtom(fontSize_conversionCacheAtom);
-  const setLinearElementCache = useSetAtom(linearElement_conversionCacheAtom);
-
   const selectedElements = app.scene.getSelectedElements(app.state);
   const elementsCategoryRef = useRef<ConversionType>(null);
 
@@ -183,10 +180,10 @@ const ConvertElementTypePopup = ({ app }: { app: App }) => {
 
   useEffect(() => {
     return () => {
-      setFontSizeCache(null);
-      setLinearElementCache({});
+      FONT_SIZE_CONVERSION_CACHE.clear();
+      LINEAR_ELEMENT_CONVERSION_CACHE.clear();
     };
-  }, [setFontSizeCache, setLinearElementCache]);
+  }, []);
 
   return <Panel app={app} elements={selectedElements} />;
 };
@@ -270,39 +267,29 @@ const Panel = ({
 
   useEffect(() => {
     for (const linearElement of linearElements) {
-      const cache = editorJotaiStore.get(linearElement_conversionCacheAtom);
       const cacheKey = toCacheKey(
         linearElement.id,
         getConvertibleType(linearElement),
       );
-
-      if (!cache[cacheKey]) {
-        editorJotaiStore.set(linearElement_conversionCacheAtom, {
-          ...cache,
-          [cacheKey]: linearElement,
-        });
+      if (!LINEAR_ELEMENT_CONVERSION_CACHE.has(cacheKey)) {
+        LINEAR_ELEMENT_CONVERSION_CACHE.set(cacheKey, linearElement);
       }
     }
   }, [linearElements]);
 
   useEffect(() => {
-    if (editorJotaiStore.get(fontSize_conversionCacheAtom)) {
-      return;
-    }
-
     for (const element of genericElements) {
-      const boundText = getBoundTextElement(
-        element,
-        app.scene.getNonDeletedElementsMap(),
-      );
-      if (boundText) {
-        editorJotaiStore.set(fontSize_conversionCacheAtom, {
-          ...editorJotaiStore.get(fontSize_conversionCacheAtom),
-          [element.id]: {
+      if (!FONT_SIZE_CONVERSION_CACHE.has(element.id)) {
+        const boundText = getBoundTextElement(
+          element,
+          app.scene.getNonDeletedElementsMap(),
+        );
+        if (boundText) {
+          FONT_SIZE_CONVERSION_CACHE.set(element.id, {
             fontSize: boundText.fontSize,
             elementType: element.type as ConvertibleGenericTypes,
-          },
-        });
+          });
+        }
       }
     }
   }, [genericElements, app.scene]);
@@ -495,13 +482,12 @@ export const convertElementTypes = (
         );
         if (boundText) {
           if (
-            editorJotaiStore.get(fontSize_conversionCacheAtom)?.[element.id]
-              ?.elementType === nextType
+            FONT_SIZE_CONVERSION_CACHE.get(element.id)?.elementType === nextType
           ) {
             mutateElement(boundText, app.scene.getNonDeletedElementsMap(), {
               fontSize:
-                editorJotaiStore.get(fontSize_conversionCacheAtom)?.[element.id]
-                  ?.fontSize ?? boundText.fontSize,
+                FONT_SIZE_CONVERSION_CACHE.get(element.id)?.fontSize ??
+                boundText.fontSize,
             });
           }
 
@@ -549,9 +535,9 @@ export const convertElementTypes = (
         app.scene.getElementsMapIncludingDeleted();
 
       for (const element of convertibleLinearElements) {
-        const cachedElement = editorJotaiStore.get(
-          linearElement_conversionCacheAtom,
-        )[toCacheKey(element.id, nextType)];
+        const cachedElement = LINEAR_ELEMENT_CONVERSION_CACHE.get(
+          toCacheKey(element.id, nextType),
+        );
 
         // if switching to the original subType or a subType we've already
         // converted to, reuse the cached element to get the original properties
@@ -608,9 +594,9 @@ export const convertElementTypes = (
             const similarCachedLinearElement = mapFind(
               ["line", "sharpArrow", "curvedArrow"] as const,
               (type) =>
-                editorJotaiStore.get(linearElement_conversionCacheAtom)[
-                  toCacheKey(element.id, type)
-                ],
+                LINEAR_ELEMENT_CONVERSION_CACHE.get(
+                  toCacheKey(element.id, type),
+                ),
             );
 
             if (similarCachedLinearElement) {
