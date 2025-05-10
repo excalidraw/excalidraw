@@ -66,7 +66,7 @@ import {
 import { aabbForElement, getElementShape, pointInsideBounds } from "./shapes";
 import { updateElbowArrowPoints } from "./elbowArrow";
 
-import type Scene from "./Scene";
+import type { Scene } from "./Scene";
 
 import type { Bounds } from "./bounds";
 import type { ElementUpdate } from "./mutateElement";
