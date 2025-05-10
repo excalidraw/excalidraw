@@ -5,9 +5,9 @@ import { vi } from "vitest";
 
 import { setDateTimeForTests, reseed } from "@excalidraw/common";
 
-import { isInGroup } from "@excalidraw/element/groups";
+import { isInGroup } from "@excalidraw/element";
 
-import { isTextElement } from "@excalidraw/element/typeChecks";
+import { isTextElement } from "@excalidraw/element";
 
 import type { Degrees } from "@excalidraw/math";
 

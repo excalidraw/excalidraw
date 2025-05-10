@@ -1,12 +1,12 @@
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { LinearElementEditor } from "@excalidraw/element";
 import {
   isElbowArrow,
   isLinearElement,
   isLineElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 import { arrayToMap } from "@excalidraw/common";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type {
   ExcalidrawLinearElement,

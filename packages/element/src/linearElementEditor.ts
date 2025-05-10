@@ -20,7 +20,7 @@ import {
   tupleToCoors,
 } from "@excalidraw/common";
 
-import type { Store } from "@excalidraw/element/store";
+import type { Store } from "@excalidraw/element";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -70,7 +70,7 @@ import { getLockedLinearCursorAlignSize } from "./sizeHelpers";
 
 import { isLineElement } from "./typeChecks";
 
-import type Scene from "./Scene";
+import type { Scene } from "./Scene";
 
 import type { Bounds } from "./bounds";
 import type {

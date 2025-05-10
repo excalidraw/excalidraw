@@ -17,11 +17,11 @@ import {
   newLinearElement,
   newMagicFrameElement,
   newTextElement,
-} from "@excalidraw/element/newElement";
+} from "@excalidraw/element";
 
-import { isLinearElementType } from "@excalidraw/element/typeChecks";
-import { getSelectedElements } from "@excalidraw/element/selection";
-import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
+import { isLinearElementType } from "@excalidraw/element";
+import { getSelectedElements } from "@excalidraw/element";
+import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,

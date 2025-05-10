@@ -4,18 +4,18 @@ import {
   pointFrom,
 } from "@excalidraw/math";
 
-import { getElementLineSegments } from "@excalidraw/element/bounds";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { getElementLineSegments } from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
 import {
   isFrameLikeElement,
   isLinearElement,
   isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
-import { getFrameChildren } from "@excalidraw/element/frame";
-import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
+import { getFrameChildren } from "@excalidraw/element";
+import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
-import { getContainerElement } from "@excalidraw/element/textElement";
+import { getContainerElement } from "@excalidraw/element";
 
 import { arrayToMap, easeOut } from "@excalidraw/common";
 

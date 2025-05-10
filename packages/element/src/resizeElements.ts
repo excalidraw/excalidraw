@@ -57,7 +57,7 @@ import {
 
 import { isInGroup } from "./groups";
 
-import type Scene from "./Scene";
+import type { Scene } from "./Scene";
 
 import type { BoundingBox } from "./bounds";
 import type {

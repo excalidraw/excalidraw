@@ -10,9 +10,9 @@ import {
 
 import { getNonDeletedElements } from "@excalidraw/element";
 
-import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import { isFrameLikeElement } from "@excalidraw/element";
 
-import { getElementsOverlappingFrame } from "@excalidraw/element/frame";
+import { getElementsOverlappingFrame } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,

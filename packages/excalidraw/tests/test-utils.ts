@@ -11,7 +11,7 @@ import ansi from "ansicolor";
 
 import { ORIG_ID, arrayToMap } from "@excalidraw/common";
 
-import { getSelectedElements } from "@excalidraw/element/selection";
+import { getSelectedElements } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
