@@ -315,6 +315,7 @@ const StatsDragInput = <
       </div>
       <input
         className="drag-input"
+        type="number"
         autoComplete="off"
         spellCheck="false"
         onKeyDown={(event) => {
@@ -331,9 +332,9 @@ const StatsDragInput = <
         }}
         ref={inputRef}
         value={inputValue}
-        onChange={(event) => {
+        onInput={(event) => {
           stateRef.current.updatePending = true;
-          setInputValue(event.target.value);
+          handleInputValue((event.target as HTMLInputElement).value, elements, appState);
         }}
         onFocus={(event) => {
           event.target.select();
