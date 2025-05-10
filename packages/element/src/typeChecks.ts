@@ -29,6 +29,7 @@ import type {
   PointBinding,
   FixedPointBinding,
   ExcalidrawFlowchartNodeElement,
+  ExcalidrawLinearElementSubType,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -106,6 +107,12 @@ export const isLinearElement = (
   element?: ExcalidrawElement | null,
 ): element is ExcalidrawLinearElement => {
   return element != null && isLinearElementType(element.type);
+};
+
+export const isLineElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawLineElement => {
+  return element != null && element.type === "line";
 };
 
 export const isArrowElement = (
@@ -358,8 +365,17 @@ export const isBounds = (box: unknown): box is Bounds =>
   typeof box[2] === "number" &&
   typeof box[3] === "number";
 
-export const isLineElement = (
-  element?: ExcalidrawElement | null,
-): element is ExcalidrawLineElement => {
-  return element != null && element.type === "line";
+export const getLinearElementSubType = (
+  element: ExcalidrawLinearElement,
+): ExcalidrawLinearElementSubType => {
+  if (isSharpArrow(element)) {
+    return "sharpArrow";
+  }
+  if (isCurvedArrow(element)) {
+    return "curvedArrow";
+  }
+  if (isElbowArrow(element)) {
+    return "elbowArrow";
+  }
+  return "line";
 };

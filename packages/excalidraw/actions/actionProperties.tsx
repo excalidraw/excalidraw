@@ -21,6 +21,7 @@ import {
   tupleToCoors,
   getLineHeight,
   isTransparent,
+  reduceToCommonValue,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -132,7 +133,6 @@ import { Fonts } from "../fonts";
 import { getLanguage, t } from "../i18n";
 import {
   canHaveArrowheads,
-  getCommonAttributeOfSelectedElements,
   getSelectedElements,
   getTargetElements,
   isSomeElementSelected,
@@ -171,12 +171,12 @@ export const changeProperty = (
 
 export const getFormValue = function <T extends Primitive>(
   elements: readonly ExcalidrawElement[],
-  appState: AppState,
+  app: AppClassProperties,
   getAttribute: (element: ExcalidrawElement) => T,
   isRelevantElement: true | ((element: ExcalidrawElement) => boolean),
   defaultValue: T | ((isSomeElementSelected: boolean) => T),
 ): T {
-  const editingTextElement = appState.editingTextElement;
+  const editingTextElement = app.state.editingTextElement;
   const nonDeletedElements = getNonDeletedElements(elements);
 
   let ret: T | null = null;
@@ -186,17 +186,17 @@ export const getFormValue = function <T extends Primitive>(
   }
 
   if (!ret) {
-    const hasSelection = isSomeElementSelected(nonDeletedElements, appState);
+    const hasSelection = isSomeElementSelected(nonDeletedElements, app.state);
 
     if (hasSelection) {
+      const selectedElements = app.scene.getSelectedElements(app.state);
+      const targetElements =
+        isRelevantElement === true
+          ? selectedElements
+          : selectedElements.filter((el) => isRelevantElement(el));
+
       ret =
-        getCommonAttributeOfSelectedElements(
-          isRelevantElement === true
-            ? nonDeletedElements
-            : nonDeletedElements.filter((el) => isRelevantElement(el)),
-          appState,
-          getAttribute,
-        ) ??
+        reduceToCommonValue(targetElements, getAttribute) ??
         (typeof defaultValue === "function"
           ? defaultValue(true)
           : defaultValue);
@@ -324,7 +324,7 @@ export const actionChangeStrokeColor = register({
         : CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, appProps }) => (
+  PanelComponent: ({ elements, appState, updateData, app }) => (
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
@@ -334,7 +334,7 @@ export const actionChangeStrokeColor = register({
         label={t("labels.stroke")}
         color={getFormValue(
           elements,
-          appState,
+          app,
           (element) => element.strokeColor,
           true,
           (hasSelection) =>
@@ -403,7 +403,7 @@ export const actionChangeBackgroundColor = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, appProps }) => (
+  PanelComponent: ({ elements, appState, updateData, app }) => (
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
@@ -413,7 +413,7 @@ export const actionChangeBackgroundColor = register({
         label={t("labels.background")}
         color={getFormValue(
           elements,
-          appState,
+          app,
           (element) => element.backgroundColor,
           true,
           (hasSelection) =>
@@ -448,7 +448,7 @@ export const actionChangeFillStyle = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData, app }) => {
     const selectedElements = getSelectedElements(elements, appState);
     const allElementsZigZag =
       selectedElements.length > 0 &&
@@ -484,7 +484,7 @@ export const actionChangeFillStyle = register({
           ]}
           value={getFormValue(
             elements,
-            appState,
+            app,
             (element) => element.fillStyle,
             (element) => element.hasOwnProperty("fillStyle"),
             (hasSelection) =>
@@ -521,7 +521,7 @@ export const actionChangeStrokeWidth = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.strokeWidth")}</legend>
       <ButtonIconSelect
@@ -548,7 +548,7 @@ export const actionChangeStrokeWidth = register({
         ]}
         value={getFormValue(
           elements,
-          appState,
+          app,
           (element) => element.strokeWidth,
           (element) => element.hasOwnProperty("strokeWidth"),
           (hasSelection) =>
@@ -576,7 +576,7 @@ export const actionChangeSloppiness = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.sloppiness")}</legend>
       <ButtonIconSelect
@@ -600,7 +600,7 @@ export const actionChangeSloppiness = register({
         ]}
         value={getFormValue(
           elements,
-          appState,
+          app,
           (element) => element.roughness,
           (element) => element.hasOwnProperty("roughness"),
           (hasSelection) =>
@@ -627,7 +627,7 @@ export const actionChangeStrokeStyle = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.strokeStyle")}</legend>
       <ButtonIconSelect
@@ -651,7 +651,7 @@ export const actionChangeStrokeStyle = register({
         ]}
         value={getFormValue(
           elements,
-          appState,
+          app,
           (element) => element.strokeStyle,
           (element) => element.hasOwnProperty("strokeStyle"),
           (hasSelection) =>
@@ -682,13 +682,8 @@ export const actionChangeOpacity = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <Range
-      updateData={updateData}
-      elements={elements}
-      appState={appState}
-      testId="opacity"
-    />
+  PanelComponent: ({ app, updateData }) => (
+    <Range updateData={updateData} app={app} testId="opacity" />
   ),
 });
 
@@ -732,7 +727,7 @@ export const actionChangeFontSize = register({
         ]}
         value={getFormValue(
           elements,
-          appState,
+          app,
           (element) => {
             if (isTextElement(element)) {
               return element.fontSize;
@@ -1030,7 +1025,7 @@ export const actionChangeFontFamily = register({
       ) =>
         getFormValue(
           elementsArray,
-          appState,
+          app,
           (element) => {
             if (isTextElement(element)) {
               return element.fontFamily;
@@ -1068,7 +1063,7 @@ export const actionChangeFontFamily = register({
 
       // popup props are not in sync, hence we are in the middle of an update, so keeping the previous value we've had
       return prevSelectedFontFamilyRef.current;
-    }, [batchedData.openPopup, appState, elements, app.scene]);
+    }, [batchedData.openPopup, appState, elements, app]);
 
     useEffect(() => {
       prevSelectedFontFamilyRef.current = selectedFontFamily;
@@ -1254,7 +1249,7 @@ export const actionChangeTextAlign = register({
           ]}
           value={getFormValue(
             elements,
-            appState,
+            app,
             (element) => {
               if (isTextElement(element)) {
                 return element.textAlign;
@@ -1342,7 +1337,7 @@ export const actionChangeVerticalAlign = register({
           ]}
           value={getFormValue(
             elements,
-            appState,
+            app,
             (element) => {
               if (isTextElement(element) && element.containerId) {
                 return element.verticalAlign;
@@ -1400,7 +1395,7 @@ export const actionChangeRoundness = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, renderAction }) => {
+  PanelComponent: ({ elements, appState, updateData, app, renderAction }) => {
     const targetElements = getTargetElements(
       getNonDeletedElements(elements),
       appState,
@@ -1429,7 +1424,7 @@ export const actionChangeRoundness = register({
           ]}
           value={getFormValue(
             elements,
-            appState,
+            app,
             (element) =>
               hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
             (element) =>
@@ -1561,7 +1556,7 @@ export const actionChangeArrowhead = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData, app }) => {
     const isRTL = getLanguage().rtl;
 
     return (
@@ -1573,7 +1568,7 @@ export const actionChangeArrowhead = register({
             options={getArrowheadOptions(!isRTL)}
             value={getFormValue<Arrowhead | null>(
               elements,
-              appState,
+              app,
               (element) =>
                 isLinearElement(element) && canHaveArrowheads(element.type)
                   ? element.startArrowhead
@@ -1590,7 +1585,7 @@ export const actionChangeArrowhead = register({
             options={getArrowheadOptions(!!isRTL)}
             value={getFormValue<Arrowhead | null>(
               elements,
-              appState,
+              app,
               (element) =>
                 isLinearElement(element) && canHaveArrowheads(element.type)
                   ? element.endArrowhead
@@ -1799,7 +1794,7 @@ export const actionChangeArrowType = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData, app }) => {
     return (
       <fieldset>
         <legend>{t("labels.arrowtypes")}</legend>
@@ -1827,7 +1822,7 @@ export const actionChangeArrowType = register({
           ]}
           value={getFormValue(
             elements,
-            appState,
+            app,
             (element) => {
               if (isArrowElement(element)) {
                 return element.elbowed
