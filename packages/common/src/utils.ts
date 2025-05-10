@@ -1244,11 +1244,39 @@ export const isReadonlyArray = (value?: any): value is readonly any[] => {
 };
 
 export const sizeOf = (
-  value: readonly number[] | Readonly<Map<any, any>> | Record<any, any>,
+  value:
+    | readonly unknown[]
+    | Readonly<Map<string, unknown>>
+    | Readonly<Record<string, unknown>>
+    | ReadonlySet<unknown>,
 ): number => {
   return isReadonlyArray(value)
     ? value.length
-    : value instanceof Map
+    : value instanceof Map || value instanceof Set
     ? value.size
     : Object.keys(value).length;
+};
+
+export const reduceToCommonValue = <T, R = T>(
+  collection: readonly T[] | ReadonlySet<T>,
+  getValue?: (item: T) => R,
+): R | null => {
+  if (sizeOf(collection) === 0) {
+    return null;
+  }
+
+  const valueExtractor = getValue || ((item: T) => item as unknown as R);
+
+  let commonValue: R | null = null;
+
+  for (const item of collection) {
+    const value = valueExtractor(item);
+    if ((commonValue === null || commonValue === value) && value != null) {
+      commonValue = value;
+    } else {
+      return null;
+    }
+  }
+
+  return commonValue;
 };
