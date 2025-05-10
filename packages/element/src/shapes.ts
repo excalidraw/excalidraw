@@ -5,6 +5,7 @@ import {
   ROUNDNESS,
   invariant,
   elementCenterPoint,
+  MIN_LOOP_LOCK_DISTANCE,
 } from "@excalidraw/common";
 import {
   isPoint,
@@ -39,6 +40,7 @@ import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawLinearElement,
+  ExcalidrawLineElement,
   NonDeleted,
 } from "./types";
 
@@ -395,4 +397,38 @@ export const isPathALoop = (
     return distance <= LINE_CONFIRM_THRESHOLD / zoomValue;
   }
   return false;
+};
+
+export const toggleLinePolygonState = (
+  element: ExcalidrawLineElement,
+  nextPolygonState: boolean,
+) => {
+  const updatedPoints = [...element.points];
+
+  if (nextPolygonState) {
+    const firstPoint = updatedPoints[0];
+    const lastPoint = updatedPoints[updatedPoints.length - 1];
+
+    const distance = Math.hypot(
+      firstPoint[0] - lastPoint[0],
+      firstPoint[1] - lastPoint[1],
+    );
+
+    if (distance > MIN_LOOP_LOCK_DISTANCE) {
+      updatedPoints.push(pointFrom(firstPoint[0], firstPoint[1]));
+    } else {
+      updatedPoints[updatedPoints.length - 1] = pointFrom(
+        firstPoint[0],
+        firstPoint[1],
+      );
+    }
+  }
+
+  // TODO: satisfies ElementUpdate<ExcalidrawLineElement>
+  const ret = {
+    polygon: nextPolygonState,
+    points: updatedPoints,
+  };
+
+  return ret;
 };

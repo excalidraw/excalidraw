@@ -68,6 +68,7 @@ exports[`select single element on the scene > arrow escape 1`] = `
   "lastCommittedPoint": null,
   "link": null,
   "locked": false,
+  "loopLock": false,
   "opacity": 100,
   "points": [
     [

@@ -293,6 +293,7 @@ function CommandPaletteInner({
         actionManager.actions.decreaseFontSize,
         actionManager.actions.toggleLinearEditor,
         actionManager.actions.cropEditor,
+        actionManager.actions.togglePolygon,
         actionLink,
         actionCopyElementLink,
         actionLinkToElement,
@@ -585,10 +586,10 @@ function CommandPaletteInner({
       });
 
       setAllCommands(allCommands);
-      setLastUsed(
-        allCommands.find((command) => command.label === lastUsed?.label) ??
-          null,
-      );
+      // setLastUsed(
+      //   allCommands.find((command) => command.label === lastUsed?.label) ??
+      //     null,
+      // );
     }
   }, [
     stableDeps,

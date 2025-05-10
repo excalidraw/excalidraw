@@ -69,6 +69,17 @@
       }
     }
 
+    .color-picker__button-outline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      svg {
+        color: var(--color-gray-60);
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+    }
+
     &.active {
       .color-picker__button-outline {
         position: absolute;

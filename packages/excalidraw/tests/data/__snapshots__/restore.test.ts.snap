@@ -229,6 +229,7 @@ exports[`restoreElements > should restore line and draw elements correctly 1`] =
   "lastCommittedPoint": null,
   "link": null,
   "locked": false,
+  "loopLock": false,
   "opacity": 100,
   "points": [
     [
@@ -278,6 +279,7 @@ exports[`restoreElements > should restore line and draw elements correctly 2`] =
   "lastCommittedPoint": null,
   "link": null,
   "locked": false,
+  "loopLock": false,
   "opacity": 100,
   "points": [
     [
