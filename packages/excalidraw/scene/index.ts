@@ -1,7 +1,6 @@
 export {
   isSomeElementSelected,
   getElementsWithinSelection,
-  getCommonAttributeOfSelectedElements,
   getSelectedElements,
   getTargetElements,
 } from "@excalidraw/element";
