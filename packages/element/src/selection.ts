@@ -169,25 +169,6 @@ export const isSomeElementSelected = (function () {
   return ret;
 })();
 
-/**
- * Returns common attribute (picked by `getAttribute` callback) of selected
- *  elements. If elements don't share the same value, returns `null`.
- */
-export const getCommonAttributeOfSelectedElements = <T>(
-  elements: readonly NonDeletedExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds">,
-  getAttribute: (element: ExcalidrawElement) => T,
-): T | null => {
-  const attributes = Array.from(
-    new Set(
-      getSelectedElements(elements, appState).map((element) =>
-        getAttribute(element),
-      ),
-    ),
-  );
-  return attributes.length === 1 ? attributes[0] : null;
-};
-
 export const getSelectedElements = (
   elements: ElementsMapOrArray,
   appState: Pick<InteractiveCanvasAppState, "selectedElementIds">,
