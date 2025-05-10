@@ -1,5 +1,5 @@
 import StatsDragInput from "./DragInput";
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 import type { AppState } from "../../types";
 import { getStepSizedValue } from "./utils";
 import { getNormalizedGridSize } from "../../scene";
