@@ -315,7 +315,6 @@ const StatsDragInput = <
       </div>
       <input
         className="drag-input"
-        type="number"
         autoComplete="off"
         spellCheck="false"
         onKeyDown={(event) => {
@@ -323,18 +322,37 @@ const StatsDragInput = <
             const eventTarget = event.target;
             if (
               eventTarget instanceof HTMLInputElement &&
-              event.key === KEYS.ENTER
+              (
+                [KEYS.ENTER, KEYS.ARROW_UP, KEYS.ARROW_DOWN] as string[]
+              ).includes(event.key)
             ) {
+              if (!isNaN(eventTarget.value)) {
+                if (event.key === KEYS.ARROW_UP) {
+                  stateRef.current.updatePending = true;
+                  eventTarget.value = (
+                    parseFloat(eventTarget.value) + 1
+                  ).toString();
+                } else if (event.key === KEYS.ARROW_DOWN) {
+                  stateRef.current.updatePending = true;
+                  eventTarget.value = (
+                    parseFloat(eventTarget.value) - 1
+                  ).toString();
+                }
+              }
+
               handleInputValue(eventTarget.value, elements, appState);
-              app.focusContainer();
+
+              if (event.key === KEYS.ENTER) {
+                app.focusContainer();
+              }
             }
           }
         }}
         ref={inputRef}
         value={inputValue}
-        onInput={(event) => {
+        onChange={(event) => {
           stateRef.current.updatePending = true;
-          handleInputValue((event.target as HTMLInputElement).value, elements, appState);
+          setInputValue(event.target.value);
         }}
         onFocus={(event) => {
           event.target.select();
