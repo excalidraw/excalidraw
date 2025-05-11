@@ -560,6 +560,7 @@
     }
   },
   "colorPicker": {
+    "color": "Color",
     "mostUsedCustomColors": "Most used custom colors",
     "colors": "Colors",
     "shades": "Shades",
