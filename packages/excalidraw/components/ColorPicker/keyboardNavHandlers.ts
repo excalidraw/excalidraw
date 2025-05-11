@@ -109,7 +109,7 @@ interface ColorPickerKeyNavHandlerProps {
   event: React.KeyboardEvent;
   activeColorPickerSection: ActiveColorPickerSectionAtomType;
   palette: ColorPaletteCustom;
-  color: string;
+  color: string | null;
   onChange: (color: string) => void;
   customColors: string[];
   setActiveColorPickerSection: (
@@ -270,7 +270,7 @@ export const colorPickerKeyNavHandler = ({
   }
 
   if (activeColorPickerSection === "custom") {
-    const indexOfColor = customColors.indexOf(color);
+    const indexOfColor = color != null ? customColors.indexOf(color) : 0;
 
     const newColorIndex = arrowHandler(
       event.key,

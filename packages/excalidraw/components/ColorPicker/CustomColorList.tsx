@@ -8,7 +8,7 @@ import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 
 interface CustomColorListProps {
   colors: string[];
-  color: string;
+  color: string | null;
   onChange: (color: string) => void;
   label: string;
 }

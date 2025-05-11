@@ -14,7 +14,7 @@ import type { ColorPickerType } from "./colorPickerUtils";
 interface TopPicksProps {
   onChange: (color: string) => void;
   type: ColorPickerType;
-  activeColor: string;
+  activeColor: string | null;
   topPicks?: readonly string[];
 }
 

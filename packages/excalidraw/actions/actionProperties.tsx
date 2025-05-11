@@ -333,7 +333,8 @@ export const actionChangeStrokeColor = register({
           app,
           (element) => element.strokeColor,
           true,
-          appState.currentItemStrokeColor,
+          (hasSelection) =>
+            !hasSelection ? appState.currentItemStrokeColor : null,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
         elements={elements}
@@ -379,7 +380,8 @@ export const actionChangeBackgroundColor = register({
           app,
           (element) => element.backgroundColor,
           true,
-          appState.currentItemBackgroundColor,
+          (hasSelection) =>
+            !hasSelection ? appState.currentItemBackgroundColor : null,
         )}
         onChange={(color) => updateData({ currentItemBackgroundColor: color })}
         elements={elements}

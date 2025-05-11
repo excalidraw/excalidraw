@@ -19,6 +19,7 @@ interface ColorInputProps {
   onChange: (color: string) => void;
   label: string;
   colorPickerType: ColorPickerType;
+  placeholder?: string;
 }
 
 export const ColorInput = ({
@@ -26,6 +27,7 @@ export const ColorInput = ({
   onChange,
   label,
   colorPickerType,
+  placeholder,
 }: ColorInputProps) => {
   const device = useDevice();
   const [innerValue, setInnerValue] = useState(color);
@@ -93,6 +95,7 @@ export const ColorInput = ({
           }
           event.stopPropagation();
         }}
+        placeholder={placeholder}
       />
       {/* TODO reenable on mobile with a better UX */}
       {!device.editor.isMobile && (

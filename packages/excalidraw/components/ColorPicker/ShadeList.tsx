@@ -13,14 +13,14 @@ import {
 } from "./colorPickerUtils";
 
 interface ShadeListProps {
-  hex: string;
+  color: string | null;
   onChange: (color: string) => void;
   palette: ColorPaletteCustom;
 }
 
-export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
+export const ShadeList = ({ color, onChange, palette }: ShadeListProps) => {
   const colorObj = getColorNameAndShadeFromColor({
-    color: hex || "transparent",
+    color: color || "transparent",
     palette,
   });
 
