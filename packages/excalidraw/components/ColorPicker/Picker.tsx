@@ -32,7 +32,6 @@ import type { ColorPickerType } from "./colorPickerUtils";
 interface PickerProps {
   color: string | null;
   onChange: (color: string) => void;
-  label: string;
   type: ColorPickerType;
   elements: readonly ExcalidrawElement[];
   palette: ColorPaletteCustom;
@@ -47,7 +46,6 @@ export const Picker = React.forwardRef(
     {
       color,
       onChange,
-      label,
       type,
       elements,
       palette,

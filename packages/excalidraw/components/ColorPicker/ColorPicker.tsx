@@ -171,7 +171,6 @@ const ColorPickerPopupContent = ({
               updateData({ openPopup: null });
             }
           }}
-          label={label}
           type={type}
           elements={elements}
           updateData={updateData}
