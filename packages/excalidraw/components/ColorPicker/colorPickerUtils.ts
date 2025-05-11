@@ -11,11 +11,14 @@ export const getColorNameAndShadeFromColor = ({
   color,
 }: {
   palette: ColorPaletteCustom;
-  color: string;
+  color: string | null;
 }): {
   colorName: ColorPickerColor;
   shade: number | null;
 } | null => {
+  if (!color) {
+    return null;
+  }
   for (const [colorName, colorVal] of Object.entries(palette)) {
     if (Array.isArray(colorVal)) {
       const shade = colorVal.indexOf(color);
