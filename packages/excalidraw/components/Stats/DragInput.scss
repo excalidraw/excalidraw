@@ -47,7 +47,17 @@
 
     padding: 0.5rem;
     padding-left: 0.25rem;
-    appearance: none;
+
+    // hide spinbutton arrows
+    &[type="number"] {
+      -moz-appearance: textfield;
+
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        appearance: none;
+      }
+    }
 
     &:focus-visible {
       box-shadow: none;
