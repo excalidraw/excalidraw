@@ -7884,8 +7884,13 @@ class App extends React.Component<AppProps, AppState> {
           });
           // If we click on something
         } else if (hitElement != null) {
+          // == deep selection ==
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
           if (event[KEYS.CTRL_OR_CMD]) {
+            if (event.altKey) {
+              // ctrl + alt means we're lasso selecting
+              return false;
+            }
             if (!this.state.selectedElementIds[hitElement.id]) {
               pointerDownState.hit.wasAddedToSelection = true;
             }
@@ -9267,17 +9272,19 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         if (event.altKey) {
-          this.setActiveTool(
-            { type: "lasso", fromSelection: true },
-            event.shiftKey,
-          );
-          this.lassoTrail.startPath(
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-            event.shiftKey,
-          );
-          this.setAppState({
-            selectionElement: null,
+          flushSync(() => {
+            this.setActiveTool(
+              { type: "lasso", fromSelection: true },
+              event.shiftKey,
+            );
+            this.lassoTrail.startPath(
+              pointerDownState.origin.x,
+              pointerDownState.origin.y,
+              event.shiftKey,
+            );
+            this.setAppState({
+              selectionElement: null,
+            });
           });
         } else {
           this.maybeDragNewGenericElement(pointerDownState, event);
