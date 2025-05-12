@@ -3929,8 +3929,26 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private debounceConstrainScrollState = debounce((state: AppState) => {
-    this.setState(constrainScrollState(state, "rigid"));
-  }, 500);
+    const newState = constrainScrollState(state, "rigid");
+
+    const fromValues = {
+      scrollX: this.state.scrollX,
+      scrollY: this.state.scrollY,
+      zoom: this.state.zoom.value,
+    };
+    const toValues = {
+      scrollX: newState.scrollX,
+      scrollY: newState.scrollY,
+      zoom: newState.zoom.value,
+    };
+
+    if (areCanvasTranslatesClose(fromValues, toValues)) {
+      return;
+    }
+
+    this.cancelInProgressAnimation?.();
+    this.animateToConstrainedArea(fromValues, toValues);
+  }, 300);
 
   private animateToConstrainedArea = (
     fromValues: AnimateTranslateCanvasValues,
