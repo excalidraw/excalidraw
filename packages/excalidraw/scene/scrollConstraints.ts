@@ -1,5 +1,7 @@
 import { isShallowEqual } from "@excalidraw/common";
 
+import { clamp } from "@excalidraw/math";
+
 import { getNormalizedZoom } from "./normalize";
 
 import type {
@@ -45,12 +47,10 @@ const calculateZoomLevel = (
   height: AppState["height"],
 ) => {
   const viewportZoomFactor = scrollConstraints.viewportZoomFactor
-    ? Math.min(
+    ? clamp(
+        scrollConstraints.viewportZoomFactor,
+        MIN_VIEWPORT_ZOOM_FACTOR,
         MAX_VIEWPORT_ZOOM_FACTOR,
-        Math.max(
-          scrollConstraints.viewportZoomFactor,
-          MIN_VIEWPORT_ZOOM_FACTOR,
-        ),
       )
     : DEFAULT_VIEWPORT_ZOOM_FACTOR;
 
@@ -122,7 +122,7 @@ const calculateScrollBounds = ({
 }) => {
   const overscrollAllowance =
     scrollConstraints.overscrollAllowance ?? DEFAULT_OVERSCROLL_ALLOWANCE;
-  const validatedOverscroll = Math.min(Math.max(overscrollAllowance, 0), 1);
+  const validatedOverscroll = clamp(overscrollAllowance, 0, 1);
 
   const calculateCenter = (zoom: number) => {
     const centerX =
@@ -254,14 +254,8 @@ const constrainScrollValues = ({
   maxScrollY: number;
   constrainedZoom: AppState["zoom"];
 }): CanvasTranslate => {
-  const constrainedScrollX = Math.min(
-    maxScrollX,
-    Math.max(scrollX, minScrollX),
-  );
-  const constrainedScrollY = Math.min(
-    maxScrollY,
-    Math.max(scrollY, minScrollY),
-  );
+  const constrainedScrollX = clamp(scrollX, minScrollX, maxScrollX);
+  const constrainedScrollY = clamp(scrollY, minScrollY, maxScrollY);
   return {
     scrollX: constrainedScrollX,
     scrollY: constrainedScrollY,
