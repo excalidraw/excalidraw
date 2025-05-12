@@ -3948,7 +3948,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.cancelInProgressAnimation?.();
     this.animateToConstrainedArea(fromValues, toValues);
-  }, 300);
+  }, 200);
 
   private animateToConstrainedArea = (
     fromValues: AnimateTranslateCanvasValues,
