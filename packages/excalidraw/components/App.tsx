@@ -3917,6 +3917,20 @@ class App extends React.Component<AppProps, AppState> {
       }),
     };
 
+    // RULE: cannot go below the minimum zoom level if zoom lock is enabled
+    const constrainedState =
+      newState.scrollConstraints && newState.scrollConstraints.lockZoom
+        ? constrainScrollState(newState, "elastic")
+        : newState;
+    if (constrainedState.zoom.value > newState.zoom.value) {
+      newState.zoom = constrainedState.zoom;
+      newState.scrollX = constrainedState.scrollX;
+      newState.scrollY = constrainedState.scrollY;
+
+      this.debounceConstrainScrollState(newState);
+      return;
+    }
+
     this.setState(newState);
     if (this.state.scrollConstraints) {
       // debounce to allow centering on user's cursor position before constraining
