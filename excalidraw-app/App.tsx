@@ -1032,7 +1032,7 @@ const ExcalidrawWrapper = () => {
   );
 
   const [constraints] = useState<DebugScrollConstraints>(() => {
-    const stored = new URLSearchParams(location.hash.slice(1)).get(
+    const stored = new URLSearchParams(location.search.slice(1)).get(
       "constraints",
     );
     let storedConstraints = {};
