@@ -959,6 +959,10 @@ export const bindPointToSnapToElementOutline = (
           otherPoint,
         ),
       ),
+      FIXED_BINDING_DISTANCE *
+        (bindableElement.type === "diamond"
+          ? 1.414 // sqrt(2)
+          : 1),
     )[0];
   } else {
     intersection = intersectElementWithLineSegment(
@@ -989,24 +993,7 @@ export const bindPointToSnapToElementOutline = (
     return edgePoint;
   }
 
-  if (elbowed) {
-    const scalar =
-      pointDistanceSq(edgePoint, center) -
-        pointDistanceSq(intersection, center) >
-      0
-        ? FIXED_BINDING_DISTANCE
-        : -FIXED_BINDING_DISTANCE;
-
-    return pointFromVector(
-      vectorScale(
-        vectorNormalize(vectorFromPoint(edgePoint, intersection)),
-        scalar,
-      ),
-      intersection,
-    );
-  }
-
-  return edgePoint;
+  return elbowed ? intersection : edgePoint;
 };
 
 export const avoidRectangularCorner = (
@@ -1117,55 +1104,83 @@ export const snapToMid = (
 
   // snap-to-center point is adaptive to element size, but we don't want to go
   // above and below certain px distance
-  const verticalThrehsold = clamp(tolerance * height, 5, 80);
-  const horizontalThrehsold = clamp(tolerance * width, 5, 80);
+  const verticalThreshold = clamp(tolerance * height, 5, 80);
+  const horizontalThreshold = clamp(tolerance * width, 5, 80);
 
   if (
     nonRotated[0] <= x + width / 2 &&
-    nonRotated[1] > center[1] - verticalThrehsold &&
-    nonRotated[1] < center[1] + verticalThrehsold
+    nonRotated[1] > center[1] - verticalThreshold &&
+    nonRotated[1] < center[1] + verticalThreshold
   ) {
     // LEFT
-    return pointRotateRads(
+    const otherPoint = pointRotateRads<GlobalPoint>(
       pointFrom(x - FIXED_BINDING_DISTANCE, center[1]),
       center,
       angle,
     );
+    return (
+      intersectElementWithLineSegment(
+        element,
+        lineSegment(center, otherPoint),
+        FIXED_BINDING_DISTANCE,
+      )[0] ?? otherPoint
+    );
   } else if (
     nonRotated[1] <= y + height / 2 &&
-    nonRotated[0] > center[0] - horizontalThrehsold &&
-    nonRotated[0] < center[0] + horizontalThrehsold
+    nonRotated[0] > center[0] - horizontalThreshold &&
+    nonRotated[0] < center[0] + horizontalThreshold
   ) {
     // TOP
-    return pointRotateRads(
+    const otherPoint = pointRotateRads<GlobalPoint>(
       pointFrom(center[0], y - FIXED_BINDING_DISTANCE),
       center,
       angle,
     );
+    return (
+      intersectElementWithLineSegment(
+        element,
+        lineSegment(center, otherPoint),
+        FIXED_BINDING_DISTANCE,
+      )[0] ?? otherPoint
+    );
   } else if (
     nonRotated[0] >= x + width / 2 &&
-    nonRotated[1] > center[1] - verticalThrehsold &&
-    nonRotated[1] < center[1] + verticalThrehsold
+    nonRotated[1] > center[1] - verticalThreshold &&
+    nonRotated[1] < center[1] + verticalThreshold
   ) {
     // RIGHT
-    return pointRotateRads(
+    const otherPoint = pointRotateRads<GlobalPoint>(
       pointFrom(x + width + FIXED_BINDING_DISTANCE, center[1]),
       center,
       angle,
     );
+    return (
+      intersectElementWithLineSegment(
+        element,
+        lineSegment(center, otherPoint),
+        FIXED_BINDING_DISTANCE,
+      )[0] ?? otherPoint
+    );
   } else if (
     nonRotated[1] >= y + height / 2 &&
-    nonRotated[0] > center[0] - horizontalThrehsold &&
-    nonRotated[0] < center[0] + horizontalThrehsold
+    nonRotated[0] > center[0] - horizontalThreshold &&
+    nonRotated[0] < center[0] + horizontalThreshold
   ) {
     // DOWN
-    return pointRotateRads(
+    const otherPoint = pointRotateRads<GlobalPoint>(
       pointFrom(center[0], y + height + FIXED_BINDING_DISTANCE),
       center,
       angle,
     );
+    return (
+      intersectElementWithLineSegment(
+        element,
+        lineSegment(center, otherPoint),
+        FIXED_BINDING_DISTANCE,
+      )[0] ?? otherPoint
+    );
   } else if (element.type === "diamond") {
-    const distance = FIXED_BINDING_DISTANCE - 1;
+    const distance = FIXED_BINDING_DISTANCE * 0.7071; // 1 / sqrt(2)
     const topLeft = pointFrom<GlobalPoint>(
       x + width / 4 - distance,
       y + height / 4 - distance,
@@ -1182,29 +1197,30 @@ export const snapToMid = (
       x + (3 * width) / 4 + distance,
       y + (3 * height) / 4 + distance,
     );
+
     if (
       pointDistance(topLeft, nonRotated) <
-      Math.max(horizontalThrehsold, verticalThrehsold)
+      Math.max(horizontalThreshold, verticalThreshold)
     ) {
-      return pointRotateRads(topLeft, center, angle);
+      return topLeft;
     }
     if (
       pointDistance(topRight, nonRotated) <
-      Math.max(horizontalThrehsold, verticalThrehsold)
+      Math.max(horizontalThreshold, verticalThreshold)
     ) {
-      return pointRotateRads(topRight, center, angle);
+      return topRight;
     }
     if (
       pointDistance(bottomLeft, nonRotated) <
-      Math.max(horizontalThrehsold, verticalThrehsold)
+      Math.max(horizontalThreshold, verticalThreshold)
     ) {
-      return pointRotateRads(bottomLeft, center, angle);
+      return bottomLeft;
     }
     if (
       pointDistance(bottomRight, nonRotated) <
-      Math.max(horizontalThrehsold, verticalThrehsold)
+      Math.max(horizontalThreshold, verticalThreshold)
     ) {
-      return pointRotateRads(bottomRight, center, angle);
+      return bottomRight;
     }
   }
 
