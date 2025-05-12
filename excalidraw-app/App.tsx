@@ -67,6 +67,8 @@ import {
 
 import { useApp } from "@excalidraw/excalidraw/components/App";
 
+import { clamp } from "@excalidraw/math";
+
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
 import type {
@@ -173,9 +175,9 @@ const ConstraintsSettings = ({
   const [activeFrameId, setActiveFrameId] = useState<string | null>(null);
 
   useEffect(() => {
-    const hash = new URLSearchParams(window.location.hash.slice(1));
-    hash.set("constraints", encodeConstraints(constraints));
-    window.location.hash = decodeURIComponent(hash.toString());
+    const params = new URLSearchParams(window.location.search);
+    params.set("constraints", encodeConstraints(constraints));
+    history.replaceState(null, "", `?${params.toString()}`);
 
     constraints.enabled
       ? excalidrawAPI.setScrollConstraints(constraints)
@@ -205,6 +207,26 @@ const ConstraintsSettings = ({
     });
   }, [excalidrawAPI]);
 
+  const parseValue = (
+    value: string,
+    opts?: {
+      min?: number;
+      max?: number;
+    },
+  ) => {
+    const { min = -Infinity, max = Infinity } = opts || {};
+    let parsedValue = parseInt(value);
+    if (isNaN(parsedValue)) {
+      parsedValue = 0;
+    }
+    return clamp(parsedValue, min, max);
+  };
+
+  const inputStyle = {
+    width: "4rem",
+    height: "1rem",
+  };
+
   return (
     <div
       style={{
@@ -224,6 +246,7 @@ const ConstraintsSettings = ({
         style={{
           display: "flex",
           gap: "0.6rem",
+          alignItems: "center",
         }}
       >
         enabled:{" "}
@@ -237,54 +260,66 @@ const ConstraintsSettings = ({
         x:{" "}
         <input
           placeholder="x"
-          size={4}
+          type="number"
+          step={"10"}
           value={constraints.x.toString()}
-          onChange={(e) =>
+          onChange={(e) => {
             setConstraints((s) => ({
               ...s,
-              x: parseInt(e.target.value) ?? 0,
-            }))
-          }
+              x: parseValue(e.target.value),
+            }));
+          }}
+          style={inputStyle}
         />
         y:{" "}
         <input
           placeholder="y"
-          size={4}
+          type="number"
+          step={"10"}
           value={constraints.y.toString()}
           onChange={(e) =>
             setConstraints((s) => ({
               ...s,
-              y: parseInt(e.target.value) ?? 0,
+              y: parseValue(e.target.value),
             }))
           }
+          style={inputStyle}
         />
         w:{" "}
         <input
           placeholder="width"
-          size={4}
+          type="number"
+          step={"10"}
           value={constraints.width.toString()}
           onChange={(e) =>
             setConstraints((s) => ({
               ...s,
-              width: parseInt(e.target.value) ?? 200,
+              width: parseValue(e.target.value, {
+                min: 200,
+              }),
             }))
           }
+          style={inputStyle}
         />
         h:{" "}
         <input
           placeholder="height"
-          size={4}
+          type="number"
+          step={"10"}
           value={constraints.height.toString()}
           onChange={(e) =>
             setConstraints((s) => ({
               ...s,
-              height: parseInt(e.target.value) ?? 200,
+              height: parseValue(e.target.value, {
+                min: 200,
+              }),
             }))
           }
+          style={inputStyle}
         />
         zoomFactor:
         <input
-          placeholder="height"
+          placeholder="zoom factor"
           type="number"
           min="0.1"
           max="1"
@@ -296,10 +331,11 @@ const ConstraintsSettings = ({
               viewportZoomFactor: parseFloat(e.target.value.toString()) ?? 0.7,
             }))
           }
+          style={inputStyle}
         />
         overscrollAllowance:
         <input
-          placeholder="height"
+          placeholder="overscroll allowance"
           type="number"
           min="0"
           max="1"
@@ -311,6 +347,7 @@ const ConstraintsSettings = ({
               overscrollAllowance: parseFloat(e.target.value.toString()) ?? 0.5,
             }))
           }
+          style={inputStyle}
         />
         lockZoom:{" "}
         <input
