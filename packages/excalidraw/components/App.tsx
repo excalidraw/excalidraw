@@ -3917,8 +3917,20 @@ class App extends React.Component<AppProps, AppState> {
       }),
     };
 
-    this.setState(constrainScrollState(newState));
+    this.setState(newState);
+    if (this.state.scrollConstraints) {
+      // debounce to allow centering on user's cursor position before constraining
+      if (newState.zoom.value !== this.state.zoom.value) {
+        this.debounceConstrainScrollState(newState);
+      } else {
+        this.setState(constrainScrollState(newState));
+      }
+    }
   };
+
+  private debounceConstrainScrollState = debounce((state: AppState) => {
+    this.setState(constrainScrollState(state, "rigid"));
+  }, 500);
 
   private animateToConstrainedArea = (
     fromValues: AnimateTranslateCanvasValues,
