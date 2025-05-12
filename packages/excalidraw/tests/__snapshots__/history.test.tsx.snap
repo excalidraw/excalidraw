@@ -783,7 +783,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "0.00000",
+  "height": 0,
   "id": "id668",
   "index": "a2",
   "isDeleted": false,
@@ -859,14 +859,14 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
               [
                 100,
-                "-0.00000",
+                0,
               ],
             ],
           },
           "inserted": {
             "endBinding": {
               "elementId": "id665",
-              "focus": "0.00000",
+              "focus": -0,
               "gap": 1,
             },
             "points": [
@@ -922,7 +922,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
             ],
             "startBinding": null,
-            "y": 0,
           },
           "inserted": {
             "points": [
@@ -932,15 +931,14 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
               [
                 100,
-                "-0.00000",
+                0,
               ],
             ],
             "startBinding": {
               "elementId": "id664",
-              "focus": "-0.00000",
+              "focus": 0,
               "gap": 1,
             },
-            "y": "0.00000",
           },
         },
       },

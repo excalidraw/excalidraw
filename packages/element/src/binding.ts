@@ -959,10 +959,7 @@ export const bindPointToSnapToElementOutline = (
           otherPoint,
         ),
       ),
-      FIXED_BINDING_DISTANCE *
-        (bindableElement.type === "diamond"
-          ? 1.414 // sqrt(2)
-          : 1),
+      FIXED_BINDING_DISTANCE,
     )[0];
   } else {
     intersection = intersectElementWithLineSegment(
@@ -1180,7 +1177,7 @@ export const snapToMid = (
       )[0] ?? otherPoint
     );
   } else if (element.type === "diamond") {
-    const distance = FIXED_BINDING_DISTANCE * 0.7071; // 1 / sqrt(2)
+    const distance = FIXED_BINDING_DISTANCE;
     const topLeft = pointFrom<GlobalPoint>(
       x + width / 4 - distance,
       y + height / 4 - distance,
@@ -1202,25 +1199,25 @@ export const snapToMid = (
       pointDistance(topLeft, nonRotated) <
       Math.max(horizontalThreshold, verticalThreshold)
     ) {
-      return topLeft;
+      return pointRotateRads(topLeft, center, angle);
     }
     if (
       pointDistance(topRight, nonRotated) <
       Math.max(horizontalThreshold, verticalThreshold)
     ) {
-      return topRight;
+      return pointRotateRads(topRight, center, angle);
     }
     if (
       pointDistance(bottomLeft, nonRotated) <
       Math.max(horizontalThreshold, verticalThreshold)
     ) {
-      return bottomLeft;
+      return pointRotateRads(bottomLeft, center, angle);
     }
     if (
       pointDistance(bottomRight, nonRotated) <
       Math.max(horizontalThreshold, verticalThreshold)
     ) {
-      return bottomRight;
+      return pointRotateRads(bottomRight, center, angle);
     }
   }
 
