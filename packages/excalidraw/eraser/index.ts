@@ -1,21 +1,18 @@
 import { arrayToMap, easeOut, THEME } from "@excalidraw/common";
-import { getElementLineSegments } from "@excalidraw/element/bounds";
+import { getElementLineSegments } from "@excalidraw/element";
 import {
   lineSegment,
   lineSegmentIntersectionPoints,
   pointFrom,
 } from "@excalidraw/math";
 
-import { getElementsInGroup } from "@excalidraw/element/groups";
+import { getElementsInGroup } from "@excalidraw/element";
 
-import { getElementShape } from "@excalidraw/element/shapes";
-import { shouldTestInside } from "@excalidraw/element/collision";
+import { getElementShape } from "@excalidraw/element";
+import { shouldTestInside } from "@excalidraw/element";
 import { isPointInShape } from "@excalidraw/utils/collision";
-import {
-  hasBoundTextElement,
-  isBoundToContainer,
-} from "@excalidraw/element/typeChecks";
-import { getBoundTextElementId } from "@excalidraw/element/textElement";
+import { hasBoundTextElement, isBoundToContainer } from "@excalidraw/element";
+import { getBoundTextElementId } from "@excalidraw/element";
 
 import type { GeometricShape } from "@excalidraw/utils/shape";
 import type {

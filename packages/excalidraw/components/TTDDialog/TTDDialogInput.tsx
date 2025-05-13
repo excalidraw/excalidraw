@@ -34,6 +34,7 @@ export const TTDDialogInput = ({
           callbackRef.current?.();
         }
       };
+      textarea.focus();
       textarea.addEventListener(EVENT.KEYDOWN, handleKeyDown);
       return () => {
         textarea.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
@@ -47,7 +48,6 @@ export const TTDDialogInput = ({
       onChange={onChange}
       value={input}
       placeholder={placeholder}
-      autoFocus
       ref={ref}
     />
   );

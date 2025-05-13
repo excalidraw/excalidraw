@@ -7,7 +7,7 @@ import {
 
 import { getNonDeletedElements } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { Theme } from "@excalidraw/element/types";
 
