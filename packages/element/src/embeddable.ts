@@ -83,6 +83,7 @@ const ALLOW_SAME_ORIGIN = new Set([
   "*.simplepdf.eu",
   "stackblitz.com",
   "reddit.com",
+  "forms.microsoft.com",
 ]);
 
 export const createSrcDoc = (body: string) => {
