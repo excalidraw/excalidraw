@@ -208,6 +208,10 @@ export const getEmbedLink = (
     };
   }
 
+  if (link.includes("forms.microsoft.com") && !link.includes("embed=true")) {
+    link += link.includes("?") ? "&embed=true" : "?embed=true";
+  }
+
   if (RE_TWITTER.test(link)) {
     const postId = link.match(RE_TWITTER)![1];
     // the embed srcdoc still supports twitter.com domain only.
