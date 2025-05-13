@@ -33,6 +33,8 @@ const RE_GH_GIST = /^https:\/\/gist\.github\.com\/([\w_-]+)\/([\w_-]+)/;
 const RE_GH_GIST_EMBED =
   /^<script[\s\S]*?\ssrc=["'](https:\/\/gist\.github\.com\/.*?)\.js["']/i;
 
+const RE_MSFORMS = /^(?:https?:\/\/)?forms\.microsoft\.com\//;
+
 // not anchored to start to allow <blockquote> twitter embeds
 const RE_TWITTER =
   /(?:https?:\/\/)?(?:(?:w){3}\.)?(?:twitter|x)\.com\/[^/]+\/status\/(\d+)/;
@@ -208,7 +210,7 @@ export const getEmbedLink = (
     };
   }
 
-  if (link.includes("forms.microsoft.com") && !link.includes("embed=true")) {
+  if (RE_MSFORMS.test(link) && !link.includes("embed=true")) {
     link += link.includes("?") ? "&embed=true" : "?embed=true";
   }
 
