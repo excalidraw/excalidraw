@@ -78,7 +78,6 @@ exports[`multi point mode in linear elements > line 3`] = `
   ],
   "link": null,
   "locked": false,
-  "loopLock": false,
   "opacity": 100,
   "points": [
     [
@@ -94,6 +93,7 @@ exports[`multi point mode in linear elements > line 3`] = `
       110,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": {
     "type": 2,

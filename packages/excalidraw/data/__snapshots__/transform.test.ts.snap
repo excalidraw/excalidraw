@@ -937,7 +937,6 @@ exports[`Test Transform > should transform linear elements 3`] = `
   "lastCommittedPoint": null,
   "link": null,
   "locked": false,
-  "loopLock": false,
   "opacity": 100,
   "points": [
     [
@@ -949,6 +948,7 @@ exports[`Test Transform > should transform linear elements 3`] = `
       0,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
@@ -985,7 +985,6 @@ exports[`Test Transform > should transform linear elements 4`] = `
   "lastCommittedPoint": null,
   "link": null,
   "locked": false,
-  "loopLock": false,
   "opacity": 100,
   "points": [
     [
@@ -997,6 +996,7 @@ exports[`Test Transform > should transform linear elements 4`] = `
       0,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,

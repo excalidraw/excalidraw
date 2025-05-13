@@ -142,7 +142,6 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "lastCommittedPoint": null,
   "link": null,
   "locked": false,
-  "loopLock": false,
   "opacity": 100,
   "points": [
     [
@@ -154,6 +153,7 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
       50,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": {
     "type": 2,
