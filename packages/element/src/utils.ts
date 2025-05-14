@@ -5,15 +5,9 @@ import {
   lineSegment,
   pointFrom,
   pointFromArray,
-  pointFromVector,
   rectangle,
-  vectorFromPoint,
-  vectorNormalize,
-  vectorScale,
   type GlobalPoint,
 } from "@excalidraw/math";
-
-import { elementCenterPoint } from "@excalidraw/common";
 
 import type { Curve, LineSegment, LocalPoint } from "@excalidraw/math";
 
@@ -118,11 +112,8 @@ export function deconstructRectanguloidElement(
 
   if (roundness <= 0) {
     const r = rectangle(
-      pointFrom(element.x - offset, element.y - offset),
-      pointFrom(
-        element.x + element.width + offset,
-        element.y + element.height + offset,
-      ),
+      pointFrom(element.x, element.y),
+      pointFrom(element.x + element.width, element.y + element.height),
     );
 
     const top = lineSegment<GlobalPoint>(
@@ -146,8 +137,6 @@ export function deconstructRectanguloidElement(
     return [sides, []];
   }
 
-  const center = elementCenterPoint(element);
-
   const r = rectangle(
     pointFrom(element.x, element.y),
     pointFrom(element.x + element.width, element.y + element.height),
@@ -170,116 +159,92 @@ export function deconstructRectanguloidElement(
     pointFrom<GlobalPoint>(r[0][0], r[0][1] + roundness),
   );
 
-  const offsets = [
-    vectorScale(
-      vectorNormalize(
-        vectorFromPoint(pointFrom(r[0][0] - offset, r[0][1] - offset), center),
-      ),
-      offset,
-    ), // TOP LEFT
-    vectorScale(
-      vectorNormalize(
-        vectorFromPoint(pointFrom(r[1][0] + offset, r[0][1] - offset), center),
-      ),
-      offset,
-    ), //TOP RIGHT
-    vectorScale(
-      vectorNormalize(
-        vectorFromPoint(pointFrom(r[1][0] + offset, r[1][1] + offset), center),
-      ),
-      offset,
-    ), // BOTTOM RIGHT
-    vectorScale(
-      vectorNormalize(
-        vectorFromPoint(pointFrom(r[0][0] - offset, r[1][1] + offset), center),
-      ),
-      offset,
-    ), // BOTTOM LEFT
-  ];
-
-  const corners = [
+  const baseCorners = [
     curve(
-      pointFromVector(offsets[0], left[1]),
-      pointFromVector(
-        offsets[0],
-        pointFrom<GlobalPoint>(
-          left[1][0] + (2 / 3) * (r[0][0] - left[1][0]),
-          left[1][1] + (2 / 3) * (r[0][1] - left[1][1]),
-        ),
+      left[1],
+      pointFrom<GlobalPoint>(
+        left[1][0] + (2 / 3) * (r[0][0] - left[1][0]),
+        left[1][1] + (2 / 3) * (r[0][1] - left[1][1]),
       ),
-      pointFromVector(
-        offsets[0],
-        pointFrom<GlobalPoint>(
-          top[0][0] + (2 / 3) * (r[0][0] - top[0][0]),
-          top[0][1] + (2 / 3) * (r[0][1] - top[0][1]),
-        ),
+      pointFrom<GlobalPoint>(
+        top[0][0] + (2 / 3) * (r[0][0] - top[0][0]),
+        top[0][1] + (2 / 3) * (r[0][1] - top[0][1]),
       ),
-      pointFromVector(offsets[0], top[0]),
+      top[0],
     ), // TOP LEFT
     curve(
-      pointFromVector(offsets[1], top[1]),
-      pointFromVector(
-        offsets[1],
-        pointFrom<GlobalPoint>(
-          top[1][0] + (2 / 3) * (r[1][0] - top[1][0]),
-          top[1][1] + (2 / 3) * (r[0][1] - top[1][1]),
-        ),
+      top[1],
+      pointFrom<GlobalPoint>(
+        top[1][0] + (2 / 3) * (r[1][0] - top[1][0]),
+        top[1][1] + (2 / 3) * (r[0][1] - top[1][1]),
       ),
-      pointFromVector(
-        offsets[1],
-        pointFrom<GlobalPoint>(
-          right[0][0] + (2 / 3) * (r[1][0] - right[0][0]),
-          right[0][1] + (2 / 3) * (r[0][1] - right[0][1]),
-        ),
+      pointFrom<GlobalPoint>(
+        right[0][0] + (2 / 3) * (r[1][0] - right[0][0]),
+        right[0][1] + (2 / 3) * (r[0][1] - right[0][1]),
       ),
-      pointFromVector(offsets[1], right[0]),
+      right[0],
     ), // TOP RIGHT
     curve(
-      pointFromVector(offsets[2], right[1]),
-      pointFromVector(
-        offsets[2],
-        pointFrom<GlobalPoint>(
-          right[1][0] + (2 / 3) * (r[1][0] - right[1][0]),
-          right[1][1] + (2 / 3) * (r[1][1] - right[1][1]),
-        ),
+      right[1],
+      pointFrom<GlobalPoint>(
+        right[1][0] + (2 / 3) * (r[1][0] - right[1][0]),
+        right[1][1] + (2 / 3) * (r[1][1] - right[1][1]),
       ),
-      pointFromVector(
-        offsets[2],
-        pointFrom<GlobalPoint>(
-          bottom[1][0] + (2 / 3) * (r[1][0] - bottom[1][0]),
-          bottom[1][1] + (2 / 3) * (r[1][1] - bottom[1][1]),
-        ),
+      pointFrom<GlobalPoint>(
+        bottom[1][0] + (2 / 3) * (r[1][0] - bottom[1][0]),
+        bottom[1][1] + (2 / 3) * (r[1][1] - bottom[1][1]),
       ),
-      pointFromVector(offsets[2], bottom[1]),
+      bottom[1],
     ), // BOTTOM RIGHT
     curve(
-      pointFromVector(offsets[3], bottom[0]),
-      pointFromVector(
-        offsets[3],
-        pointFrom<GlobalPoint>(
-          bottom[0][0] + (2 / 3) * (r[0][0] - bottom[0][0]),
-          bottom[0][1] + (2 / 3) * (r[1][1] - bottom[0][1]),
-        ),
+      bottom[0],
+      pointFrom<GlobalPoint>(
+        bottom[0][0] + (2 / 3) * (r[0][0] - bottom[0][0]),
+        bottom[0][1] + (2 / 3) * (r[1][1] - bottom[0][1]),
       ),
-      pointFromVector(
-        offsets[3],
-        pointFrom<GlobalPoint>(
-          left[0][0] + (2 / 3) * (r[0][0] - left[0][0]),
-          left[0][1] + (2 / 3) * (r[1][1] - left[0][1]),
-        ),
+      pointFrom<GlobalPoint>(
+        left[0][0] + (2 / 3) * (r[0][0] - left[0][0]),
+        left[0][1] + (2 / 3) * (r[1][1] - left[0][1]),
       ),
-      pointFromVector(offsets[3], left[0]),
+      left[0],
     ), // BOTTOM LEFT
   ];
 
+  const corners =
+    offset > 0
+      ? baseCorners.map(
+          (corner) =>
+            curveCatmullRomCubicApproxPoints(
+              curveOffsetPoints(corner, offset),
+            )!,
+        )
+      : [
+          [baseCorners[0]],
+          [baseCorners[1]],
+          [baseCorners[2]],
+          [baseCorners[3]],
+        ];
+
   const sides = [
-    lineSegment<GlobalPoint>(corners[0][3], corners[1][0]),
-    lineSegment<GlobalPoint>(corners[1][3], corners[2][0]),
-    lineSegment<GlobalPoint>(corners[2][3], corners[3][0]),
-    lineSegment<GlobalPoint>(corners[3][3], corners[0][0]),
+    lineSegment<GlobalPoint>(
+      corners[0][corners[0].length - 1][3],
+      corners[1][0][0],
+    ),
+    lineSegment<GlobalPoint>(
+      corners[1][corners[1].length - 1][3],
+      corners[2][0][0],
+    ),
+    lineSegment<GlobalPoint>(
+      corners[2][corners[2].length - 1][3],
+      corners[3][0][0],
+    ),
+    lineSegment<GlobalPoint>(
+      corners[3][corners[3].length - 1][3],
+      corners[0][0][0],
+    ),
   ];
 
-  return [sides, corners];
+  return [sides, corners.flat()];
 }
 
 /**
@@ -329,8 +294,6 @@ export function deconstructDiamondElement(
     return [[topRight, bottomRight, bottomLeft, topLeft], []];
   }
 
-  const center = elementCenterPoint(element);
-
   const [top, right, bottom, left]: GlobalPoint[] = [
     pointFrom(element.x + topX, element.y + topY),
     pointFrom(element.x + rightX, element.y + rightY),
@@ -338,84 +301,53 @@ export function deconstructDiamondElement(
     pointFrom(element.x + leftX, element.y + leftY),
   ];
 
-  const cornerPoints = [
-    vectorScale(vectorNormalize(vectorFromPoint(right, center)), 0), // RIGHT
-    vectorScale(vectorNormalize(vectorFromPoint(bottom, center)), 0), // BOTTOM
-    vectorScale(vectorNormalize(vectorFromPoint(left, center)), 0), // LEFT
-    vectorScale(vectorNormalize(vectorFromPoint(top, center)), 0), // TOP
-  ];
-
   const baseCorners = [
     curve(
-      pointFromVector(
-        cornerPoints[0],
-        pointFrom<GlobalPoint>(
-          right[0] - verticalRadius,
-          right[1] - horizontalRadius,
-        ),
+      pointFrom<GlobalPoint>(
+        right[0] - verticalRadius,
+        right[1] - horizontalRadius,
       ),
-      pointFromVector(cornerPoints[0], right),
-      pointFromVector(cornerPoints[0], right),
-      pointFromVector(
-        cornerPoints[0],
-        pointFrom<GlobalPoint>(
-          right[0] - verticalRadius,
-          right[1] + horizontalRadius,
-        ),
+      right,
+      right,
+      pointFrom<GlobalPoint>(
+        right[0] - verticalRadius,
+        right[1] + horizontalRadius,
       ),
     ), // RIGHT
     curve(
-      pointFromVector(
-        cornerPoints[1],
-        pointFrom<GlobalPoint>(
-          bottom[0] + verticalRadius,
-          bottom[1] - horizontalRadius,
-        ),
+      pointFrom<GlobalPoint>(
+        bottom[0] + verticalRadius,
+        bottom[1] - horizontalRadius,
       ),
-      pointFromVector(cornerPoints[1], bottom),
-      pointFromVector(cornerPoints[1], bottom),
-      pointFromVector(
-        cornerPoints[1],
-        pointFrom<GlobalPoint>(
-          bottom[0] - verticalRadius,
-          bottom[1] - horizontalRadius,
-        ),
+      bottom,
+      bottom,
+      pointFrom<GlobalPoint>(
+        bottom[0] - verticalRadius,
+        bottom[1] - horizontalRadius,
       ),
     ), // BOTTOM
     curve(
-      pointFromVector(
-        cornerPoints[2],
-        pointFrom<GlobalPoint>(
-          left[0] + verticalRadius,
-          left[1] + horizontalRadius,
-        ),
+      pointFrom<GlobalPoint>(
+        left[0] + verticalRadius,
+        left[1] + horizontalRadius,
       ),
-      pointFromVector(cornerPoints[2], left),
-      pointFromVector(cornerPoints[2], left),
-      pointFromVector(
-        cornerPoints[2],
-        pointFrom<GlobalPoint>(
-          left[0] + verticalRadius,
-          left[1] - horizontalRadius,
-        ),
+      left,
+      left,
+      pointFrom<GlobalPoint>(
+        left[0] + verticalRadius,
+        left[1] - horizontalRadius,
       ),
     ), // LEFT
     curve(
-      pointFromVector(
-        cornerPoints[3],
-        pointFrom<GlobalPoint>(
-          top[0] - verticalRadius,
-          top[1] + horizontalRadius,
-        ),
+      pointFrom<GlobalPoint>(
+        top[0] - verticalRadius,
+        top[1] + horizontalRadius,
       ),
-      pointFromVector(cornerPoints[3], top),
-      pointFromVector(cornerPoints[3], top),
-      pointFromVector(
-        cornerPoints[3],
-        pointFrom<GlobalPoint>(
-          top[0] + verticalRadius,
-          top[1] + horizontalRadius,
-        ),
+      top,
+      top,
+      pointFrom<GlobalPoint>(
+        top[0] + verticalRadius,
+        top[1] + horizontalRadius,
       ),
     ), // TOP
   ];
