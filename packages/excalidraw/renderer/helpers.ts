@@ -348,13 +348,13 @@ export const drawHighlightForDiamondWithRotation = (
       topApprox[topApprox.length - 1][0],
       topApprox[topApprox.length - 1][1],
     );
-    context.lineTo(rightApprox[0][0], rightApprox[0][1]);
+    context.lineTo(rightApprox[1][0], rightApprox[1][1]);
     drawCatmullRomCubicApprox(context, rightApprox);
-    context.lineTo(bottomApprox[0][0], bottomApprox[0][1]);
+    context.lineTo(bottomApprox[1][0], bottomApprox[1][1]);
     drawCatmullRomCubicApprox(context, bottomApprox);
-    context.lineTo(leftApprox[0][0], leftApprox[0][1]);
+    context.lineTo(leftApprox[1][0], leftApprox[1][1]);
     drawCatmullRomCubicApprox(context, leftApprox);
-    context.lineTo(topApprox[0][0], topApprox[0][1]);
+    context.lineTo(topApprox[1][0], topApprox[1][1]);
     drawCatmullRomCubicApprox(context, topApprox);
   }
 
@@ -411,13 +411,13 @@ export const drawHighlightForDiamondWithRotation = (
       topApprox[topApprox.length - 1][0],
       topApprox[topApprox.length - 1][1],
     );
-    context.lineTo(leftApprox[0][0], leftApprox[0][1]);
+    context.lineTo(leftApprox[1][0], leftApprox[1][1]);
     drawCatmullRomCubicApprox(context, leftApprox);
-    context.lineTo(bottomApprox[0][0], bottomApprox[0][1]);
+    context.lineTo(bottomApprox[1][0], bottomApprox[1][1]);
     drawCatmullRomCubicApprox(context, bottomApprox);
-    context.lineTo(rightApprox[0][0], rightApprox[0][1]);
+    context.lineTo(rightApprox[1][0], rightApprox[1][1]);
     drawCatmullRomCubicApprox(context, rightApprox);
-    context.lineTo(topApprox[0][0], topApprox[0][1]);
+    context.lineTo(topApprox[1][0], topApprox[1][1]);
     drawCatmullRomCubicApprox(context, topApprox);
   }
   context.closePath();

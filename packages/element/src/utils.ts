@@ -1,5 +1,7 @@
 import {
   curve,
+  curveCatmullRomCubicApproxPoints,
+  curveOffsetPoints,
   lineSegment,
   pointFrom,
   pointFromArray,
@@ -299,10 +301,10 @@ export function deconstructDiamondElement(
 
   if (element.roundness?.type == null) {
     const [top, right, bottom, left]: GlobalPoint[] = [
-      pointFrom(element.x + topX, element.y + topY - offset),
-      pointFrom(element.x + rightX + offset, element.y + rightY),
-      pointFrom(element.x + bottomX, element.y + bottomY + offset),
-      pointFrom(element.x + leftX - offset, element.y + leftY),
+      pointFrom(element.x + topX, element.y + topY),
+      pointFrom(element.x + rightX, element.y + rightY),
+      pointFrom(element.x + bottomX, element.y + bottomY),
+      pointFrom(element.x + leftX, element.y + leftY),
     ];
 
     // Create the line segment parts of the diamond
@@ -336,26 +338,26 @@ export function deconstructDiamondElement(
     pointFrom(element.x + leftX, element.y + leftY),
   ];
 
-  const offsets = [
-    vectorScale(vectorNormalize(vectorFromPoint(right, center)), offset), // RIGHT
-    vectorScale(vectorNormalize(vectorFromPoint(bottom, center)), offset), // BOTTOM
-    vectorScale(vectorNormalize(vectorFromPoint(left, center)), offset), // LEFT
-    vectorScale(vectorNormalize(vectorFromPoint(top, center)), offset), // TOP
+  const cornerPoints = [
+    vectorScale(vectorNormalize(vectorFromPoint(right, center)), 0), // RIGHT
+    vectorScale(vectorNormalize(vectorFromPoint(bottom, center)), 0), // BOTTOM
+    vectorScale(vectorNormalize(vectorFromPoint(left, center)), 0), // LEFT
+    vectorScale(vectorNormalize(vectorFromPoint(top, center)), 0), // TOP
   ];
 
-  const corners = [
+  const baseCorners = [
     curve(
       pointFromVector(
-        offsets[0],
+        cornerPoints[0],
         pointFrom<GlobalPoint>(
           right[0] - verticalRadius,
           right[1] - horizontalRadius,
         ),
       ),
-      pointFromVector(offsets[0], right),
-      pointFromVector(offsets[0], right),
+      pointFromVector(cornerPoints[0], right),
+      pointFromVector(cornerPoints[0], right),
       pointFromVector(
-        offsets[0],
+        cornerPoints[0],
         pointFrom<GlobalPoint>(
           right[0] - verticalRadius,
           right[1] + horizontalRadius,
@@ -364,16 +366,16 @@ export function deconstructDiamondElement(
     ), // RIGHT
     curve(
       pointFromVector(
-        offsets[1],
+        cornerPoints[1],
         pointFrom<GlobalPoint>(
           bottom[0] + verticalRadius,
           bottom[1] - horizontalRadius,
         ),
       ),
-      pointFromVector(offsets[1], bottom),
-      pointFromVector(offsets[1], bottom),
+      pointFromVector(cornerPoints[1], bottom),
+      pointFromVector(cornerPoints[1], bottom),
       pointFromVector(
-        offsets[1],
+        cornerPoints[1],
         pointFrom<GlobalPoint>(
           bottom[0] - verticalRadius,
           bottom[1] - horizontalRadius,
@@ -382,16 +384,16 @@ export function deconstructDiamondElement(
     ), // BOTTOM
     curve(
       pointFromVector(
-        offsets[2],
+        cornerPoints[2],
         pointFrom<GlobalPoint>(
           left[0] + verticalRadius,
           left[1] + horizontalRadius,
         ),
       ),
-      pointFromVector(offsets[2], left),
-      pointFromVector(offsets[2], left),
+      pointFromVector(cornerPoints[2], left),
+      pointFromVector(cornerPoints[2], left),
       pointFromVector(
-        offsets[2],
+        cornerPoints[2],
         pointFrom<GlobalPoint>(
           left[0] + verticalRadius,
           left[1] - horizontalRadius,
@@ -400,16 +402,16 @@ export function deconstructDiamondElement(
     ), // LEFT
     curve(
       pointFromVector(
-        offsets[3],
+        cornerPoints[3],
         pointFrom<GlobalPoint>(
           top[0] - verticalRadius,
           top[1] + horizontalRadius,
         ),
       ),
-      pointFromVector(offsets[3], top),
-      pointFromVector(offsets[3], top),
+      pointFromVector(cornerPoints[3], top),
+      pointFromVector(cornerPoints[3], top),
       pointFromVector(
-        offsets[3],
+        cornerPoints[3],
         pointFrom<GlobalPoint>(
           top[0] + verticalRadius,
           top[1] + horizontalRadius,
@@ -418,12 +420,39 @@ export function deconstructDiamondElement(
     ), // TOP
   ];
 
+  const corners =
+    offset > 0
+      ? baseCorners.map(
+          (corner) =>
+            curveCatmullRomCubicApproxPoints(
+              curveOffsetPoints(corner, offset),
+            )!,
+        )
+      : [
+          [baseCorners[0]],
+          [baseCorners[1]],
+          [baseCorners[2]],
+          [baseCorners[3]],
+        ];
+
   const sides = [
-    lineSegment<GlobalPoint>(corners[0][3], corners[1][0]),
-    lineSegment<GlobalPoint>(corners[1][3], corners[2][0]),
-    lineSegment<GlobalPoint>(corners[2][3], corners[3][0]),
-    lineSegment<GlobalPoint>(corners[3][3], corners[0][0]),
+    lineSegment<GlobalPoint>(
+      corners[0][corners[0].length - 1][3],
+      corners[1][0][0],
+    ),
+    lineSegment<GlobalPoint>(
+      corners[1][corners[1].length - 1][3],
+      corners[2][0][0],
+    ),
+    lineSegment<GlobalPoint>(
+      corners[2][corners[2].length - 1][3],
+      corners[3][0][0],
+    ),
+    lineSegment<GlobalPoint>(
+      corners[3][corners[3].length - 1][3],
+      corners[0][0][0],
+    ),
   ];
 
-  return [sides, corners];
+  return [sides, corners.flat()];
 }

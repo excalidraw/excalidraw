@@ -329,15 +329,14 @@ export function curveCatmullRomQuadraticApproxPoints(
   return pointSets;
 }
 
-export function curveCatmullRomCubicApproxPoints(
-  points: GlobalPoint[],
-  tension = 0.5,
-) {
+export function curveCatmullRomCubicApproxPoints<
+  Point extends GlobalPoint | LocalPoint,
+>(points: Point[], tension = 0.5) {
   if (points.length < 2) {
     return;
   }
 
-  const pointSets: [GlobalPoint, GlobalPoint, GlobalPoint][] = [];
+  const pointSets: Curve<Point>[] = [];
   for (let i = 0; i < points.length - 1; i++) {
     const p0 = points[i - 1 < 0 ? 0 : i - 1];
     const p1 = points[i];
@@ -350,11 +349,14 @@ export function curveCatmullRomCubicApproxPoints(
     const cp2x = p2[0] - tangent2[0] / 3;
     const cp2y = p2[1] - tangent2[1] / 3;
 
-    pointSets.push([
-      pointFrom<GlobalPoint>(cp1x, cp1y),
-      pointFrom<GlobalPoint>(cp2x, cp2y),
-      pointFrom<GlobalPoint>(p2[0], p2[1]),
-    ]);
+    pointSets.push(
+      curve(
+        pointFrom(p1[0], p1[1]),
+        pointFrom(cp1x, cp1y),
+        pointFrom(cp2x, cp2y),
+        pointFrom(p2[0], p2[1]),
+      ),
+    );
   }
 
   return pointSets;
@@ -362,7 +364,7 @@ export function curveCatmullRomCubicApproxPoints(
 
 export function curveOffsetPoints(
   [p0, p1, p2, p3]: Curve<GlobalPoint>,
-  offsetDist: number,
+  offset: number,
   steps = 50,
 ) {
   const offsetPoints = [];
@@ -374,7 +376,7 @@ export function curveOffsetPoints(
     const tangent = vectorNormalize(curveTangent(c, t));
     const normal = vectorNormal(tangent);
 
-    offsetPoints.push(pointFromVector(vectorScale(normal, offsetDist), point));
+    offsetPoints.push(pointFromVector(vectorScale(normal, offset), point));
   }
 
   return offsetPoints;
