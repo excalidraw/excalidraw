@@ -180,7 +180,6 @@ describe("element binding", () => {
     mouse.downAt(50, 50);
     mouse.moveTo(57, 0);
     mouse.up(0, 0);
-    console.log(JSON.stringify(h.elements));
 
     // Test sticky connection
     expect(API.getSelectedElement().type).toBe("arrow");
