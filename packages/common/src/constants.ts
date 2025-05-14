@@ -477,4 +477,9 @@ export enum UserIdleState {
   IDLE = "idle",
 }
 
-export const MIN_LOOP_LOCK_DISTANCE = 20;
+/**
+ * distance at which we merge points instead of adding a new merge-point
+ * when converting a line to a polygon (merge currently means overlaping
+ * the start and end points)
+ */
+export const LINE_POLYGON_POINT_MERGE_DISTANCE = 20;

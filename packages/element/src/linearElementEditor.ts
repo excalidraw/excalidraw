@@ -1390,7 +1390,7 @@ export class LinearElementEditor {
   ) {
     const { points } = element;
 
-    // Handle loop lock behavior
+    // if polygon, move start and end points together
     if (isLineElement(element) && element.polygon) {
       const firstPointUpdate = pointUpdates.get(0);
       const lastPointUpdate = pointUpdates.get(points.length - 1);

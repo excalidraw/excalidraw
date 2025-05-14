@@ -104,14 +104,11 @@ export const actionTogglePolygon = register({
       selectedElementIds: appState.selectedElementIds,
     });
 
-    // Check if all selected elements are locked
-    const allLocked =
-      selectedElements.length > 0 &&
-      selectedElements.every(
-        (element) => isLineElement(element) && element.polygon,
-      );
+    const allPolygons = !selectedElements.some(
+      (element) => !isLineElement(element) || !element.polygon,
+    );
 
-    return allLocked
+    return allPolygons
       ? "labels.polygon.breakPolygon"
       : "labels.polygon.convertToPolygon";
   },
