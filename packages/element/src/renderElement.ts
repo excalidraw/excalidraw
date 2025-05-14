@@ -509,7 +509,6 @@ const drawElementOnCanvas = (
           element.fontSize,
           lineHeightPx,
         );
-
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],
@@ -517,7 +516,52 @@ const drawElementOnCanvas = (
             index * lineHeightPx + verticalOffset,
           );
         }
-        context.restore();
+        const maxLineWidth = Math.max(
+          ...lines.map((line) => context.measureText(line).width),
+        );
+        const boxWidth = maxLineWidth + 2 * BOUND_TEXT_PADDING;
+        const boxHeight = lines.length * lineHeightPx + 2 * BOUND_TEXT_PADDING;
+        
+        const boxX =
+          horizontalOffset -
+          (element.textAlign === "center"
+            ? boxWidth / 2
+            : element.textAlign === "right"
+            ? boxWidth
+            : 0);
+        const boxY = -BOUND_TEXT_PADDING;
+        
+        context.save();
+        context.strokeStyle = "rgba(0,0,0,0.5)";
+        context.lineWidth = 3;
+        const radius = 6;
+        context.beginPath();
+        context.moveTo(boxX + radius, boxY);
+        context.lineTo(boxX + boxWidth - radius, boxY);
+        context.quadraticCurveTo(
+          boxX + boxWidth,
+          boxY,
+          boxX + boxWidth,
+          boxY + radius,
+        );
+        context.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
+        context.quadraticCurveTo(
+          boxX + boxWidth,
+          boxY + boxHeight,
+          boxX + boxWidth - radius,
+          boxY + boxHeight,
+        );
+        context.lineTo(boxX + radius, boxY + boxHeight);
+        context.quadraticCurveTo(
+          boxX,
+          boxY + boxHeight,
+          boxX,
+          boxY + boxHeight - radius,
+        );
+        context.lineTo(boxX, boxY + radius);
+        context.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
+        context.closePath();
+        context.stroke();        context.restore();
         if (shouldTemporarilyAttach) {
           context.canvas.remove();
         }

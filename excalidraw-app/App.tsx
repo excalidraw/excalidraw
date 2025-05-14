@@ -500,7 +500,7 @@ const ExcalidrawWrapper = () => {
     };
 
     const titleTimeout = setTimeout(
-      () => (document.title = APP_NAME),
+      () => (document.title = "Rabbit Hole"),
       TITLE_TIMEOUT,
     );
 
