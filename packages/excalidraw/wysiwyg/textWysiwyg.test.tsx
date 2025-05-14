@@ -682,7 +682,7 @@ describe("textWysiwyg", () => {
       expect(diamond.height).toBe(70);
     });
 
-    it("should bind text to container when double clicked on center of transparent container", async () => {
+    it("should bind text to container when double clicked inside of the transparent container", async () => {
       const rectangle = API.createElement({
         type: "rectangle",
         x: 10,
@@ -693,7 +693,7 @@ describe("textWysiwyg", () => {
       });
       API.setElements([rectangle]);
 
-      mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
+      mouse.doubleClickAt(rectangle.x + 20, rectangle.y + 20);
       expect(h.elements.length).toBe(2);
       let text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.type).toBe("text");
@@ -790,7 +790,7 @@ describe("textWysiwyg", () => {
         freedraw.x + freedraw.width / 2,
         freedraw.y + freedraw.height / 2,
       );
-      console.log(JSON.stringify(h.elements));
+
       const editor = await getTextEditor(textEditorSelector, true);
       updateTextEditor(editor, "Hello World!");
       Keyboard.exitTextEditor(editor);

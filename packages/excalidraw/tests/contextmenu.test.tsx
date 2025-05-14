@@ -115,9 +115,10 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 3,
-      clientY: 3,
+      clientX: 30,
+      clientY: 30,
     });
+
     const contextMenu = UI.queryContextMenu();
     const contextMenuOptions =
       contextMenu?.querySelectorAll(".context-menu li");

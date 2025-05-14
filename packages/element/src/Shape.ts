@@ -419,6 +419,10 @@ export const generateLinearCollisionShape = (
         });
     }
     case "freedraw": {
+      if (element.points.length < 2) {
+        return [];
+      }
+
       const simplifiedPoints = simplify(
         element.points as Mutable<LocalPoint[]>,
         0.75,
