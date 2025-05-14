@@ -4,8 +4,6 @@ import { MIME_TYPES } from "@excalidraw/common";
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 import { hitElementBoundingBox } from "@excalidraw/element";
 
-import { DEFAULT_LINK_SIZE } from "@excalidraw/element";
-
 import type { GlobalPoint, Radians } from "@excalidraw/math";
 
 import type { Bounds } from "@excalidraw/element";
@@ -16,9 +14,11 @@ import type {
 
 import type { AppState, UIAppState } from "../../types";
 
+export const DEFAULT_LINK_SIZE = 12;
+
 export const EXTERNAL_LINK_IMG = document.createElement("img");
 EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1971c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`,
+  `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1971c2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`,
 )}`;
 
 export const ELEMENT_LINK_IMG = document.createElement("img");
