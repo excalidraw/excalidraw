@@ -1,7 +1,7 @@
 import {
   DEFAULT_FILENAME,
   EXPORT_DATA_TYPES,
-  EXPORT_SOURCE,
+  getExportSource,
   MIME_TYPES,
   VERSIONS,
 } from "@excalidraw/common";
@@ -56,7 +56,7 @@ export const serializeAsJSON = (
   const data: ExportedDataState = {
     type: EXPORT_DATA_TYPES.excalidraw,
     version: VERSIONS.excalidraw,
-    source: EXPORT_SOURCE,
+    source: getExportSource(),
     elements:
       type === "local"
         ? clearElementsForExport(elements)
@@ -142,7 +142,7 @@ export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {
   const data: ExportedLibraryData = {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
     version: VERSIONS.excalidrawLibrary,
-    source: EXPORT_SOURCE,
+    source: getExportSource(),
     libraryItems,
   };
   return JSON.stringify(data, null, 2);

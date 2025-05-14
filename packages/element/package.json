@@ -13,7 +13,7 @@
       "default": "./dist/prod/index.js"
     },
     "./*": {
-      "types": "./../element/dist/types/element/src/*.d.ts"
+      "types": "./dist/types/element/src/*.d.ts"
     }
   },
   "files": [
