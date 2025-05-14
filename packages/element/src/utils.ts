@@ -105,36 +105,13 @@ export function deconstructRectanguloidElement(
   element: ExcalidrawRectanguloidElement,
   offset: number = 0,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
-  const roundness = getCornerRadius(
+  let radius = getCornerRadius(
     Math.min(element.width, element.height),
     element,
   );
 
-  if (roundness <= 0) {
-    const r = rectangle(
-      pointFrom(element.x, element.y),
-      pointFrom(element.x + element.width, element.y + element.height),
-    );
-
-    const top = lineSegment<GlobalPoint>(
-      pointFrom<GlobalPoint>(r[0][0] + roundness, r[0][1]),
-      pointFrom<GlobalPoint>(r[1][0] - roundness, r[0][1]),
-    );
-    const right = lineSegment<GlobalPoint>(
-      pointFrom<GlobalPoint>(r[1][0], r[0][1] + roundness),
-      pointFrom<GlobalPoint>(r[1][0], r[1][1] - roundness),
-    );
-    const bottom = lineSegment<GlobalPoint>(
-      pointFrom<GlobalPoint>(r[0][0] + roundness, r[1][1]),
-      pointFrom<GlobalPoint>(r[1][0] - roundness, r[1][1]),
-    );
-    const left = lineSegment<GlobalPoint>(
-      pointFrom<GlobalPoint>(r[0][0], r[1][1] - roundness),
-      pointFrom<GlobalPoint>(r[0][0], r[0][1] + roundness),
-    );
-    const sides = [top, right, bottom, left];
-
-    return [sides, []];
+  if (radius === 0) {
+    radius = 0.01;
   }
 
   const r = rectangle(
@@ -143,20 +120,20 @@ export function deconstructRectanguloidElement(
   );
 
   const top = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[0][0] + roundness, r[0][1]),
-    pointFrom<GlobalPoint>(r[1][0] - roundness, r[0][1]),
+    pointFrom<GlobalPoint>(r[0][0] + radius, r[0][1]),
+    pointFrom<GlobalPoint>(r[1][0] - radius, r[0][1]),
   );
   const right = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[1][0], r[0][1] + roundness),
-    pointFrom<GlobalPoint>(r[1][0], r[1][1] - roundness),
+    pointFrom<GlobalPoint>(r[1][0], r[0][1] + radius),
+    pointFrom<GlobalPoint>(r[1][0], r[1][1] - radius),
   );
   const bottom = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[0][0] + roundness, r[1][1]),
-    pointFrom<GlobalPoint>(r[1][0] - roundness, r[1][1]),
+    pointFrom<GlobalPoint>(r[0][0] + radius, r[1][1]),
+    pointFrom<GlobalPoint>(r[1][0] - radius, r[1][1]),
   );
   const left = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[0][0], r[1][1] - roundness),
-    pointFrom<GlobalPoint>(r[0][0], r[0][1] + roundness),
+    pointFrom<GlobalPoint>(r[0][0], r[1][1] - radius),
+    pointFrom<GlobalPoint>(r[0][0], r[0][1] + radius),
   );
 
   const baseCorners = [
@@ -261,38 +238,12 @@ export function deconstructDiamondElement(
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
   const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
     getDiamondPoints(element);
-  const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
-  const horizontalRadius = getCornerRadius(Math.abs(rightY - topY), element);
-
-  if (element.roundness?.type == null) {
-    const [top, right, bottom, left]: GlobalPoint[] = [
-      pointFrom(element.x + topX, element.y + topY),
-      pointFrom(element.x + rightX, element.y + rightY),
-      pointFrom(element.x + bottomX, element.y + bottomY),
-      pointFrom(element.x + leftX, element.y + leftY),
-    ];
-
-    // Create the line segment parts of the diamond
-    // NOTE: Horizontal and vertical seems to be flipped here
-    const topRight = lineSegment<GlobalPoint>(
-      pointFrom(top[0] + verticalRadius, top[1] + horizontalRadius),
-      pointFrom(right[0] - verticalRadius, right[1] - horizontalRadius),
-    );
-    const bottomRight = lineSegment<GlobalPoint>(
-      pointFrom(right[0] - verticalRadius, right[1] + horizontalRadius),
-      pointFrom(bottom[0] + verticalRadius, bottom[1] - horizontalRadius),
-    );
-    const bottomLeft = lineSegment<GlobalPoint>(
-      pointFrom(bottom[0] - verticalRadius, bottom[1] - horizontalRadius),
-      pointFrom(left[0] + verticalRadius, left[1] + horizontalRadius),
-    );
-    const topLeft = lineSegment<GlobalPoint>(
-      pointFrom(left[0] + verticalRadius, left[1] - horizontalRadius),
-      pointFrom(top[0] - verticalRadius, top[1] + horizontalRadius),
-    );
-
-    return [[topRight, bottomRight, bottomLeft, topLeft], []];
-  }
+  const verticalRadius = element.roundness
+    ? getCornerRadius(Math.abs(topX - leftX), element)
+    : (topX - leftX) * 0.01;
+  const horizontalRadius = element.roundness
+    ? getCornerRadius(Math.abs(rightY - topY), element)
+    : (rightY - topY) * 0.01;
 
   const [top, right, bottom, left]: GlobalPoint[] = [
     pointFrom(element.x + topX, element.y + topY),
