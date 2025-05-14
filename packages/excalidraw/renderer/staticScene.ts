@@ -184,9 +184,6 @@ const renderLinkIcon = (
       linkIconCanvasCache[canvasKey] = linkCanvas;
 
       const linkCanvasCacheContext = linkCanvas.getContext("2d")!;
-      linkCanvas.width = width * window.devicePixelRatio * appState.zoom.value;
-      linkCanvas.height =
-        height * window.devicePixelRatio * appState.zoom.value;
       linkCanvasCacheContext.scale(
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
