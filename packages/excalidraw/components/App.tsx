@@ -9528,7 +9528,10 @@ class App extends React.Component<AppProps, AppState> {
         // if we're editing a line, pointerup shouldn't switch selection if
         // box selected
         (!this.state.editingLinearElement ||
-          !pointerDownState.boxSelection.hasOccurred)
+          !pointerDownState.boxSelection.hasOccurred) &&
+        // hitElement can be set when alt + ctrl to toggle lasso and we will
+        // just respect the selected elements from lasso instead
+        this.state.activeTool.type !== "lasso"
       ) {
         // when inside line editor, shift selects points instead
         if (childEvent.shiftKey && !this.state.editingLinearElement) {
