@@ -9529,7 +9529,7 @@ class App extends React.Component<AppProps, AppState> {
         // box selected
         (!this.state.editingLinearElement ||
           !pointerDownState.boxSelection.hasOccurred) &&
-        // hitElemnt can be set when alt + ctrl to toggle lasso and we will
+        // hitElement can be set when alt + ctrl to toggle lasso and we will
         // just respect the selected elements from lasso instead
         this.state.activeTool.type !== "lasso"
       ) {
