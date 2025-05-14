@@ -13,7 +13,7 @@
       "default": "./dist/prod/index.js"
     },
     "./*": {
-      "types": "./../utils/dist/types/utils/src/*.d.ts"
+      "types": "./dist/types/utils/src/*.d.ts"
     }
   },
   "files": [
