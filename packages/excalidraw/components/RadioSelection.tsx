@@ -4,8 +4,7 @@ import { ButtonIcon } from "./ButtonIcon";
 
 import type { JSX } from "react";
 
-// TODO: It might be "clever" to add option.icon to the existing component <ButtonSelect />
-export const ButtonIconSelect = <T extends Object>(
+export const RadioSelection = <T extends Object>(
   props: {
     options: {
       value: T;
@@ -28,7 +27,7 @@ export const ButtonIconSelect = <T extends Object>(
       }
   ),
 ) => (
-  <div className="buttonList">
+  <>
     {props.options.map((option) =>
       props.type === "button" ? (
         <ButtonIcon
@@ -56,5 +55,5 @@ export const ButtonIconSelect = <T extends Object>(
         </label>
       ),
     )}
-  </div>
+  </>
 );

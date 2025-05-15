@@ -6,7 +6,7 @@ import { FONT_FAMILY } from "@excalidraw/common";
 import type { FontFamilyValues } from "@excalidraw/element/types";
 
 import { t } from "../../i18n";
-import { ButtonIconSelect } from "../ButtonIconSelect";
+import { RadioSelection } from "../RadioSelection";
 import { ButtonSeparator } from "../ButtonSeparator";
 import {
   FontFamilyCodeIcon,
@@ -82,12 +82,14 @@ export const FontPicker = React.memo(
 
     return (
       <div role="dialog" aria-modal="true" className="FontPicker__container">
-        <ButtonIconSelect<FontFamilyValues | false>
-          type="button"
-          options={defaultFonts}
-          value={selectedFontFamily}
-          onClick={onSelectCallback}
-        />
+        <div className="buttonList">
+          <RadioSelection<FontFamilyValues | false>
+            type="button"
+            options={defaultFonts}
+            value={selectedFontFamily}
+            onClick={onSelectCallback}
+          />
+        </div>
         <ButtonSeparator />
         <Popover.Root open={isOpened} onOpenChange={onPopupChange}>
           <FontPickerTrigger selectedFontFamily={selectedFontFamily} />

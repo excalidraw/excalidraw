@@ -154,7 +154,7 @@ export const SelectedShapeActions = ({
     !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
 
   return (
-    <div className="panelColumn">
+    <div className="selected-shape-actions">
       <div>
         {canChangeStrokeColor(appState, targetElements) &&
           renderAction("changeStrokeColor")}
