@@ -46,7 +46,7 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       unitsPerEm: 1000,
       ascender: 1011,
       descender: -353,
-      lineHeight: 1.35,
+      lineHeight: 1.25,
     },
   },
   [FONT_FAMILY["Lilita One"]]: {
@@ -116,7 +116,7 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       unitsPerEm: 1000,
       ascender: 880,
       descender: -144,
-      lineHeight: 1.15,
+      lineHeight: 1.25,
     },
     fallback: true,
   },

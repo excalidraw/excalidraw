@@ -199,7 +199,7 @@ const renderLinkIcon = (
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
       );
-      /*linkCanvasCacheContext.fillStyle = "#fff";
+      /*linkCanvasCacheContext.fillStyle = appState.viewBackgroundColor || "#fff";
       linkCanvasCacheContext.fillRect(0, 0, width, height);*/ //zsviczian
 
       if (canvasKey === "elementLink") {
