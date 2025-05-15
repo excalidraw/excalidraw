@@ -170,10 +170,11 @@ export const isSnappingEnabled = ({
 }) => {
   if (event) {
     return (
-      (app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
-      (!app.state.objectsSnapModeEnabled &&
-        event[KEYS.CTRL_OR_CMD] &&
-        !isGridModeEnabled(app))
+      app.state.activeTool.type !== "lasso" &&
+      ((app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
+        (!app.state.objectsSnapModeEnabled &&
+          event[KEYS.CTRL_OR_CMD] &&
+          !isGridModeEnabled(app)))
     );
   }
 

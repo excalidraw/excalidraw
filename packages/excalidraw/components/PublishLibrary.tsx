@@ -5,10 +5,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   EDITOR_LS_KEYS,
   EXPORT_DATA_TYPES,
-  EXPORT_SOURCE,
   MIME_TYPES,
   VERSIONS,
   chunk,
+  getExportSource,
 } from "@excalidraw/common";
 
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
@@ -281,7 +281,7 @@ const PublishLibrary = ({
     const libContent: ExportedLibraryData = {
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
       version: VERSIONS.excalidrawLibrary,
-      source: EXPORT_SOURCE,
+      source: getExportSource(),
       libraryItems: clonedLibItems,
     };
     const content = JSON.stringify(libContent, null, 2);

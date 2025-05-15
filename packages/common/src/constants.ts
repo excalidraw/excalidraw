@@ -10,6 +10,7 @@ export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
 export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
 export const isFirefox =
+  typeof window !== "undefined" &&
   "netscape" in window &&
   navigator.userAgent.indexOf("rv:") > 1 &&
   navigator.userAgent.indexOf("Gecko") > 1;
@@ -255,7 +256,7 @@ export const EXPORT_DATA_TYPES = {
   excalidrawClipboardWithAPI: "excalidraw-api/clipboard",
 } as const;
 
-export const EXPORT_SOURCE =
+export const getExportSource = () =>
   window.EXCALIDRAW_EXPORT_SOURCE || window.location.origin;
 
 // time in milliseconds
