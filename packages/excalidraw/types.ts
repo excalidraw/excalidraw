@@ -554,7 +554,10 @@ export interface ExcalidrawPropsCustomOptions {
     menuRender?: (props: { children: React.ReactNode }) => React.ReactNode;
   };
   pickerRenders?: {
-    ButtonList?: React.ComponentType<{ children: React.ReactNode; className?: string }>;
+    ButtonList?: React.ComponentType<{
+      children: React.ReactNode;
+      className?: string;
+    }>;
     elementStrokeColors?: ColorTuple;
     elementBackgroundColors?: ColorTuple;
     buttonIconSelectRender?: <T extends Object>(
@@ -600,7 +603,7 @@ export interface ExcalidrawPropsCustomOptions {
       key: string;
     }) => React.ReactNode;
     colorPickerPopoverRender?: (props: {
-      color: string;
+      color: string | null;
       label: string;
       type: ColorPickerType;
       onChange: (color: string) => void;

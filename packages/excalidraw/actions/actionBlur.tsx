@@ -37,12 +37,7 @@ export const actionChangeBlur = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <BlurRange
-      updateData={updateData}
-      elements={elements}
-      appState={appState}
-      testId="blur"
-    />
+  PanelComponent: ({ updateData, app }) => (
+    <BlurRange updateData={updateData} app={app} testId="blur" />
   ),
 });

@@ -133,7 +133,7 @@ export const BlurRange = ({ updateData, app, testId }: RangeProps) => {
 
   return (
     <label className="control-label">
-      {t("labels.opacity")}
+      {t("labels.blur")}
       {customOptions?.pickerRenders?.rangeRender ? (
         customOptions?.pickerRenders?.rangeRender({
           value,
