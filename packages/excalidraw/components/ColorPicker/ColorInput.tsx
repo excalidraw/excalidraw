@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { KEYS, getShortcutKey } from "@excalidraw/common";
+import { COLOR_PALETTE, KEYS, getShortcutKey } from "@excalidraw/common";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
@@ -22,7 +22,14 @@ interface ColorInputProps {
   placeholder?: string;
 }
 
-export function validateHexColor(color: string): boolean {
+export function validateHexColor(
+  color: string,
+  includeKeywords?: string[],
+): boolean {
+  if (includeKeywords && color in includeKeywords) {
+    return true;
+  }
+
   if (color.startsWith("#")) {
     color = color.slice(1);
   }
@@ -85,7 +92,7 @@ export const ColorInput = ({
   return (
     <div
       className={clsx("color-picker__input-label", {
-        error: !validateHexColor(innerValue),
+        error: !validateHexColor(innerValue, [COLOR_PALETTE.transparent]),
       })}
     >
       <div className="color-picker__input-hash">#</div>
