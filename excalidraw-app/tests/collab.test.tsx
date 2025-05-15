@@ -3,17 +3,14 @@ import {
   createRedoAction,
   createUndoAction,
 } from "@excalidraw/excalidraw/actions/actionHistory";
-import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+import { syncInvalidIndices } from "@excalidraw/element";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { act, render, waitFor } from "@excalidraw/excalidraw/tests/test-utils";
 import { vi } from "vitest";
 
-import { StoreIncrement } from "@excalidraw/element/store";
+import { StoreIncrement } from "@excalidraw/element";
 
-import type {
-  DurableIncrement,
-  EphemeralIncrement,
-} from "@excalidraw/element/store";
+import type { DurableIncrement, EphemeralIncrement } from "@excalidraw/element";
 
 import ExcalidrawApp from "../App";
 

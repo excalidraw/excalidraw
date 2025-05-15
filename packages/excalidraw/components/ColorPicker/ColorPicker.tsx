@@ -18,6 +18,7 @@ import { useExcalidrawContainer } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
+import { slashIcon } from "../icons";
 
 import {
   ExcalidrawPropsCustomOptionsContext,
@@ -57,7 +58,11 @@ export const getColor = (color: string): string | null => {
 
 interface ColorPickerProps {
   type: ColorPickerType;
-  color: string;
+  /**
+   * null indicates no color should be displayed as active
+   * (e.g. when multiple shapes selected with different colors)
+   */
+  color: string | null;
   onChange: (color: string) => void;
   label: string;
   elements: readonly ExcalidrawElement[];
@@ -94,22 +99,21 @@ const ColorPickerPopupContent = ({
     <div>
       <PickerHeading>{t("colorPicker.hexCode")}</PickerHeading>
       <ColorInput
-        color={color}
+        color={color || ""}
         label={label}
         onChange={(color) => {
           onChange(color);
         }}
         colorPickerType={type}
+        placeholder={t("colorPicker.color")}
       />
     </div>
   );
 
-  const popoverRef = useRef<HTMLDivElement>(null);
+  const colorPickerContentRef = useRef<HTMLDivElement>(null);
 
   const focusPickerContent = () => {
-    popoverRef.current
-      ?.querySelector<HTMLDivElement>(".color-picker-content")
-      ?.focus();
+    colorPickerContentRef.current?.focus();
   };
 
   return (
@@ -136,6 +140,7 @@ const ColorPickerPopupContent = ({
     >
       {palette ? (
         <Picker
+          ref={colorPickerContentRef}
           palette={palette}
           color={color}
           onChange={(changedColor) => {
@@ -169,7 +174,6 @@ const ColorPickerPopupContent = ({
               updateData({ openPopup: null });
             }
           }}
-          label={label}
           type={type}
           elements={elements}
           updateData={updateData}
@@ -188,7 +192,7 @@ const ColorPickerTrigger = ({
   color,
   type,
 }: {
-  color: string;
+  color: string | null;
   label: string;
   type: ColorPickerType;
 }) => {
@@ -196,8 +200,9 @@ const ColorPickerTrigger = ({
     <Popover.Trigger
       type="button"
       className={clsx("color-picker__button active-color properties-trigger", {
-        "is-transparent": color === "transparent" || !color,
-        "has-outline": !isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD),
+        "is-transparent": !color || color === "transparent",
+        "has-outline":
+          !color || !isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD),
       })}
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}
@@ -207,7 +212,7 @@ const ColorPickerTrigger = ({
           : t("labels.showBackground")
       }
     >
-      <div className="color-picker__button-outline" />
+      <div className="color-picker__button-outline">{!color && slashIcon}</div>
     </Popover.Trigger>
   );
 };

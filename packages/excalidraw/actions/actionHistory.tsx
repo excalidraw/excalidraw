@@ -4,7 +4,7 @@ import { useContext } from "react";
 
 import { CaptureUpdateAction } from "@excalidraw/element/store";
 
-import { orderByFractionalIndex } from "@excalidraw/element/fractionalIndex";
+import { orderByFractionalIndex } from "@excalidraw/element";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
