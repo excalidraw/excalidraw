@@ -17,7 +17,6 @@ import {
   vectorDot,
   vectorNormalize,
 } from "@excalidraw/math";
-import { isPointInShape } from "@excalidraw/element/collision";
 
 import {
   COLOR_PALETTE,
@@ -103,9 +102,9 @@ import {
   Emitter,
 } from "@excalidraw/common";
 
-import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
-
 import {
+  getCommonBounds,
+  getElementAbsoluteCoords,
   bindOrUnbindLinearElements,
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
@@ -114,13 +113,8 @@ import {
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
   getSuggestedBindingsForArrows,
-} from "@excalidraw/element";
-
-import { LinearElementEditor } from "@excalidraw/element";
-
-import { newElementWith } from "@excalidraw/element";
-
-import {
+  LinearElementEditor,
+  newElementWith,
   newFrameElement,
   newFreeDrawElement,
   newEmbeddableElement,
@@ -132,11 +126,9 @@ import {
   newLinearElement,
   newTextElement,
   refreshTextDimensions,
-} from "@excalidraw/element";
-
-import { deepCopyElement, duplicateElements } from "@excalidraw/element";
-
-import {
+  deepCopyElement,
+  duplicateElements,
+  isPointInShape,
   hasBoundTextElement,
   isArrowElement,
   isBindingElement,
@@ -157,43 +149,27 @@ import {
   isFlowchartNodeElement,
   isBindableElement,
   isTextElement,
-} from "@excalidraw/element";
-
-import {
   getLockedLinearCursorAlignSize,
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
   isInvisiblySmallElement,
-} from "@excalidraw/element";
-
-import { getCornerRadius, isPathALoop } from "@excalidraw/element";
-
-import {
+  getCornerRadius,
+  isPathALoop,
   createSrcDoc,
   embeddableURLValidator,
   maybeParseEmbedSrc,
   getEmbedLink,
-} from "@excalidraw/element";
-
-import {
   getInitializedImageElements,
   loadHTMLImageElement,
   normalizeSVG,
   updateImageCache as _updateImageCache,
-} from "@excalidraw/element";
-
-import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
   isValidTextContainer,
   redrawTextBoundingBox,
-} from "@excalidraw/element";
-
-import { shouldShowBoundingBox } from "@excalidraw/element";
-
-import {
+  shouldShowBoundingBox,
   getFrameChildren,
   isCursorInFrame,
   addElementsToFrame,
@@ -208,29 +184,17 @@ import {
   getFrameLikeTitle,
   getElementsOverlappingFrame,
   filterElementsEligibleAsFrameChildren,
-} from "@excalidraw/element";
-
-import {
   hitElementBoundText,
   hitElementBoundingBoxOnly,
   hitElementItself,
-} from "@excalidraw/element";
-
-import { getVisibleSceneBounds } from "@excalidraw/element";
-
-import {
+  getVisibleSceneBounds,
   FlowChartCreator,
   FlowChartNavigator,
   getLinkDirectionFromKey,
-} from "@excalidraw/element";
-
-import { cropElement } from "@excalidraw/element";
-
-import { wrapText } from "@excalidraw/element";
-
-import { isElementLink, parseElementLinkFromURL } from "@excalidraw/element";
-
-import {
+  cropElement,
+  wrapText,
+  isElementLink,
+  parseElementLinkFromURL,
   isMeasureTextSupported,
   normalizeText,
   measureText,
@@ -238,13 +202,8 @@ import {
   getApproxMinLineWidth,
   getApproxMinLineHeight,
   getMinTextElementWidth,
-} from "@excalidraw/element";
-
-import { ShapeCache } from "@excalidraw/element";
-
-import { getRenderOpacity } from "@excalidraw/element";
-
-import {
+  ShapeCache,
+  getRenderOpacity,
   editGroupForSelectedElement,
   getElementsInGroup,
   getSelectedGroupIdForElement,
@@ -252,41 +211,26 @@ import {
   isElementInGroup,
   isSelectedViaGroup,
   selectGroupsForSelectedElements,
-} from "@excalidraw/element";
-
-import { syncInvalidIndices, syncMovedIndices } from "@excalidraw/element";
-
-import {
+  syncInvalidIndices,
+  syncMovedIndices,
   excludeElementsInFramesFromSelection,
   getSelectionStateForElements,
   makeNextSelectedElementIds,
-} from "@excalidraw/element";
-
-import {
   getResizeOffsetXY,
   getResizeArrowDirection,
   transformElements,
-} from "@excalidraw/element";
-
-import {
   getCursorForResizingElement,
   getElementWithTransformHandleType,
   getTransformHandleTypeFromCoords,
-} from "@excalidraw/element";
-
-import {
   dragNewElement,
   dragSelectedElements,
   getDragOffsetXY,
+  isNonDeletedElement,
+  Scene,
+  Store,
+  CaptureUpdateAction,
+  type ElementUpdate,
 } from "@excalidraw/element";
-
-import { isNonDeletedElement } from "@excalidraw/element";
-
-import { Scene } from "@excalidraw/element";
-
-import { Store, CaptureUpdateAction } from "@excalidraw/element";
-
-import type { ElementUpdate } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
