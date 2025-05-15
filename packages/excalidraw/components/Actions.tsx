@@ -9,6 +9,8 @@ import {
 } from "@excalidraw/common";
 
 import {
+  isEligiblePolygon,
+  isLineElement,
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
 } from "@excalidraw/element";
@@ -96,8 +98,13 @@ export const canChangeBackgroundColor = (
   targetElements: ExcalidrawElement[],
 ) => {
   return (
-    hasBackground(appState.activeTool.type) ||
-    targetElements.some((element) => hasBackground(element.type))
+    (hasBackground(appState.activeTool.type) &&
+      appState.activeTool.type !== "line") ||
+    targetElements.some(
+      (element) =>
+        hasBackground(element.type) &&
+        (!isLineElement(element) || isEligiblePolygon(element)),
+    )
   );
 };
 

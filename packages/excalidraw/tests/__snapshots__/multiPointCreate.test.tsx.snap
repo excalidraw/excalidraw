@@ -93,6 +93,7 @@ exports[`multi point mode in linear elements > line 3`] = `
       110,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": {
     "type": 2,

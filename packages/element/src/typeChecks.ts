@@ -25,6 +25,7 @@ import type {
   ExcalidrawMagicFrameElement,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
+  ExcalidrawLineElement,
   PointBinding,
   FixedPointBinding,
   ExcalidrawFlowchartNodeElement,
@@ -106,6 +107,12 @@ export const isLinearElement = (
   element?: ExcalidrawElement | null,
 ): element is ExcalidrawLinearElement => {
   return element != null && isLinearElementType(element.type);
+};
+
+export const isLineElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawLineElement => {
+  return element != null && element.type === "line";
 };
 
 export const isArrowElement = (
@@ -371,4 +378,10 @@ export const getLinearElementSubType = (
     return "elbowArrow";
   }
   return "line";
+};
+
+export const isEligiblePolygon = (
+  element: ExcalidrawElement,
+): element is ExcalidrawLineElement => {
+  return isLineElement(element) && element.points.length > 2;
 };
