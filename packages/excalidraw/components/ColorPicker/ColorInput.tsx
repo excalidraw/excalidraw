@@ -26,7 +26,7 @@ export function validateHexColor(
   color: string,
   includeKeywords?: string[],
 ): boolean {
-  if (includeKeywords && color in includeKeywords) {
+  if (includeKeywords && includeKeywords.includes(color)) {
     return true;
   }
 
