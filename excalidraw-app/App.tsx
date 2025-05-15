@@ -94,6 +94,7 @@ import Collab, {
   isOfflineAtom,
 } from "./collab/Collab";
 import { AppFooter } from "./components/AppFooter";
+import { AppHeader } from "./components/AppHeader";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 import {
@@ -804,6 +805,37 @@ const ExcalidrawWrapper = () => {
         "is-collaborating": isCollaborating,
       })}
     >
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "8px 16px",
+        backgroundColor: "#2c2c2c",
+        color: "white",
+        fontSize: "18px",
+        fontWeight: "bold",
+        borderBottom: "1px solid #444",
+      }}
+    >
+      <img
+        src="https://i.imgur.com/KttcKbd.png"
+        alt="logo"
+        style={{ height: 28, marginRight: 12 }}
+      />
+      <input
+        type="text"
+        placeholder="Untitled Drawing"
+        style={{
+          background: "transparent",
+          border: "none",
+          borderBottom: "1px solid white",
+          color: "white",
+          fontSize: "18px",
+          flex: 1,
+          outline: "none",
+        }}
+      />
+    </div>
       <Excalidraw
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
@@ -903,7 +935,8 @@ const ExcalidrawWrapper = () => {
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
-        <AppFooter onChange={() => excalidrawAPI?.refresh()} />
+        <AppHeader onChange={() => excalidrawAPI?.refresh()} excalidrawAPI={excalidrawAPI} />
+        {/* <AppFooter onChange={() => excalidrawAPI?.refresh()} /> */}
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
 
         <TTDDialogTrigger />
@@ -1143,6 +1176,40 @@ const ExcalidrawWrapper = () => {
           />
         )}
       </Excalidraw>
+      {excalidrawAPI && (() => {
+      const appState = excalidrawAPI.getAppState();
+      const elements = excalidrawAPI.getSceneElements();
+      const selected = elements.find(
+        (el) => appState.selectedElementIds[el.id] && el.type === "text"
+      );
+      if (selected && !appState.editingTextElement) {
+        const { scrollX, scrollY, zoom } = excalidrawAPI.getAppState();
+        const x = (selected.x + selected.width / 2) * zoom.value + scrollX;
+        const y = (selected.y + selected.height + 10) * zoom.value + scrollY;
+        return (
+          <div
+            style={{
+              position: "absolute",
+              top: y-5,
+              left: x-111,
+              display: "flex",
+              gap: "8px",
+              background: "#fff",
+              padding: "4px 8px",
+              borderRadius: "8px",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+              zIndex: 1000,
+            }}
+          >
+            <button>Youchewb</button>
+            <button>Google</button>
+            <button>Pinterest</button>
+          </div>
+        );
+      }
+      return null;
+    })()}
+
     </div>
   );
 };
