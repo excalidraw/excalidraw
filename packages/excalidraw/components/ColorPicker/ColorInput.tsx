@@ -22,6 +22,19 @@ interface ColorInputProps {
   placeholder?: string;
 }
 
+export function validateHexColor(color: string): boolean {
+  if (color.startsWith("#")) {
+    color = color.slice(1);
+  }
+
+  if (color.length === 3 || color.length === 6) {
+    if (/^[a-fA-F0-9]+$/.test(color)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export const ColorInput = ({
   color,
   onChange,
@@ -70,7 +83,11 @@ export const ColorInput = ({
   }, [setEyeDropperState]);
 
   return (
-    <div className="color-picker__input-label">
+    <div
+      className={clsx("color-picker__input-label", {
+        error: !validateHexColor(innerValue),
+      })}
+    >
       <div className="color-picker__input-hash">#</div>
       <input
         ref={activeSection === "hex" ? inputRef : undefined}
