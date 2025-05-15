@@ -49,6 +49,7 @@ export const CURSOR_TYPE = {
   GRAB: "grab",
   POINTER: "pointer",
   MOVE: "move",
+  ZOOM_IN: "zoom-in",
   AUTO: "",
 };
 export const POINTER_BUTTON = {
