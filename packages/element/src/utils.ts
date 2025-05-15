@@ -1,81 +1,341 @@
-import { pointDistance } from "@excalidraw/math";
+import {
+  curve,
+  curveCatmullRomCubicApproxPoints,
+  curveOffsetPoints,
+  lineSegment,
+  pointFrom,
+  pointFromArray,
+  rectangle,
+  type GlobalPoint,
+} from "@excalidraw/math";
 
-import type { LocalPoint } from "@excalidraw/math";
+import type { Curve, LineSegment, LocalPoint } from "@excalidraw/math";
 
-import { headingForPointIsHorizontal } from "./heading";
+import { getCornerRadius } from "./shapes";
 
-import type { Drawable, Op } from "roughjs/bin/core";
+import { getDiamondPoints } from "./bounds";
 
-export const getCurvePathOps = (shape: Drawable): Op[] => {
-  for (const set of shape.sets) {
-    if (set.type === "path") {
-      return set.ops;
-    }
-  }
-  return shape.sets[0].ops;
-};
+import { generateLinearCollisionShape } from "./Shape";
 
-export const generateElbowArrowRougJshPathCommands = (
-  points: readonly LocalPoint[],
-  radius: number,
-) => {
-  const subpoints = [] as [number, number][];
-  for (let i = 1; i < points.length - 1; i += 1) {
-    const prev = points[i - 1];
-    const next = points[i + 1];
-    const point = points[i];
-    const prevIsHorizontal = headingForPointIsHorizontal(point, prev);
-    const nextIsHorizontal = headingForPointIsHorizontal(next, point);
-    const corner = Math.min(
-      radius,
-      pointDistance(points[i], next) / 2,
-      pointDistance(points[i], prev) / 2,
-    );
+import type {
+  ExcalidrawDiamondElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawRectanguloidElement,
+} from "./types";
 
-    if (prevIsHorizontal) {
-      if (prev[0] < point[0]) {
-        // LEFT
-        subpoints.push([points[i][0] - corner, points[i][1]]);
-      } else {
-        // RIGHT
-        subpoints.push([points[i][0] + corner, points[i][1]]);
+export function deconstructLinearOrFreeDrawElement(
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+): (Curve<GlobalPoint> | LineSegment<GlobalPoint>)[] {
+  const ops = generateLinearCollisionShape(element) as {
+    op: string;
+    data: number[];
+  }[];
+  const components = [];
+
+  for (let idx = 0; idx < ops.length; idx += 1) {
+    const op = ops[idx];
+    const prevPoint =
+      ops[idx - 1] && pointFromArray<LocalPoint>(ops[idx - 1].data.slice(-2));
+    switch (op.op) {
+      case "move":
+        continue;
+      case "lineTo":
+        if (!prevPoint) {
+          throw new Error("prevPoint is undefined");
+        }
+
+        components.push(
+          lineSegment<GlobalPoint>(
+            pointFrom<GlobalPoint>(
+              element.x + prevPoint[0],
+              element.y + prevPoint[1],
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + op.data[0],
+              element.y + op.data[1],
+            ),
+          ),
+        );
+        continue;
+      case "bcurveTo":
+        if (!prevPoint) {
+          throw new Error("prevPoint is undefined");
+        }
+
+        components.push(
+          curve<GlobalPoint>(
+            pointFrom<GlobalPoint>(
+              element.x + prevPoint[0],
+              element.y + prevPoint[1],
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + op.data[0],
+              element.y + op.data[1],
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + op.data[2],
+              element.y + op.data[3],
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + op.data[4],
+              element.y + op.data[5],
+            ),
+          ),
+        );
+        continue;
+      default: {
+        console.error("Unknown op type", op.op);
       }
-    } else if (prev[1] < point[1]) {
-      // UP
-      subpoints.push([points[i][0], points[i][1] - corner]);
-    } else {
-      subpoints.push([points[i][0], points[i][1] + corner]);
-    }
-
-    subpoints.push(points[i] as [number, number]);
-
-    if (nextIsHorizontal) {
-      if (next[0] < point[0]) {
-        // LEFT
-        subpoints.push([points[i][0] - corner, points[i][1]]);
-      } else {
-        // RIGHT
-        subpoints.push([points[i][0] + corner, points[i][1]]);
-      }
-    } else if (next[1] < point[1]) {
-      // UP
-      subpoints.push([points[i][0], points[i][1] - corner]);
-    } else {
-      // DOWN
-      subpoints.push([points[i][0], points[i][1] + corner]);
     }
   }
 
-  const d = [`M ${points[0][0]} ${points[0][1]}`];
-  for (let i = 0; i < subpoints.length; i += 3) {
-    d.push(`L ${subpoints[i][0]} ${subpoints[i][1]}`);
-    d.push(
-      `Q ${subpoints[i + 1][0]} ${subpoints[i + 1][1]}, ${
-        subpoints[i + 2][0]
-      } ${subpoints[i + 2][1]}`,
-    );
-  }
-  d.push(`L ${points[points.length - 1][0]} ${points[points.length - 1][1]}`);
+  return components;
+}
 
-  return d.join(" ");
-};
+/**
+ * Get the building components of a rectanguloid element in the form of
+ * line segments and curves.
+ *
+ * @param element Target rectanguloid element
+ * @param offset Optional offset to expand the rectanguloid shape
+ * @returns Tuple of line segments (0) and curves (1)
+ */
+export function deconstructRectanguloidElement(
+  element: ExcalidrawRectanguloidElement,
+  offset: number = 0,
+): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+  let radius = getCornerRadius(
+    Math.min(element.width, element.height),
+    element,
+  );
+
+  if (radius === 0) {
+    radius = 0.01;
+  }
+
+  const r = rectangle(
+    pointFrom(element.x, element.y),
+    pointFrom(element.x + element.width, element.y + element.height),
+  );
+
+  const top = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(r[0][0] + radius, r[0][1]),
+    pointFrom<GlobalPoint>(r[1][0] - radius, r[0][1]),
+  );
+  const right = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(r[1][0], r[0][1] + radius),
+    pointFrom<GlobalPoint>(r[1][0], r[1][1] - radius),
+  );
+  const bottom = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(r[0][0] + radius, r[1][1]),
+    pointFrom<GlobalPoint>(r[1][0] - radius, r[1][1]),
+  );
+  const left = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(r[0][0], r[1][1] - radius),
+    pointFrom<GlobalPoint>(r[0][0], r[0][1] + radius),
+  );
+
+  const baseCorners = [
+    curve(
+      left[1],
+      pointFrom<GlobalPoint>(
+        left[1][0] + (2 / 3) * (r[0][0] - left[1][0]),
+        left[1][1] + (2 / 3) * (r[0][1] - left[1][1]),
+      ),
+      pointFrom<GlobalPoint>(
+        top[0][0] + (2 / 3) * (r[0][0] - top[0][0]),
+        top[0][1] + (2 / 3) * (r[0][1] - top[0][1]),
+      ),
+      top[0],
+    ), // TOP LEFT
+    curve(
+      top[1],
+      pointFrom<GlobalPoint>(
+        top[1][0] + (2 / 3) * (r[1][0] - top[1][0]),
+        top[1][1] + (2 / 3) * (r[0][1] - top[1][1]),
+      ),
+      pointFrom<GlobalPoint>(
+        right[0][0] + (2 / 3) * (r[1][0] - right[0][0]),
+        right[0][1] + (2 / 3) * (r[0][1] - right[0][1]),
+      ),
+      right[0],
+    ), // TOP RIGHT
+    curve(
+      right[1],
+      pointFrom<GlobalPoint>(
+        right[1][0] + (2 / 3) * (r[1][0] - right[1][0]),
+        right[1][1] + (2 / 3) * (r[1][1] - right[1][1]),
+      ),
+      pointFrom<GlobalPoint>(
+        bottom[1][0] + (2 / 3) * (r[1][0] - bottom[1][0]),
+        bottom[1][1] + (2 / 3) * (r[1][1] - bottom[1][1]),
+      ),
+      bottom[1],
+    ), // BOTTOM RIGHT
+    curve(
+      bottom[0],
+      pointFrom<GlobalPoint>(
+        bottom[0][0] + (2 / 3) * (r[0][0] - bottom[0][0]),
+        bottom[0][1] + (2 / 3) * (r[1][1] - bottom[0][1]),
+      ),
+      pointFrom<GlobalPoint>(
+        left[0][0] + (2 / 3) * (r[0][0] - left[0][0]),
+        left[0][1] + (2 / 3) * (r[1][1] - left[0][1]),
+      ),
+      left[0],
+    ), // BOTTOM LEFT
+  ];
+
+  const corners =
+    offset > 0
+      ? baseCorners.map(
+          (corner) =>
+            curveCatmullRomCubicApproxPoints(
+              curveOffsetPoints(corner, offset),
+            )!,
+        )
+      : [
+          [baseCorners[0]],
+          [baseCorners[1]],
+          [baseCorners[2]],
+          [baseCorners[3]],
+        ];
+
+  const sides = [
+    lineSegment<GlobalPoint>(
+      corners[0][corners[0].length - 1][3],
+      corners[1][0][0],
+    ),
+    lineSegment<GlobalPoint>(
+      corners[1][corners[1].length - 1][3],
+      corners[2][0][0],
+    ),
+    lineSegment<GlobalPoint>(
+      corners[2][corners[2].length - 1][3],
+      corners[3][0][0],
+    ),
+    lineSegment<GlobalPoint>(
+      corners[3][corners[3].length - 1][3],
+      corners[0][0][0],
+    ),
+  ];
+
+  return [sides, corners.flat()];
+}
+
+/**
+ * Get the building components of a diamond element in the form of
+ * line segments and curves as a tuple, in this order.
+ *
+ * @param element The element to deconstruct
+ * @param offset An optional offset
+ * @returns Tuple of line segments (0) and curves (1)
+ */
+export function deconstructDiamondElement(
+  element: ExcalidrawDiamondElement,
+  offset: number = 0,
+): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+  const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+    getDiamondPoints(element);
+  const verticalRadius = element.roundness
+    ? getCornerRadius(Math.abs(topX - leftX), element)
+    : (topX - leftX) * 0.01;
+  const horizontalRadius = element.roundness
+    ? getCornerRadius(Math.abs(rightY - topY), element)
+    : (rightY - topY) * 0.01;
+
+  const [top, right, bottom, left]: GlobalPoint[] = [
+    pointFrom(element.x + topX, element.y + topY),
+    pointFrom(element.x + rightX, element.y + rightY),
+    pointFrom(element.x + bottomX, element.y + bottomY),
+    pointFrom(element.x + leftX, element.y + leftY),
+  ];
+
+  const baseCorners = [
+    curve(
+      pointFrom<GlobalPoint>(
+        right[0] - verticalRadius,
+        right[1] - horizontalRadius,
+      ),
+      right,
+      right,
+      pointFrom<GlobalPoint>(
+        right[0] - verticalRadius,
+        right[1] + horizontalRadius,
+      ),
+    ), // RIGHT
+    curve(
+      pointFrom<GlobalPoint>(
+        bottom[0] + verticalRadius,
+        bottom[1] - horizontalRadius,
+      ),
+      bottom,
+      bottom,
+      pointFrom<GlobalPoint>(
+        bottom[0] - verticalRadius,
+        bottom[1] - horizontalRadius,
+      ),
+    ), // BOTTOM
+    curve(
+      pointFrom<GlobalPoint>(
+        left[0] + verticalRadius,
+        left[1] + horizontalRadius,
+      ),
+      left,
+      left,
+      pointFrom<GlobalPoint>(
+        left[0] + verticalRadius,
+        left[1] - horizontalRadius,
+      ),
+    ), // LEFT
+    curve(
+      pointFrom<GlobalPoint>(
+        top[0] - verticalRadius,
+        top[1] + horizontalRadius,
+      ),
+      top,
+      top,
+      pointFrom<GlobalPoint>(
+        top[0] + verticalRadius,
+        top[1] + horizontalRadius,
+      ),
+    ), // TOP
+  ];
+
+  const corners =
+    offset > 0
+      ? baseCorners.map(
+          (corner) =>
+            curveCatmullRomCubicApproxPoints(
+              curveOffsetPoints(corner, offset),
+            )!,
+        )
+      : [
+          [baseCorners[0]],
+          [baseCorners[1]],
+          [baseCorners[2]],
+          [baseCorners[3]],
+        ];
+
+  const sides = [
+    lineSegment<GlobalPoint>(
+      corners[0][corners[0].length - 1][3],
+      corners[1][0][0],
+    ),
+    lineSegment<GlobalPoint>(
+      corners[1][corners[1].length - 1][3],
+      corners[2][0][0],
+    ),
+    lineSegment<GlobalPoint>(
+      corners[2][corners[2].length - 1][3],
+      corners[3][0][0],
+    ),
+    lineSegment<GlobalPoint>(
+      corners[3][corners[3].length - 1][3],
+      corners[0][0][0],
+    ),
+  ];
+
+  return [sides, corners.flat()];
+}

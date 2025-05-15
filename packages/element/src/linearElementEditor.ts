@@ -9,6 +9,8 @@ import {
   vectorFromPoint,
 } from "@excalidraw/math";
 
+import { getCurvePathOps } from "@excalidraw/utils/shape";
+
 import {
   DRAGGING_THRESHOLD,
   KEYS,
@@ -18,7 +20,7 @@ import {
   tupleToCoors,
 } from "@excalidraw/common";
 
-import { getCurvePathOps, type Store } from "@excalidraw/element";
+import type { Store } from "@excalidraw/element";
 
 import type { Radians } from "@excalidraw/math";
 

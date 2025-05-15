@@ -226,7 +226,10 @@ const getOriginalBindingIfStillCloseOfLinearElementEdge = (
       : linearElement.endBinding?.elementId;
   if (elementId) {
     const element = elementsMap.get(elementId);
-    if (isBindableElement(element) && bindingBorderTest(element, coors, zoom)) {
+    if (
+      isBindableElement(element) &&
+      bindingBorderTest(element, coors, elementsMap, zoom)
+    ) {
       return element;
     }
   }
@@ -556,6 +559,7 @@ export const getHoveredElementForBinding = (
         bindingBorderTest(
           element,
           pointerCoords,
+          elementsMap,
           zoom,
           (fullShape ||
             !isBindingFallthroughEnabled(
@@ -588,7 +592,7 @@ export const getHoveredElementForBinding = (
 
     // Prefer the shape with the border being tested (if any)
     const borderTestElements = candidateElements.filter((element) =>
-      bindingBorderTest(element, pointerCoords, zoom, false),
+      bindingBorderTest(element, pointerCoords, elementsMap, zoom, false),
     );
     if (borderTestElements.length === 1) {
       return borderTestElements[0];
@@ -609,6 +613,7 @@ export const getHoveredElementForBinding = (
       bindingBorderTest(
         element,
         pointerCoords,
+        elementsMap,
         zoom,
         // disable fullshape snapping for frame elements so we
         // can bind to frame children
@@ -1540,6 +1545,7 @@ const newBoundElements = (
 export const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
   { x, y }: { x: number; y: number },
+  elementsMap: NonDeletedSceneElementsMap,
   zoom?: AppState["zoom"],
   fullShape?: boolean,
 ): boolean => {

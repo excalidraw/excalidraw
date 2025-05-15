@@ -1,7 +1,3 @@
-import { simplify } from "points-on-curve";
-
-import { RoughGenerator } from "roughjs/bin/generator";
-
 import {
   isTransparent,
   elementCenterPoint,
@@ -21,43 +17,43 @@ import {
   vectorFromPoint,
   vectorNormalize,
   vectorScale,
-  curve,
-  curveCatmullRomCubicApproxPoints,
-  curveOffsetPoints,
-  pointFromArray,
-  rectangle,
+} from "@excalidraw/math";
+
+import {
   ellipse,
   ellipseSegmentInterceptPoints,
-} from "@excalidraw/math";
+} from "@excalidraw/math/ellipse";
 
 import type {
   Curve,
   GlobalPoint,
   LineSegment,
-  LocalPoint,
   Radians,
 } from "@excalidraw/math";
+
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
-import { getCornerRadius, isPathALoop } from "./shapes";
-import { getDiamondPoints, getElementBounds } from "./bounds";
-import { getBoundTextElement } from "./textElement";
-import { LinearElementEditor } from "./linearElementEditor";
-import { distanceToElement } from "./distance";
-import { generateElbowArrowRougJshPathCommands } from "./utils";
-
+import { isPathALoop } from "./shapes";
+import { getElementBounds } from "./bounds";
 import {
   hasBoundTextElement,
-  isElbowArrow,
   isFreeDrawElement,
   isIframeLikeElement,
   isImageElement,
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
+import {
+  deconstructDiamondElement,
+  deconstructLinearOrFreeDrawElement,
+  deconstructRectanguloidElement,
+} from "./utils";
 
-import type { Options } from "roughjs/bin/core";
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
+import { getBoundTextElement } from "./textElement";
+
+import { LinearElementEditor } from "./linearElementEditor";
+
+import { distanceToElement } from "./distance";
 
 import type {
   ElementsMap,
@@ -115,9 +111,9 @@ export const hitElementItself = ({
     ? shouldTestInside(element)
       ? // Since `inShape` tests STRICTLY againt the insides of a shape
         // we would need `onShape` as well to include the "borders"
-        isPointInElement(point, element) ||
-        isPointOnElementOutline(point, element, threshold)
-      : isPointOnElementOutline(point, element, threshold)
+        isPointInShape(point, element) ||
+        isPointOnShape(point, element, threshold)
+      : isPointOnShape(point, element, threshold)
     : false;
 
   // hit test against a frame's name
@@ -181,7 +177,7 @@ export const hitElementBoundText = (
       }
     : boundTextElementCandidate;
 
-  return isPointInElement(point, boundTextElement);
+  return isPointInShape(point, boundTextElement);
 };
 
 /**
@@ -222,17 +218,19 @@ const intersectLinearOrFreeDrawWithLineSegment = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   segment: LineSegment<GlobalPoint>,
 ): GlobalPoint[] => {
-  const shapes = deconstructLinearOrFreeDrawElementForCollision(element);
+  const shapes = deconstructLinearOrFreeDrawElement(element);
   const intersections: GlobalPoint[] = [];
 
   for (const shape of shapes) {
     switch (true) {
       case isCurve(shape):
+        //debugDrawCubicBezier(shape);
         intersections.push(
           ...curveIntersectLineSegment(shape as Curve<GlobalPoint>, segment),
         );
         continue;
       case isLineSegment(shape):
+        //debugDrawLine(shape);
         const point = lineSegmentIntersectionPoints(
           segment,
           shape as LineSegment<GlobalPoint>,
@@ -269,10 +267,7 @@ const intersectRectanguloidWithLineSegment = (
   );
 
   // Get the element's building components we can test against
-  const [sides, corners] = deconstructRectanguloidElementForCollision(
-    element,
-    offset,
-  );
+  const [sides, corners] = deconstructRectanguloidElement(element, offset);
 
   return (
     // Test intersection against the sides, keep only the valid
@@ -323,10 +318,7 @@ const intersectDiamondWithLineSegment = (
   const rotatedA = pointRotateRads(l[0], center, -element.angle as Radians);
   const rotatedB = pointRotateRads(l[1], center, -element.angle as Radians);
 
-  const [sides, curves] = deconstructDiamondElementForCollision(
-    element,
-    offset,
-  );
+  const [sides, curves] = deconstructDiamondElement(element, offset);
 
   return (
     sides
@@ -379,14 +371,14 @@ const intersectEllipseWithLineSegment = (
 };
 
 // check if the given point is considered on the given shape's border
-const isPointOnElementOutline = (
+const isPointOnShape = (
   point: GlobalPoint,
   element: ExcalidrawElement,
   tolerance = 1,
 ) => distanceToElement(element, point) <= tolerance;
 
 // check if the given point is considered inside the element's border
-export const isPointInElement = (
+export const isPointInShape = (
   point: GlobalPoint,
   element: ExcalidrawElement,
 ) => {
@@ -414,438 +406,4 @@ export const isPointInElement = (
   ).filter((item, pos, arr) => arr.indexOf(item) === pos);
 
   return intersections.length % 2 === 1;
-};
-
-export function deconstructLinearOrFreeDrawElementForCollision(
-  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
-): (Curve<GlobalPoint> | LineSegment<GlobalPoint>)[] {
-  const ops = generateLinearShapesForCollision(element) as {
-    op: string;
-    data: number[];
-  }[];
-  const components = [];
-
-  for (let idx = 0; idx < ops.length; idx += 1) {
-    const op = ops[idx];
-    const prevPoint =
-      ops[idx - 1] && pointFromArray<LocalPoint>(ops[idx - 1].data.slice(-2));
-    switch (op.op) {
-      case "move":
-        continue;
-      case "lineTo":
-        if (!prevPoint) {
-          throw new Error("prevPoint is undefined");
-        }
-
-        components.push(
-          lineSegment<GlobalPoint>(
-            pointFrom<GlobalPoint>(
-              element.x + prevPoint[0],
-              element.y + prevPoint[1],
-            ),
-            pointFrom<GlobalPoint>(
-              element.x + op.data[0],
-              element.y + op.data[1],
-            ),
-          ),
-        );
-        continue;
-      case "bcurveTo":
-        if (!prevPoint) {
-          throw new Error("prevPoint is undefined");
-        }
-
-        components.push(
-          curve<GlobalPoint>(
-            pointFrom<GlobalPoint>(
-              element.x + prevPoint[0],
-              element.y + prevPoint[1],
-            ),
-            pointFrom<GlobalPoint>(
-              element.x + op.data[0],
-              element.y + op.data[1],
-            ),
-            pointFrom<GlobalPoint>(
-              element.x + op.data[2],
-              element.y + op.data[3],
-            ),
-            pointFrom<GlobalPoint>(
-              element.x + op.data[4],
-              element.y + op.data[5],
-            ),
-          ),
-        );
-        continue;
-      default: {
-        console.error("Unknown op type", op.op);
-      }
-    }
-  }
-
-  return components;
-}
-
-/**
- * Get the building components of a rectanguloid element in the form of
- * line segments and curves.
- *
- * @param element Target rectanguloid element
- * @param offset Optional offset to expand the rectanguloid shape
- * @returns Tuple of line segments (0) and curves (1)
- */
-export function deconstructRectanguloidElementForCollision(
-  element: ExcalidrawRectanguloidElement,
-  offset: number = 0,
-): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
-  let radius = getCornerRadius(
-    Math.min(element.width, element.height),
-    element,
-  );
-
-  if (radius === 0) {
-    radius = 0.01;
-  }
-
-  const r = rectangle(
-    pointFrom(element.x, element.y),
-    pointFrom(element.x + element.width, element.y + element.height),
-  );
-
-  const top = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[0][0] + radius, r[0][1]),
-    pointFrom<GlobalPoint>(r[1][0] - radius, r[0][1]),
-  );
-  const right = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[1][0], r[0][1] + radius),
-    pointFrom<GlobalPoint>(r[1][0], r[1][1] - radius),
-  );
-  const bottom = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[0][0] + radius, r[1][1]),
-    pointFrom<GlobalPoint>(r[1][0] - radius, r[1][1]),
-  );
-  const left = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[0][0], r[1][1] - radius),
-    pointFrom<GlobalPoint>(r[0][0], r[0][1] + radius),
-  );
-
-  const baseCorners = [
-    curve(
-      left[1],
-      pointFrom<GlobalPoint>(
-        left[1][0] + (2 / 3) * (r[0][0] - left[1][0]),
-        left[1][1] + (2 / 3) * (r[0][1] - left[1][1]),
-      ),
-      pointFrom<GlobalPoint>(
-        top[0][0] + (2 / 3) * (r[0][0] - top[0][0]),
-        top[0][1] + (2 / 3) * (r[0][1] - top[0][1]),
-      ),
-      top[0],
-    ), // TOP LEFT
-    curve(
-      top[1],
-      pointFrom<GlobalPoint>(
-        top[1][0] + (2 / 3) * (r[1][0] - top[1][0]),
-        top[1][1] + (2 / 3) * (r[0][1] - top[1][1]),
-      ),
-      pointFrom<GlobalPoint>(
-        right[0][0] + (2 / 3) * (r[1][0] - right[0][0]),
-        right[0][1] + (2 / 3) * (r[0][1] - right[0][1]),
-      ),
-      right[0],
-    ), // TOP RIGHT
-    curve(
-      right[1],
-      pointFrom<GlobalPoint>(
-        right[1][0] + (2 / 3) * (r[1][0] - right[1][0]),
-        right[1][1] + (2 / 3) * (r[1][1] - right[1][1]),
-      ),
-      pointFrom<GlobalPoint>(
-        bottom[1][0] + (2 / 3) * (r[1][0] - bottom[1][0]),
-        bottom[1][1] + (2 / 3) * (r[1][1] - bottom[1][1]),
-      ),
-      bottom[1],
-    ), // BOTTOM RIGHT
-    curve(
-      bottom[0],
-      pointFrom<GlobalPoint>(
-        bottom[0][0] + (2 / 3) * (r[0][0] - bottom[0][0]),
-        bottom[0][1] + (2 / 3) * (r[1][1] - bottom[0][1]),
-      ),
-      pointFrom<GlobalPoint>(
-        left[0][0] + (2 / 3) * (r[0][0] - left[0][0]),
-        left[0][1] + (2 / 3) * (r[1][1] - left[0][1]),
-      ),
-      left[0],
-    ), // BOTTOM LEFT
-  ];
-
-  const corners =
-    offset > 0
-      ? baseCorners.map(
-          (corner) =>
-            curveCatmullRomCubicApproxPoints(
-              curveOffsetPoints(corner, offset),
-            )!,
-        )
-      : [
-          [baseCorners[0]],
-          [baseCorners[1]],
-          [baseCorners[2]],
-          [baseCorners[3]],
-        ];
-
-  const sides = [
-    lineSegment<GlobalPoint>(
-      corners[0][corners[0].length - 1][3],
-      corners[1][0][0],
-    ),
-    lineSegment<GlobalPoint>(
-      corners[1][corners[1].length - 1][3],
-      corners[2][0][0],
-    ),
-    lineSegment<GlobalPoint>(
-      corners[2][corners[2].length - 1][3],
-      corners[3][0][0],
-    ),
-    lineSegment<GlobalPoint>(
-      corners[3][corners[3].length - 1][3],
-      corners[0][0][0],
-    ),
-  ];
-
-  return [sides, corners.flat()];
-}
-
-/**
- * Get the building components of a diamond element in the form of
- * line segments and curves as a tuple, in this order.
- *
- * @param element The element to deconstruct
- * @param offset An optional offset
- * @returns Tuple of line segments (0) and curves (1)
- */
-export function deconstructDiamondElementForCollision(
-  element: ExcalidrawDiamondElement,
-  offset: number = 0,
-): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
-  const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
-    getDiamondPoints(element);
-  const verticalRadius = element.roundness
-    ? getCornerRadius(Math.abs(topX - leftX), element)
-    : (topX - leftX) * 0.01;
-  const horizontalRadius = element.roundness
-    ? getCornerRadius(Math.abs(rightY - topY), element)
-    : (rightY - topY) * 0.01;
-
-  const [top, right, bottom, left]: GlobalPoint[] = [
-    pointFrom(element.x + topX, element.y + topY),
-    pointFrom(element.x + rightX, element.y + rightY),
-    pointFrom(element.x + bottomX, element.y + bottomY),
-    pointFrom(element.x + leftX, element.y + leftY),
-  ];
-
-  const baseCorners = [
-    curve(
-      pointFrom<GlobalPoint>(
-        right[0] - verticalRadius,
-        right[1] - horizontalRadius,
-      ),
-      right,
-      right,
-      pointFrom<GlobalPoint>(
-        right[0] - verticalRadius,
-        right[1] + horizontalRadius,
-      ),
-    ), // RIGHT
-    curve(
-      pointFrom<GlobalPoint>(
-        bottom[0] + verticalRadius,
-        bottom[1] - horizontalRadius,
-      ),
-      bottom,
-      bottom,
-      pointFrom<GlobalPoint>(
-        bottom[0] - verticalRadius,
-        bottom[1] - horizontalRadius,
-      ),
-    ), // BOTTOM
-    curve(
-      pointFrom<GlobalPoint>(
-        left[0] + verticalRadius,
-        left[1] + horizontalRadius,
-      ),
-      left,
-      left,
-      pointFrom<GlobalPoint>(
-        left[0] + verticalRadius,
-        left[1] - horizontalRadius,
-      ),
-    ), // LEFT
-    curve(
-      pointFrom<GlobalPoint>(
-        top[0] - verticalRadius,
-        top[1] + horizontalRadius,
-      ),
-      top,
-      top,
-      pointFrom<GlobalPoint>(
-        top[0] + verticalRadius,
-        top[1] + horizontalRadius,
-      ),
-    ), // TOP
-  ];
-
-  const corners =
-    offset > 0
-      ? baseCorners.map(
-          (corner) =>
-            curveCatmullRomCubicApproxPoints(
-              curveOffsetPoints(corner, offset),
-            )!,
-        )
-      : [
-          [baseCorners[0]],
-          [baseCorners[1]],
-          [baseCorners[2]],
-          [baseCorners[3]],
-        ];
-
-  const sides = [
-    lineSegment<GlobalPoint>(
-      corners[0][corners[0].length - 1][3],
-      corners[1][0][0],
-    ),
-    lineSegment<GlobalPoint>(
-      corners[1][corners[1].length - 1][3],
-      corners[2][0][0],
-    ),
-    lineSegment<GlobalPoint>(
-      corners[2][corners[2].length - 1][3],
-      corners[3][0][0],
-    ),
-    lineSegment<GlobalPoint>(
-      corners[3][corners[3].length - 1][3],
-      corners[0][0][0],
-    ),
-  ];
-
-  return [sides, corners.flat()];
-}
-
-const generateLinearShapesForCollision = (
-  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
-) => {
-  const generator = new RoughGenerator();
-  const options: Options = {
-    seed: element.seed,
-    disableMultiStroke: true,
-    disableMultiStrokeFill: true,
-    roughness: 0,
-    preserveVertices: true,
-  };
-
-  switch (element.type) {
-    case "line":
-    case "arrow": {
-      // points array can be empty in the beginning, so it is important to add
-      // initial position to it
-      const points = element.points.length
-        ? element.points
-        : [pointFrom<LocalPoint>(0, 0)];
-      const [x1, y1, x2, y2] = getElementBounds(
-        {
-          ...element,
-          angle: 0 as Radians,
-        },
-        new Map(),
-      );
-      const center = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
-
-      if (isElbowArrow(element)) {
-        return generator.path(
-          generateElbowArrowRougJshPathCommands(points, 16),
-          options,
-        ).sets[0].ops;
-      } else if (!element.roundness) {
-        return points.map((point, idx) => {
-          const p = pointRotateRads(
-            pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
-            center,
-            element.angle,
-          );
-
-          return {
-            op: idx === 0 ? "move" : "lineTo",
-            data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-          };
-        });
-      }
-
-      return generator
-        .curve(points as unknown as RoughPoint[], options)
-        .sets[0].ops.slice(0, element.points.length)
-        .map((op, i, arr) => {
-          if (i === 0) {
-            const p = pointRotateRads<GlobalPoint>(
-              pointFrom<GlobalPoint>(
-                element.x + op.data[0],
-                element.y + op.data[1],
-              ),
-              center,
-              element.angle,
-            );
-
-            return {
-              op: "move",
-              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-            };
-          }
-
-          return {
-            op: "bcurveTo",
-            data: [
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[0],
-                  element.y + op.data[1],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[2],
-                  element.y + op.data[3],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[4],
-                  element.y + op.data[5],
-                ),
-                center,
-                element.angle,
-              ),
-            ]
-              .map((p) =>
-                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-              )
-              .flat(),
-          };
-        });
-    }
-    case "freedraw": {
-      if (element.points.length < 2) {
-        return [];
-      }
-
-      const simplifiedPoints = simplify(element.points as LocalPoint[], 0.75);
-
-      return generator
-        .curve(simplifiedPoints as [number, number][], options)
-        .sets[0].ops.slice(0, element.points.length);
-    }
-  }
 };

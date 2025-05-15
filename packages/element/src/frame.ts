@@ -15,7 +15,7 @@ import { getElementsWithinSelection, getSelectedElements } from "./selection";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 
 import {
-  approximateElementWithLineSegments,
+  getElementLineSegments,
   getCommonBounds,
   getElementAbsoluteCoords,
 } from "./bounds";
@@ -69,15 +69,9 @@ export function isElementIntersectingFrame(
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) {
-  const frameLineSegments = approximateElementWithLineSegments(
-    frame,
-    elementsMap,
-  );
+  const frameLineSegments = getElementLineSegments(frame, elementsMap);
 
-  const elementLineSegments = approximateElementWithLineSegments(
-    element,
-    elementsMap,
-  );
+  const elementLineSegments = getElementLineSegments(element, elementsMap);
 
   const intersecting = frameLineSegments.some((frameLineSegment) =>
     elementLineSegments.some((elementLineSegment) =>

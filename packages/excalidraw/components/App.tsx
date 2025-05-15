@@ -128,7 +128,7 @@ import {
   refreshTextDimensions,
   deepCopyElement,
   duplicateElements,
-  isPointInElement,
+  isPointInShape,
   hasBoundTextElement,
   isArrowElement,
   isBindingElement,
@@ -5159,7 +5159,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       // if hitting the bounding box, return early
       // but if not, we should check for other cases as well (e.g. frame name)
-      if (isPointInElement(pointFrom(x, y), element)) {
+      if (isPointInShape(pointFrom(x, y), element)) {
         return true;
       }
     }

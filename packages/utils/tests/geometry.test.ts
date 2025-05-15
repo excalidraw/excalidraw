@@ -8,7 +8,14 @@ import {
   segmentsIntersectAt,
 } from "@excalidraw/math";
 
-import type { GlobalPoint, LineSegment, Polygon } from "@excalidraw/math";
+import type {
+  GlobalPoint,
+  LineSegment,
+  Polygon,
+  Radians,
+} from "@excalidraw/math";
+
+import { pointInEllipse, pointOnEllipse, type Ellipse } from "../src/shape";
 
 describe("point and line", () => {
   // const l: Line<GlobalPoint> = line(point(1, 0), point(1, 2));
@@ -64,56 +71,56 @@ describe("point and polygon", () => {
   });
 });
 
-// describe("point and ellipse", () => {
-//   const ellipse: Ellipse<GlobalPoint> = {
-//     center: pointFrom(0, 0),
-//     angle: 0 as Radians,
-//     halfWidth: 2,
-//     halfHeight: 1,
-//   };
+describe("point and ellipse", () => {
+  const ellipse: Ellipse<GlobalPoint> = {
+    center: pointFrom(0, 0),
+    angle: 0 as Radians,
+    halfWidth: 2,
+    halfHeight: 1,
+  };
 
-//   it("point on ellipse", () => {
-//     [
-//       pointFrom(0, 1),
-//       pointFrom(0, -1),
-//       pointFrom(2, 0),
-//       pointFrom(-2, 0),
-//     ].forEach((p) => {
-//       expect(pointOnEllipse(p, ellipse)).toBe(true);
-//     });
-//     expect(pointOnEllipse(pointFrom(-1.4, 0.7), ellipse, 0.1)).toBe(true);
-//     expect(pointOnEllipse(pointFrom(-1.4, 0.71), ellipse, 0.01)).toBe(true);
+  it("point on ellipse", () => {
+    [
+      pointFrom(0, 1),
+      pointFrom(0, -1),
+      pointFrom(2, 0),
+      pointFrom(-2, 0),
+    ].forEach((p) => {
+      expect(pointOnEllipse(p, ellipse)).toBe(true);
+    });
+    expect(pointOnEllipse(pointFrom(-1.4, 0.7), ellipse, 0.1)).toBe(true);
+    expect(pointOnEllipse(pointFrom(-1.4, 0.71), ellipse, 0.01)).toBe(true);
 
-//     expect(pointOnEllipse(pointFrom(1.4, 0.7), ellipse, 0.1)).toBe(true);
-//     expect(pointOnEllipse(pointFrom(1.4, 0.71), ellipse, 0.01)).toBe(true);
+    expect(pointOnEllipse(pointFrom(1.4, 0.7), ellipse, 0.1)).toBe(true);
+    expect(pointOnEllipse(pointFrom(1.4, 0.71), ellipse, 0.01)).toBe(true);
 
-//     expect(pointOnEllipse(pointFrom(1, -0.86), ellipse, 0.1)).toBe(true);
-//     expect(pointOnEllipse(pointFrom(1, -0.86), ellipse, 0.01)).toBe(true);
+    expect(pointOnEllipse(pointFrom(1, -0.86), ellipse, 0.1)).toBe(true);
+    expect(pointOnEllipse(pointFrom(1, -0.86), ellipse, 0.01)).toBe(true);
 
-//     expect(pointOnEllipse(pointFrom(-1, -0.86), ellipse, 0.1)).toBe(true);
-//     expect(pointOnEllipse(pointFrom(-1, -0.86), ellipse, 0.01)).toBe(true);
+    expect(pointOnEllipse(pointFrom(-1, -0.86), ellipse, 0.1)).toBe(true);
+    expect(pointOnEllipse(pointFrom(-1, -0.86), ellipse, 0.01)).toBe(true);
 
-//     expect(pointOnEllipse(pointFrom(-1, 0.8), ellipse)).toBe(false);
-//     expect(pointOnEllipse(pointFrom(1, -0.8), ellipse)).toBe(false);
-//   });
+    expect(pointOnEllipse(pointFrom(-1, 0.8), ellipse)).toBe(false);
+    expect(pointOnEllipse(pointFrom(1, -0.8), ellipse)).toBe(false);
+  });
 
-//   it("point in ellipse", () => {
-//     [
-//       pointFrom(0, 1),
-//       pointFrom(0, -1),
-//       pointFrom(2, 0),
-//       pointFrom(-2, 0),
-//     ].forEach((p) => {
-//       expect(pointInEllipse(p, ellipse)).toBe(true);
-//     });
+  it("point in ellipse", () => {
+    [
+      pointFrom(0, 1),
+      pointFrom(0, -1),
+      pointFrom(2, 0),
+      pointFrom(-2, 0),
+    ].forEach((p) => {
+      expect(pointInEllipse(p, ellipse)).toBe(true);
+    });
 
-//     expect(pointInEllipse(pointFrom(-1, 0.8), ellipse)).toBe(true);
-//     expect(pointInEllipse(pointFrom(1, -0.8), ellipse)).toBe(true);
+    expect(pointInEllipse(pointFrom(-1, 0.8), ellipse)).toBe(true);
+    expect(pointInEllipse(pointFrom(1, -0.8), ellipse)).toBe(true);
 
-//     expect(pointInEllipse(pointFrom(-1, 1), ellipse)).toBe(false);
-//     expect(pointInEllipse(pointFrom(-1.4, 0.8), ellipse)).toBe(false);
-//   });
-// });
+    expect(pointInEllipse(pointFrom(-1, 1), ellipse)).toBe(false);
+    expect(pointInEllipse(pointFrom(-1.4, 0.8), ellipse)).toBe(false);
+  });
+});
 
 describe("line and line", () => {
   const lineA: LineSegment<GlobalPoint> = lineSegment(

@@ -18,10 +18,10 @@ import type {
 } from "@excalidraw/math";
 
 import {
-  deconstructDiamondElementForCollision,
-  deconstructLinearOrFreeDrawElementForCollision,
-  deconstructRectanguloidElementForCollision,
-} from "./collision";
+  deconstructDiamondElement,
+  deconstructLinearOrFreeDrawElement,
+  deconstructRectanguloidElement,
+} from "./utils";
 
 import type {
   ExcalidrawDiamondElement,
@@ -75,7 +75,7 @@ const distanceToRectanguloidElement = (
   const rotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
 
   // Get the element's building components we can test against
-  const [sides, corners] = deconstructRectanguloidElementForCollision(element);
+  const [sides, corners] = deconstructRectanguloidElement(element);
 
   return Math.min(
     ...sides.map((s) => distanceToLineSegment(rotatedPoint, s)),
@@ -103,7 +103,7 @@ const distanceToDiamondElement = (
   // points. It's all the same distance-wise.
   const rotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
 
-  const [sides, curves] = deconstructDiamondElementForCollision(element);
+  const [sides, curves] = deconstructDiamondElement(element);
 
   return Math.min(
     ...sides.map((s) => distanceToLineSegment(rotatedPoint, s)),
@@ -137,7 +137,7 @@ const distanceToLinearOrFreeDraElement = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   p: GlobalPoint,
 ) => {
-  const shapes = deconstructLinearOrFreeDrawElementForCollision(element);
+  const shapes = deconstructLinearOrFreeDrawElement(element);
   let distance = Infinity;
 
   for (const shape of shapes) {
