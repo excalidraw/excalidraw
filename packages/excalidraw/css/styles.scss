@@ -765,3 +765,8 @@ body.excalidraw-cursor-resize * {
     font-family: "Assistant";
   }
 }
+
+.FixedSideContainer_side_top {
+  top: calc(var(--app-menu-location-y, 0px) + 99px) !important;
+}
+
