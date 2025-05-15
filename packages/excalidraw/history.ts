@@ -5,7 +5,7 @@ import {
   StoreChange,
   StoreDelta,
   type Store,
-} from "@excalidraw/element/store";
+} from "@excalidraw/element";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
 

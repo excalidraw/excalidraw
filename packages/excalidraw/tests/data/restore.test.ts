@@ -3,8 +3,8 @@ import { vi } from "vitest";
 
 import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "@excalidraw/common";
 
-import { newElementWith } from "@excalidraw/element/mutateElement";
-import * as sizeHelpers from "@excalidraw/element/sizeHelpers";
+import { newElementWith } from "@excalidraw/element";
+import * as sizeHelpers from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,

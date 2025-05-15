@@ -1,10 +1,10 @@
-import { isEmbeddableElement } from "@excalidraw/element/typeChecks";
+import { isEmbeddableElement } from "@excalidraw/element";
 
 import { KEYS, getShortcutKey } from "@excalidraw/common";
 
 import { useContext } from "react";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import { ToolButton } from "../components/ToolButton";
 import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";

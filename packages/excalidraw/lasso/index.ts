@@ -4,20 +4,20 @@ import {
   pointFrom,
 } from "@excalidraw/math";
 
-import { getElementLineSegments } from "@excalidraw/element/bounds";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { getElementLineSegments } from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
 import {
   isFrameLikeElement,
   isLinearElement,
   isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
-import { getFrameChildren } from "@excalidraw/element/frame";
-import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
+import { getFrameChildren } from "@excalidraw/element";
+import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
-import { getContainerElement } from "@excalidraw/element/textElement";
+import { getContainerElement } from "@excalidraw/element";
 
-import { arrayToMap, easeOut } from "@excalidraw/common";
+import { arrayToMap, easeOut, isShallowEqual } from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
@@ -33,11 +33,18 @@ import { getLassoSelectedElementIds } from "./utils";
 
 import type App from "../components/App";
 
+type CanvasTranslate = {
+  scrollX: number;
+  scrollY: number;
+  zoom: number;
+};
+
 export class LassoTrail extends AnimatedTrail {
   private intersectedElements: Set<ExcalidrawElement["id"]> = new Set();
   private enclosedElements: Set<ExcalidrawElement["id"]> = new Set();
   private elementsSegments: Map<string, LineSegment<GlobalPoint>[]> | null =
     null;
+  private canvasTranslate: CanvasTranslate | null = null;
   private keepPreviousSelection: boolean = false;
 
   constructor(animationFrameHandler: AnimationFrameHandler, app: App) {
@@ -169,7 +176,17 @@ export class LassoTrail extends AnimatedTrail {
       .getCurrentTrail()
       ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1]));
 
-    if (!this.elementsSegments) {
+    const currentCanvasTranslate: CanvasTranslate = {
+      scrollX: this.app.state.scrollX,
+      scrollY: this.app.state.scrollY,
+      zoom: this.app.state.zoom.value,
+    };
+
+    if (
+      !this.elementsSegments ||
+      !isShallowEqual(currentCanvasTranslate, this.canvasTranslate ?? {})
+    ) {
+      this.canvasTranslate = currentCanvasTranslate;
       this.elementsSegments = new Map();
       const visibleElementsMap = arrayToMap(this.app.visibleElements);
       for (const element of this.app.visibleElements) {

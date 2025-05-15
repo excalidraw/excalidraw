@@ -10,16 +10,13 @@ import {
 
 import { EVENT, HYPERLINK_TOOLTIP_DELAY, KEYS } from "@excalidraw/common";
 
-import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+import { getElementAbsoluteCoords } from "@excalidraw/element";
 
-import { hitElementBoundingBox } from "@excalidraw/element/collision";
+import { hitElementBoundingBox } from "@excalidraw/element";
 
-import { isElementLink } from "@excalidraw/element/elementLink";
+import { isElementLink } from "@excalidraw/element";
 
-import {
-  getEmbedLink,
-  embeddableURLValidator,
-} from "@excalidraw/element/embeddable";
+import { getEmbedLink, embeddableURLValidator } from "@excalidraw/element";
 
 import {
   sceneCoordsToViewportCoords,
@@ -29,9 +26,9 @@ import {
   normalizeLink,
 } from "@excalidraw/common";
 
-import { isEmbeddableElement } from "@excalidraw/element/typeChecks";
+import { isEmbeddableElement } from "@excalidraw/element";
 
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 
 import type {
   ElementsMap,

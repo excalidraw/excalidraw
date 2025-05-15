@@ -15,48 +15,42 @@ import {
   throttleRAF,
 } from "@excalidraw/common";
 
-import {
-  FIXED_BINDING_DISTANCE,
-  maxBindingGap,
-} from "@excalidraw/element/binding";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { FIXED_BINDING_DISTANCE, maxBindingGap } from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
 import {
   getOmitSidesForDevice,
   getTransformHandles,
   getTransformHandlesFromCoords,
   shouldShowBoundingBox,
-} from "@excalidraw/element/transformHandles";
+} from "@excalidraw/element";
 import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
   isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
-import { renderSelectionElement } from "@excalidraw/element/renderElement";
+import { renderSelectionElement } from "@excalidraw/element";
 
 import {
   getElementsInGroup,
   getSelectedGroupIds,
   isSelectedViaGroup,
   selectGroupsFromGivenElements,
-} from "@excalidraw/element/groups";
+} from "@excalidraw/element";
 
-import {
-  getCommonBounds,
-  getElementAbsoluteCoords,
-} from "@excalidraw/element/bounds";
+import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   SuggestedBinding,
   SuggestedPointBinding,
-} from "@excalidraw/element/binding";
+} from "@excalidraw/element";
 
 import type {
   TransformHandles,
   TransformHandleType,
-} from "@excalidraw/element/transformHandles";
+} from "@excalidraw/element";
 
 import type {
   ElementsMap,
@@ -1040,10 +1034,10 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
-  appState.searchMatches.forEach(({ id, focus, matchedLines }) => {
+  appState.searchMatches?.matches.forEach(({ id, focus, matchedLines }) => {
     const element = elementsMap.get(id);
 
-    if (element && isTextElement(element)) {
+    if (element) {
       const [elementX1, elementY1, , , cx, cy] = getElementAbsoluteCoords(
         element,
         elementsMap,
@@ -1063,17 +1057,20 @@ const _renderInteractiveScene = ({
         context.fillStyle = "rgba(99, 52, 0, 0.4)";
       }
 
+      const zoomFactor = isFrameLikeElement(element) ? appState.zoom.value : 1;
+
       context.translate(appState.scrollX, appState.scrollY);
       context.translate(cx, cy);
       context.rotate(element.angle);
 
       matchedLines.forEach((matchedLine) => {
-        context.fillRect(
-          elementX1 + matchedLine.offsetX - cx,
-          elementY1 + matchedLine.offsetY - cy,
-          matchedLine.width,
-          matchedLine.height,
-        );
+        (matchedLine.showOnCanvas || focus) &&
+          context.fillRect(
+            elementX1 + matchedLine.offsetX / zoomFactor - cx,
+            elementY1 + matchedLine.offsetY / zoomFactor - cy,
+            matchedLine.width / zoomFactor,
+            matchedLine.height / zoomFactor,
+          );
       });
 
       context.restore();

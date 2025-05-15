@@ -11,7 +11,7 @@ import {
 import {
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
-} from "@excalidraw/element/textElement";
+} from "@excalidraw/element";
 
 import {
   hasBoundTextElement,
@@ -19,14 +19,14 @@ import {
   isImageElement,
   isLinearElement,
   isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
 import {
   canChangeBlur,
   canChangeLayer,
   hasStrokeColor,
   toolIsArrow,
-} from "@excalidraw/element/comparisons";
+} from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,

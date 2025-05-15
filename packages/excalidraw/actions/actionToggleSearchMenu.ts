@@ -5,7 +5,7 @@ import {
   DEFAULT_SIDEBAR,
 } from "@excalidraw/common";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import { searchIcon } from "../components/icons";
 
@@ -33,13 +33,6 @@ export const actionToggleSearchMenu = register({
         app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
           `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
         );
-
-      if (searchInput?.matches(":focus")) {
-        return {
-          appState: { ...appState, openSidebar: null },
-          captureUpdate: CaptureUpdateAction.EVENTUALLY,
-        };
-      }
 
       searchInput?.focus();
       searchInput?.select();

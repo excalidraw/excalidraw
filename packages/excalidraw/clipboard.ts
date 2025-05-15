@@ -7,14 +7,14 @@ import {
   isPromiseLike,
 } from "@excalidraw/common";
 
-import { mutateElement } from "@excalidraw/element/mutateElement";
-import { deepCopyElement } from "@excalidraw/element/duplicate";
+import { mutateElement } from "@excalidraw/element";
+import { deepCopyElement } from "@excalidraw/element";
 import {
   isFrameLikeElement,
   isInitializedImageElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
-import { getContainingFrame } from "@excalidraw/element/frame";
+import { getContainingFrame } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,

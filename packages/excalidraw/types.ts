@@ -9,11 +9,11 @@ import type {
   ColorTuple,
 } from "@excalidraw/common";
 
-import type { SuggestedBinding } from "@excalidraw/element/binding";
+import type { SuggestedBinding } from "@excalidraw/element";
 
-import type { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import type { LinearElementEditor } from "@excalidraw/element";
 
-import type { MaybeTransformHandleType } from "@excalidraw/element/transformHandles";
+import type { MaybeTransformHandleType } from "@excalidraw/element";
 
 import type {
   PointerType,
@@ -51,7 +51,7 @@ import type {
   CaptureUpdateActionType,
   DurableIncrement,
   EphemeralIncrement,
-} from "@excalidraw/element/store";
+} from "@excalidraw/element";
 
 import type { ColorPickerType } from "./components/ColorPicker/colorPickerUtils";
 
@@ -443,10 +443,14 @@ export interface AppState {
   isCropping: boolean;
   croppingElementId: ExcalidrawElement["id"] | null;
 
-  searchMatches: readonly SearchMatch[];
+  /** null if no search matches found / search closed */
+  searchMatches: Readonly<{
+    focusedId: ExcalidrawElement["id"] | null;
+    matches: readonly SearchMatch[];
+  }> | null;
 }
 
-type SearchMatch = {
+export type SearchMatch = {
   id: string;
   focus: boolean;
   matchedLines: {
@@ -454,6 +458,7 @@ type SearchMatch = {
     offsetY: number;
     width: number;
     height: number;
+    showOnCanvas: boolean;
   }[];
 };
 
@@ -549,7 +554,10 @@ export interface ExcalidrawPropsCustomOptions {
     menuRender?: (props: { children: React.ReactNode }) => React.ReactNode;
   };
   pickerRenders?: {
-    ButtonList?: React.ComponentType<{ children: React.ReactNode; className?: string }>;
+    ButtonList?: React.ComponentType<{
+      children: React.ReactNode;
+      className?: string;
+    }>;
     elementStrokeColors?: ColorTuple;
     elementBackgroundColors?: ColorTuple;
     buttonIconSelectRender?: <T extends Object>(
@@ -595,7 +603,7 @@ export interface ExcalidrawPropsCustomOptions {
       key: string;
     }) => React.ReactNode;
     colorPickerPopoverRender?: (props: {
-      color: string;
+      color: string | null;
       label: string;
       type: ColorPickerType;
       onChange: (color: string) => void;

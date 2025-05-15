@@ -5,11 +5,11 @@ import {
   moveOneRight,
   moveAllLeft,
   moveAllRight,
-} from "@excalidraw/element/zindex";
+} from "@excalidraw/element";
 
 import { useContext } from "react";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import {
   BringForwardIcon,

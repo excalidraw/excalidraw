@@ -2,9 +2,9 @@ import { KEYS } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
 
-import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeActions";
+import { showSelectedShapeActions } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element/store";
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import { ToolButton } from "../components/ToolButton";
 import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
