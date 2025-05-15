@@ -1,10 +1,10 @@
 import { arrayToMap, easeOut, THEME } from "@excalidraw/common";
-import { getElementLineSegments, isPointInShape } from "@excalidraw/element";
 import {
-  lineSegment,
-  lineSegmentIntersectionPoints,
-  pointFrom,
-} from "@excalidraw/math";
+  getBoundTextElement,
+  intersectElementWithLineSegment,
+  isPointInElement,
+} from "@excalidraw/element";
+import { lineSegment, pointFrom } from "@excalidraw/math";
 
 import { getElementsInGroup } from "@excalidraw/element";
 
@@ -12,12 +12,7 @@ import { shouldTestInside } from "@excalidraw/element";
 import { hasBoundTextElement, isBoundToContainer } from "@excalidraw/element";
 import { getBoundTextElementId } from "@excalidraw/element";
 
-import type { GeometricShape } from "@excalidraw/utils/shape";
-import type {
-  ElementsSegmentsMap,
-  GlobalPoint,
-  LineSegment,
-} from "@excalidraw/math/types";
+import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import { AnimatedTrail } from "../animated-trail";
@@ -33,8 +28,6 @@ export class EraserTrail extends AnimatedTrail {
   private elementsToErase: Set<ExcalidrawElement["id"]> = new Set();
   private groupsToErase: Set<ExcalidrawElement["id"]> = new Set();
   private segmentsCache: Map<string, LineSegment<GlobalPoint>[]> = new Map();
-  private geometricShapesCache: Map<string, GeometricShape<GlobalPoint>> =
-    new Map();
 
   constructor(animationFrameHandler: AnimationFrameHandler, app: App) {
     super(animationFrameHandler, app, {
@@ -110,8 +103,6 @@ export class EraserTrail extends AnimatedTrail {
         const intersects = eraserTest(
           pathSegments,
           element,
-          this.segmentsCache,
-          this.geometricShapesCache,
           candidateElementsMap,
           this.app,
         );
@@ -148,8 +139,6 @@ export class EraserTrail extends AnimatedTrail {
         const intersects = eraserTest(
           pathSegments,
           element,
-          this.segmentsCache,
-          this.geometricShapesCache,
           candidateElementsMap,
           this.app,
         );
@@ -201,31 +190,23 @@ export class EraserTrail extends AnimatedTrail {
 const eraserTest = (
   pathSegments: LineSegment<GlobalPoint>[],
   element: ExcalidrawElement,
-  elementsSegments: ElementsSegmentsMap,
-  shapesCache: Map<string, GeometricShape<GlobalPoint>>,
   elementsMap: ElementsMap,
   app: App,
 ): boolean => {
   const lastPoint = pathSegments[pathSegments.length - 1][1];
-  if (shouldTestInside(element) && isPointInShape(lastPoint, element)) {
+  if (shouldTestInside(element) && isPointInElement(lastPoint, element)) {
     return true;
   }
 
-  let elementSegments = elementsSegments.get(element.id);
+  const offset = app.getElementHitThreshold();
+  const boundTextElement = getBoundTextElement(element, elementsMap);
 
-  if (!elementSegments) {
-    elementSegments = getElementLineSegments(element, elementsMap);
-    elementsSegments.set(element.id, elementSegments);
-  }
-
-  return pathSegments.some((pathSegment) =>
-    elementSegments?.some(
-      (elementSegment) =>
-        lineSegmentIntersectionPoints(
-          pathSegment,
-          elementSegment,
-          app.getElementHitThreshold(),
-        ) !== null,
-    ),
+  return pathSegments.some(
+    (pathSegment) =>
+      intersectElementWithLineSegment(element, pathSegment, offset).length >
+        0 ||
+      (boundTextElement &&
+        intersectElementWithLineSegment(boundTextElement, pathSegment, offset)
+          .length > 0),
   );
 };

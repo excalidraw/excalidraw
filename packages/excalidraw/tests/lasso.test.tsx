@@ -22,7 +22,7 @@ import {
   type ElementsSegmentsMap,
 } from "@excalidraw/math";
 
-import { getElementLineSegments } from "@excalidraw/element";
+import { approximateElementWithLineSegments } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -56,7 +56,7 @@ const updatePath = (startPoint: GlobalPoint, points: LocalPoint[]) => {
 
     const elementsSegments: ElementsSegmentsMap = new Map();
     for (const element of h.elements) {
-      const segments = getElementLineSegments(
+      const segments = approximateElementWithLineSegments(
         element,
         h.app.scene.getElementsMapIncludingDeleted(),
       );

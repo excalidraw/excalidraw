@@ -17,118 +17,23 @@ import {
   type GlobalPoint,
   type LocalPoint,
 } from "@excalidraw/math";
-import {
-  getClosedCurveShape,
-  getCurvePathOps,
-  getCurveShape,
-  getEllipseShape,
-  getFreedrawShape,
-  getPolygonShape,
-  type GeometricShape,
-} from "@excalidraw/utils/shape";
 
 import type { NormalizedZoomValue, Zoom } from "@excalidraw/excalidraw/types";
 
-import { shouldTestInside } from "./collision";
-import { LinearElementEditor } from "./linearElementEditor";
-import { getBoundTextElement } from "./textElement";
 import { ShapeCache } from "./ShapeCache";
 
-import { getElementAbsoluteCoords, type Bounds } from "./bounds";
+import { getCurvePathOps } from "./utils";
+
+import type { Bounds } from "./bounds";
 
 import { canBecomePolygon } from "./typeChecks";
 
 import type {
-  ElementsMap,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawLineElement,
   NonDeleted,
 } from "./types";
-
-/**
- * get the pure geometric shape of an excalidraw elementw
- * which is then used for hit detection
- */
-export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
-  element: ExcalidrawElement,
-  elementsMap: ElementsMap,
-): GeometricShape<Point> => {
-  switch (element.type) {
-    case "rectangle":
-    case "diamond":
-    case "frame":
-    case "magicframe":
-    case "embeddable":
-    case "image":
-    case "iframe":
-    case "text":
-    case "selection":
-      return getPolygonShape(element);
-    case "arrow":
-    case "line": {
-      const roughShape =
-        ShapeCache.get(element)?.[0] ??
-        ShapeCache.generateElementShape(element, null)[0];
-      const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
-
-      return shouldTestInside(element)
-        ? getClosedCurveShape<Point>(
-            element,
-            roughShape,
-            pointFrom<Point>(element.x, element.y),
-            element.angle,
-            pointFrom(cx, cy),
-          )
-        : getCurveShape<Point>(
-            roughShape,
-            pointFrom<Point>(element.x, element.y),
-            element.angle,
-            pointFrom(cx, cy),
-          );
-    }
-
-    case "ellipse":
-      return getEllipseShape(element);
-
-    case "freedraw": {
-      const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
-      return getFreedrawShape(
-        element,
-        pointFrom(cx, cy),
-        shouldTestInside(element),
-      );
-    }
-  }
-};
-
-export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
-  element: ExcalidrawElement,
-  elementsMap: ElementsMap,
-): GeometricShape<Point> | null => {
-  const boundTextElement = getBoundTextElement(element, elementsMap);
-
-  if (boundTextElement) {
-    if (element.type === "arrow") {
-      return getElementShape(
-        {
-          ...boundTextElement,
-          // arrow's bound text accurate position is not stored in the element's property
-          // but rather calculated and returned from the following static method
-          ...LinearElementEditor.getBoundTextElementPosition(
-            element,
-            boundTextElement,
-            elementsMap,
-          ),
-        },
-        elementsMap,
-      );
-    }
-    return getElementShape(boundTextElement, elementsMap);
-  }
-
-  return null;
-};
 
 export const getControlPointsForBezierCurve = <
   P extends GlobalPoint | LocalPoint,

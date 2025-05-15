@@ -13,11 +13,12 @@ import type {
   LineSegment,
 } from "@excalidraw/math/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
+import { intersectElementWithLineSegment } from "@excalidraw/element";
+import App from "../components/App";
 
 export const getLassoSelectedElementIds = (input: {
   lassoPath: GlobalPoint[];
   elements: readonly ExcalidrawElement[];
-  elementsSegments: ElementsSegmentsMap;
   intersectedElements: Set<ExcalidrawElement["id"]>;
   enclosedElements: Set<ExcalidrawElement["id"]>;
   simplifyDistance?: number;
@@ -27,7 +28,6 @@ export const getLassoSelectedElementIds = (input: {
   const {
     lassoPath,
     elements,
-    elementsSegments,
     intersectedElements,
     enclosedElements,
     simplifyDistance,
@@ -49,7 +49,7 @@ export const getLassoSelectedElementIds = (input: {
       if (enclosed) {
         enclosedElements.add(element.id);
       } else {
-        const intersects = intersectionTest(path, element, elementsSegments);
+        const intersects = intersectionTest(path, element, app);
         if (intersects) {
           intersectedElements.add(element.id);
         }
@@ -67,13 +67,13 @@ export const getLassoSelectedElementIds = (input: {
 const enclosureTest = (
   lassoPath: GlobalPoint[],
   element: ExcalidrawElement,
-  elementsSegments: ElementsSegmentsMap,
+  app: App,
 ): boolean => {
-  const lassoPolygon = polygonFromPoints(lassoPath);
-  const segments = elementsSegments.get(element.id);
-  if (!segments) {
-    return false;
-  }
+  const lassoSegments = lassoPath
+    .slice(1)
+    .map((point, index) => lineSegment(lassoPath[index], point))
+    .concat(lineSegment(lassoPath[lassoPath.length - 1], lassoPath[0]));
+  const offset = app.getElementHitThreshold();
 
   return segments.some((segment) => {
     return segment.some((point) =>
@@ -85,26 +85,15 @@ const enclosureTest = (
 const intersectionTest = (
   lassoPath: GlobalPoint[],
   element: ExcalidrawElement,
-  elementsSegments: ElementsSegmentsMap,
+  app: App,
 ): boolean => {
-  const elementSegments = elementsSegments.get(element.id);
-  if (!elementSegments) {
-    return false;
-  }
-
-  const lassoSegments = lassoPath.reduce((acc, point, index) => {
-    if (index === 0) {
-      return acc;
-    }
-    acc.push(lineSegment(lassoPath[index - 1], point));
-    return acc;
-  }, [] as LineSegment<GlobalPoint>[]);
+  const lassoSegments = lassoPath
+    .slice(1)
+    .map((point, index) => lineSegment(lassoPath[index], point))
+    .concat(lineSegment(lassoPath[lassoPath.length - 1], lassoPath[0]));
+  const offset = app.getElementHitThreshold();
 
   return lassoSegments.some((lassoSegment) =>
-    elementSegments.some(
-      (elementSegment) =>
-        // introduce a bit of tolerance to account for roughness and simplification of paths
-        lineSegmentIntersectionPoints(lassoSegment, elementSegment, 1) !== null,
-    ),
+    intersectElementWithLineSegment(element, lassoSegment, offset),
   );
 };

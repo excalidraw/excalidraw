@@ -4,7 +4,7 @@ import {
   pointFrom,
 } from "@excalidraw/math";
 
-import { getElementLineSegments } from "@excalidraw/element";
+import { approximateElementWithLineSegments } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
 import {
   isFrameLikeElement,
@@ -190,7 +190,10 @@ export class LassoTrail extends AnimatedTrail {
       this.elementsSegments = new Map();
       const visibleElementsMap = arrayToMap(this.app.visibleElements);
       for (const element of this.app.visibleElements) {
-        const segments = getElementLineSegments(element, visibleElementsMap);
+        const segments = approximateElementWithLineSegments(
+          element,
+          visibleElementsMap,
+        );
         this.elementsSegments.set(element.id, segments);
       }
     }
