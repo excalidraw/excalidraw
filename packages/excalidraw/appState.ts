@@ -125,7 +125,7 @@ export const getDefaultAppState = (): Omit<
     followedBy: new Set(),
     isCropping: false,
     croppingElementId: null,
-    searchMatches: [],
+    searchMatches: null,
   };
 };
 

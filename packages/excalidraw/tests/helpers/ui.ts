@@ -1,11 +1,7 @@
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
-import {
-  getCommonBounds,
-  getElementPointsCoords,
-} from "@excalidraw/element/bounds";
-import { cropElement } from "@excalidraw/element/cropElement";
-import { mutateElement } from "@excalidraw/element/mutateElement";
+import { getCommonBounds, getElementPointsCoords } from "@excalidraw/element";
+import { cropElement } from "@excalidraw/element";
 import {
   getTransformHandles,
   getTransformHandlesFromCoords,
@@ -13,18 +9,18 @@ import {
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   type TransformHandle,
   type TransformHandleDirection,
-} from "@excalidraw/element/transformHandles";
+} from "@excalidraw/element";
 import {
   isLinearElement,
   isFreeDrawElement,
   isTextElement,
   isFrameLikeElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 import { KEYS, arrayToMap, elementCenterPoint } from "@excalidraw/common";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 
-import type { TransformHandleType } from "@excalidraw/element/transformHandles";
+import type { TransformHandleType } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -526,7 +522,7 @@ export class UI {
 
     if (angle !== 0) {
       act(() => {
-        mutateElement(origElement, { angle });
+        h.app.scene.mutateElement(origElement, { angle });
       });
     }
 

@@ -1,5 +1,5 @@
-import { isElementInViewport } from "@excalidraw/element/sizeHelpers";
-import { isImageElement } from "@excalidraw/element/typeChecks";
+import { isElementInViewport } from "@excalidraw/element";
+import { isImageElement } from "@excalidraw/element";
 
 import { memoize, toBrandedType } from "@excalidraw/common";
 
@@ -9,10 +9,11 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
+import type { Scene } from "@excalidraw/element";
+
 import { renderInteractiveSceneThrottled } from "../renderer/interactiveScene";
 import { renderStaticSceneThrottled } from "../renderer/staticScene";
 
-import type Scene from "./Scene";
 import type { RenderableElementsMap } from "./types";
 
 import type { AppState } from "../types";

@@ -1,25 +1,26 @@
 import { getNonDeletedElements } from "@excalidraw/element";
-import { mutateElement } from "@excalidraw/element/mutateElement";
-import { newFrameElement } from "@excalidraw/element/newElement";
-import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import { mutateElement } from "@excalidraw/element";
+import { newFrameElement } from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element";
 import {
   addElementsToFrame,
   removeAllElementsFromFrame,
-} from "@excalidraw/element/frame";
-import { getFrameChildren } from "@excalidraw/element/frame";
+} from "@excalidraw/element";
+import { getFrameChildren } from "@excalidraw/element";
 
 import { KEYS, updateActiveTool } from "@excalidraw/common";
 
-import { getElementsInGroup } from "@excalidraw/element/groups";
+import { getElementsInGroup } from "@excalidraw/element";
 
-import { getCommonBounds } from "@excalidraw/element/bounds";
+import { getCommonBounds } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { setCursorForShape } from "../cursor";
 import { frameToolIcon } from "../components/icons";
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
@@ -173,11 +174,9 @@ export const actionWrapSelectionInFrame = register({
   },
   perform: (elements, appState, _, app) => {
     const selectedElements = getSelectedElements(elements, appState);
+    const elementsMap = app.scene.getNonDeletedElementsMap();
 
-    const [x1, y1, x2, y2] = getCommonBounds(
-      selectedElements,
-      app.scene.getNonDeletedElementsMap(),
-    );
+    const [x1, y1, x2, y2] = getCommonBounds(selectedElements, elementsMap);
     const PADDING = 16;
     const frame = newFrameElement({
       x: x1 - PADDING,
@@ -196,13 +195,9 @@ export const actionWrapSelectionInFrame = register({
       for (const elementInGroup of elementsInGroup) {
         const index = elementInGroup.groupIds.indexOf(appState.editingGroupId);
 
-        mutateElement(
-          elementInGroup,
-          {
-            groupIds: elementInGroup.groupIds.slice(0, index),
-          },
-          false,
-        );
+        mutateElement(elementInGroup, elementsMap, {
+          groupIds: elementInGroup.groupIds.slice(0, index),
+        });
       }
     }
 

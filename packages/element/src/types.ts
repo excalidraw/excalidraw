@@ -296,6 +296,11 @@ export type FixedPointBinding = Merge<
   }
 >;
 
+export type PointsPositionUpdates = Map<
+  number,
+  { point: LocalPoint; isDragging?: boolean }
+>;
+
 export type Arrowhead =
   | "arrow"
   | "bar"
@@ -414,3 +419,12 @@ export type ElementsMapOrArray =
   | Readonly<ElementsMap>;
 
 export type ArrangeAlgorithms = "bin-packing"; // Add more here if required
+export type ExcalidrawLinearElementSubType =
+  | "line"
+  | "sharpArrow"
+  | "curvedArrow"
+  | "elbowArrow";
+
+export type ConvertibleGenericTypes = "rectangle" | "diamond" | "ellipse";
+export type ConvertibleLinearTypes = ExcalidrawLinearElementSubType;
+export type ConvertibleTypes = ConvertibleGenericTypes | ConvertibleLinearTypes;

@@ -6,21 +6,22 @@ import {
   toBrandedType,
   isDevEnv,
   isTestEnv,
-  isReadonlyArray,
+  toArray,
 } from "@excalidraw/common";
 import { isNonDeletedElement } from "@excalidraw/element";
-import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
-import { getElementsInGroup } from "@excalidraw/element/groups";
+import { isFrameLikeElement } from "@excalidraw/element";
+import { getElementsInGroup } from "@excalidraw/element";
 
 import {
   syncInvalidIndices,
   syncMovedIndices,
   validateFractionalIndices,
-} from "@excalidraw/element/fractionalIndex";
+} from "@excalidraw/element";
 
-import { getSelectedElements } from "@excalidraw/element/selection";
+import { getSelectedElements } from "@excalidraw/element";
 
-import type { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { mutateElement, type ElementUpdate } from "@excalidraw/element";
+
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -33,12 +34,13 @@ import type {
   Ordered,
 } from "@excalidraw/element/types";
 
-import type { Assert, SameType } from "@excalidraw/common/utility-types";
+import type {
+  Assert,
+  Mutable,
+  SameType,
+} from "@excalidraw/common/utility-types";
 
-import type { AppState } from "../types";
-
-type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
-type ElementKey = ExcalidrawElement | ElementIdKey;
+import type { AppState } from "../../excalidraw/types";
 
 type SceneStateCallback = () => void;
 type SceneStateCallbackRemover = () => void;
@@ -103,44 +105,7 @@ const hashSelectionOpts = (
 // in our codebase
 export type ExcalidrawElementsIncludingDeleted = readonly ExcalidrawElement[];
 
-const isIdKey = (elementKey: ElementKey): elementKey is ElementIdKey => {
-  if (typeof elementKey === "string") {
-    return true;
-  }
-  return false;
-};
-
-class Scene {
-  // ---------------------------------------------------------------------------
-  // static methods/props
-  // ---------------------------------------------------------------------------
-
-  private static sceneMapByElement = new WeakMap<ExcalidrawElement, Scene>();
-  private static sceneMapById = new Map<string, Scene>();
-
-  static mapElementToScene(elementKey: ElementKey, scene: Scene) {
-    if (isIdKey(elementKey)) {
-      // for cases where we don't have access to the element object
-      // (e.g. restore serialized appState with id references)
-      this.sceneMapById.set(elementKey, scene);
-    } else {
-      this.sceneMapByElement.set(elementKey, scene);
-      // if mapping element objects, also cache the id string when later
-      // looking up by id alone
-      this.sceneMapById.set(elementKey.id, scene);
-    }
-  }
-
-  /**
-   * @deprecated pass down `app.scene` and use it directly
-   */
-  static getScene(elementKey: ElementKey): Scene | null {
-    if (isIdKey(elementKey)) {
-      return this.sceneMapById.get(elementKey) || null;
-    }
-    return this.sceneMapByElement.get(elementKey) || null;
-  }
-
+export class Scene {
   // ---------------------------------------------------------------------------
   // instance methods/props
   // ---------------------------------------------------------------------------
@@ -197,6 +162,12 @@ class Scene {
 
   getFramesIncludingDeleted() {
     return this.frames;
+  }
+
+  constructor(elements: ElementsMapOrArray | null = null) {
+    if (elements) {
+      this.replaceAllElements(elements);
+    }
   }
 
   getSelectedElements(opts: {
@@ -293,9 +264,8 @@ class Scene {
   }
 
   replaceAllElements(nextElements: ElementsMapOrArray) {
-    const _nextElements = isReadonlyArray(nextElements)
-      ? nextElements
-      : Array.from(nextElements.values());
+    // we do trust the insertion order on the map, though maybe we shouldn't and should prefer order defined by fractional indices
+    const _nextElements = toArray(nextElements);
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
 
     validateIndicesThrottled(_nextElements);
@@ -307,7 +277,6 @@ class Scene {
         nextFrameLikes.push(element);
       }
       this.elementsMap.set(element.id, element);
-      Scene.mapElementToScene(element, this);
     });
     const nonDeletedElements = getNonDeletedElements(this.elements);
     this.nonDeletedElements = nonDeletedElements.elements;
@@ -351,12 +320,6 @@ class Scene {
     this.selectedElementsCache.selectedElementIds = null;
     this.selectedElementsCache.elements = null;
     this.selectedElementsCache.cache.clear();
-
-    Scene.sceneMapById.forEach((scene, elementKey) => {
-      if (scene === this) {
-        Scene.sceneMapById.delete(elementKey);
-      }
-    });
 
     // done not for memory leaks, but to guard against possible late fires
     // (I guess?)
@@ -454,6 +417,40 @@ class Scene {
     // then, check if the id is a group
     return getElementsInGroup(elementsMap, id);
   };
-}
 
-export default Scene;
+  // Mutate an element with passed updates and trigger the component to update. Make sure you
+  // are calling it either from a React event handler or within unstable_batchedUpdates().
+  mutateElement<TElement extends Mutable<ExcalidrawElement>>(
+    element: TElement,
+    updates: ElementUpdate<TElement>,
+    options: {
+      informMutation: boolean;
+      isDragging: boolean;
+    } = {
+      informMutation: true,
+      isDragging: false,
+    },
+  ) {
+    const elementsMap = this.getNonDeletedElementsMap();
+
+    const { version: prevVersion } = element;
+    const { version: nextVersion } = mutateElement(
+      element,
+      elementsMap,
+      updates,
+      options,
+    );
+
+    if (
+      // skip if the element is not in the scene (i.e. selection)
+      this.elementsMap.has(element.id) &&
+      // skip if the element's version hasn't changed, as mutateElement returned the same element
+      prevVersion !== nextVersion &&
+      options.informMutation
+    ) {
+      this.triggerUpdate();
+    }
+
+    return element;
+  }
+}

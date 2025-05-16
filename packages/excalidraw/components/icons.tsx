@@ -580,6 +580,14 @@ export const bucketFillIcon = createIcon(
   tablerIconProps,
 );
 
+// simple / icon
+export const slashIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path d="M6 18l12 -12" />
+  </g>,
+  tablerIconProps,
+);
+
 export const ExportImageIcon = createIcon(
   <g strokeWidth="1.25">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>

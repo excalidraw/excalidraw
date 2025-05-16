@@ -10,6 +10,7 @@ export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
 export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
 export const isFirefox =
+  typeof window !== "undefined" &&
   "netscape" in window &&
   navigator.userAgent.indexOf("rv:") > 1 &&
   navigator.userAgent.indexOf("Gecko") > 1;
@@ -119,6 +120,7 @@ export const CLASSES = {
   SHAPE_ACTIONS_MENU: "App-menu__left",
   ZOOM_ACTIONS: "zoom-actions",
   SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
+  CONVERT_ELEMENT_TYPE_POPUP: "ConvertElementTypePopup",
 };
 
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
@@ -142,6 +144,7 @@ export const FONT_FAMILY = {
   "Lilita One": 7,
   "Comic Shanns": 8,
   "Liberation Sans": 9,
+  Assistant: 10,
 };
 
 export const FONT_FAMILY_FALLBACKS = {
@@ -253,7 +256,7 @@ export const EXPORT_DATA_TYPES = {
   excalidrawClipboardWithAPI: "excalidraw-api/clipboard",
 } as const;
 
-export const EXPORT_SOURCE =
+export const getExportSource = () =>
   window.EXCALIDRAW_EXPORT_SOURCE || window.location.origin;
 
 // time in milliseconds

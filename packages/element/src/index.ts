@@ -1,3 +1,5 @@
+import { toIterable } from "@excalidraw/common";
+
 import { isInvisiblySmallElement } from "./sizeHelpers";
 import { isLinearElementType } from "./typeChecks";
 
@@ -5,6 +7,7 @@ import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
+  ElementsMapOrArray,
 } from "./types";
 
 /**
@@ -16,12 +19,10 @@ export const getSceneVersion = (elements: readonly ExcalidrawElement[]) =>
 /**
  * Hashes elements' versionNonce (using djb2 algo). Order of elements matters.
  */
-export const hashElementsVersion = (
-  elements: readonly ExcalidrawElement[],
-): number => {
+export const hashElementsVersion = (elements: ElementsMapOrArray): number => {
   let hash = 5381;
-  for (let i = 0; i < elements.length; i++) {
-    hash = (hash << 5) + hash + elements[i].versionNonce;
+  for (const element of toIterable(elements)) {
+    hash = (hash << 5) + hash + element.versionNonce;
   }
   return hash >>> 0; // Ensure unsigned 32-bit integer
 };
@@ -71,3 +72,47 @@ export const clearElementsForExport = (
 export const clearElementsForLocalStorage = (
   elements: readonly ExcalidrawElement[],
 ) => _clearElements(elements);
+
+export * from "./align";
+export * from "./binding";
+export * from "./bounds";
+export * from "./collision";
+export * from "./comparisons";
+export * from "./containerCache";
+export * from "./cropElement";
+export * from "./delta";
+export * from "./distance";
+export * from "./distribute";
+export * from "./dragElements";
+export * from "./duplicate";
+export * from "./elbowArrow";
+export * from "./elementLink";
+export * from "./embeddable";
+export * from "./flowchart";
+export * from "./fractionalIndex";
+export * from "./frame";
+export * from "./groups";
+export * from "./heading";
+export * from "./image";
+export * from "./linearElementEditor";
+export * from "./mutateElement";
+export * from "./newElement";
+export * from "./renderElement";
+export * from "./resizeElements";
+export * from "./resizeTest";
+export * from "./Scene";
+export * from "./selection";
+export * from "./Shape";
+export * from "./ShapeCache";
+export * from "./shapes";
+export * from "./showSelectedShapeActions";
+export * from "./sizeHelpers";
+export * from "./sortElements";
+export * from "./store";
+export * from "./textElement";
+export * from "./textMeasurements";
+export * from "./textWrapping";
+export * from "./transformHandles";
+export * from "./typeChecks";
+export * from "./utils";
+export * from "./zindex";
