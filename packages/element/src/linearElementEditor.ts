@@ -45,6 +45,7 @@ import {
   bindOrUnbindLinearElement,
   getHoveredElementForBinding,
   isBindingEnabled,
+  maybeSuggestBindingsForLinearElementAtCoords,
 } from "./binding";
 import {
   getElementAbsoluteCoords,
@@ -275,18 +276,13 @@ export class LinearElementEditor {
     app: AppClassProperties,
     scenePointerX: number,
     scenePointerY: number,
-    maybeSuggestBinding: (
-      element: NonDeleted<ExcalidrawLinearElement>,
-      pointSceneCoords: { x: number; y: number }[],
-    ) => void,
     linearElementEditor: LinearElementEditor,
-    scene: Scene,
-  ): LinearElementEditor | null {
+  ): Pick<AppState, keyof AppState> | null {
     if (!linearElementEditor) {
       return null;
     }
     const { elementId } = linearElementEditor;
-    const elementsMap = scene.getNonDeletedElementsMap();
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     let customLineAngle = linearElementEditor.customLineAngle;
     if (!element) {
@@ -347,7 +343,7 @@ export class LinearElementEditor {
 
         LinearElementEditor.movePoints(
           element,
-          scene,
+          app.scene,
           new Map([
             [
               selectedIndex,
@@ -375,7 +371,7 @@ export class LinearElementEditor {
 
         LinearElementEditor.movePoints(
           element,
-          scene,
+          app.scene,
           new Map(
             selectedPointsIndices.map((pointIndex) => {
               const newPointPosition: LocalPoint =
@@ -407,10 +403,11 @@ export class LinearElementEditor {
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
-        handleBindTextResize(element, scene, false);
+        handleBindTextResize(element, app.scene, false);
       }
 
       // suggest bindings for first and last point if selected
+      let suggestedBindings: ExcalidrawBindableElement[] = [];
       if (isBindingElement(element, false)) {
         const coords: { x: number; y: number }[] = [];
 
@@ -442,11 +439,16 @@ export class LinearElementEditor {
         }
 
         if (coords.length) {
-          maybeSuggestBinding(element, coords);
+          suggestedBindings = maybeSuggestBindingsForLinearElementAtCoords(
+            element,
+            coords,
+            app.scene,
+            app.state.zoom,
+          );
         }
       }
 
-      return {
+      const newLinearElementEditor = {
         ...linearElementEditor,
         selectedPointsIndices,
         segmentMidPointHoveredCoords:
@@ -465,6 +467,15 @@ export class LinearElementEditor {
             : -1,
         isDragging: true,
         customLineAngle,
+      };
+
+      return {
+        ...app.state,
+        editingLinearElement: app.state.editingLinearElement
+          ? newLinearElementEditor
+          : null,
+        selectedLinearElement: newLinearElementEditor,
+        suggestedBindings,
       };
     }
 

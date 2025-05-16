@@ -381,6 +381,51 @@ export const getSuggestedBindingsForArrows = (
   );
 };
 
+export const maybeSuggestBindingsForLinearElementAtCoords = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  /** scene coords */
+  pointerCoords: {
+    x: number;
+    y: number;
+  }[],
+  scene: Scene,
+  zoom: AppState["zoom"],
+  // During line creation the start binding hasn't been written yet
+  // into `linearElement`
+  oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
+): ExcalidrawBindableElement[] => {
+  if (!pointerCoords.length) {
+    return [];
+  }
+
+  const suggestedBindings = pointerCoords.reduce(
+    (acc: NonDeleted<ExcalidrawBindableElement>[], coords) => {
+      const hoveredBindableElement = getHoveredElementForBinding(
+        coords,
+        scene.getNonDeletedElements(),
+        scene.getNonDeletedElementsMap(),
+        zoom,
+        isElbowArrow(linearElement),
+        isElbowArrow(linearElement),
+      );
+      if (
+        hoveredBindableElement != null &&
+        !isLinearElementSimpleAndAlreadyBound(
+          linearElement,
+          oppositeBindingBoundElement?.id,
+          hoveredBindableElement,
+        )
+      ) {
+        acc.push(hoveredBindableElement);
+      }
+      return acc;
+    },
+    [],
+  );
+
+  return suggestedBindings;
+};
+
 export const maybeBindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   appState: AppState,
