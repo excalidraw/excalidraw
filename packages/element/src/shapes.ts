@@ -23,6 +23,7 @@ import {
   getEllipseShape,
   getFreedrawShape,
   getPolygonShape,
+  getRabbitShape,
   type GeometricShape,
 } from "@excalidraw/utils/shape";
 
@@ -95,6 +96,10 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
         shouldTestInside(element),
       );
     }
+
+    case "rabbit-searchbox": {
+      return getRabbitShape(element);
+    }
   }
 };
 
@@ -125,6 +130,8 @@ export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
 
   return null;
 };
+
+
 
 export const getControlPointsForBezierCurve = <
   P extends GlobalPoint | LocalPoint,

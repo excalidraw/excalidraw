@@ -30,12 +30,15 @@ import {
   resolvablePromise,
   isRunningInIframe,
   isDevEnv,
+  FONT_FAMILY,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
+
+import { newRabbitSearchBoxElement } from "@excalidraw/element/newRabbitElement";
 
 import {
   GithubIcon,
@@ -948,6 +951,31 @@ const ExcalidrawWrapper = () => {
 
         <CommandPalette
           customCommandPaletteItems={[
+            // Testing rabbit hole search box
+            {
+              label: "Add Rabbit SearchBox",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["rabbit", "search", "box", "searchbox"],
+              perform: () => {
+                if (excalidrawAPI) {
+                  const searchBox = newRabbitSearchBoxElement({
+                    x: 100,
+                    y: 100,
+                    text: "Search...",
+                    fontSize: 16,
+                    fontFamily: FONT_FAMILY.Virgil,
+                    textAlign: "left",
+                    verticalAlign: "middle",
+                    hasIcon: true,
+                  });
+                  
+                  excalidrawAPI.updateScene({
+                    elements: [...excalidrawAPI.getSceneElements(), searchBox],
+                  });
+                }
+              },
+            },
             {
               label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,

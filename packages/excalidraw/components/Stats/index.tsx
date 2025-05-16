@@ -296,7 +296,9 @@ export const StatsInner = memo(
                       >
                         {appState.croppingElementId
                           ? t("labels.imageCropping")
-                          : t(`element.${singleElement.type}`)}
+                          : singleElement.type === "rabbit-searchbox" 
+                            ? "Search Box" // Hardcoded fallback
+                            : t(`element.${singleElement.type}`)}
                       </StatsRow>
 
                       <StatsRow>

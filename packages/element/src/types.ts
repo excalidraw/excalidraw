@@ -15,6 +15,8 @@ import type {
   ValueOf,
 } from "@excalidraw/common/utility-types";
 
+import type { RabbitElement } from "./rabbitElement";
+
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
 export type FontFamilyKeys = keyof typeof FONT_FAMILY;
@@ -212,7 +214,8 @@ export type ExcalidrawElement =
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement
   | ExcalidrawIframeElement
-  | ExcalidrawEmbeddableElement;
+  | ExcalidrawEmbeddableElement
+  | RabbitElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<
   ExcalidrawElement,

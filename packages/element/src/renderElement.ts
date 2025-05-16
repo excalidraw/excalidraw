@@ -3,6 +3,8 @@ import { getStroke } from "perfect-freehand";
 
 import { isRightAngleRads } from "@excalidraw/math";
 
+import { isRabbitElement, isRabbitSearchBoxElement } from "./rabbitElement";
+
 import {
   BOUND_TEXT_PADDING,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
@@ -69,6 +71,10 @@ import type {
   NonDeletedSceneElementsMap,
   ElementsMap,
 } from "./types";
+
+import type {
+  RabbitElement
+} from "./rabbitElement";
 
 import type { StrokeOptions } from "perfect-freehand";
 import type { RoughCanvas } from "roughjs/bin/canvas";
@@ -771,6 +777,17 @@ export const renderElement = (
     reduceAlphaForSelection ? DEFAULT_REDUCED_GLOBAL_ALPHA : 1,
   );
 
+  // Check for RabbitElements
+  if (isRabbitElement(element)) {
+    renderRabbitElement(
+      element, 
+      context, 
+      appState,
+      renderConfig
+    );
+    return;
+  }
+
   switch (element.type) {
     case "magicframe":
     case "frame": {
@@ -1055,6 +1072,119 @@ export const renderElement = (
 
   context.globalAlpha = 1;
 };
+
+    // Add the renderRabbitElement function
+  const renderRabbitElement = (
+    element: RabbitElement,
+    context: CanvasRenderingContext2D,
+    appState: StaticCanvasAppState,
+    renderConfig: StaticCanvasRenderConfig,
+  ) => {
+    if (isRabbitSearchBoxElement(element)) {
+      context.save();
+
+      context.translate(
+        element.x + appState.scrollX,
+        element.y + appState.scrollY
+      );
+      
+      // Fill with white background
+      context.fillStyle = element.backgroundColor;
+      
+      // Get the corner radius from the element's roundness property
+      const radius = getCornerRadius(
+        Math.min(element.width, element.height),
+        element
+      );
+      
+      // Draw rounded rectangle
+      if (context.roundRect) {
+        context.beginPath();
+        context.roundRect(0, 0, element.width, element.height, radius);
+        context.fill();
+        
+        // Draw border
+        context.strokeStyle = element.strokeColor;
+        context.lineWidth = element.strokeWidth;
+        context.stroke();
+      } else {
+        // Fallback for browsers that don't support roundRect
+        context.beginPath();
+        context.moveTo(radius, 0);
+        context.lineTo(element.width - radius, 0);
+        context.quadraticCurveTo(element.width, 0, element.width, radius);
+        context.lineTo(element.width, element.height - radius);
+        context.quadraticCurveTo(element.width, element.height, element.width - radius, element.height);
+        context.lineTo(radius, element.height);
+        context.quadraticCurveTo(0, element.height, 0, element.height - radius);
+        context.lineTo(0, radius);
+        context.quadraticCurveTo(0, 0, radius, 0);
+        context.closePath();
+        context.fill();
+        context.stroke();
+      }
+      
+      // Set text properties
+      context.font = getFontString(element);
+      context.fillStyle = element.strokeColor;
+      context.textAlign = element.textAlign as CanvasTextAlign;
+      
+      // Calculate text position
+      const padding = 10;
+      const iconSpace = element.hasIcon ? 30 : 0;
+      
+      const horizontalOffset =
+        element.textAlign === "center"
+          ? element.width / 2
+          : element.textAlign === "right"
+          ? element.width - padding - iconSpace
+          : padding;
+      
+      const lineHeightPx = getLineHeightInPx(
+        element.fontSize,
+        element.lineHeight,
+      );
+      
+      const verticalOffset = getVerticalOffset(
+        element.fontFamily,
+        element.fontSize,
+        lineHeightPx,
+      );
+      
+      // Draw the text
+      const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+      for (let index = 0; index < lines.length; index++) {
+        context.fillText(
+          lines[index],
+          horizontalOffset,
+          index * lineHeightPx + verticalOffset + element.height / 2 - (lines.length * lineHeightPx) / 2,
+        );
+      }
+      
+      // Draw search icon if enabled
+      if (element.hasIcon) {
+        // Draw a simple magnifying glass icon
+        const iconX = element.width - 20;
+        const iconY = element.height / 2;
+        const iconSize = Math.min(12, element.height / 2);
+        
+        context.beginPath();
+        // Circle of magnifying glass
+        context.arc(iconX - iconSize/2, iconY, iconSize, 0, 2 * Math.PI);
+        context.strokeStyle = "#888888";
+        context.lineWidth = 2;
+        context.stroke();
+        
+        // Handle of magnifying glass
+        context.beginPath();
+        context.moveTo(iconX + iconSize/2, iconY + iconSize/2);
+        context.lineTo(iconX + iconSize, iconY + iconSize);
+        context.stroke();
+      }
+    
+    context.restore();
+  }
+  }
 
 export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);
 
