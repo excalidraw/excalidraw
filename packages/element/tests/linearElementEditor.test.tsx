@@ -1,5 +1,3 @@
-import { newArrowElement } from "@excalidraw/element/newElement";
-
 import { pointCenter, pointFrom } from "@excalidraw/math";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
 import React from "react";
@@ -13,36 +11,34 @@ import {
   arrayToMap,
 } from "@excalidraw/common";
 
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import {
-  getBoundTextElementPosition,
-  getBoundTextMaxWidth,
-} from "@excalidraw/element/textElement";
-import * as textElementUtils from "@excalidraw/element/textElement";
-import { wrapText } from "@excalidraw/element/textWrapping";
+import { Excalidraw } from "@excalidraw/excalidraw";
+import * as InteractiveCanvas from "@excalidraw/excalidraw/renderer/interactiveScene";
+import * as StaticScene from "@excalidraw/excalidraw/renderer/staticScene";
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
-
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElementWithContainer,
-  FontString,
-} from "@excalidraw/element/types";
-
-import { Excalidraw, mutateElement } from "../index";
-import * as InteractiveCanvas from "../renderer/interactiveScene";
-import * as StaticScene from "../renderer/staticScene";
-import { API } from "../tests/helpers/api";
-
-import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   screen,
   render,
   fireEvent,
   GlobalTestState,
   unmountComponent,
-} from "./test-utils";
+} from "@excalidraw/excalidraw/tests/test-utils";
+
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
+
+import { wrapText } from "../src";
+import * as textElementUtils from "../src/textElement";
+import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
+import { LinearElementEditor } from "../src";
+import { newArrowElement } from "../src";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
+  FontString,
+} from "../src/types";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,
@@ -118,7 +114,7 @@ describe("Test Linear Elements", () => {
       ],
       roundness,
     });
-    mutateElement(line, { points: line.points });
+    h.app.scene.mutateElement(line, { points: line.points });
     API.setElements([line]);
     mouse.clickAt(p1[0], p1[1]);
     return line;
@@ -177,7 +173,7 @@ describe("Test Linear Elements", () => {
       pointFrom<LocalPoint>(0.5, 0),
       pointFrom<LocalPoint>(100, 100),
     ]);
-    new LinearElementEditor(element);
+    new LinearElementEditor(element, arrayToMap(h.elements));
     expect(element.points).toEqual([
       pointFrom<LocalPoint>(0, 0),
       pointFrom<LocalPoint>(99.5, 100),
@@ -1271,7 +1267,7 @@ describe("Test Linear Elements", () => {
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(
         h.elements[0],
-        arrayToMap(h.elements),
+        h.app.scene,
         "nw",
         false,
       );
@@ -1384,19 +1380,30 @@ describe("Test Linear Elements", () => {
       const [origStartX, origStartY] = [line.x, line.y];
 
       act(() => {
-        LinearElementEditor.movePoints(line, [
-          {
-            index: 0,
-            point: pointFrom(line.points[0][0] + 10, line.points[0][1] + 10),
-          },
-          {
-            index: line.points.length - 1,
-            point: pointFrom(
-              line.points[line.points.length - 1][0] - 10,
-              line.points[line.points.length - 1][1] - 10,
-            ),
-          },
-        ]);
+        LinearElementEditor.movePoints(
+          line,
+          h.app.scene,
+          new Map([
+            [
+              0,
+              {
+                point: pointFrom(
+                  line.points[0][0] + 10,
+                  line.points[0][1] + 10,
+                ),
+              },
+            ],
+            [
+              line.points.length - 1,
+              {
+                point: pointFrom(
+                  line.points[line.points.length - 1][0] - 10,
+                  line.points[line.points.length - 1][1] - 10,
+                ),
+              },
+            ],
+          ]),
+        );
       });
       expect(line.x).toBe(origStartX + 10);
       expect(line.y).toBe(origStartY + 10);

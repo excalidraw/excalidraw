@@ -1,7 +1,7 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { bindOrUnbindLinearElement } from "@excalidraw/element/binding";
+import { bindOrUnbindLinearElement } from "@excalidraw/element";
 
 import { KEYS, reseed } from "@excalidraw/common";
 
@@ -12,8 +12,6 @@ import type {
   NonDeleted,
   ExcalidrawRectangleElement,
 } from "@excalidraw/element/types";
-
-import type Scene from "@excalidraw/excalidraw/scene/Scene";
 
 import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
@@ -85,15 +83,13 @@ describe("move element", () => {
     const rectA = UI.createElement("rectangle", { size: 100 });
     const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
     const arrow = UI.createElement("arrow", { x: 110, y: 50, size: 80 });
-    const elementsMap = h.app.scene.getNonDeletedElementsMap();
     act(() => {
       // bind line to two rectangles
       bindOrUnbindLinearElement(
         arrow.get() as NonDeleted<ExcalidrawLinearElement>,
         rectA.get() as ExcalidrawRectangleElement,
         rectB.get() as ExcalidrawRectangleElement,
-        elementsMap,
-        {} as Scene,
+        h.app.scene,
       );
     });
 
@@ -170,8 +166,6 @@ describe("duplicate element on move when ALT is clicked", () => {
     fireEvent.pointerMove(canvas, { clientX: 10, clientY: 60 });
     fireEvent.pointerUp(canvas);
 
-    // TODO: This used to be 4, but binding made it go up to 5. Do we need
-    // that additional render?
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`4`);
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`3`);
     expect(h.state.selectionElement).toBeNull();

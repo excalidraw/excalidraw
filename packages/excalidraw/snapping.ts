@@ -12,23 +12,20 @@ import {
   getCommonBounds,
   getDraggedElementsBounds,
   getElementAbsoluteCoords,
-} from "@excalidraw/element/bounds";
-import {
-  isBoundToContainer,
-  isFrameLikeElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
+import { isBoundToContainer, isFrameLikeElement } from "@excalidraw/element";
 
-import { getMaximumGroups } from "@excalidraw/element/groups";
+import { getMaximumGroups } from "@excalidraw/element";
 
 import {
   getSelectedElements,
   getVisibleAndNonSelectedElements,
-} from "@excalidraw/element/selection";
+} from "@excalidraw/element";
 
 import type { InclusiveRange } from "@excalidraw/math";
 
-import type { Bounds } from "@excalidraw/element/bounds";
-import type { MaybeTransformHandleType } from "@excalidraw/element/transformHandles";
+import type { Bounds } from "@excalidraw/element";
+import type { MaybeTransformHandleType } from "@excalidraw/element";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -173,10 +170,11 @@ export const isSnappingEnabled = ({
 }) => {
   if (event) {
     return (
-      (app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
-      (!app.state.objectsSnapModeEnabled &&
-        event[KEYS.CTRL_OR_CMD] &&
-        !isGridModeEnabled(app))
+      app.state.activeTool.type !== "lasso" &&
+      ((app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
+        (!app.state.objectsSnapModeEnabled &&
+          event[KEYS.CTRL_OR_CMD] &&
+          !isGridModeEnabled(app)))
     );
   }
 

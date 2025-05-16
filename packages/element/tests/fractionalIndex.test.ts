@@ -7,13 +7,14 @@ import {
   syncInvalidIndices,
   syncMovedIndices,
   validateFractionalIndices,
-} from "@excalidraw/element/fractionalIndex";
+} from "@excalidraw/element";
 
-import { deepCopyElement } from "@excalidraw/element/duplicate";
+import { deepCopyElement } from "@excalidraw/element";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import type {
+  ElementsMap,
   ExcalidrawElement,
   FractionalIndex,
 } from "@excalidraw/element/types";
@@ -749,7 +750,7 @@ function testInvalidIndicesSync(args: {
 function prepareArguments(
   elementsLike: { id: string; index?: string }[],
   movedElementsIds?: string[],
-): [ExcalidrawElement[], Map<string, ExcalidrawElement> | undefined] {
+): [ExcalidrawElement[], ElementsMap | undefined] {
   const elements = elementsLike.map((x) =>
     API.createElement({ id: x.id, index: x.index as FractionalIndex }),
   );
@@ -764,7 +765,7 @@ function prepareArguments(
 function test(
   name: string,
   elements: ExcalidrawElement[],
-  movedElements: Map<string, ExcalidrawElement> | undefined,
+  movedElements: ElementsMap | undefined,
   expectUnchangedElements: Map<string, { id: string }>,
   expectValidInput?: boolean,
 ) {

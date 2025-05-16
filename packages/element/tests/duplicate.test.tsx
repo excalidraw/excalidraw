@@ -7,7 +7,7 @@ import {
   isPrimitive,
 } from "@excalidraw/common";
 
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw, mutateElement } from "@excalidraw/excalidraw";
 
 import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions";
 
@@ -24,7 +24,6 @@ import {
 
 import type { LocalPoint } from "@excalidraw/math";
 
-import { mutateElement } from "../src/mutateElement";
 import { duplicateElement, duplicateElements } from "../src/duplicate";
 
 import type { ExcalidrawLinearElement } from "../src/types";
@@ -62,7 +61,7 @@ describe("duplicating single elements", () => {
     // @ts-ignore
     element.__proto__ = { hello: "world" };
 
-    mutateElement(element, {
+    mutateElement(element, new Map(), {
       points: [pointFrom<LocalPoint>(1, 2), pointFrom<LocalPoint>(3, 4)],
     });
 

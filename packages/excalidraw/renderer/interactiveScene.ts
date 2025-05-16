@@ -1,65 +1,56 @@
-import oc from "open-color";
 import {
   pointFrom,
   type GlobalPoint,
   type LocalPoint,
   type Radians,
 } from "@excalidraw/math";
+import oc from "open-color";
 
 import {
+  arrayToMap,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
-  THEME,
-  arrayToMap,
   invariant,
+  THEME,
   throttleRAF,
 } from "@excalidraw/common";
 
-import {
-  BINDING_HIGHLIGHT_OFFSET,
-  BINDING_HIGHLIGHT_THICKNESS,
-  maxBindingGap,
-} from "@excalidraw/element/binding";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { FIXED_BINDING_DISTANCE, maxBindingGap } from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
 import {
   getOmitSidesForDevice,
   getTransformHandles,
   getTransformHandlesFromCoords,
   shouldShowBoundingBox,
-} from "@excalidraw/element/transformHandles";
+} from "@excalidraw/element";
 import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
   isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
-import { getCornerRadius } from "@excalidraw/element/shapes";
-
-import { renderSelectionElement } from "@excalidraw/element/renderElement";
+import { renderSelectionElement } from "@excalidraw/element";
 
 import {
-  isSelectedViaGroup,
-  getSelectedGroupIds,
   getElementsInGroup,
+  getSelectedGroupIds,
+  isSelectedViaGroup,
   selectGroupsFromGivenElements,
-} from "@excalidraw/element/groups";
+} from "@excalidraw/element";
 
-import {
-  getCommonBounds,
-  getElementAbsoluteCoords,
-} from "@excalidraw/element/bounds";
+import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   SuggestedBinding,
   SuggestedPointBinding,
-} from "@excalidraw/element/binding";
+} from "@excalidraw/element";
 
 import type {
   TransformHandles,
   TransformHandleType,
-} from "@excalidraw/element/transformHandles";
+} from "@excalidraw/element";
 
 import type {
   ElementsMap,
@@ -86,8 +77,12 @@ import { getClientColor, renderRemoteCursors } from "../clients";
 
 import {
   bootstrapCanvas,
+  drawHighlightForDiamondWithRotation,
+  drawHighlightForRectWithRotation,
   fillCircle,
   getNormalizedCanvasDimensions,
+  strokeEllipseWithRotation,
+  strokeRectWithRotation,
 } from "./helpers";
 
 import type {
@@ -160,57 +155,6 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   );
 };
 
-const strokeRectWithRotation = (
-  context: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  cx: number,
-  cy: number,
-  angle: number,
-  fill: boolean = false,
-  /** should account for zoom */
-  radius: number = 0,
-) => {
-  context.save();
-  context.translate(cx, cy);
-  context.rotate(angle);
-  if (fill) {
-    context.fillRect(x - cx, y - cy, width, height);
-  }
-  if (radius && context.roundRect) {
-    context.beginPath();
-    context.roundRect(x - cx, y - cy, width, height, radius);
-    context.stroke();
-    context.closePath();
-  } else {
-    context.strokeRect(x - cx, y - cy, width, height);
-  }
-  context.restore();
-};
-
-const strokeDiamondWithRotation = (
-  context: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  cx: number,
-  cy: number,
-  angle: number,
-) => {
-  context.save();
-  context.translate(cx, cy);
-  context.rotate(angle);
-  context.beginPath();
-  context.moveTo(0, height / 2);
-  context.lineTo(width / 2, 0);
-  context.lineTo(0, -height / 2);
-  context.lineTo(-width / 2, 0);
-  context.closePath();
-  context.stroke();
-  context.restore();
-};
-
 const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -237,19 +181,6 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   );
 };
 
-const strokeEllipseWithRotation = (
-  context: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  cx: number,
-  cy: number,
-  angle: number,
-) => {
-  context.beginPath();
-  context.ellipse(cx, cy, width / 2, height / 2, angle, 0, Math.PI * 2);
-  context.stroke();
-};
-
 const renderBindingHighlightForBindableElement = (
   context: CanvasRenderingContext2D,
   element: ExcalidrawBindableElement,
@@ -261,16 +192,10 @@ const renderBindingHighlightForBindableElement = (
   const height = y2 - y1;
 
   context.strokeStyle = "rgba(0,0,0,.05)";
-  // When zooming out, make line width greater for visibility
-  const zoomValue = zoom.value < 1 ? zoom.value : 1;
-  context.lineWidth = BINDING_HIGHLIGHT_THICKNESS / zoomValue;
-  // To ensure the binding highlight doesn't overlap the element itself
-  const padding = context.lineWidth / 2 + BINDING_HIGHLIGHT_OFFSET;
+  context.fillStyle = "rgba(0,0,0,.05)";
 
-  const radius = getCornerRadius(
-    Math.min(element.width, element.height),
-    element,
-  );
+  // To ensure the binding highlight doesn't overlap the element itself
+  const padding = maxBindingGap(element, element.width, element.height, zoom);
 
   switch (element.type) {
     case "rectangle":
@@ -280,37 +205,20 @@ const renderBindingHighlightForBindableElement = (
     case "embeddable":
     case "frame":
     case "magicframe":
-      strokeRectWithRotation(
-        context,
-        x1 - padding,
-        y1 - padding,
-        width + padding * 2,
-        height + padding * 2,
-        x1 + width / 2,
-        y1 + height / 2,
-        element.angle,
-        undefined,
-        radius,
-      );
+      drawHighlightForRectWithRotation(context, element, padding);
       break;
     case "diamond":
-      const side = Math.hypot(width, height);
-      const wPadding = (padding * side) / height;
-      const hPadding = (padding * side) / width;
-      strokeDiamondWithRotation(
-        context,
-        width + wPadding * 2,
-        height + hPadding * 2,
-        x1 + width / 2,
-        y1 + height / 2,
-        element.angle,
-      );
+      drawHighlightForDiamondWithRotation(context, padding, element);
       break;
     case "ellipse":
+      context.lineWidth =
+        maxBindingGap(element, element.width, element.height, zoom) -
+        FIXED_BINDING_DISTANCE;
+
       strokeEllipseWithRotation(
         context,
-        width + padding * 2,
-        height + padding * 2,
+        width + padding + FIXED_BINDING_DISTANCE,
+        height + padding + FIXED_BINDING_DISTANCE,
         x1 + width / 2,
         y1 + height / 2,
         element.angle,
@@ -1126,10 +1034,10 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
-  appState.searchMatches.forEach(({ id, focus, matchedLines }) => {
+  appState.searchMatches?.matches.forEach(({ id, focus, matchedLines }) => {
     const element = elementsMap.get(id);
 
-    if (element && isTextElement(element)) {
+    if (element) {
       const [elementX1, elementY1, , , cx, cy] = getElementAbsoluteCoords(
         element,
         elementsMap,
@@ -1149,17 +1057,20 @@ const _renderInteractiveScene = ({
         context.fillStyle = "rgba(99, 52, 0, 0.4)";
       }
 
+      const zoomFactor = isFrameLikeElement(element) ? appState.zoom.value : 1;
+
       context.translate(appState.scrollX, appState.scrollY);
       context.translate(cx, cy);
       context.rotate(element.angle);
 
       matchedLines.forEach((matchedLine) => {
-        context.fillRect(
-          elementX1 + matchedLine.offsetX - cx,
-          elementY1 + matchedLine.offsetY - cy,
-          matchedLine.width,
-          matchedLine.height,
-        );
+        (matchedLine.showOnCanvas || focus) &&
+          context.fillRect(
+            elementX1 + matchedLine.offsetX / zoomFactor - cx,
+            elementY1 + matchedLine.offsetY / zoomFactor - cy,
+            matchedLine.width / zoomFactor,
+            matchedLine.height / zoomFactor,
+          );
       });
 
       context.restore();
