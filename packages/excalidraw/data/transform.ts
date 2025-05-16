@@ -507,7 +507,7 @@ class ElementStore {
 
 export const convertToExcalidrawElements = (
   elementsSkeleton: ExcalidrawElementSkeleton[] | null,
-  opts?: { regenerateIds: boolean },
+  opts?: { regenerateIds: boolean; useElbow?: boolean },
 ) => {
   if (!elementsSkeleton) {
     return [];
@@ -567,6 +567,7 @@ export const convertToExcalidrawElements = (
           points: [pointFrom(0, 0), pointFrom(width, height)],
           ...element,
           type: "arrow",
+          elbowed: opts?.useElbow,
         });
 
         Object.assign(

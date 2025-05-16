@@ -22,6 +22,8 @@ import {
   isDevEnv,
 } from "@excalidraw/common";
 
+import { debugDrawBounds } from "@excalidraw/utils/visualdebug";
+
 import type { AppState } from "@excalidraw/excalidraw/types";
 
 import {

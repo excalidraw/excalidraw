@@ -6,5 +6,19 @@
       font-weight: 700;
       padding-inline: 2.5rem;
     }
+
+    &-arrow-type {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8;
+      // height: 2rem;
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+        display: block;
+      }
+    }
   }
 }

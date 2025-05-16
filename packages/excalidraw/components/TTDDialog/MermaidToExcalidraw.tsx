@@ -5,10 +5,12 @@ import { EDITOR_LS_KEYS, debounce, isDevEnv } from "@excalidraw/common";
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useApp } from "../App";
-import { ArrowRightIcon } from "../icons";
+import { ArrowRightIcon, elbowArrowIcon, roundArrowIcon } from "../icons";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { t } from "../../i18n";
 import Trans from "../Trans";
+
+import { RadioGroup } from "../RadioGroup";
 
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
@@ -43,6 +45,7 @@ const MermaidToExcalidraw = ({
   );
   const deferredText = useDeferredValue(text.trim());
   const [error, setError] = useState<Error | null>(null);
+  const [arrowType, setArrowType] = useState<"arrow" | "elbow">("arrow");
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const data = useRef<{
@@ -59,6 +62,7 @@ const MermaidToExcalidraw = ({
       mermaidToExcalidrawLib,
       setError,
       mermaidDefinition: deferredText,
+      useElbow: arrowType === "elbow",
     }).catch((err) => {
       if (isDevEnv()) {
         console.error("Failed to parse mermaid definition", err);
@@ -66,7 +70,7 @@ const MermaidToExcalidraw = ({
     });
 
     debouncedSaveMermaidDefinition(deferredText);
-  }, [deferredText, mermaidToExcalidrawLib]);
+  }, [deferredText, mermaidToExcalidrawLib, arrowType]);
 
   useEffect(
     () => () => {
@@ -123,6 +127,29 @@ const MermaidToExcalidraw = ({
             icon: ArrowRightIcon,
           }}
           renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
+          renderBottomRight={() => (
+            <div className="dialog-mermaid-arrow-type">
+              <RadioGroup
+                name={"mermaid arrow config"}
+                value={arrowType}
+                onChange={(value: "arrow" | "elbow") => {
+                  setArrowType(value);
+                }}
+                choices={[
+                  {
+                    value: "arrow",
+                    label: roundArrowIcon,
+                    ariaLabel: `${t("labels.arrowtype_round")}`,
+                  },
+                  {
+                    value: "elbow",
+                    label: elbowArrowIcon,
+                    ariaLabel: `${t("labels.arrowtype_elbowed")}`,
+                  },
+                ]}
+              />
+            </div>
+          )}
         >
           <TTDDialogOutput
             canvasRef={canvasRef}
