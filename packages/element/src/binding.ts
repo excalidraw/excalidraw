@@ -393,40 +393,35 @@ export const maybeSuggestBindingsForLinearElementAtCoords = (
   // During line creation the start binding hasn't been written yet
   // into `linearElement`
   oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
-): ExcalidrawBindableElement[] => {
-  if (!pointerCoords.length) {
-    return [];
-  }
+): ExcalidrawBindableElement[] =>
+  Array.from(
+    pointerCoords.reduce(
+      (acc: Set<NonDeleted<ExcalidrawBindableElement>>, coords) => {
+        const hoveredBindableElement = getHoveredElementForBinding(
+          coords,
+          scene.getNonDeletedElements(),
+          scene.getNonDeletedElementsMap(),
+          zoom,
+          isElbowArrow(linearElement),
+          isElbowArrow(linearElement),
+        );
 
-  const suggestedBindings = pointerCoords.reduce(
-    (acc: Set<NonDeleted<ExcalidrawBindableElement>>, coords) => {
-      const hoveredBindableElement = getHoveredElementForBinding(
-        coords,
-        scene.getNonDeletedElements(),
-        scene.getNonDeletedElementsMap(),
-        zoom,
-        isElbowArrow(linearElement),
-        isElbowArrow(linearElement),
-      );
+        if (
+          hoveredBindableElement != null &&
+          !isLinearElementSimpleAndAlreadyBound(
+            linearElement,
+            oppositeBindingBoundElement?.id,
+            hoveredBindableElement,
+          )
+        ) {
+          acc.add(hoveredBindableElement);
+        }
 
-      if (
-        hoveredBindableElement != null &&
-        !isLinearElementSimpleAndAlreadyBound(
-          linearElement,
-          oppositeBindingBoundElement?.id,
-          hoveredBindableElement,
-        )
-      ) {
-        acc.add(hoveredBindableElement);
-      }
-
-      return acc;
-    },
-    new Set() as Set<NonDeleted<ExcalidrawBindableElement>>,
+        return acc;
+      },
+      new Set() as Set<NonDeleted<ExcalidrawBindableElement>>,
+    ),
   );
-
-  return Array.from(suggestedBindings);
-};
 
 export const maybeBindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,

@@ -9730,7 +9730,8 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        pointerDownState.drag.hasOccurred ||
+        (pointerDownState.drag.hasOccurred &&
+          !this.state.selectedLinearElement) ||
         isResizing ||
         isRotating ||
         isCropping
