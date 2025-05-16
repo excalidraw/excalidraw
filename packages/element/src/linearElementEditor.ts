@@ -409,33 +409,40 @@ export class LinearElementEditor {
       // suggest bindings for first and last point if selected
       let suggestedBindings: ExcalidrawBindableElement[] = [];
       if (isBindingElement(element, false)) {
+        const firstSelectedIndex = selectedPointsIndices[0] === 0;
+        const lastSelectedIndex =
+          selectedPointsIndices[selectedPointsIndices.length - 1] ===
+          element.points.length - 1;
         const coords: { x: number; y: number }[] = [];
 
-        const firstSelectedIndex = selectedPointsIndices[0];
-        if (firstSelectedIndex === 0) {
-          coords.push(
-            tupleToCoors(
-              LinearElementEditor.getPointGlobalCoordinates(
-                element,
-                element.points[0],
-                elementsMap,
+        if (!firstSelectedIndex !== !lastSelectedIndex) {
+          coords.push({ x: scenePointerX, y: scenePointerY });
+        } else {
+          if (firstSelectedIndex) {
+            coords.push(
+              tupleToCoors(
+                LinearElementEditor.getPointGlobalCoordinates(
+                  element,
+                  element.points[0],
+                  elementsMap,
+                ),
               ),
-            ),
-          );
-        }
+            );
+          }
 
-        const lastSelectedIndex =
-          selectedPointsIndices[selectedPointsIndices.length - 1];
-        if (lastSelectedIndex === element.points.length - 1) {
-          coords.push(
-            tupleToCoors(
-              LinearElementEditor.getPointGlobalCoordinates(
-                element,
-                element.points[lastSelectedIndex],
-                elementsMap,
+          if (lastSelectedIndex) {
+            coords.push(
+              tupleToCoors(
+                LinearElementEditor.getPointGlobalCoordinates(
+                  element,
+                  element.points[
+                    selectedPointsIndices[selectedPointsIndices.length - 1]
+                  ],
+                  elementsMap,
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
 
         if (coords.length) {
