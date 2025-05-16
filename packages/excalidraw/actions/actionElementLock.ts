@@ -24,15 +24,10 @@ export const actionToggleElementLock = register({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: false,
     });
-    if (selected.length === 1 && !isFrameLikeElement(selected[0])) {
-      return selected[0].locked
-        ? "labels.elementLock.unlock"
-        : "labels.elementLock.lock";
-    }
 
     return shouldLock(selected)
-      ? "labels.elementLock.lockAll"
-      : "labels.elementLock.unlockAll";
+      ? "labels.elementLock.lock"
+      : "labels.elementLock.unlock";
   },
   icon: (appState, elements) => {
     const selectedElements = getSelectedElements(elements, appState);
