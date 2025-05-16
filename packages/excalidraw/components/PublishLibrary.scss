@@ -14,7 +14,7 @@
         span {
           font-weight: 500;
           font-size: 1rem;
-          color: $oc-gray-6;
+          color: var(--button-grey-6);
         }
         input,
         textarea {
@@ -56,9 +56,9 @@
       }
 
       &--cancel.ToolIcon_type_button {
-        background-color: $oc-gray-5;
+        background-color: var(--button-gray-5);
         &:hover {
-          background-color: $oc-gray-6;
+          background-color: var(--button-gray-6);
         }
       }
 
