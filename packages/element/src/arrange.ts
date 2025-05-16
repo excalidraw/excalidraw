@@ -2,9 +2,9 @@ import { getCommonBoundingBox } from "./bounds";
 
 import { getMaximumGroups } from "./groups";
 
-import { mutateElement } from "./mutateElement";
-
 import { GrowingPacker, type Block } from "./arrange-algorithms/packer";
+
+import type { Scene } from "./Scene";
 
 import type { BoundingBox } from "./bounds";
 
@@ -23,6 +23,7 @@ interface Group {
  * Updates all elements relative to the group position
  */
 const mutateGroup = (
+  scene: Scene,
   group: ExcalidrawElement[],
   update: { x: number; y: number },
 ) => {
@@ -33,7 +34,7 @@ const mutateGroup = (
   // Update the elements in the group
 
   group.forEach((element) => {
-    mutateElement(element, {
+    scene.mutateElement(element, {
       x: element.x + deltaX,
       y: element.y + deltaY,
     });
@@ -41,6 +42,7 @@ const mutateGroup = (
 };
 
 const arrangeElementsBinaryTreePacking = (
+  scene: Scene,
   groups: Group[],
   gap: number,
 ): ExcalidrawElement[] => {
@@ -81,7 +83,7 @@ const arrangeElementsBinaryTreePacking = (
   // For each groupsAdded, we need to actually perform the translation
   // and update the elements
   groupsAdded.forEach((group) => {
-    mutateGroup(group.group, {
+    mutateGroup(scene, group.group, {
       x: origin.x + (group.fit?.x ?? 0),
       y: origin.y + (group.fit?.y ?? 0),
     });
@@ -91,6 +93,7 @@ const arrangeElementsBinaryTreePacking = (
 };
 
 const arrangeElements = (
+  scene: Scene,
   selectedElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
   algorithm: ArrangeAlgorithms,
@@ -109,12 +112,12 @@ const arrangeElements = (
 
   switch (algorithm) {
     case "bin-packing":
-      return arrangeElementsBinaryTreePacking(groupBoundingBoxes, gap);
+      return arrangeElementsBinaryTreePacking(scene, groupBoundingBoxes, gap);
     default:
       console.warn(
         `Unimplemented algorithm [${algorithm}] - using bin-packing`,
       );
-      return arrangeElementsBinaryTreePacking(groupBoundingBoxes, gap);
+      return arrangeElementsBinaryTreePacking(scene, groupBoundingBoxes, gap);
   }
 };
 

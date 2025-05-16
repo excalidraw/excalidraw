@@ -25,6 +25,7 @@ const arrangeSelectedElements = (
   const selectedElements = app.scene.getSelectedElements(appState);
   const elementsMap = arrayToMap(elements);
   const updatedElements = arrangeElements(
+    app.scene,
     selectedElements,
     elementsMap,
     appState.arrangeConfiguration.algorithm,
