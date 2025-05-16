@@ -1,5 +1,7 @@
 import { arrayToMap, getShortcutKey, KEYS, matchKey } from "@excalidraw/common";
 
+import { CaptureUpdateAction } from "@excalidraw/element";
+
 import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/frame";
 
 import { arrangeElements } from "@excalidraw/element/arrange";
@@ -7,7 +9,6 @@ import { arrangeElements } from "@excalidraw/element/arrange";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { TableCellsIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
 
 import { t } from "../i18n";
 
