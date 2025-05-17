@@ -575,6 +575,23 @@ export const convertToExcalidrawElements = (
         );
         break;
       }
+      case "triangle": // Add this case
+      {
+        const width =
+          element?.label?.text && element.width === undefined
+            ? 0
+            : element?.width || DEFAULT_DIMENSION;
+        const height =
+          element?.label?.text && element.height === undefined
+            ? 0
+            : element?.height || DEFAULT_DIMENSION;
+        excalidrawElement = newElement({
+          ...element,
+          width,
+          height,
+        });
+        break;
+      }
       case "text": {
         const fontFamily = element?.fontFamily || DEFAULT_FONT_FAMILY;
         const fontSize = element?.fontSize || DEFAULT_FONT_SIZE;

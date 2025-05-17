@@ -285,6 +285,7 @@
     "rectangle": "Rectangle",
     "diamond": "Diamond",
     "ellipse": "Ellipse",
+    "triangle": "Triangle",
     "arrow": "Arrow",
     "line": "Line",
     "freedraw": "Draw",
