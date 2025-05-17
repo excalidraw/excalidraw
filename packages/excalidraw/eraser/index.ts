@@ -1,5 +1,5 @@
 import { arrayToMap, easeOut, THEME } from "@excalidraw/common";
-import { getElementLineSegments } from "@excalidraw/element";
+import { getElementLineSegments, isPointInShape } from "@excalidraw/element";
 import {
   lineSegment,
   lineSegmentIntersectionPoints,
@@ -8,9 +8,7 @@ import {
 
 import { getElementsInGroup } from "@excalidraw/element";
 
-import { getElementShape } from "@excalidraw/element";
 import { shouldTestInside } from "@excalidraw/element";
-import { isPointInShape } from "@excalidraw/utils/collision";
 import { hasBoundTextElement, isBoundToContainer } from "@excalidraw/element";
 import { getBoundTextElementId } from "@excalidraw/element";
 
@@ -208,15 +206,8 @@ const eraserTest = (
   elementsMap: ElementsMap,
   app: App,
 ): boolean => {
-  let shape = shapesCache.get(element.id);
-
-  if (!shape) {
-    shape = getElementShape<GlobalPoint>(element, elementsMap);
-    shapesCache.set(element.id, shape);
-  }
-
   const lastPoint = pathSegments[pathSegments.length - 1][1];
-  if (shouldTestInside(element) && isPointInShape(lastPoint, shape)) {
+  if (shouldTestInside(element) && isPointInShape(lastPoint, element)) {
     return true;
   }
 

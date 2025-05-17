@@ -1221,7 +1221,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "version": 3,
   "versionNonce": 1150084233,
   "width": 20,
-  "x": -10,
+  "x": -7,
   "y": 0,
 }
 `;
@@ -1274,7 +1274,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
             "strokeWidth": 2,
             "type": "rectangle",
             "width": 20,
-            "x": -10,
+            "x": -7,
             "y": 0,
           },
           "inserted": {
@@ -2097,7 +2097,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "version": 3,
   "versionNonce": 1150084233,
   "width": 20,
-  "x": -10,
+  "x": -7,
   "y": 0,
 }
 `;
@@ -2150,7 +2150,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
             "strokeWidth": 2,
             "type": "rectangle",
             "width": 20,
-            "x": -10,
+            "x": -7,
             "y": 0,
           },
           "inserted": {
@@ -2307,7 +2307,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "version": 4,
   "versionNonce": 1014066025,
   "width": 20,
-  "x": -10,
+  "x": -7,
   "y": 0,
 }
 `;
@@ -2360,7 +2360,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
             "strokeWidth": 2,
             "type": "rectangle",
             "width": 20,
-            "x": -10,
+            "x": -7,
             "y": 0,
           },
           "inserted": {
@@ -2548,7 +2548,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "version": 3,
   "versionNonce": 1150084233,
   "width": 20,
-  "x": -10,
+  "x": -7,
   "y": 0,
 }
 `;
@@ -2582,7 +2582,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "version": 5,
   "versionNonce": 400692809,
   "width": 20,
-  "x": 0,
+  "x": 3,
   "y": 10,
 }
 `;
@@ -2635,7 +2635,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
             "strokeWidth": 2,
             "type": "rectangle",
             "width": 20,
-            "x": -10,
+            "x": -7,
             "y": 0,
           },
           "inserted": {
@@ -2689,7 +2689,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
             "strokeWidth": 2,
             "type": "rectangle",
             "width": 20,
-            "x": 0,
+            "x": 3,
             "y": 10,
           },
           "inserted": {
@@ -8639,8 +8639,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
     ],
-    "left": -17,
-    "top": -7,
+    "left": 10,
+    "top": 20,
   },
   "croppingElementId": null,
   "currentChartType": "bar",
