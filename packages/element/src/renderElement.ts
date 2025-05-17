@@ -79,6 +79,21 @@ import type {
 import type { StrokeOptions } from "perfect-freehand";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 
+
+const rabbitImageCache: Record<string, HTMLImageElement> = {};
+
+function getCachedRabbitImage(url: string): HTMLImageElement {
+  let img = rabbitImageCache[url];
+  if (!img) {
+    img = new Image();
+    img.src = url;
+    // no-op onload; we'll rely on the next Excalidraw redraw
+    rabbitImageCache[url] = img;
+  }
+  return img;
+}
+
+
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
 // color scheme (it's still not quite there and the colors look slightly
@@ -1184,6 +1199,47 @@ const renderRabbitElement = (
 
     context.restore();
   }
+// else if (isRabbitImageElement(element)) {
+//   const offsetX = element.x + appState.scrollX;
+//   const offsetY = element.y + appState.scrollY;
+//   const { width, height } = element;
+//   const padding = 10;
+//   const labelHeight = 20;
+
+//   // 1) Draw the box and label immediately
+//   context.save();
+//   context.translate(offsetX, offsetY);
+
+//   // Background & border
+//   context.fillStyle = element.backgroundColor || "#ffffff";
+//   context.fillRect(0, 0, width, height);
+//   context.strokeStyle = element.strokeColor || "#000000";
+//   context.strokeRect(0, 0, width, height);
+
+//   // Label
+//   context.fillStyle = "#000";
+//   context.font = "16px sans-serif";
+//   context.textBaseline = "bottom";
+//   context.fillText(element.label, padding, height - 5);
+
+//   context.restore();
+
+//   // 2) Draw the image once it’s loaded, within its own transformed context
+//   const image = new Image();
+//   image.src = element.imageUrl;
+//   image.onload = () => {
+//     context.save();
+//     context.translate(offsetX, offsetY);
+//     context.drawImage(
+//       image,
+//       padding,
+//       padding,
+//       width - padding * 2,
+//       height - labelHeight - padding * 2
+//     );
+//     context.restore();
+//   };
+// }
 else if (isRabbitImageElement(element)) {
   const offsetX = element.x + appState.scrollX;
   const offsetY = element.y + appState.scrollY;
@@ -1191,94 +1247,35 @@ else if (isRabbitImageElement(element)) {
   const padding = 10;
   const labelHeight = 20;
 
-  // 1) Draw the box and label immediately
+  // 1) Draw the box and label
   context.save();
   context.translate(offsetX, offsetY);
-
-  // Background & border
-  context.fillStyle = element.backgroundColor || "#ffffff";
+  context.fillStyle = element.backgroundColor || "#fff";
   context.fillRect(0, 0, width, height);
-  context.strokeStyle = element.strokeColor || "#000000";
+  context.strokeStyle = element.strokeColor || "#000";
   context.strokeRect(0, 0, width, height);
-
-  // Label
   context.fillStyle = "#000";
   context.font = "16px sans-serif";
   context.textBaseline = "bottom";
   context.fillText(element.label, padding, height - 5);
-
   context.restore();
 
-  // 2) Draw the image once it’s loaded, within its own transformed context
-  const image = new Image();
-  image.src = element.imageUrl;
-  image.onload = () => {
+  // 2) Draw the cached image if it’s ready
+  const img = getCachedRabbitImage(element.imageUrl);
+  if (img.complete && img.naturalWidth) {
     context.save();
     context.translate(offsetX, offsetY);
     context.drawImage(
-      image,
+      img,
       padding,
       padding,
       width - padding * 2,
       height - labelHeight - padding * 2
     );
     context.restore();
-  };
-}
-//   else if (isRabbitImageElement(element)) {
-//   const offsetX = element.x + appState.scrollX;
-//   const offsetY = element.y + appState.scrollY;
-//   const { width, height } = element;
-//   const padding = 10;
-//   const labelHeight = 20;
-
-//   // draw background + border + label exactly once per frame
-//   context.save();
-//   context.translate(offsetX, offsetY);
-//   context.fillStyle = element.backgroundColor || "#fff";
-//   context.fillRect(0, 0, width, height);
-//   context.strokeStyle = element.strokeColor || "#000";
-//   context.strokeRect(0, 0, width, height);
-//   context.fillStyle = "#000";
-//   context.font = "16px sans-serif";
-//   context.textBaseline = "bottom";
-//   context.fillText(element.label, padding, height - 5);
-//   context.restore();
-
-//   // draw the cached image synchronously if it's ready
-//   const img = getCachedRabbitImage(element.imageUrl);
-//   if (img.complete && img.naturalWidth) {
-//     context.save();
-//     context.translate(offsetX, offsetY);
-//     context.drawImage(
-//       img,
-//       padding,
-//       padding,
-//       width - padding * 2,
-//       height - labelHeight - padding * 2
-//     );
-//     context.restore();
-//   }
-// }
-
-// Simple URL → HTMLImageElement cache
-const rabbitImageCache: Record<string, HTMLImageElement> = {};
-
-function getCachedRabbitImage(url: string): HTMLImageElement {
-  let img = rabbitImageCache[url];
-  if (!img) {
-    img = new Image();
-    img.src = url;
-    // once it loads, ask Excalidraw to repaint
-    img.onload = () => {
-      // if you have access to an Excalidraw `appState` or an API, trigger a scene refresh here.
-      // e.g. excalidrawAPI?.refresh(); 
-      // or if you're inside Excalidraw's render loop, simply invalidating the frame will rerender.
-    };
-    rabbitImageCache[url] = img;
   }
-  return img;
 }
+
 
 
 
