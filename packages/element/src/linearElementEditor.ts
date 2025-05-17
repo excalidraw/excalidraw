@@ -554,7 +554,15 @@ export class LinearElementEditor {
 
           const bindingElement = isBindingEnabled(appState)
             ? getHoveredElementForBinding(
-                pointerCoords,
+                (selectedPointsIndices?.length ?? 0) > 1
+                  ? tupleToCoors(
+                      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                        element,
+                        selectedPoint!,
+                        elementsMap,
+                      ),
+                    )
+                  : pointerCoords,
                 elements,
                 elementsMap,
                 appState.zoom,
