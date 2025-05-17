@@ -38,7 +38,7 @@ import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
 
-import { newRabbitSearchBoxElement } from "@excalidraw/element/newRabbitElement";
+import { newRabbitSearchBoxElement, newRabbitImageElement } from "@excalidraw/element/newRabbitElement";
 
 import {
   GithubIcon,
@@ -972,6 +972,25 @@ const ExcalidrawWrapper = () => {
                   
                   excalidrawAPI.updateScene({
                     elements: [...excalidrawAPI.getSceneElements(), searchBox],
+                  });
+                }
+              },
+            },
+            {
+              label: "Add Rabbit Image",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["rabbit", "image", "rabbitimage"],
+              perform: () => {
+                if (excalidrawAPI) {
+                  const image = newRabbitImageElement({
+                    x: 100,
+                    y: 100,
+                    label: "Rabbit Image",
+                    imageUrl: "https://c02.purpledshub.com/uploads/sites/40/2023/08/JI230816Cosmos220-6d9254f-edited-scaled.jpg",
+                  });
+                  excalidrawAPI.updateScene({
+                    elements: [...excalidrawAPI.getSceneElements(), image],
                   });
                 }
               },

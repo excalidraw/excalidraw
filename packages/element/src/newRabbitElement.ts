@@ -22,7 +22,7 @@ import type {
   VerticalAlign,
   FontFamilyValues,
 } from "@excalidraw/element/types";
-import { RabbitSearchBoxElement } from "./rabbitElement";
+import { RabbitSearchBoxElement, RabbitElementBase, RabbitImageElement } from "./rabbitElement";
 
 export const newRabbitSearchBoxElement = (
   opts: {
@@ -107,4 +107,66 @@ export const newRabbitSearchBoxElement = (
 
   // type assertion to bypass TypeScript's type checking
   return searchBoxElement as RabbitSearchBoxElement;
+};
+
+export const newRabbitImageElement = (
+  opts: {
+    x: number;
+    y: number;
+    width?: number;
+    height?: number;
+    text?: string;
+    fontSize?: number;
+    fontFamily?: FontFamilyValues;
+    textAlign?: TextAlign;
+    verticalAlign?: VerticalAlign;
+    hasIcon?: boolean;
+    strokeColor?: string;
+    backgroundColor?: string;
+    fillStyle?: FillStyle;
+    strokeWidth?: number;
+    strokeStyle?: StrokeStyle;
+    roughness?: number;
+    opacity?: number;
+    roundness?: { type: RoundnessType; value?: number };
+    angle?: number;
+    imageUrl?: string; 
+    label?: string;    
+  }
+): RabbitImageElement => {
+  const base: RabbitElementBase = {
+    id: randomId(),
+    x: opts.x,
+    y: opts.y,
+    width: opts.width ?? 200,
+    height: opts.height ?? 200,
+    angle: (opts.angle || 0) as Radians,
+    version: 1,
+    versionNonce: 0,
+    strokeColor: opts.strokeColor ?? "#000000",
+    backgroundColor: opts.backgroundColor ?? "#ffffff",
+    fillStyle: opts.fillStyle ?? "solid",
+    strokeWidth: opts.strokeWidth ?? 1,
+    strokeStyle: opts.strokeStyle ?? "solid",
+    roughness: opts.roughness ?? 0,
+    opacity: opts.opacity ?? 100,
+    groupIds: [],
+    frameId: null,
+    roundness: opts.roundness ?? null,
+    seed: Math.floor(Math.random() * 100000),
+    isDeleted: false,
+    boundElements: null,
+    updated: Date.now(),
+    link: null,
+    locked: false,
+    customData: {},
+    index: null,
+  };
+
+  return {
+    ...base,
+    type: "rabbit-image",
+    imageUrl: opts.imageUrl ?? "https://via.placeholder.com/150",
+    label: opts.label ?? "Rabbit Image",
+  };
 };
