@@ -297,6 +297,10 @@ export const SearchMenu = () => {
         event.preventDefault();
         event.stopPropagation();
 
+        if (app.state.openDialog) {
+          return;
+        }
+
         if (!searchInputRef.current?.matches(":focus")) {
           if (app.state.openDialog) {
             setAppState({
