@@ -224,9 +224,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 37,
-  "width": "98.40611",
-  "x": 1,
+  "version": 35,
+  "width": "102.80179",
+  "x": "-0.42182",
   "y": 0,
 }
 `;
@@ -828,9 +828,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 33,
-  "width": 0,
-  "x": 149,
+  "version": 31,
+  "width": 100,
+  "x": "149.29289",
   "y": 0,
 }
 `;
