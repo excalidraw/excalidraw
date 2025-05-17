@@ -3,7 +3,7 @@ import { getStroke } from "perfect-freehand";
 
 import { isRightAngleRads } from "@excalidraw/math";
 
-import { isRabbitElement, isRabbitSearchBoxElement } from "./rabbitElement";
+import { isRabbitElement, isRabbitSearchBoxElement, isRabbitImageElement } from "./rabbitElement";
 
 import {
   BOUND_TEXT_PADDING,
@@ -78,6 +78,21 @@ import type {
 
 import type { StrokeOptions } from "perfect-freehand";
 import type { RoughCanvas } from "roughjs/bin/canvas";
+
+
+const rabbitImageCache: Record<string, HTMLImageElement> = {};
+
+function getCachedRabbitImage(url: string): HTMLImageElement {
+  let img = rabbitImageCache[url];
+  if (!img) {
+    img = new Image();
+    img.src = url;
+    // no-op onload; we'll rely on the next Excalidraw redraw
+    rabbitImageCache[url] = img;
+  }
+  return img;
+}
+
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -323,17 +338,17 @@ const generateElementCanvas = (
     // Clear the bound text area
     boundTextCanvasContext.clearRect(
       -(boundTextElement.width / 2 + BOUND_TEXT_PADDING) *
-        window.devicePixelRatio *
-        scale,
+      window.devicePixelRatio *
+      scale,
       -(boundTextElement.height / 2 + BOUND_TEXT_PADDING) *
-        window.devicePixelRatio *
-        scale,
+      window.devicePixelRatio *
+      scale,
       (boundTextElement.width + BOUND_TEXT_PADDING * 2) *
-        window.devicePixelRatio *
-        scale,
+      window.devicePixelRatio *
+      scale,
       (boundTextElement.height + BOUND_TEXT_PADDING * 2) *
-        window.devicePixelRatio *
-        scale,
+      window.devicePixelRatio *
+      scale,
     );
   }
 
@@ -458,11 +473,11 @@ const drawElementOnCanvas = (
         const { x, y, width, height } = element.crop
           ? element.crop
           : {
-              x: 0,
-              y: 0,
-              width: img.naturalWidth,
-              height: img.naturalHeight,
-            };
+            x: 0,
+            y: 0,
+            width: img.naturalWidth,
+            height: img.naturalHeight,
+          };
 
         context.drawImage(
           img,
@@ -502,8 +517,8 @@ const drawElementOnCanvas = (
           element.textAlign === "center"
             ? element.width / 2
             : element.textAlign === "right"
-            ? element.width
-            : 0;
+              ? element.width
+              : 0;
 
         const lineHeightPx = getLineHeightInPx(
           element.fontSize,
@@ -527,16 +542,16 @@ const drawElementOnCanvas = (
         );
         const boxWidth = maxLineWidth + 2 * BOUND_TEXT_PADDING;
         const boxHeight = lines.length * lineHeightPx + 2 * BOUND_TEXT_PADDING;
-        
+
         const boxX =
           horizontalOffset -
           (element.textAlign === "center"
             ? boxWidth / 2
             : element.textAlign === "right"
-            ? boxWidth
-            : 0);
+              ? boxWidth
+              : 0);
         const boxY = -BOUND_TEXT_PADDING;
-        
+
         context.save();
         context.strokeStyle = "rgba(0,0,0,0.5)";
         context.lineWidth = 3;
@@ -567,7 +582,7 @@ const drawElementOnCanvas = (
         context.lineTo(boxX, boxY + radius);
         context.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
         context.closePath();
-        context.stroke();        context.restore();
+        context.stroke(); context.restore();
         if (shouldTemporarilyAttach) {
           context.canvas.remove();
         }
@@ -592,8 +607,8 @@ const generateElementWithCanvas = (
   const zoom: Zoom = renderConfig
     ? appState.zoom
     : {
-        value: 1 as NormalizedZoomValue,
-      };
+      value: 1 as NormalizedZoomValue,
+    };
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
@@ -699,16 +714,16 @@ const drawElementFromCanvas = (
     context.drawImage(
       elementWithCanvas.canvas!,
       (x1 + appState.scrollX) * window.devicePixelRatio -
-        (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
+      (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
       (y1 + appState.scrollY) * window.devicePixelRatio -
-        (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
+      (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
       elementWithCanvas.canvas!.width / elementWithCanvas.scale,
       elementWithCanvas.canvas!.height / elementWithCanvas.scale,
     );
 
     if (
       import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
-        "true" &&
+      "true" &&
       hasBoundTextElement(element)
     ) {
       const textElement = getBoundTextElement(
@@ -780,8 +795,8 @@ export const renderElement = (
   // Check for RabbitElements
   if (isRabbitElement(element)) {
     renderRabbitElement(
-      element, 
-      context, 
+      element,
+      context,
       appState,
       renderConfig
     );
@@ -1073,87 +1088,99 @@ export const renderElement = (
   context.globalAlpha = 1;
 };
 
-    // Add the renderRabbitElement function
-  const renderRabbitElement = (
-    element: RabbitElement,
-    context: CanvasRenderingContext2D,
-    appState: StaticCanvasAppState,
-    renderConfig: StaticCanvasRenderConfig,
-  ) => {
-    if (isRabbitSearchBoxElement(element)) {
-      context.save();
+// Add the renderRabbitElement function
+const renderRabbitElement = (
+  element: RabbitElement,
+  context: CanvasRenderingContext2D,
+  appState: StaticCanvasAppState,
+  renderConfig: StaticCanvasRenderConfig,
+) => {
+  if (isRabbitSearchBoxElement(element)) {
+    context.save();
 
-      context.translate(
-        element.x + appState.scrollX,
-        element.y + appState.scrollY
-      );
-      
-      // Fill with white background
-      context.fillStyle = element.backgroundColor;
-      
-      // Get the corner radius from the element's roundness property
-      const radius = getCornerRadius(
-        Math.min(element.width, element.height),
-        element
-      );
-      
-      // Draw rounded rectangle
-      if (context.roundRect) {
-        context.beginPath();
-        context.roundRect(0, 0, element.width, element.height, radius);
-        context.fill();
-        
-        // Draw border
-        context.strokeStyle = element.strokeColor;
-        context.lineWidth = element.strokeWidth;
-        context.stroke();
-      } else {
-        // Fallback for browsers that don't support roundRect
-        context.beginPath();
-        context.moveTo(radius, 0);
-        context.lineTo(element.width - radius, 0);
-        context.quadraticCurveTo(element.width, 0, element.width, radius);
-        context.lineTo(element.width, element.height - radius);
-        context.quadraticCurveTo(element.width, element.height, element.width - radius, element.height);
-        context.lineTo(radius, element.height);
-        context.quadraticCurveTo(0, element.height, 0, element.height - radius);
-        context.lineTo(0, radius);
-        context.quadraticCurveTo(0, 0, radius, 0);
-        context.closePath();
-        context.fill();
-        context.stroke();
-      }
-      
-      // Set text properties
-      context.font = getFontString(element);
-      context.fillStyle = element.strokeColor;
-      context.textAlign = element.textAlign as CanvasTextAlign;
-      
-      // Calculate text position
-      const padding = 10;
-      const iconSpace = element.hasIcon ? 30 : 0;
-      
-      const horizontalOffset =
-        element.textAlign === "center"
-          ? element.width / 2
-          : element.textAlign === "right"
+    context.translate(
+      element.x + appState.scrollX,
+      element.y + appState.scrollY
+    );
+
+    // Fill with white background
+    context.fillStyle = element.backgroundColor;
+
+    // Get the corner radius from the element's roundness property
+    const radius = getCornerRadius(
+      Math.min(element.width, element.height),
+      element
+    );
+
+    // Draw rounded rectangle
+    if (context.roundRect) {
+      context.beginPath();
+      context.roundRect(0, 0, element.width, element.height, radius);
+      context.fill();
+
+      // Draw border
+      context.strokeStyle = element.strokeColor;
+      context.lineWidth = element.strokeWidth;
+      context.stroke();
+    } else {
+      // Fallback for browsers that don't support roundRect
+      context.beginPath();
+      context.moveTo(radius, 0);
+      context.lineTo(element.width - radius, 0);
+      context.quadraticCurveTo(element.width, 0, element.width, radius);
+      context.lineTo(element.width, element.height - radius);
+      context.quadraticCurveTo(element.width, element.height, element.width - radius, element.height);
+      context.lineTo(radius, element.height);
+      context.quadraticCurveTo(0, element.height, 0, element.height - radius);
+      context.lineTo(0, radius);
+      context.quadraticCurveTo(0, 0, radius, 0);
+      context.closePath();
+      context.fill();
+      context.stroke();
+    }
+
+    // Set text properties
+    context.font = getFontString(element);
+    context.fillStyle = element.strokeColor;
+    context.textAlign = element.textAlign as CanvasTextAlign;
+
+    // Calculate text position
+    const padding = 10;
+    const iconSpace = element.hasIcon ? 30 : 0;
+
+    const horizontalOffset =
+      element.textAlign === "center"
+        ? element.width / 2
+        : element.textAlign === "right"
           ? element.width - padding - iconSpace
           : padding;
+
+    const lineHeightPx = getLineHeightInPx(
+      element.fontSize,
+      element.lineHeight,
+    );
+
+    const verticalOffset = getVerticalOffset(
+      element.fontFamily,
+      element.fontSize,
+      lineHeightPx,
+    );
+
+    // Draw the text
+    // const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+    // for (let index = 0; index < lines.length; index++) {
+    //   context.fillText(
+    //     lines[index],
+    //     horizontalOffset,
+    //     index * lineHeightPx + verticalOffset + element.height / 2 - (lines.length * lineHeightPx) / 2,
+    //   );
       
-      const lineHeightPx = getLineHeightInPx(
-        element.fontSize,
-        element.lineHeight,
-      );
       
-      const verticalOffset = getVerticalOffset(
-        element.fontFamily,
-        element.fontSize,
-        lineHeightPx,
-      );
-      
-      const displayText = element.isEditing 
-        ? element.currentText 
-        : (element.currentText.trim() !== "" ? element.currentText : element.text);
+
+
+        const displayText = element.isEditing 
+          ? element.currentText 
+          : (element.currentText.trim() !== "" ? element.currentText : element.text);
 
       const lines = displayText.replace(/\r\n?/g, "\n").split("\n");
       for (let index = 0; index < lines.length; index++) {
@@ -1188,7 +1215,87 @@ export const renderElement = (
     
     context.restore();
   }
+// else if (isRabbitImageElement(element)) {
+//   const offsetX = element.x + appState.scrollX;
+//   const offsetY = element.y + appState.scrollY;
+//   const { width, height } = element;
+//   const padding = 10;
+//   const labelHeight = 20;
+
+//   // 1) Draw the box and label immediately
+//   context.save();
+//   context.translate(offsetX, offsetY);
+
+//   // Background & border
+//   context.fillStyle = element.backgroundColor || "#ffffff";
+//   context.fillRect(0, 0, width, height);
+//   context.strokeStyle = element.strokeColor || "#000000";
+//   context.strokeRect(0, 0, width, height);
+
+//   // Label
+//   context.fillStyle = "#000";
+//   context.font = "16px sans-serif";
+//   context.textBaseline = "bottom";
+//   context.fillText(element.label, padding, height - 5);
+
+//   context.restore();
+
+//   // 2) Draw the image once it’s loaded, within its own transformed context
+//   const image = new Image();
+//   image.src = element.imageUrl;
+//   image.onload = () => {
+//     context.save();
+//     context.translate(offsetX, offsetY);
+//     context.drawImage(
+//       image,
+//       padding,
+//       padding,
+//       width - padding * 2,
+//       height - labelHeight - padding * 2
+//     );
+//     context.restore();
+//   };
+// }
+
+else if (isRabbitImageElement(element)) {
+  const offsetX = element.x + appState.scrollX;
+  const offsetY = element.y + appState.scrollY;
+  const { width, height } = element;
+  const padding = 10;
+  const labelHeight = 20;
+
+  // 1) Draw the box and label
+  context.save();
+  context.translate(offsetX, offsetY);
+  context.fillStyle = element.backgroundColor || "#fff";
+  context.fillRect(0, 0, width, height);
+  context.strokeStyle = element.strokeColor || "#000";
+  context.strokeRect(0, 0, width, height);
+  context.fillStyle = "#000";
+  context.font = "16px sans-serif";
+  context.textBaseline = "bottom";
+  context.fillText(element.label, padding, height - 5);
+  context.restore();
+
+  // 2) Draw the cached image if it’s ready
+  const img = getCachedRabbitImage(element.imageUrl);
+  if (img.complete && img.naturalWidth) {
+    context.save();
+    context.translate(offsetX, offsetY);
+    context.drawImage(
+      img,
+      padding,
+      padding,
+      width - padding * 2,
+      height - labelHeight - padding * 2
+    );
+    context.restore();
   }
+}
+
+
+
+}
 
 export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);
 
@@ -1208,8 +1315,8 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
   const inputPoints = element.simulatePressure
     ? element.points
     : element.points.length
-    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
-    : [[0, 0, 0.5]];
+      ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
+      : [[0, 0, 0.5]];
 
   // Consider changing the options for simulated pressure vs real pressure
   const options: StrokeOptions = {
