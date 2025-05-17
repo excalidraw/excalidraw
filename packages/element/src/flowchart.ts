@@ -21,7 +21,6 @@ import {
 import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import { newArrowElement, newElement } from "./newElement";
-import { aabbForElement } from "./shapes";
 import { elementsAreInFrameBounds, elementOverlapsWithFrame } from "./frame";
 import {
   isBindableElement,
@@ -38,6 +37,7 @@ import {
   type Ordered,
   type OrderedExcalidrawElement,
 } from "./types";
+import { aabbForElement } from "./bounds";
 
 import type { Scene } from "./Scene";
 

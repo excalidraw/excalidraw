@@ -704,7 +704,7 @@ describe("regression tests", () => {
 
     // pointer down on rectangle
     mouse.reset();
-    mouse.down(100, 100);
+    mouse.down(110, 100); // Rectangle is rounded, there is no selection at the corner
     mouse.up(200, 200);
 
     expect(API.getSelectedElement().type).toBe("rectangle");
@@ -989,6 +989,7 @@ describe("regression tests", () => {
 
       // select rectangle
       mouse.reset();
+      mouse.moveTo(30, 0); // Rectangle is rounded, there is no selection at the corner
       mouse.click();
 
       // click on intersection between ellipse and rectangle
@@ -1155,6 +1156,7 @@ it(
     // Select first rectangle while keeping third one selected.
     // Third rectangle is selected because it was the last element to be created.
     mouse.reset();
+    mouse.moveTo(30, 0);
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.click();
     });
@@ -1176,6 +1178,7 @@ it(
 
     // Pointer down o first rectangle that is part of the group
     mouse.reset();
+    mouse.moveTo(30, 0);
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.down();
     });

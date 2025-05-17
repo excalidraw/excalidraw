@@ -510,12 +510,12 @@ describe("arrow element", () => {
       h.state,
     )[0] as ExcalidrawElbowArrowElement;
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
 
     UI.resize(rectangle, "se", [-200, -150]);
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
   });
 
@@ -538,11 +538,11 @@ describe("arrow element", () => {
       h.state,
     )[0] as ExcalidrawElbowArrowElement;
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
 
     UI.resize([rectangle, arrow], "nw", [300, 350]);
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(0);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.05);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.25);
   });
 });
@@ -819,7 +819,7 @@ describe("image element", () => {
 
     UI.resize(image, "ne", [40, 0]);
 
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(31, 0);
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(30, 0);
 
     const imageWidth = image.width;
     const scale = 20 / image.height;
@@ -1033,7 +1033,7 @@ describe("multiple selection", () => {
 
     expect(leftBoundArrow.x).toBeCloseTo(-110);
     expect(leftBoundArrow.y).toBeCloseTo(50);
-    expect(leftBoundArrow.width).toBeCloseTo(143, 0);
+    expect(leftBoundArrow.width).toBeCloseTo(140, 0);
     expect(leftBoundArrow.height).toBeCloseTo(7, 0);
     expect(leftBoundArrow.angle).toEqual(0);
     expect(leftBoundArrow.startBinding).toBeNull();

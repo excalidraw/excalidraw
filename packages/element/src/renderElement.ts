@@ -54,9 +54,9 @@ import {
   isImageElement,
 } from "./typeChecks";
 import { getContainingFrame } from "./frame";
-import { getCornerRadius } from "./shapes";
 
-import { ShapeCache } from "./ShapeCache";
+import { getCornerRadius } from "./utils";
+import { ShapeCache } from "./shape";
 
 import type {
   ExcalidrawElement,

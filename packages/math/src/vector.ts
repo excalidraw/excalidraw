@@ -21,13 +21,23 @@ export function vector(
  *
  * @param p The point to turn into a vector
  * @param origin The origin point in a given coordiante system
- * @returns The created vector from the point and the origin
+ * @param threshold The threshold to consider the vector as 'undefined'
+ * @param defaultValue The default value to return if the vector is 'undefined'
+ * @returns The created vector from the point and the origin or default
  */
 export function vectorFromPoint<Point extends GlobalPoint | LocalPoint>(
   p: Point,
   origin: Point = [0, 0] as Point,
+  threshold?: number,
+  defaultValue: Vector = [0, 1] as Vector,
 ): Vector {
-  return vector(p[0] - origin[0], p[1] - origin[1]);
+  const vec = vector(p[0] - origin[0], p[1] - origin[1]);
+
+  if (threshold && vectorMagnitudeSq(vec) < threshold * threshold) {
+    return defaultValue;
+  }
+
+  return vec;
 }
 
 /**
