@@ -13,7 +13,7 @@ import {
 } from "@excalidraw/common";
 
 import { FillStyle, StrokeStyle, RoundnessType } from "@excalidraw/element/types";
-import type { Radians } from "@excalidraw/math"; // Change import to type import for Radians
+import type { Radians } from "@excalidraw/math"; 
 import { newElement } from "@excalidraw/element/newElement";
 import { normalizeText, measureText } from "@excalidraw/element/textMeasurements";
 
@@ -103,8 +103,20 @@ export const newRabbitSearchBoxElement = (
     verticalAlign,
     hasIcon,
     lineHeight,
+    // originalText: text,
+    autoResize: false,
+    containerId: null,
+    isEditing: false,
+    currentText: text,
   };
 
   // type assertion to bypass TypeScript's type checking
   return searchBoxElement as RabbitSearchBoxElement;
+};
+
+export const getSearchBoxText = (element: RabbitSearchBoxElement): string => {
+  if (element.currentText !== "Search..." && element.currentText.trim() !== "") {
+    console.log("Search Box Text:", element.currentText);
+  }
+  return element.currentText;
 };

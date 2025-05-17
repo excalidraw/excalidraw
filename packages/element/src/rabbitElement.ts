@@ -58,6 +58,9 @@ export type RabbitSearchBoxElement = {
   // rabbitSearchBox specific properties
   rabbitId: string;
   hasIcon: boolean;
+  
+  isEditing: boolean;
+  currentText: string;
 };
 
 export type RabbitElement = RabbitSearchBoxElement;

@@ -1151,8 +1151,11 @@ export const renderElement = (
         lineHeightPx,
       );
       
-      // Draw the text
-      const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+      const displayText = element.isEditing 
+        ? element.currentText 
+        : (element.currentText.trim() !== "" ? element.currentText : element.text);
+
+      const lines = displayText.replace(/\r\n?/g, "\n").split("\n");
       for (let index = 0; index < lines.length; index++) {
         context.fillText(
           lines[index],
@@ -1164,6 +1167,7 @@ export const renderElement = (
       // Draw search icon if enabled
       if (element.hasIcon) {
         // Draw a simple magnifying glass icon
+        // const iconX = element.width - 20;
         const iconX = element.width - 20;
         const iconY = element.height / 2;
         const iconSize = Math.min(12, element.height / 2);

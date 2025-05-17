@@ -76,6 +76,13 @@ import type {
 } from "@excalidraw/excalidraw/types";
 import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
+// import { 
+//   handleRabbitSearchBoxClick, 
+//   handleRabbitSearchBoxKeyDown 
+// } from "@excalidraw/element/rabbitElementHandlers";
+import { isRabbitSearchBoxElement } from "@excalidraw/element/rabbitElement";
+import { getSearchBoxText } from "@excalidraw/element/newRabbitElement";
+import { useRabbitSearchBoxHandlers } from "@excalidraw/element/rabbitElementHandlers";
 
 import CustomStats from "./CustomStats";
 import {
@@ -340,6 +347,7 @@ const initializeScene = async (opts: {
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
+  
 
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
@@ -368,6 +376,7 @@ const ExcalidrawWrapper = () => {
 
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
+  useRabbitSearchBoxHandlers(excalidrawAPI);
 
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
@@ -973,6 +982,10 @@ const ExcalidrawWrapper = () => {
                   excalidrawAPI.updateScene({
                     elements: [...excalidrawAPI.getSceneElements(), searchBox],
                   });
+                  excalidrawAPI.setToast({
+                  message: "Double-click on the search box to edit. Press Enter to confirm and log text to console.",
+                  duration: 5000 
+                });
                 }
               },
             },
