@@ -29,7 +29,6 @@ import {
   FIXED_BINDING_DISTANCE,
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
-  snapToMid,
   getHoveredElementForBinding,
 } from "./binding";
 import { distanceToElement } from "./distance";
@@ -2233,13 +2232,7 @@ const getGlobalPoint = (
 ): GlobalPoint => {
   if (isDragging) {
     if (element) {
-      const snapPoint = bindPointToSnapToElementOutline(
-        arrow,
-        element,
-        startOrEnd,
-      );
-
-      return snapToMid(element, snapPoint);
+      return bindPointToSnapToElementOutline(arrow, element, startOrEnd);
     }
 
     return initialPoint;
