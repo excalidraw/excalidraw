@@ -246,11 +246,10 @@ export const isExcalidrawElement = (
     case "frame":
     case "magicframe":
     case "image":
-    case "selection": {
-      return true;
-    }
+    case "selection":
+    case "rabbit-searchbox":
     default: {
-      assertNever(type, null);
+      console.warn(`Unknown element type: ${type}`);
       return false;
     }
   }

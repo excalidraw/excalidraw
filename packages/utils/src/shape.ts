@@ -52,6 +52,11 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
+
+import type {
+  RabbitElement,
+} from "@excalidraw/element/rabbitElement";
+
 import type { Curve, LineSegment, Polygon, Radians } from "@excalidraw/math";
 
 import type { Drawable, Op } from "roughjs/bin/core";
@@ -114,7 +119,7 @@ type RectangularElement =
 
 // polygon
 export const getPolygonShape = <Point extends GlobalPoint | LocalPoint>(
-  element: RectangularElement,
+  element: RectangularElement
 ): GeometricShape<Point> => {
   const { angle, width, height, x, y } = element;
 
@@ -132,7 +137,52 @@ export const getPolygonShape = <Point extends GlobalPoint | LocalPoint>(
       pointRotateRads(pointFrom(cx, y + height), center, angle),
       pointRotateRads(pointFrom(x, cy), center, angle),
     );
-  } else {
+  }
+  else {
+    data = polygon(
+      pointRotateRads(pointFrom(x, y), center, angle),
+      pointRotateRads(pointFrom(x + width, y), center, angle),
+      pointRotateRads(pointFrom(x + width, y + height), center, angle),
+      pointRotateRads(pointFrom(x, y + height), center, angle),
+    );
+  }
+
+  return {
+    type: "polygon",
+    data,
+  };
+};
+
+// rabbit
+export const getRabbitShape = <Point extends GlobalPoint | LocalPoint>(
+  element: RabbitElement
+): GeometricShape<Point> => {
+  const { angle, width, height, x, y } = element;
+
+  const cx = x + width / 2;
+  const cy = y + height / 2;
+
+  const center: Point = pointFrom(cx, cy);
+
+  let data: Polygon<Point>;
+
+  if (element.type === "rabbit-searchbox") {
+      data = polygon(
+      pointRotateRads(pointFrom(cx, y), center, angle),
+      pointRotateRads(pointFrom(x + width, cy), center, angle),
+      pointRotateRads(pointFrom(cx, y + height), center, angle),
+      pointRotateRads(pointFrom(x, cy), center, angle),
+    );
+  }
+  else if (element.type === "rabbit-image") {
+    data = polygon(
+    pointRotateRads(pointFrom(cx, y), center, angle),
+    pointRotateRads(pointFrom(x + width, cy), center, angle),
+    pointRotateRads(pointFrom(cx, y + height), center, angle),
+    pointRotateRads(pointFrom(x, cy), center, angle),
+  );
+  }
+  else {
     data = polygon(
       pointRotateRads(pointFrom(x, y), center, angle),
       pointRotateRads(pointFrom(x + width, y), center, angle),

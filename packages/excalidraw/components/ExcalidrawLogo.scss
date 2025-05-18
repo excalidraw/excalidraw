@@ -1,16 +1,16 @@
 .excalidraw {
   .ExcalidrawLogo {
-    --logo-icon--xs: 2rem;
-    --logo-text--xs: 1.5rem;
+    --logo-icon--xs: 2.4rem;
+    --logo-text--xs: 1.8rem;
 
-    --logo-icon--small: 2.5rem;
-    --logo-text--small: 1.75rem;
+    --logo-icon--small: 3rem;
+    --logo-text--small: 2.1rem;
 
-    --logo-icon--normal: 3rem;
-    --logo-text--normal: 2.2rem;
+    --logo-icon--normal: 3.6rem;
+    --logo-text--normal: 2.6rem;
 
-    --logo-icon--large: 90px;
-    --logo-text--large: 65px;
+    --logo-icon--large: 110px;
+    --logo-text--large: 80px;
 
     display: flex;
     align-items: center;
@@ -22,6 +22,9 @@
     .ExcalidrawLogo-icon {
       width: auto;
       color: var(--color-logo-icon);
+      //move logo down a couple pixel
+      margin-top: 5px;
+      
     }
 
     .ExcalidrawLogo-text {
@@ -71,3 +74,13 @@
     }
   }
 }
+
+// .ExcalidrawLogo-icon {
+
+// }
+
+// .ExcalidrawLogo-text {
+//   font-size: 20px;
+//   font-weight: bold;
+//   margin-left: 8px;
+// }

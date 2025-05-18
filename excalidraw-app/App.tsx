@@ -30,12 +30,15 @@ import {
   resolvablePromise,
   isRunningInIframe,
   isDevEnv,
+  FONT_FAMILY,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
+
+import { newRabbitSearchBoxElement, newRabbitImageElement } from "@excalidraw/element/newRabbitElement";
 
 import {
   GithubIcon,
@@ -73,6 +76,13 @@ import type {
 } from "@excalidraw/excalidraw/types";
 import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
+// import { 
+//   handleRabbitSearchBoxClick, 
+//   handleRabbitSearchBoxKeyDown 
+// } from "@excalidraw/element/rabbitElementHandlers";
+import { isRabbitSearchBoxElement } from "@excalidraw/element/rabbitElement";
+import { getSearchBoxText } from "@excalidraw/element/newRabbitElement";
+import { useRabbitSearchBoxHandlers } from "@excalidraw/element/rabbitElementHandlers";
 
 import CustomStats from "./CustomStats";
 import {
@@ -325,11 +335,11 @@ const initializeScene = async (opts: {
   } else if (scene) {
     return isExternalScene && jsonBackendMatch
       ? {
-          scene,
-          isExternalScene,
-          id: jsonBackendMatch[1],
-          key: jsonBackendMatch[2],
-        }
+        scene,
+        isExternalScene,
+        id: jsonBackendMatch[1],
+        key: jsonBackendMatch[2],
+      }
       : { scene, isExternalScene: false };
   }
   return { scene: null, isExternalScene: false };
@@ -338,6 +348,7 @@ const initializeScene = async (opts: {
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
+  
 
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
@@ -366,6 +377,7 @@ const ExcalidrawWrapper = () => {
 
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
+  useRabbitSearchBoxHandlers(excalidrawAPI);
 
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
@@ -767,8 +779,7 @@ const ExcalidrawWrapper = () => {
     keywords: ["plus", "cloud", "server"],
     perform: () => {
       window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_LP
+        `${import.meta.env.VITE_APP_PLUS_LP
         }/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
@@ -790,8 +801,7 @@ const ExcalidrawWrapper = () => {
     ],
     perform: () => {
       window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_APP
+        `${import.meta.env.VITE_APP_PLUS_APP
         }?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
@@ -849,27 +859,27 @@ const ExcalidrawWrapper = () => {
               onExportToBackend,
               renderCustomUI: excalidrawAPI
                 ? (elements, appState, files) => {
-                    return (
-                      <ExportToExcalidrawPlus
-                        elements={elements}
-                        appState={appState}
-                        files={files}
-                        name={excalidrawAPI.getName()}
-                        onError={(error) => {
-                          excalidrawAPI?.updateScene({
-                            appState: {
-                              errorMessage: error.message,
-                            },
-                          });
-                        }}
-                        onSuccess={() => {
-                          excalidrawAPI.updateScene({
-                            appState: { openDialog: null },
-                          });
-                        }}
-                      />
-                    );
-                  }
+                  return (
+                    <ExportToExcalidrawPlus
+                      elements={elements}
+                      appState={appState}
+                      files={files}
+                      name={excalidrawAPI.getName()}
+                      onError={(error) => {
+                        excalidrawAPI?.updateScene({
+                          appState: {
+                            errorMessage: error.message,
+                          },
+                        });
+                      }}
+                      onSuccess={() => {
+                        excalidrawAPI.updateScene({
+                          appState: { openDialog: null },
+                        });
+                      }}
+                    />
+                  );
+                }
                 : undefined,
             },
           },
@@ -912,8 +922,8 @@ const ExcalidrawWrapper = () => {
           refresh={() => forceRefresh((prev) => !prev)}
         />
         <AppWelcomeScreen
-          onCollabDialogOpen={onCollabDialogOpen}
-          isCollabEnabled={!isCollabDisabled}
+          // onCollabDialogOpen={onCollabDialogOpen}
+          // isCollabEnabled={!isCollabDisabled}
         />
         <OverwriteConfirmDialog>
           <OverwriteConfirmDialog.Actions.ExportToImage />
@@ -981,6 +991,83 @@ const ExcalidrawWrapper = () => {
 
         <CommandPalette
           customCommandPaletteItems={[
+            // Testing rabbit hole search box
+            {
+              label: "Add Rabbit SearchBox",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["rabbit", "search", "box", "searchbox"],
+              perform: () => {
+                if (excalidrawAPI) {
+                  const searchBox = newRabbitSearchBoxElement({
+                    x: 100,
+                    y: 100,
+                    text: "Search...",
+                    fontSize: 16,
+                    fontFamily: FONT_FAMILY.Virgil,
+                    textAlign: "left",
+                    verticalAlign: "middle",
+                    hasIcon: true,
+                  });
+
+                  excalidrawAPI.updateScene({
+                    elements: [...excalidrawAPI.getSceneElements(), searchBox],
+                  });
+                  excalidrawAPI.setToast({
+                  message: "Double-click on the search box to edit. Press Enter to confirm and log text to console.",
+                  duration: 5000 
+                });
+                }
+              },
+            },
+            {
+              label: "Add Rabbit Image",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["rabbit", "image", "rabbitimage"],
+              perform: () => {
+                if (excalidrawAPI) {
+                  const imageUrl = "https://t3.ftcdn.net/jpg/02/47/33/08/360_F_247330858_RvSJWAhMbfrqsM5VUmjLD4gzzSKUaJls.jpg";
+                  const label = "Rabbit Image";
+                  const padding = 10;
+                  const labelHeight = 20;
+                  const fixedImageHeight = 200; // <-- set your fixed height here
+
+                  const img = new Image();
+                  img.crossOrigin = "anonymous"; // for CORS safety if needed
+
+                  img.onload = () => {
+                    // maintain aspect ratio so image doesn't load too large
+                    const aspectRatio = img.naturalWidth / img.naturalHeight;
+                    const imageHeight = fixedImageHeight;
+                    const imageWidth = imageHeight * aspectRatio;
+
+                    const totalWidth = imageWidth + padding * 2;
+                    const totalHeight = imageHeight + padding * 2 + labelHeight;
+
+                    // calls newRabbitImageElement to make the element
+                    const image = newRabbitImageElement({
+                      x: 100,
+                      y: 300,
+                      label,
+                      imageUrl,
+                      width: totalWidth,
+                      height: totalHeight,
+                    });
+
+                    excalidrawAPI.updateScene({
+                      elements: [...excalidrawAPI.getSceneElements(), image],
+                    });
+                  };
+
+                  img.onerror = () => {
+                    console.error("Failed to load image for RabbitImageElement");
+                  };
+
+                  img.src = imageUrl;
+                }
+              },
+            },
             {
               label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
@@ -1119,11 +1206,11 @@ const ExcalidrawWrapper = () => {
             },
             ...(isExcalidrawPlusSignedUser
               ? [
-                  {
-                    ...ExcalidrawPlusAppCommand,
-                    label: "Sign in / Go to Excalidraw+",
-                  },
-                ]
+                {
+                  ...ExcalidrawPlusAppCommand,
+                  label: "Sign in / Go to Excalidraw+",
+                },
+              ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
 
             {
