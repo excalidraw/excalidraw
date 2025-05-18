@@ -19,19 +19,30 @@ import { generateLinearCollisionShape } from "./Shape";
 
 import type {
   ExcalidrawDiamondElement,
+  ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
 
+type ElementShape = [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]];
+
+class ElementShapeCache {
+  private static cache = new WeakMap<
+    ExcalidrawElement,
+    Map<number, ElementShape>
+  >();
+}
+
 export function deconstructLinearOrFreeDrawElement(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
-): (Curve<GlobalPoint> | LineSegment<GlobalPoint>)[] {
+): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
   const ops = generateLinearCollisionShape(element) as {
     op: string;
     data: number[];
   }[];
-  const components = [];
+  const lines = [];
+  const curves = [];
 
   for (let idx = 0; idx < ops.length; idx += 1) {
     const op = ops[idx];
@@ -45,7 +56,7 @@ export function deconstructLinearOrFreeDrawElement(
           throw new Error("prevPoint is undefined");
         }
 
-        components.push(
+        lines.push(
           lineSegment<GlobalPoint>(
             pointFrom<GlobalPoint>(
               element.x + prevPoint[0],
@@ -63,7 +74,7 @@ export function deconstructLinearOrFreeDrawElement(
           throw new Error("prevPoint is undefined");
         }
 
-        components.push(
+        curves.push(
           curve<GlobalPoint>(
             pointFrom<GlobalPoint>(
               element.x + prevPoint[0],
@@ -90,7 +101,7 @@ export function deconstructLinearOrFreeDrawElement(
     }
   }
 
-  return components;
+  return [lines, curves];
 }
 
 /**

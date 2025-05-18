@@ -5,8 +5,6 @@ import {
 } from "@excalidraw/common";
 import {
   curveIntersectLineSegment,
-  isCurve,
-  isLineSegment,
   isPointWithinBounds,
   lineSegment,
   lineSegmentIntersectionPoints,
@@ -24,12 +22,7 @@ import {
   ellipseSegmentInterceptPoints,
 } from "@excalidraw/math/ellipse";
 
-import type {
-  Curve,
-  GlobalPoint,
-  LineSegment,
-  Radians,
-} from "@excalidraw/math";
+import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
 
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
@@ -218,33 +211,13 @@ const intersectLinearOrFreeDrawWithLineSegment = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   segment: LineSegment<GlobalPoint>,
 ): GlobalPoint[] => {
-  const shapes = deconstructLinearOrFreeDrawElement(element);
-  const intersections: GlobalPoint[] = [];
-
-  for (const shape of shapes) {
-    switch (true) {
-      case isCurve(shape):
-        //debugDrawCubicBezier(shape);
-        intersections.push(
-          ...curveIntersectLineSegment(shape as Curve<GlobalPoint>, segment),
-        );
-        continue;
-      case isLineSegment(shape):
-        //debugDrawLine(shape);
-        const point = lineSegmentIntersectionPoints(
-          segment,
-          shape as LineSegment<GlobalPoint>,
-        );
-
-        if (point) {
-          intersections.push(point);
-        }
-
-        continue;
-    }
-  }
-
-  return intersections;
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+  return [
+    ...lines
+      .map((l) => lineSegmentIntersectionPoints(l, segment))
+      .filter((p): p is GlobalPoint => p != null),
+    ...curves.flatMap((c) => curveIntersectLineSegment(c, segment)),
+  ].sort();
 };
 
 const intersectRectanguloidWithLineSegment = (

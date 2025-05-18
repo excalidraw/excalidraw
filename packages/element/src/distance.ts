@@ -1,8 +1,6 @@
 import {
   curvePointDistance,
   distanceToLineSegment,
-  isCurve,
-  isLineSegment,
   pointRotateRads,
 } from "@excalidraw/math";
 
@@ -10,12 +8,7 @@ import { ellipse, ellipseDistanceFromPoint } from "@excalidraw/math/ellipse";
 
 import { elementCenterPoint } from "@excalidraw/common";
 
-import type {
-  Curve,
-  GlobalPoint,
-  LineSegment,
-  Radians,
-} from "@excalidraw/math";
+import type { GlobalPoint, Radians } from "@excalidraw/math";
 
 import {
   deconstructDiamondElement,
@@ -137,31 +130,9 @@ const distanceToLinearOrFreeDraElement = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   p: GlobalPoint,
 ) => {
-  const shapes = deconstructLinearOrFreeDrawElement(element);
-  let distance = Infinity;
-
-  for (const shape of shapes) {
-    switch (true) {
-      case isCurve(shape): {
-        const d = curvePointDistance(shape as Curve<GlobalPoint>, p);
-
-        if (d < distance) {
-          distance = d;
-        }
-
-        continue;
-      }
-      case isLineSegment(shape): {
-        const d = distanceToLineSegment(p, shape as LineSegment<GlobalPoint>);
-
-        if (d < distance) {
-          distance = d;
-        }
-
-        continue;
-      }
-    }
-  }
-
-  return distance;
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+  return Math.min(
+    ...lines.map((s) => distanceToLineSegment(p, s)),
+    ...curves.map((a) => curvePointDistance(a, p)),
+  );
 };
