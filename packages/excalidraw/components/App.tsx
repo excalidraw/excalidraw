@@ -7213,6 +7213,10 @@ class App extends React.Component<AppProps, AppState> {
           this.getElementAtPosition(
             pointerDownState.origin.x,
             pointerDownState.origin.y,
+            {
+              preferSelected: true,
+              includeLockedElements: true,
+            },
           );
 
         this.hitLinkElement = this.getElementLinkAtPosition(
