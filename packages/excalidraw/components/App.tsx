@@ -5169,7 +5169,7 @@ class App extends React.Component<AppProps, AppState> {
     x: number,
     y: number,
     includeBoundTextElement: boolean = false,
-    includeLockedElements: boolean = false,
+    includeLockedElements: boolean = true,
   ): NonDeleted<ExcalidrawElement>[] {
     const iframeLikes: Ordered<ExcalidrawIframeElement>[] = [];
 
