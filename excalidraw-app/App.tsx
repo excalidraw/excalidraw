@@ -334,11 +334,11 @@ const initializeScene = async (opts: {
   } else if (scene) {
     return isExternalScene && jsonBackendMatch
       ? {
-          scene,
-          isExternalScene,
-          id: jsonBackendMatch[1],
-          key: jsonBackendMatch[2],
-        }
+        scene,
+        isExternalScene,
+        id: jsonBackendMatch[1],
+        key: jsonBackendMatch[2],
+      }
       : { scene, isExternalScene: false };
   }
   return { scene: null, isExternalScene: false };
@@ -778,8 +778,7 @@ const ExcalidrawWrapper = () => {
     keywords: ["plus", "cloud", "server"],
     perform: () => {
       window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_LP
+        `${import.meta.env.VITE_APP_PLUS_LP
         }/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
@@ -801,8 +800,7 @@ const ExcalidrawWrapper = () => {
     ],
     perform: () => {
       window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_APP
+        `${import.meta.env.VITE_APP_PLUS_APP
         }?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
@@ -829,27 +827,27 @@ const ExcalidrawWrapper = () => {
               onExportToBackend,
               renderCustomUI: excalidrawAPI
                 ? (elements, appState, files) => {
-                    return (
-                      <ExportToExcalidrawPlus
-                        elements={elements}
-                        appState={appState}
-                        files={files}
-                        name={excalidrawAPI.getName()}
-                        onError={(error) => {
-                          excalidrawAPI?.updateScene({
-                            appState: {
-                              errorMessage: error.message,
-                            },
-                          });
-                        }}
-                        onSuccess={() => {
-                          excalidrawAPI.updateScene({
-                            appState: { openDialog: null },
-                          });
-                        }}
-                      />
-                    );
-                  }
+                  return (
+                    <ExportToExcalidrawPlus
+                      elements={elements}
+                      appState={appState}
+                      files={files}
+                      name={excalidrawAPI.getName()}
+                      onError={(error) => {
+                        excalidrawAPI?.updateScene({
+                          appState: {
+                            errorMessage: error.message,
+                          },
+                        });
+                      }}
+                      onSuccess={() => {
+                        excalidrawAPI.updateScene({
+                          appState: { openDialog: null },
+                        });
+                      }}
+                    />
+                  );
+                }
                 : undefined,
             },
           },
@@ -978,7 +976,7 @@ const ExcalidrawWrapper = () => {
                     verticalAlign: "middle",
                     hasIcon: true,
                   });
-                  
+
                   excalidrawAPI.updateScene({
                     elements: [...excalidrawAPI.getSceneElements(), searchBox],
                   });
@@ -996,15 +994,44 @@ const ExcalidrawWrapper = () => {
               keywords: ["rabbit", "image", "rabbitimage"],
               perform: () => {
                 if (excalidrawAPI) {
-                  const image = newRabbitImageElement({
-                    x: 100,
-                    y: 100,
-                    label: "Rabbit Image",
-                    imageUrl: "https://c02.purpledshub.com/uploads/sites/40/2023/08/JI230816Cosmos220-6d9254f-edited-scaled.jpg",
-                  });
-                  excalidrawAPI.updateScene({
-                    elements: [...excalidrawAPI.getSceneElements(), image],
-                  });
+                  const imageUrl = "https://t3.ftcdn.net/jpg/02/47/33/08/360_F_247330858_RvSJWAhMbfrqsM5VUmjLD4gzzSKUaJls.jpg";
+                  const label = "Rabbit Image";
+                  const padding = 10;
+                  const labelHeight = 20;
+                  const fixedImageHeight = 200; // <-- set your fixed height here
+
+                  const img = new Image();
+                  img.crossOrigin = "anonymous"; // for CORS safety if needed
+
+                  img.onload = () => {
+                    // maintain aspect ratio so image doesn't load too large
+                    const aspectRatio = img.naturalWidth / img.naturalHeight;
+                    const imageHeight = fixedImageHeight;
+                    const imageWidth = imageHeight * aspectRatio;
+
+                    const totalWidth = imageWidth + padding * 2;
+                    const totalHeight = imageHeight + padding * 2 + labelHeight;
+
+                    // calls newRabbitImageElement to make the element
+                    const image = newRabbitImageElement({
+                      x: 100,
+                      y: 300,
+                      label,
+                      imageUrl,
+                      width: totalWidth,
+                      height: totalHeight,
+                    });
+
+                    excalidrawAPI.updateScene({
+                      elements: [...excalidrawAPI.getSceneElements(), image],
+                    });
+                  };
+
+                  img.onerror = () => {
+                    console.error("Failed to load image for RabbitImageElement");
+                  };
+
+                  img.src = imageUrl;
                 }
               },
             },
@@ -1146,11 +1173,11 @@ const ExcalidrawWrapper = () => {
             },
             ...(isExcalidrawPlusSignedUser
               ? [
-                  {
-                    ...ExcalidrawPlusAppCommand,
-                    label: "Sign in / Go to Excalidraw+",
-                  },
-                ]
+                {
+                  ...ExcalidrawPlusAppCommand,
+                  label: "Sign in / Go to Excalidraw+",
+                },
+              ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
 
             {
