@@ -30,13 +30,69 @@ type ElementShape = [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]];
 class ElementShapeCache {
   private static cache = new WeakMap<
     ExcalidrawElement,
-    Map<number, ElementShape>
+    { version: ExcalidrawElement["version"]; shapes: Map<number, ElementShape> }
   >();
+
+  public static get = <T extends ExcalidrawElement>(
+    element: T,
+    offset: number,
+  ): ElementShape | undefined => {
+    const record = ElementShapeCache.cache.get(element);
+
+    if (!record) {
+      return undefined;
+    }
+
+    const { version, shapes } = record;
+
+    if (version !== element.version) {
+      ElementShapeCache.cache.delete(element);
+      return undefined;
+    }
+
+    return shapes.get(offset);
+  };
+
+  public static set = <T extends ExcalidrawElement>(
+    element: T,
+    shape: ElementShape,
+    offset: number,
+  ) => {
+    const record = ElementShapeCache.cache.get(element);
+
+    if (!record) {
+      ElementShapeCache.cache.set(element, {
+        version: element.version,
+        shapes: new Map([[offset, shape]]),
+      });
+
+      return;
+    }
+
+    const { version, shapes } = record;
+
+    if (version !== element.version) {
+      ElementShapeCache.cache.set(element, {
+        version: element.version,
+        shapes: new Map([[offset, shape]]),
+      });
+
+      return;
+    }
+
+    shapes.set(offset, shape);
+  };
 }
 
 export function deconstructLinearOrFreeDrawElement(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+  const cachedShape = ElementShapeCache.get(element, 0);
+
+  if (cachedShape) {
+    return cachedShape;
+  }
+
   const ops = generateLinearCollisionShape(element) as {
     op: string;
     data: number[];
@@ -101,7 +157,10 @@ export function deconstructLinearOrFreeDrawElement(
     }
   }
 
-  return [lines, curves];
+  const shape = [lines, curves] as ElementShape;
+  ElementShapeCache.set(element, shape, 0);
+
+  return shape;
 }
 
 /**
@@ -116,6 +175,12 @@ export function deconstructRectanguloidElement(
   element: ExcalidrawRectanguloidElement,
   offset: number = 0,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+  const cachedShape = ElementShapeCache.get(element, offset);
+
+  if (cachedShape) {
+    return cachedShape;
+  }
+
   let radius = getCornerRadius(
     Math.min(element.width, element.height),
     element,
@@ -231,8 +296,11 @@ export function deconstructRectanguloidElement(
       corners[0][0][0],
     ),
   ];
+  const shape = [sides, corners.flat()] as ElementShape;
 
-  return [sides, corners.flat()];
+  ElementShapeCache.set(element, shape, offset);
+
+  return shape;
 }
 
 /**
@@ -247,6 +315,12 @@ export function deconstructDiamondElement(
   element: ExcalidrawDiamondElement,
   offset: number = 0,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+  const cachedShape = ElementShapeCache.get(element, offset);
+
+  if (cachedShape) {
+    return cachedShape;
+  }
+
   const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
     getDiamondPoints(element);
   const verticalRadius = element.roundness
@@ -348,5 +422,9 @@ export function deconstructDiamondElement(
     ),
   ];
 
-  return [sides, corners.flat()];
+  const shape = [sides, corners.flat()] as ElementShape;
+
+  ElementShapeCache.set(element, shape, offset);
+
+  return shape;
 }
