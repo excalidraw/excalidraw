@@ -897,37 +897,6 @@ export const updateElbowArrowPoints = (
     return { points: updates.points ?? arrow.points };
   }
 
-  // NOTE (mtolmacs): This is a temporary check to ensure that the incoming elbow
-  // arrow size is valid. This check will be removed once the issue is identified
-  if (
-    arrow.x < -MAX_POS ||
-    arrow.x > MAX_POS ||
-    arrow.y < -MAX_POS ||
-    arrow.y > MAX_POS ||
-    arrow.x + (updates?.points?.[updates?.points?.length - 1]?.[0] ?? 0) <
-      -MAX_POS ||
-    arrow.x + (updates?.points?.[updates?.points?.length - 1]?.[0] ?? 0) >
-      MAX_POS ||
-    arrow.y + (updates?.points?.[updates?.points?.length - 1]?.[1] ?? 0) <
-      -MAX_POS ||
-    arrow.y + (updates?.points?.[updates?.points?.length - 1]?.[1] ?? 0) >
-      MAX_POS ||
-    arrow.x + (arrow?.points?.[arrow?.points?.length - 1]?.[0] ?? 0) <
-      -MAX_POS ||
-    arrow.x + (arrow?.points?.[arrow?.points?.length - 1]?.[0] ?? 0) >
-      MAX_POS ||
-    arrow.y + (arrow?.points?.[arrow?.points?.length - 1]?.[1] ?? 0) <
-      -MAX_POS ||
-    arrow.y + (arrow?.points?.[arrow?.points?.length - 1]?.[1] ?? 0) > MAX_POS
-  ) {
-    console.error(
-      "Elbow arrow (or update) is outside reasonable bounds (> 1e6)",
-      {
-        arrow,
-        updates,
-      },
-    );
-  }
   // @ts-ignore See above note
   arrow.x = clamp(arrow.x, -MAX_POS, MAX_POS);
   // @ts-ignore See above note
