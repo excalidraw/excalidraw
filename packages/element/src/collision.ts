@@ -111,9 +111,9 @@ export const hitElementItself = ({
     ? shouldTestInside(element)
       ? // Since `inShape` tests STRICTLY againt the insides of a shape
         // we would need `onShape` as well to include the "borders"
-        isPointInShape(point, element) ||
-        isPointOnShape(point, element, threshold)
-      : isPointOnShape(point, element, threshold)
+        isPointInElement(point, element) ||
+        isPointOnElementOutline(point, element, threshold)
+      : isPointOnElementOutline(point, element, threshold)
     : false;
 
   // hit test against a frame's name
@@ -177,7 +177,7 @@ export const hitElementBoundText = (
       }
     : boundTextElementCandidate;
 
-  return isPointInShape(point, boundTextElement);
+  return isPointInElement(point, boundTextElement);
 };
 
 /**
@@ -371,14 +371,14 @@ const intersectEllipseWithLineSegment = (
 };
 
 // check if the given point is considered on the given shape's border
-const isPointOnShape = (
+const isPointOnElementOutline = (
   point: GlobalPoint,
   element: ExcalidrawElement,
   tolerance = 1,
 ) => distanceToElement(element, point) <= tolerance;
 
 // check if the given point is considered inside the element's border
-export const isPointInShape = (
+export const isPointInElement = (
   point: GlobalPoint,
   element: ExcalidrawElement,
 ) => {
