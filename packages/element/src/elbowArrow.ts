@@ -897,19 +897,6 @@ export const updateElbowArrowPoints = (
     return { points: updates.points ?? arrow.points };
   }
 
-  // @ts-ignore See above note
-  arrow.x = clamp(arrow.x, -MAX_POS, MAX_POS);
-  // @ts-ignore See above note
-  arrow.y = clamp(arrow.y, -MAX_POS, MAX_POS);
-  if (updates.points) {
-    updates.points = updates.points.map(([x, y]) =>
-      pointFrom<LocalPoint>(
-        clamp(x, -MAX_POS, MAX_POS),
-        clamp(y, -MAX_POS, MAX_POS),
-      ),
-    );
-  }
-
   if (!import.meta.env.PROD) {
     invariant(
       !updates.points || updates.points.length >= 2,
