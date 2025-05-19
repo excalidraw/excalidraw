@@ -4,7 +4,8 @@ Use `npm` or `yarn` to install the package.
 
 ```bash
 npm install 
-npm yarn start
+
+yarn start or npm start --ignore-engines
 ```
 
 
