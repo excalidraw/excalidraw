@@ -1,6 +1,6 @@
-import { KEYS, arrayToMap } from "@excalidraw/common";
+import { KEYS, arrayToMap, randomId } from "@excalidraw/common";
 
-import { newElementWith } from "@excalidraw/element";
+import { elementsAreInSameGroup, newElementWith } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
@@ -52,19 +52,75 @@ export const actionToggleElementLock = register({
 
     const nextLockState = shouldLock(selectedElements);
     const selectedElementsMap = arrayToMap(selectedElements);
+
+    const isAGroup =
+      selectedElements.length > 1 && elementsAreInSameGroup(selectedElements);
+    const isASingleUnit = selectedElements.length === 1 || isAGroup;
+    const newGroupId = isASingleUnit ? null : randomId();
+
+    let nextLockedSingleUnits = { ...appState.lockedUnits.singleUnits };
+    let nextLockedMultiSelections = { ...appState.lockedUnits.multiSelections };
+
+    if (nextLockState) {
+      nextLockedSingleUnits = {
+        ...appState.lockedUnits?.singleUnits,
+        ...(isASingleUnit
+          ? {
+              [isAGroup
+                ? selectedElements[0].groupIds.at(-1)!
+                : selectedElements[0].id]: true,
+            }
+          : {}),
+      };
+
+      nextLockedMultiSelections = {
+        ...appState.lockedUnits.multiSelections,
+        ...(newGroupId ? { [newGroupId]: true } : {}),
+      };
+    } else if (isAGroup) {
+      const groupId = selectedElements[0].groupIds.at(-1)!;
+      delete nextLockedSingleUnits[groupId];
+      delete nextLockedMultiSelections[groupId];
+    } else {
+      delete nextLockedSingleUnits[selectedElements[0].id];
+    }
+
     return {
       elements: elements.map((element) => {
         if (!selectedElementsMap.has(element.id)) {
           return element;
         }
 
-        return newElementWith(element, { locked: nextLockState });
+        let nextGroupIds = element.groupIds;
+
+        // if locking together, add to group
+        // if unlocking, remove the temporary group
+        if (nextLockState) {
+          if (newGroupId) {
+            nextGroupIds = [...nextGroupIds, newGroupId];
+          }
+        } else {
+          nextGroupIds = nextGroupIds.filter(
+            (groupId) => !appState.lockedUnits?.multiSelections?.[groupId],
+          );
+        }
+
+        return newElementWith(element, {
+          locked: nextLockState,
+          groupIds: nextGroupIds,
+        });
       }),
       appState: {
         ...appState,
+        selectedElementIds: nextLockState ? {} : appState.selectedElementIds,
+        selectedGroupIds: nextLockState ? {} : appState.selectedGroupIds,
         selectedLinearElement: nextLockState
           ? null
           : appState.selectedLinearElement,
+        lockedUnits: {
+          singleUnits: nextLockedSingleUnits,
+          multiSelections: nextLockedMultiSelections,
+        },
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -97,10 +153,23 @@ export const actionUnlockAllElements = register({
   perform: (elements, appState) => {
     const lockedElements = elements.filter((el) => el.locked);
 
+    const hasTemporaryGroupIds =
+      Object.keys(appState.lockedUnits.multiSelections).length > 0;
+
     return {
       elements: elements.map((element) => {
         if (element.locked) {
-          return newElementWith(element, { locked: false });
+          // remove the temporary groupId if it exists
+          const nextGroupIds = hasTemporaryGroupIds
+            ? element.groupIds.filter(
+                (gid) => !appState.lockedUnits.multiSelections[gid],
+              )
+            : element.groupIds;
+
+          return newElementWith(element, {
+            locked: false,
+            groupIds: nextGroupIds,
+          });
         }
         return element;
       }),
@@ -109,6 +178,10 @@ export const actionUnlockAllElements = register({
         selectedElementIds: Object.fromEntries(
           lockedElements.map((el) => [el.id, true]),
         ),
+        lockedUnits: {
+          singleUnits: {},
+          multiSelections: {},
+        },
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };

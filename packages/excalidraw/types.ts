@@ -439,6 +439,15 @@ export interface AppState {
   }> | null;
 
   hitLockedId: string | null;
+  lockedUnits: {
+    // when locking multiple units of elements together, we assign a temporary
+    // groupId to them so we can unlock them together;
+    // as elements are unlocked, we remove the groupId from the elements
+    // and also remove groupId from this map
+    multiSelections: { [groupId: string]: true };
+    // a single unit is either a single element, group, or a frame
+    singleUnits: { [id: string]: true };
+  };
 }
 
 export type SearchMatch = {

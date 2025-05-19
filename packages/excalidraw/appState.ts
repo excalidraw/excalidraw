@@ -122,6 +122,10 @@ export const getDefaultAppState = (): Omit<
     isCropping: false,
     croppingElementId: null,
     searchMatches: null,
+    lockedUnits: {
+      singleUnits: {},
+      multiSelections: {},
+    },
     hitLockedId: null,
   };
 };
@@ -247,6 +251,7 @@ const APP_STATE_STORAGE_CONF = (<
   isCropping: { browser: false, export: false, server: false },
   croppingElementId: { browser: false, export: false, server: false },
   searchMatches: { browser: false, export: false, server: false },
+  lockedUnits: { browser: true, export: true, server: true },
   hitLockedId: { browser: false, export: false, server: false },
 });
 
