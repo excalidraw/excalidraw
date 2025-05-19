@@ -5169,7 +5169,7 @@ class App extends React.Component<AppProps, AppState> {
     x: number,
     y: number,
     includeBoundTextElement: boolean = false,
-    includeLockedElements: boolean = false,
+    includeLockedElements: boolean = true,
   ): NonDeleted<ExcalidrawElement>[] {
     const iframeLikes: Ordered<ExcalidrawIframeElement>[] = [];
 
@@ -7213,6 +7213,10 @@ class App extends React.Component<AppProps, AppState> {
           this.getElementAtPosition(
             pointerDownState.origin.x,
             pointerDownState.origin.y,
+            {
+              preferSelected: true,
+              includeLockedElements: true,
+            },
           );
 
         this.hitLinkElement = this.getElementLinkAtPosition(
