@@ -437,6 +437,8 @@ export interface AppState {
     focusedId: ExcalidrawElement["id"] | null;
     matches: readonly SearchMatch[];
   }> | null;
+
+  hitLockedId: string | null;
 }
 
 export type SearchMatch = {

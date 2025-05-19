@@ -104,7 +104,11 @@ import {
   Emitter,
 } from "@excalidraw/common";
 
-import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
+import {
+  getCommonBounds,
+  getElementAbsoluteCoords,
+  selectGroupsFromGivenElements,
+} from "@excalidraw/element";
 
 import {
   bindOrUnbindLinearElement,
@@ -1554,6 +1558,74 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  private renderUnlockButton = () => {
+    const { hitLockedId } = this.state;
+
+    if (!hitLockedId) {
+      return null;
+    }
+
+    const element = this.scene.getElement(hitLockedId);
+
+    const elements = element
+      ? [element]
+      : getElementsInGroup(this.scene.getNonDeletedElementsMap(), hitLockedId);
+
+    if (elements.length === 0) {
+      return null;
+    }
+
+    const [x, y, width, height] = getCommonBounds(elements);
+    const { x: viewX, y: viewY } = sceneCoordsToViewportCoords(
+      { sceneX: x, sceneY: y },
+      this.state,
+    );
+    const isDarkTheme = this.state.theme === THEME.DARK;
+
+    return (
+      <div
+        style={{
+          position: "absolute",
+          bottom: `${
+            this.state.height +
+            FRAME_STYLE.nameOffsetY -
+            viewY +
+            this.state.offsetTop
+          }px`,
+          left: `${viewX - this.state.offsetLeft}px`,
+          zIndex: 2,
+          fontSize: FRAME_STYLE.nameFontSize,
+          color: isDarkTheme
+            ? FRAME_STYLE.nameColorDarkTheme
+            : FRAME_STYLE.nameColorLightTheme,
+          cursor: CURSOR_TYPE.POINTER,
+        }}
+        onClick={() => {
+          flushSync(() => {
+            const groupIds = selectGroupsFromGivenElements(
+              elements,
+              this.state,
+            );
+            this.setState({
+              selectedElementIds: elements.reduce(
+                (acc, element) => ({
+                  ...acc,
+                  [element.id]: true,
+                }),
+                {},
+              ),
+              selectedGroupIds: groupIds,
+              hitLockedId: null,
+            });
+          });
+          this.actionManager.executeAction(actionToggleElementLock);
+        }}
+      >
+        🔓
+      </div>
+    );
+  };
+
   private toggleOverscrollBehavior(event: React.PointerEvent) {
     // when pointer inside editor, disable overscroll behavior to prevent
     // panning to trigger history back/forward on MacOS Chrome
@@ -1876,6 +1948,7 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
+                        {this.renderUnlockButton()}
                         {showShapeSwitchPanel && (
                           <ConvertElementTypePopup app={this} />
                         )}
@@ -8946,6 +9019,37 @@ class App extends React.Component<AppProps, AppState> {
       SnapCache.setVisibleGaps(null);
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
+
+      if (!pointerDownState.boxSelection.hasOccurred) {
+        const sceneCoords = viewportCoordsToSceneCoords(
+          { clientX: childEvent.clientX, clientY: childEvent.clientY },
+          this.state,
+        );
+        const hitLockedElement = this.getElementAtPosition(
+          sceneCoords.x,
+          sceneCoords.y,
+          {
+            includeLockedElements: true,
+          },
+        );
+
+        if (hitLockedElement?.locked) {
+          this.setState({
+            hitLockedId:
+              hitLockedElement.groupIds.length > 0
+                ? hitLockedElement.groupIds.at(-1) || ""
+                : hitLockedElement.id,
+          });
+        } else {
+          this.setState({
+            hitLockedId: null,
+          });
+        }
+      } else {
+        this.setState({
+          hitLockedId: null,
+        });
+      }
 
       this.setState({
         selectedElementsAreBeingDragged: false,
