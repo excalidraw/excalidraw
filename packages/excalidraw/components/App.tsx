@@ -529,6 +529,7 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
+import UnlockPopup from "./UnlockPopup";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1558,74 +1559,6 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private renderUnlockButton = () => {
-    const { hitLockedId } = this.state;
-
-    if (!hitLockedId) {
-      return null;
-    }
-
-    const element = this.scene.getElement(hitLockedId);
-
-    const elements = element
-      ? [element]
-      : getElementsInGroup(this.scene.getNonDeletedElementsMap(), hitLockedId);
-
-    if (elements.length === 0) {
-      return null;
-    }
-
-    const [x, y, width, height] = getCommonBounds(elements);
-    const { x: viewX, y: viewY } = sceneCoordsToViewportCoords(
-      { sceneX: x, sceneY: y },
-      this.state,
-    );
-    const isDarkTheme = this.state.theme === THEME.DARK;
-
-    return (
-      <div
-        style={{
-          position: "absolute",
-          bottom: `${
-            this.state.height +
-            FRAME_STYLE.nameOffsetY -
-            viewY +
-            this.state.offsetTop
-          }px`,
-          left: `${viewX - this.state.offsetLeft}px`,
-          zIndex: 2,
-          fontSize: FRAME_STYLE.nameFontSize,
-          color: isDarkTheme
-            ? FRAME_STYLE.nameColorDarkTheme
-            : FRAME_STYLE.nameColorLightTheme,
-          cursor: CURSOR_TYPE.POINTER,
-        }}
-        onClick={() => {
-          flushSync(() => {
-            const groupIds = selectGroupsFromGivenElements(
-              elements,
-              this.state,
-            );
-            this.setState({
-              selectedElementIds: elements.reduce(
-                (acc, element) => ({
-                  ...acc,
-                  [element.id]: true,
-                }),
-                {},
-              ),
-              selectedGroupIds: groupIds,
-              hitLockedId: null,
-            });
-          });
-          this.actionManager.executeAction(actionToggleElementLock);
-        }}
-      >
-        🔓
-      </div>
-    );
-  };
-
   private toggleOverscrollBehavior(event: React.PointerEvent) {
     // when pointer inside editor, disable overscroll behavior to prevent
     // panning to trigger history back/forward on MacOS Chrome
@@ -1948,7 +1881,7 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
-                        {this.renderUnlockButton()}
+                        <UnlockPopup app={this} />
                         {showShapeSwitchPanel && (
                           <ConvertElementTypePopup app={this} />
                         )}

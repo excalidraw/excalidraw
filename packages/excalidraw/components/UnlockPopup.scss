@@ -1,0 +1,30 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .UnlockPopup {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    background: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    color: var(--text-color);
+
+    touch-action: manipulation;
+
+    &:focus {
+      outline: none;
+    }
+
+    svg {
+      display: block;
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--icon-fill-color);
+    }
+  }
+}
