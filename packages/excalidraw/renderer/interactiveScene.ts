@@ -377,6 +377,7 @@ const renderElementsBoxHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   elements: NonDeleted<ExcalidrawElement>[],
+  colors = ["rgb(0,118,255)"],
 ) => {
   const individualElements = elements.filter(
     (element) => element.groupIds.length === 0,
@@ -394,7 +395,7 @@ const renderElementsBoxHighlight = (
       x2,
       y1,
       y2,
-      selectionColors: ["rgb(0,118,255)"],
+      selectionColors: colors,
       dashed: false,
       cx: x1 + (x2 - x1) / 2,
       cy: y1 + (y2 - y1) / 2,
@@ -785,6 +786,14 @@ const _renderInteractiveScene = ({
 
   if (appState.elementsToHighlight) {
     renderElementsBoxHighlight(context, appState, appState.elementsToHighlight);
+  }
+
+  if (appState.hitLockedId) {
+    const element = allElementsMap.get(appState.hitLockedId);
+    const elements = element
+      ? [element]
+      : getElementsInGroup(allElementsMap, appState.hitLockedId);
+    renderElementsBoxHighlight(context, appState, elements, ["#ced4da"]);
   }
 
   const isFrameSelected = selectedElements.some((element) =>

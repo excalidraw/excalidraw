@@ -235,6 +235,7 @@ export type InteractiveCanvasAppState = Readonly<
     croppingElementId: AppState["croppingElementId"];
     // Search matches
     searchMatches: AppState["searchMatches"];
+    hitLockedId: AppState["hitLockedId"];
   }
 >;
 
