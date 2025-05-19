@@ -104,11 +104,7 @@ import {
   Emitter,
 } from "@excalidraw/common";
 
-import {
-  getCommonBounds,
-  getElementAbsoluteCoords,
-  selectGroupsFromGivenElements,
-} from "@excalidraw/element";
+import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
   bindOrUnbindLinearElement,
@@ -489,6 +485,8 @@ import { Toast } from "./Toast";
 
 import { findShapeByKey } from "./shapes";
 
+import UnlockPopup from "./UnlockPopup";
+
 import type {
   RenderInteractiveSceneCallback,
   ScrollBars,
@@ -529,7 +527,6 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
-import UnlockPopup from "./UnlockPopup";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);

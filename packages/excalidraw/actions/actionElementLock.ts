@@ -2,8 +2,6 @@ import { KEYS, arrayToMap } from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element";
 
-import { isFrameLikeElement } from "@excalidraw/element";
-
 import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";

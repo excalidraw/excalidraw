@@ -1,15 +1,20 @@
-import "./UnlockPopup.scss";
-import type App from "./App";
 import {
   getCommonBounds,
   getElementsInGroup,
   selectGroupsFromGivenElements,
 } from "@excalidraw/element";
 import { sceneCoordsToViewportCoords } from "@excalidraw/common";
-import { actionToggleElementLock } from "../actions";
+
 import { flushSync } from "react-dom";
+
+import { actionToggleElementLock } from "../actions";
 import { t } from "../i18n";
+
+import "./UnlockPopup.scss";
+
 import { LockedIconFilled } from "./icons";
+
+import type App from "./App";
 
 const UnlockPopup = ({ app }: { app: App }) => {
   const { hitLockedId } = app.state;
