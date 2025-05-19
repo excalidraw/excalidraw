@@ -44,7 +44,7 @@ const UnlockPopup = ({ app }: { app: App }) => {
       className="UnlockPopup"
       style={{
         position: "absolute",
-        bottom: `${app.state.height + 20 - viewY + app.state.offsetTop}px`,
+        bottom: `${app.state.height + 12 - viewY + app.state.offsetTop}px`,
         left: `${viewX - app.state.offsetLeft}px`,
         zIndex: 2,
       }}
@@ -64,9 +64,6 @@ const UnlockPopup = ({ app }: { app: App }) => {
           });
         });
         app.actionManager.executeAction(actionToggleElementLock);
-      }}
-      onWheel={(e) => {
-        e.preventDefault();
       }}
     >
       {LockedIconFilled}

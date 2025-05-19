@@ -3,7 +3,6 @@
 .excalidraw {
   .UnlockPopup {
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
@@ -12,7 +11,7 @@
     box-shadow: var(--shadow-island);
     padding: 0.8rem;
     cursor: pointer;
-    color: var(--text-color);
+    color: var(--color-gray-60);
 
     &:focus {
       outline: none;
@@ -22,7 +21,7 @@
       display: block;
       width: 1.25rem;
       height: 1.25rem;
-      color: var(--icon-fill-color);
+      color: var(--color-gray-60);
     }
   }
 }
