@@ -14,8 +14,6 @@
     cursor: pointer;
     color: var(--text-color);
 
-    touch-action: manipulation;
-
     &:focus {
       outline: none;
     }
