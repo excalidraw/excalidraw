@@ -54,6 +54,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "gridModeEnabled": false,
   "gridSize": 20,
   "gridStep": 5,
+  "hitLockedId": null,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
@@ -61,6 +62,10 @@ exports[`exportToSvg > with default arguments 1`] = `
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedUnits": {
+    "multiSelections": {},
+    "singleUnits": {},
+  },
   "multiElement": null,
   "name": "name",
   "newElement": null,
