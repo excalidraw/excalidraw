@@ -1,3 +1,16 @@
+## For CS 188
+
+Use `npm` or `yarn` to install the package.
+
+```bash
+npm install 
+npm yarn start
+```
+
+
+
+
+
 <a href="https://excalidraw.com/" target="_blank" rel="noopener">
   <picture>
     <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2_dark.png" />
