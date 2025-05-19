@@ -1,6 +1,10 @@
 import { KEYS, arrayToMap, randomId } from "@excalidraw/common";
 
-import { elementsAreInSameGroup, newElementWith } from "@excalidraw/element";
+import {
+  elementsAreInSameGroup,
+  newElementWith,
+  selectGroupsFromGivenElements,
+} from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
@@ -11,6 +15,8 @@ import { LockedIcon, UnlockedIcon } from "../components/icons";
 import { getSelectedElements } from "../scene";
 
 import { register } from "./register";
+
+import type { AppState } from "../types";
 
 const shouldLock = (elements: readonly ExcalidrawElement[]) =>
   elements.every((el) => !el.locked);
@@ -85,35 +91,49 @@ export const actionToggleElementLock = register({
       delete nextLockedSingleUnits[selectedElements[0].id];
     }
 
+    const nextElements = elements.map((element) => {
+      if (!selectedElementsMap.has(element.id)) {
+        return element;
+      }
+
+      let nextGroupIds = element.groupIds;
+
+      // if locking together, add to group
+      // if unlocking, remove the temporary group
+      if (nextLockState) {
+        if (newGroupId) {
+          nextGroupIds = [...nextGroupIds, newGroupId];
+        }
+      } else {
+        nextGroupIds = nextGroupIds.filter(
+          (groupId) => !appState.lockedUnits?.multiSelections?.[groupId],
+        );
+      }
+
+      return newElementWith(element, {
+        locked: nextLockState,
+        groupIds: nextGroupIds,
+      });
+    });
+
+    const nextElementsMap = arrayToMap(nextElements);
+    const nextSelectedElementIds: AppState["selectedElementIds"] = nextLockState
+      ? {}
+      : Object.fromEntries(selectedElements.map((el) => [el.id, true]));
+    const unlockedSelectedElements = selectedElements.map(
+      (el) => nextElementsMap.get(el.id) || el,
+    );
+    const nextSelectedGroupIds = nextLockState
+      ? {}
+      : selectGroupsFromGivenElements(unlockedSelectedElements, appState);
+
     return {
-      elements: elements.map((element) => {
-        if (!selectedElementsMap.has(element.id)) {
-          return element;
-        }
+      elements: nextElements,
 
-        let nextGroupIds = element.groupIds;
-
-        // if locking together, add to group
-        // if unlocking, remove the temporary group
-        if (nextLockState) {
-          if (newGroupId) {
-            nextGroupIds = [...nextGroupIds, newGroupId];
-          }
-        } else {
-          nextGroupIds = nextGroupIds.filter(
-            (groupId) => !appState.lockedUnits?.multiSelections?.[groupId],
-          );
-        }
-
-        return newElementWith(element, {
-          locked: nextLockState,
-          groupIds: nextGroupIds,
-        });
-      }),
       appState: {
         ...appState,
-        selectedElementIds: nextLockState ? {} : appState.selectedElementIds,
-        selectedGroupIds: nextLockState ? {} : appState.selectedGroupIds,
+        selectedElementIds: nextSelectedElementIds,
+        selectedGroupIds: nextSelectedGroupIds,
         selectedLinearElement: nextLockState
           ? null
           : appState.selectedLinearElement,
@@ -156,27 +176,39 @@ export const actionUnlockAllElements = register({
     const hasTemporaryGroupIds =
       Object.keys(appState.lockedUnits.multiSelections).length > 0;
 
-    return {
-      elements: elements.map((element) => {
-        if (element.locked) {
-          // remove the temporary groupId if it exists
-          const nextGroupIds = hasTemporaryGroupIds
-            ? element.groupIds.filter(
-                (gid) => !appState.lockedUnits.multiSelections[gid],
-              )
-            : element.groupIds;
+    const nextElements = elements.map((element) => {
+      if (element.locked) {
+        // remove the temporary groupId if it exists
+        const nextGroupIds = hasTemporaryGroupIds
+          ? element.groupIds.filter(
+              (gid) => !appState.lockedUnits.multiSelections[gid],
+            )
+          : element.groupIds;
 
-          return newElementWith(element, {
-            locked: false,
-            groupIds: nextGroupIds,
-          });
-        }
-        return element;
-      }),
+        return newElementWith(element, {
+          locked: false,
+          groupIds: nextGroupIds,
+        });
+      }
+      return element;
+    });
+
+    const nextElementsMap = arrayToMap(nextElements);
+
+    const unlockedElements = lockedElements.map(
+      (el) => nextElementsMap.get(el.id) || el,
+    );
+
+    return {
+      elements: nextElements,
       appState: {
         ...appState,
         selectedElementIds: Object.fromEntries(
           lockedElements.map((el) => [el.id, true]),
+        ),
+        selectedGroupIds: selectGroupsFromGivenElements(
+          unlockedElements,
+          appState,
         ),
         lockedUnits: {
           singleUnits: {},
