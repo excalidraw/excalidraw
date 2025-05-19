@@ -174,6 +174,8 @@ export const isBindableElement = (
       element.type === "embeddable" ||
       element.type === "frame" ||
       element.type === "magicframe" ||
+      element.type === "rabbit-searchbox" || 
+      element.type === "rabbit-image" ||
       (element.type === "text" && !element.containerId))
   );
 };

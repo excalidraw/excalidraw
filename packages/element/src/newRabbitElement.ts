@@ -89,6 +89,7 @@ export const newRabbitSearchBoxElement = (
       value: 4 
     },    
     angle: (opts.angle || 0) as Radians,
+    boundElements: [],
   });
 
   // rabbitSearchBox specific properties
@@ -108,6 +109,8 @@ export const newRabbitSearchBoxElement = (
     containerId: null,
     isEditing: false,
     currentText: text,
+    boundElements: [],
+    originalText: text,
   };
 
   // type assertion to bypass TypeScript's type checking
