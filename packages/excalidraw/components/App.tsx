@@ -7225,6 +7225,15 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (
+          !hitElementMightBeLocked ||
+          hitElementMightBeLocked.id !== this.state.hitLockedId
+        ) {
+          this.setState({
+            hitLockedId: null,
+          });
+        }
+
+        if (
           hitElementMightBeLocked &&
           hitElementMightBeLocked.locked &&
           !hitElements.some((el) => this.state.selectedElementIds[el.id])
@@ -8087,6 +8096,12 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
       const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
+
+      if (this.state.hitLockedId) {
+        this.setState({
+          hitLockedId: null,
+        });
+      }
 
       if (
         this.state.selectedLinearElement &&
