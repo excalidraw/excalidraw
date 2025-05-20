@@ -9028,6 +9028,7 @@ class App extends React.Component<AppProps, AppState> {
           },
         );
 
+        this.store.scheduleCapture();
         if (hitLockedElement?.locked) {
           this.setState({
             hitLockedId:

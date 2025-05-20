@@ -673,7 +673,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             break;
           }
           case "hitLockedId": {
-            const prevHitLockedId = nextAppState[key] || null;
+            const prevHitLockedId = prevAppState[key] || null;
             const nextHitLockedId = nextAppState[key] || null;
 
             if (prevHitLockedId !== nextHitLockedId) {

@@ -5023,6 +5023,27 @@ exports[`regression tests > deselects group of selected elements on pointer up w
     },
     "id": "id8",
   },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {},
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+            "id3": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id11",
+  },
 ]
 `;
 
@@ -13517,16 +13538,15 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "delta": Delta {
         "deleted": {
           "editingGroupId": null,
-          "selectedElementIds": {
-            "id3": true,
-          },
-          "selectedGroupIds": {
-            "id11": true,
-          },
+          "selectedElementIds": {},
+          "selectedGroupIds": {},
         },
         "inserted": {
           "editingGroupId": "id11",
-          "selectedElementIds": {},
+          "selectedElementIds": {
+            "id0": true,
+            "id6": true,
+          },
           "selectedGroupIds": {
             "id19": true,
           },
@@ -13538,7 +13558,33 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "removed": {},
       "updated": {},
     },
-    "id": "id25",
+    "id": "id24",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+            "id3": true,
+            "id6": true,
+          },
+          "selectedGroupIds": {
+            "id11": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+          "selectedGroupIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id27",
   },
   {
     "appState": AppStateDelta {
@@ -13557,32 +13603,6 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
           },
           "selectedGroupIds": {
             "id11": true,
-          },
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id27",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "editingGroupId": "id19",
-          "selectedElementIds": {},
-          "selectedGroupIds": {},
-        },
-        "inserted": {
-          "editingGroupId": "id11",
-          "selectedElementIds": {
-            "id6": true,
-          },
-          "selectedGroupIds": {
-            "id19": true,
           },
         },
       },
@@ -13598,6 +13618,32 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
+          "editingGroupId": "id19",
+          "selectedElementIds": {},
+          "selectedGroupIds": {},
+        },
+        "inserted": {
+          "editingGroupId": "id11",
+          "selectedElementIds": {
+            "id6": true,
+          },
+          "selectedGroupIds": {
+            "id19": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id31",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
           "editingGroupId": null,
           "selectedElementIds": {
             "id3": true,
@@ -13619,7 +13665,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "removed": {},
       "updated": {},
     },
-    "id": "id32",
+    "id": "id34",
   },
   {
     "appState": AppStateDelta {
@@ -13646,7 +13692,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "removed": {},
       "updated": {},
     },
-    "id": "id34",
+    "id": "id36",
   },
 ]
 `;
