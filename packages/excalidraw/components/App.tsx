@@ -6161,10 +6161,31 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    const hitElement = this.getElementAtPosition(
-      scenePointer.x,
-      scenePointer.y,
+    const hitElementMightBeLocked = this.getElementAtPosition(
+      scenePointerX,
+      scenePointerY,
+      {
+        includeLockedElements: true,
+      },
     );
+
+    const hitElements = this.getElementsAtPosition(
+      scenePointerX,
+      scenePointerY,
+    );
+
+    let hitElement: ExcalidrawElement | null = null;
+    if (
+      hitElementMightBeLocked &&
+      hitElementMightBeLocked.locked &&
+      !hitElements.some((el) => this.state.selectedElementIds[el.id])
+    ) {
+      hitElement = null;
+    } else if (hitElementMightBeLocked && !hitElementMightBeLocked.locked) {
+      hitElement = hitElementMightBeLocked;
+    } else {
+      hitElement = this.getElementAtPosition(scenePointerX, scenePointerY);
+    }
 
     this.hitLinkElement = this.getElementLinkAtPosition(
       scenePointer,
@@ -6261,7 +6282,7 @@ class App extends React.Component<AppProps, AppState> {
             selectGroupsForSelectedElements(
               {
                 editingGroupId: prevState.editingGroupId,
-                selectedElementIds: { [hitElement.id]: true },
+                selectedElementIds: { [hitElement!.id]: true },
               },
               this.scene.getNonDeletedElements(),
               prevState,
