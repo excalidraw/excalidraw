@@ -256,6 +256,7 @@ export type ObservedElementsAppState = {
   // Right now it's coupled to `editingLinearElement`, ideally it should not be really needed as we already have selectedElementIds & editingLinearElementId
   selectedLinearElementId: LinearElementEditor["elementId"] | null;
   croppingElementId: AppState["croppingElementId"];
+  lockedUnits: AppState["lockedUnits"];
 };
 
 export interface AppState {

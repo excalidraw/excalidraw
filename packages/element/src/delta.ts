@@ -658,6 +658,15 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
 
             break;
+          case "lockedUnits": {
+            const prevLockedUnits = prevAppState[key] || {};
+            const nextLockedUnits = nextAppState[key] || {};
+
+            if (!isShallowEqual(prevLockedUnits, nextLockedUnits)) {
+              visibleDifferenceFlag.value = true;
+            }
+            break;
+          }
           default: {
             assertNever(
               key,
@@ -753,6 +762,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       editingLinearElementId,
       selectedLinearElementId,
       croppingElementId,
+      lockedUnits,
       ...standaloneProps
     } = delta as ObservedAppState;
 
@@ -796,6 +806,15 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         inserted,
         "selectedGroupIds",
         (prevValue) => (prevValue ?? false) as ValueOf<T["selectedGroupIds"]>,
+      );
+      Delta.diffObjects(
+        deleted,
+        inserted,
+        "lockedUnits",
+        (prevValue) =>
+          (prevValue ?? { multiSelections: {}, singleUnits: {} }) as ValueOf<
+            T["lockedUnits"]
+          >,
       );
     } catch (e) {
       // if postprocessing fails it does not make sense to bubble up, but let's make sure we know about it

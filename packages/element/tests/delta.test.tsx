@@ -3,6 +3,11 @@ import type { LinearElementEditor } from "@excalidraw/element";
 
 import { AppStateDelta } from "../src/delta";
 
+const EMPTY_LOCKED_UNITS: ObservedAppState["lockedUnits"] = {
+  singleUnits: {},
+  multiSelections: {},
+};
+
 describe("AppStateDelta", () => {
   describe("ensure stable delta properties order", () => {
     it("should maintain stable order for root properties", () => {
@@ -16,6 +21,7 @@ describe("AppStateDelta", () => {
         editingGroupId: null,
         croppingElementId: null,
         editingLinearElementId: null,
+        lockedUnits: EMPTY_LOCKED_UNITS,
       };
 
       const prevAppState1: ObservedAppState = {
@@ -57,6 +63,7 @@ describe("AppStateDelta", () => {
         croppingElementId: null,
         selectedLinearElementId: null,
         editingLinearElementId: null,
+        lockedUnits: EMPTY_LOCKED_UNITS,
       };
 
       const prevAppState1: ObservedAppState = {
@@ -102,6 +109,7 @@ describe("AppStateDelta", () => {
         croppingElementId: null,
         selectedLinearElementId: null,
         editingLinearElementId: null,
+        lockedUnits: EMPTY_LOCKED_UNITS,
       };
 
       const prevAppState1: ObservedAppState = {
