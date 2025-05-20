@@ -1878,7 +1878,12 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
-                        <UnlockPopup app={this} />
+                        {this.state.hitLockedId && (
+                          <UnlockPopup
+                            app={this}
+                            hitLockedId={this.state.hitLockedId}
+                          />
+                        )}
                         {showShapeSwitchPanel && (
                           <ConvertElementTypePopup app={this} />
                         )}

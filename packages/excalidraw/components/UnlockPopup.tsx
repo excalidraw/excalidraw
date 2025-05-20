@@ -16,13 +16,15 @@ import { LockedIconFilled } from "./icons";
 
 import type App from "./App";
 
-const UnlockPopup = ({ app }: { app: App }) => {
-  const { hitLockedId } = app.state;
+import type { AppState } from "../types";
 
-  if (!hitLockedId) {
-    return null;
-  }
-
+const UnlockPopup = ({
+  app,
+  hitLockedId,
+}: {
+  app: App;
+  hitLockedId: NonNullable<AppState["hitLockedId"]>;
+}) => {
   const element = app.scene.getElement(hitLockedId);
 
   const elements = element
