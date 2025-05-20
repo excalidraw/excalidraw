@@ -1723,12 +1723,6 @@ export const actionChangeArrowType = register({
             fixedSegments: null,
           }),
         };
-
-        LinearElementEditor.updateEditorMidPointsCache(
-          newElement,
-          elementsMap,
-          app.state,
-        );
       } else {
         const elementsMap = app.scene.getNonDeletedElementsMap();
         if (newElement.startBinding) {
