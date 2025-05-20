@@ -827,9 +827,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         inserted,
         "lockedUnits",
         (prevValue) =>
-          (prevValue ?? { multiSelections: {}, singleUnits: {} }) as ValueOf<
-            T["lockedUnits"]
-          >,
+          (prevValue ?? { multiSelections: {} }) as ValueOf<T["lockedUnits"]>,
       );
       Delta.diffObjects(
         deleted,

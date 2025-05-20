@@ -941,7 +941,6 @@ const getDefaultObservedAppState = (): ObservedAppState => {
     croppingElementId: null,
     hitLockedId: null,
     lockedUnits: {
-      singleUnits: {},
       multiSelections: {},
     },
   };

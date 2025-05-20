@@ -4,7 +4,6 @@ import type { LinearElementEditor } from "@excalidraw/element";
 import { AppStateDelta } from "../src/delta";
 
 const EMPTY_LOCKED_UNITS: ObservedAppState["lockedUnits"] = {
-  singleUnits: {},
   multiSelections: {},
 };
 

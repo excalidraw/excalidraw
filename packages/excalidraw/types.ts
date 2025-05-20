@@ -448,8 +448,6 @@ export interface AppState {
     // as elements are unlocked, we remove the groupId from the elements
     // and also remove groupId from this map
     multiSelections: { [groupId: string]: true };
-    // a single unit is either a single element, group, or a frame
-    singleUnits: { [id: string]: true };
   };
 }
 

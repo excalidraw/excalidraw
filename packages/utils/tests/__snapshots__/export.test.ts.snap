@@ -64,7 +64,6 @@ exports[`exportToSvg > with default arguments 1`] = `
   "lastPointerDownWith": "mouse",
   "lockedUnits": {
     "multiSelections": {},
-    "singleUnits": {},
   },
   "multiElement": null,
   "name": "name",

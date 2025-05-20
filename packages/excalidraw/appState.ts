@@ -123,7 +123,6 @@ export const getDefaultAppState = (): Omit<
     croppingElementId: null,
     searchMatches: null,
     lockedUnits: {
-      singleUnits: {},
       multiSelections: {},
     },
     hitLockedId: null,

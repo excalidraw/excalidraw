@@ -64,31 +64,16 @@ export const actionToggleElementLock = register({
     const isASingleUnit = selectedElements.length === 1 || isAGroup;
     const newGroupId = isASingleUnit ? null : randomId();
 
-    let nextLockedSingleUnits = { ...appState.lockedUnits.singleUnits };
     let nextLockedMultiSelections = { ...appState.lockedUnits.multiSelections };
 
     if (nextLockState) {
-      nextLockedSingleUnits = {
-        ...appState.lockedUnits?.singleUnits,
-        ...(isASingleUnit
-          ? {
-              [isAGroup
-                ? selectedElements[0].groupIds.at(-1)!
-                : selectedElements[0].id]: true,
-            }
-          : {}),
-      };
-
       nextLockedMultiSelections = {
         ...appState.lockedUnits.multiSelections,
         ...(newGroupId ? { [newGroupId]: true } : {}),
       };
     } else if (isAGroup) {
       const groupId = selectedElements[0].groupIds.at(-1)!;
-      delete nextLockedSingleUnits[groupId];
       delete nextLockedMultiSelections[groupId];
-    } else {
-      delete nextLockedSingleUnits[selectedElements[0].id];
     }
 
     const nextElements = elements.map((element) => {
@@ -146,7 +131,6 @@ export const actionToggleElementLock = register({
           ? null
           : appState.selectedLinearElement,
         lockedUnits: {
-          singleUnits: nextLockedSingleUnits,
           multiSelections: nextLockedMultiSelections,
         },
         hitLockedId,
@@ -220,7 +204,6 @@ export const actionUnlockAllElements = register({
           appState,
         ),
         lockedUnits: {
-          singleUnits: {},
           multiSelections: {},
         },
         hitLockedId: null,
