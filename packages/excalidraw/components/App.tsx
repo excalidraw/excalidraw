@@ -7210,13 +7210,35 @@ class App extends React.Component<AppProps, AppState> {
             return true;
           }
         }
-        // hitElement may already be set above, so check first
-        pointerDownState.hit.element =
-          pointerDownState.hit.element ??
-          this.getElementAtPosition(
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-          );
+
+        const hitElementMightBeLocked = this.getElementAtPosition(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          {
+            includeLockedElements: true,
+          },
+        );
+
+        const hitElements = this.getElementsAtPosition(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        );
+
+        if (
+          hitElementMightBeLocked &&
+          hitElementMightBeLocked.locked &&
+          !hitElements.some((el) => this.state.selectedElementIds[el.id])
+        ) {
+          pointerDownState.hit.element = null;
+        } else {
+          // hitElement may already be set above, so check first
+          pointerDownState.hit.element =
+            pointerDownState.hit.element ??
+            this.getElementAtPosition(
+              pointerDownState.origin.x,
+              pointerDownState.origin.y,
+            );
+        }
 
         this.hitLinkElement = this.getElementLinkAtPosition(
           pointerDownState.origin,
@@ -7250,10 +7272,7 @@ class App extends React.Component<AppProps, AppState> {
 
         // For overlapped elements one position may hit
         // multiple elements
-        pointerDownState.hit.allHitElements = this.getElementsAtPosition(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-        );
+        pointerDownState.hit.allHitElements = hitElements;
 
         const hitElement = pointerDownState.hit.element;
         const someHitElementIsSelected =
@@ -8950,7 +8969,17 @@ class App extends React.Component<AppProps, AppState> {
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
-      if (!pointerDownState.boxSelection.hasOccurred) {
+      // if current elements are still selected
+      // and the pointer is just over a locked element
+      // do not allow hitLockedId to be set
+
+      const hitElements = pointerDownState.hit.allHitElements;
+
+      if (
+        this.state.activeTool.type === "selection" &&
+        !pointerDownState.boxSelection.hasOccurred &&
+        !hitElements.some((el) => this.state.selectedElementIds[el.id])
+      ) {
         const sceneCoords = viewportCoordsToSceneCoords(
           { clientX: childEvent.clientX, clientY: childEvent.clientY },
           this.state,
