@@ -43,10 +43,8 @@ const UnlockPopup = ({ app }: { app: App }) => {
     <div
       className="UnlockPopup"
       style={{
-        position: "absolute",
         bottom: `${app.state.height + 12 - viewY + app.state.offsetTop}px`,
         left: `${viewX - app.state.offsetLeft}px`,
-        zIndex: 2,
       }}
       onClick={() => {
         flushSync(() => {
@@ -65,9 +63,9 @@ const UnlockPopup = ({ app }: { app: App }) => {
         });
         app.actionManager.executeAction(actionToggleElementLock);
       }}
+      title={t("labels.elementLock.unlock")}
     >
       {LockedIconFilled}
-      <div>{t("labels.elementLock.unlock")}</div>
     </div>
   );
 };
