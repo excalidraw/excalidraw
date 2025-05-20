@@ -97,7 +97,11 @@ export const actionToggleElementLock = register({
 
       return newElementWith(element, {
         locked: nextLockState,
-        groupIds: nextGroupIds,
+        // do not recreate the array unncessarily
+        groupIds:
+          nextGroupIds.length !== element.groupIds.length
+            ? nextGroupIds
+            : element.groupIds,
       });
     });
 
@@ -166,21 +170,20 @@ export const actionUnlockAllElements = register({
   perform: (elements, appState) => {
     const lockedElements = elements.filter((el) => el.locked);
 
-    const hasTemporaryGroupIds =
-      Object.keys(appState.lockedUnits.multiSelections).length > 0;
-
     const nextElements = elements.map((element) => {
       if (element.locked) {
         // remove the temporary groupId if it exists
-        const nextGroupIds = hasTemporaryGroupIds
-          ? element.groupIds.filter(
-              (gid) => !appState.lockedUnits.multiSelections[gid],
-            )
-          : element.groupIds;
+        const nextGroupIds = element.groupIds.filter(
+          (gid) => !appState.lockedUnits.multiSelections[gid],
+        );
 
         return newElementWith(element, {
           locked: false,
-          groupIds: nextGroupIds,
+          groupIds:
+            // do not recreate the array unncessarily
+            element.groupIds.length !== nextGroupIds.length
+              ? nextGroupIds
+              : element.groupIds,
         });
       }
       return element;
