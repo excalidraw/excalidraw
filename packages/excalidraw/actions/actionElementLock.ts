@@ -127,6 +127,14 @@ export const actionToggleElementLock = register({
       ? {}
       : selectGroupsFromGivenElements(unlockedSelectedElements, appState);
 
+    const hitLockedId = nextLockState
+      ? newGroupId
+        ? newGroupId
+        : isAGroup
+        ? selectedElements[0].groupIds.at(-1)!
+        : selectedElements[0].id
+      : null;
+
     return {
       elements: nextElements,
 
@@ -141,6 +149,7 @@ export const actionToggleElementLock = register({
           singleUnits: nextLockedSingleUnits,
           multiSelections: nextLockedMultiSelections,
         },
+        hitLockedId,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -214,6 +223,7 @@ export const actionUnlockAllElements = register({
           singleUnits: {},
           multiSelections: {},
         },
+        hitLockedId: null,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };

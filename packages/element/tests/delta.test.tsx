@@ -22,6 +22,7 @@ describe("AppStateDelta", () => {
         croppingElementId: null,
         editingLinearElementId: null,
         lockedUnits: EMPTY_LOCKED_UNITS,
+        hitLockedId: null,
       };
 
       const prevAppState1: ObservedAppState = {
@@ -63,6 +64,7 @@ describe("AppStateDelta", () => {
         croppingElementId: null,
         selectedLinearElementId: null,
         editingLinearElementId: null,
+        hitLockedId: null,
         lockedUnits: EMPTY_LOCKED_UNITS,
       };
 
@@ -109,6 +111,7 @@ describe("AppStateDelta", () => {
         croppingElementId: null,
         selectedLinearElementId: null,
         editingLinearElementId: null,
+        hitLockedId: null,
         lockedUnits: EMPTY_LOCKED_UNITS,
       };
 

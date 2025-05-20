@@ -187,10 +187,12 @@ export class Delta<T> {
       return;
     }
 
-    if (
-      typeof deleted[property] === "object" ||
-      typeof inserted[property] === "object"
-    ) {
+    const isDeletedObject =
+      deleted[property] !== null && typeof deleted[property] === "object";
+    const isInsertedObject =
+      inserted[property] !== null && typeof inserted[property] === "object";
+
+    if (isDeletedObject || isInsertedObject) {
       type RecordLike = Record<string, V | undefined>;
 
       const deletedObject: RecordLike = deleted[property] ?? {};
@@ -222,6 +224,9 @@ export class Delta<T> {
         Reflect.deleteProperty(deleted, property);
         Reflect.deleteProperty(inserted, property);
       }
+    } else if (deleted[property] === inserted[property]) {
+      Reflect.deleteProperty(deleted, property);
+      Reflect.deleteProperty(inserted, property);
     }
   }
 
@@ -667,6 +672,15 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
             break;
           }
+          case "hitLockedId": {
+            const prevHitLockedId = nextAppState[key] || null;
+            const nextHitLockedId = nextAppState[key] || null;
+
+            if (prevHitLockedId !== nextHitLockedId) {
+              visibleDifferenceFlag.value = true;
+            }
+            break;
+          }
           default: {
             assertNever(
               key,
@@ -763,6 +777,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       selectedLinearElementId,
       croppingElementId,
       lockedUnits,
+      hitLockedId,
       ...standaloneProps
     } = delta as ObservedAppState;
 
@@ -815,6 +830,12 @@ export class AppStateDelta implements DeltaContainer<AppState> {
           (prevValue ?? { multiSelections: {}, singleUnits: {} }) as ValueOf<
             T["lockedUnits"]
           >,
+      );
+      Delta.diffObjects(
+        deleted,
+        inserted,
+        "hitLockedId",
+        (prevValue) => (prevValue ?? null) as ValueOf<T["hitLockedId"]>,
       );
     } catch (e) {
       // if postprocessing fails it does not make sense to bubble up, but let's make sure we know about it

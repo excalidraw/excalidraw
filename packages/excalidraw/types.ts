@@ -257,6 +257,7 @@ export type ObservedElementsAppState = {
   selectedLinearElementId: LinearElementEditor["elementId"] | null;
   croppingElementId: AppState["croppingElementId"];
   lockedUnits: AppState["lockedUnits"];
+  hitLockedId: AppState["hitLockedId"];
 };
 
 export interface AppState {
