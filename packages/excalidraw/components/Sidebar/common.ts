@@ -25,6 +25,10 @@ export type SidebarProps<P = {}> = {
    * supply alongside `docked` prop in order to make the Sidebar user-dockable
    */
   onDock?: (docked: boolean) => void;
+  /**
+   * Allow hiding library button, default: true
+   */
+  libraryEnabled?: boolean;
   docked?: boolean;
   className?: string;
   // NOTE sidebars we use internally inside the editor must have this flag set.
