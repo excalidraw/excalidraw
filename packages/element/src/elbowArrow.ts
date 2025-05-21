@@ -976,11 +976,20 @@ export const updateElbowArrowPoints = (
     );
 
     invariant(
-      updates.fixedSegments?.find((segment) => segment.index === 0) == null &&
+      updates.fixedSegments?.find(
+        (segment) =>
+          segment.index === 1 &&
+          pointsEqual(segment.start, (updates.points ?? arrow.points)[0]),
+      ) == null &&
         updates.fixedSegments?.find(
           (segment) =>
-            segment.index === arrow.points.length - 1 ||
-            (updates.points && segment.index === updates.points?.length - 1),
+            segment.index === (updates.points ?? arrow.points).length - 1 &&
+            pointsEqual(
+              segment.end,
+              (updates.points ?? arrow.points)[
+                (updates.points ?? arrow.points).length - 1
+              ],
+            ),
         ) == null,
       "The first and last segments cannot be fixed",
     );
