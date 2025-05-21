@@ -37,9 +37,10 @@ export const getLassoSelectedElementIds = (input: {
   if (simplifyDistance) {
     path = simplify(lassoPath, simplifyDistance) as GlobalPoint[];
   }
+  const unlockedElements = elements.filter((el) => !el.locked);
   // as the path might not enclose a shape anymore, clear before checking
   enclosedElements.clear();
-  for (const element of elements) {
+  for (const element of unlockedElements) {
     if (
       !intersectedElements.has(element.id) &&
       !enclosedElements.has(element.id)

@@ -187,10 +187,12 @@ export class Delta<T> {
       return;
     }
 
-    if (
-      typeof deleted[property] === "object" ||
-      typeof inserted[property] === "object"
-    ) {
+    const isDeletedObject =
+      deleted[property] !== null && typeof deleted[property] === "object";
+    const isInsertedObject =
+      inserted[property] !== null && typeof inserted[property] === "object";
+
+    if (isDeletedObject || isInsertedObject) {
       type RecordLike = Record<string, V | undefined>;
 
       const deletedObject: RecordLike = deleted[property] ?? {};
@@ -222,6 +224,9 @@ export class Delta<T> {
         Reflect.deleteProperty(deleted, property);
         Reflect.deleteProperty(inserted, property);
       }
+    } else if (deleted[property] === inserted[property]) {
+      Reflect.deleteProperty(deleted, property);
+      Reflect.deleteProperty(inserted, property);
     }
   }
 
@@ -658,6 +663,24 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
 
             break;
+          case "lockedMultiSelections": {
+            const prevLockedUnits = prevAppState[key] || {};
+            const nextLockedUnits = nextAppState[key] || {};
+
+            if (!isShallowEqual(prevLockedUnits, nextLockedUnits)) {
+              visibleDifferenceFlag.value = true;
+            }
+            break;
+          }
+          case "activeLockedId": {
+            const prevHitLockedId = prevAppState[key] || null;
+            const nextHitLockedId = nextAppState[key] || null;
+
+            if (prevHitLockedId !== nextHitLockedId) {
+              visibleDifferenceFlag.value = true;
+            }
+            break;
+          }
           default: {
             assertNever(
               key,
@@ -753,6 +776,8 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       editingLinearElementId,
       selectedLinearElementId,
       croppingElementId,
+      lockedMultiSelections,
+      activeLockedId,
       ...standaloneProps
     } = delta as ObservedAppState;
 
@@ -796,6 +821,18 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         inserted,
         "selectedGroupIds",
         (prevValue) => (prevValue ?? false) as ValueOf<T["selectedGroupIds"]>,
+      );
+      Delta.diffObjects(
+        deleted,
+        inserted,
+        "lockedMultiSelections",
+        (prevValue) => (prevValue ?? {}) as ValueOf<T["lockedMultiSelections"]>,
+      );
+      Delta.diffObjects(
+        deleted,
+        inserted,
+        "activeLockedId",
+        (prevValue) => (prevValue ?? null) as ValueOf<T["activeLockedId"]>,
       );
     } catch (e) {
       // if postprocessing fails it does not make sense to bubble up, but let's make sure we know about it
