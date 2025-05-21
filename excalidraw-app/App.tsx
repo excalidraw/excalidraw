@@ -32,7 +32,7 @@ import {
   isDevEnv,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
@@ -1147,6 +1147,100 @@ const ExcalidrawWrapper = () => {
   );
 };
 
+const ExcalidrawRecorderWrapper = ({ children }: React.PropsWithChildren) => {
+  const listenerRef = useRef<
+    WeakMap<
+      EventListenerOrEventListenerObject,
+      { type: string; listener: EventListener }
+    >
+  >(new WeakMap());
+  const dataRef = useRef<object[]>([]);
+
+  React.useEffect(() => {
+    dataRef.current.push({
+      time: new Date().getTime(),
+      type: "start",
+      localStorage: JSON.parse(JSON.stringify(window.localStorage)),
+      dimensions: {
+        outerWidth: window.outerWidth,
+        outerHeight: window.outerHeight,
+      },
+      chromeVersion: window.navigator.userAgent
+        .split(" ")
+        .find((v) => v.startsWith("Chrome/"))
+        ?.substring(7),
+    });
+
+    Window.prototype._removeEventListener =
+      Window.prototype.removeEventListener;
+    window.removeEventListener = function <K extends keyof WindowEventMap>(
+      type: K,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions,
+    ) {
+      const existing = listenerRef.current.get(listener);
+      if (existing) {
+        window._removeEventListener(type, existing.listener, options);
+        listenerRef.current.delete(listener);
+      } else {
+        window._removeEventListener(type, listener, options);
+      }
+    };
+
+    Window.prototype._addEventListener = Window.prototype.addEventListener;
+    window.addEventListener = function <K extends keyof WindowEventMap>(
+      type: K,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions,
+    ) {
+      const existing = listenerRef.current.get(listener);
+      let wrappedListener: EventListener;
+
+      if (!existing || existing?.type !== type) {
+        wrappedListener = function (...args) {
+          dataRef.current.push({
+            time: new Date().getTime(),
+            type: "event",
+            name: type,
+            args,
+          });
+
+          if (listener instanceof Function) {
+            listener.apply(window, args);
+          } else {
+            listener.handleEvent.apply(window, args);
+          }
+        };
+      } else {
+        wrappedListener = existing.listener;
+        window._removeEventListener(type, wrappedListener);
+      }
+
+      listenerRef.current.set(listener, { type, listener: wrappedListener });
+
+      window._addEventListener(type, wrappedListener, options);
+    };
+
+    return () => {
+      Window.prototype.removeEventListener =
+        Window.prototype._removeEventListener;
+      Window.prototype.addEventListener = Window.prototype._addEventListener;
+      dataRef.current = [];
+      window.gc?.();
+    };
+  }, []);
+
+  React.useEffect(() => {
+    const handle = setInterval(() => {
+      console.log(dataRef.current);
+    }, 10000);
+
+    return () => clearInterval(handle);
+  }, []);
+
+  return <>{children}</>;
+};
+
 const ExcalidrawApp = () => {
   const isCloudExportWindow =
     window.location.pathname === "/excalidraw-plus-export";
@@ -1155,11 +1249,13 @@ const ExcalidrawApp = () => {
   }
 
   return (
-    <TopErrorBoundary>
-      <Provider store={appJotaiStore}>
-        <ExcalidrawWrapper />
-      </Provider>
-    </TopErrorBoundary>
+    <ExcalidrawRecorderWrapper>
+      <TopErrorBoundary>
+        <Provider store={appJotaiStore}>
+          <ExcalidrawWrapper />
+        </Provider>
+      </TopErrorBoundary>
+    </ExcalidrawRecorderWrapper>
   );
 };
 

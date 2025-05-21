@@ -11425,6 +11425,8 @@ declare global {
       history: History;
       store: Store;
     };
+    _addEventListener: typeof window.addEventListener;
+    _removeEventListener: typeof window.removeEventListener;
   }
 }
 
