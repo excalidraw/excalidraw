@@ -256,7 +256,7 @@ export type ObservedElementsAppState = {
   // Right now it's coupled to `editingLinearElement`, ideally it should not be really needed as we already have selectedElementIds & editingLinearElementId
   selectedLinearElementId: LinearElementEditor["elementId"] | null;
   croppingElementId: AppState["croppingElementId"];
-  lockedUnits: AppState["lockedUnits"];
+  lockedMultiSelections: AppState["lockedMultiSelections"];
   hitLockedId: AppState["hitLockedId"];
 };
 
@@ -442,13 +442,11 @@ export interface AppState {
   }> | null;
 
   hitLockedId: string | null;
-  lockedUnits: {
-    // when locking multiple units of elements together, we assign a temporary
-    // groupId to them so we can unlock them together;
-    // as elements are unlocked, we remove the groupId from the elements
-    // and also remove groupId from this map
-    multiSelections: { [groupId: string]: true };
-  };
+  // when locking multiple units of elements together, we assign a temporary
+  // groupId to them so we can unlock them together;
+  // as elements are unlocked, we remove the groupId from the elements
+  // and also remove groupId from this map
+  lockedMultiSelections: { [groupId: string]: true };
 }
 
 export type SearchMatch = {

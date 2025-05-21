@@ -64,11 +64,11 @@ export const actionToggleElementLock = register({
     const isASingleUnit = selectedElements.length === 1 || isAGroup;
     const newGroupId = isASingleUnit ? null : randomId();
 
-    let nextLockedMultiSelections = { ...appState.lockedUnits.multiSelections };
+    let nextLockedMultiSelections = { ...appState.lockedMultiSelections };
 
     if (nextLockState) {
       nextLockedMultiSelections = {
-        ...appState.lockedUnits.multiSelections,
+        ...appState.lockedMultiSelections,
         ...(newGroupId ? { [newGroupId]: true } : {}),
       };
     } else if (isAGroup) {
@@ -91,7 +91,7 @@ export const actionToggleElementLock = register({
         }
       } else {
         nextGroupIds = nextGroupIds.filter(
-          (groupId) => !appState.lockedUnits?.multiSelections?.[groupId],
+          (groupId) => !appState.lockedMultiSelections[groupId],
         );
       }
 
@@ -134,9 +134,7 @@ export const actionToggleElementLock = register({
         selectedLinearElement: nextLockState
           ? null
           : appState.selectedLinearElement,
-        lockedUnits: {
-          multiSelections: nextLockedMultiSelections,
-        },
+        lockedMultiSelections: nextLockedMultiSelections,
         hitLockedId,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -174,7 +172,7 @@ export const actionUnlockAllElements = register({
       if (element.locked) {
         // remove the temporary groupId if it exists
         const nextGroupIds = element.groupIds.filter(
-          (gid) => !appState.lockedUnits.multiSelections[gid],
+          (gid) => !appState.lockedMultiSelections[gid],
         );
 
         return newElementWith(element, {
@@ -206,9 +204,7 @@ export const actionUnlockAllElements = register({
           unlockedElements,
           appState,
         ),
-        lockedUnits: {
-          multiSelections: {},
-        },
+        lockedMultiSelections: {},
         hitLockedId: null,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
