@@ -3,6 +3,7 @@
 exports[`exportToSvg > with default arguments 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -61,6 +62,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "name",
   "newElement": null,

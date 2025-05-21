@@ -170,7 +170,7 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => canChangeLayer(element.type));
 
   return (
-    <div className="panelColumn">
+    <div className="selected-shape-actions">
       <div>
         {canChangeStrokeColor(appState, targetElements) &&
           renderAction("changeStrokeColor")}
