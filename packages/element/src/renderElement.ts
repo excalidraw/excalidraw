@@ -1182,15 +1182,37 @@ const renderRabbitElement = (
           ? element.currentText 
           : (element.currentText.trim() !== "" ? element.currentText : element.text);
 
-      const lines = displayText.replace(/\r\n?/g, "\n").split("\n");
-      for (let index = 0; index < lines.length; index++) {
-        context.fillText(
-          lines[index],
-          horizontalOffset,
-          index * lineHeightPx + verticalOffset + element.height / 2 - (lines.length * lineHeightPx) / 2,
-        );
-      }
-      
+          const maxTextWidth = element.width - 2 * padding - (element.hasIcon ? 30 : 0);
+          const words = displayText.split(/\s+/);
+          const lines: string[] = [];
+          let currentLine = "";
+          
+          for (let word of words) {
+            const testLine = currentLine ? `${currentLine} ${word}` : word;
+            const testWidth = context.measureText(testLine).width;
+            if (testWidth < maxTextWidth) {
+              currentLine = testLine;
+            } else {
+              if (currentLine) lines.push(currentLine);
+              currentLine = word;
+            }
+          }
+          if (currentLine) lines.push(currentLine);
+          
+          for (let i = 0; i < lines.length; i++) {
+            context.fillText(
+              lines[i],
+              horizontalOffset,
+              i * lineHeightPx + verticalOffset + element.height / 2 - (lines.length * lineHeightPx) / 2,
+            );
+          }
+          
+          const totalTextHeight = lines.length * lineHeightPx + padding * 2;
+
+          if (element.height < totalTextHeight) {
+            element.height = totalTextHeight;
+          }
+        
       // Draw search icon if enabled
       if (element.hasIcon) {
         // Draw a simple magnifying glass icon
