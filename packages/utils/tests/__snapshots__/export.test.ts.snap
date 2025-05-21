@@ -3,6 +3,7 @@
 exports[`exportToSvg > with default arguments 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -91,7 +92,6 @@ exports[`exportToSvg > with default arguments 1`] = `
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": null,
-  "selectedLockedId": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,

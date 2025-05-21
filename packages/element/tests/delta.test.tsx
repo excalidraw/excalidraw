@@ -17,7 +17,7 @@ describe("AppStateDelta", () => {
         croppingElementId: null,
         editingLinearElementId: null,
         lockedMultiSelections: {},
-        selectedLockedId: null,
+        activeLockedId: null,
       };
 
       const prevAppState1: ObservedAppState = {
@@ -59,7 +59,7 @@ describe("AppStateDelta", () => {
         croppingElementId: null,
         selectedLinearElementId: null,
         editingLinearElementId: null,
-        selectedLockedId: null,
+        activeLockedId: null,
         lockedMultiSelections: {},
       };
 
@@ -106,7 +106,7 @@ describe("AppStateDelta", () => {
         croppingElementId: null,
         selectedLinearElementId: null,
         editingLinearElementId: null,
-        selectedLockedId: null,
+        activeLockedId: null,
         lockedMultiSelections: {},
       };
 

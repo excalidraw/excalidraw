@@ -939,7 +939,7 @@ const getDefaultObservedAppState = (): ObservedAppState => {
     editingLinearElementId: null,
     selectedLinearElementId: null,
     croppingElementId: null,
-    selectedLockedId: null,
+    activeLockedId: null,
     lockedMultiSelections: {},
   };
 };
@@ -954,7 +954,7 @@ export const getObservedAppState = (appState: AppState): ObservedAppState => {
     editingLinearElementId: appState.editingLinearElement?.elementId || null,
     selectedLinearElementId: appState.selectedLinearElement?.elementId || null,
     croppingElementId: appState.croppingElementId,
-    selectedLockedId: appState.selectedLockedId,
+    activeLockedId: appState.activeLockedId,
     lockedMultiSelections: appState.lockedMultiSelections,
   };
 

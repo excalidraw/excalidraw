@@ -789,11 +789,11 @@ const _renderInteractiveScene = ({
     renderElementsBoxHighlight(context, appState, appState.elementsToHighlight);
   }
 
-  if (appState.selectedLockedId) {
-    const element = allElementsMap.get(appState.selectedLockedId);
+  if (appState.activeLockedId) {
+    const element = allElementsMap.get(appState.activeLockedId);
     const elements = element
       ? [element]
-      : getElementsInGroup(allElementsMap, appState.selectedLockedId);
+      : getElementsInGroup(allElementsMap, appState.activeLockedId);
     renderElementsBoxHighlight(context, appState, elements, {
       colors: ["#ced4da"],
       dashed: true,
