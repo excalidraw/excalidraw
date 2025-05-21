@@ -5122,16 +5122,27 @@ class App extends React.Component<AppProps, AppState> {
   private getElementAtPosition(
     x: number,
     y: number,
-    opts?: {
+    opts?: (
+      | {
+          includeBoundTextElement?: boolean;
+          includeLockedElements?: boolean;
+        }
+      | {
+          allHitElements: NonDeleted<ExcalidrawElement>[];
+        }
+    ) & {
       preferSelected?: boolean;
-      includeBoundTextElement?: boolean;
-      includeLockedElements?: boolean;
     },
   ): NonDeleted<ExcalidrawElement> | null {
-    const allHitElements = this.getElementsAtPosition(x, y, {
-      includeBoundTextElement: opts?.includeBoundTextElement,
-      includeLockedElements: opts?.includeLockedElements,
-    });
+    let allHitElements: NonDeleted<ExcalidrawElement>[] = [];
+    if (opts && "allHitElements" in opts) {
+      allHitElements = opts?.allHitElements || [];
+    } else {
+      allHitElements = this.getElementsAtPosition(x, y, {
+        includeBoundTextElement: opts?.includeBoundTextElement,
+        includeLockedElements: opts?.includeLockedElements,
+      });
+    }
 
     if (allHitElements.length > 1) {
       if (opts?.preferSelected) {
@@ -6177,25 +6188,14 @@ class App extends React.Component<AppProps, AppState> {
       scenePointerX,
       scenePointerY,
       {
+        preferSelected: true,
         includeLockedElements: true,
       },
     );
 
-    const hitElements = this.getElementsAtPosition(
-      scenePointerX,
-      scenePointerY,
-    );
-
     let hitElement: ExcalidrawElement | null = null;
     if (hitElementMightBeLocked && hitElementMightBeLocked.locked) {
-      // if some of the hit elements are selected,
-      // choose the last one as hitElement
-      // otherwise, set hitElement to null so that we can show the default cursor
-      if (hitElements.some((el) => this.state.selectedElementIds[el.id])) {
-        hitElement = hitElements.at(-1) ?? null;
-      } else {
-        hitElement = null;
-      }
+      hitElement = null;
     } else {
       hitElement = hitElementMightBeLocked;
     }
@@ -7248,17 +7248,24 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        const hitElementMightBeLocked = this.getElementAtPosition(
+        const allHitElements = this.getElementsAtPosition(
           pointerDownState.origin.x,
           pointerDownState.origin.y,
           {
             includeLockedElements: true,
           },
         );
+        const unlockedHitElements = allHitElements.filter((e) => !e.locked);
 
-        const hitElements = this.getElementsAtPosition(
+        // Cannot set preferSelected in getElementAtPosition as we do in pointer move; consider:
+        // A & B: both unlocked, A selected, B on top, A & B overlaps in some way
+        // we want to select B when clicking on the overlapping area
+        const hitElementMightBeLocked = this.getElementAtPosition(
           pointerDownState.origin.x,
           pointerDownState.origin.y,
+          {
+            allHitElements,
+          },
         );
 
         if (
@@ -7273,7 +7280,9 @@ class App extends React.Component<AppProps, AppState> {
         if (
           hitElementMightBeLocked &&
           hitElementMightBeLocked.locked &&
-          !hitElements.some((el) => this.state.selectedElementIds[el.id])
+          !unlockedHitElements.some(
+            (el) => this.state.selectedElementIds[el.id],
+          )
         ) {
           pointerDownState.hit.element = null;
         } else {
@@ -7318,7 +7327,7 @@ class App extends React.Component<AppProps, AppState> {
 
         // For overlapped elements one position may hit
         // multiple elements
-        pointerDownState.hit.allHitElements = hitElements;
+        pointerDownState.hit.allHitElements = unlockedHitElements;
 
         const hitElement = pointerDownState.hit.element;
         const someHitElementIsSelected =
