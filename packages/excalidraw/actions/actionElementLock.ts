@@ -116,7 +116,7 @@ export const actionToggleElementLock = register({
       ? {}
       : selectGroupsFromGivenElements(unlockedSelectedElements, appState);
 
-    const hitLockedId = nextLockState
+    const selectedLockedId = nextLockState
       ? newGroupId
         ? newGroupId
         : isAGroup
@@ -135,7 +135,7 @@ export const actionToggleElementLock = register({
           ? null
           : appState.selectedLinearElement,
         lockedMultiSelections: nextLockedMultiSelections,
-        hitLockedId,
+        selectedLockedId,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -205,7 +205,7 @@ export const actionUnlockAllElements = register({
           appState,
         ),
         lockedMultiSelections: {},
-        hitLockedId: null,
+        selectedLockedId: null,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };

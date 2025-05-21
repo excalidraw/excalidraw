@@ -20,16 +20,19 @@ import type { AppState } from "../types";
 
 const UnlockPopup = ({
   app,
-  hitLockedId,
+  selectedLockedId,
 }: {
   app: App;
-  hitLockedId: NonNullable<AppState["hitLockedId"]>;
+  selectedLockedId: NonNullable<AppState["selectedLockedId"]>;
 }) => {
-  const element = app.scene.getElement(hitLockedId);
+  const element = app.scene.getElement(selectedLockedId);
 
   const elements = element
     ? [element]
-    : getElementsInGroup(app.scene.getNonDeletedElementsMap(), hitLockedId);
+    : getElementsInGroup(
+        app.scene.getNonDeletedElementsMap(),
+        selectedLockedId,
+      );
 
   if (elements.length === 0) {
     return null;
@@ -60,7 +63,7 @@ const UnlockPopup = ({
               {},
             ),
             selectedGroupIds: groupIds,
-            hitLockedId: null,
+            selectedLockedId: null,
           });
         });
         app.actionManager.executeAction(actionToggleElementLock);

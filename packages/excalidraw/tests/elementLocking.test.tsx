@@ -134,7 +134,7 @@ describe("element locking", () => {
     expect(API.getSelectedElements().length).toBe(0);
     mouse.clickAt(50, 50);
     expect(API.getSelectedElements().length).toBe(0);
-    expect(h.state.hitLockedId).toBe(lockedRectangle.id);
+    expect(h.state.selectedLockedId).toBe(lockedRectangle.id);
   });
 
   it("right-clicking on a locked element should select it & open its contextMenu", () => {

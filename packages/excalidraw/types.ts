@@ -235,7 +235,7 @@ export type InteractiveCanvasAppState = Readonly<
     croppingElementId: AppState["croppingElementId"];
     // Search matches
     searchMatches: AppState["searchMatches"];
-    hitLockedId: AppState["hitLockedId"];
+    selectedLockedId: AppState["selectedLockedId"];
   }
 >;
 
@@ -257,7 +257,7 @@ export type ObservedElementsAppState = {
   selectedLinearElementId: LinearElementEditor["elementId"] | null;
   croppingElementId: AppState["croppingElementId"];
   lockedMultiSelections: AppState["lockedMultiSelections"];
-  hitLockedId: AppState["hitLockedId"];
+  selectedLockedId: AppState["selectedLockedId"];
 };
 
 export interface AppState {
@@ -441,7 +441,7 @@ export interface AppState {
     matches: readonly SearchMatch[];
   }> | null;
 
-  hitLockedId: string | null;
+  selectedLockedId: string | null;
   // when locking multiple units of elements together, we assign a temporary
   // groupId to them so we can unlock them together;
   // as elements are unlocked, we remove the groupId from the elements

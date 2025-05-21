@@ -1878,10 +1878,10 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
-                        {this.state.hitLockedId && (
+                        {this.state.selectedLockedId && (
                           <UnlockPopup
                             app={this}
-                            hitLockedId={this.state.hitLockedId}
+                            selectedLockedId={this.state.selectedLockedId}
                           />
                         )}
                         {showShapeSwitchPanel && (
@@ -7252,10 +7252,10 @@ class App extends React.Component<AppProps, AppState> {
 
         if (
           !hitElementMightBeLocked ||
-          hitElementMightBeLocked.id !== this.state.hitLockedId
+          hitElementMightBeLocked.id !== this.state.selectedLockedId
         ) {
           this.setState({
-            hitLockedId: null,
+            selectedLockedId: null,
           });
         }
 
@@ -8123,9 +8123,9 @@ class App extends React.Component<AppProps, AppState> {
       }
       const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
 
-      if (this.state.hitLockedId) {
+      if (this.state.selectedLockedId) {
         this.setState({
-          hitLockedId: null,
+          selectedLockedId: null,
         });
       }
 
@@ -9012,7 +9012,7 @@ class App extends React.Component<AppProps, AppState> {
 
       // if current elements are still selected
       // and the pointer is just over a locked element
-      // do not allow hitLockedId to be set
+      // do not allow selectedLockedId to be set
 
       const hitElements = pointerDownState.hit.allHitElements;
 
@@ -9036,19 +9036,19 @@ class App extends React.Component<AppProps, AppState> {
         this.store.scheduleCapture();
         if (hitLockedElement?.locked) {
           this.setState({
-            hitLockedId:
+            selectedLockedId:
               hitLockedElement.groupIds.length > 0
                 ? hitLockedElement.groupIds.at(-1) || ""
                 : hitLockedElement.id,
           });
         } else {
           this.setState({
-            hitLockedId: null,
+            selectedLockedId: null,
           });
         }
       } else {
         this.setState({
-          hitLockedId: null,
+          selectedLockedId: null,
         });
       }
 

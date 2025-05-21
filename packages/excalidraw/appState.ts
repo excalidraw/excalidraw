@@ -123,7 +123,7 @@ export const getDefaultAppState = (): Omit<
     croppingElementId: null,
     searchMatches: null,
     lockedMultiSelections: {},
-    hitLockedId: null,
+    selectedLockedId: null,
   };
 };
 
@@ -249,7 +249,7 @@ const APP_STATE_STORAGE_CONF = (<
   croppingElementId: { browser: false, export: false, server: false },
   searchMatches: { browser: false, export: false, server: false },
   lockedMultiSelections: { browser: true, export: true, server: true },
-  hitLockedId: { browser: false, export: false, server: false },
+  selectedLockedId: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

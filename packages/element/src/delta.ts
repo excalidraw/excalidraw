@@ -672,7 +672,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
             break;
           }
-          case "hitLockedId": {
+          case "selectedLockedId": {
             const prevHitLockedId = prevAppState[key] || null;
             const nextHitLockedId = nextAppState[key] || null;
 
@@ -777,7 +777,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       selectedLinearElementId,
       croppingElementId,
       lockedMultiSelections,
-      hitLockedId,
+      selectedLockedId,
       ...standaloneProps
     } = delta as ObservedAppState;
 
@@ -831,8 +831,8 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       Delta.diffObjects(
         deleted,
         inserted,
-        "hitLockedId",
-        (prevValue) => (prevValue ?? null) as ValueOf<T["hitLockedId"]>,
+        "selectedLockedId",
+        (prevValue) => (prevValue ?? null) as ValueOf<T["selectedLockedId"]>,
       );
     } catch (e) {
       // if postprocessing fails it does not make sense to bubble up, but let's make sure we know about it
