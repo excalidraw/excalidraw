@@ -222,7 +222,9 @@ export type ExcalidrawElement =
   | ExcalidrawMagicFrameElement
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement
-  | RabbitElement;
+  | RabbitElement
+  | RabbitSearchBoxElement
+  | RabbitImageElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<
   ExcalidrawElement,
