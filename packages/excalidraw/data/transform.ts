@@ -62,6 +62,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
+import { adjustBoundTextSize } from "../components/ConvertElementTypePopup";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -238,7 +239,7 @@ const bindTextToContainer = (
     }),
   });
 
-  redrawTextBoundingBox(textElement, container, scene);
+  adjustBoundTextSize(container as any, textElement as any, scene, false);
 
   return [container, textElement] as const;
 };
