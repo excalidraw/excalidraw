@@ -5128,12 +5128,10 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements?: boolean;
     },
   ): NonDeleted<ExcalidrawElement> | null {
-    const allHitElements = this.getElementsAtPosition(
-      x,
-      y,
-      opts?.includeBoundTextElement,
-      opts?.includeLockedElements,
-    );
+    const allHitElements = this.getElementsAtPosition(x, y, {
+      includeBoundTextElement: opts?.includeBoundTextElement,
+      includeLockedElements: opts?.includeLockedElements,
+    });
 
     if (allHitElements.length > 1) {
       if (opts?.preferSelected) {
@@ -5176,22 +5174,24 @@ class App extends React.Component<AppProps, AppState> {
   private getElementsAtPosition(
     x: number,
     y: number,
-    includeBoundTextElement: boolean = false,
-    includeLockedElements: boolean = false,
+    opts?: {
+      includeBoundTextElement?: boolean;
+      includeLockedElements?: boolean;
+    },
   ): NonDeleted<ExcalidrawElement>[] {
     const iframeLikes: Ordered<ExcalidrawIframeElement>[] = [];
 
     const elementsMap = this.scene.getNonDeletedElementsMap();
 
     const elements = (
-      includeBoundTextElement && includeLockedElements
+      opts?.includeBoundTextElement && opts?.includeLockedElements
         ? this.scene.getNonDeletedElements()
         : this.scene
             .getNonDeletedElements()
             .filter(
               (element) =>
-                (includeLockedElements || !element.locked) &&
-                (includeBoundTextElement ||
+                (opts?.includeLockedElements || !element.locked) &&
+                (opts?.includeBoundTextElement ||
                   !(isTextElement(element) && element.containerId)),
             )
     )
@@ -6180,16 +6180,17 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     let hitElement: ExcalidrawElement | null = null;
-    if (
-      hitElementMightBeLocked &&
-      hitElementMightBeLocked.locked &&
-      !hitElements.some((el) => this.state.selectedElementIds[el.id])
-    ) {
-      hitElement = null;
-    } else if (hitElementMightBeLocked && !hitElementMightBeLocked.locked) {
-      hitElement = hitElementMightBeLocked;
+    if (hitElementMightBeLocked && hitElementMightBeLocked.locked) {
+      // if some of the hit elements are selected,
+      // choose the last one as hitElement
+      // otherwise, set hitElement to null so that we can show the default cursor
+      if (hitElements.some((el) => this.state.selectedElementIds[el.id])) {
+        hitElement = hitElements.at(-1) ?? null;
+      } else {
+        hitElement = null;
+      }
     } else {
-      hitElement = this.getElementAtPosition(scenePointerX, scenePointerY);
+      hitElement = hitElementMightBeLocked;
     }
 
     this.hitLinkElement = this.getElementLinkAtPosition(
