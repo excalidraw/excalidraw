@@ -39,6 +39,7 @@ const handleDimensionChange: DragInputCallbackType<
   shouldKeepAspectRatio,
   shouldChangeByStepSize,
   nextValue,
+  ratio,
   property,
   originalAppState,
   instantChange,
@@ -154,6 +155,12 @@ const handleDimensionChange: DragInputCallbackType<
     }
 
     if (nextValue !== undefined) {
+      if (ratio) {
+        ratio = property === "width" ? ratio : [ratio[1], ratio[0]];
+        nextValue = (origElement[property] / ratio[0]) * ratio[1];
+        property = property === "width" ? "height" : "width";
+      }
+
       const nextWidth = Math.max(
         property === "width"
           ? nextValue

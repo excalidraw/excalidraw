@@ -151,6 +151,7 @@ const handleDimensionChange: DragInputCallbackType<
   originalAppState,
   shouldChangeByStepSize,
   nextValue,
+  ratio,
   scene,
   property,
 }) => {
@@ -202,9 +203,22 @@ const handleDimensionChange: DragInputCallbackType<
           origElement &&
           isPropertyEditable(latestElement, property)
         ) {
+          let _nextValue = nextValue;
+          let _property = property;
+          if (ratio) {
+            let _ratio = ratio;
+            if (ratio) {
+              _ratio = _property === "width" ? _ratio : [_ratio[1], _ratio[0]];
+              _nextValue = (origElement[_property] / _ratio[0]) * _ratio[1];
+              _property = _property === "width" ? "height" : "width";
+            }
+          }
+
           let nextWidth =
-            property === "width" ? Math.max(0, nextValue) : latestElement.width;
-          if (property === "width") {
+            _property === "width"
+              ? Math.max(0, _nextValue)
+              : latestElement.width;
+          if (_property === "width") {
             if (shouldChangeByStepSize) {
               nextWidth = getStepSizedValue(nextWidth, STEP_SIZE);
             } else {
@@ -213,10 +227,10 @@ const handleDimensionChange: DragInputCallbackType<
           }
 
           let nextHeight =
-            property === "height"
-              ? Math.max(0, nextValue)
+            _property === "height"
+              ? Math.max(0, _nextValue)
               : latestElement.height;
-          if (property === "height") {
+          if (_property === "height") {
             if (shouldChangeByStepSize) {
               nextHeight = getStepSizedValue(nextHeight, STEP_SIZE);
             } else {
@@ -234,7 +248,7 @@ const handleDimensionChange: DragInputCallbackType<
             origElement,
             originalElementsMap,
             scene,
-            property === "width" ? "e" : "s",
+            _property === "width" ? "e" : "s",
             {
               shouldInformMutation: false,
             },

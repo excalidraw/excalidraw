@@ -33,6 +33,7 @@ export type DragInputCallbackType<
   shouldChangeByStepSize: boolean;
   scene: Scene;
   nextValue?: number;
+  ratio?: [number, number] | null;
   property: P;
   originalAppState: AppState;
   setInputValue: (value: number) => void;
@@ -109,10 +110,21 @@ const StatsDragInput = <
     }
     stateRef.current.updatePending = false;
 
+    const ratioMatch = updatedValue
+      .trim()
+      .match(/^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/);
+
+    let ratio: [number, number] | null = null;
+    if (ratioMatch) {
+      ratio = [Number(ratioMatch[1]), Number(ratioMatch[2])];
+    }
+
     const parsed = Number(updatedValue);
     if (isNaN(parsed)) {
       setInputValue(value.toString());
-      return;
+      if (!ratio) {
+        return;
+      }
     }
 
     const rounded = Number(parsed.toFixed(2));
@@ -123,7 +135,11 @@ const StatsDragInput = <
     // 2. original was not "Mixed" and the difference between a new value and previous value is greater
     //    than the smallest delta allowed, which is 0.01
     // reason: idempotent to avoid unnecessary
-    if (isNaN(original) || Math.abs(rounded - original) >= SMALLEST_DELTA) {
+    if (
+      isNaN(original) ||
+      ratio ||
+      Math.abs(rounded - original) >= SMALLEST_DELTA
+    ) {
       stateRef.current.lastUpdatedValue = updatedValue;
       dragInputCallback({
         accumulatedChange: 0,
@@ -134,6 +150,7 @@ const StatsDragInput = <
         shouldChangeByStepSize: false,
         scene,
         nextValue: rounded,
+        ratio,
         property,
         originalAppState: appState,
         setInputValue: (value) => setInputValue(String(value)),
