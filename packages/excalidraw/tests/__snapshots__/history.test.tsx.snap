@@ -3,6 +3,7 @@
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -61,6 +62,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -592,6 +594,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -650,6 +653,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -1099,6 +1103,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added arrow when it's bindable elements are added through the history > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -1157,6 +1162,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -1465,6 +1471,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added bindable elements when it's arrow is added through the history > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -1523,6 +1530,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -1832,6 +1840,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should unbind remotely deleted bindable elements from arrow when the arrow is added through the history > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -1890,6 +1899,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -2097,6 +2107,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should update bound element points when rectangle was remotely moved and arrow is added back through the history > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -2155,6 +2166,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -2532,6 +2544,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should preserve latest remotely added binding and unbind previous one when the container is added through the history > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -2590,6 +2603,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -2829,6 +2843,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should preserve latest remotely added binding and unbind previous one when the text is added through history > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -2887,6 +2902,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -3111,6 +3127,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should rebind bindings when both are updated through the history and the container got bound to a different text in the meantime > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -3169,6 +3186,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -3403,6 +3421,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should rebind bindings when both are updated through the history and the text got bound to a different container in the meantime > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -3461,6 +3480,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -3687,6 +3707,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should rebind bindings when both are updated through the history and there no conflicting updates in the meantime > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -3745,6 +3766,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -3920,6 +3942,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should rebind remotely added bound text when it's container is added through the history > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -3978,6 +4001,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -4177,6 +4201,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should rebind remotely added container when it's bound text is added through the history > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -4235,6 +4260,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -4448,6 +4474,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should redraw bound text to match container dimensions when the bound text is updated through the history > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -4506,6 +4533,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -4677,6 +4705,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should redraw remotely added bound text when it's container is updated through the history > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -4735,6 +4764,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -4906,6 +4936,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should unbind remotely deleted bound text from container when the container is added through the history > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -4964,6 +4995,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -5133,6 +5165,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should unbind remotely deleted container from bound text when the text is added through the history > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -5191,6 +5224,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -5360,6 +5394,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 exports[`history > multiplayer undo/redo > conflicts in frames and their children > should not rebind frame child with frame when frame was remotely deleted and frame child is added back through the history  > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -5418,6 +5453,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -5618,6 +5654,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
 exports[`history > multiplayer undo/redo > should iterate through the history when editing group contains only remotely deleted elements > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -5676,6 +5713,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -5949,6 +5987,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -6007,6 +6046,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -6376,6 +6416,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 exports[`history > multiplayer undo/redo > should iterate through the history when selected elements relate only to remotely deleted elements > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -6434,6 +6475,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -6754,6 +6796,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 exports[`history > multiplayer undo/redo > should iterate through the history when selected groups contain only remotely deleted elements > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -6812,6 +6855,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -7072,6 +7116,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 exports[`history > multiplayer undo/redo > should iterate through the history when selected or editing linear element was remotely deleted > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -7130,6 +7175,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -7371,6 +7417,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 exports[`history > multiplayer undo/redo > should iterate through the history when when element change relates to remotely deleted element > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -7429,6 +7476,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -7599,6 +7647,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 exports[`history > multiplayer undo/redo > should iterate through the history when z-index changes do not produce visible change and we synced all indices > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -7657,6 +7706,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -7953,6 +8003,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 exports[`history > multiplayer undo/redo > should iterate through the history when z-index changes do not produce visible change and we synced changed indices > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -8011,6 +8062,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -8307,6 +8359,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
 exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress dragging > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -8365,6 +8418,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -8713,6 +8767,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress freedraw > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -8771,6 +8826,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -8998,6 +9054,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress resizing > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -9056,6 +9113,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -9262,6 +9320,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
 exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -9320,6 +9379,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -9527,6 +9587,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
 exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -9585,6 +9646,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -9757,6 +9819,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
 exports[`history > multiplayer undo/redo > should override remotely added groups on undo, but restore them on redo > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -9815,6 +9878,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -10056,6 +10120,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
 exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -10114,6 +10179,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -10396,6 +10462,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
 exports[`history > multiplayer undo/redo > should redistribute deltas when element gets removed locally but is restored remotely > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -10454,6 +10521,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -10630,6 +10698,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
 exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -10688,6 +10757,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -11078,6 +11148,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
 exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -11136,6 +11207,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -11334,6 +11406,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
 exports[`history > singleplayer undo/redo > remounting undo/redo buttons should initialize undo/redo state correctly > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -11392,6 +11465,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -11571,6 +11645,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
 exports[`history > singleplayer undo/redo > should clear the redo stack on elements change > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -11629,6 +11704,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -11810,6 +11886,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
 exports[`history > singleplayer undo/redo > should create entry when selecting freedraw > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -11868,6 +11945,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -12211,6 +12289,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
 exports[`history > singleplayer undo/redo > should create new history entry on scene import via drag&drop > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -12269,6 +12348,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -12456,6 +12536,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
 exports[`history > singleplayer undo/redo > should disable undo/redo buttons when stacks empty > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -12514,6 +12595,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -12695,6 +12777,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
 exports[`history > singleplayer undo/redo > should end up with no history entry after initializing scene > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -12753,6 +12836,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -12934,6 +13018,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
 exports[`history > singleplayer undo/redo > should iterate through the history when selection changes do not produce visible change > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -12992,6 +13077,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -13181,6 +13267,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
 exports[`history > singleplayer undo/redo > should not clear the redo stack on standalone appstate change > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -13239,6 +13326,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -13514,6 +13602,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
 exports[`history > singleplayer undo/redo > should not collapse when applying corrupted history entry > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -13572,6 +13661,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -13684,6 +13774,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
 exports[`history > singleplayer undo/redo > should not end up with history entry when there are no appstate changes > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -13742,6 +13833,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -13970,6 +14062,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
 exports[`history > singleplayer undo/redo > should not end up with history entry when there are no elements changes > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -14028,6 +14121,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -14235,6 +14329,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
 exports[`history > singleplayer undo/redo > should not override appstate changes when redo stack is not cleared > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -14293,6 +14388,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -14513,6 +14609,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
 exports[`history > singleplayer undo/redo > should support appstate name or viewBackgroundColor change > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -14571,6 +14668,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -14673,6 +14771,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on deletion and rebind on undo > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -14731,6 +14830,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -15372,6 +15472,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on undo and rebind on redo > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -15430,6 +15531,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -15990,6 +16092,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind everything from non deleted elements when iterating through the whole undo stack and vice versa rebind everything on redo > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -16048,6 +16151,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -16608,6 +16712,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangle from arrow on deletion and rebind on undo > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -16666,6 +16771,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -17321,6 +17427,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangles from arrow on deletion and rebind on undo > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -17379,6 +17486,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -18072,6 +18180,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
 exports[`history > singleplayer undo/redo > should support changes in elements' order > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -18130,6 +18239,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -18550,6 +18660,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
 exports[`history > singleplayer undo/redo > should support duplication of groups, appstate group selection and editing group > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -18608,6 +18719,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -19071,6 +19183,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
 exports[`history > singleplayer undo/redo > should support element creation, deletion and appstate element selection change > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -19129,6 +19242,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
@@ -19530,6 +19644,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
 exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
     "fromSelection": false,
@@ -19588,6 +19703,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "newElement": null,
   "objectsSnapModeEnabled": false,
