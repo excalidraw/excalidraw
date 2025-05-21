@@ -483,7 +483,7 @@ import {
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { Toast } from "./Toast";
 
-import { findShapeByKey } from "./shapes";
+import { findShapeByCode, findShapeByKey } from "./shapes";
 
 import type {
   RenderInteractiveSceneCallback,
@@ -4560,7 +4560,7 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
       ) {
-        const shape = findShapeByKey(event.key);
+        const shape = findShapeByKey(event.key) || findShapeByCode(event.code);
         if (shape) {
           if (this.state.activeTool.type !== shape) {
             trackEvent(
