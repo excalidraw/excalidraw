@@ -564,7 +564,7 @@ export const convertElementTypes = (
               continue;
             }
             const fixedSegments: FixedSegment[] = [];
-            for (let i = 0; i < nextPoints.length - 1; i++) {
+            for (let i = 1; i < nextPoints.length - 2; i++) {
               fixedSegments.push({
                 start: nextPoints[i],
                 end: nextPoints[i + 1],
