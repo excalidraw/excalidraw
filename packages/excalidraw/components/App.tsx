@@ -5677,14 +5677,21 @@ class App extends React.Component<AppProps, AppState> {
 
   private getElementLinkAtPosition = (
     scenePointer: Readonly<{ x: number; y: number }>,
-    hitElement: NonDeletedExcalidrawElement | null,
+    hitElementMightBeLocked: NonDeletedExcalidrawElement | null,
   ): ExcalidrawElement | undefined => {
+    if (hitElementMightBeLocked && hitElementMightBeLocked.locked) {
+      return undefined;
+    }
+
     const elements = this.scene.getNonDeletedElements();
     let hitElementIndex = -1;
 
     for (let index = elements.length - 1; index >= 0; index--) {
       const element = elements[index];
-      if (hitElement && element.id === hitElement.id) {
+      if (
+        hitElementMightBeLocked &&
+        element.id === hitElementMightBeLocked.id
+      ) {
         hitElementIndex = index;
       }
       if (
@@ -6195,7 +6202,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.hitLinkElement = this.getElementLinkAtPosition(
       scenePointer,
-      hitElement,
+      hitElementMightBeLocked,
     );
     if (isEraserActive(this.state)) {
       return;
@@ -6802,6 +6809,9 @@ class App extends React.Component<AppProps, AppState> {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
         scenePointer.y,
+        {
+          includeLockedElements: true,
+        },
       );
       this.hitLinkElement = this.getElementLinkAtPosition(
         scenePointer,
@@ -7278,7 +7288,7 @@ class App extends React.Component<AppProps, AppState> {
 
         this.hitLinkElement = this.getElementLinkAtPosition(
           pointerDownState.origin,
-          pointerDownState.hit.element,
+          hitElementMightBeLocked,
         );
 
         if (this.hitLinkElement) {
