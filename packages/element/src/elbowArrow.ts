@@ -974,6 +974,16 @@ export const updateElbowArrowPoints = (
         ),
       "Elbow arrow segments must be either horizontal or vertical",
     );
+
+    invariant(
+      updates.fixedSegments?.find((segment) => segment.index === 0) == null &&
+        updates.fixedSegments?.find(
+          (segment) =>
+            segment.index === arrow.points.length - 1 ||
+            (updates.points && segment.index === updates.points?.length - 1),
+        ) == null,
+      "The first and last segments cannot be fixed",
+    );
   }
 
   const fixedSegments = updates.fixedSegments ?? arrow.fixedSegments ?? [];
