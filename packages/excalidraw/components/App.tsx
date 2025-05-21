@@ -9039,6 +9039,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         this.state.activeTool.type === "selection" &&
         !pointerDownState.boxSelection.hasOccurred &&
+        !pointerDownState.resize.isResizing &&
         !hitElements.some((el) => this.state.selectedElementIds[el.id])
       ) {
         const sceneCoords = viewportCoordsToSceneCoords(
