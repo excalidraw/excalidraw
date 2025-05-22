@@ -82,7 +82,7 @@ export const FontPicker = React.memo(
 
     return (
       <div role="dialog" aria-modal="true" className="FontPicker__container">
-        <div className="buttonList">
+        <div>
           <RadioSelection<FontFamilyValues | false>
             type="button"
             options={defaultFonts}

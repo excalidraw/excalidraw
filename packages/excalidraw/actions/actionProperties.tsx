@@ -439,7 +439,7 @@ export const actionChangeFillStyle = register({
     return (
       <fieldset>
         <legend>{t("labels.fill")}</legend>
-        <div className="buttonList">
+        <div>
           <RadioSelection
             type="button"
             options={[
@@ -508,7 +508,7 @@ export const actionChangeStrokeWidth = register({
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.strokeWidth")}</legend>
-      <div className="buttonList">
+      <div>
         <RadioSelection
           group="stroke-width"
           options={[
@@ -565,7 +565,7 @@ export const actionChangeSloppiness = register({
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.sloppiness")}</legend>
-      <div className="buttonList">
+      <div>
         <RadioSelection
           group="sloppiness"
           options={[
@@ -618,7 +618,7 @@ export const actionChangeStrokeStyle = register({
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.strokeStyle")}</legend>
-      <div className="buttonList">
+      <div>
         <RadioSelection
           group="strokeStyle"
           options={[
@@ -687,7 +687,7 @@ export const actionChangeFontSize = register({
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.fontSize")}</legend>
-      <div className="buttonList">
+      <div>
         <RadioSelection
           group="font-size"
           options={[
@@ -1217,7 +1217,7 @@ export const actionChangeTextAlign = register({
     return (
       <fieldset>
         <legend>{t("labels.textAlign")}</legend>
-        <div className="buttonList">
+        <div>
           <RadioSelection<TextAlign | false>
             group="text-align"
             options={[
@@ -1307,7 +1307,7 @@ export const actionChangeVerticalAlign = register({
   PanelComponent: ({ elements, appState, updateData, app }) => {
     return (
       <fieldset>
-        <div className="buttonList">
+        <div>
           <RadioSelection<VerticalAlign | false>
             group="text-align"
             options={[
@@ -1404,7 +1404,7 @@ export const actionChangeRoundness = register({
     return (
       <fieldset>
         <legend>{t("labels.edges")}</legend>
-        <div className="buttonList">
+        <div>
           <RadioSelection
             group="edges"
             options={[
@@ -1838,7 +1838,7 @@ export const actionChangeArrowType = register({
     return (
       <fieldset>
         <legend>{t("labels.arrowtypes")}</legend>
-        <div className="buttonList">
+        <div>
           <RadioSelection
             group="arrowtypes"
             options={[

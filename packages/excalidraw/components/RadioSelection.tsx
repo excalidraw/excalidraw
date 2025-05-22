@@ -1,10 +1,12 @@
 import clsx from "clsx";
 
+import { useContext, type JSX } from "react";
+
+import { ExcalidrawPropsCustomOptionsContext } from "../types";
+
 import { ButtonIcon } from "./ButtonIcon";
 
-import type { JSX } from "react";
-
-export const RadioSelection = <T extends Object>(
+export const RadioSelectionCore = <T extends Object>(
   props: {
     options: {
       value: T;
@@ -57,3 +59,15 @@ export const RadioSelection = <T extends Object>(
     )}
   </>
 );
+
+export const RadioSelection = ((
+  props: Parameters<typeof RadioSelectionCore>[0],
+) => {
+  const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+  if (customOptions?.pickerRenders?.RadioSelection) {
+    return <customOptions.pickerRenders.RadioSelection {...props} />;
+  }
+
+  return <RadioSelectionCore {...props} />;
+}) as typeof RadioSelectionCore;
