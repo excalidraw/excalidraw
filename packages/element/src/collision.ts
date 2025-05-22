@@ -8,6 +8,7 @@ import {
   isPointWithinBounds,
   lineSegment,
   lineSegmentIntersectionPoints,
+  pointDistanceSq,
   pointFrom,
   pointFromVector,
   pointRotateRads,
@@ -217,7 +218,7 @@ const intersectLinearOrFreeDrawWithLineSegment = (
       .map((l) => lineSegmentIntersectionPoints(l, segment))
       .filter((p): p is GlobalPoint => p != null),
     ...curves.flatMap((c) => curveIntersectLineSegment(c, segment)),
-  ].sort();
+  ].sort(pointDistanceSq);
 };
 
 const intersectRectanguloidWithLineSegment = (
