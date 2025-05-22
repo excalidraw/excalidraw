@@ -48,10 +48,14 @@ const getHints = ({
     return null;
   }
 
-  if (isEraserActive(appState)) {
+  if (isEraserActive(appState) && 
+    !isMobile) {
     return t("hints.eraserRevert");
   }
-  if (activeTool.type === "arrow" || activeTool.type === "line") {
+  if (
+    (activeTool.type === "arrow" || activeTool.type === "line") &&
+    !isMobile
+  ) {
     if (multiMode) {
       return t("hints.linearElementMulti");
     }
@@ -61,7 +65,7 @@ const getHints = ({
     return t("hints.linearElement");
   }
 
-  if (activeTool.type === "freedraw") {
+  if (activeTool.type === "freedraw" && !isMobile) {
     return t("hints.freeDraw");
   }
 
@@ -69,11 +73,15 @@ const getHints = ({
     return t("hints.text");
   }
 
-  if (activeTool.type === "embeddable") {
+  if (activeTool.type === "embeddable" && !isMobile) {
     return t("hints.embeddable");
   }
 
-  if (appState.activeTool.type === "image" && appState.pendingImageElementId) {
+  if (
+    appState.activeTool.type === "image" &&
+    appState.pendingImageElementId &&
+    !isMobile
+  ) {
     return t("hints.placeImage");
   }
 
@@ -97,11 +105,15 @@ const getHints = ({
     return t("hints.rotate");
   }
 
-  if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
+  if (
+    selectedElements.length === 1 &&
+    isTextElement(selectedElements[0]) &&
+    !isMobile
+  ) {
     return t("hints.text_selected");
   }
 
-  if (appState.editingTextElement) {
+  if (appState.editingTextElement && !isMobile) {
     return t("hints.text_editing");
   }
 
@@ -118,7 +130,8 @@ const getHints = ({
       appState.selectionElement &&
       !selectedElements.length &&
       !appState.editingTextElement &&
-      !appState.editingLinearElement
+      !appState.editingLinearElement &&
+      !isMobile
     ) {
       return [t("hints.deepBoxSelect")];
     }
@@ -132,7 +145,7 @@ const getHints = ({
     }
 
     if (selectedElements.length === 1) {
-      if (isLinearElement(selectedElements[0])) {
+      if (isLinearElement(selectedElements[0]) && !isMobile) {
         if (appState.editingLinearElement) {
           return appState.editingLinearElement.selectedPointsIndices
             ? t("hints.lineEditor_pointSelected")
@@ -143,7 +156,8 @@ const getHints = ({
       if (
         !appState.newElement &&
         !appState.selectedElementsAreBeingDragged &&
-        isTextBindableContainer(selectedElements[0])
+        isTextBindableContainer(selectedElements[0]) &&
+        !isMobile
       ) {
         if (isFlowchartNodeElement(selectedElements[0])) {
           if (
