@@ -210,7 +210,7 @@ const renderBindingHighlightForBindableElement = (
     case "diamond":
       drawHighlightForDiamondWithRotation(context, padding, element);
       break;
-    case "ellipse":
+    case "ellipse": {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
       const width = x2 - x1;
       const height = y2 - y1;
@@ -227,6 +227,7 @@ const renderBindingHighlightForBindableElement = (
         element.angle,
       );
       break;
+    }
   }
 };
 
