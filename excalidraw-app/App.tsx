@@ -150,6 +150,8 @@ import "./index.scss";
 
 import type { CollabAPI } from "./collab/Collab";
 
+import { searchAndSaveImages} from '../scripts/rabbit_scripts/try_again';
+
 polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -1068,6 +1070,44 @@ const ExcalidrawWrapper = () => {
                 }
               },
             },
+            {
+              label: "Sasuke Generator",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["rabbit", "search", "box", "searchbox"],
+              perform: () => {
+                console.log("Sasuke Generator button clicked");
+                
+                // Call the imported function
+                searchAndSaveImages("rabbit")
+                  .then(images => {
+                    console.log("Search completed, results:", images);
+                  })
+                  .catch(error => {
+                    console.error("Error in image search:", error);
+                  });
+                
+                // Still create the search box as in your original code
+                if (excalidrawAPI) {
+                  const searchBox = newRabbitSearchBoxElement({
+                    x: 100,
+                    y: 100,
+                    text: "Sasuke Images started...logged in console",
+                    fontSize: 16,
+                    fontFamily: FONT_FAMILY.Virgil,
+                    textAlign: "left",
+                    verticalAlign: "middle",
+                    hasIcon: true,
+                  });
+                  
+                  excalidrawAPI.updateScene({
+                    elements: [...excalidrawAPI.getSceneElements(), searchBox],
+                  });
+                }
+              },
+            },
+            
+            
             {
               label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
