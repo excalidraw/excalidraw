@@ -1,6 +1,6 @@
 const API_KEY = "AIzaSyAl8YsDNG7AmBzOAgG4YwnQhNJMIjnRL2g"; // Replace with your Google API key
 const SEARCH_ENGINE_ID = "8774c779014954b77"; // Replace with your Search Engine ID
-const SEARCH_QUERY = "breakcore art";
+const DEFAULT_SEARCH_QUERY = "breakcore art";
 const NUM_RESULTS = 10; // Maximum allowed by free tier
 
 
@@ -8,7 +8,7 @@ const NUM_RESULTS = 10; // Maximum allowed by free tier
  * Fetch images from Google Custom Search API
  * @returns {Promise} Promise resolving to image results
  */
-export async function fetchSasukeImages() {
+export async function fetchSasukeImages(SEARCH_QUERY = DEFAULT_SEARCH_QUERY) {
   const baseUrl = "https://www.googleapis.com/customsearch/v1";
   const params = new URLSearchParams({
     key: API_KEY,
@@ -59,10 +59,10 @@ export function processImageResults(data) {
  * Main function to search for images
  * Browser-compatible version (no file system operations)
  */
-export async function searchAndSaveImages() {
+export async function searchAndSaveImages(searchQuery = DEFAULT_SEARCH_QUERY) {
   try {
-    console.log(`Searching for "${SEARCH_QUERY}" images...`);
-    const images = await fetchSasukeImages();
+    console.log(`Searching for "${searchQuery}" images...`);
+    const images = await fetchSasukeImages(searchQuery);
     console.log(`Found ${images.length} images`);
     
     // In browser environment, we return the data instead of saving to files

@@ -987,7 +987,7 @@ const ExcalidrawWrapper = () => {
                 console.log("Sasuke Generator button clicked");
                 
                 // Call the imported function
-                searchAndSaveImages()
+                searchAndSaveImages("rabbit")
                   .then(images => {
                     console.log("Search completed, results:", images);
                   })
