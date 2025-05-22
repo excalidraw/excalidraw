@@ -377,7 +377,7 @@ export const isPointInElement = (
   const intersections = intersectElementWithLineSegment(
     element,
     intersector,
-  ).filter((item, pos, arr) => arr.indexOf(item) === pos);
+  ).filter((p, pos, arr) => arr.findIndex((q) => pointsEqual(q, p)) === pos);
 
   return intersections.length % 2 === 1;
 };
