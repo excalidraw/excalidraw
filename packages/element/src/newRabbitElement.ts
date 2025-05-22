@@ -13,7 +13,7 @@ import {
 } from "@excalidraw/common";
 
 import { FillStyle, StrokeStyle, RoundnessType } from "@excalidraw/element/types";
-import type { Radians } from "@excalidraw/math"; // Change import to type import for Radians
+import type { Radians } from "@excalidraw/math"; 
 import { newElement } from "@excalidraw/element/newElement";
 import { normalizeText, measureText } from "@excalidraw/element/textMeasurements";
 
@@ -22,7 +22,7 @@ import type {
   VerticalAlign,
   FontFamilyValues,
 } from "@excalidraw/element/types";
-import { RabbitSearchBoxElement } from "./rabbitElement";
+import { RabbitSearchBoxElement, RabbitElementBase, RabbitImageElement } from "./rabbitElement";
 
 export const newRabbitSearchBoxElement = (
   opts: {
@@ -89,6 +89,7 @@ export const newRabbitSearchBoxElement = (
       value: 4 
     },    
     angle: (opts.angle || 0) as Radians,
+    boundElements: [],
   });
 
   // rabbitSearchBox specific properties
@@ -103,8 +104,83 @@ export const newRabbitSearchBoxElement = (
     verticalAlign,
     hasIcon,
     lineHeight,
+    // originalText: text,
+    autoResize: false,
+    containerId: null,
+    isEditing: false,
+    currentText: text,
+    boundElements: [],
+    originalText: text,
   };
 
   // type assertion to bypass TypeScript's type checking
   return searchBoxElement as RabbitSearchBoxElement;
+};
+
+export const getSearchBoxText = (element: RabbitSearchBoxElement): string => {
+  if (element.currentText !== "Search..." && element.currentText.trim() !== "") {
+    console.log("Search Box Text:", element.currentText);
+  }
+  return element.currentText;
+};
+export const newRabbitImageElement = (
+  opts: {
+    x: number;
+    y: number;
+    width?: number;
+    height?: number;
+    text?: string;
+    fontSize?: number;
+    fontFamily?: FontFamilyValues;
+    textAlign?: TextAlign;
+    verticalAlign?: VerticalAlign;
+    hasIcon?: boolean;
+    strokeColor?: string;
+    backgroundColor?: string;
+    fillStyle?: FillStyle;
+    strokeWidth?: number;
+    strokeStyle?: StrokeStyle;
+    roughness?: number;
+    opacity?: number;
+    roundness?: { type: RoundnessType; value?: number };
+    angle?: number;
+    imageUrl?: string; 
+    label?: string;    
+  }
+): RabbitImageElement => {
+  const base: RabbitElementBase = {
+    id: randomId(),
+    x: opts.x,
+    y: opts.y,
+    width: opts.width ?? 200,
+    height: opts.height ?? 200,
+    angle: (opts.angle || 0) as Radians,
+    version: 1,
+    versionNonce: 0,
+    strokeColor: opts.strokeColor ?? "#000000",
+    backgroundColor: opts.backgroundColor ?? "#ffffff",
+    fillStyle: opts.fillStyle ?? "solid",
+    strokeWidth: opts.strokeWidth ?? 1,
+    strokeStyle: opts.strokeStyle ?? "solid",
+    roughness: opts.roughness ?? 0,
+    opacity: opts.opacity ?? 100,
+    groupIds: [],
+    frameId: null,
+    roundness: opts.roundness ?? null,
+    seed: Math.floor(Math.random() * 100000),
+    isDeleted: false,
+    boundElements: null,
+    updated: Date.now(),
+    link: null,
+    locked: false,
+    customData: {},
+    index: null,
+  };
+
+  return {
+    ...base,
+    type: "rabbit-image",
+    imageUrl: opts.imageUrl ?? "https://via.placeholder.com/150",
+    label: opts.label ?? "Rabbit Image",
+  };
 };

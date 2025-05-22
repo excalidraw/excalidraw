@@ -36,6 +36,7 @@ import { ShapeCache } from "./ShapeCache";
 
 import { getElementAbsoluteCoords, type Bounds } from "./bounds";
 
+import { RabbitElement } from "./rabbitElement";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -97,10 +98,11 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
       );
     }
 
-    case "rabbit-searchbox": {
-      return getRabbitShape(element);
-    }
+    case "rabbit-searchbox":
+    case "rabbit-image":
+      return getRabbitShape(element as RabbitElement);
   }
+    
 };
 
 export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(

@@ -38,7 +38,7 @@ import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
 
-import { newRabbitSearchBoxElement } from "@excalidraw/element/newRabbitElement";
+import { newRabbitSearchBoxElement, newRabbitImageElement } from "@excalidraw/element/newRabbitElement";
 
 import {
   GithubIcon,
@@ -76,6 +76,13 @@ import type {
 } from "@excalidraw/excalidraw/types";
 import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
+// import { 
+//   handleRabbitSearchBoxClick, 
+//   handleRabbitSearchBoxKeyDown 
+// } from "@excalidraw/element/rabbitElementHandlers";
+import { isRabbitSearchBoxElement } from "@excalidraw/element/rabbitElement";
+import { getSearchBoxText } from "@excalidraw/element/newRabbitElement";
+import { useRabbitSearchBoxHandlers } from "@excalidraw/element/rabbitElementHandlers";
 
 import CustomStats from "./CustomStats";
 import {
@@ -97,6 +104,7 @@ import Collab, {
   isOfflineAtom,
 } from "./collab/Collab";
 import { AppFooter } from "./components/AppFooter";
+import { AppHeader } from "./components/AppHeader";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 import {
@@ -329,11 +337,11 @@ const initializeScene = async (opts: {
   } else if (scene) {
     return isExternalScene && jsonBackendMatch
       ? {
-          scene,
-          isExternalScene,
-          id: jsonBackendMatch[1],
-          key: jsonBackendMatch[2],
-        }
+        scene,
+        isExternalScene,
+        id: jsonBackendMatch[1],
+        key: jsonBackendMatch[2],
+      }
       : { scene, isExternalScene: false };
   }
   return { scene: null, isExternalScene: false };
@@ -342,6 +350,7 @@ const initializeScene = async (opts: {
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
+  
 
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
@@ -370,6 +379,7 @@ const ExcalidrawWrapper = () => {
 
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
+  useRabbitSearchBoxHandlers(excalidrawAPI);
 
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
@@ -771,8 +781,7 @@ const ExcalidrawWrapper = () => {
     keywords: ["plus", "cloud", "server"],
     perform: () => {
       window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_LP
+        `${import.meta.env.VITE_APP_PLUS_LP
         }/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
@@ -794,8 +803,7 @@ const ExcalidrawWrapper = () => {
     ],
     perform: () => {
       window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_APP
+        `${import.meta.env.VITE_APP_PLUS_APP
         }?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
@@ -809,6 +817,37 @@ const ExcalidrawWrapper = () => {
         "is-collaborating": isCollaborating,
       })}
     >
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "8px 16px",
+        backgroundColor: "#2c2c2c",
+        color: "white",
+        fontSize: "18px",
+        fontWeight: "bold",
+        borderBottom: "1px solid #444",
+      }}
+    >
+      <img
+        src="https://i.imgur.com/KttcKbd.png"
+        alt="logo"
+        style={{ height: 28, marginRight: 12 }}
+      />
+      <input
+        type="text"
+        placeholder="Untitled Drawing"
+        style={{
+          background: "transparent",
+          border: "none",
+          borderBottom: "1px solid white",
+          color: "white",
+          fontSize: "18px",
+          flex: 1,
+          outline: "none",
+        }}
+      />
+    </div>
       <Excalidraw
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
@@ -822,27 +861,27 @@ const ExcalidrawWrapper = () => {
               onExportToBackend,
               renderCustomUI: excalidrawAPI
                 ? (elements, appState, files) => {
-                    return (
-                      <ExportToExcalidrawPlus
-                        elements={elements}
-                        appState={appState}
-                        files={files}
-                        name={excalidrawAPI.getName()}
-                        onError={(error) => {
-                          excalidrawAPI?.updateScene({
-                            appState: {
-                              errorMessage: error.message,
-                            },
-                          });
-                        }}
-                        onSuccess={() => {
-                          excalidrawAPI.updateScene({
-                            appState: { openDialog: null },
-                          });
-                        }}
-                      />
-                    );
-                  }
+                  return (
+                    <ExportToExcalidrawPlus
+                      elements={elements}
+                      appState={appState}
+                      files={files}
+                      name={excalidrawAPI.getName()}
+                      onError={(error) => {
+                        excalidrawAPI?.updateScene({
+                          appState: {
+                            errorMessage: error.message,
+                          },
+                        });
+                      }}
+                      onSuccess={() => {
+                        excalidrawAPI.updateScene({
+                          appState: { openDialog: null },
+                        });
+                      }}
+                    />
+                  );
+                }
                 : undefined,
             },
           },
@@ -885,8 +924,8 @@ const ExcalidrawWrapper = () => {
           refresh={() => forceRefresh((prev) => !prev)}
         />
         <AppWelcomeScreen
-          onCollabDialogOpen={onCollabDialogOpen}
-          isCollabEnabled={!isCollabDisabled}
+          // onCollabDialogOpen={onCollabDialogOpen}
+          // isCollabEnabled={!isCollabDisabled}
         />
         <OverwriteConfirmDialog>
           <OverwriteConfirmDialog.Actions.ExportToImage />
@@ -908,7 +947,8 @@ const ExcalidrawWrapper = () => {
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
-        <AppFooter onChange={() => excalidrawAPI?.refresh()} />
+        <AppHeader onChange={() => excalidrawAPI?.refresh()} excalidrawAPI={excalidrawAPI} />
+        {/* <AppFooter onChange={() => excalidrawAPI?.refresh()} /> */}
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
 
         <TTDDialogTrigger />
@@ -971,10 +1011,62 @@ const ExcalidrawWrapper = () => {
                     verticalAlign: "middle",
                     hasIcon: true,
                   });
-                  
+
                   excalidrawAPI.updateScene({
                     elements: [...excalidrawAPI.getSceneElements(), searchBox],
                   });
+                  excalidrawAPI.setToast({
+                  message: "Double-click on the search box to edit. Press Enter to confirm and log text to console.",
+                  duration: 5000 
+                });
+                }
+              },
+            },
+            {
+              label: "Add Rabbit Image",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["rabbit", "image", "rabbitimage"],
+              perform: () => {
+                if (excalidrawAPI) {
+                  const imageUrl = "https://t3.ftcdn.net/jpg/02/47/33/08/360_F_247330858_RvSJWAhMbfrqsM5VUmjLD4gzzSKUaJls.jpg";
+                  const label = "Rabbit Image";
+                  const padding = 10;
+                  const labelHeight = 20;
+                  const fixedImageHeight = 200; // <-- set your fixed height here
+
+                  const img = new Image();
+                  img.crossOrigin = "anonymous"; // for CORS safety if needed
+
+                  img.onload = () => {
+                    // maintain aspect ratio so image doesn't load too large
+                    const aspectRatio = img.naturalWidth / img.naturalHeight;
+                    const imageHeight = fixedImageHeight;
+                    const imageWidth = imageHeight * aspectRatio;
+
+                    const totalWidth = imageWidth + padding * 2;
+                    const totalHeight = imageHeight + padding * 2 + labelHeight;
+
+                    // calls newRabbitImageElement to make the element
+                    const image = newRabbitImageElement({
+                      x: 100,
+                      y: 300,
+                      label,
+                      imageUrl,
+                      width: totalWidth,
+                      height: totalHeight,
+                    });
+
+                    excalidrawAPI.updateScene({
+                      elements: [...excalidrawAPI.getSceneElements(), image],
+                    });
+                  };
+
+                  img.onerror = () => {
+                    console.error("Failed to load image for RabbitImageElement");
+                  };
+
+                  img.src = imageUrl;
                 }
               },
             },
@@ -1154,11 +1246,11 @@ const ExcalidrawWrapper = () => {
             },
             ...(isExcalidrawPlusSignedUser
               ? [
-                  {
-                    ...ExcalidrawPlusAppCommand,
-                    label: "Sign in / Go to Excalidraw+",
-                  },
-                ]
+                {
+                  ...ExcalidrawPlusAppCommand,
+                  label: "Sign in / Go to Excalidraw+",
+                },
+              ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
 
             {
@@ -1211,6 +1303,40 @@ const ExcalidrawWrapper = () => {
           />
         )}
       </Excalidraw>
+      {excalidrawAPI && (() => {
+      const appState = excalidrawAPI.getAppState();
+      const elements = excalidrawAPI.getSceneElements();
+      const selected = elements.find(
+        (el) => appState.selectedElementIds[el.id] && el.type === "text"
+      );
+      if (selected && !appState.editingTextElement) {
+        const { scrollX, scrollY, zoom } = excalidrawAPI.getAppState();
+        const x = (selected.x + selected.width / 2) * zoom.value + scrollX;
+        const y = (selected.y + selected.height + 10) * zoom.value + scrollY;
+        return (
+          <div
+            style={{
+              position: "absolute",
+              top: y-5,
+              left: x-111,
+              display: "flex",
+              gap: "8px",
+              background: "#fff",
+              padding: "4px 8px",
+              borderRadius: "8px",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+              zIndex: 1000,
+            }}
+          >
+            <button>Youchewb</button>
+            <button>Google</button>
+            <button>Pinterest</button>
+          </div>
+        );
+      }
+      return null;
+    })()}
+
     </div>
   );
 };

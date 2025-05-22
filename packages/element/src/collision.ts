@@ -174,6 +174,8 @@ export const intersectElementWithLineSegment = (
     case "embeddable":
     case "frame":
     case "magicframe":
+    case "rabbit-image":
+    case "rabbit-searchbox":
       return intersectRectanguloidWithLineSegment(element, line, offset);
     case "diamond":
       return intersectDiamondWithLineSegment(element, line, offset);

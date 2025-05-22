@@ -9,6 +9,11 @@ import type {
 } from "@excalidraw/common";
 
 import type {
+  RabbitSearchBoxElement,
+  RabbitImageElement,
+} from "./rabbitElement";
+
+import type {
   MakeBrand,
   MarkNonNullable,
   Merge,
@@ -197,7 +202,9 @@ export type ExcalidrawRectanguloidElement =
   | ExcalidrawFreeDrawElement
   | ExcalidrawIframeLikeElement
   | ExcalidrawFrameLikeElement
-  | ExcalidrawEmbeddableElement;
+  | ExcalidrawEmbeddableElement
+  | RabbitSearchBoxElement
+  | RabbitImageElement;
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
@@ -215,7 +222,9 @@ export type ExcalidrawElement =
   | ExcalidrawMagicFrameElement
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement
-  | RabbitElement;
+  | RabbitElement
+  | RabbitSearchBoxElement
+  | RabbitImageElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<
   ExcalidrawElement,
@@ -267,7 +276,9 @@ export type ExcalidrawBindableElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement
   | ExcalidrawFrameElement
-  | ExcalidrawMagicFrameElement;
+  | ExcalidrawMagicFrameElement
+  | RabbitSearchBoxElement
+  | RabbitImageElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
