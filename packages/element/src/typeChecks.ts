@@ -174,6 +174,8 @@ export const isBindableElement = (
       element.type === "embeddable" ||
       element.type === "frame" ||
       element.type === "magicframe" ||
+      element.type === "rabbit-searchbox" || 
+      element.type === "rabbit-image" ||
       (element.type === "text" && !element.containerId))
   );
 };
@@ -246,11 +248,10 @@ export const isExcalidrawElement = (
     case "frame":
     case "magicframe":
     case "image":
-    case "selection": {
-      return true;
-    }
+    case "selection":
+    case "rabbit-searchbox":
     default: {
-      assertNever(type, null);
+      console.warn(`Unknown element type: ${type}`);
       return false;
     }
   }

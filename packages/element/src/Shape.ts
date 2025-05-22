@@ -3,6 +3,8 @@ import { simplify } from "points-on-curve";
 import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
 import { ROUGHNESS, isTransparent, assertNever } from "@excalidraw/common";
 
+import { isRabbitElement, isRabbitSearchBoxElement } from "./rabbitElement";
+
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import type { EmbedsValidationStatus } from "@excalidraw/excalidraw/types";
@@ -323,6 +325,37 @@ export const _generateElementShape = (
     embedsValidationStatus: EmbedsValidationStatus | null;
   },
 ): Drawable | Drawable[] | null => {
+  // Add check for Rabbit elements
+  if (isRabbitElement(element)) {
+    if (isRabbitSearchBoxElement(element)) {
+      let shape;
+      if (element.roundness) {
+        const w = element.width;
+        const h = element.height;
+        const r = getCornerRadius(Math.min(w, h), element);
+        shape = generator.path(
+          `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
+            h - r
+          } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
+            h - r
+          } L 0 ${r} Q 0 0, ${r} 0`,
+          generateRoughOptions(element, true),
+        );
+      } else {
+        shape = generator.rectangle(
+          0,
+          0,
+          element.width,
+          element.height,
+          generateRoughOptions(element, false),
+        );
+      }
+      return shape;
+    }
+    // Handle other Rabbit element types here as needed
+    return null;
+  }
+
   switch (element.type) {
     case "rectangle":
     case "iframe":

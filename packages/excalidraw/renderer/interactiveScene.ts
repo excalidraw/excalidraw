@@ -14,6 +14,7 @@ import {
   THEME,
   throttleRAF,
 } from "@excalidraw/common";
+import type { ExcalidrawRectanguloidElement } from "@excalidraw/element/types";
 
 import { FIXED_BINDING_DISTANCE, maxBindingGap } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
@@ -205,6 +206,8 @@ const renderBindingHighlightForBindableElement = (
     case "embeddable":
     case "frame":
     case "magicframe":
+    case "rabbit-image":
+    case "rabbit-searchbox":
       drawHighlightForRectWithRotation(context, element, padding);
       break;
     case "diamond":

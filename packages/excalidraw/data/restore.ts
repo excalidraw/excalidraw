@@ -303,7 +303,29 @@ const restoreElement = (
         pressures: element.pressures,
       });
     }
-    case "image":
+    case "rabbit-searchbox":
+      return restoreElementWithProperties(element, {
+        text: element.text || "",
+        fontSize: element.fontSize ?? 20,
+        fontFamily: element.fontFamily ?? DEFAULT_FONT_FAMILY,
+        textAlign: element.textAlign ?? DEFAULT_TEXT_ALIGN,
+        verticalAlign: element.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,
+        containerId: element.containerId ?? null,
+        originalText: element.originalText || element.text || "",
+        autoResize: element.autoResize ?? false,
+        lineHeight: element.lineHeight ?? getLineHeight(DEFAULT_FONT_FAMILY),
+        hasIcon: element.hasIcon ?? true,
+        currentText: element.currentText || "",
+        rabbitId: element.rabbitId ?? `rabbit-${randomId()}`,
+        isEditing: false,
+      });
+
+  case "rabbit-image":
+    return restoreElementWithProperties(element, {
+      imageUrl: element.imageUrl ?? "https://via.placeholder.com/150",
+      label: element.label ?? "Rabbit Image",
+    });
+      case "image":
       return restoreElementWithProperties(element, {
         status: element.status || "pending",
         fileId: element.fileId,

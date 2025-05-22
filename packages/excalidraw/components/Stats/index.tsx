@@ -296,7 +296,12 @@ export const StatsInner = memo(
                       >
                         {appState.croppingElementId
                           ? t("labels.imageCropping")
-                          : t(`element.${singleElement.type}`)}
+                          : singleElement.type === "rabbit-searchbox"
+                            ? "Search Box"            // your existing hard-coded label
+                            : singleElement.type === "rabbit-image"
+                              ? "Rabbit Image"        // ← your new hard-coded fallback
+                              : t(`element.${singleElement.type}`) // everything else via i18n
+                        }
                       </StatsRow>
 
                       <StatsRow>

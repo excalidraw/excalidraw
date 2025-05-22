@@ -19,6 +19,10 @@ import {
   newTextElement,
 } from "@excalidraw/element";
 
+import {
+  newRabbitSearchBoxElement,
+} from "@excalidraw/element/newRabbitElement";
+
 import { isLinearElementType } from "@excalidraw/element";
 import { getSelectedElements } from "@excalidraw/element";
 import { selectGroupsForSelectedElements } from "@excalidraw/element";
@@ -38,6 +42,11 @@ import type {
   ExcalidrawArrowElement,
   FixedSegment,
 } from "@excalidraw/element/types";
+
+import type {
+  RabbitElement,
+} from "@excalidraw/element/rabbitElement";
+
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
@@ -360,6 +369,33 @@ export class API {
         break;
       case "magicframe":
         element = newMagicFrameElement({ ...base, width, height });
+        break;
+      case "rabbit-searchbox":
+        element = newRabbitSearchBoxElement({
+          x: base.x,
+          y: base.y,
+          width: width,
+          height: height,
+          text: rest.text || "Search...",
+          fontSize: 16,
+          fontFamily: rest.fontFamily || appState.currentItemFontFamily,
+          textAlign: rest.textAlign || appState.currentItemTextAlign,
+          verticalAlign: rest.verticalAlign || DEFAULT_VERTICAL_ALIGN,
+          hasIcon: true,
+          strokeColor: base.strokeColor,
+          backgroundColor: base.backgroundColor,
+          fillStyle: base.fillStyle,
+          strokeWidth: base.strokeWidth,
+          strokeStyle: base.strokeStyle,
+          roughness: base.roughness,
+          opacity: base.opacity,
+          angle: base.angle,
+          // Don't spread the base object directly
+          // Only pass specific properties that your function expects
+          ...(rest.roundness && { roundness: rest.roundness }),
+          ...(rest.frameId && { frameId: rest.frameId }),
+          ...(groupIds.length && { groupIds })
+        });
         break;
       default:
         assertNever(

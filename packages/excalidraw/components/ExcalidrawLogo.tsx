@@ -62,8 +62,12 @@ export const ExcalidrawLogo = ({
 }: LogoProps) => {
   return (
     <div className={`ExcalidrawLogo is-${size}`} style={style}>
-      <LogoIcon />
-      {withText && <LogoText />}
+      <img
+        src="https://imgur.com/pWjusvL.png"
+        alt="Rabbit Hole Logo"
+        className="ExcalidrawLogo-icon"
+      />
+      {withText && <span className="ExcalidrawLogo-text">Rabbit Hole</span>}
     </div>
   );
 };
