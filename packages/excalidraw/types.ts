@@ -68,10 +68,10 @@ import type { ImportedDataState } from "./data/types";
 import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
-import type { ButtonIconSelectProps } from "./components/ButtonIconSelect";
 import type { ButtonIcon } from "./components/ButtonIcon";
 
 import type { History } from "./history";
+import type { RadioSelection } from "./components/RadioSelection";
 
 export type SocketId = string & { _brand: "SocketId" };
 
@@ -571,9 +571,7 @@ export interface ExcalidrawPropsCustomOptions {
     }>;
     elementStrokeColors?: ColorTuple;
     elementBackgroundColors?: ColorTuple;
-    buttonIconSelectRender?: <T extends Object>(
-      props: ButtonIconSelectProps<T>,
-    ) => JSX.Element;
+    RadioSelection?: typeof RadioSelection;
     buttonIconSelectRadioRender?: (props: {
       key: string;
       active: boolean;
