@@ -27,67 +27,65 @@ import type {
 
 type ElementShape = [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]];
 
-class ElementShapeCache {
-  private static cache = new WeakMap<
-    ExcalidrawElement,
-    { version: ExcalidrawElement["version"]; shapes: Map<number, ElementShape> }
-  >();
+const ElementShapesCache = new WeakMap<
+  ExcalidrawElement,
+  { version: ExcalidrawElement["version"]; shapes: Map<number, ElementShape> }
+>();
 
-  public static get = <T extends ExcalidrawElement>(
-    element: T,
-    offset: number,
-  ): ElementShape | undefined => {
-    const record = ElementShapeCache.cache.get(element);
+const getElementShapesCacheEntry = <T extends ExcalidrawElement>(
+  element: T,
+  offset: number,
+): ElementShape | undefined => {
+  const record = ElementShapesCache.get(element);
 
-    if (!record) {
-      return undefined;
-    }
+  if (!record) {
+    return undefined;
+  }
 
-    const { version, shapes } = record;
+  const { version, shapes } = record;
 
-    if (version !== element.version) {
-      ElementShapeCache.cache.delete(element);
-      return undefined;
-    }
+  if (version !== element.version) {
+    ElementShapesCache.delete(element);
+    return undefined;
+  }
 
-    return shapes.get(offset);
-  };
+  return shapes.get(offset);
+};
 
-  public static set = <T extends ExcalidrawElement>(
-    element: T,
-    shape: ElementShape,
-    offset: number,
-  ) => {
-    const record = ElementShapeCache.cache.get(element);
+const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
+  element: T,
+  shape: ElementShape,
+  offset: number,
+) => {
+  const record = ElementShapesCache.get(element);
 
-    if (!record) {
-      ElementShapeCache.cache.set(element, {
-        version: element.version,
-        shapes: new Map([[offset, shape]]),
-      });
+  if (!record) {
+    ElementShapesCache.set(element, {
+      version: element.version,
+      shapes: new Map([[offset, shape]]),
+    });
 
-      return;
-    }
+    return;
+  }
 
-    const { version, shapes } = record;
+  const { version, shapes } = record;
 
-    if (version !== element.version) {
-      ElementShapeCache.cache.set(element, {
-        version: element.version,
-        shapes: new Map([[offset, shape]]),
-      });
+  if (version !== element.version) {
+    ElementShapesCache.set(element, {
+      version: element.version,
+      shapes: new Map([[offset, shape]]),
+    });
 
-      return;
-    }
+    return;
+  }
 
-    shapes.set(offset, shape);
-  };
-}
+  shapes.set(offset, shape);
+};
 
 export function deconstructLinearOrFreeDrawElement(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
-  const cachedShape = ElementShapeCache.get(element, 0);
+  const cachedShape = getElementShapesCacheEntry(element, 0);
 
   if (cachedShape) {
     return cachedShape;
@@ -158,7 +156,7 @@ export function deconstructLinearOrFreeDrawElement(
   }
 
   const shape = [lines, curves] as ElementShape;
-  ElementShapeCache.set(element, shape, 0);
+  setElementShapesCacheEntry(element, shape, 0);
 
   return shape;
 }
@@ -175,7 +173,7 @@ export function deconstructRectanguloidElement(
   element: ExcalidrawRectanguloidElement,
   offset: number = 0,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
-  const cachedShape = ElementShapeCache.get(element, offset);
+  const cachedShape = getElementShapesCacheEntry(element, offset);
 
   if (cachedShape) {
     return cachedShape;
@@ -298,7 +296,7 @@ export function deconstructRectanguloidElement(
   ];
   const shape = [sides, corners.flat()] as ElementShape;
 
-  ElementShapeCache.set(element, shape, offset);
+  setElementShapesCacheEntry(element, shape, offset);
 
   return shape;
 }
@@ -315,7 +313,7 @@ export function deconstructDiamondElement(
   element: ExcalidrawDiamondElement,
   offset: number = 0,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
-  const cachedShape = ElementShapeCache.get(element, offset);
+  const cachedShape = getElementShapesCacheEntry(element, offset);
 
   if (cachedShape) {
     return cachedShape;
@@ -424,7 +422,7 @@ export function deconstructDiamondElement(
 
   const shape = [sides, corners.flat()] as ElementShape;
 
-  ElementShapeCache.set(element, shape, offset);
+  setElementShapesCacheEntry(element, shape, offset);
 
   return shape;
 }
