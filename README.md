@@ -40,6 +40,7 @@
   <a href="https://twitter.com/excalidraw">
     <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+@excalidraw&style=social&logo=twitter"/>
   </a>
+  <img alt"CodeRabbit Reviews" src="https://img.shields.io/coderabbit/prs/github/excalidraw/excalidraw?utm_source=oss&utm_medium=github&utm_campaign=excalidraw%2Fexcalidraw&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews"/>
 </p>
 
 <div align="center">
