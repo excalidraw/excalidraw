@@ -383,25 +383,22 @@ const proxy = <T extends ExcalidrawElement>(
       the proxy */
   get(): typeof element;
 } => {
-  return new Proxy(
-    {},
-    {
-      get(target, prop) {
-        const currentElement = h.elements.find(
-          ({ id }) => id === element.id,
-        ) as any;
-        if (prop === "get") {
-          if (currentElement.hasOwnProperty("get")) {
-            throw new Error(
-              "trying to get `get` test property, but ExcalidrawElement seems to define its own",
-            );
-          }
-          return () => currentElement;
+  return new Proxy(element, {
+    get(target, prop) {
+      const currentElement = h.elements.find(
+        ({ id }) => id === element.id,
+      ) as any;
+      if (prop === "get") {
+        if (currentElement.hasOwnProperty("get")) {
+          throw new Error(
+            "trying to get `get` test property, but ExcalidrawElement seems to define its own",
+          );
         }
-        return currentElement[prop];
-      },
+        return () => currentElement;
+      }
+      return currentElement[prop];
     },
-  ) as any;
+  }) as any;
 };
 
 /** Tools that can be used to draw shapes */

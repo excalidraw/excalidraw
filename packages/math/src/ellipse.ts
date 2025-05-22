@@ -4,7 +4,7 @@ import {
   pointFromVector,
   pointsEqual,
 } from "./point";
-import { PRECISION } from "./utils";
+import { PRECISION } from "./constants";
 import {
   vector,
   vectorAdd,

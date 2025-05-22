@@ -5,7 +5,7 @@ import {
   pointFromVector,
   pointRotateRads,
 } from "./point";
-import { PRECISION } from "./utils";
+import { PRECISION } from "./constants";
 import {
   vectorAdd,
   vectorCross,

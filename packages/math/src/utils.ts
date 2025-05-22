@@ -1,4 +1,4 @@
-export const PRECISION = 10e-5;
+import { PRECISION } from "./constants";
 
 export const clamp = (value: number, min: number, max: number) => {
   return Math.min(Math.max(value, min), max);

@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/math",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "types": "./dist/types/math/src/index.d.ts",
   "main": "./dist/prod/index.js",
@@ -19,7 +19,7 @@
   "files": [
     "dist/*"
   ],
-  "description": "Excalidraw math functions",
+  "description": "Excalidraw math library for 2D vector graphics.",
   "publishConfig": {
     "access": "public"
   },

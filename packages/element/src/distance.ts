@@ -1,6 +1,8 @@
 import {
   curvePointDistance,
   distanceToLineSegment,
+  isCurve,
+  isLineSegment,
   pointRotateRads,
 } from "@excalidraw/math";
 
@@ -8,25 +10,34 @@ import { ellipse, ellipseDistanceFromPoint } from "@excalidraw/math/ellipse";
 
 import { elementCenterPoint } from "@excalidraw/common";
 
-import type { GlobalPoint, Radians } from "@excalidraw/math";
+import type {
+  Curve,
+  GlobalPoint,
+  LineSegment,
+  Radians,
+} from "@excalidraw/math";
 
 import {
   deconstructDiamondElement,
+  deconstructLinearOrFreeDrawElement,
   deconstructRectanguloidElement,
 } from "./utils";
 
 import type {
-  ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
+  ExcalidrawElement,
   ExcalidrawEllipseElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
 
-export const distanceToBindableElement = (
-  element: ExcalidrawBindableElement,
+export const distanceToElement = (
+  element: ExcalidrawElement,
   p: GlobalPoint,
 ): number => {
   switch (element.type) {
+    case "selection":
     case "rectangle":
     case "image":
     case "text":
@@ -39,6 +50,10 @@ export const distanceToBindableElement = (
       return distanceToDiamondElement(element, p);
     case "ellipse":
       return distanceToEllipseElement(element, p);
+    case "line":
+    case "arrow":
+    case "freedraw":
+      return distanceToLinearOrFreeDraElement(element, p);
   }
 };
 
@@ -116,4 +131,37 @@ const distanceToEllipseElement = (
     pointRotateRads(p, center, -element.angle as Radians),
     ellipse(center, element.width / 2, element.height / 2),
   );
+};
+
+const distanceToLinearOrFreeDraElement = (
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  p: GlobalPoint,
+) => {
+  const shapes = deconstructLinearOrFreeDrawElement(element);
+  let distance = Infinity;
+
+  for (const shape of shapes) {
+    switch (true) {
+      case isCurve(shape): {
+        const d = curvePointDistance(shape as Curve<GlobalPoint>, p);
+
+        if (d < distance) {
+          distance = d;
+        }
+
+        continue;
+      }
+      case isLineSegment(shape): {
+        const d = distanceToLineSegment(p, shape as LineSegment<GlobalPoint>);
+
+        if (d < distance) {
+          distance = d;
+        }
+
+        continue;
+      }
+    }
+  }
+
+  return distance;
 };

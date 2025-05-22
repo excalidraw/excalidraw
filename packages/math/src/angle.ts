@@ -1,4 +1,4 @@
-import { PRECISION } from "./utils";
+import { PRECISION } from "./constants";
 
 import type {
   Degrees,

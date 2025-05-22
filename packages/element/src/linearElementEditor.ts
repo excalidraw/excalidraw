@@ -7,6 +7,10 @@ import {
   type LocalPoint,
   pointDistance,
   vectorFromPoint,
+  isCurve,
+  isLineSegment,
+  curveLength,
+  curvePointAtLength,
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/shape";
@@ -20,9 +24,14 @@ import {
   tupleToCoors,
 } from "@excalidraw/common";
 
-import type { Store } from "@excalidraw/element";
+import {
+  deconstructLinearOrFreeDrawElement,
+  isPathALoop,
+  ShapeCache,
+  type Store,
+} from "@excalidraw/element";
 
-import type { Radians } from "@excalidraw/math";
+import type { Curve, Radians } from "@excalidraw/math";
 
 import type {
   AppState,
@@ -54,16 +63,6 @@ import {
   isElbowArrow,
   isFixedPointBinding,
 } from "./typeChecks";
-
-import { ShapeCache } from "./ShapeCache";
-
-import {
-  isPathALoop,
-  getBezierCurveLength,
-  getControlPointsForBezierCurve,
-  mapIntervalToBezierT,
-  getBezierXY,
-} from "./shapes";
 
 import { getLockedLinearCursorAlignSize } from "./sizeHelpers";
 
@@ -567,10 +566,7 @@ export class LinearElementEditor {
       }
       const segmentMidPoint = LinearElementEditor.getSegmentMidPoint(
         element,
-        points[index],
-        points[index + 1],
         index + 1,
-        elementsMap,
       );
       midpoints.push(segmentMidPoint);
       index++;
@@ -672,7 +668,14 @@ export class LinearElementEditor {
 
     let distance = pointDistance(startPoint, endPoint);
     if (element.points.length > 2 && element.roundness) {
-      distance = getBezierCurveLength(element, endPoint);
+      const segments = deconstructLinearOrFreeDrawElement(element);
+
+      invariant(
+        segments.length >= index,
+        "Invalid segment index while calculating segment length",
+      );
+
+      distance = curveLength(segments[index] as Curve<GlobalPoint>);
     }
 
     return distance * zoom.value < LinearElementEditor.POINT_HANDLE_SIZE * 4;
@@ -680,39 +683,39 @@ export class LinearElementEditor {
 
   static getSegmentMidPoint(
     element: NonDeleted<ExcalidrawLinearElement>,
-    startPoint: GlobalPoint,
-    endPoint: GlobalPoint,
-    endPointIndex: number,
-    elementsMap: ElementsMap,
+    index: number,
   ): GlobalPoint {
-    let segmentMidPoint = pointCenter(startPoint, endPoint);
-    if (element.points.length > 2 && element.roundness) {
-      const controlPoints = getControlPointsForBezierCurve(
-        element,
-        element.points[endPointIndex],
+    if (isElbowArrow(element)) {
+      invariant(
+        element.points.length >= index,
+        "Invalid segment index while calculating elbow arrow mid point",
       );
-      if (controlPoints) {
-        const t = mapIntervalToBezierT(
-          element,
-          element.points[endPointIndex],
-          0.5,
-        );
 
-        segmentMidPoint = LinearElementEditor.getPointGlobalCoordinates(
-          element,
-          getBezierXY(
-            controlPoints[0],
-            controlPoints[1],
-            controlPoints[2],
-            controlPoints[3],
-            t,
-          ),
-          elementsMap,
-        );
-      }
+      const p = pointCenter(element.points[index - 1], element.points[index]);
+
+      return pointFrom<GlobalPoint>(element.x + p[0], element.y + p[1]);
     }
 
-    return segmentMidPoint;
+    const segments = deconstructLinearOrFreeDrawElement(element);
+
+    invariant(
+      segments.length >= index,
+      "Invalid segment index while calculating mid point",
+    );
+
+    const shape = segments[index - 1];
+
+    switch (true) {
+      case isCurve(shape):
+        return curvePointAtLength(shape as Curve<GlobalPoint>, 0.5);
+      case isLineSegment(shape):
+        return pointCenter(shape[0] as GlobalPoint, shape[1] as GlobalPoint);
+    }
+
+    invariant(
+      false,
+      `Invalid segment type while calculating mid point ${shape}`,
+    );
   }
 
   static getSegmentMidPointIndex(
@@ -1592,10 +1595,7 @@ export class LinearElementEditor {
       const index = element.points.length / 2 - 1;
       const midSegmentMidpoint = LinearElementEditor.getSegmentMidPoint(
         element,
-        points[index],
-        points[index + 1],
         index + 1,
-        elementsMap,
       );
 
       x = midSegmentMidpoint[0] - boundTextElement.width / 2;
