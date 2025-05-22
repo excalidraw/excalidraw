@@ -29,10 +29,9 @@ import {
   FIXED_BINDING_DISTANCE,
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
-  snapToMid,
   getHoveredElementForBinding,
 } from "./binding";
-import { distanceToBindableElement } from "./distance";
+import { distanceToElement } from "./distance";
 import {
   compareHeading,
   flipHeading,
@@ -896,50 +895,6 @@ export const updateElbowArrowPoints = (
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   if (arrow.points.length < 2) {
     return { points: updates.points ?? arrow.points };
-  }
-
-  // NOTE (mtolmacs): This is a temporary check to ensure that the incoming elbow
-  // arrow size is valid. This check will be removed once the issue is identified
-  if (
-    arrow.x < -MAX_POS ||
-    arrow.x > MAX_POS ||
-    arrow.y < -MAX_POS ||
-    arrow.y > MAX_POS ||
-    arrow.x + (updates?.points?.[updates?.points?.length - 1]?.[0] ?? 0) <
-      -MAX_POS ||
-    arrow.x + (updates?.points?.[updates?.points?.length - 1]?.[0] ?? 0) >
-      MAX_POS ||
-    arrow.y + (updates?.points?.[updates?.points?.length - 1]?.[1] ?? 0) <
-      -MAX_POS ||
-    arrow.y + (updates?.points?.[updates?.points?.length - 1]?.[1] ?? 0) >
-      MAX_POS ||
-    arrow.x + (arrow?.points?.[arrow?.points?.length - 1]?.[0] ?? 0) <
-      -MAX_POS ||
-    arrow.x + (arrow?.points?.[arrow?.points?.length - 1]?.[0] ?? 0) >
-      MAX_POS ||
-    arrow.y + (arrow?.points?.[arrow?.points?.length - 1]?.[1] ?? 0) <
-      -MAX_POS ||
-    arrow.y + (arrow?.points?.[arrow?.points?.length - 1]?.[1] ?? 0) > MAX_POS
-  ) {
-    console.error(
-      "Elbow arrow (or update) is outside reasonable bounds (> 1e6)",
-      {
-        arrow,
-        updates,
-      },
-    );
-  }
-  // @ts-ignore See above note
-  arrow.x = clamp(arrow.x, -MAX_POS, MAX_POS);
-  // @ts-ignore See above note
-  arrow.y = clamp(arrow.y, -MAX_POS, MAX_POS);
-  if (updates.points) {
-    updates.points = updates.points.map(([x, y]) =>
-      pointFrom<LocalPoint>(
-        clamp(x, -MAX_POS, MAX_POS),
-        clamp(y, -MAX_POS, MAX_POS),
-      ),
-    );
   }
 
   if (!import.meta.env.PROD) {
@@ -2233,13 +2188,7 @@ const getGlobalPoint = (
 ): GlobalPoint => {
   if (isDragging) {
     if (element) {
-      const snapPoint = bindPointToSnapToElementOutline(
-        arrow,
-        element,
-        startOrEnd,
-      );
-
-      return snapToMid(element, snapPoint);
+      return bindPointToSnapToElementOutline(arrow, element, startOrEnd);
     }
 
     return initialPoint;
@@ -2253,8 +2202,7 @@ const getGlobalPoint = (
 
     // NOTE: Resize scales the binding position point too, so we need to update it
     return Math.abs(
-      distanceToBindableElement(element, fixedGlobalPoint) -
-        FIXED_BINDING_DISTANCE,
+      distanceToElement(element, fixedGlobalPoint) - FIXED_BINDING_DISTANCE,
     ) > 0.01
       ? bindPointToSnapToElementOutline(arrow, element, startOrEnd)
       : fixedGlobalPoint;
@@ -2276,7 +2224,7 @@ const getBindPointHeading = (
     hoveredElement &&
       aabbForElement(
         hoveredElement,
-        Array(4).fill(distanceToBindableElement(hoveredElement, p)) as [
+        Array(4).fill(distanceToElement(hoveredElement, p)) as [
           number,
           number,
           number,
