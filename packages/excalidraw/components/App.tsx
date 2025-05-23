@@ -11427,6 +11427,9 @@ declare global {
     };
     _addEventListener: typeof window.addEventListener;
     _removeEventListener: typeof window.removeEventListener;
+    getRecordedDataRef: () => object[] | null;
+    setRecordedDataRef: (data: object[] | null) => void;
+    runReplay: (type: string, payload: any) => void;
   }
 }
 

@@ -878,6 +878,7 @@ const ExcalidrawWrapper = () => {
           theme={appTheme}
           setTheme={(theme) => setAppTheme(theme)}
           refresh={() => forceRefresh((prev) => !prev)}
+          excalidrawAPI={excalidrawAPI}
         />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
@@ -1154,25 +1155,38 @@ const ExcalidrawRecorderWrapper = ({ children }: React.PropsWithChildren) => {
       { type: string; listener: EventListener }
     >
   >(new WeakMap());
-  const dataRef = useRef<object[]>([]);
+  const replayRef = useRef<Map<string, EventListenerOrEventListenerObject[]>>(
+    new Map(),
+  );
+  const dataRef = useRef<object[] | null>(null);
 
   React.useEffect(() => {
-    dataRef.current.push({
-      time: new Date().getTime(),
-      type: "start",
-      localStorage: JSON.parse(JSON.stringify(window.localStorage)),
-      dimensions: {
-        outerWidth: window.outerWidth,
-        outerHeight: window.outerHeight,
-      },
-      chromeVersion: window.navigator.userAgent
-        .split(" ")
-        .find((v) => v.startsWith("Chrome/"))
-        ?.substring(7),
-    });
+    /**
+     * Run the event listeners for the type
+     */
+    window.runReplay = (type: string, payload: any) => {
+      replayRef.current
+        .get(type)
+        ?.forEach((listener) =>
+          Object.hasOwn(listener, "handleEvent")
+            ? (listener as EventListenerObject).handleEvent(payload)
+            : (listener as EventListener)(payload),
+        );
+    };
+
+    /**
+     * Access to the recorded data
+     */
+    window.getRecordedDataRef = (): object[] | null => dataRef.current;
+    window.setRecordedDataRef = (data: object[] | null) => {
+      dataRef.current = data;
+    };
 
     Window.prototype._removeEventListener =
       Window.prototype.removeEventListener;
+    /**
+     * removeEventListener
+     */
     window.removeEventListener = function <K extends keyof WindowEventMap>(
       type: K,
       listener: EventListenerOrEventListenerObject,
@@ -1182,12 +1196,25 @@ const ExcalidrawRecorderWrapper = ({ children }: React.PropsWithChildren) => {
       if (existing) {
         window._removeEventListener(type, existing.listener, options);
         listenerRef.current.delete(listener);
+        const eventListeners = replayRef.current.get(type);
+        if (eventListeners) {
+          const index = eventListeners.indexOf(existing.listener);
+          if (index !== -1) {
+            eventListeners.splice(index, 1);
+            if (eventListeners.length === 0) {
+              replayRef.current.delete(type);
+            }
+          }
+        }
       } else {
         window._removeEventListener(type, listener, options);
       }
     };
 
     Window.prototype._addEventListener = Window.prototype.addEventListener;
+    /**
+     * addEventListener
+     */
     window.addEventListener = function <K extends keyof WindowEventMap>(
       type: K,
       listener: EventListenerOrEventListenerObject,
@@ -1198,7 +1225,7 @@ const ExcalidrawRecorderWrapper = ({ children }: React.PropsWithChildren) => {
 
       if (!existing || existing?.type !== type) {
         wrappedListener = function (...args) {
-          dataRef.current.push({
+          dataRef.current?.push({
             time: new Date().getTime(),
             type: "event",
             name: type,
@@ -1217,6 +1244,11 @@ const ExcalidrawRecorderWrapper = ({ children }: React.PropsWithChildren) => {
       }
 
       listenerRef.current.set(listener, { type, listener: wrappedListener });
+      if (replayRef.current.has(type)) {
+        replayRef.current.get(type)?.push(listener);
+      } else {
+        replayRef.current.set(type, [listener]);
+      }
 
       window._addEventListener(type, wrappedListener, options);
     };
@@ -1228,14 +1260,6 @@ const ExcalidrawRecorderWrapper = ({ children }: React.PropsWithChildren) => {
       dataRef.current = [];
       window.gc?.();
     };
-  }, []);
-
-  React.useEffect(() => {
-    const handle = setInterval(() => {
-      console.log(dataRef.current);
-    }, 10000);
-
-    return () => clearInterval(handle);
   }, []);
 
   return <>{children}</>;
