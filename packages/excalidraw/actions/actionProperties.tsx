@@ -1704,13 +1704,13 @@ const getArrowheadOptions = (flip: boolean) => {
       value: "crowfoot_one",
       text: t("labels.arrowhead_crowfoot_one"),
       icon: <ArrowheadCrowfootOneIcon flip={flip} />,
-      keyBinding: "c",
+      keyBinding: "x",
     },
     {
       value: "crowfoot_many",
       text: t("labels.arrowhead_crowfoot_many"),
       icon: <ArrowheadCrowfootIcon flip={flip} />,
-      keyBinding: "x",
+      keyBinding: "c",
     },
     {
       value: "crowfoot_one_or_many",
@@ -1944,12 +1944,6 @@ export const actionChangeArrowType = register({
             fixedSegments: null,
           }),
         };
-
-        LinearElementEditor.updateEditorMidPointsCache(
-          newElement,
-          elementsMap,
-          app.state,
-        );
       } else {
         const elementsMap = app.scene.getNonDeletedElementsMap();
         if (newElement.startBinding) {

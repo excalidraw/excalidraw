@@ -85,11 +85,6 @@ import type {
   PointsPositionUpdates,
 } from "./types";
 
-const editorMidPointsCache: {
-  version: number | null;
-  points: (GlobalPoint | null)[];
-  zoom: number | null;
-} = { version: null, points: [], zoom: null };
 export class LinearElementEditor {
   public readonly elementId: ExcalidrawElement["id"] & {
     _brand: "excalidrawLinearElementId";
@@ -536,7 +531,7 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     elementsMap: ElementsMap,
     appState: InteractiveCanvasAppState,
-  ): typeof editorMidPointsCache["points"] => {
+  ): (GlobalPoint | null)[] => {
     const boundText = getBoundTextElement(element, elementsMap);
 
     // Since its not needed outside editor unless 2 pointer lines or bound text
@@ -548,25 +543,7 @@ export class LinearElementEditor {
     ) {
       return [];
     }
-    if (
-      editorMidPointsCache.version === element.version &&
-      editorMidPointsCache.zoom === appState.zoom.value
-    ) {
-      return editorMidPointsCache.points;
-    }
-    LinearElementEditor.updateEditorMidPointsCache(
-      element,
-      elementsMap,
-      appState,
-    );
-    return editorMidPointsCache.points!;
-  };
 
-  static updateEditorMidPointsCache = (
-    element: NonDeleted<ExcalidrawLinearElement>,
-    elementsMap: ElementsMap,
-    appState: InteractiveCanvasAppState,
-  ) => {
     const points = LinearElementEditor.getPointsGlobalCoordinates(
       element,
       elementsMap,
@@ -598,9 +575,8 @@ export class LinearElementEditor {
       midpoints.push(segmentMidPoint);
       index++;
     }
-    editorMidPointsCache.points = midpoints;
-    editorMidPointsCache.version = element.version;
-    editorMidPointsCache.zoom = appState.zoom.value;
+
+    return midpoints;
   };
 
   static getSegmentMidpointHitCoords = (
@@ -654,8 +630,11 @@ export class LinearElementEditor {
       }
     }
     let index = 0;
-    const midPoints: typeof editorMidPointsCache["points"] =
-      LinearElementEditor.getEditorMidPoints(element, elementsMap, appState);
+    const midPoints = LinearElementEditor.getEditorMidPoints(
+      element,
+      elementsMap,
+      appState,
+    );
 
     while (index < midPoints.length) {
       if (midPoints[index] !== null) {
@@ -1611,23 +1590,14 @@ export class LinearElementEditor {
       y = midPoint[1] - boundTextElement.height / 2;
     } else {
       const index = element.points.length / 2 - 1;
+      const midSegmentMidpoint = LinearElementEditor.getSegmentMidPoint(
+        element,
+        points[index],
+        points[index + 1],
+        index + 1,
+        elementsMap,
+      );
 
-      let midSegmentMidpoint = editorMidPointsCache.points[index];
-      if (element.points.length === 2) {
-        midSegmentMidpoint = pointCenter(points[0], points[1]);
-      }
-      if (
-        !midSegmentMidpoint ||
-        editorMidPointsCache.version !== element.version
-      ) {
-        midSegmentMidpoint = LinearElementEditor.getSegmentMidPoint(
-          element,
-          points[index],
-          points[index + 1],
-          index + 1,
-          elementsMap,
-        );
-      }
       x = midSegmentMidpoint[0] - boundTextElement.width / 2;
       y = midSegmentMidpoint[1] - boundTextElement.height / 2;
     }

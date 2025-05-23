@@ -1,0 +1,40 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .UnlockPopup {
+    position: absolute;
+    z-index: var(--zIndex-interactiveCanvas);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    background: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
+    padding: 0.8rem;
+    cursor: pointer;
+    color: var(--color-gray-60);
+
+    &:focus {
+      outline: none;
+    }
+
+    svg {
+      display: block;
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--color-gray-60);
+    }
+
+    &:hover {
+      svg {
+        color: var(--color-primary);
+      }
+    }
+    &:active {
+      svg {
+        transform: scale(0.95);
+      }
+    }
+  }
+}
