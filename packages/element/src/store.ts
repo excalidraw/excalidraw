@@ -534,7 +534,7 @@ export class StoreDelta {
   /**
    * Inverse store delta, creates new instance of `StoreDelta`.
    */
-  public static inverse(delta: StoreDelta): StoreDelta {
+  public static inverse(delta: StoreDelta) {
     return this.create(delta.elements.inverse(), delta.appState.inverse());
   }
 
@@ -545,7 +545,7 @@ export class StoreDelta {
     delta: StoreDelta,
     elements: SceneElementsMap,
     modifierOptions: "deleted" | "inserted",
-  ): StoreDelta {
+  ) {
     return this.create(
       delta.elements.applyLatestChanges(elements, modifierOptions),
       delta.appState,
@@ -562,12 +562,9 @@ export class StoreDelta {
     delta: StoreDelta,
     elements: SceneElementsMap,
     appState: AppState,
-    prevSnapshot: StoreSnapshot = StoreSnapshot.empty(),
   ): [SceneElementsMap, AppState, boolean] {
-    const [nextElements, elementsContainVisibleChange] = delta.elements.applyTo(
-      elements,
-      prevSnapshot.elements,
-    );
+    const [nextElements, elementsContainVisibleChange] =
+      delta.elements.applyTo(elements);
 
     const [nextAppState, appStateContainsVisibleChange] =
       delta.appState.applyTo(appState, nextElements);
