@@ -1327,19 +1327,6 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       });
     }
 
-    // TODO: this looks wrong, shouldn't be here
-    if (element.type === "image") {
-      const _delta = delta as Delta<ElementPartial<ExcalidrawImageElement>>;
-      // we want to override `crop` only if modified so that we don't reset
-      // when undoing/redoing unrelated change
-      if (_delta.deleted.crop || _delta.inserted.crop) {
-        Object.assign(directlyApplicablePartial, {
-          // apply change verbatim
-          crop: _delta.inserted.crop ?? null,
-        });
-      }
-    }
-
     if (!flags.containsVisibleDifference) {
       // strip away fractional index, as even if it would be different, it doesn't have to result in visible change
       const { index, ...rest } = directlyApplicablePartial;
