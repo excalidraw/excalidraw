@@ -7,8 +7,11 @@ import {
   isTestEnv,
 } from "@excalidraw/common";
 
+import type { LocalPoint } from "@excalidraw/math/types";
+
 import type {
   ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -868,6 +871,13 @@ export class AppStateDelta implements DeltaContainer<AppState> {
 type ElementPartial<TElement extends ExcalidrawElement = ExcalidrawElement> =
   Omit<Partial<Ordered<TElement>>, "id" | "updated" | "seed">;
 
+type ElementPartialWithPoints = Omit<
+  ElementPartial<ExcalidrawFreeDrawElement | ExcalidrawLinearElement>,
+  "points"
+> & {
+  points: { [key: string]: LocalPoint };
+};
+
 export type ApplyToOptions = {
   excludedProperties: Set<keyof ElementPartial>;
 };
@@ -1259,7 +1269,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     for (const key of Object.keys(delta.inserted) as Array<
       keyof typeof delta.inserted
     >) {
-      if (key === "boundElements") {
+      if (
+        key === "boundElements" ||
+        (key as keyof ExcalidrawFreeDrawElement | ExcalidrawLinearElement) ===
+          "points"
+      ) {
         continue;
       }
 
@@ -1284,6 +1298,32 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
       Object.assign(directlyApplicablePartial, {
         boundElements: mergedBoundElements,
+      });
+    }
+
+    const deletedPoints = (delta.deleted as ElementPartialWithPoints).points;
+    const insertedPoints = (delta.inserted as ElementPartialWithPoints).points;
+
+    if (insertedPoints && deletedPoints) {
+      const mergedPoints = Delta.mergeObjects(
+        arrayToObject(
+          (element as ExcalidrawFreeDrawElement | ExcalidrawLinearElement)
+            .points,
+        ),
+        insertedPoints,
+        deletedPoints,
+      );
+
+      const sortedPoints = Object.entries(mergedPoints)
+        .sort((aKey, bKey) => {
+          const a = Number(aKey);
+          const b = Number(bKey);
+          return a - b;
+        })
+        .map(([_, value]) => value);
+
+      Object.assign(directlyApplicablePartial, {
+        points: sortedPoints,
       });
     }
 
@@ -1606,6 +1646,19 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   ): [ElementPartial, ElementPartial] {
     try {
       Delta.diffArrays(deleted, inserted, "boundElements", (x) => x.id);
+
+      // points depend on the order, so we diff them as objects and group by index
+      // creates `ElementPartialWithPoints`
+      Delta.diffObjects(
+        deleted as ElementPartial<
+          ExcalidrawFreeDrawElement | ExcalidrawLinearElement
+        >,
+        inserted as ElementPartial<
+          ExcalidrawFreeDrawElement | ExcalidrawLinearElement
+        >,
+        "points",
+        (prevValue) => prevValue!,
+      );
     } catch (e) {
       // if postprocessing fails, it does not make sense to bubble up, but let's make sure we know about it
       console.error(`Couldn't postprocess elements delta.`);
