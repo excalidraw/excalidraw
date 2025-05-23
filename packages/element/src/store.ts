@@ -213,16 +213,7 @@ export class Store {
       // using the same instance, since in history we have a check against `HistoryEntry`, so that we don't re-record the same delta again
       storeDelta = delta;
     } else {
-      // calculate the deltas based on the previous and next snapshot
-      const elementsDelta = snapshot.metadata.didElementsChange
-        ? ElementsDelta.calculate(prevSnapshot.elements, snapshot.elements)
-        : ElementsDelta.empty();
-
-      const appStateDelta = snapshot.metadata.didAppStateChange
-        ? AppStateDelta.calculate(prevSnapshot.appState, snapshot.appState)
-        : AppStateDelta.empty();
-
-      storeDelta = StoreDelta.create(elementsDelta, appStateDelta);
+      storeDelta = StoreDelta.calculate(prevSnapshot, snapshot);
     }
 
     if (!storeDelta.isEmpty()) {
@@ -506,6 +497,24 @@ export class StoreDelta {
   }
 
   /**
+   * Calculate the delta between the previous and next snapshot.
+   */
+  public static calculate(
+    prevSnapshot: StoreSnapshot,
+    nextSnapshot: StoreSnapshot,
+  ) {
+    const elementsDelta = nextSnapshot.metadata.didElementsChange
+      ? ElementsDelta.calculate(prevSnapshot.elements, nextSnapshot.elements)
+      : ElementsDelta.empty();
+
+    const appStateDelta = nextSnapshot.metadata.didAppStateChange
+      ? AppStateDelta.calculate(prevSnapshot.appState, nextSnapshot.appState)
+      : AppStateDelta.empty();
+
+    return this.create(elementsDelta, appStateDelta);
+  }
+
+  /**
    * Restore a store delta instance from a DTO.
    */
   public static restore(storeDeltaDTO: DTO<StoreDelta>) {
@@ -536,23 +545,6 @@ export class StoreDelta {
    */
   public static inverse(delta: StoreDelta) {
     return this.create(delta.elements.inverse(), delta.appState.inverse());
-  }
-
-  /**
-   * Apply latest (remote) changes to the delta, creates new instance of `StoreDelta`.
-   */
-  public static applyLatestChanges(
-    delta: StoreDelta,
-    elements: SceneElementsMap,
-    modifierOptions: "deleted" | "inserted",
-  ) {
-    return this.create(
-      delta.elements.applyLatestChanges(elements, modifierOptions),
-      delta.appState,
-      {
-        id: delta.id,
-      },
-    );
   }
 
   /**
