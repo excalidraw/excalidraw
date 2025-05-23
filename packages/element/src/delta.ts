@@ -18,7 +18,12 @@ import type {
   SceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type { DTO, SubtypeOf, ValueOf } from "@excalidraw/common/utility-types";
+import type {
+  DTO,
+  Mutable,
+  SubtypeOf,
+  ValueOf,
+} from "@excalidraw/common/utility-types";
 
 import type {
   AppState,
@@ -50,6 +55,8 @@ import { getNonDeletedGroupIds } from "./groups";
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 
 import { Scene } from "./Scene";
+
+import { StoreSnapshot } from "./store";
 
 import type { BindableProp, BindingProp } from "./binding";
 
@@ -858,10 +865,17 @@ export class AppStateDelta implements DeltaContainer<AppState> {
   }
 }
 
-type ElementPartial<T extends ExcalidrawElement = ExcalidrawElement> = Omit<
-  ElementUpdate<Ordered<T>>,
-  "seed"
->;
+type ElementPartial<TElement extends ExcalidrawElement = ExcalidrawElement> =
+  Omit<Partial<Ordered<TElement>>, "id" | "updated" | "seed">;
+
+export type ApplyToOptions = {
+  excludedProperties: Set<keyof ElementPartial>;
+};
+
+type ApplyToFlags = {
+  containsVisibleDifference: boolean;
+  containsZindexDifference: boolean;
+};
 
 /**
  * Elements change is a low level primitive to capture a change between two sets of elements.
@@ -1101,8 +1115,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
         for (const key of Object.keys(partial) as Array<keyof typeof partial>) {
           // do not update following props:
+          // - `version` and `versionNonce`, as they should keep it's original value
           // - `boundElements`, as it is a reference value which is postprocessed to contain only deleted/inserted keys
           switch (key) {
+            case "version":
+            case "versionNonce":
             case "boundElements":
               latestPartial[key] = partial[key];
               break;
@@ -1150,12 +1167,15 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
   public applyTo(
     elements: SceneElementsMap,
-    elementsSnapshot: Map<string, OrderedExcalidrawElement>,
+    snapshot: StoreSnapshot["elements"] = StoreSnapshot.empty().elements,
+    options: ApplyToOptions = {
+      excludedProperties: new Set(),
+    },
   ): [SceneElementsMap, boolean] {
     let nextElements = new Map(elements) as SceneElementsMap;
     let changedElements: Map<string, OrderedExcalidrawElement>;
 
-    const flags = {
+    const flags: ApplyToFlags = {
       containsVisibleDifference: false,
       containsZindexDifference: false,
     };
@@ -1164,13 +1184,14 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     try {
       const applyDeltas = ElementsDelta.createApplier(
         nextElements,
-        elementsSnapshot,
+        snapshot,
+        options,
         flags,
       );
 
-      const addedElements = applyDeltas("added", this.added);
-      const removedElements = applyDeltas("removed", this.removed);
-      const updatedElements = applyDeltas("updated", this.updated);
+      const addedElements = applyDeltas(this.added);
+      const removedElements = applyDeltas(this.removed);
+      const updatedElements = applyDeltas(this.updated);
 
       const affectedElements = this.resolveConflicts(elements, nextElements);
 
@@ -1229,18 +1250,12 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   private static createApplier =
     (
       nextElements: SceneElementsMap,
-      snapshot: Map<string, OrderedExcalidrawElement>,
-      flags: {
-        containsVisibleDifference: boolean;
-        containsZindexDifference: boolean;
-      },
+      snapshot: StoreSnapshot["elements"],
+      options: ApplyToOptions,
+      flags: ApplyToFlags,
     ) =>
-    (
-      type: "added" | "removed" | "updated",
-      deltas: Record<string, Delta<ElementPartial>>,
-    ) => {
+    (deltas: Record<string, Delta<ElementPartial>>) => {
       const getElement = ElementsDelta.createGetter(
-        type,
         nextElements,
         snapshot,
         flags,
@@ -1250,7 +1265,13 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         const element = getElement(id, delta.inserted);
 
         if (element) {
-          const newElement = ElementsDelta.applyDelta(element, delta, flags);
+          const newElement = ElementsDelta.applyDelta(
+            element,
+            delta,
+            options,
+            flags,
+          );
+
           nextElements.set(newElement.id, newElement);
           acc.set(newElement.id, newElement);
         }
@@ -1261,13 +1282,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
   private static createGetter =
     (
-      type: "added" | "removed" | "updated",
       elements: SceneElementsMap,
-      snapshot: Map<string, OrderedExcalidrawElement>,
-      flags: {
-        containsVisibleDifference: boolean;
-        containsZindexDifference: boolean;
-      },
+      snapshot: StoreSnapshot["elements"],
+      flags: ApplyToFlags,
     ) =>
     (id: string, partial: ElementPartial) => {
       let element = elements.get(id);
@@ -1281,10 +1298,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           flags.containsZindexDifference = true;
 
           // as the element was force deleted, we need to check if adding it back results in a visible change
-          if (
-            partial.isDeleted === false ||
-            (partial.isDeleted !== true && element.isDeleted === false)
-          ) {
+          if (!partial.isDeleted || (partial.isDeleted && !element.isDeleted)) {
             flags.containsVisibleDifference = true;
           }
         } else {
@@ -1304,16 +1318,25 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   private static applyDelta(
     element: OrderedExcalidrawElement,
     delta: Delta<ElementPartial>,
-    flags: {
-      containsVisibleDifference: boolean;
-      containsZindexDifference: boolean;
-    } = {
-      // by default we don't care about about the flags
-      containsVisibleDifference: true,
-      containsZindexDifference: true,
-    },
+    options: ApplyToOptions,
+    flags: ApplyToFlags,
   ) {
-    const { boundElements, ...directlyApplicablePartial } = delta.inserted;
+    const directlyApplicablePartial: Mutable<ElementPartial> = {};
+
+    for (const key of Object.keys(delta.inserted) as Array<
+      keyof typeof delta.inserted
+    >) {
+      if (key === "boundElements") {
+        continue;
+      }
+
+      if (options.excludedProperties.has(key)) {
+        continue;
+      }
+
+      const value = delta.inserted[key];
+      Reflect.set(directlyApplicablePartial, key, value);
+    }
 
     if (
       delta.deleted.boundElements?.length ||
@@ -1665,7 +1688,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   private static stripIrrelevantProps(
     partial: Partial<OrderedExcalidrawElement>,
   ): ElementPartial {
-    const { id, updated, version, versionNonce, ...strippedPartial } = partial;
+    const { id, updated, ...strippedPartial } = partial;
 
     return strippedPartial;
   }

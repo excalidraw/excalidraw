@@ -7,11 +7,65 @@ import {
   type Store,
 } from "@excalidraw/element";
 
+import type { StoreSnapshot } from "@excalidraw/element";
+
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
 import type { AppState } from "./types";
 
-class HistoryEntry extends StoreDelta {}
+class HistoryEntry extends StoreDelta {
+  /**
+   * Apply the delta to the passed elements and appState, does not modify the snapshot.
+   */
+  public applyTo(
+    elements: SceneElementsMap,
+    appState: AppState,
+    snapshot: StoreSnapshot,
+  ): [SceneElementsMap, AppState, boolean] {
+    const [nextElements, elementsContainVisibleChange] = this.elements.applyTo(
+      elements,
+      // used to fallback into local snapshot in case we couldn't apply the delta
+      // due to a missing elements in the scene (force deleted)
+      snapshot.elements,
+      // we don't want to apply the version and versionNonce properties for history
+      {
+        excludedProperties: new Set(["version", "versionNonce"]),
+      },
+    );
+
+    const [nextAppState, appStateContainsVisibleChange] = this.appState.applyTo(
+      appState,
+      nextElements,
+    );
+
+    const appliedVisibleChanges =
+      elementsContainVisibleChange || appStateContainsVisibleChange;
+
+    return [nextElements, nextAppState, appliedVisibleChanges];
+  }
+
+  /**
+   * Overriding once to avoid type casting everywhere.
+   */
+  public static override inverse(delta: StoreDelta): HistoryEntry {
+    return super.inverse(delta) as HistoryEntry;
+  }
+
+  /**
+   * Overriding once to avoid type casting everywhere.
+   */
+  public static override applyLatestChanges(
+    delta: StoreDelta,
+    elements: SceneElementsMap,
+    modifierOptions: "deleted" | "inserted",
+  ): HistoryEntry {
+    return super.applyLatestChanges(
+      delta,
+      elements,
+      modifierOptions,
+    ) as HistoryEntry;
+  }
+}
 
 export class HistoryChangedEvent {
   constructor(
@@ -112,12 +166,7 @@ export class History {
       while (historyEntry) {
         try {
           [nextElements, nextAppState, containsVisibleChange] =
-            StoreDelta.applyTo(
-              historyEntry,
-              nextElements,
-              nextAppState,
-              prevSnapshot,
-            );
+            historyEntry.applyTo(nextElements, nextAppState, prevSnapshot);
 
           const nextSnapshot = prevSnapshot.maybeClone(
             action,
