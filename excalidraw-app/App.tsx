@@ -151,6 +151,7 @@ import "./index.scss";
 import type { CollabAPI } from "./collab/Collab";
 
 import { searchAndSaveImages} from '../scripts/rabbit_scripts/try_again';
+import { RabbitSearchBoxElement, RabbitElementBase, RabbitImageElement } from "../packages/element/src/rabbitElement";
 
 polyfill();
 
@@ -1011,6 +1012,7 @@ const ExcalidrawWrapper = () => {
                     verticalAlign: "middle",
                     hasIcon: true,
                   });
+                  console.log(getSearchBoxText(searchBox));
 
                   excalidrawAPI.updateScene({
                     elements: [...excalidrawAPI.getSceneElements(), searchBox],
@@ -1023,88 +1025,207 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              label: "Add Rabbit Image",
-              category: DEFAULT_CATEGORIES.app,
-              predicate: () => true,
-              keywords: ["rabbit", "image", "rabbitimage"],
-              perform: () => {
-                if (excalidrawAPI) {
-                  const imageUrl = "https://t3.ftcdn.net/jpg/02/47/33/08/360_F_247330858_RvSJWAhMbfrqsM5VUmjLD4gzzSKUaJls.jpg";
-                  const label = "Rabbit Image";
+  label: "Do Everything",
+  category: DEFAULT_CATEGORIES.app,
+  predicate: () => true,
+  keywords: ["rabbit", "search", "box", "searchbox", "everything"],
+  perform: () => {
+    if (excalidrawAPI) {
+      // Step 1: Create and add the search box first
+      const searchBox = newRabbitSearchBoxElement({
+        x: 100,
+        y: 100,
+        text: "Search...",
+        fontSize: 16,
+        fontFamily: FONT_FAMILY.Virgil,
+        textAlign: "left",
+        verticalAlign: "middle",
+        hasIcon: true,
+      });
+
+      // Add search box to scene immediately
+      excalidrawAPI.updateScene({
+        elements: [...excalidrawAPI.getSceneElements(), searchBox],
+      });
+
+      // Show instructions to user
+      excalidrawAPI.setToast({
+        message: "Double-click on the search box to edit. Press Enter to confirm and search for images.",
+        duration: 5000
+      });
+
+      // Step 2: Set up Enter key event listener
+      let hasSearched = false; // Prevent multiple searches for the same query
+      let lastSearchQuery = ""; // Track last search to prevent duplicates
+      
+      const handleEnterKey = (event: KeyboardEvent) => {
+        if (event.key !== 'Enter') return;
+        
+        // Get current elements from scene
+        const currentElements = excalidrawAPI.getSceneElements();
+        const currentSearchBox = currentElements.find(el => 
+          el.type === 'rabbit-searchbox' && el.id === searchBox.id
+        ) as RabbitSearchBoxElement;
+
+        if (currentSearchBox) {
+          const searchQuery = getSearchBoxText(currentSearchBox);
+          
+          // Check if user has entered valid search text and it's different from last search
+          if (searchQuery !== "Search..." && 
+              searchQuery.trim() !== "" && 
+              searchQuery.length > 2 &&
+              searchQuery !== lastSearchQuery) {
+            
+            console.log("Search query detected:", searchQuery);
+            lastSearchQuery = searchQuery; // Update last search query
+            hasSearched = true;
+            
+            // Step 3: Search for images using the user's input
+            searchAndSaveImages(searchQuery)
+              .then(images => {
+                console.log("Search completed, results:", images);
+                
+                if (images && images.length > 0) {
+                  console.log("Look at first", images[0]['link']);
+                  
+                  const imageUrl = images[0]['link'];
+                  const label = searchQuery + " Image";
                   const padding = 10;
                   const labelHeight = 20;
-                  const fixedImageHeight = 200; // <-- set your fixed height here
-
+                  const fixedImageHeight = 200;
+                  
                   const img = new Image();
-                  img.crossOrigin = "anonymous"; // for CORS safety if needed
-
+                  img.crossOrigin = "anonymous";
+                  
                   img.onload = () => {
-                    // maintain aspect ratio so image doesn't load too large
                     const aspectRatio = img.naturalWidth / img.naturalHeight;
                     const imageHeight = fixedImageHeight;
                     const imageWidth = imageHeight * aspectRatio;
-
+                    
                     const totalWidth = imageWidth + padding * 2;
                     const totalHeight = imageHeight + padding * 2 + labelHeight;
-
-                    // calls newRabbitImageElement to make the element
+                    
                     const image = newRabbitImageElement({
                       x: 100,
-                      y: 300,
+                      y: 350, // Position below search box
                       label,
                       imageUrl,
                       width: totalWidth,
                       height: totalHeight,
                     });
-
+                    
+                    // Add image to scene
                     excalidrawAPI.updateScene({
                       elements: [...excalidrawAPI.getSceneElements(), image],
                     });
+                    
+                    // Show success message
+                    excalidrawAPI.setToast({
+                      message: `Image for "${searchQuery}" added successfully!`,
+                      duration: 3000
+                    });
                   };
-
+                  
                   img.onerror = () => {
                     console.error("Failed to load image for RabbitImageElement");
+                    excalidrawAPI.setToast({
+                      message: "Failed to load image. Please try a different search term.",
+                      duration: 3000
+                    });
                   };
-
+                  
                   img.src = imageUrl;
+                } else {
+                  excalidrawAPI.setToast({
+                    message: "No images found. Please try a different search term.",
+                    duration: 3000
+                  });
                 }
-              },
-            },
+              })
+              .catch(error => {
+                console.error("Error in image search:", error);
+                excalidrawAPI.setToast({
+                  message: "Error searching for images. Please try again.",
+                  duration: 3000
+                });
+              });
+          }
+        }
+      };
+
+      // Add the event listener
+      document.addEventListener('keydown', handleEnterKey);
+
+      // Optional: Store the listener reference if you need to remove it later
+      // You might want to store this in a way that allows cleanup when the search box is removed
+      // For example:
+      // searchBox.eventListener = handleEnterKey;
+    }
+  },
+},
+            
             {
-              label: "Sasuke Generator",
+              
+              label: "Add Rabbit Image",
               category: DEFAULT_CATEGORIES.app,
               predicate: () => true,
-              keywords: ["rabbit", "search", "box", "searchbox"],
+              keywords: ["rabbit", "image", "rabbitimage"],
+              
               perform: () => {
-                console.log("Sasuke Generator button clicked");
-                
-                // Call the imported function
-                searchAndSaveImages("rabbit")
-                  .then(images => {
-                    console.log("Search completed, results:", images);
-                  })
-                  .catch(error => {
-                    console.error("Error in image search:", error);
-                  });
-                
-                // Still create the search box as in your original code
-                if (excalidrawAPI) {
-                  const searchBox = newRabbitSearchBoxElement({
-                    x: 100,
-                    y: 100,
-                    text: "Sasuke Images started...logged in console",
-                    fontSize: 16,
-                    fontFamily: FONT_FAMILY.Virgil,
-                    textAlign: "left",
-                    verticalAlign: "middle",
-                    hasIcon: true,
-                  });
+              const customQuer = "naruto"
+              searchAndSaveImages(customQuer)
+                .then(images => {
+                  console.log("Search completed, results:", images);
+                  console.log("Look at first", images[0]['link']);
                   
-                  excalidrawAPI.updateScene({
-                    elements: [...excalidrawAPI.getSceneElements(), searchBox],
-                  });
-                }
-              },
+                  // Use the search result here, inside the .then()
+                  const searchQuer = images[0]['link'];
+                  
+                  if (excalidrawAPI) {
+                    const imageUrl = searchQuer;
+                    
+                    // Put all your image creation code here
+                    const label = customQuer + "Image";
+                    const padding = 10;
+                    const labelHeight = 20;
+                    const fixedImageHeight = 200;
+                    
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    
+                    img.onload = () => {
+                      const aspectRatio = img.naturalWidth / img.naturalHeight;
+                      const imageHeight = fixedImageHeight;
+                      const imageWidth = imageHeight * aspectRatio;
+                      
+                      const totalWidth = imageWidth + padding * 2;
+                      const totalHeight = imageHeight + padding * 2 + labelHeight;
+                      
+                      const image = newRabbitImageElement({
+                        x: 100,
+                        y: 300,
+                        label,
+                        imageUrl,
+                        width: totalWidth,
+                        height: totalHeight,
+                      });
+                      
+                      excalidrawAPI.updateScene({
+                        elements: [...excalidrawAPI.getSceneElements(), image],
+                      });
+                    };
+                    
+                    img.onerror = () => {
+                      console.error("Failed to load image for RabbitImageElement");
+                    };
+                    
+                    img.src = imageUrl;
+      }
+    })
+    .catch(error => {
+      console.error("Error in image search:", error);
+    });
+},
             },
             
             
