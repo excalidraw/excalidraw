@@ -103,6 +103,7 @@ import {
 } from "@excalidraw/common";
 
 import {
+  getObservedAppState,
   getCommonBounds,
   getElementAbsoluteCoords,
   bindOrUnbindLinearElements,
@@ -3909,22 +3910,30 @@ class App extends React.Component<AppProps, AppState> {
     }) => {
       const { elements, appState, collaborators, captureUpdate } = sceneData;
 
-      const nextElements = elements ? syncInvalidIndices(elements) : undefined;
+      const nextElements = elements
+        ? syncInvalidIndices(elements, {
+            // we have to create new instances here, otherwise scheduled micro action below won't be able to
+            // detect the fractional index change and won't update the store snapshot
+            shouldCreateNewInstances: true,
+          })
+        : undefined;
 
       if (captureUpdate) {
         const nextElementsMap = elements
           ? (arrayToMap(nextElements ?? []) as SceneElementsMap)
           : undefined;
 
-        const nextAppState = appState
-          ? // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
-            Object.assign({}, this.store.snapshot.appState, appState)
+        const nextObservedAppState = appState
+          ? getObservedAppState({
+              ...this.store.snapshot.appState,
+              ...appState,
+            })
           : undefined;
 
         this.store.scheduleMicroAction({
           action: captureUpdate,
           elements: nextElementsMap,
-          appState: nextAppState,
+          appState: nextObservedAppState,
         });
       }
 

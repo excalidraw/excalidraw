@@ -431,12 +431,17 @@ export const assertElements = <T extends AllPossibleKeys<ExcalidrawElement>>(
   expect(h.state.selectedElementIds).toEqual(selectedElementIds);
 };
 
-const stripSeed = (deltas: Record<string, { deleted: any; inserted: any }>) =>
+const stripProps = (
+  deltas: Record<string, { deleted: any; inserted: any }>,
+  props: string[],
+) =>
   Object.entries(deltas).reduce((acc, curr) => {
     const { inserted, deleted, ...rest } = curr[1];
 
-    delete inserted.seed;
-    delete deleted.seed;
+    for (const prop of props) {
+      delete inserted[prop];
+      delete deleted[prop];
+    }
 
     acc[curr[0]] = {
       inserted,
@@ -453,9 +458,9 @@ export const checkpointHistory = (history: History, name: string) => {
       ...x,
       elements: {
         ...x.elements,
-        added: stripSeed(x.elements.added),
-        removed: stripSeed(x.elements.removed),
-        updated: stripSeed(x.elements.updated),
+        added: stripProps(x.elements.added, ["seed", "versionNonce"]),
+        removed: stripProps(x.elements.removed, ["seed", "versionNonce"]),
+        updated: stripProps(x.elements.updated, ["seed", "versionNonce"]),
       },
     })),
   ).toMatchSnapshot(`[${name}] undo stack`);
@@ -465,9 +470,9 @@ export const checkpointHistory = (history: History, name: string) => {
       ...x,
       elements: {
         ...x.elements,
-        added: stripSeed(x.elements.added),
-        removed: stripSeed(x.elements.removed),
-        updated: stripSeed(x.elements.updated),
+        added: stripProps(x.elements.added, ["seed", "versionNonce"]),
+        removed: stripProps(x.elements.removed, ["seed", "versionNonce"]),
+        updated: stripProps(x.elements.updated, ["seed", "versionNonce"]),
       },
     })),
   ).toMatchSnapshot(`[${name}] redo stack`);

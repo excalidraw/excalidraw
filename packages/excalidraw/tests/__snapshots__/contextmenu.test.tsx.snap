@@ -1269,6 +1269,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": -20,
             "y": -10,
@@ -1511,6 +1512,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": -10,
             "y": 0,
@@ -1563,6 +1565,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": 20,
             "y": 30,
@@ -1598,9 +1601,11 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
         "id0": {
           "deleted": {
             "index": "a2",
+            "version": 4,
           },
           "inserted": {
             "index": "a0",
+            "version": 3,
           },
         },
       },
@@ -1836,6 +1841,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": -10,
             "y": 0,
@@ -1888,6 +1894,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": 20,
             "y": 30,
@@ -1923,9 +1930,11 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
         "id0": {
           "deleted": {
             "index": "a2",
+            "version": 4,
           },
           "inserted": {
             "index": "a0",
+            "version": 3,
           },
         },
       },
@@ -2131,6 +2140,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": -20,
             "y": -10,
@@ -2339,6 +2349,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": -20,
             "y": -10,
@@ -2370,9 +2381,11 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
         "id0": {
           "deleted": {
             "isDeleted": true,
+            "version": 4,
           },
           "inserted": {
             "isDeleted": false,
+            "version": 3,
           },
         },
       },
@@ -2610,6 +2623,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": -20,
             "y": -10,
@@ -2662,6 +2676,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 5,
             "width": 10,
             "x": -10,
             "y": 0,
@@ -2913,6 +2928,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": -10,
             "y": 0,
@@ -2965,6 +2981,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": 20,
             "y": 30,
@@ -3020,9 +3037,11 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
             "groupIds": [
               "id9",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id3": {
@@ -3030,9 +3049,11 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
             "groupIds": [
               "id9",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
       },
@@ -3270,6 +3291,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": -10,
             "y": 0,
@@ -3322,6 +3344,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": 20,
             "y": 30,
@@ -3349,9 +3372,11 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
         "id3": {
           "deleted": {
             "strokeColor": "#e03131",
+            "version": 4,
           },
           "inserted": {
             "strokeColor": "#1e1e1e",
+            "version": 3,
           },
         },
       },
@@ -3372,9 +3397,11 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
         "id3": {
           "deleted": {
             "backgroundColor": "#a5d8ff",
+            "version": 5,
           },
           "inserted": {
             "backgroundColor": "transparent",
+            "version": 4,
           },
         },
       },
@@ -3395,9 +3422,11 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
         "id3": {
           "deleted": {
             "fillStyle": "cross-hatch",
+            "version": 6,
           },
           "inserted": {
             "fillStyle": "solid",
+            "version": 5,
           },
         },
       },
@@ -3418,9 +3447,11 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
         "id3": {
           "deleted": {
             "strokeStyle": "dotted",
+            "version": 7,
           },
           "inserted": {
             "strokeStyle": "solid",
+            "version": 6,
           },
         },
       },
@@ -3441,9 +3472,11 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
         "id3": {
           "deleted": {
             "roughness": 2,
+            "version": 8,
           },
           "inserted": {
             "roughness": 1,
+            "version": 7,
           },
         },
       },
@@ -3464,9 +3497,11 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
         "id3": {
           "deleted": {
             "opacity": 60,
+            "version": 9,
           },
           "inserted": {
             "opacity": 100,
+            "version": 8,
           },
         },
       },
@@ -3500,6 +3535,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
             "roughness": 2,
             "strokeColor": "#e03131",
             "strokeStyle": "dotted",
+            "version": 4,
           },
           "inserted": {
             "backgroundColor": "transparent",
@@ -3508,6 +3544,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
             "roughness": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
+            "version": 3,
           },
         },
       },
@@ -3743,6 +3780,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": -10,
             "y": 0,
@@ -3795,6 +3833,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": 20,
             "y": 30,
@@ -3822,9 +3861,11 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
         "id3": {
           "deleted": {
             "index": "Zz",
+            "version": 4,
           },
           "inserted": {
             "index": "a1",
+            "version": 3,
           },
         },
       },
@@ -4060,6 +4101,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": -10,
             "y": 0,
@@ -4112,6 +4154,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": 20,
             "y": 30,
@@ -4139,9 +4182,11 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
         "id3": {
           "deleted": {
             "index": "Zz",
+            "version": 4,
           },
           "inserted": {
             "index": "a1",
+            "version": 3,
           },
         },
       },
@@ -4380,6 +4425,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": -10,
             "y": 0,
@@ -4432,6 +4478,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": 20,
             "y": 30,
@@ -4487,9 +4534,11 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
             "groupIds": [
               "id9",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id3": {
@@ -4497,9 +4546,11 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
             "groupIds": [
               "id9",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
       },
@@ -4526,21 +4577,25 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
         "id0": {
           "deleted": {
             "groupIds": [],
+            "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id9",
             ],
+            "version": 4,
           },
         },
         "id3": {
           "deleted": {
             "groupIds": [],
+            "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id9",
             ],
+            "version": 4,
           },
         },
       },
@@ -5653,6 +5708,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": -10,
             "y": 0,
@@ -5705,6 +5761,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 12,
             "y": 0,
@@ -6872,6 +6929,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": -10,
             "y": 0,
@@ -6924,6 +6982,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 12,
             "y": 0,
@@ -7001,9 +7060,11 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id3": {
@@ -7011,9 +7072,11 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
       },
@@ -9822,6 +9885,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] un
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": -20,
             "y": -10,
