@@ -2,7 +2,9 @@ import { generateNKeysBetween } from "fractional-indexing";
 
 import { arrayToMap } from "@excalidraw/common";
 
-import { mutateElement } from "./mutateElement";
+import type { Mutable } from "@excalidraw/common/utility-types";
+
+import { mutateElement, newElementWith } from "./mutateElement";
 import { getBoundTextElement } from "./textElement";
 import { hasBoundTextElement } from "./typeChecks";
 
@@ -161,9 +163,15 @@ export const syncMovedIndices = (
 
     // try generatating indices, throws on invalid movedElements
     const elementsUpdates = generateIndices(elements, indicesGroups);
-    const elementsCandidates = elements.map((x) =>
-      elementsUpdates.has(x) ? { ...x, ...elementsUpdates.get(x) } : x,
-    );
+    const elementsCandidates = elements.map((x) => {
+      const elementUpdates = elementsUpdates.get(x);
+
+      if (elementUpdates) {
+        return { ...x, index: elementUpdates.index };
+      }
+
+      return x;
+    });
 
     // ensure next indices are valid before mutation, throws on invalid ones
     validateFractionalIndices(
@@ -177,8 +185,8 @@ export const syncMovedIndices = (
     );
 
     // split mutation so we don't end up in an incosistent state
-    for (const [element, update] of elementsUpdates) {
-      mutateElement(element, elementsMap, update);
+    for (const [element, { index }] of elementsUpdates) {
+      mutateElement(element, elementsMap, { index });
     }
   } catch (e) {
     // fallback to default sync
@@ -189,19 +197,33 @@ export const syncMovedIndices = (
 };
 
 /**
- * Synchronizes all invalid fractional indices with the array order by mutating passed elements.
+ * Synchronizes all invalid fractional indices with the array order by mutating passed elements array.
+ *
+ * When `shouldCreateNewInstances` is true, it creates new instances of the elements, instead of mutating the existing ones.
  *
  * WARN: in edge cases it could modify the elements which were not moved, as it's impossible to guess the actually moved elements from the elements array itself.
  */
 export const syncInvalidIndices = (
   elements: readonly ExcalidrawElement[],
+  {
+    shouldCreateNewInstances = false,
+  }: {
+    shouldCreateNewInstances?: boolean;
+  } = {},
 ): OrderedExcalidrawElement[] => {
-  const elementsMap = arrayToMap(elements);
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
 
-  for (const [element, update] of elementsUpdates) {
-    mutateElement(element, elementsMap, update);
+  for (const [element, { index, arrayIndex }] of elementsUpdates) {
+    if (shouldCreateNewInstances) {
+      const updatedElement = newElementWith(element, { index });
+
+      // mutate the element in the array with the new updated instance
+      (elements as Mutable<typeof elements>)[arrayIndex] = updatedElement;
+    } else {
+      const elementsMap = arrayToMap(elements);
+      mutateElement(element, elementsMap, { index });
+    }
   }
 
   return elements as OrderedExcalidrawElement[];
@@ -380,7 +402,7 @@ const generateIndices = (
 ) => {
   const elementsUpdates = new Map<
     ExcalidrawElement,
-    { index: FractionalIndex }
+    { index: FractionalIndex; arrayIndex: number }
   >();
 
   for (const indices of indicesGroups) {
@@ -398,6 +420,7 @@ const generateIndices = (
 
       elementsUpdates.set(element, {
         index: fractionalIndices[i],
+        arrayIndex: indices[i],
       });
     }
   }

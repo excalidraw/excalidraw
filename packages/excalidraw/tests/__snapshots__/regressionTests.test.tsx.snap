@@ -171,6 +171,7 @@ exports[`given element A and group of elements B and given both are selected whe
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 0,
@@ -225,6 +226,7 @@ exports[`given element A and group of elements B and given both are selected whe
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 30,
@@ -279,6 +281,7 @@ exports[`given element A and group of elements B and given both are selected whe
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 60,
@@ -357,10 +360,12 @@ exports[`given element A and group of elements B and given both are selected whe
               "id15",
             ],
             "index": "a2",
+            "version": 5,
           },
           "inserted": {
             "groupIds": [],
             "index": "a0",
+            "version": 3,
           },
         },
         "id6": {
@@ -369,10 +374,12 @@ exports[`given element A and group of elements B and given both are selected whe
               "id15",
             ],
             "index": "a3",
+            "version": 5,
           },
           "inserted": {
             "groupIds": [],
             "index": "a2",
+            "version": 3,
           },
         },
       },
@@ -595,6 +602,7 @@ exports[`given element A and group of elements B and given both are selected whe
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 100,
             "x": 0,
             "y": 0,
@@ -649,6 +657,7 @@ exports[`given element A and group of elements B and given both are selected whe
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 100,
             "x": 110,
             "y": 110,
@@ -703,6 +712,7 @@ exports[`given element A and group of elements B and given both are selected whe
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 100,
             "x": 220,
             "y": 220,
@@ -759,10 +769,12 @@ exports[`given element A and group of elements B and given both are selected whe
               "id12",
             ],
             "index": "a2",
+            "version": 5,
           },
           "inserted": {
             "groupIds": [],
             "index": "a0",
+            "version": 3,
           },
         },
         "id6": {
@@ -771,10 +783,12 @@ exports[`given element A and group of elements B and given both are selected whe
               "id12",
             ],
             "index": "a3",
+            "version": 5,
           },
           "inserted": {
             "groupIds": [],
             "index": "a2",
+            "version": 3,
           },
         },
       },
@@ -998,6 +1012,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 0,
@@ -1052,6 +1067,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 30,
             "y": 0,
@@ -1129,9 +1145,11 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id3": {
@@ -1139,9 +1157,11 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
       },
@@ -1217,6 +1237,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 60,
             "y": 0,
@@ -1302,11 +1323,13 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
               "id12",
               "id28",
             ],
+            "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
         },
         "id19": {
@@ -1314,9 +1337,11 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "groupIds": [
               "id28",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id3": {
@@ -1325,11 +1350,13 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
               "id12",
               "id28",
             ],
+            "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
         },
       },
@@ -1554,6 +1581,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 0,
@@ -1580,10 +1608,12 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
       "updated": {
         "id0": {
           "deleted": {
+            "version": 4,
             "x": 25,
             "y": 25,
           },
           "inserted": {
+            "version": 3,
             "x": 0,
             "y": 0,
           },
@@ -1764,6 +1794,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -1818,6 +1849,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 30,
             "y": 10,
@@ -1872,6 +1904,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 50,
             "y": 10,
@@ -1950,10 +1983,12 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
               "id15",
             ],
             "index": "a2",
+            "version": 5,
           },
           "inserted": {
             "groupIds": [],
             "index": "a0",
+            "version": 3,
           },
         },
         "id6": {
@@ -1962,10 +1997,12 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
               "id15",
             ],
             "index": "a3",
+            "version": 5,
           },
           "inserted": {
             "groupIds": [],
             "index": "a2",
+            "version": 3,
           },
         },
       },
@@ -2141,6 +2178,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -2195,6 +2233,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 6,
             "width": 10,
             "x": 20,
             "y": 20,
@@ -2204,7 +2243,16 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
           },
         },
       },
-      "updated": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "version": 5,
+          },
+          "inserted": {
+            "version": 3,
+          },
+        },
+      },
     },
     "id": "id6",
   },
@@ -2375,6 +2423,7 @@ exports[`regression tests > arrow keys > [end of test] undo stack 1`] = `
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -2557,6 +2606,7 @@ exports[`regression tests > can drag element that covers another element, while 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 200,
             "x": 100,
             "y": 100,
@@ -2611,6 +2661,7 @@ exports[`regression tests > can drag element that covers another element, while 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 200,
             "x": 100,
             "y": 100,
@@ -2665,6 +2716,7 @@ exports[`regression tests > can drag element that covers another element, while 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 350,
             "x": 300,
             "y": 300,
@@ -2699,10 +2751,12 @@ exports[`regression tests > can drag element that covers another element, while 
       "updated": {
         "id3": {
           "deleted": {
+            "version": 4,
             "x": 300,
             "y": 300,
           },
           "inserted": {
+            "version": 3,
             "x": 100,
             "y": 100,
           },
@@ -2878,6 +2932,7 @@ exports[`regression tests > change the properties of a shape > [end of test] und
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -2905,9 +2960,11 @@ exports[`regression tests > change the properties of a shape > [end of test] und
         "id0": {
           "deleted": {
             "backgroundColor": "#ffec99",
+            "version": 4,
           },
           "inserted": {
             "backgroundColor": "transparent",
+            "version": 3,
           },
         },
       },
@@ -2928,9 +2985,11 @@ exports[`regression tests > change the properties of a shape > [end of test] und
         "id0": {
           "deleted": {
             "backgroundColor": "#ffc9c9",
+            "version": 5,
           },
           "inserted": {
             "backgroundColor": "#ffec99",
+            "version": 4,
           },
         },
       },
@@ -2951,9 +3010,11 @@ exports[`regression tests > change the properties of a shape > [end of test] und
         "id0": {
           "deleted": {
             "strokeColor": "#1971c2",
+            "version": 6,
           },
           "inserted": {
             "strokeColor": "#1e1e1e",
+            "version": 5,
           },
         },
       },
@@ -3163,6 +3224,7 @@ exports[`regression tests > click on an element and drag it > [dragged] undo sta
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -3189,10 +3251,12 @@ exports[`regression tests > click on an element and drag it > [dragged] undo sta
       "updated": {
         "id0": {
           "deleted": {
+            "version": 4,
             "x": 20,
             "y": 20,
           },
           "inserted": {
+            "version": 3,
             "x": 10,
             "y": 10,
           },
@@ -3370,6 +3434,7 @@ exports[`regression tests > click on an element and drag it > [end of test] undo
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -3396,10 +3461,12 @@ exports[`regression tests > click on an element and drag it > [end of test] undo
       "updated": {
         "id0": {
           "deleted": {
+            "version": 4,
             "x": 20,
             "y": 20,
           },
           "inserted": {
+            "version": 3,
             "x": 10,
             "y": 10,
           },
@@ -3421,10 +3488,12 @@ exports[`regression tests > click on an element and drag it > [end of test] undo
       "updated": {
         "id0": {
           "deleted": {
+            "version": 5,
             "x": 10,
             "y": 10,
           },
           "inserted": {
+            "version": 4,
             "x": 20,
             "y": 20,
           },
@@ -3602,6 +3671,7 @@ exports[`regression tests > click to select a shape > [end of test] undo stack 1
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -3656,6 +3726,7 @@ exports[`regression tests > click to select a shape > [end of test] undo stack 1
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 30,
             "y": 10,
@@ -3861,6 +3932,7 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -3915,6 +3987,7 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 30,
             "y": 10,
@@ -3969,6 +4042,7 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 50,
             "y": 10,
@@ -4174,6 +4248,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 0,
@@ -4228,6 +4303,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 50,
             "y": 0,
@@ -4305,9 +4381,11 @@ exports[`regression tests > deleting last but one element in editing group shoul
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id3": {
@@ -4315,9 +4393,11 @@ exports[`regression tests > deleting last but one element in editing group shoul
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
       },
@@ -4376,9 +4456,11 @@ exports[`regression tests > deleting last but one element in editing group shoul
         "id0": {
           "deleted": {
             "isDeleted": true,
+            "version": 5,
           },
           "inserted": {
             "isDeleted": false,
+            "version": 4,
           },
         },
       },
@@ -4633,6 +4715,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 0,
@@ -4687,6 +4770,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 10,
             "x": 110,
             "y": 110,
@@ -4888,6 +4972,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 0,
@@ -4942,6 +5027,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 10,
             "x": 110,
             "y": 110,
@@ -5193,6 +5279,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 0,
@@ -5373,6 +5460,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 100,
             "x": 0,
             "y": 0,
@@ -5573,6 +5661,7 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -5627,6 +5716,7 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 30,
             "y": 10,
@@ -5681,6 +5771,7 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 50,
             "y": 10,
@@ -5737,9 +5828,11 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "groupIds": [
               "id11",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id3": {
@@ -5747,9 +5840,11 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "groupIds": [
               "id11",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id6": {
@@ -5757,9 +5852,11 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "groupIds": [
               "id11",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
       },
@@ -5964,6 +6061,7 @@ exports[`regression tests > drags selected elements from point inside common bou
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 0,
@@ -6018,6 +6116,7 @@ exports[`regression tests > drags selected elements from point inside common bou
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 10,
             "x": 110,
             "y": 110,
@@ -6064,20 +6163,24 @@ exports[`regression tests > drags selected elements from point inside common bou
       "updated": {
         "id0": {
           "deleted": {
+            "version": 4,
             "x": 25,
             "y": 25,
           },
           "inserted": {
+            "version": 3,
             "x": 0,
             "y": 0,
           },
         },
         "id3": {
           "deleted": {
+            "version": 4,
             "x": 135,
             "y": 135,
           },
           "inserted": {
+            "version": 3,
             "x": 110,
             "y": 110,
           },
@@ -6251,6 +6354,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": 10,
             "y": -10,
@@ -6305,6 +6409,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "diamond",
+            "version": 3,
             "width": 20,
             "x": 40,
             "y": -10,
@@ -6359,6 +6464,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 20,
             "x": 70,
             "y": -10,
@@ -6431,6 +6537,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
+            "version": 4,
             "width": 50,
             "x": 130,
             "y": -10,
@@ -6502,6 +6609,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "line",
+            "version": 4,
             "width": 50,
             "x": 220,
             "y": -10,
@@ -6577,6 +6685,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
+            "version": 6,
             "width": 50,
             "x": 310,
             "y": -10,
@@ -6622,6 +6731,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 20,
               ],
             ],
+            "version": 8,
             "width": 80,
           },
           "inserted": {
@@ -6640,6 +6750,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 10,
               ],
             ],
+            "version": 6,
             "width": 50,
           },
         },
@@ -6726,6 +6837,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "line",
+            "version": 6,
             "width": 50,
             "x": 430,
             "y": -10,
@@ -6771,6 +6883,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 20,
               ],
             ],
+            "version": 8,
             "width": 80,
           },
           "inserted": {
@@ -6789,6 +6902,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 10,
               ],
             ],
+            "version": 6,
             "width": 50,
           },
         },
@@ -6893,6 +7007,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "freedraw",
+            "version": 4,
             "width": 50,
             "x": 550,
             "y": -10,
@@ -7076,6 +7191,7 @@ exports[`regression tests > given a group of selected elements with an element t
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 0,
@@ -7130,6 +7246,7 @@ exports[`regression tests > given a group of selected elements with an element t
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 100,
             "x": 110,
             "y": 110,
@@ -7184,6 +7301,7 @@ exports[`regression tests > given a group of selected elements with an element t
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "diamond",
+            "version": 3,
             "width": 100,
             "x": 310,
             "y": 310,
@@ -7410,6 +7528,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 1000,
             "x": 0,
             "y": 0,
@@ -7464,6 +7583,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 1000,
             "x": 500,
             "y": 500,
@@ -7688,6 +7808,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 2,
             "width": 1000,
             "x": 0,
             "y": 0,
@@ -7719,6 +7840,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 2,
             "width": 500,
             "x": 500,
             "y": 500,
@@ -7923,6 +8045,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 2,
             "width": 1000,
             "x": 0,
             "y": 0,
@@ -7954,6 +8077,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 2,
             "width": 500,
             "x": 500,
             "y": 500,
@@ -7980,10 +8104,12 @@ exports[`regression tests > given selected element A with lower z-index than uns
       "updated": {
         "id0": {
           "deleted": {
+            "version": 3,
             "x": 100,
             "y": 100,
           },
           "inserted": {
+            "version": 2,
             "x": 0,
             "y": 0,
           },
@@ -8159,6 +8285,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] undo st
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -8339,6 +8466,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] undo stac
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "diamond",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -8519,6 +8647,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] undo stac
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -8742,6 +8871,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
+            "version": 4,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -8964,6 +9094,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] undo stack 1
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "line",
+            "version": 4,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -9158,6 +9289,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] undo sta
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "freedraw",
+            "version": 4,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -9381,6 +9513,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
+            "version": 4,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -9561,6 +9694,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] undo stac
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "diamond",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -9783,6 +9917,7 @@ exports[`regression tests > key l selects line tool > [end of test] undo stack 1
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "line",
+            "version": 4,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -9963,6 +10098,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] undo stac
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -10157,6 +10293,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] undo sta
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "freedraw",
+            "version": 4,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -10337,6 +10474,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] undo st
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -10525,6 +10663,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -10579,6 +10718,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 30,
             "y": 10,
@@ -10633,6 +10773,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 50,
             "y": 10,
@@ -10689,9 +10830,11 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id3": {
@@ -10699,9 +10842,11 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id6": {
@@ -10709,9 +10854,11 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
       },
@@ -10771,6 +10918,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 7,
             "width": 10,
             "x": 20,
             "y": 20,
@@ -10804,6 +10952,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 7,
             "width": 10,
             "x": 40,
             "y": 20,
@@ -10837,6 +10986,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 7,
             "width": 10,
             "x": 60,
             "y": 20,
@@ -10846,7 +10996,32 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
           },
         },
       },
-      "updated": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "version": 6,
+          },
+          "inserted": {
+            "version": 4,
+          },
+        },
+        "id3": {
+          "deleted": {
+            "version": 6,
+          },
+          "inserted": {
+            "version": 4,
+          },
+        },
+        "id6": {
+          "deleted": {
+            "version": 6,
+          },
+          "inserted": {
+            "version": 4,
+          },
+        },
+      },
     },
     "id": "id21",
   },
@@ -11019,6 +11194,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -11052,39 +11228,18 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "removed": {
         "id3": {
           "deleted": {
-            "angle": 0,
-            "backgroundColor": "transparent",
-            "boundElements": null,
-            "customData": undefined,
-            "fillStyle": "solid",
-            "frameId": null,
-            "groupIds": [],
-            "height": 10,
-            "index": "a1",
             "isDeleted": false,
-            "link": null,
-            "locked": false,
-            "opacity": 100,
-            "roughness": 1,
-            "roundness": {
-              "type": 3,
-            },
-            "strokeColor": "#1e1e1e",
-            "strokeStyle": "solid",
-            "strokeWidth": 2,
-            "type": "rectangle",
-            "width": 10,
-            "x": 30,
-            "y": 10,
+            "version": 5,
           },
           "inserted": {
             "isDeleted": true,
+            "version": 4,
           },
         },
       },
       "updated": {},
     },
-    "id": "id8",
+    "id": "id10",
   },
   {
     "appState": AppStateDelta {
@@ -11106,7 +11261,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "removed": {},
       "updated": {},
     },
-    "id": "id11",
+    "id": "id13",
   },
   {
     "appState": AppStateDelta {
@@ -11128,7 +11283,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "removed": {},
       "updated": {},
     },
-    "id": "id14",
+    "id": "id16",
   },
 ]
 `;
@@ -11420,6 +11575,7 @@ exports[`regression tests > shift click on selected element should deselect it o
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 0,
@@ -11624,6 +11780,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -11678,6 +11835,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 30,
             "y": 10,
@@ -11746,20 +11904,24 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
       "updated": {
         "id0": {
           "deleted": {
+            "version": 4,
             "x": 20,
             "y": 20,
           },
           "inserted": {
+            "version": 3,
             "x": 10,
             "y": 10,
           },
         },
         "id3": {
           "deleted": {
+            "version": 4,
             "x": 40,
             "y": 20,
           },
           "inserted": {
+            "version": 3,
             "x": 30,
             "y": 10,
           },
@@ -11941,6 +12103,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 10,
@@ -11995,6 +12158,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 30,
             "y": 10,
@@ -12049,6 +12213,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 50,
             "y": 10,
@@ -12105,9 +12270,11 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id3": {
@@ -12115,9 +12282,11 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id6": {
@@ -12125,9 +12294,11 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
       },
@@ -12154,31 +12325,37 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
         "id0": {
           "deleted": {
             "groupIds": [],
+            "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
         },
         "id3": {
           "deleted": {
             "groupIds": [],
+            "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
         },
         "id6": {
           "deleted": {
             "groupIds": [],
+            "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
         },
       },
@@ -12362,6 +12539,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 0,
@@ -12416,6 +12594,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 50,
             "y": 0,
@@ -12493,9 +12672,11 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id3": {
@@ -12503,9 +12684,11 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
       },
@@ -12558,6 +12741,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 10,
             "y": 50,
@@ -12612,6 +12796,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 50,
             "y": 50,
@@ -12689,9 +12874,11 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "groupIds": [
               "id27",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id18": {
@@ -12699,9 +12886,11 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "groupIds": [
               "id27",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
       },
@@ -12759,11 +12948,13 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
               "id12",
               "id32",
             ],
+            "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
         },
         "id15": {
@@ -12772,11 +12963,13 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
               "id27",
               "id32",
             ],
+            "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id27",
             ],
+            "version": 4,
           },
         },
         "id18": {
@@ -12785,11 +12978,13 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
               "id27",
               "id32",
             ],
+            "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id27",
             ],
+            "version": 4,
           },
         },
         "id3": {
@@ -12798,11 +12993,13 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
               "id12",
               "id32",
             ],
+            "version": 5,
           },
           "inserted": {
             "groupIds": [
               "id12",
             ],
+            "version": 4,
           },
         },
       },
@@ -13104,6 +13301,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 50,
             "x": 0,
             "y": 0,
@@ -13158,6 +13356,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 50,
             "x": 100,
             "y": 100,
@@ -13212,6 +13411,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 50,
             "x": 200,
             "y": 200,
@@ -13268,9 +13468,11 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "groupIds": [
               "id11",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id3": {
@@ -13278,9 +13480,11 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "groupIds": [
               "id11",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
         "id6": {
@@ -13288,9 +13492,11 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "groupIds": [
               "id11",
             ],
+            "version": 4,
           },
           "inserted": {
             "groupIds": [],
+            "version": 3,
           },
         },
       },
@@ -13368,12 +13574,14 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
               "id11",
             ],
             "index": "a2",
+            "version": 6,
           },
           "inserted": {
             "groupIds": [
               "id11",
             ],
             "index": "a0",
+            "version": 4,
           },
         },
         "id6": {
@@ -13383,12 +13591,14 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
               "id11",
             ],
             "index": "a3",
+            "version": 6,
           },
           "inserted": {
             "groupIds": [
               "id11",
             ],
             "index": "a2",
+            "version": 4,
           },
         },
       },
@@ -13756,6 +13966,7 @@ exports[`regression tests > switches from group of selected elements to another 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 0,
@@ -13810,6 +14021,7 @@ exports[`regression tests > switches from group of selected elements to another 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 100,
             "x": 110,
             "y": 110,
@@ -13864,6 +14076,7 @@ exports[`regression tests > switches from group of selected elements to another 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "diamond",
+            "version": 3,
             "width": 100,
             "x": 310,
             "y": 310,
@@ -14096,6 +14309,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 10,
             "x": 0,
             "y": 0,
@@ -14150,6 +14364,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "ellipse",
+            "version": 3,
             "width": 10,
             "x": 20,
             "y": 20,
@@ -14428,7 +14643,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
       "removed": {},
       "updated": {},
     },
-    "id": "id13",
+    "id": "id14",
   },
   {
     "appState": AppStateDelta {
@@ -14458,6 +14673,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
                 10,
               ],
             ],
+            "version": 9,
             "width": 60,
           },
           "inserted": {
@@ -14480,12 +14696,13 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
                 20,
               ],
             ],
+            "version": 8,
             "width": 100,
           },
         },
       },
     },
-    "id": "id14",
+    "id": "id16",
   },
   {
     "appState": AppStateDelta {
@@ -14507,58 +14724,18 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
         "id6": {
           "deleted": {
             "isDeleted": true,
+            "version": 10,
           },
           "inserted": {
-            "angle": 0,
-            "backgroundColor": "transparent",
-            "boundElements": null,
-            "customData": undefined,
-            "elbowed": false,
-            "endArrowhead": "arrow",
-            "endBinding": null,
-            "fillStyle": "solid",
-            "frameId": null,
-            "groupIds": [],
-            "height": 10,
-            "index": "a2",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              60,
-              10,
-            ],
-            "link": null,
-            "locked": false,
-            "opacity": 100,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                60,
-                10,
-              ],
-            ],
-            "roughness": 1,
-            "roundness": {
-              "type": 2,
-            },
-            "startArrowhead": null,
-            "startBinding": null,
-            "strokeColor": "#1e1e1e",
-            "strokeStyle": "solid",
-            "strokeWidth": 2,
-            "type": "arrow",
-            "width": 60,
-            "x": 130,
-            "y": 10,
+            "version": 9,
           },
         },
       },
       "removed": {},
       "updated": {},
     },
-    "id": "id15",
+    "id": "id18",
   },
 ]
 `;
@@ -14604,6 +14781,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] undo st
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
+            "version": 3,
             "width": 20,
             "x": 10,
             "y": -10,
@@ -14637,39 +14815,18 @@ exports[`regression tests > undo/redo drawing an element > [end of test] undo st
       "removed": {
         "id3": {
           "deleted": {
-            "angle": 0,
-            "backgroundColor": "transparent",
-            "boundElements": null,
-            "customData": undefined,
-            "fillStyle": "solid",
-            "frameId": null,
-            "groupIds": [],
-            "height": 20,
-            "index": "a1",
             "isDeleted": false,
-            "link": null,
-            "locked": false,
-            "opacity": 100,
-            "roughness": 1,
-            "roundness": {
-              "type": 3,
-            },
-            "strokeColor": "#1e1e1e",
-            "strokeStyle": "solid",
-            "strokeWidth": 2,
-            "type": "rectangle",
-            "width": 30,
-            "x": 40,
-            "y": 0,
+            "version": 5,
           },
           "inserted": {
             "isDeleted": true,
+            "version": 4,
           },
         },
       },
       "updated": {},
     },
-    "id": "id17",
+    "id": "id22",
   },
 ]
 `;
