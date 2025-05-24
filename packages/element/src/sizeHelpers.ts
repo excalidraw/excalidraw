@@ -145,7 +145,7 @@ export const getLockedLinearCursorAlignSize = (
   let width = x - originX;
   let height = y - originY;
 
-  const angle = Math.atan(height / width) as Radians;
+  const angle = Math.atan2(height, width) as Radians;
   let lockedAngle = (Math.round(angle / SHIFT_LOCKING_ANGLE) *
     SHIFT_LOCKING_ANGLE) as Radians;
 

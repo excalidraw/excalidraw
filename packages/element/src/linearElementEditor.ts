@@ -298,9 +298,9 @@ export class LinearElementEditor {
           element.points[selectedIndex === 0 ? 1 : selectedIndex - 1];
         customLineAngle =
           linearElementEditor.customLineAngle ??
-          Math.atan(
-            (element.points[selectedIndex][1] - referencePoint[1]) /
-              (element.points[selectedIndex][0] - referencePoint[0]),
+          Math.atan2(
+            element.points[selectedIndex][1] - referencePoint[1],
+            element.points[selectedIndex][0] - referencePoint[0],
           );
 
         const [width, height] = LinearElementEditor._getShiftLockedDelta(
