@@ -7,6 +7,9 @@ import {
 } from "@excalidraw/element";
 import { resizeSingleElement } from "@excalidraw/element";
 import { isImageElement } from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element";
+import { getElementsInResizingFrame } from "@excalidraw/element";
+import { replaceAllElementsInFrame } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -184,6 +187,25 @@ const handleDimensionChange: DragInputCallbackType<
         },
       );
 
+      // Handle frame membership update for resized frames
+      if (isFrameLikeElement(latestElement)) {
+        const nextElementsInFrame = getElementsInResizingFrame(
+          scene.getElementsIncludingDeleted(),
+          latestElement,
+          originalAppState,
+          scene.getNonDeletedElementsMap(),
+        );
+
+        const updatedElements = replaceAllElementsInFrame(
+          scene.getElementsIncludingDeleted(),
+          nextElementsInFrame,
+          latestElement,
+          { state: originalAppState } as any,
+        );
+
+        scene.replaceAllElements(updatedElements);
+      }
+
       return;
     }
     const changeInWidth = property === "width" ? accumulatedChange : 0;
@@ -230,6 +252,25 @@ const handleDimensionChange: DragInputCallbackType<
         shouldMaintainAspectRatio: keepAspectRatio,
       },
     );
+
+    // Handle frame membership update for resized frames
+    if (isFrameLikeElement(latestElement)) {
+      const nextElementsInFrame = getElementsInResizingFrame(
+        scene.getElementsIncludingDeleted(),
+        latestElement,
+        originalAppState,
+        scene.getNonDeletedElementsMap(),
+      );
+
+      const updatedElements = replaceAllElementsInFrame(
+        scene.getElementsIncludingDeleted(),
+        nextElementsInFrame,
+        latestElement,
+        { state: originalAppState } as any,
+      );
+
+      scene.replaceAllElements(updatedElements);
+    }
   }
 };
 
