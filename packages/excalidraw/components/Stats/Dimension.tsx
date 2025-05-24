@@ -46,6 +46,8 @@ const handleDimensionChange: DragInputCallbackType<
   originalAppState,
   instantChange,
   scene,
+  app,
+  setAppState,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const origElement = originalElements[0];
@@ -200,10 +202,15 @@ const handleDimensionChange: DragInputCallbackType<
           scene.getElementsIncludingDeleted(),
           nextElementsInFrame,
           latestElement,
-          { state: originalAppState } as any,
+          app,
         );
 
         scene.replaceAllElements(updatedElements);
+
+        setAppState({
+          ...app.state,
+          elementsToHighlight: nextElementsInFrame,
+        });
       }
 
       return;
@@ -266,10 +273,15 @@ const handleDimensionChange: DragInputCallbackType<
         scene.getElementsIncludingDeleted(),
         nextElementsInFrame,
         latestElement,
-        { state: originalAppState } as any,
+        app,
       );
 
       scene.replaceAllElements(updatedElements);
+
+      setAppState({
+        ...app.state,
+        elementsToHighlight: nextElementsInFrame,
+      });
     }
   }
 };
