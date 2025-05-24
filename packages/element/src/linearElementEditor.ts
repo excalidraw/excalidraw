@@ -117,6 +117,7 @@ export class LinearElementEditor {
   public readonly hoverPointIndex: number;
   public readonly segmentMidPointHoveredCoords: GlobalPoint | null;
   public readonly elbowed: boolean;
+  public readonly customLineAngle: number | null;
 
   constructor(
     element: NonDeleted<ExcalidrawLinearElement>,
@@ -150,6 +151,7 @@ export class LinearElementEditor {
     this.hoverPointIndex = -1;
     this.segmentMidPointHoveredCoords = null;
     this.elbowed = isElbowArrow(element) && element.elbowed;
+    this.customLineAngle = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -253,6 +255,7 @@ export class LinearElementEditor {
     const { elementId } = linearElementEditor;
     const elementsMap = scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
+    let customLineAngle = linearElementEditor.customLineAngle;
     if (!element) {
       return null;
     }
@@ -293,6 +296,12 @@ export class LinearElementEditor {
         const selectedIndex = selectedPointsIndices[0];
         const referencePoint =
           element.points[selectedIndex === 0 ? 1 : selectedIndex - 1];
+        customLineAngle =
+          linearElementEditor.customLineAngle ??
+          Math.atan(
+            (element.points[selectedIndex][1] - referencePoint[1]) /
+              (element.points[selectedIndex][0] - referencePoint[0]),
+          );
 
         const [width, height] = LinearElementEditor._getShiftLockedDelta(
           element,
@@ -300,6 +309,7 @@ export class LinearElementEditor {
           referencePoint,
           pointFrom(scenePointerX, scenePointerY),
           event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
+          customLineAngle,
         );
 
         LinearElementEditor.movePoints(
@@ -421,6 +431,7 @@ export class LinearElementEditor {
             ? lastClickedPoint
             : -1,
         isDragging: true,
+        customLineAngle,
       };
     }
 
@@ -524,6 +535,7 @@ export class LinearElementEditor {
           : selectedPointsIndices,
       isDragging: false,
       pointerOffset: { x: 0, y: 0 },
+      customLineAngle: null,
     };
   }
 
@@ -1531,6 +1543,7 @@ export class LinearElementEditor {
     referencePoint: LocalPoint,
     scenePointer: GlobalPoint,
     gridSize: NullableGridSize,
+    customLineAngle?: number,
   ) {
     const referencePointCoords = LinearElementEditor.getPointGlobalCoordinates(
       element,
@@ -1556,6 +1569,7 @@ export class LinearElementEditor {
       referencePointCoords[1],
       gridX,
       gridY,
+      customLineAngle,
     );
 
     return pointRotateRads(
