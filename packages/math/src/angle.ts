@@ -49,3 +49,35 @@ export function radiansToDegrees(degrees: Radians): Degrees {
 export function isRightAngleRads(rads: Radians): boolean {
   return Math.abs(Math.sin(2 * rads)) < PRECISION;
 }
+
+export function radiansBetweenAngles(
+  a: Radians,
+  min: Radians,
+  max: Radians,
+): boolean {
+  a = normalizeRadians(a);
+  min = normalizeRadians(min);
+  max = normalizeRadians(max);
+
+  if (min < max) {
+    return a >= min && a <= max;
+  }
+
+  // The range wraps around the 0 angle
+  return a >= min || a <= max;
+}
+
+export function radiansDifference(a: Radians, b: Radians): Radians {
+  a = normalizeRadians(a);
+  b = normalizeRadians(b);
+
+  let diff = a - b;
+
+  if (diff < -Math.PI) {
+    diff = (diff + 2 * Math.PI) as Radians;
+  } else if (diff > Math.PI) {
+    diff = (diff - 2 * Math.PI) as Radians;
+  }
+
+  return Math.abs(diff) as Radians;
+}
