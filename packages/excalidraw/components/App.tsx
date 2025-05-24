@@ -621,6 +621,19 @@ const gesture: Gesture = {
 };
 
 class App extends React.Component<AppProps, AppState> {
+  private static readonly NON_DRAWING_TOOLS: readonly ToolType[] = [
+    "selection",
+    "hand",
+    "lasso",
+    "text",
+    "image",
+    "eraser",
+    "frame",
+    "magicframe",
+    "embeddable",
+    "laser"
+  ];
+
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
   rc: RoughCanvas;
@@ -6433,6 +6446,18 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    const isNonDrawingTool = 
+      this.state.activeTool.type === "custom" || 
+      App.NON_DRAWING_TOOLS.includes(this.state.activeTool.type as ToolType);
+    
+    if (isNonDrawingTool) {
+      this.setToast({
+        message: "Please select a shape tool to draw.",
+        closable: true,
+        duration: 2000,
+      });
+      return;
+    }
     const target = event.target as HTMLElement;
     // capture subsequent pointer events to the canvas
     // this makes other elements non-interactive until pointer up
@@ -9816,7 +9841,7 @@ class App extends React.Component<AppProps, AppState> {
         !(hitElement && isElbowArrow(hitElement)) &&
         // not dragged
         !pointerDownState.drag.hasOccurred &&
-        // not resized
+        // not resizing
         !this.state.isResizing &&
         // only hitting the bounding box of the previous hit element
         ((hitElement &&
