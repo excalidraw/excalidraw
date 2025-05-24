@@ -1,3 +1,116 @@
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Provider } from 'jotai';
+import ExcalidrawApp from './App';
+import { appJotaiStore } from './app-jotai';
+import { THEME } from '@excalidraw/common';
+import * as LocalData from './data/LocalData';
+
+// Mock the dependencies
+jest.mock('@excalidraw/excalidraw', () => ({
+  Excalidraw: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="excalidraw-container">{children}</div>
+  ),
+  LiveCollaborationTrigger: () => <div data-testid="collab-trigger" />,
+}));
+
+jest.mock('./data/LocalData', () => ({
+  save: jest.fn(),
+  flushSave: jest.fn(),
+  fileStorage: {
+    shouldPreventUnload: jest.fn().mockReturnValue(false),
+  },
+}));
+
+describe('ExcalidrawApp', () => {
+  beforeEach(() => {
+    // Clear all mocks before each test
+    jest.clearAllMocks();
+    // Reset localStorage
+    localStorage.clear();
+  });
+
+  it('renders without crashing', () => {
+    render(
+      <Provider store={appJotaiStore}>
+        <ExcalidrawApp />
+      </Provider>
+    );
+    expect(screen.getByTestId('excalidraw-container')).toBeInTheDocument();
+  });
+
+  it('prevents unload when there are unsaved changes', () => {
+    const mockPreventUnload = jest.spyOn(LocalData.fileStorage, 'shouldPreventUnload');
+    mockPreventUnload.mockReturnValue(true);
+
+    render(
+      <Provider store={appJotaiStore}>
+        <ExcalidrawApp />
+      </Provider>
+    );
+
+    // Simulate beforeunload event
+    const event = new Event('beforeunload');
+    window.dispatchEvent(event);
+
+    expect(mockPreventUnload).toHaveBeenCalled();
+  });
+
+  it('saves data when window loses focus', async () => {
+    render(
+      <Provider store={appJotaiStore}>
+        <ExcalidrawApp />
+      </Provider>
+    );
+
+
+    
+
+    // Simulate window blur event
+    window.dispatchEvent(new Event('blur'));
+
+    await waitFor(() => {
+      expect(LocalData.flushSave).toHaveBeenCalled();
+    });
+  });
+
+  it('handles collaboration trigger click', async () => {
+    render(
+      <Provider store={appJotaiStore}>
+        <ExcalidrawApp />
+      </Provider>
+    );
+
+    const collabTrigger = screen.getByTestId('collab-trigger');
+    await userEvent.click(collabTrigger);
+
+    // Add assertions based on what should happen when collaboration is triggered
+    // This might involve checking if the share dialog opens, etc.
+  });
+
+  describe('error handling', () => {
+    it('displays error message when present', () => {
+      render(
+        <Provider store={appJotaiStore}>
+          <ExcalidrawApp />
+        </Provider>
+      );
+
+      // Simulate an error condition
+      // This would depend on how errors are triggered in your app
+      // You might need to mock certain dependencies to trigger errors
+    });
+  });
+
+  describe('theme switching', () => {
+    it('toggles theme correctly', async () => {
+      const { container } = render(
+        <Provider store={appJotaiStore}>
+          <ExcalidrawApp />
+        </Provider>
+      );
+
+      // You'll need to implement the actual theme toggle trigger in your test
 import {
   Excalidraw,
   LiveCollaborationTrigger,
@@ -10,6 +123,9 @@ import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 import {
   CommandPalette,
   DEFAULT_CATEGORIES,
+
+
+
 } from "@excalidraw/excalidraw/components/CommandPalette/CommandPalette";
 import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
 import { OverwriteConfirmDialog } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
