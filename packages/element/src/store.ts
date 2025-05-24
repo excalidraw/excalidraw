@@ -533,9 +533,7 @@ export class StoreDelta {
     id,
     elements: { added, removed, updated },
   }: DTO<StoreDelta>) {
-    const elements = ElementsDelta.create(added, removed, updated, {
-      shouldRedistribute: false,
-    });
+    const elements = ElementsDelta.create(added, removed, updated);
 
     return new this(id, elements, AppStateDelta.empty());
   }
@@ -676,11 +674,10 @@ export class StoreSnapshot {
       nextElements.set(id, changedElement);
     }
 
-    const nextAppState = Object.assign(
-      {},
-      this.appState,
-      change.appState,
-    ) as ObservedAppState;
+    const nextAppState = getObservedAppState({
+      ...this.appState,
+      ...change.appState,
+    });
 
     return StoreSnapshot.create(nextElements, nextAppState, {
       // by default we assume that change is different from what we have in the snapshot
@@ -933,18 +930,26 @@ const getDefaultObservedAppState = (): ObservedAppState => {
   };
 };
 
-export const getObservedAppState = (appState: AppState): ObservedAppState => {
+export const getObservedAppState = (
+  appState: AppState | ObservedAppState,
+): ObservedAppState => {
   const observedAppState = {
     name: appState.name,
     editingGroupId: appState.editingGroupId,
     viewBackgroundColor: appState.viewBackgroundColor,
     selectedElementIds: appState.selectedElementIds,
     selectedGroupIds: appState.selectedGroupIds,
-    editingLinearElementId: appState.editingLinearElement?.elementId || null,
-    selectedLinearElementId: appState.selectedLinearElement?.elementId || null,
     croppingElementId: appState.croppingElementId,
     activeLockedId: appState.activeLockedId,
     lockedMultiSelections: appState.lockedMultiSelections,
+    editingLinearElementId:
+      (appState as AppState).editingLinearElement?.elementId ?? // prefer app state, as it's likely newer
+      (appState as ObservedAppState).editingLinearElementId ?? // fallback to observed app state, as it's likely older coming from a previous snapshot
+      null,
+    selectedLinearElementId:
+      (appState as AppState).selectedLinearElement?.elementId ??
+      (appState as ObservedAppState).selectedLinearElementId ??
+      null,
   };
 
   Reflect.defineProperty(observedAppState, hiddenObservedAppStateProp, {

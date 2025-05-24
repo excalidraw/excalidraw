@@ -13,7 +13,7 @@ import type { SceneElementsMap } from "@excalidraw/element/types";
 
 import type { AppState } from "./types";
 
-class HistoryDelta extends StoreDelta {
+export class HistoryDelta extends StoreDelta {
   /**
    * Apply the delta to the passed elements and appState, does not modify the snapshot.
    */
@@ -27,7 +27,9 @@ class HistoryDelta extends StoreDelta {
       // used to fallback into local snapshot in case we couldn't apply the delta
       // due to a missing elements in the scene (force deleted)
       snapshot.elements,
-      // we don't want to apply the version and versionNonce properties for history
+      // we don't want to apply the `version` and `versionNonce` properties for history
+      // as we always need to end up with a new version due to collaboration,
+      // approaching each undo / redo as a new user operation
       {
         excludedProperties: new Set(["version", "versionNonce"]),
       },
@@ -221,6 +223,10 @@ export class History {
   }
 
   private static push(stack: HistoryDelta[], entry: HistoryDelta) {
+    if (entry.isEmpty()) {
+      return;
+    }
+
     const inversedEntry = HistoryDelta.inverse(entry);
     return stack.push(inversedEntry);
   }

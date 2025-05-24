@@ -7,12 +7,9 @@ import {
   isTestEnv,
 } from "@excalidraw/common";
 
-import type { LocalPoint } from "@excalidraw/math/types";
-
 import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
-  ExcalidrawImageElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   NonDeleted,
@@ -266,12 +263,14 @@ export class Delta<T> {
           arrayToObject(deletedArray, groupBy),
           arrayToObject(insertedArray, groupBy),
         ),
+        (x) => x,
       );
       const insertedDifferences = arrayToObject(
         Delta.getRightDifferences(
           arrayToObject(deletedArray, groupBy),
           arrayToObject(insertedArray, groupBy),
         ),
+        (x) => x,
       );
 
       if (
@@ -871,13 +870,6 @@ export class AppStateDelta implements DeltaContainer<AppState> {
 type ElementPartial<TElement extends ExcalidrawElement = ExcalidrawElement> =
   Omit<Partial<Ordered<TElement>>, "id" | "updated" | "seed">;
 
-type ElementPartialWithPoints = Omit<
-  ElementPartial<ExcalidrawFreeDrawElement | ExcalidrawLinearElement>,
-  "points"
-> & {
-  points: { [key: string]: LocalPoint };
-};
-
 export type ApplyToOptions = {
   excludedProperties: Set<keyof ElementPartial>;
 };
@@ -1108,6 +1100,70 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     );
   }
 
+  /**
+   * Update delta/s based on the existing elements.
+   *
+   * @param elements current elements
+   * @param modifierOptions defines which of the delta (`deleted` or `inserted`) will be updated
+   * @returns new instance with modified delta/s
+   */
+  public applyLatestChanges(
+    elements: SceneElementsMap,
+    modifierOptions: "deleted" | "inserted",
+  ): ElementsDelta {
+    const modifier =
+      (element: OrderedExcalidrawElement) => (partial: ElementPartial) => {
+        const latestPartial: { [key: string]: unknown } = {};
+
+        for (const key of Object.keys(partial) as Array<keyof typeof partial>) {
+          // do not update following props:
+          // - `boundElements`, as it is a reference value which is postprocessed to contain only deleted/inserted keys
+          switch (key) {
+            case "boundElements":
+              latestPartial[key] = partial[key];
+              break;
+            default:
+              latestPartial[key] = element[key];
+          }
+        }
+
+        return latestPartial;
+      };
+
+    const applyLatestChangesInternal = (
+      deltas: Record<string, Delta<ElementPartial>>,
+    ) => {
+      const modifiedDeltas: Record<string, Delta<ElementPartial>> = {};
+
+      for (const [id, delta] of Object.entries(deltas)) {
+        const existingElement = elements.get(id);
+
+        if (existingElement) {
+          const modifiedDelta = Delta.create(
+            delta.deleted,
+            delta.inserted,
+            modifier(existingElement),
+            modifierOptions,
+          );
+
+          modifiedDeltas[id] = modifiedDelta;
+        } else {
+          modifiedDeltas[id] = delta;
+        }
+      }
+
+      return modifiedDeltas;
+    };
+
+    const added = applyLatestChangesInternal(this.added);
+    const removed = applyLatestChangesInternal(this.removed);
+    const updated = applyLatestChangesInternal(this.updated);
+
+    return ElementsDelta.create(added, removed, updated, {
+      shouldRedistribute: true, // redistribute the deltas as `isDeleted` could have been updated
+    });
+  }
+
   public applyTo(
     elements: SceneElementsMap,
     snapshot: StoreSnapshot["elements"] = StoreSnapshot.empty().elements,
@@ -1266,14 +1322,13 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   ) {
     const directlyApplicablePartial: Mutable<ElementPartial> = {};
 
+    // some properties are not directly applicable, such as:
+    // - boundElements which contains only diff)
+    // - version & versionNonce, if we don't want to return to previous versions
     for (const key of Object.keys(delta.inserted) as Array<
       keyof typeof delta.inserted
     >) {
-      if (
-        key === "boundElements" ||
-        (key as keyof ExcalidrawFreeDrawElement | ExcalidrawLinearElement) ===
-          "points"
-      ) {
+      if (key === "boundElements") {
         continue;
       }
 
@@ -1298,32 +1353,6 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
       Object.assign(directlyApplicablePartial, {
         boundElements: mergedBoundElements,
-      });
-    }
-
-    const deletedPoints = (delta.deleted as ElementPartialWithPoints).points;
-    const insertedPoints = (delta.inserted as ElementPartialWithPoints).points;
-
-    if (insertedPoints && deletedPoints) {
-      const mergedPoints = Delta.mergeObjects(
-        arrayToObject(
-          (element as ExcalidrawFreeDrawElement | ExcalidrawLinearElement)
-            .points,
-        ),
-        insertedPoints,
-        deletedPoints,
-      );
-
-      const sortedPoints = Object.entries(mergedPoints)
-        .sort((aKey, bKey) => {
-          const a = Number(aKey);
-          const b = Number(bKey);
-          return a - b;
-        })
-        .map(([_, value]) => value);
-
-      Object.assign(directlyApplicablePartial, {
-        points: sortedPoints,
       });
     }
 
@@ -1634,18 +1663,31 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     try {
       Delta.diffArrays(deleted, inserted, "boundElements", (x) => x.id);
 
-      // points depend on the order, so we diff them as objects and group by index
-      // creates `ElementPartialWithPoints`
-      Delta.diffObjects(
-        deleted as ElementPartial<
-          ExcalidrawFreeDrawElement | ExcalidrawLinearElement
-        >,
-        inserted as ElementPartial<
-          ExcalidrawFreeDrawElement | ExcalidrawLinearElement
-        >,
-        "points",
-        (prevValue) => prevValue!,
-      );
+      // don't diff the points as:
+      // - we can't ensure the multiplayer order consistency without fractional index on each point
+      // - we prefer to not merge the points, as it might just lead to unexpected / incosistent results
+      const deletedPoints =
+        (
+          deleted as ElementPartial<
+            ExcalidrawFreeDrawElement | ExcalidrawLinearElement
+          >
+        ).points ?? [];
+
+      const insertedPoints =
+        (
+          inserted as ElementPartial<
+            ExcalidrawFreeDrawElement | ExcalidrawLinearElement
+          >
+        ).points ?? [];
+
+      if (
+        !Delta.isLeftDifferent(deletedPoints, insertedPoints) &&
+        !Delta.isRightDifferent(deletedPoints, insertedPoints)
+      ) {
+        // delete the points from delta if there is no difference, otherwise leave them as they were captured due to consistency
+        Reflect.deleteProperty(deleted, "points");
+        Reflect.deleteProperty(inserted, "points");
+      }
     } catch (e) {
       // if postprocessing fails, it does not make sense to bubble up, but let's make sure we know about it
       console.error(`Couldn't postprocess elements delta.`);
