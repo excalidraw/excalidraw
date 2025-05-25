@@ -1,3 +1,5 @@
+
+
 ## For CS 188
 
 Use `npm` or `yarn` to install the package.
@@ -8,6 +10,10 @@ npm install
 yarn start or npm start --ignore-engines
 ```
 
+<picture>
+    <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://imgur.com/gallery/rabbit-hole-banner-tOrtBxv" />
+    <img alt="Rabbit-Hole" src="https://imgur.com/gallery/rabbit-hole-banner-tOrtBxv" />
+</picture>
 
 
 
