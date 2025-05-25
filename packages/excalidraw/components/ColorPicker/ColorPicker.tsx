@@ -25,6 +25,7 @@ import { Picker } from "./Picker";
 import PickerHeading from "./PickerHeading";
 import { TopPicks } from "./TopPicks";
 import { activeColorPickerSectionAtom, isColorDark } from "./colorPickerUtils";
+import { validateHexColor, isValidColorBrowser } from "./hexValidation";
 
 import "./ColorPicker.scss";
 
@@ -32,23 +33,24 @@ import type { ColorPickerType } from "./colorPickerUtils";
 
 import type { AppState } from "../../types";
 
-const isValidColor = (color: string) => {
-  const style = new Option().style;
-  style.color = color;
-  return !!style.color;
-};
-
 export const getColor = (color: string): string | null => {
   if (isTransparent(color)) {
     return color;
   }
 
-  // testing for `#` first fixes a bug on Electron (more specfically, an
+  // First try our hex validation for better error handling
+  const hexValidation = validateHexColor(color);
+  if (hexValidation.isValid && hexValidation.normalizedValue) {
+    return hexValidation.normalizedValue;
+  }
+
+  // Fallback to browser validation for edge cases (named colors, etc.)
+  // testing for `#` first fixes a bug on Electron (more specifically, an
   // Obsidian popout window), where a hex color without `#` is (incorrectly)
   // considered valid
-  return isValidColor(`#${color}`)
+  return isValidColorBrowser(`#${color}`)
     ? `#${color}`
-    : isValidColor(color)
+    : isValidColorBrowser(color)
     ? color
     : null;
 };

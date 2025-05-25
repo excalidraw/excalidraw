@@ -351,10 +351,28 @@
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
       border-radius: var(--border-radius-lg);
     }
+
+    &--error {
+      border-color: var(--color-danger);
+
+      &:focus-within {
+        box-shadow: 0 0 0 1px var(--color-danger);
+      }
+    }
   }
 
   .color-picker__input-hash {
     padding: 0 0.25rem;
+  }
+
+  .color-picker__input-error {
+    font-size: 0.75rem;
+    color: var(--color-danger-icon-color);
+    margin: 0 8px 8px 8px;
+    padding: 4px 8px;
+    background-color: var(--color-danger-icon-background);
+    border-radius: 4px;
+    border: 1px solid var(--color-danger);
   }
 
   .color-picker-input {
@@ -388,6 +406,10 @@
 
     &:focus-visible {
       box-shadow: none;
+    }
+
+    &--error {
+      color: var(--color-danger);
     }
   }
 
