@@ -178,13 +178,13 @@ export const actionFinalize = register({
         newElements = newElements.filter((el) => el.id !== element!.id);
       }
 
-      if (isLineElement(element) || isFreeDrawElement(element)) {
+      if (isLinearElement(element) || isFreeDrawElement(element)) {
         // If the multi point line closes the loop,
         // set the last point to first point.
         // This ensures that loop remains closed at different scales.
         const isLoop = isPathALoop(element.points, appState.zoom.value);
 
-        if (isLoop) {
+        if (isLoop && (isLineElement(element) || isFreeDrawElement(element))) {
           const linePoints = element.points;
           const firstPoint = linePoints[0];
           const points: LocalPoint[] = linePoints.map((p, index) =>

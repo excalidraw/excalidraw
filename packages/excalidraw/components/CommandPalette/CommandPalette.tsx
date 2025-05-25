@@ -586,10 +586,10 @@ function CommandPaletteInner({
       });
 
       setAllCommands(allCommands);
-      // setLastUsed(
-      //   allCommands.find((command) => command.label === lastUsed?.label) ??
-      //     null,
-      // );
+      setLastUsed(
+        allCommands.find((command) => command.label === lastUsed?.label) ??
+          null,
+      );
     }
   }, [
     stableDeps,
