@@ -8,8 +8,8 @@ import type {
   Radians,
 } from "./types";
 
-// TODO: Simplify with modulo and fix for angles beyond 4*Math.PI and - 4*Math.PI
 export const normalizeRadians = (angle: Radians): Radians => {
+  angle = (angle % (2 * Math.PI)) as Radians;
   if (angle < 0) {
     return (angle + 2 * Math.PI) as Radians;
   }
