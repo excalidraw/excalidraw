@@ -5,7 +5,7 @@ import {
   bindOrUnbindLinearElement,
   isBindingEnabled,
 } from "@excalidraw/element/binding";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { isValidPolygon, LinearElementEditor } from "@excalidraw/element";
 
 import {
   isBindingElement,
@@ -99,6 +99,12 @@ export const actionFinalize = register({
             scene,
           );
         }
+        if (isLineElement(element) && !isValidPolygon(element.points)) {
+          scene.mutateElement(element, {
+            polygon: false,
+          });
+        }
+
         return {
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
@@ -196,6 +202,12 @@ export const actionFinalize = register({
               points,
             });
           }
+        }
+
+        if (isLineElement(element) && !isValidPolygon(element.points)) {
+          scene.mutateElement(element, {
+            polygon: false,
+          });
         }
 
         if (

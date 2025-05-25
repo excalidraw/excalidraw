@@ -24,7 +24,7 @@ import {
   reduceToCommonValue,
 } from "@excalidraw/common";
 
-import { getNonDeletedElements } from "@excalidraw/element";
+import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
 
 import {
   bindLinearElement,
@@ -364,18 +364,16 @@ export const actionChangeBackgroundColor = register({
       };
     }
 
-    const selectedElements = app.scene.getSelectedElements(appState);
-    const shouldEnablePolygon = selectedElements.every((el) =>
-      isLineElement(el),
-    );
-
     let nextElements;
 
-    if (
-      shouldEnablePolygon &&
-      value.currentItemBackgroundColor &&
-      !isTransparent(value.currentItemBackgroundColor)
-    ) {
+    const selectedElements = app.scene.getSelectedElements(appState);
+    const shouldEnablePolygon =
+      !isTransparent(value.currentItemBackgroundColor) &&
+      selectedElements.every(
+        (el) => isLineElement(el) && canBecomePolygon(el.points),
+      );
+
+    if (shouldEnablePolygon) {
       const selectedElementsMap = arrayToMap(selectedElements);
       nextElements = elements.map((el) => {
         if (selectedElementsMap.has(el.id) && isLineElement(el)) {

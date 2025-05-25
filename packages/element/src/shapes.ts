@@ -36,6 +36,8 @@ import { ShapeCache } from "./ShapeCache";
 
 import { getElementAbsoluteCoords, type Bounds } from "./bounds";
 
+import { canBecomePolygon } from "./typeChecks";
+
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -402,10 +404,17 @@ export const isPathALoop = (
 export const toggleLinePolygonState = (
   element: ExcalidrawLineElement,
   nextPolygonState: boolean,
-) => {
+): {
+  polygon: ExcalidrawLineElement["polygon"];
+  points: ExcalidrawLineElement["points"];
+} | null => {
   const updatedPoints = [...element.points];
 
   if (nextPolygonState) {
+    if (!canBecomePolygon(element.points)) {
+      return null;
+    }
+
     const firstPoint = updatedPoints[0];
     const lastPoint = updatedPoints[updatedPoints.length - 1];
 

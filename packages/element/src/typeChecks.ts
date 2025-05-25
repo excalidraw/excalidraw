@@ -1,5 +1,7 @@
 import { ROUNDNESS, assertNever } from "@excalidraw/common";
 
+import { pointsEqual } from "@excalidraw/math";
+
 import type { ElementOrToolType } from "@excalidraw/excalidraw/types";
 
 import type { MarkNonNullable } from "@excalidraw/common/utility-types";
@@ -378,4 +380,27 @@ export const getLinearElementSubType = (
     return "elbowArrow";
   }
   return "line";
+};
+
+/**
+ * Checks if current element points meet all the conditions for polygon=true
+ * (this isn't a element type check, for that use isLineElement).
+ *
+ * If you want to check if points *can* be turned into a polygon, use
+ *  canBecomePolygon(points).
+ */
+export const isValidPolygon = (
+  points: ExcalidrawLineElement["points"],
+): boolean => {
+  return points.length > 3 && pointsEqual(points[0], points[points.length - 1]);
+};
+
+export const canBecomePolygon = (
+  points: ExcalidrawLineElement["points"],
+): boolean => {
+  return (
+    points.length > 3 ||
+    // 3-point polygons can't have all points in a single line
+    (points.length === 3 && !pointsEqual(points[0], points[points.length - 1]))
+  );
 };

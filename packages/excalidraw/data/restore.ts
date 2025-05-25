@@ -18,7 +18,7 @@ import {
   normalizeLink,
   getLineHeight,
 } from "@excalidraw/common";
-import { getNonDeletedElements } from "@excalidraw/element";
+import { getNonDeletedElements, isValidPolygon } from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
 import {
   updateElbowArrowPoints,
@@ -342,7 +342,11 @@ const restoreElement = (
         x,
         y,
         ...(isLineElement(element)
-          ? { polygon: element.polygon ?? false }
+          ? {
+              polygon: isValidPolygon(element.points)
+                ? element.polygon ?? false
+                : false,
+            }
           : {}),
         ...getSizeFromPoints(points),
       });
