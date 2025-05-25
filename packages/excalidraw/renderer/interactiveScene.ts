@@ -383,7 +383,9 @@ const renderElementsBoxHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   elements: NonDeleted<ExcalidrawElement>[],
+  config?: { colors?: string[]; dashed?: boolean },
 ) => {
+  const { colors = ["rgb(0,118,255)"], dashed = false } = config || {};
   const individualElements = elements.filter(
     (element) => element.groupIds.length === 0,
   );
@@ -400,8 +402,8 @@ const renderElementsBoxHighlight = (
       x2,
       y1,
       y2,
-      selectionColors: ["rgb(0,118,255)"],
-      dashed: false,
+      selectionColors: colors,
+      dashed,
       cx: x1 + (x2 - x1) / 2,
       cy: y1 + (y2 - y1) / 2,
       activeEmbeddable: false,
@@ -819,6 +821,17 @@ const _renderInteractiveScene = ({
     renderElementsBoxHighlight(context, appState, appState.elementsToHighlight);
   }
 
+  if (appState.activeLockedId) {
+    const element = allElementsMap.get(appState.activeLockedId);
+    const elements = element
+      ? [element]
+      : getElementsInGroup(allElementsMap, appState.activeLockedId);
+    renderElementsBoxHighlight(context, appState, elements, {
+      colors: ["#ced4da"],
+      dashed: true,
+    });
+  }
+
   const isFrameSelected = selectedElements.some((element) =>
     isFrameLikeElement(element),
   );
@@ -933,8 +946,8 @@ const _renderInteractiveScene = ({
             y1,
             x2,
             y2,
-            selectionColors,
-            dashed: !!remoteClients,
+            selectionColors: element.locked ? ["#ced4da"] : selectionColors,
+            dashed: !!remoteClients || element.locked,
             cx,
             cy,
             activeEmbeddable:
@@ -958,7 +971,9 @@ const _renderInteractiveScene = ({
           x2,
           y1,
           y2,
-          selectionColors: [oc.black],
+          selectionColors: groupElements.some((el) => el.locked)
+            ? ["#ced4da"]
+            : [oc.black],
           dashed: true,
           cx: x1 + (x2 - x1) / 2,
           cy: y1 + (y2 - y1) / 2,
@@ -1022,7 +1037,11 @@ const _renderInteractiveScene = ({
           );
         }
       }
-    } else if (selectedElements.length > 1 && !appState.isRotating) {
+    } else if (
+      selectedElements.length > 1 &&
+      !appState.isRotating &&
+      !selectedElements.some((el) => el.locked)
+    ) {
       const dashedLinePadding =
         (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
       context.fillStyle = oc.white;

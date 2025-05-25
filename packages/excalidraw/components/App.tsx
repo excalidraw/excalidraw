@@ -107,13 +107,11 @@ import {
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
-  bindOrUnbindLinearElement,
   bindOrUnbindLinearElements,
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
   isBindingEnabled,
   isLinearElementSimpleAndAlreadyBound,
-  maybeBindLinearElement,
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
   getSuggestedBindingsForArrows,
@@ -484,6 +482,8 @@ import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { Toast } from "./Toast";
 
 import { findShapeByKey } from "./shapes";
+
+import UnlockPopup from "./UnlockPopup";
 
 import type {
   RenderInteractiveSceneCallback,
@@ -1876,6 +1876,12 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
+                        {this.state.activeLockedId && (
+                          <UnlockPopup
+                            app={this}
+                            activeLockedId={this.state.activeLockedId}
+                          />
+                        )}
                         {showShapeSwitchPanel && (
                           <ConvertElementTypePopup app={this} />
                         )}
@@ -2789,7 +2795,6 @@ class App extends React.Component<AppProps, AppState> {
     this.updateEmbeddables();
     const elements = this.scene.getElementsIncludingDeleted();
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
-    const nonDeletedElementsMap = this.scene.getNonDeletedElementsMap();
 
     if (!this.state.showWelcomeScreen && !elements.length) {
       this.setState({ showWelcomeScreen: true });
@@ -2934,27 +2939,6 @@ class App extends React.Component<AppProps, AppState> {
       // To make sure `selectedLinearElement` is in sync with `selectedElementIds`, however this shouldn't be needed once
       // we have a single API to update `selectedElementIds`
       this.setState({ selectedLinearElement: null });
-    }
-
-    const { multiElement } = prevState;
-    if (
-      prevState.activeTool !== this.state.activeTool &&
-      multiElement != null &&
-      isBindingEnabled(this.state) &&
-      isBindingElement(multiElement, false)
-    ) {
-      maybeBindLinearElement(
-        multiElement,
-        this.state,
-        tupleToCoors(
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            multiElement,
-            -1,
-            nonDeletedElementsMap,
-          ),
-        ),
-        this.scene,
-      );
     }
 
     this.store.commit(elementsMap, this.state);
@@ -5114,18 +5098,27 @@ class App extends React.Component<AppProps, AppState> {
   private getElementAtPosition(
     x: number,
     y: number,
-    opts?: {
+    opts?: (
+      | {
+          includeBoundTextElement?: boolean;
+          includeLockedElements?: boolean;
+        }
+      | {
+          allHitElements: NonDeleted<ExcalidrawElement>[];
+        }
+    ) & {
       preferSelected?: boolean;
-      includeBoundTextElement?: boolean;
-      includeLockedElements?: boolean;
     },
   ): NonDeleted<ExcalidrawElement> | null {
-    const allHitElements = this.getElementsAtPosition(
-      x,
-      y,
-      opts?.includeBoundTextElement,
-      opts?.includeLockedElements,
-    );
+    let allHitElements: NonDeleted<ExcalidrawElement>[] = [];
+    if (opts && "allHitElements" in opts) {
+      allHitElements = opts?.allHitElements || [];
+    } else {
+      allHitElements = this.getElementsAtPosition(x, y, {
+        includeBoundTextElement: opts?.includeBoundTextElement,
+        includeLockedElements: opts?.includeLockedElements,
+      });
+    }
 
     if (allHitElements.length > 1) {
       if (opts?.preferSelected) {
@@ -5168,22 +5161,24 @@ class App extends React.Component<AppProps, AppState> {
   private getElementsAtPosition(
     x: number,
     y: number,
-    includeBoundTextElement: boolean = false,
-    includeLockedElements: boolean = false,
+    opts?: {
+      includeBoundTextElement?: boolean;
+      includeLockedElements?: boolean;
+    },
   ): NonDeleted<ExcalidrawElement>[] {
     const iframeLikes: Ordered<ExcalidrawIframeElement>[] = [];
 
     const elementsMap = this.scene.getNonDeletedElementsMap();
 
     const elements = (
-      includeBoundTextElement && includeLockedElements
+      opts?.includeBoundTextElement && opts?.includeLockedElements
         ? this.scene.getNonDeletedElements()
         : this.scene
             .getNonDeletedElements()
             .filter(
               (element) =>
-                (includeLockedElements || !element.locked) &&
-                (includeBoundTextElement ||
+                (opts?.includeLockedElements || !element.locked) &&
+                (opts?.includeBoundTextElement ||
                   !(isTextElement(element) && element.containerId)),
             )
     )
@@ -5669,14 +5664,21 @@ class App extends React.Component<AppProps, AppState> {
 
   private getElementLinkAtPosition = (
     scenePointer: Readonly<{ x: number; y: number }>,
-    hitElement: NonDeletedExcalidrawElement | null,
+    hitElementMightBeLocked: NonDeletedExcalidrawElement | null,
   ): ExcalidrawElement | undefined => {
+    if (hitElementMightBeLocked && hitElementMightBeLocked.locked) {
+      return undefined;
+    }
+
     const elements = this.scene.getNonDeletedElements();
     let hitElementIndex = -1;
 
     for (let index = elements.length - 1; index >= 0; index--) {
       const element = elements[index];
-      if (hitElement && element.id === hitElement.id) {
+      if (
+        hitElementMightBeLocked &&
+        element.id === hitElementMightBeLocked.id
+      ) {
         hitElementIndex = index;
       }
       if (
@@ -6158,14 +6160,25 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    const hitElement = this.getElementAtPosition(
-      scenePointer.x,
-      scenePointer.y,
+    const hitElementMightBeLocked = this.getElementAtPosition(
+      scenePointerX,
+      scenePointerY,
+      {
+        preferSelected: true,
+        includeLockedElements: true,
+      },
     );
+
+    let hitElement: ExcalidrawElement | null = null;
+    if (hitElementMightBeLocked && hitElementMightBeLocked.locked) {
+      hitElement = null;
+    } else {
+      hitElement = hitElementMightBeLocked;
+    }
 
     this.hitLinkElement = this.getElementLinkAtPosition(
       scenePointer,
-      hitElement,
+      hitElementMightBeLocked,
     );
     if (isEraserActive(this.state)) {
       return;
@@ -6258,7 +6271,7 @@ class App extends React.Component<AppProps, AppState> {
             selectGroupsForSelectedElements(
               {
                 editingGroupId: prevState.editingGroupId,
-                selectedElementIds: { [hitElement.id]: true },
+                selectedElementIds: { [hitElement!.id]: true },
               },
               this.scene.getNonDeletedElements(),
               prevState,
@@ -6772,6 +6785,9 @@ class App extends React.Component<AppProps, AppState> {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
         scenePointer.y,
+        {
+          includeLockedElements: true,
+        },
       );
       this.hitLinkElement = this.getElementLinkAtPosition(
         scenePointer,
@@ -7207,17 +7223,57 @@ class App extends React.Component<AppProps, AppState> {
             return true;
           }
         }
-        // hitElement may already be set above, so check first
-        pointerDownState.hit.element =
-          pointerDownState.hit.element ??
-          this.getElementAtPosition(
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-          );
+
+        const allHitElements = this.getElementsAtPosition(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          {
+            includeLockedElements: true,
+          },
+        );
+        const unlockedHitElements = allHitElements.filter((e) => !e.locked);
+
+        // Cannot set preferSelected in getElementAtPosition as we do in pointer move; consider:
+        // A & B: both unlocked, A selected, B on top, A & B overlaps in some way
+        // we want to select B when clicking on the overlapping area
+        const hitElementMightBeLocked = this.getElementAtPosition(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          {
+            allHitElements,
+          },
+        );
+
+        if (
+          !hitElementMightBeLocked ||
+          hitElementMightBeLocked.id !== this.state.activeLockedId
+        ) {
+          this.setState({
+            activeLockedId: null,
+          });
+        }
+
+        if (
+          hitElementMightBeLocked &&
+          hitElementMightBeLocked.locked &&
+          !unlockedHitElements.some(
+            (el) => this.state.selectedElementIds[el.id],
+          )
+        ) {
+          pointerDownState.hit.element = null;
+        } else {
+          // hitElement may already be set above, so check first
+          pointerDownState.hit.element =
+            pointerDownState.hit.element ??
+            this.getElementAtPosition(
+              pointerDownState.origin.x,
+              pointerDownState.origin.y,
+            );
+        }
 
         this.hitLinkElement = this.getElementLinkAtPosition(
           pointerDownState.origin,
-          pointerDownState.hit.element,
+          hitElementMightBeLocked,
         );
 
         if (this.hitLinkElement) {
@@ -7247,10 +7303,7 @@ class App extends React.Component<AppProps, AppState> {
 
         // For overlapped elements one position may hit
         // multiple elements
-        pointerDownState.hit.allHitElements = this.getElementsAtPosition(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-        );
+        pointerDownState.hit.allHitElements = unlockedHitElements;
 
         const hitElement = pointerDownState.hit.element;
         const someHitElementIsSelected =
@@ -8065,6 +8118,12 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
       const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
+
+      if (this.state.activeLockedId) {
+        this.setState({
+          activeLockedId: null,
+        });
+      }
 
       if (
         this.state.selectedLinearElement &&
@@ -8947,6 +9006,49 @@ class App extends React.Component<AppProps, AppState> {
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
+      // if current elements are still selected
+      // and the pointer is just over a locked element
+      // do not allow activeLockedId to be set
+
+      const hitElements = pointerDownState.hit.allHitElements;
+
+      if (
+        this.state.activeTool.type === "selection" &&
+        !pointerDownState.boxSelection.hasOccurred &&
+        !pointerDownState.resize.isResizing &&
+        !hitElements.some((el) => this.state.selectedElementIds[el.id])
+      ) {
+        const sceneCoords = viewportCoordsToSceneCoords(
+          { clientX: childEvent.clientX, clientY: childEvent.clientY },
+          this.state,
+        );
+        const hitLockedElement = this.getElementAtPosition(
+          sceneCoords.x,
+          sceneCoords.y,
+          {
+            includeLockedElements: true,
+          },
+        );
+
+        this.store.scheduleCapture();
+        if (hitLockedElement?.locked) {
+          this.setState({
+            activeLockedId:
+              hitLockedElement.groupIds.length > 0
+                ? hitLockedElement.groupIds.at(-1) || ""
+                : hitLockedElement.id,
+          });
+        } else {
+          this.setState({
+            activeLockedId: null,
+          });
+        }
+      } else {
+        this.setState({
+          activeLockedId: null,
+        });
+      }
+
       this.setState({
         selectedElementsAreBeingDragged: false,
       });
@@ -9017,34 +9119,9 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({ selectedLinearElement: null });
           }
         } else {
-          const linearElementEditor = LinearElementEditor.handlePointerUp(
-            childEvent,
-            this.state.selectedLinearElement,
-            this.state,
-            this.scene,
-          );
-
-          const { startBindingElement, endBindingElement } =
-            linearElementEditor;
-          const element = this.scene.getElement(linearElementEditor.elementId);
-          if (isBindingElement(element)) {
-            bindOrUnbindLinearElement(
-              element,
-              startBindingElement,
-              endBindingElement,
-              this.scene,
-            );
-          }
-
-          if (linearElementEditor !== this.state.selectedLinearElement) {
-            this.setState({
-              selectedLinearElement: {
-                ...linearElementEditor,
-                selectedPointsIndices: null,
-              },
-              suggestedBindings: [],
-            });
-          }
+          this.actionManager.executeAction(actionFinalize, "ui", {
+            event: childEvent,
+          });
         }
       }
 
@@ -9168,12 +9245,7 @@ class App extends React.Component<AppProps, AppState> {
             isBindingEnabled(this.state) &&
             isBindingElement(newElement, false)
           ) {
-            maybeBindLinearElement(
-              newElement,
-              this.state,
-              pointerCoords,
-              this.scene,
-            );
+            this.actionManager.executeAction(actionFinalize);
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
           if (!activeTool.locked) {
