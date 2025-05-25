@@ -15,6 +15,7 @@ import {
 import type { Radians } from "@excalidraw/math";
 
 import type { MarkOptional, Merge } from "@excalidraw/common/utility-types";
+import { ROUNDNESS } from "@excalidraw/common";
 
 import {
   getElementAbsoluteCoords,

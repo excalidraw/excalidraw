@@ -23,6 +23,7 @@ import {
   getEllipseShape,
   getFreedrawShape,
   getPolygonShape,
+  getRabbitShape,
   type GeometricShape,
 } from "@excalidraw/utils/shape";
 
@@ -35,6 +36,7 @@ import { ShapeCache } from "./ShapeCache";
 
 import { getElementAbsoluteCoords, type Bounds } from "./bounds";
 
+import { RabbitElement } from "./rabbitElement";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -95,7 +97,12 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
         shouldTestInside(element),
       );
     }
+
+    case "rabbit-searchbox":
+    case "rabbit-image":
+      return getRabbitShape(element as RabbitElement);
   }
+    
 };
 
 export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
@@ -125,6 +132,8 @@ export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
 
   return null;
 };
+
+
 
 export const getControlPointsForBezierCurve = <
   P extends GlobalPoint | LocalPoint,

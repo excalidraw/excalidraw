@@ -1,3 +1,26 @@
+
+
+## Rabbit Hole (Project for HCI CS 188)
+
+Use `npm` or `yarn` to install the package.
+
+```bash
+npm install 
+
+yarn start or npm start --ignore-engines
+```
+
+<picture>
+    <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://i.imgur.com/RlvSxBK.png" />
+    <img alt="Rabbit-Hole" src="https://i.imgur.com/RlvSxBK.png" />
+</picture>
+
+
+<br>
+<br>
+
+
+
 <a href="https://excalidraw.com/" target="_blank" rel="noopener">
   <picture>
     <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2_dark.png" />

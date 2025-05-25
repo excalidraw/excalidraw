@@ -31,6 +31,11 @@ import { calculateScrollCenter } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { LoadingMessage } from "./LoadingMessage";
 import { LockButton } from "./LockButton";
+
+// added import for the new RabbitColorPaletteButton
+import { RabbitSearchButton } from "./RabbitSearch";
+import { RabbitColorPaletteButton } from "./RabbitColorPalette";
+
 import { MobileMenu } from "./MobileMenu";
 import { PasteChartDialog } from "./PasteChartDialog";
 import { Section } from "./Section";
@@ -283,18 +288,38 @@ const LayerUI = ({
                           />
                           {heading}
                           <Stack.Row gap={1}>
-                            <PenModeButton
+                            {/* <PenModeButton
                               zenModeEnabled={appState.zenModeEnabled}
                               checked={appState.penMode}
                               onChange={() => onPenModeToggle(null)}
                               title={t("toolBar.penMode")}
                               penDetected={appState.penDetected}
+                            /> */}
+
+
+                            <RabbitSearchButton
+                              checked={isHandToolActive(appState)}
+                              onChange={() => onLockToggle()}
+                              title={t("toolBar.hand")}
+                              isMobile
                             />
-                            <LockButton
+
+                            <RabbitColorPaletteButton
+                              checked={isHandToolActive(appState)}
+                              onChange={() => onLockToggle()}
+                              title={t("toolBar.hand")}
+                              isMobile
+                            />
+
+
+
+                            {/* <LockButton
                               checked={appState.activeTool.locked}
                               onChange={onLockToggle}
                               title={t("toolBar.lock")}
-                            />
+                            /> */}
+
+
 
                             <div className="App-toolbar__divider" />
 
@@ -452,8 +477,8 @@ const LayerUI = ({
                       ? "strokeColor"
                       : "backgroundColor"
                     : colorPickerType === "elementBackground"
-                    ? "backgroundColor"
-                    : "strokeColor"]: color,
+                      ? "backgroundColor"
+                      : "strokeColor"]: color,
                 });
                 ShapeCache.delete(element);
               }
@@ -535,8 +560,8 @@ const LayerUI = ({
             className="layer-ui__wrapper"
             style={
               appState.openSidebar &&
-              isSidebarDocked &&
-              device.editor.canFitSidebar
+                isSidebarDocked &&
+                device.editor.canFitSidebar
                 ? { width: `calc(100% - var(--right-sidebar-width))` }
                 : {}
             }
