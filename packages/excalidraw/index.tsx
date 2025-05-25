@@ -279,6 +279,7 @@ export { mermaidToExcalidraw } from "./components/TTDDialog/MermaidToExcalidrawL
 export {
   destroyObsidianUtils,
   registerLocalFont,
+  getFontMetrics,
   getFontFamilies,
   registerFontsInCSS,
   getCSSFontDefinition,
