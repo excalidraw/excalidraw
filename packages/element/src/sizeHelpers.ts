@@ -8,7 +8,11 @@ import { pointsEqual } from "@excalidraw/math";
 import type { AppState, Offsets, Zoom } from "@excalidraw/excalidraw/types";
 
 import { getCommonBounds, getElementBounds } from "./bounds";
-import { isFreeDrawElement, isLinearElement } from "./typeChecks";
+import {
+  isArrowElement,
+  isFreeDrawElement,
+  isLinearElement,
+} from "./typeChecks";
 
 import type { ElementsMap, ExcalidrawElement } from "./types";
 
@@ -24,6 +28,7 @@ export const isInvisiblySmallElement = (
     return (
       element.points.length < 2 ||
       (element.points.length === 2 &&
+        isArrowElement(element) &&
         pointsEqual(
           element.points[0],
           element.points[element.points.length - 1],

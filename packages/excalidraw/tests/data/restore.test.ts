@@ -186,6 +186,37 @@ describe("restoreElements", () => {
     expect(restoredArrow).toBeUndefined();
   });
 
+  it("should keep 'imperceptibly' small freedraw/line elements", () => {
+    const freedrawElement = API.createElement({
+      type: "freedraw",
+      points: [
+        [0, 0],
+        [0.0001, 0.0001],
+      ] as LocalPoint[],
+      x: 0,
+      y: 0,
+    });
+    const lineElement = API.createElement({
+      type: "line",
+      points: [
+        [0, 0],
+        [0.0001, 0.0001],
+      ] as LocalPoint[],
+      x: 0,
+      y: 0,
+    });
+
+    const restoredElements = restore.restoreElements(
+      [freedrawElement, lineElement],
+      null,
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({ id: freedrawElement.id }),
+      expect.objectContaining({ id: lineElement.id }),
+    ]);
+  });
+
   it("should restore loop linears correctly", () => {
     const linearElement = API.createElement({
       type: "line",
