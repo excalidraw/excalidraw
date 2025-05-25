@@ -1,6 +1,6 @@
 
 
-## For CS 188
+## Rabbit Hole (Project for HCI CS 188)
 
 Use `npm` or `yarn` to install the package.
 
@@ -15,6 +15,9 @@ yarn start or npm start --ignore-engines
     <img alt="Rabbit-Hole" src="https://i.imgur.com/RlvSxBK.png" />
 </picture>
 
+
+<br>
+<br>
 
 
 
