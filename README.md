@@ -11,8 +11,8 @@ yarn start or npm start --ignore-engines
 ```
 
 <picture>
-    <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://imgur.com/gallery/rabbit-hole-banner-tOrtBxv" />
-    <img alt="Rabbit-Hole" src="https://imgur.com/gallery/rabbit-hole-banner-tOrtBxv" />
+    <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://i.imgur.com/RlvSxBK.png" />
+    <img alt="Rabbit-Hole" src="https://i.imgur.com/RlvSxBK.png" />
 </picture>
 
 
