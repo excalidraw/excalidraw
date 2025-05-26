@@ -466,8 +466,20 @@ const renderLinearPointHandles = (
         2 / appState.zoom.value,
       );
 
-    const isSelected =
+    let isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
+    // when element is a polygon, highlight the last point as well if first
+    // point is selected since they overlap and the last point tends to be
+    // rendered on top
+    if (
+      _isLineElement &&
+      element.polygon &&
+      !isSelected &&
+      idx === element.points.length - 1 &&
+      !!appState.editingLinearElement?.selectedPointsIndices?.includes(0)
+    ) {
+      isSelected = true;
+    }
 
     renderSingleLinearPoint(
       context,
