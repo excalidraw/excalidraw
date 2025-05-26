@@ -423,7 +423,10 @@ export const toggleLinePolygonState = (
       firstPoint[1] - lastPoint[1],
     );
 
-    if (distance > LINE_POLYGON_POINT_MERGE_DISTANCE) {
+    if (
+      distance > LINE_POLYGON_POINT_MERGE_DISTANCE ||
+      updatedPoints.length < 4
+    ) {
       updatedPoints.push(pointFrom(firstPoint[0], firstPoint[1]));
     } else {
       updatedPoints[updatedPoints.length - 1] = pointFrom(
