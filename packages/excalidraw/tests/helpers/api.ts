@@ -5,6 +5,7 @@ import util from "util";
 import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
 import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
+import { isRabbitSearchBoxElement, RabbitSearchBoxElement } from "@excalidraw/element/rabbitElement"; 
 
 import {
   newArrowElement,
@@ -238,6 +239,8 @@ export class API {
     ? ExcalidrawFrameElement
     : T extends "magicframe"
     ? ExcalidrawMagicFrameElement
+    : T extends "rabbit-searchbox"
+    ? RabbitElement 
     : ExcalidrawGenericElement => {
     let element: Mutable<ExcalidrawElement> = null!;
 
@@ -399,7 +402,7 @@ export class API {
         break;
       default:
         assertNever(
-          type,
+          type as never,
           `API.createElement: unimplemented element type ${type}}`,
         );
         break;

@@ -85,5 +85,8 @@
   },
   "resolutions": {
     "strip-ansi": "6.0.1"
+  },
+  "dependencies": {
+    "@google/genai": "1.0.1"
   }
 }
