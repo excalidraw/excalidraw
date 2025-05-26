@@ -1290,24 +1290,19 @@ export class LinearElementEditor {
       app.state.editingLinearElement?.lastUncommittedPoint ===
       element.points[element.points.length - 1];
 
-    const isPolygon = isLineElement(element) && element.polygon;
-
-    // break polygon if deleting start/end point
-    if (
-      isPolygon &&
-      // don't disable polygon if cleaning up uncommitted point
-      !isUncommittedPoint &&
-      (pointIndices.includes(0) ||
-        pointIndices.includes(element.points.length - 1))
-    ) {
-      app.scene.mutateElement(element, { polygon: false });
-    }
-
     const nextPoints = element.points.filter((_, idx) => {
       return !pointIndices.includes(idx);
     });
 
-    if (isUncommittedPoint && isLineElement(element) && element.polygon) {
+    const isPolygon = isLineElement(element) && element.polygon;
+
+    // keep polygon intact if deleting start/end point or uncommitted point
+    if (
+      isPolygon &&
+      (isUncommittedPoint ||
+        pointIndices.includes(0) ||
+        pointIndices.includes(element.points.length - 1))
+    ) {
       nextPoints[0] = pointFrom(
         nextPoints[nextPoints.length - 1][0],
         nextPoints[nextPoints.length - 1][1],
