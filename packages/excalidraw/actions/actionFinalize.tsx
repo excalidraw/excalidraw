@@ -3,10 +3,16 @@ import { pointFrom } from "@excalidraw/math";
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
-} from "@excalidraw/element";
-import { LinearElementEditor } from "@excalidraw/element";
+  isBindingEnabled,
+} from "@excalidraw/element/binding";
+import { isValidPolygon, LinearElementEditor } from "@excalidraw/element";
 
-import { isBindingElement, isLinearElement } from "@excalidraw/element";
+import {
+  isBindingElement,
+  isFreeDrawElement,
+  isLinearElement,
+  isLineElement,
+} from "@excalidraw/element";
 
 import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element";
@@ -14,6 +20,13 @@ import { isPathALoop } from "@excalidraw/element";
 import { isInvisiblySmallElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { LocalPoint } from "@excalidraw/math";
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  NonDeleted,
+} from "@excalidraw/element/types";
 
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";
@@ -28,10 +41,49 @@ export const actionFinalize = register({
   name: "finalize",
   label: "",
   trackEvent: false,
-  perform: (elements, appState, _, app) => {
+  perform: (elements, appState, data, app) => {
     const { interactiveCanvas, focusContainer, scene } = app;
 
     const elementsMap = scene.getNonDeletedElementsMap();
+
+    if (data?.event && appState.selectedLinearElement) {
+      const linearElementEditor = LinearElementEditor.handlePointerUp(
+        data.event,
+        appState.selectedLinearElement,
+        appState,
+        app.scene,
+      );
+
+      const { startBindingElement, endBindingElement } = linearElementEditor;
+      const element = app.scene.getElement(linearElementEditor.elementId);
+      if (isBindingElement(element)) {
+        bindOrUnbindLinearElement(
+          element,
+          startBindingElement,
+          endBindingElement,
+          app.scene,
+        );
+      }
+
+      if (linearElementEditor !== appState.selectedLinearElement) {
+        let newElements = elements;
+        if (element && isInvisiblySmallElement(element)) {
+          // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
+          newElements = newElements.filter((el) => el.id !== element!.id);
+        }
+        return {
+          elements: newElements,
+          appState: {
+            selectedLinearElement: {
+              ...linearElementEditor,
+              selectedPointsIndices: null,
+            },
+            suggestedBindings: [],
+          },
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        };
+      }
+    }
 
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =
@@ -47,6 +99,12 @@ export const actionFinalize = register({
             scene,
           );
         }
+        if (isLineElement(element) && !isValidPolygon(element.points)) {
+          scene.mutateElement(element, {
+            polygon: false,
+          });
+        }
+
         return {
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
@@ -80,73 +138,103 @@ export const actionFinalize = register({
       focusContainer();
     }
 
-    const multiPointElement = appState.multiElement
-      ? appState.multiElement
-      : appState.newElement?.type === "freedraw"
-      ? appState.newElement
-      : null;
+    let element: NonDeleted<ExcalidrawElement> | null = null;
+    if (appState.multiElement) {
+      element = appState.multiElement;
+    } else if (
+      appState.newElement?.type === "freedraw" ||
+      isBindingElement(appState.newElement)
+    ) {
+      element = appState.newElement;
+    } else if (Object.keys(appState.selectedElementIds).length === 1) {
+      const candidate = elementsMap.get(
+        Object.keys(appState.selectedElementIds)[0],
+      ) as NonDeleted<ExcalidrawLinearElement> | undefined;
+      if (candidate) {
+        element = candidate;
+      }
+    }
 
-    if (multiPointElement) {
+    if (element) {
       // pen and mouse have hover
       if (
-        multiPointElement.type !== "freedraw" &&
+        appState.multiElement &&
+        element.type !== "freedraw" &&
         appState.lastPointerDownWith !== "touch"
       ) {
-        const { points, lastCommittedPoint } = multiPointElement;
+        const { points, lastCommittedPoint } = element;
         if (
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
         ) {
-          scene.mutateElement(multiPointElement, {
-            points: multiPointElement.points.slice(0, -1),
+          scene.mutateElement(element, {
+            points: element.points.slice(0, -1),
           });
         }
       }
 
-      if (isInvisiblySmallElement(multiPointElement)) {
+      if (element && isInvisiblySmallElement(element)) {
         // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
-        newElements = newElements.filter(
-          (el) => el.id !== multiPointElement.id,
-        );
-      }
-
-      // If the multi point line closes the loop,
-      // set the last point to first point.
-      // This ensures that loop remains closed at different scales.
-      const isLoop = isPathALoop(multiPointElement.points, appState.zoom.value);
-      if (multiPointElement.type === "line") {
-        //zsviczian multiPointElement.type === "freedraw"
-        if (isLoop) {
-          const linePoints = multiPointElement.points;
-          const firstPoint = linePoints[0];
-          scene.mutateElement(multiPointElement, {
-            points: linePoints.map((p, index) =>
-              index === linePoints.length - 1
-                ? pointFrom(firstPoint[0], firstPoint[1])
-                : p,
-            ),
-          });
-        }
+        newElements = newElements.filter((el) => el.id !== element!.id);
       }
 
       if (
-        isBindingElement(multiPointElement) &&
-        !isLoop &&
-        multiPointElement.points.length > 1
+        isLinearElement(element)
+        //https://github.com/zsviczian/excalidraw/commit/7e2cba833eb8ca57622f49041331973b7a5b3f82
+        //https://github.com/zsviczian/obsidian-excalidraw-plugin/releases/tag/2.0.15
+        //|| isFreeDrawElement(multiPointElement) //zsviczian
       ) {
-        const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          multiPointElement,
-          -1,
-          arrayToMap(elements),
-        );
-        maybeBindLinearElement(multiPointElement, appState, { x, y }, scene);
+        // If the multi point line closes the loop,
+        // set the last point to first point.
+        // This ensures that loop remains closed at different scales.
+        const isLoop = isPathALoop(element.points, appState.zoom.value);
+
+        if (isLoop && (isLineElement(element) || isFreeDrawElement(element))) {
+          const linePoints = element.points;
+          const firstPoint = linePoints[0];
+          const points: LocalPoint[] = linePoints.map((p, index) =>
+            index === linePoints.length - 1
+              ? pointFrom(firstPoint[0], firstPoint[1])
+              : p,
+          );
+          if (isLineElement(element)) {
+            scene.mutateElement(element, {
+              points,
+              polygon: true,
+            });
+          } /*else { //zsviczian, because isFreeDrawElement(element) is commented out.
+            scene.mutateElement(element, {
+              points,
+            });
+          }*/
+        }
+
+        if (isLineElement(element) && !isValidPolygon(element.points)) {
+          scene.mutateElement(element, {
+            polygon: false,
+          });
+        }
+
+        if (
+          isBindingElement(element) &&
+          !isLoop &&
+          element.points.length > 1 &&
+          isBindingEnabled(appState)
+        ) {
+          const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            element,
+            -1,
+            arrayToMap(elements),
+          );
+          maybeBindLinearElement(element, appState, { x, y }, scene);
+        }
       }
     }
 
     if (
       (!appState.activeTool.locked &&
         appState.activeTool.type !== "freedraw") ||
-      !multiPointElement
+      !element
     ) {
       resetCursor(interactiveCanvas);
     }
@@ -173,7 +261,7 @@ export const actionFinalize = register({
         activeTool:
           (appState.activeTool.locked ||
             appState.activeTool.type === "freedraw") &&
-          multiPointElement
+          element
             ? appState.activeTool
             : activeTool,
         activeEmbeddable: null,
@@ -184,21 +272,18 @@ export const actionFinalize = register({
         startBoundElement: null,
         suggestedBindings: [],
         selectedElementIds:
-          multiPointElement &&
+          element &&
           !appState.activeTool.locked &&
           appState.activeTool.type !== "freedraw"
             ? {
                 ...appState.selectedElementIds,
-                [multiPointElement.id]: true,
+                [element.id]: true,
               }
             : appState.selectedElementIds,
         // To select the linear element when user has finished mutipoint editing
         selectedLinearElement:
-          multiPointElement && isLinearElement(multiPointElement)
-            ? new LinearElementEditor(
-                multiPointElement,
-                arrayToMap(newElements),
-              )
+          element && isLinearElement(element)
+            ? new LinearElementEditor(element, arrayToMap(newElements))
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },

@@ -3,12 +3,20 @@ import {
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
+import { pointsEqual } from "@excalidraw/math";
+
 import type { AppState, Offsets, Zoom } from "@excalidraw/excalidraw/types";
 
 import { getCommonBounds, getElementBounds } from "./bounds";
-import { isFreeDrawElement, isLinearElement } from "./typeChecks";
+import {
+  isArrowElement,
+  isFreeDrawElement,
+  isLinearElement,
+} from "./typeChecks";
 
 import type { ElementsMap, ExcalidrawElement } from "./types";
+
+export const INVISIBLY_SMALL_ELEMENT_SIZE = 0.1;
 
 // TODO:  remove invisible elements consistently actions, so that invisible elements are not recorded by the store, exported, broadcasted or persisted
 //        - perhaps could be as part of a standalone 'cleanup' action, in addition to 'finalize'
@@ -17,8 +25,18 @@ export const isInvisiblySmallElement = (
   element: ExcalidrawElement,
 ): boolean => {
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    return element.points.length < 2;
+    return (
+      element.points.length < 2 ||
+      (element.points.length === 2 &&
+        isArrowElement(element) &&
+        pointsEqual(
+          element.points[0],
+          element.points[element.points.length - 1],
+          INVISIBLY_SMALL_ELEMENT_SIZE,
+        ))
+    );
   }
+
   return element.width === 0 && element.height === 0;
 };
 

@@ -299,8 +299,10 @@ export type FixedPointBinding = Merge<
   }
 >;
 
+type Index = number;
+
 export type PointsPositionUpdates = Map<
-  number,
+  Index,
   { point: LocalPoint; isDragging?: boolean }
 >;
 
@@ -329,10 +331,16 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     endArrowhead: Arrowhead | null;
   }>;
 
+export type ExcalidrawLineElement = ExcalidrawLinearElement &
+  Readonly<{
+    type: "line";
+    polygon: boolean;
+  }>;
+
 export type FixedSegment = {
   start: LocalPoint;
   end: LocalPoint;
-  index: number;
+  index: Index;
 };
 
 export type ExcalidrawArrowElement = ExcalidrawLinearElement &
