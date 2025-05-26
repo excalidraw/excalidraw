@@ -459,18 +459,27 @@ const renderLinearPointHandles = (
 
     const isOverlappingPoint =
       idx > 0 &&
-      (idx !== points.length - 1 ||
-        appState.editingLinearElement ||
-        !_isLineElement ||
-        !element.polygon) &&
+      (idx !== points.length - 1 || !_isLineElement || !element.polygon) &&
       pointsEqual(
         point,
         idx === points.length - 1 ? points[0] : points[idx - 1],
         2 / appState.zoom.value,
       );
 
-    const isSelected =
+    let isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
+    // when element is a polygon, highlight the last point as well if first
+    // point is selected since they overlap and the last point tends to be
+    // rendered on top
+    if (
+      _isLineElement &&
+      element.polygon &&
+      !isSelected &&
+      idx === element.points.length - 1 &&
+      !!appState.editingLinearElement?.selectedPointsIndices?.includes(0)
+    ) {
+      isSelected = true;
+    }
 
     renderSingleLinearPoint(
       context,
