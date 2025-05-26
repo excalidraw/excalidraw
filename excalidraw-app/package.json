@@ -54,6 +54,7 @@
     "vite-plugin-sitemap": "0.7.1",
     "cross-env": "^7.0.3",
     "vite": "^5.0.12",
-    "@vitejs/plugin-react": "^3.1.0"
+    "@vitejs/plugin-react": "^3.1.0",
+    "typescript": "^4.9.4"
   }
 }
