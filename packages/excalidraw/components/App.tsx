@@ -7253,7 +7253,12 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
 
-        if (
+        // Prioritize unlocked elements over locked ones
+        if (unlockedHitElements.length > 0) {
+          // If there are unlocked elements, use the topmost one
+          pointerDownState.hit.element =
+            unlockedHitElements[unlockedHitElements.length - 1];
+        } else if (
           hitElementMightBeLocked &&
           hitElementMightBeLocked.locked &&
           !unlockedHitElements.some(
