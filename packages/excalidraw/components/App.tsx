@@ -3910,13 +3910,10 @@ class App extends React.Component<AppProps, AppState> {
     }) => {
       const { elements, appState, collaborators, captureUpdate } = sceneData;
 
-      const nextElements = elements
-        ? syncInvalidIndices(elements, {
-            // we have to create new element instances for elements that have incorrect fractional indices
-            // otherwise scheduled micro action below won't be able to detect the fractional index change and won't update the store snapshot
-            shouldCreateNewInstances: true,
-          })
-        : undefined;
+      // TODO: if different "index" in any element is not an intended z-index change
+      // then this might end up being captured as part of a history entry
+      // which would make it undoable, potentially leading into a incorrect z-index order on undo / redo
+      const nextElements = elements ? syncInvalidIndices(elements) : undefined;
 
       if (captureUpdate) {
         const nextElementsMap = elements

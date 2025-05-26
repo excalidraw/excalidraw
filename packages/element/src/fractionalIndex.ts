@@ -205,25 +205,13 @@ export const syncMovedIndices = (
  */
 export const syncInvalidIndices = (
   elements: readonly ExcalidrawElement[],
-  {
-    shouldCreateNewInstances = false,
-  }: {
-    shouldCreateNewInstances?: boolean;
-  } = {},
 ): OrderedExcalidrawElement[] => {
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
 
-  for (const [element, { index, arrayIndex }] of elementsUpdates) {
-    if (shouldCreateNewInstances) {
-      const updatedElement = newElementWith(element, { index });
-
-      // mutate the element in the array with the new updated instance
-      (elements as Mutable<typeof elements>)[arrayIndex] = updatedElement;
-    } else {
-      const elementsMap = arrayToMap(elements);
-      mutateElement(element, elementsMap, { index });
-    }
+  for (const [element, { index }] of elementsUpdates) {
+    const elementsMap = arrayToMap(elements);
+    mutateElement(element, elementsMap, { index });
   }
 
   return elements as OrderedExcalidrawElement[];
@@ -402,7 +390,7 @@ const generateIndices = (
 ) => {
   const elementsUpdates = new Map<
     ExcalidrawElement,
-    { index: FractionalIndex; arrayIndex: number }
+    { index: FractionalIndex }
   >();
 
   for (const indices of indicesGroups) {
@@ -420,7 +408,6 @@ const generateIndices = (
 
       elementsUpdates.set(element, {
         index: fractionalIndices[i],
-        arrayIndex: indices[i],
       });
     }
   }
