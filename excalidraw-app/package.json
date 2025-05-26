@@ -51,6 +51,9 @@
     "build:preview": "yarn build && vite preview --port 5000"
   },
   "devDependencies": {
-    "vite-plugin-sitemap": "0.7.1"
+    "vite-plugin-sitemap": "0.7.1",
+    "cross-env": "^7.0.3",
+    "vite": "^5.0.12",
+    "@vitejs/plugin-react": "^3.1.0"
   }
 }
