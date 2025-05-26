@@ -1,14 +1,15 @@
 import { GlobalPoint } from "@excalidraw/math/types";
 import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
 import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
-import { FONT_FAMILY } from "@excalidraw/common";
-import type { ElementsMap, ExcalidrawElement, NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import { FONT_FAMILY, getVerticalOffset } from "@excalidraw/common";
+import type { ElementsMap, ExcalidrawElement, ExcalidrawTextElement, NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 import { Fonts } from "./fonts";
 import type { FontMetadata } from "@excalidraw/common";
 import { FONT_METADATA } from "@excalidraw/common";
 import type { AppState } from "./types";
 import { intersectElementWithLineSegment } from "@excalidraw/element/collision";
 import { lineSegment } from "@excalidraw/math";
+import { getLineHeightInPx } from "@excalidraw/element";
 
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
 export let hostPlugin: any = null;
@@ -70,6 +71,43 @@ export function hideFreedrawPenmodeCursor() {
 
 export function getOpenAIDefaultVisionModel() {
   return getHostPlugin().settings.openAIDefaultVisionModel;
+}
+
+export function getFontMetrics(fontFamily: ExcalidrawTextElement["fontFamily"], fontSize: number = 20): {
+  unitsPerEm: number,
+  ascender: number,
+  descender: number,
+  lineHeight: number,
+  baseline: number,
+  fontString: string
+} {
+  // Get the font metadata, fallback to Excalifont if not found
+  const metadata = FONT_METADATA[fontFamily] ?? FONT_METADATA[FONT_FAMILY.Excalifont];
+  const { unitsPerEm, ascender, descender, lineHeight } = metadata.metrics;
+  
+  // Calculate baseline offset using the existing utility function
+  const lineHeightPx = getLineHeightInPx(fontSize, lineHeight as ExcalidrawTextElement["lineHeight"]);
+  const baseline = getVerticalOffset(fontFamily, fontSize, lineHeightPx);
+  
+  // Get the font string from registered fonts or use font family name as fallback
+  let fontString = "";
+  const fontFaces = Fonts.registered.get(fontFamily);
+  if (fontFaces && fontFaces.fontFaces.length > 0) {
+    fontString = fontFaces.fontFaces[0].fontFace.family;
+  } else {
+    // Fallback to font family enum name
+    const fontFamilyName = Object.entries(FONT_FAMILY).find(([_, value]) => value === fontFamily)?.[0];
+    fontString = fontFamilyName || "Excalifont";
+  }
+  
+  return {
+    unitsPerEm,
+    ascender,
+    descender,
+    lineHeight,
+    baseline,
+    fontString
+  };
 }
 
 export function registerLocalFont(
