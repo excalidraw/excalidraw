@@ -3,6 +3,7 @@ import { newElementWith } from "@excalidraw/element";
 import { isRabbitSearchBoxElement } from "@excalidraw/element/rabbitElement";
 import { getSearchBoxText } from "@excalidraw/element/newRabbitElement";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import type { RabbitSearchBoxElement } from "@excalidraw/element/rabbitElement";
 
 export const useRabbitSearchBoxHandlers = (
   excalidrawAPI: ExcalidrawImperativeAPI | null
@@ -81,7 +82,7 @@ export const useRabbitSearchBoxHandlers = (
       if (!editingElement || !isRabbitSearchBoxElement(editingElement) || !editingElement.isEditing) return;
       
       const key = event.key;
-      let updatedElement;
+      let updatedElement: RabbitSearchBoxElement;
       
       if (key === "Escape") {
         // Cancel editing

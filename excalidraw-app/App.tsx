@@ -151,6 +151,64 @@ import "./index.scss";
 import type { CollabAPI } from "./collab/Collab";
 
 import { searchAndSaveImages} from '../scripts/rabbit_scripts/try_again';
+import type { RabbitSearchBoxElement} from "../packages/element/src/rabbitElement";
+import { RabbitElementBase, RabbitImageElement } from "../packages/element/src/rabbitElement";
+import { GoogleGenAI } from "@google/genai";
+const ai = new GoogleGenAI({ 
+  apiKey: import.meta.env.VITE_GEMINI_API_KEY 
+});
+async function main() {
+  const response = await ai.models.generateContent({
+    model: "gemini-2.0-flash",
+    contents: "Hello there",
+    config: {
+      systemInstruction: "You are a cat. Your name is Neko.",
+    },
+  });
+  console.log(response.text);
+}
+
+async function generateBetterSearchQuery(originalSearch: string, extension: string): Promise<string> {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: `You are a search query optimizer. I will give you two strings:
+1. An initial search query
+2. An extension/modifier for that search
+
+Your job is to combine them into a single, natural-sounding search query that makes grammatical sense and captures the user's intent.
+
+Rules:
+- Adjectives (colors, styles, sizes) usually go BEFORE nouns
+- Be concise - avoid redundant words
+- Maintain the core meaning of both inputs
+- Make it sound like something a human would actually search for
+
+Examples:
+Initial: "house" + Extension: "modern" → "modern house"
+Initial: "cute kitty" + Extension: "brown" → "cute brown kitty"
+Initial: "car" + Extension: "red sports" → "red sports car"
+Initial: "pizza recipe" + Extension: "vegetarian" → "vegetarian pizza recipe"
+Initial: "dog training" + Extension: "puppy" → "puppy training"
+
+Now combine these:
+Initial: "${originalSearch}"
+Extension: "${extension}"
+
+Output only the combined search query, nothing else.`,
+      config: {
+        systemInstruction: "You are a helpful assistant that creates natural search queries. Only respond with the optimized search query.",
+      },
+    });
+
+    const rawText = response.text ?? "";
+    return rawText.trim();
+  } catch (error) {
+    console.error("Error generating better search query:", error);
+    return `${extension} ${originalSearch}`;
+  }
+}
+
 
 polyfill();
 
@@ -1011,6 +1069,7 @@ const ExcalidrawWrapper = () => {
                     verticalAlign: "middle",
                     hasIcon: true,
                   });
+                  console.log(getSearchBoxText(searchBox));
 
                   excalidrawAPI.updateScene({
                     elements: [...excalidrawAPI.getSceneElements(), searchBox],
@@ -1023,88 +1082,317 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              label: "Add Rabbit Image",
+              label: "Do Everything",
               category: DEFAULT_CATEGORIES.app,
               predicate: () => true,
-              keywords: ["rabbit", "image", "rabbitimage"],
+              keywords: ["rabbit", "search", "box", "searchbox", "everything"],
               perform: () => {
                 if (excalidrawAPI) {
-                  const imageUrl = "https://t3.ftcdn.net/jpg/02/47/33/08/360_F_247330858_RvSJWAhMbfrqsM5VUmjLD4gzzSKUaJls.jpg";
-                  const label = "Rabbit Image";
-                  const padding = 10;
-                  const labelHeight = 20;
-                  const fixedImageHeight = 200; // <-- set your fixed height here
-
-                  const img = new Image();
-                  img.crossOrigin = "anonymous"; // for CORS safety if needed
-
-                  img.onload = () => {
-                    // maintain aspect ratio so image doesn't load too large
-                    const aspectRatio = img.naturalWidth / img.naturalHeight;
-                    const imageHeight = fixedImageHeight;
-                    const imageWidth = imageHeight * aspectRatio;
-
-                    const totalWidth = imageWidth + padding * 2;
-                    const totalHeight = imageHeight + padding * 2 + labelHeight;
-
-                    // calls newRabbitImageElement to make the element
-                    const image = newRabbitImageElement({
-                      x: 100,
-                      y: 300,
-                      label,
-                      imageUrl,
-                      width: totalWidth,
-                      height: totalHeight,
-                    });
-
-                    excalidrawAPI.updateScene({
-                      elements: [...excalidrawAPI.getSceneElements(), image],
-                    });
-                  };
-
-                  img.onerror = () => {
-                    console.error("Failed to load image for RabbitImageElement");
-                  };
-
-                  img.src = imageUrl;
-                }
-              },
-            },
-            {
-              label: "Sasuke Generator",
-              category: DEFAULT_CATEGORIES.app,
-              predicate: () => true,
-              keywords: ["rabbit", "search", "box", "searchbox"],
-              perform: () => {
-                console.log("Sasuke Generator button clicked");
-                
-                // Call the imported function
-                searchAndSaveImages("rabbit")
-                  .then(images => {
-                    console.log("Search completed, results:", images);
-                  })
-                  .catch(error => {
-                    console.error("Error in image search:", error);
-                  });
-                
-                // Still create the search box as in your original code
-                if (excalidrawAPI) {
+                  //create and add search box
                   const searchBox = newRabbitSearchBoxElement({
                     x: 100,
                     y: 100,
-                    text: "Sasuke Images started...logged in console",
+                    text: "Search...",
                     fontSize: 16,
                     fontFamily: FONT_FAMILY.Virgil,
                     textAlign: "left",
                     verticalAlign: "middle",
                     hasIcon: true,
                   });
-                  
+            
+                  //add box to scene
                   excalidrawAPI.updateScene({
                     elements: [...excalidrawAPI.getSceneElements(), searchBox],
                   });
+            
+                  excalidrawAPI.setToast({
+                    message: "Double-click on the search box to edit. Press Enter to confirm and search for images.",
+                    duration: 5000
+                  });
+            
+                  let hasSearched = false; 
+                  let lastSearchQuery = ""; //preventing duplicate searches
+                  
+                  const handleEnterKey = (event: KeyboardEvent) => {
+                    if (event.key !== 'Enter') return;
+                  
+
+                    const currentElements = excalidrawAPI.getSceneElements();
+                    const currentSearchBox = currentElements.find(el => 
+                      el.type === 'rabbit-searchbox' && el.id === searchBox.id
+                    ) as RabbitSearchBoxElement;
+            
+                    if (currentSearchBox) {
+                      const searchQuery = getSearchBoxText(currentSearchBox);
+                      
+                      // valid and different search query
+                      if (searchQuery !== "Search..." && 
+                          searchQuery.trim() !== "" && 
+                          searchQuery.length > 2 &&
+                          searchQuery !== lastSearchQuery) {
+                        
+                        console.log("Search query detected:", searchQuery);
+                        lastSearchQuery = searchQuery; // Update last search query
+                        hasSearched = true;
+                        
+                        searchAndSaveImages(searchQuery)
+                          .then(images => {
+                            console.log("Search completed, results:", images);
+                            
+                            if (images && images.length > 0) {
+                              console.log("Look at first", images[0]['link']);
+                              
+                              const imageUrl = images[0]['link'];
+                              const label = searchQuery + "";
+                              const padding = 10;
+                              const labelHeight = 20;
+                              const fixedImageHeight = 200;
+                              
+                              
+                              const searchBarHeight = 40;
+                              const searchBarSpacing = 2; 
+                              const imageY = 200;
+                              const searchBarY = imageY - searchBarSpacing - searchBarHeight; 
+                              
+                              const img = new Image();
+                              img.crossOrigin = "anonymous";
+                              
+                              img.onload = () => {
+                                const aspectRatio = img.naturalWidth / img.naturalHeight;
+                                const imageHeight = fixedImageHeight;
+                                const imageWidth = imageHeight * aspectRatio;
+                                
+                                const totalWidth = imageWidth + padding * 2;
+                                const totalHeight = imageHeight + padding * 2 + labelHeight;
+                                
+                                const imageSearchBox = newRabbitSearchBoxElement({
+                                  x: 100,
+                                  y: searchBarY,
+                                  text: "Search...", 
+                                  fontSize: 14,
+                                  fontFamily: FONT_FAMILY.Virgil,
+                                  textAlign: "left",
+                                  verticalAlign: "middle",
+                                  hasIcon: true,
+                                  width: Math.max(totalWidth, 200),
+                                  height: searchBarHeight,
+                                });
+                                
+                                const image = newRabbitImageElement({
+                                  x: 100,
+                                  y: imageY,
+                                  label,
+                                  imageUrl,
+                                  width: totalWidth,
+                                  height: totalHeight,
+                                });
+                                
+                                //bind elements together
+                                const groupId = `rabbit-group-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                                
+                                const groupedSearchBox = { ...imageSearchBox, groupIds: [groupId] };
+                                const groupedImage = { ...image, groupIds: [groupId] };
+                                
+                                //to extend the search
+                                const handleExtendedSearch = async (event: KeyboardEvent) => {
+                                  if (event.key !== 'Enter') return;
+                                  
+                                  const currentElements = excalidrawAPI.getSceneElements();
+                                  const currentImageSearchBox = currentElements.find(el => 
+                                    el.type === 'rabbit-searchbox' && el.id === imageSearchBox.id
+                                  ) as RabbitSearchBoxElement;
+            
+                                  if (currentImageSearchBox) {
+                                    const extendedSearchText = getSearchBoxText(currentImageSearchBox);
+                                    
+                                    if (extendedSearchText && 
+                                        extendedSearchText !== "Search..." && 
+                                        extendedSearchText.trim() !== "" && 
+                                        extendedSearchText.length > 2) {
+                                      
+                                      //combine with new input and call gemini
+                                      const finalSearchQuery = await generateBetterSearchQuery(searchQuery, extendedSearchText);
+                                      console.log("Extended search query:", finalSearchQuery);
+                                      
+                                      //search w/ the extended query
+                                      searchAndSaveImages(finalSearchQuery)
+                                        .then(newImages => {
+                                          if (newImages && newImages.length > 0) {
+                                            const newImageUrl = newImages[0]['link'];
+                                            
+                                            const newImg = new Image();
+                                            newImg.crossOrigin = "anonymous";
+                                            
+                                            newImg.onload = () => {
+                                              const newAspectRatio = newImg.naturalWidth / newImg.naturalHeight;
+                                              const newImageHeight = fixedImageHeight;
+                                              const newImageWidth = newImageHeight * newAspectRatio;
+                                              const newTotalWidth = newImageWidth + padding * 2;
+                                              const newTotalHeight = newImageHeight + padding * 2 + labelHeight;
+                                              
+                                              
+                                              const newImage = newRabbitImageElement({
+                                                x: 100 + totalWidth + 50, //to the right of the original image
+                                                y: imageY,
+                                                label: finalSearchQuery,
+                                                imageUrl: newImageUrl,
+                                                width: newTotalWidth,
+                                                height: newTotalHeight,
+                                              });
+                                              
+                                              //new search bar for new image
+                                              const newSearchBox = newRabbitSearchBoxElement({
+                                                x: 100 + totalWidth + 50,
+                                                y: imageY - 2 - searchBarHeight,
+                                                text: "Search...", 
+                                                fontSize: 14,
+                                                fontFamily: FONT_FAMILY.Virgil,
+                                                textAlign: "left",
+                                                verticalAlign: "middle",
+                                                hasIcon: true,
+                                                width: Math.max(newTotalWidth, 200),
+                                                height: searchBarHeight,
+                                              });
+                                              
+                                              const newGroupId = `rabbit-group-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                                              const newGroupedSearchBox = { ...newSearchBox, groupIds: [newGroupId] };
+                                              const newGroupedImage = { ...newImage, groupIds: [newGroupId] };
+                                              
+                                              excalidrawAPI.updateScene({
+                                                elements: [...excalidrawAPI.getSceneElements(), newGroupedSearchBox, newGroupedImage],
+                                              });
+                                              
+                                              excalidrawAPI.setToast({
+                                                message: `Extended search "${finalSearchQuery}" completed!`,
+                                                duration: 3000
+                                              });
+                                            };
+                                            
+                                            newImg.src = newImageUrl;
+                                          } else {
+                                            excalidrawAPI.setToast({
+                                              message: "No results found for extended search.",
+                                              duration: 3000
+                                            });
+                                          }
+                                        })
+                                        .catch(error => {
+                                          console.error("Error in extended search:", error);
+                                          excalidrawAPI.setToast({
+                                            message: "Error in extended search. Please try again.",
+                                            duration: 3000
+                                          });
+                                        });
+                                    }
+                                  }
+                                };
+                                
+                                document.addEventListener('keydown', handleExtendedSearch);
+                                
+                                excalidrawAPI.updateScene({
+                                  elements: [...excalidrawAPI.getSceneElements(), groupedSearchBox, groupedImage],
+                                });
+                                
+                                excalidrawAPI.setToast({
+                                  message: `Image for "${searchQuery}" added with search bar!`,
+                                  duration: 3000
+                                });
+                              };
+                              
+                              img.onerror = () => {
+                                console.error("Failed to load image for RabbitImageElement");
+                                excalidrawAPI.setToast({
+                                  message: "Failed to load image. Please try a different search term.",
+                                  duration: 3000
+                                });
+                              };
+                              
+                              img.src = imageUrl;
+                            } else {
+                              excalidrawAPI.setToast({
+                                message: "No images found. Please try a different search term.",
+                                duration: 3000
+                              });
+                            }
+                          })
+                          .catch(error => {
+                            console.error("Error in image search:", error);
+                            excalidrawAPI.setToast({
+                              message: "Error searching for images. Please try again.",
+                              duration: 3000
+                            });
+                          });
+                      }
+                    }
+                  };
+            
+                  document.addEventListener('keydown', handleEnterKey);
                 }
               },
+            },
+            
+            {
+              
+              label: "Add Rabbit Image",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["rabbit", "image", "rabbitimage"],
+              
+              perform: () => {
+              const customQuer = "naruto"
+              searchAndSaveImages(customQuer)
+                .then(images => {
+                  console.log("Search completed, results:", images);
+                  console.log("Look at first", images[0]['link']);
+                  
+                  // Use the search result here, inside the .then()
+                  const searchQuer = images[0]['link'];
+                  
+                  if (excalidrawAPI) {
+                    const imageUrl = searchQuer;
+                    
+                    // Put all your image creation code here
+                    const label = customQuer + "Image";
+                    const padding = 10;
+                    const labelHeight = 20;
+                    const fixedImageHeight = 200;
+                    
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    
+                    img.onload = () => {
+                      const aspectRatio = img.naturalWidth / img.naturalHeight;
+                      const imageHeight = fixedImageHeight;
+                      const imageWidth = imageHeight * aspectRatio;
+                      
+                      const totalWidth = imageWidth + padding * 2;
+                      const totalHeight = imageHeight + padding * 2 + labelHeight;
+                      
+                      const image = newRabbitImageElement({
+                        x: 100,
+                        y: 300,
+                        label,
+                        imageUrl,
+                        width: totalWidth,
+                        height: totalHeight,
+                      });
+                      
+                      excalidrawAPI.updateScene({
+                        elements: [...excalidrawAPI.getSceneElements(), image],
+                      });
+                    };
+                    
+                    img.onerror = () => {
+                      console.error("Failed to load image for RabbitImageElement");
+                    };
+                    
+                    img.src = imageUrl;
+      }
+    })
+    .catch(error => {
+      console.error("Error in image search:", error);
+    });
+},
             },
             
             
