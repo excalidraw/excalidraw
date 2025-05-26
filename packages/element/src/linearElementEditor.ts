@@ -551,6 +551,8 @@ export class LinearElementEditor {
     return {
       ...editingLinearElement,
       ...bindings,
+      segmentMidPointHoveredCoords: null,
+      hoverPointIndex: -1,
       // if clicking without previously dragging a point(s), and not holding
       // shift, deselect all points except the one clicked. If holding shift,
       // toggle the point.
