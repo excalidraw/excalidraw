@@ -6492,6 +6492,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 10,
               ],
             ],
+            "polygon": false,
             "roughness": 1,
             "roundness": {
               "type": 2,
@@ -6716,6 +6717,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 10,
               ],
             ],
+            "polygon": false,
             "roughness": 1,
             "roundness": {
               "type": 2,
@@ -8954,6 +8956,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] undo stack 1
                 10,
               ],
             ],
+            "polygon": false,
             "roughness": 1,
             "roundness": {
               "type": 2,
@@ -9773,6 +9776,7 @@ exports[`regression tests > key l selects line tool > [end of test] undo stack 1
                 10,
               ],
             ],
+            "polygon": false,
             "roughness": 1,
             "roundness": {
               "type": 2,

@@ -469,7 +469,7 @@ const bindLinearElementToElement = (
 
   Object.assign(
     linearElement,
-    LinearElementEditor.getNormalizedPoints({
+    LinearElementEditor.getNormalizeElementPointsAndCoords({
       ...linearElement,
       points: newPoints,
     }),
