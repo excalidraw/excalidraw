@@ -1,6 +1,9 @@
-import type { ExcalidrawElement } from "../../element/types";
-import type { ColorPickerColor, ColorPaletteCustom } from "../../colors";
-import { MAX_CUSTOM_COLORS_USED_IN_CANVAS } from "../../colors";
+import { MAX_CUSTOM_COLORS_USED_IN_CANVAS } from "@excalidraw/common";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { ColorPickerColor, ColorPaletteCustom } from "@excalidraw/common";
+
 import { atom } from "../../editor-jotai";
 
 export const getColorNameAndShadeFromColor = ({
@@ -8,11 +11,14 @@ export const getColorNameAndShadeFromColor = ({
   color,
 }: {
   palette: ColorPaletteCustom;
-  color: string;
+  color: string | null;
 }): {
   colorName: ColorPickerColor;
   shade: number | null;
 } | null => {
+  if (!color) {
+    return null;
+  }
   for (const [colorName, colorVal] of Object.entries(palette)) {
     if (Array.isArray(colorVal)) {
       const shade = colorVal.indexOf(color);
@@ -90,19 +96,42 @@ export type ActiveColorPickerSectionAtomType =
 export const activeColorPickerSectionAtom =
   atom<ActiveColorPickerSectionAtomType>(null);
 
-const calculateContrast = (r: number, g: number, b: number) => {
+const calculateContrast = (r: number, g: number, b: number): number => {
   const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  return yiq >= 160 ? "black" : "white";
+  return yiq;
 };
 
-// inspiration from https://stackoverflow.com/a/11868398
-export const getContrastYIQ = (bgHex: string, isCustomColor: boolean) => {
-  if (isCustomColor) {
-    const style = new Option().style;
-    style.color = bgHex;
+// YIQ algo, inspiration from https://stackoverflow.com/a/11868398
+export const isColorDark = (color: string, threshold = 160): boolean => {
+  // no color ("") -> assume it default to black
+  if (!color) {
+    return true;
+  }
 
-    if (style.color) {
-      const rgb = style.color
+  if (color === "transparent") {
+    return false;
+  }
+
+  // a string color (white etc) or any other format -> convert to rgb by way
+  // of creating a DOM node and retrieving the computeStyle
+  if (!color.startsWith("#")) {
+    const node = document.createElement("div");
+    node.style.color = color;
+
+    if (node.style.color) {
+      // making invisible so document doesn't reflow (hopefully).
+      // display=none works too, but supposedly not in all browsers
+      node.style.position = "absolute";
+      node.style.visibility = "hidden";
+      node.style.width = "0";
+      node.style.height = "0";
+
+      // needs to be in DOM else browser won't compute the style
+      document.body.appendChild(node);
+      const computedColor = getComputedStyle(node).color;
+      document.body.removeChild(node);
+      // computed style is in rgb() format
+      const rgb = computedColor
         .replace(/^(rgb|rgba)\(/, "")
         .replace(/\)$/, "")
         .replace(/\s/g, "")
@@ -111,20 +140,17 @@ export const getContrastYIQ = (bgHex: string, isCustomColor: boolean) => {
       const g = parseInt(rgb[1]);
       const b = parseInt(rgb[2]);
 
-      return calculateContrast(r, g, b);
+      return calculateContrast(r, g, b) < threshold;
     }
+    // invalid color -> assume it default to black
+    return true;
   }
 
-  // TODO: ? is this wanted?
-  if (bgHex === "transparent") {
-    return "black";
-  }
+  const r = parseInt(color.slice(1, 3), 16);
+  const g = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
 
-  const r = parseInt(bgHex.substring(1, 3), 16);
-  const g = parseInt(bgHex.substring(3, 5), 16);
-  const b = parseInt(bgHex.substring(5, 7), 16);
-
-  return calculateContrast(r, g, b);
+  return calculateContrast(r, g, b) < threshold;
 };
 
 export type ColorPickerType =

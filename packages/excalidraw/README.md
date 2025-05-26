@@ -1,49 +1,45 @@
 # Excalidraw
 
-**Excalidraw** is exported as a component to directly embed in your projects.
+**Excalidraw** is exported as a component to be directly embedded in your project.
 
 ## Installation
 
-You can use `npm`
+Use `npm` or `yarn` to install the package.
 
 ```bash
 npm install react react-dom @excalidraw/excalidraw
-```
-
-or via `yarn`
-
-```bash
+# or
 yarn add react react-dom @excalidraw/excalidraw
 ```
 
-After installation you will see a folder `excalidraw-assets` and `excalidraw-assets-dev` in `dist` directory which contains the assets needed for this app in prod and dev mode respectively.
+> **Note**: If you don't want to wait for the next stable release and try out the unreleased changes, use `@excalidraw/excalidraw@next`.
 
-Move the folder `excalidraw-assets` and `excalidraw-assets-dev` to the path where your assets are served.
+#### Self-hosting fonts
 
-By default it will try to load the files from [`https://unpkg.com/@excalidraw/excalidraw/dist/`](https://unpkg.com/@excalidraw/excalidraw/dist)
+By default, Excalidraw will try to download all the used fonts from the [CDN](https://esm.run/@excalidraw/excalidraw/dist/prod).
 
-If you want to load assets from a different path you can set a variable `window.EXCALIDRAW_ASSET_PATH` depending on environment (for example if you have different URL's for dev and prod) to the url from where you want to load the assets.
+For self-hosting purposes, you'll have to copy the content of the folder `node_modules/@excalidraw/excalidraw/dist/prod/fonts` to the path where your assets should be served from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
 
-#### Note
+```js
+<script>window.EXCALIDRAW_ASSET_PATH = "/";</script>
+```
 
-**If you don't want to wait for the next stable release and try out the unreleased changes you can use `@excalidraw/excalidraw@next`.**
-
-## Dimensions of Excalidraw
+### Dimensions of Excalidraw
 
 Excalidraw takes _100%_ of `width` and `height` of the containing block so make sure the container in which you render Excalidraw has non zero dimensions.
 
-### Demo
+## Demo
 
-[Try here](https://codesandbox.io/s/excalidraw-ehlz3).
+Go to [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/master/examples/with-script-in-browser) example.
 
 ## Integration
 
-Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/integration)
+Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/integration).
 
 ## API
 
-Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api)
+Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api).
 
 ## Contributing
 
-Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/contributing)
+Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/contributing).

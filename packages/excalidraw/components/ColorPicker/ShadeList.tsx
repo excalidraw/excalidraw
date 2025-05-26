@@ -1,23 +1,26 @@
 import clsx from "clsx";
-import { useAtom } from "../../editor-jotai";
 import { useEffect, useRef } from "react";
+
+import type { ColorPaletteCustom } from "@excalidraw/common";
+
+import { useAtom } from "../../editor-jotai";
+import { t } from "../../i18n";
+
+import HotkeyLabel from "./HotkeyLabel";
 import {
   activeColorPickerSectionAtom,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
-import HotkeyLabel from "./HotkeyLabel";
-import { t } from "../../i18n";
-import type { ColorPaletteCustom } from "../../colors";
 
 interface ShadeListProps {
-  hex: string;
+  color: string | null;
   onChange: (color: string) => void;
   palette: ColorPaletteCustom;
 }
 
-export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
+export const ShadeList = ({ color, onChange, palette }: ShadeListProps) => {
   const colorObj = getColorNameAndShadeFromColor({
-    color: hex || "transparent",
+    color: color || "transparent",
     palette,
   });
 
@@ -52,7 +55,7 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
               key={i}
               type="button"
               className={clsx(
-                "color-picker__button color-picker__button--large",
+                "color-picker__button color-picker__button--large has-outline",
                 { active: i === shade },
               )}
               aria-label="Shade"

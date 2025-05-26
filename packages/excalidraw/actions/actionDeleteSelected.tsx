@@ -1,25 +1,34 @@
-import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { KEYS } from "../keys";
-import { ToolButton } from "../components/ToolButton";
-import { t } from "../i18n";
-import { register } from "./register";
-import { getNonDeletedElements } from "../element";
-import type { ExcalidrawElement } from "../element/types";
-import type { AppClassProperties, AppState } from "../types";
-import { mutateElement, newElementWith } from "../element/mutateElement";
-import { getElementsInGroup, selectGroupsForSelectedElements } from "../groups";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { fixBindingsAfterDeletion } from "../element/binding";
+import { KEYS, updateActiveTool } from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+import { fixBindingsAfterDeletion } from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element";
+import { getContainerElement } from "@excalidraw/element";
 import {
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
-} from "../element/typeChecks";
-import { updateActiveTool } from "../utils";
+} from "@excalidraw/element";
+import { getFrameChildren } from "@excalidraw/element";
+
+import {
+  getElementsInGroup,
+  selectGroupsForSelectedElements,
+} from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { t } from "../i18n";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { TrashIcon } from "../components/icons";
-import { StoreAction } from "../store";
-import { getContainerElement } from "../element/textElement";
-import { getFrameChildren } from "../frame";
+import { ToolButton } from "../components/ToolButton";
+
+import { register } from "./register";
+
+import type { AppClassProperties, AppState } from "../types";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
@@ -83,7 +92,7 @@ const deleteSelectedElements = (
         el.boundElements.forEach((candidate) => {
           const bound = app.scene.getNonDeletedElementsMap().get(candidate.id);
           if (bound && isElbowArrow(bound)) {
-            mutateElement(bound, {
+            app.scene.mutateElement(bound, {
               startBinding:
                 el.id === bound.startBinding?.elementId
                   ? null
@@ -91,7 +100,6 @@ const deleteSelectedElements = (
               endBinding:
                 el.id === bound.endBinding?.elementId ? null : bound.endBinding,
             });
-            mutateElement(bound, { points: bound.points });
           }
         });
       }
@@ -233,7 +241,7 @@ export const actionDeleteSelected = register({
             ...nextAppState,
             editingLinearElement: null,
           },
-          storeAction: StoreAction.CAPTURE,
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
       }
 
@@ -250,7 +258,7 @@ export const actionDeleteSelected = register({
           : endBindingElement,
       };
 
-      LinearElementEditor.deletePoints(element, selectedPointsIndices);
+      LinearElementEditor.deletePoints(element, app, selectedPointsIndices);
 
       return {
         elements,
@@ -265,7 +273,7 @@ export const actionDeleteSelected = register({
                 : [0],
           },
         },
-        storeAction: StoreAction.CAPTURE,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
     }
 
@@ -286,13 +294,14 @@ export const actionDeleteSelected = register({
         activeTool: updateActiveTool(appState, { type: "selection" }),
         multiElement: null,
         activeEmbeddable: null,
+        selectedLinearElement: null,
       },
-      storeAction: isSomeElementSelected(
+      captureUpdate: isSomeElementSelected(
         getNonDeletedElements(elements),
         appState,
       )
-        ? StoreAction.CAPTURE
-        : StoreAction.NONE,
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event, appState, elements) =>

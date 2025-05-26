@@ -6,12 +6,13 @@
 // Note: when adding new icons, review https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/RTL_Guidelines
 // to determine whether or not the icons should be mirrored in right-to-left languages.
 
+import clsx from "clsx";
+import oc from "open-color";
 import React from "react";
 
-import oc from "open-color";
-import clsx from "clsx";
-import type { Theme } from "../element/types";
-import { THEME } from "../constants";
+import { THEME } from "@excalidraw/common";
+
+import type { Theme } from "@excalidraw/element/types";
 
 export const iconFillColor = (theme: Theme) => "var(--icon-fill-color)";
 
@@ -128,6 +129,21 @@ export const PinIcon = createIcon(
   tablerIconProps,
 );
 
+export const polygonIcon = createIcon(
+  <g strokeWidth={1.25}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+    <path d="M19 8m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+    <path d="M5 11m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+    <path d="M15 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+    <path d="M6.5 9.5l3.5 -3" />
+    <path d="M14 5.5l3 1.5" />
+    <path d="M18.5 10l-2.5 7" />
+    <path d="M13.5 17.5l-7 -5" />
+  </g>,
+  tablerIconProps,
+);
+
 // tabler-icons: lock-open (via Figma)
 export const UnlockedIcon = createIcon(
   <g>
@@ -175,6 +191,16 @@ export const LockedIcon = createIcon(
     <path d="M6.667 8.333V5.417C6.667 3.806 8.159 2.5 10 2.5c1.841 0 3.333 1.306 3.333 2.917v2.916" />
   </g>,
   modifiedTablerIconProps,
+);
+
+export const LockedIconFilled = createIcon(
+  <g fill="currentColor">
+    <path d="M12 2a5 5 0 0 1 5 5v3a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-10a3 3 0 0 1 -3 -3v-6a3 3 0 0 1 3 -3v-3a5 5 0 0 1 5 -5m0 12a2 2 0 0 0 -1.995 1.85l-.005 .15a2 2 0 1 0 2 -2m0 -10a3 3 0 0 0 -3 3v3h6v-3a3 3 0 0 0 -3 -3" />
+  </g>,
+  {
+    width: 24,
+    height: 24,
+  },
 );
 
 // custom
@@ -270,6 +296,21 @@ export const SelectionIcon = createIcon(
     <path d="M6 6l4.153 11.793a0.365 .365 0 0 0 .331 .207a0.366 .366 0 0 0 .332 -.207l2.184 -4.793l4.787 -1.994a0.355 .355 0 0 0 .213 -.323a0.355 .355 0 0 0 -.213 -.323l-11.787 -4.36z" />
     <path d="M13.5 13.5l4.5 4.5" />
   </g>,
+  { fill: "none", width: 22, height: 22, strokeWidth: 1.25 },
+);
+
+export const LassoIcon = createIcon(
+  <g
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth={1.5}
+  >
+    <path d="M4.028 13.252c-.657 -.972 -1.028 -2.078 -1.028 -3.252c0 -3.866 4.03 -7 9 -7s9 3.134 9 7s-4.03 7 -9 7c-1.913 0 -3.686 -.464 -5.144 -1.255" />
+    <path d="M5 15m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+    <path d="M5 17c0 1.42 .316 2.805 1 4" />
+  </g>,
+
   { fill: "none", width: 22, height: 22, strokeWidth: 1.25 },
 );
 
@@ -405,7 +446,7 @@ export const TrashIcon = createIcon(
 );
 
 export const EmbedIcon = createIcon(
-  <g strokeWidth="1.25">
+  <g strokeWidth="1.5">
     <polyline points="12 16 18 10 12 4" />
     <polyline points="8 4 2 10 8 16" />
   </g>,
@@ -560,6 +601,14 @@ export const bucketFillIcon = createIcon(
     <path d="M5 16l1.465 1.638a2 2 0 1 1 -3.015 .099l1.55 -1.737z" />
     <path d="M13.737 9.737c2.299 -2.3 3.23 -5.095 2.081 -6.245c-1.15 -1.15 -3.945 -.217 -6.244 2.082c-2.3 2.299 -3.231 5.095 -2.082 6.244c1.15 1.15 3.946 .218 6.245 -2.081z" />
     <path d="M7.492 11.818c.362 .362 .768 .676 1.208 .934l6.895 4.047c1.078 .557 2.255 -.075 3.692 -1.512c1.437 -1.437 2.07 -2.614 1.512 -3.692c-.372 -.718 -1.72 -3.017 -4.047 -6.895a6.015 6.015 0 0 0 -.934 -1.208" />
+  </g>,
+  tablerIconProps,
+);
+
+// simple / icon
+export const slashIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path d="M6 18l12 -12" />
   </g>,
   tablerIconProps,
 );

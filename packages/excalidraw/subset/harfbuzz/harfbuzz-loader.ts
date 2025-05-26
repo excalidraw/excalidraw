@@ -7,8 +7,8 @@
  * In the future consider separating common utils into a separate shared chunk.
  */
 
-import binary from "./harfbuzz-wasm";
 import bindings from "./harfbuzz-bindings";
+import binary from "./harfbuzz-wasm";
 
 /**
  * Lazy loads wasm and respective bindings for font subsetting based on the harfbuzzjs.

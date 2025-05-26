@@ -1,20 +1,34 @@
 import "pepjs";
+import { act } from "@testing-library/react";
+import {
+  render,
+  queries,
+  waitFor,
+  fireEvent,
+  cleanup,
+} from "@testing-library/react";
+import ansi from "ansicolor";
+
+import { ORIG_ID, arrayToMap } from "@excalidraw/common";
+
+import { getSelectedElements } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { AllPossibleKeys } from "@excalidraw/common/utility-types";
+
+import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
+
+import { Pointer, UI } from "./helpers/ui";
+import * as toolQueries from "./queries/toolQueries";
+
+import type { History } from "../history";
 
 import type { RenderResult, RenderOptions } from "@testing-library/react";
-import { act } from "@testing-library/react";
-import { render, queries, waitFor, fireEvent } from "@testing-library/react";
 
-import * as toolQueries from "./queries/toolQueries";
 import type { ImportedDataState } from "../data/types";
-import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
-import { getSelectedElements } from "../scene/selection";
-import type { ExcalidrawElement } from "../element/types";
-import { UI } from "./helpers/ui";
-import { diffStringsUnified } from "jest-diff";
-import ansi from "ansicolor";
-import { ORIG_ID } from "../constants";
-import { arrayToMap } from "../utils";
-import type { AllPossibleKeys } from "../utility-types";
+
+export { cleanup as unmountComponent };
 
 const customQueries = {
   ...queries,
@@ -30,6 +44,10 @@ type TestRenderFn = (
 ) => Promise<RenderResult<typeof customQueries>>;
 
 const renderApp: TestRenderFn = async (ui, options) => {
+  // when tests reuse Pointer instances let's reset the last
+  // pointer poisitions so there's no leak between tests
+  Pointer.resetAll();
+
   if (options?.localStorageData) {
     initLocalStorage(options.localStorageData);
     delete options.localStorageData;
@@ -251,36 +269,6 @@ expect.extend({
       pass: false,
     };
   },
-
-  toCloselyEqualPoints(received, expected, precision) {
-    if (!Array.isArray(received) || !Array.isArray(expected)) {
-      throw new Error("expected and received are not point arrays");
-    }
-
-    const COMPARE = 1 / Math.pow(10, precision || 2);
-    const pass = received.every(
-      (point, idx) =>
-        Math.abs(expected[idx]?.[0] - point[0]) < COMPARE &&
-        Math.abs(expected[idx]?.[1] - point[1]) < COMPARE,
-    );
-
-    if (!pass) {
-      return {
-        message: () => ` The provided array of points are not close enough.
-
-${diffStringsUnified(
-  JSON.stringify(expected, undefined, 2),
-  JSON.stringify(received, undefined, 2),
-)}`,
-        pass: false,
-      };
-    }
-
-    return {
-      message: () => `expected ${received} to not be close to ${expected}`,
-      pass: true,
-    };
-  },
 });
 
 /**
@@ -445,4 +433,46 @@ export const assertElements = <T extends AllPossibleKeys<ExcalidrawElement>>(
   );
 
   expect(h.state.selectedElementIds).toEqual(selectedElementIds);
+};
+
+const stripSeed = (deltas: Record<string, { deleted: any; inserted: any }>) =>
+  Object.entries(deltas).reduce((acc, curr) => {
+    const { inserted, deleted, ...rest } = curr[1];
+
+    delete inserted.seed;
+    delete deleted.seed;
+
+    acc[curr[0]] = {
+      inserted,
+      deleted,
+      ...rest,
+    };
+
+    return acc;
+  }, {} as Record<string, any>);
+
+export const checkpointHistory = (history: History, name: string) => {
+  expect(
+    history.undoStack.map((x) => ({
+      ...x,
+      elements: {
+        ...x.elements,
+        added: stripSeed(x.elements.added),
+        removed: stripSeed(x.elements.removed),
+        updated: stripSeed(x.elements.updated),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] undo stack`);
+
+  expect(
+    history.redoStack.map((x) => ({
+      ...x,
+      elements: {
+        ...x.elements,
+        added: stripSeed(x.elements.added),
+        removed: stripSeed(x.elements.removed),
+        updated: stripSeed(x.elements.updated),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] redo stack`);
 };

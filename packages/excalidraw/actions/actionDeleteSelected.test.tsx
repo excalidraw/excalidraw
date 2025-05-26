@@ -1,7 +1,9 @@
 import React from "react";
-import { Excalidraw, mutateElement } from "../index";
-import { act, assertElements, render } from "../tests/test-utils";
+
+import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
+import { act, assertElements, render } from "../tests/test-utils";
+
 import { actionDeleteSelected } from "./actionDeleteSelected";
 
 const { h } = window;
@@ -54,7 +56,7 @@ describe("deleting selected elements when frame selected should keep children + 
       frameId: f1.id,
     });
 
-    mutateElement(r1, {
+    h.app.scene.mutateElement(r1, {
       boundElements: [{ type: "text", id: t1.id }],
     });
 
@@ -92,7 +94,7 @@ describe("deleting selected elements when frame selected should keep children + 
       frameId: null,
     });
 
-    mutateElement(r1, {
+    h.app.scene.mutateElement(r1, {
       boundElements: [{ type: "text", id: t1.id }],
     });
 
@@ -130,7 +132,7 @@ describe("deleting selected elements when frame selected should keep children + 
       frameId: null,
     });
 
-    mutateElement(r1, {
+    h.app.scene.mutateElement(r1, {
       boundElements: [{ type: "text", id: t1.id }],
     });
 
@@ -168,7 +170,7 @@ describe("deleting selected elements when frame selected should keep children + 
       frameId: null,
     });
 
-    mutateElement(a1, {
+    h.app.scene.mutateElement(a1, {
       boundElements: [{ type: "text", id: t1.id }],
     });
 

@@ -1,31 +1,33 @@
 import React from "react";
-import { Card } from "../../packages/excalidraw/components/Card";
-import { ToolButton } from "../../packages/excalidraw/components/ToolButton";
-import { serializeAsJSON } from "../../packages/excalidraw/data/json";
-import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
+import { uploadBytes, ref } from "firebase/storage";
+import { nanoid } from "nanoid";
+
+import { trackEvent } from "@excalidraw/excalidraw/analytics";
+import { Card } from "@excalidraw/excalidraw/components/Card";
+import { ExcalidrawLogo } from "@excalidraw/excalidraw/components/ExcalidrawLogo";
+import { ToolButton } from "@excalidraw/excalidraw/components/ToolButton";
+import { MIME_TYPES, getFrame } from "@excalidraw/common";
+import {
+  encryptData,
+  generateEncryptionKey,
+} from "@excalidraw/excalidraw/data/encryption";
+import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
+import { isInitializedImageElement } from "@excalidraw/element";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
+
 import type {
   FileId,
   NonDeletedExcalidrawElement,
-} from "../../packages/excalidraw/element/types";
+} from "@excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
-} from "../../packages/excalidraw/types";
-import { nanoid } from "nanoid";
-import { useI18n } from "../../packages/excalidraw/i18n";
-import {
-  encryptData,
-  generateEncryptionKey,
-} from "../../packages/excalidraw/data/encryption";
-import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
+} from "@excalidraw/excalidraw/types";
+
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";
-import { MIME_TYPES } from "../../packages/excalidraw/constants";
-import { trackEvent } from "../../packages/excalidraw/analytics";
-import { getFrame } from "../../packages/excalidraw/utils";
-import { ExcalidrawLogo } from "../../packages/excalidraw/components/ExcalidrawLogo";
-import { uploadBytes, ref } from "firebase/storage";
+import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
 
 export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],

@@ -1,17 +1,24 @@
-import { fileOpen, fileSave } from "./filesystem";
-import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 import {
   DEFAULT_FILENAME,
   EXPORT_DATA_TYPES,
-  EXPORT_SOURCE,
+  getExportSource,
   MIME_TYPES,
   VERSIONS,
-} from "../constants";
-import { clearElementsForDatabase, clearElementsForExport } from "../element";
-import type { ExcalidrawElement } from "../element/types";
-import type { AppState, BinaryFiles, LibraryItems } from "../types";
-import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
+} from "@excalidraw/common";
 
+import {
+  clearElementsForDatabase,
+  clearElementsForExport,
+} from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
+
+import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
+import { fileOpen, fileSave } from "./filesystem";
+
+import type { AppState, BinaryFiles, LibraryItems } from "../types";
 import type {
   ExportedDataState,
   ImportedDataState,
@@ -49,7 +56,7 @@ export const serializeAsJSON = (
   const data: ExportedDataState = {
     type: EXPORT_DATA_TYPES.excalidraw,
     version: VERSIONS.excalidraw,
-    source: EXPORT_SOURCE,
+    source: getExportSource(),
     elements:
       type === "local"
         ? clearElementsForExport(elements)
@@ -135,7 +142,7 @@ export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {
   const data: ExportedLibraryData = {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
     version: VERSIONS.excalidrawLibrary,
-    source: EXPORT_SOURCE,
+    source: getExportSource(),
     libraryItems,
   };
   return JSON.stringify(data, null, 2);

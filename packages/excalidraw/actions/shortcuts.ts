@@ -1,7 +1,9 @@
-import { isDarwin } from "../constants";
+import { isDarwin, getShortcutKey } from "@excalidraw/common";
+
+import type { SubtypeOf } from "@excalidraw/common/utility-types";
+
 import { t } from "../i18n";
-import type { SubtypeOf } from "../utility-types";
-import { getShortcutKey } from "../utils";
+
 import type { ActionName } from "./types";
 
 export type ShortcutName =

@@ -1,4 +1,3 @@
-import type { InclusiveRange } from "../math";
 import {
   pointFrom,
   pointRotateRads,
@@ -6,32 +5,37 @@ import {
   rangeIntersection,
   rangesOverlap,
   type GlobalPoint,
-} from "../math";
-import { TOOL_TYPE } from "./constants";
-import type { Bounds } from "./element/bounds";
+} from "@excalidraw/math";
+
+import { TOOL_TYPE, KEYS } from "@excalidraw/common";
 import {
   getCommonBounds,
   getDraggedElementsBounds,
   getElementAbsoluteCoords,
-} from "./element/bounds";
-import type { MaybeTransformHandleType } from "./element/transformHandles";
-import { isBoundToContainer, isFrameLikeElement } from "./element/typeChecks";
+} from "@excalidraw/element";
+import { isBoundToContainer, isFrameLikeElement } from "@excalidraw/element";
+
+import { getMaximumGroups } from "@excalidraw/element";
+
+import {
+  getSelectedElements,
+  getVisibleAndNonSelectedElements,
+} from "@excalidraw/element";
+
+import type { InclusiveRange } from "@excalidraw/math";
+
+import type { Bounds } from "@excalidraw/element";
+import type { MaybeTransformHandleType } from "@excalidraw/element";
 import type {
   ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
-} from "./element/types";
-import { getMaximumGroups } from "./groups";
-import { KEYS } from "./keys";
-import {
-  getSelectedElements,
-  getVisibleAndNonSelectedElements,
-} from "./scene/selection";
+} from "@excalidraw/element/types";
+
 import type {
   AppClassProperties,
   AppState,
   KeyboardModifiersObject,
-  NullableGridSize,
 } from "./types";
 
 const SNAP_DISTANCE = 8;
@@ -166,10 +170,11 @@ export const isSnappingEnabled = ({
 }) => {
   if (event) {
     return (
-      (app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
-      (!app.state.objectsSnapModeEnabled &&
-        event[KEYS.CTRL_OR_CMD] &&
-        !isGridModeEnabled(app))
+      app.state.activeTool.type !== "lasso" &&
+      ((app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
+        (!app.state.objectsSnapModeEnabled &&
+          event[KEYS.CTRL_OR_CMD] &&
+          !isGridModeEnabled(app)))
     );
   }
 
@@ -1407,19 +1412,4 @@ export const isActiveToolNonLinearSnappable = (
     activeToolType === TOOL_TYPE.image ||
     activeToolType === TOOL_TYPE.text
   );
-};
-
-// TODO: Rounding this point causes some shake when free drawing
-export const getGridPoint = (
-  x: number,
-  y: number,
-  gridSize: NullableGridSize,
-): [number, number] => {
-  if (gridSize) {
-    return [
-      Math.round(x / gridSize) * gridSize,
-      Math.round(y / gridSize) * gridSize,
-    ];
-  }
-  return [x, y];
 };

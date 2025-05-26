@@ -1,25 +1,33 @@
-import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "./element/types";
-import type { BinaryFiles } from "./types";
-import type { Spreadsheet } from "./charts";
-import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
 import {
   ALLOWED_PASTE_MIME_TYPES,
   EXPORT_DATA_TYPES,
   MIME_TYPES,
-} from "./constants";
+  arrayToMap,
+  isMemberOf,
+  isPromiseLike,
+} from "@excalidraw/common";
+
+import { mutateElement } from "@excalidraw/element";
+import { deepCopyElement } from "@excalidraw/element";
 import {
   isFrameLikeElement,
   isInitializedImageElement,
-} from "./element/typeChecks";
-import { deepCopyElement } from "./element/newElement";
-import { mutateElement } from "./element/mutateElement";
-import { getContainingFrame } from "./frame";
-import { arrayToMap, isMemberOf, isPromiseLike } from "./utils";
-import { createFile, isSupportedImageFileType } from "./data/blob";
+} from "@excalidraw/element";
+
+import { getContainingFrame } from "@excalidraw/element";
+
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
+
 import { ExcalidrawError } from "./errors";
+import { createFile, isSupportedImageFileType } from "./data/blob";
+import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
+
+import type { Spreadsheet } from "./charts";
+
+import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
@@ -164,7 +172,7 @@ export const serializeAsClipboardJSON = ({
         !framesToCopy.has(getContainingFrame(element, elementsMap)!)
       ) {
         const copiedElement = deepCopyElement(element);
-        mutateElement(copiedElement, {
+        mutateElement(copiedElement, elementsMap, {
           frameId: null,
         });
         return copiedElement;

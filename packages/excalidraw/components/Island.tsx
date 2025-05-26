@@ -1,7 +1,7 @@
-import "./Island.scss";
-
 import React from "react";
 import clsx from "clsx";
+
+import "./Island.scss";
 
 type IslandProps = {
   children: React.ReactNode;

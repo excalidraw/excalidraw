@@ -1,23 +1,30 @@
 import React, { useEffect, useRef } from "react";
-import { isShallowEqual, sceneCoordsToViewportCoords } from "../../utils";
-import { CURSOR_TYPE } from "../../constants";
+
+import {
+  CURSOR_TYPE,
+  isShallowEqual,
+  sceneCoordsToViewportCoords,
+} from "@excalidraw/common";
+
+import type {
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "@excalidraw/element/types";
+
 import { t } from "../../i18n";
-import type { DOMAttributes } from "react";
-import type { AppState, Device, InteractiveCanvasAppState } from "../../types";
+import { isRenderThrottlingEnabled } from "../../reactUtils";
+import { renderInteractiveScene } from "../../renderer/interactiveScene";
+
 import type {
   InteractiveCanvasRenderConfig,
   RenderableElementsMap,
   RenderInteractiveSceneCallback,
 } from "../../scene/types";
-import type {
-  NonDeletedExcalidrawElement,
-  NonDeletedSceneElementsMap,
-} from "../../element/types";
-import { isRenderThrottlingEnabled } from "../../reactUtils";
-import { renderInteractiveScene } from "../../renderer/interactiveScene";
+import type { AppState, Device, InteractiveCanvasAppState } from "../../types";
+import type { DOMAttributes } from "react";
 
 type InteractiveCanvasProps = {
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   canvas: HTMLCanvasElement | null;
   elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
@@ -27,6 +34,7 @@ type InteractiveCanvasProps = {
   selectionNonce: number | undefined;
   scale: number;
   appState: InteractiveCanvasAppState;
+  renderScrollbars: boolean;
   device: Device;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
@@ -136,7 +144,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           remotePointerUsernames,
           remotePointerUserStates,
           selectionColor,
-          renderScrollbars: false,
+          renderScrollbars: props.renderScrollbars,
         },
         device: props.device,
         callback: props.renderInteractiveSceneCallback,
@@ -207,6 +215,7 @@ const getRelevantAppStateProps = (
   isCropping: appState.isCropping,
   croppingElementId: appState.croppingElementId,
   searchMatches: appState.searchMatches,
+  activeLockedId: appState.activeLockedId,
 });
 
 const areEqual = (
@@ -223,7 +232,8 @@ const areEqual = (
     // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||
-    prevProps.selectedElements !== nextProps.selectedElements
+    prevProps.selectedElements !== nextProps.selectedElements ||
+    prevProps.renderScrollbars !== nextProps.renderScrollbars
   ) {
     return false;
   }

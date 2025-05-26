@@ -1,18 +1,22 @@
 import React from "react";
-import { render, waitFor } from "./test-utils";
-import { Excalidraw } from "../index";
-import { API } from "./helpers/api";
+
+import { SVG_NS } from "@excalidraw/common";
+
+import type { FileId } from "@excalidraw/element/types";
+
+import { getDefaultAppState } from "../appState";
+import { getDataURL } from "../data/blob";
 import { encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
+import { Excalidraw } from "../index";
 import {
   decodeSvgBase64Payload,
   encodeSvgBase64Payload,
   exportToSvg,
 } from "../scene/export";
-import type { FileId } from "../element/types";
-import { getDataURL } from "../data/blob";
-import { getDefaultAppState } from "../appState";
-import { SVG_NS } from "../constants";
+
+import { API } from "./helpers/api";
+import { render, waitFor } from "./test-utils";
 
 const { h } = window;
 

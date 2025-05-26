@@ -1,22 +1,26 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import type { ExcalidrawElement } from "../element/types";
-import { CODES, KEYS } from "../keys";
+import { vi } from "vitest";
+
+import { FONT_FAMILY, CODES, KEYS, reseed } from "@excalidraw/common";
+
+import { setDateTimeForTests } from "@excalidraw/common";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
-import { reseed } from "../random";
 import * as StaticScene from "../renderer/staticScene";
-import { setDateTimeForTests } from "../utils";
+
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
   assertSelectedElements,
+  checkpointHistory,
   fireEvent,
   render,
   screen,
   togglePopover,
+  unmountComponent,
 } from "./test-utils";
-import { FONT_FAMILY } from "../constants";
-import { vi } from "vitest";
 
 const { h } = window;
 
@@ -36,15 +40,15 @@ const checkpoint = (name: string) => {
     `[${name}] number of renders`,
   );
   expect(h.state).toMatchSnapshot(`[${name}] appState`);
-  expect(h.history).toMatchSnapshot(`[${name}] history`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
   h.elements.forEach((element, i) =>
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
   );
+
+  checkpointHistory(h.history, name);
 };
 beforeEach(async () => {
-  // Unmount ReactDOM from root
-  ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+  unmountComponent();
 
   localStorage.clear();
   renderStaticScene.mockClear();
@@ -1182,3 +1186,7 @@ it(
     expect(API.getSelectedElements().length).toBe(1);
   },
 );
+
+//
+// DEPRECATED: DO NOT ADD TESTS HERE
+//

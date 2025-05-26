@@ -1,19 +1,26 @@
-import type {
-  ElementsMap,
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-  NonDeletedSceneElementsMap,
-} from "../../element/types";
-import type Scene from "../../scene/Scene";
-import StatsDragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
-import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
-import { getCommonBounds, isTextElement } from "../../element";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
 import { useMemo } from "react";
+
+import { isTextElement } from "@excalidraw/element";
+
+import { getCommonBounds } from "@excalidraw/element";
+
+import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Scene } from "@excalidraw/element";
+
+import StatsDragInput from "./DragInput";
+import {
+  getAtomicUnits,
+  getStepSizedValue,
+  isPropertyEditable,
+  STEP_SIZE,
+} from "./utils";
 import { getElementsInAtomicUnit, moveElement } from "./utils";
+
+import type { DragInputCallbackType } from "./DragInput";
 import type { AtomicUnit } from "./utils";
 import type { AppState } from "../../types";
-import { pointFrom, pointRotateRads } from "../../../math";
 
 interface MultiPositionProps {
   property: "x" | "y";
@@ -24,19 +31,15 @@ interface MultiPositionProps {
   appState: AppState;
 }
 
-const STEP_SIZE = 10;
-
 const moveElements = (
   property: MultiPositionProps["property"],
   changeInTopX: number,
   changeInTopY: number,
-  elements: readonly ExcalidrawElement[],
   originalElements: readonly ExcalidrawElement[],
-  elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
   scene: Scene,
 ) => {
-  for (let i = 0; i < elements.length; i++) {
+  for (let i = 0; i < originalElements.length; i++) {
     const origElement = originalElements[i];
 
     const [cx, cy] = [
@@ -59,8 +62,6 @@ const moveElements = (
       newTopLeftX,
       newTopLeftY,
       origElement,
-      elementsMap,
-      elements,
       scene,
       originalElementsMap,
       false,
@@ -72,11 +73,10 @@ const moveGroupTo = (
   nextX: number,
   nextY: number,
   originalElements: ExcalidrawElement[],
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
   originalElementsMap: ElementsMap,
   scene: Scene,
 ) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
   const [x1, y1, ,] = getCommonBounds(originalElements);
   const offsetX = nextX - x1;
   const offsetY = nextY - y1;
@@ -106,8 +106,6 @@ const moveGroupTo = (
         topLeftX + offsetX,
         topLeftY + offsetY,
         origElement,
-        elementsMap,
-        elements,
         scene,
         originalElementsMap,
         false,
@@ -129,7 +127,6 @@ const handlePositionChange: DragInputCallbackType<
   originalAppState,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const elements = scene.getNonDeletedElements();
 
   if (nextValue !== undefined) {
     for (const atomicUnit of getAtomicUnits(
@@ -153,8 +150,6 @@ const handlePositionChange: DragInputCallbackType<
           newTopLeftX,
           newTopLeftY,
           elementsInUnit.map((el) => el.original),
-          elementsMap,
-          elements,
           originalElementsMap,
           scene,
         );
@@ -182,8 +177,6 @@ const handlePositionChange: DragInputCallbackType<
             newTopLeftX,
             newTopLeftY,
             origElement,
-            elementsMap,
-            elements,
             scene,
             originalElementsMap,
             false,
@@ -208,8 +201,6 @@ const handlePositionChange: DragInputCallbackType<
     changeInTopX,
     changeInTopY,
     originalElements,
-    originalElements,
-    elementsMap,
     originalElementsMap,
     scene,
   );

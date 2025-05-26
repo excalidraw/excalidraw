@@ -1,18 +1,22 @@
-import type { ExcalidrawElement } from "../../element/types";
-import DragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, isPropertyEditable } from "./utils";
-import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
-import { resizeSingleElement } from "../../element/resizeElements";
-import type Scene from "../../scene/Scene";
-import type { AppState } from "../../types";
-import { isImageElement } from "../../element/typeChecks";
+import { clamp, round } from "@excalidraw/math";
+
+import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
 import {
   MINIMAL_CROP_SIZE,
   getUncroppedWidthAndHeight,
-} from "../../element/cropElement";
-import { mutateElement } from "../../element/mutateElement";
-import { clamp, round } from "../../../math";
+} from "@excalidraw/element";
+import { resizeSingleElement } from "@excalidraw/element";
+import { isImageElement } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Scene } from "@excalidraw/element";
+
+import DragInput from "./DragInput";
+import { getStepSizedValue, isPropertyEditable } from "./utils";
+
+import type { DragInputCallbackType } from "./DragInput";
+import type { AppState } from "../../types";
 
 interface DimensionDragInputProps {
   property: "width" | "height";
@@ -109,7 +113,7 @@ const handleDimensionChange: DragInputCallbackType<
           };
         }
 
-        mutateElement(element, {
+        scene.mutateElement(element, {
           crop: nextCrop,
           width: nextCrop.width / (crop.naturalWidth / uncroppedWidth),
           height: nextCrop.height / (crop.naturalHeight / uncroppedHeight),
@@ -140,7 +144,7 @@ const handleDimensionChange: DragInputCallbackType<
         height: nextCropHeight,
       };
 
-      mutateElement(element, {
+      scene.mutateElement(element, {
         crop: nextCrop,
         width: nextCrop.width / (crop.naturalWidth / uncroppedWidth),
         height: nextCrop.height / (crop.naturalHeight / uncroppedHeight),
@@ -172,8 +176,8 @@ const handleDimensionChange: DragInputCallbackType<
         nextHeight,
         latestElement,
         origElement,
-        elementsMap,
         originalElementsMap,
+        scene,
         property === "width" ? "e" : "s",
         {
           shouldMaintainAspectRatio: keepAspectRatio,
@@ -219,8 +223,8 @@ const handleDimensionChange: DragInputCallbackType<
       nextHeight,
       latestElement,
       origElement,
-      elementsMap,
       originalElementsMap,
+      scene,
       property === "width" ? "e" : "s",
       {
         shouldMaintainAspectRatio: keepAspectRatio,

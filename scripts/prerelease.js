@@ -1,9 +1,10 @@
 const fs = require("fs");
 const util = require("util");
+
 const exec = util.promisify(require("child_process").exec);
 const updateChangelog = require("./updateChangelog");
 
-const excalidrawDir = `${__dirname}/../packages/excalidraw/packages/excalidraw`;
+const excalidrawDir = `${__dirname}/../packages/excalidraw/`;
 const excalidrawPackage = `${excalidrawDir}/package.json`;
 
 const updatePackageVersion = (nextVersion) => {

@@ -1,19 +1,24 @@
-import { t } from "../i18n";
-import type { AppClassProperties, Device, UIAppState } from "../types";
+import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "@excalidraw/common";
+
 import {
   isFlowchartNodeElement,
   isImageElement,
   isLinearElement,
   isTextBindableContainer,
   isTextElement,
-} from "../element/typeChecks";
-import { getShortcutKey } from "../utils";
+} from "@excalidraw/element";
+
+import { getShortcutKey } from "@excalidraw/common";
+
+import { isNodeInFlowchart } from "@excalidraw/element";
+
+import { t } from "../i18n";
 import { isEraserActive } from "../appState";
+import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
-import { isNodeInFlowchart } from "../element/flowchart";
-import { isGridModeEnabled } from "../snapping";
-import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "../constants";
+
+import type { AppClassProperties, Device, UIAppState } from "../types";
 
 interface HintViewerProps {
   appState: UIAppState;
@@ -34,7 +39,7 @@ const getHints = ({
   if (
     appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
     appState.openSidebar.tab === CANVAS_SEARCH_TAB &&
-    appState.searchMatches?.length
+    appState.searchMatches?.matches.length
   ) {
     return t("hints.dismissSearch");
   }
@@ -115,7 +120,7 @@ const getHints = ({
       !appState.editingTextElement &&
       !appState.editingLinearElement
     ) {
-      return t("hints.deepBoxSelect");
+      return [t("hints.deepBoxSelect")];
     }
 
     if (isGridModeEnabled(app) && appState.selectedElementsAreBeingDragged) {
@@ -123,7 +128,7 @@ const getHints = ({
     }
 
     if (!selectedElements.length && !isMobile) {
-      return t("hints.canvasPanning");
+      return [t("hints.canvasPanning")];
     }
 
     if (selectedElements.length === 1) {

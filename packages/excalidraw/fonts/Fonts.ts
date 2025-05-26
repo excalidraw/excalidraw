@@ -4,17 +4,36 @@ import {
   CJK_HAND_DRAWN_FALLBACK_FONT,
   WINDOWS_EMOJI_FALLBACK_FONT,
   getFontFamilyFallbacks,
-} from "../constants";
-import { isTextElement } from "../element";
-import { getContainerElement } from "../element/textElement";
-import { containsCJK } from "../element/textWrapping";
-import { ShapeCache } from "../scene/ShapeCache";
-import { getFontString, PromisePool, promiseTry } from "../utils";
-import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
+} from "@excalidraw/common";
+import { getContainerElement } from "@excalidraw/element";
+import { charWidth } from "@excalidraw/element";
+import { containsCJK } from "@excalidraw/element";
+
+import {
+  FONT_METADATA,
+  type FontMetadata,
+  getFontString,
+  PromisePool,
+  promiseTry,
+} from "@excalidraw/common";
+
+import { ShapeCache } from "@excalidraw/element";
+
+import { isTextElement } from "@excalidraw/element";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
+
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
+import type { Scene } from "@excalidraw/element";
 
 import { CascadiaFontFaces } from "./Cascadia";
 import { ComicShannsFontFaces } from "./ComicShanns";
 import { EmojiFontFaces } from "./Emoji";
+import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
 import { ExcalifontFontFaces } from "./Excalifont";
 import { HelveticaFontFaces } from "./Helvetica";
 import { LiberationFontFaces } from "./Liberation";
@@ -22,16 +41,6 @@ import { LilitaFontFaces } from "./Lilita";
 import { NunitoFontFaces } from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
-
-import { FONT_METADATA, type FontMetadata } from "./FontMetadata";
-import type {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  FontFamilyValues,
-} from "../element/types";
-import type Scene from "../scene/Scene";
-import type { ValueOf } from "../utility-types";
-import { charWidth } from "../element/textMeasurements";
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
@@ -453,37 +462,6 @@ export class Fonts {
     return Array.from(Fonts.registered.keys());
   }
 }
-
-/**
- * Calculates vertical offset for a text with alphabetic baseline.
- */
-export const getVerticalOffset = (
-  fontFamily: ExcalidrawTextElement["fontFamily"],
-  fontSize: ExcalidrawTextElement["fontSize"],
-  lineHeightPx: number,
-) => {
-  const { unitsPerEm, ascender, descender } =
-    Fonts.registered.get(fontFamily)?.metadata.metrics ||
-    FONT_METADATA[FONT_FAMILY.Virgil].metrics;
-
-  const fontSizeEm = fontSize / unitsPerEm;
-  const lineGap =
-    (lineHeightPx - fontSizeEm * ascender + fontSizeEm * descender) / 2;
-
-  const verticalOffset = fontSizeEm * ascender + lineGap;
-  return verticalOffset;
-};
-
-/**
- * Gets line height forr a selected family.
- */
-export const getLineHeight = (fontFamily: FontFamilyValues) => {
-  const { lineHeight } =
-    Fonts.registered.get(fontFamily)?.metadata.metrics ||
-    FONT_METADATA[FONT_FAMILY.Excalifont].metrics;
-
-  return lineHeight as ExcalidrawTextElement["lineHeight"];
-};
 
 export interface ExcalidrawFontFaceDescriptor {
   uri: string;

@@ -1,19 +1,25 @@
-import { useEffect, useRef, useState } from "react";
-import { EVENT } from "../../constants";
-import { KEYS } from "../../keys";
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
-import { deepCopyElement } from "../../element/newElement";
 import clsx from "clsx";
+import { useEffect, useRef, useState } from "react";
+
+import { EVENT, KEYS, cloneJSON } from "@excalidraw/common";
+
+import { deepCopyElement } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Scene } from "@excalidraw/element";
+
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
-import type { StatsInputProperty } from "./utils";
+
 import { SMALLEST_DELTA } from "./utils";
-import { StoreAction } from "../../store";
-import type Scene from "../../scene/Scene";
 
 import "./DragInput.scss";
+
+import type { StatsInputProperty } from "./utils";
 import type { AppState } from "../../types";
-import { cloneJSON } from "../../utils";
 
 export type DragInputCallbackType<
   P extends StatsInputProperty,
@@ -132,7 +138,9 @@ const StatsDragInput = <
         originalAppState: appState,
         setInputValue: (value) => setInputValue(String(value)),
       });
-      app.syncActionResult({ storeAction: StoreAction.CAPTURE });
+      app.syncActionResult({
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
     }
   };
 
@@ -210,13 +218,12 @@ const StatsDragInput = <
               y: number;
             } | null = null;
 
-            let originalElementsMap: Map<string, ExcalidrawElement> | null =
-              app.scene
-                .getNonDeletedElements()
-                .reduce((acc: ElementsMap, element) => {
-                  acc.set(element.id, deepCopyElement(element));
-                  return acc;
-                }, new Map());
+            let originalElementsMap: ElementsMap | null = app.scene
+              .getNonDeletedElements()
+              .reduce((acc: ElementsMap, element) => {
+                acc.set(element.id, deepCopyElement(element));
+                return acc;
+              }, new Map());
 
             let originalElements: readonly E[] | null = elements.map(
               (element) => originalElementsMap!.get(element.id) as E,
@@ -276,7 +283,9 @@ const StatsDragInput = <
                 false,
               );
 
-              app.syncActionResult({ storeAction: StoreAction.CAPTURE });
+              app.syncActionResult({
+                captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+              });
 
               lastPointer = null;
               accumulatedChange = 0;

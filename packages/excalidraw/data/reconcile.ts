@@ -1,14 +1,18 @@
 import throttle from "lodash.throttle";
-import { ENV } from "../constants";
-import type { OrderedExcalidrawElement } from "../element/types";
+
+import { arrayToMap, isDevEnv, isTestEnv } from "@excalidraw/common";
+
 import {
   orderByFractionalIndex,
   syncInvalidIndices,
   validateFractionalIndices,
-} from "../fractionalIndex";
+} from "@excalidraw/element";
+
+import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
+
+import type { MakeBrand } from "@excalidraw/common/utility-types";
+
 import type { AppState } from "../types";
-import type { MakeBrand } from "../utility-types";
-import { arrayToMap } from "../utils";
 
 export type ReconciledExcalidrawElement = OrderedExcalidrawElement &
   MakeBrand<"ReconciledElement">;
@@ -45,11 +49,7 @@ const validateIndicesThrottled = throttle(
     localElements: readonly OrderedExcalidrawElement[],
     remoteElements: readonly RemoteExcalidrawElement[],
   ) => {
-    if (
-      import.meta.env.DEV ||
-      import.meta.env.MODE === ENV.TEST ||
-      window?.DEBUG_FRACTIONAL_INDICES
-    ) {
+    if (isDevEnv() || isTestEnv() || window?.DEBUG_FRACTIONAL_INDICES) {
       // create new instances due to the mutation
       const elements = syncInvalidIndices(
         orderedElements.map((x) => ({ ...x })),
@@ -57,7 +57,7 @@ const validateIndicesThrottled = throttle(
 
       validateFractionalIndices(elements, {
         // throw in dev & test only, to remain functional on `DEBUG_FRACTIONAL_INDICES`
-        shouldThrow: import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
+        shouldThrow: isTestEnv() || isDevEnv(),
         includeBoundTextValidation: true,
         reconciliationContext: {
           localElements,

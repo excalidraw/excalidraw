@@ -1,0 +1,25 @@
+{
+  "name": "with-nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build:workspace": "yarn workspace @excalidraw/excalidraw run build:esm && yarn copy:assets",
+    "copy:assets": "cp -r ../../packages/excalidraw/dist/prod/fonts ./public",
+    "dev": "yarn build:workspace && next dev -p 3005",
+    "build": "yarn build:workspace && next build",
+    "start": "next start -p 3006",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "14.1",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "19.0.10",
+    "@types/react-dom": "19.0.4",
+    "path2d-polyfill": "2.0.1",
+    "typescript": "^5"
+  }
+}

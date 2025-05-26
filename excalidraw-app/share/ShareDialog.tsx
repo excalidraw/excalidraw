@@ -1,10 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { copyTextToSystemClipboard } from "../../packages/excalidraw/clipboard";
-import { trackEvent } from "../../packages/excalidraw/analytics";
-import { getFrame } from "../../packages/excalidraw/utils";
-import { useI18n } from "../../packages/excalidraw/i18n";
-import { KEYS } from "../../packages/excalidraw/keys";
-import { Dialog } from "../../packages/excalidraw/components/Dialog";
+import { trackEvent } from "@excalidraw/excalidraw/analytics";
+import { copyTextToSystemClipboard } from "@excalidraw/excalidraw/clipboard";
+import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
+import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
+import { TextField } from "@excalidraw/excalidraw/components/TextField";
 import {
   copyIcon,
   LinkIcon,
@@ -13,16 +11,19 @@ import {
   share,
   shareIOS,
   shareWindows,
-} from "../../packages/excalidraw/components/icons";
-import { TextField } from "../../packages/excalidraw/components/TextField";
-import { FilledButton } from "../../packages/excalidraw/components/FilledButton";
-import type { CollabAPI } from "../collab/Collab";
-import { activeRoomLinkAtom } from "../collab/Collab";
-import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
-import { useCopyStatus } from "../../packages/excalidraw/hooks/useCopiedIndicator";
+} from "@excalidraw/excalidraw/components/icons";
+import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
+import { useCopyStatus } from "@excalidraw/excalidraw/hooks/useCopiedIndicator";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
+import { KEYS, getFrame } from "@excalidraw/common";
+import { useEffect, useRef, useState } from "react";
+
 import { atom, useAtom, useAtomValue } from "../app-jotai";
+import { activeRoomLinkAtom } from "../collab/Collab";
 
 import "./ShareDialog.scss";
+
+import type { CollabAPI } from "../collab/Collab";
 
 type OnExportToBackend = () => void;
 type ShareDialogType = "share" | "collaborationOnly";

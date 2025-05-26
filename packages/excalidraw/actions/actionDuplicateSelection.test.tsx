@@ -1,14 +1,15 @@
+import { ORIG_ID } from "@excalidraw/common";
+
 import { Excalidraw } from "../index";
+import { API } from "../tests/helpers/api";
 import {
   act,
   assertElements,
   getCloneByOrigId,
   render,
 } from "../tests/test-utils";
-import { API } from "../tests/helpers/api";
+
 import { actionDuplicateSelection } from "./actionDuplicateSelection";
-import React from "react";
-import { ORIG_ID } from "../constants";
 
 const { h } = window;
 
@@ -256,7 +257,7 @@ describe("actionDuplicateSelection", () => {
       assertElements(h.elements, [
         { id: frame.id },
         { id: text.id, frameId: frame.id },
-        { [ORIG_ID]: text.id, frameId: frame.id },
+        { [ORIG_ID]: text.id, frameId: frame.id, selected: true },
       ]);
     });
 
