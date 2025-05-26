@@ -5,9 +5,14 @@ import {
   bindOrUnbindLinearElement,
   isBindingEnabled,
 } from "@excalidraw/element/binding";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { isValidPolygon, LinearElementEditor } from "@excalidraw/element";
 
-import { isBindingElement, isLinearElement } from "@excalidraw/element";
+import {
+  isBindingElement,
+  isFreeDrawElement,
+  isLinearElement,
+  isLineElement,
+} from "@excalidraw/element";
 
 import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element";
@@ -16,6 +21,7 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
+import type { LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -93,6 +99,12 @@ export const actionFinalize = register({
             scene,
           );
         }
+        if (isLineElement(element) && !isValidPolygon(element.points)) {
+          scene.mutateElement(element, {
+            polygon: false,
+          });
+        }
+
         return {
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
@@ -166,23 +178,36 @@ export const actionFinalize = register({
         newElements = newElements.filter((el) => el.id !== element!.id);
       }
 
-      if (isLinearElement(element) || element.type === "freedraw") {
+      if (isLinearElement(element) || isFreeDrawElement(element)) {
         // If the multi point line closes the loop,
         // set the last point to first point.
         // This ensures that loop remains closed at different scales.
         const isLoop = isPathALoop(element.points, appState.zoom.value);
-        if (element.type === "line" || element.type === "freedraw") {
-          if (isLoop) {
-            const linePoints = element.points;
-            const firstPoint = linePoints[0];
+
+        if (isLoop && (isLineElement(element) || isFreeDrawElement(element))) {
+          const linePoints = element.points;
+          const firstPoint = linePoints[0];
+          const points: LocalPoint[] = linePoints.map((p, index) =>
+            index === linePoints.length - 1
+              ? pointFrom(firstPoint[0], firstPoint[1])
+              : p,
+          );
+          if (isLineElement(element)) {
             scene.mutateElement(element, {
-              points: linePoints.map((p, index) =>
-                index === linePoints.length - 1
-                  ? pointFrom(firstPoint[0], firstPoint[1])
-                  : p,
-              ),
+              points,
+              polygon: true,
+            });
+          } else {
+            scene.mutateElement(element, {
+              points,
             });
           }
+        }
+
+        if (isLineElement(element) && !isValidPolygon(element.points)) {
+          scene.mutateElement(element, {
+            polygon: false,
+          });
         }
 
         if (

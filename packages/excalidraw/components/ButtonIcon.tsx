@@ -15,6 +15,7 @@ interface ButtonIconProps {
   /** include standalone style (could interfere with parent styles) */
   standalone?: boolean;
   onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  style?: React.CSSProperties;
 }
 
 export const ButtonIcon = forwardRef<HTMLButtonElement, ButtonIconProps>(
@@ -30,6 +31,7 @@ export const ButtonIcon = forwardRef<HTMLButtonElement, ButtonIconProps>(
         data-testid={testId}
         className={clsx(className, { standalone, active })}
         onClick={onClick}
+        style={props.style}
       >
         {icon}
       </button>
