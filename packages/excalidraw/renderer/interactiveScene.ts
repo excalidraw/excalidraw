@@ -459,10 +459,7 @@ const renderLinearPointHandles = (
 
     const isOverlappingPoint =
       idx > 0 &&
-      (idx !== points.length - 1 ||
-        appState.editingLinearElement ||
-        !_isLineElement ||
-        !element.polygon) &&
+      (idx !== points.length - 1 || !_isLineElement || !element.polygon) &&
       pointsEqual(
         point,
         idx === points.length - 1 ? points[0] : points[idx - 1],
