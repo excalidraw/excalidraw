@@ -237,37 +237,15 @@ describe("collaboration", () => {
 
     // with explicit redo (as removal) we again restore the element from the snapshot!
     await waitFor(() => {
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(0);
-      expect(API.getSnapshot()).toEqual([
-        expect.objectContaining(rect1Props),
-        expect.objectContaining({ ...rect2Props, isDeleted: true }),
-      ]);
-      expect(h.elements).toEqual([
-        expect.objectContaining(rect1Props),
-        expect.objectContaining({ ...rect2Props, isDeleted: true }),
-      ]);
-    });
-
-    // simulate local update
-    API.updateScene({
-      elements: syncInvalidIndices([
-        h.elements[0],
-        newElementWith(h.elements[1], { x: 100, isDeleted: false }),
-      ]),
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-    });
-
-    await waitFor(() => {
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(0);
       expect(API.getSnapshot()).toEqual([
         expect.objectContaining(rect1Props),
-        expect.objectContaining({ ...rect2Props, isDeleted: false, x: 100 }),
+        expect.objectContaining({ ...rect2Props, isDeleted: true }),
       ]);
       expect(h.elements).toEqual([
         expect.objectContaining(rect1Props),
-        expect.objectContaining({ ...rect2Props, isDeleted: false, x: 100 }),
+        expect.objectContaining({ ...rect2Props, isDeleted: true }),
       ]);
     });
   });

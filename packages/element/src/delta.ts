@@ -80,13 +80,20 @@ export class Delta<T> {
   public static create<T>(
     deleted: Partial<T>,
     inserted: Partial<T>,
-    modifier?: (delta: Partial<T>) => Partial<T>,
-    modifierOptions?: "deleted" | "inserted",
+    modifier?: (
+      delta: Partial<T>,
+      partialType: "deleted" | "inserted",
+    ) => Partial<T>,
+    modifierOptions?: "deleted" | "inserted" | "both",
   ) {
     const modifiedDeleted =
-      modifier && modifierOptions !== "inserted" ? modifier(deleted) : deleted;
+      modifier && modifierOptions !== "inserted"
+        ? modifier(deleted, "deleted")
+        : deleted;
     const modifiedInserted =
-      modifier && modifierOptions !== "deleted" ? modifier(inserted) : inserted;
+      modifier && modifierOptions !== "deleted"
+        ? modifier(inserted, "inserted")
+        : inserted;
 
     return new Delta(modifiedDeleted, modifiedInserted);
   }
@@ -1103,16 +1110,38 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   /**
    * Update delta/s based on the existing elements.
    *
-   * @param elements current elements
+   * @param nextElements current elements
    * @param modifierOptions defines which of the delta (`deleted` or `inserted`) will be updated
    * @returns new instance with modified delta/s
    */
   public applyLatestChanges(
-    elements: SceneElementsMap,
-    modifierOptions: "deleted" | "inserted",
+    prevElements: SceneElementsMap,
+    nextElements: SceneElementsMap,
+    modifierOptions: "deleted" | "inserted" | "both",
   ): ElementsDelta {
     const modifier =
-      (element: OrderedExcalidrawElement) => (partial: ElementPartial) => {
+      (
+        prevElement: OrderedExcalidrawElement | undefined,
+        nextElement: OrderedExcalidrawElement | undefined,
+      ) =>
+      (partial: ElementPartial, partialType: "deleted" | "inserted") => {
+        let element: OrderedExcalidrawElement | undefined;
+
+        switch (partialType) {
+          case "deleted":
+            element = prevElement;
+            break;
+          case "inserted":
+            element = nextElement;
+            break;
+        }
+
+        // the element wasn't found -> don't update the partial
+        if (!element) {
+          console.error(`Element not foudn for applying latest changes`);
+          return partial;
+        }
+
         const latestPartial: { [key: string]: unknown } = {};
 
         for (const key of Object.keys(partial) as Array<keyof typeof partial>) {
@@ -1136,13 +1165,14 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       const modifiedDeltas: Record<string, Delta<ElementPartial>> = {};
 
       for (const [id, delta] of Object.entries(deltas)) {
-        const existingElement = elements.get(id);
+        const prevElement = prevElements.get(id);
+        const nextElement = nextElements.get(id);
 
-        if (existingElement) {
+        if (prevElement || nextElement) {
           const modifiedDelta = Delta.create(
             delta.deleted,
             delta.inserted,
-            modifier(existingElement),
+            modifier(prevElement, nextElement),
             modifierOptions,
           );
 

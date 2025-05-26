@@ -4,10 +4,9 @@ import {
   CaptureUpdateAction,
   StoreChange,
   StoreDelta,
-  type Store,
 } from "@excalidraw/element";
 
-import type { StoreSnapshot } from "@excalidraw/element";
+import type { StoreSnapshot, Store } from "@excalidraw/element";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
@@ -61,6 +60,23 @@ export class HistoryDelta extends StoreDelta {
    */
   public static override inverse(delta: StoreDelta): HistoryDelta {
     return super.inverse(delta) as HistoryDelta;
+  }
+
+  /**
+   * Overriding once to avoid type casting everywhere.
+   */
+  public static override applyLatestChanges(
+    delta: StoreDelta,
+    prevElements: SceneElementsMap,
+    nextElements: SceneElementsMap,
+    modifierOptions: "deleted" | "inserted" | "both",
+  ) {
+    return super.applyLatestChanges(
+      delta,
+      prevElements,
+      nextElements,
+      modifierOptions,
+    ) as HistoryDelta;
   }
 }
 
@@ -145,9 +161,9 @@ export class History {
     push: (entry: HistoryDelta) => void,
   ): [SceneElementsMap, AppState] | void {
     try {
-      let historyDelta = pop();
+      let delta = pop();
 
-      if (historyDelta === null) {
+      if (delta === null) {
         return;
       }
 
@@ -159,12 +175,16 @@ export class History {
       let nextAppState = appState;
       let containsVisibleChange = false;
 
-      // iterate through the history entries in case they result in no visible changes
-      while (historyDelta) {
+      // iterate through the history entries in case ;they result in no visible changes
+      while (delta) {
         try {
-          [nextElements, nextAppState, containsVisibleChange] =
-            historyDelta.applyTo(nextElements, nextAppState, prevSnapshot);
+          [nextElements, nextAppState, containsVisibleChange] = delta.applyTo(
+            nextElements,
+            nextAppState,
+            prevSnapshot,
+          );
 
+          const prevElements = prevSnapshot.elements;
           const nextSnapshot = prevSnapshot.maybeClone(
             action,
             nextElements,
@@ -173,29 +193,31 @@ export class History {
 
           const change = StoreChange.create(prevSnapshot, nextSnapshot);
 
-          // update the history entry, so that it's the a new history entry instance
-          // and so that it contains the latest changes in both inserted and deleted partials
-          // including version and versionNonce or properties which were in the meantime updated by a remote client
-          historyDelta = HistoryDelta.calculate(prevSnapshot, nextSnapshot);
+          delta = HistoryDelta.applyLatestChanges(
+            delta,
+            prevElements,
+            nextElements,
+            "both",
+          );
 
           // schedule immediate capture, so that it's emitted for the sync purposes
           this.store.scheduleMicroAction({
             action,
             change,
-            delta: historyDelta,
+            delta,
           });
 
           prevSnapshot = nextSnapshot;
         } finally {
           // make sure to always push, even if the delta is corrupted
-          push(historyDelta);
+          push(delta);
         }
 
         if (containsVisibleChange) {
           break;
         }
 
-        historyDelta = pop();
+        delta = pop();
       }
 
       return [nextElements, nextAppState];
@@ -223,10 +245,6 @@ export class History {
   }
 
   private static push(stack: HistoryDelta[], entry: HistoryDelta) {
-    if (entry.isEmpty()) {
-      return;
-    }
-
     const inversedEntry = HistoryDelta.inverse(entry);
     return stack.push(inversedEntry);
   }

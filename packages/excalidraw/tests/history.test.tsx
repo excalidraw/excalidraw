@@ -25,7 +25,7 @@ import "@excalidraw/utils/test-utils";
 
 import { ElementsDelta, AppStateDelta } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction, StoreDelta } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
@@ -53,8 +53,6 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { getDefaultAppState } from "../appState";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
-
-import { HistoryDelta } from "../history";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -123,19 +121,9 @@ describe("history", () => {
 
       API.setElements([rect]);
 
-      const corrupedEntry = HistoryDelta.create(
+      const corrupedEntry = StoreDelta.create(
         ElementsDelta.empty(),
-        // delta can't be empty, otherwise it won't be pushed into the undo stack
-        AppStateDelta.restore({
-          delta: {
-            inserted: {
-              selectedElementIds: {},
-            },
-            deleted: {
-              selectedElementIds: { [rect.id]: true },
-            },
-          },
-        }),
+        AppStateDelta.empty(),
       );
 
       vi.spyOn(corrupedEntry.elements, "applyTo").mockImplementation(() => {
@@ -402,7 +390,7 @@ describe("history", () => {
       ]);
     });
 
-    it("should not push into redo stack when selection changes dooes not produce a visible change", async () => {
+    it("should iterate through the history when selection changes do not produce visible change", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
 
       const rect = UI.createElement("rectangle", { x: 10 });
@@ -433,18 +421,18 @@ describe("history", () => {
       expect(API.getSelectedElements().length).toBe(0);
 
       Keyboard.redo(); // acceptable empty redo
-      expect(API.getUndoStack().length).toBe(2); // empty change, nothing goes into undo stack
+      expect(API.getUndoStack().length).toBe(3);
       expect(API.getRedoStack().length).toBe(0);
       expect(API.getSelectedElements().length).toBe(0);
 
       Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(1);
       assertSelectedElements(rect);
 
       Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(0);
-      expect(API.getRedoStack().length).toBe(2);
+      expect(API.getUndoStack().length).toBe(0); // now we iterated through the same undos!
+      expect(API.getRedoStack().length).toBe(3);
       expect(API.getSelectedElements().length).toBe(0);
       expect(h.elements).toEqual([
         expect.objectContaining({ id: rect.id, isDeleted: true }),
@@ -1326,6 +1314,7 @@ describe("history", () => {
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
 
+        // element ref changes after the update
         rect1 = h.elements[0] as ExcalidrawRectangleElement;
         text = h.elements[1] as ExcalidrawTextElement;
         rect2 = h.elements[2] as ExcalidrawRectangleElement;
@@ -2379,10 +2368,10 @@ describe("history", () => {
         }),
       ]);
 
+      // We reached the bottom, again we iterate through invisible changes and reach the top
       Keyboard.redo();
       assertSelectedElements();
-      // We reached the bottom, now there is only one non-empty history delta, which will be pushed to the undo stack
-      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(0);
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -2447,31 +2436,7 @@ describe("history", () => {
       ]);
 
       Keyboard.redo();
-      expect(API.getUndoStack().length).toBe(2);
-      expect(API.getRedoStack().length).toBe(3);
-      // visible change detected, so we don't iterate up again
-      expect(API.getSelectedElements()).toEqual([]);
-      expect(h.elements).toEqual([
-        expect.objectContaining({
-          id: rect1.id,
-          isDeleted: false,
-        }),
-        expect.objectContaining({
-          id: rect2.id,
-          isDeleted: true,
-          backgroundColor: transparent,
-        }),
-        expect.objectContaining({
-          id: rect3.id,
-          isDeleted: true,
-          x: 30,
-          y: 30,
-        }),
-      ]);
-
-      Keyboard.redo();
-      // we iterate all the way up, as there are no visible changes
-      expect(API.getUndoStack().length).toBe(4);
+      expect(API.getUndoStack().length).toBe(5);
       expect(API.getRedoStack().length).toBe(0);
       expect(API.getSelectedElements()).toEqual([]);
       expect(h.elements).toEqual([
@@ -2530,8 +2495,8 @@ describe("history", () => {
       ]);
 
       Keyboard.redo();
-      expect(API.getUndoStack().length).toBe(2);
-      expect(API.getRedoStack().length).toBe(1);
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
       // do not expect any selectedElementIds, as all relate to deleted elements
       expect(API.getSelectedElements()).toEqual([]);
       expect(h.elements).toEqual([
@@ -2547,6 +2512,7 @@ describe("history", () => {
         expect.objectContaining({ id: rect1.id, isDeleted: false }),
       ]);
 
+      // Simulate remote update
       API.updateScene({
         elements: [
           h.elements[0],
@@ -2563,13 +2529,14 @@ describe("history", () => {
       Keyboard.redo();
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(1);
-      // redo entry was calculated again with the latest undo, which goes back to nothing being selected
-      expect(API.getSelectedElements()).toEqual([]);
+      expect(API.getSelectedElements()).toEqual([
+        expect.objectContaining({ id: rect2.id, isDeleted: false }),
+      ]);
 
       Keyboard.redo();
       expect(API.getUndoStack().length).toBe(3);
       expect(API.getRedoStack().length).toBe(0);
-      // now we again expect these as selected, as they got restored remotely and this redo entry was calculated in the beginning
+      // now we again expect these as selected, as they got restored remotely
       expect(API.getSelectedElements()).toEqual([
         expect.objectContaining({ id: rect2.id }),
         expect.objectContaining({ id: rect3.id }),
@@ -2638,13 +2605,15 @@ describe("history", () => {
 
       Keyboard.undo();
       expect(API.getUndoStack().length).toBe(0);
-      expect(API.getRedoStack().length).toBe(1); // iterated two steps back and reduce two empty entries into one!
+      expect(API.getRedoStack().length).toBe(2); // iterated two steps back!
       expect(h.state.selectedGroupIds).toEqual({});
 
       Keyboard.redo();
-      expect(API.getUndoStack().length).toBe(0); // no changes applied, so there is no new entry
+      expect(API.getUndoStack().length).toBe(2); // iterated two steps forward!
       expect(API.getRedoStack().length).toBe(0);
       expect(h.state.selectedGroupIds).toEqual({});
+
+      Keyboard.undo();
 
       // Simulate remote update
       API.updateScene({
@@ -2658,6 +2627,22 @@ describe("history", () => {
         ],
         captureUpdate: CaptureUpdateAction.NEVER,
       });
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.state.selectedGroupIds).toEqual({ A: true });
+
+      // Simulate remote update
+      API.updateScene({
+        elements: [h.elements[0], h.elements[1], rect3, rect4],
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.selectedGroupIds).toEqual({ A: true, B: true });
     });
 
     it("should iterate through the history when editing group contains only remotely deleted elements", async () => {
@@ -2702,7 +2687,33 @@ describe("history", () => {
 
       Keyboard.undo();
       expect(API.getUndoStack().length).toBe(0);
-      expect(API.getRedoStack().length).toBe(0); // all changes relate to remotely deleted elements, there is no change and thus nothing to redo
+      expect(API.getRedoStack().length).toBe(3);
+      expect(h.state.editingGroupId).toBeNull();
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.editingGroupId).toBeNull();
+
+      // Simulate remote update
+      API.updateScene({
+        elements: [
+          newElementWith(h.elements[0], {
+            isDeleted: false,
+          }),
+          h.elements[1],
+        ],
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.state.editingGroupId).toBe("A");
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
       expect(h.state.editingGroupId).toBeNull();
     });
 
@@ -2739,13 +2750,13 @@ describe("history", () => {
       });
 
       Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(1); // iterated few entries back
-      expect(API.getRedoStack().length).toBe(1); // added just one non-empty entry into redo stack
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(3);
       expect(h.state.editingLinearElement).toBeNull();
       expect(h.state.selectedLinearElement).toBeNull();
 
       Keyboard.redo();
-      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getUndoStack().length).toBe(4);
       expect(API.getRedoStack().length).toBe(0);
       expect(h.state.editingLinearElement).toBeNull();
       expect(h.state.selectedLinearElement).toBeNull();
@@ -2833,7 +2844,7 @@ describe("history", () => {
       // We iterated two steps as there was no change in order!
       expect(API.getUndoStack().length).toBe(0);
       expect(API.getRedoStack().length).toBe(2);
-      assertSelectedElements([]);
+      expect(API.getSelectedElements().length).toBe(0);
       expect(h.elements).toEqual([
         expect.objectContaining({ id: rect1.id }), // a "Zx"
         expect.objectContaining({ id: rect3.id }), // c "Zy"
@@ -2841,7 +2852,7 @@ describe("history", () => {
       ]);
     });
 
-    it("should tolerate remote z-index changes with incorrect fractional indices", async () => {
+    it("should iterate through the history when z-index changes do not produce visible change and we synced all indices", async () => {
       const rect1 = API.createElement({ type: "rectangle", x: 10, y: 10 });
       const rect2 = API.createElement({ type: "rectangle", x: 20, y: 20 });
       const rect3 = API.createElement({ type: "rectangle", x: 30, y: 30 });
@@ -2894,31 +2905,21 @@ describe("history", () => {
       // Simulate remote update
       API.updateScene({
         elements: [
+          h.elements[1], // rect2
           h.elements[0], // rect3
           h.elements[2], // rect1
-          h.elements[1], // rect2
         ],
         captureUpdate: CaptureUpdateAction.NEVER,
       });
 
       Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(1);
-      assertSelectedElements([rect2]);
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(2); // now we iterated two steps back!
+      assertSelectedElements([]);
       expect(h.elements).toEqual([
         expect.objectContaining({ id: rect2.id }),
         expect.objectContaining({ id: rect3.id }),
         expect.objectContaining({ id: rect1.id }),
-      ]);
-
-      Keyboard.redo();
-      expect(API.getUndoStack().length).toBe(2);
-      expect(API.getRedoStack().length).toBe(0);
-      assertSelectedElements([rect2]);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect3.id }),
-        expect.objectContaining({ id: rect1.id }),
-        expect.objectContaining({ id: rect2.id }),
       ]);
     });
 
@@ -3729,52 +3730,54 @@ describe("history", () => {
           captureUpdate: CaptureUpdateAction.NEVER,
         });
 
-        Keyboard.redo();
-        expect(API.getUndoStack().length).toBe(1);
-        expect(API.getRedoStack().length).toBe(0);
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            id: container.id,
-            // previously bound text is preserved
-            // text bindings are not duplicated
-            boundElements: [{ id: remoteText.id, type: "text" }],
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: text.id,
-            // unbound
-            containerId: null,
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: remoteText.id,
-            // preserved existing binding!
-            containerId: container.id,
-            isDeleted: false,
-          }),
-        ]);
+        runTwice(() => {
+          Keyboard.redo();
+          expect(API.getUndoStack().length).toBe(1);
+          expect(API.getRedoStack().length).toBe(0);
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              id: container.id,
+              // previously bound text is preserved
+              // text bindings are not duplicated
+              boundElements: [{ id: remoteText.id, type: "text" }],
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: text.id,
+              // unbound
+              containerId: null,
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: remoteText.id,
+              // preserved existing binding!
+              containerId: container.id,
+              isDeleted: false,
+            }),
+          ]);
 
-        Keyboard.undo();
-        expect(API.getUndoStack().length).toBe(0);
-        expect(API.getRedoStack().length).toBe(1);
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            id: container.id,
-            boundElements: [{ id: remoteText.id, type: "text" }],
-            isDeleted: false, // isDeleted got remotely updated to false
-          }),
-          expect.objectContaining({
-            id: text.id,
-            containerId: null,
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: remoteText.id,
-            // unbound
-            containerId: container.id,
-            isDeleted: false,
-          }),
-        ]);
+          Keyboard.undo();
+          expect(API.getUndoStack().length).toBe(0);
+          expect(API.getRedoStack().length).toBe(1);
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              id: container.id,
+              boundElements: [{ id: remoteText.id, type: "text" }],
+              isDeleted: false, // isDeleted got remotely updated to false
+            }),
+            expect.objectContaining({
+              id: text.id,
+              containerId: null,
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: remoteText.id,
+              // unbound
+              containerId: container.id,
+              isDeleted: false,
+            }),
+          ]);
+        });
       });
 
       it("should preserve latest remotely added binding and unbind previous one when the text is added through history", async () => {

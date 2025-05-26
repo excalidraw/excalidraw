@@ -3912,8 +3912,8 @@ class App extends React.Component<AppProps, AppState> {
 
       const nextElements = elements
         ? syncInvalidIndices(elements, {
-            // we have to create new instances here, otherwise scheduled micro action below won't be able to
-            // detect the fractional index change and won't update the store snapshot
+            // we have to create new element instances for elements that have incorrect fractional indices
+            // otherwise scheduled micro action below won't be able to detect the fractional index change and won't update the store snapshot
             shouldCreateNewInstances: true,
           })
         : undefined;

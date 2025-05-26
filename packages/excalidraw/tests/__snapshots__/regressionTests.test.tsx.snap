@@ -11092,18 +11092,40 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "removed": {
         "id3": {
           "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a1",
             "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": {
+              "type": 3,
+            },
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
             "version": 5,
+            "width": 10,
+            "x": 30,
+            "y": 10,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 4,
           },
         },
       },
       "updated": {},
     },
-    "id": "id10",
+    "id": "id8",
   },
   {
     "appState": AppStateDelta {
@@ -11125,7 +11147,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "removed": {},
       "updated": {},
     },
-    "id": "id13",
+    "id": "id11",
   },
   {
     "appState": AppStateDelta {
@@ -11147,7 +11169,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "removed": {},
       "updated": {},
     },
-    "id": "id16",
+    "id": "id14",
   },
 ]
 `;
@@ -14467,7 +14489,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
       "removed": {},
       "updated": {},
     },
-    "id": "id14",
+    "id": "id13",
   },
   {
     "appState": AppStateDelta {
@@ -14526,7 +14548,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
         },
       },
     },
-    "id": "id16",
+    "id": "id14",
   },
   {
     "appState": AppStateDelta {
@@ -14548,18 +14570,59 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
         "id6": {
           "deleted": {
             "isDeleted": true,
-            "version": 10,
           },
           "inserted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "elbowed": false,
+            "endArrowhead": "arrow",
+            "endBinding": null,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a2",
             "isDeleted": false,
+            "lastCommittedPoint": [
+              60,
+              10,
+            ],
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                60,
+                10,
+              ],
+            ],
+            "roughness": 1,
+            "roundness": {
+              "type": 2,
+            },
+            "startArrowhead": null,
+            "startBinding": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "arrow",
             "version": 9,
+            "width": 60,
+            "x": 130,
+            "y": 10,
           },
         },
       },
       "removed": {},
       "updated": {},
     },
-    "id": "id18",
+    "id": "id15",
   },
 ]
 `;
@@ -14637,18 +14700,40 @@ exports[`regression tests > undo/redo drawing an element > [end of test] undo st
       "removed": {
         "id3": {
           "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a1",
             "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": {
+              "type": 3,
+            },
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
             "version": 5,
+            "width": 30,
+            "x": 40,
+            "y": 0,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 4,
           },
         },
       },
       "updated": {},
     },
-    "id": "id22",
+    "id": "id17",
   },
 ]
 `;

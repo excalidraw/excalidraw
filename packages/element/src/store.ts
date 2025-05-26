@@ -565,6 +565,28 @@ export class StoreDelta {
     return [nextElements, nextAppState, appliedVisibleChanges];
   }
 
+  /**
+   * Apply latest (remote) changes to the delta, creates new instance of `StoreDelta`.
+   */
+  public static applyLatestChanges(
+    delta: StoreDelta,
+    prevElements: SceneElementsMap,
+    nextElements: SceneElementsMap,
+    modifierOptions: "deleted" | "inserted" | "both",
+  ): StoreDelta {
+    return this.create(
+      delta.elements.applyLatestChanges(
+        prevElements,
+        nextElements,
+        modifierOptions,
+      ),
+      delta.appState,
+      {
+        id: delta.id,
+      },
+    );
+  }
+
   public isEmpty() {
     return this.elements.isEmpty() && this.appState.isEmpty();
   }
