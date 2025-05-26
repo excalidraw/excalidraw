@@ -33,7 +33,6 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { generateRoughOptions } from "./Shape";
 import { ShapeCache } from "./ShapeCache";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";
@@ -51,6 +50,8 @@ import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
 } from "./utils";
+
+import { generateRoughOptions } from "./Shape";
 
 import type { Drawable, Op } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";

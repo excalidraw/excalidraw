@@ -89,6 +89,7 @@ export const convertMermaidToExcalidraw = async ({
     const { elements, files } = ret;
     setError(null);
 
+    // Store the converted elements (which now include adjusted elbow arrow points)
     data.current = {
       elements: convertToExcalidrawElements(elements, {
         regenerateIds: true,

@@ -16,7 +16,11 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import { bindLinearElement } from "@excalidraw/element";
+import {
+  bindLinearElement,
+  getBindingSideMidPoint,
+  isElbowArrow,
+} from "@excalidraw/element";
 import {
   newArrowElement,
   newElement,
@@ -30,8 +34,6 @@ import { measureText, normalizeText } from "@excalidraw/element";
 import { isArrowElement } from "@excalidraw/element";
 
 import { syncInvalidIndices } from "@excalidraw/element";
-
-import { redrawTextBoundingBox } from "@excalidraw/element";
 
 import { LinearElementEditor } from "@excalidraw/element";
 
@@ -62,6 +64,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
+
 import { adjustBoundTextSize } from "../components/ConvertElementTypePopup";
 
 export type ValidLinearElement = {
@@ -244,242 +247,6 @@ const bindTextToContainer = (
   return [container, textElement] as const;
 };
 
-const bindLinearElementToElement = (
-  linearElement: ExcalidrawArrowElement,
-  start: ValidLinearElement["start"],
-  end: ValidLinearElement["end"],
-  elementStore: ElementStore,
-  scene: Scene,
-): {
-  linearElement: ExcalidrawLinearElement;
-  startBoundElement?: ExcalidrawElement;
-  endBoundElement?: ExcalidrawElement;
-} => {
-  let startBoundElement;
-  let endBoundElement;
-
-  Object.assign(linearElement, {
-    startBinding: linearElement?.startBinding || null,
-    endBinding: linearElement.endBinding || null,
-  });
-
-  if (start) {
-    const width = start?.width ?? DEFAULT_DIMENSION;
-    const height = start?.height ?? DEFAULT_DIMENSION;
-
-    let existingElement;
-    if (start.id) {
-      existingElement = elementStore.getElement(start.id);
-      if (!existingElement) {
-        console.error(`No element for start binding with id ${start.id} found`);
-      }
-    }
-
-    const startX = start.x || linearElement.x - width;
-    const startY = start.y || linearElement.y - height / 2;
-    const startType = existingElement ? existingElement.type : start.type;
-
-    if (startType) {
-      if (startType === "text") {
-        let text = "";
-        if (existingElement && existingElement.type === "text") {
-          text = existingElement.text;
-        } else if (start.type === "text") {
-          text = start.text;
-        }
-        if (!text) {
-          console.error(
-            `No text found for start binding text element for ${linearElement.id}`,
-          );
-        }
-        startBoundElement = newTextElement({
-          x: startX,
-          y: startY,
-          type: "text",
-          ...existingElement,
-          ...start,
-          text,
-        });
-        // to position the text correctly when coordinates not provided
-        Object.assign(startBoundElement, {
-          x: start.x || linearElement.x - startBoundElement.width,
-          y: start.y || linearElement.y - startBoundElement.height / 2,
-        });
-      } else {
-        switch (startType) {
-          case "rectangle":
-          case "ellipse":
-          case "diamond": {
-            startBoundElement = newElement({
-              x: startX,
-              y: startY,
-              width,
-              height,
-              ...existingElement,
-              ...start,
-              type: startType,
-            });
-            break;
-          }
-          default: {
-            assertNever(
-              linearElement as never,
-              `Unhandled element start type "${start.type}"`,
-              true,
-            );
-          }
-        }
-      }
-
-      bindLinearElement(
-        linearElement,
-        startBoundElement as ExcalidrawBindableElement,
-        "start",
-        scene,
-      );
-    }
-  }
-  if (end) {
-    const height = end?.height ?? DEFAULT_DIMENSION;
-    const width = end?.width ?? DEFAULT_DIMENSION;
-
-    let existingElement;
-    if (end.id) {
-      existingElement = elementStore.getElement(end.id);
-      if (!existingElement) {
-        console.error(`No element for end binding with id ${end.id} found`);
-      }
-    }
-    const endX = end.x || linearElement.x + linearElement.width;
-    const endY = end.y || linearElement.y - height / 2;
-    const endType = existingElement ? existingElement.type : end.type;
-
-    if (endType) {
-      if (endType === "text") {
-        let text = "";
-        if (existingElement && existingElement.type === "text") {
-          text = existingElement.text;
-        } else if (end.type === "text") {
-          text = end.text;
-        }
-
-        if (!text) {
-          console.error(
-            `No text found for end binding text element for ${linearElement.id}`,
-          );
-        }
-        endBoundElement = newTextElement({
-          x: endX,
-          y: endY,
-          type: "text",
-          ...existingElement,
-          ...end,
-          text,
-        });
-        // to position the text correctly when coordinates not provided
-        Object.assign(endBoundElement, {
-          y: end.y || linearElement.y - endBoundElement.height / 2,
-        });
-      } else {
-        switch (endType) {
-          case "rectangle":
-          case "ellipse":
-          case "diamond": {
-            endBoundElement = newElement({
-              x: endX,
-              y: endY,
-              width,
-              height,
-              ...existingElement,
-              ...end,
-              type: endType,
-            });
-            break;
-          }
-          default: {
-            assertNever(
-              linearElement as never,
-              `Unhandled element end type "${endType}"`,
-              true,
-            );
-          }
-        }
-      }
-
-      bindLinearElement(
-        linearElement,
-        endBoundElement as ExcalidrawBindableElement,
-        "end",
-        scene,
-      );
-    }
-  }
-
-  // Safe check to early return for single point
-  if (linearElement.points.length < 2) {
-    return {
-      linearElement,
-      startBoundElement,
-      endBoundElement,
-    };
-  }
-
-  // Update start/end points by 0.5 so bindings don't overlap with start/end bound element coordinates.
-  const endPointIndex = linearElement.points.length - 1;
-  const delta = 0.5;
-
-  const newPoints = cloneJSON<readonly LocalPoint[]>(linearElement.points);
-
-  // left to right so shift the arrow towards right
-  if (
-    linearElement.points[endPointIndex][0] >
-    linearElement.points[endPointIndex - 1][0]
-  ) {
-    newPoints[0][0] = delta;
-    newPoints[endPointIndex][0] -= delta;
-  }
-
-  // right to left so shift the arrow towards left
-  if (
-    linearElement.points[endPointIndex][0] <
-    linearElement.points[endPointIndex - 1][0]
-  ) {
-    newPoints[0][0] = -delta;
-    newPoints[endPointIndex][0] += delta;
-  }
-  // top to bottom so shift the arrow towards top
-  if (
-    linearElement.points[endPointIndex][1] >
-    linearElement.points[endPointIndex - 1][1]
-  ) {
-    newPoints[0][1] = delta;
-    newPoints[endPointIndex][1] -= delta;
-  }
-
-  // bottom to top so shift the arrow towards bottom
-  if (
-    linearElement.points[endPointIndex][1] <
-    linearElement.points[endPointIndex - 1][1]
-  ) {
-    newPoints[0][1] = -delta;
-    newPoints[endPointIndex][1] += delta;
-  }
-
-  Object.assign(
-    linearElement,
-    LinearElementEditor.getNormalizeElementPointsAndCoords({
-      ...linearElement,
-      points: newPoints,
-    }),
-  );
-
-  return {
-    linearElement,
-    startBoundElement,
-    endBoundElement,
-  };
-};
-
 class ElementStore {
   excalidrawElements = new Map<string, ExcalidrawElement>();
 
@@ -505,6 +272,289 @@ class ElementStore {
     return this.excalidrawElements.get(id);
   };
 }
+
+const createBoundElement = (
+  binding: ValidLinearElement["start"] | ValidLinearElement["end"],
+  linearElement: ExcalidrawArrowElement,
+  edge: "start" | "end",
+  elementStore: ElementStore,
+): ExcalidrawElement | undefined => {
+  if (!binding) {
+    return undefined;
+  }
+
+  const width = binding?.width ?? DEFAULT_DIMENSION;
+  const height = binding?.height ?? DEFAULT_DIMENSION;
+
+  let existingElement;
+  if (binding.id) {
+    existingElement = elementStore.getElement(binding.id);
+    if (!existingElement) {
+      console.error(
+        `No element for ${edge} binding with id ${binding.id} found`,
+      );
+      return undefined;
+    }
+  }
+
+  const x =
+    binding.x ||
+    (edge === "start"
+      ? linearElement.x - width
+      : linearElement.x + linearElement.width);
+  const y = binding.y || linearElement.y - height / 2;
+  const elementType = existingElement ? existingElement.type : binding.type;
+
+  if (!elementType) {
+    return undefined;
+  }
+
+  if (elementType === "text") {
+    let text = "";
+    if (existingElement && existingElement.type === "text") {
+      text = existingElement.text;
+    } else if (binding.type === "text") {
+      text = binding.text;
+    }
+    if (!text) {
+      console.error(
+        `No text found for ${edge} binding text element for ${linearElement.id}`,
+      );
+      return undefined;
+    }
+    const textElement = newTextElement({
+      x,
+      y,
+      type: "text",
+      ...existingElement,
+      ...binding,
+      text,
+    });
+    // to position the text correctly when coordinates not provided
+    Object.assign(textElement, {
+      x:
+        binding.x ||
+        (edge === "start" ? linearElement.x - textElement.width : x),
+      y: binding.y || linearElement.y - textElement.height / 2,
+    });
+    return textElement;
+  }
+  switch (elementType) {
+    case "rectangle":
+    case "ellipse":
+    case "diamond": {
+      return newElement({
+        x,
+        y,
+        width,
+        height,
+        ...existingElement,
+        ...binding,
+        type: elementType,
+      });
+    }
+    default: {
+      assertNever(
+        elementType as never,
+        `Unhandled element ${edge} type "${elementType}"`,
+        true,
+      );
+      return undefined;
+    }
+  }
+};
+
+const bindLinearElementToElement = (
+  linearElement: ExcalidrawArrowElement,
+  start: ValidLinearElement["start"],
+  end: ValidLinearElement["end"],
+  elementStore: ElementStore,
+  scene: Scene,
+): {
+  linearElement: ExcalidrawLinearElement;
+  startBoundElement?: ExcalidrawElement;
+  endBoundElement?: ExcalidrawElement;
+} => {
+  let startBoundElement;
+  let endBoundElement;
+
+  Object.assign(linearElement, {
+    startBinding: linearElement?.startBinding || null,
+    endBinding: linearElement.endBinding || null,
+  });
+
+  if (start) {
+    startBoundElement = createBoundElement(
+      start,
+      linearElement,
+      "start",
+      elementStore,
+    );
+    if (startBoundElement) {
+      elementStore.add(startBoundElement);
+      scene.replaceAllElements(elementStore.getElementsMap());
+      bindLinearElement(
+        linearElement,
+        startBoundElement as ExcalidrawBindableElement,
+        "start",
+        scene,
+      );
+    }
+  }
+
+  if (end) {
+    endBoundElement = createBoundElement(
+      end,
+      linearElement,
+      "end",
+      elementStore,
+    );
+    if (endBoundElement) {
+      elementStore.add(endBoundElement);
+      scene.replaceAllElements(elementStore.getElementsMap());
+      bindLinearElement(
+        linearElement,
+        endBoundElement as ExcalidrawBindableElement,
+        "end",
+        scene,
+      );
+    }
+  }
+
+  if (linearElement.points.length < 2) {
+    return {
+      linearElement,
+      startBoundElement,
+      endBoundElement,
+    };
+  }
+
+  // update start/end points by 0.5 so bindings don't overlap with start/end bound element coordinates.
+  if (!isElbowArrow(linearElement)) {
+    const endPointIndex = linearElement.points.length - 1;
+    const delta = 0.5;
+
+    const newPoints = cloneJSON<readonly LocalPoint[]>(linearElement.points);
+
+    // left to right so shift the arrow towards right
+    if (
+      linearElement.points[endPointIndex][0] >
+      linearElement.points[endPointIndex - 1][0]
+    ) {
+      newPoints[0][0] = delta;
+      newPoints[endPointIndex][0] -= delta;
+    }
+
+    // right to left so shift the arrow towards left
+    if (
+      linearElement.points[endPointIndex][0] <
+      linearElement.points[endPointIndex - 1][0]
+    ) {
+      newPoints[0][0] = -delta;
+      newPoints[endPointIndex][0] += delta;
+    }
+    // top to bottom so shift the arrow towards top
+    if (
+      linearElement.points[endPointIndex][1] >
+      linearElement.points[endPointIndex - 1][1]
+    ) {
+      newPoints[0][1] = delta;
+      newPoints[endPointIndex][1] -= delta;
+    }
+
+    // bottom to top so shift the arrow towards bottom
+    if (
+      linearElement.points[endPointIndex][1] <
+      linearElement.points[endPointIndex - 1][1]
+    ) {
+      newPoints[0][1] = -delta;
+      newPoints[endPointIndex][1] += delta;
+    }
+
+    Object.assign(
+      linearElement,
+      LinearElementEditor.getNormalizeElementPointsAndCoords({
+        ...linearElement,
+        points: newPoints,
+      }),
+    );
+  }
+
+  return {
+    linearElement,
+    startBoundElement,
+    endBoundElement,
+  };
+};
+
+const adjustElbowArrowPoints = (elements: ExcalidrawElement[]) => {
+  const elementsMap = arrayToMap(elements) as NonDeletedSceneElementsMap;
+  const scene = new Scene(elementsMap);
+
+  elements.forEach((element) => {
+    if (isElbowArrow(element) && (element.startBinding || element.endBinding)) {
+      if (element.endBinding && element.endBinding.elementId) {
+        const midPoint = getBindingSideMidPoint(
+          element.endBinding,
+          elementsMap,
+        );
+
+        const endBindableElement = elementsMap.get(
+          element.endBinding.elementId,
+        ) as ExcalidrawBindableElement;
+
+        if (midPoint) {
+          LinearElementEditor.movePoints(
+            element,
+            scene,
+            new Map([
+              [
+                element.points.length - 1,
+                {
+                  point: pointFrom(
+                    midPoint[0] - element.x,
+                    midPoint[1] - element.y,
+                  ),
+                  isDragging: true,
+                },
+              ],
+            ]),
+          );
+        }
+      }
+
+      if (element.startBinding && element.startBinding.elementId) {
+        const midPoint = getBindingSideMidPoint(
+          element.startBinding,
+          elementsMap,
+        );
+
+        const startBindableElement = elementsMap.get(
+          element.startBinding.elementId,
+        ) as ExcalidrawBindableElement;
+
+        if (midPoint) {
+          LinearElementEditor.movePoints(
+            element,
+            scene,
+            new Map([
+              [
+                0,
+                {
+                  point: pointFrom(
+                    midPoint[0] - element.x,
+                    midPoint[1] - element.y,
+                  ),
+                  isDragging: true,
+                },
+              ],
+            ]),
+          );
+        }
+      }
+    }
+  });
+};
 
 export const convertToExcalidrawElements = (
   elementsSkeleton: ExcalidrawElementSkeleton[] | null,
@@ -561,20 +611,32 @@ export const convertToExcalidrawElements = (
       case "arrow": {
         const width = element.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
         const height = element.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
-        excalidrawElement = newArrowElement({
-          width,
-          height,
-          endArrowhead: "arrow",
-          points: [pointFrom(0, 0), pointFrom(width, height)],
-          ...element,
-          type: "arrow",
-          elbowed: opts?.useElbow,
-        });
 
-        Object.assign(
-          excalidrawElement,
-          getSizeFromPoints(excalidrawElement.points),
-        );
+        if (!opts?.useElbow) {
+          excalidrawElement = newArrowElement({
+            width,
+            height,
+            endArrowhead: "arrow",
+            points: [pointFrom(0, 0), pointFrom(width, height)],
+            ...element,
+            type: "arrow",
+            elbowed: opts?.useElbow,
+          });
+          Object.assign(
+            excalidrawElement,
+            getSizeFromPoints(excalidrawElement.points),
+          );
+        } else {
+          excalidrawElement = newArrowElement({
+            width,
+            height,
+            endArrowhead: "arrow",
+            ...element,
+            type: "arrow",
+            elbowed: opts?.useElbow,
+            roundness: null,
+          });
+        }
         break;
       }
       case "text": {
@@ -806,5 +868,12 @@ export const convertToExcalidrawElements = (
     }
   }
 
-  return elementStore.getElements();
+  const finalElements = elementStore.getElements();
+
+  // Adjust elbow arrow points now that all elements are in the scene
+  if (opts?.useElbow) {
+    adjustElbowArrowPoints(finalElements);
+  }
+
+  return finalElements;
 };
