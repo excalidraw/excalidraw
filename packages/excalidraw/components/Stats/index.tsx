@@ -300,6 +300,8 @@ export const StatsInner = memo(
                             ? "Search Box"            // your existing hard-coded label
                             : singleElement.type === "rabbit-image"
                               ? "Rabbit Image"        // ← your new hard-coded fallback
+                              : singleElement.type === "rabbit-image-tabs"
+                              ? "Rabbit Image Tabs"
                               : t(`element.${singleElement.type}`) // everything else via i18n
                         }
                       </StatsRow>

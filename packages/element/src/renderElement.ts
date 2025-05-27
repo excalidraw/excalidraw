@@ -3,7 +3,7 @@ import { getStroke } from "perfect-freehand";
 
 import { isRightAngleRads } from "@excalidraw/math";
 
-import { isRabbitElement, isRabbitSearchBoxElement, isRabbitImageElement } from "./rabbitElement";
+import { isRabbitElement, isRabbitSearchBoxElement, isRabbitImageElement, isRabbitImageTabsElement } from "./rabbitElement";
 
 import {
   BOUND_TEXT_PADDING,
@@ -1174,9 +1174,6 @@ const renderRabbitElement = (
     //     horizontalOffset,
     //     index * lineHeightPx + verticalOffset + element.height / 2 - (lines.length * lineHeightPx) / 2,
     //   );
-      
-      
-
 
         const displayText = element.isEditing 
           ? element.currentText 
@@ -1237,43 +1234,6 @@ const renderRabbitElement = (
     
     context.restore();
   }
-// else if (isRabbitImageElement(element)) {
-//   const offsetX = element.x + appState.scrollX;
-//   const offsetY = element.y + appState.scrollY;
-//   const { width, height } = element;
-//   const padding = 10;
-//   const labelHeight = 20;
-
-//   // 1) Draw the box and label
-//   context.save();
-  
-//   context.translate(offsetX, offsetY);
-//   context.fillStyle = element.backgroundColor || "#fff";
-//   context.fillRect(0, 0, width, height);
-//   context.strokeStyle = element.strokeColor || "#000";
-//   context.strokeRect(0, 0, width, height);
-//   context.fillStyle = "#000";
-//   context.font = "16px sans-serif";
-//   context.textBaseline = "bottom";
-//   context.fillText(element.label, padding, height - 5);
-//   context.restore();
-
-//   // 2) Draw the cached image if it’s ready
-//   const img = getCachedRabbitImage(element.imageUrl);
-//   if (img.complete && img.naturalWidth) {
-//     context.save();
-//     context.translate(offsetX, offsetY);
-//     context.drawImage(
-//       img,
-//       padding,
-//       padding,
-//       width - padding * 2,
-//       height - labelHeight - padding * 2
-//     );
-//     context.restore();
-//   }
-// }
-
 else if (isRabbitImageElement(element)) {
   const offsetX = element.x + appState.scrollX;
   const offsetY = element.y + appState.scrollY;
@@ -1341,9 +1301,316 @@ else if (isRabbitImageElement(element)) {
     context.restore();
   }
 }
+else if (isRabbitImageTabsElement(element)) {
+
+//   context.save();
+  
+//   context.translate(
+//     element.x + appState.scrollX,
+//     element.y + appState.scrollY
+//   );
+
+//   const tabHeight = element.tabHeight;
+//   const tabWidth = element.width / element.images.length;
+  
+//   // Draw tabs
+//   element.images.forEach((image, index) => {
+//     const tabX = index * tabWidth;
+//     const isActive = index === element.activeTabIndex;
+    
+//     // Tab background
+//     context.fillStyle = isActive ? "#4f46e5" : "#e5e5e5";
+//     context.fillRect(tabX, 0, tabWidth, tabHeight);
+    
+//     // Tab border
+//     context.strokeStyle = "#d1d5db";
+//     context.lineWidth = 1;
+//     context.strokeRect(tabX, 0, tabWidth, tabHeight);
+    
+//     // Tab text
+//     context.fillStyle = isActive ? "#ffffff" : "#374151";
+//     context.font = "14px Arial";
+//     context.textAlign = "center";
+//     context.textBaseline = "middle";
+//     context.fillText(
+//       image.title,
+//       tabX + tabWidth / 2,
+//       tabHeight / 2
+//     );
+//   });
+  
+//   // Draw main content area border
+//   context.strokeStyle = element.strokeColor;
+//   context.lineWidth = element.strokeWidth;
+//   context.strokeRect(0, tabHeight, element.width, element.height - tabHeight);
+  
+//   // Fill main content area
+//   context.fillStyle = element.backgroundColor;
+//   context.fillRect(0, tabHeight, element.width, element.height - tabHeight);
+  
+//   // Draw active image using the existing cache function
+//   const activeImage = element.images[element.activeTabIndex];
+//   if (activeImage) {
+//     const imageArea = {
+//       x: 10,
+//       y: tabHeight + 10,
+//       width: element.width - 20,
+//       height: element.height - tabHeight - 20
+//     };
+    
+//     // Use the existing getCachedRabbitImage function
+//     const img = getCachedRabbitImage(activeImage.url);
+    
+//     if (img.complete && img.naturalWidth > 0) {
+//       // Image is loaded, draw it
+//       const aspectRatio = img.naturalWidth / img.naturalHeight;
+//       let drawWidth = imageArea.width;
+//       let drawHeight = imageArea.height;
+      
+//       // Maintain aspect ratio
+//       if (aspectRatio > imageArea.width / imageArea.height) {
+//         drawHeight = drawWidth / aspectRatio;
+//       } else {
+//         drawWidth = drawHeight * aspectRatio;
+//       }
+      
+//       // Center the image
+//       const offsetX = (imageArea.width - drawWidth) / 2;
+//       const offsetY = (imageArea.height - drawHeight) / 2;
+      
+//       context.drawImage(
+//         img,
+//         imageArea.x + offsetX,
+//         imageArea.y + offsetY,
+//         drawWidth,
+//         drawHeight
+//       );
+//     } else {
+//       // Image is still loading or failed to load
+//       if (img.complete) {
+//         // Image failed to load
+//         context.fillStyle = "#fee2e2";
+//         context.fillRect(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
+//         context.fillStyle = "#dc2626";
+//         context.font = "16px Arial";
+//         context.textAlign = "center";
+//         context.textBaseline = "middle";
+//         context.fillText(
+//           "Failed to load image",
+//           imageArea.x + imageArea.width / 2,
+//           imageArea.y + imageArea.height / 2
+//         );
+//       } else {
+//         // Image is still loading
+//         context.fillStyle = "#f9fafb";
+//         context.fillRect(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
+//         context.strokeStyle = "#e5e7eb";
+//         context.lineWidth = 1;
+//         context.strokeRect(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
+        
+//         context.fillStyle = "#9ca3af";
+//         context.font = "14px Arial";
+//         context.textAlign = "center";
+//         context.textBaseline = "middle";
+//         context.fillText(
+//           "Loading...",
+//           imageArea.x + imageArea.width / 2,
+//           imageArea.y + imageArea.height / 2
+//         );
+//       }
+//     }
+//   }
+  
+//   context.restore();
+// }
+
+context.save();
+  
+context.translate(
+  element.x + appState.scrollX,
+  element.y + appState.scrollY
+);
+
+const tabHeight = element.tabHeight;
+const tabWidth = element.width / element.images.length;
+
+// Draw tabs
+element.images.forEach((image, index) => {
+  const tabX = index * tabWidth;
+  const isActive = index === element.activeTabIndex;
+  
+  // Tab background
+  context.fillStyle = isActive ? "#4f46e5" : "#e5e5e5";
+  context.fillRect(tabX, 0, tabWidth, tabHeight);
+  
+  // Tab border
+  context.strokeStyle = "#d1d5db";
+  context.lineWidth = 1;
+  context.strokeRect(tabX, 0, tabWidth, tabHeight);
+  
+  // Tab text
+  context.fillStyle = isActive ? "#ffffff" : "#374151";
+  context.font = "14px Arial";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(
+    image.title,
+    tabX + tabWidth / 2,
+    tabHeight / 2
+  );
+});
+
+// Draw main content area border
+context.strokeStyle = element.strokeColor;
+context.lineWidth = element.strokeWidth;
+context.strokeRect(0, tabHeight, element.width, element.height - tabHeight);
+
+// Fill main content area
+context.fillStyle = element.backgroundColor;
+context.fillRect(0, tabHeight, element.width, element.height - tabHeight);
+
+// Set up clipping region for scrollable content
+const contentArea = {
+  x: 0,
+  y: tabHeight,
+  width: element.width,
+  height: element.height - tabHeight
+};
+
+context.save();
+context.beginPath();
+context.rect(contentArea.x, contentArea.y, contentArea.width, contentArea.height);
+context.clip();
+
+// Calculate scroll offset (you'll need to add scrollOffset to your element state)
+// const scrollOffset = element.scrollOffset || 0;
+
+// Two-column layout configuration
+const padding = 10;
+const columnGap = 10;
+const columnWidth = (contentArea.width - padding * 2 - columnGap) / 2;
+const imageHeight = 150; // Fixed height for each image
+const imageSpacing = 10;
+
+// Get active tab images (assuming you want to show multiple images from active tab)
+// const activeTabImages = element.images[element.activeTabIndex]?.subImages || [element.images[element.activeTabIndex]];
+const activeTabImages = element.images[element.activeTabIndex]?.subImages || [];
+
+if (activeTabImages && activeTabImages.length > 0) {
+  activeTabImages.forEach((imageData, index) => {
+    const columnIndex = index % 2; // 0 for left column, 1 for right column
+    const rowIndex = Math.floor(index / 2);
+    
+    const imageX = contentArea.x + padding + columnIndex * (columnWidth + columnGap);
+    const imageY = contentArea.y + padding + rowIndex * (imageHeight + imageSpacing);
+    
+    // Only draw if image is visible in the viewport
+    if (imageY + imageHeight >= contentArea.y && imageY <= contentArea.y + contentArea.height) {
+      const img = getCachedRabbitImage(imageData.url);
+      
+      if (img.complete && img.naturalWidth > 0) {
+        // Image is loaded, draw it
+        const aspectRatio = img.naturalWidth / img.naturalHeight;
+        let drawWidth = columnWidth;
+        let drawHeight = imageHeight;
+        
+        // Maintain aspect ratio
+        if (aspectRatio > columnWidth / imageHeight) {
+          drawHeight = drawWidth / aspectRatio;
+        } else {
+          drawWidth = drawHeight * aspectRatio;
+        }
+        
+        // Center the image within its allocated space
+        const offsetX = (columnWidth - drawWidth) / 2;
+        const offsetY = (imageHeight - drawHeight) / 2;
+        
+        context.drawImage(
+          img,
+          imageX + offsetX,
+          imageY + offsetY,
+          drawWidth,
+          drawHeight
+        );
+        
+        // Optional: Draw image border
+        context.strokeStyle = "#e5e7eb";
+        context.lineWidth = 1;
+        context.strokeRect(imageX, imageY, columnWidth, imageHeight);
+        
+        // Optional: Draw image title if available
+        if (imageData.title) {
+          context.fillStyle = "#374151";
+          context.font = "12px Arial";
+          context.textAlign = "center";
+          context.textBaseline = "top";
+          context.fillText(
+            imageData.title,
+            imageX + columnWidth / 2,
+            imageY + imageHeight + 5
+          );
+        }
+      } else {
+        // Image is still loading or failed to load
+        if (img.complete) {
+          // Image failed to load
+          context.fillStyle = "#fee2e2";
+          context.fillRect(imageX, imageY, columnWidth, imageHeight);
+          context.fillStyle = "#dc2626";
+          context.font = "12px Arial";
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.fillText(
+            "Failed to load",
+            imageX + columnWidth / 2,
+            imageY + imageHeight / 2
+          );
+        } else {
+          // Image is still loading
+          context.fillStyle = "#f9fafb";
+          context.fillRect(imageX, imageY, columnWidth, imageHeight);
+          context.strokeStyle = "#e5e7eb";
+          context.lineWidth = 1;
+          context.strokeRect(imageX, imageY, columnWidth, imageHeight);
+          
+          context.fillStyle = "#9ca3af";
+          context.font = "12px Arial";
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.fillText(
+            "Loading...",
+            imageX + columnWidth / 2,
+            imageY + imageHeight / 2
+          );
+        }
+      }
+    }
+  });
+}
+
+context.restore(); // Restore clipping
+
+// Optional: Draw scrollbar indicator
+// const totalRows = Math.ceil(activeTabImages.length / 2);
+// const totalContentHeight = totalRows * (imageHeight + imageSpacing) + padding;
+// const maxScrollOffset = Math.max(0, totalContentHeight - contentArea.height);
+
+// if (maxScrollOffset > 0) {
+//   const scrollbarWidth = 8;
+//   const scrollbarHeight = Math.max(20, (contentArea.height / totalContentHeight) * contentArea.height);
+//   const scrollbarY = contentArea.y + (scrollOffset / maxScrollOffset) * (contentArea.height - scrollbarHeight);
+  
+//   context.fillStyle = "#d1d5db";
+//   context.fillRect(
+//     contentArea.x + contentArea.width - scrollbarWidth - 2,
+//     scrollbarY,
+//     scrollbarWidth,
+//     scrollbarHeight
+//   );
+// }
 
 
-
+}
 }
 
 export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);

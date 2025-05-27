@@ -101,6 +101,8 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
     case "rabbit-searchbox":
     case "rabbit-image":
       return getRabbitShape(element as RabbitElement);
+    case "rabbit-image-tabs":
+      return getRabbitShape(element as RabbitElement);
   }
     
 };

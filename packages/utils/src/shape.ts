@@ -182,6 +182,14 @@ export const getRabbitShape = <Point extends GlobalPoint | LocalPoint>(
     pointRotateRads(pointFrom(x, cy), center, angle),
   );
   }
+  else if (element.type === "rabbit-image-tabs") {
+    data = polygon(
+    pointRotateRads(pointFrom(cx, y), center, angle),
+    pointRotateRads(pointFrom(x + width, cy), center, angle),
+    pointRotateRads(pointFrom(cx, y + height), center, angle),
+    pointRotateRads(pointFrom(x, cy), center, angle),
+  );
+  }
   else {
     data = polygon(
       pointRotateRads(pointFrom(x, y), center, angle),

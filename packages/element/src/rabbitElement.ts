@@ -99,8 +99,25 @@ export type RabbitImageElement = {
   label: string;
 } & RabbitElementBase;
 
+export type RabbitImageTabsElement = {
+  type: "rabbit-image-tabs";
+  images: Array<{
+    id: string;
+    title: string;
+    subImages: Array<{
+      id: string;
+      url: string;
+      title: string;
+    }>;
+  }>;
+  activeTabIndex: number;
+  tabHeight: number;
+} & RabbitElementBase;
+
+
+
 // Add to union type when adding more Rabbit element types
-export type RabbitElement = RabbitSearchBoxElement | RabbitImageElement;
+export type RabbitElement = RabbitSearchBoxElement | RabbitImageElement | RabbitImageTabsElement;
 
 export const isRabbitElement = (element: ExcalidrawElement): element is RabbitElement => {
   // return element.type === "rabbit-searchbox";
@@ -119,3 +136,10 @@ export const isRabbitImageElement = (
 ): element is RabbitImageElement => {
   return element.type === "rabbit-image";
 };
+
+export const isRabbitImageTabsElement = (
+  element: ExcalidrawElement
+): element is RabbitImageTabsElement => {
+  return element.type === "rabbit-image-tabs";
+};
+
