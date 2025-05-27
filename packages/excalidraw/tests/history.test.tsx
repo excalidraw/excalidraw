@@ -34,7 +34,6 @@ import type {
   ExcalidrawFrameElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
-  ExcalidrawRectangleElement,
   ExcalidrawTextElement,
   FixedPointBinding,
   FractionalIndex,
@@ -1313,11 +1312,6 @@ describe("history", () => {
           elements: [rect1, text, rect2],
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
-
-        // element ref changes after the update
-        rect1 = h.elements[0] as ExcalidrawRectangleElement;
-        text = h.elements[1] as ExcalidrawTextElement;
-        rect2 = h.elements[2] as ExcalidrawRectangleElement;
 
         // bind text1 to rect1
         mouse.select([rect1, text]);

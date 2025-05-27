@@ -69,7 +69,7 @@ export class HistoryDelta extends StoreDelta {
     delta: StoreDelta,
     prevElements: SceneElementsMap,
     nextElements: SceneElementsMap,
-    modifierOptions: "deleted" | "inserted" | "both",
+    modifierOptions?: "deleted" | "inserted",
   ) {
     return super.applyLatestChanges(
       delta,
@@ -197,7 +197,6 @@ export class History {
             delta,
             prevElements,
             nextElements,
-            "both",
           );
 
           // schedule immediate capture, so that it's emitted for the sync purposes

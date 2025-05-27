@@ -261,7 +261,6 @@ import type {
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
-  SceneElementsMap,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -3910,17 +3909,8 @@ class App extends React.Component<AppProps, AppState> {
     }) => {
       const { elements, appState, collaborators, captureUpdate } = sceneData;
 
-      // TODO: if different "index" in any element is not an intended z-index change
-      // then this might end up being captured as part of a history entry
-      // which would make it undoable, potentially leading into a incorrect z-index order on undo / redo
-      const nextElements = elements ? syncInvalidIndices(elements) : undefined;
-
       if (captureUpdate) {
-        const nextElementsMap = elements
-          ? (arrayToMap(nextElements ?? []) as SceneElementsMap)
-          : undefined;
-
-        const nextObservedAppState = appState
+        const observedAppState = appState
           ? getObservedAppState({
               ...this.store.snapshot.appState,
               ...appState,
@@ -3929,8 +3919,8 @@ class App extends React.Component<AppProps, AppState> {
 
         this.store.scheduleMicroAction({
           action: captureUpdate,
-          elements: nextElementsMap,
-          appState: nextObservedAppState,
+          elements: elements ?? [],
+          appState: observedAppState,
         });
       }
 
@@ -3938,8 +3928,8 @@ class App extends React.Component<AppProps, AppState> {
         this.setState(appState);
       }
 
-      if (nextElements) {
-        this.scene.replaceAllElements(nextElements);
+      if (elements) {
+        this.scene.replaceAllElements(elements);
       }
 
       if (collaborators) {
@@ -10556,7 +10546,7 @@ class App extends React.Component<AppProps, AppState> {
         // otherwise we would end up with duplicated fractional indices on undo
         this.store.scheduleMicroAction({
           action: CaptureUpdateAction.NEVER,
-          elements: arrayToMap(elements) as SceneElementsMap,
+          elements,
           appState: undefined,
         });
 

@@ -19,9 +19,17 @@ import { newElementWith } from "./mutateElement";
 
 import { ElementsDelta, AppStateDelta, Delta } from "./delta";
 
-import { hashElementsVersion, hashString } from "./index";
+import {
+  syncInvalidIndicesImmutable,
+  hashElementsVersion,
+  hashString,
+} from "./index";
 
-import type { OrderedExcalidrawElement, SceneElementsMap } from "./types";
+import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+  SceneElementsMap,
+} from "./types";
 
 export const CaptureUpdateAction = {
   /**
@@ -105,7 +113,7 @@ export class Store {
     params:
       | {
           action: CaptureUpdateActionType;
-          elements: SceneElementsMap | undefined;
+          elements: readonly ExcalidrawElement[] | undefined;
           appState: AppState | ObservedAppState | undefined;
         }
       | {
@@ -133,9 +141,15 @@ export class Store {
         this.app.scene.getElementsMapIncludingDeleted(),
         this.app.state,
       );
+
       const scheduledSnapshot = currentSnapshot.maybeClone(
         action,
-        params.elements,
+        // let's sync invalid indices first, so that we could detect this change
+        // also have the synced elements immutable, so that we don't mutate elements,
+        // that are already in the scene, otherwise we wouldn't see any change
+        params.elements
+          ? syncInvalidIndicesImmutable(params.elements)
+          : undefined,
         params.appState,
       );
 
@@ -572,7 +586,7 @@ export class StoreDelta {
     delta: StoreDelta,
     prevElements: SceneElementsMap,
     nextElements: SceneElementsMap,
-    modifierOptions: "deleted" | "inserted" | "both",
+    modifierOptions?: "deleted" | "inserted",
   ): StoreDelta {
     return this.create(
       delta.elements.applyLatestChanges(

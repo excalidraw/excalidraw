@@ -2,8 +2,6 @@ import { generateNKeysBetween } from "fractional-indexing";
 
 import { arrayToMap } from "@excalidraw/common";
 
-import type { Mutable } from "@excalidraw/common/utility-types";
-
 import { mutateElement, newElementWith } from "./mutateElement";
 import { getBoundTextElement } from "./textElement";
 import { hasBoundTextElement } from "./typeChecks";
@@ -13,6 +11,7 @@ import type {
   ExcalidrawElement,
   FractionalIndex,
   OrderedExcalidrawElement,
+  SceneElementsMap,
 } from "./types";
 
 export class InvalidFractionalIndexError extends Error {
@@ -197,24 +196,41 @@ export const syncMovedIndices = (
 };
 
 /**
- * Synchronizes all invalid fractional indices with the array order by mutating passed elements array.
- *
- * When `shouldCreateNewInstances` is true, it creates new instances of the elements, instead of mutating the existing ones.
+ * Synchronizes all invalid fractional indices within the array order by mutating elements in the passed array.
  *
  * WARN: in edge cases it could modify the elements which were not moved, as it's impossible to guess the actually moved elements from the elements array itself.
  */
 export const syncInvalidIndices = (
   elements: readonly ExcalidrawElement[],
 ): OrderedExcalidrawElement[] => {
+  const elementsMap = arrayToMap(elements);
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
 
   for (const [element, { index }] of elementsUpdates) {
-    const elementsMap = arrayToMap(elements);
     mutateElement(element, elementsMap, { index });
   }
 
   return elements as OrderedExcalidrawElement[];
+};
+
+/**
+ * Synchronizes all invalid fractional indices within the array order by creating new instances of elements with corrected indices.
+ *
+ * WARN: in edge cases it could modify the elements which were not moved, as it's impossible to guess the actually moved elements from the elements array itself.
+ */
+export const syncInvalidIndicesImmutable = (
+  elements: readonly ExcalidrawElement[],
+): SceneElementsMap | undefined => {
+  const syncedElements = arrayToMap(elements);
+  const indicesGroups = getInvalidIndicesGroups(elements);
+  const elementsUpdates = generateIndices(elements, indicesGroups);
+
+  for (const [element, { index }] of elementsUpdates) {
+    syncedElements.set(element.id, newElementWith(element, { index }));
+  }
+
+  return syncedElements as SceneElementsMap;
 };
 
 /**

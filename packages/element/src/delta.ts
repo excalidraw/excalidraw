@@ -1117,7 +1117,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   public applyLatestChanges(
     prevElements: SceneElementsMap,
     nextElements: SceneElementsMap,
-    modifierOptions: "deleted" | "inserted" | "both",
+    modifierOptions?: "deleted" | "inserted",
   ): ElementsDelta {
     const modifier =
       (
