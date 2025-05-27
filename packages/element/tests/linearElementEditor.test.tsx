@@ -1411,5 +1411,55 @@ describe("Test Linear Elements", () => {
       expect(line.points[line.points.length - 1][0]).toBe(20);
       expect(line.points[line.points.length - 1][1]).toBe(-20);
     });
+
+    it("should preserve original angle when dragging endpoint with SHIFT key", () => {
+      createTwoPointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      enterLineEditingMode(line);
+
+      const elementsMap = arrayToMap(h.elements);
+      const points = LinearElementEditor.getPointsGlobalCoordinates(
+        line,
+        elementsMap,
+      );
+
+      // Calculate original angle between first and last point
+      const originalAngle = Math.atan2(
+        points[1][1] - points[0][1],
+        points[1][0] - points[0][0],
+      );
+
+      // Drag the second point (endpoint) with SHIFT key pressed
+      const startPoint = pointFrom<GlobalPoint>(points[1][0], points[1][1]);
+      const endPoint = pointFrom<GlobalPoint>(
+        startPoint[0] + 4,
+        startPoint[1] + 4,
+      );
+
+      // Perform drag with SHIFT key modifier
+      Keyboard.withModifierKeys({ shift: true }, () => {
+        mouse.downAt(startPoint[0], startPoint[1]);
+        mouse.moveTo(endPoint[0], endPoint[1]);
+        mouse.upAt(endPoint[0], endPoint[1]);
+      });
+
+      // Get updated points after drag
+      const updatedPoints = LinearElementEditor.getPointsGlobalCoordinates(
+        line,
+        elementsMap,
+      );
+
+      // Calculate new angle
+      const newAngle = Math.atan2(
+        updatedPoints[1][1] - updatedPoints[0][1],
+        updatedPoints[1][0] - updatedPoints[0][0],
+      );
+
+      // The angle should be preserved (within a small tolerance for floating point precision)
+      const angleDifference = Math.abs(newAngle - originalAngle);
+      const tolerance = 0.01; // Small tolerance for floating point precision
+
+      expect(angleDifference).toBeLessThan(tolerance);
+    });
   });
 });
