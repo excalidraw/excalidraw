@@ -74,6 +74,7 @@ export const actionFinalize = register({
         return {
           elements: newElements,
           appState: {
+            ...appState, //zsviczian https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/2360
             selectedLinearElement: {
               ...linearElementEditor,
               selectedPointsIndices: null,
