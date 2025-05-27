@@ -814,6 +814,15 @@ export const renderElement = (
 
       break;
     }
+    case "triangle": {
+      const shape = new Drawable(
+        roughCanvas.polygon(getTrianglePoints(element).map(([x, y]) => [x, y])), 
+        {
+          ...extraOpts,
+        }
+      );
+      return [shape, null];
+    }
     case "rectangle":
     case "diamond":
     case "ellipse":
