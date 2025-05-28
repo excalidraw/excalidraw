@@ -120,16 +120,15 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                         style={{
                             flex: 1,
                             padding: "8px",
-                            background:
-                                activeTab === index ? "var(--color-primary)" : "transparent",
-                            color:
-                                activeTab === index
-                                    ? "var(--color-surface-lowest)"
-                                    : "var(--color-text-secondary)",
+                            background: activeTab === index ? "#007BFF" : "transparent", // solid blue for active
+                            color: activeTab === index ? "#ffffff" : "var(--color-text-secondary)",
                             border: "none",
                             cursor: "pointer",
-                            fontWeight: 500,
+                            fontWeight: 600,
                             fontSize: "12px",
+                            borderBottom: activeTab === index ? "3px solid #0056b3" : "none", // optional accent
+                            borderRadius: "6px 6px 0 0", // optional rounded top corners
+                            transition: "background 0.2s ease, color 0.2s ease",
                         }}
                     >
                         {tab.name}
@@ -153,20 +152,20 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                         key={image.id}
                         onClick={() => handleImageClick(image)}
                         style={{
-  boxSizing: "border-box", // ← this fixes the resize issue
-  border: isImageSelected(image.id)
-    ? "3px solid #007BFF"
-    : "2px solid transparent",
-  borderRadius: "10px",
-  overflow: "hidden",
-  cursor: "pointer",
-  position: "relative",
-  background: "var(--color-surface-low)",
-  boxShadow: isImageSelected(image.id)
-    ? "0 0 0 2px rgba(0, 123, 255, 0.3)"
-    : "none",
-  transition: "border 0.2s ease, box-shadow 0.2s ease",
-}}
+                            boxSizing: "border-box", // ← this fixes the resize issue
+                            border: isImageSelected(image.id)
+                                ? "3px solid #007BFF"
+                                : "2px solid transparent",
+                            borderRadius: "10px",
+                            overflow: "hidden",
+                            cursor: "pointer",
+                            position: "relative",
+                            background: "var(--color-surface-low)",
+                            boxShadow: isImageSelected(image.id)
+                                ? "0 0 0 2px rgba(0, 123, 255, 0.3)"
+                                : "none",
+                            transition: "border 0.2s ease, box-shadow 0.2s ease",
+                        }}
                     >
                         <img
                             src={image.src}
