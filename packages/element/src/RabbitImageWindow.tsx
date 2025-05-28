@@ -55,7 +55,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
 
     const tabData = [
         {
-            name: "Animals",
+            name: "Google",
             images: Array.from({ length: 10 }, (_, i) => ({
                 id: `animal-${i}`,
                 src: `https://picsum.photos/80/80?random=${i + 1}`,
@@ -64,7 +64,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
             })),
         },
         {
-            name: "Nature",
+            name: "Pinterest",
             images: Array.from({ length: 10 }, (_, i) => ({
                 id: `nature-${i}`,
                 src: `https://picsum.photos/80/80?random=${i + 11}`,
@@ -73,7 +73,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
             })),
         },
         {
-            name: "Objects",
+            name: "YouTube",
             images: Array.from({ length: 10 }, (_, i) => ({
                 id: `object-${i}`,
                 src: `https://picsum.photos/80/80?random=${i + 21}`,
@@ -107,9 +107,9 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                 left: pos.x,
                 width: "320px",
                 // background: "var(--color-surface-lowest)",
-                background: "white",
+                background: "#F5F5F5",
 
-                border: "1px solid var(--color-border)",
+                border: "1px solidrgb(243, 243, 243)",
                 borderRadius: "12px",
                 boxShadow: "var(--shadow-3)",
                 zIndex: 999,
@@ -131,7 +131,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                 }}
                 onMouseDown={onMouseDown}
             >
-                <h3 style={{ fontSize: "14px", margin: 0, userSelect: "none" }}>
+                <h3 style={{ fontSize: "14px", margin: 0, userSelect: "none", fontFamily: "Helvetica"}}>
                     Rabbit Images
                 </h3>
                 <button
@@ -163,14 +163,18 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                         style={{
                             flex: 1,
                             padding: "8px",
-                            background: activeTab === index ? "#007BFF" : "transparent",
-                            color: activeTab === index ? "#fff" : "var(--color-text-secondary)",
+                            background: activeTab === index ? "white" : "transparent",
+                            color: activeTab === index ? "black" : "black",
                             border: "none",
                             cursor: "pointer",
                             fontWeight: 600,
                             fontSize: "12px",
-                            borderBottom: activeTab === index ? "3px solid #0056b3" : "none",
+                            // borderBottom: "none",
+                            // // borderBottom: activeTab === index ? "3px solid #0056b3" : "none",
                             borderRadius: "6px 6px 0 0",
+                            borderStyle: "solid",
+   borderWidth: "1px 1px 0 1px",  // top, right, bottom, left
+  borderColor: "#CDCDCD",
                             transition: "background 0.2s ease, color 0.2s ease",
                         }}
                     >
@@ -183,12 +187,16 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
             <div
                 style={{
                     padding: "16px",
+                    
                     maxHeight: "400px",
                     overflowY: "auto",
-                    background: "white",
+                    background: "white", // same blue as selected tab
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr",
                     gap: "12px",
+                     borderStyle: "solid",
+  borderWidth: "0px 1px 1px 1px",  // top, right, bottom, left
+  borderColor: "#CDCDCD",
                 }}
             >
                 {tabData[activeTab].images.map((image) => (
@@ -198,7 +206,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                         style={{
                             boxSizing: "border-box",
                             border: isImageSelected(image.id)
-                                ? "3px solid #007BFF"
+                                ? "3px solid rgb(60, 170, 255)"
                                 : "2px solid transparent",
                             borderRadius: "10px",
                             overflow: "hidden",
@@ -220,15 +228,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                                 display: "block",
                             }}
                         />
-                        <p
-                            style={{
-                                fontSize: "11px",
-                                textAlign: "center",
-                                margin: "4px 0 0 0",
-                            }}
-                        >
-                            {image.name}
-                        </p>
+                       
                     </div>
                 ))}
             </div>
@@ -245,6 +245,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                     <p
                         style={{
                             fontSize: "11px",
+                            fontFamily: "Arial",
                             color: "var(--color-text-secondary)",
                             textAlign: "center",
                             margin: 0,
