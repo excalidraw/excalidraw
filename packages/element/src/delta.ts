@@ -968,13 +968,34 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     inserted,
   }: Delta<ElementPartial>) => !!deleted.isDeleted === !!inserted.isDeleted;
 
+  private static satisfiesCommmonInvariants = ({
+    deleted,
+    inserted,
+  }: Delta<ElementPartial>) =>
+    !!(
+      deleted.version &&
+      inserted.version &&
+      // versions are required integers
+      Number.isInteger(deleted.version) &&
+      Number.isInteger(inserted.version) &&
+      // versions should be positive, zero included
+      deleted.version >= 0 &&
+      inserted.version >= 0 &&
+      // versionNonce is required
+      deleted.versionNonce &&
+      inserted.versionNonce
+    );
+
   private static validate(
     elementsDelta: ElementsDelta,
     type: "added" | "removed" | "updated",
-    satifies: (delta: Delta<ElementPartial>) => boolean,
+    satifiesSpecialInvariants: (delta: Delta<ElementPartial>) => boolean,
   ) {
     for (const [id, delta] of Object.entries(elementsDelta[type])) {
-      if (!satifies(delta)) {
+      if (
+        !this.satisfiesCommmonInvariants(delta) ||
+        !satifiesSpecialInvariants(delta)
+      ) {
         console.error(
           `Broken invariant for "${type}" delta, element "${id}", delta:`,
           delta,

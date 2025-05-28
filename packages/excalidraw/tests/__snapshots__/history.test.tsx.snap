@@ -499,6 +499,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id688": {
@@ -529,6 +530,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -600,6 +602,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -979,6 +982,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id665": {
@@ -1009,6 +1013,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -1080,6 +1085,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -1385,6 +1391,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
         "id712": {
@@ -1417,6 +1424,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
       },
@@ -1783,6 +1791,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 8,
           },
         },
       },
@@ -2045,6 +2054,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id733": {
@@ -2075,6 +2085,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -2371,6 +2382,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id737": {
@@ -2401,6 +2413,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -2480,6 +2493,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           },
           "inserted": {
             "isDeleted": true,
+            "version": 7,
           },
         },
       },
@@ -2769,6 +2783,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
         "id613": {
           "deleted": {
             "isDeleted": false,
+            "version": 7,
           },
           "inserted": {
             "angle": 0,
@@ -4158,6 +4173,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
       },
@@ -4425,6 +4441,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 7,
           },
         },
       },
@@ -5587,6 +5604,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
           },
           "inserted": {
             "isDeleted": true,
+            "version": 7,
           },
         },
       },
@@ -5860,6 +5878,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
         "id469": {
@@ -5894,6 +5913,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -6207,6 +6227,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -6263,6 +6284,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
       },
@@ -6343,6 +6365,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
       },
@@ -6638,6 +6661,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id433": {
@@ -6668,6 +6692,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id434": {
@@ -6698,6 +6723,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -7304,6 +7330,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 5,
           },
         },
       },
@@ -7565,6 +7592,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
       },
@@ -7856,6 +7884,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
         "id513": {
           "deleted": {
             "isDeleted": true,
+            "version": 4,
           },
           "inserted": {
             "angle": 0,
@@ -7888,6 +7917,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
         "id514": {
           "deleted": {
             "isDeleted": true,
+            "version": 8,
           },
           "inserted": {
             "angle": 0,
@@ -7920,6 +7950,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
         "id515": {
           "deleted": {
             "isDeleted": true,
+            "version": 4,
           },
           "inserted": {
             "angle": 0,
@@ -8211,6 +8242,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
         "id501": {
           "deleted": {
             "isDeleted": true,
+            "version": 4,
           },
           "inserted": {
             "angle": 0,
@@ -8243,6 +8275,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
         "id502": {
           "deleted": {
             "isDeleted": true,
+            "version": 7,
           },
           "inserted": {
             "angle": 0,
@@ -8275,6 +8308,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
         "id503": {
           "deleted": {
             "isDeleted": true,
+            "version": 4,
           },
           "inserted": {
             "angle": 0,
@@ -8577,6 +8611,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
           },
           "inserted": {
             "isDeleted": true,
+            "version": 7,
           },
         },
       },
@@ -8632,6 +8667,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
           },
           "inserted": {
             "isDeleted": true,
+            "version": 7,
           },
         },
       },
@@ -8999,6 +9035,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
       },
@@ -9237,6 +9274,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
           },
           "inserted": {
             "isDeleted": true,
+            "version": 7,
           },
         },
       },
@@ -9528,6 +9566,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -9734,6 +9773,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -10316,6 +10356,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
           },
           "inserted": {
             "isDeleted": true,
+            "version": 11,
           },
         },
       },
@@ -10607,6 +10648,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
       },
@@ -10910,6 +10952,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
         "6Rm4g567UQM4WjLwej2Vc": {
           "deleted": {
             "isDeleted": true,
+            "version": 3,
           },
           "inserted": {
             "angle": 0,
@@ -11027,6 +11070,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
         "KPrBI4g_v9qUB1XxYLgSz": {
           "deleted": {
             "isDeleted": true,
+            "version": 4,
           },
           "inserted": {
             "angle": 0,
@@ -11057,6 +11101,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
         "u2JGnnmoJ0VATV4vCNJE5": {
           "deleted": {
             "isDeleted": true,
+            "version": 4,
           },
           "inserted": {
             "angle": 0,
@@ -11344,6 +11389,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -11550,6 +11596,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
         "id329": {
           "deleted": {
             "isDeleted": true,
+            "version": 4,
           },
           "inserted": {
             "angle": 0,
@@ -11816,6 +11863,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -12128,6 +12176,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -12217,6 +12266,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -12463,6 +12513,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
           },
           "inserted": {
             "isDeleted": true,
+            "version": 4,
           },
         },
       },
@@ -12701,6 +12752,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
           },
           "inserted": {
             "isDeleted": true,
+            "version": 4,
           },
         },
       },
@@ -12939,6 +12991,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 4,
           },
         },
       },
@@ -13159,6 +13212,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
         "id53": {
           "deleted": {
             "isDeleted": true,
+            "version": 4,
           },
           "inserted": {
             "angle": 0,
@@ -13425,6 +13479,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -13520,6 +13575,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
           },
           "inserted": {
             "isDeleted": true,
+            "version": 4,
           },
         },
       },
@@ -13940,6 +13996,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id5": {
@@ -13972,6 +14029,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -14203,6 +14261,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id11": {
@@ -14233,6 +14292,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -14514,6 +14574,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -15092,6 +15153,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id231": {
@@ -15131,6 +15193,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id232": {
@@ -15161,6 +15224,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -15340,6 +15404,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 5,
           },
         },
       },
@@ -15712,6 +15777,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id213": {
@@ -15751,6 +15817,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id214": {
@@ -15781,6 +15848,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -15960,6 +16028,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 7,
           },
         },
       },
@@ -16342,6 +16411,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 7,
           },
         },
         "id250": {
@@ -16383,6 +16453,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 8,
           },
         },
         "id251": {
@@ -16415,6 +16486,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 5,
           },
         },
       },
@@ -16594,6 +16666,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 7,
           },
         },
       },
@@ -17039,6 +17112,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id276": {
@@ -17078,6 +17152,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id277": {
@@ -17108,6 +17183,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -17287,6 +17363,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 5,
           },
         },
       },
@@ -17760,6 +17837,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id298": {
@@ -17799,6 +17877,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id299": {
@@ -17829,6 +17908,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -18008,6 +18088,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
+            "version": 5,
           },
         },
       },
@@ -18352,6 +18433,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -18405,6 +18487,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -18458,6 +18541,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -18940,6 +19024,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id161": {
@@ -18972,6 +19057,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -19035,6 +19121,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
         "id186": {
@@ -19067,6 +19154,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -19335,6 +19423,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
           },
           "inserted": {
             "isDeleted": true,
+            "version": 4,
           },
         },
       },
@@ -19390,6 +19479,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
       },
@@ -19445,6 +19535,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
       },
@@ -19783,6 +19874,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
           },
           "inserted": {
             "isDeleted": true,
+            "version": 12,
           },
         },
       },
