@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type {
     AppState,
-    PointerDownState as ExcalidrawPointerDownState,
 } from "@excalidraw/excalidraw/types";
+
 interface RabbitImageWindowProps {
     appState: AppState;
     onImageSelect: (image: any) => void;
@@ -19,6 +19,39 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
     onToggleVisibility,
 }) => {
     const [activeTab, setActiveTab] = useState(0);
+
+    // Initial position (can adjust)
+    const [pos, setPos] = useState({ x: 0, y: 0 });
+
+    // Used to track dragging state & last cursor position
+    const dragRef = useRef<{ x: number; y: number } | null>(null);
+
+    // Start dragging
+    const onMouseDown = (e: React.MouseEvent) => {
+        e.preventDefault(); // prevent text selection etc
+        dragRef.current = { x: e.clientX, y: e.clientY };
+        window.addEventListener("mousemove", onMouseMove);
+        window.addEventListener("mouseup", onMouseUp);
+    };
+
+    // Drag move
+    const onMouseMove = (e: MouseEvent) => {
+        if (!dragRef.current) return;
+        const dx = e.clientX - dragRef.current.x;
+        const dy = e.clientY - dragRef.current.y;
+        setPos((prev) => ({
+            x: prev.x + dx,
+            y: prev.y + dy,
+        }));
+        dragRef.current = { x: e.clientX, y: e.clientY };
+    };
+
+    // Drag end
+    const onMouseUp = () => {
+        dragRef.current = null;
+        window.removeEventListener("mousemove", onMouseMove);
+        window.removeEventListener("mouseup", onMouseUp);
+    };
 
     const tabData = [
         {
@@ -57,7 +90,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
 
     const isImageSelected = (id: string) => selectedImages.includes(id);
 
-    // Do not show in certain modes
+    // Hide in some modes
     if (
         appState.viewModeEnabled ||
         appState.zenModeEnabled ||
@@ -70,17 +103,20 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
         <div
             style={{
                 position: "absolute",
-                top: "calc(100% + 4px)",
-                left: 0,
+                top: pos.y,
+                left: pos.x,
                 width: "320px",
-                background: "var(--color-surface-lowest)",
+                // background: "var(--color-surface-lowest)",
+                background: "white",
+
                 border: "1px solid var(--color-border)",
                 borderRadius: "12px",
                 boxShadow: "var(--shadow-3)",
                 zIndex: 999,
+                userSelect: dragRef.current ? "none" : "auto", // disable text select while dragging
             }}
         >
-            {/* Header */}
+            {/* Header: draggable */}
             <div
                 style={{
                     display: "flex",
@@ -89,9 +125,15 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                     padding: "12px 16px",
                     borderBottom: "1px solid var(--color-border)",
                     background: "var(--color-surface-low)",
+                    cursor: "move", // show drag cursor
+                    borderTopLeftRadius: "12px",
+                    borderTopRightRadius: "12px",
                 }}
+                onMouseDown={onMouseDown}
             >
-                <h3 style={{ fontSize: "14px", margin: 0 }}>Rabbit Images</h3>
+                <h3 style={{ fontSize: "14px", margin: 0, userSelect: "none" }}>
+                    Rabbit Images
+                </h3>
                 <button
                     onClick={onToggleVisibility}
                     title="Hide"
@@ -100,6 +142,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                         background: "none",
                         color: "var(--color-text-secondary)",
                         cursor: "pointer",
+                        userSelect: "none",
                     }}
                 >
                     ✕
@@ -120,14 +163,14 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                         style={{
                             flex: 1,
                             padding: "8px",
-                            background: activeTab === index ? "#007BFF" : "transparent", // solid blue for active
-                            color: activeTab === index ? "#ffffff" : "var(--color-text-secondary)",
+                            background: activeTab === index ? "#007BFF" : "transparent",
+                            color: activeTab === index ? "#fff" : "var(--color-text-secondary)",
                             border: "none",
                             cursor: "pointer",
                             fontWeight: 600,
                             fontSize: "12px",
-                            borderBottom: activeTab === index ? "3px solid #0056b3" : "none", // optional accent
-                            borderRadius: "6px 6px 0 0", // optional rounded top corners
+                            borderBottom: activeTab === index ? "3px solid #0056b3" : "none",
+                            borderRadius: "6px 6px 0 0",
                             transition: "background 0.2s ease, color 0.2s ease",
                         }}
                     >
@@ -142,6 +185,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                     padding: "16px",
                     maxHeight: "400px",
                     overflowY: "auto",
+                    background: "white",
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr",
                     gap: "12px",
@@ -152,7 +196,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                         key={image.id}
                         onClick={() => handleImageClick(image)}
                         style={{
-                            boxSizing: "border-box", // ← this fixes the resize issue
+                            boxSizing: "border-box",
                             border: isImageSelected(image.id)
                                 ? "3px solid #007BFF"
                                 : "2px solid transparent",

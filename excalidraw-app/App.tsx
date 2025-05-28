@@ -1706,14 +1706,11 @@ const ExcalidrawWrapper = () => {
                 // top: y - 200,
                 // left: x + 300,
                 // zIndex: 1000,
-                // position: "fixed",
-                // top: "150px", // adjust as needed
-                // right: "400px", // distance from the right edge of screen
-                // zIndex: 1000,
-                 position: "absolute",
-    top: y,
-    left: x - 160, // to center the window horizontally, adjust as needed
-    zIndex: 1000,
+                position: "fixed",
+                top: "150px", // adjust as needed
+                right: "400px", // distance from the right edge of screen
+                zIndex: 1000,
+
               }}
             >
               <RabbitImageWindow
