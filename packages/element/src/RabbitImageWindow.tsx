@@ -289,11 +289,19 @@ interface Tab {
 
 interface RabbitImageWindowProps {
   appState: AppState;
-  onImageSelect: (image: ImageItem) => void;
-  onImageDeselect: (image: ImageItem) => void;
+  onImageSelect: (image: any) => void;
+  onImageDeselect: (image: any) => void;
   selectedImages: string[];
   onToggleVisibility: () => void;
-  tabs: Tab[];
+  tabData: {
+    name: string;
+    images: {
+      id: string;
+      src: string;
+      alt: string;
+      name: string;
+    }[];
+  }[];
 }
 
 export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
@@ -302,7 +310,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
   onImageDeselect,
   selectedImages,
   onToggleVisibility,
-  tabs,
+  tabData,
 }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -392,7 +400,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
       </div>
 
       <div style={{ display: "flex", borderBottom: "1px solid var(--color-border)" }}>
-        {tabs.map((tab, index) => (
+        {tabData.map((tab, index) => (
           <button
             key={index}
             onClick={() => setActiveTab(index)}
@@ -442,7 +450,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
           borderColor: "#93A2B7",
         }}
       >
-        {tabs[activeTab]?.images.map((image) => (
+        {tabData[activeTab]?.images.map((image) => (
           <div
             key={image.id}
             onClick={() => handleImageClick(image)}
