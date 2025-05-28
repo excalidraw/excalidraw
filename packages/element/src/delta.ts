@@ -128,11 +128,7 @@ export class Delta<T> {
     // - we do this only on previously detected changed elements
     // - we do shallow compare only on the first level of properties (not going any deeper)
     // - # of properties is reasonably small
-    for (const key of this.distinctKeysIterator(
-      "full",
-      prevObject,
-      nextObject,
-    )) {
+    for (const key of this.getDifferences(prevObject, nextObject)) {
       deleted[key as keyof T] = prevObject[key];
       inserted[key as keyof T] = nextObject[key];
     }
@@ -338,6 +334,42 @@ export class Delta<T> {
   }
 
   /**
+   * Compares if shared properties of object1 and object2 contain any different value (aka inner join).
+   */
+  public static isInnerDifferent<T extends {}>(
+    object1: T,
+    object2: T,
+    skipShallowCompare = false,
+  ): boolean {
+    const anyDistinctKey = !!this.distinctKeysIterator(
+      "inner",
+      object1,
+      object2,
+      skipShallowCompare,
+    ).next().value;
+
+    return !!anyDistinctKey;
+  }
+
+  /**
+   * Compares if any properties of object1 and object2 contain any different value (aka full join).
+   */
+  public static isDifferent<T extends {}>(
+    object1: T,
+    object2: T,
+    skipShallowCompare = false,
+  ): boolean {
+    const anyDistinctKey = !!this.distinctKeysIterator(
+      "full",
+      object1,
+      object2,
+      skipShallowCompare,
+    ).next().value;
+
+    return !!anyDistinctKey;
+  }
+
+  /**
    * Returns sorted object1 keys that have distinct values.
    */
   public static getLeftDifferences<T extends {}>(
@@ -364,6 +396,32 @@ export class Delta<T> {
   }
 
   /**
+   * Returns sorted keys of shared object1 and object2 properties that have distinct values (aka inner join).
+   */
+  public static getInnerDifferences<T extends {}>(
+    object1: T,
+    object2: T,
+    skipShallowCompare = false,
+  ) {
+    return Array.from(
+      this.distinctKeysIterator("inner", object1, object2, skipShallowCompare),
+    ).sort();
+  }
+
+  /**
+   * Returns sorted keys that have distinct values between object1 and object2 (aka full join).
+   */
+  public static getDifferences<T extends {}>(
+    object1: T,
+    object2: T,
+    skipShallowCompare = false,
+  ) {
+    return Array.from(
+      this.distinctKeysIterator("full", object1, object2, skipShallowCompare),
+    ).sort();
+  }
+
+  /**
    * Iterator comparing values of object properties based on the passed joining strategy.
    *
    * @yields keys of properties with different values
@@ -371,7 +429,7 @@ export class Delta<T> {
    * WARN: it's based on shallow compare performed only on the first level and doesn't go deeper than that.
    */
   private static *distinctKeysIterator<T extends {}>(
-    join: "left" | "right" | "full",
+    join: "left" | "right" | "inner" | "full",
     object1: T,
     object2: T,
     skipShallowCompare = false,
@@ -386,6 +444,8 @@ export class Delta<T> {
       keys = Object.keys(object1);
     } else if (join === "right") {
       keys = Object.keys(object2);
+    } else if (join === "inner") {
+      keys = Object.keys(object1).filter((key) => key in object2);
     } else if (join === "full") {
       keys = Array.from(
         new Set([...Object.keys(object1), ...Object.keys(object2)]),
@@ -399,17 +459,17 @@ export class Delta<T> {
     }
 
     for (const key of keys) {
-      const object1Value = object1[key as keyof T];
-      const object2Value = object2[key as keyof T];
+      const value1 = object1[key as keyof T];
+      const value2 = object2[key as keyof T];
 
-      if (object1Value !== object2Value) {
+      if (value1 !== value2) {
         if (
           !skipShallowCompare &&
-          typeof object1Value === "object" &&
-          typeof object2Value === "object" &&
-          object1Value !== null &&
-          object2Value !== null &&
-          isShallowEqual(object1Value, object2Value)
+          typeof value1 === "object" &&
+          typeof value2 === "object" &&
+          value1 !== null &&
+          value2 !== null &&
+          isShallowEqual(value1, value2)
         ) {
           continue;
         }
@@ -981,6 +1041,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       // versions should be positive, zero included
       deleted.version >= 0 &&
       inserted.version >= 0 &&
+      // versions should never be the same
+      deleted.version !== inserted.version &&
       // versionNonce is required
       deleted.versionNonce &&
       inserted.versionNonce
@@ -1170,7 +1232,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
         // the element wasn't found -> don't update the partial
         if (!element) {
-          console.error(`Element not foudn for applying latest changes`);
+          console.error(
+            `Element not found when trying to apply latest changes`,
+          );
           return partial;
         }
 
@@ -1200,17 +1264,22 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         const prevElement = prevElements.get(id);
         const nextElement = nextElements.get(id);
 
+        let latestDelta: Delta<ElementPartial> | null = null;
+
         if (prevElement || nextElement) {
-          const modifiedDelta = Delta.create(
+          latestDelta = Delta.create(
             delta.deleted,
             delta.inserted,
             modifier(prevElement, nextElement),
             modifierOptions,
           );
-
-          modifiedDeltas[id] = modifiedDelta;
         } else {
-          modifiedDeltas[id] = delta;
+          latestDelta = delta;
+        }
+
+        // it might happen that after applying latest changes the delta itself does not contain any changes
+        if (Delta.isInnerDifferent(latestDelta.deleted, latestDelta.inserted)) {
+          modifiedDeltas[id] = latestDelta;
         }
       }
 
@@ -1742,10 +1811,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           >
         ).points ?? [];
 
-      if (
-        !Delta.isLeftDifferent(deletedPoints, insertedPoints) &&
-        !Delta.isRightDifferent(deletedPoints, insertedPoints)
-      ) {
+      if (!Delta.isDifferent(deletedPoints, insertedPoints)) {
         // delete the points from delta if there is no difference, otherwise leave them as they were captured due to consistency
         Reflect.deleteProperty(deleted, "points");
         Reflect.deleteProperty(inserted, "points");

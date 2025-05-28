@@ -176,6 +176,7 @@ exports[`given element A and group of elements B and given both are selected whe
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -229,6 +230,7 @@ exports[`given element A and group of elements B and given both are selected whe
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -282,6 +284,7 @@ exports[`given element A and group of elements B and given both are selected whe
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -601,6 +604,7 @@ exports[`given element A and group of elements B and given both are selected whe
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -654,6 +658,7 @@ exports[`given element A and group of elements B and given both are selected whe
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -707,6 +712,7 @@ exports[`given element A and group of elements B and given both are selected whe
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -1005,6 +1011,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -1058,6 +1065,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -1226,6 +1234,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -1568,6 +1577,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -1779,6 +1789,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -1832,6 +1843,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -1885,6 +1897,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -2157,6 +2170,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -2210,6 +2224,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 5,
           },
         },
       },
@@ -2398,6 +2413,7 @@ exports[`regression tests > arrow keys > [end of test] undo stack 1`] = `
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -2579,6 +2595,7 @@ exports[`regression tests > can drag element that covers another element, while 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -2632,6 +2649,7 @@ exports[`regression tests > can drag element that covers another element, while 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -2685,6 +2703,7 @@ exports[`regression tests > can drag element that covers another element, while 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -2899,6 +2918,7 @@ exports[`regression tests > change the properties of a shape > [end of test] und
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -3128,7 +3148,7 @@ exports[`regression tests > click on an element and drag it > [dragged] element 
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 1116226695,
+  "versionNonce": 1014066025,
   "width": 10,
   "x": 20,
   "y": 20,
@@ -3187,6 +3207,7 @@ exports[`regression tests > click on an element and drag it > [dragged] undo sta
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -3395,6 +3416,7 @@ exports[`regression tests > click on an element and drag it > [end of test] undo
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -3630,6 +3652,7 @@ exports[`regression tests > click to select a shape > [end of test] undo stack 1
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -3683,6 +3706,7 @@ exports[`regression tests > click to select a shape > [end of test] undo stack 1
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -3887,6 +3911,7 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -3940,6 +3965,7 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -3993,6 +4019,7 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -4197,6 +4224,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -4250,6 +4278,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -4570,8 +4599,10 @@ exports[`regression tests > deselects group of selected elements on pointer down
     "locked": false,
     "opacity": 100,
     "roughness": 1,
-    "roundness": null,
-    "seed": 1505387817,
+    "roundness": {
+      "type": 2,
+    },
+    "seed": 493213705,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 2,
@@ -4658,6 +4689,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -4711,6 +4743,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -4911,6 +4944,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -4964,6 +4998,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -5124,8 +5159,10 @@ exports[`regression tests > deselects selected element on pointer down when poin
     "locked": false,
     "opacity": 100,
     "roughness": 1,
-    "roundness": null,
-    "seed": 1150084233,
+    "roundness": {
+      "type": 2,
+    },
+    "seed": 1116226695,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 2,
@@ -5212,6 +5249,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -5391,6 +5429,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -5590,6 +5629,7 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -5643,6 +5683,7 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -5696,6 +5737,7 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -5984,6 +6026,7 @@ exports[`regression tests > drags selected elements from point inside common bou
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -6037,6 +6080,7 @@ exports[`regression tests > drags selected elements from point inside common bou
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -6273,6 +6317,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -6326,6 +6371,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -6379,6 +6425,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -6452,6 +6499,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -6523,6 +6571,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -6599,6 +6648,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 5,
           },
         },
       },
@@ -6750,6 +6800,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 5,
           },
         },
       },
@@ -6920,6 +6971,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -7102,6 +7154,7 @@ exports[`regression tests > given a group of selected elements with an element t
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -7155,6 +7208,7 @@ exports[`regression tests > given a group of selected elements with an element t
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -7208,6 +7262,7 @@ exports[`regression tests > given a group of selected elements with an element t
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -7433,6 +7488,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -7486,6 +7542,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -7709,6 +7766,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id1": {
@@ -7739,6 +7797,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -7942,6 +8001,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
         "id1": {
@@ -7972,6 +8032,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
           },
           "inserted": {
             "isDeleted": true,
+            "version": 1,
           },
         },
       },
@@ -8178,6 +8239,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] undo st
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -8357,6 +8419,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] undo stac
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -8536,6 +8599,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] undo stac
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -8761,6 +8825,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] undo stack 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -8984,6 +9049,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] undo stack 1
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -9179,6 +9245,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] undo sta
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -9404,6 +9471,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] undo stack 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -9583,6 +9651,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] undo stac
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -9806,6 +9875,7 @@ exports[`regression tests > key l selects line tool > [end of test] undo stack 1
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -9985,6 +10055,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] undo stac
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -10180,6 +10251,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] undo sta
           },
           "inserted": {
             "isDeleted": true,
+            "version": 3,
           },
         },
       },
@@ -10359,6 +10431,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] undo st
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -10546,6 +10619,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -10599,6 +10673,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -10652,6 +10727,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -10795,6 +10871,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
         "id18": {
@@ -10827,6 +10904,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
         "id19": {
@@ -10859,6 +10937,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
           },
           "inserted": {
             "isDeleted": true,
+            "version": 6,
           },
         },
       },
@@ -11065,6 +11144,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -11120,6 +11200,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
           },
           "inserted": {
             "isDeleted": true,
+            "version": 4,
           },
         },
       },
@@ -11466,6 +11547,7 @@ exports[`regression tests > shift click on selected element should deselect it o
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -11669,6 +11751,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -11722,6 +11805,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -11988,6 +12072,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -12041,6 +12126,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -12094,6 +12180,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -12418,6 +12505,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -12471,6 +12559,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -12616,6 +12705,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -12669,6 +12759,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -13172,6 +13263,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -13225,6 +13317,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -13278,6 +13371,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -13741,8 +13835,10 @@ exports[`regression tests > switches from group of selected elements to another 
     "locked": false,
     "opacity": 100,
     "roughness": 1,
-    "roundness": null,
-    "seed": 1723083209,
+    "roundness": {
+      "type": 2,
+    },
+    "seed": 289600103,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 2,
@@ -13829,6 +13925,7 @@ exports[`regression tests > switches from group of selected elements to another 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -13882,6 +13979,7 @@ exports[`regression tests > switches from group of selected elements to another 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -13935,6 +14033,7 @@ exports[`regression tests > switches from group of selected elements to another 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -14076,8 +14175,10 @@ exports[`regression tests > switches selected element on pointer down > [end of 
     "locked": false,
     "opacity": 100,
     "roughness": 1,
-    "roundness": null,
-    "seed": 1604849351,
+    "roundness": {
+      "type": 2,
+    },
+    "seed": 23633383,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 2,
@@ -14164,6 +14265,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -14217,6 +14319,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -14570,6 +14673,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
         "id6": {
           "deleted": {
             "isDeleted": true,
+            "version": 10,
           },
           "inserted": {
             "angle": 0,
@@ -14673,6 +14777,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] undo st
           },
           "inserted": {
             "isDeleted": true,
+            "version": 2,
           },
         },
       },
@@ -14728,6 +14833,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] undo st
           },
           "inserted": {
             "isDeleted": true,
+            "version": 4,
           },
         },
       },

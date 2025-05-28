@@ -24,11 +24,11 @@ export class HistoryDelta extends StoreDelta {
     const [nextElements, elementsContainVisibleChange] = this.elements.applyTo(
       elements,
       // used to fallback into local snapshot in case we couldn't apply the delta
-      // due to a missing elements in the scene (force deleted)
+      // due to a missing (force deleted) elements in the scene
       snapshot.elements,
       // we don't want to apply the `version` and `versionNonce` properties for history
       // as we always need to end up with a new version due to collaboration,
-      // approaching each undo / redo as a new user operation
+      // approaching each undo / redo as a new user action
       {
         excludedProperties: new Set(["version", "versionNonce"]),
       },
@@ -161,9 +161,9 @@ export class History {
     push: (entry: HistoryDelta) => void,
   ): [SceneElementsMap, AppState] | void {
     try {
-      let delta = pop();
+      let historyDelta = pop();
 
-      if (delta === null) {
+      if (historyDelta === null) {
         return;
       }
 
@@ -176,13 +176,10 @@ export class History {
       let containsVisibleChange = false;
 
       // iterate through the history entries in case ;they result in no visible changes
-      while (delta) {
+      while (historyDelta) {
         try {
-          [nextElements, nextAppState, containsVisibleChange] = delta.applyTo(
-            nextElements,
-            nextAppState,
-            prevSnapshot,
-          );
+          [nextElements, nextAppState, containsVisibleChange] =
+            historyDelta.applyTo(nextElements, nextAppState, prevSnapshot);
 
           const prevElements = prevSnapshot.elements;
           const nextSnapshot = prevSnapshot.maybeClone(
@@ -192,31 +189,33 @@ export class History {
           );
 
           const change = StoreChange.create(prevSnapshot, nextSnapshot);
-
-          delta = HistoryDelta.applyLatestChanges(
-            delta,
+          const delta = HistoryDelta.applyLatestChanges(
+            historyDelta,
             prevElements,
             nextElements,
           );
 
-          // schedule immediate capture, so that it's emitted for the sync purposes
-          this.store.scheduleMicroAction({
-            action,
-            change,
-            delta,
-          });
+          if (!delta.isEmpty()) {
+            // schedule immediate capture, so that it's emitted for the sync purposes
+            this.store.scheduleMicroAction({
+              action,
+              change,
+              delta,
+            });
+
+            historyDelta = delta;
+          }
 
           prevSnapshot = nextSnapshot;
         } finally {
-          // make sure to always push, even if the delta is corrupted
-          push(delta);
+          push(historyDelta);
         }
 
         if (containsVisibleChange) {
           break;
         }
 
-        delta = pop();
+        historyDelta = pop();
       }
 
       return [nextElements, nextAppState];
