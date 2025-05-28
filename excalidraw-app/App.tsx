@@ -1,3 +1,4 @@
+
 import {
   Excalidraw,
   LiveCollaborationTrigger,
@@ -33,7 +34,7 @@ import {
   FONT_FAMILY,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
@@ -153,6 +154,14 @@ import type { CollabAPI } from "./collab/Collab";
 import { searchAndSaveImages } from '../scripts/rabbit_scripts/try_again';
 import type { RabbitSearchBoxElement } from "../packages/element/src/rabbitElement";
 import { RabbitElementBase, RabbitImageElement } from "../packages/element/src/rabbitElement";
+
+import { RabbitImageWindow } from "@excalidraw/element/RabbitImageWindow";
+// for rabbit image window
+
+
+
+
+
 import { GoogleGenAI } from "@google/genai";
 const ai = new GoogleGenAI({
   apiKey: import.meta.env.VITE_GEMINI_API_KEY
@@ -406,6 +415,17 @@ const initializeScene = async (opts: {
 };
 
 const ExcalidrawWrapper = () => {
+
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+
+const handleImageSelect = (image: any) => {
+  setSelectedImages((prev) => [...prev, image.id]);
+};
+
+const handleImageDeselect = (image: any) => {
+  setSelectedImages((prev) => prev.filter((id) => id !== image.id));
+};
+
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
 
@@ -1070,56 +1090,56 @@ const ExcalidrawWrapper = () => {
 
                 const placeholderImageUrl = "https://vetsonparker.com.au/wp-content/uploads/2015/04/Rabbit-Facts.jpg";
 
-    // Create 3 tabs, each with 10 subImages using the placeholder URL
-    const images = [
-      {
-        id: "tab-1",
-        title: "Google",
-        subImages: Array.from({ length: 10 }).map((_, index) => ({
-          id: `1-${index + 1}`,
-          url: placeholderImageUrl,
-          title: `Tab 1 Image ${index + 1}`,
-        })),
-      },
-      {
-        id: "tab-2",
-        title: "Pinterest",
-        subImages: Array.from({ length: 10 }).map((_, index) => ({
-          id: `2-${index + 1}`,
-          url: placeholderImageUrl,
-          title: `Tab 2 Image ${index + 1}`,
-        })),
-      },
-      {
-        id: "tab-3",
-        title: "YouTube",
-        subImages: Array.from({ length: 10 }).map((_, index) => ({
-          id: `3-${index + 1}`,
-          url: placeholderImageUrl,
-          title: `Tab 3 Image ${index + 1}`,
-        })),
-      },
-    ];
+                // Create 3 tabs, each with 10 subImages using the placeholder URL
+                const images = [
+                  {
+                    id: "tab-1",
+                    title: "Google",
+                    subImages: Array.from({ length: 10 }).map((_, index) => ({
+                      id: `1-${index + 1}`,
+                      url: placeholderImageUrl,
+                      title: `Tab 1 Image ${index + 1}`,
+                    })),
+                  },
+                  {
+                    id: "tab-2",
+                    title: "Pinterest",
+                    subImages: Array.from({ length: 10 }).map((_, index) => ({
+                      id: `2-${index + 1}`,
+                      url: placeholderImageUrl,
+                      title: `Tab 2 Image ${index + 1}`,
+                    })),
+                  },
+                  {
+                    id: "tab-3",
+                    title: "YouTube",
+                    subImages: Array.from({ length: 10 }).map((_, index) => ({
+                      id: `3-${index + 1}`,
+                      url: placeholderImageUrl,
+                      title: `Tab 3 Image ${index + 1}`,
+                    })),
+                  },
+                ];
 
-    
 
-    if (excalidrawAPI) {
-      // Create the tabbed image element using your factory function
-      const tabsElement = newRabbitImageTabsElement({
-        x: 100,
-        y: 100,
-        width: 400,
-        height: 350,
-        images,             // shorthand for images: images,
-        activeTabIndex: 0,
-        tabHeight: 40,
-      });
 
-      // Add the new element to the current scene elements
-      excalidrawAPI.updateScene({
-        elements: [...excalidrawAPI.getSceneElements(), tabsElement],
-      });
-    }
+                if (excalidrawAPI) {
+                  // Create the tabbed image element using your factory function
+                  const tabsElement = newRabbitImageTabsElement({
+                    x: 100,
+                    y: 100,
+                    width: 400,
+                    height: 350,
+                    images,             // shorthand for images: images,
+                    activeTabIndex: 0,
+                    tabHeight: 40,
+                  });
+
+                  // Add the new element to the current scene elements
+                  excalidrawAPI.updateScene({
+                    elements: [...excalidrawAPI.getSceneElements(), tabsElement],
+                  });
+                }
               },
             },
 
@@ -1401,9 +1421,7 @@ const ExcalidrawWrapper = () => {
                 }
               },
             },
-
             {
-
               label: "Add Rabbit Image",
               category: DEFAULT_CATEGORIES.app,
               predicate: () => true,
@@ -1465,8 +1483,6 @@ const ExcalidrawWrapper = () => {
                   });
               },
             },
-
-
             {
               label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
@@ -1662,12 +1678,59 @@ const ExcalidrawWrapper = () => {
           />
         )}
       </Excalidraw>
+
+      {excalidrawAPI && (() => {
+        const appState = excalidrawAPI.getAppState();
+        const elements = excalidrawAPI.getSceneElements();
+
+        // Find any 'rabbit-searchbox' element (first one)
+        const searchbox = elements.find(el => el.type === "rabbit-searchbox");
+
+        console.log('is this happening');
+
+        if (searchbox) {
+          const { scrollX, scrollY, zoom } = appState;
+          const x = (searchbox.x + searchbox.width / 2) * zoom.value + scrollX;
+          const y = (searchbox.y + searchbox.height + 10) * zoom.value + scrollY;
+
+          console.log("Showing RabbitImageWindow below rabbit-searchbox");
+
+          return (
+            <div
+              style={{
+                // position: "absolute",
+                // top: y,
+                // left: x - 160, // adjust horizontal centering as needed
+                // zIndex: 1000,
+                position: "absolute",
+                top: y - 200,
+                left: x + 300,
+                zIndex: 1000,
+              }}
+            >
+              <RabbitImageWindow
+                appState={appState}
+                onImageSelect={handleImageSelect}
+                onImageDeselect={handleImageDeselect}
+                selectedImages={selectedImages}
+                onToggleVisibility={() => {
+                  // do something here, e.g. toggle visibility state
+                }}
+              />
+            </div>
+          );
+        }
+        return null;
+      })()}
+
+
       {excalidrawAPI && (() => {
         const appState = excalidrawAPI.getAppState();
         const elements = excalidrawAPI.getSceneElements();
         const selected = elements.find(
           (el) => appState.selectedElementIds[el.id] && el.type === "text"
         );
+
         if (selected && !appState.editingTextElement) {
           const { scrollX, scrollY, zoom } = excalidrawAPI.getAppState();
           const x = (selected.x + selected.width / 2) * zoom.value + scrollX;
@@ -1687,7 +1750,7 @@ const ExcalidrawWrapper = () => {
                 zIndex: 1000,
               }}
             >
-              <button>Youchewb</button>
+              <button>YouTube</button>
               <button>Google</button>
               <button>Pinterest</button>
             </div>
@@ -1695,12 +1758,15 @@ const ExcalidrawWrapper = () => {
         }
         return null;
       })()}
-
     </div>
   );
 };
 
 const ExcalidrawApp = () => {
+
+
+
+
   const isCloudExportWindow =
     window.location.pathname === "/excalidraw-plus-export";
   if (isCloudExportWindow) {

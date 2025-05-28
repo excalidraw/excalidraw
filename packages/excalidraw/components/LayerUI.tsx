@@ -311,15 +311,11 @@ const LayerUI = ({
                               isMobile
                             />
 
-
-
                             {/* <LockButton
                               checked={appState.activeTool.locked}
                               onChange={onLockToggle}
                               title={t("toolBar.lock")}
                             /> */}
-
-
 
                             <div className="App-toolbar__divider" />
 
