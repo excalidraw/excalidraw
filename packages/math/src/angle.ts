@@ -8,16 +8,10 @@ import type {
   Radians,
 } from "./types";
 
-// TODO: Simplify with modulo and fix for angles beyond 4*Math.PI and - 4*Math.PI
-export const normalizeRadians = (angle: Radians): Radians => {
-  if (angle < 0) {
-    return (angle + 2 * Math.PI) as Radians;
-  }
-  if (angle >= 2 * Math.PI) {
-    return (angle - 2 * Math.PI) as Radians;
-  }
-  return angle;
-};
+export const normalizeRadians = (angle: Radians): Radians =>
+  angle < 0
+    ? (((angle % (2 * Math.PI)) + 2 * Math.PI) as Radians)
+    : ((angle % (2 * Math.PI)) as Radians);
 
 /**
  * Return the polar coordinates for the given cartesian point represented by
