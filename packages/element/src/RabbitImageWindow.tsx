@@ -107,9 +107,9 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                 left: pos.x,
                 width: "320px",
                 // background: "var(--color-surface-lowest)",
-                background: "#F5F5F5",
+                background: "white",
 
-                border: "1px solidrgb(243, 243, 243)",
+                border: "1px solid rgb(151, 172, 202)",
                 borderRadius: "12px",
                 boxShadow: "var(--shadow-3)",
                 zIndex: 999,
@@ -131,8 +131,8 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                 }}
                 onMouseDown={onMouseDown}
             >
-                <h3 style={{ fontSize: "14px", margin: 0, userSelect: "none", fontFamily: "Helvetica"}}>
-                    Rabbit Images
+                <h3 style={{ fontSize: "14px", margin: 0, userSelect: "none", fontFamily: "Assistant", fontWeight: 600 }}>
+                    Rabbit Image Search
                 </h3>
                 <button
                     onClick={onToggleVisibility}
@@ -163,40 +163,53 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                         style={{
                             flex: 1,
                             padding: "8px",
-                            background: activeTab === index ? "white" : "transparent",
-                            color: activeTab === index ? "black" : "black",
+                            background: activeTab === index ? "white" : "#DEECFF",  // light blue for unselected
+                            color: "black",
                             border: "none",
                             cursor: "pointer",
+                            fontFamily: "Assistant",
                             fontWeight: 600,
                             fontSize: "12px",
-                            // borderBottom: "none",
-                            // // borderBottom: activeTab === index ? "3px solid #0056b3" : "none",
                             borderRadius: "6px 6px 0 0",
                             borderStyle: "solid",
-   borderWidth: "1px 1px 0 1px",  // top, right, bottom, left
-  borderColor: "#CDCDCD",
+                            borderWidth: "1px 1px 0 1px",  // top, right, bottom, left
+                            borderColor: "#93A2B7",
                             transition: "background 0.2s ease, color 0.2s ease",
                         }}
                     >
                         {tab.name}
                     </button>
+
                 ))}
             </div>
+
+            {/* Spacer div for margin */}
+            <div
+                style={{
+                    height: "10px",   // or however much space you want
+                    background: "white",
+                   
+                    border: "1px solid #93A2B7",
+                    borderTop: "none",
+                    borderBottom: "none",
+                }}
+            ></div>
 
             {/* Image Grid */}
             <div
                 style={{
                     padding: "16px",
-                    
+
                     maxHeight: "400px",
                     overflowY: "auto",
                     background: "white", // same blue as selected tab
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr",
                     gap: "12px",
-                     borderStyle: "solid",
-  borderWidth: "0px 1px 1px 1px",  // top, right, bottom, left
-  borderColor: "#CDCDCD",
+                    borderStyle: "solid",
+                    borderWidth: "0px 1px 1px 1px",  // top, right, bottom, left
+                    borderColor: "#93A2B7",
+                    // borderBottom: "none",
                 }}
             >
                 {tabData[activeTab].images.map((image) => (
@@ -206,16 +219,16 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                         style={{
                             boxSizing: "border-box",
                             border: isImageSelected(image.id)
-                                ? "3px solid rgb(60, 170, 255)"
+                                ? "3.5px solid rgb(0, 145, 255)"
                                 : "2px solid transparent",
-                            borderRadius: "10px",
+                            borderRadius: "5px",
                             overflow: "hidden",
                             cursor: "pointer",
                             position: "relative",
                             background: "var(--color-surface-low)",
-                            boxShadow: isImageSelected(image.id)
-                                ? "0 0 0 2px rgba(0, 123, 255, 0.3)"
-                                : "none",
+                            // boxShadow: isImageSelected(image.id)
+                            //     ? "0 0 0 2px rgba(0, 123, 255, 0.3)"
+                            //     : "none",
                             transition: "border 0.2s ease, box-shadow 0.2s ease",
                         }}
                     >
@@ -228,7 +241,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                                 display: "block",
                             }}
                         />
-                       
+
                     </div>
                 ))}
             </div>
@@ -245,7 +258,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                     <p
                         style={{
                             fontSize: "11px",
-                            fontFamily: "Arial",
+                            fontFamily: "Assistant",
                             color: "var(--color-text-secondary)",
                             textAlign: "center",
                             margin: 0,
