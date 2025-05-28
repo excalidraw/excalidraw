@@ -31,11 +31,14 @@ export const fillCircle = (
   cx: number,
   cy: number,
   radius: number,
-  stroke = true,
+  stroke: boolean,
+  fill = true,
 ) => {
   context.beginPath();
   context.arc(cx, cy, radius, 0, Math.PI * 2);
-  context.fill();
+  if (fill) {
+    context.fill();
+  }
   if (stroke) {
     context.stroke();
   }
