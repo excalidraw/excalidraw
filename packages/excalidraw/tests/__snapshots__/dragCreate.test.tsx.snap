@@ -153,6 +153,7 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
       50,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": {
     "type": 2,

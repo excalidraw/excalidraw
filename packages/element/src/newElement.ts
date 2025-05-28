@@ -25,6 +25,8 @@ import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 
+import { isLineElement } from "./typeChecks";
+
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
@@ -46,6 +48,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawBlurElement,
+  ExcalidrawLineElement,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -477,9 +480,10 @@ export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
     points?: ExcalidrawLinearElement["points"];
+    polygon?: ExcalidrawLineElement["polygon"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
-  return {
+  const element = {
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: opts.points || [],
     lastCommittedPoint: null,
@@ -488,6 +492,17 @@ export const newLinearElement = (
     startArrowhead: null,
     endArrowhead: null,
   };
+
+  if (isLineElement(element)) {
+    const lineElement: NonDeleted<ExcalidrawLineElement> = {
+      ...element,
+      polygon: opts.polygon ?? false,
+    };
+
+    return lineElement;
+  }
+
+  return element;
 };
 
 export const newArrowElement = <T extends boolean>(
