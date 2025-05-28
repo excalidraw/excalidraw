@@ -153,7 +153,10 @@
     "css-loader": "^7.1.2",
     "esbuild-plugin-external-global": "^1.0.1"
   },
-  "repository": "https://github.com/excalidraw/excalidraw",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zsviczian/excalidraw.git"
+  },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
