@@ -11252,6 +11252,45 @@ class App extends React.Component<AppProps, AppState> {
     (
       event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
     ) => {
+      if (this.props.customOptions?.onWheel) {
+        const { deltaY } = event;
+        this.props.customOptions.onWheel(event, () => {
+          const sign = Math.sign(deltaY);
+          const MAX_STEP = ZOOM_STEP * 100;
+          const absDelta = Math.abs(deltaY);
+          let delta = deltaY;
+          if (absDelta > MAX_STEP) {
+            delta = MAX_STEP * sign;
+          }
+
+          let newZoom = this.state.zoom.value - delta / 100;
+          // increase zoom steps the more zoomed-in we are (applies to >100% only)
+          newZoom +=
+            Math.log10(Math.max(1, this.state.zoom.value)) *
+            -sign *
+            // reduced amplification for small deltas (small movements on a trackpad)
+            Math.min(1, absDelta / 20);
+
+          this.translateCanvas((state) => ({
+            ...getStateForZoom(
+              {
+                viewportX: this.lastViewportPosition.x,
+                viewportY: this.lastViewportPosition.y,
+                nextZoom: getNormalizedZoom(newZoom),
+              },
+              state,
+            ),
+            shouldCacheIgnoreZoom: true,
+          }));
+          this.resetShouldCacheIgnoreZoomDebounced();
+        });
+        return;
+      }
+
+      if (this.props.customOptions?.disableKeyEvents) {
+        return;
+      }
+
       // if not scrolling on canvas/wysiwyg, ignore
       if (
         !(
