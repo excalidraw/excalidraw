@@ -5,6 +5,7 @@ import {
   isDevEnv,
   isShallowEqual,
   isTestEnv,
+  randomInteger,
 } from "@excalidraw/common";
 
 import type {
@@ -1009,7 +1010,12 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
       if (!nextElement) {
         const deleted = { ...prevElement, isDeleted: false } as ElementPartial;
-        const inserted = { isDeleted: true } as ElementPartial;
+
+        const inserted = {
+          isDeleted: true,
+          version: prevElement.version + 1,
+          versionNonce: randomInteger(),
+        } as ElementPartial;
 
         const delta = Delta.create(
           deleted,
@@ -1025,7 +1031,12 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       const prevElement = prevElements.get(nextElement.id);
 
       if (!prevElement) {
-        const deleted = { isDeleted: true } as ElementPartial;
+        const deleted = {
+          isDeleted: true,
+          version: nextElement.version - 1,
+          versionNonce: randomInteger(),
+        } as ElementPartial;
+
         const inserted = {
           ...nextElement,
           isDeleted: false,
