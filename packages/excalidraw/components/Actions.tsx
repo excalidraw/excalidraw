@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useState, useContext } from "react";
+import { useState, useContext, useMemo } from "react";
 
 import {
   CLASSES,
@@ -121,6 +121,20 @@ export const SelectedShapeActions = ({
   app: AppClassProperties;
 }) => {
   const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+  const extraTools = customOptions?.getExtraTools?.();
+  const { extraHasTextTool, extraHasBackgroundTool } = useMemo(() => {
+    let extraHasTextTool = false;
+    let extraHasBackgroundTool = false;
+    if (extraTools) {
+      extraTools.forEach((tool) => {
+        if (tool === "serialNumber") {
+          extraHasTextTool = true;
+          extraHasBackgroundTool = true;
+        }
+      });
+    }
+    return { extraHasTextTool, extraHasBackgroundTool };
+  }, [extraTools]);
 
   const targetElements = getTargetElements(elementsMap, appState);
 
@@ -139,7 +153,7 @@ export const SelectedShapeActions = ({
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
-    (hasBackground(appState.activeTool.type) &&
+    ((hasBackground(appState.activeTool.type) || extraHasBackgroundTool) &&
       !isTransparent(appState.currentItemBackgroundColor)) ||
     targetElements.some(
       (element) =>
@@ -175,7 +189,8 @@ export const SelectedShapeActions = ({
         {canChangeStrokeColor(appState, targetElements) &&
           renderAction("changeStrokeColor")}
       </div>
-      {canChangeBackgroundColor(appState, targetElements) && (
+      {(canChangeBackgroundColor(appState, targetElements) ||
+        extraHasBackgroundTool) && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
       {showFillIcons && renderAction("changeFillStyle")}
@@ -207,7 +222,8 @@ export const SelectedShapeActions = ({
       )}
 
       {(appState.activeTool.type === "text" ||
-        targetElements.some(isTextElement)) && (
+        targetElements.some(isTextElement) ||
+        extraHasTextTool) && (
         <>
           {renderAction("changeFontFamily")}
           {renderAction("changeFontSize")}

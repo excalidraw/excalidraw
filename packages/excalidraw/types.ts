@@ -546,6 +546,10 @@ export type OnUserFollowedPayload = {
 
 export interface ExcalidrawPropsCustomOptions {
   disableKeyEvents?: boolean;
+  onWheel?: (
+    event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
+    zoomAction: () => void,
+  ) => void;
   hideMainToolbar?: boolean;
   hideMenu?: boolean;
   hideFooter?: boolean;
@@ -564,6 +568,7 @@ export interface ExcalidrawPropsCustomOptions {
   layoutRenders?: {
     menuRender?: (props: { children: React.ReactNode }) => React.ReactNode;
   };
+  getExtraTools?: () => string[];
   pickerRenders?: {
     ButtonList?: React.ComponentType<{
       children: React.ReactNode;

@@ -6,6 +6,8 @@ import { arrayToMap } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
+import { useContext } from "react";
+
 import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
 
 import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
@@ -13,6 +15,8 @@ import { ToolButton } from "../components/ToolButton";
 import { lineEditorIcon } from "../components/icons";
 
 import { t } from "../i18n";
+
+import { ExcalidrawPropsCustomOptionsContext } from "../types";
 
 import { register } from "./register";
 
@@ -72,6 +76,18 @@ export const actionToggleLinearEditor = register({
         ? "labels.lineEditor.editArrow"
         : "labels.lineEditor.edit",
     );
+
+    const customOptions = useContext(ExcalidrawPropsCustomOptionsContext);
+
+    if (customOptions?.pickerRenders?.layerButtonRender) {
+      return customOptions.pickerRenders.layerButtonRender({
+        onClick: () => updateData(null),
+        title: label,
+        children: lineEditorIcon,
+        name: label,
+      });
+    }
+
     return (
       <ToolButton
         type="button"
