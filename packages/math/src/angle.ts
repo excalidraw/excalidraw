@@ -8,16 +8,10 @@ import type {
   Radians,
 } from "./types";
 
-export const normalizeRadians = (angle: Radians): Radians => {
-  angle = (angle % (2 * Math.PI)) as Radians;
-  if (angle < 0) {
-    return (angle + 2 * Math.PI) as Radians;
-  }
-  if (angle >= 2 * Math.PI) {
-    return (angle - 2 * Math.PI) as Radians;
-  }
-  return angle;
-};
+export const normalizeRadians = (angle: Radians): Radians =>
+  angle < 0
+    ? (((angle % (2 * Math.PI)) + 2 * Math.PI) as Radians)
+    : ((angle % (2 * Math.PI)) as Radians);
 
 /**
  * Return the polar coordinates for the given cartesian point represented by
