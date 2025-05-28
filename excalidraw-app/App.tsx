@@ -1744,52 +1744,17 @@ const ExcalidrawWrapper = () => {
           />
         )}
       </Excalidraw>
-
-      {/* {excalidrawAPI && (() => {
-        const appState = excalidrawAPI.getAppState();
-        const elements = excalidrawAPI.getSceneElements();
-
-        // Find any 'rabbit-searchbox' element (first one)
-        const searchbox = elements.find(el => el.type === "rabbit-searchbox");
-
-        if (searchbox) {
-
-          return (
-            <div
-              style={{
-                position: "fixed",
-                top: "150px", // adjust as needed
-                right: "400px", // distance from the right edge of screen
-                zIndex: 1000,
-              }}
-            >
-              <RabbitImageWindow
-                appState={appState}
-                onImageSelect={handleImageSelect}
-                onImageDeselect={handleImageDeselect}
-                selectedImages={selectedImages}
-                onToggleVisibility={() => {
-                  // do something here, e.g. toggle visibility state
-                }}
-              />
-            </div>
-          );
-        }
-        return null;
-      })()} */}
-
+      {/* Where the rabbit image window shows up*/}
       {excalidrawAPI && isImageWindowVisible && (
-  <RabbitImageWindow
-    appState={excalidrawAPI.getAppState()}
-    selectedImages={selectedImages}
-    onImageSelect={handleImageSelect}
-    onImageDeselect={handleImageDeselect}
-    onToggleVisibility={() => setImageWindowVisible(false)}
-    tabData={tabData}
-  />
-)}
-
-
+        <RabbitImageWindow
+          appState={excalidrawAPI.getAppState()}
+          selectedImages={selectedImages}
+          onImageSelect={handleImageSelect}
+          onImageDeselect={handleImageDeselect}
+          onToggleVisibility={() => setImageWindowVisible(false)}
+          tabData={tabData}
+        />
+      )}
       {excalidrawAPI && (() => {
         const appState = excalidrawAPI.getAppState();
         const elements = excalidrawAPI.getSceneElements();
