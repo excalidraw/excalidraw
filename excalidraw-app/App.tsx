@@ -1172,7 +1172,7 @@ const ExcalidrawWrapper = () => {
                 }
               },
             },
-            {
+             {
               label: "Do Everything",
               category: DEFAULT_CATEGORIES.app,
               predicate: () => true,
@@ -1421,6 +1421,9 @@ const ExcalidrawWrapper = () => {
                 }
               },
             },
+            
+            
+
             {
               label: "Add Rabbit Image",
               category: DEFAULT_CATEGORIES.app,
@@ -1679,38 +1682,22 @@ const ExcalidrawWrapper = () => {
         )}
       </Excalidraw>
 
-      {excalidrawAPI && (() => {
+      {/* {excalidrawAPI && (() => {
         const appState = excalidrawAPI.getAppState();
         const elements = excalidrawAPI.getSceneElements();
 
         // Find any 'rabbit-searchbox' element (first one)
         const searchbox = elements.find(el => el.type === "rabbit-searchbox");
 
-        console.log('is this happening');
-
         if (searchbox) {
-          const { scrollX, scrollY, zoom } = appState;
-          const x = (searchbox.x + searchbox.width / 2) * zoom.value + scrollX;
-          const y = (searchbox.y + searchbox.height + 10) * zoom.value + scrollY;
-
-          console.log("Showing RabbitImageWindow below rabbit-searchbox");
 
           return (
             <div
               style={{
-                // position: "absolute",
-                // top: y,
-                // left: x - 160, // adjust horizontal centering as needed
-                // zIndex: 1000,
-                // position: "absolute",
-                // top: y - 200,
-                // left: x + 300,
-                // zIndex: 1000,
                 position: "fixed",
                 top: "150px", // adjust as needed
                 right: "400px", // distance from the right edge of screen
                 zIndex: 1000,
-
               }}
             >
               <RabbitImageWindow
@@ -1726,7 +1713,7 @@ const ExcalidrawWrapper = () => {
           );
         }
         return null;
-      })()}
+      })()} */}
 
 
       {excalidrawAPI && (() => {
