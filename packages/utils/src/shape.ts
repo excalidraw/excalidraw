@@ -83,29 +83,29 @@ export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
 
 export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
   | {
-      type: "line";
-      data: LineSegment<Point>;
-    }
+    type: "line";
+    data: LineSegment<Point>;
+  }
   | {
-      type: "polygon";
-      data: Polygon<Point>;
-    }
+    type: "polygon";
+    data: Polygon<Point>;
+  }
   | {
-      type: "curve";
-      data: Curve<Point>;
-    }
+    type: "curve";
+    data: Curve<Point>;
+  }
   | {
-      type: "ellipse";
-      data: Ellipse<Point>;
-    }
+    type: "ellipse";
+    data: Ellipse<Point>;
+  }
   | {
-      type: "polyline";
-      data: Polyline<Point>;
-    }
+    type: "polyline";
+    data: Polyline<Point>;
+  }
   | {
-      type: "polycurve";
-      data: Polycurve<Point>;
-    };
+    type: "polycurve";
+    data: Polycurve<Point>;
+  };
 
 type RectangularElement =
   | ExcalidrawRectangleElement
@@ -167,7 +167,7 @@ export const getRabbitShape = <Point extends GlobalPoint | LocalPoint>(
   let data: Polygon<Point>;
 
   if (element.type === "rabbit-searchbox") {
-      data = polygon(
+    data = polygon(
       pointRotateRads(pointFrom(cx, y), center, angle),
       pointRotateRads(pointFrom(x + width, cy), center, angle),
       pointRotateRads(pointFrom(cx, y + height), center, angle),
@@ -176,28 +176,28 @@ export const getRabbitShape = <Point extends GlobalPoint | LocalPoint>(
   }
   else if (element.type === "rabbit-image") {
     data = polygon(
-    pointRotateRads(pointFrom(cx, y), center, angle),
-    pointRotateRads(pointFrom(x + width, cy), center, angle),
-    pointRotateRads(pointFrom(cx, y + height), center, angle),
-    pointRotateRads(pointFrom(x, cy), center, angle),
-  );
+      pointRotateRads(pointFrom(x, y), center, angle),                // top-left
+      pointRotateRads(pointFrom(x + width, y), center, angle),        // top-right  
+      pointRotateRads(pointFrom(x + width, y + height), center, angle), // bottom-right
+      pointRotateRads(pointFrom(x, y + height), center, angle),       // bottom-left
+    );
   }
   else if (element.type === "rabbit-image-tabs") {
     data = polygon(
-    pointRotateRads(pointFrom(cx, y), center, angle),
-    pointRotateRads(pointFrom(x + width, cy), center, angle),
-    pointRotateRads(pointFrom(cx, y + height), center, angle),
-    pointRotateRads(pointFrom(x, cy), center, angle),
-  );
+      pointRotateRads(pointFrom(cx, y), center, angle),
+      pointRotateRads(pointFrom(x + width, cy), center, angle),
+      pointRotateRads(pointFrom(cx, y + height), center, angle),
+      pointRotateRads(pointFrom(x, cy), center, angle),
+    );
   }
   else if (element.type === "rabbit-color-palette") {
-    const totalHeight = element.rectangleHeight * 5;
+    const totalHeight = element.rectangleHeight * element.colors.length; // Use actual colors count
     data = polygon(
-    pointRotateRads(pointFrom(cx, y), center, angle),
-    pointRotateRads(pointFrom(x + width, cy), center, angle),
-    pointRotateRads(pointFrom(cx, y + totalHeight), center, angle),
-    pointRotateRads(pointFrom(x, cy), center, angle),
-  );
+      pointRotateRads(pointFrom(x, y), center, angle),                    // top-left
+      pointRotateRads(pointFrom(x + width, y), center, angle),            // top-right  
+      pointRotateRads(pointFrom(x + width, y + totalHeight), center, angle), // bottom-right
+      pointRotateRads(pointFrom(x, y + totalHeight), center, angle),      // bottom-left
+    );
   }
   else {
     data = polygon(
@@ -350,13 +350,13 @@ export const getFreedrawShape = <Point extends GlobalPoint | LocalPoint>(
   return (
     isClosed
       ? {
-          type: "polygon",
-          data: polygonFromPoints(polyline.flat()),
-        }
+        type: "polygon",
+        data: polygonFromPoints(polyline.flat()),
+      }
       : {
-          type: "polyline",
-          data: polyline,
-        }
+        type: "polyline",
+        data: polyline,
+      }
   ) as GeometricShape<Point>;
 };
 
@@ -548,7 +548,7 @@ export const pointInEllipse = <Point extends LocalPoint | GlobalPoint>(
 
   return (
     (rotatedPointX / halfWidth) * (rotatedPointX / halfWidth) +
-      (rotatedPointY / halfHeight) * (rotatedPointY / halfHeight) <=
+    (rotatedPointY / halfHeight) * (rotatedPointY / halfHeight) <=
     1
   );
 };

@@ -97,6 +97,7 @@ export const newRabbitSearchBoxElement = (
     type: "rabbit-searchbox",
     rabbitId: `rabbit-${randomId()}`,
     
+    
     // IMPORTANT: Standard text properties for WYSIWYG compatibility
     text,
     originalText: text,  // This is what WYSIWYG editor uses
@@ -106,7 +107,7 @@ export const newRabbitSearchBoxElement = (
     verticalAlign,
     lineHeight,
     autoResize: false,
-    containerId: null,
+    containerId: `rabbit-${randomId()}`,
     boundElements: [],
     
     // Custom properties for your search box functionality
@@ -278,59 +279,6 @@ export const newRabbitImageTabsElement = (
   };
 };
 
-// export const newRabbitColorPalette = (
-//   opts: {
-//     x: number;
-//     y: number;
-//     colors?: string[];
-//     width?: number;
-//     rectangleHeight?: number;
-//     angle?: number;
-//   }
-// ): RabbitColorPaletteElement => {
-//   const defaultColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57'];
-//   const colors = opts.colors || defaultColors;
-//   const width = opts.width || 200;
-//   const rectangleHeight = opts.rectangleHeight || 50;
-//   const totalHeight = rectangleHeight * 5;
-
-//   // Create base element (since baseElement is not exported)
-//   const baseElement = {
-//     id: randomId(),
-//     x: opts.x,
-//     y: opts.y,
-//     width,
-//     height: totalHeight,
-//     angle: (opts.angle || 0) as Radians,
-//     strokeColor: "#1e1e1e",
-//     backgroundColor: "transparent",
-//     fillStyle: "solid" as const,
-//     strokeWidth: 2,
-//     strokeStyle: "solid" as const,
-//     roughness: 1,
-//     opacity: 100,
-//     groupIds: [],
-//     frameId: null,
-//     roundness: null,
-//     seed: Math.floor(Math.random() * 100000),
-//     versionNonce: Math.floor(Math.random() * 100000),
-//     isDeleted: false,
-//     boundElements: null,
-//     updated: 1,
-//     link: null,
-//     locked: false,
-//   };
-
-//   return {
-//   ...baseElement,
-//   type: "rabbit-color-palette",
-//   colors: colors.slice(0, 5), // Ensure exactly 5 colors
-//   rectangleHeight,
-//   version: 1,     
-//   index: null,       
-// };
-// };
-
 export const newRabbitColorPalette = (
   opts: {
     x: number;
@@ -384,3 +332,4 @@ export const newRabbitColorPalette = (
     rectangleHeight,
   };
 };
+

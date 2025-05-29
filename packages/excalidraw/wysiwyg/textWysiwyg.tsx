@@ -139,11 +139,10 @@ export const textWysiwyg = ({
     const { textAlign, verticalAlign } = updatedTextElement;
     const elementsMap = app.scene.getNonDeletedElementsMap();
     if (updatedTextElement && isTextElement(updatedTextElement)) {
-      console.log("it's an updatedtext element");
+    
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
 
-      
       const container = getContainerElement(
         updatedTextElement,
         app.scene.getNonDeletedElementsMap(),
@@ -157,19 +156,6 @@ export const textWysiwyg = ({
 
       let maxWidth = updatedTextElement.width;
       let maxHeight = updatedTextElement.height;
-
-      if ((updatedTextElement as any).type === "rabbit-searchbox") {
-    const padding = 10;
-    const iconSpace = (updatedTextElement as any).hasIcon ? 30 : 0;
-    
-    coordX = updatedTextElement.x + padding;
-    coordY = updatedTextElement.y;
-    
-    width = updatedTextElement.width - (padding * 2) - iconSpace;
-    height = updatedTextElement.height;
-  }
-
-
 
       if (container && updatedTextElement.containerId) {
         if (isArrowElement(container)) {
@@ -297,22 +283,28 @@ export const textWysiwyg = ({
       });
       editable.scrollTop = 0;
 
-      if ((updatedTextElement as any).type === "rabbit-searchbox") {
-        Object.assign(editable.style, {
-          cursor: "text",
-          textAlign: "left",
-          paddingLeft: "10px",
-          paddingRight: (updatedTextElement as any).hasIcon ? "30px" : "10px",
-          userSelect: "text",
-          pointerEvents: "auto",
-        });
+console.log("updatedTextElement id:", updatedTextElement.id);
+console.log("updatedTextElement type:", (updatedTextElement as any).type);
+console.log("container Id:", (updatedTextElement as any).containerId);
 
-        console.log("what is going on here");
-        
-        setTimeout(() => {
-          editable.focus();
-          editable.setSelectionRange(editable.value.length, editable.value.length);
-        }, 0);
+      if ((updatedTextElement as any).type === "rabbit-searchbox") {
+        console.log("woah is this working");
+        Object.assign(editable.style, {
+          // Make it completely invisible
+          opacity: "0",
+          color: "transparent",
+          caretColor: "transparent",
+          background: "transparent",
+          border: "none",
+          outline: "none",
+          boxShadow: "none",
+          // Position it correctly but invisibly
+          left: `${viewportX + 10}px`,
+          // Ensure no visual artifacts
+          textShadow: "none",
+          backdropFilter: "none",
+          filter: "none",
+        });
       }
 
       // For some reason updating font attribute doesn't set font family
@@ -362,7 +354,7 @@ export const textWysiwyg = ({
     boxSizing: "content-box",
   });
   editable.value = element.originalText;
-  
+
   updateWysiwygStyle();
 
   if (onChange) {
@@ -550,9 +542,9 @@ export const textWysiwyg = ({
           startIndices.concat(
             idx
               ? // curr line index is prev line's start + prev line's length + \n
-                startIndices[idx - 1] + lines[idx - 1].length + 1
+              startIndices[idx - 1] + lines[idx - 1].length + 1
               : // first selected line
-                selectionStart,
+              selectionStart,
           ),
         [] as number[],
       )

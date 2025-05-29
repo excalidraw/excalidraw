@@ -1489,6 +1489,9 @@ const renderRabbitElement = (
   context.save();
   context.translate(offsetX, offsetY);
 
+  context.fillStyle = "rgba(255,0,0,0.1)"; // Semi-transparent red
+context.fillRect(0, 0, width, colors.length * rectangleHeight);
+
   // Render each color rectangle
   colors.forEach((color, index) => {
     const y = index * rectangleHeight;
