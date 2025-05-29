@@ -5076,7 +5076,7 @@ class App extends React.Component<AppProps, AppState> {
         element: elementWithHighestZIndex,
         // when overlapping, we would like to be more precise
         // this also avoids the need to update past tests
-        threshold: this.getElementHitThreshold() / 2,
+        threshold: this.getElementHitThreshold(elementWithHighestZIndex) / 2,
         frameNameBound: isFrameLikeElement(elementWithHighestZIndex)
           ? this.frameNameBoundsCache.get(elementWithHighestZIndex)
           : null,
@@ -5141,8 +5141,11 @@ class App extends React.Component<AppProps, AppState> {
     return elements;
   }
 
-  getElementHitThreshold() {
-    return DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value;
+  getElementHitThreshold(element: ExcalidrawElement) {
+    return Math.max(
+      DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value,
+      element.strokeWidth,
+    );
   }
 
   private hitElement(
@@ -5177,7 +5180,7 @@ class App extends React.Component<AppProps, AppState> {
     return hitElementItself({
       point: pointFrom(x, y),
       element,
-      threshold: this.getElementHitThreshold(),
+      threshold: this.getElementHitThreshold(element),
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
         : null,
@@ -5207,7 +5210,7 @@ class App extends React.Component<AppProps, AppState> {
         hitElementItself({
           point: pointFrom(x, y),
           element: elements[index],
-          threshold: this.getElementHitThreshold(),
+          threshold: this.getElementHitThreshold(elements[index]),
         })
       ) {
         hitElement = elements[index];
@@ -5554,7 +5557,7 @@ class App extends React.Component<AppProps, AppState> {
           hitElementItself({
             point: pointFrom(sceneX, sceneY),
             element: container,
-            threshold: this.getElementHitThreshold(),
+            threshold: this.getElementHitThreshold(container),
           })
         ) {
           const midPoint = getContainerCenter(
@@ -6246,6 +6249,7 @@ class App extends React.Component<AppProps, AppState> {
         hitElementItself({
           point: pointFrom(scenePointerX, scenePointerY),
           element,
+          threshold: this.getElementHitThreshold(element),
         })
       ) {
         hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
@@ -7415,7 +7419,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // How many pixels off the shape boundary we still consider a hit
-    const threshold = this.getElementHitThreshold();
+    const threshold = Math.max(
+      DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value,
+      1,
+    );
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
     return (
       point.x > x1 - threshold &&
@@ -9683,7 +9690,7 @@ class App extends React.Component<AppProps, AppState> {
                 pointerDownState.origin.y,
               ),
               element: hitElement,
-              threshold: this.getElementHitThreshold(),
+              threshold: this.getElementHitThreshold(hitElement),
               frameNameBound: isFrameLikeElement(hitElement)
                 ? this.frameNameBoundsCache.get(hitElement)
                 : null,

@@ -12,11 +12,7 @@ import { shouldTestInside } from "@excalidraw/element";
 import { hasBoundTextElement, isBoundToContainer } from "@excalidraw/element";
 import { getBoundTextElementId } from "@excalidraw/element";
 
-import type {
-  ElementsSegmentsMap,
-  GlobalPoint,
-  LineSegment,
-} from "@excalidraw/math/types";
+import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import { AnimatedTrail } from "../animated-trail";
@@ -107,7 +103,6 @@ export class EraserTrail extends AnimatedTrail {
         const intersects = eraserTest(
           pathSegments,
           element,
-          this.segmentsCache,
           candidateElementsMap,
           this.app,
         );
@@ -144,7 +139,6 @@ export class EraserTrail extends AnimatedTrail {
         const intersects = eraserTest(
           pathSegments,
           element,
-          this.segmentsCache,
           candidateElementsMap,
           this.app,
         );
@@ -196,7 +190,6 @@ export class EraserTrail extends AnimatedTrail {
 const eraserTest = (
   pathSegments: LineSegment<GlobalPoint>[],
   element: ExcalidrawElement,
-  elementsSegments: ElementsSegmentsMap,
   elementsMap: ElementsMap,
   app: App,
 ): boolean => {
@@ -205,7 +198,7 @@ const eraserTest = (
     return true;
   }
 
-  const offset = app.getElementHitThreshold();
+  const offset = app.getElementHitThreshold(element);
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
   return pathSegments.some(

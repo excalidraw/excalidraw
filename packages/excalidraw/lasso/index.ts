@@ -203,7 +203,7 @@ export class LassoTrail extends AnimatedTrail {
         intersectedElements: this.intersectedElements,
         enclosedElements: this.enclosedElements,
         simplifyDistance: 5 / this.app.state.zoom.value,
-        hitThreshold: this.app.getElementHitThreshold(),
+        getElementThreshold: this.app.getElementHitThreshold.bind(this.app),
       });
 
       this.selectElementsFromIds(selectedElementIds);

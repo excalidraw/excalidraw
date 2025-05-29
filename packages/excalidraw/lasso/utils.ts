@@ -18,7 +18,7 @@ export const getLassoSelectedElementIds = (input: {
   intersectedElements: Set<ExcalidrawElement["id"]>;
   enclosedElements: Set<ExcalidrawElement["id"]>;
   simplifyDistance?: number;
-  hitThreshold: number;
+  getElementThreshold: (element: ExcalidrawElement) => number;
 }): {
   selectedElementIds: string[];
 } => {
@@ -29,7 +29,7 @@ export const getLassoSelectedElementIds = (input: {
     intersectedElements,
     enclosedElements,
     simplifyDistance,
-    hitThreshold,
+    getElementThreshold,
   } = input;
   // simplify the path to reduce the number of points
   let path: GlobalPoint[] = lassoPath;
@@ -48,7 +48,11 @@ export const getLassoSelectedElementIds = (input: {
       if (enclosed) {
         enclosedElements.add(element.id);
       } else {
-        const intersects = intersectionTest(path, element, hitThreshold);
+        const intersects = intersectionTest(
+          path,
+          element,
+          getElementThreshold(element),
+        );
         if (intersects) {
           intersectedElements.add(element.id);
         }

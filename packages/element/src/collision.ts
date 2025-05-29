@@ -84,14 +84,14 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
 export type HitTestArgs = {
   point: GlobalPoint;
   element: ExcalidrawElement;
-  threshold?: number;
+  threshold: number;
   frameNameBound?: FrameNameBounds | null;
 };
 
 export const hitElementItself = ({
   point,
   element,
-  threshold = 10,
+  threshold,
   frameNameBound = null,
 }: HitTestArgs) => {
   // First check if the element is in the bounding box because it's MUCH faster
@@ -139,14 +139,11 @@ export const hitElementBoundingBox = (
 export const hitElementBoundingBoxOnly = (
   hitArgs: HitTestArgs,
   elementsMap: ElementsMap,
-) => {
-  return (
-    !hitElementItself(hitArgs) &&
-    // bound text is considered part of the element (even if it's outside the bounding box)
-    !hitElementBoundText(hitArgs.point, hitArgs.element, elementsMap) &&
-    hitElementBoundingBox(hitArgs.point, hitArgs.element, elementsMap)
-  );
-};
+) =>
+  !hitElementItself(hitArgs) &&
+  // bound text is considered part of the element (even if it's outside the bounding box)
+  !hitElementBoundText(hitArgs.point, hitArgs.element, elementsMap) &&
+  hitElementBoundingBox(hitArgs.point, hitArgs.element, elementsMap);
 
 export const hitElementBoundText = (
   point: GlobalPoint,
