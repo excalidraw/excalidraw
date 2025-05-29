@@ -451,6 +451,7 @@ export interface AppState {
   lastSave: {
     timestamp: number;
     hash: number;
+    elementsCount: number;
   } | null;
 }
 
