@@ -505,8 +505,6 @@ describe("group-related duplication", () => {
       mouse.up(frame.x + frame.width + 50, frame.y + frame.height + 50);
     });
 
-    // console.log(h.elements);
-
     assertElements(h.elements, [
       { id: frame.id },
       { id: rectangle1.id, frameId: frame.id },

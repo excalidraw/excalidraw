@@ -104,7 +104,11 @@ import {
   Emitter,
 } from "@excalidraw/common";
 
-import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
+import {
+  getCommonBounds,
+  getElementAbsoluteCoords,
+  getObservedAppState,
+} from "@excalidraw/element";
 
 import {
   bindOrUnbindLinearElements,
@@ -320,7 +324,6 @@ import type {
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
-  SceneElementsMap,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -762,6 +765,8 @@ class App extends React.Component<AppProps, AppState> {
         addFiles: this.addFiles,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
+        getSceneElementsMapIncludingDeleted:
+          this.getSceneElementsMapIncludingDeleted,
         history: {
           clear: this.resetHistory,
         },
@@ -3969,22 +3974,18 @@ class App extends React.Component<AppProps, AppState> {
     }) => {
       const { elements, appState, collaborators, captureUpdate } = sceneData;
 
-      const nextElements = elements ? syncInvalidIndices(elements) : undefined;
-
       if (captureUpdate) {
-        const nextElementsMap = elements
-          ? (arrayToMap(nextElements ?? []) as SceneElementsMap)
-          : undefined;
-
-        const nextAppState = appState
-          ? // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
-            Object.assign({}, this.store.snapshot.appState, appState)
+        const observedAppState = appState
+          ? getObservedAppState({
+              ...this.store.snapshot.appState,
+              ...appState,
+            })
           : undefined;
 
         this.store.scheduleMicroAction({
           action: captureUpdate,
-          elements: nextElementsMap,
-          appState: nextAppState,
+          elements: elements ?? [],
+          appState: observedAppState,
         });
       }
 
@@ -3992,8 +3993,8 @@ class App extends React.Component<AppProps, AppState> {
         this.setState(appState);
       }
 
-      if (nextElements) {
-        this.scene.replaceAllElements(nextElements);
+      if (elements) {
+        this.scene.replaceAllElements(elements);
       }
 
       if (collaborators) {
@@ -10602,7 +10603,7 @@ class App extends React.Component<AppProps, AppState> {
         // otherwise we would end up with duplicated fractional indices on undo
         this.store.scheduleMicroAction({
           action: CaptureUpdateAction.NEVER,
-          elements: arrayToMap(elements) as SceneElementsMap,
+          elements,
           appState: undefined,
         });
 

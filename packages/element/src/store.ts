@@ -19,9 +19,17 @@ import { newElementWith } from "./mutateElement";
 
 import { ElementsDelta, AppStateDelta, Delta } from "./delta";
 
-import { hashElementsVersion, hashString } from "./index";
+import {
+  syncInvalidIndicesImmutable,
+  hashElementsVersion,
+  hashString,
+} from "./index";
 
-import type { OrderedExcalidrawElement, SceneElementsMap } from "./types";
+import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+  SceneElementsMap,
+} from "./types";
 
 export const CaptureUpdateAction = {
   /**
@@ -105,7 +113,7 @@ export class Store {
     params:
       | {
           action: CaptureUpdateActionType;
-          elements: SceneElementsMap | undefined;
+          elements: readonly ExcalidrawElement[] | undefined;
           appState: AppState | ObservedAppState | undefined;
         }
       | {
@@ -133,9 +141,15 @@ export class Store {
         this.app.scene.getElementsMapIncludingDeleted(),
         this.app.state,
       );
+
       const scheduledSnapshot = currentSnapshot.maybeClone(
         action,
-        params.elements,
+        // let's sync invalid indices first, so that we could detect this change
+        // also have the synced elements immutable, so that we don't mutate elements,
+        // that are already in the scene, otherwise we wouldn't see any change
+        params.elements
+          ? syncInvalidIndicesImmutable(params.elements)
+          : undefined,
         params.appState,
       );
 
@@ -213,16 +227,7 @@ export class Store {
       // using the same instance, since in history we have a check against `HistoryEntry`, so that we don't re-record the same delta again
       storeDelta = delta;
     } else {
-      // calculate the deltas based on the previous and next snapshot
-      const elementsDelta = snapshot.metadata.didElementsChange
-        ? ElementsDelta.calculate(prevSnapshot.elements, snapshot.elements)
-        : ElementsDelta.empty();
-
-      const appStateDelta = snapshot.metadata.didAppStateChange
-        ? AppStateDelta.calculate(prevSnapshot.appState, snapshot.appState)
-        : AppStateDelta.empty();
-
-      storeDelta = StoreDelta.create(elementsDelta, appStateDelta);
+      storeDelta = StoreDelta.calculate(prevSnapshot, snapshot);
     }
 
     if (!storeDelta.isEmpty()) {
@@ -506,6 +511,24 @@ export class StoreDelta {
   }
 
   /**
+   * Calculate the delta between the previous and next snapshot.
+   */
+  public static calculate(
+    prevSnapshot: StoreSnapshot,
+    nextSnapshot: StoreSnapshot,
+  ) {
+    const elementsDelta = nextSnapshot.metadata.didElementsChange
+      ? ElementsDelta.calculate(prevSnapshot.elements, nextSnapshot.elements)
+      : ElementsDelta.empty();
+
+    const appStateDelta = nextSnapshot.metadata.didAppStateChange
+      ? AppStateDelta.calculate(prevSnapshot.appState, nextSnapshot.appState)
+      : AppStateDelta.empty();
+
+    return this.create(elementsDelta, appStateDelta);
+  }
+
+  /**
    * Restore a store delta instance from a DTO.
    */
   public static restore(storeDeltaDTO: DTO<StoreDelta>) {
@@ -524,9 +547,7 @@ export class StoreDelta {
     id,
     elements: { added, removed, updated },
   }: DTO<StoreDelta>) {
-    const elements = ElementsDelta.create(added, removed, updated, {
-      shouldRedistribute: false,
-    });
+    const elements = ElementsDelta.create(added, removed, updated);
 
     return new this(id, elements, AppStateDelta.empty());
   }
@@ -534,25 +555,8 @@ export class StoreDelta {
   /**
    * Inverse store delta, creates new instance of `StoreDelta`.
    */
-  public static inverse(delta: StoreDelta): StoreDelta {
+  public static inverse(delta: StoreDelta) {
     return this.create(delta.elements.inverse(), delta.appState.inverse());
-  }
-
-  /**
-   * Apply latest (remote) changes to the delta, creates new instance of `StoreDelta`.
-   */
-  public static applyLatestChanges(
-    delta: StoreDelta,
-    elements: SceneElementsMap,
-    modifierOptions: "deleted" | "inserted",
-  ): StoreDelta {
-    return this.create(
-      delta.elements.applyLatestChanges(elements, modifierOptions),
-      delta.appState,
-      {
-        id: delta.id,
-      },
-    );
   }
 
   /**
@@ -562,12 +566,9 @@ export class StoreDelta {
     delta: StoreDelta,
     elements: SceneElementsMap,
     appState: AppState,
-    prevSnapshot: StoreSnapshot = StoreSnapshot.empty(),
   ): [SceneElementsMap, AppState, boolean] {
-    const [nextElements, elementsContainVisibleChange] = delta.elements.applyTo(
-      elements,
-      prevSnapshot.elements,
-    );
+    const [nextElements, elementsContainVisibleChange] =
+      delta.elements.applyTo(elements);
 
     const [nextAppState, appStateContainsVisibleChange] =
       delta.appState.applyTo(appState, nextElements);
@@ -576,6 +577,28 @@ export class StoreDelta {
       elementsContainVisibleChange || appStateContainsVisibleChange;
 
     return [nextElements, nextAppState, appliedVisibleChanges];
+  }
+
+  /**
+   * Apply latest (remote) changes to the delta, creates new instance of `StoreDelta`.
+   */
+  public static applyLatestChanges(
+    delta: StoreDelta,
+    prevElements: SceneElementsMap,
+    nextElements: SceneElementsMap,
+    modifierOptions?: "deleted" | "inserted",
+  ): StoreDelta {
+    return this.create(
+      delta.elements.applyLatestChanges(
+        prevElements,
+        nextElements,
+        modifierOptions,
+      ),
+      delta.appState,
+      {
+        id: delta.id,
+      },
+    );
   }
 
   public isEmpty() {
@@ -687,11 +710,10 @@ export class StoreSnapshot {
       nextElements.set(id, changedElement);
     }
 
-    const nextAppState = Object.assign(
-      {},
-      this.appState,
-      change.appState,
-    ) as ObservedAppState;
+    const nextAppState = getObservedAppState({
+      ...this.appState,
+      ...change.appState,
+    });
 
     return StoreSnapshot.create(nextElements, nextAppState, {
       // by default we assume that change is different from what we have in the snapshot
@@ -944,18 +966,26 @@ const getDefaultObservedAppState = (): ObservedAppState => {
   };
 };
 
-export const getObservedAppState = (appState: AppState): ObservedAppState => {
+export const getObservedAppState = (
+  appState: AppState | ObservedAppState,
+): ObservedAppState => {
   const observedAppState = {
     name: appState.name,
     editingGroupId: appState.editingGroupId,
     viewBackgroundColor: appState.viewBackgroundColor,
     selectedElementIds: appState.selectedElementIds,
     selectedGroupIds: appState.selectedGroupIds,
-    editingLinearElementId: appState.editingLinearElement?.elementId || null,
-    selectedLinearElementId: appState.selectedLinearElement?.elementId || null,
     croppingElementId: appState.croppingElementId,
     activeLockedId: appState.activeLockedId,
     lockedMultiSelections: appState.lockedMultiSelections,
+    editingLinearElementId:
+      (appState as AppState).editingLinearElement?.elementId ?? // prefer app state, as it's likely newer
+      (appState as ObservedAppState).editingLinearElementId ?? // fallback to observed app state, as it's likely older coming from a previous snapshot
+      null,
+    selectedLinearElementId:
+      (appState as AppState).selectedLinearElement?.elementId ??
+      (appState as ObservedAppState).selectedLinearElementId ??
+      null,
   };
 
   Reflect.defineProperty(observedAppState, hiddenObservedAppStateProp, {

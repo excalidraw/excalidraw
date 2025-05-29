@@ -2,7 +2,7 @@ import { generateNKeysBetween } from "fractional-indexing";
 
 import { arrayToMap } from "@excalidraw/common";
 
-import { mutateElement } from "./mutateElement";
+import { mutateElement, newElementWith } from "./mutateElement";
 import { getBoundTextElement } from "./textElement";
 import { hasBoundTextElement } from "./typeChecks";
 
@@ -11,6 +11,7 @@ import type {
   ExcalidrawElement,
   FractionalIndex,
   OrderedExcalidrawElement,
+  SceneElementsMap,
 } from "./types";
 
 export class InvalidFractionalIndexError extends Error {
@@ -161,9 +162,15 @@ export const syncMovedIndices = (
 
     // try generatating indices, throws on invalid movedElements
     const elementsUpdates = generateIndices(elements, indicesGroups);
-    const elementsCandidates = elements.map((x) =>
-      elementsUpdates.has(x) ? { ...x, ...elementsUpdates.get(x) } : x,
-    );
+    const elementsCandidates = elements.map((x) => {
+      const elementUpdates = elementsUpdates.get(x);
+
+      if (elementUpdates) {
+        return { ...x, index: elementUpdates.index };
+      }
+
+      return x;
+    });
 
     // ensure next indices are valid before mutation, throws on invalid ones
     validateFractionalIndices(
@@ -177,8 +184,8 @@ export const syncMovedIndices = (
     );
 
     // split mutation so we don't end up in an incosistent state
-    for (const [element, update] of elementsUpdates) {
-      mutateElement(element, elementsMap, update);
+    for (const [element, { index }] of elementsUpdates) {
+      mutateElement(element, elementsMap, { index });
     }
   } catch (e) {
     // fallback to default sync
@@ -189,7 +196,7 @@ export const syncMovedIndices = (
 };
 
 /**
- * Synchronizes all invalid fractional indices with the array order by mutating passed elements.
+ * Synchronizes all invalid fractional indices within the array order by mutating elements in the passed array.
  *
  * WARN: in edge cases it could modify the elements which were not moved, as it's impossible to guess the actually moved elements from the elements array itself.
  */
@@ -200,11 +207,30 @@ export const syncInvalidIndices = (
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
 
-  for (const [element, update] of elementsUpdates) {
-    mutateElement(element, elementsMap, update);
+  for (const [element, { index }] of elementsUpdates) {
+    mutateElement(element, elementsMap, { index });
   }
 
   return elements as OrderedExcalidrawElement[];
+};
+
+/**
+ * Synchronizes all invalid fractional indices within the array order by creating new instances of elements with corrected indices.
+ *
+ * WARN: in edge cases it could modify the elements which were not moved, as it's impossible to guess the actually moved elements from the elements array itself.
+ */
+export const syncInvalidIndicesImmutable = (
+  elements: readonly ExcalidrawElement[],
+): SceneElementsMap | undefined => {
+  const syncedElements = arrayToMap(elements);
+  const indicesGroups = getInvalidIndicesGroups(elements);
+  const elementsUpdates = generateIndices(elements, indicesGroups);
+
+  for (const [element, { index }] of elementsUpdates) {
+    syncedElements.set(element.id, newElementWith(element, { index }));
+  }
+
+  return syncedElements as SceneElementsMap;
 };
 
 /**
