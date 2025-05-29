@@ -416,6 +416,10 @@ const ExcalidrawWrapper = () => {
   }, [excalidrawAPI]);
 
   useEffect(() => {
+    setReminderState(importReminderStateFromLocalStorage());
+  }, []);
+
+  useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
       return;
     }
@@ -681,7 +685,7 @@ const ExcalidrawWrapper = () => {
               },
             },
           });
-          setReminderState({
+          updateReminderState({
             nextIndex: currentReminderIndex + 1,
             sceneId: appState.id,
           });
