@@ -5582,6 +5582,12 @@ class App extends React.Component<AppProps, AppState> {
 
           return;
         }
+      } else if (
+        this.state.editingLinearElement &&
+        this.state.editingLinearElement.elementId === selectedElements[0].id &&
+        !isArrowElement(selectedElements[0])
+      ) {
+        return;
       }
     }
 
