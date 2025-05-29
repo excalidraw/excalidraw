@@ -104,7 +104,11 @@ import {
   Emitter,
 } from "@excalidraw/common";
 
-import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
+import {
+  getCommonBounds,
+  getElementAbsoluteCoords,
+  isLineElement,
+} from "@excalidraw/element";
 
 import {
   bindOrUnbindLinearElements,
@@ -5585,7 +5589,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (
         this.state.editingLinearElement &&
         this.state.editingLinearElement.elementId === selectedElements[0].id &&
-        !isArrowElement(selectedElements[0])
+        isLineElement(selectedElements[0])
       ) {
         return;
       }
