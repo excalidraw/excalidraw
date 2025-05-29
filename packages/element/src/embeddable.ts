@@ -58,7 +58,7 @@ const RE_REDDIT =
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
-const ALLOWED_DOMAINS = new Set([
+const ALLOWED_EMBED_HOSTS = new Set([
   "youtube.com",
   "youtu.be",
   "vimeo.com",
@@ -92,7 +92,7 @@ const ALLOW_SAME_ORIGIN = new Set([
   "reddit.com",
   "forms.microsoft.com",
   "forms.gle",
-  "docs.google.com/forms",
+  "docs.google.com",
   "app.sli.do",
 ]);
 
@@ -366,7 +366,7 @@ const matchHostname = (
 
     if (allowedHostnames instanceof Set) {
       // Check for exact domain match
-      if (ALLOWED_DOMAINS.has(bareDomain)) {
+      if (ALLOWED_EMBED_HOSTS.has(bareDomain)) {
         return bareDomain;
       }
 
@@ -374,7 +374,7 @@ const matchHostname = (
       const domainWithPath = `${bareDomain}${
         pathname.split("/")[1] ? `/${pathname.split("/")[1]}` : ""
       }`;
-      if (ALLOWED_DOMAINS.has(domainWithPath)) {
+      if (ALLOWED_EMBED_HOSTS.has(domainWithPath)) {
         return domainWithPath;
       }
 
@@ -382,7 +382,7 @@ const matchHostname = (
         /^([^.]+)/,
         "*",
       );
-      if (ALLOWED_DOMAINS.has(bareDomainWithFirstSubdomainWildcarded)) {
+      if (ALLOWED_EMBED_HOSTS.has(bareDomainWithFirstSubdomainWildcarded)) {
         return bareDomainWithFirstSubdomainWildcarded;
       }
       return null;
@@ -459,5 +459,5 @@ export const embeddableURLValidator = (
     }
   }
 
-  return !!matchHostname(url, ALLOWED_DOMAINS);
+  return !!matchHostname(url, ALLOWED_EMBED_HOSTS);
 };
