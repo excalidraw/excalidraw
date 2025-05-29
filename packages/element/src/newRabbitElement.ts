@@ -22,8 +22,7 @@ import type {
   VerticalAlign,
   FontFamilyValues,
 } from "@excalidraw/element/types";
-import { RabbitSearchBoxElement, RabbitElementBase, RabbitImageElement, RabbitImageTabsElement } from "./rabbitElement";
-
+import { RabbitSearchBoxElement, RabbitElementBase, RabbitImageElement, RabbitImageTabsElement, RabbitColorPaletteElement } from "./rabbitElement";
 export const newRabbitSearchBoxElement = (
   opts: {
     x: number;
@@ -97,20 +96,23 @@ export const newRabbitSearchBoxElement = (
     ...baseElement,
     type: "rabbit-searchbox",
     rabbitId: `rabbit-${randomId()}`,
+    
+    // IMPORTANT: Standard text properties for WYSIWYG compatibility
     text,
+    originalText: text,  // This is what WYSIWYG editor uses
     fontSize,
     fontFamily,
     textAlign,
     verticalAlign,
-    hasIcon,
     lineHeight,
-    // originalText: text,
     autoResize: false,
     containerId: null,
-    isEditing: false,
-    currentText: text,
     boundElements: [],
-    originalText: text,
+    
+    // Custom properties for your search box functionality
+    hasIcon,
+    isEditing: false,
+    currentText: text,  // Keep this in sync with originalText
   };
 
   // type assertion to bypass TypeScript's type checking
@@ -239,7 +241,6 @@ export const newRabbitImageTabsElement = (
     index: null,
   };
 
-
   return {
     ...base,
     type: "rabbit-image-tabs",
@@ -277,4 +278,109 @@ export const newRabbitImageTabsElement = (
   };
 };
 
+// export const newRabbitColorPalette = (
+//   opts: {
+//     x: number;
+//     y: number;
+//     colors?: string[];
+//     width?: number;
+//     rectangleHeight?: number;
+//     angle?: number;
+//   }
+// ): RabbitColorPaletteElement => {
+//   const defaultColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57'];
+//   const colors = opts.colors || defaultColors;
+//   const width = opts.width || 200;
+//   const rectangleHeight = opts.rectangleHeight || 50;
+//   const totalHeight = rectangleHeight * 5;
 
+//   // Create base element (since baseElement is not exported)
+//   const baseElement = {
+//     id: randomId(),
+//     x: opts.x,
+//     y: opts.y,
+//     width,
+//     height: totalHeight,
+//     angle: (opts.angle || 0) as Radians,
+//     strokeColor: "#1e1e1e",
+//     backgroundColor: "transparent",
+//     fillStyle: "solid" as const,
+//     strokeWidth: 2,
+//     strokeStyle: "solid" as const,
+//     roughness: 1,
+//     opacity: 100,
+//     groupIds: [],
+//     frameId: null,
+//     roundness: null,
+//     seed: Math.floor(Math.random() * 100000),
+//     versionNonce: Math.floor(Math.random() * 100000),
+//     isDeleted: false,
+//     boundElements: null,
+//     updated: 1,
+//     link: null,
+//     locked: false,
+//   };
+
+//   return {
+//   ...baseElement,
+//   type: "rabbit-color-palette",
+//   colors: colors.slice(0, 5), // Ensure exactly 5 colors
+//   rectangleHeight,
+//   version: 1,     
+//   index: null,       
+// };
+// };
+
+export const newRabbitColorPalette = (
+  opts: {
+    x: number;
+    y: number;
+    colors?: string[];
+    width?: number;
+    rectangleHeight?: number;
+    angle?: number;
+  }
+): RabbitColorPaletteElement => {
+  const defaultColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57'];
+  const colors = opts.colors || defaultColors;
+  const width = opts.width || 200;
+  const rectangleHeight = opts.rectangleHeight || 50;
+  const totalHeight = rectangleHeight * 5;
+
+  // Use the same base structure as the other elements
+  const base: RabbitElementBase = {
+    id: randomId(),
+    x: opts.x,
+    y: opts.y,
+    width,
+    height: totalHeight,
+    angle: (opts.angle || 0) as Radians,
+    version: 1,
+    versionNonce: Math.floor(Math.random() * 100000), // Changed from 0 to random
+    strokeColor: "#1e1e1e",
+    backgroundColor: "transparent",
+    fillStyle: "solid" as const,
+    strokeWidth: 2,
+    strokeStyle: "solid" as const,
+    roughness: 1,
+    opacity: 100,
+    groupIds: [],
+    frameId: null,
+    roundness: null,
+    seed: Math.floor(Math.random() * 100000),
+    isDeleted: false,
+    boundElements: null,
+    updated: Date.now(), // Changed from 1 to Date.now()
+    link: null,
+    locked: false,
+    customData: {}, // Added missing customData property
+    index: null,
+  };
+
+  return {
+    ...base,
+    type: "rabbit-color-palette",
+    colors: colors.slice(0, 5), // Ensure exactly 5 colors
+    rectangleHeight,
+  };
+};

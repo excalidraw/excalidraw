@@ -139,8 +139,11 @@ export const textWysiwyg = ({
     const { textAlign, verticalAlign } = updatedTextElement;
     const elementsMap = app.scene.getNonDeletedElementsMap();
     if (updatedTextElement && isTextElement(updatedTextElement)) {
+      console.log("it's an updatedtext element");
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
+
+      
       const container = getContainerElement(
         updatedTextElement,
         app.scene.getNonDeletedElementsMap(),
@@ -154,6 +157,19 @@ export const textWysiwyg = ({
 
       let maxWidth = updatedTextElement.width;
       let maxHeight = updatedTextElement.height;
+
+      if ((updatedTextElement as any).type === "rabbit-searchbox") {
+    const padding = 10;
+    const iconSpace = (updatedTextElement as any).hasIcon ? 30 : 0;
+    
+    coordX = updatedTextElement.x + padding;
+    coordY = updatedTextElement.y;
+    
+    width = updatedTextElement.width - (padding * 2) - iconSpace;
+    height = updatedTextElement.height;
+  }
+
+
 
       if (container && updatedTextElement.containerId) {
         if (isArrowElement(container)) {
@@ -280,6 +296,25 @@ export const textWysiwyg = ({
         maxHeight: `${editorMaxHeight}px`,
       });
       editable.scrollTop = 0;
+
+      if ((updatedTextElement as any).type === "rabbit-searchbox") {
+        Object.assign(editable.style, {
+          cursor: "text",
+          textAlign: "left",
+          paddingLeft: "10px",
+          paddingRight: (updatedTextElement as any).hasIcon ? "30px" : "10px",
+          userSelect: "text",
+          pointerEvents: "auto",
+        });
+
+        console.log("what is going on here");
+        
+        setTimeout(() => {
+          editable.focus();
+          editable.setSelectionRange(editable.value.length, editable.value.length);
+        }, 0);
+      }
+
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
       if (isTestEnv()) {
@@ -327,6 +362,7 @@ export const textWysiwyg = ({
     boxSizing: "content-box",
   });
   editable.value = element.originalText;
+  
   updateWysiwygStyle();
 
   if (onChange) {

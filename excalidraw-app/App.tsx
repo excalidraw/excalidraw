@@ -39,7 +39,7 @@ import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
 
-import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement } from "@excalidraw/element/newRabbitElement";
+import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement, newRabbitColorPalette } from "@excalidraw/element/newRabbitElement";
 
 import {
   GithubIcon,
@@ -1285,8 +1285,6 @@ const ExcalidrawWrapper = () => {
                             console.log("Tab Data was set!");
                             setImageWindowVisible(true);
                           });
-
-
                       }
 
                       //   searchAndSaveImages(searchQuery)
@@ -1484,9 +1482,6 @@ const ExcalidrawWrapper = () => {
                 }
               },
             },
-
-
-
             {
               label: "Add Rabbit Image",
               category: DEFAULT_CATEGORIES.app,
@@ -1547,6 +1542,24 @@ const ExcalidrawWrapper = () => {
                   .catch(error => {
                     console.error("Error in image search:", error);
                   });
+              },
+            },
+            {
+              label: "Add Rabbit Color Palette",
+              category: DEFAULT_CATEGORIES.app,
+              keywords: ["palette", "colors", "color-palette", "hex"],
+              perform: () => {
+                if (excalidrawAPI) {
+                  const colorPalette = newRabbitColorPalette({
+                    x: 100,
+                    y: 100,
+                    colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57']
+                  });
+
+                  excalidrawAPI.updateScene({
+                    elements: [...excalidrawAPI.getSceneElements(), colorPalette]
+                  });
+                }
               },
             },
             {
@@ -1789,15 +1802,12 @@ const ExcalidrawWrapper = () => {
         }
         return null;
       })()}
+
     </div>
   );
 };
 
 const ExcalidrawApp = () => {
-
-
-
-
   const isCloudExportWindow =
     window.location.pathname === "/excalidraw-plus-export";
   if (isCloudExportWindow) {

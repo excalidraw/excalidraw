@@ -190,6 +190,15 @@ export const getRabbitShape = <Point extends GlobalPoint | LocalPoint>(
     pointRotateRads(pointFrom(x, cy), center, angle),
   );
   }
+  else if (element.type === "rabbit-color-palette") {
+    const totalHeight = element.rectangleHeight * 5;
+    data = polygon(
+    pointRotateRads(pointFrom(cx, y), center, angle),
+    pointRotateRads(pointFrom(x + width, cy), center, angle),
+    pointRotateRads(pointFrom(cx, y + totalHeight), center, angle),
+    pointRotateRads(pointFrom(x, cy), center, angle),
+  );
+  }
   else {
     data = polygon(
       pointRotateRads(pointFrom(x, y), center, angle),

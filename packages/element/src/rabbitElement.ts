@@ -114,10 +114,14 @@ export type RabbitImageTabsElement = {
   tabHeight: number;
 } & RabbitElementBase;
 
-
+export type RabbitColorPaletteElement = {
+  type: "rabbit-color-palette";
+  colors: string[];
+  rectangleHeight: number;
+} & RabbitElementBase;
 
 // Add to union type when adding more Rabbit element types
-export type RabbitElement = RabbitSearchBoxElement | RabbitImageElement | RabbitImageTabsElement;
+export type RabbitElement = RabbitSearchBoxElement | RabbitImageElement | RabbitImageTabsElement | RabbitColorPaletteElement;
 
 export const isRabbitElement = (element: ExcalidrawElement): element is RabbitElement => {
   // return element.type === "rabbit-searchbox";
@@ -143,3 +147,8 @@ export const isRabbitImageTabsElement = (
   return element.type === "rabbit-image-tabs";
 };
 
+export const isRabbitColorPaletteElement = (
+  element: ExcalidrawElement
+): element is RabbitColorPaletteElement => {
+  return element.type === "rabbit-color-palette";
+};
