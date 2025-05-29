@@ -18,6 +18,7 @@ import {
 import {
   getCommonBounds,
   getElementAbsoluteCoords,
+  getNonDeletedElements,
   hashElementsVersion,
 } from "@excalidraw/element";
 
@@ -583,7 +584,11 @@ export const getExportSize = (
 
 export const generateLastSave = (
   elements: readonly OrderedExcalidrawElement[],
-): AppState["lastSave"] => ({
-  hash: hashElementsVersion(elements),
-  timestamp: Date.now(),
-});
+): AppState["lastSave"] => {
+  const nonDeletedElements = getNonDeletedElements(elements);
+  return {
+    hash: hashElementsVersion(nonDeletedElements),
+    timestamp: Date.now(),
+    elementsCount: nonDeletedElements.length,
+  };
+};
