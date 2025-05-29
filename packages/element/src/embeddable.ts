@@ -44,6 +44,8 @@ const RE_TWITTER_EMBED =
 const RE_VALTOWN =
   /^https:\/\/(?:www\.)?val\.town\/(v|embed)\/[a-zA-Z_$][0-9a-zA-Z_$]+\.[a-zA-Z_$][0-9a-zA-Z_$]+/;
 
+const RE_SLIDO = /^https:\/\/app\.sli\.do\/event\/([a-zA-Z0-9]+)/;
+
 const RE_GENERIC_EMBED =
   /^<(?:iframe|blockquote)[\s\S]*?\s(?:src|href)=["']([^"']*)["'][\s\S]*?>$/i;
 
@@ -74,6 +76,7 @@ const ALLOWED_DOMAINS = new Set([
   "forms.microsoft.com",
   "forms.gle",
   "docs.google.com/forms",
+  "app.sli.do",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -89,7 +92,8 @@ const ALLOW_SAME_ORIGIN = new Set([
   "reddit.com",
   "forms.microsoft.com",
   "forms.gle",
-  "docs.google.com",
+  "docs.google.com/forms",
+  "app.sli.do",
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -280,6 +284,23 @@ export const getEmbedLink = (
     };
     embeddedLinkCache.set(link, ret);
     return ret;
+  }
+
+  if (RE_SLIDO.test(link)) {
+    const [, eventId] = link.match(RE_SLIDO)!;
+    link = `https://app.sli.do/event/${eventId}`;
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
   }
 
   embeddedLinkCache.set(link, {
