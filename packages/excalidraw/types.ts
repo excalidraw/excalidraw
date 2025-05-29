@@ -444,6 +444,12 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+
+  /* Timestamp and hashed elements version of last time we stored on disk */
+  lastSave: {
+    timestamp: number;
+    hash: number;
+  } | null;
 }
 
 export type SearchMatch = {

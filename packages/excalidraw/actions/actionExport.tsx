@@ -25,7 +25,7 @@ import { resaveAsImageWithScene } from "../data/resave";
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { getExportSize } from "../scene/export";
+import { generateLastSave, getExportSize } from "../scene/export";
 
 import "../components/ToolIcon.scss";
 
@@ -174,6 +174,7 @@ export const actionSaveToActiveFile = register({
         appState: {
           ...appState,
           fileHandle,
+          lastSave: generateLastSave(elements),
           toast: fileHandleExists
             ? {
                 message: fileHandle?.name
@@ -220,6 +221,7 @@ export const actionSaveFileToDisk = register({
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
           ...appState,
+          lastSave: generateLastSave(elements),
           openDialog: null,
           fileHandle,
           toast: { message: t("toast.fileSaved") },
