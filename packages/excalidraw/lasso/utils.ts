@@ -7,7 +7,7 @@ import {
 } from "@excalidraw/math";
 
 import {
-  Bounds,
+  type Bounds,
   doBoundsIntersect,
   getElementBounds,
   intersectElementWithLineSegment,
