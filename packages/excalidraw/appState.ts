@@ -15,6 +15,8 @@ import {
 
 import { nanoid } from "nanoid";
 
+import { generateLastSave } from "@excalidraw/excalidraw/scene/export";
+
 import type { AppState, NormalizedZoomValue } from "./types";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
@@ -127,7 +129,7 @@ export const getDefaultAppState = (): Omit<
     searchMatches: null,
     lockedMultiSelections: {},
     activeLockedId: null,
-    lastSave: null,
+    lastSave: generateLastSave([]),
   };
 };
 

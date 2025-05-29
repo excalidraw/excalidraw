@@ -4,6 +4,8 @@ import {
   TTDDialogTrigger,
   CaptureUpdateAction,
   reconcileElements,
+  getNonDeletedElements,
+  hashElementsVersion,
 } from "@excalidraw/excalidraw";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
@@ -85,6 +87,7 @@ import {
 import {
   FIREBASE_STORAGE_PREFIXES,
   isExcalidrawPlusSignedUser,
+  REMINDER_THRESHOLDS,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
@@ -112,7 +115,9 @@ import {
 import { updateStaleImageStatuses } from "./data/FileManager";
 import {
   importFromLocalStorage,
+  importReminderStateFromLocalStorage,
   importUsernameFromLocalStorage,
+  saveReminderStateToLocalStorage,
 } from "./data/localStorage";
 
 import { loadFilesFromFirebase } from "./data/firebase";
@@ -156,6 +161,11 @@ declare global {
   interface WindowEventMap {
     beforeinstallprompt: BeforeInstallPromptEvent;
   }
+}
+
+export interface ReminderState {
+  sceneId: string;
+  nextIndex: number;
 }
 
 let pwaEvent: BeforeInstallPromptEvent | null = null;
@@ -342,6 +352,14 @@ const ExcalidrawWrapper = () => {
 
   const [langCode, setLangCode] = useAppLangCode();
 
+  const [reminderState, setReminderState] = useState<ReminderState | null>(
+    null,
+  );
+  const updateReminderState = useCallback((newState: ReminderState) => {
+    setReminderState(newState);
+    saveReminderStateToLocalStorage(newState);
+  }, []);
+
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -516,6 +534,7 @@ const ExcalidrawWrapper = () => {
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
           const localDataState = importFromLocalStorage();
           const username = importUsernameFromLocalStorage();
+          const reminderState = importReminderStateFromLocalStorage();
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
             ...localDataState,
@@ -529,6 +548,7 @@ const ExcalidrawWrapper = () => {
             }
           });
           collabAPI?.setUsername(username || "");
+          setReminderState(reminderState);
         }
 
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_FILES)) {
@@ -630,6 +650,43 @@ const ExcalidrawWrapper = () => {
   ) => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
+    } else if (excalidrawAPI) {
+      const currentReminderIndex =
+        reminderState && reminderState.sceneId === appState.id
+          ? reminderState.nextIndex
+          : 0;
+      const now = Date.now();
+      // if delta is less than first threshold, then we recently saved
+      if (now - appState.lastSave.timestamp < REMINDER_THRESHOLDS[0].time) {
+        if (currentReminderIndex !== 0) {
+          updateReminderState({
+            nextIndex: 0,
+            sceneId: appState.id,
+          });
+        }
+      } else if (currentReminderIndex < REMINDER_THRESHOLDS.length) {
+        const reminderThreshold = REMINDER_THRESHOLDS[currentReminderIndex];
+        const nonDeletedElements = getNonDeletedElements(elements);
+        // Remind if we haven't saved for too long
+        if (
+          now - appState.lastSave.timestamp >= reminderThreshold.time &&
+          nonDeletedElements.length - appState.lastSave.elementsCount >=
+            reminderThreshold.elementsCount &&
+          hashElementsVersion(nonDeletedElements) !== appState.lastSave.hash
+        ) {
+          excalidrawAPI.updateScene({
+            appState: {
+              toast: {
+                message: t("toast.rememberToSave"),
+              },
+            },
+          });
+          setReminderState({
+            nextIndex: currentReminderIndex + 1,
+            sceneId: appState.id,
+          });
+        }
+      }
     }
 
     // this check is redundant, but since this is a hot path, it's best
