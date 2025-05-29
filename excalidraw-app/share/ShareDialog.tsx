@@ -18,8 +18,12 @@ import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { KEYS, getFrame } from "@excalidraw/common";
 import { useEffect, useRef, useState } from "react";
 
+import { useExcalidrawSetAppState } from "@excalidraw/excalidraw/components/App";
+
 import { atom, useAtom, useAtomValue } from "../app-jotai";
 import { activeRoomLinkAtom } from "../collab/Collab";
+import { RoomList } from "../components/RoomList";
+import { getCollaborationLink } from "../data";
 
 import "./ShareDialog.scss";
 
@@ -180,6 +184,7 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
   const { t } = useI18n();
 
   const { collabAPI } = props;
+  const setAppState = useExcalidrawSetAppState();
 
   const startCollabJSX = collabAPI ? (
     <>
@@ -203,6 +208,34 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
           }}
         />
       </div>
+
+      <div
+        style={{
+          height: "1px",
+          backgroundColor: "var(--color-border)",
+          width: "100%",
+        }}
+      ></div>
+
+      <RoomList
+        collabAPI={collabAPI}
+        onRoomSelect={async (roomId, roomKey) => {
+          const roomLink = getCollaborationLink({ roomId, roomKey });
+          try {
+            await copyTextToSystemClipboard(roomLink);
+            trackEvent("share", "room link copied from list");
+            // set a toast message when the link is copied
+            setAppState({
+              toast: {
+                message: t("roomDialog.roomLinkCopied"),
+              },
+            });
+          } catch (e) {
+            collabAPI.setCollabError(t("errors.copyToSystemClipboardFailed"));
+          }
+        }}
+        handleClose={props.handleClose}
+      />
 
       {props.type === "share" && (
         <div className="ShareDialog__separator">
