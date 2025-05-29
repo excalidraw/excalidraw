@@ -270,7 +270,10 @@ export const actionLoadScene = register({
       } = await loadFromJSON(appState, elements);
       return {
         elements: loadedElements,
-        appState: loadedAppState,
+        appState: {
+          ...loadedAppState,
+          lastSave: generateLastSave(loadedElements),
+        },
         files,
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
