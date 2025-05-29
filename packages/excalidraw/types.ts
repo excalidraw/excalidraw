@@ -452,7 +452,7 @@ export interface AppState {
     timestamp: number;
     hash: number;
     elementsCount: number;
-  } | null;
+  };
 }
 
 export type SearchMatch = {

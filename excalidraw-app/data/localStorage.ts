@@ -9,11 +9,27 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import { STORAGE_KEYS } from "../app_constants";
 
+import type { ReminderState } from "excalidraw-app/App";
+
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_COLLAB,
       JSON.stringify({ username }),
+    );
+  } catch (error: any) {
+    // Unable to access window.localStorage
+    console.error(error);
+  }
+};
+
+export const saveReminderStateToLocalStorage = (
+  reminderState: ReminderState,
+) => {
+  try {
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_REMINDER_STATE,
+      JSON.stringify(reminderState),
     );
   } catch (error: any) {
     // Unable to access window.localStorage
@@ -29,6 +45,21 @@ export const importUsernameFromLocalStorage = (): string | null => {
     }
   } catch (error: any) {
     // Unable to access localStorage
+    console.error(error);
+  }
+
+  return null;
+};
+
+export const importReminderStateFromLocalStorage = (): ReminderState | null => {
+  try {
+    const data = localStorage.getItem(
+      STORAGE_KEYS.LOCAL_STORAGE_REMINDER_STATE,
+    );
+    if (data) {
+      return JSON.parse(data);
+    }
+  } catch (error: any) {
     console.error(error);
   }
 
