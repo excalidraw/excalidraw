@@ -83,6 +83,7 @@ import {
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
 import { resetBrowserStateVersions } from "../data/tabSync";
+import { roomManager } from "../data/roomManager";
 
 import { collabErrorIndicatorAtom } from "./CollabError";
 import Portal from "./Portal";
@@ -547,6 +548,25 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       });
 
       this.saveCollabRoomToFirebase(getSyncableElements(elements));
+
+      // Save room data to local room manager for new rooms
+      try {
+        await roomManager.addRoom(
+          roomId,
+          roomKey,
+          getCollaborationLink({ roomId, roomKey }),
+          "", // User can edit this later
+        );
+      } catch (error) {
+        console.warn("Failed to save room to local storage:", error);
+      }
+    } else {
+      // Update access time for existing rooms
+      try {
+        await roomManager.updateRoomAccess(existingRoomLinkData.roomId);
+      } catch (error) {
+        console.warn("Failed to update room access time:", error);
+      }
     }
 
     // fallback in case you're not alone in the room but still don't receive
