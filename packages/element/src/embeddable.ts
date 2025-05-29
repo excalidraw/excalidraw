@@ -44,6 +44,8 @@ const RE_TWITTER_EMBED =
 const RE_VALTOWN =
   /^https:\/\/(?:www\.)?val\.town\/(v|embed)\/[a-zA-Z_$][0-9a-zA-Z_$]+\.[a-zA-Z_$][0-9a-zA-Z_$]+/;
 
+const RE_SLIDO = /^https:\/\/app\.sli\.do\/event\/([a-zA-Z0-9]+)/;
+
 const RE_GENERIC_EMBED =
   /^<(?:iframe|blockquote)[\s\S]*?\s(?:src|href)=["']([^"']*)["'][\s\S]*?>$/i;
 
@@ -56,7 +58,7 @@ const RE_REDDIT =
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
-const ALLOWED_DOMAINS = new Set([
+const ALLOWED_EMBED_HOSTS = new Set([
   "youtube.com",
   "youtu.be",
   "vimeo.com",
@@ -72,6 +74,9 @@ const ALLOWED_DOMAINS = new Set([
   "giphy.com",
   "reddit.com",
   "forms.microsoft.com",
+  "forms.gle",
+  "docs.google.com/forms",
+  "app.sli.do",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -86,6 +91,9 @@ const ALLOW_SAME_ORIGIN = new Set([
   "stackblitz.com",
   "reddit.com",
   "forms.microsoft.com",
+  "forms.gle",
+  "docs.google.com",
+  "app.sli.do",
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -278,6 +286,23 @@ export const getEmbedLink = (
     return ret;
   }
 
+  if (RE_SLIDO.test(link)) {
+    const [, eventId] = link.match(RE_SLIDO)!;
+    link = `https://app.sli.do/event/${eventId}`;
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
+  }
+
   embeddedLinkCache.set(link, {
     link,
     intrinsicSize: aspectRatio,
@@ -335,20 +360,29 @@ const matchHostname = (
   allowedHostnames: Set<string> | string,
 ): string | null => {
   try {
-    const { hostname } = new URL(url);
+    const { hostname, pathname } = new URL(url);
 
     const bareDomain = hostname.replace(/^www\./, "");
 
     if (allowedHostnames instanceof Set) {
-      if (ALLOWED_DOMAINS.has(bareDomain)) {
+      // Check for exact domain match
+      if (ALLOWED_EMBED_HOSTS.has(bareDomain)) {
         return bareDomain;
+      }
+
+      // Check for path-based match (e.g., docs.google.com/forms)
+      const domainWithPath = `${bareDomain}${
+        pathname.split("/")[1] ? `/${pathname.split("/")[1]}` : ""
+      }`;
+      if (ALLOWED_EMBED_HOSTS.has(domainWithPath)) {
+        return domainWithPath;
       }
 
       const bareDomainWithFirstSubdomainWildcarded = bareDomain.replace(
         /^([^.]+)/,
         "*",
       );
-      if (ALLOWED_DOMAINS.has(bareDomainWithFirstSubdomainWildcarded)) {
+      if (ALLOWED_EMBED_HOSTS.has(bareDomainWithFirstSubdomainWildcarded)) {
         return bareDomainWithFirstSubdomainWildcarded;
       }
       return null;
@@ -399,6 +433,7 @@ export const embeddableURLValidator = (
   if (!url) {
     return false;
   }
+
   if (validateEmbeddable != null) {
     if (typeof validateEmbeddable === "function") {
       const ret = validateEmbeddable(url);
@@ -424,5 +459,5 @@ export const embeddableURLValidator = (
     }
   }
 
-  return !!matchHostname(url, ALLOWED_DOMAINS);
+  return !!matchHostname(url, ALLOWED_EMBED_HOSTS);
 };
