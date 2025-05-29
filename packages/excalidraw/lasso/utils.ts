@@ -6,7 +6,12 @@ import {
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
-import { intersectElementWithLineSegment } from "@excalidraw/element";
+import {
+  Bounds,
+  doBoundsIntersect,
+  getElementBounds,
+  intersectElementWithLineSegment,
+} from "@excalidraw/element";
 
 import type { ElementsSegmentsMap, GlobalPoint } from "@excalidraw/math/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
@@ -39,8 +44,32 @@ export const getLassoSelectedElementIds = (input: {
   const unlockedElements = elements.filter((el) => !el.locked);
   // as the path might not enclose a shape anymore, clear before checking
   enclosedElements.clear();
+  const lassoBounds = lassoPath.reduce(
+    (acc, item) => {
+      return [
+        Math.min(acc[0], item[0]),
+        Math.min(acc[1], item[1]),
+        Math.max(acc[2], item[0]),
+        Math.max(acc[3], item[1]),
+      ];
+    },
+    [-Infinity, -Infinity, Infinity, Infinity],
+  ) as Bounds;
   for (const element of unlockedElements) {
+    const threshold = getElementThreshold(element);
+    // First check if the lasso segment intersects the element's axis-aligned
+    // bounding box as it is much faster than checking intersection against
+    // the element's shape
+    const snugElementBounds = getElementBounds(element, new Map());
+    const elementBounds = [
+      snugElementBounds[0] - threshold,
+      snugElementBounds[1] - threshold,
+      snugElementBounds[2] + threshold,
+      snugElementBounds[3] + threshold,
+    ] as Bounds;
+
     if (
+      doBoundsIntersect(lassoBounds, elementBounds) &&
       !intersectedElements.has(element.id) &&
       !enclosedElements.has(element.id)
     ) {
@@ -48,11 +77,7 @@ export const getLassoSelectedElementIds = (input: {
       if (enclosed) {
         enclosedElements.add(element.id);
       } else {
-        const intersects = intersectionTest(
-          path,
-          element,
-          getElementThreshold(element),
-        );
+        const intersects = intersectionTest(path, element, threshold);
         if (intersects) {
           intersectedElements.add(element.id);
         }

@@ -28,7 +28,7 @@ import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./shapes";
-import { getElementBounds } from "./bounds";
+import { type Bounds, doBoundsIntersect, getElementBounds } from "./bounds";
 import {
   hasBoundTextElement,
   isFreeDrawElement,
@@ -184,6 +184,21 @@ export const intersectElementWithLineSegment = (
   line: LineSegment<GlobalPoint>,
   offset: number = 0,
 ): GlobalPoint[] => {
+  // First check if the line intersects the element's axis-aligned bounding box
+  // as it is much faster than checking intersection against the element's shape
+  const intersectorBounds = [
+    Math.min(line[0][0] - offset, line[1][0] - offset),
+    Math.min(line[0][1] - offset, line[1][1] - offset),
+    Math.max(line[0][0] + offset, line[1][0] + offset),
+    Math.max(line[0][1] + offset, line[1][1] + offset),
+  ] as Bounds;
+  const elementBounds = getElementBounds(element, new Map());
+
+  if (!doBoundsIntersect(intersectorBounds, elementBounds)) {
+    return [];
+  }
+
+  // Do the actual intersection test against the element's shape
   switch (element.type) {
     case "rectangle":
     case "image":
