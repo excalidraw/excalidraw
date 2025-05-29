@@ -19,6 +19,7 @@ interface RabbitImageWindowProps {
     onImageDeselect: (image: any) => void;
     selectedImages: string[];
     onToggleVisibility: () => void;
+    onTabClick?: (tabName: string, tabIndex: number) => void;
     tabData: {
         name: string;
         images: {
@@ -27,6 +28,8 @@ interface RabbitImageWindowProps {
             alt: string;
             name: string;
         }[];
+        searchQuery?: string;  // Add this
+        loaded?: boolean; 
     }[];
 }
 
@@ -36,6 +39,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
     onImageDeselect,
     selectedImages,
     onToggleVisibility,
+    onTabClick,
     tabData,
 }) => {
     const [activeTab, setActiveTab] = useState(0);
@@ -48,6 +52,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
         window.addEventListener("mousemove", onMouseMove);
         window.addEventListener("mouseup", onMouseUp);
     };
+    
 
     const onMouseMove = (e: MouseEvent) => {
         if (!dragRef.current) return;
@@ -129,7 +134,13 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                 {tabData.map((tab, index) => (
                     <button
                         key={index}
-                        onClick={() => setActiveTab(index)}
+                         onClick={() => {
+            setActiveTab(index);
+            // Call the lazy loading function if provided
+            if (onTabClick) {
+                onTabClick(tab.name, index);
+            }
+        }}
                         style={{
                             flex: 1,
                             padding: "8px",

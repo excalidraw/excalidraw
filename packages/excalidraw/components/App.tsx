@@ -421,7 +421,7 @@ import {
   showHyperlinkTooltip,
   hideHyperlinkToolip,
   Hyperlink,
-} from "../components/hyperlink/Hyperlink";
+} from "./hyperlink/Hyperlink";
 
 import { Fonts } from "../fonts";
 import { editorJotaiStore, type WritableAtom } from "../editor-jotai";
@@ -446,7 +446,7 @@ import {
   resetCursor,
   setCursorForShape,
 } from "../cursor";
-import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
+import { ElementCanvasButtons } from "./ElementCanvasButtons";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";

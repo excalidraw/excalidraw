@@ -431,6 +431,8 @@ const ExcalidrawWrapper = () => {
   type TabData = {
     name: string;
     images: TabImage[];
+    searchQuery?: string;  
+    loaded?: boolean;      
   };
 
   const [isImageWindowVisible, setImageWindowVisible] = useState(false);
@@ -450,6 +452,60 @@ const ExcalidrawWrapper = () => {
   };
 
   const [errorMessage, setErrorMessage] = useState("");
+
+  
+
+
+const handleTabClick = async (tabName: string, tabIndex: number) => {
+  const currentTab = tabData[tabIndex];
+  
+  // Only load if not already loaded and has a search query
+  if (!currentTab.loaded && currentTab.searchQuery) {
+    console.log(`Loading ${tabName} results for "${currentTab.searchQuery}"`);
+    
+    try {
+      let newImages: ImageResult[] = [];
+      
+      if (tabName === "Pinterest") {
+        // Pinterest-specific search with siteRestrict = true
+        newImages = await searchAndSaveImages(currentTab.searchQuery, true);
+      } else if (tabName === "YouTube") {
+        // General search for now (you can add YouTube restriction later)
+        newImages = await searchAndSaveImages(currentTab.searchQuery, false);
+      }
+      
+      // Update the specific tab with results
+      const updatedTabs = [...tabData];
+      updatedTabs[tabIndex] = {
+        ...currentTab,
+        images: newImages.slice(0, 10).map((img: ImageResult, i: number) => ({
+          id: `${tabName.toLowerCase()}-${i}`,
+          src: img.link,
+          alt: `${tabName} Result ${i + 1}`,
+          name: `${tabName} ${i + 1}`,
+        })),
+        loaded: true // Mark as loaded
+      };
+      
+      setTabData(updatedTabs);
+      
+      excalidrawAPI?.setToast({
+        message: `${tabName} results loaded!`,
+        duration: 2000
+      });
+      
+    } catch (error) {
+      console.error(`Error loading ${tabName} results:`, error);
+      excalidrawAPI?.setToast({
+        message: `Error loading ${tabName} results. Please try again.`,
+        duration: 3000
+      });
+    }
+  }
+};
+
+
+
   const isCollabDisabled = isRunningInIframe();
 
 
@@ -1249,7 +1305,7 @@ const ExcalidrawWrapper = () => {
                         lastSearchQuery = searchQuery; // Update last search query
                         hasSearched = true;
 
-                        searchAndSaveImages(searchQuery)
+                        searchAndSaveImages(searchQuery, false)
                           .then((images: ImageResult[]) => {
                             const tabs = [
                               {
@@ -1260,15 +1316,14 @@ const ExcalidrawWrapper = () => {
                                   alt: `Google Result ${i + 1}`,
                                   name: `Google ${i + 1}`,
                                 })),
+                                loaded: true
                               },
                               {
                                 name: "Pinterest",
-                                images: images.slice(10, 20).map((img: ImageResult, i: number) => ({
-                                  id: `pinterest-${i}`,
-                                  src: img.link,
-                                  alt: `Pinterest Result ${i + 1}`,
-                                  name: `Pinterest ${i + 1}`,
-                                })),
+                                images: [], // Empty initially
+                                searchQuery: searchQuery, // Store query for later
+                                loaded: false // Mark as not loaded
+                              
                               },
                               {
                                 name: "YouTube",
@@ -1487,6 +1542,7 @@ const ExcalidrawWrapper = () => {
 
 
 
+
             {
               label: "Add Rabbit Image",
               category: DEFAULT_CATEGORIES.app,
@@ -1549,6 +1605,7 @@ const ExcalidrawWrapper = () => {
                   });
               },
             },
+            
             {
               label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
@@ -1752,6 +1809,7 @@ const ExcalidrawWrapper = () => {
           onImageSelect={handleImageSelect}
           onImageDeselect={handleImageDeselect}
           onToggleVisibility={() => setImageWindowVisible(false)}
+          onTabClick={handleTabClick}
           tabData={tabData}
         />
       )}
