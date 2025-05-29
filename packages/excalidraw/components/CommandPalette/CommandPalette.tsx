@@ -319,6 +319,7 @@ function CommandPaletteInner({
         actionManager.actions.toggleHandTool,
         actionManager.actions.setFrameAsActiveTool,
         actionManager.actions.toggleLassoTool,
+        actionManager.actions.setEmbeddableAsActiveTool,
       ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.tools));
 
       const editorCommands: CommandPaletteItem[] = [
