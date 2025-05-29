@@ -72,6 +72,8 @@ const ALLOWED_DOMAINS = new Set([
   "giphy.com",
   "reddit.com",
   "forms.microsoft.com",
+  "forms.gle",
+  "docs.google.com/forms",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -86,6 +88,8 @@ const ALLOW_SAME_ORIGIN = new Set([
   "stackblitz.com",
   "reddit.com",
   "forms.microsoft.com",
+  "forms.gle",
+  "docs.google.com",
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -335,13 +339,22 @@ const matchHostname = (
   allowedHostnames: Set<string> | string,
 ): string | null => {
   try {
-    const { hostname } = new URL(url);
+    const { hostname, pathname } = new URL(url);
 
     const bareDomain = hostname.replace(/^www\./, "");
 
     if (allowedHostnames instanceof Set) {
+      // Check for exact domain match
       if (ALLOWED_DOMAINS.has(bareDomain)) {
         return bareDomain;
+      }
+
+      // Check for path-based match (e.g., docs.google.com/forms)
+      const domainWithPath = `${bareDomain}${
+        pathname.split("/")[1] ? `/${pathname.split("/")[1]}` : ""
+      }`;
+      if (ALLOWED_DOMAINS.has(domainWithPath)) {
+        return domainWithPath;
       }
 
       const bareDomainWithFirstSubdomainWildcarded = bareDomain.replace(
@@ -399,6 +412,7 @@ export const embeddableURLValidator = (
   if (!url) {
     return false;
   }
+
   if (validateEmbeddable != null) {
     if (typeof validateEmbeddable === "function") {
       const ret = validateEmbeddable(url);
