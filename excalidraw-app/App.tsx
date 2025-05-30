@@ -546,17 +546,35 @@ const ExcalidrawWrapper = () => {
     try {
       const allColors: string[] = [];
       const colorThief = new ColorThief();
+      const imageColorArrays: string[][] = [];
 
+      // First, collect colors from all images
       for (const imageElement of selectedImages) {
-        const colors = await extractColorsFromImageElement(imageElement, colorThief, excalidrawAPI);
-        allColors.push(...colors);
+        try {
+          const colors = await extractColorsFromImageElement(imageElement, colorThief, excalidrawAPI);
+          imageColorArrays.push(colors);
+        } catch (error) {
+          console.warn(`Failed to extract colors from image ${imageElement.id}:`, error);
+        }
       }
 
-      const uniqueColors = [...new Set(allColors)];
-      const finalPalette = uniqueColors.slice(0, 5);
+      // Then, pick colors round-robin style (1 from each image, then repeat)
+      const finalPalette: string[] = [];
+      const maxColors = 5;
+      let colorIndex = 0;
 
-      console.log("Extracted colors:", finalPalette);
+      while (finalPalette.length < maxColors && colorIndex < 6) {
+        for (const imageColors of imageColorArrays) {
+          if (finalPalette.length >= maxColors) break;
 
+          if (imageColors[colorIndex] && !finalPalette.includes(imageColors[colorIndex])) {
+            finalPalette.push(imageColors[colorIndex]);
+          }
+        }
+        colorIndex++;
+      }
+
+      console.log("Extracted colors from multiple images:", finalPalette);
       // Create color palette element
       const colorPalette = newRabbitColorPalette({
         x: 100,
@@ -580,38 +598,71 @@ const ExcalidrawWrapper = () => {
         duration: 3000
       });
     }
-
-    // TODO: Add your color extraction logic here
     console.log("Images to process:", selectedImages);
   }, [excalidrawAPI]); // Don't forget the dependency array!
 
-  // Move useEffect to the top level, outside of useCallback
   useEffect(() => {
     (window as any).__handleColorPalette = handleColorPalette;
 
     return () => {
-      delete (window as any).__handleColorPalette; // Also fix this - was __handleRabbitSearch
+      delete (window as any).__handleColorPalette;
     };
   }, [handleColorPalette]);
 
-  // helper function for color palette
+  // processes multiple color extractions in parallel
+  async function extractColorsFromMultipleImages(
+    imageElements: any[],
+    colorThief: ColorThief,
+    excalidrawAPI: any
+  ): Promise<string[][]> {
+    const promises = imageElements.map(imageElement =>
+      extractColorsFromImageElement(imageElement, colorThief, excalidrawAPI)
+    );
+
+    const allColors = await Promise.all(promises);
+    return allColors;
+  }
+
   // Helper function to extract colors from an image element
   const extractColorsFromImageElement = async (
     imageElement: any,
     colorThief: ColorThief,
     excalidrawAPI: any
   ): Promise<string[]> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
+    const img = new Image();
+    img.crossOrigin = "anonymous";
 
+    // First, set up the image source
+    try {
+      if (imageElement.type === 'image') {
+        const files = excalidrawAPI.getFiles();
+        const file = files[imageElement.fileId];
+
+        console.log("data url", imageElement.dataURL);
+
+        if (file) {
+          if (file.dataURL) {
+            img.src = file.dataURL;
+            console.log("here");
+          }
+          else {
+            throw new Error('No image source found for image')
+          }
+        }
+      } else if (imageElement.type === 'rabbit-image') {
+        img.src = imageElement.imageUrl;
+      }
+    } catch (error) {
+      throw new Error('Failed to load rabbit image');
+    }
+
+    // Then wait for the image to load
+    return new Promise((resolve, reject) => {
       img.onload = () => {
         try {
-          // Get dominant color and palette
           const dominantColor = colorThief.getColor(img);
-          const palette = colorThief.getPalette(img, 5); // Get top 5 colors
+          const palette = colorThief.getPalette(img, 5);
 
-          // Convert RGB arrays to hex strings
           const hexColors = [dominantColor, ...palette].map(rgb =>
             '#' + rgb.map((x: number) => x.toString(16).padStart(2, '0')).join('')
           );
@@ -623,24 +674,8 @@ const ExcalidrawWrapper = () => {
       };
 
       img.onerror = () => reject(new Error('Failed to load image'));
-
-      // Get image URL from the element
-      if (imageElement.type === 'image') {
-        // For regular Excalidraw images
-        const files = excalidrawAPI.getFiles();
-        const file = files[imageElement.fileId];
-        if (file) {
-          img.src = URL.createObjectURL(file);
-        } else {
-          reject(new Error('Image file not found'));
-        }
-      } else if (imageElement.type === 'rabbit-image') {
-        // For rabbit images
-        img.src = imageElement.imageUrl;
-      }
     });
   };
-
 
   useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
