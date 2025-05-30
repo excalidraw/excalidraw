@@ -8,11 +8,7 @@ interface ImageItem {
     name?: string;
 }
 
-interface Tab {
-    name: string;
-    images: ImageItem[];
-}
-
+// properties of rabbit image window
 interface RabbitImageWindowProps {
     appState: AppState;
     onImageSelect: (image: any) => void;
@@ -39,7 +35,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
     tabData,
 }) => {
     const [activeTab, setActiveTab] = useState(0);
-    const [pos, setPos] = useState({ x: 0, y: 0 });
+    const [pos, setPos] = useState({ x: 1000, y: 160 });
     const dragRef = useRef<{ x: number; y: number } | null>(null);
 
     const onMouseDown = (e: React.MouseEvent) => {

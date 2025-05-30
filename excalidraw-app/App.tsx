@@ -42,7 +42,6 @@ import { t } from "@excalidraw/excalidraw/i18n";
 import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement, newRabbitColorPalette } from "@excalidraw/element/newRabbitElement";
 import ColorThief from 'colorthief'; // for color palette
 
-
 import {
   GithubIcon,
   XBrandIcon,
