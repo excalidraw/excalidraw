@@ -40,6 +40,8 @@ import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRef
 import { t } from "@excalidraw/excalidraw/i18n";
 
 import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement, newRabbitColorPalette } from "@excalidraw/element/newRabbitElement";
+import ColorThief from 'colorthief'; // for color palette
+
 
 import {
   GithubIcon,
@@ -436,9 +438,6 @@ const ExcalidrawWrapper = () => {
   const [isImageWindowVisible, setImageWindowVisible] = useState(false);
   const [tabData, setTabData] = useState<TabData[]>([]);
 
-
-
-
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   const handleImageSelect = (image: any) => {
@@ -512,6 +511,137 @@ const ExcalidrawWrapper = () => {
       forceRefresh((prev) => !prev);
     }
   }, [excalidrawAPI]);
+
+  // color palette handler for color palette button
+  const handleColorPalette = useCallback(async () => {
+    if (!excalidrawAPI) return;
+
+    // Get currently selected elements
+    const selectedElements = excalidrawAPI.getSceneElements().filter(
+      element => excalidrawAPI.getAppState().selectedElementIds[element.id]
+    );
+
+    // Check if selected elements are images or rabbit-images
+    const selectedImages = selectedElements.filter(
+      element => element.type === 'image' || element.type === 'rabbit-image'
+    );
+
+    console.log("Selected elements:", selectedElements.length);
+    console.log("Selected images:", selectedImages.length);
+
+    // if no images selected, error message
+    if (selectedImages.length === 0) {
+      excalidrawAPI.setToast({
+        message: "Please select at least one image",
+        duration: 3000
+      });
+      return;
+    }
+
+    // If images are selected, proceed with color extraction
+    excalidrawAPI.setToast({
+      message: `Generating color palette for \n${selectedImages.length} selected image(s)...`,
+      duration: 3000
+    });
+
+    try {
+      const allColors: string[] = [];
+      const colorThief = new ColorThief();
+
+      for (const imageElement of selectedImages) {
+        const colors = await extractColorsFromImageElement(imageElement, colorThief, excalidrawAPI);
+        allColors.push(...colors);
+      }
+
+      const uniqueColors = [...new Set(allColors)];
+      const finalPalette = uniqueColors.slice(0, 5);
+
+      console.log("Extracted colors:", finalPalette);
+
+      // Create color palette element
+      const colorPalette = newRabbitColorPalette({
+        x: 100,
+        y: 100,
+        colors: finalPalette
+      });
+
+      excalidrawAPI.updateScene({
+        elements: [...excalidrawAPI.getSceneElements(), colorPalette]
+      });
+
+      excalidrawAPI.setToast({
+        message: `Color palette created`,
+        duration: 3000
+      });
+
+    } catch (error) {
+      console.error("Error extracting colors:", error);
+      excalidrawAPI.setToast({
+        message: "Error extracting colors from images",
+        duration: 3000
+      });
+    }
+
+    // TODO: Add your color extraction logic here
+    console.log("Images to process:", selectedImages);
+  }, [excalidrawAPI]); // Don't forget the dependency array!
+
+  // Move useEffect to the top level, outside of useCallback
+  useEffect(() => {
+    (window as any).__handleColorPalette = handleColorPalette;
+
+    return () => {
+      delete (window as any).__handleColorPalette; // Also fix this - was __handleRabbitSearch
+    };
+  }, [handleColorPalette]);
+
+  // helper function for color palette
+  // Helper function to extract colors from an image element
+  const extractColorsFromImageElement = async (
+    imageElement: any,
+    colorThief: ColorThief,
+    excalidrawAPI: any
+  ): Promise<string[]> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+
+      img.onload = () => {
+        try {
+          // Get dominant color and palette
+          const dominantColor = colorThief.getColor(img);
+          const palette = colorThief.getPalette(img, 5); // Get top 5 colors
+
+          // Convert RGB arrays to hex strings
+          const hexColors = [dominantColor, ...palette].map(rgb =>
+            '#' + rgb.map((x: number) => x.toString(16).padStart(2, '0')).join('')
+          );
+
+          resolve(hexColors);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      img.onerror = () => reject(new Error('Failed to load image'));
+
+      // Get image URL from the element
+      if (imageElement.type === 'image') {
+        // For regular Excalidraw images
+        const files = excalidrawAPI.getFiles();
+        const file = files[imageElement.fileId];
+        if (file) {
+          img.src = URL.createObjectURL(file);
+        } else {
+          reject(new Error('Image file not found'));
+        }
+      } else if (imageElement.type === 'rabbit-image') {
+        // For rabbit images
+        img.src = imageElement.imageUrl;
+      }
+    });
+  };
+
 
   useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
@@ -931,9 +1061,9 @@ const ExcalidrawWrapper = () => {
         }}
       >
         <img
-          src="https://i.imgur.com/KttcKbd.png"
+          src="https://imgur.com/KttcKbd"
           alt="logo"
-          style={{ height: 28, marginRight: 12 }}
+          style={{ height: 30, marginRight: 10 }}
         />
         <input
           type="text"
