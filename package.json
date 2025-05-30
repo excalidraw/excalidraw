@@ -82,7 +82,8 @@
     "clean-install": "yarn rm:node_modules && yarn install"
   },
   "resolutions": {
-    "strip-ansi": "6.0.1"
+    "strip-ansi": "6.0.1",
+    "vite": "5.4.19"
   },
   "dependencies": {
     "@google/genai": "1.0.1"
