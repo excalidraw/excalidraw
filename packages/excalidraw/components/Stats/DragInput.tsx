@@ -11,7 +11,7 @@ import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
 
-import { useApp } from "../App";
+import { useApp, useExcalidrawSetAppState } from "../App";
 import { InlineIcon } from "../InlineIcon";
 
 import { SMALLEST_DELTA } from "./utils";
@@ -36,6 +36,8 @@ export type DragInputCallbackType<
   property: P;
   originalAppState: AppState;
   setInputValue: (value: number) => void;
+  app: ReturnType<typeof useApp>;
+  setAppState: ReturnType<typeof useExcalidrawSetAppState>;
 }) => void;
 
 interface StatsDragInputProps<
@@ -73,6 +75,7 @@ const StatsDragInput = <
   sensitivity = 1,
 }: StatsDragInputProps<T, E>) => {
   const app = useApp();
+  const setAppState = useExcalidrawSetAppState();
   const inputRef = useRef<HTMLInputElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
 
@@ -137,6 +140,8 @@ const StatsDragInput = <
         property,
         originalAppState: appState,
         setInputValue: (value) => setInputValue(String(value)),
+        app,
+        setAppState,
       });
       app.syncActionResult({
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -263,6 +268,8 @@ const StatsDragInput = <
                       scene,
                       originalAppState,
                       setInputValue: (value) => setInputValue(String(value)),
+                      app,
+                      setAppState,
                     });
 
                     stepChange = 0;
@@ -285,6 +292,11 @@ const StatsDragInput = <
 
               app.syncActionResult({
                 captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+              });
+
+              // Clear frame highlighting
+              setAppState({
+                elementsToHighlight: null,
               });
 
               lastPointer = null;
@@ -341,6 +353,11 @@ const StatsDragInput = <
           stateRef.current.originalAppState = cloneJSON(appState);
         }}
         onBlur={(event) => {
+          // Clear frame highlighting when input loses focus
+          setAppState({
+            elementsToHighlight: null,
+          });
+
           if (!inputValue) {
             setInputValue(value.toString());
           } else if (editable) {
