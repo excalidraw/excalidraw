@@ -446,6 +446,98 @@ const ExcalidrawWrapper = () => {
   const handleImageDeselect = (image: any) => {
     setSelectedImages((prev) => prev.filter((id) => id !== image.id));
   };
+  
+const handleAddToCanvas = async (selectedImageIds: string[]) => {
+  if (!excalidrawAPI) return;
+
+  const selectedImageData = selectedImageIds
+    .map(id => {
+      for (const tab of tabData) {
+        const image = tab.images.find(img => img.id === id);
+        if (image) return image;
+      }
+      return null;
+    })
+    .filter((imageData): imageData is NonNullable<typeof imageData> => imageData !== null);
+
+  const MAX_WIDTH = 200;
+  const MAX_HEIGHT = 200;
+  const MARGIN = 30; // Space between images
+  const START_X = 100; // Starting X position
+  const START_Y = 100; // Starting Y position
+
+  // Calculate grid layout
+  const imageCount = selectedImageData.length;
+  const cols = Math.ceil(Math.sqrt(imageCount)); // Auto-calculate columns for square-ish grid
+  const rows = Math.ceil(imageCount / cols);
+
+  const elementsWithDimensions = await Promise.all(
+    selectedImageData.map((imageData, index) => {
+      return new Promise<any>((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          let scaledWidth = img.width;
+          let scaledHeight = img.height;
+
+          // Scale down if width is too large
+          if (scaledWidth > MAX_WIDTH) {
+            const ratio = MAX_WIDTH / scaledWidth;
+            scaledWidth = MAX_WIDTH;
+            scaledHeight = scaledHeight * ratio;
+          }
+
+          // Scale down further if height is still too large
+          if (scaledHeight > MAX_HEIGHT) {
+            const ratio = MAX_HEIGHT / scaledHeight;
+            scaledHeight = MAX_HEIGHT;
+            scaledWidth = scaledWidth * ratio;
+          }
+
+          // Calculate grid position
+          const col = index % cols;
+          const row = Math.floor(index / cols);
+          
+          // Calculate position with consistent spacing
+          const x = START_X + col * (MAX_WIDTH + MARGIN);
+          const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+          const element = newRabbitImageElement({
+            x: x,
+            y: y,
+            imageUrl: imageData.src,
+            width: scaledWidth,
+            height: scaledHeight,
+          });
+          resolve(element);
+        };
+        
+        img.onerror = () => {
+          const col = index % cols;
+          const row = Math.floor(index / cols);
+          const x = START_X + col * (MAX_WIDTH + MARGIN);
+          const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+          const element = newRabbitImageElement({
+            x: x,
+            y: y,
+            imageUrl: imageData.src,
+            width: MAX_WIDTH,
+            height: MAX_HEIGHT,
+          });
+          resolve(element);
+        };
+        
+        img.src = imageData.src;
+      });
+    })
+  );
+
+  excalidrawAPI.updateScene({
+    elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
+  });
+
+  setSelectedImages([]);
+};
 
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
@@ -1929,6 +2021,7 @@ const ExcalidrawWrapper = () => {
           onImageSelect={handleImageSelect}
           onImageDeselect={handleImageDeselect}
           onToggleVisibility={() => setImageWindowVisible(false)}
+          onAddToCanvas={handleAddToCanvas}
           tabData={tabData}
         />
       )}

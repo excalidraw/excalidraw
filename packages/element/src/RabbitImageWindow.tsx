@@ -15,6 +15,7 @@ interface RabbitImageWindowProps {
     onImageDeselect: (image: any) => void;
     selectedImages: string[];
     onToggleVisibility: () => void;
+    onAddToCanvas: (selectedImages: string[]) => void;
     tabData: {
         name: string;
         images: {
@@ -32,6 +33,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
     onImageDeselect,
     selectedImages,
     onToggleVisibility,
+    onAddToCanvas,
     tabData,
 }) => {
     const [activeTab, setActiveTab] = useState(0);
@@ -225,8 +227,8 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
 
                     <button
                         onClick={() => {
-                            // Add your submit logic here
-                            console.log('Submitting images:', selectedImages);
+                            // calls onAddToCanvas function in App.tsx which generates rabbit-images
+                            onAddToCanvas(selectedImages);
                         }}
                         style={{
                             background: "rgb(107, 176, 229)",
@@ -264,11 +266,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                         Add to Canvas
                     </button>
                 </div>
-
-
             )}
-
-
         </div>
     );
 };
