@@ -110,15 +110,14 @@ describe("contextMenu element", () => {
 
   it("shows context menu for element", () => {
     UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 30,
-      clientY: 30,
+      clientX: 3,
+      clientY: 3,
     });
-
     const contextMenu = UI.queryContextMenu();
     const contextMenuOptions =
       contextMenu?.querySelectorAll(".context-menu li");
@@ -305,12 +304,12 @@ describe("contextMenu element", () => {
 
   it("selecting 'Copy styles' in context menu copies styles", () => {
     UI.clickTool("rectangle");
-    mouse.down(13, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 13,
+      clientX: 3,
       clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
@@ -390,12 +389,12 @@ describe("contextMenu element", () => {
 
   it("selecting 'Delete' in context menu deletes element", () => {
     UI.clickTool("rectangle");
-    mouse.down(13, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 13,
+      clientX: 3,
       clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
@@ -406,12 +405,12 @@ describe("contextMenu element", () => {
 
   it("selecting 'Add to library' in context menu adds element to library", async () => {
     UI.clickTool("rectangle");
-    mouse.down(13, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 13,
+      clientX: 3,
       clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
@@ -425,12 +424,12 @@ describe("contextMenu element", () => {
 
   it("selecting 'Duplicate' in context menu duplicates element", () => {
     UI.clickTool("rectangle");
-    mouse.down(13, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 13,
+      clientX: 3,
       clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
