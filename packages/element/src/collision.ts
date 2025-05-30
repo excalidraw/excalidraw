@@ -28,7 +28,12 @@ import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./shapes";
-import { type Bounds, doBoundsIntersect, getElementBounds } from "./bounds";
+import {
+  type Bounds,
+  doBoundsIntersect,
+  ElementBounds,
+  getElementBounds,
+} from "./bounds";
 import {
   hasBoundTextElement,
   isFreeDrawElement,
@@ -86,6 +91,7 @@ export type HitTestArgs = {
   element: ExcalidrawElement;
   threshold: number;
   frameNameBound?: FrameNameBounds | null;
+  onlySelection?: boolean;
 };
 
 export const hitElementItself = ({
@@ -93,22 +99,41 @@ export const hitElementItself = ({
   element,
   threshold,
   frameNameBound = null,
+  onlySelection = false,
 }: HitTestArgs) => {
-  // First check if the element is in the bounding box because it's MUCH faster
-  // than checking if the point is in the element's shape
-  let hit = hitElementBoundingBox(
-    point,
-    element,
+  const bounds = ElementBounds.calculateBounds(
+    { ...element, angle: 0 } as ExcalidrawElement,
     arrayToMap([element]),
-    threshold,
-  )
-    ? shouldTestInside(element)
-      ? // Since `inShape` tests STRICTLY againt the insides of a shape
-        // we would need `onShape` as well to include the "borders"
-        isPointInElement(point, element) ||
-        isPointOnElementOutline(point, element, threshold)
-      : isPointOnElementOutline(point, element, threshold)
-    : false;
+  );
+  const rotatedPoint = pointRotateRads(
+    point,
+    elementCenterPoint(element),
+    -element.angle as Radians,
+  );
+  let hit = isPointWithinBounds(
+    pointFrom(bounds[0], bounds[1]),
+    rotatedPoint,
+    pointFrom(bounds[2], bounds[3]),
+  );
+
+  if (!hit) {
+    // Optimization: Bail out early if the point is not even in the
+    // rotated bounding box
+    return false;
+  }
+
+  if (onlySelection) {
+    // If this is the only selected element, allow successful hit test
+    // within the selection box because of user convenience
+    return true;
+  }
+
+  hit = shouldTestInside(element)
+    ? // Since `inShape` tests STRICTLY againt the insides of a shape
+      // we would need `onShape` as well to include the "borders"
+      isPointInElement(point, element) ||
+      isPointOnElementOutline(point, element, threshold)
+    : isPointOnElementOutline(point, element, threshold);
 
   // hit test against a frame's name
   if (!hit && frameNameBound) {

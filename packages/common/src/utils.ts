@@ -1,4 +1,5 @@
 import { average, pointFrom, type GlobalPoint } from "@excalidraw/math";
+import { getCenterForBounds, getElementBounds } from "@excalidraw/element";
 
 import type {
   ExcalidrawBindableElement,
@@ -1243,13 +1244,11 @@ export const elementCenterPoint = (
   xOffset: number = 0,
   yOffset: number = 0,
 ) => {
-  const { x, y, width, height } = element;
+  const [x, y] = getCenterForBounds(
+    getElementBounds(element, arrayToMap([element])),
+  );
 
-  const centerXPoint = x + width / 2 + xOffset;
-
-  const centerYPoint = y + height / 2 + yOffset;
-
-  return pointFrom<GlobalPoint>(centerXPoint, centerYPoint);
+  return pointFrom<GlobalPoint>(x + xOffset, y + yOffset);
 };
 
 /** hack for Array.isArray type guard not working with readonly value[] */

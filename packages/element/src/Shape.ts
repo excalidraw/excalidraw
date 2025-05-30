@@ -10,7 +10,7 @@ import { ROUGHNESS, isTransparent, assertNever } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
 
-import type { GlobalPoint, Radians } from "@excalidraw/math";
+import type { GlobalPoint } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
@@ -30,9 +30,10 @@ import { headingForPointIsHorizontal } from "./heading";
 import { canChangeRoundness } from "./comparisons";
 import { generateFreeDrawShape } from "./renderElement";
 import {
+  ElementBounds,
   getArrowheadPoints,
+  getCenterForBounds,
   getDiamondPoints,
-  getElementBounds,
 } from "./bounds";
 
 import type {
@@ -327,6 +328,9 @@ export const generateLinearCollisionShape = (
     roughness: 0,
     preserveVertices: true,
   };
+  const center = getCenterForBounds(
+    ElementBounds.calculateBounds(element, new Map()),
+  );
 
   switch (element.type) {
     case "line":
@@ -336,14 +340,6 @@ export const generateLinearCollisionShape = (
       const points = element.points.length
         ? element.points
         : [pointFrom<LocalPoint>(0, 0)];
-      const [x1, y1, x2, y2] = getElementBounds(
-        {
-          ...element,
-          angle: 0 as Radians,
-        },
-        new Map(),
-      );
-      const center = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
 
       if (isElbowArrow(element)) {
         return generator.path(generateElbowArrowShape(points, 16), options)
@@ -366,7 +362,7 @@ export const generateLinearCollisionShape = (
       return generator
         .curve(points as unknown as RoughPoint[], options)
         .sets[0].ops.slice(0, element.points.length)
-        .map((op, i, arr) => {
+        .map((op, i) => {
           if (i === 0) {
             const p = pointRotateRads<GlobalPoint>(
               pointFrom<GlobalPoint>(
@@ -430,7 +426,58 @@ export const generateLinearCollisionShape = (
 
       return generator
         .curve(simplifiedPoints as [number, number][], options)
-        .sets[0].ops.slice(0, element.points.length);
+        .sets[0].ops.slice(0, element.points.length)
+        .map((op, i) => {
+          if (i === 0) {
+            const p = pointRotateRads<GlobalPoint>(
+              pointFrom<GlobalPoint>(
+                element.x + op.data[0],
+                element.y + op.data[1],
+              ),
+              center,
+              element.angle,
+            );
+
+            return {
+              op: "move",
+              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+            };
+          }
+
+          return {
+            op: "bcurveTo",
+            data: [
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[0],
+                  element.y + op.data[1],
+                ),
+                center,
+                element.angle,
+              ),
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[2],
+                  element.y + op.data[3],
+                ),
+                center,
+                element.angle,
+              ),
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[4],
+                  element.y + op.data[5],
+                ),
+                center,
+                element.angle,
+              ),
+            ]
+              .map((p) =>
+                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+              )
+              .flat(),
+          };
+        });
     }
   }
 };

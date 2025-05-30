@@ -5033,6 +5033,7 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
+  // NOTE: Hot path for hit testing, so avoid unnecessary computations
   private getElementAtPosition(
     x: number,
     y: number,
@@ -5080,6 +5081,8 @@ class App extends React.Component<AppProps, AppState> {
         frameNameBound: isFrameLikeElement(elementWithHighestZIndex)
           ? this.frameNameBoundsCache.get(elementWithHighestZIndex)
           : null,
+        onlySelection:
+          elementWithHighestZIndex.id in this.state.selectedElementIds,
       })
         ? elementWithHighestZIndex
         : allHitElements[allHitElements.length - 2];
@@ -5091,6 +5094,7 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
+  // NOTE: Hot path for hit testing, so avoid unnecessary computations
   private getElementsAtPosition(
     x: number,
     y: number,
@@ -5177,6 +5181,8 @@ class App extends React.Component<AppProps, AppState> {
       return true;
     }
 
+    const selectedElementIds = Object.keys(this.state.selectedElementIds);
+
     return hitElementItself({
       point: pointFrom(x, y),
       element,
@@ -5184,6 +5190,8 @@ class App extends React.Component<AppProps, AppState> {
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
         : null,
+      onlySelection:
+        selectedElementIds.length === 1 && element.id === selectedElementIds[0],
     });
   }
 
