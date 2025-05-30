@@ -3,15 +3,17 @@ import { simplify } from "points-on-curve";
 import {
   polygonFromPoints,
   lineSegment,
-  lineSegmentIntersectionPoints,
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
-import type {
-  ElementsSegmentsMap,
-  GlobalPoint,
-  LineSegment,
-} from "@excalidraw/math/types";
+import {
+  type Bounds,
+  doBoundsIntersect,
+  getElementBounds,
+  intersectElementWithLineSegment,
+} from "@excalidraw/element";
+
+import type { ElementsSegmentsMap, GlobalPoint } from "@excalidraw/math/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 export const getLassoSelectedElementIds = (input: {
@@ -21,6 +23,7 @@ export const getLassoSelectedElementIds = (input: {
   intersectedElements: Set<ExcalidrawElement["id"]>;
   enclosedElements: Set<ExcalidrawElement["id"]>;
   simplifyDistance?: number;
+  getElementThreshold: (element: ExcalidrawElement) => number;
 }): {
   selectedElementIds: string[];
 } => {
@@ -31,6 +34,7 @@ export const getLassoSelectedElementIds = (input: {
     intersectedElements,
     enclosedElements,
     simplifyDistance,
+    getElementThreshold,
   } = input;
   // simplify the path to reduce the number of points
   let path: GlobalPoint[] = lassoPath;
@@ -40,8 +44,32 @@ export const getLassoSelectedElementIds = (input: {
   const unlockedElements = elements.filter((el) => !el.locked);
   // as the path might not enclose a shape anymore, clear before checking
   enclosedElements.clear();
+  const lassoBounds = lassoPath.reduce(
+    (acc, item) => {
+      return [
+        Math.min(acc[0], item[0]),
+        Math.min(acc[1], item[1]),
+        Math.max(acc[2], item[0]),
+        Math.max(acc[3], item[1]),
+      ];
+    },
+    [-Infinity, -Infinity, Infinity, Infinity],
+  ) as Bounds;
   for (const element of unlockedElements) {
+    const threshold = getElementThreshold(element);
+    // First check if the lasso segment intersects the element's axis-aligned
+    // bounding box as it is much faster than checking intersection against
+    // the element's shape
+    const snugElementBounds = getElementBounds(element, new Map());
+    const elementBounds = [
+      snugElementBounds[0] - threshold,
+      snugElementBounds[1] - threshold,
+      snugElementBounds[2] + threshold,
+      snugElementBounds[3] + threshold,
+    ] as Bounds;
+
     if (
+      doBoundsIntersect(lassoBounds, elementBounds) &&
       !intersectedElements.has(element.id) &&
       !enclosedElements.has(element.id)
     ) {
@@ -49,7 +77,7 @@ export const getLassoSelectedElementIds = (input: {
       if (enclosed) {
         enclosedElements.add(element.id);
       } else {
-        const intersects = intersectionTest(path, element, elementsSegments);
+        const intersects = intersectionTest(path, element, threshold);
         if (intersects) {
           intersectedElements.add(element.id);
         }
@@ -85,26 +113,16 @@ const enclosureTest = (
 const intersectionTest = (
   lassoPath: GlobalPoint[],
   element: ExcalidrawElement,
-  elementsSegments: ElementsSegmentsMap,
+  hitThreshold: number,
 ): boolean => {
-  const elementSegments = elementsSegments.get(element.id);
-  if (!elementSegments) {
-    return false;
-  }
+  const lassoSegments = lassoPath
+    .slice(1)
+    .map((point: GlobalPoint, index) => lineSegment(lassoPath[index], point))
+    .concat([lineSegment(lassoPath[lassoPath.length - 1], lassoPath[0])]);
 
-  const lassoSegments = lassoPath.reduce((acc, point, index) => {
-    if (index === 0) {
-      return acc;
-    }
-    acc.push(lineSegment(lassoPath[index - 1], point));
-    return acc;
-  }, [] as LineSegment<GlobalPoint>[]);
-
-  return lassoSegments.some((lassoSegment) =>
-    elementSegments.some(
-      (elementSegment) =>
-        // introduce a bit of tolerance to account for roughness and simplification of paths
-        lineSegmentIntersectionPoints(lassoSegment, elementSegment, 1) !== null,
-    ),
+  return lassoSegments.some(
+    (lassoSegment) =>
+      intersectElementWithLineSegment(element, lassoSegment, hitThreshold)
+        .length > 0,
   );
 };

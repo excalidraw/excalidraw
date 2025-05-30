@@ -125,7 +125,7 @@ export class ElementBounds {
     return bounds;
   }
 
-  private static calculateBounds(
+  static calculateBounds(
     element: ExcalidrawElement,
     elementsMap: ElementsMap,
   ): Bounds {

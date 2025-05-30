@@ -1,52 +1,66 @@
-import { isTransparent, elementCenterPoint } from "@excalidraw/common";
+import {
+  isTransparent,
+  elementCenterPoint,
+  arrayToMap,
+} from "@excalidraw/common";
 import {
   curveIntersectLineSegment,
   isPointWithinBounds,
-  line,
   lineSegment,
   lineSegmentIntersectionPoints,
+  pointDistanceSq,
   pointFrom,
+  pointFromVector,
   pointRotateRads,
   pointsEqual,
+  vectorFromPoint,
+  vectorNormalize,
+  vectorScale,
 } from "@excalidraw/math";
 
 import {
   ellipse,
-  ellipseLineIntersectionPoints,
+  ellipseSegmentInterceptPoints,
 } from "@excalidraw/math/ellipse";
 
-import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
-import { type GeometricShape, getPolygonShape } from "@excalidraw/utils/shape";
-
-import type {
-  GlobalPoint,
-  LineSegment,
-  LocalPoint,
-  Polygon,
-  Radians,
-} from "@excalidraw/math";
+import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
 
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
-import { getBoundTextShape, isPathALoop } from "./shapes";
-import { getElementBounds } from "./bounds";
+import { isPathALoop } from "./shapes";
+import {
+  type Bounds,
+  doBoundsIntersect,
+  ElementBounds,
+  getElementBounds,
+} from "./bounds";
 import {
   hasBoundTextElement,
+  isFreeDrawElement,
   isIframeLikeElement,
   isImageElement,
+  isLinearElement,
   isTextElement,
 } from "./typeChecks";
 import {
   deconstructDiamondElement,
+  deconstructLinearOrFreeDrawElement,
   deconstructRectanguloidElement,
 } from "./utils";
+
+import { getBoundTextElement } from "./textElement";
+
+import { LinearElementEditor } from "./linearElementEditor";
+
+import { distanceToElement } from "./distance";
 
 import type {
   ElementsMap,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
-  ExcalidrawRectangleElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
 
@@ -72,45 +86,69 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
   return isDraggableFromInside || isImageElement(element);
 };
 
-export type HitTestArgs<Point extends GlobalPoint | LocalPoint> = {
-  x: number;
-  y: number;
+export type HitTestArgs = {
+  point: GlobalPoint;
   element: ExcalidrawElement;
-  shape: GeometricShape<Point>;
-  threshold?: number;
+  threshold: number;
   frameNameBound?: FrameNameBounds | null;
+  onlySelection?: boolean;
 };
 
-export const hitElementItself = <Point extends GlobalPoint | LocalPoint>({
-  x,
-  y,
+export const hitElementItself = ({
+  point,
   element,
-  shape,
-  threshold = 10,
+  threshold,
   frameNameBound = null,
-}: HitTestArgs<Point>) => {
-  let hit = shouldTestInside(element)
+  onlySelection = false,
+}: HitTestArgs) => {
+  const bounds = ElementBounds.calculateBounds(
+    { ...element, angle: 0 } as ExcalidrawElement,
+    arrayToMap([element]),
+  );
+  const rotatedPoint = pointRotateRads(
+    point,
+    elementCenterPoint(element),
+    -element.angle as Radians,
+  );
+  let hit = isPointWithinBounds(
+    pointFrom(bounds[0] - 1, bounds[1] - 1),
+    rotatedPoint,
+    pointFrom(bounds[2] + 1, bounds[3] + 1),
+  );
+
+  if (!hit) {
+    // Optimization: Bail out early if the point is not even in the
+    // rotated bounding box
+    return false;
+  }
+
+  if (onlySelection) {
+    // If this is the only selected element, allow successful hit test
+    // within the selection box because of user convenience
+    return true;
+  }
+
+  hit = shouldTestInside(element)
     ? // Since `inShape` tests STRICTLY againt the insides of a shape
       // we would need `onShape` as well to include the "borders"
-      isPointInShape(pointFrom(x, y), shape) ||
-      isPointOnShape(pointFrom(x, y), shape, threshold)
-    : isPointOnShape(pointFrom(x, y), shape, threshold);
+      isPointInElement(point, element) ||
+      isPointOnElementOutline(point, element, threshold)
+    : isPointOnElementOutline(point, element, threshold);
 
   // hit test against a frame's name
   if (!hit && frameNameBound) {
-    hit = isPointInShape(pointFrom(x, y), {
-      type: "polygon",
-      data: getPolygonShape(frameNameBound as ExcalidrawRectangleElement)
-        .data as Polygon<Point>,
-    });
+    const x1 = frameNameBound.x - threshold;
+    const y1 = frameNameBound.y - threshold;
+    const x2 = frameNameBound.x + frameNameBound.width + threshold;
+    const y2 = frameNameBound.y + frameNameBound.height + threshold;
+    hit = isPointWithinBounds(pointFrom(x1, y1), point, pointFrom(x2, y2));
   }
 
   return hit;
 };
 
 export const hitElementBoundingBox = (
-  x: number,
-  y: number,
+  point: GlobalPoint,
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
   tolerance = 0,
@@ -120,37 +158,42 @@ export const hitElementBoundingBox = (
   y1 -= tolerance;
   x2 += tolerance;
   y2 += tolerance;
-  return isPointWithinBounds(
-    pointFrom(x1, y1),
-    pointFrom(x, y),
-    pointFrom(x2, y2),
-  );
+  return isPointWithinBounds(pointFrom(x1, y1), point, pointFrom(x2, y2));
 };
 
-export const hitElementBoundingBoxOnly = <
-  Point extends GlobalPoint | LocalPoint,
->(
-  hitArgs: HitTestArgs<Point>,
+export const hitElementBoundingBoxOnly = (
+  hitArgs: HitTestArgs,
   elementsMap: ElementsMap,
-) => {
-  return (
-    !hitElementItself(hitArgs) &&
-    // bound text is considered part of the element (even if it's outside the bounding box)
-    !hitElementBoundText(
-      hitArgs.x,
-      hitArgs.y,
-      getBoundTextShape(hitArgs.element, elementsMap),
-    ) &&
-    hitElementBoundingBox(hitArgs.x, hitArgs.y, hitArgs.element, elementsMap)
-  );
-};
+) =>
+  !hitElementItself(hitArgs) &&
+  // bound text is considered part of the element (even if it's outside the bounding box)
+  !hitElementBoundText(hitArgs.point, hitArgs.element, elementsMap) &&
+  hitElementBoundingBox(hitArgs.point, hitArgs.element, elementsMap);
 
-export const hitElementBoundText = <Point extends GlobalPoint | LocalPoint>(
-  x: number,
-  y: number,
-  textShape: GeometricShape<Point> | null,
+export const hitElementBoundText = (
+  point: GlobalPoint,
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
 ): boolean => {
-  return !!textShape && isPointInShape(pointFrom(x, y), textShape);
+  const boundTextElementCandidate = getBoundTextElement(element, elementsMap);
+
+  if (!boundTextElementCandidate) {
+    return false;
+  }
+  const boundTextElement = isLinearElement(element)
+    ? {
+        ...boundTextElementCandidate,
+        // arrow's bound text accurate position is not stored in the element's property
+        // but rather calculated and returned from the following static method
+        ...LinearElementEditor.getBoundTextElementPosition(
+          element,
+          boundTextElementCandidate,
+          elementsMap,
+        ),
+      }
+    : boundTextElementCandidate;
+
+  return isPointInElement(point, boundTextElement);
 };
 
 /**
@@ -166,6 +209,21 @@ export const intersectElementWithLineSegment = (
   line: LineSegment<GlobalPoint>,
   offset: number = 0,
 ): GlobalPoint[] => {
+  // First check if the line intersects the element's axis-aligned bounding box
+  // as it is much faster than checking intersection against the element's shape
+  const intersectorBounds = [
+    Math.min(line[0][0] - offset, line[1][0] - offset),
+    Math.min(line[0][1] - offset, line[1][1] - offset),
+    Math.max(line[0][0] + offset, line[1][0] + offset),
+    Math.max(line[0][1] + offset, line[1][1] + offset),
+  ] as Bounds;
+  const elementBounds = getElementBounds(element, new Map());
+
+  if (!doBoundsIntersect(intersectorBounds, elementBounds)) {
+    return [];
+  }
+
+  // Do the actual intersection test against the element's shape
   switch (element.type) {
     case "rectangle":
     case "image":
@@ -173,15 +231,31 @@ export const intersectElementWithLineSegment = (
     case "iframe":
     case "embeddable":
     case "frame":
+    case "selection":
     case "magicframe":
       return intersectRectanguloidWithLineSegment(element, line, offset);
     case "diamond":
       return intersectDiamondWithLineSegment(element, line, offset);
     case "ellipse":
       return intersectEllipseWithLineSegment(element, line, offset);
-    default:
-      throw new Error(`Unimplemented element type '${element.type}'`);
+    case "line":
+    case "freedraw":
+    case "arrow":
+      return intersectLinearOrFreeDrawWithLineSegment(element, line);
   }
+};
+
+const intersectLinearOrFreeDrawWithLineSegment = (
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  segment: LineSegment<GlobalPoint>,
+): GlobalPoint[] => {
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+  return [
+    ...lines
+      .map((l) => lineSegmentIntersectionPoints(l, segment))
+      .filter((p): p is GlobalPoint => p != null),
+    ...curves.flatMap((c) => curveIntersectLineSegment(c, segment)),
+  ].sort(pointDistanceSq);
 };
 
 const intersectRectanguloidWithLineSegment = (
@@ -301,8 +375,46 @@ const intersectEllipseWithLineSegment = (
   const rotatedA = pointRotateRads(l[0], center, -element.angle as Radians);
   const rotatedB = pointRotateRads(l[1], center, -element.angle as Radians);
 
-  return ellipseLineIntersectionPoints(
+  return ellipseSegmentInterceptPoints(
     ellipse(center, element.width / 2 + offset, element.height / 2 + offset),
-    line(rotatedA, rotatedB),
+    lineSegment(rotatedA, rotatedB),
   ).map((p) => pointRotateRads(p, center, element.angle));
+};
+
+// check if the given point is considered on the given shape's border
+const isPointOnElementOutline = (
+  point: GlobalPoint,
+  element: ExcalidrawElement,
+  tolerance = 1,
+) => distanceToElement(element, point) <= tolerance;
+
+// check if the given point is considered inside the element's border
+export const isPointInElement = (
+  point: GlobalPoint,
+  element: ExcalidrawElement,
+) => {
+  if (
+    (isLinearElement(element) || isFreeDrawElement(element)) &&
+    !isPathALoop(element.points)
+  ) {
+    // There isn't any "inside" for a non-looping path
+    return false;
+  }
+
+  const [x1, y1, x2, y2] = getElementBounds(element, new Map());
+  const center = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
+  const otherPoint = pointFromVector(
+    vectorScale(
+      vectorNormalize(vectorFromPoint(point, center, 0.1)),
+      Math.max(element.width, element.height) * 2,
+    ),
+    center,
+  );
+  const intersector = lineSegment(point, otherPoint);
+  const intersections = intersectElementWithLineSegment(
+    element,
+    intersector,
+  ).filter((p, pos, arr) => arr.findIndex((q) => pointsEqual(q, p)) === pos);
+
+  return intersections.length % 2 === 1;
 };

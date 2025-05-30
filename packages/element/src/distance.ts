@@ -12,21 +12,25 @@ import type { GlobalPoint, Radians } from "@excalidraw/math";
 
 import {
   deconstructDiamondElement,
+  deconstructLinearOrFreeDrawElement,
   deconstructRectanguloidElement,
 } from "./utils";
 
 import type {
-  ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
+  ExcalidrawElement,
   ExcalidrawEllipseElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
 
-export const distanceToBindableElement = (
-  element: ExcalidrawBindableElement,
+export const distanceToElement = (
+  element: ExcalidrawElement,
   p: GlobalPoint,
 ): number => {
   switch (element.type) {
+    case "selection":
     case "rectangle":
     case "image":
     case "text":
@@ -39,6 +43,10 @@ export const distanceToBindableElement = (
       return distanceToDiamondElement(element, p);
     case "ellipse":
       return distanceToEllipseElement(element, p);
+    case "line":
+    case "arrow":
+    case "freedraw":
+      return distanceToLinearOrFreeDraElement(element, p);
   }
 };
 
@@ -115,5 +123,16 @@ const distanceToEllipseElement = (
     // Instead of rotating the ellipse, rotate the point to the inverse angle
     pointRotateRads(p, center, -element.angle as Radians),
     ellipse(center, element.width / 2, element.height / 2),
+  );
+};
+
+const distanceToLinearOrFreeDraElement = (
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  p: GlobalPoint,
+) => {
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+  return Math.min(
+    ...lines.map((s) => distanceToLineSegment(p, s)),
+    ...curves.map((a) => curvePointDistance(a, p)),
   );
 };
