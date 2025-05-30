@@ -419,6 +419,7 @@ const ExcalidrawWrapper = () => {
   type ImageResult = {
     link: string;
     title?: string;
+    snippet?: string; 
   };
 
   type TabImage = {
@@ -431,6 +432,8 @@ const ExcalidrawWrapper = () => {
   type TabData = {
     name: string;
     images: TabImage[];
+    searchQuery?: string;  
+    loaded?: boolean;      
   };
 
   const [isImageWindowVisible, setImageWindowVisible] = useState(false);
@@ -539,6 +542,66 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
 };
 
   const [errorMessage, setErrorMessage] = useState("");
+
+  
+
+
+const handleTabClick = async (tabName: string, tabIndex: number) => {
+  const currentTab = tabData[tabIndex];
+  
+  // Only load if not already loaded and has a search query
+  if (!currentTab.loaded && currentTab.searchQuery) {
+    console.log(`Loading ${tabName} results for "${currentTab.searchQuery}"`);
+    
+    try {
+      let newImages: ImageResult[] = [];
+      
+      if (tabName === "Pinterest") {
+        // Pinterest-specific search with siteRestrict = true
+        newImages = await searchAndSaveImages(currentTab.searchQuery, true);
+      } else if (tabName === "YouTube") {
+        // General search for now (you can add YouTube restriction later)
+        newImages = await searchAndSaveImages(currentTab.searchQuery, false);
+      }
+      else if (tabName === "Internet webpages") {
+        // General search for now (you can add YouTube restriction later)
+        newImages = await searchAndSaveImages(currentTab.searchQuery, false, true);
+        console.log("Raw web search results:", newImages);
+      }
+      
+      // Update the specific tab with results
+      const updatedTabs = [...tabData];
+      updatedTabs[tabIndex] = {
+        ...currentTab,
+        images: newImages.slice(0, 10).map((img: ImageResult, i: number) => ({
+          id: `${tabName.toLowerCase()}-${i}`,
+          src: img.link,
+          alt: img.title || `${tabName} Result ${i + 1}`,
+          name: img.title || `${tabName} ${i + 1}`,
+          snippet : img.snippet,
+        })),
+        loaded: true // Mark as loaded
+      };
+      
+      setTabData(updatedTabs);
+      
+      excalidrawAPI?.setToast({
+        message: `${tabName} results loaded!`,
+        duration: 2000
+      });
+      
+    } catch (error) {
+      console.error(`Error loading ${tabName} results:`, error);
+      excalidrawAPI?.setToast({
+        message: `Error loading ${tabName} results. Please try again.`,
+        duration: 3000
+      });
+    }
+  }
+};
+
+
+
   const isCollabDisabled = isRunningInIframe();
 
 
@@ -1608,7 +1671,7 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
                         lastSearchQuery = searchQuery; // Update last search query
                         hasSearched = true;
 
-                        searchAndSaveImages(searchQuery)
+                        searchAndSaveImages(searchQuery, false)
                           .then((images: ImageResult[]) => {
                             const tabs = [
                               {
@@ -1619,15 +1682,14 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
                                   alt: `Google Result ${i + 1}`,
                                   name: `Google ${i + 1}`,
                                 })),
+                                loaded: true
                               },
                               {
                                 name: "Pinterest",
-                                images: images.slice(10, 20).map((img: ImageResult, i: number) => ({
-                                  id: `pinterest-${i}`,
-                                  src: img.link,
-                                  alt: `Pinterest Result ${i + 1}`,
-                                  name: `Pinterest ${i + 1}`,
-                                })),
+                                images: [], // Empty initially will be lazily loaded upon onclick
+                                searchQuery: searchQuery, // Store query for later
+                                loaded: false // Mark as not loaded
+                              
                               },
                               {
                                 name: "YouTube",
@@ -1637,6 +1699,12 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
                                   alt: `YouTube Result ${i + 1}`,
                                   name: `YouTube ${i + 1}`,
                                 })),
+                              },
+                              {
+                                name: "Internet webpages",
+                                images: [], // Empty initially will be lazily loaded upon onclick
+                                searchQuery: searchQuery, // Store query for later
+                                loaded: false // Mark as not loaded
                               },
                             ];
                             console.log(tabs);
@@ -1716,6 +1784,7 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
                   });
               },
             },
+            
             {
               label: "Add Rabbit Color Palette",
               category: DEFAULT_CATEGORIES.app,
@@ -1937,6 +2006,7 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
           onImageSelect={handleImageSelect}
           onImageDeselect={handleImageDeselect}
           onToggleVisibility={() => setImageWindowVisible(false)}
+          onTabClick={handleTabClick}
           onAddToCanvas={handleAddToCanvas}
           tabData={tabData}
         />
@@ -1970,6 +2040,7 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
               <button>YouTube</button>
               <button>Google</button>
               <button>Pinterest</button>
+              <button>Internet Webpages</button>
             </div>
           );
         }

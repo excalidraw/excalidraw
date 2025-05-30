@@ -6,6 +6,7 @@ interface ImageItem {
     src: string;
     alt: string;
     name?: string;
+    snippet?: string;
 }
 
 // properties of rabbit image window
@@ -15,6 +16,7 @@ interface RabbitImageWindowProps {
     onImageDeselect: (image: any) => void;
     selectedImages: string[];
     onToggleVisibility: () => void;
+    onTabClick?: (tabName: string, tabIndex: number) => void;
     onAddToCanvas: (selectedImages: string[]) => void;
     tabData: {
         name: string;
@@ -23,7 +25,10 @@ interface RabbitImageWindowProps {
             src: string;
             alt: string;
             name: string;
+            snippet?: string;
         }[];
+        searchQuery?: string;  // Add this
+        loaded?: boolean; 
     }[];
 }
 
@@ -33,12 +38,14 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
     onImageDeselect,
     selectedImages,
     onToggleVisibility,
+    onTabClick,
     onAddToCanvas,
     tabData,
 }) => {
     const [activeTab, setActiveTab] = useState(0);
     const [pos, setPos] = useState({ x: 1000, y: 160 });
     const dragRef = useRef<{ x: number; y: number } | null>(null);
+    const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
     // Component dimensions - adjust these if you change the component size
     const COMPONENT_WIDTH = 320;
@@ -50,6 +57,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
         window.addEventListener("mousemove", onMouseMove);
         window.addEventListener("mouseup", onMouseUp);
     };
+    
 
     const onMouseMove = (e: MouseEvent) => {
         if (!dragRef.current) return;
@@ -73,6 +81,17 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
         });
         
         dragRef.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const handleDoubleClick = (image: ImageItem) => {
+    if (tabData[activeTab].name === "Internet webpages") {
+        window.open(
+ 
+  image.src, 
+  '_blank', 
+  'width=1200,height=800,left=100,top=100,scrollbars=yes,resizable=yes,menubar=yes,toolbar=yes'
+);
+    }
     };
 
     const onMouseUp = () => {
@@ -147,7 +166,13 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                 {tabData.map((tab, index) => (
                     <button
                         key={index}
-                        onClick={() => setActiveTab(index)}
+                         onClick={() => {
+            setActiveTab(index);
+            // Call the lazy loading function if provided
+            if (onTabClick) {
+                onTabClick(tab.name, index);
+            }
+        }}
                         style={{
                             flex: 1,
                             padding: "8px",
@@ -198,19 +223,37 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                     <div
                         key={image.id}
                         onClick={() => handleImageClick(image)}
+                        onMouseEnter = {() => setHoveredCard(image.id)}
+                        onMouseLeave={() => setHoveredCard(null)}
+                        onDoubleClick= {()=> handleDoubleClick(image)}
                         style={{
                             boxSizing: "border-box",
                             border: isImageSelected(image.id)
                                 ? "3.5px solid rgb(0, 145, 255)"
                                 : "2px solid transparent",
                             borderRadius: "5px",
-                            overflow: "hidden",
+                            overflow: "visible",
                             cursor: "pointer",
                             position: "relative",
                             background: "var(--color-surface-low)",
                             transition: "border 0.2s ease, box-shadow 0.2s ease",
+                            padding: tabData[activeTab].name === "Internet webpages" ? "8px" : "0",
+                            minHeight: tabData[activeTab].name === "Internet webpages" ? "60px" : "auto",
+                            display: "flex",
+                            alignItems: "center",
                         }}
-                    >
+                    > {tabData[activeTab].name === "Internet webpages" ? (
+            <div style={{
+                fontSize: "12px",
+                fontWeight: "600",
+                color: "#333",
+                lineHeight: "1.3",
+                textAlign: "center",
+                width: "100%"
+            }}>
+                {image.name}
+            </div>
+        ) : (
                         <img
                             src={image.src}
                             alt={image.alt}
@@ -220,7 +263,29 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                                 display: "block",
                             }}
                         />
+                        )}
+                        {/* Move tooltip INSIDE the card div */}
+        {hoveredCard === image.id && image.snippet && tabData[activeTab].name === "Internet webpages" && (
+            <div style={{
+                position: "absolute",
+                top: "100%",
+                left: "0",
+                right: "0",
+                background: "#333",
+                color: "white",
+                padding: "8px",
+                borderRadius: "4px",
+                fontSize: "11px",
+                zIndex: 1001,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                marginTop: "4px",
+                maxWidth: "280px",
+                wordWrap: "break-word"
+            }}>
+                {image.snippet}
                     </div>
+                    )}
+</div>
                 ))}
             </div>
 
