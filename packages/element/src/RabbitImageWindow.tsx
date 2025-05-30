@@ -161,7 +161,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
             <div
                 style={{
                     padding: "16px",
-                    maxHeight: "400px",
+                    maxHeight: "320px",
                     overflowY: "auto",
                     background: "white",
                     display: "grid",
@@ -205,9 +205,10 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
             {selectedImages.length > 0 && (
                 <div
                     style={{
-                        padding: "12px 16px",
+                        padding: "12px 0px",
                         borderTop: "1px solid var(--color-border)",
                         background: "var(--color-surface-low)",
+                        marginBottom: "10px",
                     }}
                 >
                     <p
@@ -221,8 +222,53 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                     >
                         {selectedImages.length} selected
                     </p>
+
+                    <button
+                        onClick={() => {
+                            // Add your submit logic here
+                            console.log('Submitting images:', selectedImages);
+                        }}
+                        style={{
+                            background: "rgb(107, 176, 229)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "6px 16px", // Smaller padding
+                            fontSize: "12px", // Smaller font
+                            fontFamily: "Assistant",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            transition: "all 0.2s ease",
+                            boxShadow: "0 1px 4px rgba(151, 172, 202, 0.3)",
+                            minWidth: "70px", // Smaller minimum width
+                            display: "block",
+                            margin: "0 auto",
+                            marginLeft: "110px",
+                            marginTop: "10px",
+                            marginBottom: "-8px",
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "translateY(-1px)";
+                            e.currentTarget.style.background = "rgb(66, 144, 204)"; // Darker on hover
+                            e.currentTarget.style.boxShadow = "0 2px 6px rgba(151, 172, 202, 0.4)";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "translateY(0)";
+                            e.currentTarget.style.background = "rgb(107, 176, 229)";
+                            e.currentTarget.style.boxShadow = "0 1px 4px rgba(151, 172, 202, 0.3)";
+                        }}
+                        onMouseDown={(e) => {
+                            e.currentTarget.style.transform = "translateY(0)";
+                        }}
+                    >
+                        Add to Canvas
+                    </button>
                 </div>
+
+
             )}
+
+
         </div>
     );
 };
