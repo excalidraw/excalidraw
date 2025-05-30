@@ -178,7 +178,7 @@ describe("element binding", () => {
     expect(arrow.endBinding).toBe(null);
 
     mouse.downAt(50, 50);
-    mouse.moveTo(57, 0);
+    mouse.moveTo(57.5, 0);
     mouse.up(0, 0);
 
     // Test sticky connection
