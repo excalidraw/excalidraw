@@ -139,8 +139,10 @@ export const textWysiwyg = ({
     const { textAlign, verticalAlign } = updatedTextElement;
     const elementsMap = app.scene.getNonDeletedElementsMap();
     if (updatedTextElement && isTextElement(updatedTextElement)) {
+    
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
+
       const container = getContainerElement(
         updatedTextElement,
         app.scene.getNonDeletedElementsMap(),
@@ -280,6 +282,31 @@ export const textWysiwyg = ({
         maxHeight: `${editorMaxHeight}px`,
       });
       editable.scrollTop = 0;
+
+console.log("updatedTextElement id:", updatedTextElement.id);
+console.log("updatedTextElement type:", (updatedTextElement as any).type);
+console.log("container Id:", (updatedTextElement as any).containerId);
+
+      if ((updatedTextElement as any).type === "rabbit-searchbox") {
+        console.log("woah is this working");
+        Object.assign(editable.style, {
+          // Make it completely invisible
+          opacity: "0",
+          color: "transparent",
+          caretColor: "transparent",
+          background: "transparent",
+          border: "none",
+          outline: "none",
+          boxShadow: "none",
+          // Position it correctly but invisibly
+          left: `${viewportX + 10}px`,
+          // Ensure no visual artifacts
+          textShadow: "none",
+          backdropFilter: "none",
+          filter: "none",
+        });
+      }
+
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
       if (isTestEnv()) {
@@ -327,6 +354,7 @@ export const textWysiwyg = ({
     boxSizing: "content-box",
   });
   editable.value = element.originalText;
+
   updateWysiwygStyle();
 
   if (onChange) {
@@ -514,9 +542,9 @@ export const textWysiwyg = ({
           startIndices.concat(
             idx
               ? // curr line index is prev line's start + prev line's length + \n
-                startIndices[idx - 1] + lines[idx - 1].length + 1
+              startIndices[idx - 1] + lines[idx - 1].length + 1
               : // first selected line
-                selectionStart,
+              selectionStart,
           ),
         [] as number[],
       )

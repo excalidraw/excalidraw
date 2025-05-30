@@ -313,7 +313,12 @@ const LayerUI = ({
 
                             <RabbitColorPaletteButton
                               checked={isHandToolActive(appState)}
-                              onChange={() => onLockToggle()}
+                              onChange={() => {
+                                const handler = (window as any).__handleColorPalette;
+                                if (handler) {
+                                  handler();
+                                }
+                              }}
                               title={t("toolBar.hand")}
                               isMobile
                             />

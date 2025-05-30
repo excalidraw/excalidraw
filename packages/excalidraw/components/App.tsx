@@ -526,6 +526,8 @@ import type {
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
 
+import { newRabbitImageElement } from "@excalidraw/element/newRabbitElement";
+
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
 
@@ -828,7 +830,7 @@ class App extends React.Component<AppProps, AppState> {
     let data = null;
     try {
       data = JSON.parse(event.data);
-    } catch (e) {}
+    } catch (e) { }
     if (!data) {
       return;
     }
@@ -1120,9 +1122,8 @@ class App extends React.Component<AppProps, AppState> {
                       html, body {
                         width: 100%;
                         height: 100%;
-                        color: ${
-                          this.state.theme === THEME.DARK ? "white" : "black"
-                        };
+                        color: ${this.state.theme === THEME.DARK ? "white" : "black"
+                    };
                       }
                       body {
                         display: flex;
@@ -1245,9 +1246,8 @@ class App extends React.Component<AppProps, AppState> {
               })}
               style={{
                 transform: isVisible
-                  ? `translate(${x - this.state.offsetLeft}px, ${
-                      y - this.state.offsetTop
-                    }px) scale(${scale})`
+                  ? `translate(${x - this.state.offsetLeft}px, ${y - this.state.offsetTop
+                  }px) scale(${scale})`
                   : "none",
                 display: isVisible ? "block" : "none",
                 opacity: getRenderOpacity(
@@ -1306,28 +1306,27 @@ class App extends React.Component<AppProps, AppState> {
                   {(isEmbeddableElement(el)
                     ? this.props.renderEmbeddable?.(el, this.state)
                     : null) ?? (
-                    <iframe
-                      ref={(ref) => this.cacheEmbeddableRef(el, ref)}
-                      className="excalidraw__embeddable"
-                      srcDoc={
-                        src?.type === "document"
-                          ? src.srcdoc(this.state.theme)
-                          : undefined
-                      }
-                      src={
-                        src?.type !== "document" ? src?.link ?? "" : undefined
-                      }
-                      // https://stackoverflow.com/q/18470015
-                      scrolling="no"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Excalidraw Embedded Content"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen={true}
-                      sandbox={`${
-                        src?.sandbox?.allowSameOrigin ? "allow-same-origin" : ""
-                      } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
-                    />
-                  )}
+                      <iframe
+                        ref={(ref) => this.cacheEmbeddableRef(el, ref)}
+                        className="excalidraw__embeddable"
+                        srcDoc={
+                          src?.type === "document"
+                            ? src.srcdoc(this.state.theme)
+                            : undefined
+                        }
+                        src={
+                          src?.type !== "document" ? src?.link ?? "" : undefined
+                        }
+                        // https://stackoverflow.com/q/18470015
+                        scrolling="no"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Excalidraw Embedded Content"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen={true}
+                        sandbox={`${src?.sandbox?.allowSameOrigin ? "allow-same-origin" : ""
+                          } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
+                      />
+                    )}
                 </div>
               </div>
             </div>
@@ -1487,9 +1486,8 @@ class App extends React.Component<AppProps, AppState> {
               transform: `translate(-${FRAME_NAME_EDIT_PADDING}px, ${FRAME_NAME_EDIT_PADDING}px)`,
               color: "var(--color-gray-80)",
               overflow: "hidden",
-              maxWidth: `${
-                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING
-              }px`,
+              maxWidth: `${document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING
+                }px`,
             }}
             size={frameNameInEdit.length + 1 || 1}
             dir="auto"
@@ -1513,12 +1511,11 @@ class App extends React.Component<AppProps, AppState> {
             // messes up input position when editing the frame name.
             // This makes the positioning deterministic and we can calculate
             // the same position when rendering to canvas / svg.
-            bottom: `${
-              this.state.height +
+            bottom: `${this.state.height +
               FRAME_STYLE.nameOffsetY -
               y1 +
               this.state.offsetTop
-            }px`,
+              }px`,
             left: `${x1 - this.state.offsetLeft}px`,
             zIndex: 2,
             fontSize: FRAME_STYLE.nameFontSize,
@@ -1590,12 +1587,12 @@ class App extends React.Component<AppProps, AppState> {
       "setPointerCapture" in HTMLElement.prototype
         ? false
         : this.state.selectionElement ||
-          this.state.newElement ||
-          this.state.selectedElementsAreBeingDragged ||
-          this.state.resizingElement ||
-          (this.state.activeTool.type === "laser" &&
-            // technically we can just test on this once we make it more safe
-            this.state.cursorButton === "down");
+        this.state.newElement ||
+        this.state.selectedElementsAreBeingDragged ||
+        this.state.resizingElement ||
+        (this.state.activeTool.type === "laser" &&
+          // technically we can just test on this once we make it more safe
+          this.state.cursorButton === "down");
 
     const firstSelectedElement = selectedElements[0];
 
@@ -1686,7 +1683,7 @@ class App extends React.Component<AppProps, AppState> {
                         />
                         {selectedElements.length === 1 &&
                           this.state.openDialog?.name !==
-                            "elementLinkSelector" &&
+                          "elementLinkSelector" &&
                           this.state.showHyperlinkPopup && (
                             <Hyperlink
                               key={firstSelectedElement.id}
@@ -2068,9 +2065,9 @@ class App extends React.Component<AppProps, AppState> {
       const parsedHtml =
         html.includes("<!DOCTYPE html>") && html.includes("</html>")
           ? html.slice(
-              html.indexOf("<!DOCTYPE html>"),
-              html.indexOf("</html>") + "</html>".length,
-            )
+            html.indexOf("<!DOCTYPE html>"),
+            html.indexOf("</html>") + "</html>".length,
+          )
           : html;
 
       this.updateMagicGeneration({
@@ -2601,7 +2598,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
-    (window as any).launchQueue?.setConsumer(() => {});
+    (window as any).launchQueue?.setConsumer(() => { });
     this.renderer.destroy();
     this.scene.destroy();
     this.scene = new Scene();
@@ -3179,8 +3176,8 @@ class App extends React.Component<AppProps, AppState> {
         const elements = (
           data.programmaticAPI
             ? convertToExcalidrawElements(
-                data.elements as ExcalidrawElementSkeleton[],
-              )
+              data.elements as ExcalidrawElementSkeleton[],
+            )
             : data.elements
         ) as readonly ExcalidrawElement[];
         // TODO remove formatting from elements if isPlainPaste
@@ -3286,14 +3283,14 @@ class App extends React.Component<AppProps, AppState> {
       typeof opts.position === "object"
         ? opts.position.clientX
         : opts.position === "cursor"
-        ? this.lastViewportPosition.x
-        : this.state.width / 2 + this.state.offsetLeft;
+          ? this.lastViewportPosition.x
+          : this.state.width / 2 + this.state.offsetLeft;
     const clientY =
       typeof opts.position === "object"
         ? opts.position.clientY
         : opts.position === "cursor"
-        ? this.lastViewportPosition.y
-        : this.state.height / 2 + this.state.offsetTop;
+          ? this.lastViewportPosition.y
+          : this.state.height / 2 + this.state.offsetTop;
 
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX, clientY },
@@ -3381,8 +3378,8 @@ class App extends React.Component<AppProps, AppState> {
         // from library, not when pasting from clipboard. Alas.
         openSidebar:
           this.state.openSidebar &&
-          this.device.editor.canFitSidebar &&
-          editorJotaiStore.get(isSidebarDockedAtom)
+            this.device.editor.canFitSidebar &&
+            editorJotaiStore.get(isSidebarDockedAtom)
             ? this.state.openSidebar
             : null,
         ...selectGroupsForSelectedElements(
@@ -3673,8 +3670,8 @@ class App extends React.Component<AppProps, AppState> {
     opts:
       | Partial<AppState["frameRendering"]>
       | ((
-          prevState: AppState["frameRendering"],
-        ) => Partial<AppState["frameRendering"]>),
+        prevState: AppState["frameRendering"],
+      ) => Partial<AppState["frameRendering"]>),
   ) => {
     this.setState((prevState) => {
       const next =
@@ -3740,22 +3737,22 @@ class App extends React.Component<AppProps, AppState> {
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
     opts?: (
       | {
-          fitToContent?: boolean;
-          fitToViewport?: never;
-          viewportZoomFactor?: number;
-          animate?: boolean;
-          duration?: number;
-        }
+        fitToContent?: boolean;
+        fitToViewport?: never;
+        viewportZoomFactor?: number;
+        animate?: boolean;
+        duration?: number;
+      }
       | {
-          fitToContent?: never;
-          fitToViewport?: boolean;
-          /** when fitToViewport=true, how much screen should the content cover,
-           * between 0.1 (10%) and 1 (100%)
-           */
-          viewportZoomFactor?: number;
-          animate?: boolean;
-          duration?: number;
-        }
+        fitToContent?: never;
+        fitToViewport?: boolean;
+        /** when fitToViewport=true, how much screen should the content cover,
+         * between 0.1 (10%) and 1 (100%)
+         */
+        viewportZoomFactor?: number;
+        animate?: boolean;
+        duration?: number;
+      }
     ) & {
       minZoom?: number;
       maxZoom?: number;
@@ -3994,7 +3991,7 @@ class App extends React.Component<AppProps, AppState> {
 
         const nextAppState = appState
           ? // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
-            Object.assign({}, this.store.snapshot.appState, appState)
+          Object.assign({}, this.store.snapshot.appState, appState)
           : undefined;
 
         this.store.scheduleMicroAction({
@@ -4056,7 +4053,7 @@ class App extends React.Component<AppProps, AppState> {
     if (force === undefined) {
       nextName =
         this.state.openSidebar?.name === name &&
-        this.state.openSidebar?.tab === tab
+          this.state.openSidebar?.tab === tab
           ? null
           : name;
     } else {
@@ -4098,27 +4095,27 @@ class App extends React.Component<AppProps, AppState> {
 
     return getLanguage().rtl
       ? {
-          top: toolbarBottom + PADDING,
-          right:
-            Math.max(
-              this.state.width -
-                (propertiesPanelRect?.left ?? this.state.width),
-              0,
-            ) + PADDING,
-          bottom: PADDING,
-          left: Math.max(sidebarRect?.right ?? 0, 0) + PADDING,
-        }
-      : {
-          top: toolbarBottom + PADDING,
-          right: Math.max(
+        top: toolbarBottom + PADDING,
+        right:
+          Math.max(
             this.state.width -
-              (sidebarRect?.left ?? this.state.width) +
-              PADDING,
+            (propertiesPanelRect?.left ?? this.state.width),
             0,
-          ),
-          bottom: PADDING,
-          left: Math.max(propertiesPanelRect?.right ?? 0, 0) + PADDING,
-        };
+          ) + PADDING,
+        bottom: PADDING,
+        left: Math.max(sidebarRect?.right ?? 0, 0) + PADDING,
+      }
+      : {
+        top: toolbarBottom + PADDING,
+        right: Math.max(
+          this.state.width -
+          (sidebarRect?.left ?? this.state.width) +
+          PADDING,
+          0,
+        ),
+        bottom: PADDING,
+        left: Math.max(propertiesPanelRect?.right ?? 0, 0) + PADDING,
+      };
   };
 
   // Input handling
@@ -4140,8 +4137,8 @@ class App extends React.Component<AppProps, AppState> {
             }
             return prop === "key"
               ? // CapsLock inverts capitalization based on ShiftKey, so invert
-                // it back
-                event.shiftKey
+              // it back
+              event.shiftKey
                 ? ev.key.toUpperCase()
                 : ev.key.toLowerCase()
               : value;
@@ -4511,7 +4508,7 @@ class App extends React.Component<AppProps, AppState> {
               if (
                 !this.state.editingLinearElement ||
                 this.state.editingLinearElement.elementId !==
-                  selectedElements[0].id
+                selectedElements[0].id
               ) {
                 this.store.scheduleCapture();
                 if (!isElbowArrow(selectedElement)) {
@@ -4566,8 +4563,7 @@ class App extends React.Component<AppProps, AppState> {
             trackEvent(
               "toolbar",
               shape,
-              `keyboard (${
-                this.device.editor.isMobile ? "mobile" : "desktop"
+              `keyboard (${this.device.editor.isMobile ? "mobile" : "desktop"
               })`,
             );
           }
@@ -4577,8 +4573,8 @@ class App extends React.Component<AppProps, AppState> {
                 prevState.currentItemArrowType === ARROW_TYPE.sharp
                   ? ARROW_TYPE.round
                   : prevState.currentItemArrowType === ARROW_TYPE.round
-                  ? ARROW_TYPE.elbow
-                  : ARROW_TYPE.sharp,
+                    ? ARROW_TYPE.elbow
+                    : ARROW_TYPE.sharp,
             }));
           }
           this.setActiveTool({ type: shape });
@@ -4784,7 +4780,7 @@ class App extends React.Component<AppProps, AppState> {
   private isToolSupported = <T extends ToolType | "custom">(tool: T) => {
     return (
       this.props.UIOptions.tools?.[
-        tool as Extract<T, keyof AppProps["UIOptions"]["tools"]>
+      tool as Extract<T, keyof AppProps["UIOptions"]["tools"]>
       ] !== false
     );
   };
@@ -4792,12 +4788,12 @@ class App extends React.Component<AppProps, AppState> {
   setActiveTool = (
     tool: (
       | (
-          | { type: Exclude<ToolType, "image"> }
-          | {
-              type: Extract<ToolType, "image">;
-              insertOnCanvasDirectly?: boolean;
-            }
-        )
+        | { type: Exclude<ToolType, "image"> }
+        | {
+          type: Extract<ToolType, "image">;
+          insertOnCanvasDirectly?: boolean;
+        }
+      )
       | { type: "custom"; customType: string }
     ) & { locked?: boolean; fromSelection?: boolean },
     keepSelection = false,
@@ -4849,11 +4845,11 @@ class App extends React.Component<AppProps, AppState> {
           ...(keepSelection
             ? {}
             : {
-                selectedElementIds: makeNextSelectedElementIds({}, prevState),
-                selectedGroupIds: makeNextSelectedElementIds({}, prevState),
-                editingGroupId: null,
-                multiElement: null,
-              }),
+              selectedElementIds: makeNextSelectedElementIds({}, prevState),
+              selectedGroupIds: makeNextSelectedElementIds({}, prevState),
+              editingGroupId: null,
+              multiElement: null,
+            }),
           ...commonResets,
         };
       } else if (nextActiveTool.type !== "selection") {
@@ -5179,13 +5175,13 @@ class App extends React.Component<AppProps, AppState> {
       includeBoundTextElement && includeLockedElements
         ? this.scene.getNonDeletedElements()
         : this.scene
-            .getNonDeletedElements()
-            .filter(
-              (element) =>
-                (includeLockedElements || !element.locked) &&
-                (includeBoundTextElement ||
-                  !(isTextElement(element) && element.containerId)),
-            )
+          .getNonDeletedElements()
+          .filter(
+            (element) =>
+              (includeLockedElements || !element.locked) &&
+              (includeBoundTextElement ||
+                !(isTextElement(element) && element.containerId)),
+          )
     )
       .filter((el) => this.hitElement(x, y, el))
       .filter((element) => {
@@ -5509,7 +5505,7 @@ class App extends React.Component<AppProps, AppState> {
         event[KEYS.CTRL_OR_CMD] &&
         (!this.state.editingLinearElement ||
           this.state.editingLinearElement.elementId !==
-            selectedElements[0].id) &&
+          selectedElements[0].id) &&
         !isElbowArrow(selectedElements[0])
       ) {
         this.store.scheduleCapture();
@@ -5532,11 +5528,11 @@ class App extends React.Component<AppProps, AppState> {
         );
         const midPoint = hitCoords
           ? LinearElementEditor.getSegmentMidPointIndex(
-              this.state.selectedLinearElement,
-              this.state,
-              hitCoords,
-              this.scene.getNonDeletedElementsMap(),
-            )
+            this.state.selectedLinearElement,
+            this.state,
+            hitCoords,
+            this.scene.getNonDeletedElementsMap(),
+          )
           : -1;
 
         if (midPoint && midPoint > -1) {
@@ -5558,11 +5554,11 @@ class App extends React.Component<AppProps, AppState> {
           );
           const nextIndex = nextCoords
             ? LinearElementEditor.getSegmentMidPointIndex(
-                this.state.selectedLinearElement,
-                this.state,
-                nextCoords,
-                this.scene.getNonDeletedElementsMap(),
-              )
+              this.state.selectedLinearElement,
+              this.state,
+              nextCoords,
+              this.scene.getNonDeletedElementsMap(),
+            )
             : null;
 
           this.setState({
@@ -5588,6 +5584,21 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
       this.startImageCropping(selectedElements[0]);
       return;
+    }
+
+    // Add your check here for non-editable elements
+    if (selectedElements.length === 1) {
+      const element = selectedElements[0];
+
+      // Define which elements should not be text-editable
+      if (
+        element.type === "rabbit-image" ||
+        // element.type === "rabbit-searchbox" ||
+        element.type === "rabbit-image-tabs" ||
+        element.type === "rabbit-color-palette" 
+      ) {
+        return; // Exit early, don't start text editing
+      }
     }
 
     resetCursor(this.interactiveCanvas);
@@ -5838,7 +5849,7 @@ class App extends React.Component<AppProps, AppState> {
       gesture.lastCenter =
         gesture.initialDistance =
         gesture.initialScale =
-          null;
+        null;
     }
 
     if (
@@ -6341,7 +6352,7 @@ class App extends React.Component<AppProps, AppState> {
           );
         const isHoveringAPointHandle = isElbowArrow(element)
           ? hoverPointIndex === 0 ||
-            hoverPointIndex === element.points.length - 1
+          hoverPointIndex === element.points.length - 1
           : hoverPointIndex >= 0;
         if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
@@ -6453,10 +6464,10 @@ class App extends React.Component<AppProps, AppState> {
       this.updateScene({
         ...(element.points.length < 10
           ? {
-              elements: this.scene
-                .getElementsIncludingDeleted()
-                .filter((el) => el.id !== element.id),
-            }
+            elements: this.scene
+              .getElementsIncludingDeleted()
+              .filter((el) => el.id !== element.id),
+          }
           : {}),
         appState: {
           newElement: null,
@@ -7684,9 +7695,9 @@ class App extends React.Component<AppProps, AppState> {
 
     const topLayerFrame = addToFrameUnderCursor
       ? this.getTopLayerFrameAtSceneCoords({
-          x: gridX,
-          y: gridY,
-        })
+        x: gridX,
+        y: gridY,
+      })
       : null;
 
     const element = newImageElement({
@@ -7799,50 +7810,50 @@ class App extends React.Component<AppProps, AppState> {
       const element =
         elementType === "arrow"
           ? newArrowElement({
-              type: elementType,
-              x: gridX,
-              y: gridY,
-              strokeColor: this.state.currentItemStrokeColor,
-              backgroundColor: this.state.currentItemBackgroundColor,
-              fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.state.currentItemStrokeWidth,
-              strokeStyle: this.state.currentItemStrokeStyle,
-              roughness: this.state.currentItemRoughness,
-              opacity: this.state.currentItemOpacity,
-              roundness:
-                this.state.currentItemArrowType === ARROW_TYPE.round
-                  ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
-                  : // note, roundness doesn't have any effect for elbow arrows,
-                    // but it's best to set it to null as well
-                    null,
-              startArrowhead,
-              endArrowhead,
-              locked: false,
-              frameId: topLayerFrame ? topLayerFrame.id : null,
-              elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow,
-              fixedSegments:
-                this.state.currentItemArrowType === ARROW_TYPE.elbow
-                  ? []
-                  : null,
-            })
+            type: elementType,
+            x: gridX,
+            y: gridY,
+            strokeColor: this.state.currentItemStrokeColor,
+            backgroundColor: this.state.currentItemBackgroundColor,
+            fillStyle: this.state.currentItemFillStyle,
+            strokeWidth: this.state.currentItemStrokeWidth,
+            strokeStyle: this.state.currentItemStrokeStyle,
+            roughness: this.state.currentItemRoughness,
+            opacity: this.state.currentItemOpacity,
+            roundness:
+              this.state.currentItemArrowType === ARROW_TYPE.round
+                ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
+                : // note, roundness doesn't have any effect for elbow arrows,
+                // but it's best to set it to null as well
+                null,
+            startArrowhead,
+            endArrowhead,
+            locked: false,
+            frameId: topLayerFrame ? topLayerFrame.id : null,
+            elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow,
+            fixedSegments:
+              this.state.currentItemArrowType === ARROW_TYPE.elbow
+                ? []
+                : null,
+          })
           : newLinearElement({
-              type: elementType,
-              x: gridX,
-              y: gridY,
-              strokeColor: this.state.currentItemStrokeColor,
-              backgroundColor: this.state.currentItemBackgroundColor,
-              fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.state.currentItemStrokeWidth,
-              strokeStyle: this.state.currentItemStrokeStyle,
-              roughness: this.state.currentItemRoughness,
-              opacity: this.state.currentItemOpacity,
-              roundness:
-                this.state.currentItemRoundness === "round"
-                  ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
-                  : null,
-              locked: false,
-              frameId: topLayerFrame ? topLayerFrame.id : null,
-            });
+            type: elementType,
+            x: gridX,
+            y: gridY,
+            strokeColor: this.state.currentItemStrokeColor,
+            backgroundColor: this.state.currentItemBackgroundColor,
+            fillStyle: this.state.currentItemFillStyle,
+            strokeWidth: this.state.currentItemStrokeWidth,
+            strokeStyle: this.state.currentItemStrokeStyle,
+            roughness: this.state.currentItemRoughness,
+            opacity: this.state.currentItemOpacity,
+            roundness:
+              this.state.currentItemRoundness === "round"
+                ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
+                : null,
+            locked: false,
+            frameId: topLayerFrame ? topLayerFrame.id : null,
+          });
       this.setState((prevState) => {
         const nextSelectedElementIds = {
           ...prevState.selectedElementIds,
@@ -7887,10 +7898,10 @@ class App extends React.Component<AppProps, AppState> {
   ) {
     return this.state.currentItemRoundness === "round"
       ? {
-          type: isUsingAdaptiveRadius(elementType)
-            ? ROUNDNESS.ADAPTIVE_RADIUS
-            : ROUNDNESS.PROPORTIONAL_RADIUS,
-        }
+        type: isUsingAdaptiveRadius(elementType)
+          ? ROUNDNESS.ADAPTIVE_RADIUS
+          : ROUNDNESS.PROPORTIONAL_RADIUS,
+      }
       : null;
   }
 
@@ -8092,11 +8103,11 @@ class App extends React.Component<AppProps, AppState> {
           );
           index = nextCoords
             ? LinearElementEditor.getSegmentMidPointIndex(
-                this.state.selectedLinearElement,
-                this.state,
-                nextCoords,
-                this.scene.getNonDeletedElementsMap(),
-              )
+              this.state.selectedLinearElement,
+              this.state,
+              nextCoords,
+              this.scene.getNonDeletedElementsMap(),
+            )
             : -1;
         }
 
@@ -8289,7 +8300,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.editingLinearElement &&
         event.shiftKey &&
         this.state.editingLinearElement.elementId ===
-          pointerDownState.hit.element?.id;
+        pointerDownState.hit.element?.id;
       if (
         (hasHitASelectedElement ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
@@ -8425,13 +8436,13 @@ class App extends React.Component<AppProps, AppState> {
                   ...crop,
                   x: clamp(
                     crop.x -
-                      offsetVector[0] * Math.sign(croppingElement.scale[0]),
+                    offsetVector[0] * Math.sign(croppingElement.scale[0]),
                     0,
                     image.naturalWidth - crop.width,
                   ),
                   y: clamp(
                     crop.y -
-                      offsetVector[1] * Math.sign(croppingElement.scale[1]),
+                    offsetVector[1] * Math.sign(croppingElement.scale[1]),
                     0,
                     image.naturalHeight - crop.height,
                   ),
@@ -8808,11 +8819,11 @@ class App extends React.Component<AppProps, AppState> {
           }
           const elementsWithinSelection = this.state.selectionElement
             ? getElementsWithinSelection(
-                elements,
-                this.state.selectionElement,
-                this.scene.getNonDeletedElementsMap(),
-                false,
-              )
+              elements,
+              this.state.selectionElement,
+              this.scene.getNonDeletedElementsMap(),
+              false,
+            )
             : [];
 
           this.setState((prevState) => {
@@ -8854,16 +8865,16 @@ class App extends React.Component<AppProps, AppState> {
               // select linear element only when we haven't box-selected anything else
               selectedLinearElement:
                 elementsWithinSelection.length === 1 &&
-                isLinearElement(elementsWithinSelection[0])
+                  isLinearElement(elementsWithinSelection[0])
                   ? new LinearElementEditor(
-                      elementsWithinSelection[0],
-                      this.scene.getNonDeletedElementsMap(),
-                    )
+                    elementsWithinSelection[0],
+                    this.scene.getNonDeletedElementsMap(),
+                  )
                   : null,
               showHyperlinkPopup:
                 elementsWithinSelection.length === 1 &&
-                (elementsWithinSelection[0].link ||
-                  isEmbeddableElement(elementsWithinSelection[0]))
+                  (elementsWithinSelection[0].link ||
+                    isEmbeddableElement(elementsWithinSelection[0]))
                   ? "info"
                   : false,
             };
@@ -8885,7 +8896,7 @@ class App extends React.Component<AppProps, AppState> {
         scrollX:
           this.state.scrollX -
           (dx * (currentScrollBars.horizontal?.deltaMultiplier || 1)) /
-            this.state.zoom.value,
+          this.state.zoom.value,
       });
       pointerDownState.lastCoords.x = x;
       return true;
@@ -8898,7 +8909,7 @@ class App extends React.Component<AppProps, AppState> {
         scrollY:
           this.state.scrollY -
           (dy * (currentScrollBars.vertical?.deltaMultiplier || 1)) /
-            this.state.zoom.value,
+          this.state.zoom.value,
       });
       pointerDownState.lastCoords.y = y;
       return true;
@@ -8975,7 +8986,7 @@ class App extends React.Component<AppProps, AppState> {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
           pointerDownState.hit?.element?.id !==
-            this.state.editingLinearElement.elementId
+          this.state.editingLinearElement.elementId
         ) {
           this.actionManager.executeAction(actionFinalize);
         } else {
@@ -9593,11 +9604,11 @@ class App extends React.Component<AppProps, AppState> {
                   // set selectedLinearElement only if thats the only element selected
                   selectedLinearElement:
                     newSelectedElements.length === 1 &&
-                    isLinearElement(newSelectedElements[0])
+                      isLinearElement(newSelectedElements[0])
                       ? new LinearElementEditor(
-                          newSelectedElements[0],
-                          this.scene.getNonDeletedElementsMap(),
-                        )
+                        newSelectedElements[0],
+                        this.scene.getNonDeletedElementsMap(),
+                      )
                       : prevState.selectedLinearElement,
                 };
               });
@@ -9668,13 +9679,13 @@ class App extends React.Component<AppProps, AppState> {
             ),
             selectedLinearElement:
               isLinearElement(hitElement) &&
-              // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
-              // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
-              prevState.selectedLinearElement?.elementId !== hitElement.id
+                // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
+                // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
+                prevState.selectedLinearElement?.elementId !== hitElement.id
                 ? new LinearElementEditor(
-                    hitElement,
-                    this.scene.getNonDeletedElementsMap(),
-                  )
+                  hitElement,
+                  this.scene.getNonDeletedElementsMap(),
+                )
                 : prevState.selectedLinearElement,
           }));
         }
@@ -9804,8 +9815,8 @@ class App extends React.Component<AppProps, AppState> {
         this.lastPointerUpEvent &&
         this.lastPointerDownEvent &&
         this.lastPointerUpEvent.timeStamp -
-          this.lastPointerDownEvent.timeStamp <
-          300 &&
+        this.lastPointerDownEvent.timeStamp <
+        300 &&
         gesture.pointers.size <= 1 &&
         isIframeLikeElement(hitElement) &&
         this.isIframeLikeElementCenter(
@@ -9976,37 +9987,64 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * inserts image into elements array and rerenders
    */
-  insertImageElement = async (
-    imageElement: ExcalidrawImageElement,
-    imageFile: File,
-    showCursorImagePreview?: boolean,
-  ) => {
-    // we should be handling all cases upstream, but in case we forget to handle
-    // a future case, let's throw here
-    if (!this.isToolSupported("image")) {
-      this.setState({ errorMessage: t("errors.imageToolNotSupported") });
-      return;
+/**
+ * inserts image into elements array and rerenders
+ */
+insertImageElement = async (
+  imageElement: ExcalidrawImageElement,
+  imageFile: File,
+  showCursorImagePreview?: boolean,
+) => {
+  // we should be handling all cases upstream, but in case we forget to handle
+  // a future case, let's throw here
+  if (!this.isToolSupported("image")) {
+    this.setState({ errorMessage: t("errors.imageToolNotSupported") });
+    return;
+  }
+
+  
+  this.scene.insertElement(imageElement);
+  this.scene.mutateElement(imageElement, { isDeleted: true });
+
+  try {
+    //imgur upload function (not imgur anymore)
+    const uploadToImgur = (window as any).__uploadToImgur;
+    if (!uploadToImgur) {
+      throw new Error("Image upload service not available");
     }
 
-    this.scene.insertElement(imageElement);
+    
+    const imgurUrl = await uploadToImgur(imageFile);
 
-    try {
-      return await this.initializeImage({
-        imageFile,
-        imageElement,
-        showCursorImagePreview,
-      });
-    } catch (error: any) {
-      this.scene.mutateElement(imageElement, {
-        isDeleted: true,
-      });
-      this.actionManager.executeAction(actionFinalize);
-      this.setState({
-        errorMessage: error.message || t("errors.imageInsertError"),
-      });
-      return null;
-    }
-  };
+    //instead of regular iage, create rabbit image
+    const rabbitImage = newRabbitImageElement({
+      x: imageElement.x,
+      y: imageElement.y,
+      imageUrl: imgurUrl,
+      width: imageElement.width || 200,
+      height: imageElement.height || 200,
+      angle: imageElement.angle || 0,
+      label: "",
+    });
+
+    
+    this.scene.insertElement(rabbitImage);
+
+    
+    this.setToast({
+      message: "Image uploaded successfully!",
+      duration: 3000
+    });
+
+    return rabbitImage;
+  } catch (error: any) {
+    this.actionManager.executeAction(actionFinalize);
+    this.setState({
+      errorMessage: error.message || t("errors.imageInsertError"),
+    });
+    return null;
+  }
+};
 
   private setImagePreviewCursor = async (imageFile: File) => {
     // mustn't be larger than 128 px
@@ -10334,8 +10372,8 @@ class App extends React.Component<AppProps, AppState> {
       // element from it
       editingGroupId:
         prevState.editingGroupId &&
-        hitElement != null &&
-        isElementInGroup(hitElement, prevState.editingGroupId)
+          hitElement != null &&
+          isElementInGroup(hitElement, prevState.editingGroupId)
           ? prevState.editingGroupId
           : null,
     }));
@@ -10602,23 +10640,23 @@ class App extends React.Component<AppProps, AppState> {
       {
         ...(element && !this.state.selectedElementIds[element.id]
           ? {
-              ...this.state,
-              ...selectGroupsForSelectedElements(
-                {
-                  editingGroupId: this.state.editingGroupId,
-                  selectedElementIds: { [element.id]: true },
-                },
-                this.scene.getNonDeletedElements(),
-                this.state,
-                this,
-              ),
-              selectedLinearElement: isLinearElement(element)
-                ? new LinearElementEditor(
-                    element,
-                    this.scene.getNonDeletedElementsMap(),
-                  )
-                : null,
-            }
+            ...this.state,
+            ...selectGroupsForSelectedElements(
+              {
+                editingGroupId: this.state.editingGroupId,
+                selectedElementIds: { [element.id]: true },
+              },
+              this.scene.getNonDeletedElements(),
+              this.state,
+              this,
+            ),
+            selectedLinearElement: isLinearElement(element)
+              ? new LinearElementEditor(
+                element,
+                this.scene.getNonDeletedElementsMap(),
+              )
+              : null,
+          }
           : this.state),
         showHyperlinkPopup: false,
       },

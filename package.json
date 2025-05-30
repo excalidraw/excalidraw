@@ -85,6 +85,7 @@
     "strip-ansi": "6.0.1"
   },
   "dependencies": {
-    "@google/genai": "1.0.1"
+    "@google/genai": "1.0.1",
+    "colorthief": "2.6.0"
   }
 }
