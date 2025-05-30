@@ -1,7 +1,6 @@
-import type { Bounds } from "@excalidraw/element";
+import { doBoundsIntersect, type Bounds } from "@excalidraw/element";
 
 import { isPoint, pointDistance, pointFrom, pointFromVector } from "./point";
-import { rectangle, rectangleIntersectLineSegment } from "./rectangle";
 import { vector, vectorNormal, vectorNormalize, vectorScale } from "./vector";
 
 import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
@@ -105,16 +104,15 @@ export function curveIntersectLineSegment<
   Point extends GlobalPoint | LocalPoint,
 >(c: Curve<Point>, l: LineSegment<Point>): Point[] {
   // Optimize by doing a cheap bounding box check first
-  const bounds = curveBounds(c);
-  if (
-    rectangleIntersectLineSegment(
-      rectangle(
-        pointFrom(bounds[0], bounds[1]),
-        pointFrom(bounds[2], bounds[3]),
-      ),
-      l,
-    ).length === 0
-  ) {
+  const b1 = curveBounds(c);
+  const b2 = [
+    Math.min(l[0][0], l[1][0]),
+    Math.min(l[0][1], l[1][1]),
+    Math.max(l[0][0], l[1][0]),
+    Math.max(l[0][1], l[1][1]),
+  ] as Bounds;
+
+  if (!doBoundsIntersect(b1, b2)) {
     return [];
   }
 
