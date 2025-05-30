@@ -145,7 +145,6 @@ export const getPerfectElementSize = (
     } else if (lockedAngle === Math.PI / 2) {
       width = 0;
     } else {
-      console.log(lockedAngle);
       height = absWidth * Math.tan(lockedAngle) * Math.sign(height) || height;
     }
   } else if (elementType !== "selection") {
