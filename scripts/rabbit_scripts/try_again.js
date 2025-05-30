@@ -8,7 +8,7 @@ const NUM_RESULTS = 10; // Maximum allowed by free tier
  * Fetch images from Google Custom Search API
  * @returns {Promise} Promise resolving to image results
  */
-export async function fetchSasukeImages(SEARCH_QUERY = DEFAULT_SEARCH_QUERY, SITE_RESTRICT = false) {
+export async function fetchSasukeImages(SEARCH_QUERY = DEFAULT_SEARCH_QUERY, SITE_RESTRICT = false, WEB = false) {
   const baseUrl = "https://www.googleapis.com/customsearch/v1";
   
   
@@ -16,9 +16,18 @@ export async function fetchSasukeImages(SEARCH_QUERY = DEFAULT_SEARCH_QUERY, SIT
     key: API_KEY,
     cx: SEARCH_ENGINE_ID,
     q: SEARCH_QUERY,
-    searchType: "image",
     num: NUM_RESULTS
   };
+
+
+// Add weblink restriction if enabled 
+  if (!WEB) {
+    paramObj.searchType = "image"; // Images only
+    console.log("🖼️ IMAGE SEARCH MODE");
+  }
+  else {
+    console.log("🌐 WEB SEARCH MODE");
+  }
 
   // Add site restriction if enabled
   if (SITE_RESTRICT) {
@@ -27,28 +36,51 @@ export async function fetchSasukeImages(SEARCH_QUERY = DEFAULT_SEARCH_QUERY, SIT
   } else {
     console.log("🌐 GENERAL SEARCH - no site restriction");
   }
+
+  // add webpage link restriction if enabled 
   
   console.log("🏗️ Param Object:", paramObj); // Debug: check the object before URLSearchParams
   
-  const params = new URLSearchParams(paramObj);
-  const url = `${baseUrl}?${params.toString()}`;
-  
-  console.log("Final URL:", url); // This should now show siteSearch parameter
+
     
   try {
-    const response = await fetch(url);
+    const url = new URL(baseUrl);
+    Object.keys(paramObj).forEach(key => url.searchParams.append(key, paramObj[key]));
+    
+    console.log("🔗 Request URL:", url.toString());
+    
+    const response = await fetch(url.toString());
+    
     if (!response.ok) {
-      throw new Error(`API request failed with status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-        
+    
     const data = await response.json();
-    console.log("📊 API Response:", data);
-    return processImageResults(data);
+    
+    if (WEB) {
+      // Return web page results
+      return data.items?.map(item => ({
+        title: item.title,
+        link: item.link,
+        snippet: item.snippet,
+        displayLink: item.displayLink
+      })) || [];
+    } else {
+      // Return image results (your existing format)
+      return data.items?.map(item => ({
+        title: item.title,
+        link: item.link,
+        image: item.image,
+        contextLink: item.image?.contextLink
+      })) || [];
+    }
+    
   } catch (error) {
-    console.error("Error fetching images:", error);
-    throw error;
+    console.error("❌ Search failed:", error);
+    return [];
   }
 }
+
 
 /**
  * Process the API response to extract image information
@@ -75,11 +107,11 @@ export function processImageResults(data) {
  * Main function to search for images
  * Browser-compatible version (no file system operations)
  */
-export async function searchAndSaveImages(searchQuery = DEFAULT_SEARCH_QUERY, siteRestrict = false) {
+export async function searchAndSaveImages(searchQuery = DEFAULT_SEARCH_QUERY, siteRestrict = false, WEB = false) {
   try {
     console.log(`Searching for "${searchQuery}" images...`);
-    const images = await fetchSasukeImages(searchQuery, siteRestrict);
-    console.log(`Found ${images.length} images`);
+    const images = await fetchSasukeImages(searchQuery, siteRestrict, WEB);
+    console.log(`Searching for "${searchQuery}" ${WEB ? 'web pages' : 'images'}...`);
     return images;
   } catch (error) {
     console.error("Search operation failed:", error);

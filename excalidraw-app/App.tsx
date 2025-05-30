@@ -419,6 +419,7 @@ const ExcalidrawWrapper = () => {
   type ImageResult = {
     link: string;
     title?: string;
+    snippet?: string; 
   };
 
   type TabImage = {
@@ -473,6 +474,11 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
         // General search for now (you can add YouTube restriction later)
         newImages = await searchAndSaveImages(currentTab.searchQuery, false);
       }
+      else if (tabName === "Internet webpages") {
+        // General search for now (you can add YouTube restriction later)
+        newImages = await searchAndSaveImages(currentTab.searchQuery, false, true);
+        console.log("Raw web search results:", newImages);
+      }
       
       // Update the specific tab with results
       const updatedTabs = [...tabData];
@@ -481,8 +487,9 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
         images: newImages.slice(0, 10).map((img: ImageResult, i: number) => ({
           id: `${tabName.toLowerCase()}-${i}`,
           src: img.link,
-          alt: `${tabName} Result ${i + 1}`,
-          name: `${tabName} ${i + 1}`,
+          alt: img.title || `${tabName} Result ${i + 1}`,
+          name: img.title || `${tabName} ${i + 1}`,
+          snippet : img.snippet,
         })),
         loaded: true // Mark as loaded
       };
@@ -1320,7 +1327,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                               },
                               {
                                 name: "Pinterest",
-                                images: [], // Empty initially
+                                images: [], // Empty initially will be lazily loaded upon onclick
                                 searchQuery: searchQuery, // Store query for later
                                 loaded: false // Mark as not loaded
                               
@@ -1333,6 +1340,12 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                                   alt: `YouTube Result ${i + 1}`,
                                   name: `YouTube ${i + 1}`,
                                 })),
+                              },
+                              {
+                                name: "Internet webpages",
+                                images: [], // Empty initially will be lazily loaded upon onclick
+                                searchQuery: searchQuery, // Store query for later
+                                loaded: false // Mark as not loaded
                               },
                             ];
                             console.log(tabs);
@@ -1842,6 +1855,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
               <button>YouTube</button>
               <button>Google</button>
               <button>Pinterest</button>
+              <button>Internet Webpages</button>
             </div>
           );
         }
