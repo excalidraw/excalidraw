@@ -525,6 +525,7 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
             imageUrl: imageData.src,
             width: MAX_WIDTH,
             height: MAX_HEIGHT,
+            label: "",
           });
           resolve(element);
         };
@@ -691,7 +692,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
     });
   
     let hasSearched = false;
-    let lastSearchQuery = "";
+    let lastSearchQuery = ""; // preventing duplicate searches
   
     const handleEnterKey = (event: KeyboardEvent) => {
       if (event.key !== 'Enter') return;
@@ -704,16 +705,17 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
       if (currentSearchBox) {
         const searchQuery = getSearchBoxText(currentSearchBox);
   
+        // valid and different search query
         if (searchQuery !== "Search..." &&
           searchQuery.trim() !== "" &&
           searchQuery.length > 2 &&
           searchQuery !== lastSearchQuery) {
   
           console.log("Search query detected:", searchQuery);
-          lastSearchQuery = searchQuery;
+          lastSearchQuery = searchQuery; // Update last search query
           hasSearched = true;
   
-          searchAndSaveImages(searchQuery)
+          searchAndSaveImages(searchQuery, false)
             .then((images: ImageResult[]) => {
               const tabs = [
                 {
@@ -724,15 +726,13 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                     alt: `Google Result ${i + 1}`,
                     name: `Google ${i + 1}`,
                   })),
+                  loaded: true
                 },
                 {
                   name: "Pinterest",
-                  images: images.slice(10, 20).map((img: ImageResult, i: number) => ({
-                    id: `pinterest-${i}`,
-                    src: img.link,
-                    alt: `Pinterest Result ${i + 1}`,
-                    name: `Pinterest ${i + 1}`,
-                  })),
+                  images: [], // Empty initially will be lazily loaded upon onclick
+                  searchQuery: searchQuery, // Store query for later
+                  loaded: false // Mark as not loaded
                 },
                 {
                   name: "YouTube",
@@ -743,13 +743,19 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                     name: `YouTube ${i + 1}`,
                   })),
                 },
+                {
+                  name: "Internet webpages",
+                  images: [], // Empty initially will be lazily loaded upon onclick
+                  searchQuery: searchQuery, // Store query for later
+                  loaded: false // Mark as not loaded
+                },
               ];
               console.log(tabs);
               setTabData(tabs);
               console.log("Tab Data was set!");
               setImageWindowVisible(true);
             });
-        }
+        } 
       }
     };
   
