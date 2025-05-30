@@ -1,4 +1,3 @@
-
 import {
   Excalidraw,
   LiveCollaborationTrigger,
