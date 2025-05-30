@@ -1,6 +1,9 @@
 import clsx from "clsx";
 import React from "react";
 
+import { newRabbitSearchBoxElement } from "@excalidraw/element/newRabbitElement";
+import { FONT_FAMILY } from "@excalidraw/common";
+
 import {
   CLASSES,
   DEFAULT_SIDEBAR,
@@ -296,30 +299,35 @@ const LayerUI = ({
                               penDetected={appState.penDetected}
                             /> */}
 
-
-                            <RabbitSearchButton
-                              checked={isHandToolActive(appState)}
-                              onChange={() => onLockToggle()}
-                              title={t("toolBar.hand")}
-                              isMobile
-                            />
+                                <RabbitSearchButton
+                                  checked={isHandToolActive(appState)}
+                                  onChange={() => {
+                                    const handler = (window as any).__handleRabbitSearch;
+                                    if (handler) {
+                                      handler();
+                                    }
+                                  }}
+                                  title={t("toolBar.hand")}
+                                  isMobile
+                                />
 
                             <RabbitColorPaletteButton
                               checked={isHandToolActive(appState)}
-                              onChange={() => onLockToggle()}
+                              onChange={() => {
+                                const handler = (window as any).__handleColorPalette;
+                                if (handler) {
+                                  handler();
+                                }
+                              }}
                               title={t("toolBar.hand")}
                               isMobile
                             />
-
-
 
                             {/* <LockButton
                               checked={appState.activeTool.locked}
                               onChange={onLockToggle}
                               title={t("toolBar.lock")}
                             /> */}
-
-
 
                             <div className="App-toolbar__divider" />
 

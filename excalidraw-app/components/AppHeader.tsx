@@ -11,10 +11,10 @@ export const AppHeader = React.memo(({ onChange, excalidrawAPI }: AppHeaderProps
   const [drawingName, setDrawingName] = useState<string>(() => {
     try {
       const savedTitle = localStorage.getItem(DRAWING_TITLE_STORAGE_KEY);
-      return savedTitle || "Untitled Drawing";
+      return savedTitle || "Untitled Sketch";
     } catch (error) {
       console.error("Error reading title from localStorage:", error);
-      return "Untitled Drawing";
+      return "Untitled Sketch";
     }
   });
   
@@ -64,7 +64,7 @@ export const AppHeader = React.memo(({ onChange, excalidrawAPI }: AppHeaderProps
       style={{
         position: "fixed",
         top: 0,
-        left: 0,
+        left: -20,
         width: "100%",
         zIndex: 100,
         borderBottom: "1px solid #e0e0e0",

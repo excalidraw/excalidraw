@@ -100,6 +100,8 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
 
     case "rabbit-searchbox":
     case "rabbit-image":
+    case "rabbit-image-tabs":
+    case "rabbit-color-palette":
       return getRabbitShape(element as RabbitElement);
   }
     

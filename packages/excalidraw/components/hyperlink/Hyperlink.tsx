@@ -37,7 +37,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { trackEvent } from "../../analytics";
-import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
+import { getTooltipDiv, updateTooltipPosition } from "../Tooltip";
 
 import { t } from "../../i18n";
 

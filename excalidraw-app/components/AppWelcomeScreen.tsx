@@ -1,6 +1,8 @@
 import { WelcomeScreen } from "@excalidraw/excalidraw/index";
 import React from "react";
+
 import { useI18n } from "@excalidraw/excalidraw/i18n";
+
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 export const AppWelcomeScreen: React.FC = React.memo(() => {

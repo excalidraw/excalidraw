@@ -43,7 +43,7 @@
     "vitest-canvas-mock": "0.3.3"
   },
   "engines": {
-    "node": "18.0.0 - 22.x.x"
+    "node": "18.0.0 - 23.x.x"
   },
   "homepage": ".",
   "prettier": "@excalidraw/prettier-config",
@@ -86,6 +86,7 @@
     "vite": "5.4.19"
   },
   "dependencies": {
-    "@google/genai": "1.0.1"
+    "@google/genai": "1.0.1",
+    "colorthief": "2.6.0"
   }
 }

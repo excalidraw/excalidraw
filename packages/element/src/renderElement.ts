@@ -3,7 +3,7 @@ import { getStroke } from "perfect-freehand";
 
 import { isRightAngleRads } from "@excalidraw/math";
 
-import { isRabbitElement, isRabbitSearchBoxElement, isRabbitImageElement } from "./rabbitElement";
+import { isRabbitElement, isRabbitSearchBoxElement, isRabbitImageElement, isRabbitImageTabsElement, isRabbitColorPaletteElement } from "./rabbitElement";
 
 import {
   BOUND_TEXT_PADDING,
@@ -803,6 +803,8 @@ export const renderElement = (
     return;
   }
 
+
+
   switch (element.type) {
     case "magicframe":
     case "frame": {
@@ -1088,6 +1090,23 @@ export const renderElement = (
   context.globalAlpha = 1;
 };
 
+const getContrastColor = (hexColor: string): string => {
+  // Remove # if present
+  const color = hexColor.replace('#', '');
+
+  // Convert to RGB
+  const r = parseInt(color.substr(0, 2), 16);
+  const g = parseInt(color.substr(2, 2), 16);
+  const b = parseInt(color.substr(4, 2), 16);
+
+  // Calculate luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  // Return black or white based on luminance
+  return luminance > 0.5 ? '#000000' : '#FFFFFF';
+};
+
+
 // Add the renderRabbitElement function
 const renderRabbitElement = (
   element: RabbitElement,
@@ -1096,7 +1115,7 @@ const renderRabbitElement = (
   renderConfig: StaticCanvasRenderConfig,
 ) => {
   if (isRabbitSearchBoxElement(element)) {
-    context.save();
+     context.save();
 
     context.translate(
       element.x + appState.scrollX,
@@ -1142,18 +1161,13 @@ const renderRabbitElement = (
     // Set text properties
     context.font = getFontString(element);
     context.fillStyle = element.strokeColor;
-    context.textAlign = element.textAlign as CanvasTextAlign;
+    context.textAlign = "left"; // Force left alignment for searchbox behavior
 
     // Calculate text position
     const padding = 10;
     const iconSpace = element.hasIcon ? 30 : 0;
 
-    const horizontalOffset =
-      element.textAlign === "center"
-        ? element.width / 2
-        : element.textAlign === "right"
-          ? element.width - padding - iconSpace
-          : padding;
+    const horizontalOffset = padding; // Always start text at left with padding
 
     const lineHeightPx = getLineHeightInPx(
       element.fontSize,
@@ -1174,176 +1188,337 @@ const renderRabbitElement = (
     //     horizontalOffset,
     //     index * lineHeightPx + verticalOffset + element.height / 2 - (lines.length * lineHeightPx) / 2,
     //   );
-      
-      
 
+    const displayText = element.isEditing
+      ? element.currentText
+      : (element.currentText.trim() !== "" ? element.currentText : element.text);
 
-        const displayText = element.isEditing 
-          ? element.currentText 
-          : (element.currentText.trim() !== "" ? element.currentText : element.text);
+    const maxTextWidth = element.width - 2 * padding - (element.hasIcon ? 30 : 0);
+    const words = displayText.split(/\s+/);
+    const lines: string[] = [];
+    let currentLine = "";
 
-          const maxTextWidth = element.width - 2 * padding - (element.hasIcon ? 30 : 0);
-          const words = displayText.split(/\s+/);
-          const lines: string[] = [];
-          let currentLine = "";
-          
-          for (let word of words) {
-            const testLine = currentLine ? `${currentLine} ${word}` : word;
-            const testWidth = context.measureText(testLine).width;
-            if (testWidth < maxTextWidth) {
-              currentLine = testLine;
-            } else {
-              if (currentLine) lines.push(currentLine);
-              currentLine = word;
-            }
-          }
-          if (currentLine) lines.push(currentLine);
-          
-          for (let i = 0; i < lines.length; i++) {
-            context.fillText(
-              lines[i],
-              horizontalOffset,
-              i * lineHeightPx + verticalOffset + element.height / 2 - (lines.length * lineHeightPx) / 2,
-            );
-          }
-          
-          const totalTextHeight = lines.length * lineHeightPx + padding * 2;
-
-          if (element.height < totalTextHeight) {
-            element.height = totalTextHeight;
-          }
-        
-      // Draw search icon if enabled
-      if (element.hasIcon) {
-        // Draw a simple magnifying glass icon
-        // const iconX = element.width - 20;
-        const iconX = element.width - 20;
-        const iconY = element.height / 2;
-        const iconSize = Math.min(12, element.height / 2);
-        
-        context.beginPath();
-        // Circle of magnifying glass
-        context.arc(iconX - iconSize/2, iconY, iconSize, 0, 2 * Math.PI);
-        context.strokeStyle = "#888888";
-        context.lineWidth = 2;
-        context.stroke();
-        
-        // Handle of magnifying glass
-        context.beginPath();
-        context.moveTo(iconX + iconSize/2, iconY + iconSize/2);
-        context.lineTo(iconX + iconSize, iconY + iconSize);
-        context.stroke();
+    for (let word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const testWidth = context.measureText(testLine).width;
+      if (testWidth < maxTextWidth) {
+        currentLine = testLine;
+      } else {
+        if (currentLine) lines.push(currentLine);
+        currentLine = word;
       }
-    
+    }
+    if (currentLine) lines.push(currentLine);
+
+    for (let i = 0; i < lines.length; i++) {
+      context.fillText(
+        lines[i],
+        horizontalOffset,
+        i * lineHeightPx + verticalOffset + element.height / 2 - (lines.length * lineHeightPx) / 2,
+      );
+    }
+
+    const totalTextHeight = lines.length * lineHeightPx + padding * 2;
+
+    if (element.height < totalTextHeight) {
+      element.height = totalTextHeight;
+    }
+
+    // Draw search icon if enabled
+    if (element.hasIcon) {
+      // Draw a simple magnifying glass icon
+      const iconX = element.width - 20;
+      const iconY = element.height / 2;
+      const iconSize = Math.min(12, element.height / 2);
+
+      context.beginPath();
+      // Circle of magnifying glass
+      context.arc(iconX - iconSize / 2, iconY, iconSize, 0, 2 * Math.PI);
+      context.strokeStyle = "#888888";
+      context.lineWidth = 2;
+      context.stroke();
+
+      // Handle of magnifying glass
+      context.beginPath();
+      context.moveTo(iconX + iconSize / 2, iconY + iconSize / 2);
+      context.lineTo(iconX + iconSize, iconY + iconSize);
+      context.stroke();
+    }
+
     context.restore();
   }
-// else if (isRabbitImageElement(element)) {
-//   const offsetX = element.x + appState.scrollX;
-//   const offsetY = element.y + appState.scrollY;
-//   const { width, height } = element;
-//   const padding = 10;
-//   const labelHeight = 20;
+  else if (isRabbitImageElement(element)) {
+    const offsetX = element.x + appState.scrollX;
+    const offsetY = element.y + appState.scrollY;
+    const { width, height } = element;
+    const padding = 10;
+    const labelHeight = 20;
+    const radius = 10;
 
-//   // 1) Draw the box and label
-//   context.save();
-  
-//   context.translate(offsetX, offsetY);
-//   context.fillStyle = element.backgroundColor || "#fff";
-//   context.fillRect(0, 0, width, height);
-//   context.strokeStyle = element.strokeColor || "#000";
-//   context.strokeRect(0, 0, width, height);
-//   context.fillStyle = "#000";
-//   context.font = "16px sans-serif";
-//   context.textBaseline = "bottom";
-//   context.fillText(element.label, padding, height - 5);
-//   context.restore();
+    context.save();
+    context.translate(offsetX, offsetY);
 
-//   // 2) Draw the cached image if it’s ready
-//   const img = getCachedRabbitImage(element.imageUrl);
-//   if (img.complete && img.naturalWidth) {
-//     context.save();
-//     context.translate(offsetX, offsetY);
-//     context.drawImage(
-//       img,
-//       padding,
-//       padding,
-//       width - padding * 2,
-//       height - labelHeight - padding * 2
-//     );
-//     context.restore();
-//   }
-// }
+    // Set fill style before drawing background
+    context.fillStyle = element.backgroundColor || "#fff";
 
-else if (isRabbitImageElement(element)) {
-  const offsetX = element.x + appState.scrollX;
+    // Draw rounded rectangle
+    if (context.roundRect) {
+      context.beginPath();
+      context.roundRect(0, 0, width, height, radius);
+      context.fill();
+
+      context.strokeStyle = element.strokeColor || "#000";
+      context.lineWidth = element.strokeWidth || 1;
+      context.stroke();
+    } else {
+      // Fallback rounded rect
+      context.beginPath();
+      context.moveTo(radius, 0);
+      context.lineTo(width - radius, 0);
+      context.quadraticCurveTo(width, 0, width, radius);
+      context.lineTo(width, height - radius);
+      context.quadraticCurveTo(width, height, width - radius, height);
+      context.lineTo(radius, height);
+      context.quadraticCurveTo(0, height, 0, height - radius);
+      context.lineTo(0, radius);
+      context.quadraticCurveTo(0, 0, radius, 0);
+      context.closePath();
+      context.fill();
+
+      context.strokeStyle = element.strokeColor || "#000";
+      context.lineWidth = element.strokeWidth || 1;
+      context.stroke();
+    }
+
+    // Draw label text
+    context.fillStyle = "#000";
+
+    context.font = "16px sans-serif"; // Replace with any loaded font
+    context.textBaseline = "bottom";
+    context.fillText(element.label, padding, height - 5);
+
+    context.restore();
+
+    // Draw image
+    const img = getCachedRabbitImage(element.imageUrl);
+    if (img.complete && img.naturalWidth) {
+      context.save();
+      context.translate(offsetX, offsetY);
+      context.drawImage(
+        img,
+        padding,
+        padding,
+        width - padding * 2,
+        height - labelHeight - padding * 2
+      );
+      context.restore();
+    }
+  }
+  else if (isRabbitImageTabsElement(element)) {
+    context.save();
+
+    context.translate(
+      element.x + appState.scrollX,
+      element.y + appState.scrollY
+    );
+
+    const tabHeight = element.tabHeight;
+    const tabWidth = element.width / element.images.length;
+
+    // Draw tabs
+    element.images.forEach((image, index) => {
+      const tabX = index * tabWidth;
+      const isActive = index === element.activeTabIndex;
+
+      // Tab background
+      context.fillStyle = isActive ? "#4f46e5" : "#e5e5e5";
+      context.fillRect(tabX, 0, tabWidth, tabHeight);
+
+      // Tab border
+      context.strokeStyle = "#d1d5db";
+      context.lineWidth = 1;
+      context.strokeRect(tabX, 0, tabWidth, tabHeight);
+
+      // Tab text
+      context.fillStyle = isActive ? "#ffffff" : "#374151";
+      context.font = "14px Arial";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(
+        image.title,
+        tabX + tabWidth / 2,
+        tabHeight / 2
+      );
+    });
+
+    // Draw main content area border
+    context.strokeStyle = element.strokeColor;
+    context.lineWidth = element.strokeWidth;
+    context.strokeRect(0, tabHeight, element.width, element.height - tabHeight);
+
+    // Fill main content area
+    context.fillStyle = element.backgroundColor;
+    context.fillRect(0, tabHeight, element.width, element.height - tabHeight);
+
+    // Set up clipping region for scrollable content
+    const contentArea = {
+      x: 0,
+      y: tabHeight,
+      width: element.width,
+      height: element.height - tabHeight
+    };
+
+    context.save();
+    context.beginPath();
+    context.rect(contentArea.x, contentArea.y, contentArea.width, contentArea.height);
+    context.clip();
+
+    // Calculate scroll offset (you'll need to add scrollOffset to your element state)
+    // const scrollOffset = element.scrollOffset || 0;
+
+    // Two-column layout configuration
+    const padding = 10;
+    const columnGap = 10;
+    const columnWidth = (contentArea.width - padding * 2 - columnGap) / 2;
+    const imageHeight = 150; // Fixed height for each image
+    const imageSpacing = 10;
+
+    // Get active tab images (assuming you want to show multiple images from active tab)
+    // const activeTabImages = element.images[element.activeTabIndex]?.subImages || [element.images[element.activeTabIndex]];
+    const activeTabImages = element.images[element.activeTabIndex]?.subImages || [];
+
+    if (activeTabImages && activeTabImages.length > 0) {
+      activeTabImages.forEach((imageData, index) => {
+        const columnIndex = index % 2; // 0 for left column, 1 for right column
+        const rowIndex = Math.floor(index / 2);
+
+        const imageX = contentArea.x + padding + columnIndex * (columnWidth + columnGap);
+        const imageY = contentArea.y + padding + rowIndex * (imageHeight + imageSpacing);
+
+        // Only draw if image is visible in the viewport
+        if (imageY + imageHeight >= contentArea.y && imageY <= contentArea.y + contentArea.height) {
+          const img = getCachedRabbitImage(imageData.url);
+
+          if (img.complete && img.naturalWidth > 0) {
+            // Image is loaded, draw it
+            const aspectRatio = img.naturalWidth / img.naturalHeight;
+            let drawWidth = columnWidth;
+            let drawHeight = imageHeight;
+
+            // Maintain aspect ratio
+            if (aspectRatio > columnWidth / imageHeight) {
+              drawHeight = drawWidth / aspectRatio;
+            } else {
+              drawWidth = drawHeight * aspectRatio;
+            }
+
+            // Center the image within its allocated space
+            const offsetX = (columnWidth - drawWidth) / 2;
+            const offsetY = (imageHeight - drawHeight) / 2;
+
+            context.drawImage(
+              img,
+              imageX + offsetX,
+              imageY + offsetY,
+              drawWidth,
+              drawHeight
+            );
+
+            // Optional: Draw image border
+            context.strokeStyle = "#e5e7eb";
+            context.lineWidth = 1;
+            context.strokeRect(imageX, imageY, columnWidth, imageHeight);
+
+            // Optional: Draw image title if available
+            if (imageData.title) {
+              context.fillStyle = "#374151";
+              context.font = "12px Arial";
+              context.textAlign = "center";
+              context.textBaseline = "top";
+              context.fillText(
+                imageData.title,
+                imageX + columnWidth / 2,
+                imageY + imageHeight + 5
+              );
+            }
+          } else {
+            // Image is still loading or failed to load
+            if (img.complete) {
+              // Image failed to load
+              context.fillStyle = "#fee2e2";
+              context.fillRect(imageX, imageY, columnWidth, imageHeight);
+              context.fillStyle = "#dc2626";
+              context.font = "12px Arial";
+              context.textAlign = "center";
+              context.textBaseline = "middle";
+              context.fillText(
+                "Failed to load",
+                imageX + columnWidth / 2,
+                imageY + imageHeight / 2
+              );
+            } else {
+              // Image is still loading
+              context.fillStyle = "#f9fafb";
+              context.fillRect(imageX, imageY, columnWidth, imageHeight);
+              context.strokeStyle = "#e5e7eb";
+              context.lineWidth = 1;
+              context.strokeRect(imageX, imageY, columnWidth, imageHeight);
+
+              context.fillStyle = "#9ca3af";
+              context.font = "12px Arial";
+              context.textAlign = "center";
+              context.textBaseline = "middle";
+              context.fillText(
+                "Loading...",
+                imageX + columnWidth / 2,
+                imageY + imageHeight / 2
+              );
+            }
+          }
+        }
+      });
+    }
+
+    context.restore(); // Restore clipping
+  }
+  else if (isRabbitColorPaletteElement(element)) {
+    const offsetX = element.x + appState.scrollX;
   const offsetY = element.y + appState.scrollY;
-  const { width, height } = element;
-  const padding = 10;
-  const labelHeight = 20;
-  const radius = 10;
+  const { colors, rectangleHeight, width } = element;
 
   context.save();
   context.translate(offsetX, offsetY);
 
-  // Set fill style before drawing background
-  context.fillStyle = element.backgroundColor || "#fff";
+  context.fillStyle = "rgba(255,0,0,0.1)"; // Semi-transparent red
+context.fillRect(0, 0, width, colors.length * rectangleHeight);
 
-  // Draw rounded rectangle
-  if (context.roundRect) {
-    context.beginPath();
-    context.roundRect(0, 0, width, height, radius);
-    context.fill();
+  // Render each color rectangle
+  colors.forEach((color, index) => {
+    const y = index * rectangleHeight;
 
+    // Draw rectangle background
+    context.fillStyle = color;
+    context.fillRect(0, y, width, rectangleHeight);
+
+    // Draw rectangle border
     context.strokeStyle = element.strokeColor || "#000";
     context.lineWidth = element.strokeWidth || 1;
-    context.stroke();
-  } else {
-    // Fallback rounded rect
-    context.beginPath();
-    context.moveTo(radius, 0);
-    context.lineTo(width - radius, 0);
-    context.quadraticCurveTo(width, 0, width, radius);
-    context.lineTo(width, height - radius);
-    context.quadraticCurveTo(width, height, width - radius, height);
-    context.lineTo(radius, height);
-    context.quadraticCurveTo(0, height, 0, height - radius);
-    context.lineTo(0, radius);
-    context.quadraticCurveTo(0, 0, radius, 0);
-    context.closePath();
-    context.fill();
+    context.strokeRect(0, y, width, rectangleHeight);
 
-    context.strokeStyle = element.strokeColor || "#000";
-    context.lineWidth = element.strokeWidth || 1;
-    context.stroke();
-  }
-
-  // Draw label text
-  context.fillStyle = "#000";
-  
-  context.font = "16px sans-serif"; // Replace with any loaded font
-  context.textBaseline = "bottom";
-  context.fillText(element.label, padding, height - 5);
+    // Draw hex code text
+    context.fillStyle = getContrastColor(color);
+    context.font = "14px monospace";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(
+      color.toUpperCase(),
+      width / 2,
+      y + rectangleHeight / 2
+    );
+  });
 
   context.restore();
-
-  // Draw image
-  const img = getCachedRabbitImage(element.imageUrl);
-  if (img.complete && img.naturalWidth) {
-    context.save();
-    context.translate(offsetX, offsetY);
-    context.drawImage(
-      img,
-      padding,
-      padding,
-      width - padding * 2,
-      height - labelHeight - padding * 2
-    );
-    context.restore();
   }
-}
-
-
-
 }
 
 export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);

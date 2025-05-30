@@ -69,6 +69,16 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
     return isDraggableFromInside && isPathALoop(element.points);
   }
 
+  if (element.type === "rabbit-color-palette") {
+    return true;
+  }
+
+  if (element.type === "rabbit-image") {
+    return true;
+  }
+
+
+
   return isDraggableFromInside || isImageElement(element);
 };
 
