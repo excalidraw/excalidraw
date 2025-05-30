@@ -8,9 +8,10 @@ import type {
   VERTICAL_ALIGN,
 } from "@excalidraw/common";
 
-import type {
-  RabbitSearchBoxElement,
-  RabbitImageElement,
+import {
+  type RabbitSearchBoxElement,
+  type RabbitImageElement,
+  isRabbitColorPaletteElement,
 } from "./rabbitElement";
 
 import type {

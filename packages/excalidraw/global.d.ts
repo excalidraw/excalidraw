@@ -30,6 +30,14 @@ interface Clipboard extends EventTarget {
   write(data: any[]): Promise<void>;
 }
 
+// For rabbit color palette
+declare module 'colorthief' {
+  export default class ColorThief {
+    getColor(img: HTMLImageElement | HTMLCanvasElement, quality?: number): [number, number, number];
+    getPalette(img: HTMLImageElement | HTMLCanvasElement, colorCount?: number, quality?: number): Array<[number, number, number]>;
+  }
+}
+
 // PNG encoding/decoding
 // -----------------------------------------------------------------------------
 type TEXtChunk = { name: "tEXt"; data: Uint8Array };

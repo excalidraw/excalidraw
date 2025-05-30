@@ -9,11 +9,7 @@ interface ImageItem {
     snippet?: string;
 }
 
-interface Tab {
-    name: string;
-    images: ImageItem[];
-}
-
+// properties of rabbit image window
 interface RabbitImageWindowProps {
     appState: AppState;
     onImageSelect: (image: any) => void;
@@ -21,6 +17,7 @@ interface RabbitImageWindowProps {
     selectedImages: string[];
     onToggleVisibility: () => void;
     onTabClick?: (tabName: string, tabIndex: number) => void;
+    onAddToCanvas: (selectedImages: string[]) => void;
     tabData: {
         name: string;
         images: {
@@ -42,12 +39,17 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
     selectedImages,
     onToggleVisibility,
     onTabClick,
+    onAddToCanvas,
     tabData,
 }) => {
     const [activeTab, setActiveTab] = useState(0);
-    const [pos, setPos] = useState({ x: 0, y: 0 });
+    const [pos, setPos] = useState({ x: 1000, y: 160 });
     const dragRef = useRef<{ x: number; y: number } | null>(null);
     const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+
+    // Component dimensions - adjust these if you change the component size
+    const COMPONENT_WIDTH = 320;
+    const COMPONENT_HEIGHT = 400; // Approximate height, adjust as needed
 
     const onMouseDown = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -59,9 +61,25 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
 
     const onMouseMove = (e: MouseEvent) => {
         if (!dragRef.current) return;
+        
         const dx = e.clientX - dragRef.current.x;
         const dy = e.clientY - dragRef.current.y;
-        setPos((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+        
+        setPos((prev) => {
+            const newX = prev.x + dx;
+            const newY = prev.y + dy;
+            
+            // Get viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            // Constrain to viewport bounds
+            const constrainedX = Math.max(0, Math.min(newX, viewportWidth - COMPONENT_WIDTH));
+            const constrainedY = Math.max(0, Math.min(newY, viewportHeight - COMPONENT_HEIGHT));
+            
+            return { x: constrainedX, y: constrainedY };
+        });
+        
         dragRef.current = { x: e.clientX, y: e.clientY };
     };
 
@@ -190,7 +208,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
             <div
                 style={{
                     padding: "16px",
-                    maxHeight: "400px",
+                    maxHeight: "320px",
                     overflowY: "auto",
                     background: "white",
                     display: "grid",
@@ -274,9 +292,10 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
             {selectedImages.length > 0 && (
                 <div
                     style={{
-                        padding: "12px 16px",
+                        padding: "12px 0px",
                         borderTop: "1px solid var(--color-border)",
                         background: "var(--color-surface-low)",
+                        marginBottom: "10px",
                     }}
                 >
                     <p
@@ -290,6 +309,47 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                     >
                         {selectedImages.length} selected
                     </p>
+
+                    <button
+                        onClick={() => {
+                            // calls onAddToCanvas function in App.tsx which generates rabbit-images
+                            onAddToCanvas(selectedImages);
+                        }}
+                        style={{
+                            background: "rgb(107, 176, 229)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "6px 16px", // Smaller padding
+                            fontSize: "12px", // Smaller font
+                            fontFamily: "Assistant",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            transition: "all 0.2s ease",
+                            boxShadow: "0 1px 4px rgba(151, 172, 202, 0.3)",
+                            minWidth: "70px", // Smaller minimum width
+                            display: "block",
+                            margin: "0 auto",
+                            marginLeft: "110px",
+                            marginTop: "10px",
+                            marginBottom: "-8px",
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "translateY(-1px)";
+                            e.currentTarget.style.background = "rgb(66, 144, 204)"; // Darker on hover
+                            e.currentTarget.style.boxShadow = "0 2px 6px rgba(151, 172, 202, 0.4)";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "translateY(0)";
+                            e.currentTarget.style.background = "rgb(107, 176, 229)";
+                            e.currentTarget.style.boxShadow = "0 1px 4px rgba(151, 172, 202, 0.3)";
+                        }}
+                        onMouseDown={(e) => {
+                            e.currentTarget.style.transform = "translateY(0)";
+                        }}
+                    >
+                        Add to Canvas
+                    </button>
                 </div>
             )}
         </div>
