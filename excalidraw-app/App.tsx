@@ -39,7 +39,8 @@ import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
 
-import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement } from "@excalidraw/element/newRabbitElement";
+import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement, newRabbitColorPalette } from "@excalidraw/element/newRabbitElement";
+import ColorThief from 'colorthief'; // for color palette
 
 import {
   GithubIcon,
@@ -436,9 +437,6 @@ const ExcalidrawWrapper = () => {
   const [isImageWindowVisible, setImageWindowVisible] = useState(false);
   const [tabData, setTabData] = useState<TabData[]>([]);
 
-
-
-
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   const handleImageSelect = (image: any) => {
@@ -448,6 +446,98 @@ const ExcalidrawWrapper = () => {
   const handleImageDeselect = (image: any) => {
     setSelectedImages((prev) => prev.filter((id) => id !== image.id));
   };
+  
+const handleAddToCanvas = async (selectedImageIds: string[]) => {
+  if (!excalidrawAPI) return;
+
+  const selectedImageData = selectedImageIds
+    .map(id => {
+      for (const tab of tabData) {
+        const image = tab.images.find(img => img.id === id);
+        if (image) return image;
+      }
+      return null;
+    })
+    .filter((imageData): imageData is NonNullable<typeof imageData> => imageData !== null);
+
+  const MAX_WIDTH = 200;
+  const MAX_HEIGHT = 200;
+  const MARGIN = 30; // Space between images
+  const START_X = 100; // Starting X position
+  const START_Y = 100; // Starting Y position
+
+  // Calculate grid layout
+  const imageCount = selectedImageData.length;
+  const cols = Math.ceil(Math.sqrt(imageCount)); // Auto-calculate columns for square-ish grid
+  const rows = Math.ceil(imageCount / cols);
+
+  const elementsWithDimensions = await Promise.all(
+    selectedImageData.map((imageData, index) => {
+      return new Promise<any>((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          let scaledWidth = img.width;
+          let scaledHeight = img.height;
+
+          // Scale down if width is too large
+          if (scaledWidth > MAX_WIDTH) {
+            const ratio = MAX_WIDTH / scaledWidth;
+            scaledWidth = MAX_WIDTH;
+            scaledHeight = scaledHeight * ratio;
+          }
+
+          // Scale down further if height is still too large
+          if (scaledHeight > MAX_HEIGHT) {
+            const ratio = MAX_HEIGHT / scaledHeight;
+            scaledHeight = MAX_HEIGHT;
+            scaledWidth = scaledWidth * ratio;
+          }
+
+          // Calculate grid position
+          const col = index % cols;
+          const row = Math.floor(index / cols);
+          
+          // Calculate position with consistent spacing
+          const x = START_X + col * (MAX_WIDTH + MARGIN);
+          const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+          const element = newRabbitImageElement({
+            x: x,
+            y: y,
+            imageUrl: imageData.src,
+            width: scaledWidth,
+            height: scaledHeight,
+          });
+          resolve(element);
+        };
+        
+        img.onerror = () => {
+          const col = index % cols;
+          const row = Math.floor(index / cols);
+          const x = START_X + col * (MAX_WIDTH + MARGIN);
+          const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+          const element = newRabbitImageElement({
+            x: x,
+            y: y,
+            imageUrl: imageData.src,
+            width: MAX_WIDTH,
+            height: MAX_HEIGHT,
+          });
+          resolve(element);
+        };
+        
+        img.src = imageData.src;
+      });
+    })
+  );
+
+  excalidrawAPI.updateScene({
+    elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
+  });
+
+  setSelectedImages([]);
+};
 
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
@@ -616,6 +706,172 @@ const ExcalidrawWrapper = () => {
       delete (window as any).__handleRabbitSearch;
     };
   }, [handleRabbitSearch]);
+  // color palette handler for color palette button
+  const handleColorPalette = useCallback(async () => {
+    if (!excalidrawAPI) return;
+
+    // Get currently selected elements
+    const selectedElements = excalidrawAPI.getSceneElements().filter(
+      element => excalidrawAPI.getAppState().selectedElementIds[element.id]
+    );
+
+    // Check if selected elements are images or rabbit-images
+    const selectedImages = selectedElements.filter(
+      element => element.type === 'image' || element.type === 'rabbit-image'
+    );
+
+    console.log("Selected elements:", selectedElements.length);
+    console.log("Selected images:", selectedImages.length);
+
+    // if no images selected, error message
+    if (selectedImages.length === 0) {
+      excalidrawAPI.setToast({
+        message: "Please select at least one image",
+        duration: 3000
+      });
+      return;
+    }
+
+    // If images are selected, proceed with color extraction
+    excalidrawAPI.setToast({
+      message: `Generating color palette for \n${selectedImages.length} selected image(s)...`,
+      duration: 3000
+    });
+
+    try {
+      const allColors: string[] = [];
+      const colorThief = new ColorThief();
+      const imageColorArrays: string[][] = [];
+
+      // First, collect colors from all images
+      for (const imageElement of selectedImages) {
+        try {
+          const colors = await extractColorsFromImageElement(imageElement, colorThief, excalidrawAPI);
+          imageColorArrays.push(colors);
+        } catch (error) {
+          console.warn(`Failed to extract colors from image ${imageElement.id}:`, error);
+        }
+      }
+
+      // Then, pick colors round-robin style (1 from each image, then repeat)
+      const finalPalette: string[] = [];
+      const maxColors = 5;
+      let colorIndex = 0;
+
+      while (finalPalette.length < maxColors && colorIndex < 6) {
+        for (const imageColors of imageColorArrays) {
+          if (finalPalette.length >= maxColors) break;
+
+          if (imageColors[colorIndex] && !finalPalette.includes(imageColors[colorIndex])) {
+            finalPalette.push(imageColors[colorIndex]);
+          }
+        }
+        colorIndex++;
+      }
+
+      console.log("Extracted colors from multiple images:", finalPalette);
+      // Create color palette element
+      const colorPalette = newRabbitColorPalette({
+        x: 100,
+        y: 100,
+        colors: finalPalette
+      });
+
+      excalidrawAPI.updateScene({
+        elements: [...excalidrawAPI.getSceneElements(), colorPalette]
+      });
+
+      excalidrawAPI.setToast({
+        message: `Color palette created`,
+        duration: 3000
+      });
+
+    } catch (error) {
+      console.error("Error extracting colors:", error);
+      excalidrawAPI.setToast({
+        message: "Error extracting colors from images",
+        duration: 3000
+      });
+    }
+    console.log("Images to process:", selectedImages);
+  }, [excalidrawAPI]); // Don't forget the dependency array!
+
+  useEffect(() => {
+    (window as any).__handleColorPalette = handleColorPalette;
+
+    return () => {
+      delete (window as any).__handleColorPalette;
+    };
+  }, [handleColorPalette]);
+
+  // processes multiple color extractions in parallel
+  async function extractColorsFromMultipleImages(
+    imageElements: any[],
+    colorThief: ColorThief,
+    excalidrawAPI: any
+  ): Promise<string[][]> {
+    const promises = imageElements.map(imageElement =>
+      extractColorsFromImageElement(imageElement, colorThief, excalidrawAPI)
+    );
+
+    const allColors = await Promise.all(promises);
+    return allColors;
+  }
+
+  // Helper function to extract colors from an image element
+  const extractColorsFromImageElement = async (
+    imageElement: any,
+    colorThief: ColorThief,
+    excalidrawAPI: any
+  ): Promise<string[]> => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+
+    // First, set up the image source
+    try {
+      if (imageElement.type === 'image') {
+        const files = excalidrawAPI.getFiles();
+        const file = files[imageElement.fileId];
+
+        console.log("data url", imageElement.dataURL);
+
+        if (file) {
+          if (file.dataURL) {
+            img.src = file.dataURL;
+            console.log("here");
+          }
+          else {
+            throw new Error('No image source found for image')
+          }
+        }
+      } else if (imageElement.type === 'rabbit-image') {
+        img.src = imageElement.imageUrl;
+      }
+    } catch (error) {
+      throw new Error('Failed to load rabbit image');
+    }
+
+    // Then wait for the image to load
+    return new Promise((resolve, reject) => {
+      img.onload = () => {
+        try {
+          const dominantColor = colorThief.getColor(img);
+          const palette = colorThief.getPalette(img, 5);
+
+          const hexColors = [dominantColor, ...palette].map(rgb =>
+            '#' + rgb.map((x: number) => x.toString(16).padStart(2, '0')).join('')
+          );
+
+          resolve(hexColors);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      img.onerror = () => reject(new Error('Failed to load image'));
+    });
+  };
+
   useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
       return;
@@ -1035,9 +1291,9 @@ const ExcalidrawWrapper = () => {
         }}
       >
         <img
-          src="https://i.imgur.com/KttcKbd.png"
+          src="https://imgur.com/KttcKbd"
           alt="logo"
-          style={{ height: 28, marginRight: 12 }}
+          style={{ height: 30, marginRight: 10 }}
         />
         <input
           type="text"
@@ -1399,9 +1655,6 @@ const ExcalidrawWrapper = () => {
                 }
               },
             },
-
-
-
             {
               label: "Add Rabbit Image",
               category: DEFAULT_CATEGORIES.app,
@@ -1462,6 +1715,24 @@ const ExcalidrawWrapper = () => {
                   .catch(error => {
                     console.error("Error in image search:", error);
                   });
+              },
+            },
+            {
+              label: "Add Rabbit Color Palette",
+              category: DEFAULT_CATEGORIES.app,
+              keywords: ["palette", "colors", "color-palette", "hex"],
+              perform: () => {
+                if (excalidrawAPI) {
+                  const colorPalette = newRabbitColorPalette({
+                    x: 100,
+                    y: 100,
+                    colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57']
+                  });
+
+                  excalidrawAPI.updateScene({
+                    elements: [...excalidrawAPI.getSceneElements(), colorPalette]
+                  });
+                }
               },
             },
             {
@@ -1667,6 +1938,7 @@ const ExcalidrawWrapper = () => {
           onImageSelect={handleImageSelect}
           onImageDeselect={handleImageDeselect}
           onToggleVisibility={() => setImageWindowVisible(false)}
+          onAddToCanvas={handleAddToCanvas}
           tabData={tabData}
         />
       )}
@@ -1704,15 +1976,12 @@ const ExcalidrawWrapper = () => {
         }
         return null;
       })()}
+
     </div>
   );
 };
 
 const ExcalidrawApp = () => {
-
-
-
-
   const isCloudExportWindow =
     window.location.pathname === "/excalidraw-plus-export";
   if (isCloudExportWindow) {
