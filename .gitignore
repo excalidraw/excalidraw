@@ -27,4 +27,3 @@ dev-dist
 html
 meta*.json
 .env
-yarn.lock
