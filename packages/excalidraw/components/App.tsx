@@ -5514,7 +5514,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state.editingLinearElement.elementId !==
             selectedElements[0].id) &&
           !isElbowArrow(selectedElements[0]) &&
-          !isArrowElement(selectedElements[0]))
+          isLineElement(selectedElements[0]))
       ) {
         this.store.scheduleCapture();
         this.setState({
