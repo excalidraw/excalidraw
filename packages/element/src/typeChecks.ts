@@ -192,6 +192,8 @@ export const isRectanguloidElement = (
       element.type === "embeddable" ||
       element.type === "frame" ||
       element.type === "magicframe" ||
+      element.type === "rabbit-searchbox" ||
+      element.type === "rabbit-image" ||
       (element.type === "text" && !element.containerId))
   );
 };
@@ -210,6 +212,8 @@ export const isRectangularElement = (
       element.type === "embeddable" ||
       element.type === "frame" ||
       element.type === "magicframe" ||
+      element.type === "rabbit-searchbox" ||
+      element.type === "rabbit-image" ||
       element.type === "freedraw")
   );
 };
@@ -250,6 +254,8 @@ export const isExcalidrawElement = (
     case "image":
     case "selection":
     case "rabbit-searchbox":
+    case "rabbit-image":  // Add this case
+      return true;
     default: {
       console.warn(`Unknown element type: ${type}`);
       return false;

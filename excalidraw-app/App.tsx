@@ -39,6 +39,7 @@ import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
 
+import {AutoOrganizer, createAutoOrganizerCommands } from '@excalidraw/element/autoOrganizer';
 import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement, newRabbitColorPalette } from "@excalidraw/element/newRabbitElement";
 import ColorThief from 'colorthief'; // for color palette
 
@@ -158,9 +159,6 @@ import { RabbitElementBase, RabbitImageElement } from "../packages/element/src/r
 
 import { RabbitImageWindow } from "@excalidraw/element/RabbitImageWindow";
 // for rabbit image window
-
-
-
 
 
 import { GoogleGenAI } from "@google/genai";
@@ -437,6 +435,10 @@ const ExcalidrawWrapper = () => {
   const [isImageWindowVisible, setImageWindowVisible] = useState(false);
   const [tabData, setTabData] = useState<TabData[]>([]);
 
+  // consts for auto-organizer
+  const [currentSearchQuery, setCurrentSearchQuery] = useState("");
+  const [autoOrganizer, setAutoOrganizer] = useState<AutoOrganizer | null>(null);
+
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   const handleImageSelect = (image: any) => {
@@ -447,7 +449,7 @@ const ExcalidrawWrapper = () => {
     setSelectedImages((prev) => prev.filter((id) => id !== image.id));
   };
   
-const handleAddToCanvas = async (selectedImageIds: string[]) => {
+const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize: boolean = true) => {
   if (!excalidrawAPI) return;
 
   const selectedImageData = selectedImageIds
@@ -535,6 +537,17 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
   excalidrawAPI.updateScene({
     elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
   });
+
+  if (shouldAutoOrganize && autoOrganizer && currentSearchQuery) {
+    setTimeout(async () => {
+      await autoOrganizer.enhanceAddToCanvas(
+        selectedImageIds, 
+        currentSearchQuery, 
+        tabData, 
+        () => {} // Empty since images already added
+      );
+    }, 100);
+  }
 
   setSelectedImages([]);
 };
@@ -768,6 +781,12 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
       img.onerror = () => reject(new Error('Failed to load image'));
     });
   };
+
+  useEffect(() => {
+    if (excalidrawAPI) {
+      setAutoOrganizer(new AutoOrganizer(excalidrawAPI));
+    }
+  }, [excalidrawAPI]);
 
   useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
@@ -1505,6 +1524,8 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
                         lastSearchQuery = searchQuery; // Update last search query
                         hasSearched = true;
 
+                        setCurrentSearchQuery(searchQuery);
+
                         searchAndSaveImages(searchQuery)
                           .then((images: ImageResult[]) => {
                             const tabs = [
@@ -1818,6 +1839,7 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
                 }
               },
             },
+
             {
               label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
@@ -2003,6 +2025,7 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
                 }
               },
             },
+            ...(excalidrawAPI ? createAutoOrganizerCommands(excalidrawAPI) : []),
           ]}
         />
         {isVisualDebuggerEnabled() && excalidrawAPI && (
