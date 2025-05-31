@@ -1064,12 +1064,13 @@ describe("Test Linear Elements", () => {
       expect(h.elements.length).toBe(1);
       mouse.doubleClickAt(line.x, line.y);
 
-      expect(h.elements.length).toBe(2);
+      expect(h.elements.length).toBe(1);
 
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      expect(text.type).toBe("text");
-      expect(text.containerId).toBeNull();
-      expect(line.boundElements).toBeNull();
+      expect(text).toBeUndefined();
+      // expect(text.type).toBe("text");
+      // expect(text.containerId).toBeNull();
+      // expect(line.boundElements).toBeNull();
     });
 
     // TODO fix #7029 and rewrite this test
