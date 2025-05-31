@@ -186,6 +186,7 @@ export const intersectElementWithLineSegment = (
     case "magicframe":
     case "rabbit-image":
     case "rabbit-searchbox":
+    case "rabbit-color-palette":
       return intersectRectanguloidWithLineSegment(element, line, offset);
     case "diamond":
       return intersectDiamondWithLineSegment(element, line, offset);

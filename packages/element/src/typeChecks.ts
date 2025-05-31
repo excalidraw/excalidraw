@@ -176,6 +176,7 @@ export const isBindableElement = (
       element.type === "magicframe" ||
       element.type === "rabbit-searchbox" || 
       element.type === "rabbit-image" ||
+      element.type === "rabbit-color-palette" ||
       (element.type === "text" && !element.containerId))
   );
 };

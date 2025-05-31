@@ -11,6 +11,7 @@ import type {
 import {
   type RabbitSearchBoxElement,
   type RabbitImageElement,
+  type RabbitColorPaletteElement,
   isRabbitColorPaletteElement,
 } from "./rabbitElement";
 
@@ -205,7 +206,8 @@ export type ExcalidrawRectanguloidElement =
   | ExcalidrawFrameLikeElement
   | ExcalidrawEmbeddableElement
   | RabbitSearchBoxElement
-  | RabbitImageElement;
+  | RabbitImageElement
+  | RabbitColorPaletteElement;
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
@@ -225,7 +227,8 @@ export type ExcalidrawElement =
   | ExcalidrawEmbeddableElement
   | RabbitElement
   | RabbitSearchBoxElement
-  | RabbitImageElement;
+  | RabbitImageElement
+  | RabbitColorPaletteElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<
   ExcalidrawElement,
@@ -279,7 +282,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement
   | RabbitSearchBoxElement
-  | RabbitImageElement;
+  | RabbitImageElement
+  | RabbitColorPaletteElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement

@@ -65,8 +65,8 @@ import type {
   NonDeleted,
 } from "@excalidraw/element/types";
 
-import { renderSnaps } from "./renderSnaps";
-import { roundRect } from "./roundRect";
+import { renderSnaps } from "../renderer/renderSnaps";
+import { roundRect } from "../renderer/roundRect";
 import {
   getScrollBars,
   SCROLLBAR_COLOR,
@@ -208,6 +208,7 @@ const renderBindingHighlightForBindableElement = (
     case "magicframe":
     case "rabbit-image":
     case "rabbit-searchbox":
+    case "rabbit-color-palette":
       drawHighlightForRectWithRotation(context, element, padding);
       break;
     case "diamond":
