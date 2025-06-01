@@ -405,7 +405,7 @@ import {
   generateIdFromFile,
   getDataURL,
   getDataURL_sync,
-  getFileFromEvent,
+  getFilesFromEvent,
   ImageURLToFile,
   isImageFileHandle,
   isSupportedImageFile,
@@ -3120,6 +3120,16 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
+      const filesData = await getFilesFromEvent(event);
+
+      const imageFiles = filesData
+        .map((data) => data.file)
+        .filter((file): file is File => isSupportedImageFile(file));
+
+      if (imageFiles.length > 0 && this.isToolSupported("image")) {
+        return this.insertMultipleImages(imageFiles, sceneX, sceneY);
+      }
+
       // must be called in the same frame (thus before any awaits) as the paste
       // event else some browsers (FF...) will clear the clipboardData
       // (something something security)
@@ -4833,7 +4843,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ suggestedBindings: [] });
     }
     if (nextActiveTool.type === "image") {
-      this.onImageAction({
+      this.onImageToolbarButtonClick({
         insertOnCanvasDirectly:
           (tool.type === "image" && tool.insertOnCanvasDirectly) ?? false,
       });
@@ -10114,7 +10124,7 @@ class App extends React.Component<AppProps, AppState> {
     // a future case, let's throw here
     if (!this.isToolSupported("image")) {
       this.setState({ errorMessage: t("errors.imageToolNotSupported") });
-      return;
+      return imageElement;
     }
 
     this.scene.insertElement(imageElement);
@@ -10133,7 +10143,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         errorMessage: error.message || t("errors.imageInsertError"),
       });
-      return null;
+      return imageElement;
     }
   };
 
@@ -10184,7 +10194,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private onImageAction = async ({
+  private onImageToolbarButtonClick = async ({
     insertOnCanvasDirectly,
   }: {
     insertOnCanvasDirectly: boolean;
@@ -10198,11 +10208,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
-      const imageFile = await fileOpen({
+      const imageFiles = await fileOpen({
         description: "Image",
         extensions: Object.keys(
           IMAGE_MIME_TYPES,
         ) as (keyof typeof IMAGE_MIME_TYPES)[],
+        multiple: true,
       });
 
       const imageElement = this.createImageElement({
@@ -10211,21 +10222,11 @@ class App extends React.Component<AppProps, AppState> {
         addToFrameUnderCursor: false,
       });
 
-      if (insertOnCanvasDirectly) {
-        this.insertImageElement(imageElement, imageFile);
-        this.initializeImageDimensions(imageElement);
-        this.setState(
-          {
-            selectedElementIds: makeNextSelectedElementIds(
-              { [imageElement.id]: true },
-              this.state,
-            ),
-          },
-          () => {
-            this.actionManager.executeAction(actionFinalize);
-          },
-        );
+      if (insertOnCanvasDirectly || imageFiles.length > 1) {
+        this.insertMultipleImages(imageFiles, x, y);
       } else {
+        const imageFile = imageFiles[0];
+
         this.setState(
           {
             pendingImageElementId: imageElement.id,
@@ -10503,69 +10504,205 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  // TODO rewrite (vibe-coded)
+  private positionElementsOnGrid = (
+    elements: ExcalidrawElement[] | ExcalidrawElement[][],
+    centerX: number,
+    centerY: number,
+    padding = 50,
+  ) => {
+    // Ensure there are elements to position
+    if (!elements || elements.length === 0) {
+      return;
+    }
+
+    // Normalize input to work with atomic units (groups of elements)
+    // If elements is a flat array, treat each element as its own atomic unit
+    const atomicUnits: ExcalidrawElement[][] = Array.isArray(elements[0])
+      ? (elements as ExcalidrawElement[][])
+      : (elements as ExcalidrawElement[]).map((element) => [element]);
+
+    // Determine the number of columns for atomic units
+    // A common approach for a "grid-like" layout without specific column constraints
+    // is to aim for a roughly square arrangement.
+    const numUnits = atomicUnits.length;
+    const numColumns = Math.max(1, Math.ceil(Math.sqrt(numUnits)));
+
+    // Group atomic units into rows based on the calculated number of columns
+    const rows: ExcalidrawElement[][][] = [];
+    for (let i = 0; i < numUnits; i += numColumns) {
+      rows.push(atomicUnits.slice(i, i + numColumns));
+    }
+
+    // Calculate properties for each row (total width, max height)
+    // and the total actual height of all row content.
+    let totalGridActualHeight = 0; // Sum of max heights of rows, without inter-row padding
+    const rowProperties = rows.map((rowUnits) => {
+      let rowWidth = 0;
+      let maxUnitHeightInRow = 0;
+
+      const unitBounds = rowUnits.map((unit) => {
+        const [minX, minY, maxX, maxY] = getCommonBounds(unit);
+        return {
+          elements: unit,
+          bounds: [minX, minY, maxX, maxY] as const,
+          width: maxX - minX,
+          height: maxY - minY,
+        };
+      });
+
+      unitBounds.forEach((unitBound, index) => {
+        rowWidth += unitBound.width;
+        // Add padding between units in the same row, but not after the last one
+        if (index < unitBounds.length - 1) {
+          rowWidth += padding;
+        }
+        if (unitBound.height > maxUnitHeightInRow) {
+          maxUnitHeightInRow = unitBound.height;
+        }
+      });
+
+      totalGridActualHeight += maxUnitHeightInRow;
+      return {
+        unitBounds,
+        width: rowWidth,
+        maxHeight: maxUnitHeightInRow,
+      };
+    });
+
+    // Calculate the total height of the grid including padding between rows
+    const totalGridHeightWithPadding =
+      totalGridActualHeight + Math.max(0, rows.length - 1) * padding;
+
+    // Calculate the starting Y position to center the entire grid vertically around centerY
+    let currentY = centerY - totalGridHeightWithPadding / 2;
+
+    // Position atomic units row by row
+    rowProperties.forEach((rowProp) => {
+      const { unitBounds, width: rowWidth, maxHeight: rowMaxHeight } = rowProp;
+
+      // Calculate the starting X for the current row to center it horizontally around centerX
+      let currentX = centerX - rowWidth / 2;
+
+      unitBounds.forEach((unitBound) => {
+        // Calculate the offset needed to position this atomic unit
+        const [originalMinX, originalMinY] = unitBound.bounds;
+        const offsetX = currentX - originalMinX;
+        const offsetY = currentY - originalMinY;
+
+        // Apply the offset to all elements in this atomic unit
+        unitBound.elements.forEach((element) => {
+          this.scene.mutateElement(element, {
+            x: element.x + offsetX,
+            y: element.y + offsetY,
+          });
+        });
+
+        // Move X for the next unit in the row
+        currentX += unitBound.width + padding;
+      });
+
+      // Move Y to the starting position for the next row
+      // This accounts for the tallest unit in the current row and the inter-row padding
+      currentY += rowMaxHeight + padding;
+    });
+  };
+
+  private insertMultipleImages = async (
+    imageFiles: File[],
+    sceneX: number,
+    sceneY: number,
+  ) => {
+    try {
+      const selectedElementIds: Record<ExcalidrawElement["id"], true> = {};
+
+      const imageElements: Promise<NonDeleted<ExcalidrawImageElement>>[] = [];
+      for (let i = 0; i < imageFiles.length; i++) {
+        const file = imageFiles[i];
+
+        const imageElement = this.createImageElement({
+          sceneX,
+          sceneY,
+        });
+
+        imageElements.push(this.insertImageElement(imageElement, file));
+        this.initializeImageDimensions(imageElement);
+        selectedElementIds[imageElement.id] = true;
+      }
+
+      this.setState(
+        {
+          selectedElementIds: makeNextSelectedElementIds(
+            selectedElementIds,
+            this.state,
+          ),
+        },
+        () => {
+          this.actionManager.executeAction(actionFinalize);
+        },
+      );
+
+      const initializedImageElements = await Promise.all(imageElements);
+
+      this.positionElementsOnGrid(initializedImageElements, sceneX, sceneY);
+    } catch (error: any) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.setState({
+        isLoading: false,
+        errorMessage,
+      });
+    }
+  };
+
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
-    // must be retrieved first, in the same frame
-    const { file, fileHandle } = await getFileFromEvent(event);
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
       this.state,
     );
 
-    try {
-      // if image tool not supported, don't show an error here and let it fall
-      // through so we still support importing scene data from images. If no
-      // scene data encoded, we'll show an error then
-      if (isSupportedImageFile(file) && this.isToolSupported("image")) {
-        // first attempt to decode scene from the image if it's embedded
-        // ---------------------------------------------------------------------
+    // must be retrieved first, in the same frame
+    const filesData = await getFilesFromEvent(event);
 
-        if (file?.type === MIME_TYPES.png || file?.type === MIME_TYPES.svg) {
-          try {
-            const scene = await loadFromBlob(
-              file,
-              this.state,
-              this.scene.getElementsIncludingDeleted(),
-              fileHandle,
-            );
-            this.syncActionResult({
-              ...scene,
-              appState: {
-                ...(scene.appState || this.state),
-                isLoading: false,
-              },
-              replaceFiles: true,
-              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-            });
-            return;
-          } catch (error: any) {
-            // Don't throw for image scene daa
-            if (error.name !== "EncodingError") {
-              throw new Error(t("alerts.couldNotLoadInvalidFile"));
-            }
-          }
-        }
+    if (filesData.length === 1) {
+      const { file, fileHandle } = filesData[0];
 
-        // if no scene is embedded or we fail for whatever reason, fall back
-        // to importing as regular image
-        // ---------------------------------------------------------------------
-
-        const imageElement = this.createImageElement({ sceneX, sceneY });
-        this.insertImageElement(imageElement, file);
-        this.initializeImageDimensions(imageElement);
-        this.setState({
-          selectedElementIds: makeNextSelectedElementIds(
-            { [imageElement.id]: true },
+      if (
+        file &&
+        (file.type === MIME_TYPES.png || file.type === MIME_TYPES.svg)
+      ) {
+        try {
+          const scene = await loadFromBlob(
+            file,
             this.state,
-          ),
-        });
-
-        return;
+            this.scene.getElementsIncludingDeleted(),
+            fileHandle,
+          );
+          this.syncActionResult({
+            ...scene,
+            appState: {
+              ...(scene.appState || this.state),
+              isLoading: false,
+            },
+            replaceFiles: true,
+            captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          });
+          return;
+        } catch (error: any) {
+          if (error.name !== "EncodingError") {
+            throw new Error(t("alerts.couldNotLoadInvalidFile"));
+          }
+          // if EncodingError, fall through to insert as regular image
+        }
       }
-    } catch (error: any) {
-      return this.setState({
-        isLoading: false,
-        errorMessage: error.message,
-      });
+    }
+
+    const imageFiles = filesData
+      .map((data) => data.file)
+      .filter((file): file is File => isSupportedImageFile(file));
+
+    if (imageFiles.length > 0 && this.isToolSupported("image")) {
+      return this.insertMultipleImages(imageFiles, sceneX, sceneY);
     }
 
     const libraryJSON = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
@@ -10583,9 +10720,12 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (file) {
-      // Attempt to parse an excalidraw/excalidrawlib file
-      await this.loadFileToCanvas(file, fileHandle);
+    if (filesData.length > 1) {
+      const { file, fileHandle } = filesData[0];
+      if (file) {
+        // Attempt to parse an excalidraw/excalidrawlib file
+        await this.loadFileToCanvas(file, fileHandle);
+      }
     }
 
     if (event.dataTransfer?.types?.includes("text/plain")) {
