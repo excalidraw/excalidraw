@@ -389,23 +389,53 @@ export const ImageURLToFile = async (
   throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
 };
 
-export const getFileFromEvent = async (
-  event: React.DragEvent<HTMLDivElement>,
+export const getFilesFromEvent = async (
+  event: React.DragEvent<HTMLDivElement> | ClipboardEvent,
 ) => {
-  const file = event.dataTransfer.files.item(0);
-  const fileHandle = await getFileHandle(event);
+  let fileList: FileList | undefined = undefined;
+  let items: DataTransferItemList | undefined = undefined;
 
-  return { file: file ? await normalizeFile(file) : null, fileHandle };
+  if (event instanceof ClipboardEvent) {
+    fileList = event.clipboardData?.files;
+    items = event.clipboardData?.items;
+  } else {
+    fileList = event.dataTransfer?.files;
+    items = event.dataTransfer?.items;
+  }
+
+  const files: (File | null)[] = Array.from(fileList || []);
+
+  return await Promise.all(
+    files.map(async (file, idx) => {
+      const dataTransferItem = items?.[idx];
+      const fileHandle = dataTransferItem
+        ? getFileHandle(dataTransferItem)
+        : null;
+      return file
+        ? {
+            file: await normalizeFile(file),
+            fileHandle: await fileHandle,
+          }
+        : {
+            file: null,
+            fileHandle: null,
+          };
+    }),
+  );
 };
 
 export const getFileHandle = async (
-  event: React.DragEvent<HTMLDivElement>,
+  event: DragEvent | React.DragEvent | DataTransferItem,
 ): Promise<FileSystemHandle | null> => {
   if (nativeFileSystemSupported) {
     try {
-      const item = event.dataTransfer.items[0];
+      const dataTransferItem =
+        event instanceof DataTransferItem
+          ? event
+          : (event as DragEvent).dataTransfer?.items?.[0];
+
       const handle: FileSystemHandle | null =
-        (await (item as any).getAsFileSystemHandle()) || null;
+        (await (dataTransferItem as any).getAsFileSystemHandle()) || null;
 
       return handle;
     } catch (error: any) {
