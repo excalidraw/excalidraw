@@ -3006,6 +3006,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  // TODO: this is so spaghetti, we should refactor it and cover it with tests
   public pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent) => {
       const isPlainPaste = !!IS_PLAIN_PASTE;
@@ -3180,6 +3181,7 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
           if (embeddables.length) {
+            this.store.scheduleCapture();
             this.setState({
               selectedElementIds: Object.fromEntries(
                 embeddables.map((embeddable) => [embeddable.id, true]),
@@ -3292,11 +3294,10 @@ class App extends React.Component<AppProps, AppState> {
       this.addMissingFiles(opts.files);
     }
 
-    this.store.scheduleCapture();
-
     const nextElementsToSelect =
       excludeElementsInFramesFromSelection(duplicatedElements);
 
+    this.store.scheduleCapture();
     this.setState(
       {
         ...this.state,
@@ -3530,7 +3531,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.scene.insertElements(textElements);
-
+    this.store.scheduleCapture();
     this.setState({
       selectedElementIds: makeNextSelectedElementIds(
         Object.fromEntries(textElements.map((el) => [el.id, true])),
@@ -3552,8 +3553,6 @@ class App extends React.Component<AppProps, AppState> {
       });
       PLAIN_PASTE_TOAST_SHOWN = true;
     }
-
-    this.store.scheduleCapture();
   }
 
   setAppState: React.Component<any, AppState>["setState"] = (
@@ -8978,6 +8977,7 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         this.store.scheduleCapture();
+
         if (hitLockedElement?.locked) {
           this.setState({
             activeLockedId:
@@ -10021,11 +10021,12 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.mutateElement(imageElement, {
         isDeleted: true,
       });
-      this.actionManager.executeAction(actionFinalize);
       this.setState({
         errorMessage: error.message || t("errors.imageInsertError"),
       });
       return null;
+    } finally {
+      this.actionManager.executeAction(actionFinalize);
     }
   };
 
@@ -10219,6 +10220,7 @@ class App extends React.Component<AppProps, AppState> {
       fileIds: elements.map((element) => element.fileId),
       files,
     });
+
     if (updatedFiles.size || erroredFiles.size) {
       for (const element of elements) {
         if (updatedFiles.has(element.fileId)) {
@@ -10226,6 +10228,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
     }
+
     if (erroredFiles.size) {
       this.scene.replaceAllElements(
         this.scene.getElementsIncludingDeleted().map((element) => {
@@ -10494,6 +10497,7 @@ class App extends React.Component<AppProps, AppState> {
           link: normalizeLink(text),
         });
         if (embeddable) {
+          this.store.scheduleCapture();
           this.setState({ selectedElementIds: { [embeddable.id]: true } });
         }
       }

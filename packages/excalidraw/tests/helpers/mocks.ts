@@ -31,3 +31,22 @@ export const mockMermaidToExcalidraw = (opts: {
     });
   }
 };
+
+export class ImageMock {
+  onload: (() => void) | null = null;
+  onerror: ((error: any) => void) | null = null;
+  src: string = "";
+  complete: boolean = false;
+
+  constructor() {
+    // simulate image loading
+    setTimeout(() => {
+      if (this.src) {
+        this.complete = true;
+        if (this.onload) {
+          this.onload();
+        }
+      }
+    }, 0);
+  }
+}

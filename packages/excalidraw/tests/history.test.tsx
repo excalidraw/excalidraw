@@ -49,9 +49,10 @@ import {
 } from "../actions";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import * as StaticScene from "../renderer/staticScene";
 import { getDefaultAppState } from "../appState";
 import { Excalidraw } from "../index";
-import * as StaticScene from "../renderer/staticScene";
+import { createPasteEvent } from "../clipboard";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -64,6 +65,8 @@ import {
   getCloneByOrigId,
   checkpointHistory,
 } from "./test-utils";
+
+import { ImageMock } from "./helpers/mocks";
 
 import type { AppState } from "../types";
 
@@ -556,6 +559,197 @@ describe("history", () => {
       expect(h.elements).toEqual([
         expect.objectContaining({ id: "A", isDeleted: true }),
         expect.objectContaining({ id: "B", isDeleted: false }),
+      ]);
+    });
+
+    it("should create new history entry on image drag&drop", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      // mock the global Image constructor
+      global.Image = ImageMock as any;
+
+      await API.drop(await API.loadFile("./fixtures/deer.png"));
+
+      await waitFor(() => {
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            type: "image",
+            fileId: expect.any(String),
+          }),
+        ]);
+      });
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "image",
+          fileId: expect.any(String),
+          isDeleted: true,
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "image",
+          fileId: expect.any(String),
+          isDeleted: false,
+        }),
+      ]);
+    });
+
+    it("should create new history entry on embeddable link drag&drop", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const link = "https://www.youtube.com/watch?v=gkGMXY0wekg";
+      await API.drop(
+        new Blob([link], {
+          type: MIME_TYPES.text,
+        }),
+      );
+
+      await waitFor(() => {
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            type: "embeddable",
+            link,
+          }),
+        ]);
+      });
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "embeddable",
+          link,
+          isDeleted: true,
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "embeddable",
+          link,
+          isDeleted: false,
+        }),
+      ]);
+    });
+
+    it("should create new history entry on image paste", async () => {
+      await render(
+        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
+      );
+
+      // mock the global Image constructor
+      global.Image = ImageMock as any;
+
+      Object.assign(document, {
+        elementFromPoint: () => GlobalTestState.canvas,
+      });
+
+      document.dispatchEvent(
+        createPasteEvent({
+          files: [await API.loadFile("./fixtures/smiley_embedded_v2.png")],
+        }),
+      );
+
+      await waitFor(() => {
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            type: "image",
+            fileId: expect.any(String),
+          }),
+        ]);
+      });
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "image",
+          fileId: expect.any(String),
+          isDeleted: true,
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "image",
+          fileId: expect.any(String),
+          isDeleted: false,
+        }),
+      ]);
+    });
+
+    it("should create new history entry on embeddable link paste", async () => {
+      await render(
+        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
+      );
+
+      Object.assign(document, {
+        elementFromPoint: () => GlobalTestState.canvas,
+      });
+
+      const link = "https://www.youtube.com/watch?v=gkGMXY0wekg";
+
+      document.dispatchEvent(
+        createPasteEvent({
+          types: {
+            "text/plain": link,
+          },
+        }),
+      );
+
+      await waitFor(() => {
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            type: "embeddable",
+            link,
+          }),
+        ]);
+      });
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "embeddable",
+          link,
+          isDeleted: true,
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "embeddable",
+          link,
+          isDeleted: false,
+        }),
       ]);
     });
 
