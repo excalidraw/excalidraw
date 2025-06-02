@@ -476,6 +476,51 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
   const elementsWithDimensions = await Promise.all(
     selectedImageData.map((imageData, index) => {
       return new Promise<any>((resolve) => {
+        // Calculate grid position
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+        const x = START_X + col * (MAX_WIDTH + MARGIN);
+        const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+        // Check if this is from Internet webpages tab
+        if (imageData.id.startsWith('internet webpages-')) {
+          console.log("You have sucessfuly started with internet webpages!")
+          // Create a text element for web pages
+          const textElement = {
+            type: "text",
+            id: `text-${Date.now()}-${Math.random()}`,
+            x: x,
+            y: y,
+            width: MAX_WIDTH,
+            height: 40,
+            text: imageData.name || imageData.alt || "Web Page",
+            fontSize: 10,
+            fontFamily: 1,
+            textAlign: "left",
+            verticalAlign: "top",
+            strokeColor: "#1e1e1e",
+            backgroundColor: "transparent",
+            fillStyle: "solid",
+            strokeWidth: 1,
+            strokeStyle: "solid",
+            roughness: 1,
+            opacity: 100,
+            angle: 0,
+            groupIds: [],
+            frameId: null,
+            roundness: null,
+            seed: Math.floor(Math.random() * 2147483647),
+            versionNonce: Math.floor(Math.random() * 2147483647),
+            isDeleted: false,
+            boundElements: null,
+            updated: 1,
+            link: imageData.src,
+            locked: false,
+            containerId: null,  // Add this line
+            originalText: imageData.name || imageData.alt || "Web Page",  // Add this line
+          };
+          resolve(textElement);
+        } else {
         const img = new Image();
         img.onload = () => {
           let scaledWidth = img.width;
@@ -530,6 +575,7 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
         };
         
         img.src = imageData.src;
+      }
       });
     })
   );
@@ -1436,6 +1482,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
             event.preventDefault();
             excalidrawAPI?.scrollToContent(element.link, { animate: true });
           }
+          
         }}
       >
         <AppMainMenu
