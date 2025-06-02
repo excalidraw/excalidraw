@@ -75,23 +75,12 @@ const ActiveRoomDialog = ({
   const [isRoomOwner, setIsRoomOwner] = useState(false);
   useEffect(() => {
     roomManager
-      .getCurrentRoom()
-      .then((room) => {
-        if (room) {
-          const _room = new URL(activeRoomLink);
-          const match = _room.hash.match(/room=([^,]+),([^&]+)/);
-          if (match) {
-            const [, roomId] = match;
-            setIsRoomOwner(roomId === room.roomId);
-          } else {
-            setIsRoomOwner(false);
-          }
-        } else {
-          setIsRoomOwner(false);
-        }
+      .isRoomOwnedByUser(activeRoomLink)
+      .then((isOwned) => {
+        setIsRoomOwner(isOwned);
       })
       .catch((error) => {
-        console.error("Error getting current room:", error);
+        console.warn("Failed to check room ownership:", error);
         setIsRoomOwner(false);
       });
   }, [activeRoomLink]);

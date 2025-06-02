@@ -176,6 +176,24 @@ class RoomManager {
     }
   }
 
+  async isRoomOwnedByUser(url: string): Promise<boolean> {
+    try {
+      const rooms = await this.loadRooms();
+      const _url = new URL(url);
+      const match = _url.hash.match(/room=([^,]+),([^&]+)/);
+
+      if (!match) {
+        return false;
+      }
+
+      const [, roomId] = match;
+      return rooms.some((room) => room.roomId === roomId);
+    } catch (error) {
+      console.warn("Failed to check room ownership:", error);
+      return false;
+    }
+  }
+
   async getCurrentRoom(): Promise<CollabRoom | null> {
     const rooms = await this.loadRooms();
     if (rooms.length === 0) {
