@@ -252,6 +252,20 @@ class Portal {
       this.socket.emit(WS_EVENTS.USER_FOLLOW_CHANGE, payload);
     }
   };
+
+  broadcastRoomDeletion = async () => {
+    if (this.socket?.id) {
+      const data: SocketUpdateDataSource["ROOM_DELETED"] = {
+        type: WS_SUBTYPES.DELETE,
+        payload: {
+          socketId: this.socket.id as SocketId,
+          roomId: this.roomId!,
+        },
+      };
+
+      this._broadcastSocketData(data as SocketUpdateData);
+    }
+  };
 }
 
 export default Portal;

@@ -186,7 +186,7 @@ class RoomManager {
         return false;
       }
 
-      const [, roomId] = match;
+      const roomId = match[1];
       return rooms.some((room) => room.roomId === roomId);
     } catch (error) {
       console.warn("Failed to check room ownership:", error);

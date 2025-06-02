@@ -198,10 +198,10 @@ const ActiveRoomDialog = ({
             color="danger"
             onClick={() => {
               trackEvent("share", "room deleted");
-              // TODO: handle deletion
-              // 1. stop collaboration (for all users?)
-              // 2. delete room from backend (firebase)
-              // 3. close
+              collabAPI.deleteRoom();
+              if (!collabAPI.isCollaborating()) {
+                handleClose();
+              }
             }}
           />
         )}

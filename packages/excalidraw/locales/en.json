@@ -253,7 +253,8 @@
     "resetLibrary": "This will clear your library. Are you sure?",
     "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
     "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
-    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!"
+    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!",
+    "collabRoomDeleted": "This collab room has been deleted by its owner."
   },
   "errors": {
     "unsupportedFileType": "Unsupported file type.",
@@ -280,7 +281,8 @@
     },
     "asyncPasteFailedOnRead": "Couldn't paste (couldn't read from system clipboard).",
     "asyncPasteFailedOnParse": "Couldn't paste.",
-    "copyToSystemClipboardFailed": "Couldn't copy to clipboard."
+    "copyToSystemClipboardFailed": "Couldn't copy to clipboard.",
+    "roomDeletionFailed": "Couldn't delete the collaboration room."
   },
   "toolBar": {
     "selection": "Selection",
