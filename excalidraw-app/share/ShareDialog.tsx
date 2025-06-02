@@ -171,8 +171,8 @@ const ActiveRoomDialog = ({
         </p>
         <h3>Stop Session</h3>
         <p>{t("roomDialog.desc_exitSession")}</p>
-        <h3>Delete Session</h3>
-        <p>{t("roomDialog.desc_deleteSession")}</p>
+        {isRoomOwner && <h3>Delete Session</h3>}
+        {isRoomOwner && <p>{t("roomDialog.desc_deleteSession")}</p>}
       </div>
 
       <div className="ShareDialog__active__actions">
