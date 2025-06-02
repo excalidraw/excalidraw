@@ -32,6 +32,7 @@
     "strokeStyle_dotted": "Dotted",
     "sloppiness": "Sloppiness",
     "opacity": "Opacity",
+    "pressureSensitivity": "Stroke sensitivity",
     "textAlign": "Text align",
     "edges": "Edges",
     "sharp": "Sharp",
