@@ -5078,6 +5078,7 @@ class App extends React.Component<AppProps, AppState> {
         // when overlapping, we would like to be more precise
         // this also avoids the need to update past tests
         threshold: this.getElementHitThreshold(elementWithHighestZIndex) / 2,
+        elementsMap: this.scene.getNonDeletedElementsMap(),
         frameNameBound: isFrameLikeElement(elementWithHighestZIndex)
           ? this.frameNameBoundsCache.get(elementWithHighestZIndex)
           : null,
@@ -5187,6 +5188,7 @@ class App extends React.Component<AppProps, AppState> {
       point: pointFrom(x, y),
       element,
       threshold: this.getElementHitThreshold(element),
+      elementsMap: this.scene.getNonDeletedElementsMap(),
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
         : null,
@@ -5218,6 +5220,7 @@ class App extends React.Component<AppProps, AppState> {
         hitElementItself({
           point: pointFrom(x, y),
           element: elements[index],
+          elementsMap: this.scene.getNonDeletedElementsMap(),
           threshold: this.getElementHitThreshold(elements[index]),
         })
       ) {
@@ -5565,6 +5568,7 @@ class App extends React.Component<AppProps, AppState> {
           hitElementItself({
             point: pointFrom(sceneX, sceneY),
             element: container,
+            elementsMap: this.scene.getNonDeletedElementsMap(),
             threshold: this.getElementHitThreshold(container),
           })
         ) {
@@ -6257,6 +6261,7 @@ class App extends React.Component<AppProps, AppState> {
         hitElementItself({
           point: pointFrom(scenePointerX, scenePointerY),
           element,
+          elementsMap,
           threshold: this.getElementHitThreshold(element),
         })
       ) {
@@ -9698,6 +9703,7 @@ class App extends React.Component<AppProps, AppState> {
                 pointerDownState.origin.y,
               ),
               element: hitElement,
+              elementsMap,
               threshold: this.getElementHitThreshold(hitElement),
               frameNameBound: isFrameLikeElement(hitElement)
                 ? this.frameNameBoundsCache.get(hitElement)

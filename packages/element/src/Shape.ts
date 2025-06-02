@@ -30,10 +30,10 @@ import { headingForPointIsHorizontal } from "./heading";
 import { canChangeRoundness } from "./comparisons";
 import { generateFreeDrawShape } from "./renderElement";
 import {
-  ElementBounds,
   getArrowheadPoints,
   getCenterForBounds,
   getDiamondPoints,
+  getElementBounds,
 } from "./bounds";
 
 import type {
@@ -328,9 +328,7 @@ export const generateLinearCollisionShape = (
     roughness: 0,
     preserveVertices: true,
   };
-  const center = getCenterForBounds(
-    ElementBounds.calculateBounds(element, new Map()),
-  );
+  const center = getCenterForBounds(getElementBounds(element, new Map()));
 
   switch (element.type) {
     case "line":

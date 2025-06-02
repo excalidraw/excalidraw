@@ -1,8 +1,4 @@
-import {
-  isTransparent,
-  elementCenterPoint,
-  arrayToMap,
-} from "@excalidraw/common";
+import { isTransparent, elementCenterPoint } from "@excalidraw/common";
 import {
   curveIntersectLineSegment,
   isPointWithinBounds,
@@ -28,12 +24,7 @@ import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./shapes";
-import {
-  type Bounds,
-  doBoundsIntersect,
-  ElementBounds,
-  getElementBounds,
-} from "./bounds";
+import { type Bounds, doBoundsIntersect, getElementBounds } from "./bounds";
 import {
   hasBoundTextElement,
   isFreeDrawElement,
@@ -90,6 +81,7 @@ export type HitTestArgs = {
   point: GlobalPoint;
   element: ExcalidrawElement;
   threshold: number;
+  elementsMap: ElementsMap;
   frameNameBound?: FrameNameBounds | null;
   onlySelection?: boolean;
 };
@@ -98,13 +90,11 @@ export const hitElementItself = ({
   point,
   element,
   threshold,
+  elementsMap,
   frameNameBound = null,
   onlySelection = false,
 }: HitTestArgs) => {
-  const bounds = ElementBounds.calculateBounds(
-    { ...element, angle: 0 } as ExcalidrawElement,
-    arrayToMap([element]),
-  );
+  const bounds = getElementBounds(element, elementsMap);
   const rotatedPoint = pointRotateRads(
     point,
     elementCenterPoint(element),
