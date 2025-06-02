@@ -1,16 +1,37 @@
 import { clamp, roundToStep } from "@excalidraw/math";
 
 import {
+  DEFAULT_CANVAS_BACKGROUND_PICKS,
+  CURSOR_TYPE,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  THEME,
+  ZOOM_STEP,
+  getShortcutKey,
+  updateActiveTool,
+  CODES,
+  KEYS,
+} from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element";
+import { getCommonBounds, type SceneBounds } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
 } from "../appState";
-import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
 import {
   handIcon,
+  LassoIcon,
   MoonIcon,
   SunIcon,
   TrashIcon,
@@ -19,34 +40,20 @@ import {
   ZoomOutIcon,
   ZoomResetIcon,
 } from "../components/icons";
-import {
-  CURSOR_TYPE,
-  MAX_ZOOM,
-  MIN_ZOOM,
-  THEME,
-  ZOOM_STEP,
-} from "../constants";
 import { setCursor } from "../cursor";
-import { getCommonBounds, getNonDeletedElements } from "../element";
-import { newElementWith } from "../element/mutateElement";
+
 import { t } from "../i18n";
-import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import { CaptureUpdateAction } from "../store";
-import { getShortcutKey, updateActiveTool } from "../utils";
 
 import { register } from "./register";
 
-import type { SceneBounds } from "../element/bounds";
-import type { ExcalidrawElement } from "../element/types";
 import type { AppState, Offsets } from "../types";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   label: "labels.canvasBackground",
-  paletteName: "Change canvas background color",
   trackEvent: false,
   predicate: (elements, appState, props, app) => {
     return (
@@ -84,7 +91,6 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   label: "labels.clearCanvas",
-  paletteName: "Clear canvas",
   icon: TrashIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, props, app) => {
@@ -519,10 +525,42 @@ export const actionToggleEraserTool = register({
   keyTest: (event) => event.key === KEYS.E,
 });
 
+export const actionToggleLassoTool = register({
+  name: "toggleLassoTool",
+  label: "toolBar.lasso",
+  icon: LassoIcon,
+  trackEvent: { category: "toolbar" },
+  perform: (elements, appState, _, app) => {
+    let activeTool: AppState["activeTool"];
+
+    if (appState.activeTool.type !== "lasso") {
+      activeTool = updateActiveTool(appState, {
+        type: "lasso",
+        fromSelection: false,
+      });
+      setCursor(app.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
+    } else {
+      activeTool = updateActiveTool(appState, {
+        type: "selection",
+      });
+    }
+
+    return {
+      appState: {
+        ...appState,
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        activeEmbeddable: null,
+        activeTool,
+      },
+      captureUpdate: CaptureUpdateAction.NEVER,
+    };
+  },
+});
+
 export const actionToggleHandTool = register({
   name: "toggleHandTool",
   label: "toolBar.hand",
-  paletteName: "Toggle hand tool",
   trackEvent: { category: "toolbar" },
   icon: handIcon,
   viewMode: false,

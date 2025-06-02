@@ -1,21 +1,20 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
-import { rgbToHex } from "../colors";
-import { EVENT } from "../constants";
+import { EVENT, KEYS, rgbToHex } from "@excalidraw/common";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { useUIAppState } from "../context/ui-appState";
 import { atom } from "../editor-jotai";
 import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import { useStable } from "../hooks/useStable";
-import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 
 import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
 
 import "./EyeDropper.scss";
-
-import type { ExcalidrawElement } from "../element/types";
 
 import type { ColorPickerType } from "./ColorPicker/colorPickerUtils";
 

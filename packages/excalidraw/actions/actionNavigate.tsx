@@ -1,5 +1,7 @@
 import clsx from "clsx";
 
+import { CaptureUpdateAction } from "@excalidraw/element";
+
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
 import {
@@ -8,7 +10,6 @@ import {
   microphoneMutedIcon,
 } from "../components/icons";
 import { t } from "../i18n";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

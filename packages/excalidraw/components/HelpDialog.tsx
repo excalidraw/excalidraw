@@ -1,11 +1,12 @@
 import React from "react";
 
+import { isDarwin, isFirefox, isWindows } from "@excalidraw/common";
+
+import { KEYS, getShortcutKey } from "@excalidraw/common";
+
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { probablySupportsClipboardBlob } from "../clipboard";
-import { isDarwin, isFirefox, isWindows } from "../constants";
 import { t } from "../i18n";
-import { KEYS } from "../keys";
-import { getShortcutKey } from "../utils";
 
 import { Dialog } from "./Dialog";
 import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
@@ -20,7 +21,7 @@ const Header = () => (
       className="HelpDialog__btn"
       href="https://docs.excalidraw.com"
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener"
     >
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
       {t("helpDialog.documentation")}
@@ -29,7 +30,7 @@ const Header = () => (
       className="HelpDialog__btn"
       href="https://plus.excalidraw.com/blog"
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener"
     >
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
       {t("helpDialog.blog")}
@@ -245,6 +246,11 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut
               label={t("toolBar.link")}
               shortcuts={[getShortcutKey("CtrlOrCmd+K")]}
+            />
+            <Shortcut
+              label={t("toolBar.convertElementType")}
+              shortcuts={["Tab", "Shift+Tab"]}
+              isOr={true}
             />
           </ShortcutIsland>
           <ShortcutIsland

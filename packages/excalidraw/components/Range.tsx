@@ -1,32 +1,35 @@
 import React, { useEffect } from "react";
 
-import { getFormValue } from "../actions/actionProperties";
 import { t } from "../i18n";
 
 import "./Range.scss";
 
+import type { AppClassProperties } from "../types";
+
 export type RangeProps = {
   updateData: (value: number) => void;
-  appState: any;
-  elements: any;
+  app: AppClassProperties;
   testId?: string;
 };
 
-export const Range = ({
-  updateData,
-  appState,
-  elements,
-  testId,
-}: RangeProps) => {
+export const Range = ({ updateData, app, testId }: RangeProps) => {
   const rangeRef = React.useRef<HTMLInputElement>(null);
   const valueRef = React.useRef<HTMLDivElement>(null);
-  const value = getFormValue(
-    elements,
-    appState,
-    (element) => element.opacity,
-    true,
-    appState.currentItemOpacity,
-  );
+  const selectedElements = app.scene.getSelectedElements(app.state);
+  let hasCommonOpacity = true;
+  const firstElement = selectedElements.at(0);
+  const leastCommonOpacity = selectedElements.reduce((acc, element) => {
+    if (acc != null && acc !== element.opacity) {
+      hasCommonOpacity = false;
+    }
+    if (acc == null || acc > element.opacity) {
+      return element.opacity;
+    }
+    return acc;
+  }, firstElement?.opacity ?? null);
+
+  const value = leastCommonOpacity ?? app.state.currentItemOpacity;
+
   useEffect(() => {
     if (rangeRef.current && valueRef.current) {
       const rangeElement = rangeRef.current;
@@ -45,6 +48,11 @@ export const Range = ({
       {t("labels.opacity")}
       <div className="range-wrapper">
         <input
+          style={{
+            ["--color-slider-track" as string]: hasCommonOpacity
+              ? undefined
+              : "var(--button-bg)",
+          }}
           ref={rangeRef}
           type="range"
           min="0"

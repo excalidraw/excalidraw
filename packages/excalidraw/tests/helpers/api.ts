@@ -4,29 +4,25 @@ import util from "util";
 
 import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
-import { getDefaultAppState } from "../../appState";
-import { createTestHook } from "../../components/App";
-import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
-import { getMimeType } from "../../data/blob";
-import { newElement, newTextElement, newLinearElement } from "../../element";
-import { mutateElement } from "../../element/mutateElement";
+import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
+
 import {
   newArrowElement,
+  newElement,
   newEmbeddableElement,
   newFrameElement,
   newFreeDrawElement,
   newIframeElement,
   newImageElement,
+  newLinearElement,
   newMagicFrameElement,
-} from "../../element/newElement";
-import { isLinearElementType } from "../../element/typeChecks";
-import { selectGroupsForSelectedElements } from "../../groups";
-import { getSelectedElements } from "../../scene/selection";
-import { assertNever } from "../../utils";
-import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
+  newTextElement,
+} from "@excalidraw/element";
 
-import type { Action } from "../../actions/types";
-import type App from "../../components/App";
+import { isLinearElementType } from "@excalidraw/element";
+import { getSelectedElements } from "@excalidraw/element";
+import { selectGroupsForSelectedElements } from "@excalidraw/element";
+
 import type {
   ExcalidrawElement,
   ExcalidrawGenericElement,
@@ -41,9 +37,19 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
   FixedSegment,
-} from "../../element/types";
+} from "@excalidraw/element/types";
+
+import type { Mutable } from "@excalidraw/common/utility-types";
+
+import { getMimeType } from "../../data/blob";
+import { createTestHook } from "../../components/App";
+import { getDefaultAppState } from "../../appState";
+import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
+
+import type { Action } from "../../actions/types";
+import type App from "../../components/App";
 import type { AppState } from "../../types";
-import type { Mutable } from "../../utility-types";
+
 
 const readFile = util.promisify(fs.readFile);
 // so that window.h is available when App.tsx is not imported as well.
@@ -93,10 +99,10 @@ export class API {
 
   // eslint-disable-next-line prettier/prettier
   static updateElement = <T extends ExcalidrawElement>(
-    ...args: Parameters<typeof mutateElement<T>>
+    ...args: Parameters<typeof h.app.scene.mutateElement<T>>
   ) => {
     act(() => {
-      mutateElement<T>(...args);
+      h.app.scene.mutateElement(...args);
     });
   };
 
@@ -412,12 +418,11 @@ export class API {
 
     });
 
-    mutateElement(
+    h.app.scene.mutateElement(
       rectangle,
       {
         boundElements: [{ type: "text", id: text.id }],
       },
-      false,
     );
 
     return [rectangle, text];
@@ -437,7 +442,6 @@ export class API {
 
     const text = API.createElement({
       type: "text",
-      id: "text2",
       width: 50,
       height: 20,
       containerId: arrow.id,
@@ -447,12 +451,11 @@ export class API {
           : opts?.label?.frameId ?? null,
     });
 
-    mutateElement(
+    h.app.scene.mutateElement(
       arrow,
       {
         boundElements: [{ type: "text", id: text.id }],
       },
-      false,
     );
 
     return [arrow, text];

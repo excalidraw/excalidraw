@@ -3,12 +3,17 @@ import clsx from "clsx";
 import throttle from "lodash.throttle";
 import { useEffect, useMemo, useState, memo } from "react";
 
-import { STATS_PANELS } from "../../constants";
-import { getCommonBounds } from "../../element/bounds";
-import { getUncroppedWidthAndHeight } from "../../element/cropElement";
-import { isElbowArrow, isImageElement } from "../../element/typeChecks";
-import { frameAndChildrenSelectedTogether } from "../../frame";
-import { elementsAreInSameGroup } from "../../groups";
+import { STATS_PANELS } from "@excalidraw/common";
+import { getCommonBounds } from "@excalidraw/element";
+import { getUncroppedWidthAndHeight } from "@excalidraw/element";
+import { isElbowArrow, isImageElement } from "@excalidraw/element";
+
+import { frameAndChildrenSelectedTogether } from "@excalidraw/element";
+
+import { elementsAreInSameGroup } from "@excalidraw/element";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
 import { t } from "../../i18n";
 import { isGridModeEnabled } from "../../snapping";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
@@ -29,7 +34,6 @@ import { getAtomicUnits } from "./utils";
 
 import "./Stats.scss";
 
-import type { NonDeletedExcalidrawElement } from "../../element/types";
 import type {
   AppClassProperties,
   AppState,
@@ -285,7 +289,11 @@ export const StatsInner = memo(
                           </StatsRow>
                         )}
 
-                      <StatsRow heading data-testid="stats-element-type">
+                      <StatsRow
+                        heading
+                        data-testid="stats-element-type"
+                        style={{ margin: "0.3125rem 0" }}
+                      >
                         {appState.croppingElementId
                           ? t("labels.imageCropping")
                           : t(`element.${singleElement.type}`)}

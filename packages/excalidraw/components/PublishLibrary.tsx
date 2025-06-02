@@ -5,14 +5,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   EDITOR_LS_KEYS,
   EXPORT_DATA_TYPES,
-  EXPORT_SOURCE,
   MIME_TYPES,
   VERSIONS,
-} from "../constants";
+  chunk,
+  getExportSource,
+} from "@excalidraw/common";
+
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { t } from "../i18n";
-import { chunk } from "../utils";
 
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
@@ -280,7 +281,7 @@ const PublishLibrary = ({
     const libContent: ExportedLibraryData = {
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
       version: VERSIONS.excalidrawLibrary,
-      source: EXPORT_SOURCE,
+      source: getExportSource(),
       libraryItems: clonedLibItems,
     };
     const content = JSON.stringify(libContent, null, 2);
@@ -388,7 +389,7 @@ const PublishLibrary = ({
                 <a
                   href="https://libraries.excalidraw.com"
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener"
                 >
                   {el}
                 </a>

@@ -8,44 +8,26 @@ import {
 import { vi } from "vitest";
 import { pointFrom } from "@excalidraw/math";
 
-import type { LocalPoint, Radians } from "@excalidraw/math";
-
-import "../global.d.ts";
-import "../../utils/test-utils";
+import { newElementWith } from "@excalidraw/element";
 
 import {
-  actionSendBackward,
-  actionBringForward,
-  actionSendToBack,
-} from "../actions";
-import { createUndoAction, createRedoAction } from "../actions/actionHistory";
-import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { getDefaultAppState } from "../appState";
-import { HistoryEntry } from "../history";
-import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
-import * as StaticScene from "../renderer/staticScene";
-import { EXPORT_DATA_TYPES, MIME_TYPES, ORIG_ID } from "../constants";
-import { Snapshot, CaptureUpdateAction } from "../store";
-import { arrayToMap } from "../utils";
-import {
+  EXPORT_DATA_TYPES,
+  MIME_TYPES,
+  ORIG_ID,
+  KEYS,
+  arrayToMap,
   COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
-} from "../colors";
-import { newElementWith } from "../element/mutateElement";
-import { AppStateChange, ElementsChange } from "../change";
+} from "@excalidraw/common";
 
-import { API } from "./helpers/api";
-import { Keyboard, Pointer, UI } from "./helpers/ui";
-import {
-  GlobalTestState,
-  act,
-  assertSelectedElements,
-  render,
-  togglePopover,
-  getCloneByOrigId,
-} from "./test-utils";
+import "@excalidraw/utils/test-utils";
+
+import { ElementsDelta, AppStateDelta } from "@excalidraw/element";
+
+import { CaptureUpdateAction, StoreDelta } from "@excalidraw/element";
+
+import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
   ExcalidrawElbowArrowElement,
@@ -56,7 +38,33 @@ import type {
   FixedPointBinding,
   FractionalIndex,
   SceneElementsMap,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import "../global.d.ts";
+
+import {
+  actionSendBackward,
+  actionBringForward,
+  actionSendToBack,
+} from "../actions";
+import { createUndoAction, createRedoAction } from "../actions/actionHistory";
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import { getDefaultAppState } from "../appState";
+import { Excalidraw } from "../index";
+import * as StaticScene from "../renderer/staticScene";
+
+import { API } from "./helpers/api";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
+import {
+  GlobalTestState,
+  act,
+  assertSelectedElements,
+  render,
+  togglePopover,
+  getCloneByOrigId,
+  checkpointHistory,
+} from "./test-utils";
+
 import type { AppState } from "../types";
 
 const { h } = window;
@@ -76,13 +84,15 @@ const checkpoint = (name: string) => {
     ...strippedAppState
   } = h.state;
   expect(strippedAppState).toMatchSnapshot(`[${name}] appState`);
-  expect(h.history).toMatchSnapshot(`[${name}] history`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
+
   h.elements
     .map(({ seed, versionNonce, ...strippedElement }) => strippedElement)
     .forEach((element, i) =>
       expect(element).toMatchSnapshot(`[${name}] element ${i}`),
     );
+
+  checkpointHistory(h.history, name);
 };
 
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
@@ -110,12 +120,12 @@ describe("history", () => {
 
       API.setElements([rect]);
 
-      const corrupedEntry = HistoryEntry.create(
-        AppStateChange.empty(),
-        ElementsChange.empty(),
+      const corrupedEntry = StoreDelta.create(
+        ElementsDelta.empty(),
+        AppStateDelta.empty(),
       );
 
-      vi.spyOn(corrupedEntry, "applyTo").mockImplementation(() => {
+      vi.spyOn(corrupedEntry.elements, "applyTo").mockImplementation(() => {
         throw new Error("Oh no, I am corrupted!");
       });
 
@@ -130,7 +140,6 @@ describe("history", () => {
             h.history.undo(
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
-              Snapshot.empty(),
             ) as any,
         );
       } catch (e) {
@@ -151,7 +160,6 @@ describe("history", () => {
             h.history.redo(
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
-              Snapshot.empty(),
             ) as any,
         );
       } catch (e) {
@@ -448,8 +456,8 @@ describe("history", () => {
         expect(h.history.isUndoStackEmpty).toBeTruthy();
       });
 
-      const undoAction = createUndoAction(h.history, h.store);
-      const redoAction = createRedoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history);
+      const redoAction = createRedoAction(h.history);
       // noop
       API.executeAction(undoAction);
       expect(h.elements).toEqual([
@@ -525,8 +533,8 @@ describe("history", () => {
         expect.objectContaining({ id: "B", isDeleted: false }),
       ]);
 
-      const undoAction = createUndoAction(h.history, h.store);
-      const redoAction = createRedoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history);
+      const redoAction = createRedoAction(h.history);
       API.executeAction(undoAction);
 
       expect(API.getSnapshot()).toEqual([
@@ -1707,8 +1715,8 @@ describe("history", () => {
         />,
       );
 
-      const undoAction = createUndoAction(h.history, h.store);
-      const redoAction = createRedoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history);
+      const redoAction = createRedoAction(h.history);
 
       await waitFor(() => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
@@ -1757,7 +1765,7 @@ describe("history", () => {
         />,
       );
 
-      const undoAction = createUndoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history);
 
       await waitFor(() => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);

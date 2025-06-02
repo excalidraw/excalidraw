@@ -9,19 +9,24 @@ import {
 } from "@testing-library/react";
 import ansi from "ansicolor";
 
-import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
-import { ORIG_ID } from "../constants";
-import { getSelectedElements } from "../scene/selection";
-import { arrayToMap } from "../utils";
+import { ORIG_ID, arrayToMap } from "@excalidraw/common";
 
-import { UI } from "./helpers/ui";
+import { getSelectedElements } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { AllPossibleKeys } from "@excalidraw/common/utility-types";
+
+import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
+
+import { Pointer, UI } from "./helpers/ui";
 import * as toolQueries from "./queries/toolQueries";
+
+import type { History } from "../history";
 
 import type { RenderResult, RenderOptions } from "@testing-library/react";
 
 import type { ImportedDataState } from "../data/types";
-import type { ExcalidrawElement } from "../element/types";
-import type { AllPossibleKeys } from "../utility-types";
 
 export { cleanup as unmountComponent };
 
@@ -39,6 +44,10 @@ type TestRenderFn = (
 ) => Promise<RenderResult<typeof customQueries>>;
 
 const renderApp: TestRenderFn = async (ui, options) => {
+  // when tests reuse Pointer instances let's reset the last
+  // pointer poisitions so there's no leak between tests
+  Pointer.resetAll();
+
   if (options?.localStorageData) {
     initLocalStorage(options.localStorageData);
     delete options.localStorageData;
@@ -424,4 +433,46 @@ export const assertElements = <T extends AllPossibleKeys<ExcalidrawElement>>(
   );
 
   expect(h.state.selectedElementIds).toEqual(selectedElementIds);
+};
+
+const stripSeed = (deltas: Record<string, { deleted: any; inserted: any }>) =>
+  Object.entries(deltas).reduce((acc, curr) => {
+    const { inserted, deleted, ...rest } = curr[1];
+
+    delete inserted.seed;
+    delete deleted.seed;
+
+    acc[curr[0]] = {
+      inserted,
+      deleted,
+      ...rest,
+    };
+
+    return acc;
+  }, {} as Record<string, any>);
+
+export const checkpointHistory = (history: History, name: string) => {
+  expect(
+    history.undoStack.map((x) => ({
+      ...x,
+      elements: {
+        ...x.elements,
+        added: stripSeed(x.elements.added),
+        removed: stripSeed(x.elements.removed),
+        updated: stripSeed(x.elements.updated),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] undo stack`);
+
+  expect(
+    history.redoStack.map((x) => ({
+      ...x,
+      elements: {
+        ...x.elements,
+        added: stripSeed(x.elements.added),
+        removed: stripSeed(x.elements.removed),
+        updated: stripSeed(x.elements.updated),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] redo stack`);
 };

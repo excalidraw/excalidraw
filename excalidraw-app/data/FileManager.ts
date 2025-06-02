@@ -1,7 +1,7 @@
 import { CaptureUpdateAction } from "@excalidraw/excalidraw";
 import { compressData } from "@excalidraw/excalidraw/data/encode";
-import { newElementWith } from "@excalidraw/excalidraw/element/mutateElement";
-import { isInitializedImageElement } from "@excalidraw/excalidraw/element/typeChecks";
+import { newElementWith } from "@excalidraw/element";
+import { isInitializedImageElement } from "@excalidraw/element";
 import { t } from "@excalidraw/excalidraw/i18n";
 
 import type {
@@ -9,7 +9,7 @@ import type {
   ExcalidrawImageElement,
   FileId,
   InitializedExcalidrawImageElement,
-} from "@excalidraw/excalidraw/element/types";
+} from "@excalidraw/element/types";
 import type {
   BinaryFileData,
   BinaryFileMetadata,

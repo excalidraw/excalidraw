@@ -1,12 +1,14 @@
+import { isImageElement } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { ExcalidrawImageElement } from "@excalidraw/element/types";
+
 import { ToolButton } from "../components/ToolButton";
 import { cropIcon } from "../components/icons";
-import { isImageElement } from "../element/typeChecks";
 import { t } from "../i18n";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
-
-import type { ExcalidrawImageElement } from "../element/types";
 
 export const actionToggleCropEditor = register({
   name: "cropEditor",

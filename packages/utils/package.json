@@ -2,18 +2,18 @@
   "name": "@excalidraw/utils",
   "version": "0.1.2",
   "type": "module",
-  "types": "./dist/types/utils/index.d.ts",
+  "types": "./dist/types/utils/src/index.d.ts",
   "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
   "exports": {
     ".": {
-      "types": "./dist/types/utils/index.d.ts",
+      "types": "./dist/types/utils/src/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
       "default": "./dist/prod/index.js"
     },
     "./*": {
-      "types": "./../utils/dist/types/utils/*"
+      "types": "./dist/types/utils/src/*.d.ts"
     }
   },
   "files": [
@@ -69,7 +69,7 @@
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
-    "gen:types": "rm -rf types && tsc",
-    "build:esm": "rm -rf dist && node ../../scripts/buildUtils.js && yarn gen:types"
+    "gen:types": "rimraf types && tsc",
+    "build:esm": "rimraf dist && node ../../scripts/buildUtils.js && yarn gen:types"
   }
 }

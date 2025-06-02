@@ -1,6 +1,5 @@
 import rough from "roughjs/bin/rough";
 
-import { getDefaultAppState } from "../appState";
 import {
   DEFAULT_EXPORT_PADDING,
   FRAME_STYLE,
@@ -10,39 +9,57 @@ import {
   THEME_FILTER,
   MIME_TYPES,
   EXPORT_DATA_TYPES,
-} from "../constants";
-import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
-import { serializeAsJSON } from "../data/json";
-import { newTextElement } from "../element";
-import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
+  arrayToMap,
+  distance,
+  getFontString,
+  toBrandedType,
+} from "@excalidraw/common";
+
+import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
+
 import {
   getInitializedImageElements,
   updateImageCache,
-} from "../element/image";
-import { newElementWith } from "../element/mutateElement";
-import { isFrameLikeElement } from "../element/typeChecks";
-import { Fonts } from "../fonts";
-import { syncInvalidIndices } from "../fractionalIndex";
+} from "@excalidraw/element";
+
+import { newElementWith } from "@excalidraw/element";
+
+import { isFrameLikeElement } from "@excalidraw/element";
+
 import {
   getElementsOverlappingFrame,
   getFrameLikeElements,
   getFrameLikeTitle,
   getRootElements,
-} from "../frame";
-import { renderStaticScene } from "../renderer/staticScene";
-import { renderSceneToSvg } from "../renderer/staticSvgScene";
-import { type Mutable } from "../utility-types";
-import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
+} from "@excalidraw/element";
 
-import type { RenderableElementsMap } from "./types";
-import type { Bounds } from "../element/bounds";
+import { syncInvalidIndices } from "@excalidraw/element";
+
+import { type Mutable } from "@excalidraw/common/utility-types";
+
+import { newTextElement } from "@excalidraw/element";
+
+import type { Bounds } from "@excalidraw/element";
+
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import { getDefaultAppState } from "../appState";
+import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
+import { serializeAsJSON } from "../data/json";
+
+import { Fonts } from "../fonts";
+
+import { renderStaticScene } from "../renderer/staticScene";
+import { renderSceneToSvg } from "../renderer/staticSvgScene";
+
+import type { RenderableElementsMap } from "./types";
+
 import type { AppState, BinaryFiles } from "../types";
 
 const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {

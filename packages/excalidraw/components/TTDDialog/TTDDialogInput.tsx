@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { EVENT } from "../../constants";
-import { KEYS } from "../../keys";
+import { EVENT, KEYS } from "@excalidraw/common";
 
 import type { ChangeEventHandler } from "react";
 
@@ -35,6 +34,7 @@ export const TTDDialogInput = ({
           callbackRef.current?.();
         }
       };
+      textarea.focus();
       textarea.addEventListener(EVENT.KEYDOWN, handleKeyDown);
       return () => {
         textarea.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
@@ -48,7 +48,6 @@ export const TTDDialogInput = ({
       onChange={onChange}
       value={input}
       placeholder={placeholder}
-      autoFocus
       ref={ref}
     />
   );

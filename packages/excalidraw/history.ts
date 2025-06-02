@@ -1,11 +1,17 @@
-import { Emitter } from "./emitter";
+import { Emitter } from "@excalidraw/common";
 
-import type { AppStateChange, ElementsChange } from "./change";
-import type { SceneElementsMap } from "./element/types";
-import type { Snapshot } from "./store";
+import {
+  CaptureUpdateAction,
+  StoreChange,
+  StoreDelta,
+  type Store,
+} from "@excalidraw/element";
+
+import type { SceneElementsMap } from "@excalidraw/element/types";
+
 import type { AppState } from "./types";
 
-type HistoryStack = HistoryEntry[];
+class HistoryEntry extends StoreDelta {}
 
 export class HistoryChangedEvent {
   constructor(
@@ -19,8 +25,8 @@ export class History {
     [HistoryChangedEvent]
   >();
 
-  private readonly undoStack: HistoryStack = [];
-  private readonly redoStack: HistoryStack = [];
+  public readonly undoStack: HistoryEntry[] = [];
+  public readonly redoStack: HistoryEntry[] = [];
 
   public get isUndoStackEmpty() {
     return this.undoStack.length === 0;
@@ -30,60 +36,52 @@ export class History {
     return this.redoStack.length === 0;
   }
 
+  constructor(private readonly store: Store) {}
+
   public clear() {
     this.undoStack.length = 0;
     this.redoStack.length = 0;
   }
 
   /**
-   * Record a local change which will go into the history
+   * Record a non-empty local durable increment, which will go into the undo stack..
+   * Do not re-record history entries, which were already pushed to undo / redo stack, as part of history action.
    */
-  public record(
-    elementsChange: ElementsChange,
-    appStateChange: AppStateChange,
-  ) {
-    const entry = HistoryEntry.create(appStateChange, elementsChange);
-
-    if (!entry.isEmpty()) {
-      // we have the latest changes, no need to `applyLatest`, which is done within `History.push`
-      this.undoStack.push(entry.inverse());
-
-      if (!entry.elementsChange.isEmpty()) {
-        // don't reset redo stack on local appState changes,
-        // as a simple click (unselect) could lead to losing all the redo entries
-        // only reset on non empty elements changes!
-        this.redoStack.length = 0;
-      }
-
-      this.onHistoryChangedEmitter.trigger(
-        new HistoryChangedEvent(this.isUndoStackEmpty, this.isRedoStackEmpty),
-      );
+  public record(delta: StoreDelta) {
+    if (delta.isEmpty() || delta instanceof HistoryEntry) {
+      return;
     }
+
+    // construct history entry, so once it's emitted, it's not recorded again
+    const entry = HistoryEntry.inverse(delta);
+
+    this.undoStack.push(entry);
+
+    if (!entry.elements.isEmpty()) {
+      // don't reset redo stack on local appState changes,
+      // as a simple click (unselect) could lead to losing all the redo entries
+      // only reset on non empty elements changes!
+      this.redoStack.length = 0;
+    }
+
+    this.onHistoryChangedEmitter.trigger(
+      new HistoryChangedEvent(this.isUndoStackEmpty, this.isRedoStackEmpty),
+    );
   }
 
-  public undo(
-    elements: SceneElementsMap,
-    appState: AppState,
-    snapshot: Readonly<Snapshot>,
-  ) {
+  public undo(elements: SceneElementsMap, appState: AppState) {
     return this.perform(
       elements,
       appState,
-      snapshot,
       () => History.pop(this.undoStack),
       (entry: HistoryEntry) => History.push(this.redoStack, entry, elements),
     );
   }
 
-  public redo(
-    elements: SceneElementsMap,
-    appState: AppState,
-    snapshot: Readonly<Snapshot>,
-  ) {
+  public redo(elements: SceneElementsMap, appState: AppState) {
     return this.perform(
       elements,
       appState,
-      snapshot,
       () => History.pop(this.redoStack),
       (entry: HistoryEntry) => History.push(this.undoStack, entry, elements),
     );
@@ -92,7 +90,6 @@ export class History {
   private perform(
     elements: SceneElementsMap,
     appState: AppState,
-    snapshot: Readonly<Snapshot>,
     pop: () => HistoryEntry | null,
     push: (entry: HistoryEntry) => void,
   ): [SceneElementsMap, AppState] | void {
@@ -103,6 +100,10 @@ export class History {
         return;
       }
 
+      const action = CaptureUpdateAction.IMMEDIATELY;
+
+      let prevSnapshot = this.store.snapshot;
+
       let nextElements = elements;
       let nextAppState = appState;
       let containsVisibleChange = false;
@@ -111,9 +112,29 @@ export class History {
       while (historyEntry) {
         try {
           [nextElements, nextAppState, containsVisibleChange] =
-            historyEntry.applyTo(nextElements, nextAppState, snapshot);
+            StoreDelta.applyTo(
+              historyEntry,
+              nextElements,
+              nextAppState,
+              prevSnapshot,
+            );
+
+          const nextSnapshot = prevSnapshot.maybeClone(
+            action,
+            nextElements,
+            nextAppState,
+          );
+
+          // schedule immediate capture, so that it's emitted for the sync purposes
+          this.store.scheduleMicroAction({
+            action,
+            change: StoreChange.create(prevSnapshot, nextSnapshot),
+            delta: historyEntry,
+          });
+
+          prevSnapshot = nextSnapshot;
         } finally {
-          // make sure to always push / pop, even if the increment is corrupted
+          // make sure to always push, even if the delta is corrupted
           push(historyEntry);
         }
 
@@ -134,7 +155,7 @@ export class History {
     }
   }
 
-  private static pop(stack: HistoryStack): HistoryEntry | null {
+  private static pop(stack: HistoryEntry[]): HistoryEntry | null {
     if (!stack.length) {
       return null;
     }
@@ -149,63 +170,17 @@ export class History {
   }
 
   private static push(
-    stack: HistoryStack,
+    stack: HistoryEntry[],
     entry: HistoryEntry,
     prevElements: SceneElementsMap,
   ) {
-    const updatedEntry = entry.inverse().applyLatestChanges(prevElements);
-    return stack.push(updatedEntry);
-  }
-}
-
-export class HistoryEntry {
-  private constructor(
-    public readonly appStateChange: AppStateChange,
-    public readonly elementsChange: ElementsChange,
-  ) {}
-
-  public static create(
-    appStateChange: AppStateChange,
-    elementsChange: ElementsChange,
-  ) {
-    return new HistoryEntry(appStateChange, elementsChange);
-  }
-
-  public inverse(): HistoryEntry {
-    return new HistoryEntry(
-      this.appStateChange.inverse(),
-      this.elementsChange.inverse(),
+    const inversedEntry = HistoryEntry.inverse(entry);
+    const updatedEntry = HistoryEntry.applyLatestChanges(
+      inversedEntry,
+      prevElements,
+      "inserted",
     );
-  }
 
-  public applyTo(
-    elements: SceneElementsMap,
-    appState: AppState,
-    snapshot: Readonly<Snapshot>,
-  ): [SceneElementsMap, AppState, boolean] {
-    const [nextElements, elementsContainVisibleChange] =
-      this.elementsChange.applyTo(elements, snapshot.elements);
-
-    const [nextAppState, appStateContainsVisibleChange] =
-      this.appStateChange.applyTo(appState, nextElements);
-
-    const appliedVisibleChanges =
-      elementsContainVisibleChange || appStateContainsVisibleChange;
-
-    return [nextElements, nextAppState, appliedVisibleChanges];
-  }
-
-  /**
-   * Apply latest (remote) changes to the history entry, creates new instance of `HistoryEntry`.
-   */
-  public applyLatestChanges(elements: SceneElementsMap): HistoryEntry {
-    const updatedElementsChange =
-      this.elementsChange.applyLatestChanges(elements);
-
-    return HistoryEntry.create(this.appStateChange, updatedElementsChange);
-  }
-
-  public isEmpty(): boolean {
-    return this.appStateChange.isEmpty() && this.elementsChange.isEmpty();
+    return stack.push(updatedEntry);
   }
 }

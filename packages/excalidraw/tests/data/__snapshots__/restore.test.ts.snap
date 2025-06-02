@@ -240,6 +240,7 @@ exports[`restoreElements > should restore line and draw elements correctly 1`] =
       100,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": {
     "type": 2,
@@ -289,6 +290,7 @@ exports[`restoreElements > should restore line and draw elements correctly 2`] =
       100,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": {
     "type": 2,

@@ -1,8 +1,11 @@
 import React from "react";
 
+import { showSelectedShapeActions } from "@excalidraw/element";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
 import { isHandToolActive } from "../appState";
 import { useTunnels } from "../context/tunnels";
-import { showSelectedShapeActions } from "../element";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
@@ -18,7 +21,6 @@ import { Section } from "./Section";
 import Stack from "./Stack";
 
 import type { ActionManager } from "../actions/manager";
-import type { NonDeletedExcalidrawElement } from "../element/types";
 import type {
   AppClassProperties,
   AppProps,

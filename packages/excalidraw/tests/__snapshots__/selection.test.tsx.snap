@@ -79,6 +79,7 @@ exports[`select single element on the scene > arrow escape 1`] = `
       50,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": {
     "type": 2,

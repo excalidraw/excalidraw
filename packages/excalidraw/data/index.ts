@@ -1,32 +1,40 @@
 import {
-  copyBlobToClipboardAsPng,
-  copyTextToSystemClipboard,
-} from "../clipboard";
-import {
   DEFAULT_EXPORT_PADDING,
   DEFAULT_FILENAME,
   IMAGE_MIME_TYPES,
   isFirefox,
   MIME_TYPES,
-} from "../constants";
-import { getNonDeletedElements } from "../element";
-import { isFrameLikeElement } from "../element/typeChecks";
-import { getElementsOverlappingFrame } from "../frame";
+  cloneJSON,
+  SVG_DOCUMENT_PREAMBLE,
+} from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import { isFrameLikeElement } from "@excalidraw/element";
+
+import { getElementsOverlappingFrame } from "@excalidraw/element";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
+
+import {
+  copyBlobToClipboardAsPng,
+  copyTextToSystemClipboard,
+} from "../clipboard";
+
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas, exportToSvg } from "../scene/export";
-import { cloneJSON } from "../utils";
 
 import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
 import { serializeAsJSON } from "./json";
 
 import type { FileSystemHandle } from "./filesystem";
-import type {
-  ExcalidrawElement,
-  ExcalidrawFrameLikeElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
+
 import type { ExportType } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 
@@ -127,7 +135,11 @@ export const exportCanvas = async (
     if (type === "svg") {
       return fileSave(
         svgPromise.then((svg) => {
-          return new Blob([svg.outerHTML], { type: MIME_TYPES.svg });
+          // adding SVG preamble so that older software parse the SVG file
+          // properly
+          return new Blob([SVG_DOCUMENT_PREAMBLE + svg.outerHTML], {
+            type: MIME_TYPES.svg,
+          });
         }),
         {
           description: "Export to SVG",

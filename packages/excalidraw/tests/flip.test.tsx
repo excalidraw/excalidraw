@@ -1,18 +1,30 @@
-import { pointFrom, type Radians } from "@excalidraw/math";
 import React from "react";
 import { vi } from "vitest";
 
+import { ROUNDNESS, KEYS, arrayToMap, cloneJSON } from "@excalidraw/common";
+
+import { pointFrom, type Radians } from "@excalidraw/math";
+
+import { getBoundTextElementPosition } from "@excalidraw/element";
+import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { newLinearElement } from "@excalidraw/element";
+
 import type { LocalPoint } from "@excalidraw/math";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawImageElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
+  FileId,
+} from "@excalidraw/element/types";
 
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
 import { createPasteEvent } from "../clipboard";
-import { ROUNDNESS } from "../constants";
-import { getElementAbsoluteCoords } from "../element";
-import { newLinearElement } from "../element";
-import { getBoundTextElementPosition } from "../element/textElement";
 import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
-import { arrayToMap, cloneJSON } from "../utils";
+
+// Importing to spy on it and mock the implementation (mocking does not work with simple vi.mock for some reason)
+import * as blobModule from "../data/blob";
 
 import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
@@ -25,25 +37,17 @@ import {
   waitFor,
 } from "./test-utils";
 
-import type {
-  ExcalidrawElement,
-  ExcalidrawImageElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElementWithContainer,
-  FileId,
-} from "../element/types";
 import type { NormalizedZoomValue } from "../types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
 
-vi.mock("../data/blob", async (actual) => {
-  const orig: Object = await actual();
-  return {
-    ...orig,
-    resizeImageFile: (imageFile: File) => imageFile,
-    generateIdFromFile: () => "fileId" as FileId,
-  };
+beforeEach(() => {
+  const generateIdSpy = vi.spyOn(blobModule, "generateIdFromFile");
+  const resizeFileSpy = vi.spyOn(blobModule, "resizeImageFile");
+
+  generateIdSpy.mockImplementation(() => Promise.resolve("fileId" as FileId));
+  resizeFileSpy.mockImplementation((file: File) => Promise.resolve(file));
 });
 
 beforeEach(async () => {

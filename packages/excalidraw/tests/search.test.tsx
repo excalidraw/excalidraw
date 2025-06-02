@@ -1,15 +1,23 @@
 import React from "react";
 
-import { CANVAS_SEARCH_TAB, CLASSES, DEFAULT_SIDEBAR } from "../constants";
+import {
+  CANVAS_SEARCH_TAB,
+  CLASSES,
+  DEFAULT_SIDEBAR,
+  KEYS,
+} from "@excalidraw/common";
+
+import type {
+  ExcalidrawFrameLikeElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
 
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import { updateTextEditor } from "./queries/dom";
 import { act, render, waitFor } from "./test-utils";
-
-import type { ExcalidrawTextElement } from "../element/types";
 
 const { h } = window;
 
@@ -92,17 +100,17 @@ describe("search", () => {
     updateTextEditor(searchInput, "test");
 
     await waitFor(() => {
-      expect(h.app.state.searchMatches.length).toBe(2);
-      expect(h.app.state.searchMatches[0].focus).toBe(true);
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+      expect(h.app.state.searchMatches?.matches[0].focus).toBe(true);
     });
 
     Keyboard.keyPress(KEYS.ENTER, searchInput);
-    expect(h.app.state.searchMatches[0].focus).toBe(false);
-    expect(h.app.state.searchMatches[1].focus).toBe(true);
+    expect(h.app.state.searchMatches?.matches[0].focus).toBe(false);
+    expect(h.app.state.searchMatches?.matches[1].focus).toBe(true);
 
     Keyboard.keyPress(KEYS.ENTER, searchInput);
-    expect(h.app.state.searchMatches[0].focus).toBe(true);
-    expect(h.app.state.searchMatches[1].focus).toBe(false);
+    expect(h.app.state.searchMatches?.matches[0].focus).toBe(true);
+    expect(h.app.state.searchMatches?.matches[1].focus).toBe(false);
   });
 
   it("should match text split across multiple lines", async () => {
@@ -137,15 +145,53 @@ describe("search", () => {
     updateTextEditor(searchInput, "test");
 
     await waitFor(() => {
-      expect(h.app.state.searchMatches.length).toBe(1);
-      expect(h.app.state.searchMatches[0]?.matchedLines?.length).toBe(4);
+      expect(h.app.state.searchMatches?.matches.length).toBe(1);
+      expect(h.app.state.searchMatches?.matches[0]?.matchedLines?.length).toBe(
+        4,
+      );
     });
 
     updateTextEditor(searchInput, "ext spli");
 
     await waitFor(() => {
-      expect(h.app.state.searchMatches.length).toBe(1);
-      expect(h.app.state.searchMatches[0]?.matchedLines?.length).toBe(6);
+      expect(h.app.state.searchMatches?.matches.length).toBe(1);
+      expect(h.app.state.searchMatches?.matches[0]?.matchedLines?.length).toBe(
+        6,
+      );
+    });
+  });
+
+  it("should match frame names", async () => {
+    const scrollIntoViewMock = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+    API.setElements([
+      API.createElement({
+        type: "frame",
+      }),
+    ]);
+
+    API.updateElement(h.elements[0] as ExcalidrawFrameLikeElement, {
+      name: "Frame: name test for frame, yes, frame!",
+    });
+
+    expect(h.app.state.openSidebar).toBeNull();
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+    expect(h.app.state.openSidebar).not.toBeNull();
+    expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+    expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
+
+    const searchInput = await querySearchInput();
+
+    expect(searchInput.matches(":focus")).toBe(true);
+
+    updateTextEditor(searchInput, "frame");
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(3);
     });
   });
 });

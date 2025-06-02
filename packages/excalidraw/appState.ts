@@ -1,5 +1,5 @@
-import { COLOR_PALETTE } from "./colors";
 import {
+  COLOR_PALETTE,
   ARROW_TYPE,
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
@@ -10,7 +10,7 @@ import {
   STATS_PANELS,
   THEME,
   DEFAULT_GRID_STEP,
-} from "./constants";
+} from "@excalidraw/common";
 
 import type { AppState, NormalizedZoomValue } from "./types";
 
@@ -52,6 +52,7 @@ export const getDefaultAppState = (): Omit<
       type: "selection",
       customType: null,
       locked: DEFAULT_ELEMENT_PROPS.locked,
+      fromSelection: false,
       lastActiveTool: null,
     },
     penMode: false,
@@ -120,7 +121,9 @@ export const getDefaultAppState = (): Omit<
     followedBy: new Set(),
     isCropping: false,
     croppingElementId: null,
-    searchMatches: [],
+    searchMatches: null,
+    lockedMultiSelections: {},
+    activeLockedId: null,
   };
 };
 
@@ -245,6 +248,8 @@ const APP_STATE_STORAGE_CONF = (<
   isCropping: { browser: false, export: false, server: false },
   croppingElementId: { browser: false, export: false, server: false },
   searchMatches: { browser: false, export: false, server: false },
+  lockedMultiSelections: { browser: true, export: true, server: true },
+  activeLockedId: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

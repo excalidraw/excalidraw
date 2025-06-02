@@ -5,39 +5,43 @@ import {
   DEFAULT_FONT_SIZE,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
-} from "../constants";
-import {
-  getCommonBounds,
-  newElement,
-  newLinearElement,
-  redrawTextBoundingBox,
-} from "../element";
-import { bindLinearElement } from "../element/binding";
-import {
-  newArrowElement,
-  newFrameElement,
-  newImageElement,
-  newMagicFrameElement,
-  newTextElement,
-} from "../element/newElement";
-import { measureText, normalizeText } from "../element/textMeasurements";
-import { isArrowElement } from "../element/typeChecks";
-import { getLineHeight } from "../fonts";
-import { syncInvalidIndices } from "../fractionalIndex";
-import { getSizeFromPoints } from "../points";
-import { randomId } from "../random";
-import {
+  getSizeFromPoints,
+  randomId,
   arrayToMap,
   assertNever,
   cloneJSON,
   getFontString,
   isDevEnv,
   toBrandedType,
-} from "../utils";
+  getLineHeight,
+} from "@excalidraw/common";
 
-import type { ElementConstructorOpts } from "../element/newElement";
+import { bindLinearElement } from "@excalidraw/element";
+import {
+  newArrowElement,
+  newElement,
+  newFrameElement,
+  newImageElement,
+  newLinearElement,
+  newMagicFrameElement,
+  newTextElement,
+} from "@excalidraw/element";
+import { measureText, normalizeText } from "@excalidraw/element";
+import { isArrowElement } from "@excalidraw/element";
+
+import { syncInvalidIndices } from "@excalidraw/element";
+
+import { redrawTextBoundingBox } from "@excalidraw/element";
+
+import { LinearElementEditor } from "@excalidraw/element";
+
+import { getCommonBounds } from "@excalidraw/element";
+
+import { Scene } from "@excalidraw/element";
+
+import type { ElementConstructorOpts } from "@excalidraw/element";
+
 import type {
-  ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -55,8 +59,9 @@ import type {
   NonDeletedSceneElementsMap,
   TextAlign,
   VerticalAlign,
-} from "../element/types";
-import type { MarkOptional } from "../utility-types";
+} from "@excalidraw/element/types";
+
+import type { MarkOptional } from "@excalidraw/common/utility-types";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -214,7 +219,7 @@ const DEFAULT_DIMENSION = 100;
 const bindTextToContainer = (
   container: ExcalidrawElement,
   textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
-  elementsMap: ElementsMap,
+  scene: Scene,
 ) => {
   const textElement: ExcalidrawTextElement = newTextElement({
     x: 0,
@@ -233,7 +238,8 @@ const bindTextToContainer = (
     }),
   });
 
-  redrawTextBoundingBox(textElement, container, elementsMap);
+  redrawTextBoundingBox(textElement, container, scene);
+
   return [container, textElement] as const;
 };
 
@@ -242,7 +248,7 @@ const bindLinearElementToElement = (
   start: ValidLinearElement["start"],
   end: ValidLinearElement["end"],
   elementStore: ElementStore,
-  elementsMap: NonDeletedSceneElementsMap,
+  scene: Scene,
 ): {
   linearElement: ExcalidrawLinearElement;
   startBoundElement?: ExcalidrawElement;
@@ -328,7 +334,7 @@ const bindLinearElementToElement = (
         linearElement,
         startBoundElement as ExcalidrawBindableElement,
         "start",
-        elementsMap,
+        scene,
       );
     }
   }
@@ -403,7 +409,7 @@ const bindLinearElementToElement = (
         linearElement,
         endBoundElement as ExcalidrawBindableElement,
         "end",
-        elementsMap,
+        scene,
       );
     }
   }
@@ -458,7 +464,13 @@ const bindLinearElementToElement = (
     newPoints[endPointIndex][1] += delta;
   }
 
-  Object.assign(linearElement, { points: newPoints });
+  Object.assign(
+    linearElement,
+    LinearElementEditor.getNormalizeElementPointsAndCoords({
+      ...linearElement,
+      points: newPoints,
+    }),
+  );
 
   return {
     linearElement,
@@ -638,6 +650,9 @@ export const convertToExcalidrawElements = (
   }
 
   const elementsMap = elementStore.getElementsMap();
+  // we don't have a real scene, so we just use a temp scene to query and mutate elements
+  const scene = new Scene(elementsMap);
+
   // Add labels and arrow bindings
   for (const [id, element] of elementsWithIds) {
     const excalidrawElement = elementStore.getElement(id)!;
@@ -651,7 +666,7 @@ export const convertToExcalidrawElements = (
           let [container, text] = bindTextToContainer(
             excalidrawElement,
             element?.label,
-            elementsMap,
+            scene,
           );
           elementStore.add(container);
           elementStore.add(text);
@@ -679,7 +694,7 @@ export const convertToExcalidrawElements = (
                 originalStart,
                 originalEnd,
                 elementStore,
-                elementsMap,
+                scene,
               );
             container = linearElement;
             elementStore.add(linearElement);
@@ -704,7 +719,7 @@ export const convertToExcalidrawElements = (
                   start,
                   end,
                   elementStore,
-                  elementsMap,
+                  scene,
                 );
 
               elementStore.add(linearElement);

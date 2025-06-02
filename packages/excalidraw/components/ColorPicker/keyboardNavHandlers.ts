@@ -1,5 +1,12 @@
-import { COLORS_PER_ROW, COLOR_PALETTE } from "../../colors";
-import { KEYS } from "../../keys";
+import { COLORS_PER_ROW, COLOR_PALETTE, KEYS } from "@excalidraw/common";
+
+import type {
+  ColorPickerColor,
+  ColorPalette,
+  ColorPaletteCustom,
+} from "@excalidraw/common";
+
+import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import {
   colorPickerHotkeyBindings,
@@ -7,12 +14,6 @@ import {
 } from "./colorPickerUtils";
 
 import type { ActiveColorPickerSectionAtomType } from "./colorPickerUtils";
-import type {
-  ColorPickerColor,
-  ColorPalette,
-  ColorPaletteCustom,
-} from "../../colors";
-import type { ValueOf } from "../../utility-types";
 
 const arrowHandler = (
   eventKey: string,
@@ -108,7 +109,7 @@ interface ColorPickerKeyNavHandlerProps {
   event: React.KeyboardEvent;
   activeColorPickerSection: ActiveColorPickerSectionAtomType;
   palette: ColorPaletteCustom;
-  color: string;
+  color: string | null;
   onChange: (color: string) => void;
   customColors: string[];
   setActiveColorPickerSection: (
@@ -269,7 +270,7 @@ export const colorPickerKeyNavHandler = ({
   }
 
   if (activeColorPickerSection === "custom") {
-    const indexOfColor = customColors.indexOf(color);
+    const indexOfColor = color != null ? customColors.indexOf(color) : 0;
 
     const newColorIndex = arrowHandler(
       event.key,

@@ -1,3 +1,10 @@
+import { isTextElement } from "@excalidraw/element";
+import { getTextFromElements } from "@excalidraw/element";
+
+import { CODES, KEYS, isFirefox } from "@excalidraw/common";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
 import {
   copyTextToSystemClipboard,
   copyToClipboard,
@@ -7,12 +14,8 @@ import {
   readSystemClipboard,
 } from "../clipboard";
 import { DuplicateIcon, cutIcon, pngIcon, svgIcon } from "../components/icons";
-import { isFirefox } from "../constants";
 import { exportCanvas, prepareElementsForExport } from "../data/index";
-import { getTextFromElements, isTextElement } from "../element";
 import { t } from "../i18n";
-import { CODES, KEYS } from "../keys";
-import { CaptureUpdateAction } from "../store";
 
 import { actionDeleteSelected } from "./actionDeleteSelected";
 import { register } from "./register";

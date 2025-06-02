@@ -1,72 +1,59 @@
 import {
   pointFrom,
+  pointsEqual,
   type GlobalPoint,
   type LocalPoint,
   type Radians,
 } from "@excalidraw/math";
 import oc from "open-color";
 
-import { getClientColor, renderRemoteCursors } from "../clients";
 import {
+  arrayToMap,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
+  invariant,
   THEME,
-} from "../constants";
-import {
-  getElementAbsoluteCoords,
-  getTransformHandlesFromCoords,
-  getTransformHandles,
-  getCommonBounds,
-} from "../element";
-import {
-  BINDING_HIGHLIGHT_OFFSET,
-  BINDING_HIGHLIGHT_THICKNESS,
-  maxBindingGap,
-} from "../element/binding";
-import { LinearElementEditor } from "../element/linearElementEditor";
+  throttleRAF,
+} from "@excalidraw/common";
+
+import { FIXED_BINDING_DISTANCE, maxBindingGap } from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
 import {
   getOmitSidesForDevice,
+  getTransformHandles,
+  getTransformHandlesFromCoords,
   shouldShowBoundingBox,
-} from "../element/transformHandles";
+} from "@excalidraw/element";
 import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
+  isLineElement,
   isTextElement,
-} from "../element/typeChecks";
-import {
-  isSelectedViaGroup,
-  getSelectedGroupIds,
-  getElementsInGroup,
-  selectGroupsFromGivenElements,
-} from "../groups";
-import { renderSelectionElement } from "../renderer/renderElement";
-import { renderSnaps } from "../renderer/renderSnaps";
-import { roundRect } from "../renderer/roundRect";
-import {
-  getScrollBars,
-  SCROLLBAR_COLOR,
-  SCROLLBAR_WIDTH,
-} from "../scene/scrollbars";
-import { getCornerRadius } from "../shapes";
-import { type InteractiveCanvasAppState } from "../types";
-import { arrayToMap, invariant, throttleRAF } from "../utils";
+} from "@excalidraw/element";
+
+import { renderSelectionElement } from "@excalidraw/element";
 
 import {
-  bootstrapCanvas,
-  fillCircle,
-  getNormalizedCanvasDimensions,
-} from "./helpers";
+  getElementsInGroup,
+  getSelectedGroupIds,
+  isSelectedViaGroup,
+  selectGroupsFromGivenElements,
+} from "@excalidraw/element";
+
+import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   SuggestedBinding,
   SuggestedPointBinding,
-} from "../element/binding";
+} from "@excalidraw/element";
+
 import type {
   TransformHandles,
   TransformHandleType,
-} from "../element/transformHandles";
+} from "@excalidraw/element";
+
 import type {
   ElementsMap,
   ExcalidrawBindableElement,
@@ -77,7 +64,29 @@ import type {
   ExcalidrawTextElement,
   GroupId,
   NonDeleted,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import { renderSnaps } from "../renderer/renderSnaps";
+import { roundRect } from "../renderer/roundRect";
+import {
+  getScrollBars,
+  SCROLLBAR_COLOR,
+  SCROLLBAR_WIDTH,
+} from "../scene/scrollbars";
+import { type InteractiveCanvasAppState } from "../types";
+
+import { getClientColor, renderRemoteCursors } from "../clients";
+
+import {
+  bootstrapCanvas,
+  drawHighlightForDiamondWithRotation,
+  drawHighlightForRectWithRotation,
+  fillCircle,
+  getNormalizedCanvasDimensions,
+  strokeEllipseWithRotation,
+  strokeRectWithRotation,
+} from "./helpers";
+
 import type {
   InteractiveCanvasRenderConfig,
   InteractiveSceneRenderConfig,
@@ -148,64 +157,14 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   );
 };
 
-const strokeRectWithRotation = (
-  context: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  cx: number,
-  cy: number,
-  angle: number,
-  fill: boolean = false,
-  /** should account for zoom */
-  radius: number = 0,
-) => {
-  context.save();
-  context.translate(cx, cy);
-  context.rotate(angle);
-  if (fill) {
-    context.fillRect(x - cx, y - cy, width, height);
-  }
-  if (radius && context.roundRect) {
-    context.beginPath();
-    context.roundRect(x - cx, y - cy, width, height, radius);
-    context.stroke();
-    context.closePath();
-  } else {
-    context.strokeRect(x - cx, y - cy, width, height);
-  }
-  context.restore();
-};
-
-const strokeDiamondWithRotation = (
-  context: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  cx: number,
-  cy: number,
-  angle: number,
-) => {
-  context.save();
-  context.translate(cx, cy);
-  context.rotate(angle);
-  context.beginPath();
-  context.moveTo(0, height / 2);
-  context.lineTo(width / 2, 0);
-  context.lineTo(0, -height / 2);
-  context.lineTo(-width / 2, 0);
-  context.closePath();
-  context.stroke();
-  context.restore();
-};
-
 const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   point: Point,
   radius: number,
   isSelected: boolean,
-  isPhantomPoint = false,
+  isPhantomPoint: boolean,
+  isOverlappingPoint: boolean,
 ) => {
   context.strokeStyle = "#5e5ad8";
   context.setLineDash([]);
@@ -220,22 +179,12 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
     context,
     point[0],
     point[1],
-    radius / appState.zoom.value,
+    (isOverlappingPoint
+      ? radius * (appState.editingLinearElement ? 1.5 : 2)
+      : radius) / appState.zoom.value,
     !isPhantomPoint,
+    !isOverlappingPoint || isSelected,
   );
-};
-
-const strokeEllipseWithRotation = (
-  context: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  cx: number,
-  cy: number,
-  angle: number,
-) => {
-  context.beginPath();
-  context.ellipse(cx, cy, width / 2, height / 2, angle, 0, Math.PI * 2);
-  context.stroke();
 };
 
 const renderBindingHighlightForBindableElement = (
@@ -249,16 +198,10 @@ const renderBindingHighlightForBindableElement = (
   const height = y2 - y1;
 
   context.strokeStyle = "rgba(0,0,0,.05)";
-  // When zooming out, make line width greater for visibility
-  const zoomValue = zoom.value < 1 ? zoom.value : 1;
-  context.lineWidth = BINDING_HIGHLIGHT_THICKNESS / zoomValue;
-  // To ensure the binding highlight doesn't overlap the element itself
-  const padding = context.lineWidth / 2 + BINDING_HIGHLIGHT_OFFSET;
+  context.fillStyle = "rgba(0,0,0,.05)";
 
-  const radius = getCornerRadius(
-    Math.min(element.width, element.height),
-    element,
-  );
+  // To ensure the binding highlight doesn't overlap the element itself
+  const padding = maxBindingGap(element, element.width, element.height, zoom);
 
   switch (element.type) {
     case "rectangle":
@@ -268,37 +211,20 @@ const renderBindingHighlightForBindableElement = (
     case "embeddable":
     case "frame":
     case "magicframe":
-      strokeRectWithRotation(
-        context,
-        x1 - padding,
-        y1 - padding,
-        width + padding * 2,
-        height + padding * 2,
-        x1 + width / 2,
-        y1 + height / 2,
-        element.angle,
-        undefined,
-        radius,
-      );
+      drawHighlightForRectWithRotation(context, element, padding);
       break;
     case "diamond":
-      const side = Math.hypot(width, height);
-      const wPadding = (padding * side) / height;
-      const hPadding = (padding * side) / width;
-      strokeDiamondWithRotation(
-        context,
-        width + wPadding * 2,
-        height + hPadding * 2,
-        x1 + width / 2,
-        y1 + height / 2,
-        element.angle,
-      );
+      drawHighlightForDiamondWithRotation(context, padding, element);
       break;
     case "ellipse":
+      context.lineWidth =
+        maxBindingGap(element, element.width, element.height, zoom) -
+        FIXED_BINDING_DISTANCE;
+
       strokeEllipseWithRotation(
         context,
-        width + padding * 2,
-        height + padding * 2,
+        width + padding + FIXED_BINDING_DISTANCE,
+        height + padding + FIXED_BINDING_DISTANCE,
         x1 + width / 2,
         y1 + height / 2,
         element.angle,
@@ -333,7 +259,7 @@ const renderBindingHighlightForSuggestedPointBinding = (
       index,
       elementsMap,
     );
-    fillCircle(context, x, y, threshold);
+    fillCircle(context, x, y, threshold, true);
   });
 };
 
@@ -457,7 +383,9 @@ const renderElementsBoxHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   elements: NonDeleted<ExcalidrawElement>[],
+  config?: { colors?: string[]; dashed?: boolean },
 ) => {
+  const { colors = ["rgb(0,118,255)"], dashed = false } = config || {};
   const individualElements = elements.filter(
     (element) => element.groupIds.length === 0,
   );
@@ -474,8 +402,8 @@ const renderElementsBoxHighlight = (
       x2,
       y1,
       y2,
-      selectionColors: ["rgb(0,118,255)"],
-      dashed: false,
+      selectionColors: colors,
+      dashed,
       cx: x1 + (x2 - x1) / 2,
       cy: y1 + (y2 - y1) / 2,
       activeEmbeddable: false,
@@ -520,15 +448,48 @@ const renderLinearPointHandles = (
   const radius = appState.editingLinearElement
     ? POINT_HANDLE_SIZE
     : POINT_HANDLE_SIZE / 2;
+
+  const _isElbowArrow = isElbowArrow(element);
+  const _isLineElement = isLineElement(element);
+
   points.forEach((point, idx) => {
-    if (isElbowArrow(element) && idx !== 0 && idx !== points.length - 1) {
+    if (_isElbowArrow && idx !== 0 && idx !== points.length - 1) {
       return;
     }
 
-    const isSelected =
-      !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
+    const isOverlappingPoint =
+      idx > 0 &&
+      (idx !== points.length - 1 || !_isLineElement || !element.polygon) &&
+      pointsEqual(
+        point,
+        idx === points.length - 1 ? points[0] : points[idx - 1],
+        2 / appState.zoom.value,
+      );
 
-    renderSingleLinearPoint(context, appState, point, radius, isSelected);
+    let isSelected =
+      !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
+    // when element is a polygon, highlight the last point as well if first
+    // point is selected since they overlap and the last point tends to be
+    // rendered on top
+    if (
+      _isLineElement &&
+      element.polygon &&
+      !isSelected &&
+      idx === element.points.length - 1 &&
+      !!appState.editingLinearElement?.selectedPointsIndices?.includes(0)
+    ) {
+      isSelected = true;
+    }
+
+    renderSingleLinearPoint(
+      context,
+      appState,
+      point,
+      radius,
+      isSelected,
+      false,
+      isOverlappingPoint,
+    );
   });
 
   // Rendering segment mid points
@@ -555,6 +516,7 @@ const renderLinearPointHandles = (
           POINT_HANDLE_SIZE / 2,
           false,
           !fixedSegments.includes(idx + 1),
+          false,
         );
       }
     });
@@ -578,6 +540,7 @@ const renderLinearPointHandles = (
           POINT_HANDLE_SIZE / 2,
           false,
           true,
+          false,
         );
       }
     });
@@ -604,7 +567,7 @@ const renderTransformHandles = (
         context.strokeStyle = renderConfig.selectionColor;
       }
       if (key === "rotation") {
-        fillCircle(context, x + width / 2, y + height / 2, width / 2);
+        fillCircle(context, x + width / 2, y + height / 2, width / 2, true);
         // prefer round corners if roundRect API is available
       } else if (context.roundRect) {
         context.beginPath();
@@ -867,6 +830,17 @@ const _renderInteractiveScene = ({
     renderElementsBoxHighlight(context, appState, appState.elementsToHighlight);
   }
 
+  if (appState.activeLockedId) {
+    const element = allElementsMap.get(appState.activeLockedId);
+    const elements = element
+      ? [element]
+      : getElementsInGroup(allElementsMap, appState.activeLockedId);
+    renderElementsBoxHighlight(context, appState, elements, {
+      colors: ["#ced4da"],
+      dashed: true,
+    });
+  }
+
   const isFrameSelected = selectedElements.some((element) =>
     isFrameLikeElement(element),
   );
@@ -886,23 +860,24 @@ const _renderInteractiveScene = ({
     );
   }
 
-  if (
-    isElbowArrow(selectedElements[0]) &&
-    appState.selectedLinearElement &&
-    appState.selectedLinearElement.segmentMidPointHoveredCoords
-  ) {
-    renderElbowArrowMidPointHighlight(context, appState);
-  } else if (
-    appState.selectedLinearElement &&
-    appState.selectedLinearElement.hoverPointIndex >= 0 &&
-    !(
-      isElbowArrow(selectedElements[0]) &&
-      appState.selectedLinearElement.hoverPointIndex > 0 &&
-      appState.selectedLinearElement.hoverPointIndex <
-        selectedElements[0].points.length - 1
-    )
-  ) {
-    renderLinearElementPointHighlight(context, appState, elementsMap);
+  // Arrows have a different highlight behavior when
+  // they are the only selected element
+  if (appState.selectedLinearElement) {
+    const editor = appState.selectedLinearElement;
+    const firstSelectedLinear = selectedElements.find(
+      (el) => el.id === editor.elementId, // Don't forget bound text elements!
+    );
+
+    if (editor.segmentMidPointHoveredCoords) {
+      renderElbowArrowMidPointHighlight(context, appState);
+    } else if (
+      isElbowArrow(firstSelectedLinear)
+        ? editor.hoverPointIndex === 0 ||
+          editor.hoverPointIndex === firstSelectedLinear.points.length - 1
+        : editor.hoverPointIndex >= 0
+    ) {
+      renderLinearElementPointHighlight(context, appState, elementsMap);
+    }
   }
 
   // Paint selected elements
@@ -980,8 +955,8 @@ const _renderInteractiveScene = ({
             y1,
             x2,
             y2,
-            selectionColors,
-            dashed: !!remoteClients,
+            selectionColors: element.locked ? ["#ced4da"] : selectionColors,
+            dashed: !!remoteClients || element.locked,
             cx,
             cy,
             activeEmbeddable:
@@ -1005,7 +980,9 @@ const _renderInteractiveScene = ({
           x2,
           y1,
           y2,
-          selectionColors: [oc.black],
+          selectionColors: groupElements.some((el) => el.locked)
+            ? ["#ced4da"]
+            : [oc.black],
           dashed: true,
           cx: x1 + (x2 - x1) / 2,
           cy: y1 + (y2 - y1) / 2,
@@ -1069,11 +1046,15 @@ const _renderInteractiveScene = ({
           );
         }
       }
-    } else if (selectedElements.length > 1 && !appState.isRotating) {
+    } else if (
+      selectedElements.length > 1 &&
+      !appState.isRotating &&
+      !selectedElements.some((el) => el.locked)
+    ) {
       const dashedLinePadding =
         (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
       context.fillStyle = oc.white;
-      const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+      const [x1, y1, x2, y2] = getCommonBounds(selectedElements, elementsMap);
       const initialLineDash = context.getLineDash();
       context.setLineDash([2 / appState.zoom.value]);
       const lineWidth = context.lineWidth;
@@ -1113,10 +1094,10 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
-  appState.searchMatches.forEach(({ id, focus, matchedLines }) => {
+  appState.searchMatches?.matches.forEach(({ id, focus, matchedLines }) => {
     const element = elementsMap.get(id);
 
-    if (element && isTextElement(element)) {
+    if (element) {
       const [elementX1, elementY1, , , cx, cy] = getElementAbsoluteCoords(
         element,
         elementsMap,
@@ -1136,17 +1117,20 @@ const _renderInteractiveScene = ({
         context.fillStyle = "rgba(99, 52, 0, 0.4)";
       }
 
+      const zoomFactor = isFrameLikeElement(element) ? appState.zoom.value : 1;
+
       context.translate(appState.scrollX, appState.scrollY);
       context.translate(cx, cy);
       context.rotate(element.angle);
 
       matchedLines.forEach((matchedLine) => {
-        context.fillRect(
-          elementX1 + matchedLine.offsetX - cx,
-          elementY1 + matchedLine.offsetY - cy,
-          matchedLine.width,
-          matchedLine.height,
-        );
+        (matchedLine.showOnCanvas || focus) &&
+          context.fillRect(
+            elementX1 + matchedLine.offsetX / zoomFactor - cx,
+            elementY1 + matchedLine.offsetY / zoomFactor - cy,
+            matchedLine.width / zoomFactor,
+            matchedLine.height / zoomFactor,
+          );
       });
 
       context.restore();
@@ -1169,7 +1153,7 @@ const _renderInteractiveScene = ({
   let scrollBars;
   if (renderConfig.renderScrollbars) {
     scrollBars = getScrollBars(
-      visibleElements,
+      elementsMap,
       normalizedWidth,
       normalizedHeight,
       appState,

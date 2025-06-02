@@ -3,6 +3,19 @@ import fuzzy from "fuzzy";
 import { useEffect, useRef, useState } from "react";
 
 import {
+  DEFAULT_SIDEBAR,
+  EVENT,
+  KEYS,
+  capitalizeString,
+  getShortcutKey,
+  isWritableElement,
+} from "@excalidraw/common";
+
+import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionToggleShapeSwitch";
+
+import type { MarkRequired } from "@excalidraw/common/utility-types";
+
+import {
   actionClearCanvas,
   actionLink,
   actionToggleSearchMenu,
@@ -13,12 +26,10 @@ import {
 } from "../../actions/actionElementLink";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { trackEvent } from "../../analytics";
-import { DEFAULT_SIDEBAR, EVENT } from "../../constants";
 import { useUIAppState } from "../../context/ui-appState";
 import { deburr } from "../../deburr";
 import { atom, useAtom, editorJotaiStore } from "../../editor-jotai";
 import { t } from "../../i18n";
-import { KEYS } from "../../keys";
 import {
   useApp,
   useAppProps,
@@ -42,13 +53,7 @@ import {
   LibraryIcon,
 } from "../icons";
 
-import {
-  capitalizeString,
-  getShortcutKey,
-  isWritableElement,
-} from "../../utils";
-
-import { SHAPES } from "../../shapes";
+import { SHAPES } from "../shapes";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
@@ -60,7 +65,6 @@ import "./CommandPalette.scss";
 
 import type { CommandPaletteItem } from "./types";
 import type { AppProps, AppState, UIAppState } from "../../types";
-import type { MarkRequired } from "../../utility-types";
 import type { ShortcutName } from "../../actions/shortcuts";
 import type { TranslationKeys } from "../../i18n";
 import type { Action } from "../../actions/types";
@@ -289,6 +293,7 @@ function CommandPaletteInner({
         actionManager.actions.decreaseFontSize,
         actionManager.actions.toggleLinearEditor,
         actionManager.actions.cropEditor,
+        actionManager.actions.togglePolygon,
         actionLink,
         actionCopyElementLink,
         actionLinkToElement,
@@ -313,6 +318,7 @@ function CommandPaletteInner({
       const toolCommands: CommandPaletteItem[] = [
         actionManager.actions.toggleHandTool,
         actionManager.actions.setFrameAsActiveTool,
+        actionManager.actions.toggleLassoTool,
       ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.tools));
 
       const editorCommands: CommandPaletteItem[] = [
@@ -405,6 +411,14 @@ function CommandPaletteInner({
           viewMode: true,
           perform: () => {
             actionManager.executeAction(actionToggleSearchMenu);
+          },
+        },
+        {
+          label: t("labels.shapeSwitch"),
+          category: DEFAULT_CATEGORIES.elements,
+          icon: boltIcon,
+          perform: () => {
+            actionManager.executeAction(actionToggleShapeSwitch);
           },
         },
         {

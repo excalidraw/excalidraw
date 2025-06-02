@@ -1,22 +1,31 @@
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import { isFrameLikeElement } from "@excalidraw/element";
+
+import { CODES, KEYS, arrayToMap, getShortcutKey } from "@excalidraw/common";
+
+import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
+
+import { distributeElements } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Distribution } from "@excalidraw/element";
+
 import { ToolButton } from "../components/ToolButton";
 import {
   DistributeHorizontallyIcon,
   DistributeVerticallyIcon,
 } from "../components/icons";
-import { distributeElements } from "../distribute";
-import { getNonDeletedElements } from "../element";
-import { isFrameLikeElement } from "../element/typeChecks";
-import { updateFrameMembershipOfSelectedElements } from "../frame";
+
 import { t } from "../i18n";
-import { CODES, KEYS } from "../keys";
+
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
-import { arrayToMap, getShortcutKey } from "../utils";
 
 import { register } from "./register";
 
-import type { Distribution } from "../distribute";
-import type { ExcalidrawElement } from "../element/types";
 import type { AppClassProperties, AppState } from "../types";
 
 const enableActionGroup = (appState: AppState, app: AppClassProperties) => {

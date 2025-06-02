@@ -1,3 +1,16 @@
+import {
+  KEYS,
+  DEFAULT_EXPORT_PADDING,
+  EXPORT_SCALES,
+  THEME,
+} from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { Theme } from "@excalidraw/element/types";
+
 import { useDevice } from "../components/App";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { DarkModeToggle } from "../components/DarkModeToggle";
@@ -5,23 +18,18 @@ import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
 import { ExportIcon, questionCircle, saveAs } from "../components/icons";
-import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { resaveAsImageWithScene } from "../data/resave";
-import { getNonDeletedElements } from "../element";
+
 import { t } from "../i18n";
-import { KEYS } from "../keys";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getExportSize } from "../scene/export";
-import { CaptureUpdateAction } from "../store";
 
 import "../components/ToolIcon.scss";
 
 import { register } from "./register";
-
-import type { Theme } from "../element/types";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",

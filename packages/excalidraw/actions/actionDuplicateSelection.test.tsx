@@ -1,6 +1,5 @@
-import React from "react";
+import { ORIG_ID } from "@excalidraw/common";
 
-import { ORIG_ID } from "../constants";
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import {
@@ -258,7 +257,7 @@ describe("actionDuplicateSelection", () => {
       assertElements(h.elements, [
         { id: frame.id },
         { id: text.id, frameId: frame.id },
-        { [ORIG_ID]: text.id, frameId: frame.id },
+        { [ORIG_ID]: text.id, frameId: frame.id, selected: true },
       ]);
     });
 

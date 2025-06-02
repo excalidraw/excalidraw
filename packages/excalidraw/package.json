@@ -6,6 +6,18 @@
   "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
   "exports": {
+    "./common/*": {
+      "types": "./dist/types/common/src/*.d.ts"
+    },
+    "./element/*": {
+      "types": "./dist/types/element/src/*.d.ts"
+    },
+    "./math/*": {
+      "types": "./dist/types/math/src/*.d.ts"
+    },
+    "./utils/*": {
+      "types": "./dist/types/utils/src/*.d.ts"
+    },
     "./*": {
       "types": "./dist/types/excalidraw/*.d.ts"
     },
@@ -64,7 +76,7 @@
     "@excalidraw/mermaid-to-excalidraw": "1.1.2",
     "@excalidraw/random-username": "1.1.0",
     "@radix-ui/react-popover": "1.1.6",
-    "@radix-ui/react-tabs": "1.0.2",
+    "@radix-ui/react-tabs": "1.1.3",
     "browser-fs-access": "0.29.1",
     "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",
@@ -117,7 +129,7 @@
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
-    "gen:types": "rm -rf types && tsc",
-    "build:esm": "rm -rf dist && node ../../scripts/buildPackage.js && yarn gen:types"
+    "gen:types": "rimraf types && tsc",
+    "build:esm": "rimraf dist && node ../../scripts/buildPackage.js && yarn gen:types"
   }
 }

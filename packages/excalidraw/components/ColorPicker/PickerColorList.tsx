@@ -1,6 +1,8 @@
 import clsx from "clsx";
 import { useEffect, useRef } from "react";
 
+import type { ColorPaletteCustom } from "@excalidraw/common";
+
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
 
@@ -11,14 +13,12 @@ import {
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
 
-import type { ColorPaletteCustom } from "../../colors";
 import type { TranslationKeys } from "../../i18n";
 
 interface PickerColorListProps {
   palette: ColorPaletteCustom;
-  color: string;
+  color: string | null;
   onChange: (color: string) => void;
-  label: string;
   activeShade: number;
 }
 
@@ -26,11 +26,10 @@ const PickerColorList = ({
   palette,
   color,
   onChange,
-  label,
   activeShade,
 }: PickerColorListProps) => {
   const colorObj = getColorNameAndShadeFromColor({
-    color: color || "transparent",
+    color,
     palette,
   });
   const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
@@ -64,7 +63,7 @@ const PickerColorList = ({
             tabIndex={-1}
             type="button"
             className={clsx(
-              "color-picker__button color-picker__button--large",
+              "color-picker__button color-picker__button--large has-outline",
               {
                 active: colorObj?.colorName === key,
                 "is-transparent": color === "transparent" || !color,

@@ -141,6 +141,10 @@
       "edit": "Edit line",
       "editArrow": "Edit arrow"
     },
+    "polygon": {
+      "breakPolygon": "Break polygon",
+      "convertToPolygon": "Convert to polygon"
+    },
     "elementLock": {
       "lock": "Lock",
       "unlock": "Unlock",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "Uncropped dimension",
     "copyElementLink": "Copy link to object",
     "linkToElement": "Link to object",
-    "wrapSelectionInFrame": "Wrap selection in frame"
+    "wrapSelectionInFrame": "Wrap selection in frame",
+    "tab": "Tab",
+    "shapeSwitch": "Switch shape"
   },
   "elementLink": {
     "title": "Link to object",
@@ -182,7 +188,9 @@
     "noMatch": "No matches found...",
     "singleResult": "result",
     "multipleResults": "results",
-    "placeholder": "Find text on canvas..."
+    "placeholder": "Find text on canvas...",
+    "frames": "Frames",
+    "texts": "Texts"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -276,6 +284,7 @@
   },
   "toolBar": {
     "selection": "Selection",
+    "lasso": "Lasso selection",
     "image": "Insert image",
     "rectangle": "Rectangle",
     "diamond": "Diamond",
@@ -295,7 +304,8 @@
     "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
-    "mermaidToExcalidraw": "Mermaid to Excalidraw"
+    "mermaidToExcalidraw": "Mermaid to Excalidraw",
+    "convertElementType": "Toggle shape type"
   },
   "element": {
     "rectangle": "Rectangle",
@@ -550,6 +560,7 @@
     }
   },
   "colorPicker": {
+    "color": "Color",
     "mostUsedCustomColors": "Most used custom colors",
     "colors": "Colors",
     "shades": "Shades",

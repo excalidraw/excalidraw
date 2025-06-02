@@ -6,7 +6,7 @@ import {
   TTDDialog,
 } from "@excalidraw/excalidraw";
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
-import { safelyParseJSON } from "@excalidraw/excalidraw/utils";
+import { safelyParseJSON } from "@excalidraw/common";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
@@ -73,7 +73,7 @@ export const AIComponents = ({
                   </br>
                   <div>You can also try <a href="${
                     import.meta.env.VITE_APP_PLUS_LP
-                  }/plus?utm_source=excalidraw&utm_medium=app&utm_content=d2c" target="_blank" rel="noreferrer noopener">Excalidraw+</a> to get more requests.</div>
+                  }/plus?utm_source=excalidraw&utm_medium=app&utm_content=d2c" target="_blank" rel="noopener">Excalidraw+</a> to get more requests.</div>
                 </div>
                 </body>
                 </html>`,

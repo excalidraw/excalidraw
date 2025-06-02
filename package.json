@@ -4,9 +4,7 @@
   "packageManager": "yarn@1.22.22",
   "workspaces": [
     "excalidraw-app",
-    "packages/excalidraw",
-    "packages/utils",
-    "packages/math",
+    "packages/*",
     "examples/*"
   ],
   "devDependencies": {
@@ -35,6 +33,7 @@
     "pepjs": "0.5.3",
     "prettier": "2.6.2",
     "rewire": "6.0.0",
+    "rimraf": "^5.0.0",
     "typescript": "4.9.4",
     "vite": "5.0.12",
     "vite-plugin-checker": "0.7.2",
@@ -80,8 +79,8 @@
     "autorelease": "node scripts/autorelease.js",
     "prerelease:excalidraw": "node scripts/prerelease.js",
     "release:excalidraw": "node scripts/release.js",
-    "rm:build": "rm -rf excalidraw-app/{build,dist,dev-dist} && rm -rf packages/*/{dist,build} && rm -rf examples/*/{build,dist}",
-    "rm:node_modules": "rm -rf node_modules && rm -rf excalidraw-app/node_modules && rm -rf packages/*/node_modules",
+    "rm:build": "rimraf --glob excalidraw-app/build excalidraw-app/dist excalidraw-app/dev-dist packages/*/dist packages/*/build examples/*/build examples/*/dist",
+    "rm:node_modules": "rimraf --glob node_modules excalidraw-app/node_modules packages/*/node_modules",
     "clean-install": "yarn rm:node_modules && yarn install"
   },
   "resolutions": {

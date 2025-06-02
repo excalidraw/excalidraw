@@ -1,26 +1,33 @@
-import { ToolButton } from "../components/ToolButton";
-import { TrashIcon } from "../components/icons";
-import { getNonDeletedElements } from "../element";
-import { fixBindingsAfterDeletion } from "../element/binding";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { mutateElement, newElementWith } from "../element/mutateElement";
-import { getContainerElement } from "../element/textElement";
+import { KEYS, updateActiveTool } from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+import { fixBindingsAfterDeletion } from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element";
+import { getContainerElement } from "@excalidraw/element";
 import {
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
-} from "../element/typeChecks";
-import { getFrameChildren } from "../frame";
-import { getElementsInGroup, selectGroupsForSelectedElements } from "../groups";
+} from "@excalidraw/element";
+import { getFrameChildren } from "@excalidraw/element";
+
+import {
+  getElementsInGroup,
+  selectGroupsForSelectedElements,
+} from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { t } from "../i18n";
-import { KEYS } from "../keys";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
-import { updateActiveTool } from "../utils";
+import { TrashIcon } from "../components/icons";
+import { ToolButton } from "../components/ToolButton";
 
 import { register } from "./register";
 
-import type { ExcalidrawElement } from "../element/types";
 import type { AppClassProperties, AppState } from "../types";
 
 const deleteSelectedElements = (
@@ -85,7 +92,7 @@ const deleteSelectedElements = (
         el.boundElements.forEach((candidate) => {
           const bound = app.scene.getNonDeletedElementsMap().get(candidate.id);
           if (bound && isElbowArrow(bound)) {
-            mutateElement(bound, {
+            app.scene.mutateElement(bound, {
               startBinding:
                 el.id === bound.startBinding?.elementId
                   ? null
@@ -93,7 +100,6 @@ const deleteSelectedElements = (
               endBinding:
                 el.id === bound.endBinding?.elementId ? null : bound.endBinding,
             });
-            mutateElement(bound, { points: bound.points });
           }
         });
       }
@@ -252,7 +258,7 @@ export const actionDeleteSelected = register({
           : endBindingElement,
       };
 
-      LinearElementEditor.deletePoints(element, selectedPointsIndices);
+      LinearElementEditor.deletePoints(element, app, selectedPointsIndices);
 
       return {
         elements,
@@ -288,6 +294,7 @@ export const actionDeleteSelected = register({
         activeTool: updateActiveTool(appState, { type: "selection" }),
         multiElement: null,
         activeEmbeddable: null,
+        selectedLinearElement: null,
       },
       captureUpdate: isSomeElementSelected(
         getNonDeletedElements(elements),

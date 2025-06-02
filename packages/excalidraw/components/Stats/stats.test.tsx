@@ -3,14 +3,23 @@ import { act, fireEvent, queryByTestId } from "@testing-library/react";
 import React from "react";
 import { vi } from "vitest";
 
+import { setDateTimeForTests, reseed } from "@excalidraw/common";
+
+import { isInGroup } from "@excalidraw/element";
+
+import { isTextElement } from "@excalidraw/element";
+
 import type { Degrees } from "@excalidraw/math";
 
-import { Excalidraw, mutateElement } from "../..";
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
+
+import { Excalidraw, getCommonBounds } from "../..";
 import { actionGroup } from "../../actions";
-import { getCommonBounds, isTextElement } from "../../element";
-import { isInGroup } from "../../groups";
 import { t } from "../../i18n";
-import { reseed } from "../../random";
 import * as StaticScene from "../../renderer/staticScene";
 import { API } from "../../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
@@ -21,15 +30,8 @@ import {
   render,
   restoreOriginalGetBoundingClientRect,
 } from "../../tests/test-utils";
-import { setDateTimeForTests } from "../../utils";
 
 import { getStepSizedValue } from "./utils";
-
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-} from "../../element/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -476,7 +478,7 @@ describe("stats for a non-generic element", () => {
       containerId: container.id,
       fontSize: 20,
     });
-    mutateElement(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ type: "text", id: text.id }],
     });
     API.setElements([container, text]);

@@ -1,9 +1,11 @@
 import React from "react";
 import { vi } from "vitest";
 
+import { KEYS, reseed } from "@excalidraw/common";
+
+import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
-import { reseed } from "../random";
 import * as InteractiveScene from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
@@ -14,8 +16,6 @@ import {
   restoreOriginalGetBoundingClientRect,
   unmountComponent,
 } from "./test-utils";
-
-import type { ExcalidrawLinearElement } from "../element/types";
 
 unmountComponent();
 
@@ -313,7 +313,7 @@ describe("Test dragCreate", () => {
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
         `6`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -342,7 +342,7 @@ describe("Test dragCreate", () => {
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
         `6`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
