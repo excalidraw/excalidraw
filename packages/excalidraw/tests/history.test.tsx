@@ -19,6 +19,7 @@ import {
   COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
+  reseed,
 } from "@excalidraw/common";
 
 import "@excalidraw/utils/test-utils";
@@ -26,6 +27,8 @@ import "@excalidraw/utils/test-utils";
 import { ElementsDelta, AppStateDelta } from "@excalidraw/element";
 
 import { CaptureUpdateAction, StoreDelta } from "@excalidraw/element";
+
+import * as imageModule from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
@@ -35,6 +38,7 @@ import type {
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  FileId,
   FixedPointBinding,
   FractionalIndex,
   SceneElementsMap,
@@ -54,6 +58,8 @@ import { getDefaultAppState } from "../appState";
 import { Excalidraw } from "../index";
 import { createPasteEvent } from "../clipboard";
 
+import * as blobModule from "../data/blob";
+
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
@@ -64,9 +70,8 @@ import {
   togglePopover,
   getCloneByOrigId,
   checkpointHistory,
+  unmountComponent,
 } from "./test-utils";
-
-import { ImageMock } from "./helpers/mocks";
 
 import type { AppState } from "../types";
 
@@ -109,7 +114,29 @@ const violet = COLOR_PALETTE.violet[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 
 describe("history", () => {
   beforeEach(() => {
+    unmountComponent();
     renderStaticScene.mockClear();
+    vi.clearAllMocks();
+
+    reseed(7);
+
+    const generateIdSpy = vi.spyOn(blobModule, "generateIdFromFile");
+    const resizeFileSpy = vi.spyOn(blobModule, "resizeImageFile");
+    const updateImageCacheSpy = vi.spyOn(imageModule, "updateImageCache");
+
+    generateIdSpy.mockImplementation(() => Promise.resolve("fileId" as FileId));
+    resizeFileSpy.mockImplementation((file: File) => Promise.resolve(file));
+    updateImageCacheSpy.mockImplementation(() =>
+      Promise.resolve({
+        updatedFiles: new Map(),
+        erroredFiles: new Map(),
+        imageCache: new Map(),
+      }),
+    );
+
+    Object.assign(document, {
+      elementFromPoint: () => GlobalTestState.canvas,
+    });
   });
 
   afterEach(() => {
@@ -565,9 +592,6 @@ describe("history", () => {
     it("should create new history entry on image drag&drop", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
 
-      // mock the global Image constructor
-      global.Image = ImageMock as any;
-
       await API.drop(await API.loadFile("./fixtures/deer.png"));
 
       await waitFor(() => {
@@ -653,13 +677,6 @@ describe("history", () => {
         <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
       );
 
-      // mock the global Image constructor
-      global.Image = ImageMock as any;
-
-      Object.assign(document, {
-        elementFromPoint: () => GlobalTestState.canvas,
-      });
-
       document.dispatchEvent(
         createPasteEvent({
           files: [await API.loadFile("./fixtures/smiley_embedded_v2.png")],
@@ -704,10 +721,6 @@ describe("history", () => {
       await render(
         <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
       );
-
-      Object.assign(document, {
-        elementFromPoint: () => GlobalTestState.canvas,
-      });
 
       const link = "https://www.youtube.com/watch?v=gkGMXY0wekg";
 

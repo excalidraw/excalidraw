@@ -117,10 +117,3 @@ console.error = (...args) => {
     _consoleError(...args);
   }
 };
-
-// Mock the image-blob-reduce library which expects browser instance of Blob
-vi.mock("image-blob-reduce", () => ({
-  default: () => ({
-    toBlob: (file: File) => Promise.resolve(file),
-  }),
-}));
