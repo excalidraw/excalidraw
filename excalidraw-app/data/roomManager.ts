@@ -142,10 +142,7 @@ class RoomManager {
 
     filteredRooms.unshift(newRoom);
 
-    // Limit to the most recent 20 rooms
-    const limitedRooms = filteredRooms.slice(0, 20);
-
-    await this.saveRooms(limitedRooms);
+    await this.saveRooms(filteredRooms);
   }
 
   async getRooms(): Promise<CollabRoom[]> {
@@ -177,6 +174,16 @@ class RoomManager {
       room.name = name;
       await this.saveRooms(rooms);
     }
+  }
+
+  async getCurrentRoom(): Promise<CollabRoom | null> {
+    const rooms = await this.loadRooms();
+    if (rooms.length === 0) {
+      return null;
+    }
+
+    // Return the most recently accessed room
+    return rooms.sort((a, b) => b.lastAccessed - a.lastAccessed)[0];
   }
 
   async clearAllRooms(): Promise<void> {
