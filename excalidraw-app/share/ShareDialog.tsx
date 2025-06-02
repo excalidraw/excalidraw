@@ -11,6 +11,7 @@ import {
   share,
   shareIOS,
   shareWindows,
+  TrashIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 import { useCopyStatus } from "@excalidraw/excalidraw/hooks/useCopiedIndicator";
@@ -18,12 +19,10 @@ import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { KEYS, getFrame } from "@excalidraw/common";
 import { useEffect, useRef, useState } from "react";
 
-import { useExcalidrawSetAppState } from "@excalidraw/excalidraw/components/App";
+import { roomManager } from "excalidraw-app/data/roomManager";
 
 import { atom, useAtom, useAtomValue } from "../app-jotai";
 import { activeRoomLinkAtom } from "../collab/Collab";
-import { RoomList } from "../components/RoomList";
-import { getCollaborationLink } from "../data";
 
 import "./ShareDialog.scss";
 
@@ -72,6 +71,30 @@ const ActiveRoomDialog = ({
   const ref = useRef<HTMLInputElement>(null);
   const isShareSupported = "share" in navigator;
   const { onCopy, copyStatus } = useCopyStatus();
+
+  const [isRoomOwner, setIsRoomOwner] = useState(false);
+  useEffect(() => {
+    roomManager
+      .getCurrentRoom()
+      .then((room) => {
+        if (room) {
+          const _room = new URL(activeRoomLink);
+          const match = _room.hash.match(/room=([^,]+),([^&]+)/);
+          if (match) {
+            const [, roomId] = match;
+            setIsRoomOwner(roomId === room.roomId);
+          } else {
+            setIsRoomOwner(false);
+          }
+        } else {
+          setIsRoomOwner(false);
+        }
+      })
+      .catch((error) => {
+        console.error("Error getting current room:", error);
+        setIsRoomOwner(false);
+      });
+  }, [activeRoomLink]);
 
   const copyRoomLink = async () => {
     try {
@@ -157,7 +180,10 @@ const ActiveRoomDialog = ({
           </span>
           {t("roomDialog.desc_privacy")}
         </p>
+        <h3>Stop Session</h3>
         <p>{t("roomDialog.desc_exitSession")}</p>
+        <h3>Delete Session</h3>
+        <p>{t("roomDialog.desc_deleteSession")}</p>
       </div>
 
       <div className="ShareDialog__active__actions">
@@ -175,6 +201,21 @@ const ActiveRoomDialog = ({
             }
           }}
         />
+        {isRoomOwner && (
+          <FilledButton
+            size="large"
+            label={t("roomDialog.button_deleteSession")}
+            icon={TrashIcon}
+            color="danger"
+            onClick={() => {
+              trackEvent("share", "room deleted");
+              // TODO: handle deletion
+              // 1. stop collaboration (for all users?)
+              // 2. delete room from backend (firebase)
+              // 3. close
+            }}
+          />
+        )}
       </div>
     </>
   );
@@ -184,8 +225,6 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
   const { t } = useI18n();
 
   const { collabAPI } = props;
-  const setAppState = useExcalidrawSetAppState();
-
   const startCollabJSX = collabAPI ? (
     <>
       <div className="ShareDialog__picker__header">
@@ -193,8 +232,15 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
       </div>
 
       <div className="ShareDialog__picker__description">
-        <div style={{ marginBottom: "1em" }}>{t("roomDialog.desc_intro")}</div>
-        {t("roomDialog.desc_privacy")}
+        <div className="ShareDialog__picker__description__text">
+          {t("roomDialog.desc_intro")}
+        </div>
+        <div className="ShareDialog__picker__description__text">
+          {t("roomDialog.desc_privacy")}
+        </div>
+        <div className="ShareDialog__picker__description__text">
+          {t("roomDialog.desc_warning")}
+        </div>
       </div>
 
       <div className="ShareDialog__picker__button">
@@ -216,26 +262,6 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
           width: "100%",
         }}
       ></div>
-
-      <RoomList
-        collabAPI={collabAPI}
-        onRoomSelect={async (roomId, roomKey) => {
-          const roomLink = getCollaborationLink({ roomId, roomKey });
-          try {
-            await copyTextToSystemClipboard(roomLink);
-            trackEvent("share", "room link copied from list");
-            // set a toast message when the link is copied
-            setAppState({
-              toast: {
-                message: t("roomDialog.roomLinkCopied"),
-              },
-            });
-          } catch (e) {
-            collabAPI.setCollabError(t("errors.copyToSystemClipboardFailed"));
-          }
-        }}
-        handleClose={props.handleClose}
-      />
 
       {props.type === "share" && (
         <div className="ShareDialog__separator">
