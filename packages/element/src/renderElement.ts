@@ -1041,11 +1041,14 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
     : [[0, 0, 0.5]];
 
+  const sensitivity = element.pressureSensitivity;
+
   // Consider changing the options for simulated pressure vs real pressure
   const options: StrokeOptions = {
     simulatePressure: element.simulatePressure,
-    size: element.strokeWidth * 4.25,
-    thinning: 0.6,
+    // if sensitivity is not set, times 4.25 for backwards compatibility
+    size: element.strokeWidth * (sensitivity !== null ? 1 : 4.25),
+    thinning: 0.6 * (sensitivity ?? 1),
     smoothing: 0.5,
     streamline: 0.5,
     easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
