@@ -5147,10 +5147,15 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   getElementHitThreshold(element: ExcalidrawElement) {
-    return Math.max(
-      DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value,
-      element.strokeWidth,
-    );
+    const halfThreshold = element.strokeWidth / 2 + 0.1;
+
+    return Math.min(
+      Math.max(
+        halfThreshold / Math.pow(this.state.zoom.value, 2),
+        halfThreshold,
+      ), // When zoomed in enough, be precise
+      DEFAULT_COLLISION_THRESHOLD * this.state.zoom.value,
+    ); // When zoomed out too much have a reasonable minimum
   }
 
   private hitElement(

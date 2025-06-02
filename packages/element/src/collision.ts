@@ -101,9 +101,9 @@ export const hitElementItself = ({
     -element.angle as Radians,
   );
   let hit = isPointWithinBounds(
-    pointFrom(bounds[0] - 1, bounds[1] - 1),
+    pointFrom(bounds[0] - 3, bounds[1] - 3),
     rotatedPoint,
-    pointFrom(bounds[2] + 1, bounds[3] + 1),
+    pointFrom(bounds[2] + 3, bounds[3] + 3),
   );
 
   if (!hit) {
