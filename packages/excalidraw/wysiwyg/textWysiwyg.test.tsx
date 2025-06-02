@@ -1500,9 +1500,7 @@ describe("textWysiwyg", () => {
           locked: false,
           opacity: 100,
           roughness: 1,
-          roundness: {
-            type: 3,
-          },
+          roundness: null,
           strokeColor: "#1e1e1e",
           strokeStyle: "solid",
           strokeWidth: 2,
