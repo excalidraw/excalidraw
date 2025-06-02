@@ -333,6 +333,7 @@ export interface AppState {
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemOpacity: number;
+  currentItemPressureSensitivity: number;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
