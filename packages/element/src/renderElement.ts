@@ -1048,7 +1048,8 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     simulatePressure: element.simulatePressure,
     // if sensitivity is not set, times 4.25 for backwards compatibility
     size: element.strokeWidth * (sensitivity !== null ? 1 : 4.25),
-    thinning: 0.6 * (sensitivity ?? 1),
+    // if sensitivity is not set, set thinning to 0.6 for backwards compatibility
+    thinning: sensitivity !== null ? 0.5 * sensitivity : 0.6,
     smoothing: 0.5,
     streamline: 0.5,
     easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
