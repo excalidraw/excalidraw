@@ -116,9 +116,9 @@ export class ElementBounds {
     nonRotated: boolean = false,
   ) {
     const cachedBounds =
-      (nonRotated
+      nonRotated && element.angle !== 0
         ? ElementBounds.nonRotatedBoundsCache.get(element)
-        : undefined) ?? ElementBounds.boundsCache.get(element);
+        : ElementBounds.boundsCache.get(element);
 
     if (
       cachedBounds?.version &&
