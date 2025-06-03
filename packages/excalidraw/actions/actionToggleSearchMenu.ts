@@ -25,6 +25,10 @@ export const actionToggleSearchMenu = register({
     predicate: (appState) => appState.gridModeEnabled,
   },
   perform(elements, appState, _, app) {
+    if (appState.openDialog) {
+      return false;
+    }
+
     if (
       appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
       appState.openSidebar.tab === CANVAS_SEARCH_TAB
