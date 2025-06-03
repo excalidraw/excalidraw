@@ -94,47 +94,51 @@ export const hitElementItself = ({
   frameNameBound = null,
   onlySelection = false,
 }: HitTestArgs) => {
-  const bounds = getElementBounds(element, elementsMap);
-  const rotatedPoint = pointRotateRads(
-    point,
-    elementCenterPoint(element),
-    -element.angle as Radians,
-  );
-  let hit = isPointWithinBounds(
+  // Hit test against a frame's name
+  const hitFrameName = frameNameBound
+    ? isPointWithinBounds(
+        pointFrom(frameNameBound.x - threshold, frameNameBound.y - threshold),
+        point,
+        pointFrom(
+          frameNameBound.x + frameNameBound.width + threshold,
+          frameNameBound.y + frameNameBound.height + threshold,
+        ),
+      )
+    : false;
+
+  // Hit test against the extended, rotated bounding box of the element first
+  const bounds = getElementBounds(element, elementsMap, true);
+  const hitBounds = isPointWithinBounds(
     pointFrom(bounds[0] - threshold, bounds[1] - threshold),
-    rotatedPoint,
-    pointFrom(bounds[2] + threshold * 2, bounds[3] + threshold * 2),
+    pointRotateRads(
+      point,
+      elementCenterPoint(element),
+      -element.angle as Radians,
+    ),
+    pointFrom(bounds[2] + threshold, bounds[3] + threshold),
   );
 
-  if (!hit) {
-    // Optimization: Bail out early if the point is not even in the
-    // rotated bounding box
+  // PERF: Bail out early if the point is not even in the
+  // rotated bounding box or not hitting the frame name (saves 99%)
+  if (!hitBounds && !hitFrameName) {
     return false;
   }
 
+  // DESIGN: If this is the only selected element, allow successful hit test
+  // anywhere within the selection box because of user convenience
   if (onlySelection) {
-    // If this is the only selected element, allow successful hit test
-    // within the selection box because of user convenience
     return true;
   }
 
-  hit = shouldTestInside(element)
+  // Do the precise (and relatively costly) hit test
+  const hitElement = shouldTestInside(element)
     ? // Since `inShape` tests STRICTLY againt the insides of a shape
       // we would need `onShape` as well to include the "borders"
       isPointInElement(point, element) ||
       isPointOnElementOutline(point, element, threshold)
     : isPointOnElementOutline(point, element, threshold);
 
-  // hit test against a frame's name
-  if (!hit && frameNameBound) {
-    const x1 = frameNameBound.x - threshold;
-    const y1 = frameNameBound.y - threshold;
-    const x2 = frameNameBound.x + frameNameBound.width + threshold;
-    const y2 = frameNameBound.y + frameNameBound.height + threshold;
-    hit = isPointWithinBounds(pointFrom(x1, y1), point, pointFrom(x2, y2));
-  }
-
-  return hit;
+  return hitElement || hitFrameName;
 };
 
 export const hitElementBoundingBox = (
