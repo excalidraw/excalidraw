@@ -34,6 +34,7 @@ import type {
   ExcalidrawIframeLikeElement,
   OrderedExcalidrawElement,
   ExcalidrawNonSelectionElement,
+  ArrangeAlgorithms,
 } from "@excalidraw/element/types";
 
 import type {
@@ -268,6 +269,10 @@ export interface AppState {
   } | null;
   showWelcomeScreen: boolean;
   isLoading: boolean;
+  arrangeConfiguration: {
+    algorithm: ArrangeAlgorithms;
+    gap: number;
+  };
   errorMessage: React.ReactNode;
   activeEmbeddable: {
     element: NonDeletedExcalidrawElement;
