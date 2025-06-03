@@ -328,7 +328,7 @@ export const generateLinearCollisionShape = (
     roughness: 0,
     preserveVertices: true,
   };
-  const center = getCenterForBounds(getElementBounds(element, new Map()));
+  const center = getCenterForBounds(getElementBounds(element, new Map(), true));
 
   switch (element.type) {
     case "line":
