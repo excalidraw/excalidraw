@@ -526,6 +526,8 @@ import type {
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
 
+import {AutoOrganizer} from '@excalidraw/element/autoOrganizer'
+
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
 
@@ -663,6 +665,10 @@ class App extends React.Component<AppProps, AppState> {
   public flowChartCreator: FlowChartCreator = new FlowChartCreator();
   private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
 
+  private organizer: AutoOrganizer | null = null;
+  private excalidrawAPI: ExcalidrawImperativeAPI | null = null;
+
+
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
@@ -793,6 +799,9 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         console.error("excalidrawAPI should be a function!");
       }
+
+      this.excalidrawAPI = api;
+      this.initializeOrganizer();
     }
 
     this.excalidrawContainerValue = {
@@ -806,6 +815,7 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.registerAll(actions);
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
+
   }
 
   updateEditorAtom = <Value, Args extends unknown[], Result>(
@@ -815,6 +825,12 @@ class App extends React.Component<AppProps, AppState> {
     const result = editorJotaiStore.set(atom, ...args);
     this.triggerRender();
     return result;
+  };
+
+  private initializeOrganizer = () => {
+    if (this.excalidrawAPI && !this.organizer) {
+      this.organizer = new AutoOrganizer(this.excalidrawAPI);
+    }
   };
 
   private onWindowMessage(event: MessageEvent) {

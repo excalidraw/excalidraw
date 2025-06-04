@@ -38,6 +38,8 @@ import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
 
+import {AutoOrganizer } from "@excalidraw/element/autoOrganizer";
+import { getRabbitGroupsFromElements, removeRabbitGroup } from '@excalidraw/element/rabbitGroupUtils';
 import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement, newRabbitColorPalette } from "@excalidraw/element/newRabbitElement";
 import ColorThief from 'colorthief'; // for color palette
 
@@ -157,9 +159,6 @@ import { RabbitElementBase, RabbitImageElement } from "../packages/element/src/r
 
 import { RabbitImageWindow } from "@excalidraw/element/RabbitImageWindow";
 // for rabbit image window
-
-
-
 
 
 import { GoogleGenAI } from "@google/genai";
@@ -439,6 +438,10 @@ const ExcalidrawWrapper = () => {
   const [isImageWindowVisible, setImageWindowVisible] = useState(false);
   const [tabData, setTabData] = useState<TabData[]>([]);
 
+  // consts for auto-organizer
+  const [currentSearchQuery, setCurrentSearchQuery] = useState("");
+  const [autoOrganizer, setAutoOrganizer] = useState<AutoOrganizer | null>(null);
+
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   const handleImageSelect = (image: any) => {
@@ -449,118 +452,126 @@ const ExcalidrawWrapper = () => {
     setSelectedImages((prev) => prev.filter((id) => id !== image.id));
   };
   
-  const handleAddToCanvas = async (selectedImageIds: string[]) => {
-    if (!excalidrawAPI) return;
-  
-    const selectedImageData = selectedImageIds
-      .map(id => {
-        for (const tab of tabData) {
-          const image = tab.images.find(img => img.id === id);
-          if (image) return image;
-        }
-        return null;
-      })
-      .filter((imageData): imageData is NonNullable<typeof imageData> => imageData !== null);
-  
-    const MAX_WIDTH = 200;
-    const MAX_HEIGHT = 200;
-    const MARGIN = 30; 
-    const START_X = 100; 
-    const START_Y = 100; 
+const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize: boolean = true) => {
+  if (!excalidrawAPI) return;
 
-    if (selectedImageData.length === 0) {
-      excalidrawAPI.setToast({
-        message: "No images selected to add to canvas.",
-        duration: 2000,
-      });
-      return;
-    }
-    
-    const imageCount = selectedImageData.length;
-    const cols = Math.ceil(Math.sqrt(imageCount)); 
-    const rows = Math.ceil(imageCount / cols);
-  
-    
-    const getCloudinaryUrl = (originalUrl: string, width: number, height: number) => {
-      const cloudName = 'your-cloud-name'; 
-      
-      const encodedUrl = encodeURIComponent(originalUrl);
-      
-      
-      return `https://res.cloudinary.com/${cloudName}/image/fetch/w_${Math.round(width)},h_${Math.round(height)},c_fit,f_auto,q_auto/${encodedUrl}`;
-    };
-  
-    const elementsWithDimensions = await Promise.all(
-      selectedImageData.map((imageData, index) => {
-        return new Promise<any>((resolve) => {
-          const img = new Image();
-          img.onload = () => {
-            let scaledWidth = img.width;
-            let scaledHeight = img.height;
-  
-            if (scaledWidth > MAX_WIDTH) {
-              const ratio = MAX_WIDTH / scaledWidth;
-              scaledWidth = MAX_WIDTH;
-              scaledHeight = scaledHeight * ratio;
-            }
-  
-            if (scaledHeight > MAX_HEIGHT) {
-              const ratio = MAX_HEIGHT / scaledHeight;
-              scaledHeight = MAX_HEIGHT;
-              scaledWidth = scaledWidth * ratio;
-            }
-  
-            const col = index % cols;
-            const row = Math.floor(index / cols);
-            
-            const x = START_X + col * (MAX_WIDTH + MARGIN);
-            const y = START_Y + row * (MAX_HEIGHT + MARGIN);
-  
+  const selectedImageData = selectedImageIds
+    .map(id => {
+      for (const tab of tabData) {
+        const image = tab.images.find(img => img.id === id);
+        if (image) return image;
+      }
+      return null;
+    })
+    .filter((imageData): imageData is NonNullable<typeof imageData> => imageData !== null);
 
-            const cloudinaryUrl = getCloudinaryUrl(imageData.src, scaledWidth, scaledHeight);
-  
-            const element = newRabbitImageElement({
-              x: x,
-              y: y,
-              imageUrl: cloudinaryUrl,
-              width: scaledWidth,
-              height: scaledHeight,
-            });
-            resolve(element);
-          };
-          
-          img.onerror = () => {
-            const col = index % cols;
-            const row = Math.floor(index / cols);
-            const x = START_X + col * (MAX_WIDTH + MARGIN);
-            const y = START_Y + row * (MAX_HEIGHT + MARGIN);
-  
-            //error fallback
-            const cloudinaryUrl = getCloudinaryUrl(imageData.src, MAX_WIDTH, MAX_HEIGHT);
-  
-            const element = newRabbitImageElement({
-              x: x,
-              y: y,
-              imageUrl: cloudinaryUrl, 
-              width: MAX_WIDTH,
-              height: MAX_HEIGHT,
-              label: "",
-            });
-            resolve(element);
-          };
-          
-          console.log("Cldoudinary URL:", getCloudinaryUrl(imageData.src, MAX_WIDTH, MAX_HEIGHT));
-          img.src = imageData.src;
-        });
-      })
-    );
-  
-    excalidrawAPI.updateScene({
-      elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
+  if (selectedImageData.length === 0) {
+    excalidrawAPI.setToast({
+      message: "No images selected to add to canvas.",
+      duration: 2000,
     });
-  
-    setSelectedImages([]);
+    return;
+  }
+
+  const MAX_WIDTH = 200;
+  const MAX_HEIGHT = 200;
+  const MARGIN = 30;
+  const START_X = 100;
+  const START_Y = 100;
+
+  // Calculate grid layout
+  const imageCount = selectedImageData.length;
+  const cols = Math.ceil(Math.sqrt(imageCount));
+  const rows = Math.ceil(imageCount / cols);
+
+  const getCloudinaryUrl = (originalUrl: string, width: number, height: number) => {
+    const cloudName = 'your-cloud-name';
+    const encodedUrl = encodeURIComponent(originalUrl);
+    return `https://res.cloudinary.com/${cloudName}/image/fetch/w_${Math.round(width)},h_${Math.round(height)},c_fit,f_auto,q_auto/${encodedUrl}`;
   };
+
+  const elementsWithDimensions = await Promise.all(
+    selectedImageData.map((imageData, index) => {
+      return new Promise<any>((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          let scaledWidth = img.width;
+          let scaledHeight = img.height;
+
+          // Scale down if width is too large
+          if (scaledWidth > MAX_WIDTH) {
+            const ratio = MAX_WIDTH / scaledWidth;
+            scaledWidth = MAX_WIDTH;
+            scaledHeight = scaledHeight * ratio;
+          }
+
+          // Scale down further if height is still too large
+          if (scaledHeight > MAX_HEIGHT) {
+            const ratio = MAX_HEIGHT / scaledHeight;
+            scaledHeight = MAX_HEIGHT;
+            scaledWidth = scaledWidth * ratio;
+          }
+
+          // Calculate grid position
+          const col = index % cols;
+          const row = Math.floor(index / cols);
+          
+          const x = START_X + col * (MAX_WIDTH + MARGIN);
+          const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+          const cloudinaryUrl = getCloudinaryUrl(imageData.src, scaledWidth, scaledHeight);
+
+          const element = newRabbitImageElement({
+            x: x,
+            y: y,
+            imageUrl: cloudinaryUrl,
+            width: scaledWidth,
+            height: scaledHeight,
+          });
+          resolve(element);
+        };
+        
+        img.onerror = () => {
+          const col = index % cols;
+          const row = Math.floor(index / cols);
+          const x = START_X + col * (MAX_WIDTH + MARGIN);
+          const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+          const cloudinaryUrl = getCloudinaryUrl(imageData.src, MAX_WIDTH, MAX_HEIGHT);
+
+          const element = newRabbitImageElement({
+            x: x,
+            y: y,
+            imageUrl: cloudinaryUrl,
+            width: MAX_WIDTH,
+            height: MAX_HEIGHT,
+          });
+          resolve(element);
+        };
+        
+        img.src = imageData.src;
+      });
+    })
+  );
+
+  excalidrawAPI.updateScene({
+    elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
+  });
+
+  // Auto-organization if enabled
+  if (shouldAutoOrganize && autoOrganizer && currentSearchQuery) {
+    setTimeout(async () => {
+      await autoOrganizer.enhanceAddToCanvas(
+        selectedImageIds, 
+        currentSearchQuery, 
+        tabData, 
+        () => {} // Empty since images already added
+      );
+    }, 100);
+  }
+
+  setSelectedImages([]);
+};
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -642,6 +653,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
   }
 
   const debugCanvasRef = useRef<HTMLCanvasElement>(null);
+
 
   useEffect(() => {
     trackEvent("load", "frame", getFrame());
@@ -959,6 +971,12 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
       img.onerror = () => reject(new Error('Failed to load image'));
     });
   };
+
+  useEffect(() => {
+    if (excalidrawAPI) {
+      setAutoOrganizer(new AutoOrganizer(excalidrawAPI));
+    }
+  }, [excalidrawAPI]);
 
   useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
@@ -1613,7 +1631,6 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                 }
               },
             },
-
             {
               label: "Add Rabbit SearchBox",
               category: DEFAULT_CATEGORIES.app,
@@ -1696,6 +1713,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                         console.log("Search query detected:", searchQuery);
                         lastSearchQuery = searchQuery; // Update last search query
                         hasSearched = true;
+                        setCurrentSearchQuery(searchQuery);
 
                         searchAndSaveImages(searchQuery, false)
                           .then((images: ImageResult[]) => {
@@ -1829,6 +1847,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                 }
               },
             },
+
             {
               label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
@@ -2013,6 +2032,96 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                   });
                 }
               },
+            },
+            {
+              label: "Auto-organize: Hierarchical Layout",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["organize", "layout", "hierarchy", "tree", "dagre"],
+              perform: () => {
+                if (autoOrganizer) {
+                  autoOrganizer.organizeHierarchical();
+                  excalidrawAPI?.setToast({
+                    message: "Applied hierarchical layout",
+                    duration: 2000
+                  });
+                }
+              }
+            },
+            {
+              label: "Auto-organize: Grid Layout",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["organize", "layout", "grid", "rows", "columns"],
+              perform: () => {
+                if (autoOrganizer) {
+                  autoOrganizer.organizeGrid();
+                  excalidrawAPI?.setToast({
+                    message: "Applied grid layout",
+                    duration: 2000
+                  });
+                }
+              }
+            },
+            {
+              label: "Auto-organize: Circular Layout",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["organize", "layout", "circle", "radial"],
+              perform: () => {
+                if (autoOrganizer) {
+                  autoOrganizer.organizeCircular();
+                  excalidrawAPI?.setToast({
+                    message: "Applied circular layout",
+                    duration: 2000
+                  });
+                }
+              }
+            },
+            {
+              label: "Auto-organize: Breadth First",
+              category: DEFAULT_CATEGORIES.app, 
+              predicate: () => true,
+              keywords: ["organize", "layout", "breadth", "tree"],
+              perform: () => {
+                if (autoOrganizer) {
+                  autoOrganizer.organizeBreadthFirst();
+                  excalidrawAPI?.setToast({
+                    message: "Applied breadth-first layout",
+                    duration: 2000
+                  });
+                }
+              }
+            },
+            {
+              label: "Remove All Rabbit Groups",
+              category: DEFAULT_CATEGORIES.app, 
+              predicate: () => true,
+              keywords: ["ungroup", "remove", "clear", "groups"],
+              perform: () => {
+                if (excalidrawAPI) {
+                  const elements = excalidrawAPI.getSceneElements();
+                  const groups = getRabbitGroupsFromElements(elements);
+                  
+                  const updatedElements = elements.map(element => {
+                    if (element.customData?.rabbitGroup) {
+                      const newCustomData = { ...element.customData };
+                      delete newCustomData.rabbitGroup;
+                      return {
+                        ...element,
+                        customData: Object.keys(newCustomData).length > 0 ? newCustomData : undefined
+                      };
+                    }
+                    return element;
+                  });
+
+                  excalidrawAPI.updateScene({ elements: updatedElements });
+                  excalidrawAPI?.setToast({
+                    message: `Removed ${groups.size} rabbit groups`,
+                    duration: 2000
+                  });
+                }
+              }
             },
           ]}
         />
