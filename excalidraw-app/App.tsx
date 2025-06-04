@@ -651,9 +651,7 @@ const ExcalidrawWrapper = () => {
       delete (window as any).__uploadToImgur;
     };
   }, [uploadToImgur]);
-
-  // Add this to your ExcalidrawWrapper component, near where you set up uploadToImgur
-
+  
 const predictSearchQueryFromCloudinaryImage = useCallback(async (cloudinaryUrl: string): Promise<string> => {
   try {
     const response = await fetch(cloudinaryUrl);
