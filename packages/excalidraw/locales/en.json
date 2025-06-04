@@ -551,7 +551,7 @@
     "defaults": {
       "menuHint": "Export, preferences, and more...",
       "center_heading": "Diagrams. Made. Simple.",
-      "toolbarHint": "Pick a tool & Start drawing!",
+      "toolbarHint": "Click here to start your search!",
       "helpHint": "Shortcuts & help"
     }
   },

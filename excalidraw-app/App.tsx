@@ -1427,13 +1427,13 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
           }
           return (
             <div className="top-right-ui">
-              {collabError.message && <CollabError collabError={collabError} />}
+              {/* {collabError.message && <CollabError collabError={collabError} />}
               <LiveCollaborationTrigger
                 isCollaborating={isCollaborating}
                 onSelect={() =>
                   setShareDialogState({ isOpen: true, type: "share" })
                 }
-              />
+              /> */}
             </div>
           );
         }}
