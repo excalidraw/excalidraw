@@ -21,9 +21,6 @@ import type { AnimationFrameHandler } from "../animation-frame-handler";
 
 import type App from "../components/App";
 
-// just enough to form a segment; this is sufficient for eraser
-const POINTS_ON_TRAIL = 2;
-
 export class EraserTrail extends AnimatedTrail {
   private elementsToErase: Set<ExcalidrawElement["id"]> = new Set();
   private groupsToErase: Set<ExcalidrawElement["id"]> = new Set();
@@ -70,14 +67,21 @@ export class EraserTrail extends AnimatedTrail {
   }
 
   private updateElementsToBeErased(restoreToErase?: boolean) {
-    let eraserPath: GlobalPoint[] =
+    const eraserPath: GlobalPoint[] =
       super
         .getCurrentTrail()
         ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1])) || [];
 
+    if (eraserPath.length < 2) {
+      return [];
+    }
+
     // for efficiency and avoid unnecessary calculations,
     // take only POINTS_ON_TRAIL points to form some number of segments
-    eraserPath = eraserPath?.slice(eraserPath.length - POINTS_ON_TRAIL);
+    const pathSegment = lineSegment<GlobalPoint>(
+      eraserPath[eraserPath.length - 1],
+      eraserPath[eraserPath.length - 2],
+    );
 
     const candidateElements = this.app.visibleElements.filter(
       (el) => !el.locked,
@@ -85,23 +89,11 @@ export class EraserTrail extends AnimatedTrail {
 
     const candidateElementsMap = arrayToMap(candidateElements);
 
-    const pathSegments = eraserPath.reduce((acc, point, index) => {
-      if (index === 0) {
-        return acc;
-      }
-      acc.push(lineSegment(eraserPath[index - 1], point));
-      return acc;
-    }, [] as LineSegment<GlobalPoint>[]);
-
-    if (pathSegments.length === 0) {
-      return [];
-    }
-
     for (const element of candidateElements) {
       // restore only if already added to the to-be-erased set
       if (restoreToErase && this.elementsToErase.has(element.id)) {
         const intersects = eraserTest(
-          pathSegments,
+          pathSegment,
           element,
           candidateElementsMap,
           this.app,
@@ -137,7 +129,7 @@ export class EraserTrail extends AnimatedTrail {
         }
       } else if (!restoreToErase && !this.elementsToErase.has(element.id)) {
         const intersects = eraserTest(
-          pathSegments,
+          pathSegment,
           element,
           candidateElementsMap,
           this.app,
@@ -188,12 +180,12 @@ export class EraserTrail extends AnimatedTrail {
 }
 
 const eraserTest = (
-  pathSegments: LineSegment<GlobalPoint>[],
+  pathSegment: LineSegment<GlobalPoint>,
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
   app: App,
 ): boolean => {
-  const lastPoint = pathSegments[pathSegments.length - 1][1];
+  const lastPoint = pathSegment[1];
   if (shouldTestInside(element) && isPointInElement(lastPoint, element)) {
     return true;
   }
@@ -201,12 +193,10 @@ const eraserTest = (
   const offset = app.getElementHitThreshold(element);
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
-  return pathSegments.some(
-    (pathSegment) =>
-      intersectElementWithLineSegment(element, pathSegment, offset).length >
-        0 ||
-      (boundTextElement &&
-        intersectElementWithLineSegment(boundTextElement, pathSegment, offset)
-          .length > 0),
+  return (
+    intersectElementWithLineSegment(element, pathSegment, offset).length > 0 ||
+    (!!boundTextElement &&
+      intersectElementWithLineSegment(boundTextElement, pathSegment, offset)
+        .length > 0)
   );
 };
