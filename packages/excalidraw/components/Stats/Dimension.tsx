@@ -7,6 +7,9 @@ import {
 } from "@excalidraw/element";
 import { resizeSingleElement } from "@excalidraw/element";
 import { isImageElement } from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element";
+import { getElementsInResizingFrame } from "@excalidraw/element";
+import { replaceAllElementsInFrame } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -43,6 +46,8 @@ const handleDimensionChange: DragInputCallbackType<
   originalAppState,
   instantChange,
   scene,
+  app,
+  setAppState,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const origElement = originalElements[0];
@@ -184,6 +189,30 @@ const handleDimensionChange: DragInputCallbackType<
         },
       );
 
+      // Handle frame membership update for resized frames
+      if (isFrameLikeElement(latestElement)) {
+        const nextElementsInFrame = getElementsInResizingFrame(
+          scene.getElementsIncludingDeleted(),
+          latestElement,
+          originalAppState,
+          scene.getNonDeletedElementsMap(),
+        );
+
+        const updatedElements = replaceAllElementsInFrame(
+          scene.getElementsIncludingDeleted(),
+          nextElementsInFrame,
+          latestElement,
+          app,
+        );
+
+        scene.replaceAllElements(updatedElements);
+
+        setAppState({
+          ...app.state,
+          elementsToHighlight: nextElementsInFrame,
+        });
+      }
+
       return;
     }
     const changeInWidth = property === "width" ? accumulatedChange : 0;
@@ -230,6 +259,30 @@ const handleDimensionChange: DragInputCallbackType<
         shouldMaintainAspectRatio: keepAspectRatio,
       },
     );
+
+    // Handle frame membership update for resized frames
+    if (isFrameLikeElement(latestElement)) {
+      const nextElementsInFrame = getElementsInResizingFrame(
+        scene.getElementsIncludingDeleted(),
+        latestElement,
+        originalAppState,
+        scene.getNonDeletedElementsMap(),
+      );
+
+      const updatedElements = replaceAllElementsInFrame(
+        scene.getElementsIncludingDeleted(),
+        nextElementsInFrame,
+        latestElement,
+        app,
+      );
+
+      scene.replaceAllElements(updatedElements);
+
+      setAppState({
+        ...app.state,
+        elementsToHighlight: nextElementsInFrame,
+      });
+    }
   }
 };
 
