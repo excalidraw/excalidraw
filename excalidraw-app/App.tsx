@@ -449,98 +449,118 @@ const ExcalidrawWrapper = () => {
     setSelectedImages((prev) => prev.filter((id) => id !== image.id));
   };
   
-const handleAddToCanvas = async (selectedImageIds: string[]) => {
-  if (!excalidrawAPI) return;
+  const handleAddToCanvas = async (selectedImageIds: string[]) => {
+    if (!excalidrawAPI) return;
+  
+    const selectedImageData = selectedImageIds
+      .map(id => {
+        for (const tab of tabData) {
+          const image = tab.images.find(img => img.id === id);
+          if (image) return image;
+        }
+        return null;
+      })
+      .filter((imageData): imageData is NonNullable<typeof imageData> => imageData !== null);
+  
+    const MAX_WIDTH = 200;
+    const MAX_HEIGHT = 200;
+    const MARGIN = 30; 
+    const START_X = 100; 
+    const START_Y = 100; 
 
-  const selectedImageData = selectedImageIds
-    .map(id => {
-      for (const tab of tabData) {
-        const image = tab.images.find(img => img.id === id);
-        if (image) return image;
-      }
-      return null;
-    })
-    .filter((imageData): imageData is NonNullable<typeof imageData> => imageData !== null);
-
-  const MAX_WIDTH = 200;
-  const MAX_HEIGHT = 200;
-  const MARGIN = 30; // Space between images
-  const START_X = 100; // Starting X position
-  const START_Y = 100; // Starting Y position
-
-  // Calculate grid layout
-  const imageCount = selectedImageData.length;
-  const cols = Math.ceil(Math.sqrt(imageCount)); // Auto-calculate columns for square-ish grid
-  const rows = Math.ceil(imageCount / cols);
-
-  const elementsWithDimensions = await Promise.all(
-    selectedImageData.map((imageData, index) => {
-      return new Promise<any>((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          let scaledWidth = img.width;
-          let scaledHeight = img.height;
-
-          // Scale down if width is too large
-          if (scaledWidth > MAX_WIDTH) {
-            const ratio = MAX_WIDTH / scaledWidth;
-            scaledWidth = MAX_WIDTH;
-            scaledHeight = scaledHeight * ratio;
-          }
-
-          // Scale down further if height is still too large
-          if (scaledHeight > MAX_HEIGHT) {
-            const ratio = MAX_HEIGHT / scaledHeight;
-            scaledHeight = MAX_HEIGHT;
-            scaledWidth = scaledWidth * ratio;
-          }
-
-          // Calculate grid position
-          const col = index % cols;
-          const row = Math.floor(index / cols);
-          
-          // Calculate position with consistent spacing
-          const x = START_X + col * (MAX_WIDTH + MARGIN);
-          const y = START_Y + row * (MAX_HEIGHT + MARGIN);
-
-          const element = newRabbitImageElement({
-            x: x,
-            y: y,
-            imageUrl: imageData.src,
-            width: scaledWidth,
-            height: scaledHeight,
-          });
-          resolve(element);
-        };
-        
-        img.onerror = () => {
-          const col = index % cols;
-          const row = Math.floor(index / cols);
-          const x = START_X + col * (MAX_WIDTH + MARGIN);
-          const y = START_Y + row * (MAX_HEIGHT + MARGIN);
-
-          const element = newRabbitImageElement({
-            x: x,
-            y: y,
-            imageUrl: imageData.src,
-            width: MAX_WIDTH,
-            height: MAX_HEIGHT,
-            label: "",
-          });
-          resolve(element);
-        };
-        
-        img.src = imageData.src;
+    if (selectedImageData.length === 0) {
+      excalidrawAPI.setToast({
+        message: "No images selected to add to canvas.",
+        duration: 2000,
       });
-    })
-  );
+      return;
+    }
+    
+    const imageCount = selectedImageData.length;
+    const cols = Math.ceil(Math.sqrt(imageCount)); 
+    const rows = Math.ceil(imageCount / cols);
+  
+    
+    const getCloudinaryUrl = (originalUrl: string, width: number, height: number) => {
+      const cloudName = 'your-cloud-name'; 
+      
+      const encodedUrl = encodeURIComponent(originalUrl);
+      
+      
+      return `https://res.cloudinary.com/${cloudName}/image/fetch/w_${Math.round(width)},h_${Math.round(height)},c_fit,f_auto,q_auto/${encodedUrl}`;
+    };
+  
+    const elementsWithDimensions = await Promise.all(
+      selectedImageData.map((imageData, index) => {
+        return new Promise<any>((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            let scaledWidth = img.width;
+            let scaledHeight = img.height;
+  
+            if (scaledWidth > MAX_WIDTH) {
+              const ratio = MAX_WIDTH / scaledWidth;
+              scaledWidth = MAX_WIDTH;
+              scaledHeight = scaledHeight * ratio;
+            }
+  
+            if (scaledHeight > MAX_HEIGHT) {
+              const ratio = MAX_HEIGHT / scaledHeight;
+              scaledHeight = MAX_HEIGHT;
+              scaledWidth = scaledWidth * ratio;
+            }
+  
+            const col = index % cols;
+            const row = Math.floor(index / cols);
+            
+            const x = START_X + col * (MAX_WIDTH + MARGIN);
+            const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+  
 
-  excalidrawAPI.updateScene({
-    elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
-  });
-
-  setSelectedImages([]);
-};
+            const cloudinaryUrl = getCloudinaryUrl(imageData.src, scaledWidth, scaledHeight);
+  
+            const element = newRabbitImageElement({
+              x: x,
+              y: y,
+              imageUrl: cloudinaryUrl,
+              width: scaledWidth,
+              height: scaledHeight,
+            });
+            resolve(element);
+          };
+          
+          img.onerror = () => {
+            const col = index % cols;
+            const row = Math.floor(index / cols);
+            const x = START_X + col * (MAX_WIDTH + MARGIN);
+            const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+  
+            //error fallback
+            const cloudinaryUrl = getCloudinaryUrl(imageData.src, MAX_WIDTH, MAX_HEIGHT);
+  
+            const element = newRabbitImageElement({
+              x: x,
+              y: y,
+              imageUrl: cloudinaryUrl, 
+              width: MAX_WIDTH,
+              height: MAX_HEIGHT,
+              label: "",
+            });
+            resolve(element);
+          };
+          
+          console.log("Cldoudinary URL:", getCloudinaryUrl(imageData.src, MAX_WIDTH, MAX_HEIGHT));
+          img.src = imageData.src;
+        });
+      })
+    );
+  
+    excalidrawAPI.updateScene({
+      elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
+    });
+  
+    setSelectedImages([]);
+  };
 
   const [errorMessage, setErrorMessage] = useState("");
 
