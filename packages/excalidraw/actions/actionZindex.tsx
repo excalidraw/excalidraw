@@ -5,7 +5,9 @@ import {
   moveOneRight,
   moveAllLeft,
   moveAllRight,
-} from "@excalidraw/element/zindex";
+} from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import {
   BringForwardIcon,
@@ -14,7 +16,6 @@ import {
   SendToBackIcon,
 } from "../components/icons";
 import { t } from "../i18n";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

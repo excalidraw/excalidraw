@@ -17,9 +17,8 @@ import type { TranslationKeys } from "../../i18n";
 
 interface PickerColorListProps {
   palette: ColorPaletteCustom;
-  color: string;
+  color: string | null;
   onChange: (color: string) => void;
-  label: string;
   activeShade: number;
 }
 
@@ -27,11 +26,10 @@ const PickerColorList = ({
   palette,
   color,
   onChange,
-  label,
   activeShade,
 }: PickerColorListProps) => {
   const colorObj = getColorNameAndShadeFromColor({
-    color: color || "transparent",
+    color,
     palette,
   });
   const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(

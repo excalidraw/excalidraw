@@ -6,25 +6,21 @@ import {
   toBrandedType,
   isDevEnv,
   isTestEnv,
-  isReadonlyArray,
+  toArray,
 } from "@excalidraw/common";
 import { isNonDeletedElement } from "@excalidraw/element";
-import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
-import { getElementsInGroup } from "@excalidraw/element/groups";
+import { isFrameLikeElement } from "@excalidraw/element";
+import { getElementsInGroup } from "@excalidraw/element";
 
 import {
-  orderByFractionalIndex,
   syncInvalidIndices,
   syncMovedIndices,
   validateFractionalIndices,
-} from "@excalidraw/element/fractionalIndex";
+} from "@excalidraw/element";
 
-import { getSelectedElements } from "@excalidraw/element/selection";
+import { getSelectedElements } from "@excalidraw/element";
 
-import {
-  mutateElement,
-  type ElementUpdate,
-} from "@excalidraw/element/mutateElement";
+import { mutateElement, type ElementUpdate } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
@@ -109,7 +105,7 @@ const hashSelectionOpts = (
 // in our codebase
 export type ExcalidrawElementsIncludingDeleted = readonly ExcalidrawElement[];
 
-class Scene {
+export class Scene {
   // ---------------------------------------------------------------------------
   // instance methods/props
   // ---------------------------------------------------------------------------
@@ -268,19 +264,13 @@ class Scene {
   }
 
   replaceAllElements(nextElements: ElementsMapOrArray) {
-    // ts doesn't like `Array.isArray` of `instanceof Map`
-    if (!isReadonlyArray(nextElements)) {
-      // need to order by fractional indices to get the correct order
-      nextElements = orderByFractionalIndex(
-        Array.from(nextElements.values()) as OrderedExcalidrawElement[],
-      );
-    }
-
+    // we do trust the insertion order on the map, though maybe we shouldn't and should prefer order defined by fractional indices
+    const _nextElements = toArray(nextElements);
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
 
-    validateIndicesThrottled(nextElements);
+    validateIndicesThrottled(_nextElements);
 
-    this.elements = syncInvalidIndices(nextElements);
+    this.elements = syncInvalidIndices(_nextElements);
     this.elementsMap.clear();
     this.elements.forEach((element) => {
       if (isFrameLikeElement(element)) {
@@ -464,5 +454,3 @@ class Scene {
     return element;
   }
 }
-
-export default Scene;

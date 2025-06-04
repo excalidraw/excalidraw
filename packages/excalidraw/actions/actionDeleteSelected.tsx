@@ -1,27 +1,28 @@
 import { KEYS, updateActiveTool } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
-import { fixBindingsAfterDeletion } from "@excalidraw/element/binding";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import { newElementWith } from "@excalidraw/element/mutateElement";
-import { getContainerElement } from "@excalidraw/element/textElement";
+import { fixBindingsAfterDeletion } from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element";
+import { getContainerElement } from "@excalidraw/element";
 import {
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
-} from "@excalidraw/element/typeChecks";
-import { getFrameChildren } from "@excalidraw/element/frame";
+} from "@excalidraw/element";
+import { getFrameChildren } from "@excalidraw/element";
 
 import {
   getElementsInGroup,
   selectGroupsForSelectedElements,
-} from "@excalidraw/element/groups";
+} from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
 import { TrashIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 
@@ -257,11 +258,7 @@ export const actionDeleteSelected = register({
           : endBindingElement,
       };
 
-      LinearElementEditor.deletePoints(
-        element,
-        app.scene,
-        selectedPointsIndices,
-      );
+      LinearElementEditor.deletePoints(element, app, selectedPointsIndices);
 
       return {
         elements,

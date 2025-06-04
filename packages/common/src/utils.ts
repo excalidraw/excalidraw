@@ -544,6 +544,20 @@ export const findLastIndex = <T>(
   return -1;
 };
 
+/** returns the first non-null mapped value */
+export const mapFind = <T, K>(
+  collection: readonly T[],
+  iteratee: (value: T, index: number) => K | undefined | null,
+): K | undefined => {
+  for (let idx = 0; idx < collection.length; idx++) {
+    const result = iteratee(collection[idx], idx);
+    if (result != null) {
+      return result;
+    }
+  }
+  return undefined;
+};
+
 export const isTransparent = (color: string) => {
   const isRGBTransparent = color.length === 5 && color.substr(4, 1) === "0";
   const isRRGGBBTransparent = color.length === 9 && color.substr(7, 2) === "00";
@@ -734,6 +748,25 @@ export const arrayToList = <T>(array: readonly T[]): Node<T>[] =>
 
     return acc;
   }, [] as Node<T>[]);
+
+/**
+ * Converts a readonly array or map into an iterable.
+ * Useful for avoiding entry allocations when iterating object / map on each iteration.
+ */
+export const toIterable = <T>(
+  values: readonly T[] | ReadonlyMap<string, T>,
+): Iterable<T> => {
+  return Array.isArray(values) ? values : values.values();
+};
+
+/**
+ * Converts a readonly array or map into an array.
+ */
+export const toArray = <T>(
+  values: readonly T[] | ReadonlyMap<string, T>,
+): T[] => {
+  return Array.isArray(values) ? values : Array.from(toIterable(values));
+};
 
 export const isTestEnv = () => import.meta.env.MODE === ENV.TEST;
 
@@ -1225,11 +1258,39 @@ export const isReadonlyArray = (value?: any): value is readonly any[] => {
 };
 
 export const sizeOf = (
-  value: readonly number[] | Readonly<Map<any, any>> | Record<any, any>,
+  value:
+    | readonly unknown[]
+    | Readonly<Map<string, unknown>>
+    | Readonly<Record<string, unknown>>
+    | ReadonlySet<unknown>,
 ): number => {
   return isReadonlyArray(value)
     ? value.length
-    : value instanceof Map
+    : value instanceof Map || value instanceof Set
     ? value.size
     : Object.keys(value).length;
+};
+
+export const reduceToCommonValue = <T, R = T>(
+  collection: readonly T[] | ReadonlySet<T>,
+  getValue?: (item: T) => R,
+): R | null => {
+  if (sizeOf(collection) === 0) {
+    return null;
+  }
+
+  const valueExtractor = getValue || ((item: T) => item as unknown as R);
+
+  let commonValue: R | null = null;
+
+  for (const item of collection) {
+    const value = valueExtractor(item);
+    if ((commonValue === null || commonValue === value) && value != null) {
+      commonValue = value;
+    } else {
+      return null;
+    }
+  }
+
+  return commonValue;
 };

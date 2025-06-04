@@ -10,6 +10,7 @@ export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
 export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
 export const isFirefox =
+  typeof window !== "undefined" &&
   "netscape" in window &&
   navigator.userAgent.indexOf("rv:") > 1 &&
   navigator.userAgent.indexOf("Gecko") > 1;
@@ -143,6 +144,7 @@ export const FONT_FAMILY = {
   "Lilita One": 7,
   "Comic Shanns": 8,
   "Liberation Sans": 9,
+  Assistant: 10,
 };
 
 export const FONT_FAMILY_FALLBACKS = {
@@ -254,7 +256,7 @@ export const EXPORT_DATA_TYPES = {
   excalidrawClipboardWithAPI: "excalidraw-api/clipboard",
 } as const;
 
-export const EXPORT_SOURCE =
+export const getExportSource = () =>
   window.EXCALIDRAW_EXPORT_SOURCE || window.location.origin;
 
 // time in milliseconds
@@ -475,3 +477,10 @@ export enum UserIdleState {
   AWAY = "away",
   IDLE = "idle",
 }
+
+/**
+ * distance at which we merge points instead of adding a new merge-point
+ * when converting a line to a polygon (merge currently means overlaping
+ * the start and end points)
+ */
+export const LINE_POLYGON_POINT_MERGE_DISTANCE = 20;

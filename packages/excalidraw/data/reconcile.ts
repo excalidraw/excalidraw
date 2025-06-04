@@ -6,7 +6,7 @@ import {
   orderByFractionalIndex,
   syncInvalidIndices,
   validateFractionalIndices,
-} from "@excalidraw/element/fractionalIndex";
+} from "@excalidraw/element";
 
 import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
 

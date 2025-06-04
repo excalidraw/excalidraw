@@ -1,16 +1,18 @@
 import { getNonDeletedElements } from "@excalidraw/element";
 
-import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import { isFrameLikeElement } from "@excalidraw/element";
 
-import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/frame";
+import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
 
 import { KEYS, arrayToMap, getShortcutKey } from "@excalidraw/common";
 
-import { alignElements } from "@excalidraw/element/align";
+import { alignElements } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type { Alignment } from "@excalidraw/element/align";
+import type { Alignment } from "@excalidraw/element";
 
 import { ToolButton } from "../components/ToolButton";
 import {
@@ -25,7 +27,6 @@ import {
 import { t } from "../i18n";
 
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

@@ -2,17 +2,14 @@ import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 import { useMemo } from "react";
 
 import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
-import { updateBoundElements } from "@excalidraw/element/binding";
+import { updateBoundElements } from "@excalidraw/element";
 import {
   rescalePointsInElement,
   resizeSingleElement,
-} from "@excalidraw/element/resizeElements";
-import {
-  getBoundTextElement,
-  handleBindTextResize,
-} from "@excalidraw/element/textElement";
+} from "@excalidraw/element";
+import { getBoundTextElement, handleBindTextResize } from "@excalidraw/element";
 
-import { isTextElement } from "@excalidraw/element/typeChecks";
+import { isTextElement } from "@excalidraw/element";
 
 import { getCommonBounds } from "@excalidraw/utils";
 
@@ -22,7 +19,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 
 import DragInput from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";

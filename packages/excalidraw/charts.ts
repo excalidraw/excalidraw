@@ -15,7 +15,7 @@ import {
   newTextElement,
   newLinearElement,
   newElement,
-} from "@excalidraw/element/newElement";
+} from "@excalidraw/element";
 
 import type { Radians } from "@excalidraw/math";
 
