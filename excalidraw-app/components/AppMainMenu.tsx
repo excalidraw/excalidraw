@@ -42,9 +42,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.Separator />
       <MainMenu.ItemLink
         icon={ExcalLogo}
-        href={`${
-          import.meta.env.VITE_APP_PLUS_LP
-        }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
+        href={"https://preview--rabbit-hole-artist-guide.lovable.app"}
         className=""
       >
         Rabbit Hole (website depth point)
