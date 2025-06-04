@@ -16,6 +16,8 @@ import {
 import type { ElementsSegmentsMap, GlobalPoint } from "@excalidraw/math/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
+import { debugDrawBounds } from "../visualdebug";
+
 export const getLassoSelectedElementIds = (input: {
   lassoPath: GlobalPoint[];
   elements: readonly ExcalidrawElement[];
@@ -53,7 +55,7 @@ export const getLassoSelectedElementIds = (input: {
         Math.max(acc[3], item[1]),
       ];
     },
-    [-Infinity, -Infinity, Infinity, Infinity],
+    [Infinity, Infinity, -Infinity, -Infinity],
   ) as Bounds;
   for (const element of unlockedElements) {
     const threshold = getElementThreshold(element);
