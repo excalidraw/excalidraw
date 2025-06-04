@@ -23,7 +23,6 @@ export const getLassoSelectedElementIds = (input: {
   intersectedElements: Set<ExcalidrawElement["id"]>;
   enclosedElements: Set<ExcalidrawElement["id"]>;
   simplifyDistance?: number;
-  getElementThreshold: (element: ExcalidrawElement) => number;
 }): {
   selectedElementIds: string[];
 } => {
@@ -34,7 +33,6 @@ export const getLassoSelectedElementIds = (input: {
     intersectedElements,
     enclosedElements,
     simplifyDistance,
-    getElementThreshold,
   } = input;
   // simplify the path to reduce the number of points
   let path: GlobalPoint[] = lassoPath;
@@ -57,17 +55,10 @@ export const getLassoSelectedElementIds = (input: {
     [Infinity, Infinity, -Infinity, -Infinity],
   ) as Bounds;
   for (const element of unlockedElements) {
-    const threshold = getElementThreshold(element);
     // First check if the lasso segment intersects the element's axis-aligned
     // bounding box as it is much faster than checking intersection against
     // the element's shape
-    const snugElementBounds = getElementBounds(element, new Map());
-    const elementBounds = [
-      snugElementBounds[0] - threshold,
-      snugElementBounds[1] - threshold,
-      snugElementBounds[2] + threshold,
-      snugElementBounds[3] + threshold,
-    ] as Bounds;
+    const elementBounds = getElementBounds(element, new Map());
 
     if (
       doBoundsIntersect(lassoBounds, elementBounds) &&
@@ -78,7 +69,7 @@ export const getLassoSelectedElementIds = (input: {
       if (enclosed) {
         enclosedElements.add(element.id);
       } else {
-        const intersects = intersectionTest(path, element, threshold);
+        const intersects = intersectionTest(path, element);
         if (intersects) {
           intersectedElements.add(element.id);
         }
@@ -114,7 +105,6 @@ const enclosureTest = (
 const intersectionTest = (
   lassoPath: GlobalPoint[],
   element: ExcalidrawElement,
-  hitThreshold: number,
 ): boolean => {
   const lassoSegments = lassoPath
     .slice(1)
@@ -123,7 +113,6 @@ const intersectionTest = (
 
   return lassoSegments.some(
     (lassoSegment) =>
-      intersectElementWithLineSegment(element, lassoSegment, hitThreshold)
-        .length > 0,
+      intersectElementWithLineSegment(element, lassoSegment, 0).length > 0,
   );
 };

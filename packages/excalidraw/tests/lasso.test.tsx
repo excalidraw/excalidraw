@@ -73,7 +73,6 @@ const updatePath = (startPoint: GlobalPoint, points: LocalPoint[]) => {
       elementsSegments,
       intersectedElements: new Set(),
       enclosedElements: new Set(),
-      getElementThreshold: h.app.getElementHitThreshold.bind(h.app),
     });
 
     act(() =>
