@@ -97,7 +97,10 @@ export type RabbitImageElement = {
   type: "rabbit-image";
   imageUrl: string;
   label: string;
+  fullTitle?: string;
 } & RabbitElementBase;
+
+
 
 export type RabbitImageTabsElement = {
   type: "rabbit-image-tabs";

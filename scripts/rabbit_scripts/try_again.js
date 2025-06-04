@@ -56,6 +56,7 @@ export async function fetchSasukeImages(SEARCH_QUERY = DEFAULT_SEARCH_QUERY, SIT
     }
     
     const data = await response.json();
+    console.log("Raw API response data:", data);
     
     if (WEB) {
       // Return web page results

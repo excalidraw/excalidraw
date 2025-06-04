@@ -483,44 +483,7 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
         const y = START_Y + row * (MAX_HEIGHT + MARGIN);
 
         // Check if this is from Internet webpages tab
-        if (imageData.id.startsWith('internet webpages-')) {
-          console.log("You have sucessfuly started with internet webpages!")
-          // Create a text element for web pages
-          const textElement = {
-            type: "text",
-            id: `text-${Date.now()}-${Math.random()}`,
-            x: x,
-            y: y,
-            width: MAX_WIDTH,
-            height: 40,
-            text: imageData.name || imageData.alt || "Web Page",
-            fontSize: 10,
-            fontFamily: 1,
-            textAlign: "left",
-            verticalAlign: "top",
-            strokeColor: "#1e1e1e",
-            backgroundColor: "transparent",
-            fillStyle: "solid",
-            strokeWidth: 1,
-            strokeStyle: "solid",
-            roughness: 1,
-            opacity: 100,
-            angle: 0,
-            groupIds: [],
-            frameId: null,
-            roundness: null,
-            seed: Math.floor(Math.random() * 2147483647),
-            versionNonce: Math.floor(Math.random() * 2147483647),
-            isDeleted: false,
-            boundElements: null,
-            updated: 1,
-            link: imageData.src,
-            locked: false,
-            containerId: null,  // Add this line
-            originalText: imageData.name || imageData.alt || "Web Page",  // Add this line
-          };
-          resolve(textElement);
-        } else {
+         if (imageData) {
         const img = new Image();
         img.onload = () => {
           let scaledWidth = img.width;
@@ -554,6 +517,7 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
             imageUrl: imageData.src,
             width: scaledWidth,
             height: scaledHeight,
+            label: imageData.name
           });
           resolve(element);
         };
@@ -570,6 +534,7 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
             imageUrl: imageData.src,
             width: MAX_WIDTH,
             height: MAX_HEIGHT,
+            label: imageData.name
           });
           resolve(element);
         };
@@ -616,16 +581,20 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
       }
       
       // Update the specific tab with results
-      const updatedTabs = [...tabData];
+     const updatedTabs = [...tabData];
       updatedTabs[tabIndex] = {
         ...currentTab,
-        images: newImages.slice(0, 10).map((img: ImageResult, i: number) => ({
-          id: `${tabName.toLowerCase()}-${i}`,
-          src: img.link,
-          alt: img.title || `${tabName} Result ${i + 1}`,
-          name: img.title || `${tabName} ${i + 1}`,
-          snippet : img.snippet,
-        })),
+        images: newImages.slice(0, 10).map((img: ImageResult, i: number) => {
+
+          console.log("Google Search:", img.title);
+          return {
+            id: `${tabName.toLowerCase()}-${i}`,
+            src: img.link,
+            alt: img.title || `${tabName} Result ${i + 1}`,
+            name: img.title || `${tabName} ${i + 1}`,
+            snippet: img.snippet,
+          };
+        }),
         loaded: true // Mark as loaded
       };
       
@@ -761,15 +730,23 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
   
           searchAndSaveImages(searchQuery)
             .then((images: ImageResult[]) => {
+              console.log("First few raw search results:", images.slice(0, 3));
+    
               const tabs = [
                 {
                   name: "Google",
-                  images: images.slice(0, 10).map((img: ImageResult, i: number) => ({
-                    id: `google-${i}`,
-                    src: img.link,
-                    alt: `Google Result ${i + 1}`,
-                    name: `Google ${i + 1}`,
-                  })),
+                  images: images.slice(0, 10).map((img: ImageResult, i: number) => {
+                    // Debug each image as it's processed
+                    console.log(`Image ${i} title:`, img.title);
+                    
+                    return {
+                      id: `google-${i}`,
+                      src: img.link,
+                      alt: img.title || `Google Result ${i + 1}`,
+                      name: 'Found', // Add fallback
+                      snippet: img.snippet
+                    };
+                  }),
                 },
                 {
                   name: "Pinterest",
@@ -1727,7 +1704,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                                   id: `google-${i}`,
                                   src: img.link,
                                   alt: `Google Result ${i + 1}`,
-                                  name: `Google ${i + 1}`,
+                                  name: img.title || `Google ${i + 1}`,
                                 })),
                                 loaded: true
                               },
