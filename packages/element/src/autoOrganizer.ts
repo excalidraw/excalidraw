@@ -4,16 +4,12 @@ import dagre from 'cytoscape-dagre';
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { randomId } from "@excalidraw/common";
+import { createRabbitGroup, getRabbitGroupsFromElements } from './rabbitGroupUtils';
+import { updateBoundElements } from './binding'; // adjust path as needed
 
-// Register the dagre layout
+import { Scene } from './Scene';
+
 cytoscape.use(dagre);
-
-interface SearchGroup {
-  searchBox: ExcalidrawElement;
-  images: ExcalidrawElement[];
-  query: string;
-  color: string;
-}
 
 interface ImageData {
   id: string;
@@ -29,60 +25,46 @@ interface TabData {
 
 class AutoOrganizer {
   private excalidrawAPI: ExcalidrawImperativeAPI;
-  private searchGroups: Map<string, SearchGroup>;
-  private usedColors: Set<string>;
-  private currentLayoutType: string = 'dagre'; // Track current layout type
 
   constructor(excalidrawAPI: ExcalidrawImperativeAPI) {
     this.excalidrawAPI = excalidrawAPI;
-    this.searchGroups = new Map();
-    this.usedColors = new Set();
-    this.currentLayoutType = 'dagre';
   }
 
-  generateUniqueColor(): string {
-    const maxAttempts = 1000;
-    let attempts = 0;
+  forceBindingRefresh(): void {
+    const currentElements = this.excalidrawAPI.getSceneElements();
     
-    while (attempts < maxAttempts) {
-      const hue = Math.floor(Math.random() * 360);
-      const saturation = 65 + Math.floor(Math.random() * 25);
-      const lightness = 45 + Math.floor(Math.random() * 15);
-      
-      const hexColor = this.hslToHex(hue, saturation, lightness);
-      
-      if (!this.usedColors.has(hexColor)) {
-        this.usedColors.add(hexColor);
-        return hexColor;
-      }
-      attempts++;
-    }
+    // Create elements map like the delta system does
+    const elementsMap = new Map(currentElements.map(el => [el.id, el]));
     
-    const fallbackHue = (Date.now() % 360);
-    const fallbackColor = this.hslToHex(fallbackHue, 70, 50);
-    this.usedColors.add(fallbackColor);
-    return fallbackColor;
-  }
-
-  hslToHex(h: number, s: number, l: number): string {
-    l /= 100;
-    const a = s * Math.min(l, 1 - l) / 100;
-    const f = (n: number) => {
-      const k = (n + h / 30) % 12;
-      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-      return Math.round(255 * color).toString(16).padStart(2, '0');
-    };
-    return `#${f(0)}${f(8)}${f(4)}`;
-  }
-
-  getColorForSearch(searchQuery: string): string {
-    // Check if we already have a color for this exact query
-    for (const [groupId, group] of this.searchGroups) {
-      if (group.query === searchQuery) {
-        return group.color;
-      }
-    }
-    return this.generateUniqueColor();
+    // Create temporary scene just like ElementsDelta.applyTo does
+    const tempScene = new Scene(elementsMap);
+    
+    // Find all bindable elements that might need binding updates
+    const bindableElements = currentElements.filter(el => 
+      !el.isDeleted && (
+        el.type === 'rectangle' || el.type === 'diamond' || el.type === 'ellipse' ||
+        el.type === 'rabbit-searchbox' || el.type === 'rabbit-image' ||
+        el.type === 'text' || el.type === 'image' || el.type === 'frame' ||
+        el.type === 'magicframe' || el.type === 'embeddable' || el.type === 'iframe'
+      )
+    );
+    
+    // Create changed elements map
+    const changedElements = new Map(bindableElements.map(el => [el.id, el]));
+    
+    // Use the same method as ElementsDelta - call redrawBoundArrows or just updateBoundElements directly
+    bindableElements.forEach(element => {
+      updateBoundElements(element, tempScene, {
+        changedElements: changedElements,
+      });
+    });
+    
+    // Get the updated elements from the scene and apply them back
+    const updatedElements = Array.from(tempScene.getNonDeletedElementsMap().values());
+    
+    this.excalidrawAPI.updateScene({
+      elements: updatedElements
+    });
   }
 
   async enhanceAddToCanvas(
@@ -91,60 +73,31 @@ class AutoOrganizer {
     tabData: TabData[], 
     originalAddToCanvas: (images: string[]) => void | Promise<void>
   ): Promise<void> {
-    // create the image elements
     await originalAddToCanvas(selectedImages);
     
-    // delay to make sure elements are fully added
     setTimeout(() => {
       try {
-        // get newly updated elements
         const currentElements = this.excalidrawAPI.getSceneElements();
         
-        // find search box that triggered this search
         const searchBox = currentElements.find((el: ExcalidrawElement) => 
           el.type === 'rabbit-searchbox' && 
           (el as any).text?.trim() === searchQuery.trim()
         );
         
-        // find newly added images (assuming last N rabbit-image elements)
         const allRabbitImages = currentElements.filter((el: ExcalidrawElement) => el.type === 'rabbit-image');
         const newImages = allRabbitImages.slice(-selectedImages.length);
         
         if (!searchBox || !newImages.length) {
-          console.log("Could not find search box or images for grouping");
           return;
         }
 
-        // Generate unique group ID and color for this search
-        const groupId = randomId();
-        const groupColor = this.getColorForSearch(searchQuery);
-        
-        // Update all elements to be part of the same group with same color
-        const updatedElements = currentElements.map((el: ExcalidrawElement) => {
-          if (el.id === searchBox.id || newImages.some((img: ExcalidrawElement) => img.id === el.id)) {
-            return { 
-              ...el, 
-              strokeColor: groupColor,
-              groupIds: [...(el.groupIds || []), groupId] // Add to group
-            };
-          }
-          return el;
-        });
+        createRabbitGroup(
+          this.excalidrawAPI, 
+          searchBox.id, 
+          newImages.map(img => img.id), 
+          searchQuery
+        );
 
-        // Store the group information
-        this.searchGroups.set(groupId, {
-          searchBox: { ...searchBox, groupIds: [...(searchBox.groupIds || []), groupId] },
-          images: newImages.map(img => ({ ...img, groupIds: [...(img.groupIds || []), groupId] })),
-          query: searchQuery,
-          color: groupColor
-        });
-
-        // update scene with colored elements
-        this.excalidrawAPI.updateScene({
-          elements: updatedElements
-        });
-
-        // Auto-organize with hierarchical layout after a short delay
         setTimeout(() => {
           this.organizeHierarchical();
         }, 200);
@@ -155,117 +108,99 @@ class AutoOrganizer {
     }, 100);
   }
 
-  // Method to manually group existing elements by search query
-  groupExistingElementsByColor(): void {
-    const currentElements = this.excalidrawAPI.getSceneElements();
-    const colorGroups = new Map<string, ExcalidrawElement[]>();
-    
-    // Group elements by color
-    currentElements.forEach((element) => {
-      if (element.type === 'rabbit-searchbox' || element.type === 'rabbit-image') {
-        const color = element.strokeColor;
-        if (!colorGroups.has(color)) {
-          colorGroups.set(color, []);
-        }
-        colorGroups.get(color)!.push(element);
-      }
-    });
-    
-    // Create groups for each color
-    const updatedElements = [...currentElements];
-    colorGroups.forEach((elements, color) => {
-      if (elements.length > 1) {
-        const groupId = randomId();
-        const searchBox = elements.find(el => el.type === 'rabbit-searchbox');
-        const images = elements.filter(el => el.type === 'rabbit-image');
-        
-        if (searchBox) {
-          // Update elements to be part of the same group
-          elements.forEach((element) => {
-            const elementIndex = updatedElements.findIndex(el => el.id === element.id);
-            if (elementIndex !== -1) {
-              updatedElements[elementIndex] = {
-                ...updatedElements[elementIndex],
-                groupIds: [...(element.groupIds || []), groupId]
-              };
-            }
-          });
-          
-          // Store group information
-          this.searchGroups.set(groupId, {
-            searchBox: { ...searchBox, groupIds: [...(searchBox.groupIds || []), groupId] },
-            images: images.map(img => ({ ...img, groupIds: [...(img.groupIds || []), groupId] })),
-            query: (searchBox as any).text || 'unknown',
-            color: color
-          });
-        }
-      }
-    });
-    
-    // Update scene with grouped elements
-    this.excalidrawAPI.updateScene({
-      elements: updatedElements
-    });
-  }
-
-  // Method to remove a search group (frees up color and ungroups elements)
-  removeSearchGroup(groupId: string): void {
-    const group = this.searchGroups.get(groupId);
-    if (group) {
-      this.usedColors.delete(group.color);
-      
-      // Remove groupId from all elements in the group
-      const currentElements = this.excalidrawAPI.getSceneElements();
-      const updatedElements = currentElements.map((element) => {
-        if (element.groupIds?.includes(groupId)) {
-          return {
-            ...element,
-            groupIds: element.groupIds.filter(id => id !== groupId)
-          };
-        }
-        return element;
-      });
-      
-      this.excalidrawAPI.updateScene({
-        elements: updatedElements
-      });
-      
-      this.searchGroups.delete(groupId);
-    }
-  }
-
-  // auto-organize using Cytoscape layouts
-  autoOrganize(layoutType: string = 'dagre'): Promise<void> | void {
+  // New method to organize a single group
+  organizeSingleGroup(groupId: string, layoutType: string = 'dagre'): Promise<void> | void {
     try {
-      this.currentLayoutType = layoutType; // Store current layout type
       const currentElements = this.excalidrawAPI.getSceneElements();
+      const groups = getRabbitGroupsFromElements(currentElements);
+      const group = groups.get(groupId);
       
-      // create cytoscape elements
-      const cyElements = this.convertToCytoscapeFormat(currentElements);
+      if (!group) {
+        return;
+      }
+
+      // Get only elements from this specific group
+      const groupElementIds: string[] = [
+        ...(group.searchBox ? [group.searchBox.id] : []),
+        ...group.images.map(img => img.id)
+      ];
+
+      const groupElements = currentElements.filter(el => groupElementIds.includes(el.id));
+      
+      if (groupElements.length === 0) {
+        return;
+      }
+
+      const cyElements = this.convertToCytoscapeFormatSingleGroup(groupElements, group);
       
       if (cyElements.length === 0) {
         return;
       }
 
-      // create temporary Cytoscape instance for layout calculation
       const cy = cytoscape({
         elements: cyElements,
         headless: true, 
       });
 
-      // run the layout
-      const layout = cy.layout(this.getLayoutConfig(layoutType));
+      const layout = cy.layout(this.getLayoutConfigSingleGroup(layoutType, group));
       
       return new Promise<void>((resolve) => {
         layout.on('layoutstop', () => {
-          // apply positions back to Excalidraw elements
+          const updatedElements = this.applyLayoutPositionsSingleGroup(currentElements, cy, layoutType, groupElementIds);
+          
+          this.excalidrawAPI.updateScene({
+            elements: updatedElements
+          });
+
+          // Force binding refresh after a short delay to ensure positions are applied
+          setTimeout(() => {
+            this.forceBindingRefresh();
+          }, 50);
+
+          cy.destroy();
+          resolve();
+        });
+        
+        layout.run();
+      });
+
+    } catch (error) {
+      console.error("Error in organizeSingleGroup:", error);
+    }
+  }
+
+  autoOrganize(layoutType: string = 'dagre'): Promise<void> | void {
+    try {
+      const currentElements = this.excalidrawAPI.getSceneElements();
+      const groups = getRabbitGroupsFromElements(currentElements);
+      
+      const cyElements = this.convertToCytoscapeFormat(currentElements, groups);
+      
+      if (cyElements.length === 0) {
+        return;
+      }
+
+      const cy = cytoscape({
+        elements: cyElements,
+        headless: true, 
+      });
+
+      const layout = cy.layout(this.getLayoutConfig(layoutType, groups));
+      
+      return new Promise<void>((resolve) => {
+        layout.on('layoutstop', () => {
           const updatedElements = this.applyLayoutPositions(currentElements, cy, layoutType);
           
           this.excalidrawAPI.updateScene({
             elements: updatedElements
           });
 
-          cy.destroy(); // clean up temporary cytoscape elements
+          // Force binding refresh after a short delay to ensure positions are applied
+          setTimeout(() => {
+            this.forceBindingRefresh();
+          }, 50);
+
+          cy.destroy();
           resolve();
         });
         
@@ -277,11 +212,10 @@ class AutoOrganizer {
     }
   }
 
-  convertToCytoscapeFormat(elements: readonly ExcalidrawElement[]): any[] {
+  convertToCytoscapeFormatSingleGroup(elements: readonly ExcalidrawElement[], group: any): any[] {
     const nodes: any[] = [];
     const edges: any[] = [];
 
-    // collect nodes (only search boxes and associated rabbit images)
     elements.forEach((element: ExcalidrawElement) => {
         if (element.type === 'rabbit-searchbox' || element.type === 'rabbit-image') {
             nodes.push({
@@ -295,16 +229,45 @@ class AutoOrganizer {
         }
     });
 
-    // create edges between search boxes and their associated images
-    // If searchGroups is empty, try to rebuild relationships from stroke colors
-    if (this.searchGroups.size === 0) {
-      this.rebuildSearchGroupsFromElements(elements);
-    }
+    // Add edges from searchbox to images within this group
+    group.images.forEach((image: any) => {
+      const sourceExists = elements.find(el => el.id === group.searchBox?.id);
+      const targetExists = elements.find(el => el.id === image.id);
+      
+      if (sourceExists && targetExists) {
+        edges.push({
+          data: {
+            id: `${group.searchBox.id}-${image.id}`,
+            source: group.searchBox.id,
+            target: image.id
+          }
+        });
+      }
+    });
 
-    this.searchGroups.forEach((group) => {
-      group.images.forEach((image) => {
-        // Check if both nodes exist in current elements
-        const sourceExists = elements.find(el => el.id === group.searchBox.id);
+    return [...nodes, ...edges];
+  }
+
+  convertToCytoscapeFormat(elements: readonly ExcalidrawElement[], groups: Map<string, any>): any[] {
+    const nodes: any[] = [];
+    const edges: any[] = [];
+
+    elements.forEach((element: ExcalidrawElement) => {
+        if (element.type === 'rabbit-searchbox' || element.type === 'rabbit-image') {
+            nodes.push({
+                data: { 
+                    id: element.id, 
+                    type: element.type,
+                    width: element.width || 100,
+                    height: element.height || 100
+                }
+            });
+        }
+    });
+
+    groups.forEach((group) => {
+      group.images.forEach((image: any) => {
+        const sourceExists = elements.find(el => el.id === group.searchBox?.id);
         const targetExists = elements.find(el => el.id === image.id);
         
         if (sourceExists && targetExists) {
@@ -322,42 +285,51 @@ class AutoOrganizer {
     return [...nodes, ...edges];
   }
 
-  rebuildSearchGroupsFromElements(elements: readonly ExcalidrawElement[]): void {
-    // Group elements by stroke color to rebuild relationships
-    const colorGroups = new Map<string, { searchBox: ExcalidrawElement | null, images: ExcalidrawElement[] }>();
+  getLayoutConfigSingleGroup(layoutType: string, group: any): any {
+    const nodeCount = 1 + group.images.length; // searchbox + images
     
-    elements.forEach((element) => {
-      if (element.type === 'rabbit-searchbox' || element.type === 'rabbit-image') {
-        const color = element.strokeColor;
-        if (!colorGroups.has(color)) {
-          colorGroups.set(color, { searchBox: null, images: [] });
-        }
-        
-        const group = colorGroups.get(color)!;
-        if (element.type === 'rabbit-searchbox') {
-          group.searchBox = element;
-        } else if (element.type === 'rabbit-image') {
-          group.images.push(element);
-        }
+    const layouts: Record<string, any> = {
+      dagre: {
+        name: 'dagre',
+        rankDir: 'TB',
+        nodeSep: 80,
+        rankSep: 60,
+        fit: false,
+        padding: 20
+      },
+      grid: {
+        name: 'grid',
+        rows: undefined,
+        cols: Math.ceil(Math.sqrt(nodeCount)),
+        fit: false,
+        padding: 20,
+        spacingFactor: 1.2,
+        avoidOverlap: true,
+        condense: false
+      },
+      circle: {
+        name: 'circle',
+        fit: false,
+        padding: 20,
+        radius: Math.max(100, nodeCount * 20),
+        avoidOverlap: true,
+        spacingFactor: 1
+      },
+      breadthfirst: {
+        name: 'breadthfirst',
+        directed: true,
+        roots: group.searchBox ? [group.searchBox.id] : [],
+        spacingFactor: 1.5,
+        fit: false,
+        padding: 20,
+        avoidOverlap: true
       }
-    });
-    
-    // Rebuild searchGroups from color groups
-    this.searchGroups.clear();
-    colorGroups.forEach((group, color) => {
-      if (group.searchBox && group.images.length > 0) {
-        const groupId = `rebuilt-${Date.now()}-${Math.random()}`;
-        this.searchGroups.set(groupId, {
-          searchBox: group.searchBox,
-          images: group.images,
-          query: (group.searchBox as any).text || 'unknown',
-          color: color
-        });
-      }
-    });
+    };
+
+    return layouts[layoutType] || layouts.dagre;
   }
 
-  getLayoutConfig(layoutType: string): any {
+  getLayoutConfig(layoutType: string, groups: Map<string, any>): any {
     const layouts: Record<string, any> = {
       dagre: {
         name: 'dagre',
@@ -370,12 +342,12 @@ class AutoOrganizer {
       grid: {
         name: 'grid',
         rows: undefined,
-        cols: Math.ceil(Math.sqrt(this.getTotalNodeCount())), // Dynamic columns based on node count
+        cols: Math.ceil(Math.sqrt(this.getTotalNodeCount(groups))),
         fit: false,
         padding: 30,
-        spacingFactor: 1.5, // Increased spacing factor
+        spacingFactor: 1.5,
         avoidOverlap: true,
-        condense: false // Don't condense to prevent overlap
+        condense: false
       },
       circle: {
         name: 'circle',
@@ -388,8 +360,8 @@ class AutoOrganizer {
       breadthfirst: {
         name: 'breadthfirst',
         directed: true,
-        roots: this.getRootNodes(),
-        spacingFactor: 2, // Increased spacing factor for BFS
+        roots: this.getRootNodes(groups),
+        spacingFactor: 2,
         fit: false,
         padding: 30,
         avoidOverlap: true
@@ -399,15 +371,13 @@ class AutoOrganizer {
     return layouts[layoutType] || layouts.dagre;
   }
 
-  getTotalNodeCount(): number {
-    // Count all rabbit elements for grid layout calculations
-    const allSearchBoxes = Array.from(this.searchGroups.values()).length;
-    const allImages = Array.from(this.searchGroups.values()).reduce((count, group) => count + group.images.length, 0);
+  getTotalNodeCount(groups: Map<string, any>): number {
+    const allSearchBoxes = Array.from(groups.values()).length;
+    const allImages = Array.from(groups.values()).reduce((count, group) => count + group.images.length, 0);
     return allSearchBoxes + allImages;
   }
 
-  applyLayoutPositions(elements: readonly ExcalidrawElement[], cy: any, layoutType: string): ExcalidrawElement[] {
-    // Get all positions first
+  applyLayoutPositionsSingleGroup(elements: readonly ExcalidrawElement[], cy: any, layoutType: string, groupElementIds: string[]): ExcalidrawElement[] {
     const positions: { x: number, y: number, id: string }[] = [];
     cy.nodes().forEach((node: any) => {
       const pos = node.position();
@@ -416,7 +386,49 @@ class AutoOrganizer {
     
     if (positions.length === 0) return [...elements];
 
-    // Apply layout-specific positioning
+    // Use your original layout methods but only apply to group elements
+    let tempElements = [...elements];
+    
+    // Create a temporary set with only the group elements for layout calculation
+    const groupElementsForLayout = elements.filter(el => groupElementIds.includes(el.id));
+    
+    // Apply your original layout method to get the positioning logic
+    let layoutedGroupElements: ExcalidrawElement[];
+    switch (layoutType) {
+      case 'grid':
+        layoutedGroupElements = this.applyGridLayout(groupElementsForLayout, positions);
+        break;
+      case 'breadthfirst':
+        layoutedGroupElements = this.applyBreadthFirstLayout(groupElementsForLayout, positions);
+        break;
+      case 'circle':
+        layoutedGroupElements = this.applyCircularLayout(groupElementsForLayout, positions);
+        break;
+      case 'dagre':
+      default:
+        layoutedGroupElements = this.applyHierarchicalLayout(groupElementsForLayout, positions);
+        break;
+    }
+
+    // Apply the new positions only to the group elements
+    return tempElements.map((element: ExcalidrawElement) => {
+      if (groupElementIds.includes(element.id)) {
+        const layoutedElement = layoutedGroupElements.find(el => el.id === element.id);
+        return layoutedElement || element;
+      }
+      return element; // Don't change elements not in this group
+    });
+  }
+
+  applyLayoutPositions(elements: readonly ExcalidrawElement[], cy: any, layoutType: string): ExcalidrawElement[] {
+    const positions: { x: number, y: number, id: string }[] = [];
+    cy.nodes().forEach((node: any) => {
+      const pos = node.position();
+      positions.push({ x: pos.x, y: pos.y, id: node.id() });
+    });
+    
+    if (positions.length === 0) return [...elements];
+
     switch (layoutType) {
       case 'grid':
         return this.applyGridLayout(elements, positions);
@@ -431,24 +443,21 @@ class AutoOrganizer {
   }
 
   applyGridLayout(elements: readonly ExcalidrawElement[], positions: { x: number, y: number, id: string }[]): ExcalidrawElement[] {
-    // Calculate spacing based on actual element sizes
     const rabbitElements = elements.filter(el => el.type === 'rabbit-searchbox' || el.type === 'rabbit-image');
     const maxWidth = Math.max(...rabbitElements.map(el => el.width || 100));
     const maxHeight = Math.max(...rabbitElements.map(el => el.height || 100));
     
-    const minSpacingX = maxWidth + 50; // Element width + padding
-    const minSpacingY = maxHeight + 40; // Element height + padding
+    const minSpacingX = maxWidth + 50;
+    const minSpacingY = maxHeight + 40;
     const startX = 100;
     const startY = 100;
 
-    // Calculate grid dimensions
     const totalNodes = positions.length;
     const cols = Math.ceil(Math.sqrt(totalNodes));
 
     return elements.map((element: ExcalidrawElement) => {
       const position = positions.find(p => p.id === element.id);
       if (position) {
-        // Find grid position based on sorted positions
         const sortedPositions = [...positions].sort((a, b) => a.y - b.y || a.x - b.x);
         const gridIndex = sortedPositions.findIndex(p => p.id === element.id);
         
@@ -469,19 +478,17 @@ class AutoOrganizer {
   }
 
   applyBreadthFirstLayout(elements: readonly ExcalidrawElement[], positions: { x: number, y: number, id: string }[]): ExcalidrawElement[] {
-    // Calculate spacing based on actual element sizes
     const rabbitElements = elements.filter(el => el.type === 'rabbit-searchbox' || el.type === 'rabbit-image');
     const maxWidth = Math.max(...rabbitElements.map(el => el.width || 100));
     const maxHeight = Math.max(...rabbitElements.map(el => el.height || 100));
     
-    const minSpacingX = maxWidth + 60; // Horizontal spacing between siblings
-    const minSpacingY = maxHeight + 50; // Vertical spacing between levels
+    const minSpacingX = maxWidth + 60;
+    const minSpacingY = maxHeight + 50;
     const startX = 200;
     const startY = 100;
 
-    // Group positions by Y level (approximately)
     const levels = new Map<number, { x: number, y: number, id: string }[]>();
-    const tolerance = 50; // Y-coordinate tolerance for same level
+    const tolerance = 50;
     
     positions.forEach(pos => {
       let levelY = Math.round(pos.y / tolerance) * tolerance;
@@ -491,13 +498,11 @@ class AutoOrganizer {
       levels.get(levelY)!.push(pos);
     });
 
-    // Sort levels by Y coordinate
     const sortedLevels = Array.from(levels.entries()).sort(([a], [b]) => a - b);
 
     return elements.map((element: ExcalidrawElement) => {
       const position = positions.find(p => p.id === element.id);
       if (position) {
-        // Find which level this element belongs to
         let levelIndex = 0;
         let positionInLevel = 0;
         
@@ -529,7 +534,6 @@ class AutoOrganizer {
   }
 
   applyCircularLayout(elements: readonly ExcalidrawElement[], positions: { x: number, y: number, id: string }[]): ExcalidrawElement[] {
-    // Calculate spacing based on actual element sizes
     const rabbitElements = elements.filter(el => el.type === 'rabbit-searchbox' || el.type === 'rabbit-image');
     const maxWidth = Math.max(...rabbitElements.map(el => el.width || 100));
     const maxHeight = Math.max(...rabbitElements.map(el => el.height || 100));
@@ -542,7 +546,6 @@ class AutoOrganizer {
     const cytoscapeWidth = maxX - minX || 1;
     const cytoscapeHeight = maxY - minY || 1;
     
-    // Calculate scale based on element sizes
     const targetSpacing = Math.max(maxWidth, maxHeight) + 30;
     const scaleX = Math.max(1, targetSpacing * positions.length / (cytoscapeWidth * 2));
     const scaleY = Math.max(1, targetSpacing * positions.length / (cytoscapeHeight * 2));
@@ -564,7 +567,6 @@ class AutoOrganizer {
   }
 
   applyHierarchicalLayout(elements: readonly ExcalidrawElement[], positions: { x: number, y: number, id: string }[]): ExcalidrawElement[] {
-    // Calculate spacing based on actual element sizes
     const rabbitElements = elements.filter(el => el.type === 'rabbit-searchbox' || el.type === 'rabbit-image');
     const maxWidth = Math.max(...rabbitElements.map(el => el.width || 100));
     const maxHeight = Math.max(...rabbitElements.map(el => el.height || 100));
@@ -577,7 +579,6 @@ class AutoOrganizer {
     const cytoscapeWidth = maxX - minX || 1;
     const cytoscapeHeight = maxY - minY || 1;
     
-    // Calculate scale based on actual element sizes
     const targetSpacingX = maxWidth + 60;
     const targetSpacingY = maxHeight + 15;
     
@@ -600,12 +601,28 @@ class AutoOrganizer {
     });
   }
 
-  getRootNodes(): string[] {
-    // return search box IDs as root nodes for hierarchical layouts
-    return Array.from(this.searchGroups.values()).map(group => group.searchBox.id);
+  getRootNodes(groups: Map<string, any>): string[] {
+    return Array.from(groups.values()).map(group => group.searchBox?.id).filter(Boolean);
   }
 
-  // public methods for different layout options
+  // Single group organization methods that use your original formatting
+  organizeSingleGroupHierarchical(groupId: string): Promise<void> | void { 
+    return this.organizeSingleGroup(groupId, 'dagre'); 
+  }
+  
+  organizeSingleGroupGrid(groupId: string): Promise<void> | void { 
+    return this.organizeSingleGroup(groupId, 'grid'); 
+  }
+  
+  organizeSingleGroupCircular(groupId: string): Promise<void> | void { 
+    return this.organizeSingleGroup(groupId, 'circle'); 
+  }
+  
+  organizeSingleGroupBreadthFirst(groupId: string): Promise<void> | void { 
+    return this.organizeSingleGroup(groupId, 'breadthfirst'); 
+  }
+
+  // All groups organization methods (your original methods preserved)
   organizeHierarchical(): Promise<void> | void { 
     return this.autoOrganize('dagre'); 
   }
@@ -622,126 +639,241 @@ class AutoOrganizer {
     return this.autoOrganize('breadthfirst'); 
   }
 
-  getAllSearchGroupIds(): string[] {
-    return Array.from(this.searchGroups.keys());
+  // New method to organize multiple selected groups
+  organizeMultipleGroups(groupIds: string[], layoutType: string = 'dagre'): Promise<void> | void {
+    try {
+      const currentElements = this.excalidrawAPI.getSceneElements();
+      const allGroups = getRabbitGroupsFromElements(currentElements);
+      
+      // Get all elements from the specified groups
+      const multiGroupElementIds: string[] = [];
+      const selectedGroups: any[] = [];
+      
+      groupIds.forEach(groupId => {
+        const group = allGroups.get(groupId);
+        if (group) {
+          selectedGroups.push(group);
+          const groupElementIds = [
+            ...(group.searchBox ? [group.searchBox.id] : []),
+            ...group.images.map(img => img.id)
+          ];
+          multiGroupElementIds.push(...groupElementIds);
+        }
+      });
+
+      if (multiGroupElementIds.length === 0) {
+        return;
+      }
+
+      const multiGroupElements = currentElements.filter(el => multiGroupElementIds.includes(el.id));
+      
+      const cyElements = this.convertToCytoscapeFormatMultipleGroups(multiGroupElements, selectedGroups);
+      
+      if (cyElements.length === 0) {
+        return;
+      }
+
+      const cy = cytoscape({
+        elements: cyElements,
+        headless: true, 
+      });
+
+      const layout = cy.layout(this.getLayoutConfigMultipleGroups(layoutType, selectedGroups));
+      
+      return new Promise<void>((resolve) => {
+        layout.on('layoutstop', () => {
+          const updatedElements = this.applyLayoutPositionsMultipleGroups(currentElements, cy, layoutType, multiGroupElementIds);
+          
+          this.excalidrawAPI.updateScene({
+            elements: updatedElements
+          });
+
+          // Force binding refresh after a short delay to ensure positions are applied
+          setTimeout(() => {
+            this.forceBindingRefresh();
+          }, 50);
+
+          cy.destroy();
+          resolve();
+        });
+        
+        layout.run();
+      });
+
+    } catch (error) {
+      console.error("Error in organizeMultipleGroups:", error);
+    }
   }
 
-  // Public method to get search groups count
-  getSearchGroupsCount(): number {
-    return this.searchGroups.size;
+  convertToCytoscapeFormatMultipleGroups(elements: readonly ExcalidrawElement[], selectedGroups: any[]): any[] {
+    const nodes: any[] = [];
+    const edges: any[] = [];
+
+    elements.forEach((element: ExcalidrawElement) => {
+        if (element.type === 'rabbit-searchbox' || element.type === 'rabbit-image') {
+            nodes.push({
+                data: { 
+                    id: element.id, 
+                    type: element.type,
+                    width: element.width || 100,
+                    height: element.height || 100
+                }
+            });
+        }
+    });
+
+    // Add edges from searchboxes to images within each selected group
+    selectedGroups.forEach(group => {
+      group.images.forEach((image: any) => {
+        const sourceExists = elements.find(el => el.id === group.searchBox?.id);
+        const targetExists = elements.find(el => el.id === image.id);
+        
+        if (sourceExists && targetExists) {
+          edges.push({
+            data: {
+              id: `${group.searchBox.id}-${image.id}`,
+              source: group.searchBox.id,
+              target: image.id
+            }
+          });
+        }
+      });
+    });
+
+    return [...nodes, ...edges];
   }
 
-  // Public method to remove all search groups
+  getLayoutConfigMultipleGroups(layoutType: string, selectedGroups: any[]): any {
+    const totalNodes = selectedGroups.reduce((count, group) => {
+      return count + 1 + group.images.length; // searchbox + images
+    }, 0);
+    
+    const layouts: Record<string, any> = {
+      dagre: {
+        name: 'dagre',
+        rankDir: 'TB',
+        nodeSep: 120,
+        rankSep: 100,
+        fit: false,
+        padding: 30
+      },
+      grid: {
+        name: 'grid',
+        rows: undefined,
+        cols: Math.ceil(Math.sqrt(totalNodes)),
+        fit: false,
+        padding: 30,
+        spacingFactor: 1.5,
+        avoidOverlap: true,
+        condense: false
+      },
+      circle: {
+        name: 'circle',
+        fit: false,
+        padding: 30,
+        radius: Math.max(200, totalNodes * 30),
+        avoidOverlap: true,
+        spacingFactor: 1
+      },
+      breadthfirst: {
+        name: 'breadthfirst',
+        directed: true,
+        roots: selectedGroups.map(group => group.searchBox?.id).filter(Boolean),
+        spacingFactor: 2,
+        fit: false,
+        padding: 30,
+        avoidOverlap: true
+      }
+    };
+
+    return layouts[layoutType] || layouts.dagre;
+  }
+
+  applyLayoutPositionsMultipleGroups(elements: readonly ExcalidrawElement[], cy: any, layoutType: string, multiGroupElementIds: string[]): ExcalidrawElement[] {
+    const positions: { x: number, y: number, id: string }[] = [];
+    cy.nodes().forEach((node: any) => {
+      const pos = node.position();
+      positions.push({ x: pos.x, y: pos.y, id: node.id() });
+    });
+    
+    if (positions.length === 0) return [...elements];
+
+    // Use your original layout methods but only apply to selected group elements
+    let tempElements = [...elements];
+    
+    // Create a temporary set with only the selected group elements for layout calculation
+    const multiGroupElementsForLayout = elements.filter(el => multiGroupElementIds.includes(el.id));
+    
+    // Apply your original layout method to get the positioning logic
+    let layoutedMultiGroupElements: ExcalidrawElement[];
+    switch (layoutType) {
+      case 'grid':
+        layoutedMultiGroupElements = this.applyGridLayout(multiGroupElementsForLayout, positions);
+        break;
+      case 'breadthfirst':
+        layoutedMultiGroupElements = this.applyBreadthFirstLayout(multiGroupElementsForLayout, positions);
+        break;
+      case 'circle':
+        layoutedMultiGroupElements = this.applyCircularLayout(multiGroupElementsForLayout, positions);
+        break;
+      case 'dagre':
+      default:
+        layoutedMultiGroupElements = this.applyHierarchicalLayout(multiGroupElementsForLayout, positions);
+        break;
+    }
+
+    // Apply the new positions only to the selected group elements
+    return tempElements.map((element: ExcalidrawElement) => {
+      if (multiGroupElementIds.includes(element.id)) {
+        const layoutedElement = layoutedMultiGroupElements.find(el => el.id === element.id);
+        return layoutedElement || element;
+      }
+      return element; // Don't change elements not in selected groups
+    });
+  }
+
+  // Multiple groups organization methods that use your original formatting
+  organizeMultipleGroupsHierarchical(groupIds: string[]): Promise<void> | void { 
+    return this.organizeMultipleGroups(groupIds, 'dagre'); 
+  }
+
+  organizeMultipleGroupsGrid(groupIds: string[]): Promise<void> | void { 
+    return this.organizeMultipleGroups(groupIds, 'grid'); 
+  }
+
+  organizeMultipleGroupsCircular(groupIds: string[]): Promise<void> | void { 
+    return this.organizeMultipleGroups(groupIds, 'circle'); 
+  }
+
+  organizeMultipleGroupsBreadthFirst(groupIds: string[]): Promise<void> | void { 
+    return this.organizeMultipleGroups(groupIds, 'breadthfirst'); 
+  }
+
+  getGroupsCount(): number {
+    const elements = this.excalidrawAPI.getSceneElements();
+    const groups = getRabbitGroupsFromElements(elements);
+    return groups.size;
+  }
+
   removeAllSearchGroups(): number {
-    const groupIds = this.getAllSearchGroupIds();
-    groupIds.forEach(groupId => this.removeSearchGroup(groupId));
-    return groupIds.length;
-  }
+    const elements = this.excalidrawAPI.getSceneElements();
+    const groups = getRabbitGroupsFromElements(elements);
+    
+    const updatedElements = elements.map(element => {
+      if (element.customData?.rabbitGroup) {
+        const newCustomData = { ...element.customData };
+        delete newCustomData.rabbitGroup;
+        return {
+          ...element,
+          customData: Object.keys(newCustomData).length > 0 ? newCustomData : undefined
+        };
+      }
+      return element;
+    });
 
-  // Public method to check if there are any search groups
-  hasSearchGroups(): boolean {
-    return this.searchGroups.size > 0;
+    this.excalidrawAPI.updateScene({ elements: updatedElements });
+    return groups.size;
   }
 }
 
-// command palette integration
-export const createAutoOrganizerCommands = (excalidrawAPI: ExcalidrawImperativeAPI) => {
-  const organizer = new AutoOrganizer(excalidrawAPI);
-
-  return [
-    {
-      label: "Auto-organize",
-      category: "App",
-      predicate: () => true,
-      keywords: ["organize", "layout", "auto", "default"],
-      perform: () => {
-        organizer.organizeHierarchical();
-        excalidrawAPI?.setToast({
-          message: "Applied auto-organization",
-          duration: 2000
-        });
-      }
-    },
-    {
-      label: "Auto-organize: Hierarchical Layout",
-      category: "App",
-      predicate: () => true,
-      keywords: ["organize", "layout", "hierarchy", "tree", "dagre"],
-      perform: () => {
-        organizer.organizeHierarchical();
-        excalidrawAPI?.setToast({
-          message: "Applied hierarchical layout",
-          duration: 2000
-        });
-      }
-    },
-    {
-      label: "Auto-organize: Grid Layout",
-      category: "App",
-      predicate: () => true,
-      keywords: ["organize", "layout", "grid", "rows", "columns"],
-      perform: () => {
-        organizer.organizeGrid();
-        excalidrawAPI?.setToast({
-          message: "Applied grid layout",
-          duration: 2000
-        });
-      }
-    },
-    {
-      label: "Auto-organize: Circular Layout",
-      category: "App",
-      predicate: () => true,
-      keywords: ["organize", "layout", "circle", "radial"],
-      perform: () => {
-        organizer.organizeCircular();
-        excalidrawAPI?.setToast({
-          message: "Applied circular layout",
-          duration: 2000
-        });
-      }
-    },
-    {
-      label: "Auto-organize: Breadth First",
-      category: "App", 
-      predicate: () => true,
-      keywords: ["organize", "layout", "breadth", "tree"],
-      perform: () => {
-        organizer.organizeBreadthFirst();
-        excalidrawAPI?.setToast({
-          message: "Applied breadth-first layout",
-          duration: 2000
-        });
-      }
-    },
-    {
-      label: "Group Existing Elements by Color",
-      category: "App",
-      predicate: () => true,
-      keywords: ["group", "color", "organize", "existing"],
-      perform: () => {
-        organizer.groupExistingElementsByColor();
-        excalidrawAPI?.setToast({
-          message: "Grouped elements by color",
-          duration: 2000
-        });
-      }
-    },
-    {
-      label: "Remove All Search Groups",
-      category: "App", 
-      predicate: () => true,
-      keywords: ["ungroup", "remove", "clear", "groups"],
-      perform: () => {
-        const removedCount = organizer.removeAllSearchGroups();
-        excalidrawAPI?.setToast({
-          message: `Removed ${removedCount} search groups`,
-          duration: 2000
-        });
-      }
-    }
-  ];
-};
-
-// Export the organizer class to use in App.tsx
 export { AutoOrganizer };

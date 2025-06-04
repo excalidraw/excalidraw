@@ -68,6 +68,54 @@ import {
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import type { ActionManager } from "../actions/manager";
 
+import type { AppState } from "../types";
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
+import { 
+  getRabbitGroupsFromElements, 
+  getSelectedRabbitGroupIds,
+  getSelectedRabbitGroupId,
+  changeGroupColor
+} from '@excalidraw/element/rabbitGroupUtils';
+
+import { AutoOrganizer } from '@excalidraw/element/autoOrganizer';
+
+const getRabbitGroupSelection = (
+  targetElements: ExcalidrawElement[],
+  allElements: readonly ExcalidrawElement[]
+): {
+  type: 'none' | 'single' | 'multiple';
+  singleGroupId?: string;
+  multipleGroupIds?: string[];
+  groupsInfo?: any[];
+} => {
+  const selectedGroupIds = getSelectedRabbitGroupIds(targetElements, allElements);
+  const allGroups = getRabbitGroupsFromElements(allElements);
+  
+  if (selectedGroupIds.length === 0) {
+    return { type: 'none' };
+  }
+  
+  if (selectedGroupIds.length === 1) {
+    const singleGroupId = getSelectedRabbitGroupId(targetElements, allElements);
+    if (singleGroupId) {
+      const groupInfo = allGroups.get(singleGroupId);
+      return { 
+        type: 'single', 
+        singleGroupId,
+        groupsInfo: groupInfo ? [groupInfo] : []
+      };
+    }
+  }
+  
+  const groupsInfo = selectedGroupIds.map(id => allGroups.get(id)).filter(Boolean);
+  return { 
+    type: 'multiple', 
+    multipleGroupIds: selectedGroupIds,
+    groupsInfo
+  };
+};
+
 export const canChangeStrokeColor = (
   appState: UIAppState,
   targetElements: ExcalidrawElement[],
@@ -113,6 +161,7 @@ export const SelectedShapeActions = ({
   app: AppClassProperties;
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
+  const freshElements = app.scene.getNonDeletedElements();
 
   let isSingleElementBoundContainer = false;
   if (
@@ -152,6 +201,11 @@ export const SelectedShapeActions = ({
 
   const showAlignActions =
     !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
+
+  const rabbitGroupSelection = getRabbitGroupSelection(targetElements, freshElements);
+
+  // Create AutoOrganizer instance for organization actions
+  const autoOrganizer = new AutoOrganizer(app as any);
 
   return (
     <div className="panelColumn">
@@ -209,6 +263,232 @@ export const SelectedShapeActions = ({
       )}
 
       {renderAction("changeOpacity")}
+
+      {/* Single Group Controls */}
+      {rabbitGroupSelection.type === 'single' && (
+        <fieldset>
+          <legend>Search Group: "{rabbitGroupSelection.groupsInfo?.[0]?.query}"</legend>
+          <div style={{ marginTop: '8px' }}>
+            <label style={{ fontSize: '12px', color: '#666' }}>
+              Group Color:
+              <input
+                type="color"
+                value={rabbitGroupSelection.groupsInfo?.[0]?.color || '#000000'}
+                onChange={(e) => {
+                  const allElements = Object.values(elementsMap);
+                  const groups = getRabbitGroupsFromElements(allElements);
+                  const group = groups.get(rabbitGroupSelection.singleGroupId!);
+                  
+                  if (!group) return;
+                  
+                  const groupElementIds = [
+                    ...(group.searchBox ? [group.searchBox.id] : []),
+                    ...group.images.map(img => img.id)
+                  ];
+
+                  groupElementIds.forEach(elementId => {
+                    const element = app.scene.getElement(elementId);
+                    if (element) {
+                      app.scene.mutateElement(element, {
+                        strokeColor: e.target.value,
+                        customData: {
+                          ...element.customData,
+                          rabbitGroup: {
+                            ...element.customData?.rabbitGroup,
+                            color: e.target.value
+                          }
+                        }
+                      });
+                    }
+                  });
+
+                  app.scene.triggerUpdate();
+                }}
+                style={{ marginLeft: '8px', width: '30px', height: '20px' }}
+              />
+            </label>
+          </div>
+
+          {/* Organization Buttons */}
+          <div style={{ marginTop: '12px' }}>
+            <label style={{ fontSize: '12px', color: '#666', display: 'block', marginBottom: '6px' }}>
+              Organize Layout:
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+              <button
+                type="button"
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  border: '1px solid #ccc',
+                  borderRadius: '3px',
+                  backgroundColor: '#f8f9fa',
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (rabbitGroupSelection.singleGroupId) {
+                    autoOrganizer.organizeSingleGroupHierarchical(rabbitGroupSelection.singleGroupId);
+                  }
+                }}
+                title="Organize in a top-down hierarchy"
+              >
+                Tree
+              </button>
+              <button
+                type="button"
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  border: '1px solid #ccc',
+                  borderRadius: '3px',
+                  backgroundColor: '#f8f9fa',
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (rabbitGroupSelection.singleGroupId) {
+                    autoOrganizer.organizeSingleGroupGrid(rabbitGroupSelection.singleGroupId);
+                  }
+                }}
+                title="Organize in a grid pattern"
+              >
+                Grid
+              </button>
+              <button
+                type="button"
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  border: '1px solid #ccc',
+                  borderRadius: '3px',
+                  backgroundColor: '#f8f9fa',
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (rabbitGroupSelection.singleGroupId) {
+                    autoOrganizer.organizeSingleGroupCircular(rabbitGroupSelection.singleGroupId);
+                  }
+                }}
+                title="Organize in a circular pattern"
+              >
+                Circle
+              </button>
+              <button
+                type="button"
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  border: '1px solid #ccc',
+                  borderRadius: '3px',
+                  backgroundColor: '#f8f9fa',
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (rabbitGroupSelection.singleGroupId) {
+                    autoOrganizer.organizeSingleGroupBreadthFirst(rabbitGroupSelection.singleGroupId);
+                  }
+                }}
+                title="Organize in breadth-first layout"
+              >
+                Flow
+              </button>
+            </div>
+          </div>
+        </fieldset>
+      )}
+
+      {/* Multiple Groups Controls */}
+      {rabbitGroupSelection.type === 'multiple' && (
+        <fieldset>
+          <legend>
+            Multiple Search Groups ({rabbitGroupSelection.multipleGroupIds?.length})
+          </legend>
+          
+          {/* Organization Buttons for Multiple Groups */}
+          <div style={{ marginTop: '12px' }}>
+            <label style={{ fontSize: '12px', color: '#666', display: 'block', marginBottom: '6px' }}>
+              Organize All Selected Groups:
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+              <button
+                type="button"
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  border: '1px solid #ccc',
+                  borderRadius: '3px',
+                  backgroundColor: '#f8f9fa',
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (rabbitGroupSelection.multipleGroupIds) {
+                    autoOrganizer.organizeMultipleGroupsHierarchical(rabbitGroupSelection.multipleGroupIds);
+                  }
+                }}
+                title="Organize selected groups in a top-down hierarchy"
+              >
+                Tree
+              </button>
+              <button
+                type="button"
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  border: '1px solid #ccc',
+                  borderRadius: '3px',
+                  backgroundColor: '#f8f9fa',
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (rabbitGroupSelection.multipleGroupIds) {
+                    autoOrganizer.organizeMultipleGroupsGrid(rabbitGroupSelection.multipleGroupIds);
+                  }
+                }}
+                title="Organize selected groups in a grid pattern"
+              >
+                Grid
+              </button>
+              <button
+                type="button"
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  border: '1px solid #ccc',
+                  borderRadius: '3px',
+                  backgroundColor: '#f8f9fa',
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (rabbitGroupSelection.multipleGroupIds) {
+                    autoOrganizer.organizeMultipleGroupsCircular(rabbitGroupSelection.multipleGroupIds);
+                  }
+                }}
+                title="Organize selected groups in a circular pattern"
+              >
+                Circle
+              </button>
+              <button
+                type="button"
+                style={{
+                  padding: '4px 8px',
+                  fontSize: '11px',
+                  border: '1px solid #ccc',
+                  borderRadius: '3px',
+                  backgroundColor: '#f8f9fa',
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  if (rabbitGroupSelection.multipleGroupIds) {
+                    autoOrganizer.organizeMultipleGroupsBreadthFirst(rabbitGroupSelection.multipleGroupIds);
+                  }
+                }}
+                title="Organize selected groups in breadth-first layout"
+              >
+                Flow
+              </button>
+            </div>
+          </div>
+        </fieldset>
+      )}
 
       <fieldset>
         <legend>{t("labels.layers")}</legend>

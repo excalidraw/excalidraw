@@ -39,7 +39,8 @@ import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
 
-import {AutoOrganizer, createAutoOrganizerCommands } from '@excalidraw/element/autoOrganizer';
+import {AutoOrganizer } from "@excalidraw/element/autoOrganizer";
+import { getRabbitGroupsFromElements, removeRabbitGroup } from '@excalidraw/element/rabbitGroupUtils';
 import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement, newRabbitColorPalette } from "@excalidraw/element/newRabbitElement";
 import ColorThief from 'colorthief'; // for color palette
 
@@ -572,6 +573,7 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
   }
 
   const debugCanvasRef = useRef<HTMLCanvasElement>(null);
+
 
   useEffect(() => {
     trackEvent("load", "frame", getFrame());
@@ -2024,7 +2026,96 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
                 }
               },
             },
-            ...(excalidrawAPI ? createAutoOrganizerCommands(excalidrawAPI) : []),
+            {
+              label: "Auto-organize: Hierarchical Layout",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["organize", "layout", "hierarchy", "tree", "dagre"],
+              perform: () => {
+                if (autoOrganizer) {
+                  autoOrganizer.organizeHierarchical();
+                  excalidrawAPI?.setToast({
+                    message: "Applied hierarchical layout",
+                    duration: 2000
+                  });
+                }
+              }
+            },
+            {
+              label: "Auto-organize: Grid Layout",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["organize", "layout", "grid", "rows", "columns"],
+              perform: () => {
+                if (autoOrganizer) {
+                  autoOrganizer.organizeGrid();
+                  excalidrawAPI?.setToast({
+                    message: "Applied grid layout",
+                    duration: 2000
+                  });
+                }
+              }
+            },
+            {
+              label: "Auto-organize: Circular Layout",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["organize", "layout", "circle", "radial"],
+              perform: () => {
+                if (autoOrganizer) {
+                  autoOrganizer.organizeCircular();
+                  excalidrawAPI?.setToast({
+                    message: "Applied circular layout",
+                    duration: 2000
+                  });
+                }
+              }
+            },
+            {
+              label: "Auto-organize: Breadth First",
+              category: DEFAULT_CATEGORIES.app, 
+              predicate: () => true,
+              keywords: ["organize", "layout", "breadth", "tree"],
+              perform: () => {
+                if (autoOrganizer) {
+                  autoOrganizer.organizeBreadthFirst();
+                  excalidrawAPI?.setToast({
+                    message: "Applied breadth-first layout",
+                    duration: 2000
+                  });
+                }
+              }
+            },
+            {
+              label: "Remove All Rabbit Groups",
+              category: DEFAULT_CATEGORIES.app, 
+              predicate: () => true,
+              keywords: ["ungroup", "remove", "clear", "groups"],
+              perform: () => {
+                if (excalidrawAPI) {
+                  const elements = excalidrawAPI.getSceneElements();
+                  const groups = getRabbitGroupsFromElements(elements);
+                  
+                  const updatedElements = elements.map(element => {
+                    if (element.customData?.rabbitGroup) {
+                      const newCustomData = { ...element.customData };
+                      delete newCustomData.rabbitGroup;
+                      return {
+                        ...element,
+                        customData: Object.keys(newCustomData).length > 0 ? newCustomData : undefined
+                      };
+                    }
+                    return element;
+                  });
+
+                  excalidrawAPI.updateScene({ elements: updatedElements });
+                  excalidrawAPI?.setToast({
+                    message: `Removed ${groups.size} rabbit groups`,
+                    duration: 2000
+                  });
+                }
+              }
+            },
           ]}
         />
         {isVisualDebuggerEnabled() && excalidrawAPI && (
