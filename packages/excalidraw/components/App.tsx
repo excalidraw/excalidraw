@@ -10007,24 +10007,38 @@ insertImageElement = async (
   this.scene.mutateElement(imageElement, { isDeleted: true });
 
   try {
-    //imgur upload function (not imgur anymore)
+    //
     const uploadToImgur = (window as any).__uploadToImgur;
     if (!uploadToImgur) {
       throw new Error("Image upload service not available");
     }
 
-    
-    const imgurUrl = await uploadToImgur(imageFile);
+    //upload to cloudinary
+    const cloudinaryUrl = await uploadToImgur(imageFile);
 
-    //instead of regular iage, create rabbit image
+    //gemini prediction
+    const predictSearchQuery = (window as any).__predictSearchQueryFromCloudinaryImage;
+    let generatedLabel = "Image"; // fallback label
+    
+    if (predictSearchQuery) {
+      try {
+        generatedLabel = await predictSearchQuery(cloudinaryUrl);
+        console.log("Gemini generated label:", generatedLabel);
+      } catch (error) {
+        console.warn("Failed to generate label with Gemini:", error);
+        // Keep fallback label
+      }
+    }
+
+    //rabbit image with gemini generated label
     const rabbitImage = newRabbitImageElement({
       x: imageElement.x,
       y: imageElement.y,
-      imageUrl: imgurUrl,
+      imageUrl: cloudinaryUrl,
       width: imageElement.width || 200,
       height: imageElement.height || 200,
       angle: imageElement.angle || 0,
-      label: "",
+      label: generatedLabel, 
     });
 
     
@@ -10032,8 +10046,8 @@ insertImageElement = async (
 
     
     this.setToast({
-      message: "Image uploaded successfully!",
-      duration: 3000
+      message: `Image uploaded successfully! Label: "${generatedLabel}"`,
+      duration: 4000
     });
 
     return rabbitImage;

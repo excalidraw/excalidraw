@@ -651,6 +651,77 @@ const ExcalidrawWrapper = () => {
       delete (window as any).__uploadToImgur;
     };
   }, [uploadToImgur]);
+
+  // Add this to your ExcalidrawWrapper component, near where you set up uploadToImgur
+
+const predictSearchQueryFromCloudinaryImage = useCallback(async (cloudinaryUrl: string): Promise<string> => {
+  try {
+    const response = await fetch(cloudinaryUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
+    }
+    
+    const blob = await response.blob();
+    const base64 = await blobToBase64(blob);
+    
+    const base64Data = base64.split(',')[1];
+    
+    const geminiResponse = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [
+        {
+          parts: [
+            {
+              text: `
+              What search query likely resulted in this image?
+              only say the actual search query, nothing else.`
+            },
+            {
+              inlineData: {
+                mimeType: blob.type,
+                data: base64Data
+              }
+            }
+          ]
+        }
+      ],
+      config: {
+        systemInstruction: "What is the search query that found this simage?",
+      },
+    });
+
+    const predictedQuery = geminiResponse.text?.trim() || "";
+    console.log("Predicted search query:", predictedQuery);
+    return predictedQuery;
+    
+  } catch (error) {
+    console.error("Error predicting search query from Cloudinary image:", error);
+    return "image search";
+  }
+}, []);
+
+const blobToBase64 = (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Failed to convert blob to base64'));
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
+useEffect(() => {
+  (window as any).__predictSearchQueryFromCloudinaryImage = predictSearchQueryFromCloudinaryImage;
+  
+  return () => {
+    delete (window as any).__predictSearchQueryFromCloudinaryImage;
+  };
+}, [predictSearchQueryFromCloudinaryImage]);
   // color palette handler for color palette button
   const handleColorPalette = useCallback(async () => {
     if (!excalidrawAPI) return;
