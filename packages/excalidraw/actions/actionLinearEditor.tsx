@@ -22,7 +22,7 @@ import { ButtonIcon } from "../components/ButtonIcon";
 
 import { newElementWith } from "../../element/src/mutateElement";
 
-import { toggleLinePolygonState } from "../../element/src/shapes";
+import { toggleLinePolygonState } from "../../element/src/shape";
 
 import { register } from "./register";
 

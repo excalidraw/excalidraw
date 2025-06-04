@@ -346,12 +346,12 @@ describe("Test Linear Elements", () => {
       expect(midPointsWithRoundEdge).toMatchInlineSnapshot(`
         [
           [
-            "55.96978",
-            "47.44233",
+            "54.27552",
+            "46.16120",
           ],
           [
-            "76.08587",
-            "43.29417",
+            "76.95494",
+            "44.56052",
           ],
         ]
       `);
@@ -411,12 +411,12 @@ describe("Test Linear Elements", () => {
       expect(newMidPoints).toMatchInlineSnapshot(`
         [
           [
-            "105.96978",
-            "67.44233",
+            "104.27552",
+            "66.16120",
           ],
           [
-            "126.08587",
-            "63.29417",
+            "126.95494",
+            "64.56052",
           ],
         ]
       `);
@@ -727,12 +727,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              "31.88408",
-              "23.13276",
+              "29.28349",
+              "20.91105",
             ],
             [
-              "77.74793",
-              "44.57841",
+              "78.86048",
+              "46.12277",
             ],
           ]
         `);
@@ -816,12 +816,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              "55.96978",
-              "47.44233",
+              "54.27552",
+              "46.16120",
             ],
             [
-              "76.08587",
-              "43.29417",
+              "76.95494",
+              "44.56052",
             ],
           ]
         `);
@@ -983,8 +983,8 @@ describe("Test Linear Elements", () => {
         );
         expect(position).toMatchInlineSnapshot(`
           {
-            "x": "85.82202",
-            "y": "75.63461",
+            "x": "86.17305",
+            "y": "76.11251",
           }
         `);
       });
@@ -1262,7 +1262,7 @@ describe("Test Linear Elements", () => {
       mouse.downAt(rect.x, rect.y);
       mouse.moveTo(200, 0);
       mouse.upAt(200, 0);
-      expect(arrow.width).toBeCloseTo(204, 0);
+      expect(arrow.width).toBeCloseTo(200, 0);
       expect(rect.x).toBe(200);
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(

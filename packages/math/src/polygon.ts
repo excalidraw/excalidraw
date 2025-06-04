@@ -1,6 +1,6 @@
 import { pointsEqual } from "./point";
 import { lineSegment, pointOnLineSegment } from "./segment";
-import { PRECISION } from "./utils";
+import { PRECISION } from "./constants";
 
 import type { GlobalPoint, LocalPoint, Polygon } from "./types";
 

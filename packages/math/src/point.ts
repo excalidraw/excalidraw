@@ -1,5 +1,5 @@
 import { degreesToRadians } from "./angle";
-import { PRECISION } from "./utils";
+import { PRECISION } from "./constants";
 import { vectorFromPoint, vectorScale } from "./vector";
 
 import type {

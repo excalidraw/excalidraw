@@ -4,6 +4,9 @@ import {
   curve,
   curveClosestPoint,
   curveIntersectLineSegment,
+  curveLength,
+  curveLengthAtParameter,
+  curvePointAtLength,
   curvePointDistance,
 } from "../src/curve";
 import { pointFrom } from "../src/point";
@@ -97,6 +100,47 @@ describe("Math curve", () => {
       const p = pointFrom(0, 0);
 
       expect(curvePointDistance(c, p)).toBeCloseTo(6.695873043213627);
+    });
+  });
+
+  describe("length", () => {
+    it("can be determined", () => {
+      const c = curve(
+        pointFrom(-50, -50),
+        pointFrom(10, -50),
+        pointFrom(10, 50),
+        pointFrom(50, 50),
+      );
+
+      expect(curveLength(c)).toBeCloseTo(150.0, 0);
+    });
+  });
+
+  describe("point at given parameter", () => {
+    it("can be determined", () => {
+      const c = curve(
+        pointFrom(-50, -50),
+        pointFrom(10, -50),
+        pointFrom(10, 50),
+        pointFrom(50, 50),
+      );
+
+      expect(curveLengthAtParameter(c, 0.5)).toBeCloseTo(80.83);
+    });
+  });
+
+  describe("point at given length", () => {
+    it("can be determined", () => {
+      const c = curve(
+        pointFrom(-50, -50),
+        pointFrom(10, -50),
+        pointFrom(10, 50),
+        pointFrom(50, 50),
+      );
+
+      expect(curvePointAtLength(c, 0.5)).toEqual([
+        4.802938740176614, -5.301185927237384,
+      ]);
     });
   });
 });
