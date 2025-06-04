@@ -1514,6 +1514,21 @@ export const bindingBorderTest = (
     // can bind to frame children
     (fullShape || !isBindingFallthroughEnabled(element)) &&
     !isFrameLikeElement(element);
+
+  // PERF: Run a cheap test to see if the binding element
+  // is even close to the element
+  const bounds = [
+    x - threshold,
+    y - threshold,
+    x + threshold,
+    y + threshold,
+  ] as Bounds;
+  const elementBounds = getElementBounds(element, elementsMap);
+  if (!doBoundsIntersect(bounds, elementBounds)) {
+    return false;
+  }
+
+  // Do the intersection test against the element since it's close enough
   const intersections = intersectElementWithLineSegment(
     element,
     lineSegment(elementCenterPoint(element), p),
