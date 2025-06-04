@@ -671,8 +671,8 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
   
     // Create and add search box
     const searchBox = newRabbitSearchBoxElement({
-      x: 100,
-      y: 100,
+      x: 650,
+      y: 350,
       text: "Search...",
       fontSize: 16,
       fontFamily: FONT_FAMILY.Virgil,
