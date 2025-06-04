@@ -208,6 +208,7 @@ const renderBindingHighlightForBindableElement = (
     case "magicframe":
     case "rabbit-image":
     case "rabbit-searchbox":
+    case "rabbit-color-palette":
       drawHighlightForRectWithRotation(context, element, padding);
       break;
     case "diamond":

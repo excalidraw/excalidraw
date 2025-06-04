@@ -1,4 +1,3 @@
-
 import {
   Excalidraw,
   LiveCollaborationTrigger,
@@ -419,6 +418,7 @@ const ExcalidrawWrapper = () => {
   type ImageResult = {
     link: string;
     title?: string;
+    snippet?: string; 
   };
 
   type TabImage = {
@@ -431,6 +431,8 @@ const ExcalidrawWrapper = () => {
   type TabData = {
     name: string;
     images: TabImage[];
+    searchQuery?: string;  
+    loaded?: boolean;      
   };
 
   const [isImageWindowVisible, setImageWindowVisible] = useState(false);
@@ -463,16 +465,30 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
     })
     .filter((imageData): imageData is NonNullable<typeof imageData> => imageData !== null);
 
+  if (selectedImageData.length === 0) {
+    excalidrawAPI.setToast({
+      message: "No images selected to add to canvas.",
+      duration: 2000,
+    });
+    return;
+  }
+
   const MAX_WIDTH = 200;
   const MAX_HEIGHT = 200;
-  const MARGIN = 30; // Space between images
-  const START_X = 100; // Starting X position
-  const START_Y = 100; // Starting Y position
+  const MARGIN = 30;
+  const START_X = 100;
+  const START_Y = 100;
 
   // Calculate grid layout
   const imageCount = selectedImageData.length;
-  const cols = Math.ceil(Math.sqrt(imageCount)); // Auto-calculate columns for square-ish grid
+  const cols = Math.ceil(Math.sqrt(imageCount));
   const rows = Math.ceil(imageCount / cols);
+
+  const getCloudinaryUrl = (originalUrl: string, width: number, height: number) => {
+    const cloudName = 'your-cloud-name';
+    const encodedUrl = encodeURIComponent(originalUrl);
+    return `https://res.cloudinary.com/${cloudName}/image/fetch/w_${Math.round(width)},h_${Math.round(height)},c_fit,f_auto,q_auto/${encodedUrl}`;
+  };
 
   const elementsWithDimensions = await Promise.all(
     selectedImageData.map((imageData, index) => {
@@ -500,14 +516,15 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
           const col = index % cols;
           const row = Math.floor(index / cols);
           
-          // Calculate position with consistent spacing
           const x = START_X + col * (MAX_WIDTH + MARGIN);
           const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+          const cloudinaryUrl = getCloudinaryUrl(imageData.src, scaledWidth, scaledHeight);
 
           const element = newRabbitImageElement({
             x: x,
             y: y,
-            imageUrl: imageData.src,
+            imageUrl: cloudinaryUrl,
             width: scaledWidth,
             height: scaledHeight,
           });
@@ -520,10 +537,12 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
           const x = START_X + col * (MAX_WIDTH + MARGIN);
           const y = START_Y + row * (MAX_HEIGHT + MARGIN);
 
+          const cloudinaryUrl = getCloudinaryUrl(imageData.src, MAX_WIDTH, MAX_HEIGHT);
+
           const element = newRabbitImageElement({
             x: x,
             y: y,
-            imageUrl: imageData.src,
+            imageUrl: cloudinaryUrl,
             width: MAX_WIDTH,
             height: MAX_HEIGHT,
           });
@@ -539,6 +558,7 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
     elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
   });
 
+  // Auto-organization if enabled
   if (shouldAutoOrganize && autoOrganizer && currentSearchQuery) {
     setTimeout(async () => {
       await autoOrganizer.enhanceAddToCanvas(
@@ -554,6 +574,66 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
 };
 
   const [errorMessage, setErrorMessage] = useState("");
+
+  
+
+
+const handleTabClick = async (tabName: string, tabIndex: number) => {
+  const currentTab = tabData[tabIndex];
+  
+  // Only load if not already loaded and has a search query
+  if (!currentTab.loaded && currentTab.searchQuery) {
+    console.log(`Loading ${tabName} results for "${currentTab.searchQuery}"`);
+    
+    try {
+      let newImages: ImageResult[] = [];
+      
+      if (tabName === "Pinterest") {
+        // Pinterest-specific search with siteRestrict = true
+        newImages = await searchAndSaveImages(currentTab.searchQuery, true);
+      } else if (tabName === "YouTube") {
+        // General search for now (you can add YouTube restriction later)
+        newImages = await searchAndSaveImages(currentTab.searchQuery, false);
+      }
+      else if (tabName === "Internet webpages") {
+        // General search for now (you can add YouTube restriction later)
+        newImages = await searchAndSaveImages(currentTab.searchQuery, false, true);
+        console.log("Raw web search results:", newImages);
+      }
+      
+      // Update the specific tab with results
+      const updatedTabs = [...tabData];
+      updatedTabs[tabIndex] = {
+        ...currentTab,
+        images: newImages.slice(0, 10).map((img: ImageResult, i: number) => ({
+          id: `${tabName.toLowerCase()}-${i}`,
+          src: img.link,
+          alt: img.title || `${tabName} Result ${i + 1}`,
+          name: img.title || `${tabName} ${i + 1}`,
+          snippet : img.snippet,
+        })),
+        loaded: true // Mark as loaded
+      };
+      
+      setTabData(updatedTabs);
+      
+      excalidrawAPI?.setToast({
+        message: `${tabName} results loaded!`,
+        duration: 2000
+      });
+      
+    } catch (error) {
+      console.error(`Error loading ${tabName} results:`, error);
+      excalidrawAPI?.setToast({
+        message: `Error loading ${tabName} results. Please try again.`,
+        duration: 3000
+      });
+    }
+  }
+};
+
+
+
   const isCollabDisabled = isRunningInIframe();
 
 
@@ -618,6 +698,114 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
     }
   }, [excalidrawAPI]);
 
+  const handleRabbitSearch = useCallback(() => {
+    if (!excalidrawAPI) return;
+  
+    // Create and add search box
+    const searchBox = newRabbitSearchBoxElement({
+      x: 650,
+      y: 350,
+      text: "Search...",
+      fontSize: 16,
+      fontFamily: FONT_FAMILY.Virgil,
+      textAlign: "left",
+      verticalAlign: "middle",
+      hasIcon: true,
+    });
+  
+    // Add box to scene
+    excalidrawAPI.updateScene({
+      elements: [...excalidrawAPI.getSceneElements(), searchBox],
+    });
+  
+    excalidrawAPI.setToast({
+      message: "Double-click on the search box to edit. Press Enter to confirm and search for images.",
+      duration: 5000
+    });
+  
+    let hasSearched = false;
+    let lastSearchQuery = ""; // preventing duplicate searches
+  
+    const handleEnterKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Enter') return;
+  
+      const currentElements = excalidrawAPI.getSceneElements();
+      const currentSearchBox = currentElements.find(el =>
+        el.type === 'rabbit-searchbox' && el.id === searchBox.id
+      ) as RabbitSearchBoxElement;
+  
+      if (currentSearchBox) {
+        const searchQuery = getSearchBoxText(currentSearchBox);
+  
+        // valid and different search query
+        if (searchQuery !== "Search..." &&
+          searchQuery.trim() !== "" &&
+          searchQuery.length > 2 &&
+          searchQuery !== lastSearchQuery) {
+  
+          console.log("Search query detected:", searchQuery);
+          lastSearchQuery = searchQuery; // Update last search query
+          hasSearched = true;
+  
+          searchAndSaveImages(searchQuery, false)
+            .then((images: ImageResult[]) => {
+              const tabs = [
+                {
+                  name: "Google",
+                  images: images.slice(0, 10).map((img: ImageResult, i: number) => ({
+                    id: `google-${i}`,
+                    src: img.link,
+                    alt: `Google Result ${i + 1}`,
+                    name: `Google ${i + 1}`,
+                  })),
+                  loaded: true
+                },
+                {
+                  name: "Pinterest",
+                  images: [], // Empty initially will be lazily loaded upon onclick
+                  searchQuery: searchQuery, // Store query for later
+                  loaded: false // Mark as not loaded
+                },
+                {
+                  name: "YouTube",
+                  images: images.slice(20, 30).map((img: ImageResult, i: number) => ({
+                    id: `youtube-${i}`,
+                    src: img.link,
+                    alt: `YouTube Result ${i + 1}`,
+                    name: `YouTube ${i + 1}`,
+                  })),
+                },
+                {
+                  name: "Internet webpages",
+                  images: [], // Empty initially will be lazily loaded upon onclick
+                  searchQuery: searchQuery, // Store query for later
+                  loaded: false // Mark as not loaded
+                },
+              ];
+              console.log(tabs);
+              setTabData(tabs);
+              console.log("Tab Data was set!");
+              setImageWindowVisible(true);
+            });
+        } 
+      }
+    };
+  
+    document.addEventListener('keydown', handleEnterKey);
+    
+    // Return cleanup function
+    return () => {
+      document.removeEventListener('keydown', handleEnterKey);
+    };
+  }, [excalidrawAPI, setTabData, setImageWindowVisible]);
+
+  useEffect(() => {
+    (window as any).__handleRabbitSearch = handleRabbitSearch;
+    
+    return () => {
+      delete (window as any).__handleRabbitSearch;
+    };
+  }, [handleRabbitSearch]);
   // color palette handler for color palette button
   const handleColorPalette = useCallback(async () => {
     if (!excalidrawAPI) return;
@@ -795,6 +983,7 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
       return;
     }
 
+    
     const loadImages = (
       data: ResolutionType<typeof initializeScene>,
       isInitialLoad = false,
@@ -1276,13 +1465,13 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
           }
           return (
             <div className="top-right-ui">
-              {collabError.message && <CollabError collabError={collabError} />}
+              {/* {collabError.message && <CollabError collabError={collabError} />}
               <LiveCollaborationTrigger
                 isCollaborating={isCollaborating}
                 onSelect={() =>
                   setShareDialogState({ isOpen: true, type: "share" })
                 }
-              />
+              /> */}
             </div>
           );
         }}
@@ -1524,10 +1713,9 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
                         console.log("Search query detected:", searchQuery);
                         lastSearchQuery = searchQuery; // Update last search query
                         hasSearched = true;
-
                         setCurrentSearchQuery(searchQuery);
 
-                        searchAndSaveImages(searchQuery)
+                        searchAndSaveImages(searchQuery, false)
                           .then((images: ImageResult[]) => {
                             const tabs = [
                               {
@@ -1538,15 +1726,14 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
                                   alt: `Google Result ${i + 1}`,
                                   name: `Google ${i + 1}`,
                                 })),
+                                loaded: true
                               },
                               {
                                 name: "Pinterest",
-                                images: images.slice(10, 20).map((img: ImageResult, i: number) => ({
-                                  id: `pinterest-${i}`,
-                                  src: img.link,
-                                  alt: `Pinterest Result ${i + 1}`,
-                                  name: `Pinterest ${i + 1}`,
-                                })),
+                                images: [], // Empty initially will be lazily loaded upon onclick
+                                searchQuery: searchQuery, // Store query for later
+                                loaded: false // Mark as not loaded
+                              
                               },
                               {
                                 name: "YouTube",
@@ -1557,202 +1744,21 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
                                   name: `YouTube ${i + 1}`,
                                 })),
                               },
+                              {
+                                name: "Internet webpages",
+                                images: [], // Empty initially will be lazily loaded upon onclick
+                                searchQuery: searchQuery, // Store query for later
+                                loaded: false // Mark as not loaded
+                              },
                             ];
                             console.log(tabs);
                             setTabData(tabs);
                             console.log("Tab Data was set!");
                             setImageWindowVisible(true);
                           });
-                      }
-
-                      //   searchAndSaveImages(searchQuery)
-                      //     .then(images => {
-                      //       console.log("Search completed, results:", images);
-
-                      //       if (images && images.length > 0) {
-                      //         console.log("Look at first", images[0]['link']);
-
-                      //         const imageUrl = images[0]['link'];
-                      //         const label = searchQuery + "";
-                      //         const padding = 10;
-                      //         const labelHeight = 20;
-                      //         const fixedImageHeight = 200;
 
 
-                      //         const searchBarHeight = 40;
-                      //         const searchBarSpacing = 2;
-                      //         const imageY = 200;
-                      //         const searchBarY = imageY - searchBarSpacing - searchBarHeight;
-
-                      //         const img = new Image();
-                      //         img.crossOrigin = "anonymous";
-
-                      //         img.onload = () => {
-                      //           const aspectRatio = img.naturalWidth / img.naturalHeight;
-                      //           const imageHeight = fixedImageHeight;
-                      //           const imageWidth = imageHeight * aspectRatio;
-
-                      //           const totalWidth = imageWidth + padding * 2;
-                      //           const totalHeight = imageHeight + padding * 2 + labelHeight;
-
-                      //           const imageSearchBox = newRabbitSearchBoxElement({
-                      //             x: 100,
-                      //             y: searchBarY,
-                      //             text: "Search...",
-                      //             fontSize: 14,
-                      //             fontFamily: FONT_FAMILY.Virgil,
-                      //             textAlign: "left",
-                      //             verticalAlign: "middle",
-                      //             hasIcon: true,
-                      //             width: Math.max(totalWidth, 200),
-                      //             height: searchBarHeight,
-                      //           });
-
-                      //           const image = newRabbitImageElement({
-                      //             x: 100,
-                      //             y: imageY,
-                      //             label,
-                      //             imageUrl,
-                      //             width: totalWidth,
-                      //             height: totalHeight,
-                      //           });
-
-                      //           //bind elements together
-                      //           const groupId = `rabbit-group-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-                      //           const groupedSearchBox = { ...imageSearchBox, groupIds: [groupId] };
-                      //           const groupedImage = { ...image, groupIds: [groupId] };
-
-                      //           //to extend the search
-                      //           const handleExtendedSearch = async (event: KeyboardEvent) => {
-                      //             if (event.key !== 'Enter') return;
-
-                      //             const currentElements = excalidrawAPI.getSceneElements();
-                      //             const currentImageSearchBox = currentElements.find(el =>
-                      //               el.type === 'rabbit-searchbox' && el.id === imageSearchBox.id
-                      //             ) as RabbitSearchBoxElement;
-
-                      //             if (currentImageSearchBox) {
-                      //               const extendedSearchText = getSearchBoxText(currentImageSearchBox);
-
-                      //               if (extendedSearchText &&
-                      //                 extendedSearchText !== "Search..." &&
-                      //                 extendedSearchText.trim() !== "" &&
-                      //                 extendedSearchText.length > 2) {
-
-                      //                 //combine with new input and call gemini
-                      //                 const finalSearchQuery = await generateBetterSearchQuery(searchQuery, extendedSearchText);
-                      //                 console.log("Extended search query:", finalSearchQuery);
-
-                      //                 //search w/ the extended query
-                      //                 searchAndSaveImages(finalSearchQuery)
-                      //                   .then(newImages => {
-                      //                     if (newImages && newImages.length > 0) {
-                      //                       const newImageUrl = newImages[0]['link'];
-
-                      //                       const newImg = new Image();
-                      //                       newImg.crossOrigin = "anonymous";
-
-                      //                       newImg.onload = () => {
-                      //                         const newAspectRatio = newImg.naturalWidth / newImg.naturalHeight;
-                      //                         const newImageHeight = fixedImageHeight;
-                      //                         const newImageWidth = newImageHeight * newAspectRatio;
-                      //                         const newTotalWidth = newImageWidth + padding * 2;
-                      //                         const newTotalHeight = newImageHeight + padding * 2 + labelHeight;
-
-
-                      //                         const newImage = newRabbitImageElement({
-                      //                           x: 100 + totalWidth + 50, //to the right of the original image
-                      //                           y: imageY,
-                      //                           label: finalSearchQuery,
-                      //                           imageUrl: newImageUrl,
-                      //                           width: newTotalWidth,
-                      //                           height: newTotalHeight,
-                      //                         });
-
-                      //                         //new search bar for new image
-                      //                         const newSearchBox = newRabbitSearchBoxElement({
-                      //                           x: 100 + totalWidth + 50,
-                      //                           y: imageY - 2 - searchBarHeight,
-                      //                           text: "Search...",
-                      //                           fontSize: 14,
-                      //                           fontFamily: FONT_FAMILY.Virgil,
-                      //                           textAlign: "left",
-                      //                           verticalAlign: "middle",
-                      //                           hasIcon: true,
-                      //                           width: Math.max(newTotalWidth, 200),
-                      //                           height: searchBarHeight,
-                      //                         });
-
-                      //                         const newGroupId = `rabbit-group-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-                      //                         const newGroupedSearchBox = { ...newSearchBox, groupIds: [newGroupId] };
-                      //                         const newGroupedImage = { ...newImage, groupIds: [newGroupId] };
-
-                      //                         excalidrawAPI.updateScene({
-                      //                           elements: [...excalidrawAPI.getSceneElements(), newGroupedSearchBox, newGroupedImage],
-                      //                         });
-
-                      //                         excalidrawAPI.setToast({
-                      //                           message: `Extended search "${finalSearchQuery}" completed!`,
-                      //                           duration: 3000
-                      //                         });
-                      //                       };
-
-                      //                       newImg.src = newImageUrl;
-                      //                     } else {
-                      //                       excalidrawAPI.setToast({
-                      //                         message: "No results found for extended search.",
-                      //                         duration: 3000
-                      //                       });
-                      //                     }
-                      //                   })
-                      //                   .catch(error => {
-                      //                     console.error("Error in extended search:", error);
-                      //                     excalidrawAPI.setToast({
-                      //                       message: "Error in extended search. Please try again.",
-                      //                       duration: 3000
-                      //                     });
-                      //                   });
-                      //               }
-                      //             }
-                      //           };
-
-                      //           document.addEventListener('keydown', handleExtendedSearch);
-
-                      //           excalidrawAPI.updateScene({
-                      //             elements: [...excalidrawAPI.getSceneElements(), groupedSearchBox, groupedImage],
-                      //           });
-
-                      //           excalidrawAPI.setToast({
-                      //             message: `Image for "${searchQuery}" added with search bar!`,
-                      //             duration: 3000
-                      //           });
-                      //         };
-
-                      //         img.onerror = () => {
-                      //           console.error("Failed to load image for RabbitImageElement");
-                      //           excalidrawAPI.setToast({
-                      //             message: "Failed to load image. Please try a different search term.",
-                      //             duration: 3000
-                      //           });
-                      //         };
-
-                      //         img.src = imageUrl;
-                      //       } else {
-                      //         excalidrawAPI.setToast({
-                      //           message: "No images found. Please try a different search term.",
-                      //           duration: 3000
-                      //         });
-                      //       }
-                      //     })
-                      //     .catch(error => {
-                      //       console.error("Error in image search:", error);
-                      //       excalidrawAPI.setToast({
-                      //         message: "Error searching for images. Please try again.",
-                      //         duration: 3000
-                      //       });
-                      //     });
-                      // }
+                      } 
                     }
                   };
 
@@ -1822,6 +1828,7 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
                   });
               },
             },
+            
             {
               label: "Add Rabbit Color Palette",
               category: DEFAULT_CATEGORIES.app,
@@ -2134,6 +2141,7 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
           onImageSelect={handleImageSelect}
           onImageDeselect={handleImageDeselect}
           onToggleVisibility={() => setImageWindowVisible(false)}
+          onTabClick={handleTabClick}
           onAddToCanvas={handleAddToCanvas}
           tabData={tabData}
         />
@@ -2167,6 +2175,7 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
               <button>YouTube</button>
               <button>Google</button>
               <button>Pinterest</button>
+              <button>Internet Webpages</button>
             </div>
           );
         }

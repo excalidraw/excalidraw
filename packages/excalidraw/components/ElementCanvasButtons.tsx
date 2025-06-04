@@ -6,7 +6,7 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { useExcalidrawAppState } from "../components/App";
+import { useExcalidrawAppState } from "./App";
 
 import "./ElementCanvasButtons.scss";
 

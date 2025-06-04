@@ -45,7 +45,7 @@
     "vitest-canvas-mock": "0.3.3"
   },
   "engines": {
-    "node": "18.0.0 - 22.x.x"
+    "node": "18.0.0 - 23.x.x"
   },
   "homepage": ".",
   "prettier": "@excalidraw/prettier-config",
@@ -84,7 +84,8 @@
     "clean-install": "yarn rm:node_modules && yarn install"
   },
   "resolutions": {
-    "strip-ansi": "6.0.1"
+    "strip-ansi": "6.0.1",
+    "vite": "5.4.19"
   },
   "dependencies": {
     "@google/genai": "1.0.1",

@@ -1,6 +1,8 @@
 import { WelcomeScreen } from "@excalidraw/excalidraw/index";
 import React from "react";
+
 import { useI18n } from "@excalidraw/excalidraw/i18n";
+
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 export const AppWelcomeScreen: React.FC = React.memo(() => {
@@ -28,14 +30,17 @@ export const AppWelcomeScreen: React.FC = React.memo(() => {
 
   return (
     <WelcomeScreen>
+      {/* <WelcomeScreen.Hints.MenuHint>Add commentMore actions
+        {t("welcomeScreen.app.menuHint")}
+      </WelcomeScreen.Hints.MenuHint> */}
+      <WelcomeScreen.Hints.ToolbarHint />
+      
+      <WelcomeScreen.Hints.HelpHint />
       <WelcomeScreen.Center>
         <WelcomeScreen.Center.Logo />
         <WelcomeScreen.Center.Heading>
-          {headingContent}
+          {"re-envisioning artistic search history"}
         </WelcomeScreen.Center.Heading>
-        <WelcomeScreen.Center.Menu>
-          <WelcomeScreen.Center.MenuItemLoadScene />
-        </WelcomeScreen.Center.Menu>
       </WelcomeScreen.Center>
     </WelcomeScreen>
   );

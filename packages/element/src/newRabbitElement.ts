@@ -185,7 +185,7 @@ export const newRabbitImageElement = (
     ...base,
     type: "rabbit-image",
     imageUrl: opts.imageUrl ?? "https://via.placeholder.com/150",
-    label: opts.label ?? "Rabbit Image",
+    label: opts.label ?? "",
   };
 };
 
