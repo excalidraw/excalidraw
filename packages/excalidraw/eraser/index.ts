@@ -24,7 +24,6 @@ import type App from "../components/App";
 export class EraserTrail extends AnimatedTrail {
   private elementsToErase: Set<ExcalidrawElement["id"]> = new Set();
   private groupsToErase: Set<ExcalidrawElement["id"]> = new Set();
-  private segmentsCache: Map<string, LineSegment<GlobalPoint>[]> = new Map();
 
   constructor(animationFrameHandler: AnimationFrameHandler, app: App) {
     super(animationFrameHandler, app, {
@@ -175,7 +174,6 @@ export class EraserTrail extends AnimatedTrail {
     super.clearTrails();
     this.elementsToErase.clear();
     this.groupsToErase.clear();
-    this.segmentsCache.clear();
   }
 }
 
