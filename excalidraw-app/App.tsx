@@ -746,6 +746,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
           console.log("Search query detected:", searchQuery);
           lastSearchQuery = searchQuery; // Update last search query
           hasSearched = true;
+          setCurrentSearchQuery(searchQuery);
   
           searchAndSaveImages(searchQuery, false)
             .then((images: ImageResult[]) => {
