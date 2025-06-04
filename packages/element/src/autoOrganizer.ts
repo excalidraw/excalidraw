@@ -3,16 +3,7 @@ import dagre from 'cytoscape-dagre';
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
-import { newArrowElement } from "@excalidraw/element/newElement";
-import { pointFrom, type LocalPoint } from "@excalidraw/math";
-import { newElementWith } from "@excalidraw/element";
 import { randomId } from "@excalidraw/common";
-import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
-import { bindLinearElement } from "@excalidraw/element/binding";
-import { updateBoundElements } from "@excalidraw/element/binding";
-import type { Scene } from "@excalidraw/element/Scene";
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
-
 
 // Register the dagre layout
 cytoscape.use(dagre);
@@ -20,7 +11,6 @@ cytoscape.use(dagre);
 interface SearchGroup {
   searchBox: ExcalidrawElement;
   images: ExcalidrawElement[];
-  arrows: ExcalidrawElement[];
   query: string;
   color: string;
 }
@@ -40,84 +30,124 @@ interface TabData {
 class AutoOrganizer {
   private excalidrawAPI: ExcalidrawImperativeAPI;
   private searchGroups: Map<string, SearchGroup>;
-  private colorPalette: string[];
+  private usedColors: Set<string>;
+  private currentLayoutType: string = 'dagre'; // Track current layout type
 
   constructor(excalidrawAPI: ExcalidrawImperativeAPI) {
     this.excalidrawAPI = excalidrawAPI;
     this.searchGroups = new Map();
-    this.colorPalette = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', 
-      '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'
-    ];
+    this.usedColors = new Set();
+    this.currentLayoutType = 'dagre';
   }
 
-  // Hook into your existing "Add to Canvas" flow
+  generateUniqueColor(): string {
+    const maxAttempts = 1000;
+    let attempts = 0;
+    
+    while (attempts < maxAttempts) {
+      const hue = Math.floor(Math.random() * 360);
+      const saturation = 65 + Math.floor(Math.random() * 25);
+      const lightness = 45 + Math.floor(Math.random() * 15);
+      
+      const hexColor = this.hslToHex(hue, saturation, lightness);
+      
+      if (!this.usedColors.has(hexColor)) {
+        this.usedColors.add(hexColor);
+        return hexColor;
+      }
+      attempts++;
+    }
+    
+    const fallbackHue = (Date.now() % 360);
+    const fallbackColor = this.hslToHex(fallbackHue, 70, 50);
+    this.usedColors.add(fallbackColor);
+    return fallbackColor;
+  }
+
+  hslToHex(h: number, s: number, l: number): string {
+    l /= 100;
+    const a = s * Math.min(l, 1 - l) / 100;
+    const f = (n: number) => {
+      const k = (n + h / 30) % 12;
+      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color).toString(16).padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+  }
+
+  getColorForSearch(searchQuery: string): string {
+    // Check if we already have a color for this exact query
+    for (const [groupId, group] of this.searchGroups) {
+      if (group.query === searchQuery) {
+        return group.color;
+      }
+    }
+    return this.generateUniqueColor();
+  }
+
   async enhanceAddToCanvas(
     selectedImages: string[], 
     searchQuery: string, 
     tabData: TabData[], 
     originalAddToCanvas: (images: string[]) => void | Promise<void>
   ): Promise<void> {
-    // First, let your original function create the image elements
+    // create the image elements
     await originalAddToCanvas(selectedImages);
     
-    // Small delay to ensure elements are fully added
+    // delay to make sure elements are fully added
     setTimeout(() => {
       try {
-        // Get the newly updated elements
+        // get newly updated elements
         const currentElements = this.excalidrawAPI.getSceneElements();
         
-        // Find the search box that triggered this search
+        // find search box that triggered this search
         const searchBox = currentElements.find((el: ExcalidrawElement) => 
           el.type === 'rabbit-searchbox' && 
           (el as any).text?.trim() === searchQuery.trim()
         );
         
-        // Find the newly added images (assuming they're the last N rabbit-image elements)
+        // find newly added images (assuming last N rabbit-image elements)
         const allRabbitImages = currentElements.filter((el: ExcalidrawElement) => el.type === 'rabbit-image');
         const newImages = allRabbitImages.slice(-selectedImages.length);
         
-        if (!searchBox) {
-          console.log("Could not find search box for query:", searchQuery);
-          return;
-        }
-        
-        if (!newImages.length) {
-          console.log("Could not find newly added images");
+        if (!searchBox || !newImages.length) {
+          console.log("Could not find search box or images for grouping");
           return;
         }
 
-        // Assign color to this search group
+        // Generate unique group ID and color for this search
+        const groupId = randomId();
         const groupColor = this.getColorForSearch(searchQuery);
         
-        // Create arrows from search box to each image
-        const arrows = this.createArrowsFromSearchBoxToImages(searchBox, newImages, groupColor);
-        
-        // Update colors for the group
-        const coloredElements = currentElements.map((el: ExcalidrawElement) => {
+        // Update all elements to be part of the same group with same color
+        const updatedElements = currentElements.map((el: ExcalidrawElement) => {
           if (el.id === searchBox.id || newImages.some((img: ExcalidrawElement) => img.id === el.id)) {
-            return { ...el, strokeColor: groupColor };
+            return { 
+              ...el, 
+              strokeColor: groupColor,
+              groupIds: [...(el.groupIds || []), groupId] // Add to group
+            };
           }
           return el;
         });
 
-        // Add arrows to the elements
-        const elementsWithArrows = [...coloredElements, ...arrows];
-
-        // Store the group with arrows
-        const groupId = `search-${Date.now()}`;
+        // Store the group information
         this.searchGroups.set(groupId, {
-        searchBox,
-        images: newImages,
-        arrows: arrows,
-        query: searchQuery,
-        color: groupColor
+          searchBox: { ...searchBox, groupIds: [...(searchBox.groupIds || []), groupId] },
+          images: newImages.map(img => ({ ...img, groupIds: [...(img.groupIds || []), groupId] })),
+          query: searchQuery,
+          color: groupColor
         });
 
-        // Update scene with colored elements and arrows
+        // update scene with colored elements
         this.excalidrawAPI.updateScene({
-        elements: elementsWithArrows
+          elements: updatedElements
         });
+
+        // Auto-organize with hierarchical layout after a short delay
+        setTimeout(() => {
+          this.organizeHierarchical();
+        }, 200);
 
       } catch (error) {
         console.error("Error in enhanceAddToCanvas:", error);
@@ -125,43 +155,117 @@ class AutoOrganizer {
     }, 100);
   }
 
-  // Auto-organize using Cytoscape layouts
+  // Method to manually group existing elements by search query
+  groupExistingElementsByColor(): void {
+    const currentElements = this.excalidrawAPI.getSceneElements();
+    const colorGroups = new Map<string, ExcalidrawElement[]>();
+    
+    // Group elements by color
+    currentElements.forEach((element) => {
+      if (element.type === 'rabbit-searchbox' || element.type === 'rabbit-image') {
+        const color = element.strokeColor;
+        if (!colorGroups.has(color)) {
+          colorGroups.set(color, []);
+        }
+        colorGroups.get(color)!.push(element);
+      }
+    });
+    
+    // Create groups for each color
+    const updatedElements = [...currentElements];
+    colorGroups.forEach((elements, color) => {
+      if (elements.length > 1) {
+        const groupId = randomId();
+        const searchBox = elements.find(el => el.type === 'rabbit-searchbox');
+        const images = elements.filter(el => el.type === 'rabbit-image');
+        
+        if (searchBox) {
+          // Update elements to be part of the same group
+          elements.forEach((element) => {
+            const elementIndex = updatedElements.findIndex(el => el.id === element.id);
+            if (elementIndex !== -1) {
+              updatedElements[elementIndex] = {
+                ...updatedElements[elementIndex],
+                groupIds: [...(element.groupIds || []), groupId]
+              };
+            }
+          });
+          
+          // Store group information
+          this.searchGroups.set(groupId, {
+            searchBox: { ...searchBox, groupIds: [...(searchBox.groupIds || []), groupId] },
+            images: images.map(img => ({ ...img, groupIds: [...(img.groupIds || []), groupId] })),
+            query: (searchBox as any).text || 'unknown',
+            color: color
+          });
+        }
+      }
+    });
+    
+    // Update scene with grouped elements
+    this.excalidrawAPI.updateScene({
+      elements: updatedElements
+    });
+  }
+
+  // Method to remove a search group (frees up color and ungroups elements)
+  removeSearchGroup(groupId: string): void {
+    const group = this.searchGroups.get(groupId);
+    if (group) {
+      this.usedColors.delete(group.color);
+      
+      // Remove groupId from all elements in the group
+      const currentElements = this.excalidrawAPI.getSceneElements();
+      const updatedElements = currentElements.map((element) => {
+        if (element.groupIds?.includes(groupId)) {
+          return {
+            ...element,
+            groupIds: element.groupIds.filter(id => id !== groupId)
+          };
+        }
+        return element;
+      });
+      
+      this.excalidrawAPI.updateScene({
+        elements: updatedElements
+      });
+      
+      this.searchGroups.delete(groupId);
+    }
+  }
+
+  // auto-organize using Cytoscape layouts
   autoOrganize(layoutType: string = 'dagre'): Promise<void> | void {
     try {
+      this.currentLayoutType = layoutType; // Store current layout type
       const currentElements = this.excalidrawAPI.getSceneElements();
       
-      // Create Cytoscape elements
+      // create cytoscape elements
       const cyElements = this.convertToCytoscapeFormat(currentElements);
       
       if (cyElements.length === 0) {
-        console.log("No elements to organize");
         return;
       }
 
-      // Create temporary Cytoscape instance for layout calculation
+      // create temporary Cytoscape instance for layout calculation
       const cy = cytoscape({
         elements: cyElements,
-        headless: true, // Don't render, just calculate
+        headless: true, 
       });
 
-      // Run the layout
+      // run the layout
       const layout = cy.layout(this.getLayoutConfig(layoutType));
       
       return new Promise<void>((resolve) => {
         layout.on('layoutstop', () => {
-          // Apply positions back to Excalidraw elements
-          const updatedElements = this.applyLayoutPositions(currentElements, cy);
+          // apply positions back to Excalidraw elements
+          const updatedElements = this.applyLayoutPositions(currentElements, cy, layoutType);
           
           this.excalidrawAPI.updateScene({
             elements: updatedElements
           });
 
-          // Force arrow binding refresh after layout
-          setTimeout(() => {
-            this.refreshArrowBindings();
-          }, 100);
-
-          cy.destroy(); // Clean up
+          cy.destroy(); // clean up temporary cytoscape elements
           resolve();
         });
         
@@ -176,12 +280,8 @@ class AutoOrganizer {
   convertToCytoscapeFormat(elements: readonly ExcalidrawElement[]): any[] {
     const nodes: any[] = [];
     const edges: any[] = [];
-    const nodeIds = new Set<string>();
 
-    // Debug: Log all elements
-    console.log("All elements for layout:", elements.map(el => ({ id: el.id, type: el.type })));
-
-    // First pass: collect nodes
+    // collect nodes (only search boxes and associated rabbit images)
     elements.forEach((element: ExcalidrawElement) => {
         if (element.type === 'rabbit-searchbox' || element.type === 'rabbit-image') {
             nodes.push({
@@ -192,265 +292,320 @@ class AutoOrganizer {
                     height: element.height || 100
                 }
             });
-            nodeIds.add(element.id);
         }
     });
 
-    // Debug: Log nodes
-    console.log("Nodes found:", nodes);
+    // create edges between search boxes and their associated images
+    // If searchGroups is empty, try to rebuild relationships from stroke colors
+    if (this.searchGroups.size === 0) {
+      this.rebuildSearchGroupsFromElements(elements);
+    }
 
-    // Second pass: collect edges
-    elements.forEach((element: ExcalidrawElement) => {
-      if (element.type === 'arrow') {
-          const arrowElement = element as any;
-          
-          // More detailed arrow logging
-          console.log("Arrow element detailed:", {
-              id: arrowElement.id,
-              startBinding: JSON.stringify(arrowElement.startBinding),
-              endBinding: JSON.stringify(arrowElement.endBinding),
-              hasStartBinding: !!arrowElement.startBinding,
-              hasEndBinding: !!arrowElement.endBinding
+    this.searchGroups.forEach((group) => {
+      group.images.forEach((image) => {
+        // Check if both nodes exist in current elements
+        const sourceExists = elements.find(el => el.id === group.searchBox.id);
+        const targetExists = elements.find(el => el.id === image.id);
+        
+        if (sourceExists && targetExists) {
+          edges.push({
+            data: {
+              id: `${group.searchBox.id}-${image.id}`,
+              source: group.searchBox.id,
+              target: image.id
+            }
           });
-          
-          if (arrowElement.startBinding && arrowElement.endBinding) {
-              const sourceId = arrowElement.startBinding.elementId;
-              const targetId = arrowElement.endBinding.elementId;
-              
-              console.log("Checking binding IDs:", { 
-                  sourceId, 
-                  targetId, 
-                  sourceExists: nodeIds.has(sourceId),
-                  targetExists: nodeIds.has(targetId),
-                  nodeIds: Array.from(nodeIds) 
-              });
-              
-              if (nodeIds.has(sourceId) && nodeIds.has(targetId)) {
-                  edges.push({
-                      data: {
-                          id: element.id,
-                          source: sourceId,
-                          target: targetId
-                      }
-                  });
-                  console.log("✅ Added edge:", { source: sourceId, target: targetId });
-              } else {
-                  console.log("❌ Skipped edge - missing nodes:", { sourceId, targetId });
-              }
-          } else {
-              console.log("❌ Arrow missing bindings");
-          }
-      }
+        }
+      });
     });
 
-    // Debug: Log final edges
-    console.log("Edges found:", edges);
-
     return [...nodes, ...edges];
+  }
+
+  rebuildSearchGroupsFromElements(elements: readonly ExcalidrawElement[]): void {
+    // Group elements by stroke color to rebuild relationships
+    const colorGroups = new Map<string, { searchBox: ExcalidrawElement | null, images: ExcalidrawElement[] }>();
+    
+    elements.forEach((element) => {
+      if (element.type === 'rabbit-searchbox' || element.type === 'rabbit-image') {
+        const color = element.strokeColor;
+        if (!colorGroups.has(color)) {
+          colorGroups.set(color, { searchBox: null, images: [] });
+        }
+        
+        const group = colorGroups.get(color)!;
+        if (element.type === 'rabbit-searchbox') {
+          group.searchBox = element;
+        } else if (element.type === 'rabbit-image') {
+          group.images.push(element);
+        }
+      }
+    });
+    
+    // Rebuild searchGroups from color groups
+    this.searchGroups.clear();
+    colorGroups.forEach((group, color) => {
+      if (group.searchBox && group.images.length > 0) {
+        const groupId = `rebuilt-${Date.now()}-${Math.random()}`;
+        this.searchGroups.set(groupId, {
+          searchBox: group.searchBox,
+          images: group.images,
+          query: (group.searchBox as any).text || 'unknown',
+          color: color
+        });
+      }
+    });
   }
 
   getLayoutConfig(layoutType: string): any {
     const layouts: Record<string, any> = {
       dagre: {
         name: 'dagre',
-        rankDir: 'TB', // Top to bottom
-        nodeSep: 400,
-        rankSep: 250,
+        rankDir: 'TB',
+        nodeSep: 120,
+        rankSep: 100,
         fit: false,
-        padding: 50
+        padding: 30
       },
       grid: {
         name: 'grid',
-        rows: 10,
-        cols: 3,
+        rows: undefined,
+        cols: Math.ceil(Math.sqrt(this.getTotalNodeCount())), // Dynamic columns based on node count
         fit: false,
-        padding: 50,
-        spacingFactor: 5
+        padding: 30,
+        spacingFactor: 1.5, // Increased spacing factor
+        avoidOverlap: true,
+        condense: false // Don't condense to prevent overlap
       },
       circle: {
         name: 'circle',
-        fit: true,
-        padding: 50,
-        radius: 400
+        fit: false,
+        padding: 30,
+        radius: 250,
+        avoidOverlap: true,
+        spacingFactor: 1
       },
       breadthfirst: {
         name: 'breadthfirst',
         directed: true,
-        spacingFactor: 4,
-        fit: true,
-        padding: 50
-      },
-      force: {
-        name: 'cose',
-        idealEdgeLength: 300,
-        nodeOverlap: 100,
-        refresh: 20,
-        fit: true,
-        padding: 50
+        roots: this.getRootNodes(),
+        spacingFactor: 2, // Increased spacing factor for BFS
+        fit: false,
+        padding: 30,
+        avoidOverlap: true
       }
     };
 
     return layouts[layoutType] || layouts.dagre;
   }
 
-  applyLayoutPositions(elements: readonly ExcalidrawElement[], cy: any): ExcalidrawElement[] {
+  getTotalNodeCount(): number {
+    // Count all rabbit elements for grid layout calculations
+    const allSearchBoxes = Array.from(this.searchGroups.values()).length;
+    const allImages = Array.from(this.searchGroups.values()).reduce((count, group) => count + group.images.length, 0);
+    return allSearchBoxes + allImages;
+  }
+
+  applyLayoutPositions(elements: readonly ExcalidrawElement[], cy: any, layoutType: string): ExcalidrawElement[] {
+    // Get all positions first
+    const positions: { x: number, y: number, id: string }[] = [];
+    cy.nodes().forEach((node: any) => {
+      const pos = node.position();
+      positions.push({ x: pos.x, y: pos.y, id: node.id() });
+    });
+    
+    if (positions.length === 0) return [...elements];
+
+    // Apply layout-specific positioning
+    switch (layoutType) {
+      case 'grid':
+        return this.applyGridLayout(elements, positions);
+      case 'breadthfirst':
+        return this.applyBreadthFirstLayout(elements, positions);
+      case 'circle':
+        return this.applyCircularLayout(elements, positions);
+      case 'dagre':
+      default:
+        return this.applyHierarchicalLayout(elements, positions);
+    }
+  }
+
+  applyGridLayout(elements: readonly ExcalidrawElement[], positions: { x: number, y: number, id: string }[]): ExcalidrawElement[] {
+    // Calculate spacing based on actual element sizes
+    const rabbitElements = elements.filter(el => el.type === 'rabbit-searchbox' || el.type === 'rabbit-image');
+    const maxWidth = Math.max(...rabbitElements.map(el => el.width || 100));
+    const maxHeight = Math.max(...rabbitElements.map(el => el.height || 100));
+    
+    const minSpacingX = maxWidth + 50; // Element width + padding
+    const minSpacingY = maxHeight + 40; // Element height + padding
+    const startX = 100;
+    const startY = 100;
+
+    // Calculate grid dimensions
+    const totalNodes = positions.length;
+    const cols = Math.ceil(Math.sqrt(totalNodes));
+
     return elements.map((element: ExcalidrawElement) => {
-      const cyNode = cy.getElementById(element.id);
-      if (cyNode.length > 0) {
-        const position = cyNode.position();
+      const position = positions.find(p => p.id === element.id);
+      if (position) {
+        // Find grid position based on sorted positions
+        const sortedPositions = [...positions].sort((a, b) => a.y - b.y || a.x - b.x);
+        const gridIndex = sortedPositions.findIndex(p => p.id === element.id);
+        
+        const col = gridIndex % cols;
+        const row = Math.floor(gridIndex / cols);
+        
+        const x = startX + (col * minSpacingX);
+        const y = startY + (row * minSpacingY);
+        
         return {
           ...element,
-          x: position.x - (element.width || 100) / 2,
-          y: position.y - (element.height || 100) / 2
+          x: x - (element.width || 100) / 2,
+          y: y - (element.height || 100) / 2
         };
       }
       return element;
     });
   }
 
-  private createArrowsFromSearchBoxToImages(
-    searchBox: ExcalidrawElement, 
-    images: ExcalidrawElement[], 
-    groupColor: string
-  ): ExcalidrawElement[] {
-    const arrows: ExcalidrawElement[] = [];
-
-    // Calculate search box center
-    const searchBoxCenter = {
-      x: searchBox.x + searchBox.width / 2,
-      y: searchBox.y + searchBox.height / 2
-    };
-
-    images.forEach((image) => {
-      // Calculate image center
-      const imageCenter = {
-        x: image.x + image.width / 2,
-        y: image.y + image.height / 2
-      };
-
-      // Create arrow points using pointFrom to get proper LocalPoint type
-      const startPoint = pointFrom<LocalPoint>(0, 0);
-      const endPoint = pointFrom<LocalPoint>(
-        imageCenter.x - searchBoxCenter.x,
-        imageCenter.y - searchBoxCenter.y
-      );
-
-      // Create the arrow element
-      const arrow = newArrowElement({
-        type: "arrow",
-        x: searchBoxCenter.x,
-        y: searchBoxCenter.y,
-        width: Math.abs(endPoint[0]),
-        height: Math.abs(endPoint[1]),
-        strokeColor: groupColor,
-        backgroundColor: "transparent",
-        points: [startPoint, endPoint],
-        strokeWidth: 2,
-        strokeStyle: "solid",
-        roughness: 1,
-        opacity: 100,
-        startArrowhead: null,
-        endArrowhead: "arrow",
-        elbowed: false,
-      });
-
-      // Set up bindings to connect arrow to elements
-      const arrowWithBindings = {
-        ...arrow,
-        startBinding: {
-          elementId: searchBox.id,
-          focus: 0,
-          gap: 10,
-        },
-        endBinding: {
-          elementId: image.id,
-          focus: 0,
-          gap: 10,
-        },
-      };
-
-      arrows.push(arrowWithBindings as ExcalidrawElement);
-    });
-
-    console.log(`Created ${arrows.length} arrows from search box to images`);
-    return arrows;
-  }
-
-  private refreshArrowBindings(): void {
-    const elements = this.excalidrawAPI.getSceneElements();
-    const arrows = elements.filter((el: any) => el.type === 'arrow');
+  applyBreadthFirstLayout(elements: readonly ExcalidrawElement[], positions: { x: number, y: number, id: string }[]): ExcalidrawElement[] {
+    // Calculate spacing based on actual element sizes
+    const rabbitElements = elements.filter(el => el.type === 'rabbit-searchbox' || el.type === 'rabbit-image');
+    const maxWidth = Math.max(...rabbitElements.map(el => el.width || 100));
+    const maxHeight = Math.max(...rabbitElements.map(el => el.height || 100));
     
-    if (arrows.length === 0) {
-      console.log("No arrows found to refresh");
-      return;
-    }
+    const minSpacingX = maxWidth + 60; // Horizontal spacing between siblings
+    const minSpacingY = maxHeight + 50; // Vertical spacing between levels
+    const startX = 200;
+    const startY = 100;
 
-    console.log(`Refreshing bindings for ${arrows.length} arrows`);
-
-    // Find elements that have bound arrows
-    const boundElementIds = new Set<string>();
-    arrows.forEach((arrow: any) => {
-      if (arrow.startBinding?.elementId) {
-        boundElementIds.add(arrow.startBinding.elementId);
+    // Group positions by Y level (approximately)
+    const levels = new Map<number, { x: number, y: number, id: string }[]>();
+    const tolerance = 50; // Y-coordinate tolerance for same level
+    
+    positions.forEach(pos => {
+      let levelY = Math.round(pos.y / tolerance) * tolerance;
+      if (!levels.has(levelY)) {
+        levels.set(levelY, []);
       }
-      if (arrow.endBinding?.elementId) {
-        boundElementIds.add(arrow.endBinding.elementId);
-      }
+      levels.get(levelY)!.push(pos);
     });
 
-    if (boundElementIds.size === 0) {
-      console.log("No bound elements found");
-      return;
-    }
+    // Sort levels by Y coordinate
+    const sortedLevels = Array.from(levels.entries()).sort(([a], [b]) => a - b);
 
-    console.log(`Found ${boundElementIds.size} bound elements`);
-
-    // Very gentle nudge - just tiny position change to trigger recalculation
-    const nudgedElements = elements.map((el: any) => {
-      if (boundElementIds.has(el.id)) {
+    return elements.map((element: ExcalidrawElement) => {
+      const position = positions.find(p => p.id === element.id);
+      if (position) {
+        // Find which level this element belongs to
+        let levelIndex = 0;
+        let positionInLevel = 0;
+        
+        for (let i = 0; i < sortedLevels.length; i++) {
+          const [, levelPositions] = sortedLevels[i];
+          const foundIndex = levelPositions.findIndex(p => p.id === element.id);
+          if (foundIndex !== -1) {
+            levelIndex = i;
+            positionInLevel = foundIndex;
+            break;
+          }
+        }
+        
+        const levelPositions = sortedLevels[levelIndex][1];
+        const levelWidth = (levelPositions.length - 1) * minSpacingX;
+        const levelStartX = startX - levelWidth / 2;
+        
+        const x = levelStartX + (positionInLevel * minSpacingX);
+        const y = startY + (levelIndex * minSpacingY);
+        
         return {
-          ...el,
-          x: el.x + 0.01, // Tiny movement
+          ...element,
+          x: x - (element.width || 100) / 2,
+          y: y - (element.height || 100) / 2
         };
       }
-      return el;
+      return element;
     });
-
-    // Apply the nudge
-    this.excalidrawAPI.updateScene({
-      elements: nudgedElements
-    });
-
-    // Move back to exact original position after a short delay
-    setTimeout(() => {
-      const restoredElements = nudgedElements.map((el: any) => {
-        if (boundElementIds.has(el.id)) {
-          return {
-            ...el,
-            x: el.x - 0.01, // Move back to exact original position
-          };
-        }
-        return el;
-      });
-
-      this.excalidrawAPI.updateScene({
-        elements: restoredElements
-      });
-
-      console.log("Arrow binding refresh completed");
-    }, 50);
   }
 
-  getColorForSearch(searchQuery: string): string {
-    // Simple hash to consistently assign colors
-    let hash = 0;
-    for (let i = 0; i < searchQuery.length; i++) {
-      hash = searchQuery.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return this.colorPalette[Math.abs(hash) % this.colorPalette.length];
+  applyCircularLayout(elements: readonly ExcalidrawElement[], positions: { x: number, y: number, id: string }[]): ExcalidrawElement[] {
+    // Calculate spacing based on actual element sizes
+    const rabbitElements = elements.filter(el => el.type === 'rabbit-searchbox' || el.type === 'rabbit-image');
+    const maxWidth = Math.max(...rabbitElements.map(el => el.width || 100));
+    const maxHeight = Math.max(...rabbitElements.map(el => el.height || 100));
+    
+    const minX = Math.min(...positions.map(p => p.x));
+    const maxX = Math.max(...positions.map(p => p.x));
+    const minY = Math.min(...positions.map(p => p.y));
+    const maxY = Math.max(...positions.map(p => p.y));
+    
+    const cytoscapeWidth = maxX - minX || 1;
+    const cytoscapeHeight = maxY - minY || 1;
+    
+    // Calculate scale based on element sizes
+    const targetSpacing = Math.max(maxWidth, maxHeight) + 30;
+    const scaleX = Math.max(1, targetSpacing * positions.length / (cytoscapeWidth * 2));
+    const scaleY = Math.max(1, targetSpacing * positions.length / (cytoscapeHeight * 2));
+
+    return elements.map((element: ExcalidrawElement) => {
+      const position = positions.find(p => p.id === element.id);
+      if (position) {
+        const scaledX = (position.x - minX) * scaleX + 300;
+        const scaledY = (position.y - minY) * scaleY + 300;
+        
+        return {
+          ...element,
+          x: scaledX - (element.width || 100) / 2,
+          y: scaledY - (element.height || 100) / 2
+        };
+      }
+      return element;
+    });
   }
 
-  // Public methods for different layout options
+  applyHierarchicalLayout(elements: readonly ExcalidrawElement[], positions: { x: number, y: number, id: string }[]): ExcalidrawElement[] {
+    // Calculate spacing based on actual element sizes
+    const rabbitElements = elements.filter(el => el.type === 'rabbit-searchbox' || el.type === 'rabbit-image');
+    const maxWidth = Math.max(...rabbitElements.map(el => el.width || 100));
+    const maxHeight = Math.max(...rabbitElements.map(el => el.height || 100));
+    
+    const minX = Math.min(...positions.map(p => p.x));
+    const maxX = Math.max(...positions.map(p => p.x));
+    const minY = Math.min(...positions.map(p => p.y));
+    const maxY = Math.max(...positions.map(p => p.y));
+    
+    const cytoscapeWidth = maxX - minX || 1;
+    const cytoscapeHeight = maxY - minY || 1;
+    
+    // Calculate scale based on actual element sizes
+    const targetSpacingX = maxWidth + 60;
+    const targetSpacingY = maxHeight + 15;
+    
+    const scaleX = Math.max(1.2, targetSpacingX * positions.length / cytoscapeWidth);
+    const scaleY = Math.max(1.0, targetSpacingY * Math.sqrt(positions.length) / cytoscapeHeight);
+
+    return elements.map((element: ExcalidrawElement) => {
+      const position = positions.find(p => p.id === element.id);
+      if (position) {
+        const scaledX = (position.x - minX) * scaleX + 100;
+        const scaledY = (position.y - minY) * scaleY + 100;
+        
+        return {
+          ...element,
+          x: scaledX - (element.width || 100) / 2,
+          y: scaledY - (element.height || 100) / 2
+        };
+      }
+      return element;
+    });
+  }
+
+  getRootNodes(): string[] {
+    // return search box IDs as root nodes for hierarchical layouts
+    return Array.from(this.searchGroups.values()).map(group => group.searchBox.id);
+  }
+
+  // public methods for different layout options
   organizeHierarchical(): Promise<void> | void { 
     return this.autoOrganize('dagre'); 
   }
@@ -466,20 +621,50 @@ class AutoOrganizer {
   organizeBreadthFirst(): Promise<void> | void { 
     return this.autoOrganize('breadthfirst'); 
   }
-  
-  organizeForceDirected(): Promise<void> | void { 
-    return this.autoOrganize('force'); 
+
+  getAllSearchGroupIds(): string[] {
+    return Array.from(this.searchGroups.keys());
+  }
+
+  // Public method to get search groups count
+  getSearchGroupsCount(): number {
+    return this.searchGroups.size;
+  }
+
+  // Public method to remove all search groups
+  removeAllSearchGroups(): number {
+    const groupIds = this.getAllSearchGroupIds();
+    groupIds.forEach(groupId => this.removeSearchGroup(groupId));
+    return groupIds.length;
+  }
+
+  // Public method to check if there are any search groups
+  hasSearchGroups(): boolean {
+    return this.searchGroups.size > 0;
   }
 }
 
-// Updated command palette integration - no hardcoded searches!
+// command palette integration
 export const createAutoOrganizerCommands = (excalidrawAPI: ExcalidrawImperativeAPI) => {
   const organizer = new AutoOrganizer(excalidrawAPI);
 
   return [
     {
+      label: "Auto-organize",
+      category: "App",
+      predicate: () => true,
+      keywords: ["organize", "layout", "auto", "default"],
+      perform: () => {
+        organizer.organizeHierarchical();
+        excalidrawAPI?.setToast({
+          message: "Applied auto-organization",
+          duration: 2000
+        });
+      }
+    },
+    {
       label: "Auto-organize: Hierarchical Layout",
-      category: "App", // Use DEFAULT_CATEGORIES.app if you have it imported
+      category: "App",
       predicate: () => true,
       keywords: ["organize", "layout", "hierarchy", "tree", "dagre"],
       perform: () => {
@@ -517,19 +702,6 @@ export const createAutoOrganizerCommands = (excalidrawAPI: ExcalidrawImperativeA
       }
     },
     {
-      label: "Auto-organize: Force Directed",
-      category: "App",
-      predicate: () => true,
-      keywords: ["organize", "layout", "force", "physics"],
-      perform: () => {
-        organizer.organizeForceDirected();
-        excalidrawAPI?.setToast({
-          message: "Applied force-directed layout",
-          duration: 2000
-        });
-      }
-    },
-    {
       label: "Auto-organize: Breadth First",
       category: "App", 
       predicate: () => true,
@@ -538,6 +710,32 @@ export const createAutoOrganizerCommands = (excalidrawAPI: ExcalidrawImperativeA
         organizer.organizeBreadthFirst();
         excalidrawAPI?.setToast({
           message: "Applied breadth-first layout",
+          duration: 2000
+        });
+      }
+    },
+    {
+      label: "Group Existing Elements by Color",
+      category: "App",
+      predicate: () => true,
+      keywords: ["group", "color", "organize", "existing"],
+      perform: () => {
+        organizer.groupExistingElementsByColor();
+        excalidrawAPI?.setToast({
+          message: "Grouped elements by color",
+          duration: 2000
+        });
+      }
+    },
+    {
+      label: "Remove All Search Groups",
+      category: "App", 
+      predicate: () => true,
+      keywords: ["ungroup", "remove", "clear", "groups"],
+      perform: () => {
+        const removedCount = organizer.removeAllSearchGroups();
+        excalidrawAPI?.setToast({
+          message: `Removed ${removedCount} search groups`,
           duration: 2000
         });
       }

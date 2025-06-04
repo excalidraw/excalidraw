@@ -1440,7 +1440,6 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
                 }
               },
             },
-
             {
               label: "Add Rabbit SearchBox",
               category: DEFAULT_CATEGORIES.app,
