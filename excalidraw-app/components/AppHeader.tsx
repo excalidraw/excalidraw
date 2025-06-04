@@ -82,7 +82,7 @@ export const AppHeader = React.memo(({ onChange, excalidrawAPI }: AppHeaderProps
         }}
       >
         <img
-          src="https://i.imgur.com/pWjusvL.png"
+          src="https://i.imgur.com/KttcKbd.png"
           alt="Logo"
           style={{ height: "40px", marginRight: "1rem" }}
         />

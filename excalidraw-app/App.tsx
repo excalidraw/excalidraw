@@ -817,7 +817,13 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
           const colors = await extractColorsFromImageElement(imageElement, colorThief, excalidrawAPI);
           imageColorArrays.push(colors);
         } catch (error) {
-          console.warn(`Failed to extract colors from image ${imageElement.id}:`, error);
+          console.log("error");
+          console.error(`Failed to extract colors from image ${imageElement.id}:`, error);
+          excalidrawAPI.setToast({
+            message: `Color palette could not be generated, please select another image`,
+            duration: 3000
+          });
+          return;
         }
       }
 
