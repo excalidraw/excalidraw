@@ -16,8 +16,6 @@ import {
 import type { ElementsSegmentsMap, GlobalPoint } from "@excalidraw/math/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { debugDrawBounds } from "../visualdebug";
-
 export const getLassoSelectedElementIds = (input: {
   lassoPath: GlobalPoint[];
   elements: readonly ExcalidrawElement[];
@@ -46,6 +44,7 @@ export const getLassoSelectedElementIds = (input: {
   const unlockedElements = elements.filter((el) => !el.locked);
   // as the path might not enclose a shape anymore, clear before checking
   enclosedElements.clear();
+  intersectedElements.clear();
   const lassoBounds = lassoPath.reduce(
     (acc, item) => {
       return [
