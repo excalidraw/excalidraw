@@ -153,18 +153,43 @@ export const createRabbitGroup = (
   const elements = excalidrawAPI.getSceneElements();
   const existingGroups = getRabbitGroupsFromElements(elements);
   
-  const usedColors = new Set<string>();
-  existingGroups.forEach(group => usedColors.add(group.color));
-
-  const groupId = randomId();
-  const groupColor = generateUniqueColor(usedColors);
+  // Check if a group with the same search query already exists
+  let existingGroup: RabbitGroup | null = null;
+  for (const [groupId, group] of existingGroups) {
+    if (group.query.toLowerCase().trim() === searchQuery.toLowerCase().trim()) {
+      existingGroup = group;
+      break;
+    }
+  }
   
-  const groupData = {
-    groupId,
-    query: searchQuery,
-    color: groupColor,
-    createdAt: Date.now()
-  };
+  let groupId: string;
+  let groupColor: string;
+  let groupData: RabbitGroupData;
+  
+  if (existingGroup) {
+    // Use existing group's ID and color
+    groupId = existingGroup.groupId;
+    groupColor = existingGroup.color;
+    groupData = {
+      groupId,
+      query: searchQuery,
+      color: groupColor,
+      createdAt: Date.now()
+    };
+  } else {
+    // Create new group
+    const usedColors = new Set<string>();
+    existingGroups.forEach(group => usedColors.add(group.color));
+
+    groupId = randomId();
+    groupColor = generateUniqueColor(usedColors);
+    groupData = {
+      groupId,
+      query: searchQuery,
+      color: groupColor,
+      createdAt: Date.now()
+    };
+  }
 
   const targetIds = [searchBoxId, ...imageIds];
 
