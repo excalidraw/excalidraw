@@ -38,9 +38,14 @@ import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRef
 import { t } from "@excalidraw/excalidraw/i18n";
 
 import { AutoOrganizer } from "@excalidraw/element/autoOrganizer";
-import { getRabbitGroupsFromElements } from '@excalidraw/element/rabbitGroupUtils';
-import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement, newRabbitColorPalette } from "@excalidraw/element/newRabbitElement";
-import ColorThief from 'colorthief'; // for color palette
+import { getRabbitGroupsFromElements } from "@excalidraw/element/rabbitGroupUtils";
+import {
+  newRabbitSearchBoxElement,
+  newRabbitImageElement,
+  newRabbitImageTabsElement,
+  newRabbitColorPalette,
+} from "@excalidraw/element/newRabbitElement";
+import ColorThief from "colorthief";
 
 import {
   GithubIcon,
@@ -62,6 +67,12 @@ import {
   useHandleLibrary,
 } from "@excalidraw/excalidraw/data/library";
 
+import { getSearchBoxText } from "@excalidraw/element/newRabbitElement";
+import { useRabbitSearchBoxHandlers } from "@excalidraw/element/rabbitElementHandlers";
+import { RabbitImageWindow } from "@excalidraw/element/RabbitImageWindow";
+
+import { GoogleGenAI } from "@google/genai";
+
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
 import type {
@@ -78,13 +89,8 @@ import type {
 } from "@excalidraw/excalidraw/types";
 import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
-// import { 
-//   handleRabbitSearchBoxClick, 
-//   handleRabbitSearchBoxKeyDown 
-// } from "@excalidraw/element/rabbitElementHandlers";
-import { isRabbitSearchBoxElement } from "@excalidraw/element/rabbitElement";
-import { getSearchBoxText } from "@excalidraw/element/newRabbitElement";
-import { useRabbitSearchBoxHandlers } from "@excalidraw/element/rabbitElementHandlers";
+
+import { searchAndSaveImages } from "../scripts/rabbit_scripts/try_again";
 
 import CustomStats from "./CustomStats";
 import {
@@ -105,7 +111,6 @@ import Collab, {
   isCollaboratingAtom,
   isOfflineAtom,
 } from "./collab/Collab";
-import { AppFooter } from "./components/AppFooter";
 import { AppHeader } from "./components/AppHeader";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
@@ -136,7 +141,7 @@ import {
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
-import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
+import { collabErrorIndicatorAtom } from "./collab/CollabError";
 import { useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
 import { useAppLangCode } from "./app-language/language-state";
@@ -152,17 +157,10 @@ import "./index.scss";
 
 import type { CollabAPI } from "./collab/Collab";
 
-import { searchAndSaveImages } from '../scripts/rabbit_scripts/try_again';
 import type { RabbitSearchBoxElement } from "../packages/element/src/rabbitElement";
-import { RabbitElementBase, RabbitImageElement } from "../packages/element/src/rabbitElement";
 
-import { RabbitImageWindow } from "@excalidraw/element/RabbitImageWindow";
-// for rabbit image window
-
-
-import { GoogleGenAI } from "@google/genai";
 const ai = new GoogleGenAI({
-  apiKey: import.meta.env.VITE_GEMINI_API_KEY
+  apiKey: import.meta.env.VITE_GEMINI_API_KEY,
 });
 async function main() {
   const response = await ai.models.generateContent({
