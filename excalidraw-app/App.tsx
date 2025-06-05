@@ -451,26 +451,26 @@ const ExcalidrawWrapper = () => {
     setSelectedImages((prev) => prev.filter((id) => id !== image.id));
   };
   
-const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize: boolean = true) => {
-  if (!excalidrawAPI) return;
-
-  const selectedImageData = selectedImageIds
-    .map(id => {
-      for (const tab of tabData) {
-        const image = tab.images.find(img => img.id === id);
-        if (image) return image;
-      }
-      return null;
-    })
-    .filter((imageData): imageData is NonNullable<typeof imageData> => imageData !== null);
-
-  if (selectedImageData.length === 0) {
-    excalidrawAPI.setToast({
-      message: "No images selected to add to canvas.",
-      duration: 2000,
-    });
-    return;
-  }
+  const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize: boolean = true) => {
+    if (!excalidrawAPI) return;
+  
+    const selectedImageData = selectedImageIds
+      .map(id => {
+        for (const tab of tabData) {
+          const image = tab.images.find(img => img.id === id);
+          if (image) return image;
+        }
+        return null;
+      })
+      .filter((imageData): imageData is NonNullable<typeof imageData> => imageData !== null);
+  
+    if (selectedImageData.length === 0) {
+      excalidrawAPI.setToast({
+        message: "No images selected to add to canvas.",
+        duration: 2000,
+      });
+      return;
+    }
 
   const MAX_WIDTH = 200;
   const MAX_HEIGHT = 200;
@@ -497,101 +497,96 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
         const row = Math.floor(index / cols);
         const x = START_X + col * (MAX_WIDTH + MARGIN);
         const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+        
         console.log("This is", imageData);
-
-        
         console.log("This is it", imageData);
-        // Check if this is from Internet webpages tab
-         if (imageData.id.startsWith("youtube")) {
-         
-        // Create embedded YouTube iframe instead of image
-        const embedElement = newEmbeddableElement({
-          type: "embeddable", // Add this required property
-          x: x,
-          y: y,
-          width: 560, // Standard YouTube embed width
-          height: 315, // Standard YouTube embed height
-          link: imageData.src, // Should be the YouTube URL
-        });
-        resolve(embedElement);
         
-      }
-      else if (imageData.id.startsWith("internet webpages")) {
+        // Check if this is from Internet webpages tab
+        if (imageData.id.startsWith("youtube")) {
+          // Create embedded YouTube iframe instead of image
+          const embedElement = newEmbeddableElement({
+            type: "embeddable",
+            x: x,
+            y: y,
+            width: 560,
+            height: 315,
+            link: imageData.src,
+          });
+          resolve(embedElement);
+        }
+        else if (imageData.id.startsWith("internet webpages")) {
           const element = newRabbitImageElement({
             x: x,
             y: y,
-            imageUrl: imageData.src, // No image URL - just empty or placeholder
+            imageUrl: imageData.src, // Use original URL
             width: MAX_WIDTH * 1.5,
-            height: 60, // Smaller height since no image
+            height: 60,
             label: imageData.name,
-    
           });
           resolve(element);
         }
-      else {
-        const img = new Image();
-        img.onload = () => {
-          let scaledWidth = img.width;
-          let scaledHeight = img.height;
+        else {
+          const img = new Image();
+          img.onload = () => {
+            let scaledWidth = img.width;
+            let scaledHeight = img.height;
 
-          // Scale down if width is too large
-          if (scaledWidth > MAX_WIDTH) {
-            const ratio = MAX_WIDTH / scaledWidth;
-            scaledWidth = MAX_WIDTH;
-            scaledHeight = scaledHeight * ratio;
-          }
+            // Scale down if width is too large
+            if (scaledWidth > MAX_WIDTH) {
+              const ratio = MAX_WIDTH / scaledWidth;
+              scaledWidth = MAX_WIDTH;
+              scaledHeight = scaledHeight * ratio;
+            }
 
-          // Scale down further if height is still too large
-          if (scaledHeight > MAX_HEIGHT) {
-            const ratio = MAX_HEIGHT / scaledHeight;
-            scaledHeight = MAX_HEIGHT;
-            scaledWidth = scaledWidth * ratio;
-          }
+            // Scale down further if height is still too large
+            if (scaledHeight > MAX_HEIGHT) {
+              const ratio = MAX_HEIGHT / scaledHeight;
+              scaledHeight = MAX_HEIGHT;
+              scaledWidth = scaledWidth * ratio;
+            }
 
-          // Calculate grid position
-          const col = index % cols;
-          const row = Math.floor(index / cols);
+            // Calculate grid position
+            const col = index % cols;
+            const row = Math.floor(index / cols);
+            
+            const x = START_X + col * (MAX_WIDTH + MARGIN);
+            const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+            // Use original image URL instead of Cloudinary
+            const element = newRabbitImageElement({
+              x: x,
+              y: y,
+              imageUrl: imageData.src, // Use original URL directly
+              width: scaledWidth,
+              height: scaledHeight,
+              label: imageData.name
+            });
+            resolve(element);
+          };
           
-          const x = START_X + col * (MAX_WIDTH + MARGIN);
-          const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+          img.onerror = () => {
+            const col = index % cols;
+            const row = Math.floor(index / cols);
+            const x = START_X + col * (MAX_WIDTH + MARGIN);
+            const y = START_Y + row * (MAX_HEIGHT + MARGIN);
 
-          const cloudinaryUrl = getCloudinaryUrl(imageData.src, scaledWidth, scaledHeight);
-
-          const element = newRabbitImageElement({
-            x: x,
-            y: y,
-            imageUrl: cloudinaryUrl,
-            width: scaledWidth,
-            height: scaledHeight,
-            label: imageData.name
-          });
-          resolve(element);
-        };
-        
-        img.onerror = () => {
-          const col = index % cols;
-          const row = Math.floor(index / cols);
-          const x = START_X + col * (MAX_WIDTH + MARGIN);
-          const y = START_Y + row * (MAX_HEIGHT + MARGIN);
-
-          const cloudinaryUrl = getCloudinaryUrl(imageData.src, MAX_WIDTH, MAX_HEIGHT);
-
-          const element = newRabbitImageElement({
-            x: x,
-            y: y,
-            imageUrl: cloudinaryUrl,
-            width: MAX_WIDTH,
-            height: MAX_HEIGHT,
-            label: imageData.name
-          });
-          resolve(element);
-        };
-        
-        img.src = imageData.src;
-      }
+            // Use original image URL instead of Cloudinary
+            const element = newRabbitImageElement({
+              x: x,
+              y: y,
+              imageUrl: imageData.src, // Use original URL directly
+              width: MAX_WIDTH,
+              height: MAX_HEIGHT,
+              label: imageData.name
+            });
+            resolve(element);
+          };
+          
+          img.src = imageData.src;
+        }
       });
     })
-);
+  );
 
   excalidrawAPI.updateScene({
     elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
@@ -1081,6 +1076,12 @@ useEffect(() => {
     return allColors;
   }
 
+  const getCloudinaryUrl = (originalUrl: string, width: number, height: number) => {
+    const cloudName = 'your-cloud-name';
+    const encodedUrl = encodeURIComponent(originalUrl);
+    return `https://res.cloudinary.com/${cloudName}/image/fetch/w_${Math.round(width)},h_${Math.round(height)},c_fit,f_auto,q_auto/${encodedUrl}`;
+  };
+
   // Helper function to extract colors from an image element
   const extractColorsFromImageElement = async (
     imageElement: any,
@@ -1089,15 +1090,15 @@ useEffect(() => {
   ): Promise<string[]> => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-
+  
     // First, set up the image source
     try {
       if (imageElement.type === 'image') {
         const files = excalidrawAPI.getFiles();
         const file = files[imageElement.fileId];
-
+  
         console.log("data url", imageElement.dataURL);
-
+  
         if (file) {
           if (file.dataURL) {
             img.src = file.dataURL;
@@ -1108,29 +1109,31 @@ useEffect(() => {
           }
         }
       } else if (imageElement.type === 'rabbit-image') {
-        img.src = imageElement.imageUrl;
+        // Use Cloudinary URL for color extraction to ensure CORS compatibility
+        const cloudinaryUrl = getCloudinaryUrl(imageElement.imageUrl, 300, 300);
+        img.src = cloudinaryUrl;
       }
     } catch (error) {
       throw new Error('Failed to load rabbit image');
     }
-
+  
     // Then wait for the image to load
     return new Promise((resolve, reject) => {
       img.onload = () => {
         try {
           const dominantColor = colorThief.getColor(img);
           const palette = colorThief.getPalette(img, 5);
-
+  
           const hexColors = [dominantColor, ...palette].map(rgb =>
             '#' + rgb.map((x: number) => x.toString(16).padStart(2, '0')).join('')
           );
-
+  
           resolve(hexColors);
         } catch (error) {
           reject(error);
         }
       };
-
+  
       img.onerror = () => reject(new Error('Failed to load image'));
     });
   };
