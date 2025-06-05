@@ -8,7 +8,9 @@ import {
 
 import {
   type Bounds,
+  computeBoundTextPosition,
   doBoundsIntersect,
+  getBoundTextElement,
   getElementBounds,
   intersectElementWithLineSegment,
 } from "@excalidraw/element";
@@ -114,6 +116,8 @@ const intersectionTest = (
     .map((point: GlobalPoint, index) => lineSegment(lassoPath[index], point))
     .concat([lineSegment(lassoPath[lassoPath.length - 1], lassoPath[0])]);
 
+  const boundTextElement = getBoundTextElement(element, elementsMap);
+
   return lassoSegments.some(
     (lassoSegment) =>
       intersectElementWithLineSegment(
@@ -122,6 +126,17 @@ const intersectionTest = (
         lassoSegment,
         0,
         true,
-      ).length > 0,
+      ).length > 0 ||
+      (!!boundTextElement &&
+        intersectElementWithLineSegment(
+          {
+            ...boundTextElement,
+            ...computeBoundTextPosition(element, boundTextElement, elementsMap),
+          },
+          elementsMap,
+          lassoSegment,
+          0,
+          true,
+        ).length > 0),
   );
 };

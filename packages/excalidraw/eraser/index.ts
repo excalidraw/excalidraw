@@ -1,5 +1,6 @@
 import { arrayToMap, easeOut, THEME } from "@excalidraw/common";
 import {
+  computeBoundTextPosition,
   getBoundTextElement,
   intersectElementWithLineSegment,
   isPointInElement,
@@ -195,7 +196,10 @@ const eraserTest = (
       .length > 0 ||
     (!!boundTextElement &&
       intersectElementWithLineSegment(
-        boundTextElement,
+        {
+          ...boundTextElement,
+          ...computeBoundTextPosition(element, boundTextElement, elementsMap),
+        },
         elementsMap,
         pathSegment,
         0,
