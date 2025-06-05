@@ -75,7 +75,9 @@ import {
   getRabbitGroupsFromElements, 
   getSelectedRabbitGroupIds,
   getSelectedRabbitGroupId,
-  changeGroupColor
+  changeGroupColor,
+  addElementToRabbitGroup,
+  addElementsToRabbitGroup
 } from '@excalidraw/element/rabbitGroupUtils';
 
 import { AutoOrganizer } from '@excalidraw/element/autoOrganizer';
@@ -240,6 +242,44 @@ export const SelectedShapeActions = ({
   // Create AutoOrganizer instance for organization actions
   const autoOrganizer = new AutoOrganizer(app as any);
 
+  // Helper function for adding elements to groups
+  const getAvailableGroupsForAddition = () => {
+    const allGroups = getRabbitGroupsFromElements(freshElements);
+    
+    if (targetElements.length === 0) return { availableGroups: [], elementsToAdd: [] };
+
+    // Get all selected element IDs
+    const selectedElementIds = targetElements.map(el => el.id);
+    
+    // Get groups that the selected elements are currently in
+    const currentGroupIds = new Set(
+      targetElements
+        .map(el => el.customData?.rabbitGroup?.groupId)
+        .filter(Boolean)
+    );
+
+    // Filter out groups that ALL selected elements are already in
+    const availableGroups = Array.from(allGroups.values()).filter(group => {
+      // Don't show a group if ALL selected elements are already in it
+      if (currentGroupIds.has(group.groupId)) {
+        // Check if ALL elements are in this specific group
+        const allElementsInThisGroup = selectedElementIds.every(id => {
+          const element = freshElements.find(el => el.id === id);
+          return element?.customData?.rabbitGroup?.groupId === group.groupId;
+        });
+        return !allElementsInThisGroup;
+      }
+      return true; // Show this group as an option
+    });
+
+    return { 
+      availableGroups,
+      elementsToAdd: selectedElementIds
+    };
+  };
+
+  const addToGroupInfo = getAvailableGroupsForAddition();
+
   return (
     <div className="panelColumn">
       <div>
@@ -296,6 +336,52 @@ export const SelectedShapeActions = ({
       )}
 
       {renderAction("changeOpacity")}
+
+      {/* Alternative button-based UI */}
+      {addToGroupInfo.elementsToAdd.length > 0 && addToGroupInfo.availableGroups.length > 0 && (
+        <fieldset>
+          <div style={{ marginTop: '8px' }}>
+            <label style={{ fontSize: '12px', color: 'black', display: 'block', marginBottom: '6px' }}>
+              Add {addToGroupInfo.elementsToAdd.length} element(s) to:
+            </label>
+            <div style={{ maxHeight: '120px', overflowY: 'auto' }}>
+              {addToGroupInfo.availableGroups.map(group => (
+                <button
+                  key={group.groupId}
+                  type="button"
+                  style={{
+                    width: '100%',
+                    padding: '6px 8px',
+                    fontSize: '11px',
+                    border: '1px solid #ccc',
+                    borderRadius: '3px',
+                    backgroundColor: '#f8f9fa',
+                    cursor: 'pointer',
+                    marginBottom: '4px',
+                    textAlign: 'left',
+                    fontFamily: 'Assistant'
+                  }}
+                  onClick={() => {
+                    const results = addElementsToRabbitGroup(
+                      app as any, 
+                      addToGroupInfo.elementsToAdd, 
+                      group.groupId
+                    );
+                    
+                    if (results.success.length > 0) {
+                      console.log(`Added ${results.success.length} elements to "${group.query}"`);
+                    }
+                  }}
+                  title={`Add selected elements to "${group.query}" group`}
+                >
+                  <div style={{ color: group.color, fontSize: '10px' }}>●</div>
+                  "{group.query}" ({group.images.length + 1} items)
+                </button>
+              ))}
+            </div>
+          </div>
+        </fieldset>
+      )}
 
       {/* Single Group Controls */}
       {rabbitGroupSelection.type === 'single' && (

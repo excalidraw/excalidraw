@@ -1,4 +1,4 @@
-const API_KEY = "AIzaSyAl8YsDNG7AmBzOAgG4YwnQhNJMIjnRL2g";
+const API_KEY = "AIzaSyBNetz_8Hhm9j4wpmssxf6ReE6X9hoGiNU";
 const SEARCH_ENGINE_ID = "8774c779014954b77"; 
 const DEFAULT_SEARCH_QUERY = "breakcore art";
 const NUM_RESULTS = 10; // Maximum allowed by free tier
@@ -42,6 +42,8 @@ export async function fetchSasukeImages(SEARCH_QUERY = DEFAULT_SEARCH_QUERY, SIT
     paramObj.siteSearch = "youtube.com"; // Add to the regular object
     console.log("🔍 YOUTUBE SEARCH ENABLED - siteSearch:", paramObj.siteSearch);
   } 
+
+  
 
   // add webpage link restriction if enabled 
   

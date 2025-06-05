@@ -7,6 +7,7 @@ interface RabbitGroupData {
   query: string;
   color: string;
   createdAt: number;
+  lastOrganizationFormat?: string;
 }
 
 interface RabbitGroup {
@@ -277,4 +278,160 @@ export const removeRabbitGroup = (
   });
 
   excalidrawAPI.updateScene({ elements: updatedElements });
+};
+
+export const addElementToRabbitGroup = (
+  excalidrawAPI: ExcalidrawImperativeAPI,
+  elementId: string,
+  targetGroupId: string
+): boolean => {
+  const elements = excalidrawAPI.getSceneElements();
+  const existingGroups = getRabbitGroupsFromElements(elements);
+  
+  // Check if target group exists
+  const targetGroup = existingGroups.get(targetGroupId);
+  if (!targetGroup) {
+    console.warn(`Group with ID ${targetGroupId} not found`);
+    return false;
+  }
+
+  // Find the element to add
+  const elementToAdd = elements.find(el => el.id === elementId);
+  if (!elementToAdd) {
+    console.warn(`Element with ID ${elementId} not found`);
+    return false;
+  }
+
+  // Check if element is already in this group
+  if (elementToAdd.customData?.rabbitGroup?.groupId === targetGroupId) {
+    console.warn(`Element ${elementId} is already in group ${targetGroupId}`);
+    return false;
+  }
+
+  // Create the group data for this element
+  const groupData: RabbitGroupData = {
+    groupId: targetGroupId,
+    query: targetGroup.query,
+    color: targetGroup.color,
+    createdAt: Date.now()
+  };
+
+  // Update the element with group information
+  const updatedElements = elements.map((el: ExcalidrawElement) => {
+    if (el.id === elementId) {
+      return { 
+        ...el, 
+        strokeColor: targetGroup.color,
+        groupIds: [...(el.groupIds || []), targetGroupId],
+        customData: {
+          ...el.customData,
+          rabbitGroup: groupData
+        }
+      };
+    }
+    return el;
+  });
+
+  excalidrawAPI.updateScene({ elements: updatedElements });
+  return true;
+};
+
+export const addElementsToRabbitGroup = (
+  excalidrawAPI: ExcalidrawImperativeAPI,
+  elementIds: string[],
+  targetGroupId: string,
+  removeFromCurrentGroup: boolean = true
+): {
+  success: string[],
+  failed: string[],
+  shouldReorganize?: { groupId: string, format: string } 
+ } => {
+  const elements = excalidrawAPI.getSceneElements();
+  const existingGroups = getRabbitGroupsFromElements(elements);
+  
+  // Check if target group exists
+  const targetGroup = existingGroups.get(targetGroupId);
+  if (!targetGroup) {
+    console.warn(`Group with ID ${targetGroupId} not found`);
+    return { success: [], failed: elementIds };
+  }
+
+  const lastOrganizationFormat = targetGroup.searchBox?.customData?.rabbitGroup?.lastOrganizationFormat;
+
+  const results = { success: [] as string[], failed: [] as string[] };
+  
+  // Create the group data
+  const groupData: RabbitGroupData = {
+    groupId: targetGroupId,
+    query: targetGroup.query,
+    color: targetGroup.color,
+    createdAt: Date.now()
+  };
+
+  const updatedElements = elements.map((el: ExcalidrawElement) => {
+    if (elementIds.includes(el.id)) {
+      // Check if element already in this exact group
+      if (el.customData?.rabbitGroup?.groupId === targetGroupId) {
+        results.failed.push(el.id);
+        return el;
+      }
+
+      results.success.push(el.id);
+      
+      // Remove from current group if requested
+      let newGroupIds = [...(el.groupIds || [])];
+      if (removeFromCurrentGroup && el.customData?.rabbitGroup?.groupId) {
+        // Add the null check here
+        const currentRabbitGroupId = el.customData.rabbitGroup.groupId;
+        newGroupIds = newGroupIds.filter(id => id !== currentRabbitGroupId);
+      }
+      
+      // Add to new group
+      if (!newGroupIds.includes(targetGroupId)) {
+        newGroupIds.push(targetGroupId);
+      }
+
+      return { 
+        ...el, 
+        strokeColor: targetGroup.color,
+        groupIds: newGroupIds,
+        customData: {
+          ...el.customData,
+          rabbitGroup: groupData
+        }
+      };
+    }
+    return el;
+  });
+
+  if (results.success.length > 0) {
+    excalidrawAPI.updateScene({ elements: updatedElements });
+
+    if (lastOrganizationFormat) {
+      return {
+        ...results,
+        shouldReorganize: { groupId: targetGroupId, format: lastOrganizationFormat }
+      };
+    }
+  }
+
+  return results;
+};
+
+export const getGroupBasePosition = (
+  elements: readonly ExcalidrawElement[], 
+  groupId: string
+): { x: number, y: number } => {
+  const groups = getRabbitGroupsFromElements(elements);
+  const group = groups.get(groupId);
+  
+  if (group?.searchBox) {
+    return {
+      x: group.searchBox.x,
+      y: group.searchBox.y
+    };
+  }
+  
+  // Fallback to default if no search box found
+  return { x: 100, y: 100 };
 };

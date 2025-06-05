@@ -4,7 +4,7 @@ import dagre from 'cytoscape-dagre';
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { randomId } from "@excalidraw/common";
-import { createRabbitGroup, getRabbitGroupsFromElements } from './rabbitGroupUtils';
+import { createRabbitGroup, getRabbitGroupsFromElements, getGroupBasePosition } from './rabbitGroupUtils';
 import { updateBoundElements } from './binding'; // adjust path as needed
 
 import { Scene } from './Scene';
@@ -28,6 +28,24 @@ class AutoOrganizer {
 
   constructor(excalidrawAPI: ExcalidrawImperativeAPI) {
     this.excalidrawAPI = excalidrawAPI;
+  }
+
+  private updateGroupOrganizationFormat(elements: ExcalidrawElement[], groupId: string, format: string): ExcalidrawElement[] {
+    return elements.map(element => {
+      if (element.customData?.rabbitGroup?.groupId === groupId) {
+        return {
+          ...element,
+          customData: {
+            ...element.customData,
+            rabbitGroup: {
+              ...element.customData.rabbitGroup,
+              lastOrganizationFormat: format
+            }
+          }
+        };
+      }
+      return element;
+    });
   }
 
   forceBindingRefresh(): void {
@@ -97,9 +115,20 @@ class AutoOrganizer {
           newImages.map(img => img.id), 
           searchQuery
         );
-
+        
         setTimeout(() => {
-          this.organizeHierarchical();
+          // Check for last organization format instead of defaulting to hierarchical
+          const groups = getRabbitGroupsFromElements(this.excalidrawAPI.getSceneElements());
+          const groupId = searchBox.customData?.rabbitGroup?.groupId;
+          const lastFormat = searchBox.customData?.rabbitGroup?.lastOrganizationFormat;
+          
+          if (groupId && lastFormat) {
+            // Use the last organization format
+            this.organizeSingleGroup(groupId, lastFormat);
+          } else {
+            // Default to hierarchical only if no previous format exists
+            this.organizeHierarchical();
+          }
         }, 200);
 
       } catch (error) {
@@ -108,10 +137,16 @@ class AutoOrganizer {
     }, 100);
   }
 
-  // New method to organize a single group
-  organizeSingleGroup(groupId: string, layoutType: string = 'dagre'): Promise<void> | void {
+  // In AutoOrganizer class
+  organizeSingleGroup(groupId: string, layoutType: string = 'dagre', basePosition?: { x: number, y: number }): Promise<void> | void {
     try {
       const currentElements = this.excalidrawAPI.getSceneElements();
+      
+      // If no basePosition provided, get it from the group
+      if (!basePosition) {
+        basePosition = getGroupBasePosition(currentElements, groupId);
+      }
+      
       const groups = getRabbitGroupsFromElements(currentElements);
       const group = groups.get(groupId);
       
@@ -146,10 +181,19 @@ class AutoOrganizer {
       
       return new Promise<void>((resolve) => {
         layout.on('layoutstop', () => {
-          const updatedElements = this.applyLayoutPositionsSingleGroup(currentElements, cy, layoutType, groupElementIds);
+          // Pass basePosition to your layout methods
+          const updatedElements = this.applyLayoutPositionsSingleGroup(
+            currentElements, 
+            cy, 
+            layoutType, 
+            groupElementIds, 
+            basePosition  // Add this parameter
+          );
+
+          const elementsWithFormat = this.updateGroupOrganizationFormat(updatedElements, groupId, layoutType);
           
           this.excalidrawAPI.updateScene({
-            elements: updatedElements
+            elements: elementsWithFormat
           });
 
           // Force binding refresh after a short delay to ensure positions are applied
@@ -377,7 +421,13 @@ class AutoOrganizer {
     return allSearchBoxes + allImages;
   }
 
-  applyLayoutPositionsSingleGroup(elements: readonly ExcalidrawElement[], cy: any, layoutType: string, groupElementIds: string[]): ExcalidrawElement[] {
+  applyLayoutPositionsSingleGroup(
+    elements: readonly ExcalidrawElement[], 
+    cy: any, 
+    layoutType: string, 
+    groupElementIds: string[],
+    basePosition?: { x: number, y: number }
+  ): ExcalidrawElement[] {
     const positions: { x: number, y: number, id: string }[] = [];
     cy.nodes().forEach((node: any) => {
       const pos = node.position();
@@ -386,9 +436,10 @@ class AutoOrganizer {
     
     if (positions.length === 0) return [...elements];
 
-    // Use your original layout methods but only apply to group elements
-    let tempElements = [...elements];
-    
+    // Use basePosition or default values
+    const startX = basePosition?.x || 100;
+    const startY = basePosition?.y || 100;
+
     // Create a temporary set with only the group elements for layout calculation
     const groupElementsForLayout = elements.filter(el => groupElementIds.includes(el.id));
     
@@ -396,22 +447,22 @@ class AutoOrganizer {
     let layoutedGroupElements: ExcalidrawElement[];
     switch (layoutType) {
       case 'grid':
-        layoutedGroupElements = this.applyGridLayout(groupElementsForLayout, positions);
+        layoutedGroupElements = this.applyGridLayout(groupElementsForLayout, positions, startX, startY);
         break;
       case 'breadthfirst':
-        layoutedGroupElements = this.applyBreadthFirstLayout(groupElementsForLayout, positions);
+        layoutedGroupElements = this.applyBreadthFirstLayout(groupElementsForLayout, positions, startX, startY);
         break;
       case 'circle':
-        layoutedGroupElements = this.applyCircularLayout(groupElementsForLayout, positions);
+        layoutedGroupElements = this.applyCircularLayout(groupElementsForLayout, positions, startX, startY);
         break;
       case 'dagre':
       default:
-        layoutedGroupElements = this.applyHierarchicalLayout(groupElementsForLayout, positions);
+        layoutedGroupElements = this.applyHierarchicalLayout(groupElementsForLayout, positions, startX, startY);
         break;
     }
 
     // Apply the new positions only to the group elements
-    return tempElements.map((element: ExcalidrawElement) => {
+    return elements.map((element: ExcalidrawElement) => {
       if (groupElementIds.includes(element.id)) {
         const layoutedElement = layoutedGroupElements.find(el => el.id === element.id);
         return layoutedElement || element;
@@ -442,15 +493,18 @@ class AutoOrganizer {
     }
   }
 
-  applyGridLayout(elements: readonly ExcalidrawElement[], positions: { x: number, y: number, id: string }[]): ExcalidrawElement[] {
+  applyGridLayout(
+    elements: readonly ExcalidrawElement[], 
+    positions: { x: number, y: number, id: string }[], 
+    startX: number = 100, 
+    startY: number = 100
+  ): ExcalidrawElement[] {
     const rabbitElements = elements.filter(el => el.type === 'rabbit-searchbox' || el.type === 'rabbit-image');
     const maxWidth = Math.max(...rabbitElements.map(el => el.width || 100));
     const maxHeight = Math.max(...rabbitElements.map(el => el.height || 100));
     
     const minSpacingX = maxWidth + 50;
     const minSpacingY = maxHeight + 40;
-    const startX = 100;
-    const startY = 100;
 
     const totalNodes = positions.length;
     const cols = Math.ceil(Math.sqrt(totalNodes));
@@ -477,15 +531,18 @@ class AutoOrganizer {
     });
   }
 
-  applyBreadthFirstLayout(elements: readonly ExcalidrawElement[], positions: { x: number, y: number, id: string }[]): ExcalidrawElement[] {
+  applyBreadthFirstLayout(
+    elements: readonly ExcalidrawElement[], 
+    positions: { x: number, y: number, id: string }[], 
+    startX: number = 200, 
+    startY: number = 100
+  ): ExcalidrawElement[] {
     const rabbitElements = elements.filter(el => el.type === 'rabbit-searchbox' || el.type === 'rabbit-image');
     const maxWidth = Math.max(...rabbitElements.map(el => el.width || 100));
     const maxHeight = Math.max(...rabbitElements.map(el => el.height || 100));
     
     const minSpacingX = maxWidth + 60;
     const minSpacingY = maxHeight + 50;
-    const startX = 200;
-    const startY = 100;
 
     const levels = new Map<number, { x: number, y: number, id: string }[]>();
     const tolerance = 50;
@@ -533,7 +590,12 @@ class AutoOrganizer {
     });
   }
 
-  applyCircularLayout(elements: readonly ExcalidrawElement[], positions: { x: number, y: number, id: string }[]): ExcalidrawElement[] {
+  applyCircularLayout(
+    elements: readonly ExcalidrawElement[], 
+    positions: { x: number, y: number, id: string }[], 
+    startX: number = 300, 
+    startY: number = 300
+  ): ExcalidrawElement[] {
     const rabbitElements = elements.filter(el => el.type === 'rabbit-searchbox' || el.type === 'rabbit-image');
     const maxWidth = Math.max(...rabbitElements.map(el => el.width || 100));
     const maxHeight = Math.max(...rabbitElements.map(el => el.height || 100));
@@ -553,8 +615,8 @@ class AutoOrganizer {
     return elements.map((element: ExcalidrawElement) => {
       const position = positions.find(p => p.id === element.id);
       if (position) {
-        const scaledX = (position.x - minX) * scaleX + 300;
-        const scaledY = (position.y - minY) * scaleY + 300;
+        const scaledX = (position.x - minX) * scaleX + startX;
+        const scaledY = (position.y - minY) * scaleY + startY;
         
         return {
           ...element,
@@ -566,7 +628,12 @@ class AutoOrganizer {
     });
   }
 
-  applyHierarchicalLayout(elements: readonly ExcalidrawElement[], positions: { x: number, y: number, id: string }[]): ExcalidrawElement[] {
+  applyHierarchicalLayout(
+    elements: readonly ExcalidrawElement[], 
+    positions: { x: number, y: number, id: string }[], 
+    startX: number = 100, 
+    startY: number = 100
+  ): ExcalidrawElement[] {
     const rabbitElements = elements.filter(el => el.type === 'rabbit-searchbox' || el.type === 'rabbit-image');
     const maxWidth = Math.max(...rabbitElements.map(el => el.width || 100));
     const maxHeight = Math.max(...rabbitElements.map(el => el.height || 100));
@@ -588,8 +655,8 @@ class AutoOrganizer {
     return elements.map((element: ExcalidrawElement) => {
       const position = positions.find(p => p.id === element.id);
       if (position) {
-        const scaledX = (position.x - minX) * scaleX + 100;
-        const scaledY = (position.y - minY) * scaleY + 100;
+        const scaledX = (position.x - minX) * scaleX + startX;
+        const scaledY = (position.y - minY) * scaleY + startY;
         
         return {
           ...element,
