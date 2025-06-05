@@ -354,8 +354,8 @@ const ExcalidrawWrapper = () => {
 
         if (data.isExternalScene) {
           const tokenService = new TokenService();
-          loadFilesFromHttpStorage(fileIds, data.id, data.key, tokenService).then(
-            ({ loadedFiles, erroredFiles }) => {
+          loadFilesFromHttpStorage(fileIds, data.id, data.key, tokenService)
+            .then(({ loadedFiles, erroredFiles }) => {
               excalidrawAPI.addFiles(loadedFiles);
               updateStaleImageStatuses({
                 excalidrawAPI,
@@ -363,10 +363,10 @@ const ExcalidrawWrapper = () => {
                 elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
               });
               tokenService.destroy();
-            },
-          ).catch(() => {
-            tokenService.destroy();
-          });
+            })
+            .catch(() => {
+              tokenService.destroy();
+            });
         } else if (isInitialLoad) {
           if (fileIds.length) {
             LocalData.fileStorage

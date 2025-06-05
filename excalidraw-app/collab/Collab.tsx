@@ -145,7 +145,12 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         }
 
         console.info("[draw] Loading files from http storage", fileIds);
-        return loadFilesFromHttpStorage(fileIds, roomId, roomKey, this.tokenService);
+        return loadFilesFromHttpStorage(
+          fileIds,
+          roomId,
+          roomKey,
+          this.tokenService,
+        );
       },
       saveFiles: async ({ addedFiles }) => {
         const { roomId, roomKey } = this.portal;
