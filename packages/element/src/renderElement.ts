@@ -1131,8 +1131,6 @@ const renderRabbitElement = (
       element
     );
 
-    
-
     // Draw rounded rectangle
     if (context.roundRect) {
       context.beginPath();
@@ -1161,7 +1159,8 @@ const renderRabbitElement = (
     }
 
     // Set text properties
-    context.font = getFontString(element);
+    // context.font = getFontString(element);
+    context.font = "15px Assistant"
     context.fillStyle = element.strokeColor;
     context.textAlign = "left"; // Force left alignment for searchbox behavior
 
@@ -1181,15 +1180,6 @@ const renderRabbitElement = (
       element.fontSize,
       lineHeightPx,
     );
-
-    // Draw the text
-    // const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-    // for (let index = 0; index < lines.length; index++) {
-    //   context.fillText(
-    //     lines[index],
-    //     horizontalOffset,
-    //     index * lineHeightPx + verticalOffset + element.height / 2 - (lines.length * lineHeightPx) / 2,
-    //   );
 
     const displayText = element.isEditing
       ? element.currentText
@@ -1227,27 +1217,46 @@ const renderRabbitElement = (
     }
 
     // Draw search icon if enabled
-    if (element.hasIcon) {
-      // Draw a simple magnifying glass icon
-      const iconX = element.width - 20;
-      const iconY = element.height / 2;
-      const iconSize = Math.min(12, element.height / 2);
+if (element.hasIcon) {
+  // Calculate icon position and size
+  const iconX = element.width - 25;
+  const iconY = element.height / 2;
+  const iconSize = Math.min(24, element.height * 0.6);
+  
+  // Save the current context state
+  context.save();
+  
+  // Set styles for the SVG rendering
+  context.strokeStyle = element.strokeColor || "#666666";
+  context.lineWidth = 1.5;
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.fillStyle = "none";
+  
+  // Scale factor to fit the icon size (SVG is 24x24, we want iconSize)
+  const scale = iconSize / 24;
+  
+  // Position and scale the context for the SVG
+  context.translate(iconX - iconSize / 2, iconY - iconSize / 2);
+  context.scale(scale, scale);
+  
+  // Render the magnifying glass circle (path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0")
+  // This creates a circle centered at (10,10) with radius 7
+  context.beginPath();
+  context.arc(10, 10, 7, 0, 2 * Math.PI);
+  context.stroke();
+  
+  // Render the search handle (path d="M21 21l-6 -6")
+  // This draws a line from (21,21) to (15,15)
+  context.beginPath();
+  context.moveTo(21, 21);
+  context.lineTo(15, 15);
+  context.stroke();
+  
+  // Restore the context state
+  context.restore();
+}
 
-      context.beginPath();
-      // Circle of magnifying glass
-      context.arc(iconX - iconSize / 2, iconY, iconSize, 0, 2 * Math.PI);
-      context.strokeStyle = "#888888";
-      context.lineWidth = 2;
-      context.stroke();
-
-      // Handle of magnifying glass
-      context.beginPath();
-      context.moveTo(iconX + iconSize / 2, iconY + iconSize / 2);
-      context.lineTo(iconX + iconSize, iconY + iconSize);
-      context.stroke();
-    }
-
-    context.restore();
   }
   else if (isRabbitImageElement(element)) {
     console.log("RENDER ENTRY: Starting to render element", element.type);
