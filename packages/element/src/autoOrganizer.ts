@@ -109,6 +109,12 @@ class AutoOrganizer {
           return;
         }
 
+        // Get search box position BEFORE creating the group
+        const searchBoxPosition = {
+          x: searchBox.x,
+          y: searchBox.y
+        };
+
         createRabbitGroup(
           this.excalidrawAPI, 
           searchBox.id, 
@@ -117,19 +123,16 @@ class AutoOrganizer {
         );
         
         setTimeout(() => {
-          // Check for last organization format instead of defaulting to hierarchical
-          const groups = getRabbitGroupsFromElements(this.excalidrawAPI.getSceneElements());
-          const groupId = searchBox.customData?.rabbitGroup?.groupId;
-          const lastFormat = searchBox.customData?.rabbitGroup?.lastOrganizationFormat;
+          // Get the group data after it's created
+          const updatedElements = this.excalidrawAPI.getSceneElements();
+          const updatedSearchBox = updatedElements.find(el => el.id === searchBox.id);
+          const groupId = updatedSearchBox?.customData?.rabbitGroup?.groupId;
+          const lastFormat = updatedSearchBox?.customData?.rabbitGroup?.lastOrganizationFormat;
           
-          if (groupId && lastFormat) {
-            // Use the last organization format
-            this.organizeSingleGroup(groupId, lastFormat);
-          } else {
-            // Default to hierarchical only if no previous format exists
-            if (groupId) {
-              this.organizeSingleGroup(groupId, 'dagre');
-            }
+          if (groupId) {
+            // Always organize - use last format if available, otherwise default to 'grid'
+            const formatToUse = lastFormat || 'grid';
+            this.organizeSingleGroup(groupId, formatToUse, searchBoxPosition);
           }
         }, 200);
 
@@ -139,12 +142,11 @@ class AutoOrganizer {
     }, 100);
   }
 
-  // In AutoOrganizer class
-  organizeSingleGroup(groupId: string, layoutType: string = 'dagre', basePosition?: { x: number, y: number }): Promise<void> | void {
+  organizeSingleGroup(groupId: string, layoutType: string = 'grid', basePosition?: { x: number, y: number }): Promise<void> | void {
     try {
       const currentElements = this.excalidrawAPI.getSceneElements();
       
-      // If no basePosition provided, get it from the group
+      // Get basePosition - use provided one or get from group
       if (!basePosition) {
         basePosition = getGroupBasePosition(currentElements, groupId);
       }
@@ -183,13 +185,13 @@ class AutoOrganizer {
       
       return new Promise<void>((resolve) => {
         layout.on('layoutstop', () => {
-          // Pass basePosition to your layout methods
+          // Ensure basePosition is passed to layout methods
           const updatedElements = this.applyLayoutPositionsSingleGroup(
             currentElements, 
             cy, 
             layoutType, 
             groupElementIds, 
-            basePosition  // Add this parameter
+            basePosition // This should now have the correct search box position
           );
 
           const elementsWithFormat = this.updateGroupOrganizationFormat(updatedElements, groupId, layoutType);
@@ -215,7 +217,7 @@ class AutoOrganizer {
     }
   }
 
-  autoOrganize(layoutType: string = 'dagre'): Promise<void> | void {
+  autoOrganize(layoutType: string = 'grid'): Promise<void> | void {
     try {
       const currentElements = this.excalidrawAPI.getSceneElements();
       const groups = getRabbitGroupsFromElements(currentElements);
@@ -372,7 +374,7 @@ class AutoOrganizer {
       }
     };
 
-    return layouts[layoutType] || layouts.dagre;
+    return layouts[layoutType] || layouts.grid;
   }
 
   getLayoutConfig(layoutType: string, groups: Map<string, any>): any {
@@ -414,7 +416,7 @@ class AutoOrganizer {
       }
     };
 
-    return layouts[layoutType] || layouts.dagre;
+    return layouts[layoutType] || layouts.grid;
   }
 
   getTotalNodeCount(groups: Map<string, any>): number {
@@ -454,12 +456,15 @@ class AutoOrganizer {
       case 'breadthfirst':
         layoutedGroupElements = this.applyBreadthFirstLayout(groupElementsForLayout, positions, startX, startY);
         break;
+      case 'dagre':
+        layoutedGroupElements = this.applyHierarchicalLayout(groupElementsForLayout, positions, startX, startY);
+        break;
       case 'circle':
         layoutedGroupElements = this.applyCircularLayout(groupElementsForLayout, positions, startX, startY);
         break;
-      case 'dagre':
+      case 'grid':
       default:
-        layoutedGroupElements = this.applyHierarchicalLayout(groupElementsForLayout, positions, startX, startY);
+        layoutedGroupElements = this.applyGridLayout(groupElementsForLayout, positions, startX, startY);
         break;
     }
 
@@ -487,11 +492,13 @@ class AutoOrganizer {
         return this.applyGridLayout(elements, positions);
       case 'breadthfirst':
         return this.applyBreadthFirstLayout(elements, positions);
+      case 'dagre':
+        return this.applyHierarchicalLayout(elements, positions);
       case 'circle':
         return this.applyCircularLayout(elements, positions);
-      case 'dagre':
+      case 'grid':
       default:
-        return this.applyHierarchicalLayout(elements, positions);
+        return this.applyGridLayout(elements, positions);
     }
   }
 
@@ -649,7 +656,7 @@ class AutoOrganizer {
     const cytoscapeHeight = maxY - minY || 1;
     
     const targetSpacingX = maxWidth + 60;
-    const targetSpacingY = maxHeight + 5;
+    const targetSpacingY = maxHeight - 10;
     
     const scaleX = Math.max(1.2, targetSpacingX * positions.length / cytoscapeWidth);
     const scaleY = Math.max(1.0, targetSpacingY * Math.sqrt(positions.length) / cytoscapeHeight);
@@ -709,7 +716,7 @@ class AutoOrganizer {
   }
 
   // New method to organize multiple selected groups
-  organizeMultipleGroups(groupIds: string[], layoutType: string = 'dagre'): Promise<void> | void {
+  organizeMultipleGroups(groupIds: string[], layoutType: string = 'grid'): Promise<void> | void {
     try {
       const currentElements = this.excalidrawAPI.getSceneElements();
       const allGroups = getRabbitGroupsFromElements(currentElements);
@@ -855,7 +862,7 @@ class AutoOrganizer {
       }
     };
 
-    return layouts[layoutType] || layouts.dagre;
+    return layouts[layoutType] || layouts.grid;
   }
 
   applyLayoutPositionsMultipleGroups(elements: readonly ExcalidrawElement[], cy: any, layoutType: string, multiGroupElementIds: string[]): ExcalidrawElement[] {
@@ -882,12 +889,15 @@ class AutoOrganizer {
       case 'breadthfirst':
         layoutedMultiGroupElements = this.applyBreadthFirstLayout(multiGroupElementsForLayout, positions);
         break;
+      case 'dagre':
+        layoutedMultiGroupElements = this.applyHierarchicalLayout(multiGroupElementsForLayout, positions);
+        break;
       case 'circle':
         layoutedMultiGroupElements = this.applyCircularLayout(multiGroupElementsForLayout, positions);
         break;
-      case 'dagre':
+      case 'grid':
       default:
-        layoutedMultiGroupElements = this.applyHierarchicalLayout(multiGroupElementsForLayout, positions);
+        layoutedMultiGroupElements = this.applyGridLayout(multiGroupElementsForLayout, positions);
         break;
     }
 
