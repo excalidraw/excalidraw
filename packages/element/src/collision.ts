@@ -396,6 +396,11 @@ export const isPointInElement = (
   }
 
   const [x1, y1, x2, y2] = getElementBounds(element, new Map());
+
+  if (!isPointWithinBounds(pointFrom(x1, y1), point, pointFrom(x2, y2))) {
+    return false;
+  }
+
   const center = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
   const otherPoint = pointFromVector(
     vectorScale(
