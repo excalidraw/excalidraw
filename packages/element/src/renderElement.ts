@@ -1,5 +1,4 @@
 import rough from "roughjs/bin/rough";
-import { getStroke } from "perfect-freehand";
 
 import { isRightAngleRads } from "@excalidraw/math";
 
@@ -58,6 +57,8 @@ import { getCornerRadius } from "./shapes";
 
 import { ShapeCache } from "./ShapeCache";
 
+import { getFreeDrawSvgPath } from "./freedraw";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -70,7 +71,6 @@ import type {
   ElementsMap,
 } from "./types";
 
-import type { StrokeOptions } from "perfect-freehand";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
@@ -1031,62 +1031,4 @@ export function generateFreeDrawShape(element: ExcalidrawFreeDrawElement) {
 
 export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
   return pathsCache.get(element);
-}
-
-export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
-  // If input points are empty (should they ever be?) return a dot
-  const inputPoints = element.simulatePressure
-    ? element.points
-    : element.points.length
-    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
-    : [[0, 0, 0.5]];
-
-  const sensitivity = element.pressureSensitivity;
-
-  // Consider changing the options for simulated pressure vs real pressure
-  const options: StrokeOptions = {
-    simulatePressure: element.simulatePressure,
-    // if sensitivity is not set, times 4.25 for backwards compatibility
-    size: element.strokeWidth * (sensitivity !== null ? 1 : 4.25),
-    // if sensitivity is not set, set thinning to 0.6 for backwards compatibility
-    thinning: sensitivity !== null ? 0.5 * sensitivity : 0.6,
-    smoothing: 0.5,
-    streamline: 0.5,
-    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
-  };
-
-  return getSvgPathFromStroke(getStroke(inputPoints as number[][], options));
-}
-
-function med(A: number[], B: number[]) {
-  return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
-}
-
-// Trim SVG path data so number are each two decimal points. This
-// improves SVG exports, and prevents rendering errors on points
-// with long decimals.
-const TO_FIXED_PRECISION = /(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g;
-
-function getSvgPathFromStroke(points: number[][]): string {
-  if (!points.length) {
-    return "";
-  }
-
-  const max = points.length - 1;
-
-  return points
-    .reduce(
-      (acc, point, i, arr) => {
-        if (i === max) {
-          acc.push(point, med(point, arr[0]), "L", arr[0], "Z");
-        } else {
-          acc.push(point, med(point, arr[i + 1]));
-        }
-        return acc;
-      },
-      ["M", points[0], "Q"],
-    )
-    .join(" ")
-    .replace(TO_FIXED_PRECISION, "$1");
 }
