@@ -32,6 +32,7 @@ import {
   CURSOR_TYPE,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_VERTICAL_ALIGN,
+  DEFAULT_FONT_FAMILY,
   DRAGGING_THRESHOLD,
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
   ELEMENT_TRANSLATE_AMOUNT,
@@ -132,6 +133,7 @@ import {
   newImageElement,
   newLinearElement,
   newTextElement,
+  newTableElement,
   refreshTextDimensions,
 } from "@excalidraw/element";
 
@@ -321,6 +323,8 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
+  ExcalidrawTableElement,
+  BoundElement,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -5625,6 +5629,114 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      // Handle table cell text editing - simple approach
+      if (hitElement && hitElement.type === "table") {
+        const tableElement = hitElement as ExcalidrawTableElement;
+        const { rows, columns } = tableElement;
+
+        // Calculate cell dimensions
+        const cellWidth = hitElement.width / columns;
+        const cellHeight = hitElement.height / rows;
+
+        // Calculate which cell was clicked (relative to table position)
+        const relativeX = sceneX - hitElement.x;
+        const relativeY = sceneY - hitElement.y;
+
+        const cellCol = Math.floor(relativeX / cellWidth);
+        const cellRow = Math.floor(relativeY / cellHeight);
+
+        // Calculate cell boundaries
+        const cellX = hitElement.x + cellCol * cellWidth;
+        const cellY = hitElement.y + cellRow * cellHeight;
+
+        // Check if there's already text in this cell
+        const existingTextInCell = tableElement.boundElements?.find(
+          (boundEl) => {
+            if (boundEl.type === "text") {
+              const textElement = this.scene.getElement(boundEl.id);
+              if (textElement && isTextElement(textElement)) {
+                // Check if text element is within this cell's boundaries
+                const textCenterX =
+                  textElement.x + (textElement.width || 0) / 2;
+                const textCenterY =
+                  textElement.y + (textElement.height || 0) / 2;
+                return (
+                  textCenterX >= cellX &&
+                  textCenterX < cellX + cellWidth &&
+                  textCenterY >= cellY &&
+                  textCenterY < cellY + cellHeight
+                );
+              }
+            }
+            return false;
+          },
+        );
+
+        // If there's existing text in the cell, edit it
+        if (existingTextInCell) {
+          const textElement = this.scene.getElement(existingTextInCell.id);
+          if (textElement && isTextElement(textElement)) {
+            // Start editing the existing text
+            this.startTextEditing({
+              sceneX: textElement.x + textElement.width / 2,
+              sceneY: textElement.y + textElement.height / 2,
+              insertAtParentCenter: false,
+              container: null,
+            });
+            return;
+          }
+        }
+
+        // Create text element directly for table cells
+        const padding = 10;
+        const text = newTextElement({
+          x: cellX + padding,
+          y: cellY + padding,
+          strokeColor: this.state.currentItemStrokeColor,
+          backgroundColor: "transparent",
+          fillStyle: this.state.currentItemFillStyle,
+          strokeWidth: this.state.currentItemStrokeWidth,
+          strokeStyle: this.state.currentItemStrokeStyle,
+          roughness: this.state.currentItemRoughness,
+          opacity: this.state.currentItemOpacity,
+          text: "",
+          fontSize: this.state.currentItemFontSize,
+          fontFamily: DEFAULT_FONT_FAMILY,
+          textAlign: "left",
+          verticalAlign: "top",
+          locked: false,
+          frameId: tableElement.frameId,
+        });
+
+        this.scene.insertElement(text);
+
+        // Store cell position and set width
+        this.scene.mutateElement(text, {
+          width: cellWidth - 2 * padding,
+          autoResize: false,
+          customData: {
+            tableCellPosition: { row: cellRow, col: cellCol },
+          },
+        });
+
+        // Update table binding
+        this.scene.mutateElement(hitElement, {
+          boundElements: [
+            ...(hitElement.boundElements || []),
+            { id: text.id, type: "text" as const },
+          ] as readonly BoundElement[],
+        });
+
+        // Start editing
+        this.setState({
+          editingTextElement: text,
+          selectedElementIds: { [text.id]: true },
+        });
+        this.handleTextWysiwyg(text, { isExistingElement: false });
+
+        return;
+      }
+
       const container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
 
       if (container) {
@@ -6695,6 +6807,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
         this.state.activeTool.type,
       );
+    } else if (this.state.activeTool.type === TOOL_TYPE.table) {
+      this.createTableElementOnPointerDown(pointerDownState);
     } else if (this.state.activeTool.type === "laser") {
       this.laserTrails.startPath(
         pointerDownState.lastCoords.x,
@@ -8035,6 +8149,72 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({
       multiElement: null,
       newElement: frame,
+    });
+  };
+
+  private createTableElementOnPointerDown = (
+    pointerDownState: PointerDownState,
+  ): void => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
+        ? null
+        : this.getEffectiveGridSize(),
+    );
+
+    // Open dialog to get table configuration
+    this.setState({
+      openDialog: {
+        name: "tableConfig",
+        position: { x: gridX, y: gridY },
+      },
+    });
+
+    // Reset to selection tool after opening dialog
+    if (!this.state.activeTool.locked) {
+      this.setState({
+        activeTool: updateActiveTool(this.state, { type: "selection" }),
+      });
+    }
+  };
+
+  public createTable = (
+    rows: number,
+    columns: number,
+    x: number,
+    y: number,
+  ) => {
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({ x, y });
+
+    const DEFAULT_CELL_WIDTH = 100;
+    const DEFAULT_CELL_HEIGHT = 30;
+
+    const table = newTableElement({
+      x,
+      y,
+      width: columns * DEFAULT_CELL_WIDTH,
+      height: rows * DEFAULT_CELL_HEIGHT,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      roundness: this.getCurrentItemRoundness("rectangle"),
+      locked: false,
+      frameId: topLayerFrame ? topLayerFrame.id : null,
+      rows,
+      columns,
+    });
+
+    this.scene.insertElement(table);
+
+    this.setState({
+      selectedElementIds: {
+        [table.id]: true,
+      },
     });
   };
 

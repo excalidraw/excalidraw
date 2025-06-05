@@ -68,6 +68,7 @@ import type {
   ExcalidrawFrameLikeElement,
   NonDeletedSceneElementsMap,
   ElementsMap,
+  ExcalidrawTableElement,
 } from "./types";
 
 import type { StrokeOptions } from "perfect-freehand";
@@ -410,6 +411,62 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
       rc.draw(ShapeCache.get(element)!);
+      break;
+    }
+    case "table": {
+      context.lineJoin = "round";
+      context.lineCap = "round";
+      // Draw the outer rectangle
+      rc.draw(ShapeCache.get(element)!);
+
+      // Draw table grid
+      const tableElement = element as ExcalidrawTableElement;
+      const { rows, columns } = tableElement;
+      const cellWidth = element.width / columns;
+      const cellHeight = element.height / rows;
+
+      context.save();
+      context.strokeStyle = element.strokeColor;
+      context.lineWidth = element.strokeWidth;
+      context.globalAlpha = element.opacity / 100;
+
+      // Helper function to draw a line
+      const drawLine = (x1: number, y1: number, x2: number, y2: number) => {
+        if (element.roughness > 0) {
+          rc.line(x1, y1, x2, y2, {
+            stroke: element.strokeColor,
+            strokeWidth: element.strokeWidth,
+            roughness: element.roughness,
+            strokeLineDash:
+              element.strokeStyle === "dashed"
+                ? [12, 8]
+                : element.strokeStyle === "dotted"
+                ? [3, 6]
+                : undefined,
+          });
+        } else {
+          context.beginPath();
+          if (element.strokeStyle === "dashed") {
+            context.setLineDash([12, 8]);
+          } else if (element.strokeStyle === "dotted") {
+            context.setLineDash([3, 6]);
+          }
+          context.moveTo(x1, y1);
+          context.lineTo(x2, y2);
+          context.stroke();
+          context.setLineDash([]);
+        }
+      };
+
+      // Draw grid lines
+      for (let i = 1; i < rows; i++) {
+        drawLine(0, i * cellHeight, element.width, i * cellHeight);
+      }
+      for (let j = 1; j < columns; j++) {
+        drawLine(j * cellWidth, 0, j * cellWidth, element.height);
+      }
+
+      context.restore();
       break;
     }
     case "arrow":
@@ -815,6 +872,7 @@ export const renderElement = (
       break;
     }
     case "rectangle":
+    case "table":
     case "diamond":
     case "ellipse":
     case "line":

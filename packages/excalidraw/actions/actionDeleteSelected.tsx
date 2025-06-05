@@ -69,7 +69,28 @@ const deleteSelectedElements = (
 
   let shouldSelectEditingGroup = true;
 
+  // Collect IDs of text elements bound to tables that are being deleted
+  const tableBoundTextIds = new Set<string>();
+  for (const el of elements) {
+    if (
+      appState.selectedElementIds[el.id] &&
+      el.type === "table" &&
+      el.boundElements
+    ) {
+      el.boundElements.forEach((candidate) => {
+        if (candidate.type === "text") {
+          tableBoundTextIds.add(candidate.id);
+        }
+      });
+    }
+  }
+
   const nextElements = elements.map((el) => {
+    // Delete text elements bound to tables being deleted
+    if (tableBoundTextIds.has(el.id)) {
+      return newElementWith(el, { isDeleted: true });
+    }
+
     if (appState.selectedElementIds[el.id]) {
       const boundElement = isBoundToContainer(el)
         ? getContainerElement(el, elementsMap)

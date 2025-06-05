@@ -74,6 +74,7 @@ import type {
   ExcalidrawImageElement,
   ElementsMap,
   ExcalidrawElbowArrowElement,
+  ExcalidrawTableElement,
 } from "./types";
 
 // Returns true when transform (resizing/rotation) happened
@@ -978,6 +979,35 @@ export const resizeSingleElement = (
       // TODO: confirm with MARK if this actually makes sense
       newSize: { width: nextWidth, height: nextHeight },
     });
+
+    // Handle table text repositioning during resize
+    if (latestElement.type === "table" && latestElement.boundElements) {
+      const tableElement = latestElement as ExcalidrawTableElement;
+      const cellWidth = nextWidth / tableElement.columns;
+      const cellHeight = nextHeight / tableElement.rows;
+      const padding = 10;
+
+      latestElement.boundElements.forEach((boundElement) => {
+        if (boundElement.type === "text") {
+          const textElement = elementsMap.get(boundElement.id);
+          if (textElement && isTextElement(textElement)) {
+            const cellPos = textElement.customData?.tableCellPosition;
+            if (
+              cellPos &&
+              typeof cellPos.row === "number" &&
+              typeof cellPos.col === "number"
+            ) {
+              scene.mutateElement(textElement, {
+                x: latestElement.x + cellPos.col * cellWidth + padding,
+                y: latestElement.y + cellPos.row * cellHeight + padding,
+                width: cellWidth - 2 * padding,
+                autoResize: false,
+              });
+            }
+          }
+        }
+      });
+    }
   }
 };
 
