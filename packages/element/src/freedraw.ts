@@ -1,6 +1,6 @@
 import { LaserPointer, type Point } from "@excalidraw/laser-pointer";
 
-import { round, type LocalPoint } from "@excalidraw/math";
+import { clamp, round, type LocalPoint } from "@excalidraw/math";
 
 import getStroke from "perfect-freehand";
 
@@ -43,10 +43,6 @@ const calculateVelocityBasedPressure = (
   const normalizedDistance = Math.min(distance / maxDistance, 1);
   const basePressure = Math.max(0.1, 1 - normalizedDistance * 0.7); // Range: 0.1 to 1.0
 
-  // Apply pressure sensitivity (range 0-1):
-  // sensitivity = 0 -> constant pressure (handled above)
-  // sensitivity = 1 -> full velocity-based variation
-  // sensitivity < 1 -> interpolate between constant and velocity-based
   const constantPressure = 0.5;
   const pressure =
     constantPressure + (basePressure - constantPressure) * sensitivity;
@@ -69,18 +65,38 @@ export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
       ),
     ]);
   } else {
-    points = element.points.map(([x, y]: LocalPoint, i) => [
-      x,
-      y,
-      element.pressures?.[i] ?? 0.5,
-    ]);
+    const sensitivity = element.pressureSensitivity ?? 1;
+    points = element.points.map(([x, y]: LocalPoint, i) => {
+      if (sensitivity === 0) {
+        return [x, y, 0.5];
+      }
+
+      const rawPressure = element.pressures?.[i] ?? 0.5;
+
+      const amplifiedPressure = Math.pow(rawPressure, 0.6);
+      const adjustedPressure = amplifiedPressure * sensitivity;
+
+      return [x, y, clamp(adjustedPressure, 0.1, 1.0)];
+    });
   }
 
   const laser = new LaserPointer({
     size: element.strokeWidth,
     streamline: 0.62,
     simplify: 0.3,
-    sizeMapping: ({ pressure: t }) => 0.2 + t,
+    sizeMapping: ({ pressure: t }) => {
+      if (element.simulatePressure) {
+        return t + 0.2;
+      }
+
+      if (element.pressureSensitivity === 0) {
+        return 1;
+      }
+
+      const minSize = 0.2;
+      const maxSize = 2;
+      return minSize + t * (maxSize - minSize);
+    },
   });
 
   for (const pt of points) {
