@@ -127,7 +127,9 @@ class AutoOrganizer {
             this.organizeSingleGroup(groupId, lastFormat);
           } else {
             // Default to hierarchical only if no previous format exists
-            this.organizeHierarchical();
+            if (groupId) {
+              this.organizeSingleGroup(groupId, 'dagre');
+            }
           }
         }, 200);
 
