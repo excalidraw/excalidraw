@@ -1297,7 +1297,7 @@ const renderRabbitElement = (
     // Draw label text
     context.fillStyle = "#000";
 
-    context.font = "16px sans-serif"; // Replace with any loaded font
+    context.font = "16px Assistant, sans-serif"; // Replace with any loaded font
     context.textBaseline = "bottom";
     const fullLabel = element.fullTitle || element.label || "";
 
