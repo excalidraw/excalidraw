@@ -95,7 +95,6 @@ export class EraserTrail extends AnimatedTrail {
           pathSegment,
           element,
           candidateElementsMap,
-          this.app,
         );
 
         if (intersects) {
@@ -131,7 +130,6 @@ export class EraserTrail extends AnimatedTrail {
           pathSegment,
           element,
           candidateElementsMap,
-          this.app,
         );
 
         if (intersects) {
@@ -181,25 +179,18 @@ const eraserTest = (
   pathSegment: LineSegment<GlobalPoint>,
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-  app: App,
 ): boolean => {
   const lastPoint = pathSegment[1];
   if (shouldTestInside(element) && isPointInElement(lastPoint, element)) {
     return true;
   }
 
-  const offset = app.getElementHitThreshold(element);
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
   return (
-    intersectElementWithLineSegment(element, pathSegment, offset, true).length >
-      0 ||
+    intersectElementWithLineSegment(element, pathSegment, 0, true).length > 0 ||
     (!!boundTextElement &&
-      intersectElementWithLineSegment(
-        boundTextElement,
-        pathSegment,
-        offset,
-        true,
-      ).length > 0)
+      intersectElementWithLineSegment(boundTextElement, pathSegment, 0, true)
+        .length > 0)
   );
 };
