@@ -1,6 +1,5 @@
 import {
   Excalidraw,
-  LiveCollaborationTrigger,
   TTDDialogTrigger,
   CaptureUpdateAction,
   reconcileElements,
@@ -38,8 +37,8 @@ import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
 
-import {AutoOrganizer } from "@excalidraw/element/autoOrganizer";
-import { getRabbitGroupsFromElements, removeRabbitGroup } from '@excalidraw/element/rabbitGroupUtils';
+import { AutoOrganizer } from "@excalidraw/element/autoOrganizer";
+import { getRabbitGroupsFromElements } from '@excalidraw/element/rabbitGroupUtils';
 import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement, newRabbitColorPalette } from "@excalidraw/element/newRabbitElement";
 import ColorThief from 'colorthief'; // for color palette
 
