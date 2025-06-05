@@ -150,7 +150,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    padding: "15px 16px",
+                    padding: "12px 16px",
                     borderBottom: isMinimized ? "none" : "1px solid var(--color-border)",
                     background: "var(--color-surface-low)",
                     cursor: "move",
@@ -171,7 +171,16 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                     overflow: "hidden",
                     textOverflow: "ellipsis"
                 }}>
-                    Rabbit Search
+                    Rabbit Image Search
+                    {isMinimized && selectedImages.length > 0 && (
+                        <span style={{ 
+                            fontSize: "12px", 
+                            color: "var(--color-text-secondary)",
+                            marginLeft: "8px"
+                        }}>
+                            ({selectedImages.length} selected)
+                        </span>
+                    )}
                 </h3>
                 <div style={{ display: "flex", gap: "8px" }}>
                     <button
@@ -210,7 +219,8 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                                 <path d="M8 20l-4 0l0 -4" />
                                 <path d="M4 20l6 -6" />
                             </svg>
-                        ) : <svg 
+                        ) : (
+                            <svg 
                                 xmlns="http://www.w3.org/2000/svg" 
                                 width="16" 
                                 height="16" 
@@ -224,7 +234,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                 <path d="M5 12l14 0" />
                             </svg>
-                            }
+                        )}
                     </button>
                     <button
                         onClick={onToggleVisibility}
@@ -251,37 +261,110 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
 
             {!isMinimized && (
                 <>
+          
                     <div style={{ display: "flex", borderBottom: "1px solid var(--color-border)" }}>
-                        {tabData.map((tab, index) => (
-                            <button
-                                key={index}
-                                onClick={() => {
-                                    setActiveTab(index);
-                                    // Call the lazy loading function if provided
-                                    if (onTabClick) {
-                                        onTabClick(tab.name, index);
-                                    }
-                                }}
-                                style={{
-                                    flex: 1,
-                                    padding: "8px",
-                                    background: activeTab === index ? "white" : "#DEECFF",
-                                    color: "black",
-                                    border: "none",
-                                    cursor: "pointer",
-                                    fontFamily: "Assistant",
-                                    fontWeight: 600,
-                                    fontSize: "12px",
-                                    borderRadius: "6px 6px 0 0",
-                                    borderStyle: "solid",
-                                    borderWidth: "1px 1px 0 1px",
-                                    borderColor: "#93A2B7",
-                                    transition: "background 0.2s ease, color 0.2s ease",
-                                }}
-                            >
-                                {tab.name}
-                            </button>
-                        ))}
+                        {tabData.map((tab, index) => {
+                            const getTabIcon = (tabName: string) => {
+                                switch (tabName.toLowerCase()) {
+                                    case 'google':
+                                        return (
+                                            <svg 
+                                                xmlns="http://www.w3.org/2000/svg" 
+                                                width="16" 
+                                                height="16" 
+                                                viewBox="0 0 24 24" 
+                                                fill="currentColor"
+                                            >
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M12 2a9.96 9.96 0 0 1 6.29 2.226a1 1 0 0 1 .04 1.52l-1.51 1.362a1 1 0 0 1 -1.265 .06a6 6 0 1 0 2.103 6.836l.001 -.004h-3.66a1 1 0 0 1 -.992 -.883l-.007 -.117v-2a1 1 0 0 1 1 -1h6.945a1 1 0 0 1 .994 .89c.04 .367 .061 .737 .061 1.11c0 5.523 -4.477 10 -10 10s-10 -4.477 -10 -10s4.477 -10 10 -10z" />
+                                            </svg>
+                                        );
+                                    case 'youtube':
+                                        return (
+                                            <svg 
+                                                xmlns="http://www.w3.org/2000/svg" 
+                                                width="16" 
+                                                height="16" 
+                                                viewBox="0 0 24 24" 
+                                                fill="currentColor"
+                                            >
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M18 3a5 5 0 0 1 5 5v8a5 5 0 0 1 -5 5h-12a5 5 0 0 1 -5 -5v-8a5 5 0 0 1 5 -5zm-9 6v6a1 1 0 0 0 1.514 .857l5 -3a1 1 0 0 0 0 -1.714l-5 -3a1 1 0 0 0 -1.514 .857z" />
+                                            </svg>
+                                        );
+                                    case 'pinterest':
+                                        return (
+                                            <svg 
+                                                xmlns="http://www.w3.org/2000/svg" 
+                                                width="16" 
+                                                height="16" 
+                                                viewBox="0 0 24 24" 
+                                                fill="currentColor"
+                                            >
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M17 3.34a10 10 0 0 1 -8.512 18.023l2.364 -5.315a3.5 3.5 0 0 0 2.398 .952c2.708 0 4.75 -2.089 4.75 -5a6 6 0 1 0 -11.64 2.041a1 1 0 1 0 1.88 -.682a4 4 0 1 1 7.76 -1.36c0 1.818 -1.156 3.001 -2.75 3.001c-.609 0 -1.153 -.361 -1.478 -1.022l1.142 -2.572a1 1 0 0 0 -1.828 -.812l-4.392 9.882a10 10 0 0 1 -4.694 -8.476l.005 -.324a10 10 0 0 1 14.995 -8.336" />
+                                            </svg>
+                                        );
+                                    case 'internet webpages':
+                                        return (
+                                            <svg 
+                                                xmlns="http://www.w3.org/2000/svg" 
+                                                width="16" 
+                                                height="16" 
+                                                viewBox="0 0 24 24" 
+                                                fill="none" 
+                                                stroke="currentColor" 
+                                                strokeWidth="2" 
+                                                strokeLinecap="round" 
+                                                strokeLinejoin="round"
+                                            >
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                                                <path d="M3.6 9h16.8" />
+                                                <path d="M3.6 15h16.8" />
+                                                <path d="M11.5 3a17 17 0 0 0 0 18" />
+                                                <path d="M12.5 3a17 17 0 0 1 0 18" />
+                                            </svg>
+                                        );
+                                    default:
+                                        return null;
+                                }
+                            };
+
+                            return (
+                                <button
+                                    key={index}
+                                    onClick={() => {
+                                        setActiveTab(index);
+                                        // Call the lazy loading function if provided
+                                        if (onTabClick) {
+                                            onTabClick(tab.name, index);
+                                        }
+                                    }}
+                                    style={{
+                                        flex: 1,
+                                        padding: "8px",
+                                        background: activeTab === index ? "white" : "#DEECFF",
+                                        color: "black",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        fontFamily: "Assistant",
+                                        fontWeight: 600,
+                                        fontSize: "12px",
+                                        borderRadius: "6px 6px 0 0",
+                                        borderStyle: "solid",
+                                        borderWidth: "1px 1px 0 1px",
+                                        borderColor: "#93A2B7",
+                                        transition: "background 0.2s ease, color 0.2s ease",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                    }}
+                                >
+                                    {getTabIcon(tab.name)}
+                                </button>
+                            );
+                        })}
                     </div>
 
                     <div
