@@ -256,10 +256,14 @@ const intersectLinearOrFreeDrawWithLineSegment = (
   }
 
   for (const c of curves) {
-    intersections.push(...curveIntersectLineSegment(c, segment));
+    const hits = curveIntersectLineSegment(c, segment);
 
-    if (onlyFirst) {
-      return intersections;
+    if (hits.length > 0) {
+      intersections.push(...hits);
+
+      if (onlyFirst) {
+        return intersections;
+      }
     }
   }
 
@@ -307,12 +311,15 @@ const intersectRectanguloidWithLineSegment = (
 
   for (const t of corners) {
     const hits = curveIntersectLineSegment(t, lineSegment(rotatedA, rotatedB));
-    for (const j of hits) {
-      intersections.push(pointRotateRads(j, center, element.angle));
-    }
 
-    if (onlyFirst) {
-      return intersections;
+    if (hits.length > 0) {
+      for (const j of hits) {
+        intersections.push(pointRotateRads(j, center, element.angle));
+      }
+
+      if (onlyFirst) {
+        return intersections;
+      }
     }
   }
 
@@ -359,12 +366,15 @@ const intersectDiamondWithLineSegment = (
 
   for (const t of corners) {
     const hits = curveIntersectLineSegment(t, lineSegment(rotatedA, rotatedB));
-    for (const j of hits) {
-      intersections.push(pointRotateRads(j, center, element.angle));
-    }
 
-    if (onlyFirst) {
-      return intersections;
+    if (hits.length > 0) {
+      for (const j of hits) {
+        intersections.push(pointRotateRads(j, center, element.angle));
+      }
+
+      if (onlyFirst) {
+        return intersections;
+      }
     }
   }
 
