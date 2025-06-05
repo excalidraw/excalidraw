@@ -501,6 +501,18 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
         resolve(embedElement);
         
       }
+      else if (imageData.id.startsWith("internet webpages")) {
+          const element = newRabbitImageElement({
+            x: x,
+            y: y,
+            imageUrl: imageData.src, // No image URL - just empty or placeholder
+            width: MAX_WIDTH * 1.5,
+            height: 60, // Smaller height since no image
+            label: imageData.name,
+    
+          });
+          resolve(element);
+        }
       else {
         const img = new Image();
         img.onload = () => {
