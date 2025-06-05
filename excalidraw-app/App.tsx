@@ -670,9 +670,23 @@ const predictSearchQueryFromCloudinaryImage = useCallback(async (cloudinaryUrl: 
         {
           parts: [
             {
-              text: `
-              What search query likely resulted in this image?
-              only say the actual search query, nothing else.`
+              text: `Analyze this image and predict what search query someone likely used to find it. Consider:
+
+                      1. The main subject or object in the image
+                      2. Visual style, colors, or artistic elements
+                      3. Context clues like setting, background, or composition
+                      4. Any text visible in the image
+                      5. The general mood or theme
+
+                      Respond with only the most likely search query that would return this image - be concise and natural, like what someone would actually type into a search engine. Avoid overly descriptive or technical language.
+
+                      Examples of good responses:
+                      - "cute golden retriever puppy"
+                      - "modern minimalist kitchen"
+                      - "sunset mountain landscape"
+                      - "vintage red sports car"
+
+                      What search query likely resulted in this image?`
             },
             {
               inlineData: {

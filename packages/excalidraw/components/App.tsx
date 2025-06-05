@@ -10038,7 +10038,7 @@ insertImageElement = async (
       width: imageElement.width || 200,
       height: imageElement.height || 200,
       angle: imageElement.angle || 0,
-      label: generatedLabel, 
+      label: "Related Search: " + generatedLabel, 
     });
 
     
