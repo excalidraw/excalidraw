@@ -113,6 +113,7 @@ const intersectionTest = (
 
   return lassoSegments.some(
     (lassoSegment) =>
-      intersectElementWithLineSegment(element, lassoSegment, 0).length > 0,
+      intersectElementWithLineSegment(element, lassoSegment, 0, true).length >
+      0,
   );
 };

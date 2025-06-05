@@ -192,9 +192,14 @@ const eraserTest = (
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
   return (
-    intersectElementWithLineSegment(element, pathSegment, offset).length > 0 ||
+    intersectElementWithLineSegment(element, pathSegment, offset, true).length >
+      0 ||
     (!!boundTextElement &&
-      intersectElementWithLineSegment(boundTextElement, pathSegment, offset)
-        .length > 0)
+      intersectElementWithLineSegment(
+        boundTextElement,
+        pathSegment,
+        offset,
+        true,
+      ).length > 0)
   );
 };
