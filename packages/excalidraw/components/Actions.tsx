@@ -177,6 +177,39 @@ export const SelectedShapeActions = ({
   const device = useDevice();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
+  const updateGroupColor = (groupId: string, newColor: string) => {
+    const elements = app.scene.getNonDeletedElements();
+    const groups = getRabbitGroupsFromElements(elements);
+    const group = groups.get(groupId);
+    
+    if (!group) return;
+    
+    const groupElementIds: string[] = [
+      ...(group.searchBox ? [group.searchBox.id] : []),
+      ...group.images.map(img => img.id)
+    ];
+
+    const updatedElements = elements.map(element => {
+      if (groupElementIds.includes(element.id)) {
+        return { 
+          ...element, 
+          strokeColor: newColor,
+          customData: {
+            ...element.customData,
+            rabbitGroup: {
+              ...element.customData?.rabbitGroup,
+              color: newColor
+            }
+          }
+        };
+      }
+      return element;
+    });
+
+    // Use the app's updateScene method
+    (app as any).updateScene({ elements: updatedElements });
+  };
+
   const showFillIcons =
     (hasBackground(appState.activeTool.type) &&
       !isTransparent(appState.currentItemBackgroundColor)) ||
@@ -271,41 +304,16 @@ export const SelectedShapeActions = ({
           <div style={{ marginTop: '8px' }}>
             <label style={{ fontSize: '12px', color: '#666' }}>
               Group Color:
-              <input
-                type="color"
-                value={rabbitGroupSelection.groupsInfo?.[0]?.color || '#000000'}
-                onChange={(e) => {
-                  const allElements = Object.values(elementsMap);
-                  const groups = getRabbitGroupsFromElements(allElements);
-                  const group = groups.get(rabbitGroupSelection.singleGroupId!);
-                  
-                  if (!group) return;
-                  
-                  const groupElementIds = [
-                    ...(group.searchBox ? [group.searchBox.id] : []),
-                    ...group.images.map(img => img.id)
-                  ];
-
-                  groupElementIds.forEach(elementId => {
-                    const element = app.scene.getElement(elementId);
-                    if (element) {
-                      app.scene.mutateElement(element, {
-                        strokeColor: e.target.value,
-                        customData: {
-                          ...element.customData,
-                          rabbitGroup: {
-                            ...element.customData?.rabbitGroup,
-                            color: e.target.value
-                          }
-                        }
-                      });
+                <input
+                  type="color"
+                  value={rabbitGroupSelection.groupsInfo?.[0]?.color || '#000000'}
+                  onChange={(e) => {
+                    if (rabbitGroupSelection.singleGroupId) {
+                      updateGroupColor(rabbitGroupSelection.singleGroupId, e.target.value);
                     }
-                  });
-
-                  app.scene.triggerUpdate();
-                }}
-                style={{ marginLeft: '8px', width: '30px', height: '20px' }}
-              />
+                  }}
+                  style={{ marginLeft: '8px', width: '30px', height: '20px' }}
+                />
             </label>
           </div>
 

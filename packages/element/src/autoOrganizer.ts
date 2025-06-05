@@ -580,7 +580,7 @@ class AutoOrganizer {
     const cytoscapeHeight = maxY - minY || 1;
     
     const targetSpacingX = maxWidth + 60;
-    const targetSpacingY = maxHeight + 15;
+    const targetSpacingY = maxHeight + 5;
     
     const scaleX = Math.max(1.2, targetSpacingX * positions.length / cytoscapeWidth);
     const scaleY = Math.max(1.0, targetSpacingY * Math.sqrt(positions.length) / cytoscapeHeight);
