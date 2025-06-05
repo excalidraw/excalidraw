@@ -302,7 +302,7 @@ export const SelectedShapeActions = ({
         <fieldset>
           <legend>Search Group: "{rabbitGroupSelection.groupsInfo?.[0]?.query}"</legend>
           <div style={{ marginTop: '8px' }}>
-            <label style={{ fontSize: '12px', color: '#666' }}>
+            <label style={{ fontSize: '12px', color: 'black' }}>
               Group Color:
                 <input
                   type="color"
@@ -319,7 +319,7 @@ export const SelectedShapeActions = ({
 
           {/* Organization Buttons */}
           <div style={{ marginTop: '12px' }}>
-            <label style={{ fontSize: '12px', color: '#666', display: 'block', marginBottom: '6px' }}>
+            <label style={{ fontSize: '12px', color: 'black', display: 'block', marginBottom: '6px' }}>
               Organize Layout:
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
@@ -331,7 +331,8 @@ export const SelectedShapeActions = ({
                   border: '1px solid #ccc',
                   borderRadius: '3px',
                   backgroundColor: '#f8f9fa',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  fontFamily: 'Assistant'
                 }}
                 onClick={() => {
                   if (rabbitGroupSelection.singleGroupId) {
@@ -350,7 +351,8 @@ export const SelectedShapeActions = ({
                   border: '1px solid #ccc',
                   borderRadius: '3px',
                   backgroundColor: '#f8f9fa',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  fontFamily: 'Assistant'
                 }}
                 onClick={() => {
                   if (rabbitGroupSelection.singleGroupId) {
@@ -369,7 +371,8 @@ export const SelectedShapeActions = ({
                   border: '1px solid #ccc',
                   borderRadius: '3px',
                   backgroundColor: '#f8f9fa',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  fontFamily: 'Assistant'
                 }}
                 onClick={() => {
                   if (rabbitGroupSelection.singleGroupId) {
@@ -388,7 +391,8 @@ export const SelectedShapeActions = ({
                   border: '1px solid #ccc',
                   borderRadius: '3px',
                   backgroundColor: '#f8f9fa',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  fontFamily: 'Assistant'
                 }}
                 onClick={() => {
                   if (rabbitGroupSelection.singleGroupId) {

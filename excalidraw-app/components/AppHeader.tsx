@@ -81,9 +81,9 @@ export const AppHeader = React.memo(
             }}
           >
             <img
-              src="https://i.imgur.com/pWjusvL.png"
+              src="https://i.imgur.com/KttcKbd.png"
               alt="Logo"
-              style={{ height: "40px", marginRight: "1rem" }}
+              style={{ height: "40px", marginLeft: "15px", marginRight: "1rem" }}
             />
             <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
               <input
