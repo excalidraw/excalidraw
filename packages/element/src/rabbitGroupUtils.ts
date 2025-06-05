@@ -302,6 +302,11 @@ export const addElementToRabbitGroup = (
     return false;
   }
 
+  if (elementToAdd.type === 'rabbit-searchbox' && targetGroup.searchBox) {
+    console.warn('Cannot add search box to group that already has one');
+    return false;
+  }
+
   // Check if element is already in this group
   if (elementToAdd.customData?.rabbitGroup?.groupId === targetGroupId) {
     console.warn(`Element ${elementId} is already in group ${targetGroupId}`);
@@ -370,6 +375,12 @@ export const addElementsToRabbitGroup = (
 
   const updatedElements = elements.map((el: ExcalidrawElement) => {
     if (elementIds.includes(el.id)) {
+      if (el.type === 'rabbit-searchbox' && targetGroup.searchBox) {
+        console.warn(`Cannot add search box ${el.id} to group that already has one`);
+        results.failed.push(el.id);
+        return el;
+      }
+      
       // Check if element already in this exact group
       if (el.customData?.rabbitGroup?.groupId === targetGroupId) {
         results.failed.push(el.id);
