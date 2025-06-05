@@ -128,6 +128,8 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  strokeWidthFixedIcon,
+  strokeWidthVariableIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -671,8 +673,8 @@ export const actionChangeStrokeStyle = register({
 });
 
 export const actionChangePressureSensitivity = register({
-  name: "changePressureSensitivity",
-  label: "labels.pressureSensitivity",
+  name: "changeStrokeType",
+  label: "labels.strokeType",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -686,7 +688,47 @@ export const actionChangePressureSensitivity = register({
       return null;
     }
 
-    return <PressureSensitivityRange updateData={updateData} app={app} />;
+    const selectedElements = app.scene.getSelectedElements(app.state);
+    const firstElement = selectedElements.find(isFreeDrawElement);
+    const commonPressureSensitivity = selectedElements
+      .filter(isFreeDrawElement)
+      .reduce((acc, element) => {
+        const sensitivity = element.pressureSensitivity ?? 1;
+        if (acc !== null && acc !== sensitivity) {
+          return null; // No common value
+        }
+        return sensitivity;
+      }, firstElement?.pressureSensitivity ?? null);
+
+    const currentValue =
+      commonPressureSensitivity ?? appState.currentItemPressureSensitivity;
+
+    return (
+      <fieldset>
+        <legend>{t("labels.strokeType")}</legend>
+        <div className="buttonList">
+          <RadioSelection
+            group="pressure-sensitivity"
+            options={[
+              {
+                value: 0,
+                text: t("labels.strokeWidthFixed"),
+                icon: strokeWidthFixedIcon,
+                testId: "pressure-fixed",
+              },
+              {
+                value: 1,
+                text: t("labels.strokeWidthVariable"),
+                icon: strokeWidthVariableIcon,
+                testId: "pressure-variable",
+              },
+            ]}
+            value={currentValue}
+            onChange={(value) => updateData(value)}
+          />
+        </div>
+      </fieldset>
+    );
   },
 });
 
@@ -1878,78 +1920,3 @@ export const actionChangeArrowType = register({
     );
   },
 });
-
-const PressureSensitivityRange = ({
-  updateData,
-  app,
-}: {
-  updateData: (value: number) => void;
-  app: AppClassProperties;
-}) => {
-  const rangeRef = useRef<HTMLInputElement>(null);
-  const valueRef = useRef<HTMLDivElement>(null);
-  const selectedElements = app.scene.getSelectedElements(app.state);
-
-  let hasCommonPressureSensitivity = true;
-  const firstElement = selectedElements.find(isFreeDrawElement);
-  const leastCommonPressureSensitivity = selectedElements
-    .filter(isFreeDrawElement)
-    .reduce((acc, element) => {
-      const sensitivity = element.pressureSensitivity ?? 1;
-      if (acc != null && acc !== sensitivity) {
-        hasCommonPressureSensitivity = false;
-      }
-      if (acc == null || acc > sensitivity) {
-        return sensitivity;
-      }
-      return acc;
-    }, firstElement?.pressureSensitivity ?? null);
-
-  const value = Math.round(
-    (leastCommonPressureSensitivity ??
-      app.state.currentItemPressureSensitivity) * 100,
-  );
-
-  useEffect(() => {
-    if (rangeRef.current && valueRef.current) {
-      const rangeElement = rangeRef.current;
-      const valueElement = valueRef.current;
-      const inputWidth = rangeElement.offsetWidth;
-      const thumbWidth = 15;
-      const position =
-        (value / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
-      valueElement.style.left = `${position}px`;
-      rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
-    }
-  }, [value]);
-
-  return (
-    <label className="control-label">
-      {t("labels.pressureSensitivity")}
-      <div className="range-wrapper">
-        <input
-          style={{
-            ["--color-slider-track" as string]: hasCommonPressureSensitivity
-              ? undefined
-              : "var(--button-bg)",
-          }}
-          ref={rangeRef}
-          type="range"
-          min="0"
-          max="100"
-          step="10"
-          onChange={(event) => {
-            updateData(+event.target.value / 100);
-          }}
-          value={value}
-          className="range-input"
-          data-testid="pressure-sensitivity"
-        />
-        <div className="value-bubble" ref={valueRef}>
-          {value !== 0 ? value : null}
-        </div>
-        <div className="zero-label">0</div>
-      </div>
-    </label>
-  );
-};

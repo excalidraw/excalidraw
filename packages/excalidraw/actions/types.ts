@@ -69,7 +69,7 @@ export type ActionName =
   | "changeStrokeStyle"
   | "changeArrowhead"
   | "changeArrowType"
-  | "changePressureSensitivity"
+  | "changeStrokeType"
   | "changeOpacity"
   | "changeFontSize"
   | "toggleCanvasMenu"

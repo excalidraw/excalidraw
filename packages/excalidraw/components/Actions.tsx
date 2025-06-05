@@ -172,7 +172,7 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => element.type === "freedraw")) && (
         <>
           {renderAction("changeStrokeShape")}
-          {renderAction("changePressureSensitivity")}
+          {renderAction("changeStrokeType")}
         </>
       )}
 
