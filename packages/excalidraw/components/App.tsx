@@ -128,7 +128,6 @@ import {
   refreshTextDimensions,
   deepCopyElement,
   duplicateElements,
-  isPointInElement,
   hasBoundTextElement,
   isArrowElement,
   isBindingElement,
@@ -230,7 +229,7 @@ import {
   Store,
   CaptureUpdateAction,
   type ElementUpdate,
-  getThrottledSelectedElementsCount,
+  hitElementBoundingBox,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -2788,7 +2787,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      getThrottledSelectedElementsCount(this.state.selectedElementIds) &&
+      Object.keys(this.state.selectedElementIds).length &&
       isEraserActive(this.state)
     ) {
       this.setState({
@@ -5083,8 +5082,6 @@ class App extends React.Component<AppProps, AppState> {
         frameNameBound: isFrameLikeElement(elementWithHighestZIndex)
           ? this.frameNameBoundsCache.get(elementWithHighestZIndex)
           : null,
-        onlySelection:
-          elementWithHighestZIndex.id in this.state.selectedElementIds,
       })
         ? elementWithHighestZIndex
         : allHitElements[allHitElements.length - 2];
@@ -5168,7 +5165,14 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       // if hitting the bounding box, return early
       // but if not, we should check for other cases as well (e.g. frame name)
-      if (isPointInElement(pointFrom(x, y), element)) {
+      if (
+        hitElementBoundingBox(
+          pointFrom(x, y),
+          element,
+          this.scene.getNonDeletedElementsMap(),
+          this.getElementHitThreshold(element),
+        )
+      ) {
         return true;
       }
     }
@@ -5191,9 +5195,6 @@ class App extends React.Component<AppProps, AppState> {
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
         : null,
-      onlySelection:
-        getThrottledSelectedElementsCount(this.state.selectedElementIds) ===
-          1 && this.state.selectedElementIds[element.id],
     });
   }
 

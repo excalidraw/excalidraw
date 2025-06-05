@@ -82,7 +82,6 @@ export type HitTestArgs = {
   threshold: number;
   elementsMap: ElementsMap;
   frameNameBound?: FrameNameBounds | null;
-  onlySelection?: boolean;
 };
 
 export const hitElementItself = ({
@@ -91,7 +90,6 @@ export const hitElementItself = ({
   threshold,
   elementsMap,
   frameNameBound = null,
-  onlySelection = false,
 }: HitTestArgs) => {
   // Hit test against a frame's name
   const hitFrameName = frameNameBound
@@ -121,12 +119,6 @@ export const hitElementItself = ({
   // rotated bounding box or not hitting the frame name (saves 99%)
   if (!hitBounds && !hitFrameName) {
     return false;
-  }
-
-  // DESIGN: If this is the only selected element, allow successful hit test
-  // anywhere within the selection box because of user convenience
-  if (onlySelection) {
-    return true;
   }
 
   // Do the precise (and relatively costly) hit test
