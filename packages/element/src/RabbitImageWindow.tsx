@@ -171,7 +171,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                     overflow: "hidden",
                     textOverflow: "ellipsis"
                 }}>
-                    Rabbit Image Search
+                    Rabbit Search
                 </h3>
                 <div style={{ display: "flex", gap: "8px" }}>
                     <button
