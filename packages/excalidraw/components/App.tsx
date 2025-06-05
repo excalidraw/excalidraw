@@ -230,6 +230,7 @@ import {
   Store,
   CaptureUpdateAction,
   type ElementUpdate,
+  getThrottledSelectedElementsCount,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -2787,7 +2788,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      Object.keys(this.state.selectedElementIds).length &&
+      getThrottledSelectedElementsCount(this.state.selectedElementIds) &&
       isEraserActive(this.state)
     ) {
       this.setState({
@@ -5182,8 +5183,6 @@ class App extends React.Component<AppProps, AppState> {
       return true;
     }
 
-    const selectedElementIds = Object.keys(this.state.selectedElementIds);
-
     return hitElementItself({
       point: pointFrom(x, y),
       element,
@@ -5193,7 +5192,8 @@ class App extends React.Component<AppProps, AppState> {
         ? this.frameNameBoundsCache.get(element)
         : null,
       onlySelection:
-        selectedElementIds.length === 1 && element.id === selectedElementIds[0],
+        getThrottledSelectedElementsCount(this.state.selectedElementIds) ===
+          1 && this.state.selectedElementIds[element.id],
     });
   }
 

@@ -1,4 +1,5 @@
 import { arrayToMap, isShallowEqual } from "@excalidraw/common";
+import throttle from "lodash.throttle";
 
 import type {
   AppState,
@@ -227,6 +228,12 @@ export const getTargetElements = (
     : getSelectedElements(elements, appState, {
         includeBoundTextElement: true,
       });
+
+export const getThrottledSelectedElementsCount = throttle(
+  (selectedElementIds: AppState["selectedElementIds"]) =>
+    Object.keys(selectedElementIds).length,
+  10,
+);
 
 /**
  * returns prevState's selectedElementids if no change from previous, so as to
