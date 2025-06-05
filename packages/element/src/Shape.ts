@@ -43,6 +43,7 @@ import type {
   ExcalidrawLinearElement,
   Arrowhead,
   ExcalidrawFreeDrawElement,
+  ElementsMap,
 } from "./types";
 
 import type { Drawable, Options } from "roughjs/bin/core";
@@ -319,6 +320,7 @@ const getArrowheadShapes = (
 
 export const generateLinearCollisionShape = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
 ) => {
   const generator = new RoughGenerator();
   const options: Options = {
@@ -328,7 +330,9 @@ export const generateLinearCollisionShape = (
     roughness: 0,
     preserveVertices: true,
   };
-  const center = getCenterForBounds(getElementBounds(element, new Map(), true));
+  const center = getCenterForBounds(
+    getElementBounds(element, elementsMap, true),
+  );
 
   switch (element.type) {
     case "line":

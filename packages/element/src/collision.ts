@@ -109,7 +109,7 @@ export const hitElementItself = ({
     pointFrom(bounds[0] - threshold, bounds[1] - threshold),
     pointRotateRads(
       point,
-      elementCenterPoint(element),
+      elementCenterPoint(element, elementsMap),
       -element.angle as Radians,
     ),
     pointFrom(bounds[2] + threshold, bounds[3] + threshold),
@@ -125,9 +125,9 @@ export const hitElementItself = ({
   const hitElement = shouldTestInside(element)
     ? // Since `inShape` tests STRICTLY againt the insides of a shape
       // we would need `onShape` as well to include the "borders"
-      isPointInElement(point, element) ||
-      isPointOnElementOutline(point, element, threshold)
-    : isPointOnElementOutline(point, element, threshold);
+      isPointInElement(point, element, elementsMap) ||
+      isPointOnElementOutline(point, element, elementsMap, threshold)
+    : isPointOnElementOutline(point, element, elementsMap, threshold);
 
   return hitElement || hitFrameName;
 };
@@ -178,7 +178,7 @@ export const hitElementBoundText = (
       }
     : boundTextElementCandidate;
 
-  return isPointInElement(point, boundTextElement);
+  return isPointInElement(point, boundTextElement, elementsMap);
 };
 
 /**
@@ -191,6 +191,7 @@ export const hitElementBoundText = (
  */
 export const intersectElementWithLineSegment = (
   element: ExcalidrawElement,
+  elementsMap: ElementsMap,
   line: LineSegment<GlobalPoint>,
   offset: number = 0,
   onlyFirst = false,
@@ -221,27 +222,48 @@ export const intersectElementWithLineSegment = (
     case "magicframe":
       return intersectRectanguloidWithLineSegment(
         element,
+        elementsMap,
         line,
         offset,
         onlyFirst,
       );
     case "diamond":
-      return intersectDiamondWithLineSegment(element, line, offset, onlyFirst);
+      return intersectDiamondWithLineSegment(
+        element,
+        elementsMap,
+        line,
+        offset,
+        onlyFirst,
+      );
     case "ellipse":
-      return intersectEllipseWithLineSegment(element, line, offset);
+      return intersectEllipseWithLineSegment(
+        element,
+        elementsMap,
+        line,
+        offset,
+      );
     case "line":
     case "freedraw":
     case "arrow":
-      return intersectLinearOrFreeDrawWithLineSegment(element, line, onlyFirst);
+      return intersectLinearOrFreeDrawWithLineSegment(
+        element,
+        elementsMap,
+        line,
+        onlyFirst,
+      );
   }
 };
 
 const intersectLinearOrFreeDrawWithLineSegment = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
   segment: LineSegment<GlobalPoint>,
   onlyFirst = false,
 ): GlobalPoint[] => {
-  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(
+    element,
+    elementsMap,
+  );
   const intersections = [];
 
   for (const l of lines) {
@@ -272,11 +294,12 @@ const intersectLinearOrFreeDrawWithLineSegment = (
 
 const intersectRectanguloidWithLineSegment = (
   element: ExcalidrawRectanguloidElement,
+  elementsMap: ElementsMap,
   l: LineSegment<GlobalPoint>,
   offset: number = 0,
   onlyFirst = false,
 ): GlobalPoint[] => {
-  const center = elementCenterPoint(element);
+  const center = elementCenterPoint(element, elementsMap);
   // To emulate a rotated rectangle we rotate the point in the inverse angle
   // instead. It's all the same distance-wise.
   const rotatedA = pointRotateRads<GlobalPoint>(
@@ -335,11 +358,12 @@ const intersectRectanguloidWithLineSegment = (
  */
 const intersectDiamondWithLineSegment = (
   element: ExcalidrawDiamondElement,
+  elementsMap: ElementsMap,
   l: LineSegment<GlobalPoint>,
   offset: number = 0,
   onlyFirst = false,
 ): GlobalPoint[] => {
-  const center = elementCenterPoint(element);
+  const center = elementCenterPoint(element, elementsMap);
 
   // Rotate the point to the inverse direction to simulate the rotated diamond
   // points. It's all the same distance-wise.
@@ -390,10 +414,11 @@ const intersectDiamondWithLineSegment = (
  */
 const intersectEllipseWithLineSegment = (
   element: ExcalidrawEllipseElement,
+  elementsMap: ElementsMap,
   l: LineSegment<GlobalPoint>,
   offset: number = 0,
 ): GlobalPoint[] => {
-  const center = elementCenterPoint(element);
+  const center = elementCenterPoint(element, elementsMap);
 
   const rotatedA = pointRotateRads(l[0], center, -element.angle as Radians);
   const rotatedB = pointRotateRads(l[1], center, -element.angle as Radians);
@@ -415,8 +440,9 @@ const intersectEllipseWithLineSegment = (
 const isPointOnElementOutline = (
   point: GlobalPoint,
   element: ExcalidrawElement,
+  elementsMap: ElementsMap,
   tolerance = 1,
-) => distanceToElement(element, point) <= tolerance;
+) => distanceToElement(element, elementsMap, point) <= tolerance;
 
 /**
  * Check if the given point is considered inside the element's border
@@ -428,6 +454,7 @@ const isPointOnElementOutline = (
 export const isPointInElement = (
   point: GlobalPoint,
   element: ExcalidrawElement,
+  elementsMap: ElementsMap,
 ) => {
   if (
     (isLinearElement(element) || isFreeDrawElement(element)) &&
@@ -454,6 +481,7 @@ export const isPointInElement = (
   const intersector = lineSegment(point, otherPoint);
   const intersections = intersectElementWithLineSegment(
     element,
+    elementsMap,
     intersector,
   ).filter((p, pos, arr) => arr.findIndex((q) => pointsEqual(q, p)) === pos);
 

@@ -132,7 +132,10 @@ export const drawHighlightForRectWithRotation = (
 ) => {
   const [x, y] = pointRotateRads(
     pointFrom<GlobalPoint>(element.x, element.y),
-    elementCenterPoint(element),
+    elementCenterPoint(
+      element,
+      window.h.app.scene.getElementsMapIncludingDeleted(),
+    ),
     element.angle,
   );
 
@@ -289,7 +292,10 @@ export const drawHighlightForDiamondWithRotation = (
 ) => {
   const [x, y] = pointRotateRads(
     pointFrom<GlobalPoint>(element.x, element.y),
-    elementCenterPoint(element),
+    elementCenterPoint(
+      element,
+      window.h.app.scene.getElementsMapIncludingDeleted(),
+    ),
     element.angle,
   );
   context.save();

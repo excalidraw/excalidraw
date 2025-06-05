@@ -10812,6 +10812,7 @@ class App extends React.Component<AppProps, AppState> {
           croppingElement,
           cropElement(
             croppingElement,
+            this.scene.getNonDeletedElementsMap(),
             transformHandleType,
             image.naturalWidth,
             image.naturalHeight,

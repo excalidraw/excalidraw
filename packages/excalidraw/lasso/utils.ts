@@ -14,11 +14,12 @@ import {
 } from "@excalidraw/element";
 
 import type { ElementsSegmentsMap, GlobalPoint } from "@excalidraw/math/types";
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 export const getLassoSelectedElementIds = (input: {
   lassoPath: GlobalPoint[];
   elements: readonly ExcalidrawElement[];
+  elementsMap: ElementsMap;
   elementsSegments: ElementsSegmentsMap;
   intersectedElements: Set<ExcalidrawElement["id"]>;
   enclosedElements: Set<ExcalidrawElement["id"]>;
@@ -29,6 +30,7 @@ export const getLassoSelectedElementIds = (input: {
   const {
     lassoPath,
     elements,
+    elementsMap,
     elementsSegments,
     intersectedElements,
     enclosedElements,
@@ -69,7 +71,7 @@ export const getLassoSelectedElementIds = (input: {
       if (enclosed) {
         enclosedElements.add(element.id);
       } else {
-        const intersects = intersectionTest(path, element);
+        const intersects = intersectionTest(path, element, elementsMap);
         if (intersects) {
           intersectedElements.add(element.id);
         }
@@ -105,6 +107,7 @@ const enclosureTest = (
 const intersectionTest = (
   lassoPath: GlobalPoint[],
   element: ExcalidrawElement,
+  elementsMap: ElementsMap,
 ): boolean => {
   const lassoSegments = lassoPath
     .slice(1)
@@ -113,7 +116,12 @@ const intersectionTest = (
 
   return lassoSegments.some(
     (lassoSegment) =>
-      intersectElementWithLineSegment(element, lassoSegment, 0, true).length >
-      0,
+      intersectElementWithLineSegment(
+        element,
+        elementsMap,
+        lassoSegment,
+        0,
+        true,
+      ).length > 0,
   );
 };

@@ -1228,6 +1228,7 @@ const getElbowArrowData = (
     arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
     hoveredStartElement,
+    elementsMap,
     options?.isDragging,
   );
   const endGlobalPoint = getGlobalPoint(
@@ -1241,6 +1242,7 @@ const getElbowArrowData = (
     arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
     hoveredEndElement,
+    elementsMap,
     options?.isDragging,
   );
   const startHeading = getBindPointHeading(
@@ -1248,12 +1250,14 @@ const getElbowArrowData = (
     endGlobalPoint,
     hoveredStartElement,
     origStartGlobalPoint,
+    elementsMap,
   );
   const endHeading = getBindPointHeading(
     endGlobalPoint,
     startGlobalPoint,
     hoveredEndElement,
     origEndGlobalPoint,
+    elementsMap,
   );
   const startPointBounds = [
     startGlobalPoint[0] - 2,
@@ -1270,6 +1274,7 @@ const getElbowArrowData = (
   const startElementBounds = hoveredStartElement
     ? aabbForElement(
         hoveredStartElement,
+        elementsMap,
         offsetFromHeading(
           startHeading,
           arrow.startArrowhead
@@ -1282,6 +1287,7 @@ const getElbowArrowData = (
   const endElementBounds = hoveredEndElement
     ? aabbForElement(
         hoveredEndElement,
+        elementsMap,
         offsetFromHeading(
           endHeading,
           arrow.endArrowhead
@@ -1297,6 +1303,7 @@ const getElbowArrowData = (
       hoveredEndElement
         ? aabbForElement(
             hoveredEndElement,
+            elementsMap,
             offsetFromHeading(endHeading, BASE_PADDING, BASE_PADDING),
           )
         : endPointBounds,
@@ -1306,6 +1313,7 @@ const getElbowArrowData = (
       hoveredStartElement
         ? aabbForElement(
             hoveredStartElement,
+            elementsMap,
             offsetFromHeading(startHeading, BASE_PADDING, BASE_PADDING),
           )
         : startPointBounds,
@@ -1352,8 +1360,8 @@ const getElbowArrowData = (
           BASE_PADDING,
         ),
     boundsOverlap,
-    hoveredStartElement && aabbForElement(hoveredStartElement),
-    hoveredEndElement && aabbForElement(hoveredEndElement),
+    hoveredStartElement && aabbForElement(hoveredStartElement, elementsMap),
+    hoveredEndElement && aabbForElement(hoveredEndElement, elementsMap),
   );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
@@ -2184,27 +2192,35 @@ const getGlobalPoint = (
   fixedPointRatio: [number, number] | undefined | null,
   initialPoint: GlobalPoint,
   element?: ExcalidrawBindableElement | null,
+  elementsMap?: ElementsMap,
   isDragging?: boolean,
 ): GlobalPoint => {
   if (isDragging) {
-    if (element) {
-      return bindPointToSnapToElementOutline(arrow, element, startOrEnd);
+    if (element && elementsMap) {
+      return bindPointToSnapToElementOutline(
+        arrow,
+        element,
+        startOrEnd,
+        elementsMap,
+      );
     }
 
     return initialPoint;
   }
 
-  if (element) {
+  if (element && elementsMap) {
     const fixedGlobalPoint = getGlobalFixedPointForBindableElement(
       fixedPointRatio || [0, 0],
       element,
+      elementsMap,
     );
 
     // NOTE: Resize scales the binding position point too, so we need to update it
     return Math.abs(
-      distanceToElement(element, fixedGlobalPoint) - FIXED_BINDING_DISTANCE,
+      distanceToElement(element, elementsMap, fixedGlobalPoint) -
+        FIXED_BINDING_DISTANCE,
     ) > 0.01
-      ? bindPointToSnapToElementOutline(arrow, element, startOrEnd)
+      ? bindPointToSnapToElementOutline(arrow, element, startOrEnd, elementsMap)
       : fixedGlobalPoint;
   }
 
@@ -2216,6 +2232,7 @@ const getBindPointHeading = (
   otherPoint: GlobalPoint,
   hoveredElement: ExcalidrawBindableElement | null | undefined,
   origPoint: GlobalPoint,
+  elementsMap: ElementsMap,
 ): Heading =>
   getHeadingForElbowArrowSnap(
     p,
@@ -2224,7 +2241,8 @@ const getBindPointHeading = (
     hoveredElement &&
       aabbForElement(
         hoveredElement,
-        Array(4).fill(distanceToElement(hoveredElement, p)) as [
+        elementsMap,
+        Array(4).fill(distanceToElement(hoveredElement, elementsMap, p)) as [
           number,
           number,
           number,
@@ -2232,6 +2250,7 @@ const getBindPointHeading = (
         ],
       ),
     origPoint,
+    elementsMap,
   );
 
 const getHoveredElement = (

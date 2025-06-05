@@ -1678,6 +1678,7 @@ export const actionChangeArrowType = register({
                   newElement,
                   startElement,
                   "start",
+                  elementsMap,
                 ),
               }
             : null;
@@ -1690,6 +1691,7 @@ export const actionChangeArrowType = register({
                   newElement,
                   endElement,
                   "end",
+                  elementsMap,
                 ),
               }
             : null;

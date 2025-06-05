@@ -34,6 +34,7 @@ export const MINIMAL_CROP_SIZE = 10;
 
 export const cropElement = (
   element: ExcalidrawImageElement,
+  elementsMap: ElementsMap,
   transformHandle: TransformHandleType,
   naturalWidth: number,
   naturalHeight: number,
@@ -63,7 +64,7 @@ export const cropElement = (
 
   const rotatedPointer = pointRotateRads(
     pointFrom(pointerX, pointerY),
-    elementCenterPoint(element),
+    elementCenterPoint(element, elementsMap),
     -element.angle as Radians,
   );
 

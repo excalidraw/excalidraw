@@ -181,16 +181,25 @@ const eraserTest = (
   elementsMap: ElementsMap,
 ): boolean => {
   const lastPoint = pathSegment[1];
-  if (shouldTestInside(element) && isPointInElement(lastPoint, element)) {
+  if (
+    shouldTestInside(element) &&
+    isPointInElement(lastPoint, element, elementsMap)
+  ) {
     return true;
   }
 
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
   return (
-    intersectElementWithLineSegment(element, pathSegment, 0, true).length > 0 ||
+    intersectElementWithLineSegment(element, elementsMap, pathSegment, 0, true)
+      .length > 0 ||
     (!!boundTextElement &&
-      intersectElementWithLineSegment(boundTextElement, pathSegment, 0, true)
-        .length > 0)
+      intersectElementWithLineSegment(
+        boundTextElement,
+        elementsMap,
+        pathSegment,
+        0,
+        true,
+      ).length > 0)
   );
 };

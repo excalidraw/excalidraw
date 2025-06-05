@@ -17,6 +17,7 @@ import {
 } from "./utils";
 
 import type {
+  ElementsMap,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
@@ -27,6 +28,7 @@ import type {
 
 export const distanceToElement = (
   element: ExcalidrawElement,
+  elementsMap: ElementsMap,
   p: GlobalPoint,
 ): number => {
   switch (element.type) {
@@ -38,15 +40,15 @@ export const distanceToElement = (
     case "embeddable":
     case "frame":
     case "magicframe":
-      return distanceToRectanguloidElement(element, p);
+      return distanceToRectanguloidElement(element, elementsMap, p);
     case "diamond":
-      return distanceToDiamondElement(element, p);
+      return distanceToDiamondElement(element, elementsMap, p);
     case "ellipse":
-      return distanceToEllipseElement(element, p);
+      return distanceToEllipseElement(element, elementsMap, p);
     case "line":
     case "arrow":
     case "freedraw":
-      return distanceToLinearOrFreeDraElement(element, p);
+      return distanceToLinearOrFreeDraElement(element, elementsMap, p);
   }
 };
 
@@ -60,9 +62,10 @@ export const distanceToElement = (
  */
 const distanceToRectanguloidElement = (
   element: ExcalidrawRectanguloidElement,
+  elementsMap: ElementsMap,
   p: GlobalPoint,
 ) => {
-  const center = elementCenterPoint(element);
+  const center = elementCenterPoint(element, elementsMap);
   // To emulate a rotated rectangle we rotate the point in the inverse angle
   // instead. It's all the same distance-wise.
   const rotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
@@ -88,9 +91,10 @@ const distanceToRectanguloidElement = (
  */
 const distanceToDiamondElement = (
   element: ExcalidrawDiamondElement,
+  elementsMap: ElementsMap,
   p: GlobalPoint,
 ): number => {
-  const center = elementCenterPoint(element);
+  const center = elementCenterPoint(element, elementsMap);
 
   // Rotate the point to the inverse direction to simulate the rotated diamond
   // points. It's all the same distance-wise.
@@ -116,9 +120,10 @@ const distanceToDiamondElement = (
  */
 const distanceToEllipseElement = (
   element: ExcalidrawEllipseElement,
+  elementsMap: ElementsMap,
   p: GlobalPoint,
 ): number => {
-  const center = elementCenterPoint(element);
+  const center = elementCenterPoint(element, elementsMap);
   return ellipseDistanceFromPoint(
     // Instead of rotating the ellipse, rotate the point to the inverse angle
     pointRotateRads(p, center, -element.angle as Radians),
@@ -128,9 +133,13 @@ const distanceToEllipseElement = (
 
 const distanceToLinearOrFreeDraElement = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
   p: GlobalPoint,
 ) => {
-  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(
+    element,
+    elementsMap,
+  );
   return Math.min(
     ...lines.map((s) => distanceToLineSegment(p, s)),
     ...curves.map((a) => curvePointDistance(a, p)),
