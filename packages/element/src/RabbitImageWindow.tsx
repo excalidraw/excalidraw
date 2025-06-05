@@ -171,7 +171,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                     overflow: "hidden",
                     textOverflow: "ellipsis"
                 }}>
-                    Rabbit Image Search
+                    Rabbit Search
                     {isMinimized && selectedImages.length > 0 && (
                         <span style={{ 
                             fontSize: "12px", 
