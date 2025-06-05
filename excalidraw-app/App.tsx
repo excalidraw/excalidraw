@@ -37,7 +37,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
-
+import { newEmbeddableElement } from "@excalidraw/element/newElement";
 import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement, newRabbitColorPalette } from "@excalidraw/element/newRabbitElement";
 import ColorThief from 'colorthief'; // for color palette
 
@@ -420,6 +420,7 @@ const ExcalidrawWrapper = () => {
     link: string;
     title?: string;
     snippet?: string; 
+    thumbnail?: string;
   };
 
   type TabImage = {
@@ -481,9 +482,26 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
         const row = Math.floor(index / cols);
         const x = START_X + col * (MAX_WIDTH + MARGIN);
         const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+        console.log("This is", imageData);
 
+        
+        console.log("This is it", imageData);
         // Check if this is from Internet webpages tab
-         if (imageData) {
+         if (imageData.id.startsWith("youtube")) {
+         
+        // Create embedded YouTube iframe instead of image
+        const embedElement = newEmbeddableElement({
+          type: "embeddable", // Add this required property
+          x: x,
+          y: y,
+          width: 560, // Standard YouTube embed width
+          height: 315, // Standard YouTube embed height
+          link: imageData.src, // Should be the YouTube URL
+        });
+        resolve(embedElement);
+        
+      }
+      else {
         const img = new Image();
         img.onload = () => {
           let scaledWidth = img.width;
@@ -543,7 +561,7 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
       }
       });
     })
-  );
+);
 
   excalidrawAPI.updateScene({
     elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
@@ -571,8 +589,10 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
         // Pinterest-specific search with siteRestrict = true
         newImages = await searchAndSaveImages(currentTab.searchQuery, true);
       } else if (tabName === "YouTube") {
-        // General search for now (you can add YouTube restriction later)
-        newImages = await searchAndSaveImages(currentTab.searchQuery, false);
+        console.log(`Starting YouTube search for: "${currentTab.searchQuery}"`);
+        newImages = await searchAndSaveImages(currentTab.searchQuery, false, true, true);
+        console.log("Youtube results count:", newImages.length);
+        console.log("Youtube results:", newImages);
       }
       else if (tabName === "Internet webpages") {
         // General search for now (you can add YouTube restriction later)
@@ -590,6 +610,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
           return {
             id: `${tabName.toLowerCase()}-${i}`,
             src: img.link,
+            displayImage: tabName === "YouTube" ? img.thumbnail : img.link,
             alt: img.title || `${tabName} Result ${i + 1}`,
             name: img.title || `${tabName} ${i + 1}`,
             snippet: img.snippet,
@@ -1717,12 +1738,10 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                               },
                               {
                                 name: "YouTube",
-                                images: images.slice(20, 30).map((img: ImageResult, i: number) => ({
-                                  id: `youtube-${i}`,
-                                  src: img.link,
-                                  alt: `YouTube Result ${i + 1}`,
-                                  name: `YouTube ${i + 1}`,
-                                })),
+                                images: [], // Empty initially will be lazily loaded upon onclick
+                                searchQuery: searchQuery, // Store query for later
+                                loaded: false // Mark as not loaded
+                                
                               },
                               {
                                 name: "Internet webpages",

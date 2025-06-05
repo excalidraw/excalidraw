@@ -7,6 +7,7 @@ interface ImageItem {
     alt: string;
     name?: string;
     snippet?: string;
+    displayImage ?: string;
 }
 
 // properties of rabbit image window
@@ -26,6 +27,7 @@ interface RabbitImageWindowProps {
             alt: string;
             name: string;
             snippet?: string;
+            displayImage?: string;
         }[];
         searchQuery?: string;  // Add this
         loaded?: boolean; 
@@ -255,7 +257,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
             </div>
         ) : (
                         <img
-                            src={image.src}
+                            src={image.displayImage || image.src}
                             alt={image.alt}
                             style={{
                                 width: "100%",
@@ -285,7 +287,28 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                 {image.snippet}
                     </div>
                     )}
-</div>
+                    {/* Tooltip for YouTube - shows full title */}
+            {hoveredCard === image.id && image.name && tabData[activeTab].name === "YouTube" && (
+                <div style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: "0",
+                    right: "0",
+                    background: "#333", // YouTube red
+                    color: "white",
+                    padding: "8px",
+                    borderRadius: "4px",
+                    fontSize: "11px",
+                    zIndex: 1001,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                    marginTop: "4px",
+                    maxWidth: "280px",
+                    wordWrap: "break-word"
+                }}>
+                    {image.name}
+                </div>
+            )}
+            </div>
                 ))}
             </div>
 
