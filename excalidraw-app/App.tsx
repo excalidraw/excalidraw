@@ -1,6 +1,5 @@
 import {
   Excalidraw,
-  LiveCollaborationTrigger,
   TTDDialogTrigger,
   CaptureUpdateAction,
   reconcileElements,
@@ -37,9 +36,17 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
+
 import { newEmbeddableElement } from "@excalidraw/element/newElement";
-import { newRabbitSearchBoxElement, newRabbitImageElement, newRabbitImageTabsElement, newRabbitColorPalette } from "@excalidraw/element/newRabbitElement";
-import ColorThief from 'colorthief'; // for color palette
+import { AutoOrganizer } from "@excalidraw/element/autoOrganizer";
+import { getRabbitGroupsFromElements } from "@excalidraw/element/rabbitGroupUtils";
+import {
+  newRabbitSearchBoxElement,
+  newRabbitImageElement,
+  newRabbitImageTabsElement,
+  newRabbitColorPalette,
+} from "@excalidraw/element/newRabbitElement";
+import ColorThief from "colorthief";
 
 import {
   GithubIcon,
@@ -61,6 +68,12 @@ import {
   useHandleLibrary,
 } from "@excalidraw/excalidraw/data/library";
 
+import { getSearchBoxText } from "@excalidraw/element/newRabbitElement";
+import { useRabbitSearchBoxHandlers } from "@excalidraw/element/rabbitElementHandlers";
+import { RabbitImageWindow } from "@excalidraw/element/RabbitImageWindow";
+
+import { GoogleGenAI } from "@google/genai";
+
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
 import type {
@@ -77,13 +90,8 @@ import type {
 } from "@excalidraw/excalidraw/types";
 import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
-// import { 
-//   handleRabbitSearchBoxClick, 
-//   handleRabbitSearchBoxKeyDown 
-// } from "@excalidraw/element/rabbitElementHandlers";
-import { isRabbitSearchBoxElement } from "@excalidraw/element/rabbitElement";
-import { getSearchBoxText } from "@excalidraw/element/newRabbitElement";
-import { useRabbitSearchBoxHandlers } from "@excalidraw/element/rabbitElementHandlers";
+
+import { searchAndSaveImages } from "../scripts/rabbit_scripts/try_again";
 
 import CustomStats from "./CustomStats";
 import {
@@ -104,7 +112,6 @@ import Collab, {
   isCollaboratingAtom,
   isOfflineAtom,
 } from "./collab/Collab";
-import { AppFooter } from "./components/AppFooter";
 import { AppHeader } from "./components/AppHeader";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
@@ -135,7 +142,7 @@ import {
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
-import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
+import { collabErrorIndicatorAtom } from "./collab/CollabError";
 import { useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
 import { useAppLangCode } from "./app-language/language-state";
@@ -151,20 +158,10 @@ import "./index.scss";
 
 import type { CollabAPI } from "./collab/Collab";
 
-import { searchAndSaveImages } from '../scripts/rabbit_scripts/try_again';
 import type { RabbitSearchBoxElement } from "../packages/element/src/rabbitElement";
-import { RabbitElementBase, RabbitImageElement } from "../packages/element/src/rabbitElement";
 
-import { RabbitImageWindow } from "@excalidraw/element/RabbitImageWindow";
-// for rabbit image window
-
-
-
-
-
-import { GoogleGenAI } from "@google/genai";
 const ai = new GoogleGenAI({
-  apiKey: import.meta.env.VITE_GEMINI_API_KEY
+  apiKey: import.meta.env.VITE_GEMINI_API_KEY,
 });
 async function main() {
   const response = await ai.models.generateContent({
@@ -440,6 +437,10 @@ const ExcalidrawWrapper = () => {
   const [isImageWindowVisible, setImageWindowVisible] = useState(false);
   const [tabData, setTabData] = useState<TabData[]>([]);
 
+  // consts for auto-organizer
+  const [currentSearchQuery, setCurrentSearchQuery] = useState("");
+  const [autoOrganizer, setAutoOrganizer] = useState<AutoOrganizer | null>(null);
+
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   const handleImageSelect = (image: any) => {
@@ -450,7 +451,7 @@ const ExcalidrawWrapper = () => {
     setSelectedImages((prev) => prev.filter((id) => id !== image.id));
   };
   
-const handleAddToCanvas = async (selectedImageIds: string[]) => {
+const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize: boolean = true) => {
   if (!excalidrawAPI) return;
 
   const selectedImageData = selectedImageIds
@@ -463,16 +464,30 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
     })
     .filter((imageData): imageData is NonNullable<typeof imageData> => imageData !== null);
 
+  if (selectedImageData.length === 0) {
+    excalidrawAPI.setToast({
+      message: "No images selected to add to canvas.",
+      duration: 2000,
+    });
+    return;
+  }
+
   const MAX_WIDTH = 200;
   const MAX_HEIGHT = 200;
-  const MARGIN = 30; // Space between images
-  const START_X = 100; // Starting X position
-  const START_Y = 100; // Starting Y position
+  const MARGIN = 30;
+  const START_X = 100;
+  const START_Y = 100;
 
   // Calculate grid layout
   const imageCount = selectedImageData.length;
-  const cols = Math.ceil(Math.sqrt(imageCount)); // Auto-calculate columns for square-ish grid
+  const cols = Math.ceil(Math.sqrt(imageCount));
   const rows = Math.ceil(imageCount / cols);
+
+  const getCloudinaryUrl = (originalUrl: string, width: number, height: number) => {
+    const cloudName = 'your-cloud-name';
+    const encodedUrl = encodeURIComponent(originalUrl);
+    return `https://res.cloudinary.com/${cloudName}/image/fetch/w_${Math.round(width)},h_${Math.round(height)},c_fit,f_auto,q_auto/${encodedUrl}`;
+  };
 
   const elementsWithDimensions = await Promise.all(
     selectedImageData.map((imageData, index) => {
@@ -537,14 +552,15 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
           const col = index % cols;
           const row = Math.floor(index / cols);
           
-          // Calculate position with consistent spacing
           const x = START_X + col * (MAX_WIDTH + MARGIN);
           const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+          const cloudinaryUrl = getCloudinaryUrl(imageData.src, scaledWidth, scaledHeight);
 
           const element = newRabbitImageElement({
             x: x,
             y: y,
-            imageUrl: imageData.src,
+            imageUrl: cloudinaryUrl,
             width: scaledWidth,
             height: scaledHeight,
             label: imageData.name
@@ -558,10 +574,12 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
           const x = START_X + col * (MAX_WIDTH + MARGIN);
           const y = START_Y + row * (MAX_HEIGHT + MARGIN);
 
+          const cloudinaryUrl = getCloudinaryUrl(imageData.src, MAX_WIDTH, MAX_HEIGHT);
+
           const element = newRabbitImageElement({
             x: x,
             y: y,
-            imageUrl: imageData.src,
+            imageUrl: cloudinaryUrl,
             width: MAX_WIDTH,
             height: MAX_HEIGHT,
             label: imageData.name
@@ -578,6 +596,18 @@ const handleAddToCanvas = async (selectedImageIds: string[]) => {
   excalidrawAPI.updateScene({
     elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
   });
+
+  // Auto-organization if enabled
+  if (shouldAutoOrganize && autoOrganizer && currentSearchQuery) {
+    setTimeout(async () => {
+      await autoOrganizer.enhanceAddToCanvas(
+        selectedImageIds, 
+        currentSearchQuery, 
+        tabData, 
+        () => {} // Empty since images already added
+      );
+    }, 100);
+  }
 
   setSelectedImages([]);
 };
@@ -670,6 +700,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
 
   const debugCanvasRef = useRef<HTMLCanvasElement>(null);
 
+
   useEffect(() => {
     trackEvent("load", "frame", getFrame());
     // Delayed so that the app has a time to load the latest SW
@@ -718,8 +749,8 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
   
     // Create and add search box
     const searchBox = newRabbitSearchBoxElement({
-      x: 100,
-      y: 100,
+      x: 650,
+      y: 350,
       text: "Search...",
       fontSize: 16,
       fontFamily: FONT_FAMILY.Virgil,
@@ -739,7 +770,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
     });
   
     let hasSearched = false;
-    let lastSearchQuery = "";
+    let lastSearchQuery = ""; // preventing duplicate searches
   
     const handleEnterKey = (event: KeyboardEvent) => {
       if (event.key !== 'Enter') return;
@@ -752,16 +783,18 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
       if (currentSearchBox) {
         const searchQuery = getSearchBoxText(currentSearchBox);
   
+        // valid and different search query
         if (searchQuery !== "Search..." &&
           searchQuery.trim() !== "" &&
           searchQuery.length > 2 &&
           searchQuery !== lastSearchQuery) {
   
           console.log("Search query detected:", searchQuery);
-          lastSearchQuery = searchQuery;
+          lastSearchQuery = searchQuery; // Update last search query
           hasSearched = true;
+          setCurrentSearchQuery(searchQuery);
   
-          searchAndSaveImages(searchQuery)
+          searchAndSaveImages(searchQuery, false)
             .then((images: ImageResult[]) => {
               console.log("First few raw search results:", images.slice(0, 3));
     
@@ -783,12 +816,9 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                 },
                 {
                   name: "Pinterest",
-                  images: images.slice(10, 20).map((img: ImageResult, i: number) => ({
-                    id: `pinterest-${i}`,
-                    src: img.link,
-                    alt: `Pinterest Result ${i + 1}`,
-                    name: `Pinterest ${i + 1}`,
-                  })),
+                  images: [], // Empty initially will be lazily loaded upon onclick
+                  searchQuery: searchQuery, // Store query for later
+                  loaded: false // Mark as not loaded
                 },
                 {
                   name: "YouTube",
@@ -799,13 +829,19 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                     name: `YouTube ${i + 1}`,
                   })),
                 },
+                {
+                  name: "Internet webpages",
+                  images: [], // Empty initially will be lazily loaded upon onclick
+                  searchQuery: searchQuery, // Store query for later
+                  loaded: false // Mark as not loaded
+                },
               ];
               console.log(tabs);
               setTabData(tabs);
               console.log("Tab Data was set!");
               setImageWindowVisible(true);
             });
-        }
+        } 
       }
     };
   
@@ -824,6 +860,125 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
       delete (window as any).__handleRabbitSearch;
     };
   }, [handleRabbitSearch]);
+
+  const uploadToImgur = useCallback(async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'rabbithole'); 
+    
+    try {
+      const response = await fetch(
+        'https://api.cloudinary.com/v1_1/dnv3yidzc/image/upload', 
+        {
+          method: 'POST',
+          body: formData
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log('Cloudinary response:', data);
+      
+      return data.secure_url; 
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw new Error('Failed to upload image');
+    }
+  }, []);
+
+  useEffect(() => {
+    (window as any).__uploadToImgur = uploadToImgur;
+    
+    return () => {
+      delete (window as any).__uploadToImgur;
+    };
+  }, [uploadToImgur]);
+  
+const predictSearchQueryFromCloudinaryImage = useCallback(async (cloudinaryUrl: string): Promise<string> => {
+  try {
+    const response = await fetch(cloudinaryUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
+    }
+    
+    const blob = await response.blob();
+    const base64 = await blobToBase64(blob);
+    
+    const base64Data = base64.split(',')[1];
+    
+    const geminiResponse = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [
+        {
+          parts: [
+            {
+              text: `Analyze this image and predict what search query someone likely used to find it. Consider:
+
+                      1. The main subject or object in the image
+                      2. Visual style, colors, or artistic elements
+                      3. Context clues like setting, background, or composition
+                      4. Any text visible in the image
+                      5. The general mood or theme
+
+                      Respond with only the most likely search query that would return this image - be concise and natural, like what someone would actually type into a search engine. Avoid overly descriptive or technical language.
+
+                      Examples of good responses:
+                      - "cute golden retriever puppy"
+                      - "modern minimalist kitchen"
+                      - "sunset mountain landscape"
+                      - "vintage red sports car"
+
+                      What search query likely resulted in this image?`
+            },
+            {
+              inlineData: {
+                mimeType: blob.type,
+                data: base64Data
+              }
+            }
+          ]
+        }
+      ],
+      config: {
+        systemInstruction: "What is the search query that found this simage?",
+      },
+    });
+
+    const predictedQuery = geminiResponse.text?.trim() || "";
+    console.log("Predicted search query:", predictedQuery);
+    return predictedQuery;
+    
+  } catch (error) {
+    console.error("Error predicting search query from Cloudinary image:", error);
+    return "image search";
+  }
+}, []);
+
+const blobToBase64 = (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Failed to convert blob to base64'));
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
+useEffect(() => {
+  (window as any).__predictSearchQueryFromCloudinaryImage = predictSearchQueryFromCloudinaryImage;
+  
+  return () => {
+    delete (window as any).__predictSearchQueryFromCloudinaryImage;
+  };
+}, [predictSearchQueryFromCloudinaryImage]);
   // color palette handler for color palette button
   const handleColorPalette = useCallback(async () => {
     if (!excalidrawAPI) return;
@@ -989,6 +1144,12 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
       img.onerror = () => reject(new Error('Failed to load image'));
     });
   };
+
+  useEffect(() => {
+    if (excalidrawAPI) {
+      setAutoOrganizer(new AutoOrganizer(excalidrawAPI));
+    }
+  }, [excalidrawAPI]);
 
   useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
@@ -1477,13 +1638,13 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
           }
           return (
             <div className="top-right-ui">
-              {collabError.message && <CollabError collabError={collabError} />}
+              {/* {collabError.message && <CollabError collabError={collabError} />}
               <LiveCollaborationTrigger
                 isCollaborating={isCollaborating}
                 onSelect={() =>
                   setShareDialogState({ isOpen: true, type: "share" })
                 }
-              />
+              /> */}
             </div>
           );
         }}
@@ -1644,7 +1805,6 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                 }
               },
             },
-
             {
               label: "Add Rabbit SearchBox",
               category: DEFAULT_CATEGORIES.app,
@@ -1727,6 +1887,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                         console.log("Search query detected:", searchQuery);
                         lastSearchQuery = searchQuery; // Update last search query
                         hasSearched = true;
+                        setCurrentSearchQuery(searchQuery);
 
                         searchAndSaveImages(searchQuery, false)
                           .then((images: ImageResult[]) => {
@@ -1840,6 +2001,25 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
               },
             },
             
+            {
+              label: "Add Rabbit Color Palette",
+              category: DEFAULT_CATEGORIES.app,
+              keywords: ["palette", "colors", "color-palette", "hex"],
+              perform: () => {
+                if (excalidrawAPI) {
+                  const colorPalette = newRabbitColorPalette({
+                    x: 100,
+                    y: 100,
+                    colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57']
+                  });
+
+                  excalidrawAPI.updateScene({
+                    elements: [...excalidrawAPI.getSceneElements(), colorPalette]
+                  });
+                }
+              },
+            },
+
             {
               label: "Add Rabbit Color Palette",
               category: DEFAULT_CATEGORIES.app,
@@ -2042,6 +2222,96 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                   });
                 }
               },
+            },
+            {
+              label: "Auto-organize: Hierarchical Layout",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["organize", "layout", "hierarchy", "tree", "dagre"],
+              perform: () => {
+                if (autoOrganizer) {
+                  autoOrganizer.organizeHierarchical();
+                  excalidrawAPI?.setToast({
+                    message: "Applied hierarchical layout",
+                    duration: 2000
+                  });
+                }
+              }
+            },
+            {
+              label: "Auto-organize: Grid Layout",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["organize", "layout", "grid", "rows", "columns"],
+              perform: () => {
+                if (autoOrganizer) {
+                  autoOrganizer.organizeGrid();
+                  excalidrawAPI?.setToast({
+                    message: "Applied grid layout",
+                    duration: 2000
+                  });
+                }
+              }
+            },
+            {
+              label: "Auto-organize: Circular Layout",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => true,
+              keywords: ["organize", "layout", "circle", "radial"],
+              perform: () => {
+                if (autoOrganizer) {
+                  autoOrganizer.organizeCircular();
+                  excalidrawAPI?.setToast({
+                    message: "Applied circular layout",
+                    duration: 2000
+                  });
+                }
+              }
+            },
+            {
+              label: "Auto-organize: Breadth First",
+              category: DEFAULT_CATEGORIES.app, 
+              predicate: () => true,
+              keywords: ["organize", "layout", "breadth", "tree"],
+              perform: () => {
+                if (autoOrganizer) {
+                  autoOrganizer.organizeBreadthFirst();
+                  excalidrawAPI?.setToast({
+                    message: "Applied breadth-first layout",
+                    duration: 2000
+                  });
+                }
+              }
+            },
+            {
+              label: "Remove All Rabbit Groups",
+              category: DEFAULT_CATEGORIES.app, 
+              predicate: () => true,
+              keywords: ["ungroup", "remove", "clear", "groups"],
+              perform: () => {
+                if (excalidrawAPI) {
+                  const elements = excalidrawAPI.getSceneElements();
+                  const groups = getRabbitGroupsFromElements(elements);
+                  
+                  const updatedElements = elements.map(element => {
+                    if (element.customData?.rabbitGroup) {
+                      const newCustomData = { ...element.customData };
+                      delete newCustomData.rabbitGroup;
+                      return {
+                        ...element,
+                        customData: Object.keys(newCustomData).length > 0 ? newCustomData : undefined
+                      };
+                    }
+                    return element;
+                  });
+
+                  excalidrawAPI.updateScene({ elements: updatedElements });
+                  excalidrawAPI?.setToast({
+                    message: `Removed ${groups.size} rabbit groups`,
+                    duration: 2000
+                  });
+                }
+              }
             },
           ]}
         />

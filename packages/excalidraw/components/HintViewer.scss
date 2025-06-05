@@ -30,6 +30,15 @@ $wide-viewport-width: 1000px;
     }
   }
 
+  .welcome-screen-center {
+    transform: translateY(-50px) !important;
+  }
+
+  .welcome-screen-decor-hint--toolbar {
+    left: -111px !important;
+    transform: translateX(0) !important;
+  }
+
   &.theme--dark {
     .HintViewer {
       color: var(--color-gray-60);

@@ -1,5 +1,5 @@
-const API_KEY = "AIzaSyAl8YsDNG7AmBzOAgG4YwnQhNJMIjnRL2g"; // Replace with your Google API key
-const SEARCH_ENGINE_ID = "8774c779014954b77"; // Replace with your Search Engine ID
+const API_KEY = "AIzaSyAl8YsDNG7AmBzOAgG4YwnQhNJMIjnRL2g";
+const SEARCH_ENGINE_ID = "8774c779014954b77"; 
 const DEFAULT_SEARCH_QUERY = "breakcore art";
 const NUM_RESULTS = 10; // Maximum allowed by free tier
 
