@@ -302,6 +302,7 @@ const restoreElement = (
         lastCommittedPoint: null,
         simulatePressure: element.simulatePressure,
         pressures: element.pressures,
+        pressureSensitivity: element.pressureSensitivity ?? null,
       });
     }
     case "image":

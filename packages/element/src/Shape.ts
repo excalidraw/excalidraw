@@ -3,8 +3,6 @@ import { simplify } from "points-on-curve";
 import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
 import { ROUGHNESS, isTransparent, assertNever } from "@excalidraw/common";
 
-import type { Mutable } from "@excalidraw/common/utility-types";
-
 import type { EmbedsValidationStatus } from "@excalidraw/excalidraw/types";
 import type { ElementShapes } from "@excalidraw/excalidraw/scene/types";
 
@@ -21,6 +19,8 @@ import { headingForPointIsHorizontal } from "./heading";
 import { canChangeRoundness } from "./comparisons";
 import { generateFreeDrawShape } from "./renderElement";
 import { getArrowheadPoints, getDiamondPoints } from "./bounds";
+
+import { getFreedrawStroke } from "./freedraw";
 
 import type {
   ExcalidrawElement,
@@ -514,12 +514,19 @@ export const _generateElementShape = (
       generateFreeDrawShape(element);
 
       if (isPathALoop(element.points)) {
-        // generate rough polygon to fill freedraw shape
-        const simplifiedPoints = simplify(
-          element.points as Mutable<LocalPoint[]>,
-          0.75,
-        );
-        shape = generator.curve(simplifiedPoints as [number, number][], {
+        let points;
+        if (element.pressureSensitivity === null) {
+          // legacy freedraw
+          points = simplify(element.points as LocalPoint[], 0.75);
+        } else {
+          // new freedraw
+          const stroke = getFreedrawStroke(element);
+          points = stroke
+            .slice(0, Math.floor(stroke.length / 2))
+            .map((p) => pointFrom(p[0], p[1]));
+        }
+
+        shape = generator.curve(points, {
           ...generateRoughOptions(element),
           stroke: "none",
         });

@@ -191,6 +191,7 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
       10,
     ],
   ],
+  "pressureSensitivity": 1,
   "pressures": [],
   "roughness": 1,
   "roundness": {

@@ -47,6 +47,7 @@ import {
   isArrowElement,
   isBoundToContainer,
   isElbowArrow,
+  isFreeDrawElement,
   isLinearElement,
   isLineElement,
   isTextElement,
@@ -127,6 +128,8 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  strokeWidthFixedIcon,
+  strokeWidthVariableIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -667,6 +670,66 @@ export const actionChangeStrokeStyle = register({
       </div>
     </fieldset>
   ),
+});
+
+export const actionChangePressureSensitivity = register({
+  name: "changeStrokeType",
+  label: "labels.strokeType",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements,
+      appState: { ...appState, currentItemPressureSensitivity: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ app, appState, updateData }) => {
+    if (appState.activeTool.type !== "freedraw") {
+      return null;
+    }
+
+    const selectedElements = app.scene.getSelectedElements(app.state);
+    const firstElement = selectedElements.find(isFreeDrawElement);
+    const commonPressureSensitivity = selectedElements
+      .filter(isFreeDrawElement)
+      .reduce((acc, element) => {
+        const sensitivity = element.pressureSensitivity ?? 1;
+        if (acc !== null && acc !== sensitivity) {
+          return null; // No common value
+        }
+        return sensitivity;
+      }, firstElement?.pressureSensitivity ?? null);
+
+    const currentValue =
+      commonPressureSensitivity ?? appState.currentItemPressureSensitivity;
+
+    return (
+      <fieldset>
+        <legend>{t("labels.strokeType")}</legend>
+        <div className="buttonList">
+          <RadioSelection
+            group="pressure-sensitivity"
+            options={[
+              {
+                value: 0,
+                text: t("labels.strokeWidthFixed"),
+                icon: strokeWidthFixedIcon,
+                testId: "pressure-fixed",
+              },
+              {
+                value: 1,
+                text: t("labels.strokeWidthVariable"),
+                icon: strokeWidthVariableIcon,
+                testId: "pressure-variable",
+              },
+            ]}
+            value={currentValue}
+            onChange={(value) => updateData(value)}
+          />
+        </div>
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeOpacity = register({
