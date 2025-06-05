@@ -47,6 +47,7 @@ import {
   loadFromHttpStorage,
   saveFilesToHttpStorage,
   loadFilesFromHttpStorage,
+  TokenService,
 } from "../data/httpStorage";
 import Portal from "./Portal";
 import { t } from "../../packages/excalidraw/i18n";
@@ -121,6 +122,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   excalidrawAPI: CollabProps["excalidrawAPI"];
   activeIntervalId: number | null;
   idleTimeoutId: number | null;
+  private tokenService: TokenService;
 
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
@@ -143,7 +145,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         }
 
         console.info("[draw] Loading files from http storage", fileIds);
-        return loadFilesFromHttpStorage(fileIds, roomId, roomKey);
+        return loadFilesFromHttpStorage(fileIds, roomId, roomKey, this.tokenService);
       },
       saveFiles: async ({ addedFiles }) => {
         const { roomId, roomKey } = this.portal;
@@ -160,12 +162,14 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           }),
           roomId,
           roomKey,
+          tokenService: this.tokenService,
         });
       },
     });
     this.excalidrawAPI = props.excalidrawAPI;
     this.activeIntervalId = null;
     this.idleTimeoutId = null;
+    this.tokenService = new TokenService();
   }
 
   private onUmmount: (() => void) | null = null;
@@ -243,6 +247,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.idleTimeoutId = null;
     }
     this.onUmmount?.();
+    this.tokenService.destroy();
   }
 
   isCollaborating = () => appJotaiStore.get(isCollaboratingAtom)!;
@@ -282,6 +287,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       await saveToHttpStorage(
         this.portal,
         syncableElements,
+        this.tokenService,
         // this.excalidrawAPI.getAppState(),
       );
 
@@ -699,6 +705,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           roomLinkData.roomId,
           roomLinkData.roomKey,
           this.portal.socket,
+          this.tokenService,
         );
         if (elements) {
           if (elements.length === 0) {

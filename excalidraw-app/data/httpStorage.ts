@@ -28,6 +28,146 @@ const httpStorageSceneVersionCache = new WeakMap<Socket, number>();
 
 const HTTP_STORAGE_BACKEND_URL = import.meta.env.VITE_APP_HTTP_SERVER_URL;
 
+export class TokenService {
+  private cachedToken: string | null = null;
+  private tokenPromise: Promise<string> | null = null;
+  private eventHandlerRegistered = false;
+  private pendingRequests = new Map();
+  private allowedOrigins = (
+    import.meta.env.VITE_APP_TOKEN_SERVICE_ALLOWED_ORIGINS || ""
+  )
+    .split(",")
+    .map((origin: string) => origin.trim());
+
+  async getToken(): Promise<string> {
+    if (this.cachedToken) {
+      return this.cachedToken;
+    }
+    if (this.tokenPromise) {
+      return this.tokenPromise;
+    }
+
+    this.ensureEventHandler();
+    this.tokenPromise = this.fetchTokenFromParent();
+
+    try {
+      this.cachedToken = await this.tokenPromise;
+      // Mintain a short cache to not send too many messages
+      setTimeout(() => this.clearToken(), 10000); // 30 seconds
+      return this.cachedToken;
+    } finally {
+      this.tokenPromise = null;
+    }
+  }
+
+  private ensureEventHandler() {
+    if (!this.eventHandlerRegistered) {
+      window.addEventListener("message", this.handleMessage);
+      this.eventHandlerRegistered = true;
+      console.info(
+        "[draw][token-service] Event handler registered for token service",
+      );
+    }
+  }
+
+  private handleMessage = (event: MessageEvent) => {
+    if (!this.allowedOrigins.includes(event.origin)) {
+      console.warn(
+        "[draw][token-service] Rejected message from untrusted origin:",
+        event.origin,
+      );
+      return;
+    }
+
+    const { type, requestId, data, error } = event.data;
+
+    if (type === "TOKEN_RESPONSE" && this.pendingRequests.has(requestId)) {
+      const { resolve, reject } = this.pendingRequests.get(requestId);
+      this.pendingRequests.delete(requestId);
+
+      console.info(
+        "[draw][token-service] recieved token response for requestId:",
+        requestId,
+        "error:",
+        error,
+      );
+
+      if (error) {
+        reject(new Error(error));
+      } else {
+        resolve(data);
+      }
+    } else {
+      console.warn(
+        "[draw][token-service] Unhandled message type:",
+        type,
+        "for requestId:",
+        requestId,
+      );
+    }
+  };
+
+  private async fetchTokenFromParent(timeout = 5000): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const requestId = this.generateRequestId();
+
+      this.pendingRequests.set(requestId, { resolve, reject });
+
+      const timeoutId = setTimeout(() => {
+        if (this.pendingRequests.has(requestId)) {
+          this.pendingRequests.delete(requestId);
+          reject(new Error("Request timeout"));
+        }
+      }, timeout);
+
+      window.parent.postMessage(
+        {
+          type: "TOKEN_REQUEST",
+          requestId,
+        },
+        "*",
+      );
+
+      console.info(
+        "[draw][token-service] Requesting token from parent with requestId:",
+        requestId,
+      );
+
+      // Clear timeout when promise resolves/rejects
+      const originalResolve = resolve;
+      const originalReject = reject;
+
+      this.pendingRequests.set(requestId, {
+        resolve: (value: string) => {
+          clearTimeout(timeoutId);
+          originalResolve(value);
+        },
+        reject: (error: Error) => {
+          clearTimeout(timeoutId);
+          originalReject(error);
+        },
+      });
+    });
+  }
+
+  private generateRequestId(): string {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  }
+
+  destroy() {
+    if (this.eventHandlerRegistered) {
+      window.removeEventListener("message", this.handleMessage);
+      this.eventHandlerRegistered = false;
+    }
+    this.pendingRequests.clear();
+    this.clearToken();
+  }
+
+  clearToken() {
+    this.cachedToken = null;
+  }
+}
+
 export const isSavedToHttpStorage = (
   portal: Portal,
   elements: readonly ExcalidrawElement[],
@@ -50,6 +190,7 @@ const getSyncableElementsFromResponse = async (response: Response) => {
 export const saveToHttpStorage = async (
   portal: Portal,
   elements: readonly ExcalidrawElement[],
+  tokenService: TokenService,
 ) => {
   const { roomId, roomKey, socket } = portal;
   if (
@@ -62,16 +203,22 @@ export const saveToHttpStorage = async (
   ) {
     return true;
   }
+  const token = await tokenService.getToken();
+
+  console.info("[draw] Saving to HTTP storage", roomId, roomKey);
 
   const sceneVersion = getSceneVersion(elements);
 
   const getResponse = await fetch(`${HTTP_STORAGE_BACKEND_URL}/drawing-data`, {
     method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
     body: new URLSearchParams({
       roomId,
       roomKey,
     }),
-    credentials: "include",
   });
 
   if (!getResponse.ok && getResponse.status !== 404) {
@@ -93,14 +240,20 @@ export const saveToHttpStorage = async (
 
   console.info("[draw] Saving drawing data...");
 
+  const putHeaders: HeadersInit = {
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
+
+  putHeaders.Authorization = `Bearer ${token}`;
+
   const putResponse = await fetch(`${HTTP_STORAGE_BACKEND_URL}/drawing-data`, {
     method: "POST",
+    headers: putHeaders,
     body: new URLSearchParams({
       roomId,
       roomKey,
       data: JSON.stringify(elements),
     }),
-    credentials: "include",
   });
 
   if (putResponse.ok) {
@@ -116,14 +269,20 @@ export const loadFromHttpStorage = async (
   roomId: string,
   roomKey: string,
   socket: Socket | null,
+  tokenService: TokenService,
 ): Promise<readonly ExcalidrawElement[] | null> => {
+  const token = await tokenService.getToken();
+
   const getResponse = await fetch(`${HTTP_STORAGE_BACKEND_URL}/drawing-data`, {
     method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
     body: new URLSearchParams({
       roomId,
       roomKey,
     }),
-    credentials: "include",
   });
 
   const elements = await getSyncableElementsFromResponse(getResponse);
@@ -141,10 +300,12 @@ export const saveFilesToHttpStorage = async ({
   files,
   roomId,
   roomKey,
+  tokenService,
 }: {
   files: { id: FileId; buffer: Uint8Array }[];
   roomId: string;
   roomKey: string;
+  tokenService: TokenService;
 }) => {
   const erroredFiles = new Map<FileId, true>();
   const savedFiles = new Map<FileId, true>();
@@ -155,15 +316,19 @@ export const saveFilesToHttpStorage = async ({
         const payloadBlob = new Blob([buffer]);
         const body = await new Response(payloadBlob).arrayBuffer();
 
+        const headers: HeadersInit = {
+          "Room-Id": roomId,
+          "Room-Key": roomKey,
+          "File-Id": id,
+        };
+
+        const token = await tokenService.getToken();
+        headers.Authorization = `Bearer ${token}`;
+
         await fetch(`${HTTP_STORAGE_BACKEND_URL}/drawing-file`, {
           method: "POST",
-          headers: {
-            "Room-Id": roomId,
-            "Room-Key": roomKey,
-            "File-Id": id,
-          },
+          headers,
           body,
-          credentials: "include",
         });
         savedFiles.set(id, true);
       } catch (error: any) {
@@ -181,6 +346,7 @@ export const loadFilesFromHttpStorage = async (
   filesIds: readonly FileId[],
   roomId: string,
   roomKey: string,
+  tokenService: TokenService,
 ) => {
   const loadedFiles: BinaryFileData[] = [];
   const erroredFiles = new Map<FileId, true>();
@@ -188,16 +354,18 @@ export const loadFilesFromHttpStorage = async (
   await Promise.all(
     [...new Set(filesIds)].map(async (id) => {
       try {
+        const token = await tokenService.getToken();
+
         const response = await fetch(
           `${HTTP_STORAGE_BACKEND_URL}/drawing-file`,
           {
             method: "GET",
             headers: {
+              Authorization: `Bearer ${token}`,
               "Room-Id": roomId,
               "Room-Key": roomKey,
               "File-Id": id,
             },
-            credentials: "include",
           },
         );
         if (response.status < 400) {

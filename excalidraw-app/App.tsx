@@ -96,7 +96,7 @@ import { OverwriteConfirmDialog } from "../packages/excalidraw/components/Overwr
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import { usePostHog } from "posthog-js/react";
-import { loadFilesFromHttpStorage } from "./data/httpStorage";
+import { loadFilesFromHttpStorage, TokenService } from "./data/httpStorage";
 
 polyfill();
 
@@ -353,7 +353,8 @@ const ExcalidrawWrapper = () => {
           }, [] as FileId[]) || [];
 
         if (data.isExternalScene) {
-          loadFilesFromHttpStorage(fileIds, data.id, data.key).then(
+          const tokenService = new TokenService();
+          loadFilesFromHttpStorage(fileIds, data.id, data.key, tokenService).then(
             ({ loadedFiles, erroredFiles }) => {
               excalidrawAPI.addFiles(loadedFiles);
               updateStaleImageStatuses({
@@ -361,8 +362,11 @@ const ExcalidrawWrapper = () => {
                 erroredFiles,
                 elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
               });
+              tokenService.destroy();
             },
-          );
+          ).catch(() => {
+            tokenService.destroy();
+          });
         } else if (isInitialLoad) {
           if (fileIds.length) {
             LocalData.fileStorage
