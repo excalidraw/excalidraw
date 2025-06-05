@@ -93,6 +93,7 @@ export class TokenService {
       );
 
       if (error) {
+        console.warn("[draw][token-service] Error in token response:", error);
         reject(new Error(error));
       } else {
         resolve(data);
@@ -116,6 +117,10 @@ export class TokenService {
       const timeoutId = setTimeout(() => {
         if (this.pendingRequests.has(requestId)) {
           this.pendingRequests.delete(requestId);
+          console.warn(
+            "[draw][token-service] Request timed out for requestId:",
+            requestId,
+          );
           reject(new Error("Request timeout"));
         }
       }, timeout);
