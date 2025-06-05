@@ -806,6 +806,125 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
       delete (window as any).__handleRabbitSearch;
     };
   }, [handleRabbitSearch]);
+
+  const uploadToImgur = useCallback(async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'rabbithole'); 
+    
+    try {
+      const response = await fetch(
+        'https://api.cloudinary.com/v1_1/dnv3yidzc/image/upload', 
+        {
+          method: 'POST',
+          body: formData
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log('Cloudinary response:', data);
+      
+      return data.secure_url; 
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw new Error('Failed to upload image');
+    }
+  }, []);
+
+  useEffect(() => {
+    (window as any).__uploadToImgur = uploadToImgur;
+    
+    return () => {
+      delete (window as any).__uploadToImgur;
+    };
+  }, [uploadToImgur]);
+  
+const predictSearchQueryFromCloudinaryImage = useCallback(async (cloudinaryUrl: string): Promise<string> => {
+  try {
+    const response = await fetch(cloudinaryUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
+    }
+    
+    const blob = await response.blob();
+    const base64 = await blobToBase64(blob);
+    
+    const base64Data = base64.split(',')[1];
+    
+    const geminiResponse = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [
+        {
+          parts: [
+            {
+              text: `Analyze this image and predict what search query someone likely used to find it. Consider:
+
+                      1. The main subject or object in the image
+                      2. Visual style, colors, or artistic elements
+                      3. Context clues like setting, background, or composition
+                      4. Any text visible in the image
+                      5. The general mood or theme
+
+                      Respond with only the most likely search query that would return this image - be concise and natural, like what someone would actually type into a search engine. Avoid overly descriptive or technical language.
+
+                      Examples of good responses:
+                      - "cute golden retriever puppy"
+                      - "modern minimalist kitchen"
+                      - "sunset mountain landscape"
+                      - "vintage red sports car"
+
+                      What search query likely resulted in this image?`
+            },
+            {
+              inlineData: {
+                mimeType: blob.type,
+                data: base64Data
+              }
+            }
+          ]
+        }
+      ],
+      config: {
+        systemInstruction: "What is the search query that found this simage?",
+      },
+    });
+
+    const predictedQuery = geminiResponse.text?.trim() || "";
+    console.log("Predicted search query:", predictedQuery);
+    return predictedQuery;
+    
+  } catch (error) {
+    console.error("Error predicting search query from Cloudinary image:", error);
+    return "image search";
+  }
+}, []);
+
+const blobToBase64 = (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Failed to convert blob to base64'));
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
+useEffect(() => {
+  (window as any).__predictSearchQueryFromCloudinaryImage = predictSearchQueryFromCloudinaryImage;
+  
+  return () => {
+    delete (window as any).__predictSearchQueryFromCloudinaryImage;
+  };
+}, [predictSearchQueryFromCloudinaryImage]);
   // color palette handler for color palette button
   const handleColorPalette = useCallback(async () => {
     if (!excalidrawAPI) return;
@@ -1848,6 +1967,24 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
               },
             },
 
+            {
+              label: "Add Rabbit Color Palette",
+              category: DEFAULT_CATEGORIES.app,
+              keywords: ["palette", "colors", "color-palette", "hex"],
+              perform: () => {
+                if (excalidrawAPI) {
+                  const colorPalette = newRabbitColorPalette({
+                    x: 100,
+                    y: 100,
+                    colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57']
+                  });
+
+                  excalidrawAPI.updateScene({
+                    elements: [...excalidrawAPI.getSceneElements(), colorPalette]
+                  });
+                }
+              },
+            },
             {
               label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,

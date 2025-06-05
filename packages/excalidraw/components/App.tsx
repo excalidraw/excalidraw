@@ -527,6 +527,7 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
 
 import {AutoOrganizer} from '@excalidraw/element/autoOrganizer'
+import { newRabbitImageElement } from "@excalidraw/element/newRabbitElement";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -10001,37 +10002,78 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * inserts image into elements array and rerenders
    */
-  insertImageElement = async (
-    imageElement: ExcalidrawImageElement,
-    imageFile: File,
-    showCursorImagePreview?: boolean,
-  ) => {
-    // we should be handling all cases upstream, but in case we forget to handle
-    // a future case, let's throw here
-    if (!this.isToolSupported("image")) {
-      this.setState({ errorMessage: t("errors.imageToolNotSupported") });
-      return;
+/**
+ * inserts image into elements array and rerenders
+ */
+insertImageElement = async (
+  imageElement: ExcalidrawImageElement,
+  imageFile: File,
+  showCursorImagePreview?: boolean,
+) => {
+  // we should be handling all cases upstream, but in case we forget to handle
+  // a future case, let's throw here
+  if (!this.isToolSupported("image")) {
+    this.setState({ errorMessage: t("errors.imageToolNotSupported") });
+    return;
+  }
+
+  
+  this.scene.insertElement(imageElement);
+  this.scene.mutateElement(imageElement, { isDeleted: true });
+
+  try {
+    //
+    const uploadToImgur = (window as any).__uploadToImgur;
+    if (!uploadToImgur) {
+      throw new Error("Image upload service not available");
     }
 
-    this.scene.insertElement(imageElement);
+    //upload to cloudinary
+    const cloudinaryUrl = await uploadToImgur(imageFile);
 
-    try {
-      return await this.initializeImage({
-        imageFile,
-        imageElement,
-        showCursorImagePreview,
-      });
-    } catch (error: any) {
-      this.scene.mutateElement(imageElement, {
-        isDeleted: true,
-      });
-      this.actionManager.executeAction(actionFinalize);
-      this.setState({
-        errorMessage: error.message || t("errors.imageInsertError"),
-      });
-      return null;
+    //gemini prediction
+    const predictSearchQuery = (window as any).__predictSearchQueryFromCloudinaryImage;
+    let generatedLabel = "Image"; // fallback label
+    
+    if (predictSearchQuery) {
+      try {
+        generatedLabel = await predictSearchQuery(cloudinaryUrl);
+        console.log("Gemini generated label:", generatedLabel);
+      } catch (error) {
+        console.warn("Failed to generate label with Gemini:", error);
+        // Keep fallback label
+      }
     }
-  };
+
+    //rabbit image with gemini generated label
+    const rabbitImage = newRabbitImageElement({
+      x: imageElement.x,
+      y: imageElement.y,
+      imageUrl: cloudinaryUrl,
+      width: imageElement.width || 200,
+      height: imageElement.height || 200,
+      angle: imageElement.angle || 0,
+      label: "Related Search: " + generatedLabel, 
+    });
+
+    
+    this.scene.insertElement(rabbitImage);
+
+    
+    this.setToast({
+      message: `Image uploaded successfully! Label: "${generatedLabel}"`,
+      duration: 4000
+    });
+
+    return rabbitImage;
+  } catch (error: any) {
+    this.actionManager.executeAction(actionFinalize);
+    this.setState({
+      errorMessage: error.message || t("errors.imageInsertError"),
+    });
+    return null;
+  }
+};
 
   private setImagePreviewCursor = async (imageFile: File) => {
     // mustn't be larger than 128 px
