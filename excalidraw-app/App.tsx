@@ -37,6 +37,7 @@ import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
 
+import { newEmbeddableElement } from "@excalidraw/element/newElement";
 import { AutoOrganizer } from "@excalidraw/element/autoOrganizer";
 import { getRabbitGroupsFromElements } from "@excalidraw/element/rabbitGroupUtils";
 import {
@@ -416,6 +417,7 @@ const ExcalidrawWrapper = () => {
     link: string;
     title?: string;
     snippet?: string; 
+    thumbnail?: string;
   };
 
   type TabImage = {
@@ -490,6 +492,43 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
   const elementsWithDimensions = await Promise.all(
     selectedImageData.map((imageData, index) => {
       return new Promise<any>((resolve) => {
+        // Calculate grid position
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+        const x = START_X + col * (MAX_WIDTH + MARGIN);
+        const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+        console.log("This is", imageData);
+
+        
+        console.log("This is it", imageData);
+        // Check if this is from Internet webpages tab
+         if (imageData.id.startsWith("youtube")) {
+         
+        // Create embedded YouTube iframe instead of image
+        const embedElement = newEmbeddableElement({
+          type: "embeddable", // Add this required property
+          x: x,
+          y: y,
+          width: 560, // Standard YouTube embed width
+          height: 315, // Standard YouTube embed height
+          link: imageData.src, // Should be the YouTube URL
+        });
+        resolve(embedElement);
+        
+      }
+      else if (imageData.id.startsWith("internet webpages")) {
+          const element = newRabbitImageElement({
+            x: x,
+            y: y,
+            imageUrl: imageData.src, // No image URL - just empty or placeholder
+            width: MAX_WIDTH * 1.5,
+            height: 60, // Smaller height since no image
+            label: imageData.name,
+    
+          });
+          resolve(element);
+        }
+      else {
         const img = new Image();
         img.onload = () => {
           let scaledWidth = img.width;
@@ -524,6 +563,7 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
             imageUrl: cloudinaryUrl,
             width: scaledWidth,
             height: scaledHeight,
+            label: imageData.name
           });
           resolve(element);
         };
@@ -542,14 +582,16 @@ const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize:
             imageUrl: cloudinaryUrl,
             width: MAX_WIDTH,
             height: MAX_HEIGHT,
+            label: imageData.name
           });
           resolve(element);
         };
         
         img.src = imageData.src;
+      }
       });
     })
-  );
+);
 
   excalidrawAPI.updateScene({
     elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
@@ -589,8 +631,10 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
         // Pinterest-specific search with siteRestrict = true
         newImages = await searchAndSaveImages(currentTab.searchQuery, true);
       } else if (tabName === "YouTube") {
-        // General search for now (you can add YouTube restriction later)
-        newImages = await searchAndSaveImages(currentTab.searchQuery, false);
+        console.log(`Starting YouTube search for: "${currentTab.searchQuery}"`);
+        newImages = await searchAndSaveImages(currentTab.searchQuery, false, true, true);
+        console.log("Youtube results count:", newImages.length);
+        console.log("Youtube results:", newImages);
       }
       else if (tabName === "Internet webpages") {
         // General search for now (you can add YouTube restriction later)
@@ -599,16 +643,21 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
       }
       
       // Update the specific tab with results
-      const updatedTabs = [...tabData];
+     const updatedTabs = [...tabData];
       updatedTabs[tabIndex] = {
         ...currentTab,
-        images: newImages.slice(0, 10).map((img: ImageResult, i: number) => ({
-          id: `${tabName.toLowerCase()}-${i}`,
-          src: img.link,
-          alt: img.title || `${tabName} Result ${i + 1}`,
-          name: img.title || `${tabName} ${i + 1}`,
-          snippet : img.snippet,
-        })),
+        images: newImages.slice(0, 10).map((img: ImageResult, i: number) => {
+
+          console.log("Google Search:", img.title);
+          return {
+            id: `${tabName.toLowerCase()}-${i}`,
+            src: img.link,
+            displayImage: tabName === "YouTube" ? img.thumbnail : img.link,
+            alt: img.title || `${tabName} Result ${i + 1}`,
+            name: img.title || `${tabName} ${i + 1}`,
+            snippet: img.snippet,
+          };
+        }),
         loaded: true // Mark as loaded
       };
       
@@ -747,16 +796,23 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
   
           searchAndSaveImages(searchQuery, false)
             .then((images: ImageResult[]) => {
+              console.log("First few raw search results:", images.slice(0, 3));
+    
               const tabs = [
                 {
                   name: "Google",
-                  images: images.slice(0, 10).map((img: ImageResult, i: number) => ({
-                    id: `google-${i}`,
-                    src: img.link,
-                    alt: `Google Result ${i + 1}`,
-                    name: `Google ${i + 1}`,
-                  })),
-                  loaded: true
+                  images: images.slice(0, 10).map((img: ImageResult, i: number) => {
+                    // Debug each image as it's processed
+                    console.log(`Image ${i} title:`, img.title);
+                    
+                    return {
+                      id: `google-${i}`,
+                      src: img.link,
+                      alt: img.title || `Google Result ${i + 1}`,
+                      name: 'Found', // Add fallback
+                      snippet: img.snippet
+                    };
+                  }),
                 },
                 {
                   name: "Pinterest",
@@ -1597,6 +1653,7 @@ useEffect(() => {
             event.preventDefault();
             excalidrawAPI?.scrollToContent(element.link, { animate: true });
           }
+          
         }}
       >
         <AppMainMenu
@@ -1841,7 +1898,7 @@ useEffect(() => {
                                   id: `google-${i}`,
                                   src: img.link,
                                   alt: `Google Result ${i + 1}`,
-                                  name: `Google ${i + 1}`,
+                                  name: img.title || `Google ${i + 1}`,
                                 })),
                                 loaded: true
                               },
@@ -1854,12 +1911,10 @@ useEffect(() => {
                               },
                               {
                                 name: "YouTube",
-                                images: images.slice(20, 30).map((img: ImageResult, i: number) => ({
-                                  id: `youtube-${i}`,
-                                  src: img.link,
-                                  alt: `YouTube Result ${i + 1}`,
-                                  name: `YouTube ${i + 1}`,
-                                })),
+                                images: [], // Empty initially will be lazily loaded upon onclick
+                                searchQuery: searchQuery, // Store query for later
+                                loaded: false // Mark as not loaded
+                                
                               },
                               {
                                 name: "Internet webpages",

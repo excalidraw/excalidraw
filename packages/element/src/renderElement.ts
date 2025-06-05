@@ -1131,6 +1131,8 @@ const renderRabbitElement = (
       element
     );
 
+    
+
     // Draw rounded rectangle
     if (context.roundRect) {
       context.beginPath();
@@ -1248,6 +1250,7 @@ const renderRabbitElement = (
     context.restore();
   }
   else if (isRabbitImageElement(element)) {
+    console.log("RENDER ENTRY: Starting to render element", element.type);
     const offsetX = element.x + appState.scrollX;
     const offsetY = element.y + appState.scrollY;
     const { width, height } = element;
@@ -1260,6 +1263,7 @@ const renderRabbitElement = (
 
     // Set fill style before drawing background
     context.fillStyle = element.backgroundColor || "#fff";
+    
 
     // Draw rounded rectangle
     if (context.roundRect) {
@@ -1295,7 +1299,28 @@ const renderRabbitElement = (
 
     context.font = "16px sans-serif"; // Replace with any loaded font
     context.textBaseline = "bottom";
-    context.fillText(element.label, padding, height - 5);
+    const fullLabel = element.fullTitle || element.label || "";
+
+    const maxLabelWidth = width - (padding * 2);
+
+    // Measure the full text width
+    const textWidth = context.measureText(fullLabel).width;
+    console.log("Label width check:", fullLabel, "width:", textWidth, "maxWidth:", maxLabelWidth);
+
+    // Determine if truncation is needed
+    let displayLabel = fullLabel;
+    if (textWidth > maxLabelWidth) {
+      // Calculate approximately how many characters will fit
+      const charsPerPixel = fullLabel.length / textWidth;
+      const maxChars = Math.floor(maxLabelWidth * charsPerPixel) - 3; // Space for "..."
+      displayLabel = fullLabel.substring(0, Math.max(3, maxChars)) + "...";
+      console.log("Truncated to:", displayLabel);
+      
+    }
+
+    // Draw the truncated label
+    context.font = "16px sans-serif"; 
+    context.fillText(displayLabel, padding, height - 5);
 
     context.restore();
 
@@ -1313,8 +1338,14 @@ const renderRabbitElement = (
       );
       context.restore();
     }
+
   }
   else if (isRabbitImageTabsElement(element)) {
+    const offsetX = element.x + appState.scrollX;
+    const offsetY = element.y + appState.scrollY;
+    const { width, height } = element;
+    const labelHeight = 20;
+    const radius = 10;
     context.save();
 
     context.translate(
@@ -1428,19 +1459,46 @@ const renderRabbitElement = (
             context.strokeStyle = "#e5e7eb";
             context.lineWidth = 1;
             context.strokeRect(imageX, imageY, columnWidth, imageHeight);
+            
+            console.log("Image data title:");
 
             // Optional: Draw image title if available
             if (imageData.title) {
-              context.fillStyle = "#374151";
-              context.font = "12px Arial";
-              context.textAlign = "center";
-              context.textBaseline = "top";
-              context.fillText(
-                imageData.title,
-                imageX + columnWidth / 2,
-                imageY + imageHeight + 5
-              );
-            }
+              console.log("Hey I'm here")
+          context.fillStyle = "#374151";
+          context.font = "12px Arial";
+          context.textAlign = "center";
+          context.textBaseline = "top";
+          
+          // Calculate available width (adjust as needed)
+          const availableWidth = columnWidth - 10; // 5px padding on each side
+          
+          // Get the full title
+          const fullTitle = imageData.title;
+          
+          // Measure the text width
+          const textWidth = context.measureText(fullTitle).width;
+          
+          // Truncate if needed
+          let displayTitle = fullTitle;
+          if (textWidth > availableWidth) {
+            // Calculate approximately how many characters will fit
+            const charsPerPixel = fullTitle.length / textWidth;
+            const maxChars = Math.floor(availableWidth * charsPerPixel) - 3; // Space for "..."
+            displayTitle = fullTitle.substring(0, Math.max(3, maxChars)) + "...";
+            console.log("Avail width", displayTitle);
+            
+            // Optional: Store the full title somewhere for tooltip functionality
+            // imageData.fullTitle = fullTitle;
+          }
+          
+          // Draw the truncated title
+          context.fillText(
+            displayTitle,
+            imageX + columnWidth / 2,
+            imageY + imageHeight + 5
+          );
+        }
           } else {
             // Image is still loading or failed to load
             if (img.complete) {

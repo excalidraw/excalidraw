@@ -57,6 +57,7 @@ export const newRabbitSearchBoxElement = (
 
   // extra padding for the icon if enabled
   const iconPadding = hasIcon ? 30 : 0;
+  
 
   // for defaults
   const metrics = measureText(
@@ -152,6 +153,12 @@ export const newRabbitImageElement = (
     label?: string;
   }
 ): RabbitImageElement => {
+  // will calulate and truncate label accordingly
+  const fullLabel = opts.label ?? "Rabbit Image";
+
+ 
+  
+  
   const base: RabbitElementBase = {
     id: randomId(),
     x: opts.x,
@@ -175,7 +182,7 @@ export const newRabbitImageElement = (
     isDeleted: false,
     boundElements: null,
     updated: Date.now(),
-    link: null,
+    link: opts.imageUrl ?? null,
     locked: false,
     customData: {},
     index: null,
@@ -185,7 +192,8 @@ export const newRabbitImageElement = (
     ...base,
     type: "rabbit-image",
     imageUrl: opts.imageUrl ?? "https://via.placeholder.com/150",
-    label: opts.label ?? "",
+    label: fullLabel,
+    fullTitle: fullLabel,
   };
 };
 
