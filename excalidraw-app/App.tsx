@@ -746,7 +746,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
 
   const handleRabbitSearch = useCallback(() => {
     if (!excalidrawAPI) return;
-  
+
     // Create and add search box
     const searchBox = newRabbitSearchBoxElement({
       x: 650,
@@ -758,61 +758,54 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
       verticalAlign: "middle",
       hasIcon: true,
     });
-  
+
     // Add box to scene
     excalidrawAPI.updateScene({
       elements: [...excalidrawAPI.getSceneElements(), searchBox],
     });
-  
+
     excalidrawAPI.setToast({
       message: "Double-click on the search box to edit. Press Enter to confirm and search for images.",
       duration: 5000
     });
-  
+
     let hasSearched = false;
     let lastSearchQuery = ""; // preventing duplicate searches
-  
+
     const handleEnterKey = (event: KeyboardEvent) => {
       if (event.key !== 'Enter') return;
-  
+
       const currentElements = excalidrawAPI.getSceneElements();
       const currentSearchBox = currentElements.find(el =>
         el.type === 'rabbit-searchbox' && el.id === searchBox.id
       ) as RabbitSearchBoxElement;
-  
+
       if (currentSearchBox) {
         const searchQuery = getSearchBoxText(currentSearchBox);
-  
+
         // valid and different search query
         if (searchQuery !== "Search..." &&
           searchQuery.trim() !== "" &&
           searchQuery.length > 2 &&
           searchQuery !== lastSearchQuery) {
-  
+
           console.log("Search query detected:", searchQuery);
           lastSearchQuery = searchQuery; // Update last search query
           hasSearched = true;
           setCurrentSearchQuery(searchQuery);
-  
+
           searchAndSaveImages(searchQuery, false)
             .then((images: ImageResult[]) => {
-              console.log("First few raw search results:", images.slice(0, 3));
-    
               const tabs = [
                 {
                   name: "Google",
-                  images: images.slice(0, 10).map((img: ImageResult, i: number) => {
-                    // Debug each image as it's processed
-                    console.log(`Image ${i} title:`, img.title);
-                    
-                    return {
-                      id: `google-${i}`,
-                      src: img.link,
-                      alt: img.title || `Google Result ${i + 1}`,
-                      name: 'Found', // Add fallback
-                      snippet: img.snippet
-                    };
-                  }),
+                  images: images.slice(0, 10).map((img: ImageResult, i: number) => ({
+                    id: `google-${i}`,
+                    src: img.link,
+                    alt: `Google Result ${i + 1}`,
+                    name: img.title || `Google ${i + 1}`,
+                  })),
+                  loaded: true
                 },
                 {
                   name: "Pinterest",
@@ -822,12 +815,9 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                 },
                 {
                   name: "YouTube",
-                  images: images.slice(20, 30).map((img: ImageResult, i: number) => ({
-                    id: `youtube-${i}`,
-                    src: img.link,
-                    alt: `YouTube Result ${i + 1}`,
-                    name: `YouTube ${i + 1}`,
-                  })),
+                  images: [], // Empty initially will be lazily loaded upon onclick
+                  searchQuery: searchQuery, // Store query for later
+                  loaded: false // Mark as not loaded
                 },
                 {
                   name: "Internet webpages",
@@ -844,7 +834,7 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
         } 
       }
     };
-  
+
     document.addEventListener('keydown', handleEnterKey);
     
     // Return cleanup function
