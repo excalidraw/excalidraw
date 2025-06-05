@@ -204,7 +204,7 @@ export const intersectElementWithLineSegment = (
     Math.max(line[0][0] + offset, line[1][0] + offset),
     Math.max(line[0][1] + offset, line[1][1] + offset),
   ] as Bounds;
-  const elementBounds = getElementBounds(element, new Map());
+  const elementBounds = getElementBounds(element, elementsMap);
 
   if (!doBoundsIntersect(intersectorBounds, elementBounds)) {
     return [];
@@ -464,7 +464,7 @@ export const isPointInElement = (
     return false;
   }
 
-  const [x1, y1, x2, y2] = getElementBounds(element, new Map());
+  const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
 
   if (!isPointWithinBounds(pointFrom(x1, y1), point, pointFrom(x2, y2))) {
     return false;

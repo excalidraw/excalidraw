@@ -62,7 +62,7 @@ export const getLassoSelectedElementIds = (input: {
     // First check if the lasso segment intersects the element's axis-aligned
     // bounding box as it is much faster than checking intersection against
     // the element's shape
-    const elementBounds = getElementBounds(element, new Map());
+    const elementBounds = getElementBounds(element, elementsMap);
 
     if (
       doBoundsIntersect(lassoBounds, elementBounds) &&
