@@ -739,9 +739,14 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
     }
   }, [excalidrawAPI]);
 
+
+  const [showExtendedSearch, setShowExtendedSearch] = useState(false);
+  const [extendedSearchInput, setExtendedSearchInput] = useState("");
+  const [originalSearchQuery, setOriginalSearchQuery] = useState("");
+
   const handleRabbitSearch = useCallback(() => {
     if (!excalidrawAPI) return;
-
+  
     // Create and add search box
     const searchBox = newRabbitSearchBoxElement({
       x: 650,
@@ -753,90 +758,251 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
       verticalAlign: "middle",
       hasIcon: true,
     });
-
+  
     // Add box to scene
     excalidrawAPI.updateScene({
       elements: [...excalidrawAPI.getSceneElements(), searchBox],
     });
-
+  
     excalidrawAPI.setToast({
-      message: "Double-click on the search box to edit. Press Enter to confirm and search for images.",
+      message: "Double-click on the search box to edit. Press Enter to confirm and search for images. Press Ctrl+T for extended search.",
       duration: 5000
     });
-
+  
     let hasSearched = false;
-    let lastSearchQuery = ""; // preventing duplicate searches
-
-    const handleEnterKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Enter') return;
-
+    let lastSearchQuery = "";
+  
+    const handleKeyDown = async (event: KeyboardEvent) => {
       const currentElements = excalidrawAPI.getSceneElements();
       const currentSearchBox = currentElements.find(el =>
         el.type === 'rabbit-searchbox' && el.id === searchBox.id
       ) as RabbitSearchBoxElement;
-
-      if (currentSearchBox) {
-        const searchQuery = getSearchBoxText(currentSearchBox);
-
-        // valid and different search query
+  
+      if (!currentSearchBox) return;
+  
+      const searchQuery = getSearchBoxText(currentSearchBox);
+  
+      // Handle Enter key for regular search
+      if (event.key === 'Enter') {
         if (searchQuery !== "Search..." &&
-          searchQuery.trim() !== "" &&
-          searchQuery.length > 2 &&
-          searchQuery !== lastSearchQuery) {
-
+            searchQuery.trim() !== "" &&
+            searchQuery.length > 2 &&
+            searchQuery !== lastSearchQuery) {
+  
           console.log("Search query detected:", searchQuery);
-          lastSearchQuery = searchQuery; // Update last search query
+          lastSearchQuery = searchQuery;
           hasSearched = true;
           setCurrentSearchQuery(searchQuery);
-
-          searchAndSaveImages(searchQuery, false)
-            .then((images: ImageResult[]) => {
-              const tabs = [
-                {
-                  name: "Google",
-                  images: images.slice(0, 10).map((img: ImageResult, i: number) => ({
-                    id: `google-${i}`,
-                    src: img.link,
-                    alt: `Google Result ${i + 1}`,
-                    name: img.title || `Google ${i + 1}`,
-                  })),
-                  loaded: true
-                },
-                {
-                  name: "Pinterest",
-                  images: [], // Empty initially will be lazily loaded upon onclick
-                  searchQuery: searchQuery, // Store query for later
-                  loaded: false // Mark as not loaded
-                },
-                {
-                  name: "YouTube",
-                  images: [], // Empty initially will be lazily loaded upon onclick
-                  searchQuery: searchQuery, // Store query for later
-                  loaded: false // Mark as not loaded
-                },
-                {
-                  name: "Internet webpages",
-                  images: [], // Empty initially will be lazily loaded upon onclick
-                  searchQuery: searchQuery, // Store query for later
-                  loaded: false // Mark as not loaded
-                },
-              ];
-              console.log(tabs);
-              setTabData(tabs);
-              console.log("Tab Data was set!");
-              setImageWindowVisible(true);
-            });
-        } 
+          setOriginalSearchQuery(searchQuery); // Store for extended search
+  
+          // Perform initial search
+          performSearch(searchQuery);
+        }
+      }
+      
+      // Handle Ctrl+E for extended search
+      if (event.ctrlKey && event.key === 't') {
+        event.preventDefault();
+        
+        if (searchQuery !== "Search..." && searchQuery.trim() !== "" && searchQuery.length > 2) {
+          setOriginalSearchQuery(searchQuery);
+          setShowExtendedSearch(true);
+          setExtendedSearchInput("");
+          
+          excalidrawAPI.setToast({
+            message: `Extended search mode activated for: "${searchQuery}". Add your extension term.`,
+            duration: 3000
+          });
+        } else {
+          excalidrawAPI.setToast({
+            message: "Please enter a valid search query first, then press Ctrl+T for extended search.",
+            duration: 3000
+          });
+        }
       }
     };
-
-    document.addEventListener('keydown', handleEnterKey);
+  
+    // Function to perform the actual search
+    const performSearch = (query: string) => {
+      searchAndSaveImages(query, false)
+        .then((images: ImageResult[]) => {
+          const tabs = [
+            {
+              name: "Google",
+              images: images.slice(0, 10).map((img: ImageResult, i: number) => ({
+                id: `google-${i}`,
+                src: img.link,
+                alt: `Google Result ${i + 1}`,
+                name: img.title || `Google ${i + 1}`,
+              })),
+              loaded: true
+            },
+            {
+              name: "Pinterest",
+              images: [],
+              searchQuery: query,
+              loaded: false
+            },
+            {
+              name: "YouTube",
+              images: [],
+              searchQuery: query,
+              loaded: false
+            },
+            {
+              name: "Internet webpages",
+              images: [],
+              searchQuery: query,
+              loaded: false
+            },
+          ];
+          
+          setTabData(tabs);
+          setImageWindowVisible(true);
+          setShowExtendedSearch(false); // Hide extended search after successful search
+        })
+        .catch(error => {
+          console.error("Search error:", error);
+          excalidrawAPI.setToast({
+            message: "Search failed. Please try again.",
+            duration: 3000
+          });
+        });
+    };
+  
+    document.addEventListener('keydown', handleKeyDown);
     
-    // Return cleanup function
     return () => {
-      document.removeEventListener('keydown', handleEnterKey);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [excalidrawAPI, setTabData, setImageWindowVisible]);
+  
+  const handleExtendedSearchSubmit = async () => {
+    if (!extendedSearchInput.trim()) {
+      excalidrawAPI?.setToast({
+        message: "Please enter an extension term.",
+        duration: 2000
+      });
+      return;
+    }
+  
+    try {
+      excalidrawAPI?.setToast({
+        message: "Generating enhanced search query...",
+        duration: 2000
+      });
+  
+      // Use the generateBetterSearchQuery function
+      const enhancedQuery = await generateBetterSearchQuery(originalSearchQuery, extendedSearchInput.trim());
+      
+      console.log(`Original: "${originalSearchQuery}" + Extension: "${extendedSearchInput}" = Enhanced: "${enhancedQuery}"`);
+      
+      setCurrentSearchQuery(enhancedQuery);
+      
+      excalidrawAPI?.setToast({
+        message: `Searching for: "${enhancedQuery}"`,
+        duration: 3000
+      });
+  
+      // Perform the enhanced search
+      searchAndSaveImages(enhancedQuery, false)
+        .then((images: ImageResult[]) => {
+          const tabs = [
+            {
+              name: "Google",
+              images: images.slice(0, 10).map((img: ImageResult, i: number) => ({
+                id: `google-${i}`,
+                src: img.link,
+                alt: `Google Result ${i + 1}`,
+                name: img.title || `Google ${i + 1}`,
+              })),
+              loaded: true
+            },
+            {
+              name: "Pinterest",
+              images: [],
+              searchQuery: enhancedQuery,
+              loaded: false
+            },
+            {
+              name: "YouTube",
+              images: [],
+              searchQuery: enhancedQuery,
+              loaded: false
+            },
+            {
+              name: "Internet webpages",
+              images: [],
+              searchQuery: enhancedQuery,
+              loaded: false
+            },
+          ];
+          
+          setTabData(tabs);
+          setImageWindowVisible(true);
+          setShowExtendedSearch(false);
+          setExtendedSearchInput("");
+        })
+        .catch(error => {
+          console.error("Enhanced search error:", error);
+          excalidrawAPI?.setToast({
+            message: "Enhanced search failed. Please try again.",
+            duration: 3000
+          });
+        });
+  
+    } catch (error) {
+      console.error("Error generating enhanced query:", error);
+      excalidrawAPI?.setToast({
+        message: "Failed to generate enhanced query. Using simple combination instead.",
+        duration: 3000
+      });
+      
+      // Fallback to simple combination
+      const fallbackQuery = `${extendedSearchInput.trim()} ${originalSearchQuery}`;
+      setCurrentSearchQuery(fallbackQuery);
+      
+      // Perform fallback search
+      searchAndSaveImages(fallbackQuery, false)
+        .then((images: ImageResult[]) => {
+          const tabs = [
+            {
+              name: "Google",
+              images: images.slice(0, 10).map((img: ImageResult, i: number) => ({
+                id: `google-${i}`,
+                src: img.link,
+                alt: `Google Result ${i + 1}`,
+                name: img.title || `Google ${i + 1}`,
+              })),
+              loaded: true
+            },
+            {
+              name: "Pinterest",
+              images: [],
+              searchQuery: fallbackQuery,
+              loaded: false
+            },
+            {
+              name: "YouTube",
+              images: [],
+              searchQuery: fallbackQuery,
+              loaded: false
+            },
+            {
+              name: "Internet webpages",
+              images: [],
+              searchQuery: fallbackQuery,
+              loaded: false
+            },
+          ];
+          
+          setTabData(tabs);
+          setImageWindowVisible(true);
+          setShowExtendedSearch(false);
+          setExtendedSearchInput("");
+        });
+    }
+  };
 
   useEffect(() => {
     (window as any).__handleRabbitSearch = handleRabbitSearch;
@@ -1543,6 +1709,140 @@ useEffect(() => {
     },
   };
 
+
+  const ExtendedSearchUI = () => {
+    if (!showExtendedSearch) return null;
+  
+    return (
+      <div
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          background: "white",
+          padding: "20px",
+          borderRadius: "12px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+          zIndex: 1001,
+          minWidth: "400px",
+          border: "1px solid #e0e0e0",
+          fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        }}
+      >
+        <h3 style={{ 
+          margin: "0 0 15px 0", 
+          color: "#333",
+          fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        }}>
+          Extended Search
+        </h3>
+        
+        <div style={{ marginBottom: "15px" }}>
+          <label style={{ 
+            display: "block", 
+            marginBottom: "5px", 
+            fontWeight: "500", 
+            color: "#555",
+            fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+          }}>
+            Original Search:
+          </label>
+          <div style={{ 
+            padding: "8px 12px", 
+            background: "#f5f5f5", 
+            borderRadius: "6px",
+            color: "#666",
+            fontStyle: "italic",
+            fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+          }}>
+            {originalSearchQuery}
+          </div>
+        </div>
+  
+        <div style={{ marginBottom: "20px" }}>
+          <label style={{ 
+            display: "block", 
+            marginBottom: "5px", 
+            fontWeight: "500", 
+            color: "#555",
+            fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+          }}>
+            Add Extension:
+          </label>
+          <input
+            type="text"
+            value={extendedSearchInput}
+            onChange={(e) => setExtendedSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleExtendedSearchSubmit();
+              } else if (e.key === 'Escape') {
+                setShowExtendedSearch(false);
+                setExtendedSearchInput("");
+              }
+            }}
+            placeholder="e.g., brown, vintage, modern..."
+            style={{
+              width: "93%",
+              padding: "10px 12px",
+              border: "2px solid #ddd",
+              borderRadius: "6px",
+              fontSize: "14px",
+              outline: "none",
+              transition: "border-color 0.2s",
+              fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+            }}
+            autoFocus
+          />
+        </div>
+  
+        <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+          <button
+            onClick={() => {
+              setShowExtendedSearch(false);
+              setExtendedSearchInput("");
+            }}
+            style={{
+              padding: "8px 16px",
+              border: "1px solid #ddd",
+              borderRadius: "6px",
+              background: "white",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleExtendedSearchSubmit}
+            style={{
+              padding: "8px 16px",
+              border: "none",
+              borderRadius: "6px",
+              background: "#007bff",
+              color: "white",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+            }}
+          >
+            Search
+          </button>
+        </div>
+        
+        <div style={{ 
+          marginTop: "10px", 
+          fontSize: "12px", 
+          color: "#666",
+          fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+        }}>
+          Press Enter to search, Escape to cancel
+        </div>
+      </div>
+    );
+  };
   return (
     <div
       style={{ height: "100%" }}
@@ -2329,6 +2629,8 @@ useEffect(() => {
           tabData={tabData}
         />
       )}
+      <ExtendedSearchUI />
+
       {excalidrawAPI && (() => {
         const appState = excalidrawAPI.getAppState();
         const elements = excalidrawAPI.getSceneElements();
