@@ -228,6 +228,7 @@ export type ExcalidrawElement =
   | RabbitElement
   | RabbitSearchBoxElement
   | RabbitImageElement
+  | RabbitColorPaletteElement
   | RabbitColorPaletteElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<
