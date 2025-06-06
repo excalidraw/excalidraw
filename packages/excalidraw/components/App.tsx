@@ -4746,10 +4746,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ suggestedBindings: [] });
     }
     if (nextActiveTool.type === "image") {
-      this.onImageAction({
-        insertOnCanvasDirectly:
-          (tool.type === "image" && tool.insertOnCanvasDirectly) ?? false,
-      });
+      this.onImageAction();
     }
 
     this.setState((prevState) => {
@@ -9873,11 +9870,9 @@ class App extends React.Component<AppProps, AppState> {
   private initializeImage = async ({
     imageFile,
     imageElement: _imageElement,
-    showCursorImagePreview = false,
   }: {
     imageFile: File;
     imageElement: ExcalidrawImageElement;
-    showCursorImagePreview?: boolean;
   }) => {
     // at this point this should be guaranteed image file, but we do this check
     // to satisfy TS down the line
@@ -9935,16 +9930,6 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    if (showCursorImagePreview) {
-      const dataURL = this.files[fileId]?.dataURL;
-      // optimization so that we don't unnecessarily resize the original
-      // full-size file for cursor preview
-      // (it's much faster to convert the resized dataURL to File)
-      const resizedFile = dataURL && dataURLToFile(dataURL);
-
-      this.setImagePreviewCursor(resizedFile || imageFile);
-    }
-
     const dataURL =
       this.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
@@ -10000,10 +9985,6 @@ class App extends React.Component<AppProps, AppState> {
         } catch (error: any) {
           console.error(error);
           reject(new Error(t("errors.imageInsertError")));
-        } finally {
-          if (!showCursorImagePreview) {
-            resetCursor(this.interactiveCanvas);
-          }
         }
       },
     );
@@ -10015,7 +9996,6 @@ class App extends React.Component<AppProps, AppState> {
   insertImageElement = async (
     imageElement: ExcalidrawImageElement,
     imageFile: File,
-    showCursorImagePreview?: boolean,
   ) => {
     // we should be handling all cases upstream, but in case we forget to handle
     // a future case, let's throw here
@@ -10030,7 +10010,6 @@ class App extends React.Component<AppProps, AppState> {
       const image = await this.initializeImage({
         imageFile,
         imageElement,
-        showCursorImagePreview,
       });
 
       const nextElements = this.scene
@@ -10063,58 +10042,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private setImagePreviewCursor = async (imageFile: File) => {
-    // mustn't be larger than 128 px
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Basic_User_Interface/Using_URL_values_for_the_cursor_property
-    const cursorImageSizePx = 96;
-    let imagePreview;
-
-    try {
-      imagePreview = await resizeImageFile(imageFile, {
-        maxWidthOrHeight: cursorImageSizePx,
-      });
-    } catch (e: any) {
-      if (e.cause === "UNSUPPORTED") {
-        throw new Error(t("errors.unsupportedFileType"));
-      }
-      throw e;
-    }
-
-    let previewDataURL = await getDataURL(imagePreview);
-
-    // SVG cannot be resized via `resizeImageFile` so we resize by rendering to
-    // a small canvas
-    if (imageFile.type === MIME_TYPES.svg) {
-      const img = await loadHTMLImageElement(previewDataURL);
-
-      let height = Math.min(img.height, cursorImageSizePx);
-      let width = height * (img.width / img.height);
-
-      if (width > cursorImageSizePx) {
-        width = cursorImageSizePx;
-        height = width * (img.height / img.width);
-      }
-
-      const canvas = document.createElement("canvas");
-      canvas.height = height;
-      canvas.width = width;
-      const context = canvas.getContext("2d")!;
-
-      context.drawImage(img, 0, 0, width, height);
-
-      previewDataURL = canvas.toDataURL(MIME_TYPES.svg) as DataURL;
-    }
-
-    if (this.state.pendingImageElementId) {
-      setCursor(this.interactiveCanvas, `url(${previewDataURL}) 4 4, auto`);
-    }
-  };
-
-  private onImageAction = async ({
-    insertOnCanvasDirectly,
-  }: {
-    insertOnCanvasDirectly: boolean;
-  }) => {
+  private onImageAction = async () => {
     try {
       const clientX = this.state.width / 2 + this.state.offsetLeft;
       const clientY = this.state.height / 2 + this.state.offsetTop;
@@ -10137,35 +10065,20 @@ class App extends React.Component<AppProps, AppState> {
         addToFrameUnderCursor: false,
       });
 
-      if (insertOnCanvasDirectly) {
-        this.insertImageElement(imageElement, imageFile);
-        this.initializeImageDimensions(imageElement);
-        this.store.scheduleCapture();
-        this.setState(
-          {
-            selectedElementIds: makeNextSelectedElementIds(
-              { [imageElement.id]: true },
-              this.state,
-            ),
-          },
-          () => {
-            this.actionManager.executeAction(actionFinalize);
-          },
-        );
-      } else {
-        this.setState(
-          {
-            pendingImageElementId: imageElement.id,
-          },
-          () => {
-            this.insertImageElement(
-              imageElement,
-              imageFile,
-              /* showCursorImagePreview */ true,
-            );
-          },
-        );
-      }
+      this.insertImageElement(imageElement, imageFile);
+      this.initializeImageDimensions(imageElement);
+      this.store.scheduleCapture();
+      this.setState(
+        {
+          selectedElementIds: makeNextSelectedElementIds(
+            { [imageElement.id]: true },
+            this.state,
+          ),
+        },
+        () => {
+          this.actionManager.executeAction(actionFinalize);
+        },
+      );
     } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error(error);
