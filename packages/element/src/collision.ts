@@ -23,7 +23,12 @@ import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./shapes";
-import { type Bounds, doBoundsIntersect, getElementBounds } from "./bounds";
+import {
+  type Bounds,
+  doBoundsIntersect,
+  getCenterForBounds,
+  getElementBounds,
+} from "./bounds";
 import {
   hasBoundTextElement,
   isFreeDrawElement,
@@ -109,7 +114,7 @@ export const hitElementItself = ({
     pointFrom(bounds[0] - threshold, bounds[1] - threshold),
     pointRotateRads(
       point,
-      elementCenterPoint(element, elementsMap),
+      getCenterForBounds(bounds),
       -element.angle as Radians,
     ),
     pointFrom(bounds[2] + threshold, bounds[3] + threshold),
