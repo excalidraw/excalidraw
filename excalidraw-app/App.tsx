@@ -157,24 +157,16 @@ import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 import "./index.scss";
 
 import type { CollabAPI } from "./collab/Collab";
-
 import type { RabbitSearchBoxElement } from "../packages/element/src/rabbitElement";
 
 const ai = new GoogleGenAI({
   apiKey: import.meta.env.VITE_GEMINI_API_KEY,
 });
-async function main() {
-  const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
-    contents: "Hello there",
-    config: {
-      systemInstruction: "You are a cat. Your name is Neko.",
-    },
-  });
-  console.log(response.text);
-}
 
-async function generateBetterSearchQuery(originalSearch: string, extension: string): Promise<string> {
+async function generateBetterSearchQuery(
+  originalSearch: string,
+  extension: string,
+): Promise<string> {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
@@ -203,7 +195,8 @@ Extension: "${extension}"
 
 Output only the combined search query, nothing else.`,
       config: {
-        systemInstruction: "You are a helpful assistant that creates natural search queries. Only respond with the optimized search query.",
+        systemInstruction:
+          "You are a helpful assistant that creates natural search queries. Only respond with the optimized search query.",
       },
     });
 
@@ -214,7 +207,6 @@ Output only the combined search query, nothing else.`,
     return `${extension} ${originalSearch}`;
   }
 }
-
 
 polyfill();
 
@@ -380,7 +372,8 @@ const initializeScene = async (opts: {
           ...restoreAppState(
             {
               ...scene?.appState,
-              theme: localDataState?.appState?.theme || scene?.appState?.theme,
+              theme:
+                localDataState?.appState?.theme || scene?.appState?.theme,
             },
             excalidrawAPI.getAppState(),
           ),
@@ -401,22 +394,21 @@ const initializeScene = async (opts: {
   } else if (scene) {
     return isExternalScene && jsonBackendMatch
       ? {
-        scene,
-        isExternalScene,
-        id: jsonBackendMatch[1],
-        key: jsonBackendMatch[2],
-      }
+          scene,
+          isExternalScene,
+          id: jsonBackendMatch[1],
+          key: jsonBackendMatch[2],
+        }
       : { scene, isExternalScene: false };
   }
   return { scene: null, isExternalScene: false };
 };
 
 const ExcalidrawWrapper = () => {
-
   type ImageResult = {
     link: string;
     title?: string;
-    snippet?: string; 
+    snippet?: string;
     thumbnail?: string;
   };
 
@@ -430,8 +422,8 @@ const ExcalidrawWrapper = () => {
   type TabData = {
     name: string;
     images: TabImage[];
-    searchQuery?: string;  
-    loaded?: boolean;      
+    searchQuery?: string;
+    loaded?: boolean;
   };
 
   const [isImageWindowVisible, setImageWindowVisible] = useState(false);
@@ -439,7 +431,9 @@ const ExcalidrawWrapper = () => {
 
   // consts for auto-organizer
   const [currentSearchQuery, setCurrentSearchQuery] = useState("");
-  const [autoOrganizer, setAutoOrganizer] = useState<AutoOrganizer | null>(null);
+  const [autoOrganizer, setAutoOrganizer] = useState<AutoOrganizer | null>(
+    null,
+  );
 
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
@@ -450,20 +444,26 @@ const ExcalidrawWrapper = () => {
   const handleImageDeselect = (image: any) => {
     setSelectedImages((prev) => prev.filter((id) => id !== image.id));
   };
-  
-  const handleAddToCanvas = async (selectedImageIds: string[], shouldAutoOrganize: boolean = true) => {
+
+  const handleAddToCanvas = async (
+    selectedImageIds: string[],
+    shouldAutoOrganize: boolean = true,
+  ) => {
     if (!excalidrawAPI) return;
-  
+
     const selectedImageData = selectedImageIds
-      .map(id => {
+      .map((id) => {
         for (const tab of tabData) {
-          const image = tab.images.find(img => img.id === id);
+          const image = tab.images.find((img) => img.id === id);
           if (image) return image;
         }
         return null;
       })
-      .filter((imageData): imageData is NonNullable<typeof imageData> => imageData !== null);
-  
+      .filter(
+        (imageData): imageData is NonNullable<typeof imageData> =>
+          imageData !== null,
+      );
+
     if (selectedImageData.length === 0) {
       excalidrawAPI.setToast({
         message: "No images selected to add to canvas.",
@@ -472,211 +472,192 @@ const ExcalidrawWrapper = () => {
       return;
     }
 
-  const MAX_WIDTH = 200;
-  const MAX_HEIGHT = 200;
-  const MARGIN = 30;
-  const START_X = 100;
-  const START_Y = 100;
+    const MAX_WIDTH = 200;
+    const MAX_HEIGHT = 200;
+    const MARGIN = 30;
+    const START_X = 100;
+    const START_Y = 100;
 
-  // Calculate grid layout
-  const imageCount = selectedImageData.length;
-  const cols = Math.ceil(Math.sqrt(imageCount));
-  const rows = Math.ceil(imageCount / cols);
+    // Calculate grid layout
+    const imageCount = selectedImageData.length;
+    const cols = Math.ceil(Math.sqrt(imageCount));
 
-  const getCloudinaryUrl = (originalUrl: string, width: number, height: number) => {
-    const cloudName = 'your-cloud-name';
-    const encodedUrl = encodeURIComponent(originalUrl);
-    return `https://res.cloudinary.com/${cloudName}/image/fetch/w_${Math.round(width)},h_${Math.round(height)},c_fit,f_auto,q_auto/${encodedUrl}`;
+    const elementsWithDimensions = await Promise.all(
+      selectedImageData.map((imageData, index) => {
+        return new Promise<any>((resolve) => {
+          // Calculate grid position
+          const col = index % cols;
+          const row = Math.floor(index / cols);
+          const x = START_X + col * (MAX_WIDTH + MARGIN);
+          const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+          // Check if this is from Internet webpages tab
+          if (imageData.id.startsWith("youtube")) {
+            // Create embedded YouTube iframe instead of image
+            const embedElement = newEmbeddableElement({
+              type: "embeddable",
+              x: x,
+              y: y,
+              width: 560,
+              height: 315,
+              link: imageData.src,
+            });
+            resolve(embedElement);
+          } else if (imageData.id.startsWith("internet webpages")) {
+            const element = newRabbitImageElement({
+              x: x,
+              y: y,
+              imageUrl: imageData.src, // Use original URL
+              width: MAX_WIDTH * 1.5,
+              height: 60,
+              label: imageData.name,
+            });
+            resolve(element);
+          } else {
+            const img = new Image();
+            img.onload = () => {
+              let scaledWidth = img.width;
+              let scaledHeight = img.height;
+
+              // Scale down if width is too large
+              if (scaledWidth > MAX_WIDTH) {
+                const ratio = MAX_WIDTH / scaledWidth;
+                scaledWidth = MAX_WIDTH;
+                scaledHeight = scaledHeight * ratio;
+              }
+
+              // Scale down further if height is still too large
+              if (scaledHeight > MAX_HEIGHT) {
+                const ratio = MAX_HEIGHT / scaledHeight;
+                scaledHeight = MAX_HEIGHT;
+                scaledWidth = scaledWidth * ratio;
+              }
+
+              // Calculate grid position
+              const col = index % cols;
+              const row = Math.floor(index / cols);
+
+              const x = START_X + col * (MAX_WIDTH + MARGIN);
+              const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+              // Use original image URL instead of Cloudinary
+              const element = newRabbitImageElement({
+                x: x,
+                y: y,
+                imageUrl: imageData.src, // Use original URL directly
+                width: scaledWidth,
+                height: scaledHeight,
+                label: imageData.name,
+              });
+              resolve(element);
+            };
+
+            img.onerror = () => {
+              const col = index % cols;
+              const row = Math.floor(index / cols);
+              const x = START_X + col * (MAX_WIDTH + MARGIN);
+              const y = START_Y + row * (MAX_HEIGHT + MARGIN);
+
+              // Use original image URL instead of Cloudinary
+              const element = newRabbitImageElement({
+                x: x,
+                y: y,
+                imageUrl: imageData.src, // Use original URL directly
+                width: MAX_WIDTH,
+                height: MAX_HEIGHT,
+                label: imageData.name,
+              });
+              resolve(element);
+            };
+
+            img.src = imageData.src;
+          }
+        });
+      }),
+    );
+
+    excalidrawAPI.updateScene({
+      elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions],
+    });
+
+    // Auto-organization if enabled
+    if (shouldAutoOrganize && autoOrganizer && currentSearchQuery) {
+      setTimeout(async () => {
+        await autoOrganizer.enhanceAddToCanvas(
+          selectedImageIds,
+          currentSearchQuery,
+          tabData,
+          () => {}, // Empty since images already added
+        );
+      }, 100);
+    }
+
+    setSelectedImages([]);
   };
-
-  const elementsWithDimensions = await Promise.all(
-    selectedImageData.map((imageData, index) => {
-      return new Promise<any>((resolve) => {
-        // Calculate grid position
-        const col = index % cols;
-        const row = Math.floor(index / cols);
-        const x = START_X + col * (MAX_WIDTH + MARGIN);
-        const y = START_Y + row * (MAX_HEIGHT + MARGIN);
-        
-        console.log("This is", imageData);
-        console.log("This is it", imageData);
-        
-        // Check if this is from Internet webpages tab
-        if (imageData.id.startsWith("youtube")) {
-          // Create embedded YouTube iframe instead of image
-          const embedElement = newEmbeddableElement({
-            type: "embeddable",
-            x: x,
-            y: y,
-            width: 560,
-            height: 315,
-            link: imageData.src,
-          });
-          resolve(embedElement);
-        }
-        else if (imageData.id.startsWith("internet webpages")) {
-          const element = newRabbitImageElement({
-            x: x,
-            y: y,
-            imageUrl: imageData.src, // Use original URL
-            width: MAX_WIDTH * 1.5,
-            height: 60,
-            label: imageData.name,
-          });
-          resolve(element);
-        }
-        else {
-          const img = new Image();
-          img.onload = () => {
-            let scaledWidth = img.width;
-            let scaledHeight = img.height;
-
-            // Scale down if width is too large
-            if (scaledWidth > MAX_WIDTH) {
-              const ratio = MAX_WIDTH / scaledWidth;
-              scaledWidth = MAX_WIDTH;
-              scaledHeight = scaledHeight * ratio;
-            }
-
-            // Scale down further if height is still too large
-            if (scaledHeight > MAX_HEIGHT) {
-              const ratio = MAX_HEIGHT / scaledHeight;
-              scaledHeight = MAX_HEIGHT;
-              scaledWidth = scaledWidth * ratio;
-            }
-
-            // Calculate grid position
-            const col = index % cols;
-            const row = Math.floor(index / cols);
-            
-            const x = START_X + col * (MAX_WIDTH + MARGIN);
-            const y = START_Y + row * (MAX_HEIGHT + MARGIN);
-
-            // Use original image URL instead of Cloudinary
-            const element = newRabbitImageElement({
-              x: x,
-              y: y,
-              imageUrl: imageData.src, // Use original URL directly
-              width: scaledWidth,
-              height: scaledHeight,
-              label: imageData.name
-            });
-            resolve(element);
-          };
-          
-          img.onerror = () => {
-            const col = index % cols;
-            const row = Math.floor(index / cols);
-            const x = START_X + col * (MAX_WIDTH + MARGIN);
-            const y = START_Y + row * (MAX_HEIGHT + MARGIN);
-
-            // Use original image URL instead of Cloudinary
-            const element = newRabbitImageElement({
-              x: x,
-              y: y,
-              imageUrl: imageData.src, // Use original URL directly
-              width: MAX_WIDTH,
-              height: MAX_HEIGHT,
-              label: imageData.name
-            });
-            resolve(element);
-          };
-          
-          img.src = imageData.src;
-        }
-      });
-    })
-  );
-
-  excalidrawAPI.updateScene({
-    elements: [...excalidrawAPI.getSceneElements(), ...elementsWithDimensions]
-  });
-
-  // Auto-organization if enabled
-  if (shouldAutoOrganize && autoOrganizer && currentSearchQuery) {
-    setTimeout(async () => {
-      await autoOrganizer.enhanceAddToCanvas(
-        selectedImageIds, 
-        currentSearchQuery, 
-        tabData, 
-        () => {} // Empty since images already added
-      );
-    }, 100);
-  }
-
-  setSelectedImages([]);
-};
 
   const [errorMessage, setErrorMessage] = useState("");
 
-  
+  const handleTabClick = async (tabName: string, tabIndex: number) => {
+    const currentTab = tabData[tabIndex];
 
+    // Only load if not already loaded and has a search query
+    if (!currentTab.loaded && currentTab.searchQuery) {
+      try {
+        let newImages: ImageResult[] = [];
 
-const handleTabClick = async (tabName: string, tabIndex: number) => {
-  const currentTab = tabData[tabIndex];
-  
-  // Only load if not already loaded and has a search query
-  if (!currentTab.loaded && currentTab.searchQuery) {
-    console.log(`Loading ${tabName} results for "${currentTab.searchQuery}"`);
-    
-    try {
-      let newImages: ImageResult[] = [];
-      
-      if (tabName === "Pinterest") {
-        // Pinterest-specific search with siteRestrict = true
-        newImages = await searchAndSaveImages(currentTab.searchQuery, true);
-      } else if (tabName === "YouTube") {
-        console.log(`Starting YouTube search for: "${currentTab.searchQuery}"`);
-        newImages = await searchAndSaveImages(currentTab.searchQuery, false, true, true);
-        console.log("Youtube results count:", newImages.length);
-        console.log("Youtube results:", newImages);
+        if (tabName === "Pinterest") {
+          // Pinterest-specific search with siteRestrict = true
+          newImages = await searchAndSaveImages(currentTab.searchQuery, true);
+        } else if (tabName === "YouTube") {
+          newImages = await searchAndSaveImages(
+            currentTab.searchQuery,
+            false,
+            true,
+            true,
+          );
+        } else if (tabName === "Internet webpages") {
+          // General search for now (you can add YouTube restriction later)
+          newImages = await searchAndSaveImages(
+            currentTab.searchQuery,
+            false,
+            true,
+          );
+        }
+
+        // Update the specific tab with results
+        const updatedTabs = [...tabData];
+        updatedTabs[tabIndex] = {
+          ...currentTab,
+          images: newImages.slice(0, 10).map((img: ImageResult, i: number) => {
+            return {
+              id: `${tabName.toLowerCase()}-${i}`,
+              src: img.link,
+              displayImage: tabName === "YouTube" ? img.thumbnail : img.link,
+              alt: img.title || `${tabName} Result ${i + 1}`,
+              name: img.title || `${tabName} ${i + 1}`,
+              snippet: img.snippet,
+            };
+          }),
+          loaded: true, // Mark as loaded
+        };
+
+        setTabData(updatedTabs);
+
+        excalidrawAPI?.setToast({
+          message: `${tabName} results loaded!`,
+          duration: 2000,
+        });
+      } catch (error) {
+        console.error(`Error loading ${tabName} results:`, error);
+        excalidrawAPI?.setToast({
+          message: `Error loading ${tabName} results. Please try again.`,
+          duration: 3000,
+        });
       }
-      else if (tabName === "Internet webpages") {
-        // General search for now (you can add YouTube restriction later)
-        newImages = await searchAndSaveImages(currentTab.searchQuery, false, true);
-        console.log("Raw web search results:", newImages);
-      }
-      
-      // Update the specific tab with results
-     const updatedTabs = [...tabData];
-      updatedTabs[tabIndex] = {
-        ...currentTab,
-        images: newImages.slice(0, 10).map((img: ImageResult, i: number) => {
-
-          console.log("Google Search:", img.title);
-          return {
-            id: `${tabName.toLowerCase()}-${i}`,
-            src: img.link,
-            displayImage: tabName === "YouTube" ? img.thumbnail : img.link,
-            alt: img.title || `${tabName} Result ${i + 1}`,
-            name: img.title || `${tabName} ${i + 1}`,
-            snippet: img.snippet,
-          };
-        }),
-        loaded: true // Mark as loaded
-      };
-      
-      setTabData(updatedTabs);
-      
-      excalidrawAPI?.setToast({
-        message: `${tabName} results loaded!`,
-        duration: 2000
-      });
-      
-    } catch (error) {
-      console.error(`Error loading ${tabName} results:`, error);
-      excalidrawAPI?.setToast({
-        message: `Error loading ${tabName} results. Please try again.`,
-        duration: 3000
-      });
     }
-  }
-};
-
-
+  };
 
   const isCollabDisabled = isRunningInIframe();
-
 
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
@@ -695,7 +676,6 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
 
   const debugCanvasRef = useRef<HTMLCanvasElement>(null);
 
-
   useEffect(() => {
     trackEvent("load", "frame", getFrame());
     // Delayed so that the app has a time to load the latest SW
@@ -710,9 +690,12 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
 
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
-  const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
-    return isCollaborationLink(window.location.href);
-  });
+  const [isCollaborating] = useAtomWithInitialValue(
+    isCollaboratingAtom,
+    () => {
+      return isCollaborationLink(window.location.href);
+    },
+  );
   const collabError = useAtomValue(collabErrorIndicatorAtom);
 
   useHandleLibrary({
@@ -739,14 +722,13 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
     }
   }, [excalidrawAPI]);
 
-
   const [showExtendedSearch, setShowExtendedSearch] = useState(false);
   const [extendedSearchInput, setExtendedSearchInput] = useState("");
   const [originalSearchQuery, setOriginalSearchQuery] = useState("");
 
   const handleRabbitSearch = useCallback(() => {
     if (!excalidrawAPI) return;
-  
+
     // Create and add search box
     const searchBox = newRabbitSearchBoxElement({
       x: 650,
@@ -758,70 +740,76 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
       verticalAlign: "middle",
       hasIcon: true,
     });
-  
+
     // Add box to scene
     excalidrawAPI.updateScene({
       elements: [...excalidrawAPI.getSceneElements(), searchBox],
     });
-  
+
     excalidrawAPI.setToast({
-      message: "Double-click on the search box to edit. Press Enter to confirm and search for images. Press Ctrl+T for extended search.",
-      duration: 5000
+      message:
+        "Double-click on the search box to edit. Press Enter to confirm and search for images. Press Ctrl+T for extended search.",
+      duration: 5000,
     });
-  
+
     let hasSearched = false;
     let lastSearchQuery = "";
-  
+
     const handleKeyDown = async (event: KeyboardEvent) => {
       const currentElements = excalidrawAPI.getSceneElements();
-      const currentSearchBox = currentElements.find(el =>
-        el.type === 'rabbit-searchbox' && el.id === searchBox.id
+      const currentSearchBox = currentElements.find(
+        (el) => el.type === "rabbit-searchbox" && el.id === searchBox.id,
       ) as RabbitSearchBoxElement;
-  
+
       if (!currentSearchBox) return;
-  
+
       const searchQuery = getSearchBoxText(currentSearchBox);
-  
+
       // Handle Enter key for regular search
-      if (event.key === 'Enter') {
-        if (searchQuery !== "Search..." &&
-            searchQuery.trim() !== "" &&
-            searchQuery.length > 2 &&
-            searchQuery !== lastSearchQuery) {
-  
-          console.log("Search query detected:", searchQuery);
+      if (event.key === "Enter") {
+        if (
+          searchQuery !== "Search..." &&
+          searchQuery.trim() !== "" &&
+          searchQuery.length > 2 &&
+          searchQuery !== lastSearchQuery
+        ) {
           lastSearchQuery = searchQuery;
           hasSearched = true;
           setCurrentSearchQuery(searchQuery);
           setOriginalSearchQuery(searchQuery); // Store for extended search
-  
+
           // Perform initial search
           performSearch(searchQuery);
         }
       }
-      
+
       // Handle Ctrl+E for extended search
-      if (event.ctrlKey && event.key === 't') {
+      if (event.ctrlKey && event.key === "t") {
         event.preventDefault();
-        
-        if (searchQuery !== "Search..." && searchQuery.trim() !== "" && searchQuery.length > 2) {
+
+        if (
+          searchQuery !== "Search..." &&
+          searchQuery.trim() !== "" &&
+          searchQuery.length > 2
+        ) {
           setOriginalSearchQuery(searchQuery);
           setShowExtendedSearch(true);
           setExtendedSearchInput("");
-          
+
           excalidrawAPI.setToast({
             message: `Extended search mode activated for: "${searchQuery}". Add your extension term.`,
-            duration: 3000
+            duration: 3000,
           });
         } else {
           excalidrawAPI.setToast({
-            message: "Please enter a valid search query first, then press Ctrl+T for extended search.",
-            duration: 3000
+            message:
+              "Please enter a valid search query first, then press Ctrl+T for extended search.",
+            duration: 3000,
           });
         }
       }
     };
-  
+
     // Function to perform the actual search
     const performSearch = (query: string) => {
       searchAndSaveImages(query, false)
@@ -835,75 +823,76 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                 alt: `Google Result ${i + 1}`,
                 name: img.title || `Google ${i + 1}`,
               })),
-              loaded: true
+              loaded: true,
             },
             {
               name: "Pinterest",
               images: [],
               searchQuery: query,
-              loaded: false
+              loaded: false,
             },
             {
               name: "YouTube",
               images: [],
               searchQuery: query,
-              loaded: false
+              loaded: false,
             },
             {
               name: "Internet webpages",
               images: [],
               searchQuery: query,
-              loaded: false
+              loaded: false,
             },
           ];
-          
+
           setTabData(tabs);
           setImageWindowVisible(true);
           setShowExtendedSearch(false); // Hide extended search after successful search
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Search error:", error);
           excalidrawAPI.setToast({
             message: "Search failed. Please try again.",
-            duration: 3000
+            duration: 3000,
           });
         });
     };
-  
-    document.addEventListener('keydown', handleKeyDown);
-    
+
+    document.addEventListener("keydown", handleKeyDown);
+
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [excalidrawAPI, setTabData, setImageWindowVisible]);
-  
+
   const handleExtendedSearchSubmit = async () => {
     if (!extendedSearchInput.trim()) {
       excalidrawAPI?.setToast({
         message: "Please enter an extension term.",
-        duration: 2000
+        duration: 2000,
       });
       return;
     }
-  
+
     try {
       excalidrawAPI?.setToast({
         message: "Generating enhanced search query...",
-        duration: 2000
+        duration: 2000,
       });
-  
+
       // Use the generateBetterSearchQuery function
-      const enhancedQuery = await generateBetterSearchQuery(originalSearchQuery, extendedSearchInput.trim());
-      
-      console.log(`Original: "${originalSearchQuery}" + Extension: "${extendedSearchInput}" = Enhanced: "${enhancedQuery}"`);
-      
+      const enhancedQuery = await generateBetterSearchQuery(
+        originalSearchQuery,
+        extendedSearchInput.trim(),
+      );
+
       setCurrentSearchQuery(enhancedQuery);
-      
+
       excalidrawAPI?.setToast({
         message: `Searching for: "${enhancedQuery}"`,
-        duration: 3000
+        duration: 3000,
       });
-  
+
       // Perform the enhanced search
       searchAndSaveImages(enhancedQuery, false)
         .then((images: ImageResult[]) => {
@@ -916,97 +905,96 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
                 alt: `Google Result ${i + 1}`,
                 name: img.title || `Google ${i + 1}`,
               })),
-              loaded: true
+              loaded: true,
             },
             {
               name: "Pinterest",
               images: [],
               searchQuery: enhancedQuery,
-              loaded: false
+              loaded: false,
             },
             {
               name: "YouTube",
               images: [],
               searchQuery: enhancedQuery,
-              loaded: false
+              loaded: false,
             },
             {
               name: "Internet webpages",
               images: [],
               searchQuery: enhancedQuery,
-              loaded: false
+              loaded: false,
             },
           ];
-          
+
           setTabData(tabs);
           setImageWindowVisible(true);
           setShowExtendedSearch(false);
           setExtendedSearchInput("");
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Enhanced search error:", error);
           excalidrawAPI?.setToast({
             message: "Enhanced search failed. Please try again.",
-            duration: 3000
+            duration: 3000,
           });
         });
-  
     } catch (error) {
       console.error("Error generating enhanced query:", error);
       excalidrawAPI?.setToast({
-        message: "Failed to generate enhanced query. Using simple combination instead.",
-        duration: 3000
+        message:
+          "Failed to generate enhanced query. Using simple combination instead.",
+        duration: 3000,
       });
-      
+
       // Fallback to simple combination
       const fallbackQuery = `${extendedSearchInput.trim()} ${originalSearchQuery}`;
       setCurrentSearchQuery(fallbackQuery);
-      
+
       // Perform fallback search
-      searchAndSaveImages(fallbackQuery, false)
-        .then((images: ImageResult[]) => {
-          const tabs = [
-            {
-              name: "Google",
-              images: images.slice(0, 10).map((img: ImageResult, i: number) => ({
-                id: `google-${i}`,
-                src: img.link,
-                alt: `Google Result ${i + 1}`,
-                name: img.title || `Google ${i + 1}`,
-              })),
-              loaded: true
-            },
-            {
-              name: "Pinterest",
-              images: [],
-              searchQuery: fallbackQuery,
-              loaded: false
-            },
-            {
-              name: "YouTube",
-              images: [],
-              searchQuery: fallbackQuery,
-              loaded: false
-            },
-            {
-              name: "Internet webpages",
-              images: [],
-              searchQuery: fallbackQuery,
-              loaded: false
-            },
-          ];
-          
-          setTabData(tabs);
-          setImageWindowVisible(true);
-          setShowExtendedSearch(false);
-          setExtendedSearchInput("");
-        });
+      searchAndSaveImages(fallbackQuery, false).then((images: ImageResult[]) => {
+        const tabs = [
+          {
+            name: "Google",
+            images: images.slice(0, 10).map((img: ImageResult, i: number) => ({
+              id: `google-${i}`,
+              src: img.link,
+              alt: `Google Result ${i + 1}`,
+              name: img.title || `Google ${i + 1}`,
+            })),
+            loaded: true,
+          },
+          {
+            name: "Pinterest",
+            images: [],
+            searchQuery: fallbackQuery,
+            loaded: false,
+          },
+          {
+            name: "YouTube",
+            images: [],
+            searchQuery: fallbackQuery,
+            loaded: false,
+          },
+          {
+            name: "Internet webpages",
+            images: [],
+            searchQuery: fallbackQuery,
+            loaded: false,
+          },
+        ];
+
+        setTabData(tabs);
+        setImageWindowVisible(true);
+        setShowExtendedSearch(false);
+        setExtendedSearchInput("");
+      });
     }
   };
 
   useEffect(() => {
     (window as any).__handleRabbitSearch = handleRabbitSearch;
-    
+
     return () => {
       delete (window as any).__handleRabbitSearch;
     };
@@ -1014,59 +1002,59 @@ const handleTabClick = async (tabName: string, tabIndex: number) => {
 
   const uploadToImgur = useCallback(async (file: File): Promise<string> => {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'rabbithole'); 
-    
+    formData.append("file", file);
+    formData.append("upload_preset", "rabbithole");
+
     try {
       const response = await fetch(
-        'https://api.cloudinary.com/v1_1/dnv3yidzc/image/upload', 
+        "https://api.cloudinary.com/v1_1/dnv3yidzc/image/upload",
         {
-          method: 'POST',
-          body: formData
-        }
+          method: "POST",
+          body: formData,
+        },
       );
-  
+
       if (!response.ok) {
         throw new Error(`Upload failed: ${response.status}`);
       }
-  
+
       const data = await response.json();
-      console.log('Cloudinary response:', data);
-      
-      return data.secure_url; 
+
+      return data.secure_url;
     } catch (error) {
-      console.error('Upload error:', error);
-      throw new Error('Failed to upload image');
+      console.error("Upload error:", error);
+      throw new Error("Failed to upload image");
     }
   }, []);
 
   useEffect(() => {
     (window as any).__uploadToImgur = uploadToImgur;
-    
+
     return () => {
       delete (window as any).__uploadToImgur;
     };
   }, [uploadToImgur]);
-  
-const predictSearchQueryFromCloudinaryImage = useCallback(async (cloudinaryUrl: string): Promise<string> => {
-  try {
-    const response = await fetch(cloudinaryUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch image: ${response.status}`);
-    }
-    
-    const blob = await response.blob();
-    const base64 = await blobToBase64(blob);
-    
-    const base64Data = base64.split(',')[1];
-    
-    const geminiResponse = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [
-        {
-          parts: [
+
+  const predictSearchQueryFromCloudinaryImage = useCallback(
+    async (cloudinaryUrl: string): Promise<string> => {
+      try {
+        const response = await fetch(cloudinaryUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch image: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const base64 = await blobToBase64(blob);
+
+        const base64Data = base64.split(",")[1];
+
+        const geminiResponse = await ai.models.generateContent({
+          model: "gemini-2.0-flash",
+          contents: [
             {
-              text: `Analyze this image and predict what search query someone likely used to find it. Consider:
+              parts: [
+                {
+                  text: `Analyze this image and predict what search query someone likely used to find it. Consider:
 
                       1. The main subject or object in the image
                       2. Visual style, colors, or artistic elements
@@ -1082,76 +1070,80 @@ const predictSearchQueryFromCloudinaryImage = useCallback(async (cloudinaryUrl: 
                       - "sunset mountain landscape"
                       - "vintage red sports car"
 
-                      What search query likely resulted in this image?`
+                      What search query likely resulted in this image?`,
+                },
+                {
+                  inlineData: {
+                    mimeType: blob.type,
+                    data: base64Data,
+                  },
+                },
+              ],
             },
-            {
-              inlineData: {
-                mimeType: blob.type,
-                data: base64Data
-              }
-            }
-          ]
-        }
-      ],
-      config: {
-        systemInstruction: "What is the search query that found this simage?",
-      },
-    });
+          ],
+          config: {
+            systemInstruction: "What is the search query that found this simage?",
+          },
+        });
 
-    const predictedQuery = geminiResponse.text?.trim() || "";
-    console.log("Predicted search query:", predictedQuery);
-    return predictedQuery;
-    
-  } catch (error) {
-    console.error("Error predicting search query from Cloudinary image:", error);
-    return "image search";
-  }
-}, []);
-
-const blobToBase64 = (blob: Blob): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
-        resolve(reader.result);
-      } else {
-        reject(new Error('Failed to convert blob to base64'));
+        const predictedQuery = geminiResponse.text?.trim() || "";
+        return predictedQuery;
+      } catch (error) {
+        console.error(
+          "Error predicting search query from Cloudinary image:",
+          error,
+        );
+        return "image search";
       }
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-};
+    },
+    [],
+  );
 
-useEffect(() => {
-  (window as any).__predictSearchQueryFromCloudinaryImage = predictSearchQueryFromCloudinaryImage;
-  
-  return () => {
-    delete (window as any).__predictSearchQueryFromCloudinaryImage;
+  const blobToBase64 = (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result);
+        } else {
+          reject(new Error("Failed to convert blob to base64"));
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   };
-}, [predictSearchQueryFromCloudinaryImage]);
+
+  useEffect(() => {
+    (window as any).__predictSearchQueryFromCloudinaryImage =
+      predictSearchQueryFromCloudinaryImage;
+
+    return () => {
+      delete (window as any).__predictSearchQueryFromCloudinaryImage;
+    };
+  }, [predictSearchQueryFromCloudinaryImage]);
+
   // color palette handler for color palette button
   const handleColorPalette = useCallback(async () => {
     if (!excalidrawAPI) return;
 
     // Get currently selected elements
-    const selectedElements = excalidrawAPI.getSceneElements().filter(
-      element => excalidrawAPI.getAppState().selectedElementIds[element.id]
-    );
+    const selectedElements = excalidrawAPI
+      .getSceneElements()
+      .filter(
+        (element) => excalidrawAPI.getAppState().selectedElementIds[element.id],
+      );
 
     // Check if selected elements are images or rabbit-images
     const selectedImages = selectedElements.filter(
-      element => element.type === 'image' || element.type === 'rabbit-image'
+      (element) => element.type === "image" || element.type === "rabbit-image",
     );
-
-    console.log("Selected elements:", selectedElements.length);
-    console.log("Selected images:", selectedImages.length);
 
     // if no images selected, error message
     if (selectedImages.length === 0) {
       excalidrawAPI.setToast({
         message: "Please select at least one image",
-        duration: 3000
+        duration: 3000,
       });
       return;
     }
@@ -1159,7 +1151,7 @@ useEffect(() => {
     // If images are selected, proceed with color extraction
     excalidrawAPI.setToast({
       message: `Generating color palette for \n${selectedImages.length} selected image(s)...`,
-      duration: 3000
+      duration: 3000,
     });
 
     try {
@@ -1170,10 +1162,17 @@ useEffect(() => {
       // First, collect colors from all images
       for (const imageElement of selectedImages) {
         try {
-          const colors = await extractColorsFromImageElement(imageElement, colorThief, excalidrawAPI);
+          const colors = await extractColorsFromImageElement(
+            imageElement,
+            colorThief,
+            excalidrawAPI,
+          );
           imageColorArrays.push(colors);
         } catch (error) {
-          console.warn(`Failed to extract colors from image ${imageElement.id}:`, error);
+          console.warn(
+            `Failed to extract colors from image ${imageElement.id}:`,
+            error,
+          );
         }
       }
 
@@ -1186,38 +1185,38 @@ useEffect(() => {
         for (const imageColors of imageColorArrays) {
           if (finalPalette.length >= maxColors) break;
 
-          if (imageColors[colorIndex] && !finalPalette.includes(imageColors[colorIndex])) {
+          if (
+            imageColors[colorIndex] &&
+            !finalPalette.includes(imageColors[colorIndex])
+          ) {
             finalPalette.push(imageColors[colorIndex]);
           }
         }
         colorIndex++;
       }
 
-      console.log("Extracted colors from multiple images:", finalPalette);
       // Create color palette element
       const colorPalette = newRabbitColorPalette({
         x: 100,
         y: 100,
-        colors: finalPalette
+        colors: finalPalette,
       });
 
       excalidrawAPI.updateScene({
-        elements: [...excalidrawAPI.getSceneElements(), colorPalette]
+        elements: [...excalidrawAPI.getSceneElements(), colorPalette],
       });
 
       excalidrawAPI.setToast({
         message: `Color palette created`,
-        duration: 3000
+        duration: 3000,
       });
-
     } catch (error) {
       console.error("Error extracting colors:", error);
       excalidrawAPI.setToast({
         message: "Error extracting colors from images",
-        duration: 3000
+        duration: 3000,
       });
     }
-    console.log("Images to process:", selectedImages);
   }, [excalidrawAPI]); // Don't forget the dependency array!
 
   useEffect(() => {
@@ -1232,75 +1231,81 @@ useEffect(() => {
   async function extractColorsFromMultipleImages(
     imageElements: any[],
     colorThief: ColorThief,
-    excalidrawAPI: any
+    excalidrawAPI: any,
   ): Promise<string[][]> {
-    const promises = imageElements.map(imageElement =>
-      extractColorsFromImageElement(imageElement, colorThief, excalidrawAPI)
+    const promises = imageElements.map((imageElement) =>
+      extractColorsFromImageElement(imageElement, colorThief, excalidrawAPI),
     );
 
     const allColors = await Promise.all(promises);
     return allColors;
   }
 
-  const getCloudinaryUrl = (originalUrl: string, width: number, height: number) => {
-    const cloudName = 'your-cloud-name';
+  const getCloudinaryUrl = (
+    originalUrl: string,
+    width: number,
+    height: number,
+  ) => {
+    const cloudName = "your-cloud-name";
     const encodedUrl = encodeURIComponent(originalUrl);
-    return `https://res.cloudinary.com/${cloudName}/image/fetch/w_${Math.round(width)},h_${Math.round(height)},c_fit,f_auto,q_auto/${encodedUrl}`;
+    return `https://res.cloudinary.com/${cloudName}/image/fetch/w_${Math.round(
+      width,
+    )},h_${Math.round(height)},c_fit,f_auto,q_auto/${encodedUrl}`;
   };
 
   // Helper function to extract colors from an image element
   const extractColorsFromImageElement = async (
     imageElement: any,
     colorThief: ColorThief,
-    excalidrawAPI: any
+    excalidrawAPI: any,
   ): Promise<string[]> => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-  
+
     // First, set up the image source
     try {
-      if (imageElement.type === 'image') {
+      if (imageElement.type === "image") {
         const files = excalidrawAPI.getFiles();
         const file = files[imageElement.fileId];
-  
-        console.log("data url", imageElement.dataURL);
-  
+
         if (file) {
           if (file.dataURL) {
             img.src = file.dataURL;
-            console.log("here");
-          }
-          else {
-            throw new Error('No image source found for image')
+          } else {
+            throw new Error("No image source found for image");
           }
         }
-      } else if (imageElement.type === 'rabbit-image') {
+      } else if (imageElement.type === "rabbit-image") {
         // Use Cloudinary URL for color extraction to ensure CORS compatibility
         const cloudinaryUrl = getCloudinaryUrl(imageElement.imageUrl, 300, 300);
         img.src = cloudinaryUrl;
       }
     } catch (error) {
-      throw new Error('Failed to load rabbit image');
+      throw new Error("Failed to load rabbit image");
     }
-  
+
     // Then wait for the image to load
     return new Promise((resolve, reject) => {
       img.onload = () => {
         try {
           const dominantColor = colorThief.getColor(img);
           const palette = colorThief.getPalette(img, 5);
-  
-          const hexColors = [dominantColor, ...palette].map(rgb =>
-            '#' + rgb.map((x: number) => x.toString(16).padStart(2, '0')).join('')
+
+          const hexColors = [dominantColor, ...palette].map(
+            (rgb) =>
+              "#" +
+              rgb
+                .map((x: number) => x.toString(16).padStart(2, "0"))
+                .join(""),
           );
-  
+
           resolve(hexColors);
         } catch (error) {
           reject(error);
         }
       };
-  
-      img.onerror = () => reject(new Error('Failed to load image'));
+
+      img.onerror = () => reject(new Error("Failed to load image"));
     });
   };
 
@@ -1315,7 +1320,6 @@ useEffect(() => {
       return;
     }
 
-    
     const loadImages = (
       data: ResolutionType<typeof initializeScene>,
       isInitialLoad = false,
@@ -1680,7 +1684,8 @@ useEffect(() => {
     keywords: ["plus", "cloud", "server"],
     perform: () => {
       window.open(
-        `${import.meta.env.VITE_APP_PLUS_LP
+        `${
+          import.meta.env.VITE_APP_PLUS_LP
         }/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
@@ -1702,17 +1707,17 @@ useEffect(() => {
     ],
     perform: () => {
       window.open(
-        `${import.meta.env.VITE_APP_PLUS_APP
+        `${
+          import.meta.env.VITE_APP_PLUS_APP
         }?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
         "_blank",
       );
     },
   };
 
-
   const ExtendedSearchUI = () => {
     if (!showExtendedSearch) return null;
-  
+
     return (
       <div
         style={{
@@ -1727,47 +1732,60 @@ useEffect(() => {
           zIndex: 1001,
           minWidth: "400px",
           border: "1px solid #e0e0e0",
-          fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+          fontFamily:
+            "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
         }}
       >
-        <h3 style={{ 
-          margin: "0 0 15px 0", 
-          color: "#333",
-          fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
-        }}>
+        <h3
+          style={{
+            margin: "0 0 15px 0",
+            color: "#333",
+            fontFamily:
+              "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
+          }}
+        >
           Extended Search
         </h3>
-        
+
         <div style={{ marginBottom: "15px" }}>
-          <label style={{ 
-            display: "block", 
-            marginBottom: "5px", 
-            fontWeight: "500", 
-            color: "#555",
-            fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
-          }}>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "500",
+              color: "#555",
+              fontFamily:
+                "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
+            }}
+          >
             Original Search:
           </label>
-          <div style={{ 
-            padding: "8px 12px", 
-            background: "#f5f5f5", 
-            borderRadius: "6px",
-            color: "#666",
-            fontStyle: "italic",
-            fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
-          }}>
+          <div
+            style={{
+              padding: "8px 12px",
+              background: "#f5f5f5",
+              borderRadius: "6px",
+              color: "#666",
+              fontStyle: "italic",
+              fontFamily:
+                "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
+            }}
+          >
             {originalSearchQuery}
           </div>
         </div>
-  
+
         <div style={{ marginBottom: "20px" }}>
-          <label style={{ 
-            display: "block", 
-            marginBottom: "5px", 
-            fontWeight: "500", 
-            color: "#555",
-            fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
-          }}>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "500",
+              color: "#555",
+              fontFamily:
+                "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
+            }}
+          >
             Add Extension:
           </label>
           <input
@@ -1775,9 +1793,9 @@ useEffect(() => {
             value={extendedSearchInput}
             onChange={(e) => setExtendedSearchInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 handleExtendedSearchSubmit();
-              } else if (e.key === 'Escape') {
+              } else if (e.key === "Escape") {
                 setShowExtendedSearch(false);
                 setExtendedSearchInput("");
               }
@@ -1791,13 +1809,20 @@ useEffect(() => {
               fontSize: "14px",
               outline: "none",
               transition: "border-color 0.2s",
-              fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+              fontFamily:
+                "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
             }}
             autoFocus
           />
         </div>
-  
-        <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            justifyContent: "flex-end",
+          }}
+        >
           <button
             onClick={() => {
               setShowExtendedSearch(false);
@@ -1810,7 +1835,8 @@ useEffect(() => {
               background: "white",
               cursor: "pointer",
               fontSize: "14px",
-              fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+              fontFamily:
+                "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
             }}
           >
             Cancel
@@ -1825,19 +1851,23 @@ useEffect(() => {
               color: "white",
               cursor: "pointer",
               fontSize: "14px",
-              fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+              fontFamily:
+                "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
             }}
           >
             Search
           </button>
         </div>
-        
-        <div style={{ 
-          marginTop: "10px", 
-          fontSize: "12px", 
-          color: "#666",
-          fontFamily: "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
-        }}>
+
+        <div
+          style={{
+            marginTop: "10px",
+            fontSize: "12px",
+            color: "#666",
+            fontFamily:
+              "Assistant, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
+          }}
+        >
           Press Enter to search, Escape to cancel
         </div>
       </div>
@@ -1894,27 +1924,27 @@ useEffect(() => {
               onExportToBackend,
               renderCustomUI: excalidrawAPI
                 ? (elements, appState, files) => {
-                  return (
-                    <ExportToExcalidrawPlus
-                      elements={elements}
-                      appState={appState}
-                      files={files}
-                      name={excalidrawAPI.getName()}
-                      onError={(error) => {
-                        excalidrawAPI?.updateScene({
-                          appState: {
-                            errorMessage: error.message,
-                          },
-                        });
-                      }}
-                      onSuccess={() => {
-                        excalidrawAPI.updateScene({
-                          appState: { openDialog: null },
-                        });
-                      }}
-                    />
-                  );
-                }
+                    return (
+                      <ExportToExcalidrawPlus
+                        elements={elements}
+                        appState={appState}
+                        files={files}
+                        name={excalidrawAPI.getName()}
+                        onError={(error) => {
+                          excalidrawAPI?.updateScene({
+                            appState: {
+                              errorMessage: error.message,
+                            },
+                          });
+                        }}
+                        onSuccess={() => {
+                          excalidrawAPI.updateScene({
+                            appState: { openDialog: null },
+                          });
+                        }}
+                      />
+                    );
+                  }
                 : undefined,
             },
           },
@@ -1946,7 +1976,6 @@ useEffect(() => {
             event.preventDefault();
             excalidrawAPI?.scrollToContent(element.link, { animate: true });
           }
-          
         }}
       >
         <AppMainMenu
@@ -1981,7 +2010,10 @@ useEffect(() => {
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
-        <AppHeader onChange={() => excalidrawAPI?.refresh()} excalidrawAPI={excalidrawAPI} />
+        <AppHeader
+          onChange={() => excalidrawAPI?.refresh()}
+          excalidrawAPI={excalidrawAPI}
+        />
         {/* <AppFooter onChange={() => excalidrawAPI?.refresh()} /> */}
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
 
@@ -2044,7 +2076,8 @@ useEffect(() => {
                 //   title: `Placeholder Image ${index + 1}`,
                 // }));
 
-                const placeholderImageUrl = "https://vetsonparker.com.au/wp-content/uploads/2015/04/Rabbit-Facts.jpg";
+                const placeholderImageUrl =
+                  "https://vetsonparker.com.au/wp-content/uploads/2015/04/Rabbit-Facts.jpg";
 
                 // Create 3 tabs, each with 10 subImages using the placeholder URL
                 const images = [
@@ -2077,8 +2110,6 @@ useEffect(() => {
                   },
                 ];
 
-
-
                 if (excalidrawAPI) {
                   // Create the tabbed image element using your factory function
                   const tabsElement = newRabbitImageTabsElement({
@@ -2086,7 +2117,7 @@ useEffect(() => {
                     y: 100,
                     width: 400,
                     height: 350,
-                    images,             // shorthand for images: images,
+                    images, // shorthand for images: images,
                     activeTabIndex: 0,
                     tabHeight: 40,
                   });
@@ -2115,14 +2146,14 @@ useEffect(() => {
                     verticalAlign: "middle",
                     hasIcon: true,
                   });
-                  console.log(getSearchBoxText(searchBox));
 
                   excalidrawAPI.updateScene({
                     elements: [...excalidrawAPI.getSceneElements(), searchBox],
                   });
                   excalidrawAPI.setToast({
-                    message: "Double-click on the search box to edit. Press Enter to confirm and log text to console.",
-                    duration: 5000
+                    message:
+                      "Double-click on the search box to edit. Press Enter to confirm and log text to console.",
+                    duration: 5000,
                   });
                 }
               },
@@ -2152,82 +2183,80 @@ useEffect(() => {
                   });
 
                   excalidrawAPI.setToast({
-                    message: "Double-click on the search box to edit. Press Enter to confirm and search for images.",
-                    duration: 5000
+                    message:
+                      "Double-click on the search box to edit. Press Enter to confirm and search for images.",
+                    duration: 5000,
                   });
 
                   let hasSearched = false;
                   let lastSearchQuery = ""; //preventing duplicate searches
 
                   const handleEnterKey = (event: KeyboardEvent) => {
-                    if (event.key !== 'Enter') return;
-
+                    if (event.key !== "Enter") return;
 
                     const currentElements = excalidrawAPI.getSceneElements();
-                    const currentSearchBox = currentElements.find(el =>
-                      el.type === 'rabbit-searchbox' && el.id === searchBox.id
+                    const currentSearchBox = currentElements.find(
+                      (el) =>
+                        el.type === "rabbit-searchbox" && el.id === searchBox.id,
                     ) as RabbitSearchBoxElement;
 
                     if (currentSearchBox) {
                       const searchQuery = getSearchBoxText(currentSearchBox);
 
                       // valid and different search query
-                      if (searchQuery !== "Search..." &&
+                      if (
+                        searchQuery !== "Search..." &&
                         searchQuery.trim() !== "" &&
                         searchQuery.length > 2 &&
-                        searchQuery !== lastSearchQuery) {
-
-                        console.log("Search query detected:", searchQuery);
+                        searchQuery !== lastSearchQuery
+                      ) {
                         lastSearchQuery = searchQuery; // Update last search query
                         hasSearched = true;
                         setCurrentSearchQuery(searchQuery);
 
-                        searchAndSaveImages(searchQuery, false)
-                          .then((images: ImageResult[]) => {
+                        searchAndSaveImages(searchQuery, false).then(
+                          (images: ImageResult[]) => {
                             const tabs = [
                               {
                                 name: "Google",
-                                images: images.slice(0, 10).map((img: ImageResult, i: number) => ({
-                                  id: `google-${i}`,
-                                  src: img.link,
-                                  alt: `Google Result ${i + 1}`,
-                                  name: img.title || `Google ${i + 1}`,
-                                })),
-                                loaded: true
+                                images: images
+                                  .slice(0, 10)
+                                  .map((img: ImageResult, i: number) => ({
+                                    id: `google-${i}`,
+                                    src: img.link,
+                                    alt: `Google Result ${i + 1}`,
+                                    name: img.title || `Google ${i + 1}`,
+                                  })),
+                                loaded: true,
                               },
                               {
                                 name: "Pinterest",
                                 images: [], // Empty initially will be lazily loaded upon onclick
                                 searchQuery: searchQuery, // Store query for later
-                                loaded: false // Mark as not loaded
-                              
+                                loaded: false, // Mark as not loaded
                               },
                               {
                                 name: "YouTube",
                                 images: [], // Empty initially will be lazily loaded upon onclick
                                 searchQuery: searchQuery, // Store query for later
-                                loaded: false // Mark as not loaded
-                                
+                                loaded: false, // Mark as not loaded
                               },
                               {
                                 name: "Internet webpages",
                                 images: [], // Empty initially will be lazily loaded upon onclick
                                 searchQuery: searchQuery, // Store query for later
-                                loaded: false // Mark as not loaded
+                                loaded: false, // Mark as not loaded
                               },
                             ];
-                            console.log(tabs);
                             setTabData(tabs);
-                            console.log("Tab Data was set!");
                             setImageWindowVisible(true);
-                          });
-
-
-                      } 
+                          },
+                        );
+                      }
                     }
                   };
 
-                  document.addEventListener('keydown', handleEnterKey);
+                  document.addEventListener("keydown", handleEnterKey);
                 }
               },
             },
@@ -2238,14 +2267,11 @@ useEffect(() => {
               keywords: ["rabbit", "image", "rabbitimage"],
 
               perform: () => {
-                const customQuer = "naruto"
+                const customQuer = "naruto";
                 searchAndSaveImages(customQuer)
-                  .then(images => {
-                    console.log("Search completed, results:", images);
-                    console.log("Look at first", images[0]['link']);
-
+                  .then((images) => {
                     // Use the search result here, inside the .then()
-                    const searchQuer = images[0]['link'];
+                    const searchQuer = images[0]["link"];
 
                     if (excalidrawAPI) {
                       const imageUrl = searchQuer;
@@ -2265,7 +2291,8 @@ useEffect(() => {
                         const imageWidth = imageHeight * aspectRatio;
 
                         const totalWidth = imageWidth + padding * 2;
-                        const totalHeight = imageHeight + padding * 2 + labelHeight;
+                        const totalHeight =
+                          imageHeight + padding * 2 + labelHeight;
 
                         const image = newRabbitImageElement({
                           x: 100,
@@ -2277,23 +2304,28 @@ useEffect(() => {
                         });
 
                         excalidrawAPI.updateScene({
-                          elements: [...excalidrawAPI.getSceneElements(), image],
+                          elements: [
+                            ...excalidrawAPI.getSceneElements(),
+                            image,
+                          ],
                         });
                       };
 
                       img.onerror = () => {
-                        console.error("Failed to load image for RabbitImageElement");
+                        console.error(
+                          "Failed to load image for RabbitImageElement",
+                        );
                       };
 
                       img.src = imageUrl;
                     }
                   })
-                  .catch(error => {
+                  .catch((error) => {
                     console.error("Error in image search:", error);
                   });
               },
             },
-            
+
             {
               label: "Add Rabbit Color Palette",
               category: DEFAULT_CATEGORIES.app,
@@ -2303,11 +2335,17 @@ useEffect(() => {
                   const colorPalette = newRabbitColorPalette({
                     x: 100,
                     y: 100,
-                    colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57']
+                    colors: [
+                      "#FF6B6B",
+                      "#4ECDC4",
+                      "#45B7D1",
+                      "#96CEB4",
+                      "#FECA57",
+                    ],
                   });
 
                   excalidrawAPI.updateScene({
-                    elements: [...excalidrawAPI.getSceneElements(), colorPalette]
+                    elements: [...excalidrawAPI.getSceneElements(), colorPalette],
                   });
                 }
               },
@@ -2322,11 +2360,17 @@ useEffect(() => {
                   const colorPalette = newRabbitColorPalette({
                     x: 100,
                     y: 100,
-                    colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57']
+                    colors: [
+                      "#FF6B6B",
+                      "#4ECDC4",
+                      "#45B7D1",
+                      "#96CEB4",
+                      "#FECA57",
+                    ],
                   });
 
                   excalidrawAPI.updateScene({
-                    elements: [...excalidrawAPI.getSceneElements(), colorPalette]
+                    elements: [...excalidrawAPI.getSceneElements(), colorPalette],
                   });
                 }
               },
@@ -2469,11 +2513,11 @@ useEffect(() => {
             },
             ...(isExcalidrawPlusSignedUser
               ? [
-                {
-                  ...ExcalidrawPlusAppCommand,
-                  label: "Sign in / Go to Excalidraw+",
-                },
-              ]
+                  {
+                    ...ExcalidrawPlusAppCommand,
+                    label: "Sign in / Go to Excalidraw+",
+                  },
+                ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
 
             {
@@ -2526,10 +2570,10 @@ useEffect(() => {
                   autoOrganizer.organizeHierarchical();
                   excalidrawAPI?.setToast({
                     message: "Applied hierarchical layout",
-                    duration: 2000
+                    duration: 2000,
                   });
                 }
-              }
+              },
             },
             {
               label: "Auto-organize: Grid Layout",
@@ -2541,10 +2585,10 @@ useEffect(() => {
                   autoOrganizer.organizeGrid();
                   excalidrawAPI?.setToast({
                     message: "Applied grid layout",
-                    duration: 2000
+                    duration: 2000,
                   });
                 }
-              }
+              },
             },
             {
               label: "Auto-organize: Circular Layout",
@@ -2556,14 +2600,14 @@ useEffect(() => {
                   autoOrganizer.organizeCircular();
                   excalidrawAPI?.setToast({
                     message: "Applied circular layout",
-                    duration: 2000
+                    duration: 2000,
                   });
                 }
-              }
+              },
             },
             {
               label: "Auto-organize: Breadth First",
-              category: DEFAULT_CATEGORIES.app, 
+              category: DEFAULT_CATEGORIES.app,
               predicate: () => true,
               keywords: ["organize", "layout", "breadth", "tree"],
               perform: () => {
@@ -2571,28 +2615,31 @@ useEffect(() => {
                   autoOrganizer.organizeBreadthFirst();
                   excalidrawAPI?.setToast({
                     message: "Applied breadth-first layout",
-                    duration: 2000
+                    duration: 2000,
                   });
                 }
-              }
+              },
             },
             {
               label: "Remove All Rabbit Groups",
-              category: DEFAULT_CATEGORIES.app, 
+              category: DEFAULT_CATEGORIES.app,
               predicate: () => true,
               keywords: ["ungroup", "remove", "clear", "groups"],
               perform: () => {
                 if (excalidrawAPI) {
                   const elements = excalidrawAPI.getSceneElements();
                   const groups = getRabbitGroupsFromElements(elements);
-                  
-                  const updatedElements = elements.map(element => {
+
+                  const updatedElements = elements.map((element) => {
                     if (element.customData?.rabbitGroup) {
                       const newCustomData = { ...element.customData };
                       delete newCustomData.rabbitGroup;
                       return {
                         ...element,
-                        customData: Object.keys(newCustomData).length > 0 ? newCustomData : undefined
+                        customData:
+                          Object.keys(newCustomData).length > 0
+                            ? newCustomData
+                            : undefined,
                       };
                     }
                     return element;
@@ -2601,10 +2648,10 @@ useEffect(() => {
                   excalidrawAPI.updateScene({ elements: updatedElements });
                   excalidrawAPI?.setToast({
                     message: `Removed ${groups.size} rabbit groups`,
-                    duration: 2000
+                    duration: 2000,
                   });
                 }
-              }
+              },
             },
           ]}
         />
@@ -2631,42 +2678,44 @@ useEffect(() => {
       )}
       <ExtendedSearchUI />
 
-      {excalidrawAPI && (() => {
-        const appState = excalidrawAPI.getAppState();
-        const elements = excalidrawAPI.getSceneElements();
-        const selected = elements.find(
-          (el) => appState.selectedElementIds[el.id] && el.type === "text"
-        );
-
-        if (selected && !appState.editingTextElement) {
-          const { scrollX, scrollY, zoom } = excalidrawAPI.getAppState();
-          const x = (selected.x + selected.width / 2) * zoom.value + scrollX;
-          const y = (selected.y + selected.height + 10) * zoom.value + scrollY;
-          return (
-            <div
-              style={{
-                position: "absolute",
-                top: y - 5,
-                left: x - 111,
-                display: "flex",
-                gap: "8px",
-                background: "#fff",
-                padding: "4px 8px",
-                borderRadius: "8px",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-                zIndex: 1000,
-              }}
-            >
-              <button>YouTube</button>
-              <button>Google</button>
-              <button>Pinterest</button>
-              <button>Internet Webpages</button>
-            </div>
+      {excalidrawAPI &&
+        (() => {
+          const appState = excalidrawAPI.getAppState();
+          const elements = excalidrawAPI.getSceneElements();
+          const selected = elements.find(
+            (el) =>
+              appState.selectedElementIds[el.id] && el.type === "text",
           );
-        }
-        return null;
-      })()}
 
+          if (selected && !appState.editingTextElement) {
+            const { scrollX, scrollY, zoom } = excalidrawAPI.getAppState();
+            const x = (selected.x + selected.width / 2) * zoom.value + scrollX;
+            const y =
+              (selected.y + selected.height + 10) * zoom.value + scrollY;
+            return (
+              <div
+                style={{
+                  position: "absolute",
+                  top: y - 5,
+                  left: x - 111,
+                  display: "flex",
+                  gap: "8px",
+                  background: "#fff",
+                  padding: "4px 8px",
+                  borderRadius: "8px",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                  zIndex: 1000,
+                }}
+              >
+                <button>YouTube</button>
+                <button>Google</button>
+                <button>Pinterest</button>
+                <button>Internet Webpages</button>
+              </div>
+            );
+          }
+          return null;
+        })()}
     </div>
   );
 };

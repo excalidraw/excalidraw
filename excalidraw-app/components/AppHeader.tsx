@@ -59,55 +59,62 @@ export const AppHeader = React.memo(
     }, [excalidrawAPI, drawingName]);
 
     return (
-        <header
+      <header
+        style={{
+          position: "fixed",
+          top: 0,
+          left: -20,
+          width: "100%",
+          zIndex: 100,
+          borderBottom: "1px solid #e0e0e0",
+          boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.05)",
+        }}
+      >
+        <div
           style={{
-            position: "fixed",
-            top: 0,
-            left: -20,
+            display: "flex",
+            alignItems: "center",
             width: "100%",
-            zIndex: 100,
-            borderBottom: "1px solid #e0e0e0",
-            boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.05)",
+            padding: "0.75rem 1.5rem",
+            backgroundColor: "#f5f5f5",
+            minHeight: "70px",
           }}
         >
-          <div
+          <img
+            src="https://i.imgur.com/KttcKbd.png"
+            alt="Logo"
             style={{
-              display: "flex",
-              alignItems: "center",
-              width: "100%",
-              padding: "0.75rem 1.5rem",
-              backgroundColor: "#f5f5f5",
-              minHeight: "70px",
+              height: "40px",
+              marginLeft: "15px",
+              marginRight: "1rem",
             }}
+          />
+          <div
+            style={{ flex: 1, display: "flex", justifyContent: "center" }}
           >
-            <img
-              src="https://i.imgur.com/KttcKbd.png"
-              alt="Logo"
-              style={{ height: "40px", marginLeft: "15px", marginRight: "1rem" }}
+            <input
+              ref={inputRef}
+              type="text"
+              value={drawingName}
+              onChange={handleNameChange}
+              onKeyDown={handleKeyDown}
+              style={{
+                width: "300px",
+                fontSize: "16px",
+                fontWeight: "bold",
+                padding: "6px 10px",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                outline: "none",
+                backgroundColor: "white",
+                textAlign: "center",
+              }}
+              aria-label="Drawing Title"
             />
-            <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-              <input
-                ref={inputRef}
-                type="text"
-                value={drawingName}
-                onChange={handleNameChange}
-                onKeyDown={handleKeyDown}
-                style={{
-                  width: "300px",
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                  padding: "6px 10px",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                  outline: "none",
-                  backgroundColor: "white",
-                  textAlign: "center", 
-                }}
-                aria-label="Drawing Title"
-              />
-            </div>
-            <div style={{ width: "40px", marginLeft: "1rem" }}></div>
           </div>
-        </header>
+          <div style={{ width: "40px", marginLeft: "1rem" }}></div>
+        </div>
+      </header>
     );
-});
+  },
+);
