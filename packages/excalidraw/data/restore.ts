@@ -303,6 +303,11 @@ const restoreElement = (
         pressures: element.pressures,
       });
     }
+    case "rabbit-color-palette":
+      return restoreElementWithProperties(element, {
+        colors: element.colors || ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57'],
+        rectangleHeight: element.rectangleHeight ?? 50,
+      });
     case "rabbit-searchbox":
       return restoreElementWithProperties(element, {
         text: element.text || "",

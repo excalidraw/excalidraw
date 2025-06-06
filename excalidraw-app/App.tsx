@@ -372,8 +372,7 @@ const initializeScene = async (opts: {
           ...restoreAppState(
             {
               ...scene?.appState,
-              theme:
-                localDataState?.appState?.theme || scene?.appState?.theme,
+              theme: localDataState?.appState?.theme || scene?.appState?.theme,
             },
             excalidrawAPI.getAppState(),
           ),
@@ -1123,101 +1122,217 @@ const ExcalidrawWrapper = () => {
     };
   }, [predictSearchQueryFromCloudinaryImage]);
 
-  // color palette handler for color palette button
-  const handleColorPalette = useCallback(async () => {
-    if (!excalidrawAPI) return;
+  // color palette handler for color palette button with smart positioning
+const handleColorPalette = useCallback(async () => {
+  if (!excalidrawAPI) return;
 
-    // Get currently selected elements
-    const selectedElements = excalidrawAPI
-      .getSceneElements()
-      .filter(
-        (element) => excalidrawAPI.getAppState().selectedElementIds[element.id],
-      );
+  const selectedElements = excalidrawAPI.getSceneElements().filter(
+    element => excalidrawAPI.getAppState().selectedElementIds[element.id]
+  );
 
-    // Check if selected elements are images or rabbit-images
-    const selectedImages = selectedElements.filter(
-      (element) => element.type === "image" || element.type === "rabbit-image",
-    );
+  const selectedImages = selectedElements.filter(
+    element => element.type === 'image' || element.type === 'rabbit-image'
+  );
 
-    // if no images selected, error message
-    if (selectedImages.length === 0) {
-      excalidrawAPI.setToast({
-        message: "Please select at least one image",
-        duration: 3000,
-      });
-      return;
+  console.log("Selected elements:", selectedElements.length);
+  console.log("Selected images:", selectedImages.length);
+
+  if (selectedImages.length === 0) {
+    excalidrawAPI.setToast({
+      message: "Please select at least one image",
+      duration: 3000
+    });
+    return;
+  }
+
+  excalidrawAPI.setToast({
+    message: `Generating color palette for \n${selectedImages.length} selected image(s)...`,
+    duration: 3000
+  });
+
+  try {
+    const allColors: string[] = [];
+    const colorThief = new ColorThief();
+    const imageColorArrays: string[][] = [];
+
+    //collect colors from all images
+    for (const imageElement of selectedImages) {
+      try {
+        const colors = await extractColorsFromImageElement(imageElement, colorThief, excalidrawAPI);
+        imageColorArrays.push(colors);
+      } catch (error) {
+        console.warn(`Failed to extract colors from image ${imageElement.id}:`, error);
+      }
     }
 
-    // If images are selected, proceed with color extraction
-    excalidrawAPI.setToast({
-      message: `Generating color palette for \n${selectedImages.length} selected image(s)...`,
-      duration: 3000,
+    const finalPalette: string[] = [];
+    const maxColors = 5;
+    let colorIndex = 0;
+
+    while (finalPalette.length < maxColors && colorIndex < 6) {
+      for (const imageColors of imageColorArrays) {
+        if (finalPalette.length >= maxColors) break;
+
+        if (imageColors[colorIndex] && !finalPalette.includes(imageColors[colorIndex])) {
+          finalPalette.push(imageColors[colorIndex]);
+        }
+      }
+      colorIndex++;
+    }
+
+    console.log("Extracted colors from multiple images:", finalPalette);
+
+    // Calculate smart positioning based on selected images
+    const { x: paletteX, y: paletteY } = calculatePalettePositionWithCollisionDetection(selectedImages, excalidrawAPI);
+
+    // Create color palette element with calculated position
+    const colorPalette = newRabbitColorPalette({
+      x: paletteX,
+      y: paletteY,
+      colors: finalPalette
     });
 
-    try {
-      const allColors: string[] = [];
-      const colorThief = new ColorThief();
-      const imageColorArrays: string[][] = [];
+    excalidrawAPI.updateScene({
+      elements: [...excalidrawAPI.getSceneElements(), colorPalette]
+    });
 
-      // First, collect colors from all images
-      for (const imageElement of selectedImages) {
-        try {
-          const colors = await extractColorsFromImageElement(
-            imageElement,
-            colorThief,
-            excalidrawAPI,
-          );
-          imageColorArrays.push(colors);
-        } catch (error) {
-          console.warn(
-            `Failed to extract colors from image ${imageElement.id}:`,
-            error,
-          );
-        }
-      }
+    excalidrawAPI.setToast({
+      message: `Color palette created near selected images`,
+      duration: 3000
+    });
 
-      // Then, pick colors round-robin style (1 from each image, then repeat)
-      const finalPalette: string[] = [];
-      const maxColors = 5;
-      let colorIndex = 0;
+  } catch (error) {
+    console.error("Error extracting colors:", error);
+    excalidrawAPI.setToast({
+      message: "Error extracting colors from images",
+      duration: 3000
+    });
+  }
+  console.log("Images to process:", selectedImages);
+}, [excalidrawAPI]);
 
-      while (finalPalette.length < maxColors && colorIndex < 6) {
-        for (const imageColors of imageColorArrays) {
-          if (finalPalette.length >= maxColors) break;
+//calculate optimal palette position
+const calculatePalettePosition = (selectedImages: any[]) => {
+  if (selectedImages.length === 0) {
+    return { x: 100, y: 100 };
+  }
 
-          if (
-            imageColors[colorIndex] &&
-            !finalPalette.includes(imageColors[colorIndex])
-          ) {
-            finalPalette.push(imageColors[colorIndex]);
-          }
-        }
-        colorIndex++;
-      }
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
 
-      // Create color palette element
-      const colorPalette = newRabbitColorPalette({
-        x: 100,
-        y: 100,
-        colors: finalPalette,
-      });
+  selectedImages.forEach(image => {
+    minX = Math.min(minX, image.x);
+    minY = Math.min(minY, image.y);
+    maxX = Math.max(maxX, image.x + image.width);
+    maxY = Math.max(maxY, image.y + image.height);
+  });
 
-      excalidrawAPI.updateScene({
-        elements: [...excalidrawAPI.getSceneElements(), colorPalette],
-      });
+  const PALETTE_WIDTH = 200; 
+  const PALETTE_HEIGHT = 50; 
+  const MARGIN = 20; 
 
-      excalidrawAPI.setToast({
-        message: `Color palette created`,
-        duration: 3000,
-      });
-    } catch (error) {
-      console.error("Error extracting colors:", error);
-      excalidrawAPI.setToast({
-        message: "Error extracting colors from images",
-        duration: 3000,
-      });
+  //trying different positions in order of preference
+  const positions = [
+    // Right of images
+    { 
+      x: maxX + MARGIN, 
+      y: minY,
+      description: "right"
+    },
+    // Below images (centered)
+    { 
+      x: (minX + maxX) / 2 - PALETTE_WIDTH / 2, 
+      y: maxY + MARGIN,
+      description: "below-center"
+    },
+    // Left of images
+    { 
+      x: minX - PALETTE_WIDTH - MARGIN, 
+      y: minY,
+      description: "left"
+    },
+    // Above images (centered)
+    { 
+      x: (minX + maxX) / 2 - PALETTE_WIDTH / 2, 
+      y: minY - PALETTE_HEIGHT - MARGIN,
+      description: "above-center"
+    },
+    // Bottom-right of images
+    { 
+      x: maxX + MARGIN, 
+      y: maxY + MARGIN,
+      description: "bottom-right"
     }
-  }, [excalidrawAPI]); // Don't forget the dependency array!
+  ];
+
+  const chosenPosition = positions[0];
+  
+  console.log(`Positioning palette ${chosenPosition.description} of selected images at (${Math.round(chosenPosition.x)}, ${Math.round(chosenPosition.y)})`);
+  
+  return { 
+    x: Math.round(chosenPosition.x), 
+    y: Math.round(chosenPosition.y) 
+  };
+};
+
+//collision detection for palette position
+const calculatePalettePositionWithCollisionDetection = (selectedImages: any[], excalidrawAPI: any) => {
+  if (selectedImages.length === 0) {
+    return { x: 100, y: 100 };
+  }
+
+  const allElements = excalidrawAPI.getSceneElements();
+  
+  // Calculate bounding box of selected images
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  selectedImages.forEach(image => {
+    minX = Math.min(minX, image.x);
+    minY = Math.min(minY, image.y);
+    maxX = Math.max(maxX, image.x + image.width);
+    maxY = Math.max(maxY, image.y + image.height);
+  });
+
+  const PALETTE_WIDTH = 200;
+  const PALETTE_HEIGHT = 50;
+  const MARGIN = 20;
+
+  const testPositions = [
+    { x: maxX + MARGIN, y: minY }, // right
+    { x: (minX + maxX) / 2 - PALETTE_WIDTH / 2, y: maxY + MARGIN }, // below
+    { x: minX - PALETTE_WIDTH - MARGIN, y: minY }, // left  
+    { x: (minX + maxX) / 2 - PALETTE_WIDTH / 2, y: minY - PALETTE_HEIGHT - MARGIN }, // above
+  ];
+
+  for (const pos of testPositions) {
+    const paletteRect = {
+      x: pos.x,
+      y: pos.y,
+      width: PALETTE_WIDTH,
+      height: PALETTE_HEIGHT
+    };
+
+    // Check if this position collides with existing elements
+    const hasCollision = allElements.some((element: any) => {
+      if (selectedImages.includes(element)) return false; // ignore selected images
+      
+      return (
+        element.x < paletteRect.x + paletteRect.width &&
+        element.x + element.width > paletteRect.x &&
+        element.y < paletteRect.y + paletteRect.height &&
+        element.y + element.height > paletteRect.y
+      );
+    });
+
+    if (!hasCollision) {
+      return { x: Math.round(pos.x), y: Math.round(pos.y) };
+    }
+  }
+
+  //if all positions have collisions, use the first one anyway
+  return { x: Math.round(testPositions[0].x), y: Math.round(testPositions[0].y) };
+};
 
   useEffect(() => {
     (window as any).__handleColorPalette = handleColorPalette;
@@ -2683,8 +2798,7 @@ const ExcalidrawWrapper = () => {
           const appState = excalidrawAPI.getAppState();
           const elements = excalidrawAPI.getSceneElements();
           const selected = elements.find(
-            (el) =>
-              appState.selectedElementIds[el.id] && el.type === "text",
+            (el) => appState.selectedElementIds[el.id] && el.type === "text",
           );
 
           if (selected && !appState.editingTextElement) {
