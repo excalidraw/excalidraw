@@ -63,7 +63,7 @@ export const ExcalidrawLogo = ({
   return (
     <div className={`ExcalidrawLogo is-${size}`} style={style}>
       <img
-        src="https://imgur.com/pWjusvL.png"
+        src="https://i.imgur.com/sElZ7bQ.png"
         alt="Rabbit Hole Logo"
         className="ExcalidrawLogo-icon"
       />
