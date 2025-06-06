@@ -135,7 +135,7 @@ describe("binding with linear elements", () => {
     ) as HTMLInputElement;
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
-    UI.updateInput(inputX, String("199"));
+    UI.updateInput(inputX, String("204"));
     expect(linear.startBinding).not.toBe(null);
   });
 
