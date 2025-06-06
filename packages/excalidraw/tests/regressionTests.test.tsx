@@ -704,7 +704,7 @@ describe("regression tests", () => {
 
     // pointer down on rectangle
     mouse.reset();
-    mouse.down(100, 100); // Rectangle is rounded, there is no selection at the corner
+    mouse.down(100, 100);
     mouse.up(200, 200);
 
     expect(API.getSelectedElement().type).toBe("rectangle");

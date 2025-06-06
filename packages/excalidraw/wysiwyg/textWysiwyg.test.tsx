@@ -693,7 +693,7 @@ describe("textWysiwyg", () => {
       });
       API.setElements([rectangle]);
 
-      mouse.doubleClickAt(rectangle.x + 20, rectangle.y + 20);
+      mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
       expect(h.elements.length).toBe(2);
       let text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.type).toBe("text");
