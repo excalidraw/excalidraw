@@ -2246,18 +2246,10 @@ const getGlobalPoint = (
   }
 
   if (element) {
-    const fixedGlobalPoint = getGlobalFixedPointForBindableElement(
+    return getGlobalFixedPointForBindableElement(
       fixedPointRatio || [0, 0],
       element,
     );
-
-    // NOTE: Resize scales the binding position point too, so we need to update it
-    return Math.abs(
-      distanceToBindableElement(element, fixedGlobalPoint) -
-        FIXED_BINDING_DISTANCE,
-    ) > 0.01
-      ? bindPointToSnapToElementOutline(arrow, element, startOrEnd)
-      : fixedGlobalPoint;
   }
 
   return initialPoint;
