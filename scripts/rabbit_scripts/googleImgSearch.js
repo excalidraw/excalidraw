@@ -1,7 +1,7 @@
 // googleImgSearch.js - Script to search for Sasuke Uchiha images
 
 // Configuration - REPLACE THESE WITH YOUR ACTUAL CREDENTIALS
-const API_KEY = "AIzaSyBNetz_8Hhm9j4wpmssxf6ReE6X9hoGiNU"; // Replace with your Google API key
+const API_KEY = "AIzaSyAzOwAUurUVnnBTO-pQpEO9xGHckISoYlw"; // Replace with your Google API key
 const SEARCH_ENGINE_ID = "8774c779014954b77"; // Replace with your Search Engine ID
 const SEARCH_QUERY = "breakcore art";
 const NUM_RESULTS = 10; // Maximum allowed by free tier

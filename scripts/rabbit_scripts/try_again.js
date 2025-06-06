@@ -1,4 +1,4 @@
-const API_KEY = "AIzaSyAAqN3dNhGADwDNaImSskiQANrVI2Qu7d8";
+const API_KEY = "AIzaSyAzOwAUurUVnnBTO-pQpEO9xGHckISoYlw";
 const SEARCH_ENGINE_ID = "8774c779014954b77"; 
 const DEFAULT_SEARCH_QUERY = "breakcore art";
 const NUM_RESULTS = 10; // Maximum allowed by free tier
