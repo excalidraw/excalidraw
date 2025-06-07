@@ -102,9 +102,23 @@ export class ElementBounds {
       version: ExcalidrawElement["version"];
     }
   >();
+  private static nonRotatedBoundsCache = new WeakMap<
+    ExcalidrawElement,
+    {
+      bounds: Bounds;
+      version: ExcalidrawElement["version"];
+    }
+  >();
 
-  static getBounds(element: ExcalidrawElement, elementsMap: ElementsMap) {
-    const cachedBounds = ElementBounds.boundsCache.get(element);
+  static getBounds(
+    element: ExcalidrawElement,
+    elementsMap: ElementsMap,
+    nonRotated: boolean = false,
+  ) {
+    const cachedBounds =
+      nonRotated && element.angle !== 0
+        ? ElementBounds.nonRotatedBoundsCache.get(element)
+        : ElementBounds.boundsCache.get(element);
 
     if (
       cachedBounds?.version &&
@@ -115,6 +129,23 @@ export class ElementBounds {
     ) {
       return cachedBounds.bounds;
     }
+
+    if (nonRotated && element.angle !== 0) {
+      const nonRotatedBounds = ElementBounds.calculateBounds(
+        {
+          ...element,
+          angle: 0 as Radians,
+        },
+        elementsMap,
+      );
+      ElementBounds.nonRotatedBoundsCache.set(element, {
+        version: element.version,
+        bounds: nonRotatedBounds,
+      });
+
+      return nonRotatedBounds;
+    }
+
     const bounds = ElementBounds.calculateBounds(element, elementsMap);
 
     ElementBounds.boundsCache.set(element, {
@@ -939,8 +970,9 @@ const getLinearElementRotatedBounds = (
 export const getElementBounds = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
+  nonRotated: boolean = false,
 ): Bounds => {
-  return ElementBounds.getBounds(element, elementsMap);
+  return ElementBounds.getBounds(element, elementsMap, nonRotated);
 };
 
 export const getCommonBounds = (

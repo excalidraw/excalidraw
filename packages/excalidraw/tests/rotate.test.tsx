@@ -35,7 +35,7 @@ test("unselected bound arrow updates when rotating its target element", async ()
   expect(arrow.endBinding?.elementId).toEqual(rectangle.id);
   expect(arrow.x).toBeCloseTo(-80);
   expect(arrow.y).toBeCloseTo(50);
-  expect(arrow.width).toBeCloseTo(116.7, 1);
+  expect(arrow.width).toBeCloseTo(110.7, 1);
   expect(arrow.height).toBeCloseTo(0);
 });
 

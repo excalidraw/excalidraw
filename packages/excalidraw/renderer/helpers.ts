@@ -5,17 +5,14 @@ import { getDiamondPoints } from "@excalidraw/element";
 import { getCornerRadius } from "@excalidraw/element";
 
 import {
-  bezierEquation,
   curve,
-  curveTangent,
+  curveCatmullRomCubicApproxPoints,
+  curveCatmullRomQuadraticApproxPoints,
+  curveOffsetPoints,
   type GlobalPoint,
+  offsetPointsForQuadraticBezier,
   pointFrom,
-  pointFromVector,
   pointRotateRads,
-  vector,
-  vectorNormal,
-  vectorNormalize,
-  vectorScale,
 } from "@excalidraw/math";
 
 import type {
@@ -102,25 +99,14 @@ export const bootstrapCanvas = ({
 function drawCatmullRomQuadraticApprox(
   ctx: CanvasRenderingContext2D,
   points: GlobalPoint[],
-  segments = 20,
+  tension = 0.5,
 ) {
-  ctx.lineTo(points[0][0], points[0][1]);
+  const pointSets = curveCatmullRomQuadraticApproxPoints(points, tension);
+  if (pointSets) {
+    for (let i = 0; i < pointSets.length - 1; i++) {
+      const [[cpX, cpY], [p2X, p2Y]] = pointSets[i];
 
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[i - 1 < 0 ? 0 : i - 1];
-    const p1 = points[i];
-    const p2 = points[i + 1 >= points.length ? points.length - 1 : i + 1];
-
-    for (let t = 0; t <= 1; t += 1 / segments) {
-      const t2 = t * t;
-
-      const x =
-        (1 - t) * (1 - t) * p0[0] + 2 * (1 - t) * t * p1[0] + t2 * p2[0];
-
-      const y =
-        (1 - t) * (1 - t) * p0[1] + 2 * (1 - t) * t * p1[1] + t2 * p2[1];
-
-      ctx.lineTo(x, y);
+      ctx.quadraticCurveTo(cpX, cpY, p2X, p2Y);
     }
   }
 }
@@ -128,35 +114,13 @@ function drawCatmullRomQuadraticApprox(
 function drawCatmullRomCubicApprox(
   ctx: CanvasRenderingContext2D,
   points: GlobalPoint[],
-  segments = 20,
+  tension = 0.5,
 ) {
-  ctx.lineTo(points[0][0], points[0][1]);
-
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[i - 1 < 0 ? 0 : i - 1];
-    const p1 = points[i];
-    const p2 = points[i + 1 >= points.length ? points.length - 1 : i + 1];
-    const p3 = points[i + 2 >= points.length ? points.length - 1 : i + 2];
-
-    for (let t = 0; t <= 1; t += 1 / segments) {
-      const t2 = t * t;
-      const t3 = t2 * t;
-
-      const x =
-        0.5 *
-        (2 * p1[0] +
-          (-p0[0] + p2[0]) * t +
-          (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 +
-          (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3);
-
-      const y =
-        0.5 *
-        (2 * p1[1] +
-          (-p0[1] + p2[1]) * t +
-          (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 +
-          (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3);
-
-      ctx.lineTo(x, y);
+  const pointSets = curveCatmullRomCubicApproxPoints(points, tension);
+  if (pointSets) {
+    for (let i = 0; i < pointSets.length; i++) {
+      const [[cp1x, cp1y], [cp2x, cp2y], [x, y]] = pointSets[i];
+      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
     }
   }
 }
@@ -168,7 +132,10 @@ export const drawHighlightForRectWithRotation = (
 ) => {
   const [x, y] = pointRotateRads(
     pointFrom<GlobalPoint>(element.x, element.y),
-    elementCenterPoint(element),
+    elementCenterPoint(
+      element,
+      window.h.app.scene.getElementsMapIncludingDeleted(),
+    ),
     element.angle,
   );
 
@@ -187,25 +154,25 @@ export const drawHighlightForRectWithRotation = (
   context.beginPath();
 
   {
-    const topLeftApprox = offsetQuadraticBezier(
+    const topLeftApprox = offsetPointsForQuadraticBezier(
       pointFrom(0, 0 + radius),
       pointFrom(0, 0),
       pointFrom(0 + radius, 0),
       padding,
     );
-    const topRightApprox = offsetQuadraticBezier(
+    const topRightApprox = offsetPointsForQuadraticBezier(
       pointFrom(element.width - radius, 0),
       pointFrom(element.width, 0),
       pointFrom(element.width, radius),
       padding,
     );
-    const bottomRightApprox = offsetQuadraticBezier(
+    const bottomRightApprox = offsetPointsForQuadraticBezier(
       pointFrom(element.width, element.height - radius),
       pointFrom(element.width, element.height),
       pointFrom(element.width - radius, element.height),
       padding,
     );
-    const bottomLeftApprox = offsetQuadraticBezier(
+    const bottomLeftApprox = offsetPointsForQuadraticBezier(
       pointFrom(radius, element.height),
       pointFrom(0, element.height),
       pointFrom(0, element.height - radius),
@@ -230,25 +197,25 @@ export const drawHighlightForRectWithRotation = (
   // mask" on a filled shape for the diamond highlight, because stroking creates
   // sharp inset edges on line joins < 90 degrees.
   {
-    const topLeftApprox = offsetQuadraticBezier(
+    const topLeftApprox = offsetPointsForQuadraticBezier(
       pointFrom(0 + radius, 0),
       pointFrom(0, 0),
       pointFrom(0, 0 + radius),
       -FIXED_BINDING_DISTANCE,
     );
-    const topRightApprox = offsetQuadraticBezier(
+    const topRightApprox = offsetPointsForQuadraticBezier(
       pointFrom(element.width, radius),
       pointFrom(element.width, 0),
       pointFrom(element.width - radius, 0),
       -FIXED_BINDING_DISTANCE,
     );
-    const bottomRightApprox = offsetQuadraticBezier(
+    const bottomRightApprox = offsetPointsForQuadraticBezier(
       pointFrom(element.width - radius, element.height),
       pointFrom(element.width, element.height),
       pointFrom(element.width, element.height - radius),
       -FIXED_BINDING_DISTANCE,
     );
-    const bottomLeftApprox = offsetQuadraticBezier(
+    const bottomLeftApprox = offsetPointsForQuadraticBezier(
       pointFrom(0, element.height - radius),
       pointFrom(0, element.height),
       pointFrom(radius, element.height),
@@ -325,7 +292,10 @@ export const drawHighlightForDiamondWithRotation = (
 ) => {
   const [x, y] = pointRotateRads(
     pointFrom<GlobalPoint>(element.x, element.y),
-    elementCenterPoint(element),
+    elementCenterPoint(
+      element,
+      window.h.app.scene.getElementsMapIncludingDeleted(),
+    ),
     element.angle,
   );
   context.save();
@@ -343,32 +313,40 @@ export const drawHighlightForDiamondWithRotation = (
     const horizontalRadius = element.roundness
       ? getCornerRadius(Math.abs(rightY - topY), element)
       : (rightY - topY) * 0.01;
-    const topApprox = offsetCubicBezier(
-      pointFrom(topX - verticalRadius, topY + horizontalRadius),
-      pointFrom(topX, topY),
-      pointFrom(topX, topY),
-      pointFrom(topX + verticalRadius, topY + horizontalRadius),
+    const topApprox = curveOffsetPoints(
+      curve(
+        pointFrom(topX - verticalRadius, topY + horizontalRadius),
+        pointFrom(topX, topY),
+        pointFrom(topX, topY),
+        pointFrom(topX + verticalRadius, topY + horizontalRadius),
+      ),
       padding,
     );
-    const rightApprox = offsetCubicBezier(
-      pointFrom(rightX - verticalRadius, rightY - horizontalRadius),
-      pointFrom(rightX, rightY),
-      pointFrom(rightX, rightY),
-      pointFrom(rightX - verticalRadius, rightY + horizontalRadius),
+    const rightApprox = curveOffsetPoints(
+      curve(
+        pointFrom(rightX - verticalRadius, rightY - horizontalRadius),
+        pointFrom(rightX, rightY),
+        pointFrom(rightX, rightY),
+        pointFrom(rightX - verticalRadius, rightY + horizontalRadius),
+      ),
       padding,
     );
-    const bottomApprox = offsetCubicBezier(
-      pointFrom(bottomX + verticalRadius, bottomY - horizontalRadius),
-      pointFrom(bottomX, bottomY),
-      pointFrom(bottomX, bottomY),
-      pointFrom(bottomX - verticalRadius, bottomY - horizontalRadius),
+    const bottomApprox = curveOffsetPoints(
+      curve(
+        pointFrom(bottomX + verticalRadius, bottomY - horizontalRadius),
+        pointFrom(bottomX, bottomY),
+        pointFrom(bottomX, bottomY),
+        pointFrom(bottomX - verticalRadius, bottomY - horizontalRadius),
+      ),
       padding,
     );
-    const leftApprox = offsetCubicBezier(
-      pointFrom(leftX + verticalRadius, leftY + horizontalRadius),
-      pointFrom(leftX, leftY),
-      pointFrom(leftX, leftY),
-      pointFrom(leftX + verticalRadius, leftY - horizontalRadius),
+    const leftApprox = curveOffsetPoints(
+      curve(
+        pointFrom(leftX + verticalRadius, leftY + horizontalRadius),
+        pointFrom(leftX, leftY),
+        pointFrom(leftX, leftY),
+        pointFrom(leftX + verticalRadius, leftY - horizontalRadius),
+      ),
       padding,
     );
 
@@ -376,13 +354,13 @@ export const drawHighlightForDiamondWithRotation = (
       topApprox[topApprox.length - 1][0],
       topApprox[topApprox.length - 1][1],
     );
-    context.lineTo(rightApprox[0][0], rightApprox[0][1]);
+    context.lineTo(rightApprox[1][0], rightApprox[1][1]);
     drawCatmullRomCubicApprox(context, rightApprox);
-    context.lineTo(bottomApprox[0][0], bottomApprox[0][1]);
+    context.lineTo(bottomApprox[1][0], bottomApprox[1][1]);
     drawCatmullRomCubicApprox(context, bottomApprox);
-    context.lineTo(leftApprox[0][0], leftApprox[0][1]);
+    context.lineTo(leftApprox[1][0], leftApprox[1][1]);
     drawCatmullRomCubicApprox(context, leftApprox);
-    context.lineTo(topApprox[0][0], topApprox[0][1]);
+    context.lineTo(topApprox[1][0], topApprox[1][1]);
     drawCatmullRomCubicApprox(context, topApprox);
   }
 
@@ -398,32 +376,40 @@ export const drawHighlightForDiamondWithRotation = (
     const horizontalRadius = element.roundness
       ? getCornerRadius(Math.abs(rightY - topY), element)
       : (rightY - topY) * 0.01;
-    const topApprox = offsetCubicBezier(
-      pointFrom(topX + verticalRadius, topY + horizontalRadius),
-      pointFrom(topX, topY),
-      pointFrom(topX, topY),
-      pointFrom(topX - verticalRadius, topY + horizontalRadius),
+    const topApprox = curveOffsetPoints(
+      curve(
+        pointFrom(topX + verticalRadius, topY + horizontalRadius),
+        pointFrom(topX, topY),
+        pointFrom(topX, topY),
+        pointFrom(topX - verticalRadius, topY + horizontalRadius),
+      ),
       -FIXED_BINDING_DISTANCE,
     );
-    const rightApprox = offsetCubicBezier(
-      pointFrom(rightX - verticalRadius, rightY + horizontalRadius),
-      pointFrom(rightX, rightY),
-      pointFrom(rightX, rightY),
-      pointFrom(rightX - verticalRadius, rightY - horizontalRadius),
+    const rightApprox = curveOffsetPoints(
+      curve(
+        pointFrom(rightX - verticalRadius, rightY + horizontalRadius),
+        pointFrom(rightX, rightY),
+        pointFrom(rightX, rightY),
+        pointFrom(rightX - verticalRadius, rightY - horizontalRadius),
+      ),
       -FIXED_BINDING_DISTANCE,
     );
-    const bottomApprox = offsetCubicBezier(
-      pointFrom(bottomX - verticalRadius, bottomY - horizontalRadius),
-      pointFrom(bottomX, bottomY),
-      pointFrom(bottomX, bottomY),
-      pointFrom(bottomX + verticalRadius, bottomY - horizontalRadius),
+    const bottomApprox = curveOffsetPoints(
+      curve(
+        pointFrom(bottomX - verticalRadius, bottomY - horizontalRadius),
+        pointFrom(bottomX, bottomY),
+        pointFrom(bottomX, bottomY),
+        pointFrom(bottomX + verticalRadius, bottomY - horizontalRadius),
+      ),
       -FIXED_BINDING_DISTANCE,
     );
-    const leftApprox = offsetCubicBezier(
-      pointFrom(leftX + verticalRadius, leftY - horizontalRadius),
-      pointFrom(leftX, leftY),
-      pointFrom(leftX, leftY),
-      pointFrom(leftX + verticalRadius, leftY + horizontalRadius),
+    const leftApprox = curveOffsetPoints(
+      curve(
+        pointFrom(leftX + verticalRadius, leftY - horizontalRadius),
+        pointFrom(leftX, leftY),
+        pointFrom(leftX, leftY),
+        pointFrom(leftX + verticalRadius, leftY + horizontalRadius),
+      ),
       -FIXED_BINDING_DISTANCE,
     );
 
@@ -431,66 +417,16 @@ export const drawHighlightForDiamondWithRotation = (
       topApprox[topApprox.length - 1][0],
       topApprox[topApprox.length - 1][1],
     );
-    context.lineTo(leftApprox[0][0], leftApprox[0][1]);
+    context.lineTo(leftApprox[1][0], leftApprox[1][1]);
     drawCatmullRomCubicApprox(context, leftApprox);
-    context.lineTo(bottomApprox[0][0], bottomApprox[0][1]);
+    context.lineTo(bottomApprox[1][0], bottomApprox[1][1]);
     drawCatmullRomCubicApprox(context, bottomApprox);
-    context.lineTo(rightApprox[0][0], rightApprox[0][1]);
+    context.lineTo(rightApprox[1][0], rightApprox[1][1]);
     drawCatmullRomCubicApprox(context, rightApprox);
-    context.lineTo(topApprox[0][0], topApprox[0][1]);
+    context.lineTo(topApprox[1][0], topApprox[1][1]);
     drawCatmullRomCubicApprox(context, topApprox);
   }
   context.closePath();
   context.fill();
   context.restore();
 };
-
-function offsetCubicBezier(
-  p0: GlobalPoint,
-  p1: GlobalPoint,
-  p2: GlobalPoint,
-  p3: GlobalPoint,
-  offsetDist: number,
-  steps = 20,
-) {
-  const offsetPoints = [];
-
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const c = curve(p0, p1, p2, p3);
-    const point = bezierEquation(c, t);
-    const tangent = vectorNormalize(curveTangent(c, t));
-    const normal = vectorNormal(tangent);
-
-    offsetPoints.push(pointFromVector(vectorScale(normal, offsetDist), point));
-  }
-
-  return offsetPoints;
-}
-
-function offsetQuadraticBezier(
-  p0: GlobalPoint,
-  p1: GlobalPoint,
-  p2: GlobalPoint,
-  offsetDist: number,
-  steps = 20,
-) {
-  const offsetPoints = [];
-
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const t1 = 1 - t;
-    const point = pointFrom<GlobalPoint>(
-      t1 * t1 * p0[0] + 2 * t1 * t * p1[0] + t * t * p2[0],
-      t1 * t1 * p0[1] + 2 * t1 * t * p1[1] + t * t * p2[1],
-    );
-    const tangentX = 2 * (1 - t) * (p1[0] - p0[0]) + 2 * t * (p2[0] - p1[0]);
-    const tangentY = 2 * (1 - t) * (p1[1] - p0[1]) + 2 * t * (p2[1] - p1[1]);
-    const tangent = vectorNormalize(vector(tangentX, tangentY));
-    const normal = vectorNormal(tangent);
-
-    offsetPoints.push(pointFromVector(vectorScale(normal, offsetDist), point));
-  }
-
-  return offsetPoints;
-}

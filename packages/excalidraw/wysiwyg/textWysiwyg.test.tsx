@@ -682,7 +682,7 @@ describe("textWysiwyg", () => {
       expect(diamond.height).toBe(70);
     });
 
-    it("should bind text to container when double clicked on center of transparent container", async () => {
+    it("should bind text to container when double clicked inside of the transparent container", async () => {
       const rectangle = API.createElement({
         type: "rectangle",
         x: 10,
@@ -1500,9 +1500,7 @@ describe("textWysiwyg", () => {
           locked: false,
           opacity: 100,
           roughness: 1,
-          roundness: {
-            type: 3,
-          },
+          roundness: null,
           strokeColor: "#1e1e1e",
           strokeStyle: "solid",
           strokeWidth: 2,
