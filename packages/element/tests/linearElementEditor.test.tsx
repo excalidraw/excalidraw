@@ -32,7 +32,10 @@ import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
 import { LinearElementEditor } from "../src";
 import { newArrowElement } from "../src";
 
-import { getTextEditor } from "../../excalidraw/tests/queries/dom";
+import {
+  getTextEditor,
+  TEXT_EDITOR_SELECTOR,
+} from "../../excalidraw/tests/queries/dom";
 
 import type {
   ExcalidrawElement,
@@ -287,7 +290,7 @@ describe("Test Linear Elements", () => {
 
     mouse.doubleClick();
     expect(h.state.editingLinearElement).toEqual(null);
-    await getTextEditor(".excalidraw-textEditorContainer > textarea");
+    await getTextEditor();
   });
 
   it("shouldn't create text element on double click in line editor (arrow)", async () => {
@@ -301,9 +304,7 @@ describe("Test Linear Elements", () => {
     expect(h.state.editingLinearElement?.elementId).toEqual(arrow.id);
     expect(h.elements.length).toEqual(1);
 
-    expect(
-      document.querySelector(".excalidraw-textEditorContainer > textarea"),
-    ).toBe(null);
+    expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
   });
 
   describe("Inside editor", () => {
@@ -1034,12 +1035,10 @@ describe("Test Linear Elements", () => {
       });
     });
 
-    it("should match styles for text editor", () => {
+    it("should match styles for text editor", async () => {
       createTwoPointerLinearElement("arrow");
       Keyboard.keyPress(KEYS.ENTER);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = await getTextEditor();
       expect(editor).toMatchSnapshot();
     });
 
@@ -1056,9 +1055,7 @@ describe("Test Linear Elements", () => {
       expect(text.type).toBe("text");
       expect(text.containerId).toBe(arrow.id);
       mouse.down();
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = await getTextEditor();
 
       fireEvent.change(editor, {
         target: { value: DEFAULT_TEXT },
@@ -1086,9 +1083,7 @@ describe("Test Linear Elements", () => {
       const textElement = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(textElement.type).toBe("text");
       expect(textElement.containerId).toBe(arrow.id);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = await getTextEditor();
 
       fireEvent.change(editor, {
         target: { value: DEFAULT_TEXT },
@@ -1272,9 +1267,7 @@ describe("Test Linear Elements", () => {
 
       mouse.select(arrow);
       Keyboard.keyPress(KEYS.ENTER);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = await getTextEditor();
       fireEvent.change(editor, { target: { value: DEFAULT_TEXT } });
       Keyboard.exitTextEditor(editor);
 

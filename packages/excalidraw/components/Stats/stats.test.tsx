@@ -381,8 +381,7 @@ describe("stats for a non-generic element", () => {
   it("text element", async () => {
     UI.clickTool("text");
     mouse.clickAt(20, 30);
-    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
-    const editor = await getTextEditor(textEditorSelector, true);
+    const editor = await getTextEditor();
     updateTextEditor(editor, "Hello!");
     act(() => {
       editor.blur();
@@ -575,8 +574,7 @@ describe("stats for multiple elements", () => {
     // text, rectangle, frame
     UI.clickTool("text");
     mouse.clickAt(20, 30);
-    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
-    const editor = await getTextEditor(textEditorSelector, true);
+    const editor = await getTextEditor();
     updateTextEditor(editor, "Hello!");
     act(() => {
       editor.blur();
