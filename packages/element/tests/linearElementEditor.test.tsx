@@ -1,6 +1,5 @@
 import { pointCenter, pointFrom } from "@excalidraw/math";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
-import React from "react";
 import { vi } from "vitest";
 
 import {
@@ -32,6 +31,8 @@ import * as textElementUtils from "../src/textElement";
 import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
 import { LinearElementEditor } from "../src";
 import { newArrowElement } from "../src";
+
+import { getTextEditor } from "../../excalidraw/tests/queries/dom";
 
 import type {
   ExcalidrawElement,
@@ -252,7 +253,17 @@ describe("Test Linear Elements", () => {
     expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
-  it("should enter line editor when using double clicked with ctrl key", () => {
+  it("should enter line editor on ctrl+dblclick (simple arrow)", () => {
+    createTwoPointerLinearElement("arrow");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.doubleClick();
+    });
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor on ctrl+dblclick (line)", () => {
     createTwoPointerLinearElement("line");
     expect(h.state.editingLinearElement?.elementId).toBeUndefined();
 
@@ -260,6 +271,23 @@ describe("Test Linear Elements", () => {
       mouse.doubleClick();
     });
     expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor on dblclick (line)", () => {
+    createTwoPointerLinearElement("line");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    mouse.doubleClick();
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should not enter line editor on dblclick (arrow)", async () => {
+    createTwoPointerLinearElement("arrow");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    mouse.doubleClick();
+    expect(h.state.editingLinearElement).toEqual(null);
+    await getTextEditor(".excalidraw-textEditorContainer > textarea");
   });
 
   describe("Inside editor", () => {
