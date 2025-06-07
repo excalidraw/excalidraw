@@ -231,6 +231,7 @@ import {
   type ElementUpdate,
   hitElementBoundingBox,
   isLineElement,
+  isSimpleArrow,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -5439,22 +5440,17 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
+      const selectedLinearElement: ExcalidrawLinearElement =
+        selectedElements[0];
       if (
-        (event[KEYS.CTRL_OR_CMD] &&
-          (!this.state.editingLinearElement ||
-            this.state.editingLinearElement.elementId !==
-              selectedElements[0].id) &&
-          !isElbowArrow(selectedElements[0])) ||
-        ((!this.state.editingLinearElement ||
-          this.state.editingLinearElement.elementId !==
-            selectedElements[0].id) &&
-          !isElbowArrow(selectedElements[0]) &&
-          isLineElement(selectedElements[0]))
+        ((event[KEYS.CTRL_OR_CMD] && isSimpleArrow(selectedLinearElement)) ||
+          isLineElement(selectedLinearElement)) &&
+        this.state.editingLinearElement?.elementId !== selectedLinearElement.id
       ) {
         this.store.scheduleCapture();
         this.setState({
           editingLinearElement: new LinearElementEditor(
-            selectedElements[0],
+            selectedLinearElement,
             this.scene.getNonDeletedElementsMap(),
           ),
         });
@@ -5523,8 +5519,9 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else if (
         this.state.editingLinearElement &&
-        this.state.editingLinearElement.elementId === selectedElements[0].id &&
-        isLineElement(selectedElements[0])
+        this.state.editingLinearElement.elementId ===
+          selectedLinearElement.id &&
+        isLineElement(selectedLinearElement)
       ) {
         return;
       }
