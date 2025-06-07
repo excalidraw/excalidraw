@@ -230,6 +230,8 @@ import {
   CaptureUpdateAction,
   type ElementUpdate,
   hitElementBoundingBox,
+  isLineElement,
+  isSimpleArrow,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -5438,17 +5440,17 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
+      const selectedLinearElement: ExcalidrawLinearElement =
+        selectedElements[0];
       if (
-        event[KEYS.CTRL_OR_CMD] &&
-        (!this.state.editingLinearElement ||
-          this.state.editingLinearElement.elementId !==
-            selectedElements[0].id) &&
-        !isElbowArrow(selectedElements[0])
+        ((event[KEYS.CTRL_OR_CMD] && isSimpleArrow(selectedLinearElement)) ||
+          isLineElement(selectedLinearElement)) &&
+        this.state.editingLinearElement?.elementId !== selectedLinearElement.id
       ) {
         this.store.scheduleCapture();
         this.setState({
           editingLinearElement: new LinearElementEditor(
-            selectedElements[0],
+            selectedLinearElement,
             this.scene.getNonDeletedElementsMap(),
           ),
         });
@@ -5515,6 +5517,13 @@ class App extends React.Component<AppProps, AppState> {
 
           return;
         }
+      } else if (
+        this.state.editingLinearElement &&
+        this.state.editingLinearElement.elementId ===
+          selectedLinearElement.id &&
+        isLineElement(selectedLinearElement)
+      ) {
+        return;
       }
     }
 
@@ -5563,36 +5572,43 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
+      // shouldn't edit/create text when inside line editor (often false positive)
 
-      if (container) {
-        if (
-          hasBoundTextElement(container) ||
-          !isTransparent(container.backgroundColor) ||
-          hitElementItself({
-            point: pointFrom(sceneX, sceneY),
-            element: container,
-            elementsMap: this.scene.getNonDeletedElementsMap(),
-            threshold: this.getElementHitThreshold(container),
-          })
-        ) {
-          const midPoint = getContainerCenter(
-            container,
-            this.state,
-            this.scene.getNonDeletedElementsMap(),
-          );
+      if (!this.state.editingLinearElement) {
+        const container = this.getTextBindableContainerAtPosition(
+          sceneX,
+          sceneY,
+        );
 
-          sceneX = midPoint.x;
-          sceneY = midPoint.y;
+        if (container) {
+          if (
+            hasBoundTextElement(container) ||
+            !isTransparent(container.backgroundColor) ||
+            hitElementItself({
+              point: pointFrom(sceneX, sceneY),
+              element: container,
+              elementsMap: this.scene.getNonDeletedElementsMap(),
+              threshold: this.getElementHitThreshold(container),
+            })
+          ) {
+            const midPoint = getContainerCenter(
+              container,
+              this.state,
+              this.scene.getNonDeletedElementsMap(),
+            );
+
+            sceneX = midPoint.x;
+            sceneY = midPoint.y;
+          }
         }
-      }
 
-      this.startTextEditing({
-        sceneX,
-        sceneY,
-        insertAtParentCenter: !event.altKey,
-        container,
-      });
+        this.startTextEditing({
+          sceneX,
+          sceneY,
+          insertAtParentCenter: !event.altKey,
+          container,
+        });
+      }
     }
   };
 

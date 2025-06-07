@@ -129,6 +129,15 @@ export const isElbowArrow = (
   return isArrowElement(element) && element.elbowed;
 };
 
+/**
+ * sharp or curved arrow, but not elbow
+ */
+export const isSimpleArrow = (
+  element?: ExcalidrawElement,
+): element is ExcalidrawArrowElement => {
+  return isArrowElement(element) && !element.elbowed;
+};
+
 export const isSharpArrow = (
   element?: ExcalidrawElement,
 ): element is ExcalidrawArrowElement => {
