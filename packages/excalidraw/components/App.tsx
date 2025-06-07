@@ -5150,7 +5150,7 @@ class App extends React.Component<AppProps, AppState> {
       // NOTE: Here be dragons. Do not go under the 0.63 multiplier unless you're
       // willing to test extensively. The hit testing starts to become unreliable
       // due to FP imprecision under 0.63 in high zoom levels.
-      0.63 * (DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value),
+      0.85 * (DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value),
     );
   }
 
