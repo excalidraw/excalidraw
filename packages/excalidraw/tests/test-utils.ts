@@ -421,11 +421,7 @@ export const assertElements = <T extends AllPossibleKeys<ExcalidrawElement>>(
         .join(", ")}]\n`,
     )}`;
 
-    const error = new Error(errStr);
-    const stack = err.stack.split("\n");
-    stack.splice(1, 1);
-    error.stack = stack.join("\n");
-    throw error;
+    throw trimErrorStack(new Error(errStr), 1);
   }
 
   expect(mappedActualElements).toEqual(
@@ -475,4 +471,22 @@ export const checkpointHistory = (history: History, name: string) => {
       },
     })),
   ).toMatchSnapshot(`[${name}] redo stack`);
+};
+
+/**
+ * removes one or more leading stack trace lines (leading to files) from the
+ * error stack trace
+ */
+export const trimErrorStack = (error: Error, range = 1) => {
+  const stack = error.stack?.split("\n");
+  if (stack) {
+    stack.splice(1, range);
+    error.stack = stack.join("\n");
+  }
+  return error;
+};
+
+export const stripIgnoredNodesFromErrorMessage = (error: Error) => {
+  error.message = error.message.replace(/\s+Ignored nodes:[\s\S]+/, "");
+  return error;
 };

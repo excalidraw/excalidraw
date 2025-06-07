@@ -102,14 +102,14 @@ describe("Test <MermaidToExcalidraw/>", () => {
     expect(dialog).not.toBeNull();
 
     const selector = ".ttd-dialog-input";
-    let editor = await getTextEditor(selector, true);
+    let editor = await getTextEditor({ selector, waitForEditor: true });
 
     expect(dialog.querySelector('[data-testid="mermaid-error"]')).toBeNull();
 
     expect(editor.textContent).toMatchSnapshot();
 
     updateTextEditor(editor, "flowchart TD1");
-    editor = await getTextEditor(selector, false);
+    editor = await getTextEditor({ selector, waitForEditor: false });
 
     expect(editor.textContent).toBe("flowchart TD1");
     expect(
