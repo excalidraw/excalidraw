@@ -5572,36 +5572,43 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
+      // shouldn't edit/create text when inside line editor (often false positive)
 
-      if (container) {
-        if (
-          hasBoundTextElement(container) ||
-          !isTransparent(container.backgroundColor) ||
-          hitElementItself({
-            point: pointFrom(sceneX, sceneY),
-            element: container,
-            elementsMap: this.scene.getNonDeletedElementsMap(),
-            threshold: this.getElementHitThreshold(container),
-          })
-        ) {
-          const midPoint = getContainerCenter(
-            container,
-            this.state,
-            this.scene.getNonDeletedElementsMap(),
-          );
+      if (!this.state.editingLinearElement) {
+        const container = this.getTextBindableContainerAtPosition(
+          sceneX,
+          sceneY,
+        );
 
-          sceneX = midPoint.x;
-          sceneY = midPoint.y;
+        if (container) {
+          if (
+            hasBoundTextElement(container) ||
+            !isTransparent(container.backgroundColor) ||
+            hitElementItself({
+              point: pointFrom(sceneX, sceneY),
+              element: container,
+              elementsMap: this.scene.getNonDeletedElementsMap(),
+              threshold: this.getElementHitThreshold(container),
+            })
+          ) {
+            const midPoint = getContainerCenter(
+              container,
+              this.state,
+              this.scene.getNonDeletedElementsMap(),
+            );
+
+            sceneX = midPoint.x;
+            sceneY = midPoint.y;
+          }
         }
-      }
 
-      this.startTextEditing({
-        sceneX,
-        sceneY,
-        insertAtParentCenter: !event.altKey,
-        container,
-      });
+        this.startTextEditing({
+          sceneX,
+          sceneY,
+          insertAtParentCenter: !event.altKey,
+          container,
+        });
+      }
     }
   };
 

@@ -290,6 +290,22 @@ describe("Test Linear Elements", () => {
     await getTextEditor(".excalidraw-textEditorContainer > textarea");
   });
 
+  it("shouldn't create text element on double click in line editor (arrow)", async () => {
+    createTwoPointerLinearElement("arrow");
+    const arrow = h.elements[0] as ExcalidrawLinearElement;
+    enterLineEditingMode(arrow);
+
+    expect(h.state.editingLinearElement?.elementId).toEqual(arrow.id);
+
+    mouse.doubleClick();
+    expect(h.state.editingLinearElement?.elementId).toEqual(arrow.id);
+    expect(h.elements.length).toEqual(1);
+
+    expect(
+      document.querySelector(".excalidraw-textEditorContainer > textarea"),
+    ).toBe(null);
+  });
+
   describe("Inside editor", () => {
     it("should not drag line and add midpoint when dragged irrespective of threshold", () => {
       createTwoPointerLinearElement("line");
