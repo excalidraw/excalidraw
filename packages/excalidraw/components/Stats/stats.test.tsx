@@ -133,7 +133,6 @@ describe("binding with linear elements", () => {
     const inputX = UI.queryStatsProperty("X")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
     UI.updateInput(inputX, String("204"));
@@ -657,6 +656,7 @@ describe("stats for multiple elements", () => {
 
       mouse.reset();
       Keyboard.withModifierKeys({ shift: true }, () => {
+        mouse.moveTo(10, 0);
         mouse.click();
       });
 
