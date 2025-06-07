@@ -95,10 +95,11 @@ const getNodeRelatives = (
           type === "predecessors" ? el.points[el.points.length - 1] : [0, 0]
         ) as Readonly<LocalPoint>;
 
-        const heading = headingForPointFromElement(node, aabbForElement(node), [
-          edgePoint[0] + el.x,
-          edgePoint[1] + el.y,
-        ] as Readonly<GlobalPoint>);
+        const heading = headingForPointFromElement(
+          node,
+          aabbForElement(node, elementsMap),
+          [edgePoint[0] + el.x, edgePoint[1] + el.y] as Readonly<GlobalPoint>,
+        );
 
         acc.push({
           relative,

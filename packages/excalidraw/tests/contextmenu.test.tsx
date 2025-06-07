@@ -110,8 +110,8 @@ describe("contextMenu element", () => {
 
   it("shows context menu for element", () => {
     UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
@@ -304,8 +304,8 @@ describe("contextMenu element", () => {
 
   it("selecting 'Copy styles' in context menu copies styles", () => {
     UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
@@ -389,8 +389,8 @@ describe("contextMenu element", () => {
 
   it("selecting 'Delete' in context menu deletes element", () => {
     UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
@@ -405,8 +405,8 @@ describe("contextMenu element", () => {
 
   it("selecting 'Add to library' in context menu adds element to library", async () => {
     UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
@@ -424,8 +424,8 @@ describe("contextMenu element", () => {
 
   it("selecting 'Duplicate' in context menu duplicates element", () => {
     UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,

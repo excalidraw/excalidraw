@@ -1,7 +1,16 @@
 import { simplify } from "points-on-curve";
 
-import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
+import {
+  pointFrom,
+  pointDistance,
+  type LocalPoint,
+  pointRotateRads,
+} from "@excalidraw/math";
 import { ROUGHNESS, isTransparent, assertNever } from "@excalidraw/common";
+
+import { RoughGenerator } from "roughjs/bin/generator";
+
+import type { GlobalPoint } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
@@ -20,7 +29,12 @@ import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
 import { generateFreeDrawShape } from "./renderElement";
-import { getArrowheadPoints, getDiamondPoints } from "./bounds";
+import {
+  getArrowheadPoints,
+  getCenterForBounds,
+  getDiamondPoints,
+  getElementBounds,
+} from "./bounds";
 
 import type {
   ExcalidrawElement,
@@ -28,10 +42,11 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawLinearElement,
   Arrowhead,
+  ExcalidrawFreeDrawElement,
+  ElementsMap,
 } from "./types";
 
 import type { Drawable, Options } from "roughjs/bin/core";
-import type { RoughGenerator } from "roughjs/bin/generator";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
@@ -299,6 +314,172 @@ const getArrowheadShapes = (
             )
           : []),
       ];
+    }
+  }
+};
+
+export const generateLinearCollisionShape = (
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
+) => {
+  const generator = new RoughGenerator();
+  const options: Options = {
+    seed: element.seed,
+    disableMultiStroke: true,
+    disableMultiStrokeFill: true,
+    roughness: 0,
+    preserveVertices: true,
+  };
+  const center = getCenterForBounds(
+    getElementBounds(element, elementsMap, true),
+  );
+
+  switch (element.type) {
+    case "line":
+    case "arrow": {
+      // points array can be empty in the beginning, so it is important to add
+      // initial position to it
+      const points = element.points.length
+        ? element.points
+        : [pointFrom<LocalPoint>(0, 0)];
+
+      if (isElbowArrow(element)) {
+        return generator.path(generateElbowArrowShape(points, 16), options)
+          .sets[0].ops;
+      } else if (!element.roundness) {
+        return points.map((point, idx) => {
+          const p = pointRotateRads(
+            pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+            center,
+            element.angle,
+          );
+
+          return {
+            op: idx === 0 ? "move" : "lineTo",
+            data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+          };
+        });
+      }
+
+      return generator
+        .curve(points as unknown as RoughPoint[], options)
+        .sets[0].ops.slice(0, element.points.length)
+        .map((op, i) => {
+          if (i === 0) {
+            const p = pointRotateRads<GlobalPoint>(
+              pointFrom<GlobalPoint>(
+                element.x + op.data[0],
+                element.y + op.data[1],
+              ),
+              center,
+              element.angle,
+            );
+
+            return {
+              op: "move",
+              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+            };
+          }
+
+          return {
+            op: "bcurveTo",
+            data: [
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[0],
+                  element.y + op.data[1],
+                ),
+                center,
+                element.angle,
+              ),
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[2],
+                  element.y + op.data[3],
+                ),
+                center,
+                element.angle,
+              ),
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[4],
+                  element.y + op.data[5],
+                ),
+                center,
+                element.angle,
+              ),
+            ]
+              .map((p) =>
+                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+              )
+              .flat(),
+          };
+        });
+    }
+    case "freedraw": {
+      if (element.points.length < 2) {
+        return [];
+      }
+
+      const simplifiedPoints = simplify(
+        element.points as Mutable<LocalPoint[]>,
+        0.75,
+      );
+
+      return generator
+        .curve(simplifiedPoints as [number, number][], options)
+        .sets[0].ops.slice(0, element.points.length)
+        .map((op, i) => {
+          if (i === 0) {
+            const p = pointRotateRads<GlobalPoint>(
+              pointFrom<GlobalPoint>(
+                element.x + op.data[0],
+                element.y + op.data[1],
+              ),
+              center,
+              element.angle,
+            );
+
+            return {
+              op: "move",
+              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+            };
+          }
+
+          return {
+            op: "bcurveTo",
+            data: [
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[0],
+                  element.y + op.data[1],
+                ),
+                center,
+                element.angle,
+              ),
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[2],
+                  element.y + op.data[3],
+                ),
+                center,
+                element.angle,
+              ),
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[4],
+                  element.y + op.data[5],
+                ),
+                center,
+                element.angle,
+              ),
+            ]
+              .map((p) =>
+                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+              )
+              .flat(),
+          };
+        });
     }
   }
 };

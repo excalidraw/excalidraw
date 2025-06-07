@@ -32,6 +32,7 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   ExcalidrawImageElement,
+  ElementsMap,
 } from "@excalidraw/element/types";
 
 import { createTestHook } from "../../components/App";
@@ -146,6 +147,7 @@ export class Keyboard {
 
 const getElementPointForSelection = (
   element: ExcalidrawElement,
+  elementsMap: ElementsMap,
 ): GlobalPoint => {
   const { x, y, width, angle } = element;
   const target = pointFrom<GlobalPoint>(
@@ -162,7 +164,7 @@ const getElementPointForSelection = (
       (bounds[1] + bounds[3]) / 2,
     );
   } else {
-    center = elementCenterPoint(element);
+    center = elementCenterPoint(element, elementsMap);
   }
 
   if (isTextElement(element)) {
@@ -299,7 +301,12 @@ export class Pointer {
       elements = Array.isArray(elements) ? elements : [elements];
       elements.forEach((element) => {
         this.reset();
-        this.click(...getElementPointForSelection(element));
+        this.click(
+          ...getElementPointForSelection(
+            element,
+            h.app.scene.getElementsMapIncludingDeleted(),
+          ),
+        );
       });
     });
 
@@ -308,13 +315,23 @@ export class Pointer {
 
   clickOn(element: ExcalidrawElement) {
     this.reset();
-    this.click(...getElementPointForSelection(element));
+    this.click(
+      ...getElementPointForSelection(
+        element,
+        h.app.scene.getElementsMapIncludingDeleted(),
+      ),
+    );
     this.reset();
   }
 
   doubleClickOn(element: ExcalidrawElement) {
     this.reset();
-    this.doubleClick(...getElementPointForSelection(element));
+    this.doubleClick(
+      ...getElementPointForSelection(
+        element,
+        h.app.scene.getElementsMapIncludingDeleted(),
+      ),
+    );
     this.reset();
   }
 }
@@ -598,6 +615,7 @@ export class UI {
 
     const mutations = cropElement(
       element,
+      h.scene.getNonDeletedElementsMap(),
       handle,
       naturalWidth,
       naturalHeight,

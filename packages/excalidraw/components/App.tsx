@@ -17,8 +17,6 @@ import {
   vectorDot,
   vectorNormalize,
 } from "@excalidraw/math";
-import { isPointInShape } from "@excalidraw/utils/collision";
-import { getSelectionBoxShape } from "@excalidraw/utils/shape";
 
 import {
   COLOR_PALETTE,
@@ -104,9 +102,9 @@ import {
   Emitter,
 } from "@excalidraw/common";
 
-import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
-
 import {
+  getCommonBounds,
+  getElementAbsoluteCoords,
   bindOrUnbindLinearElements,
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
@@ -115,13 +113,8 @@ import {
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
   getSuggestedBindingsForArrows,
-} from "@excalidraw/element";
-
-import { LinearElementEditor } from "@excalidraw/element";
-
-import { newElementWith } from "@excalidraw/element";
-
-import {
+  LinearElementEditor,
+  newElementWith,
   newFrameElement,
   newFreeDrawElement,
   newEmbeddableElement,
@@ -133,11 +126,8 @@ import {
   newLinearElement,
   newTextElement,
   refreshTextDimensions,
-} from "@excalidraw/element";
-
-import { deepCopyElement, duplicateElements } from "@excalidraw/element";
-
-import {
+  deepCopyElement,
+  duplicateElements,
   hasBoundTextElement,
   isArrowElement,
   isBindingElement,
@@ -158,48 +148,27 @@ import {
   isFlowchartNodeElement,
   isBindableElement,
   isTextElement,
-} from "@excalidraw/element";
-
-import {
   getLockedLinearCursorAlignSize,
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
   isInvisiblySmallElement,
-} from "@excalidraw/element";
-
-import {
-  getBoundTextShape,
   getCornerRadius,
-  getElementShape,
   isPathALoop,
-} from "@excalidraw/element";
-
-import {
   createSrcDoc,
   embeddableURLValidator,
   maybeParseEmbedSrc,
   getEmbedLink,
-} from "@excalidraw/element";
-
-import {
   getInitializedImageElements,
   loadHTMLImageElement,
   normalizeSVG,
   updateImageCache as _updateImageCache,
-} from "@excalidraw/element";
-
-import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
   isValidTextContainer,
   redrawTextBoundingBox,
-} from "@excalidraw/element";
-
-import { shouldShowBoundingBox } from "@excalidraw/element";
-
-import {
+  shouldShowBoundingBox,
   getFrameChildren,
   isCursorInFrame,
   addElementsToFrame,
@@ -214,29 +183,17 @@ import {
   getFrameLikeTitle,
   getElementsOverlappingFrame,
   filterElementsEligibleAsFrameChildren,
-} from "@excalidraw/element";
-
-import {
   hitElementBoundText,
   hitElementBoundingBoxOnly,
   hitElementItself,
-} from "@excalidraw/element";
-
-import { getVisibleSceneBounds } from "@excalidraw/element";
-
-import {
+  getVisibleSceneBounds,
   FlowChartCreator,
   FlowChartNavigator,
   getLinkDirectionFromKey,
-} from "@excalidraw/element";
-
-import { cropElement } from "@excalidraw/element";
-
-import { wrapText } from "@excalidraw/element";
-
-import { isElementLink, parseElementLinkFromURL } from "@excalidraw/element";
-
-import {
+  cropElement,
+  wrapText,
+  isElementLink,
+  parseElementLinkFromURL,
   isMeasureTextSupported,
   normalizeText,
   measureText,
@@ -244,13 +201,8 @@ import {
   getApproxMinLineWidth,
   getApproxMinLineHeight,
   getMinTextElementWidth,
-} from "@excalidraw/element";
-
-import { ShapeCache } from "@excalidraw/element";
-
-import { getRenderOpacity } from "@excalidraw/element";
-
-import {
+  ShapeCache,
+  getRenderOpacity,
   editGroupForSelectedElement,
   getElementsInGroup,
   getSelectedGroupIdForElement,
@@ -258,41 +210,27 @@ import {
   isElementInGroup,
   isSelectedViaGroup,
   selectGroupsForSelectedElements,
-} from "@excalidraw/element";
-
-import { syncInvalidIndices, syncMovedIndices } from "@excalidraw/element";
-
-import {
+  syncInvalidIndices,
+  syncMovedIndices,
   excludeElementsInFramesFromSelection,
   getSelectionStateForElements,
   makeNextSelectedElementIds,
-} from "@excalidraw/element";
-
-import {
   getResizeOffsetXY,
   getResizeArrowDirection,
   transformElements,
-} from "@excalidraw/element";
-
-import {
   getCursorForResizingElement,
   getElementWithTransformHandleType,
   getTransformHandleTypeFromCoords,
-} from "@excalidraw/element";
-
-import {
   dragNewElement,
   dragSelectedElements,
   getDragOffsetXY,
+  isNonDeletedElement,
+  Scene,
+  Store,
+  CaptureUpdateAction,
+  type ElementUpdate,
+  hitElementBoundingBox,
 } from "@excalidraw/element";
-
-import { isNonDeletedElement } from "@excalidraw/element";
-
-import { Scene } from "@excalidraw/element";
-
-import { Store, CaptureUpdateAction } from "@excalidraw/element";
-
-import type { ElementUpdate } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
@@ -5095,6 +5033,7 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
+  // NOTE: Hot path for hit testing, so avoid unnecessary computations
   private getElementAtPosition(
     x: number,
     y: number,
@@ -5134,16 +5073,12 @@ class App extends React.Component<AppProps, AppState> {
       // If we're hitting element with highest z-index only on its bounding box
       // while also hitting other element figure, the latter should be considered.
       return hitElementItself({
-        x,
-        y,
+        point: pointFrom(x, y),
         element: elementWithHighestZIndex,
-        shape: getElementShape(
-          elementWithHighestZIndex,
-          this.scene.getNonDeletedElementsMap(),
-        ),
         // when overlapping, we would like to be more precise
         // this also avoids the need to update past tests
-        threshold: this.getElementHitThreshold() / 2,
+        threshold: this.getElementHitThreshold(elementWithHighestZIndex) / 2,
+        elementsMap: this.scene.getNonDeletedElementsMap(),
         frameNameBound: isFrameLikeElement(elementWithHighestZIndex)
           ? this.frameNameBoundsCache.get(elementWithHighestZIndex)
           : null,
@@ -5158,6 +5093,7 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
+  // NOTE: Hot path for hit testing, so avoid unnecessary computations
   private getElementsAtPosition(
     x: number,
     y: number,
@@ -5208,8 +5144,14 @@ class App extends React.Component<AppProps, AppState> {
     return elements;
   }
 
-  getElementHitThreshold() {
-    return DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value;
+  getElementHitThreshold(element: ExcalidrawElement) {
+    return Math.max(
+      element.strokeWidth / 2 + 0.1,
+      // NOTE: Here be dragons. Do not go under the 0.63 multiplier unless you're
+      // willing to test extensively. The hit testing starts to become unreliable
+      // due to FP imprecision under 0.63 in high zoom levels.
+      0.85 * (DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value),
+    );
   }
 
   private hitElement(
@@ -5224,35 +5166,35 @@ class App extends React.Component<AppProps, AppState> {
       this.state.selectedElementIds[element.id] &&
       shouldShowBoundingBox([element], this.state)
     ) {
-      const selectionShape = getSelectionBoxShape(
-        element,
-        this.scene.getNonDeletedElementsMap(),
-        isImageElement(element) ? 0 : this.getElementHitThreshold(),
-      );
-
       // if hitting the bounding box, return early
       // but if not, we should check for other cases as well (e.g. frame name)
-      if (isPointInShape(pointFrom(x, y), selectionShape)) {
+      if (
+        hitElementBoundingBox(
+          pointFrom(x, y),
+          element,
+          this.scene.getNonDeletedElementsMap(),
+          this.getElementHitThreshold(element),
+        )
+      ) {
         return true;
       }
     }
 
     // take bound text element into consideration for hit collision as well
     const hitBoundTextOfElement = hitElementBoundText(
-      x,
-      y,
-      getBoundTextShape(element, this.scene.getNonDeletedElementsMap()),
+      pointFrom(x, y),
+      element,
+      this.scene.getNonDeletedElementsMap(),
     );
     if (hitBoundTextOfElement) {
       return true;
     }
 
     return hitElementItself({
-      x,
-      y,
+      point: pointFrom(x, y),
       element,
-      shape: getElementShape(element, this.scene.getNonDeletedElementsMap()),
-      threshold: this.getElementHitThreshold(),
+      threshold: this.getElementHitThreshold(element),
+      elementsMap: this.scene.getNonDeletedElementsMap(),
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
         : null,
@@ -5280,14 +5222,10 @@ class App extends React.Component<AppProps, AppState> {
       if (
         isArrowElement(elements[index]) &&
         hitElementItself({
-          x,
-          y,
+          point: pointFrom(x, y),
           element: elements[index],
-          shape: getElementShape(
-            elements[index],
-            this.scene.getNonDeletedElementsMap(),
-          ),
-          threshold: this.getElementHitThreshold(),
+          elementsMap: this.scene.getNonDeletedElementsMap(),
+          threshold: this.getElementHitThreshold(elements[index]),
         })
       ) {
         hitElement = elements[index];
@@ -5632,14 +5570,10 @@ class App extends React.Component<AppProps, AppState> {
           hasBoundTextElement(container) ||
           !isTransparent(container.backgroundColor) ||
           hitElementItself({
-            x: sceneX,
-            y: sceneY,
+            point: pointFrom(sceneX, sceneY),
             element: container,
-            shape: getElementShape(
-              container,
-              this.scene.getNonDeletedElementsMap(),
-            ),
-            threshold: this.getElementHitThreshold(),
+            elementsMap: this.scene.getNonDeletedElementsMap(),
+            threshold: this.getElementHitThreshold(container),
           })
         ) {
           const midPoint = getContainerCenter(
@@ -6329,13 +6263,10 @@ class App extends React.Component<AppProps, AppState> {
       let segmentMidPointHoveredCoords = null;
       if (
         hitElementItself({
-          x: scenePointerX,
-          y: scenePointerY,
+          point: pointFrom(scenePointerX, scenePointerY),
           element,
-          shape: getElementShape(
-            element,
-            this.scene.getNonDeletedElementsMap(),
-          ),
+          elementsMap,
+          threshold: this.getElementHitThreshold(element),
         })
       ) {
         hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
@@ -7505,7 +7436,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // How many pixels off the shape boundary we still consider a hit
-    const threshold = this.getElementHitThreshold();
+    const threshold = Math.max(
+      DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value,
+      1,
+    );
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
     return (
       point.x > x1 - threshold &&
@@ -9768,14 +9702,13 @@ class App extends React.Component<AppProps, AppState> {
         ((hitElement &&
           hitElementBoundingBoxOnly(
             {
-              x: pointerDownState.origin.x,
-              y: pointerDownState.origin.y,
-              element: hitElement,
-              shape: getElementShape(
-                hitElement,
-                this.scene.getNonDeletedElementsMap(),
+              point: pointFrom(
+                pointerDownState.origin.x,
+                pointerDownState.origin.y,
               ),
-              threshold: this.getElementHitThreshold(),
+              element: hitElement,
+              elementsMap,
+              threshold: this.getElementHitThreshold(hitElement),
               frameNameBound: isFrameLikeElement(hitElement)
                 ? this.frameNameBoundsCache.get(hitElement)
                 : null,
@@ -10882,6 +10815,7 @@ class App extends React.Component<AppProps, AppState> {
           croppingElement,
           cropElement(
             croppingElement,
+            this.scene.getNonDeletedElementsMap(),
             transformHandleType,
             image.naturalWidth,
             image.naturalHeight,
