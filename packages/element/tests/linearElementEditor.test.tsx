@@ -1,6 +1,5 @@
 import { pointCenter, pointFrom } from "@excalidraw/math";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
-import React from "react";
 import { vi } from "vitest";
 
 import {
@@ -32,6 +31,8 @@ import * as textElementUtils from "../src/textElement";
 import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
 import { LinearElementEditor } from "../src";
 import { newArrowElement } from "../src";
+
+import { getTextEditor } from "../../excalidraw/tests/queries/dom";
 
 import type {
   ExcalidrawElement,
@@ -252,7 +253,17 @@ describe("Test Linear Elements", () => {
     expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
-  it("should enter line editor when using double clicked with ctrl key", () => {
+  it("should enter line editor on ctrl+dblclick (simple arrow)", () => {
+    createTwoPointerLinearElement("arrow");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.doubleClick();
+    });
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor on ctrl+dblclick (line)", () => {
     createTwoPointerLinearElement("line");
     expect(h.state.editingLinearElement?.elementId).toBeUndefined();
 
@@ -260,6 +271,39 @@ describe("Test Linear Elements", () => {
       mouse.doubleClick();
     });
     expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor on dblclick (line)", () => {
+    createTwoPointerLinearElement("line");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    mouse.doubleClick();
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should not enter line editor on dblclick (arrow)", async () => {
+    createTwoPointerLinearElement("arrow");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    mouse.doubleClick();
+    expect(h.state.editingLinearElement).toEqual(null);
+    await getTextEditor(".excalidraw-textEditorContainer > textarea");
+  });
+
+  it("shouldn't create text element on double click in line editor (arrow)", async () => {
+    createTwoPointerLinearElement("arrow");
+    const arrow = h.elements[0] as ExcalidrawLinearElement;
+    enterLineEditingMode(arrow);
+
+    expect(h.state.editingLinearElement?.elementId).toEqual(arrow.id);
+
+    mouse.doubleClick();
+    expect(h.state.editingLinearElement?.elementId).toEqual(arrow.id);
+    expect(h.elements.length).toEqual(1);
+
+    expect(
+      document.querySelector(".excalidraw-textEditorContainer > textarea"),
+    ).toBe(null);
   });
 
   describe("Inside editor", () => {
@@ -1063,13 +1107,7 @@ describe("Test Linear Elements", () => {
 
       expect(h.elements.length).toBe(1);
       mouse.doubleClickAt(line.x, line.y);
-
-      expect(h.elements.length).toBe(2);
-
-      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      expect(text.type).toBe("text");
-      expect(text.containerId).toBeNull();
-      expect(line.boundElements).toBeNull();
+      expect(h.elements.length).toBe(1);
     });
 
     // TODO fix #7029 and rewrite this test
