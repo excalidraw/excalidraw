@@ -4430,12 +4430,11 @@ class App extends React.Component<AppProps, AppState> {
         const selectedElements = this.scene.getSelectedElements(this.state);
         if (selectedElements.length === 1) {
           const selectedElement = selectedElements[0];
-          if (event[KEYS.CTRL_OR_CMD]) {
+          if (event[KEYS.CTRL_OR_CMD] || isLineElement(selectedElement)) {
             if (isLinearElement(selectedElement)) {
               if (
                 !this.state.editingLinearElement ||
-                this.state.editingLinearElement.elementId !==
-                  selectedElements[0].id
+                this.state.editingLinearElement.elementId !== selectedElement.id
               ) {
                 this.store.scheduleCapture();
                 if (!isElbowArrow(selectedElement)) {

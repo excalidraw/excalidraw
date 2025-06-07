@@ -256,6 +256,38 @@ describe("Test Linear Elements", () => {
     expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
+  it("should enter line editor via enter (line)", () => {
+    createTwoPointerLinearElement("line");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    mouse.clickAt(midpoint[0], midpoint[1]);
+    Keyboard.keyPress(KEYS.ENTER);
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  // ctrl+enter alias (to align with arrows)
+  it("should enter line editor via ctrl+enter (line)", () => {
+    createTwoPointerLinearElement("line");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    mouse.clickAt(midpoint[0], midpoint[1]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ENTER);
+    });
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor via ctrl+enter (arrow)", () => {
+    createTwoPointerLinearElement("arrow");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    mouse.clickAt(midpoint[0], midpoint[1]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ENTER);
+    });
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
   it("should enter line editor on ctrl+dblclick (simple arrow)", () => {
     createTwoPointerLinearElement("arrow");
     expect(h.state.editingLinearElement?.elementId).toBeUndefined();
