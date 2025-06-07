@@ -18,7 +18,6 @@ import {
   arrayToMap,
   getFontFamilyString,
   getShortcutKey,
-  tupleToCoors,
   getLineHeight,
   isTransparent,
   reduceToCommonValue,
@@ -28,9 +27,7 @@ import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
 
 import {
   bindLinearElement,
-  bindPointToSnapToElementOutline,
   calculateFixedPointForElbowArrowBinding,
-  getHoveredElementForBinding,
   updateBoundElements,
 } from "@excalidraw/element";
 
@@ -1661,63 +1658,16 @@ export const actionChangeArrowType = register({
             -1,
             elementsMap,
           );
-        const startHoveredElement =
-          !newElement.startBinding &&
-          getHoveredElementForBinding(
-            tupleToCoors(startGlobalPoint),
-            elements,
-            elementsMap,
-            appState.zoom,
-            false,
-            true,
-          );
-        const endHoveredElement =
-          !newElement.endBinding &&
-          getHoveredElementForBinding(
-            tupleToCoors(endGlobalPoint),
-            elements,
-            elementsMap,
-            appState.zoom,
-            false,
-            true,
-          );
-        const startElement = startHoveredElement
-          ? startHoveredElement
-          : newElement.startBinding &&
-            (elementsMap.get(
-              newElement.startBinding.elementId,
-            ) as ExcalidrawBindableElement);
-        const endElement = endHoveredElement
-          ? endHoveredElement
-          : newElement.endBinding &&
-            (elementsMap.get(
-              newElement.endBinding.elementId,
-            ) as ExcalidrawBindableElement);
-
-        const finalStartPoint = startHoveredElement
-          ? bindPointToSnapToElementOutline(
-              newElement,
-              startHoveredElement,
-              "start",
-            )
-          : startGlobalPoint;
-        const finalEndPoint = endHoveredElement
-          ? bindPointToSnapToElementOutline(
-              newElement,
-              endHoveredElement,
-              "end",
-            )
-          : endGlobalPoint;
-
-        startHoveredElement &&
-          bindLinearElement(
-            newElement,
-            startHoveredElement,
-            "start",
-            app.scene,
-          );
-        endHoveredElement &&
-          bindLinearElement(newElement, endHoveredElement, "end", app.scene);
+        const startElement =
+          newElement.startBinding &&
+          (elementsMap.get(
+            newElement.startBinding.elementId,
+          ) as ExcalidrawBindableElement);
+        const endElement =
+          newElement.endBinding &&
+          (elementsMap.get(
+            newElement.endBinding.elementId,
+          ) as ExcalidrawBindableElement);
 
         const startBinding =
           startElement && newElement.startBinding
@@ -1728,6 +1678,7 @@ export const actionChangeArrowType = register({
                   newElement,
                   startElement,
                   "start",
+                  elementsMap,
                 ),
               }
             : null;
@@ -1740,6 +1691,7 @@ export const actionChangeArrowType = register({
                   newElement,
                   endElement,
                   "end",
+                  elementsMap,
                 ),
               }
             : null;
@@ -1749,7 +1701,7 @@ export const actionChangeArrowType = register({
           startBinding,
           endBinding,
           ...updateElbowArrowPoints(newElement, elementsMap, {
-            points: [finalStartPoint, finalEndPoint].map(
+            points: [startGlobalPoint, endGlobalPoint].map(
               (p): LocalPoint =>
                 pointFrom(p[0] - newElement.x, p[1] - newElement.y),
             ),

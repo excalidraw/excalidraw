@@ -193,15 +193,9 @@ const renderBindingHighlightForBindableElement = (
   elementsMap: ElementsMap,
   zoom: InteractiveCanvasAppState["zoom"],
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-  const width = x2 - x1;
-  const height = y2 - y1;
-
-  context.strokeStyle = "rgba(0,0,0,.05)";
-  context.fillStyle = "rgba(0,0,0,.05)";
-
-  // To ensure the binding highlight doesn't overlap the element itself
   const padding = maxBindingGap(element, element.width, element.height, zoom);
+
+  context.fillStyle = "rgba(0,0,0,.05)";
 
   switch (element.type) {
     case "rectangle":
@@ -216,10 +210,13 @@ const renderBindingHighlightForBindableElement = (
     case "diamond":
       drawHighlightForDiamondWithRotation(context, padding, element);
       break;
-    case "ellipse":
-      context.lineWidth =
-        maxBindingGap(element, element.width, element.height, zoom) -
-        FIXED_BINDING_DISTANCE;
+    case "ellipse": {
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+      const width = x2 - x1;
+      const height = y2 - y1;
+
+      context.strokeStyle = "rgba(0,0,0,.05)";
+      context.lineWidth = padding - FIXED_BINDING_DISTANCE;
 
       strokeEllipseWithRotation(
         context,
@@ -230,6 +227,7 @@ const renderBindingHighlightForBindableElement = (
         element.angle,
       );
       break;
+    }
   }
 };
 

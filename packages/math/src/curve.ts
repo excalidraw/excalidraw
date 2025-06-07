@@ -1,8 +1,7 @@
-import type { Bounds } from "@excalidraw/element";
+import { doBoundsIntersect, type Bounds } from "@excalidraw/element";
 
-import { isPoint, pointDistance, pointFrom } from "./point";
-import { rectangle, rectangleIntersectLineSegment } from "./rectangle";
-import { vector } from "./vector";
+import { isPoint, pointDistance, pointFrom, pointFromVector } from "./point";
+import { vector, vectorNormal, vectorNormalize, vectorScale } from "./vector";
 
 import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
 
@@ -105,16 +104,15 @@ export function curveIntersectLineSegment<
   Point extends GlobalPoint | LocalPoint,
 >(c: Curve<Point>, l: LineSegment<Point>): Point[] {
   // Optimize by doing a cheap bounding box check first
-  const bounds = curveBounds(c);
-  if (
-    rectangleIntersectLineSegment(
-      rectangle(
-        pointFrom(bounds[0], bounds[1]),
-        pointFrom(bounds[2], bounds[3]),
-      ),
-      l,
-    ).length === 0
-  ) {
+  const b1 = curveBounds(c);
+  const b2 = [
+    Math.min(l[0][0], l[1][0]),
+    Math.min(l[0][1], l[1][1]),
+    Math.max(l[0][0], l[1][0]),
+    Math.max(l[0][1], l[1][1]),
+  ] as Bounds;
+
+  if (!doBoundsIntersect(b1, b2)) {
     return [];
   }
 
@@ -302,4 +300,109 @@ function curveBounds<Point extends GlobalPoint | LocalPoint>(
   const x = [P0[0], P1[0], P2[0], P3[0]];
   const y = [P0[1], P1[1], P2[1], P3[1]];
   return [Math.min(...x), Math.min(...y), Math.max(...x), Math.max(...y)];
+}
+
+export function curveCatmullRomQuadraticApproxPoints(
+  points: GlobalPoint[],
+  tension = 0.5,
+) {
+  if (points.length < 2) {
+    return;
+  }
+
+  const pointSets: [GlobalPoint, GlobalPoint][] = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1 < 0 ? 0 : i - 1];
+    const p1 = points[i];
+    const p2 = points[i + 1 >= points.length ? points.length - 1 : i + 1];
+    const cpX = p1[0] + ((p2[0] - p0[0]) * tension) / 2;
+    const cpY = p1[1] + ((p2[1] - p0[1]) * tension) / 2;
+
+    pointSets.push([
+      pointFrom<GlobalPoint>(cpX, cpY),
+      pointFrom<GlobalPoint>(p2[0], p2[1]),
+    ]);
+  }
+
+  return pointSets;
+}
+
+export function curveCatmullRomCubicApproxPoints<
+  Point extends GlobalPoint | LocalPoint,
+>(points: Point[], tension = 0.5) {
+  if (points.length < 2) {
+    return;
+  }
+
+  const pointSets: Curve<Point>[] = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1 < 0 ? 0 : i - 1];
+    const p1 = points[i];
+    const p2 = points[i + 1 >= points.length ? points.length - 1 : i + 1];
+    const p3 = points[i + 2 >= points.length ? points.length - 1 : i + 2];
+    const tangent1 = [(p2[0] - p0[0]) * tension, (p2[1] - p0[1]) * tension];
+    const tangent2 = [(p3[0] - p1[0]) * tension, (p3[1] - p1[1]) * tension];
+    const cp1x = p1[0] + tangent1[0] / 3;
+    const cp1y = p1[1] + tangent1[1] / 3;
+    const cp2x = p2[0] - tangent2[0] / 3;
+    const cp2y = p2[1] - tangent2[1] / 3;
+
+    pointSets.push(
+      curve(
+        pointFrom(p1[0], p1[1]),
+        pointFrom(cp1x, cp1y),
+        pointFrom(cp2x, cp2y),
+        pointFrom(p2[0], p2[1]),
+      ),
+    );
+  }
+
+  return pointSets;
+}
+
+export function curveOffsetPoints(
+  [p0, p1, p2, p3]: Curve<GlobalPoint>,
+  offset: number,
+  steps = 50,
+) {
+  const offsetPoints = [];
+
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const c = curve(p0, p1, p2, p3);
+    const point = bezierEquation(c, t);
+    const tangent = vectorNormalize(curveTangent(c, t));
+    const normal = vectorNormal(tangent);
+
+    offsetPoints.push(pointFromVector(vectorScale(normal, offset), point));
+  }
+
+  return offsetPoints;
+}
+
+export function offsetPointsForQuadraticBezier(
+  p0: GlobalPoint,
+  p1: GlobalPoint,
+  p2: GlobalPoint,
+  offsetDist: number,
+  steps = 50,
+) {
+  const offsetPoints = [];
+
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const t1 = 1 - t;
+    const point = pointFrom<GlobalPoint>(
+      t1 * t1 * p0[0] + 2 * t1 * t * p1[0] + t * t * p2[0],
+      t1 * t1 * p0[1] + 2 * t1 * t * p1[1] + t * t * p2[1],
+    );
+    const tangentX = 2 * (1 - t) * (p1[0] - p0[0]) + 2 * t * (p2[0] - p1[0]);
+    const tangentY = 2 * (1 - t) * (p1[1] - p0[1]) + 2 * t * (p2[1] - p1[1]);
+    const tangent = vectorNormalize(vector(tangentX, tangentY));
+    const normal = vectorNormal(tangent);
+
+    offsetPoints.push(pointFromVector(vectorScale(normal, offsetDist), point));
+  }
+
+  return offsetPoints;
 }

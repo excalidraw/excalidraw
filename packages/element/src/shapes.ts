@@ -291,6 +291,7 @@ export const mapIntervalToBezierT = <P extends GlobalPoint | LocalPoint>(
  */
 export const aabbForElement = (
   element: Readonly<ExcalidrawElement>,
+  elementsMap: ElementsMap,
   offset?: [number, number, number, number],
 ) => {
   const bbox = {
@@ -302,7 +303,7 @@ export const aabbForElement = (
     midY: element.y + element.height / 2,
   };
 
-  const center = elementCenterPoint(element);
+  const center = elementCenterPoint(element, elementsMap);
   const [topLeftX, topLeftY] = pointRotateRads(
     pointFrom(bbox.minX, bbox.minY),
     center,

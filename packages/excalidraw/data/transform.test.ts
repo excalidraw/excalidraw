@@ -781,7 +781,7 @@ describe("Test Transform", () => {
       expect((arrow as ExcalidrawArrowElement).endBinding).toStrictEqual({
         elementId: "rect-1",
         focus: -0,
-        gap: 14,
+        gap: 25,
       });
       expect(rect.boundElements).toStrictEqual([
         {

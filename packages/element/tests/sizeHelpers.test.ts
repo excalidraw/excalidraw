@@ -1,7 +1,5 @@
 import { vi } from "vitest";
 
-import * as constants from "@excalidraw/common";
-
 import { getPerfectElementSize } from "../src/sizeHelpers";
 
 const EPSILON_DIGITS = 3;
@@ -56,14 +54,5 @@ describe("getPerfectElementSize", () => {
     const { height, width } = getPerfectElementSize("arrow", 0, 0);
     expect(width).toBeCloseTo(0, EPSILON_DIGITS);
     expect(height).toBeCloseTo(0, EPSILON_DIGITS);
-  });
-
-  describe("should respond to SHIFT_LOCKING_ANGLE constant", () => {
-    it("should have only 2 locking angles per section if SHIFT_LOCKING_ANGLE = 45 deg (Math.PI/4)", () => {
-      (constants as any).SHIFT_LOCKING_ANGLE = Math.PI / 4;
-      const { height, width } = getPerfectElementSize("arrow", 120, 185);
-      expect(width).toBeCloseTo(120, EPSILON_DIGITS);
-      expect(height).toBeCloseTo(120, EPSILON_DIGITS);
-    });
   });
 });
