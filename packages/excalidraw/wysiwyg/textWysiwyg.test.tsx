@@ -871,7 +871,7 @@ describe("textWysiwyg", () => {
       );
     });
 
-    it.only("should update font family correctly on undo/redo by selecting bounded text when font family was updated", async () => {
+    it("should update font family correctly on undo/redo by selecting bounded text when font family was updated", async () => {
       expect(h.elements.length).toBe(1);
 
       mouse.doubleClickAt(
