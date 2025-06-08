@@ -59,7 +59,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 
 import { getContainingFrame } from "../frame";
 import { ShapeCache } from "../scene/ShapeCache";
-import { rgbToString } from "../colors";
+import { ColorRGBTuple, rgbToString } from "../colors";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -620,7 +620,7 @@ export const renderSelectionElement = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+  selectionColor: ColorRGBTuple,
 ) => {
   context.save();
   context.translate(element.x + appState.scrollX, element.y + appState.scrollY);

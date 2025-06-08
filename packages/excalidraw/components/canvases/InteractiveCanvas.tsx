@@ -15,7 +15,6 @@ import type {
 } from "../../element/types";
 import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
-import { colorToRgb } from "../../colors";
 
 type InteractiveCanvasProps = {
   containerRef: React.RefObject<HTMLDivElement>;
@@ -114,13 +113,12 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       remotePointerButton.set(socketId, user.button);
     });
 
-    const selectionColor = colorToRgb(
+    const selectionColor =
       (props.containerRef?.current &&
         getComputedStyle(props.containerRef.current).getPropertyValue(
           "--color-selection",
         )) ||
-        "#6965db",
-    );
+      "#6965db";
 
     renderInteractiveScene(
       {

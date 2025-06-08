@@ -15,10 +15,12 @@ export const renderSnaps = (
     return;
   }
 
-  // in dark mode, we need to adjust the color to account for color inversion.
+  // Previously, in dark mode, we needed to adjust the color to account 
+  // for color inversion.
   // Don't change if zen mode, because we draw only crosses, we want the
   // colors to be more visible
-  const snapColor = rgbToString(selectionColor);
+  // Something similar might be considered with the selection color.
+  const snapColor = selectionColor;
   // in zen mode make the cross more visible since we don't draw the lines
   const snapWidth =
     (appState.zenModeEnabled ? SNAP_WIDTH * 1.5 : SNAP_WIDTH) /
