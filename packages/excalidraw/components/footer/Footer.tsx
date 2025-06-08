@@ -9,7 +9,6 @@ import {
   ZoomActions,
 } from "../Actions";
 import { useDevice } from "../App";
-import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
 
@@ -80,9 +79,6 @@ const Footer = ({
       >
         <div style={{ position: "relative" }}>
           {renderWelcomeScreen && <WelcomeScreenHelpHintTunnel.Out />}
-          <HelpButton
-            onClick={() => actionManager.executeAction(actionShortcuts)}
-          />
         </div>
       </div>
       <ExitZenModeAction

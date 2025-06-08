@@ -170,25 +170,6 @@ export const SearchMenu = (opts?: { className?: string }) => {
 };
 SearchMenu.displayName = "SearchMenu";
 
-export const Help = () => {
-  const { t } = useI18n();
-
-  const actionManager = useExcalidrawActionManager();
-
-  return (
-    <DropdownMenuItem
-      data-testid="help-menu-item"
-      icon={HelpIcon}
-      onSelect={() => actionManager.executeAction(actionShortcuts)}
-      shortcut="?"
-      aria-label={t("helpDialog.title")}
-    >
-      {t("helpDialog.title")}
-    </DropdownMenuItem>
-  );
-};
-Help.displayName = "Help";
-
 export const ClearCanvas = () => {
   const { t } = useI18n();
 
@@ -338,37 +319,6 @@ export const Export = () => {
   );
 };
 Export.displayName = "Export";
-
-export const Socials = () => {
-  const { t } = useI18n();
-
-  return (
-    <>
-      <DropdownMenuItemLink
-        icon={GithubIcon}
-        href="https://github.com/excalidraw/excalidraw"
-        aria-label="GitHub"
-      >
-        GitHub
-      </DropdownMenuItemLink>
-      <DropdownMenuItemLink
-        icon={XBrandIcon}
-        href="https://x.com/excalidraw"
-        aria-label="X"
-      >
-        {t("labels.followUs")}
-      </DropdownMenuItemLink>
-      <DropdownMenuItemLink
-        icon={DiscordIcon}
-        href="https://discord.gg/UexuTaE"
-        aria-label="Discord"
-      >
-        {t("labels.discordChat")}
-      </DropdownMenuItemLink>
-    </>
-  );
-};
-Socials.displayName = "Socials";
 
 export const LiveCollaborationTrigger = ({
   onSelect,
