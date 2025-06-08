@@ -48,7 +48,6 @@ import {
   boltIcon,
   bucketFillIcon,
   ExportImageIcon,
-  mermaidLogoIcon,
   brainIconThin,
   LibraryIcon,
 } from "../icons";

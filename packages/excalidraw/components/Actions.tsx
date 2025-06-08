@@ -59,7 +59,6 @@ import {
   EmbedIcon,
   extraToolsIcon,
   frameToolIcon,
-  mermaidLogoIcon,
   laserPointerToolIcon,
   MagicIcon,
   LassoIcon,
