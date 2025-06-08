@@ -37,6 +37,7 @@ import type {
   ExcalidrawMagicFrameElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
+  ExcalidrawTableElement,
   FixedSegment,
 } from "@excalidraw/element/types";
 
@@ -218,6 +219,9 @@ export class API {
       : never;
     elbowed?: boolean;
     fixedSegments?: FixedSegment[] | null;
+    // table props
+    rows?: T extends "table" ? number : never;
+    columns?: T extends "table" ? number : never;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
@@ -230,6 +234,8 @@ export class API {
     ? ExcalidrawFrameElement
     : T extends "magicframe"
     ? ExcalidrawMagicFrameElement
+    : T extends "table"
+    ? ExcalidrawTableElement
     : ExcalidrawGenericElement => {
     let element: Mutable<ExcalidrawElement> = null!;
 
@@ -367,8 +373,8 @@ export class API {
           ...base, 
           width, 
           height,
-          rows: rest.rows,
-          columns: rest.columns,
+          rows: (rest as any).rows || 2,
+          columns: (rest as any).columns || 2,
         });
         break;
       default:
