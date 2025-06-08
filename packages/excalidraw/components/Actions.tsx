@@ -425,9 +425,6 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.lasso")}
           </DropdownMenu.Item>
-          <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
-            Generate
-          </div>
         </DropdownMenu.Content>
       </DropdownMenu>
     </>

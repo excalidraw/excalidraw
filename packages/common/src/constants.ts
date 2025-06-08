@@ -444,9 +444,6 @@ export const TOOL_TYPE = {
 } as const;
 
 export const EDITOR_LS_KEYS = {
-  OAI_API_KEY: "excalidraw-oai-api-key",
-  // legacy naming (non)scheme
-  MERMAID_TO_EXCALIDRAW: "mermaid-to-excalidraw",
   PUBLISH_LIBRARY: "publish-library-data",
 } as const;
 
