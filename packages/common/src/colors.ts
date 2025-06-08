@@ -1,9 +1,6 @@
 import oc from "open-color";
 
 import type { Merge } from "./utility-types";
-import { canvasToBlob } from "./data/blob";
-
-export const COLOR_OUTLINE_CONTRAST_THRESHOLD = 240;
 
 // FIXME can't put to utils.ts rn because of circular dependency
 const pick = <R extends Record<string, any>, K extends readonly (keyof R)[]>(
@@ -31,6 +28,7 @@ export type ColorPalette = Merge<
 // used general type instead of specific type (ColorPalette) to support custom colors
 export type ColorPaletteCustom = { [key: string]: ColorTuple | string };
 export type ColorShadesIndexes = [number, number, number, number, number];
+export type ColorRGBTuple = readonly [r: number, g: number, b: number];
 export type ColorRGBTuple = readonly [r: number, g: number, b: number];
 
 export const MAX_CUSTOM_COLORS_USED_IN_CANVAS = 5;
@@ -171,6 +169,67 @@ export const getAllColorsSpecificShade = (index: 0 | 1 | 2 | 3 | 4) =>
 
 export const rgbToHex = (r: number, g: number, b: number) =>
   `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+
+export const lightenRgb = (color: ColorRGBTuple, amount: number) => {
+  const other = amount * 255;
+  amount = 1 - amount;
+  return [
+    color[0] * amount + other,
+    color[1] * amount + other,
+    color[2] * amount + other,
+  ] as ColorRGBTuple;
+};
+
+export const rgbToString = (color: ColorRGBTuple, alpha = 1) =>
+  alpha === 1
+    ? `rgb(${color[0]}, ${color[1]}, ${color[2]})`
+    : `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
+
+export const colorToRgb = (color: string) => {
+  if (color[0] === "#") {
+    let c = parseInt(color.slice(1), 16);
+    switch (color.length) {
+      case 4:
+        return [(c & 0xf00) >> 4, c & 0xf0, (c & 0xf) << 4] as ColorRGBTuple;
+      case 5:
+        return [(c & 0xf000) >> 8, (c & 0xf00) >> 4, c & 0xf0] as ColorRGBTuple;
+      case 7:
+        return [c >> 16, (c & 0xff00) >> 8, c & 0xff] as ColorRGBTuple;
+      case 9:
+        return [c >> 24, (c & 0xff0000) >> 16, (c & 0xff00) >> 8] as ColorRGBTuple;
+    }
+  } else if (color.startsWith("rgba(")) {
+    return color
+      .slice(5, color.lastIndexOf(","))
+      .split(",", 3)
+      .map(parseInt) as unknown as ColorRGBTuple;
+  } else if (color.startsWith("rgb(")) {
+    return color
+      .slice(4, -1)
+      .split(",", 3)
+      .map(parseInt) as unknown as ColorRGBTuple;
+  }
+  return [0, 0, 0] as ColorRGBTuple;
+};
+
+/**
+ * Tries to convert a css-color of unknown format to a RGB-tuple.
+ * Will fail with `lch`, `oklch`, `lab` or `oklab`, but handles any notation
+ * of `rgb`, `rgba`, `hsl` and `hwb` as well as _named colors_.
+ * 
+ * @returns a RGB-tuple or black if the conversion was unsuccessfull.
+ */
+export const colorToRgbWithCanvas = (context: CanvasRenderingContext2D, color: string) => {
+  context.save();
+
+  context.fillStyle = color;
+  // this will either be a) a hex code, b) a rgba(...) or c) the input if canvas can't handle it
+  const recomputedFillStyle = context.fillStyle;
+
+  context.restore();
+
+  return colorToRgb(recomputedFillStyle);
+}
 
 export const lightenRgb = (color: ColorRGBTuple, amount: number) => {
   const other = amount * 255;
