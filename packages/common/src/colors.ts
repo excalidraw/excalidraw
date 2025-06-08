@@ -1,9 +1,6 @@
 import oc from "open-color";
 
 import type { Merge } from "./utility-types";
-import { canvasToBlob } from "./data/blob";
-
-export const COLOR_OUTLINE_CONTRAST_THRESHOLD = 240;
 
 // FIXME can't put to utils.ts rn because of circular dependency
 const pick = <R extends Record<string, any>, K extends readonly (keyof R)[]>(

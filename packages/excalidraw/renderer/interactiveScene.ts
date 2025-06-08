@@ -123,7 +123,7 @@ const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   elementsMap: ElementsMap,
-  selectionColor: ColorRGBTuple,
+  selectionColor: ColorRGBTuple
 ) => {
   const { elementId, hoverPointIndex } = appState.selectedLinearElement!;
   if (
@@ -154,7 +154,7 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  selectionColor: ColorRGBTuple,
+  selectionColor: ColorRGBTuple
 ) => {
   context.fillStyle = rgbToString(selectionColor, 0.4);
 
@@ -530,8 +530,6 @@ const renderLinearPointHandles = (
           selectionColor,
           false,
           !fixedSegments.includes(idx + 1),
-          segmentMidPoint,
-          radius,
           false,
         );
       }
