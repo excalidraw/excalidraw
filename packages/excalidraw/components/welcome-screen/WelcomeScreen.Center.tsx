@@ -5,7 +5,7 @@ import { useUIAppState } from "../../context/ui-appState";
 import { t, useI18n } from "../../i18n";
 import { useDevice, useExcalidrawActionManager } from "../App";
 import { ExcalidrawLogo } from "../ExcalidrawLogo";
-import { HelpIcon, LoadIcon, usersIcon } from "../icons";
+import { LoadIcon, usersIcon } from "../icons";
 
 import type { JSX } from "react";
 
@@ -99,7 +99,6 @@ const Center = ({ children }: { children?: React.ReactNode }) => {
             <Heading>{t("welcomeScreen.defaults.center_heading")}</Heading>
             <Menu>
               <MenuItemLoadScene />
-              <MenuItemHelp />
             </Menu>
           </>
         )}
@@ -131,21 +130,6 @@ const Menu = ({ children }: { children?: React.ReactNode }) => {
   return <div className="welcome-screen-menu">{children}</div>;
 };
 Menu.displayName = "Menu";
-
-const MenuItemHelp = () => {
-  const actionManager = useExcalidrawActionManager();
-
-  return (
-    <WelcomeScreenMenuItem
-      onSelect={() => actionManager.executeAction(actionShortcuts)}
-      shortcut="?"
-      icon={HelpIcon}
-    >
-      {t("helpDialog.title")}
-    </WelcomeScreenMenuItem>
-  );
-};
-MenuItemHelp.displayName = "MenuItemHelp";
 
 const MenuItemLoadScene = () => {
   const appState = useUIAppState();
@@ -189,7 +173,6 @@ Center.Heading = Heading;
 Center.Menu = Menu;
 Center.MenuItem = WelcomeScreenMenuItem;
 Center.MenuItemLink = WelcomeScreenMenuItemLink;
-Center.MenuItemHelp = MenuItemHelp;
 Center.MenuItemLoadScene = MenuItemLoadScene;
 Center.MenuItemLiveCollaborationTrigger = MenuItemLiveCollaborationTrigger;
 
