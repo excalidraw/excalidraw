@@ -15,7 +15,7 @@ import {
   isRTL,
   getVerticalOffset,
 } from "@excalidraw/common";
-import { rgbToString } from "@excalidraw/common/colors";
+import { rgbToString, type ColorRGBTuple } from "@excalidraw/common/colors";
 
 import type {
   AppState,
@@ -29,8 +29,7 @@ import type {
 
 import type {
   StaticCanvasRenderConfig,
-  RenderableElementsMap,
-  InteractiveCanvasRenderConfig,
+  RenderableElementsMap
 } from "@excalidraw/excalidraw/scene/types";
 
 import { getElementAbsoluteCoords } from "./bounds";
@@ -694,7 +693,7 @@ export const renderSelectionElement = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+  selectionColor: ColorRGBTuple,
 ) => {
   context.save();
   context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
