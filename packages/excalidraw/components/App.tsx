@@ -418,7 +418,7 @@ import {
   isPointHittingLink,
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
-import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
+import {copyIcon, fullscreenIcon } from "./icons";
 import { Toast } from "./Toast";
 
 import { findShapeByKey } from "./shapes";
@@ -459,7 +459,6 @@ import type {
   UnsubscribeCallback,
   EmbedsValidationStatus,
   ElementsPendingErasure,
-  GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
 } from "../types";
@@ -1640,26 +1639,6 @@ class App extends React.Component<AppProps, AppState> {
                               }
                             />
                           )}
-                        {this.props.aiEnabled !== false &&
-                          selectedElements.length === 1 &&
-                          isMagicFrameElement(firstSelectedElement) && (
-                            <ElementCanvasButtons
-                              element={firstSelectedElement}
-                              elementsMap={elementsMap}
-                            >
-                              <ElementCanvasButton
-                                title={t("labels.convertToCode")}
-                                icon={MagicIcon}
-                                checked={false}
-                                onChange={() =>
-                                  this.onMagicFrameGenerate(
-                                    firstSelectedElement,
-                                    "button",
-                                  )
-                                }
-                              />
-                            </ElementCanvasButtons>
-                          )}
                         {selectedElements.length === 1 &&
                           isIframeElement(firstSelectedElement) &&
                           firstSelectedElement.customData?.generationData
@@ -1932,108 +1911,10 @@ class App extends React.Component<AppProps, AppState> {
     this.triggerRender();
   };
 
-  public plugins: {
-    diagramToCode?: {
-      generate: GenerateDiagramToCode;
-    };
-  } = {};
+  public plugins: {} = {};
 
   public setPlugins(plugins: Partial<App["plugins"]>) {
     Object.assign(this.plugins, plugins);
-  }
-
-  private async onMagicFrameGenerate(
-    magicFrame: ExcalidrawMagicFrameElement,
-    source: "button" | "upstream",
-  ) {
-    const generateDiagramToCode = this.plugins.diagramToCode?.generate;
-
-    if (!generateDiagramToCode) {
-      this.setState({
-        errorMessage: "No diagram to code plugin found",
-      });
-      return;
-    }
-
-    const magicFrameChildren = getElementsOverlappingFrame(
-      this.scene.getNonDeletedElements(),
-      magicFrame,
-    ).filter((el) => !isMagicFrameElement(el));
-
-    if (!magicFrameChildren.length) {
-      if (source === "button") {
-        this.setState({ errorMessage: "Cannot generate from an empty frame" });
-        trackEvent("ai", "generate (no-children)", "d2c");
-      } else {
-        this.setActiveTool({ type: "magicframe" });
-      }
-      return;
-    }
-
-    const frameElement = this.insertIframeElement({
-      sceneX: magicFrame.x + magicFrame.width + 30,
-      sceneY: magicFrame.y,
-      width: magicFrame.width,
-      height: magicFrame.height,
-    });
-
-    if (!frameElement) {
-      return;
-    }
-
-    this.updateMagicGeneration({
-      frameElement,
-      data: { status: "pending" },
-    });
-
-    this.setState({
-      selectedElementIds: { [frameElement.id]: true },
-    });
-
-    trackEvent("ai", "generate (start)", "d2c");
-    try {
-      const { html } = await generateDiagramToCode({
-        frame: magicFrame,
-        children: magicFrameChildren,
-      });
-
-      trackEvent("ai", "generate (success)", "d2c");
-
-      if (!html.trim()) {
-        this.updateMagicGeneration({
-          frameElement,
-          data: {
-            status: "error",
-            code: "ERR_OAI",
-            message: "Nothing genereated :(",
-          },
-        });
-        return;
-      }
-
-      const parsedHtml =
-        html.includes("<!DOCTYPE html>") && html.includes("</html>")
-          ? html.slice(
-              html.indexOf("<!DOCTYPE html>"),
-              html.indexOf("</html>") + "</html>".length,
-            )
-          : html;
-
-      this.updateMagicGeneration({
-        frameElement,
-        data: { status: "done", html: parsedHtml },
-      });
-    } catch (error: any) {
-      trackEvent("ai", "generate (failed)", "d2c");
-      this.updateMagicGeneration({
-        frameElement,
-        data: {
-          status: "error",
-          code: "ERR_OAI",
-          message: error.message || "Unknown error during generation",
-        },
-      });
-    }
   }
 
   private onIframeSrcCopy(element: ExcalidrawIframeElement) {
@@ -2104,8 +1985,6 @@ class App extends React.Component<AppProps, AppState> {
           selectedElementIds: { [frame.id]: true },
         });
       }
-
-      this.onMagicFrameGenerate(frame, "upstream");
     }
   };
 
