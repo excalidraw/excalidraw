@@ -118,6 +118,25 @@ export const dragSelectedElements = (
           adjustedOffset,
         );
       }
+
+      // Handle table bound text elements
+      if (element.type === "table" && element.boundElements) {
+        const elementsMap = scene.getNonDeletedElementsMap();
+        element.boundElements.forEach((boundElement) => {
+          if (boundElement.type === "text") {
+            const textElement = elementsMap.get(boundElement.id);
+            if (textElement && isTextElement(textElement)) {
+              updateElementCoords(
+                pointerDownState,
+                textElement,
+                scene,
+                adjustedOffset,
+              );
+            }
+          }
+        });
+      }
+
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: Array.from(elementsToUpdate),
       });

@@ -48,6 +48,7 @@ import { DefaultSidebar } from "./DefaultSidebar";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
 import ElementLinkDialog from "./ElementLinkDialog";
+import { TableConfigDialog } from "./TableConfigDialog";
 import { ErrorDialog } from "./ErrorDialog";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 import { FixedSideContainer } from "./FixedSideContainer";
@@ -493,6 +494,28 @@ const LayerUI = ({
           scene={app.scene}
           appState={appState}
           generateLinkForSelection={generateLinkForSelection}
+        />
+      )}
+      {appState.openDialog?.name === "tableConfig" && (
+        <TableConfigDialog
+          onClose={() => {
+            setAppState({
+              openDialog: null,
+            });
+          }}
+          onCreate={(rows, columns) => {
+            if (appState.openDialog?.name === "tableConfig") {
+              app.createTable(
+                rows,
+                columns,
+                appState.openDialog.position.x,
+                appState.openDialog.position.y,
+              );
+            }
+            setAppState({
+              openDialog: null,
+            });
+          }}
         />
       )}
       <tunnels.OverwriteConfirmDialogTunnel.Out />

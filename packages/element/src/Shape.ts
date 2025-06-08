@@ -98,7 +98,8 @@ export const generateRoughOptions = (
     case "iframe":
     case "embeddable":
     case "diamond":
-    case "ellipse": {
+    case "ellipse":
+    case "table": {
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
         ? undefined
@@ -325,6 +326,7 @@ export const _generateElementShape = (
 ): Drawable | Drawable[] | null => {
   switch (element.type) {
     case "rectangle":
+    case "table":
     case "iframe":
     case "embeddable": {
       let shape: ElementShapes[typeof element.type];

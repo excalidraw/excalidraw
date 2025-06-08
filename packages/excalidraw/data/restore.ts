@@ -101,6 +101,7 @@ export const AllowedExcalidrawActiveTools: Record<
   custom: true,
   frame: true,
   embeddable: true,
+  table: true,
   hand: true,
   laser: false,
   magicframe: false,

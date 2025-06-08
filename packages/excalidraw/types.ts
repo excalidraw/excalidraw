@@ -155,6 +155,7 @@ export type ToolType =
   | "frame"
   | "magicframe"
   | "embeddable"
+  | "table"
   | "laser";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
@@ -363,7 +364,8 @@ export interface AppState {
     | { name: "imageExport" | "help" | "jsonExport" }
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" }
-    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
+    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] }
+    | { name: "tableConfig"; position: { x: number; y: number } };
 
   /**
    * Reflects user preference for whether the default sidebar should be docked.
@@ -737,6 +739,7 @@ export type AppClassProperties = {
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
+  createTable: App["createTable"];
 };
 
 export type PointerDownState = Readonly<{

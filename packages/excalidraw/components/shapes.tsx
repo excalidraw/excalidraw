@@ -11,6 +11,7 @@ import {
   TextIcon,
   ImageIcon,
   EraserIcon,
+  TableIcon,
 } from "./icons";
 
 export const SHAPES = [
@@ -69,6 +70,13 @@ export const SHAPES = [
     key: KEYS.T,
     numericKey: KEYS["8"],
     fillable: false,
+  },
+  {
+    icon: TableIcon,
+    value: "table",
+    key: KEYS.B,
+    numericKey: null,
+    fillable: true,
   },
   {
     icon: ImageIcon,
