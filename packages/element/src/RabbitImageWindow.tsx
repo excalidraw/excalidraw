@@ -1418,7 +1418,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                             }}
                             onMouseDown={(e) => onResizeMouseDown(e, 'bottom-right')}
                         >
-                            <svg
+                            {/* <svg
                                 style={{
                                     position: "absolute",
                                     bottom: "2px",
@@ -1436,7 +1436,7 @@ export const RabbitImageWindow: React.FC<RabbitImageWindowProps> = ({
                             >
                                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                                 <path d="M12 8l4 4-4 4"/>
-                            </svg>
+                            </svg> */}
                         </div>
 
                         {/* Right edge resize handle */}
