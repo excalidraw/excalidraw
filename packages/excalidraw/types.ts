@@ -813,6 +813,9 @@ export interface ExcalidrawImperativeAPI {
   getSceneElementsIncludingDeleted: InstanceType<
     typeof App
   >["getSceneElementsIncludingDeleted"];
+  getSceneElementsMapIncludingDeleted: InstanceType<
+    typeof App
+  >["getSceneElementsMapIncludingDeleted"];
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
   };
