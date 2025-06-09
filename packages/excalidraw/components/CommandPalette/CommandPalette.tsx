@@ -48,7 +48,6 @@ import {
   boltIcon,
   bucketFillIcon,
   ExportImageIcon,
-  brainIconThin,
   LibraryIcon,
 } from "../icons";
 

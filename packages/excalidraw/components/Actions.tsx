@@ -56,11 +56,9 @@ import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
-  EmbedIcon,
   extraToolsIcon,
   frameToolIcon,
   laserPointerToolIcon,
-  MagicIcon,
   LassoIcon,
 } from "./icons";
 
@@ -296,8 +294,6 @@ export const ShapesSwitcher = ({
   const laserToolSelected = activeTool.type === "laser";
   const lassoToolSelected = activeTool.type === "lasso";
 
-  const embeddableToolSelected = activeTool.type === "embeddable";
-
   return (
     <>
       {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
@@ -365,7 +361,6 @@ export const ShapesSwitcher = ({
           className={clsx("App-toolbar__extra-tools-trigger", {
             "App-toolbar__extra-tools-trigger--selected":
               frameToolSelected ||
-              embeddableToolSelected ||
               lassoToolSelected ||
               // in collab we're already highlighting the laser button
               // outside toolbar, so let's not highlight extra-tools button
@@ -377,8 +372,6 @@ export const ShapesSwitcher = ({
         >
           {frameToolSelected
             ? frameToolIcon
-            : embeddableToolSelected
-            ? EmbedIcon
             : laserToolSelected && !app.props.isCollaborating
             ? laserPointerToolIcon
             : lassoToolSelected
@@ -390,23 +383,6 @@ export const ShapesSwitcher = ({
           onSelect={() => setIsExtraToolsMenuOpen(false)}
           className="App-toolbar__extra-tools-dropdown"
         >
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "frame" })}
-            icon={frameToolIcon}
-            shortcut={KEYS.F.toLocaleUpperCase()}
-            data-testid="toolbar-frame"
-            selected={frameToolSelected}
-          >
-            {t("toolBar.frame")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "embeddable" })}
-            icon={EmbedIcon}
-            data-testid="toolbar-embeddable"
-            selected={embeddableToolSelected}
-          >
-            {t("toolBar.embeddable")}
-          </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "laser" })}
             icon={laserPointerToolIcon}

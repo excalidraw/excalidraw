@@ -151,21 +151,6 @@ const MenuItemLoadScene = () => {
 };
 MenuItemLoadScene.displayName = "MenuItemLoadScene";
 
-const MenuItemLiveCollaborationTrigger = ({
-  onSelect,
-}: {
-  onSelect: () => any;
-}) => {
-  const { t } = useI18n();
-  return (
-    <WelcomeScreenMenuItem shortcut={null} onSelect={onSelect} icon={usersIcon}>
-      {t("labels.liveCollaboration")}
-    </WelcomeScreenMenuItem>
-  );
-};
-MenuItemLiveCollaborationTrigger.displayName =
-  "MenuItemLiveCollaborationTrigger";
-
 // -----------------------------------------------------------------------------
 
 Center.Logo = Logo;
@@ -174,6 +159,5 @@ Center.Menu = Menu;
 Center.MenuItem = WelcomeScreenMenuItem;
 Center.MenuItemLink = WelcomeScreenMenuItemLink;
 Center.MenuItemLoadScene = MenuItemLoadScene;
-Center.MenuItemLiveCollaborationTrigger = MenuItemLiveCollaborationTrigger;
 
 export { Center };
