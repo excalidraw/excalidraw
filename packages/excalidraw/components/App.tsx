@@ -9948,12 +9948,16 @@ class App extends React.Component<AppProps, AppState> {
     const dataURL =
       this.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
+    // the following mutation should not be undoable
+    this.store.scheduleAction(CaptureUpdateAction.NEVER);
+
+    // inform mutation so that the scheduled action is executed asap
     const imageElement = this.scene.mutateElement(
       _imageElement,
       {
         fileId,
       },
-      { informMutation: false, isDragging: false },
+      { informMutation: true, isDragging: false },
     ) as NonDeleted<InitializedExcalidrawImageElement>;
 
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
@@ -9980,8 +9984,14 @@ class App extends React.Component<AppProps, AppState> {
             this.state.pendingImageElementId !== imageElement.id &&
             this.state.newElement?.id !== imageElement.id
           ) {
+            // the following mutation should not be undoable
+            this.store.scheduleAction(CaptureUpdateAction.NEVER);
             this.initializeImageDimensions(imageElement, true);
+
+            // trigger component update so that the scheduled action is executed asap
+            this.scene.triggerUpdate();
           }
+
           resolve(imageElement);
         } catch (error: any) {
           console.error(error);
@@ -10166,6 +10176,7 @@ class App extends React.Component<AppProps, AppState> {
         imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
       ) {
         const placeholderSize = 100 / this.state.zoom.value;
+
         this.scene.mutateElement(imageElement, {
           x: imageElement.x - placeholderSize / 2,
           y: imageElement.y - placeholderSize / 2,

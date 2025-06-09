@@ -507,6 +507,13 @@ export class API {
         types: [blob.type],
       },
     });
+    Object.defineProperty(fileDropEvent, "clientX", {
+      value: 0,
+    });
+    Object.defineProperty(fileDropEvent, "clientY", {
+      value: 0,
+    });
+    
     await fireEvent(GlobalTestState.interactiveCanvas, fileDropEvent);
   };
 

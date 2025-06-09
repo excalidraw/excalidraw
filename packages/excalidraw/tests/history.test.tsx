@@ -601,6 +601,8 @@ describe("history", () => {
           expect.objectContaining({
             type: "image",
             fileId: expect.any(String),
+            x: expect.toBeNonNaNNumber(),
+            y: expect.toBeNonNaNNumber(),
           }),
         ]);
       });
@@ -612,6 +614,8 @@ describe("history", () => {
         expect.objectContaining({
           type: "image",
           fileId: expect.any(String),
+          x: expect.toBeNonNaNNumber(),
+          y: expect.toBeNonNaNNumber(),
           isDeleted: true,
         }),
       ]);
@@ -623,6 +627,8 @@ describe("history", () => {
         expect.objectContaining({
           type: "image",
           fileId: expect.any(String),
+          x: expect.toBeNonNaNNumber(),
+          y: expect.toBeNonNaNNumber(),
           isDeleted: false,
         }),
       ]);
@@ -690,6 +696,8 @@ describe("history", () => {
           expect.objectContaining({
             type: "image",
             fileId: expect.any(String),
+            x: expect.toBeNonNaNNumber(),
+            y: expect.toBeNonNaNNumber(),
           }),
         ]);
       });
@@ -701,6 +709,8 @@ describe("history", () => {
         expect.objectContaining({
           type: "image",
           fileId: expect.any(String),
+          x: expect.toBeNonNaNNumber(),
+          y: expect.toBeNonNaNNumber(),
           isDeleted: true,
         }),
       ]);
@@ -712,6 +722,8 @@ describe("history", () => {
         expect.objectContaining({
           type: "image",
           fileId: expect.any(String),
+          x: expect.toBeNonNaNNumber(),
+          y: expect.toBeNonNaNNumber(),
           isDeleted: false,
         }),
       ]);
