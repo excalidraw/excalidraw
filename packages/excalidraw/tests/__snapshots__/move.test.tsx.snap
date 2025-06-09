@@ -49,9 +49,7 @@ exports[`duplicate element on move when ALT is clicked > rectangle 6`] = `
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
+  "roundness": null,
   "seed": 1505387817,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -157,9 +155,7 @@ exports[`move element > rectangles with binding arrow 6`] = `
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
+  "roundness": null,
   "seed": 1116226695,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -226,8 +222,8 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "updated": 1,
   "version": 11,
   "versionNonce": 1573789895,
-  "width": "86.85786",
-  "x": "107.07107",
-  "y": "47.07107",
+  "width": "81.00000",
+  "x": "110.00000",
+  "y": 50,
 }
 `;

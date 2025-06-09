@@ -1042,10 +1042,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       deleted.version >= 0 &&
       inserted.version >= 0 &&
       // versions should never be the same
-      deleted.version !== inserted.version &&
-      // versionNonce is required
-      deleted.versionNonce &&
-      inserted.versionNonce
+      deleted.version !== inserted.version
     );
 
   private static validate(
