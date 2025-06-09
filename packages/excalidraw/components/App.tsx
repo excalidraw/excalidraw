@@ -11371,6 +11371,10 @@ declare global {
       app: InstanceType<typeof App>;
       history: History;
       store: Store;
+      debugFreedraw?: {
+        streamline: number;
+        simplify: number;
+      };
     };
   }
 }
@@ -11378,6 +11382,12 @@ declare global {
 export const createTestHook = () => {
   if (isTestEnv() || isDevEnv()) {
     window.h = window.h || ({} as Window["h"]);
+
+    // Initialize debug freedraw parameters
+    window.h.debugFreedraw = window.h.debugFreedraw || {
+      streamline: 0.62,
+      simplify: 0.3,
+    };
 
     Object.defineProperties(window.h, {
       elements: {

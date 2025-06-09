@@ -50,7 +50,10 @@ const calculateVelocityBasedPressure = (
   return Math.max(0.1, Math.min(1.0, pressure));
 };
 
-export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
+export const getFreedrawStroke = (
+  element: ExcalidrawFreeDrawElement,
+  debugParams?: { streamline?: number; simplify?: number },
+) => {
   // Compose points as [x, y, pressure]
   let points: [number, number, number][];
   if (element.simulatePressure) {
@@ -80,10 +83,23 @@ export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
     });
   }
 
+  const streamline =
+    (typeof window !== "undefined" &&
+      window.h &&
+      window.h.debugFreedraw?.streamline) ??
+    debugParams?.streamline ??
+    0.62;
+  const simplify =
+    (typeof window !== "undefined" &&
+      window.h &&
+      window.h.debugFreedraw?.simplify) ??
+    debugParams?.simplify ??
+    0.3;
+
   const laser = new LaserPointer({
     size: element.strokeWidth,
-    streamline: 0.62,
-    simplify: 0.3,
+    streamline: streamline === false ? 0.62 : streamline,
+    simplify: simplify === false ? 0.3 : simplify,
     sizeMapping: ({ pressure: t }) => {
       if (element.simulatePressure) {
         return t + 0.2;
@@ -114,13 +130,14 @@ export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
  */
 export const getFreeDrawSvgPath = (
   element: ExcalidrawFreeDrawElement,
+  debugParams?: { streamline?: number; simplify?: number },
 ): string => {
   // legacy, for backwards compatibility
   if (element.pressureSensitivity === null) {
     return _legacy_getFreeDrawSvgPath(element);
   }
 
-  return getSvgPathFromStroke(getFreedrawStroke(element));
+  return getSvgPathFromStroke(getFreedrawStroke(element, debugParams));
 };
 
 const roundPoint = (A: Point): string => {
