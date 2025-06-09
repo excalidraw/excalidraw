@@ -12762,7 +12762,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
 
 exports[`history > singleplayer undo/redo > should create new history entry on image drag&drop > [end of test] number of elements 1`] = `1`;
 
-exports[`history > singleplayer undo/redo > should create new history entry on image drag&drop > [end of test] number of renders 1`] = `7`;
+exports[`history > singleplayer undo/redo > should create new history entry on image drag&drop > [end of test] number of renders 1`] = `6`;
 
 exports[`history > singleplayer undo/redo > should create new history entry on image drag&drop > [end of test] redo stack 1`] = `[]`;
 
@@ -12984,7 +12984,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
 
 exports[`history > singleplayer undo/redo > should create new history entry on image paste > [end of test] number of elements 1`] = `1`;
 
-exports[`history > singleplayer undo/redo > should create new history entry on image paste > [end of test] number of renders 1`] = `7`;
+exports[`history > singleplayer undo/redo > should create new history entry on image paste > [end of test] number of renders 1`] = `6`;
 
 exports[`history > singleplayer undo/redo > should create new history entry on image paste > [end of test] redo stack 1`] = `[]`;
 

@@ -3071,6 +3071,7 @@ class App extends React.Component<AppProps, AppState> {
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
+        this.store.scheduleCapture();
         this.setState({
           selectedElementIds: makeNextSelectedElementIds(
             {
@@ -10021,12 +10022,11 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.mutateElement(imageElement, {
         isDeleted: true,
       });
+      this.actionManager.executeAction(actionFinalize);
       this.setState({
         errorMessage: error.message || t("errors.imageInsertError"),
       });
       return null;
-    } finally {
-      this.actionManager.executeAction(actionFinalize);
     }
   };
 
@@ -10107,6 +10107,7 @@ class App extends React.Component<AppProps, AppState> {
       if (insertOnCanvasDirectly) {
         this.insertImageElement(imageElement, imageFile);
         this.initializeImageDimensions(imageElement);
+        this.store.scheduleCapture();
         this.setState(
           {
             selectedElementIds: makeNextSelectedElementIds(
@@ -10447,6 +10448,7 @@ class App extends React.Component<AppProps, AppState> {
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
+        this.store.scheduleCapture();
         this.setState({
           selectedElementIds: makeNextSelectedElementIds(
             { [imageElement.id]: true },
