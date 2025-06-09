@@ -5,7 +5,6 @@ import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
 import App from "./components/App";
 import { InitializeApp } from "./components/InitializeApp";
 import Footer from "./components/footer/FooterCenter";
-import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import { defaultLang } from "./i18n";
@@ -281,7 +280,6 @@ export { Footer };
 export { MainMenu };
 export { useDevice } from "./components/App";
 export { WelcomeScreen };
-export { LiveCollaborationTrigger };
 export { Stats } from "./components/Stats";
 
 export { DefaultSidebar } from "./components/DefaultSidebar";

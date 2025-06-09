@@ -35,7 +35,6 @@ import { MobileMenu } from "./MobileMenu";
 import { PasteChartDialog } from "./PasteChartDialog";
 import { Section } from "./Section";
 import Stack from "./Stack";
-import { UserList } from "./UserList";
 import { PenModeButton } from "./PenModeButton";
 import Footer from "./footer/Footer";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
@@ -341,12 +340,6 @@ const LayerUI = ({
               },
             )}
           >
-            {appState.collaborators.size > 0 && (
-              <UserList
-                collaborators={appState.collaborators}
-                userToFollow={appState.userToFollow?.socketId || null}
-              />
-            )}
             {renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&
               appState.openDialog?.name !== "elementLinkSelector" &&

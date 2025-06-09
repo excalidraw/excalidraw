@@ -4,9 +4,7 @@ import { composeEventHandlers } from "@excalidraw/common";
 
 import { useTunnels } from "../../context/tunnels";
 import { useUIAppState } from "../../context/ui-appState";
-import { t } from "../../i18n";
 import { useDevice, useExcalidrawSetAppState } from "../App";
-import { UserList } from "../UserList";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { HamburgerMenuIcon } from "../icons";
@@ -55,16 +53,6 @@ const MainMenu = Object.assign(
               })}
             >
               {children}
-              {device.editor.isMobile && appState.collaborators.size > 0 && (
-                <fieldset className="UserList-Wrapper">
-                  <legend>{t("labels.collaborators")}</legend>
-                  <UserList
-                    mobile={true}
-                    collaborators={appState.collaborators}
-                    userToFollow={appState.userToFollow?.socketId || null}
-                  />
-                </fieldset>
-              )}
             </DropdownMenu.Content>
           </DropdownMenu>
         </MainMenuTunnel.In>
