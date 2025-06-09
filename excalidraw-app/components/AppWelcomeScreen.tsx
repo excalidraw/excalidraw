@@ -2,10 +2,7 @@ import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { WelcomeScreen } from "@excalidraw/excalidraw/index";
 import React from "react";
 
-export const AppWelcomeScreen: React.FC<{
-  onCollabDialogOpen: () => any;
-  isCollabEnabled: boolean;
-}> = React.memo((props) => {
+export const AppWelcomeScreen: React.FC<{}> = React.memo((props) => {
   const { t } = useI18n();
   const headingContent = t("welcomeScreen.app.center_heading");
 

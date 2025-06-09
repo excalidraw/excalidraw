@@ -9,9 +9,6 @@ import type { Theme } from "@excalidraw/element/types";
 import { saveDebugState } from "./DebugCanvas";
 
 export const AppMainMenu: React.FC<{
-  onCollabDialogOpen: () => any;
-  isCollaborating: boolean;
-  isCollabEnabled: boolean;
   theme: Theme | "system";
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
