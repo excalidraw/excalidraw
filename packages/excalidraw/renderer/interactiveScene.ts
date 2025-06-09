@@ -75,8 +75,6 @@ import {
 } from "../scene/scrollbars";
 import { type InteractiveCanvasAppState } from "../types";
 
-import { getClientColor, renderRemoteCursors } from "../clients";
-
 import {
   bootstrapCanvas,
   drawHighlightForDiamondWithRotation,
@@ -752,9 +750,6 @@ const _renderInteractiveScene = ({
     undefined;
 
   visibleElements.forEach((element) => {
-    // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
-    // ShapeCache returns empty hence making sure that we get the
-    // correct element from visible elements
     if (appState.editingLinearElement?.elementId === element.id) {
       if (element) {
         editingLinearElement = element as NonDeleted<ExcalidrawLinearElement>;
@@ -843,9 +838,6 @@ const _renderInteractiveScene = ({
     isFrameLikeElement(element),
   );
 
-  // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
-  // ShapeCache returns empty hence making sure that we get the
-  // correct element from visible elements
   if (
     selectedElements.length === 1 &&
     appState.editingLinearElement?.elementId === selectedElements[0].id
@@ -858,12 +850,10 @@ const _renderInteractiveScene = ({
     );
   }
 
-  // Arrows have a different highlight behavior when
-  // they are the only selected element
   if (appState.selectedLinearElement) {
     const editor = appState.selectedLinearElement;
     const firstSelectedLinear = selectedElements.find(
-      (el) => el.id === editor.elementId, // Don't forget bound text elements!
+      (el) => el.id === editor.elementId,
     );
 
     if (editor.segmentMidPointHoveredCoords) {
@@ -878,13 +868,12 @@ const _renderInteractiveScene = ({
     }
   }
 
-  // Paint selected elements
   if (!appState.multiElement && !appState.editingLinearElement) {
     const showBoundingBox = shouldShowBoundingBox(selectedElements, appState);
 
     const isSingleLinearElementSelected =
       selectedElements.length === 1 && isLinearElement(selectedElements[0]);
-    // render selected linear element points
+
     if (
       isSingleLinearElementSelected &&
       appState.selectedLinearElement?.elementId === selectedElements[0].id &&
@@ -900,44 +889,23 @@ const _renderInteractiveScene = ({
     const selectionColor = renderConfig.selectionColor || oc.black;
 
     if (showBoundingBox) {
-      // Optimisation for finding quickly relevant element ids
       const locallySelectedIds = arrayToMap(selectedElements);
-
       const selections: ElementSelectionBorder[] = [];
 
       for (const element of elementsMap.values()) {
         const selectionColors = [];
-        const remoteClients = renderConfig.remoteSelectedElementIds.get(
-          element.id,
-        );
         if (
           !(
-            // Elbow arrow elements cannot be selected when bound on either end
-            (
-              isSingleLinearElementSelected &&
-              isElbowArrow(element) &&
-              (element.startBinding || element.endBinding)
-            )
+            isSingleLinearElementSelected &&
+            isElbowArrow(element) &&
+            (element.startBinding || element.endBinding)
           )
         ) {
-          // local user
           if (
             locallySelectedIds.has(element.id) &&
             !isSelectedViaGroup(appState, element)
           ) {
             selectionColors.push(selectionColor);
-          }
-          // remote users
-          if (remoteClients) {
-            selectionColors.push(
-              ...remoteClients.map((socketId) => {
-                const background = getClientColor(
-                  socketId,
-                  appState.collaborators.get(socketId),
-                );
-                return background;
-              }),
-            );
           }
         }
 
@@ -954,7 +922,7 @@ const _renderInteractiveScene = ({
             x2,
             y2,
             selectionColors: element.locked ? ["#ced4da"] : selectionColors,
-            dashed: !!remoteClients || element.locked,
+            dashed: element.locked,
             cx,
             cy,
             activeEmbeddable:
@@ -989,7 +957,6 @@ const _renderInteractiveScene = ({
       };
 
       for (const groupId of getSelectedGroupIds(appState)) {
-        // TODO: support multiplayer selected group IDs
         addSelectionForGroupId(groupId);
       }
 
@@ -1001,7 +968,7 @@ const _renderInteractiveScene = ({
         renderSelectionBorder(context, appState, selection),
       );
     }
-    // Paint resize transformHandles
+
     context.save();
     context.translate(appState.scrollX, appState.scrollY);
 
@@ -1011,15 +978,13 @@ const _renderInteractiveScene = ({
         selectedElements[0],
         appState.zoom,
         elementsMap,
-        "mouse", // when we render we don't know which pointer type so use mouse,
+        "mouse",
         getOmitSidesForDevice(device),
       );
       if (
         !appState.viewModeEnabled &&
         showBoundingBox &&
-        // do not show transform handles when text is being edited
         !isTextElement(appState.editingTextElement) &&
-        // do not show transform handles when image is being cropped
         !appState.croppingElementId
       ) {
         renderTransformHandles(
@@ -1139,15 +1104,6 @@ const _renderInteractiveScene = ({
 
   context.restore();
 
-  renderRemoteCursors({
-    context,
-    renderConfig,
-    appState,
-    normalizedWidth,
-    normalizedHeight,
-  });
-
-  // Paint scrollbars
   let scrollBars;
   if (renderConfig.renderScrollbars) {
     scrollBars = getScrollBars(

@@ -52,7 +52,6 @@ export const validateFractionalIndices = (
     ignoreLogs?: true;
     reconciliationContext?: {
       localElements: ReadonlyArray<ExcalidrawElement>;
-      remoteElements: ReadonlyArray<ExcalidrawElement>;
     };
   },
 ) => {
@@ -99,9 +98,7 @@ export const validateFractionalIndices = (
       additionalContext.push(
         reconciliationContext.localElements.map((x) => stringifyElement(x)),
       );
-      additionalContext.push(
-        reconciliationContext.remoteElements.map((x) => stringifyElement(x)),
-      );
+      additionalContext.push();
     }
 
     if (!ignoreLogs) {

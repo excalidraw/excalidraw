@@ -100,7 +100,6 @@ export type ActionName =
   | "toggleShortcuts"
   | "group"
   | "ungroup"
-  | "goToCollaborator"
   | "addToLibrary"
   | "changeRoundness"
   | "alignTop"
@@ -200,7 +199,6 @@ export interface Action {
           | "export"
           | "history"
           | "menu"
-          | "collab"
           | "hyperlink"
           | "search_menu"
           | "shape_switch";

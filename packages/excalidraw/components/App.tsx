@@ -451,7 +451,6 @@ import type {
   SidebarName,
   SidebarTabName,
   KeyboardModifiersObject,
-  CollaboratorPointer,
   ToolType,
   OnUserFollowedPayload,
   UnsubscribeCallback,
@@ -1783,14 +1782,6 @@ class App extends React.Component<AppProps, AppState> {
                           onPointerDown={this.handleCanvasPointerDown}
                           onDoubleClick={this.handleCanvasDoubleClick}
                         />
-                        {this.state.userToFollow && (
-                          <FollowMode
-                            width={this.state.width}
-                            height={this.state.height}
-                            userToFollow={this.state.userToFollow}
-                            onDisconnect={this.maybeUnfollowRemoteUser}
-                          />
-                        )}
                         {this.renderFrameNames()}
                         {this.state.activeLockedId && (
                           <UnlockPopup
@@ -2621,14 +2612,6 @@ class App extends React.Component<AppProps, AppState> {
       this.props.UIOptions.dockedSidebarBreakpoint
     ) {
       this.refreshEditorBreakpoints();
-    }
-
-    const hasFollowedPersonLeft =
-      prevState.userToFollow &&
-      !this.state.collaborators.has(prevState.userToFollow.socketId);
-
-    if (hasFollowedPersonLeft) {
-      this.maybeUnfollowRemoteUser();
     }
 
     if (
@@ -3644,18 +3627,12 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private maybeUnfollowRemoteUser = () => {
-    if (this.state.userToFollow) {
-      this.setState({ userToFollow: null });
-    }
-  };
 
   /** use when changing scrollX/scrollY/zoom based on user interaction */
   private translateCanvas: React.Component<any, AppState>["setState"] = (
     state,
   ) => {
     this.cancelInProgressAnimation?.();
-    this.maybeUnfollowRemoteUser();
     this.setState(state);
   };
 
@@ -3744,7 +3721,6 @@ class App extends React.Component<AppProps, AppState> {
     <K extends keyof AppState>(sceneData: {
       elements?: SceneData["elements"];
       appState?: Pick<AppState, K> | null;
-      collaborators?: SceneData["collaborators"];
       /**
        *  Controls which updates should be captured by the `Store`. Captured updates are emmitted and listened to by other components, such as `History` for undo / redo purposes.
        *
@@ -3758,7 +3734,7 @@ class App extends React.Component<AppProps, AppState> {
        */
       captureUpdate?: SceneData["captureUpdate"];
     }) => {
-      const { elements, appState, collaborators, captureUpdate } = sceneData;
+      const { elements, appState, captureUpdate } = sceneData;
 
       const nextElements = elements ? syncInvalidIndices(elements) : undefined;
 
@@ -3768,8 +3744,7 @@ class App extends React.Component<AppProps, AppState> {
           : undefined;
 
         const nextAppState = appState
-          ? // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
-            Object.assign({}, this.store.snapshot.appState, appState)
+          ? Object.assign({}, this.store.snapshot.appState, appState)
           : undefined;
 
         this.store.scheduleMicroAction({
@@ -3786,13 +3761,8 @@ class App extends React.Component<AppProps, AppState> {
       if (nextElements) {
         this.scene.replaceAllElements(nextElements);
       }
-
-      if (collaborators) {
-        this.setState({ collaborators });
-      }
     },
   );
-
   public mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     element: TElement,
     updates: ElementUpdate<TElement>,
@@ -6214,7 +6184,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
-    this.maybeUnfollowRemoteUser();
 
     if (this.state.searchMatches) {
       this.setState((state) => {
@@ -6324,8 +6293,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.lastPointerDownEvent = event;
 
-    // we must exit before we set `cursorButton` state and `savePointer`
-    // else it will send pointer state & laser pointer events in collab when
     // panning
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
@@ -11068,17 +11035,7 @@ class App extends React.Component<AppProps, AppState> {
       // sometimes the pointer goes off screen
     }
 
-    const pointer: CollaboratorPointer = {
-      x: sceneX,
-      y: sceneY,
-      tool: this.state.activeTool.type === "laser" ? "laser" : "pointer",
-    };
 
-    this.props.onPointerUpdate?.({
-      pointer,
-      button,
-      pointersMap: gesture.pointers,
-    });
   };
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {

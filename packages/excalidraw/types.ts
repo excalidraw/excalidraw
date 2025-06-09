@@ -66,47 +66,6 @@ import type { JSX } from "react";
 
 export type SocketId = string & { _brand: "SocketId" };
 
-export type Collaborator = Readonly<{
-  pointer?: CollaboratorPointer;
-  button?: "up" | "down";
-  selectedElementIds?: AppState["selectedElementIds"];
-  username?: string | null;
-  userState?: UserIdleState;
-  color?: {
-    background: string;
-    stroke: string;
-  };
-  // The url of the collaborator's avatar, defaults to username initials
-  // if not present
-  avatarUrl?: string;
-  // user id. If supplied, we'll filter out duplicates when rendering user avatars.
-  id?: string;
-  socketId?: SocketId;
-  isCurrentUser?: boolean;
-  isInCall?: boolean;
-  isSpeaking?: boolean;
-  isMuted?: boolean;
-}>;
-
-export type CollaboratorPointer = {
-  x: number;
-  y: number;
-  tool: "pointer" | "laser";
-  /**
-   * Whether to render cursor + username. Useful when you only want to render
-   * laser trail.
-   *
-   * @default true
-   */
-  renderCursor?: boolean;
-  /**
-   * Explicit laser color.
-   *
-   * @default string collaborator's cursor color
-   */
-  laserColor?: string;
-};
-
 export type DataURL = string & { _brand: "DataURL" };
 
 export type BinaryFileData = {
@@ -224,8 +183,6 @@ export type InteractiveCanvasAppState = Readonly<
     suggestedBindings: AppState["suggestedBindings"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];
-    // Collaborators
-    collaborators: AppState["collaborators"];
     // SnapLines
     snapLines: AppState["snapLines"];
     zenModeEnabled: AppState["zenModeEnabled"];
@@ -399,7 +356,6 @@ export interface AppState {
   offsetLeft: number;
 
   fileHandle: FileSystemHandle | null;
-  collaborators: Map<SocketId, Collaborator>;
   stats: {
     open: boolean;
     /** bitmap. Use `STATS_PANELS` bit values */
@@ -626,7 +582,6 @@ export interface ExcalidrawProps {
 export type SceneData = {
   elements?: ImportedDataState["elements"];
   appState?: ImportedDataState["appState"];
-  collaborators?: Map<SocketId, Collaborator>;
   captureUpdate?: CaptureUpdateActionType;
 };
 
