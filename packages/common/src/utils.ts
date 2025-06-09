@@ -714,8 +714,8 @@ export const arrayToObject = <T>(
   array: readonly T[],
   groupBy?: (value: T) => string | number,
 ) =>
-  array.reduce((acc, value) => {
-    acc[groupBy ? groupBy(value) : String(value)] = value;
+  array.reduce((acc, value, idx) => {
+    acc[groupBy ? groupBy(value) : idx] = value;
     return acc;
   }, {} as { [key: string]: T });
 
