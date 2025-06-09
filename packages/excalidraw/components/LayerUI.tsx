@@ -91,7 +91,6 @@ interface LayerUIProps {
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
   app: AppClassProperties;
-  isCollaborating: boolean;
   generateLinkForSelection?: AppProps["generateLinkForSelection"];
 }
 
@@ -144,7 +143,6 @@ const LayerUI = ({
   renderWelcomeScreen,
   children,
   app,
-  isCollaborating,
   generateLinkForSelection,
 }: LayerUIProps) => {
   const device = useDevice();
@@ -306,26 +304,6 @@ const LayerUI = ({
                             />
                           </Stack.Row>
                         </Island>
-                        {isCollaborating && (
-                          <Island
-                            style={{
-                              marginLeft: 8,
-                              alignSelf: "center",
-                              height: "fit-content",
-                            }}
-                          >
-                            <LaserPointerButton
-                              title={t("toolBar.laser")}
-                              checked={
-                                appState.activeTool.type === TOOL_TYPE.laser
-                              }
-                              onChange={() =>
-                                app.setActiveTool({ type: TOOL_TYPE.laser })
-                              }
-                              isMobile
-                            />
-                          </Island>
-                        )}
                       </Stack.Row>
                     </Stack.Col>
                   </div>

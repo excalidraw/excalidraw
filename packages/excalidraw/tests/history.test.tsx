@@ -1839,9 +1839,7 @@ describe("history", () => {
     }
 
     beforeEach(async () => {
-      await render(
-        <Excalidraw handleKeyboardGlobally={true} isCollaborating={true} />,
-      );
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
     });
 
     it("should not override remote changes on different elements", async () => {

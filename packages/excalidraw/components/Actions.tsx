@@ -365,14 +365,14 @@ export const ShapesSwitcher = ({
               // in collab we're already highlighting the laser button
               // outside toolbar, so let's not highlight extra-tools button
               // on top of it
-              (laserToolSelected && !app.props.isCollaborating),
+              laserToolSelected,
           })}
           onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
           title={t("toolBar.extraTools")}
         >
           {frameToolSelected
             ? frameToolIcon
-            : laserToolSelected && !app.props.isCollaborating
+            : laserToolSelected
             ? laserPointerToolIcon
             : lassoToolSelected
             ? LassoIcon

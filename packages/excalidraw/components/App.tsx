@@ -1603,7 +1603,6 @@ class App extends React.Component<AppProps, AppState> {
                             !this.scene.getElementsIncludingDeleted().length
                           }
                           app={this}
-                          isCollaborating={this.props.isCollaborating}
                           generateLinkForSelection={
                             this.props.generateLinkForSelection
                           }

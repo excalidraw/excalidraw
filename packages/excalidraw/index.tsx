@@ -25,7 +25,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onIncrement,
     initialData,
     excalidrawAPI,
-    isCollaborating = false,
     onPointerUpdate,
     renderTopRightUI,
     langCode = defaultLang.code,
@@ -116,7 +115,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onIncrement={onIncrement}
           initialData={initialData}
           excalidrawAPI={excalidrawAPI}
-          isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
           renderTopRightUI={renderTopRightUI}
           langCode={langCode}
