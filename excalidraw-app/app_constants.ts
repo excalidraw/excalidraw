@@ -16,7 +16,6 @@ export const WS_EVENTS = {
   SERVER_VOLATILE: "server-volatile-broadcast",
   SERVER: "server-broadcast",
   USER_FOLLOW_CHANGE: "user-follow",
-  USER_FOLLOW_ROOM_CHANGE: "user-follow-room-change",
 } as const;
 
 export enum WS_SUBTYPES {
@@ -27,8 +26,6 @@ export enum WS_SUBTYPES {
   IDLE_STATUS = "IDLE_STATUS",
   USER_VISIBLE_SCENE_BOUNDS = "USER_VISIBLE_SCENE_BOUNDS",
 }
-
-export const ROOM_ID_BYTES = 10;
 
 export const STORAGE_KEYS = {
   LOCAL_STORAGE_ELEMENTS: "excalidraw",

@@ -10,7 +10,7 @@
 .vercel
 .vscode
 .yarn
-*.log
+*.log@
 *.tgz
 build
 dist

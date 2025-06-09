@@ -213,7 +213,6 @@
     "undo": "Undo",
     "redo": "Redo",
     "resetLibrary": "Reset library",
-    "createNewRoom": "Create new room",
     "fullScreen": "Full screen",
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
@@ -369,19 +368,7 @@
     "openIssueMessage": "We were very cautious not to include your scene information on the error. If your scene is not private, please consider following up on our <button>bug tracker</button>. Please include information below by copying and pasting into the GitHub issue.",
     "sceneContent": "Scene content:"
   },
-  "shareDialog": {
-    "or": "Or"
-  },
-  "roomDialog": {
-    "desc_intro": "Invite people to collaborate on your drawing.",
-    "desc_privacy": "Don't worry, the session is end-to-end encrypted, and fully private. Not even our server can see what you draw.",
-    "button_startSession": "Start session",
-    "button_stopSession": "Stop session",
-    "desc_inProgressIntro": "Live-collaboration session is now in progress.",
-    "desc_shareLink": "Share this link with anyone you want to collaborate with:",
-    "desc_exitSession": "Stopping the session will disconnect you from the room, but you'll be able to continue working with the scene, locally. Note that this won't affect other people, and they'll still be able to collaborate on their version.",
-    "shareTitle": "Join a live collaboration session on Excalidraw"
-  },
+
   "errorDialog": {
     "title": "Error"
   },

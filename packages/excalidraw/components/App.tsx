@@ -2398,12 +2398,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const searchParams = new URLSearchParams(window.location.search.slice(1));
 
-    if (searchParams.has("web-share-target")) {
-      // Obtain a file that was shared via the Web Share Target API.
-      this.restoreFileFromShare();
-    } else {
-      this.updateDOMRect(this.initializeScene);
-    }
+    this.updateDOMRect(this.initializeScene);
 
     // note that this check seems to always pass in localhost
     if (isBrave() && !isMeasureTextSupported()) {
@@ -3627,7 +3622,6 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-
   /** use when changing scrollX/scrollY/zoom based on user interaction */
   private translateCanvas: React.Component<any, AppState>["setState"] = (
     state,
@@ -3644,23 +3638,6 @@ class App extends React.Component<AppProps, AppState> {
     } | null,
   ) => {
     this.setState({ toast });
-  };
-
-  restoreFileFromShare = async () => {
-    try {
-      const webShareTargetCache = await caches.open("web-share-target");
-
-      const response = await webShareTargetCache.match("shared-file");
-      if (response) {
-        const blob = await response.blob();
-        const file = new File([blob], blob.name || "", { type: blob.type });
-        this.loadFileToCanvas(file, null);
-        await webShareTargetCache.delete("shared-file");
-        window.history.replaceState(null, APP_NAME, window.location.pathname);
-      }
-    } catch (error: any) {
-      this.setState({ errorMessage: error.message });
-    }
   };
 
   /**
@@ -11034,8 +11011,6 @@ class App extends React.Component<AppProps, AppState> {
     if (isNaN(sceneX) || isNaN(sceneY)) {
       // sometimes the pointer goes off screen
     }
-
-
   };
 
   private resetShouldCacheIgnoreZoomDebounced = debounce(() => {

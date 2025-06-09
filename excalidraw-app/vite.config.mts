@@ -237,23 +237,6 @@ export default defineConfig(({ mode }) => {
               },
             },
           ],
-          share_target: {
-            action: "/web-share-target",
-            method: "POST",
-            enctype: "multipart/form-data",
-            params: {
-              files: [
-                {
-                  name: "file",
-                  accept: [
-                    "application/vnd.excalidraw+json",
-                    "application/json",
-                    ".excalidraw",
-                  ],
-                },
-              ],
-            },
-          },
         },
       }),
       createHtmlPlugin({

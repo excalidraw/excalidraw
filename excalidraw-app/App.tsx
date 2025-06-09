@@ -64,7 +64,6 @@ import { loadScene } from "./data";
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { importFromLocalStorage } from "./data/localStorage";
 
-import { loadFilesFromFirebase } from "./data/firebase";
 import {
   LibraryIndexedDBAdapter,
   LibraryLocalStorageMigrationAdapter,
@@ -151,7 +150,7 @@ const initializeScene = async (opts: {
 
   let scene: RestoredDataState & {
     scrollToContent?: boolean;
-  } = await loadScene(null, null, localDataState);
+  } = await loadScene(localDataState);
 
   const isExternalScene = !!(id || jsonBackendMatch);
   if (isExternalScene) {
@@ -162,11 +161,7 @@ const initializeScene = async (opts: {
       true
     ) {
       if (jsonBackendMatch) {
-        scene = await loadScene(
-          jsonBackendMatch[1],
-          jsonBackendMatch[2],
-          localDataState,
-        );
+        scene = await loadScene(localDataState);
       }
       scene.scrollToContent = true;
       window.history.replaceState({}, APP_NAME, window.location.origin);
