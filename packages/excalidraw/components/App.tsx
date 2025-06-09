@@ -7573,7 +7573,7 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
-    const simulatePressure = event.pressure === 0.5;
+    const simulatePressure = event.pressure === 0.5 || event.pressure === 0;
 
     const element = newFreeDrawElement({
       type: elementType,
