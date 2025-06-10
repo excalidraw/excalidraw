@@ -146,16 +146,12 @@ export const FONT_FAMILY = {
 
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
 // so we need to have generic font fallback before it
-export const SERIF_GENERIC_FONT = "serif";
 export const SANS_SERIF_GENERIC_FONT = "sans-serif";
 export const MONOSPACE_GENERIC_FONT = "monospace";
-export const FANTASY_GENERIC_FONT = "fantasy";
 
 export const FONT_FAMILY_GENERIC_FALLBACKS = {
-  [SERIF_GENERIC_FONT]: 996,
-  [SANS_SERIF_GENERIC_FONT]: 997,
-  [MONOSPACE_GENERIC_FONT]: 998,
-  [FANTASY_GENERIC_FONT]: 999,
+  [SANS_SERIF_GENERIC_FONT]: 998,
+  [MONOSPACE_GENERIC_FONT]: 999,
 };
 
 export const FONT_FAMILY_FALLBACKS = {
@@ -168,9 +164,6 @@ export function getGenericFontFamilyFallback(
   fontFamily: number,
 ): keyof typeof FONT_FAMILY_GENERIC_FALLBACKS {
   switch (fontFamily) {
-    case FONT_FAMILY["Lilita One"]:
-      return SERIF_GENERIC_FONT;
-
     case FONT_FAMILY.Cascadia:
     case FONT_FAMILY["Comic Shanns"]:
       return MONOSPACE_GENERIC_FONT;
