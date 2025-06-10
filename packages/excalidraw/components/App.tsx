@@ -9988,12 +9988,12 @@ class App extends React.Component<AppProps, AppState> {
             this.state.pendingImageElementId !== imageElement.id &&
             this.state.newElement?.id !== imageElement.id
           ) {
-            const naturalSizeDimensions = this.getImageNaturalDimensions(
+            const naturalDimensions = this.getImageNaturalDimensions(
               imageElement,
               imageHTML,
             );
 
-            imageElement = newElementWith(imageElement, naturalSizeDimensions);
+            imageElement = newElementWith(imageElement, naturalDimensions);
           }
 
           resolve(imageElement);
@@ -10186,11 +10186,11 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   initializeImageDimensions = (imageElement: ExcalidrawImageElement) => {
-    const image =
+    const imageHTML =
       isInitializedImageElement(imageElement) &&
       this.imageCache.get(imageElement.fileId)?.image;
 
-    if (!image || image instanceof Promise) {
+    if (!imageHTML || imageHTML instanceof Promise) {
       if (
         imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
         imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
@@ -10215,10 +10215,12 @@ class App extends React.Component<AppProps, AppState> {
       imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
       imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
     ) {
-      this.scene.mutateElement(
+      const naturalDimensions = this.getImageNaturalDimensions(
         imageElement,
-        this.getImageNaturalDimensions(imageElement, image),
+        imageHTML,
       );
+
+      this.scene.mutateElement(imageElement, naturalDimensions);
     }
   };
 

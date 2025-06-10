@@ -28,8 +28,6 @@ import { ElementsDelta, AppStateDelta } from "@excalidraw/element";
 
 import { CaptureUpdateAction, StoreDelta } from "@excalidraw/element";
 
-import * as imageModule from "@excalidraw/element";
-
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -62,6 +60,7 @@ import * as blobModule from "../data/blob";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { mockHTMLImageElement } from "./helpers/mocks";
 import {
   GlobalTestState,
   act,
@@ -117,22 +116,15 @@ describe("history", () => {
     unmountComponent();
     renderStaticScene.mockClear();
     vi.clearAllMocks();
+    vi.unstubAllGlobals();
 
     reseed(7);
 
     const generateIdSpy = vi.spyOn(blobModule, "generateIdFromFile");
     const resizeFileSpy = vi.spyOn(blobModule, "resizeImageFile");
-    const updateImageCacheSpy = vi.spyOn(imageModule, "updateImageCache");
 
     generateIdSpy.mockImplementation(() => Promise.resolve("fileId" as FileId));
     resizeFileSpy.mockImplementation((file: File) => Promise.resolve(file));
-    updateImageCacheSpy.mockImplementation(() =>
-      Promise.resolve({
-        updatedFiles: new Map(),
-        erroredFiles: new Map(),
-        imageCache: new Map(),
-      }),
-    );
 
     Object.assign(document, {
       elementFromPoint: () => GlobalTestState.canvas,
@@ -592,6 +584,19 @@ describe("history", () => {
     it("should create new history entry on image drag&drop", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
 
+      // it's necessary to specify the height in order to calculate natural dimensions of the image
+      h.state.height = 1000;
+
+      const deerImageDimensions = {
+        width: 318,
+        height: 335,
+      };
+
+      mockHTMLImageElement(
+        deerImageDimensions.width,
+        deerImageDimensions.height,
+      );
+
       await API.drop(await API.loadFile("./fixtures/deer.png"));
 
       await waitFor(() => {
@@ -603,6 +608,7 @@ describe("history", () => {
             fileId: expect.any(String),
             x: expect.toBeNonNaNNumber(),
             y: expect.toBeNonNaNNumber(),
+            ...deerImageDimensions,
           }),
         ]);
       });
@@ -617,6 +623,7 @@ describe("history", () => {
           x: expect.toBeNonNaNNumber(),
           y: expect.toBeNonNaNNumber(),
           isDeleted: true,
+          ...deerImageDimensions,
         }),
       ]);
 
@@ -630,6 +637,7 @@ describe("history", () => {
           x: expect.toBeNonNaNNumber(),
           y: expect.toBeNonNaNNumber(),
           isDeleted: false,
+          ...deerImageDimensions,
         }),
       ]);
     });
@@ -683,6 +691,19 @@ describe("history", () => {
         <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
       );
 
+      // it's necessary to specify the height in order to calculate natural dimensions of the image
+      h.state.height = 1000;
+
+      const smileyImageDimensions = {
+        width: 56,
+        height: 77,
+      };
+
+      mockHTMLImageElement(
+        smileyImageDimensions.width,
+        smileyImageDimensions.height,
+      );
+
       document.dispatchEvent(
         createPasteEvent({
           files: [await API.loadFile("./fixtures/smiley_embedded_v2.png")],
@@ -698,6 +719,7 @@ describe("history", () => {
             fileId: expect.any(String),
             x: expect.toBeNonNaNNumber(),
             y: expect.toBeNonNaNNumber(),
+            ...smileyImageDimensions,
           }),
         ]);
       });
@@ -712,6 +734,7 @@ describe("history", () => {
           x: expect.toBeNonNaNNumber(),
           y: expect.toBeNonNaNNumber(),
           isDeleted: true,
+          ...smileyImageDimensions,
         }),
       ]);
 
@@ -725,6 +748,7 @@ describe("history", () => {
           x: expect.toBeNonNaNNumber(),
           y: expect.toBeNonNaNNumber(),
           isDeleted: false,
+          ...smileyImageDimensions,
         }),
       ]);
     });
