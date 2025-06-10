@@ -147,19 +147,49 @@ export const FONT_FAMILY = {
   Assistant: 10,
 };
 
+// Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
+// so we need to have generic font fallback before it
+export const SANS_SERIF_GENERIC_FONT = "sans-serif";
+export const MONOSPACE_GENERIC_FONT = "monospace";
+
+export const FONT_FAMILY_GENERIC_FALLBACKS = {
+  [SANS_SERIF_GENERIC_FONT]: 998,
+  [MONOSPACE_GENERIC_FONT]: 999,
+};
+
 export const FONT_FAMILY_FALLBACKS = {
   [CJK_HAND_DRAWN_FALLBACK_FONT]: 100,
+  ...FONT_FAMILY_GENERIC_FALLBACKS,
   [WINDOWS_EMOJI_FALLBACK_FONT]: 1000,
 };
+
+export function getGenericFontFamilyFallback(
+  fontFamily: number,
+): keyof typeof FONT_FAMILY_GENERIC_FALLBACKS {
+  switch (fontFamily) {
+    case FONT_FAMILY.Cascadia:
+    case FONT_FAMILY["Comic Shanns"]:
+      return MONOSPACE_GENERIC_FONT;
+
+    default:
+      return SANS_SERIF_GENERIC_FONT;
+  }
+}
 
 export const getFontFamilyFallbacks = (
   fontFamily: number,
 ): Array<keyof typeof FONT_FAMILY_FALLBACKS> => {
+  const genericFallbackFont = getGenericFontFamilyFallback(fontFamily);
+
   switch (fontFamily) {
     case FONT_FAMILY.Excalifont:
-      return [CJK_HAND_DRAWN_FALLBACK_FONT, WINDOWS_EMOJI_FALLBACK_FONT];
+      return [
+        CJK_HAND_DRAWN_FALLBACK_FONT,
+        genericFallbackFont,
+        WINDOWS_EMOJI_FALLBACK_FONT,
+      ];
     default:
-      return [WINDOWS_EMOJI_FALLBACK_FONT];
+      return [genericFallbackFont, WINDOWS_EMOJI_FALLBACK_FONT];
   }
 };
 
