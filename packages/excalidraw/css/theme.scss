@@ -19,7 +19,7 @@
   --input-border-color: #{$oc-gray-4};
   --input-hover-bg-color: #{$oc-gray-1};
   --input-label-color: #{$oc-gray-7};
-  --island-bg-color: #ffffff;
+  --island-bg-color: transparent !important;
   --keybinding-color: var(--color-gray-40);
   --link-color: #{$oc-blue-7};
   --overlay-bg-color: #{transparentize($oc-white, 0.12)};
@@ -154,11 +154,11 @@
   --color-on-surface: #1b1b1f;
   --color-brand-hover: #5753d0;
   --color-on-primary-container: #030064;
-  --color-surface-primary-container: #e0dfff;
+  --color-surface-primary-container: rgba(224, 223, 255, 0.7);
   --color-brand-active: #4440bf;
   --color-border-outline: #767680;
   --color-border-outline-variant: #c5c5d0;
-  --color-surface-primary-container: #e0dfff;
+  // --color-surface-primary-container: #e0dfff;
 
   --color-badge: #0b6513;
   --background-color-badge: #d3ffd2;
@@ -259,10 +259,9 @@
     --color-on-surface: #e3e3e8;
     --color-brand-hover: #bbb8ff;
     --color-on-primary-container: #e0dfff;
-    --color-surface-primary-container: #403e6a;
+    --color-surface-primary-container: rgba(64, 62, 106, 0.7);
     --color-brand-active: #d0ccff;
     --color-border-outline: #8e8d9c;
     --color-border-outline-variant: #46464f;
-    --color-surface-primary-container: #403e6a;
   }
 }

@@ -386,6 +386,9 @@ body.excalidraw-cursor-resize * {
     width: 12.5rem;
     box-sizing: border-box;
     position: absolute;
+    background: transparent !important;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
   }
 
   .dropdown-select {
@@ -648,14 +651,16 @@ body.excalidraw-cursor-resize * {
   .App-mobile-menu,
   .App-menu__left {
     --button-border: transparent;
-    --button-bg: var(--color-surface-mid);
+    // --button-bg: var(--color-surface-mid);
+    --button-bg: rgba(255, 255, 255, 0.3);
   }
 
   @at-root .excalidraw.theme--dark#{&} {
     .App-mobile-menu,
     .App-menu__left {
       --button-hover-bg: #363541;
-      --button-bg: var(--color-surface-high);
+      // --button-bg: var(--color-surface-high);
+      --button-bg: rgba(0, 0, 0, 0.15);
     }
   }
 

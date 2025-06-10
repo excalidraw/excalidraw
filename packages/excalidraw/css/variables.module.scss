@@ -79,6 +79,10 @@
   color: var(--button-color, var(--color-on-surface));
   font-family: var(--ui-font);
 
+  // background: transparent !important;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+
   svg {
     width: var(--button-width, var(--lg-icon-size));
     height: var(--button-height, var(--lg-icon-size));
