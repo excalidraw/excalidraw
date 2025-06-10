@@ -161,7 +161,6 @@ import {
   maybeParseEmbedSrc,
   getEmbedLink,
   getInitializedImageElements,
-  loadHTMLImageElement,
   normalizeSVG,
   updateImageCache as _updateImageCache,
   getBoundTextElement,
@@ -258,7 +257,6 @@ import type {
   ExcalidrawEmbeddableElement,
   Ordered,
   MagicGenerationData,
-  ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
 } from "@excalidraw/element/types";
@@ -338,7 +336,6 @@ import {
 } from "../scene";
 import { getStateForZoom } from "../scene/zoom";
 import {
-  dataURLToFile,
   dataURLToString,
   generateIdFromFile,
   getDataURL,
@@ -440,7 +437,6 @@ import type {
   AppProps,
   AppState,
   BinaryFileData,
-  DataURL,
   ExcalidrawImperativeAPI,
   BinaryFiles,
   Gesture,

@@ -1,5 +1,4 @@
 import { isElementInViewport } from "@excalidraw/element";
-import { isImageElement } from "@excalidraw/element";
 
 import { memoize, toBrandedType } from "@excalidraw/common";
 

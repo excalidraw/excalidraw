@@ -24,7 +24,6 @@ import type {
   ChartType,
   FontFamilyValues,
   FileId,
-  ExcalidrawImageElement,
   Theme,
   StrokeRoundness,
   ExcalidrawEmbeddableElement,
