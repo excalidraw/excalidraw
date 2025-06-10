@@ -418,8 +418,6 @@ export const DEFAULT_SIDEBAR = {
 } as const;
 
 export const LIBRARY_DISABLED_TYPES = new Set([
-  "iframe",
-  "embeddable",
   "image",
 ] as const);
 
@@ -438,8 +436,6 @@ export const TOOL_TYPE = {
   eraser: "eraser",
   hand: "hand",
   frame: "frame",
-  magicframe: "magicframe",
-  embeddable: "embeddable",
   laser: "laser",
 } as const;
 

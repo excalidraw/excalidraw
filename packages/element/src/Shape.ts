@@ -14,14 +14,10 @@ import type { GlobalPoint } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import type { EmbedsValidationStatus } from "@excalidraw/excalidraw/types";
 import type { ElementShapes } from "@excalidraw/excalidraw/scene/types";
 
 import {
   isElbowArrow,
-  isEmbeddableElement,
-  isIframeElement,
-  isIframeLikeElement,
   isLinearElement,
 } from "./typeChecks";
 import { getCornerRadius, isPathALoop } from "./shapes";
@@ -110,8 +106,6 @@ export const generateRoughOptions = (
 
   switch (element.type) {
     case "rectangle":
-    case "iframe":
-    case "embeddable":
     case "diamond":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
@@ -145,13 +139,8 @@ export const generateRoughOptions = (
 const modifyIframeLikeForRoughOptions = (
   element: NonDeletedExcalidrawElement,
   isExporting: boolean,
-  embedsValidationStatus: EmbedsValidationStatus | null,
 ) => {
   if (
-    isIframeLikeElement(element) &&
-    (isExporting ||
-      (isEmbeddableElement(element) &&
-        embedsValidationStatus?.get(element.id) !== true)) &&
     isTransparent(element.backgroundColor) &&
     isTransparent(element.strokeColor)
   ) {
@@ -161,17 +150,7 @@ const modifyIframeLikeForRoughOptions = (
       backgroundColor: "#d3d3d3",
       fillStyle: "solid",
     } as const;
-  } else if (isIframeElement(element)) {
-    return {
-      ...element,
-      strokeColor: isTransparent(element.strokeColor)
-        ? "#000000"
-        : element.strokeColor,
-      backgroundColor: isTransparent(element.backgroundColor)
-        ? "#f4f4f6"
-        : element.backgroundColor,
-    };
-  }
+  } 
   return element;
 };
 
@@ -497,58 +476,13 @@ export const _generateElementShape = (
   {
     isExporting,
     canvasBackgroundColor,
-    embedsValidationStatus,
   }: {
     isExporting: boolean;
     canvasBackgroundColor: string;
-    embedsValidationStatus: EmbedsValidationStatus | null;
   },
 ): Drawable | Drawable[] | null => {
   switch (element.type) {
-    case "rectangle":
-    case "iframe":
-    case "embeddable": {
-      let shape: ElementShapes[typeof element.type];
-      // this is for rendering the stroke/bg of the embeddable, especially
-      // when the src url is not set
-
-      if (element.roundness) {
-        const w = element.width;
-        const h = element.height;
-        const r = getCornerRadius(Math.min(w, h), element);
-        shape = generator.path(
-          `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
-            h - r
-          } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
-            h - r
-          } L 0 ${r} Q 0 0, ${r} 0`,
-          generateRoughOptions(
-            modifyIframeLikeForRoughOptions(
-              element,
-              isExporting,
-              embedsValidationStatus,
-            ),
-            true,
-          ),
-        );
-      } else {
-        shape = generator.rectangle(
-          0,
-          0,
-          element.width,
-          element.height,
-          generateRoughOptions(
-            modifyIframeLikeForRoughOptions(
-              element,
-              isExporting,
-              embedsValidationStatus,
-            ),
-            false,
-          ),
-        );
-      }
-      return shape;
-    }
+    case "rectangle":  
     case "diamond": {
       let shape: ElementShapes[typeof element.type];
 
@@ -710,7 +644,6 @@ export const _generateElementShape = (
       return shape;
     }
     case "frame":
-    case "magicframe":
     case "text":
     case "image": {
       const shape: ElementShapes[typeof element.type] = null;

@@ -1,6 +1,5 @@
 import { restore } from "@excalidraw/excalidraw/data/restore";
 import { isInvisiblySmallElement } from "@excalidraw/element";
-import { bytesToHexString } from "@excalidraw/common";
 
 import type { UserIdleState } from "@excalidraw/common";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";

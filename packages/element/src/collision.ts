@@ -32,7 +32,6 @@ import {
 import {
   hasBoundTextElement,
   isFreeDrawElement,
-  isIframeLikeElement,
   isImageElement,
   isLinearElement,
   isTextElement,
@@ -67,7 +66,6 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
   const isDraggableFromInside =
     !isTransparent(element.backgroundColor) ||
     hasBoundTextElement(element) ||
-    isIframeLikeElement(element) ||
     isTextElement(element);
 
   if (element.type === "line") {
@@ -220,11 +218,8 @@ export const intersectElementWithLineSegment = (
     case "rectangle":
     case "image":
     case "text":
-    case "iframe":
-    case "embeddable":
     case "frame":
     case "selection":
-    case "magicframe":
       return intersectRectanguloidWithLineSegment(
         element,
         elementsMap,

@@ -23,8 +23,7 @@ describe("embedding scene data", () => {
         appState: {
           viewBackgroundColor: "#ffffff",
           gridModeEnabled: false,
-          exportEmbedScene: true,
-        },
+                },
         files: null,
       });
 
@@ -54,7 +53,6 @@ describe("embedding scene data", () => {
         appState: {
           viewBackgroundColor: "#ffffff",
           gridModeEnabled: false,
-          exportEmbedScene: true,
         },
         files: null,
       });

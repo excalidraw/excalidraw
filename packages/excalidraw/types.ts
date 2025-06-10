@@ -1,6 +1,5 @@
 import type {
   IMAGE_MIME_TYPES,
-  UserIdleState,
   throttleRAF,
   MIME_TYPES,
 } from "@excalidraw/common";
@@ -27,12 +26,9 @@ import type {
   ExcalidrawImageElement,
   Theme,
   StrokeRoundness,
-  ExcalidrawEmbeddableElement,
-  ExcalidrawMagicFrameElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawElementType,
-  ExcalidrawIframeLikeElement,
-  OrderedExcalidrawElement,
+OrderedExcalidrawElement,
   ExcalidrawNonSelectionElement,
 } from "@excalidraw/element/types";
 
@@ -112,8 +108,6 @@ export type ToolType =
   | "eraser"
   | "hand"
   | "frame"
-  | "magicframe"
-  | "embeddable"
   | "laser";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
@@ -172,8 +166,6 @@ export type StaticCanvasAppState = Readonly<
 
 export type InteractiveCanvasAppState = Readonly<
   _CommonCanvasAppState & {
-    // renderInteractiveScene
-    activeEmbeddable: AppState["activeEmbeddable"];
     editingLinearElement: AppState["editingLinearElement"];
     selectionElement: AppState["selectionElement"];
     selectedGroupIds: AppState["selectedGroupIds"];
@@ -226,10 +218,6 @@ export interface AppState {
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: React.ReactNode;
-  activeEmbeddable: {
-    element: NonDeletedExcalidrawElement;
-    state: "hover" | "active";
-  } | null;
   /**
    * for a newly created element
    * - set on pointer down, updated during pointer move, used on pointer up
@@ -280,7 +268,6 @@ export interface AppState {
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
-  exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
   exportScale: number;
   currentItemStrokeColor: string;
@@ -565,16 +552,6 @@ export interface ExcalidrawProps {
   onScrollChange?: (scrollX: number, scrollY: number, zoom: Zoom) => void;
   onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
-  validateEmbeddable?:
-    | boolean
-    | string[]
-    | RegExp
-    | RegExp[]
-    | ((link: string) => boolean | undefined);
-  renderEmbeddable?: (
-    element: NonDeleted<ExcalidrawEmbeddableElement>,
-    appState: AppState,
-  ) => JSX.Element | null;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
 }
@@ -673,7 +650,6 @@ export type AppClassProperties = {
   toggleLock: App["toggleLock"];
   setActiveTool: App["setActiveTool"];
   setOpenDialog: App["setOpenDialog"];
-  insertEmbeddableElement: App["insertEmbeddableElement"];
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
   flowChartCreator: App["flowChartCreator"];
@@ -839,7 +815,7 @@ export type FrameNameBounds = {
 
 export type FrameNameBoundsCache = {
   get: (
-    frameElement: ExcalidrawFrameLikeElement | ExcalidrawMagicFrameElement,
+    frameElement: ExcalidrawFrameLikeElement, 
   ) => FrameNameBounds | null;
   _cache: Map<
     string,
@@ -868,10 +844,6 @@ export type Primitive =
 
 export type JSONValue = string | number | boolean | null | object;
 
-export type EmbedsValidationStatus = Map<
-  ExcalidrawIframeLikeElement["id"],
-  boolean
->;
 
 export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
 

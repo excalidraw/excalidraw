@@ -121,28 +121,6 @@ export const actionChangeExportBackground = register({
   ),
 });
 
-export const actionChangeExportEmbedScene = register({
-  name: "changeExportEmbedScene",
-  label: "imageExportDialog.tooltip.embedScene",
-  trackEvent: { category: "export", action: "embedScene" },
-  perform: (_elements, appState, value) => {
-    return {
-      appState: { ...appState, exportEmbedScene: value },
-      captureUpdate: CaptureUpdateAction.EVENTUALLY,
-    };
-  },
-  PanelComponent: ({ appState, updateData }) => (
-    <CheckboxItem
-      checked={appState.exportEmbedScene}
-      onChange={(checked) => updateData(checked)}
-    >
-      {t("imageExportDialog.label.embedScene")}
-      <Tooltip label={t("imageExportDialog.tooltip.embedScene")} long={true}>
-        <div className="excalidraw-tooltip-icon">{questionCircle}</div>
-      </Tooltip>
-    </CheckboxItem>
-  ),
-});
 
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",

@@ -86,24 +86,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         )) ||
       "#6965db";
 
-    renderInteractiveScene(
-      {
-        canvas: props.canvas,
-        elementsMap: props.elementsMap,
-        visibleElements: props.visibleElements,
-        selectedElements: props.selectedElements,
-        allElementsMap: props.allElementsMap,
-        scale: window.devicePixelRatio,
-        appState: props.appState,
-        renderConfig: {
-          selectionColor,
-          renderScrollbars: props.renderScrollbars,
-        },
-        device: props.device,
-        callback: props.renderInteractiveSceneCallback,
-      },
-      isRenderThrottlingEnabled(),
-    );
+  
   });
 
   return (
@@ -160,7 +143,6 @@ const getRelevantAppStateProps = (
   suggestedBindings: appState.suggestedBindings,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
-  activeEmbeddable: appState.activeEmbeddable,
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
   editingTextElement: appState.editingTextElement,

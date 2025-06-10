@@ -11,7 +11,6 @@ import type { MakeBrand } from "@excalidraw/common/utility-types";
 import type {
   AppClassProperties,
   AppState,
-  EmbedsValidationStatus,
   ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
@@ -34,7 +33,6 @@ export type StaticCanvasRenderConfig = {
   /** when exporting the behavior is slightly different (e.g. we can't use
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
-  embedsValidationStatus: EmbedsValidationStatus;
   elementsPendingErasure: ElementsPendingErasure;
   pendingFlowchartNodes: PendingExcalidrawElements | null;
 };
@@ -44,17 +42,14 @@ export type SVGRenderConfig = {
   offsetY: number;
   isExporting: boolean;
   exportWithDarkMode: boolean;
-  renderEmbeddables: boolean;
   frameRendering: AppState["frameRendering"];
   canvasBackgroundColor: AppState["viewBackgroundColor"];
-  embedsValidationStatus: EmbedsValidationStatus;
   /**
    * whether to attempt to reuse images as much as possible through symbols
    * (reduces SVG size, but may be incompoatible with some SVG renderers)
    *
    * @default true
    */
-  reuseImages: boolean;
 };
 
 export type InteractiveCanvasRenderConfig = {
@@ -141,13 +136,10 @@ export type ElementShapes = {
   rectangle: Drawable;
   ellipse: Drawable;
   diamond: Drawable;
-  iframe: Drawable;
-  embeddable: Drawable;
   freedraw: Drawable | null;
   arrow: Drawable[];
   line: Drawable[];
   text: null;
   image: null;
   frame: null;
-  magicframe: null;
 };

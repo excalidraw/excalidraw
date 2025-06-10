@@ -50,7 +50,6 @@ import {
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
-  isMagicFrameElement,
   isImageElement,
 } from "./typeChecks";
 import { getContainingFrame } from "./frame";
@@ -403,8 +402,6 @@ const drawElementOnCanvas = (
 ) => {
   switch (element.type) {
     case "rectangle":
-    case "iframe":
-    case "embeddable":
     case "diamond":
     case "ellipse": {
       context.lineJoin = "round";
@@ -736,7 +733,6 @@ export const renderElement = (
   );
 
   switch (element.type) {
-    case "magicframe":
     case "frame": {
       if (appState.frameRendering.enabled && appState.frameRendering.outline) {
         context.save();
@@ -750,11 +746,6 @@ export const renderElement = (
         context.strokeStyle = FRAME_STYLE.strokeColor;
 
         // TODO change later to only affect AI frames
-        if (isMagicFrameElement(element)) {
-          context.strokeStyle =
-            appState.theme === THEME.LIGHT ? "#7affd7" : "#1d8264";
-        }
-
         if (FRAME_STYLE.radius && context.roundRect) {
           context.beginPath();
           context.roundRect(
@@ -821,8 +812,7 @@ export const renderElement = (
     case "arrow":
     case "image":
     case "text":
-    case "iframe":
-    case "embeddable": {
+     {
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)
       // rely on existing shapes

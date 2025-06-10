@@ -1,10 +1,7 @@
 import { FRAME_STYLE, throttleRAF } from "@excalidraw/common";
 import { isElementLink } from "@excalidraw/element";
-import { createPlaceholderEmbeddableLabel } from "@excalidraw/element";
 import { getBoundTextElement } from "@excalidraw/element";
 import {
-  isEmbeddableElement,
-  isIframeLikeElement,
   isTextElement,
 } from "@excalidraw/element";
 import {
@@ -281,7 +278,6 @@ const _renderStaticScene = ({
 
   // Paint visible elements
   visibleElements
-    .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       try {
         const frameId = element.frameId || appState.frameToHighlight?.id;
@@ -366,81 +362,6 @@ const _renderStaticScene = ({
       }
     });
 
-  // render embeddables on top
-  visibleElements
-    .filter((el) => isIframeLikeElement(el))
-    .forEach((element) => {
-      try {
-        const render = () => {
-          renderElement(
-            element,
-            elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
-            appState,
-          );
-
-          if (
-            isIframeLikeElement(element) &&
-            (isExporting ||
-              (isEmbeddableElement(element) &&
-                renderConfig.embedsValidationStatus.get(element.id) !==
-                  true)) &&
-            element.width &&
-            element.height
-          ) {
-            const label = createPlaceholderEmbeddableLabel(element);
-            renderElement(
-              label,
-              elementsMap,
-              allElementsMap,
-              rc,
-              context,
-              renderConfig,
-              appState,
-            );
-          }
-          if (!isExporting) {
-            renderLinkIcon(element, context, appState, elementsMap);
-          }
-        };
-        // - when exporting the whole canvas, we DO NOT apply clipping
-        // - when we are exporting a particular frame, apply clipping
-        //   if the containing frame is not selected, apply clipping
-        const frameId = element.frameId || appState.frameToHighlight?.id;
-
-        if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
-        ) {
-          context.save();
-
-          const frame = getTargetFrame(element, elementsMap, appState);
-
-          if (
-            frame &&
-            shouldApplyFrameClip(
-              element,
-              frame,
-              appState,
-              elementsMap,
-              inFrameGroupsMap,
-            )
-          ) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          render();
-          context.restore();
-        } else {
-          render();
-        }
-      } catch (error: any) {
-        console.error(error);
-      }
-    });
 
   // render pending nodes for flowcharts
   renderConfig.pendingFlowchartNodes?.forEach((element) => {

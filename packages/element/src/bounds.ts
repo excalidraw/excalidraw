@@ -410,10 +410,7 @@ const _isRectanguloidElement = (
     element != null &&
     (element.type === "rectangle" ||
       element.type === "image" ||
-      element.type === "iframe" ||
-      element.type === "embeddable" ||
       element.type === "frame" ||
-      element.type === "magicframe" ||
       (element.type === "text" && !element.containerId))
   );
 };

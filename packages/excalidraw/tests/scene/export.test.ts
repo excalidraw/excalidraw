@@ -167,8 +167,7 @@ describe("exportToSvg", () => {
       ELEMENTS,
       {
         ...DEFAULT_OPTIONS,
-        exportEmbedScene: true,
-      },
+            },
       null,
     );
     expect(svgElement.innerHTML).toMatchSnapshot();

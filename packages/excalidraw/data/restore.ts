@@ -100,10 +100,8 @@ export const AllowedExcalidrawActiveTools: Record<
   eraser: false,
   custom: true,
   frame: true,
-  embeddable: true,
   hand: true,
   laser: false,
-  magicframe: false,
 };
 
 export type RestoredDataState = {
@@ -396,10 +394,7 @@ const restoreElement = (
     case "ellipse":
     case "rectangle":
     case "diamond":
-    case "iframe":
-    case "embeddable":
       return restoreElementWithProperties(element, {});
-    case "magicframe":
     case "frame":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,

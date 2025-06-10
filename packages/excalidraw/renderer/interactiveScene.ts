@@ -199,11 +199,7 @@ const renderBindingHighlightForBindableElement = (
     case "rectangle":
     case "text":
     case "image":
-    case "iframe":
-    case "embeddable":
     case "frame":
-    case "magicframe":
-      drawHighlightForRectWithRotation(context, element, padding);
       break;
     case "diamond":
       drawHighlightForDiamondWithRotation(context, padding, element);
@@ -269,7 +265,6 @@ type ElementSelectionBorder = {
   dashed?: boolean;
   cx: number;
   cy: number;
-  activeEmbeddable: boolean;
   padding?: number;
 };
 
@@ -288,7 +283,6 @@ const renderSelectionBorder = (
     cx,
     cy,
     dashed,
-    activeEmbeddable,
   } = elementProperties;
   const elementWidth = x2 - x1;
   const elementHeight = y2 - y1;
@@ -302,7 +296,6 @@ const renderSelectionBorder = (
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  context.lineWidth = (activeEmbeddable ? 4 : 1) / appState.zoom.value;
 
   const count = selectionColors.length;
   for (let index = 0; index < count; ++index) {
@@ -402,7 +395,6 @@ const renderElementsBoxHighlight = (
       dashed,
       cx: x1 + (x2 - x1) / 2,
       cy: y1 + (y2 - y1) / 2,
-      activeEmbeddable: false,
     };
   };
 
@@ -925,9 +917,6 @@ const _renderInteractiveScene = ({
             dashed: element.locked,
             cx,
             cy,
-            activeEmbeddable:
-              appState.activeEmbeddable?.element === element &&
-              appState.activeEmbeddable.state === "active",
             padding:
               element.id === appState.croppingElementId ||
               isImageElement(element)
@@ -952,7 +941,6 @@ const _renderInteractiveScene = ({
           dashed: true,
           cx: x1 + (x2 - x1) / 2,
           cy: y1 + (y2 - y1) / 2,
-          activeEmbeddable: false,
         });
       };
 

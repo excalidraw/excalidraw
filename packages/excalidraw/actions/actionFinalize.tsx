@@ -259,7 +259,6 @@ export const actionFinalize = register({
           element
             ? appState.activeTool
             : activeTool,
-        activeEmbeddable: null,
         newElement: null,
         selectionElement: null,
         multiElement: null,

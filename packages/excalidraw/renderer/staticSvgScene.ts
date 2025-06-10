@@ -11,16 +11,11 @@ import {
 import { normalizeLink, toValidURL } from "@excalidraw/common";
 import { hashString } from "@excalidraw/element";
 import { getUncroppedWidthAndHeight } from "@excalidraw/element";
-import {
-  createPlaceholderEmbeddableLabel,
-  getEmbedLink,
-} from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
 import {
   isArrowElement,
-  isIframeLikeElement,
   isInitializedImageElement,
   isTextElement,
 } from "@excalidraw/element";
@@ -176,108 +171,7 @@ const renderElementToSvg = (
       addToRoot(g || node, element);
       break;
     }
-    case "iframe":
-    case "embeddable": {
-      // render placeholder rectangle
-      const shape = ShapeCache.generateElementShape(element, renderConfig);
-      const node = roughSVGDrawWithPrecision(
-        rsvg,
-        shape,
-        MAX_DECIMALS_FOR_SVG_EXPORT,
-      );
-      const opacity = element.opacity / 100;
-      if (opacity !== 1) {
-        node.setAttribute("stroke-opacity", `${opacity}`);
-        node.setAttribute("fill-opacity", `${opacity}`);
-      }
-      node.setAttribute("stroke-linecap", "round");
-      node.setAttribute(
-        "transform",
-        `translate(${offsetX || 0} ${
-          offsetY || 0
-        }) rotate(${degree} ${cx} ${cy})`,
-      );
-      addToRoot(node, element);
-
-      const label: ExcalidrawElement =
-        createPlaceholderEmbeddableLabel(element);
-      renderElementToSvg(
-        label,
-        elementsMap,
-        rsvg,
-        root,
-        files,
-        label.x + offset.x - element.x,
-        label.y + offset.y - element.y,
-        renderConfig,
-      );
-
-      // render embeddable element + iframe
-      const embeddableNode = roughSVGDrawWithPrecision(
-        rsvg,
-        shape,
-        MAX_DECIMALS_FOR_SVG_EXPORT,
-      );
-      embeddableNode.setAttribute("stroke-linecap", "round");
-      embeddableNode.setAttribute(
-        "transform",
-        `translate(${offsetX || 0} ${
-          offsetY || 0
-        }) rotate(${degree} ${cx} ${cy})`,
-      );
-      while (embeddableNode.firstChild) {
-        embeddableNode.removeChild(embeddableNode.firstChild);
-      }
-      const radius = getCornerRadius(
-        Math.min(element.width, element.height),
-        element,
-      );
-
-      const embedLink = getEmbedLink(toValidURL(element.link || ""));
-
-      // if rendering embeddables explicitly disabled or
-      // embedding documents via srcdoc (which doesn't seem to work for SVGs)
-      // replace with a link instead
-      if (
-        renderConfig.renderEmbeddables === false ||
-        embedLink?.type === "document"
-      ) {
-        const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
-        anchorTag.setAttribute("href", normalizeLink(element.link || ""));
-        anchorTag.setAttribute("target", "_blank");
-        anchorTag.setAttribute("rel", "noopener noreferrer");
-        anchorTag.style.borderRadius = `${radius}px`;
-
-        embeddableNode.appendChild(anchorTag);
-      } else {
-        const foreignObject = svgRoot.ownerDocument!.createElementNS(
-          SVG_NS,
-          "foreignObject",
-        );
-        foreignObject.style.width = `${element.width}px`;
-        foreignObject.style.height = `${element.height}px`;
-        foreignObject.style.border = "none";
-        const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
-        div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-        div.style.width = "100%";
-        div.style.height = "100%";
-        const iframe = div.ownerDocument!.createElement("iframe");
-        iframe.src = embedLink?.link ?? "";
-        iframe.style.width = "100%";
-        iframe.style.height = "100%";
-        iframe.style.border = "none";
-        iframe.style.borderRadius = `${radius}px`;
-        iframe.style.top = "0";
-        iframe.style.left = "0";
-        iframe.allowFullscreen = true;
-        div.appendChild(iframe);
-        foreignObject.appendChild(div);
-
-        embeddableNode.appendChild(foreignObject);
-      }
-      addToRoot(embeddableNode, element);
-      break;
-    }
+  
     case "line":
     case "arrow": {
       const boundText = getBoundTextElement(element, elementsMap);
@@ -418,7 +312,6 @@ const renderElementToSvg = (
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
-        const { reuseImages = true } = renderConfig;
 
         let symbolId = `image-${fileData.id}`;
 
@@ -433,9 +326,6 @@ const renderElementToSvg = (
           )}`;
         }
 
-        if (!reuseImages) {
-          symbolId = `image-${element.id}`;
-        }
 
         let symbol = svgRoot.querySelector(`#${symbolId}`);
         if (!symbol) {
@@ -446,7 +336,7 @@ const renderElementToSvg = (
           image.setAttribute("href", fileData.dataURL);
           image.setAttribute("preserveAspectRatio", "none");
 
-          if (element.crop || !reuseImages) {
+          if (element.crop ) {
             image.setAttribute("width", `${uncroppedWidth}`);
             image.setAttribute("height", `${uncroppedHeight}`);
           } else {
@@ -573,34 +463,6 @@ const renderElementToSvg = (
     }
     // frames are not rendered and only acts as a container
     case "frame":
-    case "magicframe": {
-      if (
-        renderConfig.frameRendering.enabled &&
-        renderConfig.frameRendering.outline
-      ) {
-        const rect = document.createElementNS(SVG_NS, "rect");
-
-        rect.setAttribute(
-          "transform",
-          `translate(${offsetX || 0} ${
-            offsetY || 0
-          }) rotate(${degree} ${cx} ${cy})`,
-        );
-
-        rect.setAttribute("width", `${element.width}px`);
-        rect.setAttribute("height", `${element.height}px`);
-        // Rounded corners
-        rect.setAttribute("rx", FRAME_STYLE.radius.toString());
-        rect.setAttribute("ry", FRAME_STYLE.radius.toString());
-
-        rect.setAttribute("fill", "none");
-        rect.setAttribute("stroke", FRAME_STYLE.strokeColor);
-        rect.setAttribute("stroke-width", FRAME_STYLE.strokeWidth.toString());
-
-        addToRoot(rect, element);
-      }
-      break;
-    }
     default: {
       if (isTextElement(element)) {
         const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
@@ -684,7 +546,6 @@ export const renderSceneToSvg = (
 
   // render elements
   elements
-    .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       if (!element.isDeleted) {
         if (
@@ -727,9 +588,7 @@ export const renderSceneToSvg = (
       }
     });
 
-  // render embeddables on top
   elements
-    .filter((el) => isIframeLikeElement(el))
     .forEach((element) => {
       if (!element.isDeleted) {
         try {

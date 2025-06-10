@@ -97,43 +97,6 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
   type: "ellipse";
 };
 
-export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
-  Readonly<{
-    type: "embeddable";
-  }>;
-
-export type MagicGenerationData =
-  | {
-      status: "pending";
-    }
-  | { status: "done"; html: string }
-  | {
-      status: "error";
-      message?: string;
-      code: "ERR_GENERATION_INTERRUPTED" | string;
-    };
-
-export type ExcalidrawIframeElement = _ExcalidrawElementBase &
-  Readonly<{
-    type: "iframe";
-    // TODO move later to AI-specific frame
-    customData?: { generationData?: MagicGenerationData };
-  }>;
-
-export type ExcalidrawIframeLikeElement =
-  | ExcalidrawIframeElement
-  | ExcalidrawEmbeddableElement;
-
-export type IframeData =
-  | {
-      intrinsicSize: { w: number; h: number };
-      error?: Error;
-      sandbox?: { allowSameOrigin?: boolean };
-    } & (
-      | { type: "video" | "generic"; link: string }
-      | { type: "document"; srcdoc: (theme: Theme) => string }
-    );
-
 export type ImageCrop = {
   x: number;
   y: number;
@@ -165,14 +128,7 @@ export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
   name: string | null;
 };
 
-export type ExcalidrawMagicFrameElement = _ExcalidrawElementBase & {
-  type: "magicframe";
-  name: string | null;
-};
-
-export type ExcalidrawFrameLikeElement =
-  | ExcalidrawFrameElement
-  | ExcalidrawMagicFrameElement;
+export type ExcalidrawFrameLikeElement = ExcalidrawFrameElement;
 
 /**
  * These are elements that don't have any additional properties.
@@ -193,9 +149,7 @@ export type ExcalidrawRectanguloidElement =
   | ExcalidrawImageElement
   | ExcalidrawTextElement
   | ExcalidrawFreeDrawElement
-  | ExcalidrawIframeLikeElement
   | ExcalidrawFrameLikeElement
-  | ExcalidrawEmbeddableElement
   | ExcalidrawSelectionElement;
 
 /**
@@ -210,10 +164,7 @@ export type ExcalidrawElement =
   | ExcalidrawArrowElement
   | ExcalidrawFreeDrawElement
   | ExcalidrawImageElement
-  | ExcalidrawFrameElement
-  | ExcalidrawMagicFrameElement
-  | ExcalidrawIframeElement
-  | ExcalidrawEmbeddableElement;
+  | ExcalidrawFrameElement;
 
 export type ExcalidrawNonSelectionElement = Exclude<
   ExcalidrawElement,
@@ -262,10 +213,7 @@ export type ExcalidrawBindableElement =
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
   | ExcalidrawImageElement
-  | ExcalidrawIframeElement
-  | ExcalidrawEmbeddableElement
-  | ExcalidrawFrameElement
-  | ExcalidrawMagicFrameElement;
+  | ExcalidrawFrameElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement

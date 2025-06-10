@@ -19,7 +19,6 @@ const exportLibraryItemToSvg = async (elements: LibraryItem["elements"]) => {
       viewBackgroundColor: COLOR_PALETTE.white,
     },
     files: null,
-    renderEmbeddables: false,
     skipInliningFonts: true,
   });
 };

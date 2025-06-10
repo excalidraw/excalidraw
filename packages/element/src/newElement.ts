@@ -41,9 +41,6 @@ import type {
   FontFamilyValues,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
-  ExcalidrawEmbeddableElement,
-  ExcalidrawMagicFrameElement,
-  ExcalidrawIframeElement,
   ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
@@ -162,23 +159,7 @@ export const newElement = (
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
-export const newEmbeddableElement = (
-  opts: {
-    type: "embeddable";
-  } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawEmbeddableElement> => {
-  return _newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts);
-};
 
-export const newIframeElement = (
-  opts: {
-    type: "iframe";
-  } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawIframeElement> => {
-  return {
-    ..._newElementBase<ExcalidrawIframeElement>("iframe", opts),
-  };
-};
 
 export const newFrameElement = (
   opts: {
@@ -197,22 +178,6 @@ export const newFrameElement = (
   return frameElement;
 };
 
-export const newMagicFrameElement = (
-  opts: {
-    name?: string;
-  } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawMagicFrameElement> => {
-  const frameElement = newElementWith(
-    {
-      ..._newElementBase<ExcalidrawMagicFrameElement>("magicframe", opts),
-      type: "magicframe",
-      name: opts?.name || null,
-    },
-    {},
-  );
-
-  return frameElement;
-};
 
 /** computes element x/y offset based on textAlign/verticalAlign */
 const getTextElementPositionOffsets = (

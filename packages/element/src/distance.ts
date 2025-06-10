@@ -36,10 +36,7 @@ export const distanceToElement = (
     case "rectangle":
     case "image":
     case "text":
-    case "iframe":
-    case "embeddable":
     case "frame":
-    case "magicframe":
       return distanceToRectanguloidElement(element, elementsMap, p);
     case "diamond":
       return distanceToDiamondElement(element, elementsMap, p);

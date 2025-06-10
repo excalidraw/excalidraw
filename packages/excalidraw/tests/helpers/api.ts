@@ -9,13 +9,10 @@ import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/comm
 import {
   newArrowElement,
   newElement,
-  newEmbeddableElement,
   newFrameElement,
   newFreeDrawElement,
-  newIframeElement,
   newImageElement,
   newLinearElement,
-  newMagicFrameElement,
   newTextElement,
 } from "@excalidraw/element";
 
@@ -33,7 +30,6 @@ import type {
   FileId,
   ExcalidrawFrameElement,
   ExcalidrawElementType,
-  ExcalidrawMagicFrameElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
   FixedSegment,
@@ -227,8 +223,6 @@ export class API {
     ? ExcalidrawImageElement
     : T extends "frame"
     ? ExcalidrawFrameElement
-    : T extends "magicframe"
-    ? ExcalidrawMagicFrameElement
     : ExcalidrawGenericElement => {
     let element: Mutable<ExcalidrawElement> = null!;
 
@@ -281,18 +275,6 @@ export class API {
       case "ellipse":
         element = newElement({
           type: type as "rectangle" | "diamond" | "ellipse",
-          ...base,
-        });
-        break;
-      case "embeddable":
-        element = newEmbeddableElement({
-          type: "embeddable",
-          ...base,
-        });
-        break;
-      case "iframe":
-        element = newIframeElement({
-          type: "iframe",
           ...base,
         });
         break;
@@ -357,9 +339,6 @@ export class API {
         break;
       case "frame":
         element = newFrameElement({ ...base, width, height });
-        break;
-      case "magicframe":
-        element = newMagicFrameElement({ ...base, width, height });
         break;
       default:
         assertNever(

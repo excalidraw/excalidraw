@@ -822,16 +822,6 @@ export const isPrimitive = (val: any) => {
   return val == null || (type !== "object" && type !== "function");
 };
 
-export const getFrame = () => {
-  try {
-    return window.self === window.top ? "top" : "iframe";
-  } catch (error) {
-    return "iframe";
-  }
-};
-
-export const isRunningInIframe = () => getFrame() === "iframe";
-
 export const isPromiseLike = (
   value: any,
 ): value is Promise<ResolutionType<typeof value>> => {

@@ -126,7 +126,6 @@ export const exportCanvas = async (
         viewBackgroundColor,
         exportPadding,
         exportScale: appState.exportScale,
-        exportEmbedScene: appState.exportEmbedScene && type === "svg",
       },
       files,
       { exportingFrame },
@@ -144,7 +143,7 @@ export const exportCanvas = async (
         {
           description: "Export to SVG",
           name,
-          extension: appState.exportEmbedScene ? "excalidraw.svg" : "svg",
+          extension:  "svg",
           mimeTypes: [IMAGE_MIME_TYPES.svg],
           fileHandle,
         },
@@ -170,21 +169,11 @@ export const exportCanvas = async (
   if (type === "png") {
     let blob = canvasToBlob(tempCanvas);
 
-    if (appState.exportEmbedScene) {
-      blob = blob.then((blob) =>
-        import("./image").then(({ encodePngMetadata }) =>
-          encodePngMetadata({
-            blob,
-            metadata: serializeAsJSON(elements, appState, files, "local"),
-          }),
-        ),
-      );
-    }
 
     return fileSave(blob, {
       description: "Export to PNG",
       name,
-      extension: appState.exportEmbedScene ? "excalidraw.png" : "png",
+      extension: "png",
       mimeTypes: [IMAGE_MIME_TYPES.png],
       fileHandle,
     });

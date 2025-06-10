@@ -16,7 +16,6 @@ import { hitElementBoundingBox } from "@excalidraw/element";
 
 import { isElementLink } from "@excalidraw/element";
 
-import { getEmbedLink, embeddableURLValidator } from "@excalidraw/element";
 
 import {
   sceneCoordsToViewportCoords,
@@ -26,13 +25,11 @@ import {
   normalizeLink,
 } from "@excalidraw/common";
 
-import { isEmbeddableElement } from "@excalidraw/element";
 
 import type { Scene } from "@excalidraw/element";
 
 import type {
   ElementsMap,
-  ExcalidrawEmbeddableElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -60,18 +57,12 @@ const AUTO_HIDE_TIMEOUT = 500;
 
 let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
 
-const embeddableLinkCache = new Map<
-  ExcalidrawEmbeddableElement["id"],
-  string
->();
-
 export const Hyperlink = ({
   element,
   scene,
   setAppState,
   onLinkOpen,
   setToast,
-  updateEmbedValidationStatus,
 }: {
   element: NonDeletedExcalidrawElement;
   scene: Scene;
@@ -79,10 +70,6 @@ export const Hyperlink = ({
   onLinkOpen: ExcalidrawProps["onLinkOpen"];
   setToast: (
     toast: { message: string; closable?: boolean; duration?: number } | null,
-  ) => void;
-  updateEmbedValidationStatus: (
-    element: ExcalidrawEmbeddableElement,
-    status: boolean,
   ) => void;
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
@@ -107,76 +94,14 @@ export const Hyperlink = ({
       trackEvent("hyperlink", "create");
     }
 
-    if (isEmbeddableElement(element)) {
-      if (appState.activeEmbeddable?.element === element) {
-        setAppState({ activeEmbeddable: null });
-      }
-      if (!link) {
-        scene.mutateElement(element, {
-          link: null,
-        });
-        updateEmbedValidationStatus(element, false);
-        return;
-      }
-
-      if (!embeddableURLValidator(link, appProps.validateEmbeddable)) {
-        if (link) {
-          setToast({ message: t("toast.unableToEmbed"), closable: true });
-        }
-        element.link && embeddableLinkCache.set(element.id, element.link);
-        scene.mutateElement(element, {
-          link,
-        });
-        updateEmbedValidationStatus(element, false);
-      } else {
-        const { width, height } = element;
-        const embedLink = getEmbedLink(link);
-        if (embedLink?.error instanceof URIError) {
-          setToast({
-            message: t("toast.unrecognizedLinkFormat"),
-            closable: true,
-          });
-        }
-        const ar = embedLink
-          ? embedLink.intrinsicSize.w / embedLink.intrinsicSize.h
-          : 1;
-        const hasLinkChanged =
-          embeddableLinkCache.get(element.id) !== element.link;
-        scene.mutateElement(element, {
-          ...(hasLinkChanged
-            ? {
-                width:
-                  embedLink?.type === "video"
-                    ? width > height
-                      ? width
-                      : height * ar
-                    : width,
-                height:
-                  embedLink?.type === "video"
-                    ? width > height
-                      ? width / ar
-                      : height
-                    : height,
-              }
-            : {}),
-          link,
-        });
-        updateEmbedValidationStatus(element, true);
-        if (embeddableLinkCache.has(element.id)) {
-          embeddableLinkCache.delete(element.id);
-        }
-      }
-    } else {
+     
       scene.mutateElement(element, { link });
-    }
+    
   }, [
     element,
     scene,
     setToast,
-    appProps.validateEmbeddable,
-    appState.activeEmbeddable,
     setAppState,
-    updateEmbedValidationStatus,
   ]);
 
   useLayoutEffect(() => {
@@ -337,7 +262,7 @@ export const Hyperlink = ({
           }}
           icon={elementLinkIcon}
         />
-        {linkVal && !isEmbeddableElement(element) && (
+        {linkVal && (
           <ToolButton
             type="button"
             title={t("buttons.remove")}
@@ -373,9 +298,7 @@ export const getContextMenuLabel = (
   appState: UIAppState,
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
-  const label = isEmbeddableElement(selectedElements[0])
-    ? "labels.link.editEmbed"
-    : selectedElements[0]?.link
+  const label = selectedElements[0]?.link
     ? "labels.link.edit"
     : "labels.link.create";
   return label;

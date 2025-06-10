@@ -70,9 +70,6 @@ const getHints = ({
     return t("hints.text");
   }
 
-  if (activeTool.type === "embeddable") {
-    return t("hints.embeddable");
-  }
 
   if (appState.activeTool.type === "image" && appState.pendingImageElementId) {
     return t("hints.placeImage");

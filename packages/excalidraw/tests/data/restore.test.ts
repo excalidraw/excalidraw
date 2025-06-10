@@ -374,7 +374,7 @@ describe("restoreElements", () => {
     types.forEach((elType) => {
       idCount += 1;
       const element = API.createElement({
-        type: elType as "rectangle" | "ellipse" | "diamond" | "embeddable",
+        type: elType as "rectangle" | "ellipse" | "diamond",
         id: idCount.toString(),
         fillStyle: "cross-hatch",
         strokeWidth: 2,

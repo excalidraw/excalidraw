@@ -277,7 +277,6 @@ export const LibraryMenu = memo(() => {
     setAppState({
       selectedElementIds: {},
       selectedGroupIds: {},
-      activeEmbeddable: null,
     });
   }, [setAppState]);
 

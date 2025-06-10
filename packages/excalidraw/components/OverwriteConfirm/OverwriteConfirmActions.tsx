@@ -1,7 +1,6 @@
 import React from "react";
 
 import { actionSaveFileToDisk } from "../../actions";
-import { actionChangeExportEmbedScene } from "../../actions/actionExport";
 import { useI18n } from "../../i18n";
 import { useExcalidrawActionManager, useExcalidrawSetAppState } from "../App";
 import { FilledButton } from "../FilledButton";
@@ -47,7 +46,6 @@ export const ExportToImage = () => {
       title={t("overwriteConfirm.action.exportToImage.title")}
       actionLabel={t("overwriteConfirm.action.exportToImage.button")}
       onClick={() => {
-        actionManager.executeAction(actionChangeExportEmbedScene, "ui", true);
         setAppState({ openDialog: { name: "imageExport" } });
       }}
     >

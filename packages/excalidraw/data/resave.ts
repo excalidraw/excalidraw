@@ -21,10 +21,7 @@ export const resaveAsImageWithScene = async (
       "fileHandle should exist and should be of type svg or png when resaving",
     );
   }
-  appState = {
-    ...appState,
-    exportEmbedScene: true,
-  };
+
 
   const { exportedElements, exportingFrame } = prepareElementsForExport(
     elements,

@@ -117,16 +117,4 @@ describe("exportToSvg", () => {
     );
   });
 
-  it("with exportEmbedScene", async () => {
-    await utils.exportToSvg({
-      ...diagramFactory({
-        overrides: {
-          appState: { name: "diagram name", exportEmbedScene: true },
-        },
-      }),
-    });
-
-    expect(passedElements().length).toBe(3);
-    expect(passedOptions().exportEmbedScene).toBe(true);
-  });
 });

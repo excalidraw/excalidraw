@@ -1,7 +1,5 @@
 import React from "react";
 
-import { getFrame } from "@excalidraw/common";
-
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { actionSaveFileToDisk } from "../actions/actionExport";
@@ -81,15 +79,6 @@ const JSONExportModal = ({
               title={t("exportDialog.link_button")}
               aria-label={t("exportDialog.link_button")}
               showAriaLabel={true}
-              onClick={async () => {
-                try {
-                  trackEvent("export", "link", `ui (${getFrame()})`);
-                  await onExportToBackend(elements, appState, files);
-                  onCloseRequest();
-                } catch (error: any) {
-                  setAppState({ errorMessage: error.message });
-                }
-              }}
             />
           </Card>
         )}

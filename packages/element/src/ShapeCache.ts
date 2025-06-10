@@ -4,7 +4,6 @@ import { COLOR_PALETTE } from "@excalidraw/common";
 
 import type {
   AppState,
-  EmbedsValidationStatus,
 } from "@excalidraw/excalidraw/types";
 import type {
   ElementShape,
@@ -60,7 +59,6 @@ export class ShapeCache {
     renderConfig: {
       isExporting: boolean;
       canvasBackgroundColor: AppState["viewBackgroundColor"];
-      embedsValidationStatus: EmbedsValidationStatus;
     } | null,
   ) => {
     // when exporting, always regenerated to guarantee the latest shape
@@ -82,7 +80,6 @@ export class ShapeCache {
       renderConfig || {
         isExporting: false,
         canvasBackgroundColor: COLOR_PALETTE.white,
-        embedsValidationStatus: null,
       },
     ) as T["type"] extends keyof ElementShapes
       ? ElementShapes[T["type"]]

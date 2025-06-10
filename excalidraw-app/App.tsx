@@ -14,7 +14,6 @@ import {
   VERSION_TIMEOUT,
   debounce,
   getVersion,
-  getFrame,
   isTestEnv,
   preventUnload,
   resolvablePromise,
@@ -116,20 +115,6 @@ window.addEventListener(
     pwaEvent = event;
   },
 );
-
-let isSelfEmbedding = false;
-
-if (window.self !== window.top) {
-  try {
-    const parentUrl = new URL(document.referrer);
-    const currentUrl = new URL(window.location.href);
-    if (parentUrl.origin === currentUrl.origin) {
-      isSelfEmbedding = true;
-    }
-  } catch (error) {
-    // ignore
-  }
-}
 
 const initializeScene = async (opts: {
   excalidrawAPI: ExcalidrawImperativeAPI;
@@ -236,7 +221,7 @@ const ExcalidrawWrapper = () => {
   const debugCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    trackEvent("load", "frame", getFrame());
+    trackEvent("load", "frame");
     // Delayed so that the app has a time to load the latest SW
     setTimeout(() => {
       trackEvent("load", "version", getVersion());
@@ -515,25 +500,6 @@ const ExcalidrawWrapper = () => {
       />
     );
   };
-
-  // browsers generally prevent infinite self-embedding, there are
-  // cases where it still happens, and while we disallow self-embedding
-  // by not whitelisting our own origin, this serves as an additional guard
-  if (isSelfEmbedding) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          height: "100%",
-        }}
-      >
-        <h1>I'm not a pretzel!</h1>
-      </div>
-    );
-  }
 
   return (
     <div style={{ height: "100%" }} className="excalidraw-app">

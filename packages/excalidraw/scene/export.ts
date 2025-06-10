@@ -264,8 +264,6 @@ export const exportToCanvas = async (
       imageCache,
       renderGrid: false,
       isExporting: true,
-      // empty disables embeddable rendering
-      embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),
       pendingFlowchartNodes: null,
     },
@@ -289,18 +287,12 @@ export const exportToSvg = async (
     exportScale?: number;
     viewBackgroundColor: string;
     exportWithDarkMode?: boolean;
-    exportEmbedScene?: boolean;
     frameRendering?: AppState["frameRendering"];
   },
   files: BinaryFiles | null,
   opts?: {
-    /**
-     * if true, all embeddables passed in will be rendered when possible.
-     */
-    renderEmbeddables?: boolean;
     exportingFrame?: ExcalidrawFrameLikeElement | null;
     skipInliningFonts?: true;
-    reuseImages?: boolean;
   },
 ): Promise<SVGSVGElement> => {
   const frameRendering = getFrameRenderingConfig(
@@ -313,7 +305,6 @@ export const exportToSvg = async (
     exportWithDarkMode = false,
     viewBackgroundColor,
     exportScale = 1,
-    exportEmbedScene,
   } = appState;
 
   const { exportingFrame = null } = opts || {};
@@ -363,26 +354,7 @@ export const exportToSvg = async (
   svgRoot.appendChild(metadataElement);
   svgRoot.appendChild(defsElement);
 
-  // ---------------------------------------------------------------------------
-  // scene embed
-  // ---------------------------------------------------------------------------
 
-  // we need to serialize the "original" elements before we put them through
-  // the tempScene hack which duplicates and regenerates ids
-  if (exportEmbedScene) {
-    try {
-      encodeSvgBase64Payload({
-        metadataElement,
-        // when embedding scene, we want to embed the origionally supplied
-        // elements which don't contain the temp frame labels.
-        // But it also requires that the exportToSvg is being supplied with
-        // only the elements that we're exporting, and no extra.
-        payload: serializeAsJSON(elements, appState, files || {}, "local"),
-      });
-    } catch (error: any) {
-      console.error(error);
-    }
-  }
 
   // ---------------------------------------------------------------------------
   // frame clip paths
@@ -465,7 +437,6 @@ export const exportToSvg = async (
 
   const rsvg = rough.svg(svgRoot);
 
-  const renderEmbeddables = opts?.renderEmbeddables ?? false;
 
   renderSceneToSvg(
     elementsForRender,
@@ -478,17 +449,8 @@ export const exportToSvg = async (
       offsetY,
       isExporting: true,
       exportWithDarkMode,
-      renderEmbeddables,
       frameRendering,
       canvasBackgroundColor: viewBackgroundColor,
-      embedsValidationStatus: renderEmbeddables
-        ? new Map(
-            elementsForRender
-              .filter((element) => isFrameLikeElement(element))
-              .map((element) => [element.id, true]),
-          )
-        : new Map(),
-      reuseImages: opts?.reuseImages ?? true,
     },
   );
 

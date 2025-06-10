@@ -134,24 +134,6 @@ export const exportToBlob = async (
         if (!blob) {
           return reject(new Error("couldn't export to blob"));
         }
-        if (
-          blob &&
-          mimeType === MIME_TYPES.png &&
-          opts.appState?.exportEmbedScene
-        ) {
-          blob = await encodePngMetadata({
-            blob,
-            metadata: serializeAsJSON(
-              // NOTE as long as we're using the Scene hack, we need to ensure
-              // we pass the original, uncloned elements when serializing
-              // so that we keep ids stable
-              opts.elements,
-              opts.appState,
-              opts.files || {},
-              "local",
-            ),
-          });
-        }
         resolve(blob);
       },
       mimeType,
@@ -165,15 +147,11 @@ export const exportToSvg = async ({
   appState = getDefaultAppState(),
   files = {},
   exportPadding,
-  renderEmbeddables,
   exportingFrame,
   skipInliningFonts,
-  reuseImages,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
-  renderEmbeddables?: boolean;
   skipInliningFonts?: true;
-  reuseImages?: boolean;
 }): Promise<SVGSVGElement> => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
@@ -188,9 +166,7 @@ export const exportToSvg = async ({
 
   return _exportToSvg(restoredElements, exportAppState, files, {
     exportingFrame,
-    renderEmbeddables,
     skipInliningFonts,
-    reuseImages,
   });
 };
 

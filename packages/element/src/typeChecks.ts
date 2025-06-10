@@ -10,7 +10,6 @@ import type { Bounds } from "./bounds";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
-  ExcalidrawEmbeddableElement,
   ExcalidrawLinearElement,
   ExcalidrawBindableElement,
   ExcalidrawFreeDrawElement,
@@ -22,9 +21,6 @@ import type {
   RoundnessType,
   ExcalidrawFrameLikeElement,
   ExcalidrawElementType,
-  ExcalidrawIframeElement,
-  ExcalidrawIframeLikeElement,
-  ExcalidrawMagicFrameElement,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
@@ -46,25 +42,7 @@ export const isImageElement = (
   return !!element && element.type === "image";
 };
 
-export const isEmbeddableElement = (
-  element: ExcalidrawElement | null | undefined,
-): element is ExcalidrawEmbeddableElement => {
-  return !!element && element.type === "embeddable";
-};
 
-export const isIframeElement = (
-  element: ExcalidrawElement | null,
-): element is ExcalidrawIframeElement => {
-  return !!element && element.type === "iframe";
-};
-
-export const isIframeLikeElement = (
-  element: ExcalidrawElement | null,
-): element is ExcalidrawIframeLikeElement => {
-  return (
-    !!element && (element.type === "iframe" || element.type === "embeddable")
-  );
-};
 
 export const isTextElement = (
   element: ExcalidrawElement | null,
@@ -78,18 +56,14 @@ export const isFrameElement = (
   return element != null && element.type === "frame";
 };
 
-export const isMagicFrameElement = (
-  element: ExcalidrawElement | null,
-): element is ExcalidrawMagicFrameElement => {
-  return element != null && element.type === "magicframe";
-};
+
 
 export const isFrameLikeElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawFrameLikeElement => {
   return (
     element != null &&
-    (element.type === "frame" || element.type === "magicframe")
+    (element.type === "frame" )
   );
 };
 
@@ -188,10 +162,7 @@ export const isBindableElement = (
       element.type === "diamond" ||
       element.type === "ellipse" ||
       element.type === "image" ||
-      element.type === "iframe" ||
-      element.type === "embeddable" ||
       element.type === "frame" ||
-      element.type === "magicframe" ||
       (element.type === "text" && !element.containerId))
   );
 };
@@ -204,10 +175,7 @@ export const isRectanguloidElement = (
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "image" ||
-      element.type === "iframe" ||
-      element.type === "embeddable" ||
       element.type === "frame" ||
-      element.type === "magicframe" ||
       (element.type === "text" && !element.containerId))
   );
 };
@@ -222,10 +190,7 @@ export const isRectangularElement = (
     (element.type === "rectangle" ||
       element.type === "image" ||
       element.type === "text" ||
-      element.type === "iframe" ||
-      element.type === "embeddable" ||
       element.type === "frame" ||
-      element.type === "magicframe" ||
       element.type === "freedraw")
   );
 };
@@ -255,14 +220,11 @@ export const isExcalidrawElement = (
     case "text":
     case "diamond":
     case "rectangle":
-    case "iframe":
-    case "embeddable":
     case "ellipse":
     case "arrow":
     case "freedraw":
     case "line":
     case "frame":
-    case "magicframe":
     case "image":
     case "selection": {
       return true;
@@ -310,8 +272,6 @@ export const isArrowBoundToElement = (element: ExcalidrawArrowElement) => {
 
 export const isUsingAdaptiveRadius = (type: string) =>
   type === "rectangle" ||
-  type === "embeddable" ||
-  type === "iframe" ||
   type === "image";
 
 export const isUsingProportionalRadius = (type: string) =>

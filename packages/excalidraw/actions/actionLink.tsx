@@ -1,4 +1,3 @@
-import { isEmbeddableElement } from "@excalidraw/element";
 
 import { KEYS, getShortcutKey } from "@excalidraw/common";
 
@@ -47,9 +46,7 @@ export const actionLink = register({
         icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
         title={`${
-          isEmbeddableElement(elements[0])
-            ? t("labels.link.labelEmbed")
-            : t("labels.link.label")
+             t("labels.link.label")
         } - ${getShortcutKey("CtrlOrCmd+K")}`}
         onClick={() => updateData(null)}
         selected={selectedElements.length === 1 && !!selectedElements[0].link}

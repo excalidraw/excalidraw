@@ -23,7 +23,6 @@ import {
   newFrameElement,
   newImageElement,
   newLinearElement,
-  newMagicFrameElement,
   newTextElement,
 } from "@excalidraw/element";
 import { measureText, normalizeText } from "@excalidraw/element";
@@ -48,10 +47,8 @@ import type {
   ExcalidrawFrameElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
-  ExcalidrawIframeLikeElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
-  ExcalidrawMagicFrameElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FileId,
@@ -83,9 +80,6 @@ export type ValidLinearElement = {
                   | "image"
                   | "text"
                   | "frame"
-                  | "magicframe"
-                  | "embeddable"
-                  | "iframe"
                 >;
                 id?: ExcalidrawGenericElement["id"];
               }
@@ -96,9 +90,6 @@ export type ValidLinearElement = {
                   | "image"
                   | "text"
                   | "frame"
-                  | "magicframe"
-                  | "embeddable"
-                  | "iframe"
                 >;
               }
           )
@@ -125,9 +116,6 @@ export type ValidLinearElement = {
                   | "image"
                   | "text"
                   | "frame"
-                  | "magicframe"
-                  | "embeddable"
-                  | "iframe"
                 >;
                 id?: ExcalidrawGenericElement["id"];
               }
@@ -138,9 +126,6 @@ export type ValidLinearElement = {
                   | "image"
                   | "text"
                   | "frame"
-                  | "magicframe"
-                  | "embeddable"
-                  | "iframe"
                 >;
               }
           )
@@ -176,7 +161,7 @@ export type ValidContainer =
 export type ExcalidrawElementSkeleton =
   | Extract<
       Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-      ExcalidrawIframeLikeElement | ExcalidrawFreeDrawElement
+     ExcalidrawFreeDrawElement
     >
   | ({
       type: Extract<ExcalidrawLinearElement["type"], "line">;
@@ -202,12 +187,8 @@ export type ExcalidrawElementSkeleton =
       type: "frame";
       children: readonly ExcalidrawElement["id"][];
       name?: string;
-    } & Partial<ExcalidrawFrameElement>)
-  | ({
-      type: "magicframe";
-      children: readonly ExcalidrawElement["id"][];
-      name?: string;
-    } & Partial<ExcalidrawMagicFrameElement>);
+    } & Partial<ExcalidrawFrameElement>);
+  
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
   width: 100,
@@ -605,26 +586,14 @@ export const convertToExcalidrawElements = (
 
         break;
       }
+      case "freedraw":
+    
       case "frame": {
         excalidrawElement = newFrameElement({
           x: 0,
           y: 0,
           ...element,
         });
-        break;
-      }
-      case "magicframe": {
-        excalidrawElement = newMagicFrameElement({
-          x: 0,
-          y: 0,
-          ...element,
-        });
-        break;
-      }
-      case "freedraw":
-      case "iframe":
-      case "embeddable": {
-        excalidrawElement = element;
         break;
       }
 
@@ -738,7 +707,7 @@ export const convertToExcalidrawElements = (
   // need to calculate coordinates and dimensions of frame which is possible after all
   // frame children are processed.
   for (const [id, element] of elementsWithIds) {
-    if (element.type !== "frame" && element.type !== "magicframe") {
+    if (element.type !== "frame" ) {
       continue;
     }
     const frame = elementStore.getElement(id);
