@@ -4706,16 +4706,10 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   setActiveTool = (
-    tool: (
-      | (
-          | { type: Exclude<ToolType, "image"> }
-          | {
-              type: Extract<ToolType, "image">;
-              insertOnCanvasDirectly?: boolean;
-            }
-        )
-      | { type: "custom"; customType: string }
-    ) & { locked?: boolean; fromSelection?: boolean },
+    tool: ({ type: ToolType } | { type: "custom"; customType: string }) & {
+      locked?: boolean;
+      fromSelection?: boolean;
+    },
     keepSelection = false,
   ) => {
     if (!this.isToolSupported(tool.type)) {
