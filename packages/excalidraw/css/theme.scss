@@ -149,7 +149,7 @@
 
   --color-surface-high: #f1f0ff;
   --color-surface-mid: #f6f6f9;
-  --color-surface-low: #ececf4;
+  --color-surface-low: rgba(236, 236, 244, 0.1);
   --color-surface-lowest: #ffffff;
   --color-on-surface: #1b1b1f;
   --color-brand-hover: #5753d0;
@@ -253,7 +253,7 @@
     --color-logo-text: #e2dfff;
 
     --color-surface-high: #2e2d39;
-    --color-surface-low: hsl(240, 8%, 15%);
+    --color-surface-low: rgba(35, 35, 41, 0.1);
     --color-surface-mid: hsl(240 6% 10%);
     --color-surface-lowest: hsl(0, 0%, 7%);
     --color-on-surface: #e3e3e8;

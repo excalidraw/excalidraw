@@ -187,6 +187,8 @@
   border: none;
   box-shadow: 0 0 0 1px var(--color-surface-lowest);
   background-color: var(--color-surface-low);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
 
   &:active {
     box-shadow: 0 0 0 1px var(--color-brand-active);
