@@ -122,18 +122,6 @@ export const actionFinalize = register({
 
     let newElements = elements;
 
-    const pendingImageElement =
-      appState.pendingImageElementId &&
-      scene.getElement(appState.pendingImageElementId);
-
-    if (pendingImageElement) {
-      scene.mutateElement(
-        pendingImageElement,
-        { isDeleted: true },
-        { informMutation: false, isDragging: false },
-      );
-    }
-
     if (window.document.activeElement instanceof HTMLElement) {
       focusContainer();
     }
@@ -280,7 +268,6 @@ export const actionFinalize = register({
           element && isLinearElement(element)
             ? new LinearElementEditor(element, arrayToMap(newElements))
             : appState.selectedLinearElement,
-        pendingImageElementId: null,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,

@@ -694,14 +694,20 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             break;
           case "croppingElementId": {
             const croppingElementId = nextAppState[key];
-            const element =
-              croppingElementId && nextElements.get(croppingElementId);
 
-            if (element && !element.isDeleted) {
+            if (!croppingElementId) {
+              // previously there was a croppingElementId (assuming visible), now there is none
               visibleDifferenceFlag.value = true;
             } else {
-              nextAppState[key] = null;
+              const element = nextElements.get(croppingElementId);
+
+              if (element && !element.isDeleted) {
+                visibleDifferenceFlag.value = true;
+              } else {
+                nextAppState[key] = null;
+              }
             }
+
             break;
           }
           case "editingGroupId":

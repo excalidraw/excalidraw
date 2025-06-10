@@ -363,13 +363,7 @@ This API has the below signature. It sets the `tool` passed in param as the acti
 ```ts
 (
   tool: (
-    | (
-        | { type: Exclude<ToolType, "image"> }
-        | {
-            type: Extract<ToolType, "image">;
-            insertOnCanvasDirectly?: boolean;
-          }
-      )
+    | { type: ToolType }
     | { type: "custom"; customType: string }
   ) & { locked?: boolean },
 ) => {};
@@ -377,7 +371,7 @@ This API has the below signature. It sets the `tool` passed in param as the acti
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `type` | [ToolType](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L91) | `selection` | The tool type which should be set as active tool. When setting `image` as active tool, the insertion onto canvas when using image tool is disabled by default, so you can enable it by setting `insertOnCanvasDirectly` to `true` |
+| `type` | [ToolType](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L91) | `selection` | The tool type which should be set as active tool |
 | `locked` | `boolean` | `false` | Indicates whether the the active tool should be locked. It behaves the same way when using the `lock` tool in the editor interface |
 
 ## setCursor
