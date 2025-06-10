@@ -247,6 +247,25 @@ export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
   };
 };
 
+// Traingle
+export const getTrianglePoints = (
+  element: Readonly<{
+    width: number;
+    height: number;
+  }>,
+): Point[] => {
+  const { width, height } = element;
+  
+  return [
+    // Top center point
+    pointFrom(width / 2, 0),
+    // Bottom left point  
+    pointFrom(0, height),
+    // Bottom right point
+    pointFrom(width, height),
+  ];
+};
+
 const polylineFromPoints = <Point extends GlobalPoint | LocalPoint>(
   points: Point[],
 ): Polyline<Point> => {
