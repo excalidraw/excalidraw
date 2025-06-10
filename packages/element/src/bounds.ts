@@ -1,17 +1,17 @@
 import rough from "roughjs/bin/rough";
 
 import {
-  rescalePoints,
   arrayToMap,
   invariant,
+  rescalePoints,
   sizeOf,
 } from "@excalidraw/common";
 
 import {
   degreesToRadians,
   lineSegment,
-  pointFrom,
   pointDistance,
+  pointFrom,
   pointFromArray,
   pointRotateRads,
 } from "@excalidraw/math";
@@ -33,8 +33,8 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { ShapeCache } from "./ShapeCache";
 import { generateRoughOptions } from "./Shape";
+import { ShapeCache } from "./ShapeCache";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
@@ -52,20 +52,20 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  Arrowhead,
-  ExcalidrawFreeDrawElement,
-  NonDeleted,
-  ExcalidrawTextElementWithContainer,
-  ElementsMap,
-  ExcalidrawRectanguloidElement,
-  ExcalidrawEllipseElement,
-  ElementsMapOrArray,
-} from "./types";
 import type { Drawable, Op } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+import type {
+  Arrowhead,
+  ElementsMap,
+  ElementsMapOrArray,
+  ExcalidrawElement,
+  ExcalidrawEllipseElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawRectanguloidElement,
+  ExcalidrawTextElementWithContainer,
+  NonDeleted,
+} from "./types";
 
 export type RectangleBox = {
   x: number;
@@ -102,9 +102,23 @@ export class ElementBounds {
       version: ExcalidrawElement["version"];
     }
   >();
+  private static nonRotatedBoundsCache = new WeakMap<
+    ExcalidrawElement,
+    {
+      bounds: Bounds;
+      version: ExcalidrawElement["version"];
+    }
+  >();
 
-  static getBounds(element: ExcalidrawElement, elementsMap: ElementsMap) {
-    const cachedBounds = ElementBounds.boundsCache.get(element);
+  static getBounds(
+    element: ExcalidrawElement,
+    elementsMap: ElementsMap,
+    nonRotated: boolean = false,
+  ) {
+    const cachedBounds =
+      nonRotated && element.angle !== 0
+        ? ElementBounds.nonRotatedBoundsCache.get(element)
+        : ElementBounds.boundsCache.get(element);
 
     if (
       cachedBounds?.version &&
@@ -115,6 +129,23 @@ export class ElementBounds {
     ) {
       return cachedBounds.bounds;
     }
+
+    if (nonRotated && element.angle !== 0) {
+      const nonRotatedBounds = ElementBounds.calculateBounds(
+        {
+          ...element,
+          angle: 0 as Radians,
+        },
+        elementsMap,
+      );
+      ElementBounds.nonRotatedBoundsCache.set(element, {
+        version: element.version,
+        bounds: nonRotatedBounds,
+      });
+
+      return nonRotatedBounds;
+    }
+
     const bounds = ElementBounds.calculateBounds(element, elementsMap);
 
     ElementBounds.boundsCache.set(element, {
@@ -939,8 +970,9 @@ const getLinearElementRotatedBounds = (
 export const getElementBounds = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
+  nonRotated: boolean = false,
 ): Bounds => {
-  return ElementBounds.getBounds(element, elementsMap);
+  return ElementBounds.getBounds(element, elementsMap, nonRotated);
 };
 
 export const getCommonBounds = (

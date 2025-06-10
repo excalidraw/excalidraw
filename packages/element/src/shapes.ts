@@ -5,6 +5,7 @@ import {
   ROUNDNESS,
   invariant,
   elementCenterPoint,
+  LINE_POLYGON_POINT_MERGE_DISTANCE,
 } from "@excalidraw/common";
 import {
   isPoint,
@@ -35,10 +36,13 @@ import { ShapeCache } from "./ShapeCache";
 
 import { getElementAbsoluteCoords, type Bounds } from "./bounds";
 
+import { canBecomePolygon } from "./typeChecks";
+
 import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawLinearElement,
+  ExcalidrawLineElement,
   NonDeleted,
 } from "./types";
 
@@ -287,6 +291,7 @@ export const mapIntervalToBezierT = <P extends GlobalPoint | LocalPoint>(
  */
 export const aabbForElement = (
   element: Readonly<ExcalidrawElement>,
+  elementsMap: ElementsMap,
   offset?: [number, number, number, number],
 ) => {
   const bbox = {
@@ -298,7 +303,7 @@ export const aabbForElement = (
     midY: element.y + element.height / 2,
   };
 
-  const center = elementCenterPoint(element);
+  const center = elementCenterPoint(element, elementsMap);
   const [topLeftX, topLeftY] = pointRotateRads(
     pointFrom(bbox.minX, bbox.minY),
     center,
@@ -395,4 +400,48 @@ export const isPathALoop = (
     return distance <= LINE_CONFIRM_THRESHOLD / zoomValue;
   }
   return false;
+};
+
+export const toggleLinePolygonState = (
+  element: ExcalidrawLineElement,
+  nextPolygonState: boolean,
+): {
+  polygon: ExcalidrawLineElement["polygon"];
+  points: ExcalidrawLineElement["points"];
+} | null => {
+  const updatedPoints = [...element.points];
+
+  if (nextPolygonState) {
+    if (!canBecomePolygon(element.points)) {
+      return null;
+    }
+
+    const firstPoint = updatedPoints[0];
+    const lastPoint = updatedPoints[updatedPoints.length - 1];
+
+    const distance = Math.hypot(
+      firstPoint[0] - lastPoint[0],
+      firstPoint[1] - lastPoint[1],
+    );
+
+    if (
+      distance > LINE_POLYGON_POINT_MERGE_DISTANCE ||
+      updatedPoints.length < 4
+    ) {
+      updatedPoints.push(pointFrom(firstPoint[0], firstPoint[1]));
+    } else {
+      updatedPoints[updatedPoints.length - 1] = pointFrom(
+        firstPoint[0],
+        firstPoint[1],
+      );
+    }
+  }
+
+  // TODO: satisfies ElementUpdate<ExcalidrawLineElement>
+  const ret = {
+    polygon: nextPolygonState,
+    points: updatedPoints,
+  };
+
+  return ret;
 };

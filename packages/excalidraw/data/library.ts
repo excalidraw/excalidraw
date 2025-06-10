@@ -14,11 +14,12 @@ import {
   resolvablePromise,
   toValidURL,
   Queue,
+  Emitter,
 } from "@excalidraw/common";
 
 import { hashElementsVersion, hashString } from "@excalidraw/element";
 
-import { getCommonBoundingBox } from "@excalidraw/element/bounds";
+import { getCommonBoundingBox } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -26,7 +27,6 @@ import type { MaybePromise } from "@excalidraw/common/utility-types";
 
 import { atom, editorJotaiStore } from "../editor-jotai";
 
-import { Emitter } from "../emitter";
 import { AbortError } from "../errors";
 import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
 import { t } from "../i18n";

@@ -29,10 +29,9 @@ import {
   FIXED_BINDING_DISTANCE,
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
-  snapToMid,
   getHoveredElementForBinding,
 } from "./binding";
-import { distanceToBindableElement } from "./distance";
+import { distanceToElement } from "./distance";
 import {
   compareHeading,
   flipHeading,
@@ -50,7 +49,6 @@ import { isBindableElement } from "./typeChecks";
 import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
-  type SceneElementsMap,
 } from "./types";
 
 import { aabbForElement, pointInsideBounds } from "./shapes";
@@ -887,7 +885,7 @@ export const updateElbowArrowPoints = (
   elementsMap: NonDeletedSceneElementsMap,
   updates: {
     points?: readonly LocalPoint[];
-    fixedSegments?: FixedSegment[] | null;
+    fixedSegments?: readonly FixedSegment[] | null;
     startBinding?: FixedPointBinding | null;
     endBinding?: FixedPointBinding | null;
   },
@@ -897,50 +895,6 @@ export const updateElbowArrowPoints = (
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   if (arrow.points.length < 2) {
     return { points: updates.points ?? arrow.points };
-  }
-
-  // NOTE (mtolmacs): This is a temporary check to ensure that the incoming elbow
-  // arrow size is valid. This check will be removed once the issue is identified
-  if (
-    arrow.x < -MAX_POS ||
-    arrow.x > MAX_POS ||
-    arrow.y < -MAX_POS ||
-    arrow.y > MAX_POS ||
-    arrow.x + (updates?.points?.[updates?.points?.length - 1]?.[0] ?? 0) <
-      -MAX_POS ||
-    arrow.x + (updates?.points?.[updates?.points?.length - 1]?.[0] ?? 0) >
-      MAX_POS ||
-    arrow.y + (updates?.points?.[updates?.points?.length - 1]?.[1] ?? 0) <
-      -MAX_POS ||
-    arrow.y + (updates?.points?.[updates?.points?.length - 1]?.[1] ?? 0) >
-      MAX_POS ||
-    arrow.x + (arrow?.points?.[arrow?.points?.length - 1]?.[0] ?? 0) <
-      -MAX_POS ||
-    arrow.x + (arrow?.points?.[arrow?.points?.length - 1]?.[0] ?? 0) >
-      MAX_POS ||
-    arrow.y + (arrow?.points?.[arrow?.points?.length - 1]?.[1] ?? 0) <
-      -MAX_POS ||
-    arrow.y + (arrow?.points?.[arrow?.points?.length - 1]?.[1] ?? 0) > MAX_POS
-  ) {
-    console.error(
-      "Elbow arrow (or update) is outside reasonable bounds (> 1e6)",
-      {
-        arrow,
-        updates,
-      },
-    );
-  }
-  // @ts-ignore See above note
-  arrow.x = clamp(arrow.x, -MAX_POS, MAX_POS);
-  // @ts-ignore See above note
-  arrow.y = clamp(arrow.y, -MAX_POS, MAX_POS);
-  if (updates.points) {
-    updates.points = updates.points.map(([x, y]) =>
-      pointFrom<LocalPoint>(
-        clamp(x, -MAX_POS, MAX_POS),
-        clamp(y, -MAX_POS, MAX_POS),
-      ),
-    );
   }
 
   if (!import.meta.env.PROD) {
@@ -974,6 +928,25 @@ export const updateElbowArrowPoints = (
           (p, i) => p[0] === arrow.points[i][0] || p[1] === arrow.points[i][1],
         ),
       "Elbow arrow segments must be either horizontal or vertical",
+    );
+
+    invariant(
+      updates.fixedSegments?.find(
+        (segment) =>
+          segment.index === 1 &&
+          pointsEqual(segment.start, (updates.points ?? arrow.points)[0]),
+      ) == null &&
+        updates.fixedSegments?.find(
+          (segment) =>
+            segment.index === (updates.points ?? arrow.points).length - 1 &&
+            pointsEqual(
+              segment.end,
+              (updates.points ?? arrow.points)[
+                (updates.points ?? arrow.points).length - 1
+              ],
+            ),
+        ) == null,
+      "The first and last segments cannot be fixed",
     );
   }
 
@@ -1255,6 +1228,7 @@ const getElbowArrowData = (
     arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
     hoveredStartElement,
+    elementsMap,
     options?.isDragging,
   );
   const endGlobalPoint = getGlobalPoint(
@@ -1268,21 +1242,22 @@ const getElbowArrowData = (
     arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
     hoveredEndElement,
+    elementsMap,
     options?.isDragging,
   );
   const startHeading = getBindPointHeading(
     startGlobalPoint,
     endGlobalPoint,
-    elementsMap,
     hoveredStartElement,
     origStartGlobalPoint,
+    elementsMap,
   );
   const endHeading = getBindPointHeading(
     endGlobalPoint,
     startGlobalPoint,
-    elementsMap,
     hoveredEndElement,
     origEndGlobalPoint,
+    elementsMap,
   );
   const startPointBounds = [
     startGlobalPoint[0] - 2,
@@ -1299,6 +1274,7 @@ const getElbowArrowData = (
   const startElementBounds = hoveredStartElement
     ? aabbForElement(
         hoveredStartElement,
+        elementsMap,
         offsetFromHeading(
           startHeading,
           arrow.startArrowhead
@@ -1311,6 +1287,7 @@ const getElbowArrowData = (
   const endElementBounds = hoveredEndElement
     ? aabbForElement(
         hoveredEndElement,
+        elementsMap,
         offsetFromHeading(
           endHeading,
           arrow.endArrowhead
@@ -1326,6 +1303,7 @@ const getElbowArrowData = (
       hoveredEndElement
         ? aabbForElement(
             hoveredEndElement,
+            elementsMap,
             offsetFromHeading(endHeading, BASE_PADDING, BASE_PADDING),
           )
         : endPointBounds,
@@ -1335,6 +1313,7 @@ const getElbowArrowData = (
       hoveredStartElement
         ? aabbForElement(
             hoveredStartElement,
+            elementsMap,
             offsetFromHeading(startHeading, BASE_PADDING, BASE_PADDING),
           )
         : startPointBounds,
@@ -1381,8 +1360,8 @@ const getElbowArrowData = (
           BASE_PADDING,
         ),
     boundsOverlap,
-    hoveredStartElement && aabbForElement(hoveredStartElement),
-    hoveredEndElement && aabbForElement(hoveredEndElement),
+    hoveredStartElement && aabbForElement(hoveredStartElement, elementsMap),
+    hoveredEndElement && aabbForElement(hoveredEndElement, elementsMap),
   );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
@@ -2213,34 +2192,35 @@ const getGlobalPoint = (
   fixedPointRatio: [number, number] | undefined | null,
   initialPoint: GlobalPoint,
   element?: ExcalidrawBindableElement | null,
+  elementsMap?: ElementsMap,
   isDragging?: boolean,
 ): GlobalPoint => {
   if (isDragging) {
-    if (element) {
-      const snapPoint = bindPointToSnapToElementOutline(
+    if (element && elementsMap) {
+      return bindPointToSnapToElementOutline(
         arrow,
         element,
         startOrEnd,
+        elementsMap,
       );
-
-      return snapToMid(element, snapPoint);
     }
 
     return initialPoint;
   }
 
-  if (element) {
+  if (element && elementsMap) {
     const fixedGlobalPoint = getGlobalFixedPointForBindableElement(
       fixedPointRatio || [0, 0],
       element,
+      elementsMap,
     );
 
     // NOTE: Resize scales the binding position point too, so we need to update it
     return Math.abs(
-      distanceToBindableElement(element, fixedGlobalPoint) -
+      distanceToElement(element, elementsMap, fixedGlobalPoint) -
         FIXED_BINDING_DISTANCE,
     ) > 0.01
-      ? bindPointToSnapToElementOutline(arrow, element, startOrEnd)
+      ? bindPointToSnapToElementOutline(arrow, element, startOrEnd, elementsMap)
       : fixedGlobalPoint;
   }
 
@@ -2250,9 +2230,9 @@ const getGlobalPoint = (
 const getBindPointHeading = (
   p: GlobalPoint,
   otherPoint: GlobalPoint,
-  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   hoveredElement: ExcalidrawBindableElement | null | undefined,
   origPoint: GlobalPoint,
+  elementsMap: ElementsMap,
 ): Heading =>
   getHeadingForElbowArrowSnap(
     p,
@@ -2261,15 +2241,16 @@ const getBindPointHeading = (
     hoveredElement &&
       aabbForElement(
         hoveredElement,
-        Array(4).fill(distanceToBindableElement(hoveredElement, p)) as [
+        elementsMap,
+        Array(4).fill(distanceToElement(hoveredElement, elementsMap, p)) as [
           number,
           number,
           number,
           number,
         ],
       ),
-    elementsMap,
     origPoint,
+    elementsMap,
   );
 
 const getHoveredElement = (

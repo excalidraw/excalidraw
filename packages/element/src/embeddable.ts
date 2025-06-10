@@ -33,6 +33,8 @@ const RE_GH_GIST = /^https:\/\/gist\.github\.com\/([\w_-]+)\/([\w_-]+)/;
 const RE_GH_GIST_EMBED =
   /^<script[\s\S]*?\ssrc=["'](https:\/\/gist\.github\.com\/.*?)\.js["']/i;
 
+const RE_MSFORMS = /^(?:https?:\/\/)?forms\.microsoft\.com\//;
+
 // not anchored to start to allow <blockquote> twitter embeds
 const RE_TWITTER =
   /(?:https?:\/\/)?(?:(?:w){3}\.)?(?:twitter|x)\.com\/[^/]+\/status\/(\d+)/;
@@ -69,6 +71,7 @@ const ALLOWED_DOMAINS = new Set([
   "val.town",
   "giphy.com",
   "reddit.com",
+  "forms.microsoft.com",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -82,6 +85,7 @@ const ALLOW_SAME_ORIGIN = new Set([
   "*.simplepdf.eu",
   "stackblitz.com",
   "reddit.com",
+  "forms.microsoft.com",
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -204,6 +208,10 @@ export const getEmbedLink = (
       type,
       sandbox: { allowSameOrigin },
     };
+  }
+
+  if (RE_MSFORMS.test(link) && !link.includes("embed=true")) {
+    link += link.includes("?") ? "&embed=true" : "?embed=true";
   }
 
   if (RE_TWITTER.test(link)) {

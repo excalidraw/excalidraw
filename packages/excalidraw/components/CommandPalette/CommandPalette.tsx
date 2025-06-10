@@ -11,6 +11,8 @@ import {
   isWritableElement,
 } from "@excalidraw/common";
 
+import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionToggleShapeSwitch";
+
 import type { MarkRequired } from "@excalidraw/common/utility-types";
 
 import {
@@ -291,6 +293,7 @@ function CommandPaletteInner({
         actionManager.actions.decreaseFontSize,
         actionManager.actions.toggleLinearEditor,
         actionManager.actions.cropEditor,
+        actionManager.actions.togglePolygon,
         actionLink,
         actionCopyElementLink,
         actionLinkToElement,
@@ -408,6 +411,14 @@ function CommandPaletteInner({
           viewMode: true,
           perform: () => {
             actionManager.executeAction(actionToggleSearchMenu);
+          },
+        },
+        {
+          label: t("labels.shapeSwitch"),
+          category: DEFAULT_CATEGORIES.elements,
+          icon: boltIcon,
+          perform: () => {
+            actionManager.executeAction(actionToggleShapeSwitch);
           },
         },
         {

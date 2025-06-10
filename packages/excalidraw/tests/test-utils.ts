@@ -11,7 +11,7 @@ import ansi from "ansicolor";
 
 import { ORIG_ID, arrayToMap } from "@excalidraw/common";
 
-import { getSelectedElements } from "@excalidraw/element/selection";
+import { getSelectedElements } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -21,6 +21,8 @@ import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
 
 import { Pointer, UI } from "./helpers/ui";
 import * as toolQueries from "./queries/toolQueries";
+
+import type { History } from "../history";
 
 import type { RenderResult, RenderOptions } from "@testing-library/react";
 
@@ -419,11 +421,7 @@ export const assertElements = <T extends AllPossibleKeys<ExcalidrawElement>>(
         .join(", ")}]\n`,
     )}`;
 
-    const error = new Error(errStr);
-    const stack = err.stack.split("\n");
-    stack.splice(1, 1);
-    error.stack = stack.join("\n");
-    throw error;
+    throw trimErrorStack(new Error(errStr), 1);
   }
 
   expect(mappedActualElements).toEqual(
@@ -431,4 +429,69 @@ export const assertElements = <T extends AllPossibleKeys<ExcalidrawElement>>(
   );
 
   expect(h.state.selectedElementIds).toEqual(selectedElementIds);
+};
+
+const stripProps = (
+  deltas: Record<string, { deleted: any; inserted: any }>,
+  props: string[],
+) =>
+  Object.entries(deltas).reduce((acc, curr) => {
+    const { inserted, deleted, ...rest } = curr[1];
+
+    for (const prop of props) {
+      delete inserted[prop];
+      delete deleted[prop];
+    }
+
+    acc[curr[0]] = {
+      inserted,
+      deleted,
+      ...rest,
+    };
+
+    return acc;
+  }, {} as Record<string, any>);
+
+export const checkpointHistory = (history: History, name: string) => {
+  expect(
+    history.undoStack.map((x) => ({
+      ...x,
+      elements: {
+        ...x.elements,
+        added: stripProps(x.elements.added, ["seed", "versionNonce"]),
+        removed: stripProps(x.elements.removed, ["seed", "versionNonce"]),
+        updated: stripProps(x.elements.updated, ["seed", "versionNonce"]),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] undo stack`);
+
+  expect(
+    history.redoStack.map((x) => ({
+      ...x,
+      elements: {
+        ...x.elements,
+        added: stripProps(x.elements.added, ["seed", "versionNonce"]),
+        removed: stripProps(x.elements.removed, ["seed", "versionNonce"]),
+        updated: stripProps(x.elements.updated, ["seed", "versionNonce"]),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] redo stack`);
+};
+
+/**
+ * removes one or more leading stack trace lines (leading to files) from the
+ * error stack trace
+ */
+export const trimErrorStack = (error: Error, range = 1) => {
+  const stack = error.stack?.split("\n");
+  if (stack) {
+    stack.splice(1, range);
+    error.stack = stack.join("\n");
+  }
+  return error;
+};
+
+export const stripIgnoredNodesFromErrorMessage = (error: Error) => {
+  error.message = error.message.replace(/\s+Ignored nodes:[\s\S]+/, "");
+  return error;
 };
