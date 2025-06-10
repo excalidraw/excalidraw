@@ -9948,17 +9948,9 @@ class App extends React.Component<AppProps, AppState> {
     const dataURL =
       this.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
-    // the following mutation should not be undoable
-    this.store.scheduleAction(CaptureUpdateAction.NEVER);
-
-    // inform mutation so that the scheduled action is executed asap
-    const imageElement = this.scene.mutateElement(
-      _imageElement,
-      {
-        fileId,
-      },
-      { informMutation: true, isDragging: false },
-    ) as NonDeleted<InitializedExcalidrawImageElement>;
+    let imageElement = newElementWith(_imageElement, {
+      fileId,
+    }) as NonDeleted<InitializedExcalidrawImageElement>;
 
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
       async (resolve, reject) => {
@@ -9972,24 +9964,36 @@ class App extends React.Component<AppProps, AppState> {
               lastRetrieved: Date.now(),
             },
           ]);
-          const cachedImageData = this.imageCache.get(fileId);
+
+          let cachedImageData = this.imageCache.get(fileId);
+
           if (!cachedImageData) {
             this.addNewImagesToImageCache();
-            await this.updateImageCache([imageElement]);
+
+            const { updatedFiles } = await this.updateImageCache([
+              imageElement,
+            ]);
+
+            if (updatedFiles.size) {
+              ShapeCache.delete(_imageElement);
+            }
+
+            cachedImageData = this.imageCache.get(fileId);
           }
-          if (cachedImageData?.image instanceof Promise) {
-            await cachedImageData.image;
-          }
+
+          const imageHTML = await cachedImageData?.image;
+
           if (
+            imageHTML &&
             this.state.pendingImageElementId !== imageElement.id &&
             this.state.newElement?.id !== imageElement.id
           ) {
-            // the following mutation should not be undoable
-            this.store.scheduleAction(CaptureUpdateAction.NEVER);
-            this.initializeImageDimensions(imageElement, true);
+            const naturalSizeDimensions = this.getImageNaturalDimensions(
+              imageElement,
+              imageHTML,
+            );
 
-            // trigger component update so that the scheduled action is executed asap
-            this.scene.triggerUpdate();
+            imageElement = newElementWith(imageElement, naturalSizeDimensions);
           }
 
           resolve(imageElement);
@@ -10023,11 +10027,30 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.insertElement(imageElement);
 
     try {
-      return await this.initializeImage({
+      const image = await this.initializeImage({
         imageFile,
         imageElement,
         showCursorImagePreview,
       });
+
+      const nextElements = this.scene
+        .getElementsIncludingDeleted()
+        .map((element) => {
+          if (element.id === image.id) {
+            return image;
+          }
+
+          return element;
+        });
+
+      // schedules an immediate micro action, which will update snapshot,
+      // but won't be undoable, which is what we want!
+      this.updateScene({
+        captureUpdate: CaptureUpdateAction.NEVER,
+        elements: nextElements,
+      });
+
+      return image;
     } catch (error: any) {
       this.scene.mutateElement(imageElement, {
         isDeleted: true,
@@ -10162,10 +10185,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  initializeImageDimensions = (
-    imageElement: ExcalidrawImageElement,
-    forceNaturalSize = false,
-  ) => {
+  initializeImageDimensions = (imageElement: ExcalidrawImageElement) => {
     const image =
       isInitializedImageElement(imageElement) &&
       this.imageCache.get(imageElement.fileId)?.image;
@@ -10188,37 +10208,46 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    // if user-created bounding box is below threshold, assume the
+    // intention was to click instead of drag, and use the image's
+    // intrinsic size
     if (
-      forceNaturalSize ||
-      // if user-created bounding box is below threshold, assume the
-      // intention was to click instead of drag, and use the image's
-      // intrinsic size
-      (imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
-        imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value)
+      imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
+      imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
     ) {
-      const minHeight = Math.max(this.state.height - 120, 160);
-      // max 65% of canvas height, clamped to <300px, vh - 120px>
-      const maxHeight = Math.min(
-        minHeight,
-        Math.floor(this.state.height * 0.5) / this.state.zoom.value,
+      this.scene.mutateElement(
+        imageElement,
+        this.getImageNaturalDimensions(imageElement, image),
       );
-
-      const height = Math.min(image.naturalHeight, maxHeight);
-      const width = height * (image.naturalWidth / image.naturalHeight);
-
-      // add current imageElement width/height to account for previous centering
-      // of the placeholder image
-      const x = imageElement.x + imageElement.width / 2 - width / 2;
-      const y = imageElement.y + imageElement.height / 2 - height / 2;
-
-      this.scene.mutateElement(imageElement, {
-        x,
-        y,
-        width,
-        height,
-        crop: null,
-      });
     }
+  };
+
+  private getImageNaturalDimensions = (
+    imageElement: ExcalidrawImageElement,
+    imageHTML: HTMLImageElement,
+  ) => {
+    const minHeight = Math.max(this.state.height - 120, 160);
+    // max 65% of canvas height, clamped to <300px, vh - 120px>
+    const maxHeight = Math.min(
+      minHeight,
+      Math.floor(this.state.height * 0.5) / this.state.zoom.value,
+    );
+
+    const height = Math.min(imageHTML.naturalHeight, maxHeight);
+    const width = height * (imageHTML.naturalWidth / imageHTML.naturalHeight);
+
+    // add current imageElement width/height to account for previous centering
+    // of the placeholder image
+    const x = imageElement.x + imageElement.width / 2 - width / 2;
+    const y = imageElement.y + imageElement.height / 2 - height / 2;
+
+    return {
+      x,
+      y,
+      width,
+      height,
+      crop: null,
+    };
   };
 
   /** updates image cache, refreshing updated elements and/or setting status
@@ -10232,14 +10261,6 @@ class App extends React.Component<AppProps, AppState> {
       fileIds: elements.map((element) => element.fileId),
       files,
     });
-
-    if (updatedFiles.size || erroredFiles.size) {
-      for (const element of elements) {
-        if (updatedFiles.has(element.fileId)) {
-          ShapeCache.delete(element);
-        }
-      }
-    }
 
     if (erroredFiles.size) {
       this.scene.replaceAllElements(
@@ -10276,6 +10297,15 @@ class App extends React.Component<AppProps, AppState> {
         uncachedImageElements,
         files,
       );
+
+      if (updatedFiles.size) {
+        for (const element of uncachedImageElements) {
+          if (updatedFiles.has(element.fileId)) {
+            ShapeCache.delete(element);
+          }
+        }
+      }
+
       if (updatedFiles.size) {
         this.scene.triggerUpdate();
       }
