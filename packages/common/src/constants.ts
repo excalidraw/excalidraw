@@ -168,10 +168,8 @@ export function getGenericFontFamilyFallback(
   fontFamily: number,
 ): keyof typeof FONT_FAMILY_GENERIC_FALLBACKS {
   switch (fontFamily) {
-    case FONT_FAMILY.Excalifont:
-      return SERIF_GENERIC_FONT;
     case FONT_FAMILY["Lilita One"]:
-      return FANTASY_GENERIC_FONT;
+      return SERIF_GENERIC_FONT;
 
     case FONT_FAMILY.Cascadia:
     case FONT_FAMILY["Comic Shanns"]:
