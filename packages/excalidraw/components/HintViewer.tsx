@@ -74,10 +74,6 @@ const getHints = ({
     return t("hints.embeddable");
   }
 
-  if (appState.activeTool.type === "image" && appState.pendingImageElementId) {
-    return t("hints.placeImage");
-  }
-
   const selectedElements = app.scene.getSelectedElements(appState);
 
   if (

@@ -1520,7 +1520,6 @@ class App extends React.Component<AppProps, AppState> {
         width: this.state.width,
         editingTextElement: this.state.editingTextElement,
         newElementId: this.state.newElement?.id,
-        pendingImageElementId: this.state.pendingImageElementId,
       });
     this.visibleElements = visibleElements;
 
@@ -6592,34 +6591,6 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type,
         pointerDownState,
       );
-    } else if (this.state.activeTool.type === "image") {
-      // reset image preview on pointerdown
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
-
-      // retrieve the latest element as the state may be stale
-      const pendingImageElement =
-        this.state.pendingImageElementId &&
-        this.scene.getElement(this.state.pendingImageElementId);
-
-      if (!pendingImageElement) {
-        return;
-      }
-
-      this.setState({
-        newElement: pendingImageElement as ExcalidrawNonSelectionElement,
-        pendingImageElementId: null,
-        multiElement: null,
-      });
-
-      const { x, y } = viewportCoordsToSceneCoords(event, this.state);
-
-      const frame = this.getTopLayerFrameAtSceneCoords({ x, y });
-
-      this.scene.mutateElement(pendingImageElement, {
-        x,
-        y,
-        frameId: frame ? frame.id : null,
-      });
     } else if (this.state.activeTool.type === "freedraw") {
       this.handleFreeDrawElementOnPointerDown(
         event,
@@ -6643,7 +6614,8 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (
       this.state.activeTool.type !== "eraser" &&
-      this.state.activeTool.type !== "hand"
+      this.state.activeTool.type !== "hand" &&
+      this.state.activeTool.type !== "image"
     ) {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
@@ -9089,10 +9061,6 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.eventListeners.onKeyUp!,
       );
 
-      if (this.state.pendingImageElementId) {
-        this.setState({ pendingImageElementId: null });
-      }
-
       this.props?.onPointerUp?.(activeTool, pointerDownState);
       this.onPointerUpEmitter.trigger(
         this.state.activeTool,
@@ -9968,11 +9936,7 @@ class App extends React.Component<AppProps, AppState> {
 
           const imageHTML = await cachedImageData?.image;
 
-          if (
-            imageHTML &&
-            this.state.pendingImageElementId !== imageElement.id &&
-            this.state.newElement?.id !== imageElement.id
-          ) {
+          if (imageHTML && this.state.newElement?.id !== imageElement.id) {
             const naturalDimensions = this.getImageNaturalDimensions(
               imageElement,
               imageHTML,
@@ -10087,7 +10051,6 @@ class App extends React.Component<AppProps, AppState> {
       }
       this.setState(
         {
-          pendingImageElementId: null,
           newElement: null,
           activeTool: updateActiveTool(this.state, { type: "selection" }),
         },
