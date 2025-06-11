@@ -20,8 +20,6 @@ import { canChangeRoundness } from "./comparisons";
 import { generateFreeDrawShape } from "./renderElement";
 import { getArrowheadPoints, getDiamondPoints } from "./bounds";
 
-import { getFreedrawStroke } from "./freedraw";
-
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -514,22 +512,21 @@ export const _generateElementShape = (
       generateFreeDrawShape(element);
 
       if (isPathALoop(element.points)) {
-        let points;
-        if (element.pressureSensitivity === null) {
-          // legacy freedraw
-          points = simplify(element.points as LocalPoint[], 0.75);
-        } else {
-          // new freedraw
-          const stroke = getFreedrawStroke(element);
-          points = stroke
-            .slice(0, Math.floor(stroke.length / 2))
-            .map((p) => pointFrom(p[0], p[1]));
-        }
+        const points =
+          element.pressureSensitivity === null
+            ? simplify(element.points as LocalPoint[], 0.75)
+            : simplify(element.points as LocalPoint[], 1.5);
 
-        shape = generator.curve(points, {
-          ...generateRoughOptions(element),
-          stroke: "none",
-        });
+        shape =
+          element.pressureSensitivity === null
+            ? generator.curve(points, {
+                ...generateRoughOptions(element),
+                stroke: "none",
+              })
+            : generator.polygon(points, {
+                ...generateRoughOptions(element),
+                stroke: "none",
+              });
       } else {
         shape = null;
       }
