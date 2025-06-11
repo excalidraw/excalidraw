@@ -7,6 +7,8 @@ import {
   shouldApplyFrameClip,
 } from "@excalidraw/element";
 
+import { convertToShape } from "@excalidraw/utils";
+
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 
 import { frameClip } from "./staticScene";
@@ -78,6 +80,29 @@ const _renderNewElementScene = ({
       );
     } else {
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
+    }
+
+    // TODO: Can we interleave the context save?
+    context.restore();
+    context.save();
+
+    if (appState.isShapeSnapEnabled && newElement?.type === "freedraw") {
+      const detectedElement = convertToShape(newElement);
+      if (detectedElement !== newElement) {
+        renderElement(
+          {
+            ...detectedElement,
+            roughness: 0,
+            strokeColor: "rgba(255, 0, 0, 0.8)",
+          },
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+        );
+      }
     }
 
     context.restore();

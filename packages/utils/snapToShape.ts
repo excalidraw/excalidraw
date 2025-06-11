@@ -17,7 +17,8 @@ import { ROUNDNESS } from "@excalidraw/common";
 
 import type { LocalPoint } from "@excalidraw/math";
 
-import type { BoundingBox, Bounds } from "@excalidraw/element/bounds";
+import type { BoundingBox } from "@excalidraw/element/bounds";
+import type { Bounds } from "@excalidraw/common";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawDiamondElement,
