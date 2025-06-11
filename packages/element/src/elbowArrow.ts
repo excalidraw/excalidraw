@@ -20,6 +20,7 @@ import {
   tupleToCoors,
   getSizeFromPoints,
   isDevEnv,
+  arrayToMap,
 } from "@excalidraw/common";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -2208,20 +2209,12 @@ const getGlobalPoint = (
     return initialPoint;
   }
 
-  if (element && elementsMap) {
-    const fixedGlobalPoint = getGlobalFixedPointForBindableElement(
+  if (element) {
+    return getGlobalFixedPointForBindableElement(
       fixedPointRatio || [0, 0],
       element,
-      elementsMap,
+      elementsMap ?? arrayToMap([element]),
     );
-
-    // NOTE: Resize scales the binding position point too, so we need to update it
-    return Math.abs(
-      distanceToElement(element, elementsMap, fixedGlobalPoint) -
-        FIXED_BINDING_DISTANCE,
-    ) > 0.01
-      ? bindPointToSnapToElementOutline(arrow, element, startOrEnd, elementsMap)
-      : fixedGlobalPoint;
   }
 
   return initialPoint;

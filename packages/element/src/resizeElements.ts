@@ -1518,11 +1518,7 @@ export const resizeMultipleElements = (
     } of elementsAndUpdates) {
       const { width, height, angle } = update;
 
-      scene.mutateElement(element, update, {
-        informMutation: true,
-        // needed for the fixed binding point udpate to take effect
-        isDragging: true,
-      });
+      scene.mutateElement(element, update);
 
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: elementsToUpdate,
