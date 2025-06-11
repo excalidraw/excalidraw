@@ -3063,17 +3063,7 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        const imageElement = this.createImageElement({ sceneX, sceneY });
-        this.insertImageElement(imageElement, file);
-        this.initializeImageDimensions(imageElement);
-        this.setState({
-          selectedElementIds: makeNextSelectedElementIds(
-            {
-              [imageElement.id]: true,
-            },
-            this.state,
-          ),
-        });
+        this.createImageElement({ sceneX, sceneY, imageFile: file });
 
         return;
       }
@@ -3379,15 +3369,12 @@ class App extends React.Component<AppProps, AppState> {
       const nextSelectedIds: Record<ExcalidrawElement["id"], true> = {};
       for (const response of responses) {
         if (response.file) {
-          const imageElement = this.createImageElement({
+          const initializedImageElement = await this.createImageElement({
             sceneX,
             sceneY: y,
+            imageFile: response.file,
           });
 
-          const initializedImageElement = await this.insertImageElement(
-            imageElement,
-            response.file,
-          );
           if (initializedImageElement) {
             // vertically center first image in the batch
             if (!firstImageYOffsetDone) {
@@ -3402,9 +3389,9 @@ class App extends React.Component<AppProps, AppState> {
               { informMutation: false, isDragging: false },
             );
 
-            y = imageElement.y + imageElement.height + 25;
+            y = initializedImageElement.y + initializedImageElement.height + 25;
 
-            nextSelectedIds[imageElement.id] = true;
+            nextSelectedIds[initializedImageElement.id] = true;
           }
         }
       }
@@ -7623,14 +7610,16 @@ class App extends React.Component<AppProps, AppState> {
     return element;
   };
 
-  private createImageElement = ({
+  private createImageElement = async ({
     sceneX,
     sceneY,
     addToFrameUnderCursor = true,
+    imageFile,
   }: {
     sceneX: number;
     sceneY: number;
     addToFrameUnderCursor?: boolean;
+    imageFile: File;
   }) => {
     const [gridX, gridY] = getGridPoint(
       sceneX,
@@ -7647,10 +7636,10 @@ class App extends React.Component<AppProps, AppState> {
         })
       : null;
 
-    const element = newImageElement({
+    const placeholderSize = 100 / this.state.zoom.value;
+
+    const imageElement = newImageElement({
       type: "image",
-      x: gridX,
-      y: gridY,
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
@@ -7661,9 +7650,18 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      x: gridX - placeholderSize / 2,
+      y: gridY - placeholderSize / 2,
+      width: placeholderSize,
+      height: placeholderSize,
     });
 
-    return element;
+    const initializedImageElement = await this.insertImageElement(
+      imageElement,
+      imageFile,
+    );
+
+    return initializedImageElement;
   };
 
   private handleLinearElementOnPointerDown = (
@@ -9087,32 +9085,6 @@ class App extends React.Component<AppProps, AppState> {
 
         return;
       }
-      if (isImageElement(newElement)) {
-        const imageElement = newElement;
-        try {
-          this.initializeImageDimensions(imageElement);
-          this.setState(
-            {
-              selectedElementIds: makeNextSelectedElementIds(
-                { [imageElement.id]: true },
-                this.state,
-              ),
-            },
-            () => {
-              this.actionManager.executeAction(actionFinalize);
-            },
-          );
-        } catch (error: any) {
-          console.error(error);
-          this.scene.replaceAllElements(
-            this.scene
-              .getElementsIncludingDeleted()
-              .filter((el) => el.id !== imageElement.id),
-          );
-          this.actionManager.executeAction(actionFinalize);
-        }
-        return;
-      }
 
       if (isLinearElement(newElement)) {
         if (newElement!.points.length > 1) {
@@ -9824,13 +9796,10 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private initializeImage = async ({
-    imageFile,
-    imageElement: _imageElement,
-  }: {
-    imageFile: File;
-    imageElement: ExcalidrawImageElement;
-  }) => {
+  private initializeImage = async (
+    imageElement: ExcalidrawImageElement,
+    imageFile: File,
+  ) => {
     // at this point this should be guaranteed image file, but we do this check
     // to satisfy TS down the line
     if (!isSupportedImageFile(imageFile)) {
@@ -9890,16 +9859,9 @@ class App extends React.Component<AppProps, AppState> {
     const dataURL =
       this.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
-    // we could have a new instance of the element, i.e. it was resized / moved while being initialized
-    const latestImageElement =
-      this.scene.getElement(_imageElement.id) ?? _imageElement;
-
-    let imageElement = newElementWith(
-      latestImageElement as ExcalidrawImageElement,
-      {
-        fileId,
-      },
-    ) as NonDeleted<InitializedExcalidrawImageElement>;
+    let initializedImageElement = newElementWith(imageElement, {
+      fileId,
+    }) as NonDeleted<InitializedExcalidrawImageElement>;
 
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
       async (resolve, reject) => {
@@ -9914,52 +9876,30 @@ class App extends React.Component<AppProps, AppState> {
             },
           ]);
 
-          let cachedImageData = this.imageCache.get(fileId);
-
-          if (!cachedImageData) {
+          if (!this.imageCache.get(fileId)) {
             this.addNewImagesToImageCache();
 
-            const { updatedFiles } = await this.updateImageCache([
-              imageElement,
-            ]);
-
-            if (updatedFiles.size) {
-              ShapeCache.delete(latestImageElement);
-            }
-
-            cachedImageData = this.imageCache.get(fileId);
+            await this.updateImageCache([initializedImageElement]);
           }
 
-          const imageHTML = await cachedImageData?.image;
+          const imageHTML = await this.imageCache.get(fileId)?.image;
 
-          if (imageHTML && this.state.newElement?.id !== imageElement.id) {
-            // again, now we could have a new instance of the image element in the scene
-            // meaning the `imageElement` in the closure could have stale props,
-            // including `version`, which is especially crutial for change detection in the store
-            const latestImageElement = this.scene.getElement(imageElement.id);
-
-            if (
-              latestImageElement &&
-              latestImageElement.version >= imageElement.version &&
-              isImageElement(latestImageElement)
-            ) {
-              imageElement = newElementWith(
-                latestImageElement as ExcalidrawImageElement,
-                {
-                  fileId,
-                },
-              ) as NonDeleted<InitializedExcalidrawImageElement>;
-            }
-
+          if (
+            imageHTML &&
+            this.state.newElement?.id !== initializedImageElement.id
+          ) {
             const naturalDimensions = this.getImageNaturalDimensions(
-              imageElement,
+              initializedImageElement,
               imageHTML,
             );
 
-            imageElement = newElementWith(imageElement, naturalDimensions);
+            initializedImageElement = newElementWith(
+              initializedImageElement,
+              naturalDimensions,
+            );
           }
 
-          resolve(imageElement);
+          resolve(initializedImageElement);
         } catch (error: any) {
           console.error(error);
           reject(new Error(t("errors.imageInsertError")));
@@ -9985,16 +9925,16 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.insertElement(imageElement);
 
     try {
-      const image = await this.initializeImage({
-        imageFile,
+      const initializedImageElement = await this.initializeImage(
         imageElement,
-      });
+        imageFile,
+      );
 
       const nextElements = this.scene
         .getElementsIncludingDeleted()
         .map((element) => {
-          if (element.id === image.id) {
-            return image;
+          if (element.id === initializedImageElement.id) {
+            return initializedImageElement;
           }
 
           return element;
@@ -10003,9 +9943,15 @@ class App extends React.Component<AppProps, AppState> {
       this.updateScene({
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         elements: nextElements,
+        appState: {
+          selectedElementIds: makeNextSelectedElementIds(
+            { [imageElement.id]: true },
+            this.state,
+          ),
+        },
       });
 
-      return image;
+      return initializedImageElement;
     } catch (error: any) {
       this.scene.mutateElement(imageElement, {
         isDeleted: true,
@@ -10035,25 +9981,12 @@ class App extends React.Component<AppProps, AppState> {
         ) as (keyof typeof IMAGE_MIME_TYPES)[],
       });
 
-      const imageElement = this.createImageElement({
+      this.createImageElement({
         sceneX: x,
         sceneY: y,
         addToFrameUnderCursor: false,
+        imageFile,
       });
-
-      this.insertImageElement(imageElement, imageFile);
-      this.initializeImageDimensions(imageElement);
-      this.setState(
-        {
-          selectedElementIds: makeNextSelectedElementIds(
-            { [imageElement.id]: true },
-            this.state,
-          ),
-        },
-        () => {
-          this.actionManager.executeAction(actionFinalize);
-        },
-      );
     } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error(error);
@@ -10069,45 +10002,6 @@ class App extends React.Component<AppProps, AppState> {
           this.actionManager.executeAction(actionFinalize);
         },
       );
-    }
-  };
-
-  initializeImageDimensions = (imageElement: ExcalidrawImageElement) => {
-    const imageHTML =
-      isInitializedImageElement(imageElement) &&
-      this.imageCache.get(imageElement.fileId)?.image;
-
-    if (!imageHTML || imageHTML instanceof Promise) {
-      if (
-        imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
-        imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
-      ) {
-        const placeholderSize = 100 / this.state.zoom.value;
-
-        this.scene.mutateElement(imageElement, {
-          x: imageElement.x - placeholderSize / 2,
-          y: imageElement.y - placeholderSize / 2,
-          width: placeholderSize,
-          height: placeholderSize,
-        });
-      }
-
-      return;
-    }
-
-    // if user-created bounding box is below threshold, assume the
-    // intention was to click instead of drag, and use the image's
-    // intrinsic size
-    if (
-      imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
-      imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
-    ) {
-      const naturalDimensions = this.getImageNaturalDimensions(
-        imageElement,
-        imageHTML,
-      );
-
-      this.scene.mutateElement(imageElement, naturalDimensions);
     }
   };
 
@@ -10374,16 +10268,7 @@ class App extends React.Component<AppProps, AppState> {
         // if no scene is embedded or we fail for whatever reason, fall back
         // to importing as regular image
         // ---------------------------------------------------------------------
-
-        const imageElement = this.createImageElement({ sceneX, sceneY });
-        this.insertImageElement(imageElement, file);
-        this.initializeImageDimensions(imageElement);
-        this.setState({
-          selectedElementIds: makeNextSelectedElementIds(
-            { [imageElement.id]: true },
-            this.state,
-          ),
-        });
+        this.createImageElement({ sceneX, sceneY, imageFile: file });
 
         return;
       }
