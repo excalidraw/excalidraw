@@ -611,6 +611,19 @@ describe("history", () => {
             ...deerImageDimensions,
           }),
         ]);
+
+        // need to check that delta actually contains initialized image element (with fileId & natural dimensions)
+        expect(
+          Object.values(h.history.undoStack[0].elements.removed)[0].deleted,
+        ).toEqual(
+          expect.objectContaining({
+            type: "image",
+            fileId: expect.any(String),
+            x: expect.toBeNonNaNNumber(),
+            y: expect.toBeNonNaNNumber(),
+            ...deerImageDimensions,
+          }),
+        );
       });
 
       Keyboard.undo();
@@ -722,6 +735,18 @@ describe("history", () => {
             ...smileyImageDimensions,
           }),
         ]);
+        // need to check that delta actually contains initialized image element (with fileId & natural dimensions)
+        expect(
+          Object.values(h.history.undoStack[0].elements.removed)[0].deleted,
+        ).toEqual(
+          expect.objectContaining({
+            type: "image",
+            fileId: expect.any(String),
+            x: expect.toBeNonNaNNumber(),
+            y: expect.toBeNonNaNNumber(),
+            ...smileyImageDimensions,
+          }),
+        );
       });
 
       Keyboard.undo();

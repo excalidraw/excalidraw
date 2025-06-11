@@ -3066,7 +3066,6 @@ class App extends React.Component<AppProps, AppState> {
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
-        this.store.scheduleCapture();
         this.setState({
           selectedElementIds: makeNextSelectedElementIds(
             {
@@ -9891,9 +9890,16 @@ class App extends React.Component<AppProps, AppState> {
     const dataURL =
       this.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
-    let imageElement = newElementWith(_imageElement, {
-      fileId,
-    }) as NonDeleted<InitializedExcalidrawImageElement>;
+    // we could have a new instance of the element, i.e. it was resized / moved while being initialized
+    const latestImageElement =
+      this.scene.getElement(_imageElement.id) ?? _imageElement;
+
+    let imageElement = newElementWith(
+      latestImageElement as ExcalidrawImageElement,
+      {
+        fileId,
+      },
+    ) as NonDeleted<InitializedExcalidrawImageElement>;
 
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
       async (resolve, reject) => {
@@ -9918,7 +9924,7 @@ class App extends React.Component<AppProps, AppState> {
             ]);
 
             if (updatedFiles.size) {
-              ShapeCache.delete(_imageElement);
+              ShapeCache.delete(latestImageElement);
             }
 
             cachedImageData = this.imageCache.get(fileId);
@@ -9927,6 +9933,24 @@ class App extends React.Component<AppProps, AppState> {
           const imageHTML = await cachedImageData?.image;
 
           if (imageHTML && this.state.newElement?.id !== imageElement.id) {
+            // again, now we could have a new instance of the image element in the scene
+            // meaning the `imageElement` in the closure could have stale props,
+            // including `version`, which is especially crutial for change detection in the store
+            const latestImageElement = this.scene.getElement(imageElement.id);
+
+            if (
+              latestImageElement &&
+              latestImageElement.version >= imageElement.version &&
+              isImageElement(latestImageElement)
+            ) {
+              imageElement = newElementWith(
+                latestImageElement as ExcalidrawImageElement,
+                {
+                  fileId,
+                },
+              ) as NonDeleted<InitializedExcalidrawImageElement>;
+            }
+
             const naturalDimensions = this.getImageNaturalDimensions(
               imageElement,
               imageHTML,
@@ -9976,10 +10000,8 @@ class App extends React.Component<AppProps, AppState> {
           return element;
         });
 
-      // schedules an immediate micro action, which will update snapshot,
-      // but won't be undoable, which is what we want!
       this.updateScene({
-        captureUpdate: CaptureUpdateAction.NEVER,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         elements: nextElements,
       });
 
@@ -10021,7 +10043,6 @@ class App extends React.Component<AppProps, AppState> {
 
       this.insertImageElement(imageElement, imageFile);
       this.initializeImageDimensions(imageElement);
-      this.store.scheduleCapture();
       this.setState(
         {
           selectedElementIds: makeNextSelectedElementIds(
@@ -10132,7 +10153,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if (erroredFiles.size) {
       this.scene.replaceAllElements(
-        this.scene.getElementsIncludingDeleted().map((element) => {
+        elements.map((element) => {
           if (
             isInitializedImageElement(element) &&
             erroredFiles.has(element.fileId)
@@ -10357,7 +10378,6 @@ class App extends React.Component<AppProps, AppState> {
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
-        this.store.scheduleCapture();
         this.setState({
           selectedElementIds: makeNextSelectedElementIds(
             { [imageElement.id]: true },

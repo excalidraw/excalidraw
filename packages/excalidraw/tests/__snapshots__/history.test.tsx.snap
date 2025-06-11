@@ -12532,14 +12532,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   {
     "appState": AppStateDelta {
       "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id0": true,
-          },
-        },
-        "inserted": {
-          "selectedElementIds": {},
-        },
+        "deleted": {},
+        "inserted": {},
       },
     },
     "elements": {
@@ -12755,14 +12749,8 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   {
     "appState": AppStateDelta {
       "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id0": true,
-          },
-        },
-        "inserted": {
-          "selectedElementIds": {},
-        },
+        "deleted": {},
+        "inserted": {},
       },
     },
     "elements": {
