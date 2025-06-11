@@ -28,7 +28,7 @@ describe("check rotated elements can be hit:", () => {
     //const p = [120, -211];
     //const p = [0, 13];
     const hit = hitElementItself({
-      point: pointFrom<GlobalPoint>(87, -68),
+      point: pointFrom<GlobalPoint>(88, -68),
       element: window.h.elements[0],
       threshold: 10,
       elementsMap: window.h.scene.getNonDeletedElementsMap(),
