@@ -18,12 +18,10 @@ import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
 import { fileOpen, fileSave } from "./filesystem";
 
-import type { AppState, BinaryFiles, LibraryItems } from "../types";
+import type { AppState, BinaryFiles } from "../types";
 import type {
   ExportedDataState,
   ImportedDataState,
-  ExportedLibraryData,
-  ImportedLibraryData,
 } from "./types";
 
 /**
@@ -129,35 +127,4 @@ export const isValidExcalidrawData = (data?: {
   );
 };
 
-export const isValidLibrary = (json: any): json is ImportedLibraryData => {
-  return (
-    typeof json === "object" &&
-    json &&
-    json.type === EXPORT_DATA_TYPES.excalidrawLibrary &&
-    (json.version === 1 || json.version === 2)
-  );
-};
 
-export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {
-  const data: ExportedLibraryData = {
-    type: EXPORT_DATA_TYPES.excalidrawLibrary,
-    version: VERSIONS.excalidrawLibrary,
-    source: getExportSource(),
-    libraryItems,
-  };
-  return JSON.stringify(data, null, 2);
-};
-
-export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {
-  const serialized = serializeLibraryAsJSON(libraryItems);
-  await fileSave(
-    new Blob([serialized], {
-      type: MIME_TYPES.excalidrawlib,
-    }),
-    {
-      name: "library",
-      extension: "excalidrawlib",
-      description: "Excalidraw library file",
-    },
-  );
-};

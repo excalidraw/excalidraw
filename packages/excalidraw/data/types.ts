@@ -6,8 +6,6 @@ import type { cleanAppStateForExport } from "../appState";
 import type {
   AppState,
   BinaryFiles,
-  LibraryItems,
-  LibraryItems_anyVersion,
 } from "../types";
 
 export interface ExportedDataState {
@@ -44,18 +42,5 @@ export interface ImportedDataState {
     >
   > | null;
   scrollToContent?: boolean;
-  libraryItems?: LibraryItems_anyVersion;
   files?: BinaryFiles;
-}
-
-export interface ExportedLibraryData {
-  type: string;
-  version: typeof VERSIONS.excalidrawLibrary;
-  source: string;
-  libraryItems: LibraryItems;
-}
-
-export interface ImportedLibraryData extends Partial<ExportedLibraryData> {
-  /** @deprecated v1 */
-  library?: LibraryItems;
 }

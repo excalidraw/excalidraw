@@ -48,7 +48,6 @@ import {
   boltIcon,
   bucketFillIcon,
   ExportImageIcon,
-  LibraryIcon,
 } from "../icons";
 
 import { SHAPES } from "../shapes";
@@ -381,26 +380,6 @@ function CommandPaletteInner({
       ];
 
       const additionalCommands: CommandPaletteItem[] = [
-        {
-          label: t("toolBar.library"),
-          category: DEFAULT_CATEGORIES.app,
-          icon: LibraryIcon,
-          viewMode: false,
-          perform: () => {
-            if (uiAppState.openSidebar) {
-              setAppState({
-                openSidebar: null,
-              });
-            } else {
-              setAppState({
-                openSidebar: {
-                  name: DEFAULT_SIDEBAR.name,
-                  tab: DEFAULT_SIDEBAR.defaultTab,
-                },
-              });
-            }
-          },
-        },
         {
           label: t("search.title"),
           category: DEFAULT_CATEGORIES.app,

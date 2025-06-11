@@ -31,14 +31,12 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     viewModeEnabled,
     zenModeEnabled,
     gridModeEnabled,
-    libraryReturnUrl,
     theme,
     name,
     renderCustomStats,
     onPaste,
     detectScroll = true,
     handleKeyboardGlobally = false,
-    onLibraryChange,
     autoFocus = false,
     generateIdForFile,
     onLinkOpen,
@@ -119,7 +117,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           viewModeEnabled={viewModeEnabled}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
-          libraryReturnUrl={libraryReturnUrl}
           theme={theme}
           name={name}
           renderCustomStats={renderCustomStats}
@@ -127,7 +124,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPaste={onPaste}
           detectScroll={detectScroll}
           handleKeyboardGlobally={handleKeyboardGlobally}
-          onLibraryChange={onLibraryChange}
           autoFocus={autoFocus}
           generateIdForFile={generateIdForFile}
           onLinkOpen={onLinkOpen}
@@ -221,7 +217,6 @@ export {
   restore,
   restoreAppState,
   restoreElements,
-  restoreLibraryItems,
 } from "./data/restore";
 
 export { reconcileElements } from "./data/reconcile";
@@ -233,14 +228,12 @@ export {
   exportToClipboard,
 } from "@excalidraw/utils/export";
 
-export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
+export { serializeAsJSON } from "./data/json";
 export {
   loadFromBlob,
   loadSceneOrLibraryFromBlob,
-  loadLibraryFromBlob,
 } from "./data/blob";
 export { getFreeDrawSvgPath } from "@excalidraw/element";
-export { mergeLibraryItems, getLibraryItemsHash } from "./data/library";
 export { isLinearElement } from "@excalidraw/element";
 
 export {
@@ -261,7 +254,6 @@ export {
 
 export { CaptureUpdateAction } from "@excalidraw/element";
 
-export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 
 export {
   sceneCoordsToViewportCoords,

@@ -129,7 +129,6 @@ describe("contextMenu element", () => {
       "copyStyles",
       "pasteStyles",
       "deleteSelectedElements",
-      "addToLibrary",
       "flipHorizontal",
       "flipVertical",
       "sendBackward",
@@ -224,7 +223,6 @@ describe("contextMenu element", () => {
       "pasteStyles",
       "deleteSelectedElements",
       "group",
-      "addToLibrary",
       "flipHorizontal",
       "flipVertical",
       "sendBackward",
@@ -282,7 +280,6 @@ describe("contextMenu element", () => {
       "deleteSelectedElements",
       "copyElementLink",
       "ungroup",
-      "addToLibrary",
       "flipHorizontal",
       "flipVertical",
       "sendBackward",
@@ -401,25 +398,6 @@ describe("contextMenu element", () => {
     fireEvent.click(queryAllByText(contextMenu!, "Delete")[0]);
     expect(API.getSelectedElements()).toHaveLength(0);
     expect(h.elements[0].isDeleted).toBe(true);
-  });
-
-  it("selecting 'Add to library' in context menu adds element to library", async () => {
-    UI.clickTool("rectangle");
-    mouse.down(0, 0);
-    mouse.up(10, 10);
-
-    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
-      button: 2,
-      clientX: 3,
-      clientY: 3,
-    });
-    const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Add to library")!);
-
-    await waitFor(async () => {
-      const libraryItems = await h.app.library.getLatestLibrary();
-      expect(libraryItems[0].elements[0]).toEqual(h.elements[0]);
-    });
   });
 
   it("selecting 'Duplicate' in context menu duplicates element", () => {

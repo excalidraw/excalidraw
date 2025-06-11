@@ -50,8 +50,6 @@ export {
 
 export { actionGroup, actionUngroup } from "./actionGroup";
 
-export { actionAddToLibrary } from "./actionAddToLibrary";
-
 export {
   actionAlignTop,
   actionAlignBottom,

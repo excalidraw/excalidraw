@@ -75,7 +75,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import type { AppState, BinaryFiles, LibraryItem } from "../types";
+import type { AppState, BinaryFiles } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
@@ -791,48 +791,4 @@ export const restore = (
     appState: restoreAppState(data?.appState, localAppState || null),
     files: data?.files || {},
   };
-};
-
-const restoreLibraryItem = (libraryItem: LibraryItem) => {
-  const elements = restoreElements(
-    getNonDeletedElements(libraryItem.elements),
-    null,
-  );
-  return elements.length ? { ...libraryItem, elements } : null;
-};
-
-export const restoreLibraryItems = (
-  libraryItems: ImportedDataState["libraryItems"] = [],
-  defaultStatus: LibraryItem["status"],
-) => {
-  const restoredItems: LibraryItem[] = [];
-  for (const item of libraryItems) {
-    // migrate older libraries
-    if (Array.isArray(item)) {
-      const restoredItem = restoreLibraryItem({
-        status: defaultStatus,
-        elements: item,
-        id: randomId(),
-        created: Date.now(),
-      });
-      if (restoredItem) {
-        restoredItems.push(restoredItem);
-      }
-    } else {
-      const _item = item as MarkOptional<
-        LibraryItem,
-        "id" | "status" | "created"
-      >;
-      const restoredItem = restoreLibraryItem({
-        ..._item,
-        id: _item.id || randomId(),
-        status: _item.status || defaultStatus,
-        created: _item.created || Date.now(),
-      });
-      if (restoredItem) {
-        restoredItems.push(restoredItem);
-      }
-    }
-  }
-  return restoredItems;
 };

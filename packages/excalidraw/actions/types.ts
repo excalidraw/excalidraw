@@ -99,7 +99,6 @@ export type ActionName =
   | "toggleShortcuts"
   | "group"
   | "ungroup"
-  | "addToLibrary"
   | "changeRoundness"
   | "alignTop"
   | "alignBottom"

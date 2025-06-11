@@ -26,13 +26,8 @@ import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRef
 import { t } from "@excalidraw/excalidraw/i18n";
 
 import { isElementLink } from "@excalidraw/element";
-import { restore } from "@excalidraw/excalidraw/data/restore";
 import { newElementWith } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
-import {
-  parseLibraryTokensFromUrl,
-  useHandleLibrary,
-} from "@excalidraw/excalidraw/data/library";
 
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
 import type {
@@ -63,11 +58,7 @@ import { loadScene } from "./data";
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { importFromLocalStorage } from "./data/localStorage";
 
-import {
-  LibraryIndexedDBAdapter,
-  LibraryLocalStorageMigrationAdapter,
-  LocalData,
-} from "./data/LocalData";
+import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
@@ -231,13 +222,6 @@ const ExcalidrawWrapper = () => {
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
 
-  useHandleLibrary({
-    excalidrawAPI,
-    adapter: LibraryIndexedDBAdapter,
-    // TODO maybe remove this in several months (shipped: 24-03-11)
-    migrationAdapter: LibraryLocalStorageMigrationAdapter,
-  });
-
   const [, forceRefresh] = useState(false);
 
   useEffect(() => {
@@ -305,21 +289,6 @@ const ExcalidrawWrapper = () => {
 
     const onHashChange = (event: HashChangeEvent) => {
       event.preventDefault();
-      const libraryUrlTokens = parseLibraryTokensFromUrl();
-      if (!libraryUrlTokens) {
-        excalidrawAPI.updateScene({ appState: { isLoading: true } });
-
-        initializeScene({ excalidrawAPI }).then((data) => {
-          loadImages(data);
-          if (data.scene) {
-            excalidrawAPI.updateScene({
-              ...data.scene,
-              ...restore(data.scene, null, null, { repairBindings: true }),
-              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-            });
-          }
-        });
-      }
     };
 
     const titleTimeout = setTimeout(
@@ -339,13 +308,6 @@ const ExcalidrawWrapper = () => {
           excalidrawAPI.updateScene({
             ...localDataState,
             captureUpdate: CaptureUpdateAction.NEVER,
-          });
-          LibraryIndexedDBAdapter.load().then((data) => {
-            if (data) {
-              excalidrawAPI.updateLibrary({
-                libraryItems: data.libraryItems,
-              });
-            }
           });
         }
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_FILES)) {

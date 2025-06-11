@@ -49,7 +49,6 @@ import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
 import type App from "./components/App";
-import type Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
@@ -435,39 +434,7 @@ export declare class GestureEvent extends UIEvent {
   readonly scale: number;
 }
 
-// libraries
-// -----------------------------------------------------------------------------
-/** @deprecated legacy: do not use outside of migration paths */
-export type LibraryItem_v1 = readonly NonDeleted<ExcalidrawElement>[];
-/** @deprecated legacy: do not use outside of migration paths */
-type LibraryItems_v1 = readonly LibraryItem_v1[];
-
-/** v2 library item */
-export type LibraryItem = {
-  id: string;
-  status: "published" | "unpublished";
-  elements: readonly NonDeleted<ExcalidrawElement>[];
-  /** timestamp in epoch (ms) */
-  created: number;
-  name?: string;
-  error?: string;
-};
-export type LibraryItems = readonly LibraryItem[];
-export type LibraryItems_anyVersion = LibraryItems | LibraryItems_v1;
-
-export type LibraryItemsSource =
-  | ((
-      currentLibraryItems: LibraryItems,
-    ) => MaybePromise<LibraryItems_anyVersion | Blob>)
-  | MaybePromise<LibraryItems_anyVersion | Blob>;
-// -----------------------------------------------------------------------------
-
-export type ExcalidrawInitialDataState = Merge<
-  ImportedDataState,
-  {
-    libraryItems?: MaybePromise<Required<ImportedDataState>["libraryItems"]>;
-  }
->;
+export type ExcalidrawInitialDataState = ImportedDataState;
 
 export type OnUserFollowedPayload = {
   userToFollow: UserToFollow;
@@ -519,7 +486,6 @@ export interface ExcalidrawProps {
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
   objectsSnapModeEnabled?: boolean;
-  libraryReturnUrl?: string;
   theme?: Theme;
   // @TODO come with better API before v0.18.0
   name?: string;
@@ -530,7 +496,6 @@ export interface ExcalidrawProps {
   UIOptions?: Partial<UIOptions>;
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
-  onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
   generateLinkForSelection?: (id: string, type: "element" | "group") => string;
@@ -624,7 +589,6 @@ export type AppClassProperties = {
   /** static canvas */
   canvas: HTMLCanvasElement;
   focusContainer(): void;
-  library: Library;
   imageCache: Map<
     FileId,
     {
@@ -732,7 +696,6 @@ export type UnsubscribeCallback = () => void;
 export interface ExcalidrawImperativeAPI {
   updateScene: InstanceType<typeof App>["updateScene"];
   mutateElement: InstanceType<typeof App>["mutateElement"];
-  updateLibrary: InstanceType<typeof Library>["updateLibrary"];
   resetScene: InstanceType<typeof App>["resetScene"];
   getSceneElementsIncludingDeleted: InstanceType<
     typeof App

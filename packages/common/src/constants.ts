@@ -252,7 +252,6 @@ export const EXPORT_IMAGE_TYPES = {
 export const EXPORT_DATA_TYPES = {
   excalidraw: "excalidraw",
   excalidrawClipboard: "excalidraw/clipboard",
-  excalidrawLibrary: "excalidrawlib",
   excalidrawClipboardWithAPI: "excalidraw-api/clipboard",
 } as const;
 
@@ -279,13 +278,6 @@ export const ACTIVE_THRESHOLD = 3_000;
 // duplicates --theme-filter, should be removed soon
 export const THEME_FILTER = "invert(93%) hue-rotate(180deg)";
 
-export const URL_QUERY_KEYS = {
-  addLibrary: "addLibrary",
-} as const;
-
-export const URL_HASH_KEYS = {
-  addLibrary: "addLibrary",
-} as const;
 
 export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
   canvasActions: {
@@ -330,7 +322,6 @@ export const ENCRYPTION_KEY_BITS = 128;
 
 export const VERSIONS = {
   excalidraw: 2,
-  excalidrawLibrary: 2,
 } as const;
 
 export const BOUND_TEXT_PADDING = 5;
@@ -440,7 +431,6 @@ export const TOOL_TYPE = {
 } as const;
 
 export const EDITOR_LS_KEYS = {
-  PUBLISH_LIBRARY: "publish-library-data",
 } as const;
 
 /**

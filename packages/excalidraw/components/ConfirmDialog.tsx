@@ -5,7 +5,6 @@ import { t } from "../i18n";
 
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
-import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
 
 import "./ConfirmDialog.scss";
@@ -29,7 +28,6 @@ const ConfirmDialog = (props: Props) => {
     ...rest
   } = props;
   const setAppState = useExcalidrawSetAppState();
-  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
   const { container } = useExcalidrawContainer();
 
   return (
@@ -45,7 +43,6 @@ const ConfirmDialog = (props: Props) => {
           label={cancelText}
           onClick={() => {
             setAppState({ openMenu: null });
-            setIsLibraryMenuOpen(false);
             // flush any pending updates synchronously,
             // otherwise it could lead to crash in some chromium versions (131.0.6778.86),
             // when `.focus` is invoked with container in some intermediate state
@@ -61,7 +58,6 @@ const ConfirmDialog = (props: Props) => {
           label={confirmText}
           onClick={() => {
             setAppState({ openMenu: null });
-            setIsLibraryMenuOpen(false);
             // flush any pending updates synchronously,
             // otherwise it leads to crash in some chromium versions (131.0.6778.86),
             // when `.focus` is invoked with container in some intermediate state

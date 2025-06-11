@@ -20,13 +20,12 @@ import { decodeSvgBase64Payload } from "../scene/export";
 
 import { base64ToString, stringToBase64, toByteString } from "./encode";
 import { nativeFileSystemSupported } from "./filesystem";
-import { isValidExcalidrawData, isValidLibrary } from "./json";
-import { restore, restoreLibraryItems } from "./restore";
+import { isValidExcalidrawData } from "./json";
+import { restore } from "./restore";
 
-import type { AppState, DataURL, LibraryItem } from "../types";
+import type { AppState, DataURL } from "../types";
 
 import type { FileSystemHandle } from "./filesystem";
-import type { ImportedLibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File): Promise<string> => {
   let contents: string;
@@ -173,12 +172,7 @@ export const loadSceneOrLibraryFromBlob = async (
           { repairBindings: true, refreshDimensions: false },
         ),
       };
-    } else if (isValidLibrary(data)) {
-      return {
-        type: MIME_TYPES.excalidrawlib,
-        data,
-      };
-    }
+    } 
     throw new Error("Error: invalid file");
   } catch (error: any) {
     if (error instanceof ImageSceneDataError) {
@@ -208,24 +202,6 @@ export const loadFromBlob = async (
   return ret.data;
 };
 
-export const parseLibraryJSON = (
-  json: string,
-  defaultStatus: LibraryItem["status"] = "unpublished",
-) => {
-  const data: ImportedLibraryData | undefined = JSON.parse(json);
-  if (!isValidLibrary(data)) {
-    throw new Error("Invalid library");
-  }
-  const libraryItems = data.libraryItems || data.library;
-  return restoreLibraryItems(libraryItems, defaultStatus);
-};
-
-export const loadLibraryFromBlob = async (
-  blob: Blob,
-  defaultStatus: LibraryItem["status"] = "unpublished",
-) => {
-  return parseLibraryJSON(await parseFileContents(blob), defaultStatus);
-};
 
 export const canvasToBlob = async (
   canvas: HTMLCanvasElement | Promise<HTMLCanvasElement>,

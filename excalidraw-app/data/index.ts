@@ -100,8 +100,7 @@ export const loadScene = async (
   // Non-optional so we don't forget to pass it even if `undefined`.
   localDataState: ImportedDataState | undefined | null,
 ) => {
-  let data;
-  data = restore(localDataState || null, null, null, {
+  const data = restore(localDataState || null, null, null, {
     repairBindings: true,
   });
 

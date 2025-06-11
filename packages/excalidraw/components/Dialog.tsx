@@ -13,7 +13,6 @@ import {
   useExcalidrawSetAppState,
 } from "./App";
 import { Island } from "./Island";
-import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { Modal } from "./Modal";
 import { CloseIcon } from "./icons";
 
@@ -94,11 +93,8 @@ export const Dialog = (props: DialogProps) => {
   }, [islandNode, props.autofocus]);
 
   const setAppState = useExcalidrawSetAppState();
-  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
-
   const onClose = () => {
     setAppState({ openMenu: null });
-    setIsLibraryMenuOpen(false);
     (lastActiveElement as HTMLElement).focus();
     props.onCloseRequest();
   };
