@@ -59,7 +59,6 @@ import {
   extraToolsIcon,
   frameToolIcon,
   laserPointerToolIcon,
-  LassoIcon,
 } from "./icons";
 
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
@@ -291,7 +290,6 @@ export const ShapesSwitcher = ({
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
-  const lassoToolSelected = activeTool.type === "lasso";
 
   return (
     <>
@@ -329,13 +327,6 @@ export const ShapesSwitcher = ({
                 app.togglePenMode(true);
               }
 
-              if (value === "selection") {
-                if (appState.activeTool.type === "selection") {
-                  app.setActiveTool({ type: "lasso" });
-                } else {
-                  app.setActiveTool({ type: "selection" });
-                }
-              }
             }}
             onChange={({ pointerType }) => {
               if (appState.activeTool.type !== value) {
@@ -360,7 +351,6 @@ export const ShapesSwitcher = ({
           className={clsx("App-toolbar__extra-tools-trigger", {
             "App-toolbar__extra-tools-trigger--selected":
               frameToolSelected ||
-              lassoToolSelected ||
               // in collab we're already highlighting the laser button
               // outside toolbar, so let's not highlight extra-tools button
               // on top of it
@@ -373,8 +363,6 @@ export const ShapesSwitcher = ({
             ? frameToolIcon
             : laserToolSelected
             ? laserPointerToolIcon
-            : lassoToolSelected
-            ? LassoIcon
             : extraToolsIcon}
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
@@ -390,14 +378,6 @@ export const ShapesSwitcher = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "lasso" })}
-            icon={LassoIcon}
-            data-testid="toolbar-lasso"
-            selected={lassoToolSelected}
-          >
-            {t("toolBar.lasso")}
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu>

@@ -96,7 +96,6 @@ export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
 export type ToolType =
   | "selection"
-  | "lasso"
   | "rectangle"
   | "diamond"
   | "ellipse"
