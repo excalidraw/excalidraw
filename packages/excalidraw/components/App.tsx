@@ -6170,7 +6170,10 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         );
-      } else if (!event[KEYS.CTRL_OR_CMD]) {
+      } else if (
+        // if using cmd/ctrl, we're not dragging
+        !event[KEYS.CTRL_OR_CMD]
+      ) {
         if (
           (hitElement ||
             this.isHittingCommonBoundingBoxOfSelectedElements(
