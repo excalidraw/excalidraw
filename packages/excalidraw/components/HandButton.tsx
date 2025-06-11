@@ -32,3 +32,4 @@ export const HandButton = (props: LockIconProps) => {
     />
   );
 };
+
