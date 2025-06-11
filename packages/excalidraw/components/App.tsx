@@ -6161,58 +6161,15 @@ class App extends React.Component<AppProps, AppState> {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       } else if (isOverScrollBar) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
-      } else if (this.state.selectedLinearElement) {
+      } else if (
+        this.state.selectedLinearElement &&
+        hitElement?.id === this.state.selectedLinearElement.elementId
+      ) {
         this.handleHoverSelectedLinearElement(
           this.state.selectedLinearElement,
           scenePointerX,
           scenePointerY,
         );
-
-        const selectedElement = LinearElementEditor.getElement(
-          this.state.selectedLinearElement.elementId,
-          this.scene.getNonDeletedElementsMap(),
-        ) as ExcalidrawElement;
-        if (
-          this.state.selectedLinearElement.hoverPointIndex === -1 &&
-          selectedElement &&
-          !this.hitElement(scenePointerX, scenePointerY, selectedElement)
-        ) {
-          if (
-            (hitElement ||
-              this.isHittingCommonBoundingBoxOfSelectedElements(
-                scenePointer,
-                selectedElements,
-              )) &&
-            !hitElement?.locked
-          ) {
-            if (
-              hitElement &&
-              isIframeLikeElement(hitElement) &&
-              this.isIframeLikeElementCenter(
-                hitElement,
-                event,
-                scenePointerX,
-                scenePointerY,
-              )
-            ) {
-              setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-              this.setState({
-                activeEmbeddable: { element: hitElement, state: "hover" },
-              });
-            } else if (
-              !hitElement ||
-              !isElbowArrow(hitElement) ||
-              !(hitElement.startBinding || hitElement.endBinding)
-            ) {
-              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
-              if (this.state.activeEmbeddable?.state === "hover") {
-                this.setState({ activeEmbeddable: null });
-              }
-            }
-          } else {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
-          }
-        }
       } else if (!event[KEYS.CTRL_OR_CMD]) {
         if (
           (hitElement ||
