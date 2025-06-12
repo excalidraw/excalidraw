@@ -61,7 +61,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import { aabbForElement } from "./shapes";
+import { aabbForElement } from "./bounds";
 import { updateElbowArrowPoints } from "./elbowArrow";
 
 import type { Scene } from "./Scene";

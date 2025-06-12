@@ -8,7 +8,7 @@ import type { Radians } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { ShapeCache } from "./ShapeCache";
+import { ShapeCache } from "./shape";
 
 import { updateElbowArrowPoints } from "./elbowArrow";
 
