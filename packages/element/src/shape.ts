@@ -3,7 +3,6 @@ import { simplify } from "points-on-curve";
 import {
   type GeometricShape,
   getClosedCurveShape,
-  getCurvePathOps,
   getCurveShape,
   getEllipseShape,
   getFreedrawShape,
@@ -15,9 +14,6 @@ import {
   pointDistance,
   type LocalPoint,
   pointRotateRads,
-  isPoint,
-  pointFromPair,
-  pointsEqual,
 } from "@excalidraw/math";
 import {
   ROUGHNESS,
@@ -25,7 +21,6 @@ import {
   assertNever,
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
-  invariant,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -63,7 +58,6 @@ import {
   getCenterForBounds,
   getDiamondPoints,
   getElementAbsoluteCoords,
-  getElementBounds,
 } from "./bounds";
 import { shouldTestInside } from "./collision";
 
@@ -76,7 +70,6 @@ import type {
   ExcalidrawFreeDrawElement,
   ElementsMap,
   ExcalidrawLineElement,
-  NonDeleted,
 } from "./types";
 
 import type { Drawable, Options } from "roughjs/bin/core";
@@ -139,7 +132,7 @@ export class ShapeCache {
 
     elementWithCanvasCache.delete(element);
 
-    const shape = _generateElementShape(
+    const shape = generateElementShape(
       element,
       ShapeCache.rg,
       renderConfig || {
@@ -428,7 +421,6 @@ const getArrowheadShapes = (
 
 export const generateLinearCollisionShape = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
-  elementsMap: ElementsMap,
 ) => {
   const generator = new RoughGenerator();
   const options: Options = {
@@ -439,7 +431,18 @@ export const generateLinearCollisionShape = (
     preserveVertices: true,
   };
   const center = getCenterForBounds(
-    getElementBounds(element, elementsMap, true),
+    // Need a non-rotated center point
+    element.points.reduce(
+      (acc, point) => {
+        return [
+          Math.min(element.x + point[0], acc[0]),
+          Math.min(element.y + point[1], acc[1]),
+          Math.max(element.x + point[0], acc[2]),
+          Math.max(element.y + point[1], acc[3]),
+        ];
+      },
+      [Infinity, Infinity, -Infinity, -Infinity],
+    ),
   );
 
   switch (element.type) {
@@ -599,7 +602,7 @@ export const generateLinearCollisionShape = (
  *
  * @private
  */
-export const _generateElementShape = (
+const generateElementShape = (
   element: Exclude<NonDeletedExcalidrawElement, ExcalidrawSelectionElement>,
   generator: RoughGenerator,
   {
@@ -957,50 +960,6 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   }
 };
 
-export const getControlPointsForBezierCurve = <
-  P extends GlobalPoint | LocalPoint,
->(
-  element: NonDeleted<ExcalidrawLinearElement>,
-  endPoint: P,
-) => {
-  const shape = ShapeCache.generateElementShape(element, null);
-  if (!shape) {
-    return null;
-  }
-
-  const ops = getCurvePathOps(shape[0]);
-  let currentP = pointFrom<P>(0, 0);
-  let index = 0;
-  let minDistance = Infinity;
-  let controlPoints: P[] | null = null;
-
-  while (index < ops.length) {
-    const { op, data } = ops[index];
-    if (op === "move") {
-      invariant(
-        isPoint(data),
-        "The returned ops is not compatible with a point",
-      );
-      currentP = pointFromPair(data);
-    }
-    if (op === "bcurveTo") {
-      const p0 = currentP;
-      const p1 = pointFrom<P>(data[0], data[1]);
-      const p2 = pointFrom<P>(data[2], data[3]);
-      const p3 = pointFrom<P>(data[4], data[5]);
-      const distance = pointDistance(p3, endPoint);
-      if (distance < minDistance) {
-        minDistance = distance;
-        controlPoints = [p0, p1, p2, p3];
-      }
-      currentP = p3;
-    }
-    index++;
-  }
-
-  return controlPoints;
-};
-
 export const toggleLinePolygonState = (
   element: ExcalidrawLineElement,
   nextPolygonState: boolean,
@@ -1043,116 +1002,4 @@ export const toggleLinePolygonState = (
   };
 
   return ret;
-};
-
-export const getBezierXY = <P extends GlobalPoint | LocalPoint>(
-  p0: P,
-  p1: P,
-  p2: P,
-  p3: P,
-  t: number,
-): P => {
-  const equation = (t: number, idx: number) =>
-    Math.pow(1 - t, 3) * p3[idx] +
-    3 * t * Math.pow(1 - t, 2) * p2[idx] +
-    3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
-    p0[idx] * Math.pow(t, 3);
-  const tx = equation(t, 0);
-  const ty = equation(t, 1);
-  return pointFrom(tx, ty);
-};
-
-const getPointsInBezierCurve = <P extends GlobalPoint | LocalPoint>(
-  element: NonDeleted<ExcalidrawLinearElement>,
-  endPoint: P,
-) => {
-  const controlPoints: P[] = getControlPointsForBezierCurve(element, endPoint)!;
-  if (!controlPoints) {
-    return [];
-  }
-  const pointsOnCurve: P[] = [];
-  let t = 1;
-  // Take 20 points on curve for better accuracy
-  while (t > 0) {
-    const p = getBezierXY(
-      controlPoints[0],
-      controlPoints[1],
-      controlPoints[2],
-      controlPoints[3],
-      t,
-    );
-    pointsOnCurve.push(pointFrom(p[0], p[1]));
-    t -= 0.05;
-  }
-  if (pointsOnCurve.length) {
-    if (pointsEqual(pointsOnCurve.at(-1)!, endPoint)) {
-      pointsOnCurve.push(pointFrom(endPoint[0], endPoint[1]));
-    }
-  }
-  return pointsOnCurve;
-};
-
-const getBezierCurveArcLengths = <P extends GlobalPoint | LocalPoint>(
-  element: NonDeleted<ExcalidrawLinearElement>,
-  endPoint: P,
-) => {
-  const arcLengths: number[] = [];
-  arcLengths[0] = 0;
-  const points = getPointsInBezierCurve(element, endPoint);
-  let index = 0;
-  let distance = 0;
-  while (index < points.length - 1) {
-    const segmentDistance = pointDistance(points[index], points[index + 1]);
-    distance += segmentDistance;
-    arcLengths.push(distance);
-    index++;
-  }
-
-  return arcLengths;
-};
-
-export const getBezierCurveLength = <P extends GlobalPoint | LocalPoint>(
-  element: NonDeleted<ExcalidrawLinearElement>,
-  endPoint: P,
-) => {
-  const arcLengths = getBezierCurveArcLengths(element, endPoint);
-  return arcLengths.at(-1) as number;
-};
-
-// This maps interval to actual interval t on the curve so that when t = 0.5, its actually the point at 50% of the length
-export const mapIntervalToBezierT = <P extends GlobalPoint | LocalPoint>(
-  element: NonDeleted<ExcalidrawLinearElement>,
-  endPoint: P,
-  interval: number, // The interval between 0 to 1 for which you want to find the point on the curve,
-) => {
-  const arcLengths = getBezierCurveArcLengths(element, endPoint);
-  const pointsCount = arcLengths.length - 1;
-  const curveLength = arcLengths.at(-1) as number;
-  const targetLength = interval * curveLength;
-  let low = 0;
-  let high = pointsCount;
-  let index = 0;
-  // Doing a binary search to find the largest length that is less than the target length
-  while (low < high) {
-    index = Math.floor(low + (high - low) / 2);
-    if (arcLengths[index] < targetLength) {
-      low = index + 1;
-    } else {
-      high = index;
-    }
-  }
-  if (arcLengths[index] > targetLength) {
-    index--;
-  }
-  if (arcLengths[index] === targetLength) {
-    return index / pointsCount;
-  }
-
-  return (
-    1 -
-    (index +
-      (targetLength - arcLengths[index]) /
-        (arcLengths[index + 1] - arcLengths[index])) /
-      pointsCount
-  );
 };

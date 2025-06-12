@@ -26,7 +26,6 @@ import { getDiamondPoints } from "./bounds";
 import { generateLinearCollisionShape } from "./shape";
 
 import type {
-  ElementsMap,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
@@ -93,7 +92,6 @@ const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
 
 export function deconstructLinearOrFreeDrawElement(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
-  elementsMap: ElementsMap,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
   const cachedShape = getElementShapesCacheEntry(element, 0);
 
@@ -101,7 +99,7 @@ export function deconstructLinearOrFreeDrawElement(
     return cachedShape;
   }
 
-  const ops = generateLinearCollisionShape(element, elementsMap) as {
+  const ops = generateLinearCollisionShape(element) as {
     op: string;
     data: number[];
   }[];

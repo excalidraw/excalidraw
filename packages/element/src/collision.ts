@@ -250,25 +250,16 @@ export const intersectElementWithLineSegment = (
     case "line":
     case "freedraw":
     case "arrow":
-      return intersectLinearOrFreeDrawWithLineSegment(
-        element,
-        elementsMap,
-        line,
-        onlyFirst,
-      );
+      return intersectLinearOrFreeDrawWithLineSegment(element, line, onlyFirst);
   }
 };
 
 const intersectLinearOrFreeDrawWithLineSegment = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
-  elementsMap: ElementsMap,
   segment: LineSegment<GlobalPoint>,
   onlyFirst = false,
 ): GlobalPoint[] => {
-  const [lines, curves] = deconstructLinearOrFreeDrawElement(
-    element,
-    elementsMap,
-  );
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
   const intersections = [];
 
   for (const l of lines) {
