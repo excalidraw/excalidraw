@@ -2,6 +2,7 @@ import rough from "roughjs/bin/rough";
 
 import {
   arrayToMap,
+  elementCenterPoint,
   invariant,
   rescalePoints,
   sizeOf,
@@ -33,8 +34,8 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { generateRoughOptions } from "./Shape";
-import { ShapeCache } from "./ShapeCache";
+import { generateRoughOptions } from "./shape";
+import { ShapeCache } from "./shape";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
@@ -45,7 +46,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import { getElementShape } from "./shapes";
+import { getElementShape } from "./shape";
 
 import {
   deconstructDiamondElement,
@@ -1178,3 +1179,68 @@ export const doBoundsIntersect = (
 
   return minX1 < maxX2 && maxX1 > minX2 && minY1 < maxY2 && maxY1 > minY2;
 };
+
+/**
+ * Get the axis-aligned bounding box for a given element
+ */
+export const aabbForElement = (
+  element: Readonly<ExcalidrawElement>,
+  elementsMap: ElementsMap,
+  offset?: [number, number, number, number],
+) => {
+  const bbox = {
+    minX: element.x,
+    minY: element.y,
+    maxX: element.x + element.width,
+    maxY: element.y + element.height,
+    midX: element.x + element.width / 2,
+    midY: element.y + element.height / 2,
+  };
+
+  const center = elementCenterPoint(element, elementsMap);
+  const [topLeftX, topLeftY] = pointRotateRads(
+    pointFrom(bbox.minX, bbox.minY),
+    center,
+    element.angle,
+  );
+  const [topRightX, topRightY] = pointRotateRads(
+    pointFrom(bbox.maxX, bbox.minY),
+    center,
+    element.angle,
+  );
+  const [bottomRightX, bottomRightY] = pointRotateRads(
+    pointFrom(bbox.maxX, bbox.maxY),
+    center,
+    element.angle,
+  );
+  const [bottomLeftX, bottomLeftY] = pointRotateRads(
+    pointFrom(bbox.minX, bbox.maxY),
+    center,
+    element.angle,
+  );
+
+  const bounds = [
+    Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX),
+    Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY),
+    Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX),
+    Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY),
+  ] as Bounds;
+
+  if (offset) {
+    const [topOffset, rightOffset, downOffset, leftOffset] = offset;
+    return [
+      bounds[0] - leftOffset,
+      bounds[1] - topOffset,
+      bounds[2] + rightOffset,
+      bounds[3] + downOffset,
+    ] as Bounds;
+  }
+
+  return bounds;
+};
+
+export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  bounds: Bounds,
+): boolean =>
+  p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];

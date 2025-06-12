@@ -2,6 +2,7 @@ import { doBoundsIntersect, type Bounds } from "@excalidraw/element";
 
 import { isPoint, pointDistance, pointFrom, pointFromVector } from "./point";
 import { vector, vectorNormal, vectorNormalize, vectorScale } from "./vector";
+import { LegendreGaussN24CValues, LegendreGaussN24TValues } from "./constants";
 
 import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
 
@@ -405,4 +406,124 @@ export function offsetPointsForQuadraticBezier(
   }
 
   return offsetPoints;
+}
+
+/**
+ * Implementation based on Legendre-Gauss quadrature for more accurate arc
+ * length calculation.
+ *
+ * Reference: https://pomax.github.io/bezierinfo/#arclength
+ *
+ * @param c The curve to calculate the length of
+ * @returns The approximated length of the curve
+ */
+export function curveLength<P extends GlobalPoint | LocalPoint>(
+  c: Curve<P>,
+): number {
+  const z2 = 0.5;
+  let sum = 0;
+
+  for (let i = 0; i < 24; i++) {
+    const t = z2 * LegendreGaussN24TValues[i] + z2;
+    const derivativeVector = curveTangent(c, t);
+    const magnitude = Math.sqrt(
+      derivativeVector[0] * derivativeVector[0] +
+        derivativeVector[1] * derivativeVector[1],
+    );
+    sum += LegendreGaussN24CValues[i] * magnitude;
+  }
+
+  return z2 * sum;
+}
+
+/**
+ * Calculates the curve length from t=0 to t=parameter using the same
+ * Legendre-Gauss quadrature method used in curveLength
+ *
+ * @param c The curve to calculate the partial length for
+ * @param t The parameter value (0 to 1) to calculate length up to
+ * @returns The length of the curve from beginning to parameter t
+ */
+export function curveLengthAtParameter<P extends GlobalPoint | LocalPoint>(
+  c: Curve<P>,
+  t: number,
+): number {
+  if (t <= 0) {
+    return 0;
+  }
+  if (t >= 1) {
+    return curveLength(c);
+  }
+
+  // Scale and shift the integration interval from [0,t] to [-1,1]
+  // which is what the Legendre-Gauss quadrature expects
+  const z1 = t / 2;
+  const z2 = t / 2;
+
+  let sum = 0;
+
+  for (let i = 0; i < 24; i++) {
+    const parameter = z1 * LegendreGaussN24TValues[i] + z2;
+    const derivativeVector = curveTangent(c, parameter);
+    const magnitude = Math.sqrt(
+      derivativeVector[0] * derivativeVector[0] +
+        derivativeVector[1] * derivativeVector[1],
+    );
+    sum += LegendreGaussN24CValues[i] * magnitude;
+  }
+
+  return z1 * sum; // Scale the result back to the original interval
+}
+
+/**
+ * Calculates the point at a specific percentage of a curve's total length
+ * using binary search for improved efficiency and accuracy.
+ *
+ * @param c The curve to calculate point on
+ * @param percent A value between 0 and 1 representing the percentage of the curve's length
+ * @returns The point at the specified percentage of curve length
+ */
+export function curvePointAtLength<P extends GlobalPoint | LocalPoint>(
+  c: Curve<P>,
+  percent: number,
+): P {
+  if (percent <= 0) {
+    return bezierEquation(c, 0);
+  }
+
+  if (percent >= 1) {
+    return bezierEquation(c, 1);
+  }
+
+  const totalLength = curveLength(c);
+  const targetLength = totalLength * percent;
+
+  // Binary search to find parameter t where length at t equals target length
+  let tMin = 0;
+  let tMax = 1;
+  let t = percent; // Start with a reasonable guess (t = percent)
+  let currentLength = 0;
+
+  // Tolerance for length comparison and iteration limit to avoid infinite loops
+  const tolerance = totalLength * 0.0001;
+  const maxIterations = 20;
+
+  for (let iteration = 0; iteration < maxIterations; iteration++) {
+    currentLength = curveLengthAtParameter(c, t);
+    const error = Math.abs(currentLength - targetLength);
+
+    if (error < tolerance) {
+      break;
+    }
+
+    if (currentLength < targetLength) {
+      tMin = t;
+    } else {
+      tMax = t;
+    }
+
+    t = (tMin + tMax) / 2;
+  }
+
+  return bezierEquation(c, t);
 }

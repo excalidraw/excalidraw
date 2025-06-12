@@ -1791,7 +1791,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 120,
-  "x": 187.7545,
+  "x": 187.75450000000004,
   "y": 44.5,
 }
 `;
