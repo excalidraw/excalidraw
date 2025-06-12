@@ -205,10 +205,15 @@ const renderBindingHighlightForBindableElement = (
     case "embeddable":
     case "frame":
     case "magicframe":
-      drawHighlightForRectWithRotation(context, element, padding);
+      drawHighlightForRectWithRotation(context, element, elementsMap, padding);
       break;
     case "diamond":
-      drawHighlightForDiamondWithRotation(context, padding, element);
+      drawHighlightForDiamondWithRotation(
+        context,
+        padding,
+        element,
+        elementsMap,
+      );
       break;
     case "ellipse": {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
