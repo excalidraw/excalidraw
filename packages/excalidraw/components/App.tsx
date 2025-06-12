@@ -9911,7 +9911,7 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * inserts image into elements array and rerenders
    */
-  insertImageElement = async (
+  private insertImageElement = async (
     imageElement: ExcalidrawImageElement,
     imageFile: File,
   ) => {
@@ -9945,7 +9945,7 @@ class App extends React.Component<AppProps, AppState> {
         elements: nextElements,
         appState: {
           selectedElementIds: makeNextSelectedElementIds(
-            { [imageElement.id]: true },
+            { [initializedImageElement.id]: true },
             this.state,
           ),
         },
