@@ -269,7 +269,7 @@
     "group": "Group",
     "frame": "Frame",
     "selection": "Selection"
-    },
+  },
   "headings": {
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
@@ -378,8 +378,7 @@
       "scale": "Scale",
       "padding": "Padding"
     },
-    "tooltip": {
-    },
+    "tooltip": {},
     "title": {
       "exportToPng": "Export to PNG",
       "exportToSvg": "Export to SVG",
@@ -477,7 +476,6 @@
         "button": "Load from file",
         "description": "Loading from a file will <bold>replace your existing content</bold>.<br></br>You can back up your drawing first using one of the options below."
       }
-    
     }
   },
   "quickSearch": {

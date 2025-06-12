@@ -85,8 +85,6 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           "--color-selection",
         )) ||
       "#6965db";
-
-  
   });
 
   return (

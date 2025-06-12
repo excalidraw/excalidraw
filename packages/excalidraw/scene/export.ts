@@ -354,8 +354,6 @@ export const exportToSvg = async (
   svgRoot.appendChild(metadataElement);
   svgRoot.appendChild(defsElement);
 
-
-
   // ---------------------------------------------------------------------------
   // frame clip paths
   // ---------------------------------------------------------------------------
@@ -436,7 +434,6 @@ export const exportToSvg = async (
   // ---------------------------------------------------------------------------
 
   const rsvg = rough.svg(svgRoot);
-
 
   renderSceneToSvg(
     elementsForRender,

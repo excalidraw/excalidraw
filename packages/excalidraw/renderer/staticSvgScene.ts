@@ -171,7 +171,7 @@ const renderElementToSvg = (
       addToRoot(g || node, element);
       break;
     }
-  
+
     case "line":
     case "arrow": {
       const boundText = getBoundTextElement(element, elementsMap);
@@ -312,7 +312,6 @@ const renderElementToSvg = (
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
-
         let symbolId = `image-${fileData.id}`;
 
         let uncroppedWidth = element.width;
@@ -326,7 +325,6 @@ const renderElementToSvg = (
           )}`;
         }
 
-
         let symbol = svgRoot.querySelector(`#${symbolId}`);
         if (!symbol) {
           symbol = svgRoot.ownerDocument!.createElementNS(SVG_NS, "symbol");
@@ -336,7 +334,7 @@ const renderElementToSvg = (
           image.setAttribute("href", fileData.dataURL);
           image.setAttribute("preserveAspectRatio", "none");
 
-          if (element.crop ) {
+          if (element.crop) {
             image.setAttribute("width", `${uncroppedWidth}`);
             image.setAttribute("height", `${uncroppedHeight}`);
           } else {
@@ -545,66 +543,64 @@ export const renderSceneToSvg = (
   }
 
   // render elements
-  elements
-    .forEach((element) => {
-      if (!element.isDeleted) {
-        if (
-          isTextElement(element) &&
-          element.containerId &&
-          elementsMap.has(element.containerId)
-        ) {
-          // will be rendered with the container
-          return;
-        }
+  elements.forEach((element) => {
+    if (!element.isDeleted) {
+      if (
+        isTextElement(element) &&
+        element.containerId &&
+        elementsMap.has(element.containerId)
+      ) {
+        // will be rendered with the container
+        return;
+      }
 
-        try {
+      try {
+        renderElementToSvg(
+          element,
+          elementsMap,
+          rsvg,
+          svgRoot,
+          files,
+          element.x + renderConfig.offsetX,
+          element.y + renderConfig.offsetY,
+          renderConfig,
+        );
+
+        const boundTextElement = getBoundTextElement(element, elementsMap);
+        if (boundTextElement) {
           renderElementToSvg(
-            element,
+            boundTextElement,
             elementsMap,
             rsvg,
             svgRoot,
             files,
-            element.x + renderConfig.offsetX,
-            element.y + renderConfig.offsetY,
+            boundTextElement.x + renderConfig.offsetX,
+            boundTextElement.y + renderConfig.offsetY,
             renderConfig,
           );
-
-          const boundTextElement = getBoundTextElement(element, elementsMap);
-          if (boundTextElement) {
-            renderElementToSvg(
-              boundTextElement,
-              elementsMap,
-              rsvg,
-              svgRoot,
-              files,
-              boundTextElement.x + renderConfig.offsetX,
-              boundTextElement.y + renderConfig.offsetY,
-              renderConfig,
-            );
-          }
-        } catch (error: any) {
-          console.error(error);
         }
+      } catch (error: any) {
+        console.error(error);
       }
-    });
+    }
+  });
 
-  elements
-    .forEach((element) => {
-      if (!element.isDeleted) {
-        try {
-          renderElementToSvg(
-            element,
-            elementsMap,
-            rsvg,
-            svgRoot,
-            files,
-            element.x + renderConfig.offsetX,
-            element.y + renderConfig.offsetY,
-            renderConfig,
-          );
-        } catch (error: any) {
-          console.error(error);
-        }
+  elements.forEach((element) => {
+    if (!element.isDeleted) {
+      try {
+        renderElementToSvg(
+          element,
+          elementsMap,
+          rsvg,
+          svgRoot,
+          files,
+          element.x + renderConfig.offsetX,
+          element.y + renderConfig.offsetY,
+          renderConfig,
+        );
+      } catch (error: any) {
+        console.error(error);
       }
-    });
+    }
+  });
 };

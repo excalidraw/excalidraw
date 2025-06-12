@@ -212,11 +212,7 @@ export { getTextFromElements } from "@excalidraw/element";
 export { isInvisiblySmallElement } from "@excalidraw/element";
 
 export { defaultLang, useI18n, languages } from "./i18n";
-export {
-  restore,
-  restoreAppState,
-  restoreElements,
-} from "./data/restore";
+export { restore, restoreAppState, restoreElements } from "./data/restore";
 
 export { reconcileElements } from "./data/reconcile";
 
@@ -228,10 +224,7 @@ export {
 } from "@excalidraw/utils/export";
 
 export { serializeAsJSON } from "./data/json";
-export {
-  loadFromBlob,
-  loadSceneOrLibraryFromBlob,
-} from "./data/blob";
+export { loadFromBlob, loadSceneOrLibraryFromBlob } from "./data/blob";
 export { getFreeDrawSvgPath } from "@excalidraw/element";
 export { isLinearElement } from "@excalidraw/element";
 
@@ -251,7 +244,6 @@ export {
 } from "@excalidraw/element";
 
 export { CaptureUpdateAction } from "@excalidraw/element";
-
 
 export {
   sceneCoordsToViewportCoords,

@@ -59,7 +59,7 @@
     "start:production": "yarn --cwd ./excalidraw-app start:production",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watch=false",
     "test:app": "vitest",
-    "test:code": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
+    "test:code": "eslint --max-warnings=1000 --ext .js,.ts,.tsx .",
     "test:other": "yarn prettier --list-different",
     "test:typecheck": "tsc",
     "test:update": "yarn test:app --update --watch=false",

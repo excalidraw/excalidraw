@@ -143,7 +143,7 @@ export const exportCanvas = async (
         {
           description: "Export to SVG",
           name,
-          extension:  "svg",
+          extension: "svg",
           mimeTypes: [IMAGE_MIME_TYPES.svg],
           fileHandle,
         },
@@ -167,8 +167,7 @@ export const exportCanvas = async (
   });
 
   if (type === "png") {
-    let blob = canvasToBlob(tempCanvas);
-
+    const blob = canvasToBlob(tempCanvas);
 
     return fileSave(blob, {
       description: "Export to PNG",

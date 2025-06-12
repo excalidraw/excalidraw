@@ -116,5 +116,4 @@ describe("exportToSvg", () => {
       expect.objectContaining({ exportPadding: 0 }),
     );
   });
-
 });

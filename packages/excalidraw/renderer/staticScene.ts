@@ -1,9 +1,7 @@
 import { FRAME_STYLE, throttleRAF } from "@excalidraw/common";
 import { isElementLink } from "@excalidraw/element";
 import { getBoundTextElement } from "@excalidraw/element";
-import {
-  isTextElement,
-} from "@excalidraw/element";
+import { isTextElement } from "@excalidraw/element";
 import {
   elementOverlapsWithFrame,
   getTargetFrame,
@@ -277,91 +275,89 @@ const _renderStaticScene = ({
   const inFrameGroupsMap = new Map<string, boolean>();
 
   // Paint visible elements
-  visibleElements
-    .forEach((element) => {
-      try {
-        const frameId = element.frameId || appState.frameToHighlight?.id;
+  visibleElements.forEach((element) => {
+    try {
+      const frameId = element.frameId || appState.frameToHighlight?.id;
 
+      if (
+        isTextElement(element) &&
+        element.containerId &&
+        elementsMap.has(element.containerId)
+      ) {
+        // will be rendered with the container
+        return;
+      }
+
+      context.save();
+
+      if (
+        frameId &&
+        appState.frameRendering.enabled &&
+        appState.frameRendering.clip
+      ) {
+        const frame = getTargetFrame(element, elementsMap, appState);
         if (
-          isTextElement(element) &&
-          element.containerId &&
-          elementsMap.has(element.containerId)
-        ) {
-          // will be rendered with the container
-          return;
-        }
-
-        context.save();
-
-        if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
-        ) {
-          const frame = getTargetFrame(element, elementsMap, appState);
-          if (
-            frame &&
-            shouldApplyFrameClip(
-              element,
-              frame,
-              appState,
-              elementsMap,
-              inFrameGroupsMap,
-            )
-          ) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          renderElement(
+          frame &&
+          shouldApplyFrameClip(
             element,
-            elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
+            frame,
             appState,
-          );
-        } else {
-          renderElement(
-            element,
             elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
-            appState,
-          );
+            inFrameGroupsMap,
+          )
+        ) {
+          frameClip(frame, context, renderConfig, appState);
         }
-
-        const boundTextElement = getBoundTextElement(element, elementsMap);
-        if (boundTextElement) {
-          renderElement(
-            boundTextElement,
-            elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
-            appState,
-          );
-        }
-
-        context.restore();
-
-        if (!isExporting) {
-          renderLinkIcon(element, context, appState, elementsMap);
-        }
-      } catch (error: any) {
-        console.error(
-          error,
-          element.id,
-          element.x,
-          element.y,
-          element.width,
-          element.height,
+        renderElement(
+          element,
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+        );
+      } else {
+        renderElement(
+          element,
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
         );
       }
-    });
 
+      const boundTextElement = getBoundTextElement(element, elementsMap);
+      if (boundTextElement) {
+        renderElement(
+          boundTextElement,
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+        );
+      }
+
+      context.restore();
+
+      if (!isExporting) {
+        renderLinkIcon(element, context, appState, elementsMap);
+      }
+    } catch (error: any) {
+      console.error(
+        error,
+        element.id,
+        element.x,
+        element.y,
+        element.width,
+        element.height,
+      );
+    }
+  });
 
   // render pending nodes for flowcharts
   renderConfig.pendingFlowchartNodes?.forEach((element) => {

@@ -159,8 +159,6 @@ export const newElement = (
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
-
-
 export const newFrameElement = (
   opts: {
     name?: string;
@@ -177,7 +175,6 @@ export const newFrameElement = (
 
   return frameElement;
 };
-
 
 /** computes element x/y offset based on textAlign/verticalAlign */
 const getTextElementPositionOffsets = (

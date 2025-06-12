@@ -172,7 +172,7 @@ export const loadSceneOrLibraryFromBlob = async (
           { repairBindings: true, refreshDimensions: false },
         ),
       };
-    } 
+    }
     throw new Error("Error: invalid file");
   } catch (error: any) {
     if (error instanceof ImageSceneDataError) {
@@ -201,7 +201,6 @@ export const loadFromBlob = async (
   }
   return ret.data;
 };
-
 
 export const canvasToBlob = async (
   canvas: HTMLCanvasElement | Promise<HTMLCanvasElement>,

@@ -31,7 +31,6 @@ import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
 import {
   handIcon,
-  
   MoonIcon,
   SunIcon,
   TrashIcon,
@@ -510,7 +509,6 @@ export const actionToggleEraserTool = register({
   },
   keyTest: (event) => event.key === KEYS.E,
 });
-
 
 export const actionToggleHandTool = register({
   name: "toggleHandTool",

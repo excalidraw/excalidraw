@@ -30,7 +30,6 @@ export {
   actionToggleTheme,
 } from "./actionCanvas";
 
-
 export { actionFinalize } from "./actionFinalize";
 
 export {

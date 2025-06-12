@@ -167,7 +167,7 @@ describe("exportToSvg", () => {
       ELEMENTS,
       {
         ...DEFAULT_OPTIONS,
-            },
+      },
       null,
     );
     expect(svgElement.innerHTML).toMatchSnapshot();

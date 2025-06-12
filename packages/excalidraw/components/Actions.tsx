@@ -55,11 +55,7 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import {
-  extraToolsIcon,
-  frameToolIcon,
-  laserPointerToolIcon,
-} from "./icons";
+import { extraToolsIcon, frameToolIcon, laserPointerToolIcon } from "./icons";
 
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import type { ActionManager } from "../actions/manager";
@@ -80,9 +76,9 @@ export const canChangeStrokeColor = (
 
   return (
     hasStrokeColor(appState.activeTool.type) &&
-      commonSelectedType !== "image" &&
-      commonSelectedType !== "frame" &&
-      targetElements.some((element) => hasStrokeColor(element.type))
+    commonSelectedType !== "image" &&
+    commonSelectedType !== "frame" &&
+    targetElements.some((element) => hasStrokeColor(element.type))
   );
 };
 
@@ -326,7 +322,6 @@ export const ShapesSwitcher = ({
               if (!appState.penDetected && pointerType === "pen") {
                 app.togglePenMode(true);
               }
-
             }}
             onChange={({ pointerType }) => {
               if (appState.activeTool.type !== value) {
@@ -344,7 +339,6 @@ export const ShapesSwitcher = ({
           />
         );
       })}
-
     </>
   );
 };

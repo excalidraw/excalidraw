@@ -77,9 +77,7 @@ export type ValidLinearElement = {
             | {
                 type: Exclude<
                   ExcalidrawBindableElement["type"],
-                  | "image"
-                  | "text"
-                  | "frame"
+                  "image" | "text" | "frame"
                 >;
                 id?: ExcalidrawGenericElement["id"];
               }
@@ -87,9 +85,7 @@ export type ValidLinearElement = {
                 id: ExcalidrawGenericElement["id"];
                 type?: Exclude<
                   ExcalidrawBindableElement["type"],
-                  | "image"
-                  | "text"
-                  | "frame"
+                  "image" | "text" | "frame"
                 >;
               }
           )
@@ -113,9 +109,7 @@ export type ValidLinearElement = {
             | {
                 type: Exclude<
                   ExcalidrawBindableElement["type"],
-                  | "image"
-                  | "text"
-                  | "frame"
+                  "image" | "text" | "frame"
                 >;
                 id?: ExcalidrawGenericElement["id"];
               }
@@ -123,9 +117,7 @@ export type ValidLinearElement = {
                 id: ExcalidrawGenericElement["id"];
                 type?: Exclude<
                   ExcalidrawBindableElement["type"],
-                  | "image"
-                  | "text"
-                  | "frame"
+                  "image" | "text" | "frame"
                 >;
               }
           )
@@ -161,7 +153,7 @@ export type ValidContainer =
 export type ExcalidrawElementSkeleton =
   | Extract<
       Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-     ExcalidrawFreeDrawElement
+      ExcalidrawFreeDrawElement
     >
   | ({
       type: Extract<ExcalidrawLinearElement["type"], "line">;
@@ -188,7 +180,6 @@ export type ExcalidrawElementSkeleton =
       children: readonly ExcalidrawElement["id"][];
       name?: string;
     } & Partial<ExcalidrawFrameElement>);
-  
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
   width: 100,
@@ -587,7 +578,7 @@ export const convertToExcalidrawElements = (
         break;
       }
       case "freedraw":
-    
+
       case "frame": {
         excalidrawElement = newFrameElement({
           x: 0,
@@ -707,7 +698,7 @@ export const convertToExcalidrawElements = (
   // need to calculate coordinates and dimensions of frame which is possible after all
   // frame children are processed.
   for (const [id, element] of elementsWithIds) {
-    if (element.type !== "frame" ) {
+    if (element.type !== "frame") {
       continue;
     }
     const frame = elementStore.getElement(id);

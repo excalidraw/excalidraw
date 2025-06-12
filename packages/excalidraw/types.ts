@@ -28,7 +28,7 @@ import type {
   StrokeRoundness,
   ExcalidrawFrameLikeElement,
   ExcalidrawElementType,
-OrderedExcalidrawElement,
+  OrderedExcalidrawElement,
   ExcalidrawNonSelectionElement,
 } from "@excalidraw/element/types";
 
@@ -58,7 +58,6 @@ import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
 import type { JSX } from "react";
-
 
 export type DataURL = string & { _brand: "DataURL" };
 
@@ -121,7 +120,6 @@ export type ActiveTool =
 
 export type SidebarName = string;
 export type SidebarTabName = string;
-
 
 type _CommonCanvasAppState = {
   zoom: AppState["zoom"];
@@ -423,8 +421,6 @@ export declare class GestureEvent extends UIEvent {
 }
 
 export type ExcalidrawInitialDataState = ImportedDataState;
-
-
 
 export interface ExcalidrawProps {
   onChange?: (
@@ -757,9 +753,7 @@ export type FrameNameBounds = {
 };
 
 export type FrameNameBoundsCache = {
-  get: (
-    frameElement: ExcalidrawFrameLikeElement, 
-  ) => FrameNameBounds | null;
+  get: (frameElement: ExcalidrawFrameLikeElement) => FrameNameBounds | null;
   _cache: Map<
     string,
     FrameNameBounds & {
@@ -786,7 +780,6 @@ export type Primitive =
   | undefined;
 
 export type JSONValue = string | number | boolean | null | object;
-
 
 export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
 

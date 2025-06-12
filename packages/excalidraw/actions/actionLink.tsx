@@ -1,4 +1,3 @@
-
 import { KEYS, getShortcutKey } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
@@ -45,9 +44,7 @@ export const actionLink = register({
         type="button"
         icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
-        title={`${
-             t("labels.link.label")
-        } - ${getShortcutKey("CtrlOrCmd+K")}`}
+        title={`${t("labels.link.label")} - ${getShortcutKey("CtrlOrCmd+K")}`}
         onClick={() => updateData(null)}
         selected={selectedElements.length === 1 && !!selectedElements[0].link}
       />

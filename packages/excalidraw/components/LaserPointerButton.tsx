@@ -23,16 +23,17 @@ const DEFAULT_SIZE: ToolButtonSize = "small";
 export const LaserPointerButton = (props: LaserPointerIconProps) => {
   return (
     <ToolButton
-    className={clsx("Shape", { fillable: false })}
-    type="radio"
-    icon={laserPointerToolIcon}
-    name="editor-current-shape"
-    checked={props.checked}
-    title={`${props.title} — H`}
-    keyBindingLabel={!props.isMobile ? KEYS.H.toLocaleUpperCase() : undefined}
-    aria-label={`${props.title} — H`}
-    aria-keyshortcuts={KEYS.H}
-    data-testid={`toolbar-laser`}
-    onChange={() => props.onChange?.()}
-    />  );
+      className={clsx("Shape", { fillable: false })}
+      type="radio"
+      icon={laserPointerToolIcon}
+      name="editor-current-shape"
+      checked={props.checked}
+      title={`${props.title} — H`}
+      keyBindingLabel={!props.isMobile ? KEYS.H.toLocaleUpperCase() : undefined}
+      aria-label={`${props.title} — H`}
+      aria-keyshortcuts={KEYS.H}
+      data-testid={`toolbar-laser`}
+      onChange={() => props.onChange?.()}
+    />
+  );
 };

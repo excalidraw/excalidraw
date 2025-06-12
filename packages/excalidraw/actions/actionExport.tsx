@@ -121,7 +121,6 @@ export const actionChangeExportBackground = register({
   ),
 });
 
-
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
   label: "buttons.save",

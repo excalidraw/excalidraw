@@ -70,7 +70,6 @@ const getHints = ({
     return t("hints.text");
   }
 
-
   if (appState.activeTool.type === "image" && appState.pendingImageElementId) {
     return t("hints.placeImage");
   }

@@ -273,17 +273,8 @@ const renderSelectionBorder = (
   appState: InteractiveCanvasAppState,
   elementProperties: ElementSelectionBorder,
 ) => {
-  const {
-    angle,
-    x1,
-    y1,
-    x2,
-    y2,
-    selectionColors,
-    cx,
-    cy,
-    dashed,
-  } = elementProperties;
+  const { angle, x1, y1, x2, y2, selectionColors, cx, cy, dashed } =
+    elementProperties;
   const elementWidth = x2 - x1;
   const elementHeight = y2 - y1;
 

@@ -294,7 +294,7 @@ const LayerUI = ({
                               title={t("toolBar.hand")}
                               isMobile
                             />
-    
+
                             <ShapesSwitcher
                               appState={appState}
                               activeTool={appState.activeTool}

@@ -22,7 +22,6 @@ export const resaveAsImageWithScene = async (
     );
   }
 
-
   const { exportedElements, exportingFrame } = prepareElementsForExport(
     elements,
     appState,

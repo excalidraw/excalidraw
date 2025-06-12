@@ -16,10 +16,7 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 
 import type { ElementShapes } from "@excalidraw/excalidraw/scene/types";
 
-import {
-  isElbowArrow,
-  isLinearElement,
-} from "./typeChecks";
+import { isElbowArrow, isLinearElement } from "./typeChecks";
 import { getCornerRadius, isPathALoop } from "./shapes";
 import { headingForPointIsHorizontal } from "./heading";
 
@@ -150,7 +147,7 @@ const modifyIframeLikeForRoughOptions = (
       backgroundColor: "#d3d3d3",
       fillStyle: "solid",
     } as const;
-  } 
+  }
   return element;
 };
 
@@ -482,7 +479,7 @@ export const _generateElementShape = (
   },
 ): Drawable | Drawable[] | null => {
   switch (element.type) {
-    case "rectangle":  
+    case "rectangle":
     case "diamond": {
       let shape: ElementShapes[typeof element.type];
 

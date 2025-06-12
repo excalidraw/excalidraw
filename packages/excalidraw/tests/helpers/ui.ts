@@ -422,10 +422,7 @@ const proxy = <T extends ExcalidrawElement>(
 };
 
 /** Tools that can be used to draw shapes */
-type DrawingToolName = Exclude<
-  ToolType,
-  "lock" | "selection" | "eraser" 
->;
+type DrawingToolName = Exclude<ToolType, "lock" | "selection" | "eraser">;
 
 type Element<T extends DrawingToolName> = T extends "line" | "freedraw"
   ? ExcalidrawLinearElement

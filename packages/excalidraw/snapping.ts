@@ -169,9 +169,7 @@ export const isSnappingEnabled = ({
   selectedElements: NonDeletedExcalidrawElement[];
 }) => {
   if (event) {
-    return (
-      app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]
-    );
+    return app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD];
   }
 
   // do not suggest snaps for an arrow to give way to binding
@@ -281,9 +279,7 @@ export const getElementsCorners = (
         : [topLeft, topRight, bottomLeft, bottomRight, center];
     }
   } else if (elements.length > 1) {
-    const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
-      elements,
-    );
+    const [minX, minY, maxX, maxY] = getDraggedElementsBounds(elements);
     const width = maxX - minX;
     const height = maxY - minY;
 
@@ -786,7 +782,7 @@ export const snapDraggedElements = (
 
   const gapSnapLines = createGapSnapLines(
     selectedElements,
-   [...nearestSnapsX, ...nearestSnapsY].filter(
+    [...nearestSnapsX, ...nearestSnapsY].filter(
       (snap) => snap.type === "gap",
     ) as GapSnap[],
   );
@@ -907,9 +903,7 @@ const createGapSnapLines = (
   selectedElements: ExcalidrawElement[],
   gapSnaps: GapSnap[],
 ): GapSnapLine[] => {
-  const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
-    selectedElements,
-  );
+  const [minX, minY, maxX, maxY] = getDraggedElementsBounds(selectedElements);
 
   const gapSnapLines: GapSnapLine[] = [];
 

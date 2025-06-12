@@ -23,7 +23,7 @@ describe("embedding scene data", () => {
         appState: {
           viewBackgroundColor: "#ffffff",
           gridModeEnabled: false,
-                },
+        },
         files: null,
       });
 

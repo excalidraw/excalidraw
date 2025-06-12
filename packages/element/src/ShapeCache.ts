@@ -2,9 +2,7 @@ import { RoughGenerator } from "roughjs/bin/generator";
 
 import { COLOR_PALETTE } from "@excalidraw/common";
 
-import type {
-  AppState,
-} from "@excalidraw/excalidraw/types";
+import type { AppState } from "@excalidraw/excalidraw/types";
 import type {
   ElementShape,
   ElementShapes,

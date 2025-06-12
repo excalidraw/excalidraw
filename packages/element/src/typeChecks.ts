@@ -42,8 +42,6 @@ export const isImageElement = (
   return !!element && element.type === "image";
 };
 
-
-
 export const isTextElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawTextElement => {
@@ -56,15 +54,10 @@ export const isFrameElement = (
   return element != null && element.type === "frame";
 };
 
-
-
 export const isFrameLikeElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawFrameLikeElement => {
-  return (
-    element != null &&
-    (element.type === "frame" )
-  );
+  return element != null && element.type === "frame";
 };
 
 export const isFreeDrawElement = (
@@ -271,8 +264,7 @@ export const isArrowBoundToElement = (element: ExcalidrawArrowElement) => {
 };
 
 export const isUsingAdaptiveRadius = (type: string) =>
-  type === "rectangle" ||
-  type === "image";
+  type === "rectangle" || type === "image";
 
 export const isUsingProportionalRadius = (type: string) =>
   type === "line" || type === "arrow" || type === "diamond";

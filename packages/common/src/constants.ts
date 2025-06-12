@@ -278,7 +278,6 @@ export const ACTIVE_THRESHOLD = 3_000;
 // duplicates --theme-filter, should be removed soon
 export const THEME_FILTER = "invert(93%) hue-rotate(180deg)";
 
-
 export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
   canvasActions: {
     changeViewBackgroundColor: true,
@@ -317,7 +316,6 @@ export const SVG_NS = "http://www.w3.org/2000/svg";
 export const SVG_DOCUMENT_PREAMBLE = `<?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 `;
-
 
 export const VERSIONS = {
   excalidraw: 2,
@@ -407,9 +405,7 @@ export const DEFAULT_SIDEBAR = {
   defaultTab: LIBRARY_SIDEBAR_TAB,
 } as const;
 
-export const LIBRARY_DISABLED_TYPES = new Set([
-  "image",
-] as const);
+export const LIBRARY_DISABLED_TYPES = new Set(["image"] as const);
 
 // use these constants to easily identify reference sites
 export const TOOL_TYPE = {
@@ -429,8 +425,7 @@ export const TOOL_TYPE = {
   laser: "laser",
 } as const;
 
-export const EDITOR_LS_KEYS = {
-} as const;
+export const EDITOR_LS_KEYS = {} as const;
 
 /**
  * not translated as this is used only in public, stateless API as default value
@@ -453,7 +448,6 @@ export const ELEMENT_LINK_KEY = "element";
 
 /** used in tests */
 export const ORIG_ID = Symbol.for("__test__originalId__");
-
 
 /**
  * distance at which we merge points instead of adding a new merge-point

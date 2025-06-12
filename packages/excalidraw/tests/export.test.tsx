@@ -85,7 +85,7 @@ describe("export", () => {
   it("export svg-embedded scene", async () => {
     const svg = await exportToSvg(
       testElements,
-      { ...getDefaultAppState()  },
+      { ...getDefaultAppState() },
       {},
     );
     const svgText = svg.outerHTML;

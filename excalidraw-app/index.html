@@ -1,62 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Todo.Png</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no"
+    />
+    <meta name="referrer" content="origin" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#121212" />
 
-<head>
-  <meta charset="utf-8" />
-  <title>Todo.Png</title>
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no" />
-  <meta name="referrer" content="origin" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="theme-color" content="#121212" />
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="Todo.png" />
+    <meta name="description" content="ExFuckin Todo.png." />
+    <link rel="canonical" href="https://excalidraw.com" />
 
-  <!-- Primary Meta Tags -->
-  <meta name="title" content="Todo.png" />
-  <meta name="description" content="ExFuckin Todo.png." />
-  <link rel="canonical" href="https://excalidraw.com" />
-
-  <!------------------------------------------------------------------------->
-  <!--   to minimize white flash on load when user has dark mode enabled   -->
-  <script>
-    try {
-      function setTheme(theme) {
-        if (theme === "dark") {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
+    <!------------------------------------------------------------------------->
+    <!--   to minimize white flash on load when user has dark mode enabled   -->
+    <script>
+      try {
+        function setTheme(theme) {
+          if (theme === "dark") {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
         }
-      }
 
-      function getTheme() {
-        const theme = window.localStorage.getItem("excalidraw-theme");
+        function getTheme() {
+          const theme = window.localStorage.getItem("excalidraw-theme");
 
-        if (theme && theme === "system") {
-          return window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light";
-        } else {
-          return theme || "light";
+          if (theme && theme === "system") {
+            return window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          } else {
+            return theme || "light";
+          }
         }
+
+        setTheme(getTheme());
+      } catch (e) {
+        console.error("Error setting dark mode", e);
       }
+    </script>
+    <style>
+      html.dark {
+        background-color: #121212;
+        color: #fff;
+      }
+    </style>
 
-      setTheme(getTheme());
-    } catch (e) {
-      console.error("Error setting dark mode", e);
-    }
-  </script>
-  <style>
-    html.dark {
-      background-color: #121212;
-      color: #fff;
-    }
-  </style>
+    <!-- Warmup the connection for Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <!-- Warmup the connection for Google fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <!------------------------------------------------------------------------->
-  <% if (typeof PROD !='undefined' && PROD==true) { %>
+    <!------------------------------------------------------------------------->
+    <% if (typeof PROD !='undefined' && PROD==true) { %>
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -80,79 +81,81 @@
     <!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->
 
     <!-- Register Assistant as the UI font, before the scene inits -->
-    <link rel="stylesheet" href="../packages/excalidraw/fonts/fonts.css" type="text/css" />
+    <link
+      rel="stylesheet"
+      href="../packages/excalidraw/fonts/fonts.css"
+      type="text/css"
+    />
 
     <% } else { %>
-      <script>
-        window.EXCALIDRAW_ASSET_PATH = window.origin;
-      </script>
-      <% } %>
+    <script>
+      window.EXCALIDRAW_ASSET_PATH = window.origin;
+    </script>
+    <% } %>
 
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 
-        <!-- Excalidraw version -->
-        <meta name="version" content="{version}" />
+    <!-- Excalidraw version -->
+    <meta name="version" content="{version}" />
 
-            <script>
-              // setting this so that libraries installation reuses this window tab.
-              window.name = "_excalidraw";
-            </script>
+    <script>
+      // setting this so that libraries installation reuses this window tab.
+      window.name = "_excalidraw";
+    </script>
 
-            <!-- FIXME: remove this when we update CRA (fix SW caching) -->
-            <style>
-              body,
-              html {
-                margin: 0;
-                -webkit-text-size-adjust: 100%;
+    <!-- FIXME: remove this when we update CRA (fix SW caching) -->
+    <style>
+      body,
+      html {
+        margin: 0;
+        -webkit-text-size-adjust: 100%;
 
-                width: 100%;
-                height: 100%;
-                overflow: hidden;
-              }
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
 
-              .visually-hidden {
-                position: absolute !important;
-                height: 1px;
-                width: 1px;
-                overflow: hidden;
-                clip: rect(1px, 1px, 1px, 1px);
-                white-space: nowrap;
-                user-select: none;
-              }
+      .visually-hidden {
+        position: absolute !important;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+        clip: rect(1px, 1px, 1px, 1px);
+        white-space: nowrap;
+        user-select: none;
+      }
 
-              #root {
-                height: 100%;
-                -webkit-touch-callout: none;
-                -webkit-user-select: none;
-                -khtml-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
-                user-select: none;
-              }
+      #root {
+        height: 100%;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
 
-              @media screen and (min-width: 1200px) {
-                #root {
-                  -webkit-touch-callout: default;
-                  -webkit-user-select: auto;
-                  -khtml-user-select: auto;
-                  -moz-user-select: auto;
-                  -ms-user-select: auto;
-                  user-select: auto;
-                }
-              }
-            </style>
-</head>
+      @media screen and (min-width: 1200px) {
+        #root {
+          -webkit-touch-callout: default;
+          -webkit-user-select: auto;
+          -khtml-user-select: auto;
+          -moz-user-select: auto;
+          -ms-user-select: auto;
+          user-select: auto;
+        }
+      }
+    </style>
+  </head>
 
-<body>
-  <noscript> You need to enable JavaScript to run this app. </noscript>
-  <header>
-    <h1 class="visually-hidden">Todo.Png</h1>
-  </header>
-  <div id="root"></div>
-  <script type="module" src="index.tsx"></script>
-
-</body>
-
+  <body>
+    <noscript> You need to enable JavaScript to run this app. </noscript>
+    <header>
+      <h1 class="visually-hidden">Todo.Png</h1>
+    </header>
+    <div id="root"></div>
+    <script type="module" src="index.tsx"></script>
+  </body>
 </html>

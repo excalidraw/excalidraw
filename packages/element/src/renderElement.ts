@@ -811,8 +811,7 @@ export const renderElement = (
     case "line":
     case "arrow":
     case "image":
-    case "text":
-     {
+    case "text": {
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)
       // rely on existing shapes

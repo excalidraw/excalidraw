@@ -54,7 +54,6 @@ import {
   THEME_FILTER,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
-  YOUTUBE_STATES,
   ZOOM_STEP,
   POINTER_EVENTS,
   TOOL_TYPE,
@@ -222,6 +221,8 @@ import {
   isLineElement,
   isSimpleArrow,
 } from "@excalidraw/element";
+
+import type { YOUTUBE_STATES } from "@excalidraw/common";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
@@ -707,8 +708,6 @@ class App extends React.Component<AppProps, AppState> {
     return result;
   };
 
-
-
   /**
    * Returns gridSize taking into account `gridModeEnabled`.
    * If disabled, returns null.
@@ -718,8 +717,6 @@ class App extends React.Component<AppProps, AppState> {
       isGridModeEnabled(this) ? this.state.gridSize : null
     ) as NullableGridSize;
   };
-
-
 
   private getFrameNameDOMId = (frameElement: ExcalidrawElement) => {
     return `${this.id}-frame-name-${frameElement.id}`;
@@ -1061,10 +1058,7 @@ class App extends React.Component<AppProps, AppState> {
                         <div className="excalidraw-contextMenuContainer" />
                         <div className="excalidraw-eye-dropper-container" />
                         <SVGLayer
-                          trails={[
-                            this.laserTrails,
-                            this.eraserTrail,
-                          ]}
+                          trails={[this.laserTrails, this.eraserTrail]}
                         />
                         {selectedElements.length === 1 &&
                           this.state.openDialog?.name !==
@@ -1090,7 +1084,6 @@ class App extends React.Component<AppProps, AppState> {
                                 title={t("labels.copySource")}
                                 icon={copyIcon}
                                 checked={false}
-
                               />
                               <ElementCanvasButton
                                 title="Enter fullscreen"
@@ -1262,14 +1255,10 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({ errorMessage: error.message });
       });
 
-    if (
-      fileHandle &&
-      isImageFileHandle(fileHandle)
-    ) {
+    if (fileHandle && isImageFileHandle(fileHandle)) {
       this.setState({ fileHandle });
     }
   };
-
 
   public plugins: {} = {};
 
@@ -3614,7 +3603,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.openDialog?.name === "elementLinkSelector"
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-      } else if ( this.state.activeTool.type === "selection"    ) {
+      } else if (this.state.activeTool.type === "selection") {
         resetCursor(this.interactiveCanvas);
       } else {
         setCursorForShape(this.interactiveCanvas, this.state);
@@ -4083,7 +4072,6 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements?: boolean;
     },
   ): NonDeleted<ExcalidrawElement>[] {
-
     const elementsMap = this.scene.getNonDeletedElementsMap();
 
     const elements = (
@@ -4114,7 +4102,7 @@ class App extends React.Component<AppProps, AppState> {
         // Exception being embeddables which should be on top of everything else in
         // terms of hit testing.
         return true;
-      })
+      });
 
     return elements;
   }
@@ -5113,7 +5101,7 @@ class App extends React.Component<AppProps, AppState> {
       hideHyperlinkToolip();
       if (
         hitElement &&
-        (hitElement.link ) &&
+        hitElement.link &&
         this.state.selectedElementIds[hitElement.id] &&
         !this.state.contextMenu &&
         !this.state.showHyperlinkPopup
@@ -5140,7 +5128,6 @@ class App extends React.Component<AppProps, AppState> {
         // if using cmd/ctrl, we're not dragging
         !event[KEYS.CTRL_OR_CMD]
       ) {
-        
       } else {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       }
@@ -5149,18 +5136,18 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.openDialog?.name === "elementLinkSelector" && hitElement) {
       this.setState((prevState) => {
         return {
-        hoveredElementIds: updateStable(
-          prevState.hoveredElementIds,
-          selectGroupsForSelectedElements(
-            {
-              editingGroupId: prevState.editingGroupId,
-              selectedElementIds: { [hitElement!.id]: true },
-            },
-            this.scene.getNonDeletedElements(),
-            prevState,
-            this,
-          ).selectedElementIds,
-        ),
+          hoveredElementIds: updateStable(
+            prevState.hoveredElementIds,
+            selectGroupsForSelectedElements(
+              {
+                editingGroupId: prevState.editingGroupId,
+                selectedElementIds: { [hitElement!.id]: true },
+              },
+              this.scene.getNonDeletedElements(),
+              prevState,
+              this,
+            ).selectedElementIds,
+          ),
         };
       });
     } else if (
@@ -5557,9 +5544,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (this.state.activeTool.type === "custom") {
       setCursorForShape(this.interactiveCanvas, this.state);
-    } else if (
-      this.state.activeTool.type === TOOL_TYPE.frame
-    ) {
+    } else if (this.state.activeTool.type === TOOL_TYPE.frame) {
       this.createFrameElementOnPointerDown(
         pointerDownState,
         this.state.activeTool.type,
@@ -5664,7 +5649,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
           pointFrom(scenePointer.x, scenePointer.y),
         )
-      )  {
+      ) {
         this.redirectToLink(event, this.device.isTouchScreen);
       }
     } else if (this.state.viewModeEnabled) {
@@ -5954,9 +5939,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private clearSelectionIfNotUsingSelection = (): void => {
-    if (
-      this.state.activeTool.type !== "selection"
-    ) {
+    if (this.state.activeTool.type !== "selection") {
       this.setState({
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
         selectedGroupIds: {},
@@ -6212,7 +6195,7 @@ class App extends React.Component<AppProps, AppState> {
                 selectedElementIds: makeNextSelectedElementIds({}, this.state),
                 selectedGroupIds: {},
                 editingGroupId: null,
-                      });
+              });
             }
 
             // Add hit element to selection. At this point if we're not holding
@@ -6473,9 +6456,6 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-
-
-
   private createImageElement = ({
     sceneX,
     sceneY,
@@ -6688,11 +6668,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private getCurrentItemRoundness(
-    elementType:
-      | "selection"
-      | "rectangle"
-      | "diamond"
-      | "ellipse"
+    elementType: "selection" | "rectangle" | "diamond" | "ellipse",
   ) {
     return this.state.currentItemRoundness === "round"
       ? {
@@ -6773,8 +6749,7 @@ class App extends React.Component<AppProps, AppState> {
       ...FRAME_STYLE,
     } as const;
 
-    const frame =
-         newFrameElement(constructorOpts);
+    const frame = newFrameElement(constructorOpts);
 
     this.scene.insertElement(frame);
 
@@ -7098,7 +7073,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         (hasHitASelectedElement ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
-        !isSelectingPointsInLineEditor 
+        !isSelectingPointsInLineEditor
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
 
@@ -8310,7 +8285,7 @@ class App extends React.Component<AppProps, AppState> {
         // if we're editing a line, pointerup shouldn't switch selection if
         // box selected
         (!this.state.editingLinearElement ||
-          !pointerDownState.boxSelection.hasOccurred) 
+          !pointerDownState.boxSelection.hasOccurred)
       ) {
         // when inside line editor, shift selects points instead
         if (childEvent.shiftKey && !this.state.editingLinearElement) {
@@ -8419,10 +8394,7 @@ class App extends React.Component<AppProps, AppState> {
                   prevState,
                   this,
                 ),
-                showHyperlinkPopup:
-                  hitElement.link
-                    ? "info"
-                    : false,
+                showHyperlinkPopup: hitElement.link ? "info" : false,
               };
             });
           } else {
@@ -8498,7 +8470,7 @@ class App extends React.Component<AppProps, AppState> {
             selectedElementIds: makeNextSelectedElementIds({}, this.state),
             selectedGroupIds: {},
             editingGroupId: null,
-              });
+          });
         }
         // reset cursor
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
@@ -8514,10 +8486,9 @@ class App extends React.Component<AppProps, AppState> {
             },
             prevState,
           ),
-          showHyperlinkPopup:
-          !newElement.link
-              ? "editor"
-              : prevState.showHyperlinkPopup,
+          showHyperlinkPopup: !newElement.link
+            ? "editor"
+            : prevState.showHyperlinkPopup,
         }));
       }
 
@@ -8558,10 +8529,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (
-        !activeTool.locked &&
-        activeTool.type !== "freedraw" 
-      ) {
+      if (!activeTool.locked && activeTool.type !== "freedraw") {
         resetCursor(this.interactiveCanvas);
         this.setState({
           newElement: null,
@@ -9206,7 +9174,6 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-
     if (file) {
       // Attempt to parse an excalidraw/excalidrawlib file
       await this.loadFileToCanvas(file, fileHandle);
@@ -9453,9 +9420,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     // highlight elements that are to be added to frames on frames creation
-    if (
-      this.state.activeTool.type === TOOL_TYPE.frame
-    ) {
+    if (this.state.activeTool.type === TOOL_TYPE.frame) {
       this.setState({
         elementsToHighlight: getElementsInResizingFrame(
           this.scene.getNonDeletedElements(),
@@ -9802,7 +9767,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !(
           event.target instanceof HTMLCanvasElement ||
-          event.target instanceof HTMLTextAreaElement 
+          event.target instanceof HTMLTextAreaElement
         )
       ) {
         // prevent zooming the browser (but allow scrolling DOM)

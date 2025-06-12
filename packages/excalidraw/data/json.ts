@@ -19,10 +19,7 @@ import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
 import { fileOpen, fileSave } from "./filesystem";
 
 import type { AppState, BinaryFiles } from "../types";
-import type {
-  ExportedDataState,
-  ImportedDataState,
-} from "./types";
+import type { ExportedDataState, ImportedDataState } from "./types";
 
 /**
  * Strips out files which are only referenced by deleted elements
@@ -126,5 +123,3 @@ export const isValidExcalidrawData = (data?: {
         (!data.appState || typeof data.appState === "object")))
   );
 };
-
-

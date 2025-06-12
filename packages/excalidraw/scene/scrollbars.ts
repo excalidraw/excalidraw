@@ -39,7 +39,7 @@ export const getScrollBars = (
     right: parseInt(getGlobalCSSVariable("sar")) || 0,
   };
 
-  const isRTL =getLanguage().rtl ;
+  const isRTL = getLanguage().rtl;
 
   // The viewport is the rectangle currently visible for the user
   const viewportMinX = -appState.scrollX + safeArea.left;

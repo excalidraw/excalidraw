@@ -16,7 +16,6 @@ import { hitElementBoundingBox } from "@excalidraw/element";
 
 import { isElementLink } from "@excalidraw/element";
 
-
 import {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
@@ -24,7 +23,6 @@ import {
   isLocalLink,
   normalizeLink,
 } from "@excalidraw/common";
-
 
 import type { Scene } from "@excalidraw/element";
 
@@ -94,15 +92,8 @@ export const Hyperlink = ({
       trackEvent("hyperlink", "create");
     }
 
-     
-      scene.mutateElement(element, { link });
-    
-  }, [
-    element,
-    scene,
-    setToast,
-    setAppState,
-  ]);
+    scene.mutateElement(element, { link });
+  }, [element, scene, setToast, setAppState]);
 
   useLayoutEffect(() => {
     return () => {
