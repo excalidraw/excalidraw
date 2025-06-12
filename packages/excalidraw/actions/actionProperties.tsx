@@ -52,9 +52,11 @@ import {
 
 import { hasStrokeColor } from "@excalidraw/element";
 
-import { updateElbowArrowPoints } from "@excalidraw/element";
-
-import { CaptureUpdateAction } from "@excalidraw/element";
+import {
+  updateElbowArrowPoints,
+  CaptureUpdateAction,
+  toggleLinePolygonState,
+} from "@excalidraw/element";
 
 import type { LocalPoint } from "@excalidraw/math";
 
@@ -134,8 +136,6 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
-
-import { toggleLinePolygonState } from "../../element/src/shapes";
 
 import { register } from "./register";
 
