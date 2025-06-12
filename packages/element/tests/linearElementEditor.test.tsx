@@ -1,6 +1,5 @@
 import { pointCenter, pointFrom } from "@excalidraw/math";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
-import React from "react";
 import { vi } from "vitest";
 
 import {
@@ -32,6 +31,11 @@ import * as textElementUtils from "../src/textElement";
 import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
 import { LinearElementEditor } from "../src";
 import { newArrowElement } from "../src";
+
+import {
+  getTextEditor,
+  TEXT_EDITOR_SELECTOR,
+} from "../../excalidraw/tests/queries/dom";
 
 import type {
   ExcalidrawElement,
@@ -252,7 +256,49 @@ describe("Test Linear Elements", () => {
     expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
-  it("should enter line editor when using double clicked with ctrl key", () => {
+  it("should enter line editor via enter (line)", () => {
+    createTwoPointerLinearElement("line");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    mouse.clickAt(midpoint[0], midpoint[1]);
+    Keyboard.keyPress(KEYS.ENTER);
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  // ctrl+enter alias (to align with arrows)
+  it("should enter line editor via ctrl+enter (line)", () => {
+    createTwoPointerLinearElement("line");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    mouse.clickAt(midpoint[0], midpoint[1]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ENTER);
+    });
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor via ctrl+enter (arrow)", () => {
+    createTwoPointerLinearElement("arrow");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    mouse.clickAt(midpoint[0], midpoint[1]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ENTER);
+    });
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor on ctrl+dblclick (simple arrow)", () => {
+    createTwoPointerLinearElement("arrow");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.doubleClick();
+    });
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor on ctrl+dblclick (line)", () => {
     createTwoPointerLinearElement("line");
     expect(h.state.editingLinearElement?.elementId).toBeUndefined();
 
@@ -260,6 +306,37 @@ describe("Test Linear Elements", () => {
       mouse.doubleClick();
     });
     expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor on dblclick (line)", () => {
+    createTwoPointerLinearElement("line");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    mouse.doubleClick();
+    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should not enter line editor on dblclick (arrow)", async () => {
+    createTwoPointerLinearElement("arrow");
+    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+
+    mouse.doubleClick();
+    expect(h.state.editingLinearElement).toEqual(null);
+    await getTextEditor();
+  });
+
+  it("shouldn't create text element on double click in line editor (arrow)", async () => {
+    createTwoPointerLinearElement("arrow");
+    const arrow = h.elements[0] as ExcalidrawLinearElement;
+    enterLineEditingMode(arrow);
+
+    expect(h.state.editingLinearElement?.elementId).toEqual(arrow.id);
+
+    mouse.doubleClick();
+    expect(h.state.editingLinearElement?.elementId).toEqual(arrow.id);
+    expect(h.elements.length).toEqual(1);
+
+    expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
   });
 
   describe("Inside editor", () => {
@@ -990,12 +1067,10 @@ describe("Test Linear Elements", () => {
       });
     });
 
-    it("should match styles for text editor", () => {
+    it("should match styles for text editor", async () => {
       createTwoPointerLinearElement("arrow");
       Keyboard.keyPress(KEYS.ENTER);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = await getTextEditor();
       expect(editor).toMatchSnapshot();
     });
 
@@ -1012,9 +1087,7 @@ describe("Test Linear Elements", () => {
       expect(text.type).toBe("text");
       expect(text.containerId).toBe(arrow.id);
       mouse.down();
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = await getTextEditor();
 
       fireEvent.change(editor, {
         target: { value: DEFAULT_TEXT },
@@ -1042,9 +1115,7 @@ describe("Test Linear Elements", () => {
       const textElement = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(textElement.type).toBe("text");
       expect(textElement.containerId).toBe(arrow.id);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = await getTextEditor();
 
       fireEvent.change(editor, {
         target: { value: DEFAULT_TEXT },
@@ -1063,13 +1134,7 @@ describe("Test Linear Elements", () => {
 
       expect(h.elements.length).toBe(1);
       mouse.doubleClickAt(line.x, line.y);
-
-      expect(h.elements.length).toBe(2);
-
-      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      expect(text.type).toBe("text");
-      expect(text.containerId).toBeNull();
-      expect(line.boundElements).toBeNull();
+      expect(h.elements.length).toBe(1);
     });
 
     // TODO fix #7029 and rewrite this test
@@ -1234,9 +1299,7 @@ describe("Test Linear Elements", () => {
 
       mouse.select(arrow);
       Keyboard.keyPress(KEYS.ENTER);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = await getTextEditor();
       fireEvent.change(editor, { target: { value: DEFAULT_TEXT } });
       Keyboard.exitTextEditor(editor);
 
@@ -1262,7 +1325,7 @@ describe("Test Linear Elements", () => {
       mouse.downAt(rect.x, rect.y);
       mouse.moveTo(200, 0);
       mouse.upAt(200, 0);
-      expect(arrow.width).toBeCloseTo(204, 0);
+      expect(arrow.width).toBeCloseTo(200, 0);
       expect(rect.x).toBe(200);
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(

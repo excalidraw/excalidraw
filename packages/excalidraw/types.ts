@@ -26,7 +26,6 @@ import type {
   FontFamilyValues,
   ExcalidrawTextElement,
   FileId,
-  ExcalidrawImageElement,
   Theme,
   StrokeRoundness,
   ExcalidrawEmbeddableElement,
@@ -194,7 +193,6 @@ type _CommonCanvasAppState = {
   offsetLeft: AppState["offsetLeft"];
   offsetTop: AppState["offsetTop"];
   theme: AppState["theme"];
-  pendingImageElementId: AppState["pendingImageElementId"];
 };
 
 export type StaticCanvasAppState = Readonly<
@@ -426,8 +424,6 @@ export interface AppState {
         shown: true;
         data: Spreadsheet;
       };
-  /** imageElement waiting to be placed on canvas */
-  pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
   linkOpacity: number; //zsviczian
   trayModeEnabled: boolean; //zsviczian
@@ -881,6 +877,9 @@ export interface ExcalidrawImperativeAPI {
   getSceneElementsIncludingDeleted: InstanceType<
     typeof App
   >["getSceneElementsIncludingDeleted"];
+  getSceneElementsMapIncludingDeleted: InstanceType<
+    typeof App
+  >["getSceneElementsMapIncludingDeleted"];
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
   };

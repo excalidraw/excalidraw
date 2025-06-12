@@ -194,15 +194,9 @@ const renderBindingHighlightForBindableElement = (
   zoom: InteractiveCanvasAppState["zoom"],
   highlightedColor: string, //zsviczian
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-  const width = x2 - x1;
-  const height = y2 - y1;
-
-  context.strokeStyle = highlightedColor ?? "rgba(0,0,0,.05)"; //zsviczian
-  context.fillStyle = highlightedColor ?? "rgba(0,0,0,.05)"; //zsviczian
-
-  // To ensure the binding highlight doesn't overlap the element itself
   const padding = maxBindingGap(element, element.width, element.height, zoom);
+
+  context.fillStyle = highlightedColor ?? "rgba(0,0,0,.05)"; //zsviczian
 
   switch (element.type) {
     case "rectangle":
@@ -217,10 +211,13 @@ const renderBindingHighlightForBindableElement = (
     case "diamond":
       drawHighlightForDiamondWithRotation(context, padding, element);
       break;
-    case "ellipse":
-      context.lineWidth =
-        maxBindingGap(element, element.width, element.height, zoom) -
-        FIXED_BINDING_DISTANCE;
+    case "ellipse": {
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+      const width = x2 - x1;
+      const height = y2 - y1;
+
+      context.strokeStyle = highlightedColor ?? "rgba(0,0,0,.05)"; //zsviczian
+      context.lineWidth = padding - FIXED_BINDING_DISTANCE;
 
       strokeEllipseWithRotation(
         context,
@@ -231,6 +228,7 @@ const renderBindingHighlightForBindableElement = (
         element.angle,
       );
       break;
+    }
   }
 };
 

@@ -1,4 +1,3 @@
-import React from "react";
 import { vi } from "vitest";
 
 import { ROUNDNESS, KEYS, arrayToMap, cloneJSON } from "@excalidraw/common";
@@ -36,6 +35,8 @@ import {
   unmountComponent,
   waitFor,
 } from "./test-utils";
+
+import { getTextEditor } from "./queries/dom";
 
 import type { NormalizedZoomValue } from "../types";
 
@@ -846,9 +847,7 @@ describe("mutliple elements", () => {
     });
 
     Keyboard.keyPress(KEYS.ENTER);
-    let editor = document.querySelector<HTMLTextAreaElement>(
-      ".excalidraw-textEditorContainer > textarea",
-    )!;
+    let editor = await getTextEditor();
     fireEvent.input(editor, { target: { value: "arrow" } });
     Keyboard.exitTextEditor(editor);
 
@@ -860,9 +859,7 @@ describe("mutliple elements", () => {
     });
 
     Keyboard.keyPress(KEYS.ENTER);
-    editor = document.querySelector<HTMLTextAreaElement>(
-      ".excalidraw-textEditorContainer > textarea",
-    )!;
+    editor = await getTextEditor();
     fireEvent.input(editor, { target: { value: "rect\ntext" } });
     Keyboard.exitTextEditor(editor);
 
