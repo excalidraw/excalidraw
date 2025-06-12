@@ -7764,17 +7764,21 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
 
+        const isUnlockedHitElSelected = unlockedHitElements.some(
+          (el) => this.state.selectedElementIds[el.id],
+        ); //zsviczian
         // Prioritize unlocked elements over locked ones
-        if (unlockedHitElements.length > 0) { //zsviczian https://github.com/excalidraw/excalidraw/pull/9582
+        if (
+          !isUnlockedHitElSelected &&
+          unlockedHitElements.length > 0
+        ) { //zsviczian https://github.com/excalidraw/excalidraw/pull/9582
           // If there are unlocked elements, use the topmost one
           pointerDownState.hit.element =
             unlockedHitElements[unlockedHitElements.length - 1];
         } else if (
           hitElementMightBeLocked &&
           hitElementMightBeLocked.locked &&
-          !unlockedHitElements.some(
-            (el) => this.state.selectedElementIds[el.id],
-          )
+          !isUnlockedHitElSelected //zsviczian
         ) {
           pointerDownState.hit.element = null;
         } else {
