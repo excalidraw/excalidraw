@@ -9094,7 +9094,7 @@ class App extends React.Component<AppProps, AppState> {
 
           if (detectedElement !== newElement) {
             if (detectedElement.type === "arrow") {
-              mutateElement(
+              this.scene.mutateElement(
                 detectedElement,
                 {
                   startArrowhead: this.state.currentItemStartArrowhead,
