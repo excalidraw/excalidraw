@@ -7,7 +7,6 @@ import { AnimatedTrail } from "./animated-trail";
 import type { Trail } from "./animated-trail";
 import type { AnimationFrameHandler } from "./animation-frame-handler";
 import type App from "./components/App";
-import type { SocketId } from "./types";
 
 export class LaserTrails implements Trail {
   public localTrail: AnimatedTrail;

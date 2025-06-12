@@ -242,7 +242,6 @@ export {
   MIME_TYPES,
   ROUNDNESS,
   DEFAULT_LASER_COLOR,
-  UserIdleState,
   normalizeLink,
 } from "@excalidraw/common";
 

@@ -1,4 +1,3 @@
-import type { UserIdleState } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
   NonDeletedElementsMap,
@@ -14,7 +13,6 @@ import type {
   ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
-  SocketId,
   Device,
   PendingExcalidrawElements,
 } from "../types";

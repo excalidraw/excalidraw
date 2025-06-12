@@ -454,11 +454,6 @@ export const ELEMENT_LINK_KEY = "element";
 /** used in tests */
 export const ORIG_ID = Symbol.for("__test__originalId__");
 
-export enum UserIdleState {
-  ACTIVE = "active",
-  AWAY = "away",
-  IDLE = "idle",
-}
 
 /**
  * distance at which we merge points instead of adding a new merge-point

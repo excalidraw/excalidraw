@@ -1000,14 +1000,13 @@ export const getCommonBounds = (
 
 export const getDraggedElementsBounds = (
   elements: ExcalidrawElement[],
-  dragOffset: { x: number; y: number },
 ) => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   return [
-    minX + dragOffset.x,
-    minY + dragOffset.y,
-    maxX + dragOffset.x,
-    maxY + dragOffset.y,
+    minX,
+    minY,
+    maxX,
+    maxY,
   ];
 };
 

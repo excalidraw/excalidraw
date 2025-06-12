@@ -59,7 +59,6 @@ import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
 import type { JSX } from "react";
 
-export type SocketId = string & { _brand: "SocketId" };
 
 export type DataURL = string & { _brand: "DataURL" };
 
@@ -123,10 +122,6 @@ export type ActiveTool =
 export type SidebarName = string;
 export type SidebarTabName = string;
 
-export type UserToFollow = {
-  socketId: SocketId;
-  username: string;
-};
 
 type _CommonCanvasAppState = {
   zoom: AppState["zoom"];
@@ -139,8 +134,6 @@ type _CommonCanvasAppState = {
   editingGroupId: AppState["editingGroupId"]; // TODO: move to interactive canvas if possible
   selectedElementIds: AppState["selectedElementIds"]; // TODO: move to interactive canvas if possible
   frameToHighlight: AppState["frameToHighlight"]; // TODO: move to interactive canvas if possible
-  offsetLeft: AppState["offsetLeft"];
-  offsetTop: AppState["offsetTop"];
   theme: AppState["theme"];
   pendingImageElementId: AppState["pendingImageElementId"];
 };
@@ -366,11 +359,6 @@ export interface AppState {
     y: number;
   } | null;
   objectsSnapModeEnabled: boolean;
-  /** the user's socket id & username who is being followed on the canvas */
-  userToFollow: UserToFollow | null;
-  /** the socket ids of the users following the current user */
-  followedBy: Set<SocketId>;
-
   /** image cropping */
   isCropping: boolean;
   croppingElementId: ExcalidrawElement["id"] | null;
@@ -436,10 +424,7 @@ export declare class GestureEvent extends UIEvent {
 
 export type ExcalidrawInitialDataState = ImportedDataState;
 
-export type OnUserFollowedPayload = {
-  userToFollow: UserToFollow;
-  action: "FOLLOW" | "UNFOLLOW";
-};
+
 
 export interface ExcalidrawProps {
   onChange?: (
@@ -514,7 +499,6 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number, zoom: Zoom) => void;
-  onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
@@ -749,9 +733,6 @@ export interface ExcalidrawImperativeAPI {
   ) => UnsubscribeCallback;
   onScrollChange: (
     callback: (scrollX: number, scrollY: number, zoom: Zoom) => void,
-  ) => UnsubscribeCallback;
-  onUserFollow: (
-    callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
 }
 

@@ -382,7 +382,6 @@ import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
-import FollowMode from "./FollowMode/FollowMode";
 import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
 import { SVGLayer } from "./SVGLayer";
@@ -429,7 +428,6 @@ import type {
   SidebarTabName,
   KeyboardModifiersObject,
   ToolType,
-  OnUserFollowedPayload,
   UnsubscribeCallback,
   ElementsPendingErasure,
   NullableGridSize,
@@ -597,7 +595,6 @@ class App extends React.Component<AppProps, AppState> {
       event: PointerEvent,
     ]
   >();
-  onUserFollowEmitter = new Emitter<[payload: OnUserFollowedPayload]>();
   onScrollChangeEmitter = new Emitter<
     [scrollX: number, scrollY: number, zoom: AppState["zoom"]]
   >();
@@ -680,7 +677,6 @@ class App extends React.Component<AppProps, AppState> {
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
         onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
-        onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
       } as const;
       if (typeof excalidrawAPI === "function") {
         excalidrawAPI(api);
@@ -1897,22 +1893,6 @@ class App extends React.Component<AppProps, AppState> {
         this.state.scrollY,
         this.state.zoom,
       );
-    }
-
-    if (prevState.userToFollow !== this.state.userToFollow) {
-      if (prevState.userToFollow) {
-        this.onUserFollowEmitter.trigger({
-          userToFollow: prevState.userToFollow,
-          action: "UNFOLLOW",
-        });
-      }
-
-      if (this.state.userToFollow) {
-        this.onUserFollowEmitter.trigger({
-          userToFollow: this.state.userToFollow,
-          action: "FOLLOW",
-        });
-      }
     }
 
     if (

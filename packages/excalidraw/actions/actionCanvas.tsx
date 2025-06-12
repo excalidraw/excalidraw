@@ -146,7 +146,6 @@ export const actionZoomIn = register({
           },
           appState,
         ),
-        userToFollow: null,
       },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
@@ -187,7 +186,6 @@ export const actionZoomOut = register({
           },
           appState,
         ),
-        userToFollow: null,
       },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
@@ -228,7 +226,6 @@ export const actionResetZoom = register({
           },
           appState,
         ),
-        userToFollow: null,
       },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
@@ -397,10 +394,7 @@ export const actionZoomToFitSelectionInViewport = register({
     const selectedElements = app.scene.getSelectedElements(appState);
     return zoomToFit({
       targetElements: selectedElements.length ? selectedElements : elements,
-      appState: {
-        ...appState,
-        userToFollow: null,
-      },
+      appState,
       fitToViewport: false,
       canvasOffsets: app.getEditorUIOffsets(),
     });
@@ -423,10 +417,7 @@ export const actionZoomToFitSelection = register({
     const selectedElements = app.scene.getSelectedElements(appState);
     return zoomToFit({
       targetElements: selectedElements.length ? selectedElements : elements,
-      appState: {
-        ...appState,
-        userToFollow: null,
-      },
+      appState,
       fitToViewport: true,
       canvasOffsets: app.getEditorUIOffsets(),
     });
@@ -448,10 +439,7 @@ export const actionZoomToFit = register({
   perform: (elements, appState, _, app) =>
     zoomToFit({
       targetElements: elements,
-      appState: {
-        ...appState,
-        userToFollow: null,
-      },
+      appState,
       fitToViewport: false,
       canvasOffsets: app.getEditorUIOffsets(),
     }),

@@ -26,7 +26,6 @@
     "node": "18.0.0 - 22.x.x"
   },
   "dependencies": {
-    "@excalidraw/random-username": "1.0.0",
     "@sentry/browser": "9.0.1",
     "callsites": "4.2.0",
     "i18next-browser-languagedetector": "6.1.4",
@@ -34,7 +33,6 @@
     "jotai": "2.11.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "socket.io-client": "4.7.2",
     "vite-plugin-html": "3.2.2"
   },
   "prettier": "@excalidraw/prettier-config",

@@ -95,22 +95,6 @@
         <!-- Excalidraw version -->
         <meta name="version" content="{version}" />
 
-        <% if (typeof VITE_APP_DEV_DISABLE_LIVE_RELOAD !='undefined' && VITE_APP_DEV_DISABLE_LIVE_RELOAD==true) { %>
-          <script>
-            {
-              const _WebSocket = window.WebSocket;
-              window.WebSocket = function (url) {
-                if (/ws:\/\/localhost:.+?\/sockjs-node/.test(url)) {
-                  console.info(
-                    "[!!!] Live reload is disabled via VITE_APP_DEV_DISABLE_LIVE_RELOAD [!!!]",
-                  );
-                } else {
-                  return new _WebSocket(url);
-                }
-              };
-            }
-          </script>
-          <% } %>
             <script>
               // setting this so that libraries installation reuses this window tab.
               window.name = "_excalidraw";
