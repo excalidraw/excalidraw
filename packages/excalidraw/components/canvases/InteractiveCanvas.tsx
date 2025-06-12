@@ -131,8 +131,6 @@ const getRelevantAppStateProps = (
   editingLinearElement: appState.editingLinearElement,
   selectedElementIds: appState.selectedElementIds,
   frameToHighlight: appState.frameToHighlight,
-  offsetLeft: appState.offsetLeft,
-  offsetTop: appState.offsetTop,
   theme: appState.theme,
   pendingImageElementId: appState.pendingImageElementId,
   selectionElement: appState.selectionElement,

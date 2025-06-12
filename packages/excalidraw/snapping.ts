@@ -283,7 +283,6 @@ export const getElementsCorners = (
   } else if (elements.length > 1) {
     const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
       elements,
-      dragOffset ?? { x: 0, y: 0 },
     );
     const width = maxX - minX;
     const height = maxY - minY;
@@ -442,7 +441,6 @@ export const getVisibleGaps = (
 
 const getGapSnaps = (
   selectedElements: ExcalidrawElement[],
-  dragOffset: Vector2D,
   app: AppClassProperties,
   event: KeyboardModifiersObject,
   nearestSnapsX: Snaps,
@@ -464,7 +462,6 @@ const getGapSnaps = (
 
     const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
       selectedElements,
-      dragOffset,
     ).map((bound) => round(bound));
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
@@ -734,7 +731,6 @@ export const snapDraggedElements = (
 
   getGapSnaps(
     selectedElements,
-    dragOffset,
     app,
     event,
     nearestSnapsX,
@@ -779,7 +775,6 @@ export const snapDraggedElements = (
 
   getGapSnaps(
     selectedElements,
-    newDragOffset,
     app,
     event,
     nearestSnapsX,
@@ -791,8 +786,7 @@ export const snapDraggedElements = (
 
   const gapSnapLines = createGapSnapLines(
     selectedElements,
-    newDragOffset,
-    [...nearestSnapsX, ...nearestSnapsY].filter(
+   [...nearestSnapsX, ...nearestSnapsY].filter(
       (snap) => snap.type === "gap",
     ) as GapSnap[],
   );
@@ -911,12 +905,10 @@ const dedupeGapSnapLines = (gapSnapLines: GapSnapLine[]) => {
 
 const createGapSnapLines = (
   selectedElements: ExcalidrawElement[],
-  dragOffset: Vector2D,
   gapSnaps: GapSnap[],
 ): GapSnapLine[] => {
   const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
     selectedElements,
-    dragOffset,
   );
 
   const gapSnapLines: GapSnapLine[] = [];
