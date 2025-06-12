@@ -9921,10 +9921,7 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * use during async image initialization,
    * when the placeholder image could have been modified in the meantime,
-   * and when you don't want to loose these changes on it
-   *
-   * in other words, the changes could have resulted in the new image element instance
-   * and we can't just mutate, since we might not have all properties initialized yet (i.e. natural dimensions)
+   * and when you don't want to loose those modifications
    */
   private getLatestInitializedImageElement = (
     imagePlaceholder: ExcalidrawImageElement,
@@ -9989,6 +9986,7 @@ class App extends React.Component<AppProps, AppState> {
 
       return initializedImageElement;
     } catch (error: any) {
+      this.store.scheduleAction(CaptureUpdateAction.NEVER);
       this.scene.mutateElement(imageElement, {
         isDeleted: true,
       });
@@ -10017,11 +10015,16 @@ class App extends React.Component<AppProps, AppState> {
         ) as (keyof typeof IMAGE_MIME_TYPES)[],
       });
 
-      this.createImageElement({
+      await this.createImageElement({
         sceneX: x,
         sceneY: y,
         addToFrameUnderCursor: false,
         imageFile,
+      });
+
+      // avoid being batched (just in case)
+      this.setState({}, () => {
+        this.actionManager.executeAction(actionFinalize);
       });
     } catch (error: any) {
       if (error.name !== "AbortError") {
@@ -10082,6 +10085,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (erroredFiles.size) {
+      this.store.scheduleAction(CaptureUpdateAction.NEVER);
       this.scene.replaceAllElements(
         elements.map((element) => {
           if (
