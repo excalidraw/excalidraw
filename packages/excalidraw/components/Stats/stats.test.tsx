@@ -133,7 +133,6 @@ describe("binding with linear elements", () => {
     const inputX = UI.queryStatsProperty("X")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
     UI.updateInput(inputX, String("204"));
@@ -382,8 +381,7 @@ describe("stats for a non-generic element", () => {
   it("text element", async () => {
     UI.clickTool("text");
     mouse.clickAt(20, 30);
-    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
-    const editor = await getTextEditor(textEditorSelector, true);
+    const editor = await getTextEditor();
     updateTextEditor(editor, "Hello!");
     act(() => {
       editor.blur();
@@ -576,8 +574,7 @@ describe("stats for multiple elements", () => {
     // text, rectangle, frame
     UI.clickTool("text");
     mouse.clickAt(20, 30);
-    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
-    const editor = await getTextEditor(textEditorSelector, true);
+    const editor = await getTextEditor();
     updateTextEditor(editor, "Hello!");
     act(() => {
       editor.blur();
@@ -657,6 +654,7 @@ describe("stats for multiple elements", () => {
 
       mouse.reset();
       Keyboard.withModifierKeys({ shift: true }, () => {
+        mouse.moveTo(10, 0);
         mouse.click();
       });
 

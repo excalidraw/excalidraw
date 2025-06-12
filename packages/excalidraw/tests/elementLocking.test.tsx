@@ -1,5 +1,3 @@
-import React from "react";
-
 import { KEYS } from "@excalidraw/common";
 
 import { actionSelectAll } from "../actions";
@@ -9,6 +7,8 @@ import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { render, unmountComponent } from "../tests/test-utils";
+
+import { getTextEditor } from "./queries/dom";
 
 unmountComponent();
 
@@ -245,7 +245,7 @@ describe("element locking", () => {
     expect(h.state.editingTextElement?.id).toBe(h.elements[1].id);
   });
 
-  it("should ignore locked text under cursor when clicked with text tool", () => {
+  it("should ignore locked text under cursor when clicked with text tool", async () => {
     const text = API.createElement({
       type: "text",
       text: "ola",
@@ -258,16 +258,14 @@ describe("element locking", () => {
     API.setElements([text]);
     UI.clickTool("text");
     mouse.clickAt(text.x + 50, text.y + 50);
-    const editor = document.querySelector(
-      ".excalidraw-textEditorContainer > textarea",
-    ) as HTMLTextAreaElement;
+    const editor = await getTextEditor();
     expect(editor).not.toBe(null);
     expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(2);
     expect(h.state.editingTextElement?.id).toBe(h.elements[1].id);
   });
 
-  it("should ignore text under cursor when double-clicked with selection tool", () => {
+  it("should ignore text under cursor when double-clicked with selection tool", async () => {
     const text = API.createElement({
       type: "text",
       text: "ola",
@@ -280,9 +278,7 @@ describe("element locking", () => {
     API.setElements([text]);
     UI.clickTool("selection");
     mouse.doubleClickAt(text.x + 50, text.y + 50);
-    const editor = document.querySelector(
-      ".excalidraw-textEditorContainer > textarea",
-    ) as HTMLTextAreaElement;
+    const editor = await getTextEditor();
     expect(editor).not.toBe(null);
     expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(2);
@@ -328,7 +324,7 @@ describe("element locking", () => {
     ]);
   });
 
-  it("bound text shouldn't be editable via double-click", () => {
+  it("bound text shouldn't be editable via double-click", async () => {
     const container = API.createElement({
       type: "rectangle",
       width: 100,
@@ -353,16 +349,14 @@ describe("element locking", () => {
     UI.clickTool("selection");
     mouse.doubleClickAt(container.width / 2, container.height / 2);
 
-    const editor = document.querySelector(
-      ".excalidraw-textEditorContainer > textarea",
-    ) as HTMLTextAreaElement;
+    const editor = await getTextEditor();
     expect(editor).not.toBe(null);
     expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(3);
     expect(h.state.editingTextElement?.id).toBe(h.elements[2].id);
   });
 
-  it("bound text shouldn't be editable via text tool", () => {
+  it("bound text shouldn't be editable via text tool", async () => {
     const container = API.createElement({
       type: "rectangle",
       width: 100,
@@ -387,9 +381,7 @@ describe("element locking", () => {
     UI.clickTool("text");
     mouse.clickAt(container.width / 2, container.height / 2);
 
-    const editor = document.querySelector(
-      ".excalidraw-textEditorContainer > textarea",
-    ) as HTMLTextAreaElement;
+    const editor = await getTextEditor();
     expect(editor).not.toBe(null);
     expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(3);

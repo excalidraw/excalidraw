@@ -421,11 +421,7 @@ export const assertElements = <T extends AllPossibleKeys<ExcalidrawElement>>(
         .join(", ")}]\n`,
     )}`;
 
-    const error = new Error(errStr);
-    const stack = err.stack.split("\n");
-    stack.splice(1, 1);
-    error.stack = stack.join("\n");
-    throw error;
+    throw trimErrorStack(new Error(errStr), 1);
   }
 
   expect(mappedActualElements).toEqual(
@@ -435,12 +431,17 @@ export const assertElements = <T extends AllPossibleKeys<ExcalidrawElement>>(
   expect(h.state.selectedElementIds).toEqual(selectedElementIds);
 };
 
-const stripSeed = (deltas: Record<string, { deleted: any; inserted: any }>) =>
+const stripProps = (
+  deltas: Record<string, { deleted: any; inserted: any }>,
+  props: string[],
+) =>
   Object.entries(deltas).reduce((acc, curr) => {
     const { inserted, deleted, ...rest } = curr[1];
 
-    delete inserted.seed;
-    delete deleted.seed;
+    for (const prop of props) {
+      delete inserted[prop];
+      delete deleted[prop];
+    }
 
     acc[curr[0]] = {
       inserted,
@@ -457,9 +458,9 @@ export const checkpointHistory = (history: History, name: string) => {
       ...x,
       elements: {
         ...x.elements,
-        added: stripSeed(x.elements.added),
-        removed: stripSeed(x.elements.removed),
-        updated: stripSeed(x.elements.updated),
+        added: stripProps(x.elements.added, ["seed", "versionNonce"]),
+        removed: stripProps(x.elements.removed, ["seed", "versionNonce"]),
+        updated: stripProps(x.elements.updated, ["seed", "versionNonce"]),
       },
     })),
   ).toMatchSnapshot(`[${name}] undo stack`);
@@ -469,10 +470,28 @@ export const checkpointHistory = (history: History, name: string) => {
       ...x,
       elements: {
         ...x.elements,
-        added: stripSeed(x.elements.added),
-        removed: stripSeed(x.elements.removed),
-        updated: stripSeed(x.elements.updated),
+        added: stripProps(x.elements.added, ["seed", "versionNonce"]),
+        removed: stripProps(x.elements.removed, ["seed", "versionNonce"]),
+        updated: stripProps(x.elements.updated, ["seed", "versionNonce"]),
       },
     })),
   ).toMatchSnapshot(`[${name}] redo stack`);
+};
+
+/**
+ * removes one or more leading stack trace lines (leading to files) from the
+ * error stack trace
+ */
+export const trimErrorStack = (error: Error, range = 1) => {
+  const stack = error.stack?.split("\n");
+  if (stack) {
+    stack.splice(1, range);
+    error.stack = stack.join("\n");
+  }
+  return error;
+};
+
+export const stripIgnoredNodesFromErrorMessage = (error: Error) => {
+  error.message = error.message.replace(/\s+Ignored nodes:[\s\S]+/, "");
+  return error;
 };

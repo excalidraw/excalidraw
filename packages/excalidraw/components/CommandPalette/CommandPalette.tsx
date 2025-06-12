@@ -503,7 +503,6 @@ function CommandPaletteInner({
               if (value === "image") {
                 app.setActiveTool({
                   type: value,
-                  insertOnCanvasDirectly: event.type === EVENT.KEYDOWN,
                 });
               } else {
                 app.setActiveTool({ type: value });
