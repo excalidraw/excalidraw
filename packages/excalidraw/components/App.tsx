@@ -9879,7 +9879,13 @@ class App extends React.Component<AppProps, AppState> {
           if (!this.imageCache.get(fileId)) {
             this.addNewImagesToImageCache();
 
-            await this.updateImageCache([initializedImageElement]);
+            const { updatedFiles } = await this.updateImageCache([
+              initializedImageElement,
+            ]);
+
+            if (updatedFiles.size) {
+              ShapeCache.delete(imageElement);
+            }
           }
 
           const imageHTML = await this.imageCache.get(fileId)?.image;
