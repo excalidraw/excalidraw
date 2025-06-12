@@ -105,7 +105,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
 
   return (
     <EditorJotaiProvider store={editorJotaiStore}>
-      <InitializeApp langCode={langCode} theme={theme}>
+      <InitializeApp theme={theme}>
         <App
           onChange={onChange}
           onIncrement={onIncrement}
@@ -113,7 +113,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           excalidrawAPI={excalidrawAPI}
           onPointerUpdate={onPointerUpdate}
           renderTopRightUI={renderTopRightUI}
-          langCode={langCode}
           viewModeEnabled={viewModeEnabled}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}

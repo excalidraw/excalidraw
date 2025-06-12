@@ -28,7 +28,6 @@
   "dependencies": {
     "@sentry/browser": "9.0.1",
     "callsites": "4.2.0",
-    "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
     "jotai": "2.11.0",
     "react": "19.0.0",

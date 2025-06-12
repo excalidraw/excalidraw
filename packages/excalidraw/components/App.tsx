@@ -307,7 +307,7 @@ import { exportCanvas, loadFromBlob } from "../data";
 import { restore, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
-import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
+import { defaultLang, getLanguage, languages, t } from "../i18n";
 
 import {
   calculateScrollCenter,
@@ -1916,9 +1916,6 @@ class App extends React.Component<AppProps, AppState> {
       this.state.showHyperlinkPopup
     ) {
       this.setState({ showHyperlinkPopup: false });
-    }
-    if (prevProps.langCode !== this.props.langCode) {
-      this.updateLanguage();
     }
 
     if (isEraserActive(prevState) && !isEraserActive(this.state)) {
@@ -9986,14 +9983,6 @@ class App extends React.Component<AppProps, AppState> {
       offsetLeft: 0,
       offsetTop: 0,
     };
-  }
-
-  private async updateLanguage() {
-    const currentLang =
-      languages.find((lang) => lang.code === this.props.langCode) ||
-      defaultLang;
-    await setLanguage(currentLang);
-    this.setAppState({});
   }
 }
 
