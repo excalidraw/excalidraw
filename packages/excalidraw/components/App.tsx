@@ -9859,13 +9859,14 @@ class App extends React.Component<AppProps, AppState> {
     const dataURL =
       this.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
-    let initializedImageElement = newElementWith(imageElement, {
-      fileId,
-    }) as NonDeleted<InitializedExcalidrawImageElement>;
-
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
       async (resolve, reject) => {
         try {
+          let initializedImageElement = this.getLatestInitializedImageElement(
+            imageElement,
+            fileId,
+          );
+
           this.addMissingFiles([
             {
               mimeType,
@@ -9879,12 +9880,12 @@ class App extends React.Component<AppProps, AppState> {
           if (!this.imageCache.get(fileId)) {
             this.addNewImagesToImageCache();
 
-            const { updatedFiles } = await this.updateImageCache([
+            const { erroredFiles } = await this.updateImageCache([
               initializedImageElement,
             ]);
 
-            if (updatedFiles.size) {
-              ShapeCache.delete(imageElement);
+            if (erroredFiles.size) {
+              throw new Error("Image cache update resulted with an error.");
             }
           }
 
@@ -9894,15 +9895,18 @@ class App extends React.Component<AppProps, AppState> {
             imageHTML &&
             this.state.newElement?.id !== initializedImageElement.id
           ) {
+            initializedImageElement = this.getLatestInitializedImageElement(
+              imageElement,
+              fileId,
+            );
+
             const naturalDimensions = this.getImageNaturalDimensions(
               initializedImageElement,
               imageHTML,
             );
 
-            initializedImageElement = newElementWith(
-              initializedImageElement,
-              naturalDimensions,
-            );
+            // no need to create a new instance anymore, just assign the natural dimensions
+            Object.assign(initializedImageElement, naturalDimensions);
           }
 
           resolve(initializedImageElement);
@@ -9910,6 +9914,32 @@ class App extends React.Component<AppProps, AppState> {
           console.error(error);
           reject(new Error(t("errors.imageInsertError")));
         }
+      },
+    );
+  };
+
+  /**
+   * use during async image initialization,
+   * when the placeholder image could have been modified in the meantime,
+   * and when you don't want to loose these changes on it
+   *
+   * in other words, the changes could have resulted in the new image element instance
+   * and we can't just mutate, since we might not have all properties initialized yet (i.e. natural dimensions)
+   */
+  private getLatestInitializedImageElement = (
+    imagePlaceholder: ExcalidrawImageElement,
+    fileId: FileId,
+  ) => {
+    const sceneImageElement = this.scene.getElement(imagePlaceholder.id);
+    const latestImageElement =
+      sceneImageElement && sceneImageElement.version > imagePlaceholder.version
+        ? sceneImageElement
+        : imagePlaceholder;
+
+    return newElementWith(
+      latestImageElement as InitializedExcalidrawImageElement,
+      {
+        fileId,
       },
     );
   };

@@ -23,6 +23,8 @@ import {
   syncInvalidIndicesImmutable,
   hashElementsVersion,
   hashString,
+  isInitializedImageElement,
+  isImageElement,
 } from "./index";
 
 import type {
@@ -906,6 +908,14 @@ export class StoreSnapshot {
         !prevElement || // element was added
         prevElement.version < nextElement.version // element was updated
       ) {
+        if (
+          isImageElement(nextElement) &&
+          !isInitializedImageElement(nextElement)
+        ) {
+          // ignore any updates on uninitialized image elements
+          continue;
+        }
+
         changedElements.set(nextElement.id, nextElement);
       }
     }
