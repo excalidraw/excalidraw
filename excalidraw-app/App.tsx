@@ -48,7 +48,6 @@ import type { ResolvablePromise } from "@excalidraw/common/utils";
 import CustomStats from "./CustomStats";
 import { Provider, appJotaiStore } from "./app-jotai";
 import { STORAGE_KEYS, SYNC_BROWSER_TABS_TIMEOUT } from "./app_constants";
-import { AppFooter } from "./components/AppFooter";
 import { AppMainMenu } from "./components/AppMainMenu";
 
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
@@ -497,7 +496,6 @@ const ExcalidrawWrapper = () => {
           <OverwriteConfirmDialog.Actions.ExportToImage />
           <OverwriteConfirmDialog.Actions.SaveToDisk />
         </OverwriteConfirmDialog>
-        <AppFooter onChange={() => excalidrawAPI?.refresh()} />
 
         {errorMessage && (
           <ErrorDialog onClose={() => setErrorMessage("")}>

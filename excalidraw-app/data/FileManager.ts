@@ -1,8 +1,6 @@
 import { CaptureUpdateAction } from "@excalidraw/excalidraw";
-import { compressData } from "@excalidraw/excalidraw/data/encode";
 import { newElementWith } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
-import { t } from "@excalidraw/excalidraw/i18n";
 
 import type {
   ExcalidrawElement,
@@ -12,7 +10,6 @@ import type {
 } from "@excalidraw/element/types";
 import type {
   BinaryFileData,
-  BinaryFileMetadata,
   ExcalidrawImperativeAPI,
   BinaryFiles,
 } from "@excalidraw/excalidraw/types";
@@ -202,50 +199,6 @@ export class FileManager {
     this.erroredFiles_save.clear();
   }
 }
-
-export const encodeFilesForUpload = async ({
-  files,
-  maxBytes,
-  encryptionKey,
-}: {
-  files: Map<FileId, BinaryFileData>;
-  maxBytes: number;
-  encryptionKey: string;
-}) => {
-  const processedFiles: {
-    id: FileId;
-    buffer: Uint8Array;
-  }[] = [];
-
-  for (const [id, fileData] of files) {
-    const buffer = new TextEncoder().encode(fileData.dataURL);
-
-    const encodedFile = await compressData<BinaryFileMetadata>(buffer, {
-      encryptionKey,
-      metadata: {
-        id,
-        mimeType: fileData.mimeType,
-        created: Date.now(),
-        lastRetrieved: Date.now(),
-      },
-    });
-
-    if (buffer.byteLength > maxBytes) {
-      throw new Error(
-        t("errors.fileTooBig", {
-          maxSize: `${Math.trunc(maxBytes / 1024 / 1024)}MB`,
-        }),
-      );
-    }
-
-    processedFiles.push({
-      id,
-      buffer: encodedFile,
-    });
-  }
-
-  return processedFiles;
-};
 
 export const updateStaleImageStatuses = (params: {
   excalidrawAPI: ExcalidrawImperativeAPI;

@@ -27,4 +27,3 @@ dev-dist
 html
 meta*.json
 .claude
-/search.py

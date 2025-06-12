@@ -17,9 +17,7 @@ import {
   debounce,
 } from "@excalidraw/common";
 import { clearElementsForLocalStorage } from "@excalidraw/element";
-import {
-  createStore, entries, del, getMany, set, setMany
-} from "idb-keyval";
+import {createStore, entries, del, getMany, set, setMany} from "idb-keyval";
 
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 import type {
