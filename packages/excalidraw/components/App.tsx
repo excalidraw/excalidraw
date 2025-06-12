@@ -10868,9 +10868,8 @@ class App extends React.Component<AppProps, AppState> {
 
           if (detectedElement !== newElement) {
             if (detectedElement.type === "arrow") {
-              mutateElement(
+              this.scene.mutateElement(
                 detectedElement,
-                this.scene.getNonDeletedElementsMap(),
                 {
                   startArrowhead: this.state.currentItemStartArrowhead,
                   endArrowhead: this.state.currentItemEndArrowhead,

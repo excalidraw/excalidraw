@@ -2061,36 +2061,25 @@ export const actionToggleShapeSnap = register({
   PanelComponent: ({ appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.shapeSnap")}</legend>
-      <ButtonIconSelect
-        group="button"
-        options={[
-          {
-            value: false,
-            text: t("labels.shapeSnapDisable"),
-            icon: snapShapeDisabledIcon,
-          },
-          {
-            value: true,
-            text: t("labels.shapeSnapEnable"),
-            icon: snapShapeEnabledIcon,
-          },
-        ]}
-        value={appState.isShapeSnapEnabled}
-        onChange={(value) => updateData(value)}
-      />
+      <div className="buttonList">
+        <RadioSelection
+          group="button"
+          options={[
+            {
+              value: false,
+              text: t("labels.shapeSnapDisable"),
+              icon: snapShapeDisabledIcon,
+            },
+            {
+              value: true,
+              text: t("labels.shapeSnapEnable"),
+              icon: snapShapeEnabledIcon,
+            },
+          ]}
+          value={appState.isShapeSnapEnabled}
+          onChange={(value) => updateData(value)}
+        />
+      </div>
     </fieldset>
   ),
 });
-
-function ButtonIconSelect(props: {
-  onChange: (value: any) => any;
-  group: string;
-  options: { value: any; text: string; icon: any }[];
-  value: any;
-}) {
-  console.error(
-    "ButtonIconSelect is a placeholder component and should be replaced by a properties setting after rebase.",
-  );
-
-  return null;
-}
