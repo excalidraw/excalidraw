@@ -11931,7 +11931,7 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 // TEST HOOKS
 // -----------------------------------------------------------------------------
-/* //zsviczian - I get a type error on h, but anyway I don't need this test hook
+ //zsviczian - I get a type error on h, but anyway I don't need this test hook
 declare global {
   interface Window {
     h: {
@@ -11973,5 +11973,5 @@ export const createTestHook = () => {
 };
 
 createTestHook();
-*/
+
 export default App;

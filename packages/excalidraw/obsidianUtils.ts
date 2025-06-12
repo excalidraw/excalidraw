@@ -243,7 +243,7 @@ export const intersectElementWithLine = (
   gap: number = 0,
   elementsMap: ElementsMap,
 ): GlobalPoint[] | undefined => {
-  return intersectElementWithLineSegment(element, lineSegment(a, b), gap);
+  return intersectElementWithLineSegment(element, elementsMap, lineSegment(a, b), gap);
 };
 
 //disable double click
