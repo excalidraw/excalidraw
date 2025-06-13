@@ -18,11 +18,6 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import {
-  EXTERNAL_LINK_IMG,
-  ELEMENT_LINK_IMG,
-  getLinkHandleFromCoords,
-} from "../components/hyperlink/helpers";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 
@@ -144,66 +139,6 @@ const linkIconCanvasCache: {
   elementLink: null,
 };
 
-const renderLinkIcon = (
-  element: NonDeletedExcalidrawElement,
-  context: CanvasRenderingContext2D,
-  appState: StaticCanvasAppState,
-  elementsMap: ElementsMap,
-) => {
-  if (element.link && !appState.selectedElementIds[element.id]) {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-    const [x, y, width, height] = getLinkHandleFromCoords(
-      [x1, y1, x2, y2],
-      element.angle,
-      appState,
-    );
-    const centerX = x + width / 2;
-    const centerY = y + height / 2;
-    context.save();
-    context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
-    context.rotate(element.angle);
-
-    const canvasKey = isElementLink(element.link)
-      ? "elementLink"
-      : "regularLink";
-
-    let linkCanvas = linkIconCanvasCache[canvasKey];
-
-    if (!linkCanvas || linkCanvas.zoom !== appState.zoom.value) {
-      linkCanvas = Object.assign(document.createElement("canvas"), {
-        zoom: appState.zoom.value,
-      });
-      linkCanvas.width = width * window.devicePixelRatio * appState.zoom.value;
-      linkCanvas.height =
-        height * window.devicePixelRatio * appState.zoom.value;
-      linkIconCanvasCache[canvasKey] = linkCanvas;
-
-      const linkCanvasCacheContext = linkCanvas.getContext("2d")!;
-      linkCanvasCacheContext.scale(
-        window.devicePixelRatio * appState.zoom.value,
-        window.devicePixelRatio * appState.zoom.value,
-      );
-      linkCanvasCacheContext.fillStyle = appState.viewBackgroundColor || "#fff";
-      linkCanvasCacheContext.fillRect(0, 0, width, height);
-
-      if (canvasKey === "elementLink") {
-        linkCanvasCacheContext.drawImage(ELEMENT_LINK_IMG, 0, 0, width, height);
-      } else {
-        linkCanvasCacheContext.drawImage(
-          EXTERNAL_LINK_IMG,
-          0,
-          0,
-          width,
-          height,
-        );
-      }
-
-      linkCanvasCacheContext.restore();
-    }
-    context.drawImage(linkCanvas, x - centerX, y - centerY, width, height);
-    context.restore();
-  }
-};
 const _renderStaticScene = ({
   canvas,
   rc,
@@ -344,9 +279,6 @@ const _renderStaticScene = ({
 
       context.restore();
 
-      if (!isExporting) {
-        renderLinkIcon(element, context, appState, elementsMap);
-      }
     } catch (error: any) {
       console.error(
         error,

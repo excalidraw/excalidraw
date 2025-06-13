@@ -107,7 +107,6 @@ export const getDefaultAppState = (): Omit<
     },
     viewModeEnabled: false,
     pendingImageElementId: null,
-    showHyperlinkPopup: false,
     selectedLinearElement: null,
     snapLines: [],
     originSnapOffset: {
@@ -230,7 +229,6 @@ const APP_STATE_STORAGE_CONF = (<
   zoom: { browser: true, export: false, server: false },
   viewModeEnabled: { browser: false, export: false, server: false },
   pendingImageElementId: { browser: false, export: false, server: false },
-  showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
   snapLines: { browser: false, export: false, server: false },
   originSnapOffset: { browser: false, export: false, server: false },

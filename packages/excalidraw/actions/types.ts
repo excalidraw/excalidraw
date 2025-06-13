@@ -116,7 +116,6 @@ export type ActionName =
   | "increaseFontSize"
   | "decreaseFontSize"
   | "unbindText"
-  | "hyperlink"
   | "bindText"
   | "unlockAllElements"
   | "toggleElementLock"
@@ -195,8 +194,7 @@ export interface Action {
           | "export"
           | "history"
           | "menu"
-          | "hyperlink"
-          | "search_menu"
+                  | "search_menu"
           | "shape_switch";
         action?: string;
         predicate?: (

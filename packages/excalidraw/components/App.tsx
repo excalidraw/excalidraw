@@ -274,7 +274,6 @@ import {
   actionUnbindText,
   actionBindText,
   actionUngroup,
-  actionLink,
   actionToggleElementLock,
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
@@ -283,7 +282,6 @@ import {
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
 import { actionPaste } from "../actions/actionClipboard";
-import { actionCopyElementLink } from "../actions/actionElementLink";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
 import {
   actionRemoveAllElementsFromFrame,
@@ -336,11 +334,6 @@ import {
 } from "../data/blob";
 
 import { fileOpen } from "../data/filesystem";
-import {
-  showHyperlinkTooltip,
-  hideHyperlinkToolip,
-  Hyperlink,
-} from "../components/hyperlink/Hyperlink";
 
 import { Fonts } from "../fonts";
 import { editorJotaiStore, type WritableAtom } from "../editor-jotai";
@@ -390,10 +383,6 @@ import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
-import {
-  isPointHittingLink,
-  isPointHittingLinkIcon,
-} from "./hyperlink/helpers";
 import { copyIcon, fullscreenIcon } from "./icons";
 import { Toast } from "./Toast";
 
@@ -560,7 +549,6 @@ class App extends React.Component<AppProps, AppState> {
   public flowChartCreator: FlowChartCreator = new FlowChartCreator();
   private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
 
-  hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
@@ -986,9 +974,7 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
-          "excalidraw--view-mode":
-            this.state.viewModeEnabled ||
-            this.state.openDialog?.name === "elementLinkSelector",
+          "excalidraw--view-mode": this.state.viewModeEnabled,
           "excalidraw--mobile": this.device.editor.isMobile,
         })}
         style={{
@@ -1047,9 +1033,6 @@ class App extends React.Component<AppProps, AppState> {
                             !this.scene.getElementsIncludingDeleted().length
                           }
                           app={this}
-                          generateLinkForSelection={
-                            this.props.generateLinkForSelection
-                          }
                         >
                           {this.props.children}
                         </LayerUI>
@@ -1060,19 +1043,7 @@ class App extends React.Component<AppProps, AppState> {
                         <SVGLayer
                           trails={[this.laserTrails, this.eraserTrail]}
                         />
-                        {selectedElements.length === 1 &&
-                          this.state.openDialog?.name !==
-                            "elementLinkSelector" &&
-                          this.state.showHyperlinkPopup && (
-                            <Hyperlink
-                              key={firstSelectedElement.id}
-                              element={firstSelectedElement}
-                              scene={this.scene}
-                              setAppState={this.setAppState}
-                              onLinkOpen={this.props.onLinkOpen}
-                              setToast={this.setToast}
-                            />
-                          )}
+
                         {selectedElements.length === 1 &&
                           firstSelectedElement.customData?.generationData
                             ?.status === "done" && (
@@ -1898,14 +1869,6 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       setEraserCursor(this.interactiveCanvas, this.state.theme);
     }
-    // Hide hyperlink popup if shown when element type is not selection
-    if (
-      prevState.activeTool.type === "selection" &&
-      this.state.activeTool.type !== "selection" &&
-      this.state.showHyperlinkPopup
-    ) {
-      this.setState({ showHyperlinkPopup: false });
-    }
 
     if (isEraserActive(prevState) && !isEraserActive(this.state)) {
       this.eraserTrail.endPath();
@@ -1921,11 +1884,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // cleanup
-    if (
-      (prevState.openDialog?.name === "elementLinkSelector" ||
-        this.state.openDialog?.name === "elementLinkSelector") &&
-      prevState.openDialog?.name !== this.state.openDialog?.name
-    ) {
+    if (prevState.openDialog?.name !== this.state.openDialog?.name) {
       this.deselectElements();
       this.setState({
         hoveredElementIds: {},
@@ -4587,14 +4546,7 @@ class App extends React.Component<AppProps, AppState> {
       }
       if (
         element.link &&
-        index >= hitElementIndex &&
-        isPointHittingLink(
-          element,
-          this.scene.getNonDeletedElementsMap(),
-          this.state,
-          pointFrom(scenePointer.x, scenePointer.y),
-          this.device.editor.isMobile,
-        )
+        index >= hitElementIndex 
       ) {
         return element;
       }
@@ -4615,7 +4567,7 @@ class App extends React.Component<AppProps, AppState> {
         this.lastPointerUpEvent!.clientY,
       ),
     );
-    if (!this.hitLinkElement || draggedDistance > DRAGGING_THRESHOLD) {
+    if( draggedDistance > DRAGGING_THRESHOLD) {
       return;
     }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
@@ -4623,51 +4575,11 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
     const elementsMap = this.scene.getNonDeletedElementsMap();
-    const lastPointerDownHittingLinkIcon = isPointHittingLink(
-      this.hitLinkElement,
-      elementsMap,
-      this.state,
-      pointFrom(lastPointerDownCoords.x, lastPointerDownCoords.y),
-      this.device.editor.isMobile,
-    );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUpEvent!,
       this.state,
     );
-    const lastPointerUpHittingLinkIcon = isPointHittingLink(
-      this.hitLinkElement,
-      elementsMap,
-      this.state,
-      pointFrom(lastPointerUpCoords.x, lastPointerUpCoords.y),
-      this.device.editor.isMobile,
-    );
-    if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
-      hideHyperlinkToolip();
-      let url = this.hitLinkElement.link;
-      if (url) {
-        url = normalizeLink(url);
-        let customEvent;
-        if (this.props.onLinkOpen) {
-          customEvent = wrapEvent(EVENT.EXCALIDRAW_LINK, event.nativeEvent);
-          this.props.onLinkOpen(
-            {
-              ...this.hitLinkElement,
-              link: url,
-            },
-            customEvent,
-          );
-        }
-        if (!customEvent?.defaultPrevented) {
-          const target = isLocalLink(url) ? "_self" : "_blank";
-          const newWindow = window.open(undefined, target);
-          // https://mathiasbynens.github.io/rel-noopener/
-          if (newWindow) {
-            newWindow.opener = null;
-            newWindow.location = url;
-          }
-        }
-      }
-    }
+
   };
 
   private getTopLayerFrameAtSceneCoords = (sceneCoords: {
@@ -5080,57 +4992,8 @@ class App extends React.Component<AppProps, AppState> {
       hitElement = hitElementMightBeLocked;
     }
 
-    this.hitLinkElement = this.getElementLinkAtPosition(
-      scenePointer,
-      hitElementMightBeLocked,
-    );
     if (isEraserActive(this.state)) {
       return;
-    }
-    if (
-      this.hitLinkElement &&
-      !this.state.selectedElementIds[this.hitLinkElement.id]
-    ) {
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-      showHyperlinkTooltip(
-        this.hitLinkElement,
-        this.state,
-        this.scene.getNonDeletedElementsMap(),
-      );
-    } else {
-      hideHyperlinkToolip();
-      if (
-        hitElement &&
-        hitElement.link &&
-        this.state.selectedElementIds[hitElement.id] &&
-        !this.state.contextMenu &&
-        !this.state.showHyperlinkPopup
-      ) {
-        this.setState({ showHyperlinkPopup: "info" });
-      } else if (this.state.activeTool.type === "text") {
-        setCursor(
-          this.interactiveCanvas,
-          isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
-        );
-      } else if (this.state.viewModeEnabled) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-      } else if (this.state.openDialog?.name === "elementLinkSelector") {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
-      } else if (isOverScrollBar) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
-      } else if (this.state.selectedLinearElement) {
-        this.handleHoverSelectedLinearElement(
-          this.state.selectedLinearElement,
-          scenePointerX,
-          scenePointerY,
-        );
-      } else if (
-        // if using cmd/ctrl, we're not dragging
-        !event[KEYS.CTRL_OR_CMD]
-      ) {
-      } else {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
-      }
     }
 
     if (this.state.openDialog?.name === "elementLinkSelector" && hitElement) {
@@ -5631,28 +5494,9 @@ class App extends React.Component<AppProps, AppState> {
           includeLockedElements: true,
         },
       );
-      this.hitLinkElement = this.getElementLinkAtPosition(
-        scenePointer,
-        hitElement,
-      );
     }
 
-    if (
-      this.hitLinkElement &&
-      !this.state.selectedElementIds[this.hitLinkElement.id]
-    ) {
-      if (
-        clicklength < 300 &&
-        !isPointHittingLinkIcon(
-          this.hitLinkElement,
-          this.scene.getNonDeletedElementsMap(),
-          this.state,
-          pointFrom(scenePointer.x, scenePointer.y),
-        )
-      ) {
-        this.redirectToLink(event, this.device.isTouchScreen);
-      }
-    } else if (this.state.viewModeEnabled) {
+ if (this.state.viewModeEnabled) {
       this.setState({
         selectedElementIds: {},
       });
@@ -6105,15 +5949,7 @@ class App extends React.Component<AppProps, AppState> {
             );
         }
 
-        this.hitLinkElement = this.getElementLinkAtPosition(
-          pointerDownState.origin,
-          hitElementMightBeLocked,
-        );
-
-        if (this.hitLinkElement) {
-          return true;
-        }
-
+   
         if (
           this.state.croppingElementId &&
           pointerDownState.hit.element?.id !== this.state.croppingElementId
@@ -6306,7 +6142,6 @@ class App extends React.Component<AppProps, AppState> {
                     prevState,
                     this,
                   ),
-                  showHyperlinkPopup: hitElement.link ? "info" : false,
                 };
               });
               pointerDownState.hit.wasAddedToSelection = true;
@@ -7606,11 +7441,6 @@ class App extends React.Component<AppProps, AppState> {
                       this.scene.getNonDeletedElementsMap(),
                     )
                   : null,
-              showHyperlinkPopup:
-                elementsWithinSelection.length === 1 &&
-                elementsWithinSelection[0].link
-                  ? "info"
-                  : false,
             };
           });
         }
@@ -8394,7 +8224,6 @@ class App extends React.Component<AppProps, AppState> {
                   prevState,
                   this,
                 ),
-                showHyperlinkPopup: hitElement.link ? "info" : false,
               };
             });
           } else {
@@ -8486,9 +8315,6 @@ class App extends React.Component<AppProps, AppState> {
             },
             prevState,
           ),
-          showHyperlinkPopup: !newElement.link
-            ? "editor"
-            : prevState.showHyperlinkPopup,
         }));
       }
 
@@ -9314,7 +9140,6 @@ class App extends React.Component<AppProps, AppState> {
                 : null,
             }
           : this.state),
-        showHyperlinkPopup: false,
       },
       () => {
         this.setState({
@@ -9749,8 +9574,6 @@ class App extends React.Component<AppProps, AppState> {
       CONTEXT_MENU_SEPARATOR,
       actionToggleLinearEditor,
       CONTEXT_MENU_SEPARATOR,
-      actionLink,
-      actionCopyElementLink,
       CONTEXT_MENU_SEPARATOR,
       actionDuplicateSelection,
       actionToggleElementLock,
