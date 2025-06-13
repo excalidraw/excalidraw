@@ -693,12 +693,12 @@ export const actionChangePressureSensitivity = register({
     const commonPressureSensitivity = selectedElements
       .filter(isFreeDrawElement)
       .reduce((acc, element) => {
-        const sensitivity = element.pressureSensitivity ?? 1;
+        const sensitivity = element.drawingConfigs?.pressureSensitivity ?? 1;
         if (acc !== null && acc !== sensitivity) {
           return null; // No common value
         }
         return sensitivity;
-      }, firstElement?.pressureSensitivity ?? null);
+      }, firstElement?.drawingConfigs?.pressureSensitivity ?? null);
 
     const currentValue =
       commonPressureSensitivity ?? appState.currentItemPressureSensitivity;

@@ -104,7 +104,11 @@ import {
   Emitter,
 } from "@excalidraw/common";
 
-import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
+import {
+  DRAWING_CONFIGS,
+  getCommonBounds,
+  getElementAbsoluteCoords,
+} from "@excalidraw/element";
 
 import {
   bindOrUnbindLinearElements,
@@ -7588,7 +7592,14 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
-      pressureSensitivity: this.state.currentItemPressureSensitivity,
+      drawingConfigs: {
+        pressureSensitivity: this.state.currentItemPressureSensitivity,
+        streamline:
+          window.h?.debugFreedraw?.streamline ??
+          DRAWING_CONFIGS.default.streamline,
+        simplify:
+          window.h?.debugFreedraw?.simplify ?? DRAWING_CONFIGS.default.simplify,
+      },
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [pointFrom<LocalPoint>(0, 0)],
@@ -11384,10 +11395,7 @@ export const createTestHook = () => {
     window.h = window.h || ({} as Window["h"]);
 
     // Initialize debug freedraw parameters
-    window.h.debugFreedraw = window.h.debugFreedraw || {
-      streamline: 0.62,
-      simplify: 0.3,
-    };
+    window.h.debugFreedraw = window.h.debugFreedraw || DRAWING_CONFIGS.default;
 
     Object.defineProperties(window.h, {
       elements: {

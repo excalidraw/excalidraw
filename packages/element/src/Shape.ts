@@ -513,12 +513,12 @@ export const _generateElementShape = (
 
       if (isPathALoop(element.points)) {
         const points =
-          element.pressureSensitivity === null
+          element.drawingConfigs === null
             ? simplify(element.points as LocalPoint[], 0.75)
             : simplify(element.points as LocalPoint[], 1.5);
 
         shape =
-          element.pressureSensitivity === null
+          element.drawingConfigs === null
             ? generator.curve(points, {
                 ...generateRoughOptions(element),
                 stroke: "none",

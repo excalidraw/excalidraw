@@ -1,15 +1,20 @@
+import { DRAWING_CONFIGS } from "@excalidraw/element";
 import { useState, useEffect } from "react";
 
 export const FreedrawDebugSliders = () => {
-  const [streamline, setStreamline] = useState(0.62);
-  const [simplify, setSimplify] = useState(0.3);
+  const [streamline, setStreamline] = useState<number>(
+    DRAWING_CONFIGS.default.streamline,
+  );
+  const [simplify, setSimplify] = useState<number>(
+    DRAWING_CONFIGS.default.simplify,
+  );
 
   useEffect(() => {
     if (!window.h) {
       window.h = {} as any;
     }
     if (!window.h.debugFreedraw) {
-      window.h.debugFreedraw = { streamline: 0.62, simplify: 0.3 };
+      window.h.debugFreedraw = DRAWING_CONFIGS.default;
     }
 
     setStreamline(window.h.debugFreedraw.streamline);
