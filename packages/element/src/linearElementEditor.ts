@@ -33,6 +33,11 @@ import type {
   Zoom,
 } from "@excalidraw/excalidraw/types";
 
+import {
+  SnapLine,
+  snapLinearElementPoint,
+} from "@excalidraw/excalidraw/snapping";
+
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import {
@@ -150,6 +155,7 @@ export class LinearElementEditor {
   public readonly segmentMidPointHoveredCoords: GlobalPoint | null;
   public readonly elbowed: boolean;
   public readonly customLineAngle: number | null;
+  public readonly snapLines: readonly SnapLine[];
 
   constructor(
     element: NonDeleted<ExcalidrawLinearElement>,
@@ -188,6 +194,7 @@ export class LinearElementEditor {
     this.segmentMidPointHoveredCoords = null;
     this.elbowed = isElbowArrow(element) && element.elbowed;
     this.customLineAngle = null;
+    this.snapLines = [];
   }
 
   // ---------------------------------------------------------------------------
@@ -323,6 +330,8 @@ export class LinearElementEditor {
     // point that's being dragged (out of all selected points)
     const draggingPoint = element.points[lastClickedPoint];
 
+    let _snapLines: SnapLine[] = [];
+
     if (selectedPointsIndices && draggingPoint) {
       if (
         shouldRotateWithDiscreteAngle(event) &&
@@ -365,11 +374,33 @@ export class LinearElementEditor {
           ]),
         );
       } else {
+        // Apply object snapping for the point being dragged
+        const originalPointerX =
+          scenePointerX - linearElementEditor.pointerOffset.x;
+        const originalPointerY =
+          scenePointerY - linearElementEditor.pointerOffset.y;
+
+        const { snapOffset, snapLines } = snapLinearElementPoint(
+          scene.getNonDeletedElements(),
+          element,
+          lastClickedPoint,
+          { x: originalPointerX, y: originalPointerY },
+          app,
+          event,
+          elementsMap,
+        );
+
+        _snapLines = snapLines;
+
+        // Apply snap offset to get final coordinates
+        const snappedPointerX = originalPointerX + snapOffset.x;
+        const snappedPointerY = originalPointerY + snapOffset.y;
+
         const newDraggingPointPosition = LinearElementEditor.createPointAt(
           element,
           elementsMap,
-          scenePointerX - linearElementEditor.pointerOffset.x,
-          scenePointerY - linearElementEditor.pointerOffset.y,
+          snappedPointerX,
+          snappedPointerY,
           event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
         );
 
@@ -386,8 +417,8 @@ export class LinearElementEditor {
                   ? LinearElementEditor.createPointAt(
                       element,
                       elementsMap,
-                      scenePointerX - linearElementEditor.pointerOffset.x,
-                      scenePointerY - linearElementEditor.pointerOffset.y,
+                      snappedPointerX,
+                      snappedPointerY,
                       event[KEYS.CTRL_OR_CMD]
                         ? null
                         : app.getEffectiveGridSize(),
@@ -461,6 +492,7 @@ export class LinearElementEditor {
                 elementsMap,
               )
             : null,
+        snapLines: _snapLines,
         hoverPointIndex:
           lastClickedPoint === 0 ||
           lastClickedPoint === element.points.length - 1

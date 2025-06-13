@@ -13,7 +13,7 @@ import {
   getDraggedElementsBounds,
   getElementAbsoluteCoords,
 } from "@excalidraw/element";
-import { isBoundToContainer, isFrameLikeElement } from "@excalidraw/element";
+import { isBoundToContainer, isFrameLikeElement, isElbowArrow } from "@excalidraw/element";
 
 import { getMaximumGroups } from "@excalidraw/element";
 
@@ -29,6 +29,7 @@ import type { MaybeTransformHandleType } from "@excalidraw/element";
 import type {
   ElementsMap,
   ExcalidrawElement,
+  ExcalidrawLinearElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -189,6 +190,68 @@ export const areRoughlyEqual = (a: number, b: number, precision = 0.01) => {
   return Math.abs(a - b) <= precision;
 };
 
+export const getLinearElementPoints = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  options: {
+    dragOffset?: Vector2D;
+    excludePointIndex?: number;
+  } = {},
+): GlobalPoint[] => {
+  const { dragOffset, excludePointIndex } = options;
+
+  // Only process linear elements and freedraw
+  if (
+    element.type !== "line" &&
+    element.type !== "arrow" &&
+    element.type !== "freedraw"
+  ) {
+    return [];
+  }
+
+  const linearElement = element as ExcalidrawLinearElement;
+  if (!linearElement.points || linearElement.points.length === 0) {
+    return [];
+  }
+
+  let elementX = element.x;
+  let elementY = element.y;
+
+  if (dragOffset) {
+    elementX += dragOffset.x;
+    elementY += dragOffset.y;
+  }
+
+  const globalPoints: GlobalPoint[] = [];
+
+  for (let i = 0; i < linearElement.points.length; i++) {
+    // Skip the point being edited if specified
+    if (excludePointIndex !== undefined && i === excludePointIndex) {
+      continue;
+    }
+
+    const localPoint = linearElement.points[i];
+    const globalX = elementX + localPoint[0];
+    const globalY = elementY + localPoint[1];
+
+    // Apply rotation if element is rotated
+    if (element.angle !== 0) {
+      const cx = elementX + element.width / 2;
+      const cy = elementY + element.height / 2;
+      const rotated = pointRotateRads<GlobalPoint>(
+        pointFrom(globalX, globalY),
+        pointFrom(cx, cy),
+        element.angle,
+      );
+      globalPoints.push(pointFrom(round(rotated[0]), round(rotated[1])));
+    } else {
+      globalPoints.push(pointFrom(round(globalX), round(globalY)));
+    }
+  }
+
+  return globalPoints;
+};
+
 export const getElementsCorners = (
   elements: ExcalidrawElement[],
   elementsMap: ElementsMap,
@@ -229,6 +292,13 @@ export const getElementsCorners = (
     const halfHeight = (y2 - y1) / 2;
 
     if (
+      (element.type === "line" || element.type === "arrow" || element.type === "freedraw") &&
+      !boundingBoxCorners
+    ) {
+      // For linear elements, use actual points instead of bounding box
+      const linearPoints = getLinearElementPoints(element, elementsMap, { dragOffset });
+      result = linearPoints;
+    } else if (
       (element.type === "diamond" || element.type === "ellipse") &&
       !boundingBoxCorners
     ) {
@@ -632,6 +702,162 @@ export const getReferenceSnapPoints = (
         !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
     )
     .flatMap((elementGroup) => getElementsCorners(elementGroup, elementsMap));
+};
+
+export const getReferenceSnapPointsForLinearElementPoint = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  editingElement: ExcalidrawLinearElement,
+  editingPointIndex: number,
+  appState: AppState,
+  elementsMap: ElementsMap,
+) => {
+  // Get all reference elements (excluding the one being edited)
+  const referenceElements = getReferenceElements(
+    elements,
+    [editingElement],
+    appState,
+    elementsMap,
+  );
+
+  let allSnapPoints: GlobalPoint[] = [];
+
+  // Add snap points from all reference elements
+  const referenceGroups = getMaximumGroups(referenceElements, elementsMap)
+    .filter(
+      (elementsGroup) =>
+        !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
+    );
+
+  for (const elementGroup of referenceGroups) {
+    allSnapPoints.push(...getElementsCorners(elementGroup, elementsMap));
+  }
+
+  // Note: We do not include other points from the same linear element
+  // as reference points when dragging a point, per user feedback
+
+  return allSnapPoints;
+};
+
+export const snapLinearElementPoint = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  editingElement: ExcalidrawLinearElement,
+  editingPointIndex: number,
+  pointPosition: Vector2D,
+  app: AppClassProperties,
+  event: KeyboardModifiersObject,
+  elementsMap: ElementsMap,
+) => {
+  if (!isSnappingEnabled({ app, event, selectedElements: [editingElement] }) ||
+      isElbowArrow(editingElement)) {
+    return {
+      snapOffset: { x: 0, y: 0 },
+      snapLines: [],
+    };
+  }
+
+  const snapDistance = getSnapDistance(app.state.zoom.value);
+  const minOffset = {
+    x: snapDistance,
+    y: snapDistance,
+  };
+
+  const nearestSnapsX: Snaps = [];
+  const nearestSnapsY: Snaps = [];
+
+  // Get reference snap points (all elements except the current point)
+  const referenceSnapPoints = getReferenceSnapPointsForLinearElementPoint(
+    elements,
+    editingElement,
+    editingPointIndex,
+    app.state,
+    elementsMap,
+  );
+
+  // Create a snap point for the current point position
+  const currentPointGlobal = pointFrom<GlobalPoint>(pointPosition.x, pointPosition.y);
+
+  // Find nearest snaps
+  for (const referencePoint of referenceSnapPoints) {
+    const offsetX = referencePoint[0] - currentPointGlobal[0];
+    const offsetY = referencePoint[1] - currentPointGlobal[1];
+
+    if (Math.abs(offsetX) <= minOffset.x) {
+      if (Math.abs(offsetX) < minOffset.x) {
+        nearestSnapsX.length = 0;
+      }
+
+      nearestSnapsX.push({
+        type: "point",
+        points: [currentPointGlobal, referencePoint],
+        offset: offsetX,
+      });
+
+      minOffset.x = Math.abs(offsetX);
+    }
+
+    if (Math.abs(offsetY) <= minOffset.y) {
+      if (Math.abs(offsetY) < minOffset.y) {
+        nearestSnapsY.length = 0;
+      }
+
+      nearestSnapsY.push({
+        type: "point",
+        points: [currentPointGlobal, referencePoint],
+        offset: offsetY,
+      });
+
+      minOffset.y = Math.abs(offsetY);
+    }
+  }
+
+  const snapOffset = {
+    x: nearestSnapsX[0]?.offset ?? 0,
+    y: nearestSnapsY[0]?.offset ?? 0,
+  };
+
+  // Create snap lines using the snapped position (fixed position)
+  let pointSnapLines: SnapLine[] = [];
+  
+  if (snapOffset.x !== 0 || snapOffset.y !== 0) {
+    // Recalculate snap lines with the snapped position
+    const snappedPosition = pointFrom<GlobalPoint>(
+      pointPosition.x + snapOffset.x,
+      pointPosition.y + snapOffset.y
+    );
+    
+    const snappedSnapsX: Snaps = [];
+    const snappedSnapsY: Snaps = [];
+    
+    // Find the reference points that we're snapping to
+    for (const referencePoint of referenceSnapPoints) {
+      const offsetX = referencePoint[0] - snappedPosition[0];
+      const offsetY = referencePoint[1] - snappedPosition[1];
+      
+      // Only include points that we're actually snapping to
+      if (Math.abs(offsetX) < 0.01) { // essentially zero after snapping
+        snappedSnapsX.push({
+          type: "point",
+          points: [snappedPosition, referencePoint],
+          offset: 0,
+        });
+      }
+      
+      if (Math.abs(offsetY) < 0.01) { // essentially zero after snapping
+        snappedSnapsY.push({
+          type: "point", 
+          points: [snappedPosition, referencePoint],
+          offset: 0,
+        });
+      }
+    }
+    
+    pointSnapLines = createPointSnapLines(snappedSnapsX, snappedSnapsY);
+  }
+
+  return {
+    snapOffset,
+    snapLines: pointSnapLines,
+  };
 };
 
 const getPointSnaps = (

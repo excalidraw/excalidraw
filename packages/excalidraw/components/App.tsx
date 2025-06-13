@@ -8334,6 +8334,7 @@ class App extends React.Component<AppProps, AppState> {
               ? newLinearElementEditor
               : null,
             selectedLinearElement: newLinearElementEditor,
+            snapLines: newLinearElementEditor.snapLines,
           });
 
           return;
