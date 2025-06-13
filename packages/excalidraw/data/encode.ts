@@ -64,19 +64,6 @@ export const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
   return byteStringToArrayBuffer(atob(base64));
 };
 
-// -----------------------------------------------------------------------------
-// base64url
-// -----------------------------------------------------------------------------
-
-export const base64urlToString = (str: string) => {
-  return window.atob(
-    // normalize base64URL to base64
-    str
-      .replace(/-/g, "+")
-      .replace(/_/g, "/")
-      .padEnd(str.length + ((4 - (str.length % 4)) % 4), "="),
-  );
-};
 
 // -----------------------------------------------------------------------------
 // text encoding

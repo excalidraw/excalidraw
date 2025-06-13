@@ -12,21 +12,6 @@ export const FILE_UPLOAD_MAX_BYTES = 3 * 1024 * 1024; // 3 MiB
 // 1 year (https://stackoverflow.com/a/25201898/927631)
 export const FILE_CACHE_MAX_AGE_SEC = 31536000;
 
-export const WS_EVENTS = {
-  SERVER_VOLATILE: "server-volatile-broadcast",
-  SERVER: "server-broadcast",
-  USER_FOLLOW_CHANGE: "user-follow",
-} as const;
-
-export enum WS_SUBTYPES {
-  INVALID_RESPONSE = "INVALID_RESPONSE",
-  INIT = "SCENE_INIT",
-  UPDATE = "SCENE_UPDATE",
-  MOUSE_LOCATION = "MOUSE_LOCATION",
-  IDLE_STATUS = "IDLE_STATUS",
-  USER_VISIBLE_SCENE_BOUNDS = "USER_VISIBLE_SCENE_BOUNDS",
-}
-
 export const STORAGE_KEYS = {
   LOCAL_STORAGE_ELEMENTS: "excalidraw",
   LOCAL_STORAGE_APP_STATE: "excalidraw-state",
@@ -36,6 +21,3 @@ export const STORAGE_KEYS = {
   VERSION_FILES: "version-files",
 } as const;
 
-export const COOKIES = {
-  AUTH_STATE_COOKIE: "excplus-auth",
-} as const;
