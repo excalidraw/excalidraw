@@ -779,14 +779,6 @@ export const isProdEnv = () => import.meta.env.MODE === ENV.PRODUCTION;
 export const isServerEnv = () =>
   typeof process !== "undefined" && !!process?.env?.NODE_ENV;
 
-export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
-  return new CustomEvent(name, {
-    detail: {
-      nativeEvent,
-    },
-    cancelable: true,
-  });
-};
 
 export const updateObject = <T extends Record<string, any>>(
   obj: T,

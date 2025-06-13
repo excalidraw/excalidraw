@@ -7,8 +7,8 @@ import {
   isRTL,
   isTestEnv,
   getVerticalOffset,
+  normalizeLink,
 } from "@excalidraw/common";
-import { normalizeLink, toValidURL } from "@excalidraw/common";
 import { hashString } from "@excalidraw/element";
 import { getUncroppedWidthAndHeight } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";

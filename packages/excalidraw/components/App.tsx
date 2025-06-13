@@ -19,14 +19,12 @@ import {
 } from "@excalidraw/math";
 
 import {
-  COLOR_PALETTE,
   CODES,
   shouldResizeFromCenter,
   shouldMaintainAspectRatio,
   shouldRotateWithDiscreteAngle,
   isArrowKey,
   KEYS,
-  APP_NAME,
   CURSOR_TYPE,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_VERTICAL_ALIGN,
@@ -62,11 +60,7 @@ import {
   DEFAULT_COLLISION_THRESHOLD,
   DEFAULT_TEXT_ALIGN,
   ARROW_TYPE,
-  DEFAULT_REDUCED_GLOBAL_ALPHA,
   isSafari,
-  isLocalLink,
-  normalizeLink,
-  toValidURL,
   getGridPoint,
   getLineHeight,
   debounce,
@@ -79,7 +73,6 @@ import {
   sceneCoordsToViewportCoords,
   tupleToCoors,
   viewportCoordsToSceneCoords,
-  wrapEvent,
   updateObject,
   updateActiveTool,
   getShortcutKey,
@@ -91,7 +84,6 @@ import {
   easeOut,
   updateStable,
   addEventListener,
-  normalizeEOL,
   getDateTime,
   isShallowEqual,
   arrayToMap,
@@ -306,7 +298,7 @@ import { exportCanvas, loadFromBlob } from "../data";
 import { restore, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
-import { defaultLang, getLanguage, languages, t } from "../i18n";
+import { getLanguage, t } from "../i18n";
 
 import {
   calculateScrollCenter,

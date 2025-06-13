@@ -27,7 +27,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     excalidrawAPI,
     onPointerUpdate,
     renderTopRightUI,
-    langCode = defaultLang.code,
     viewModeEnabled,
     zenModeEnabled,
     gridModeEnabled,
