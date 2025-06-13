@@ -11,6 +11,7 @@ import {
   vectorFromPoint,
   vectorNormalize,
   vectorScale,
+  doBoundsIntersect,
 } from "@excalidraw/math";
 
 import {
@@ -23,12 +24,7 @@ import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./utils";
-import {
-  type Bounds,
-  doBoundsIntersect,
-  getCenterForBounds,
-  getElementBounds,
-} from "./bounds";
+import { type Bounds, getCenterForBounds, getElementBounds } from "./bounds";
 import {
   hasBoundTextElement,
   isFreeDrawElement,
