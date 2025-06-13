@@ -11,7 +11,7 @@ You'll need to supply `onSelect()` to handle opening of your collaboration dialo
 
 ```tsx live
 function App() {
-  const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+  const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI>();
   const [isCollaborating, setIsCollaborating] = useState(false);
   return (
     <div style={{ height: "500px" }}>
@@ -33,9 +33,9 @@ function App() {
                 username: "Pika",
                 avatarUrl: "../../../../img/pika.jpeg",
               });
-              excalidrawAPI.updateScene({ collaborators });
+              excalidrawAPI?.updateScene({ collaborators });
             } else {
-              excalidrawAPI.updateScene({
+              excalidrawAPI?.updateScene({
                 collaborators: new Map(),
               });
             }
@@ -45,7 +45,7 @@ function App() {
         Show Collaborators
       </label>
       <Excalidraw
-        ref={(api) => setExcalidrawAPI(api)}
+        excalidrawAPI={(api) => setExcalidrawAPI(api)}
         renderTopRightUI={() => (
           <LiveCollaborationTrigger
             isCollaborating={isCollaborating}
