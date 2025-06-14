@@ -14,9 +14,8 @@ import {
 } from "@excalidraw/math";
 import { type Point } from "points-on-curve";
 
-import { elementCenterPoint } from "@excalidraw/common";
-
 import {
+  elementCenterPoint,
   getElementAbsoluteCoords,
   getResizedElementAbsoluteCoords,
 } from "./bounds";

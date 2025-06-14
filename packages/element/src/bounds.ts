@@ -2,7 +2,6 @@ import rough from "roughjs/bin/rough";
 
 import {
   arrayToMap,
-  elementCenterPoint,
   invariant,
   rescalePoints,
   sizeOf,
@@ -1244,3 +1243,14 @@ export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
   bounds: Bounds,
 ): boolean =>
   p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
+
+export const elementCenterPoint = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  xOffset: number = 0,
+  yOffset: number = 0,
+) => {
+  const [x, y] = getCenterForBounds(getElementBounds(element, elementsMap));
+
+  return pointFrom<GlobalPoint>(x + xOffset, y + yOffset);
+};

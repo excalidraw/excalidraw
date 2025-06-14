@@ -1,12 +1,9 @@
-import { average, pointFrom, type GlobalPoint } from "@excalidraw/math";
-import { getCenterForBounds, getElementBounds } from "@excalidraw/element";
+import { average } from "@excalidraw/math";
 
 import type {
   ExcalidrawBindableElement,
   FontFamilyValues,
   FontString,
-  ExcalidrawElement,
-  ElementsMap,
 } from "@excalidraw/element/types";
 
 import type {
@@ -1238,17 +1235,6 @@ export const escapeDoubleQuotes = (str: string) => {
 
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
-
-export const elementCenterPoint = (
-  element: ExcalidrawElement,
-  elementsMap: ElementsMap,
-  xOffset: number = 0,
-  yOffset: number = 0,
-) => {
-  const [x, y] = getCenterForBounds(getElementBounds(element, elementsMap));
-
-  return pointFrom<GlobalPoint>(x + xOffset, y + yOffset);
-};
 
 /** hack for Array.isArray type guard not working with readonly value[] */
 export const isReadonlyArray = (value?: any): value is readonly any[] => {
