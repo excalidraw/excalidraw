@@ -4187,7 +4187,7 @@ class App extends React.Component<AppProps, AppState> {
         this.debounceClearHighlightSearchResults = false;
       }, 500);
     }
-    this.syncActionResult({
+    this.updateScene({
       appState: {
         ...this.state,
         editingGroupId: null,
@@ -4198,7 +4198,7 @@ class App extends React.Component<AppProps, AppState> {
         highlightSearchResult, //zsviczian
       },
       captureUpdate: CaptureUpdateAction.NEVER,
-      //forceFlushSync: true,
+      forceFlushSync: true,
     });
   };
 
