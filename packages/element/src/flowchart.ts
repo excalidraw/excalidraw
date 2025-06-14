@@ -21,7 +21,7 @@ import {
 import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import { newArrowElement, newElement } from "./newElement";
-import { aabbForElement } from "./shapes";
+import { aabbForElement } from "./bounds";
 import { elementsAreInFrameBounds, elementOverlapsWithFrame } from "./frame";
 import {
   isBindableElement,

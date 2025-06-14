@@ -6,8 +6,6 @@ import {
 
 import { ellipse, ellipseDistanceFromPoint } from "@excalidraw/math/ellipse";
 
-import { elementCenterPoint } from "@excalidraw/common";
-
 import type { GlobalPoint, Radians } from "@excalidraw/math";
 
 import {
@@ -15,6 +13,8 @@ import {
   deconstructLinearOrFreeDrawElement,
   deconstructRectanguloidElement,
 } from "./utils";
+
+import { elementCenterPoint } from "./bounds";
 
 import type {
   ElementsMap,
@@ -48,7 +48,7 @@ export const distanceToElement = (
     case "line":
     case "arrow":
     case "freedraw":
-      return distanceToLinearOrFreeDraElement(element, elementsMap, p);
+      return distanceToLinearOrFreeDraElement(element, p);
   }
 };
 
@@ -133,13 +133,9 @@ const distanceToEllipseElement = (
 
 const distanceToLinearOrFreeDraElement = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
-  elementsMap: ElementsMap,
   p: GlobalPoint,
 ) => {
-  const [lines, curves] = deconstructLinearOrFreeDrawElement(
-    element,
-    elementsMap,
-  );
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
   return Math.min(
     ...lines.map((s) => distanceToLineSegment(p, s)),
     ...curves.map((a) => curvePointDistance(a, p)),
