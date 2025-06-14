@@ -11,6 +11,7 @@ import {
   vectorFromPoint,
   vectorNormalize,
   vectorScale,
+  doBoundsIntersect,
 } from "@excalidraw/math";
 
 import {
@@ -25,7 +26,6 @@ import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 import { isPathALoop } from "./utils";
 import {
   type Bounds,
-  doBoundsIntersect,
   elementCenterPoint,
   getCenterForBounds,
   getElementBounds,
