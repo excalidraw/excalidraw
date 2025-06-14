@@ -1,4 +1,4 @@
-import { isTransparent, elementCenterPoint } from "@excalidraw/common";
+import { isTransparent } from "@excalidraw/common";
 import {
   curveIntersectLineSegment,
   isPointWithinBounds,
@@ -24,7 +24,12 @@ import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./utils";
-import { type Bounds, getCenterForBounds, getElementBounds } from "./bounds";
+import {
+  type Bounds,
+  elementCenterPoint,
+  getCenterForBounds,
+  getElementBounds,
+} from "./bounds";
 import {
   hasBoundTextElement,
   isFreeDrawElement,

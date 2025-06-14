@@ -6,8 +6,6 @@ import {
 
 import { ellipse, ellipseDistanceFromPoint } from "@excalidraw/math/ellipse";
 
-import { elementCenterPoint } from "@excalidraw/common";
-
 import type { GlobalPoint, Radians } from "@excalidraw/math";
 
 import {
@@ -15,6 +13,8 @@ import {
   deconstructLinearOrFreeDrawElement,
   deconstructRectanguloidElement,
 } from "./utils";
+
+import { elementCenterPoint } from "./bounds";
 
 import type {
   ElementsMap,

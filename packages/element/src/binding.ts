@@ -6,7 +6,6 @@ import {
   invariant,
   isDevEnv,
   isTestEnv,
-  elementCenterPoint,
 } from "@excalidraw/common";
 
 import {
@@ -58,7 +57,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import { aabbForElement } from "./bounds";
+import { aabbForElement, elementCenterPoint } from "./bounds";
 import { updateElbowArrowPoints } from "./elbowArrow";
 
 import type { Scene } from "./Scene";
