@@ -243,6 +243,37 @@ describe("history", () => {
       ]);
     });
 
+    it("should not modify anything on unrelated appstate change", async () => {
+      const rect = API.createElement({ type: "rectangle" });
+      await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          initialData={{
+            elements: [rect],
+          }}
+        />,
+      );
+
+      API.updateScene({
+        appState: {
+          viewModeEnabled: true,
+        },
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+
+      await waitFor(() => {
+        expect(h.state.viewModeEnabled).toBe(true);
+        expect(API.getUndoStack().length).toBe(0);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(h.elements).toEqual([
+          expect.objectContaining({ id: rect.id, isDeleted: false }),
+        ]);
+        expect(h.store.snapshot.elements.get(rect.id)).toEqual(
+          expect.objectContaining({ id: rect.id, isDeleted: false }),
+        );
+      });
+    });
+
     it("should not clear the redo stack on standalone appstate change", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
 

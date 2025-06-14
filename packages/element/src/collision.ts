@@ -1,4 +1,4 @@
-import { isTransparent, elementCenterPoint } from "@excalidraw/common";
+import { isTransparent } from "@excalidraw/common";
 import {
   curveIntersectLineSegment,
   isPointWithinBounds,
@@ -11,6 +11,7 @@ import {
   vectorFromPoint,
   vectorNormalize,
   vectorScale,
+  doBoundsIntersect,
 } from "@excalidraw/math";
 
 import {
@@ -22,10 +23,10 @@ import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
 
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
-import { isPathALoop } from "./shapes";
+import { isPathALoop } from "./utils";
 import {
   type Bounds,
-  doBoundsIntersect,
+  elementCenterPoint,
   getCenterForBounds,
   getElementBounds,
 } from "./bounds";
@@ -250,25 +251,16 @@ export const intersectElementWithLineSegment = (
     case "line":
     case "freedraw":
     case "arrow":
-      return intersectLinearOrFreeDrawWithLineSegment(
-        element,
-        elementsMap,
-        line,
-        onlyFirst,
-      );
+      return intersectLinearOrFreeDrawWithLineSegment(element, line, onlyFirst);
   }
 };
 
 const intersectLinearOrFreeDrawWithLineSegment = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
-  elementsMap: ElementsMap,
   segment: LineSegment<GlobalPoint>,
   onlyFirst = false,
 ): GlobalPoint[] => {
-  const [lines, curves] = deconstructLinearOrFreeDrawElement(
-    element,
-    elementsMap,
-  );
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
   const intersections = [];
 
   for (const l of lines) {
