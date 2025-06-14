@@ -15,11 +15,11 @@ import {
   THEME,
   throttleRAF,
 } from "@excalidraw/common";
-import { 
+import {
   colorToRgbWithCanvas,
   lightenRgb,
   rgbToString,
-  type ColorRGBTuple
+  type ColorRGBTuple,
 } from "@excalidraw/common/colors";
 
 import { FIXED_BINDING_DISTANCE, maxBindingGap } from "@excalidraw/element";
@@ -102,7 +102,7 @@ import type {
 const renderElbowArrowMidPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  selectionColor: ColorRGBTuple
+  selectionColor: ColorRGBTuple,
 ) => {
   invariant(appState.selectedLinearElement, "selectedLinearElement is null");
 
@@ -113,17 +113,21 @@ const renderElbowArrowMidPointHighlight = (
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  highlightPoint(segmentMidPointHoveredCoords, context, appState, selectionColor);
+  highlightPoint(
+    segmentMidPointHoveredCoords,
+    context,
+    appState,
+    selectionColor,
+  );
 
   context.restore();
 };
-
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   elementsMap: ElementsMap,
-  selectionColor: ColorRGBTuple
+  selectionColor: ColorRGBTuple,
 ) => {
   const { elementId, hoverPointIndex } = appState.selectedLinearElement!;
   if (
@@ -154,7 +158,7 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  selectionColor: ColorRGBTuple
+  selectionColor: ColorRGBTuple,
 ) => {
   context.fillStyle = rgbToString(selectionColor, 0.4);
 
@@ -778,7 +782,10 @@ const _renderInteractiveScene = ({
   });
 
   
-  const selectionColor = colorToRgbWithCanvas(context, renderConfig.selectionColor);
+  const selectionColor = colorToRgbWithCanvas(
+    context, 
+    renderConfig.selectionColor,
+  );
 
   if (editingLinearElement) {
     renderLinearPointHandles(
@@ -874,7 +881,7 @@ const _renderInteractiveScene = ({
       appState,
       selectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
       elementsMap,
-      selectionColor
+      selectionColor,
     );
   }
 
@@ -894,7 +901,12 @@ const _renderInteractiveScene = ({
           editor.hoverPointIndex === firstSelectedLinear.points.length - 1
         : editor.hoverPointIndex >= 0
     ) {
-      renderLinearElementPointHighlight(context, appState, elementsMap, selectionColor);
+      renderLinearElementPointHighlight(
+        context,
+        appState,
+        elementsMap,
+        selectionColor
+      );
     }
   }
 
@@ -1155,7 +1167,7 @@ const _renderInteractiveScene = ({
     }
   });
 
-  renderSnaps(context, appState, renderConfig.selectionColor);
+  renderSnaps(context, appState);
 
   context.restore();
 

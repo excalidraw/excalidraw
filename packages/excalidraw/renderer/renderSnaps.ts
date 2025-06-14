@@ -1,27 +1,30 @@
 import { pointFrom, type GlobalPoint, type LocalPoint } from "@excalidraw/math";
 
+import { THEME } from "@excalidraw/common";
+
 import type { PointSnapLine, PointerSnapLine } from "../snapping";
 import type { InteractiveCanvasAppState } from "../types";
-import type { InteractiveCanvasRenderConfig } from "../scene/types";
 
+const SNAP_COLOR_LIGHT = "#ff6b6b";
+const SNAP_COLOR_DARK = "#ff0000";
 const SNAP_WIDTH = 1;
 const SNAP_CROSS_SIZE = 2;
 
 export const renderSnaps = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   if (!appState.snapLines.length) {
     return;
   }
 
-  // Previously, in dark mode, we needed to adjust the color to account 
-  // for color inversion.
+  // in dark mode, we need to adjust the color to account for color inversion.
   // Don't change if zen mode, because we draw only crosses, we want the
   // colors to be more visible
-  // Something similar might be considered with the selection color.
-  const snapColor = selectionColor;
+  const snapColor =
+    appState.theme === THEME.LIGHT || appState.zenModeEnabled
+      ? SNAP_COLOR_LIGHT
+      : SNAP_COLOR_DARK;
   // in zen mode make the cross more visible since we don't draw the lines
   const snapWidth =
     (appState.zenModeEnabled ? SNAP_WIDTH * 1.5 : SNAP_WIDTH) /

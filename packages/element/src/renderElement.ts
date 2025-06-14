@@ -29,7 +29,7 @@ import type {
 
 import type {
   StaticCanvasRenderConfig,
-  RenderableElementsMap
+  RenderableElementsMap,
 } from "@excalidraw/excalidraw/scene/types";
 
 import { getElementAbsoluteCoords } from "./bounds";
