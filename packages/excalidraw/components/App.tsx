@@ -8917,16 +8917,17 @@ class App extends React.Component<AppProps, AppState> {
 
       const hitElements = pointerDownState.hit.allHitElements;
 
+      const sceneCoords = viewportCoordsToSceneCoords(
+        { clientX: childEvent.clientX, clientY: childEvent.clientY },
+        this.state,
+      );
+
       if (
         this.state.activeTool.type === "selection" &&
         !pointerDownState.boxSelection.hasOccurred &&
         !pointerDownState.resize.isResizing &&
         !hitElements.some((el) => this.state.selectedElementIds[el.id])
       ) {
-        const sceneCoords = viewportCoordsToSceneCoords(
-          { clientX: childEvent.clientX, clientY: childEvent.clientY },
-          this.state,
-        );
         const hitLockedElement = this.getElementAtPosition(
           sceneCoords.x,
           sceneCoords.y,
@@ -9027,6 +9028,7 @@ class App extends React.Component<AppProps, AppState> {
         } else if (this.state.selectedLinearElement.isDragging) {
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
+            sceneCoords,
           });
         }
       }
@@ -9147,7 +9149,10 @@ class App extends React.Component<AppProps, AppState> {
             isBindingEnabled(this.state) &&
             isBindingElement(newElement, false)
           ) {
-            this.actionManager.executeAction(actionFinalize);
+            this.actionManager.executeAction(actionFinalize, "ui", {
+              event: childEvent,
+              sceneCoords,
+            });
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
           if (!activeTool.locked) {
