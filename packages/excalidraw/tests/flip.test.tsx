@@ -38,6 +38,8 @@ import {
 
 import { getTextEditor } from "./queries/dom";
 
+import { mockHTMLImageElement } from "./helpers/mocks";
+
 import type { NormalizedZoomValue } from "../types";
 
 const { h } = window;
@@ -742,6 +744,28 @@ describe("freedraw", () => {
 //image
 //TODO: currently there is no test for pixel colors at flipped positions.
 describe("image", () => {
+  const smileyImageDimensions = {
+    width: 56,
+    height: 77,
+  };
+
+  beforeEach(() => {
+    // it's necessary to specify the height in order to calculate natural dimensions of the image
+    h.state.height = 1000;
+  });
+
+  beforeAll(() => {
+    mockHTMLImageElement(
+      smileyImageDimensions.width,
+      smileyImageDimensions.height,
+    );
+  });
+
+  afterAll(() => {
+    vi.unstubAllGlobals();
+    h.state.height = 0;
+  });
+
   const createImage = async () => {
     const sendPasteEvent = (file?: File) => {
       const clipboardEvent = createPasteEvent({ files: file ? [file] : [] });
