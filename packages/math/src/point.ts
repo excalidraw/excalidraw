@@ -1,6 +1,7 @@
-import { degreesToRadians } from "./angle";
+import { degreesToRadians, radiansToDegrees } from "./angle";
+
 import { PRECISION } from "./utils";
-import { vectorFromPoint, vectorScale } from "./vector";
+import { vectorDot, vectorFromPoint, vectorScale } from "./vector";
 
 import type {
   LocalPoint,
@@ -230,4 +231,67 @@ export const isPointWithinBounds = <P extends GlobalPoint | LocalPoint>(
     q[1] <= Math.max(p[1], r[1]) &&
     q[1] >= Math.min(p[1], r[1])
   );
+};
+
+/**
+ * Calculates the perpendicular distance from a point to a line segment defined by two endpoints.
+ *
+ * If the segment is of zero length, the function returns the distance from the point to the start.
+ *
+ * @typeParam P - The point type, restricted to LocalPoint or GlobalPoint.
+ * @param p - The point from which the perpendicular distance is measured.
+ * @param start - The starting point of the line segment.
+ * @param end - The ending point of the line segment.
+ * @returns The perpendicular distance from point p to the line segment defined by start and end.
+ */
+export const perpendicularDistance = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  start: P,
+  end: P,
+): number => {
+  const dx = end[0] - start[0];
+  const dy = end[1] - start[1];
+  if (dx === 0 && dy === 0) {
+    return Math.hypot(p[0] - start[0], p[1] - start[1]);
+  }
+  // Equation of line distance
+  const numerator = Math.abs(
+    dy * p[0] - dx * p[1] + end[0] * start[1] - end[1] * start[0],
+  );
+  const denom = Math.hypot(dx, dy);
+  return numerator / denom;
+};
+
+/** * Calculates the angle between three points in degrees.
+ * The angle is calculated at the first point (p0) using the second (p1) and third (p2) points.
+ * The angle is measured in degrees and is always positive.
+ * The function uses the dot product and the arccosine function to calculate the angle. * The result is clamped to the range [-1, 1] to avoid precision errors.
+ * @param p0 The first point used to form the angle.
+ * @param p1 The vertex point where the angle is calculated.
+ * @param p2 The second point used to form the angle.
+ * @returns The angle in degrees between the three points.
+ **/
+export const angleBetween = <P extends GlobalPoint | LocalPoint>(
+  p0: P,
+  p1: P,
+  p2: P,
+): Degrees => {
+  const v1 = vectorFromPoint(p0, p1);
+  const v2 = vectorFromPoint(p1, p2);
+
+  // dot and cross product
+  const magnitude1 = Math.hypot(v1[0], v1[1]);
+  const magnitude2 = Math.hypot(v2[0], v2[1]);
+  if (magnitude1 === 0 || magnitude2 === 0) {
+    return 0 as Degrees;
+  }
+
+  const dot = vectorDot(v1, v2);
+
+  let cos = dot / (magnitude1 * magnitude2);
+  // Clamp cos to [-1,1] to avoid precision errors
+  cos = Math.max(-1, Math.min(1, cos));
+  const rad = Math.acos(cos) as Radians;
+
+  return radiansToDegrees(rad);
 };
