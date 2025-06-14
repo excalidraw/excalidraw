@@ -401,11 +401,23 @@ describe("stats for a non-generic element", () => {
     UI.updateInput(input, "36");
     expect(text.fontSize).toBe(36);
 
-    // cannot change width or height
-    const width = UI.queryStatsProperty("W")?.querySelector(".drag-input");
-    expect(width).toBeUndefined();
-    const height = UI.queryStatsProperty("H")?.querySelector(".drag-input");
-    expect(height).toBeUndefined();
+    // can change width or height
+    const width = UI.queryStatsProperty("W")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(width).toBeDefined();
+    const height = UI.queryStatsProperty("H")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(height).toBeDefined();
+
+    const textHeightBeforeWrapping = text.height;
+    const textBeforeWrapping = text.text;
+    const originalTextBeforeWrapping = textBeforeWrapping;
+    UI.updateInput(width, "30");
+    expect(text.height).toBeGreaterThan(textHeightBeforeWrapping);
+    expect(text.text).not.toBe(textBeforeWrapping);
+    expect(text.originalText).toBe(originalTextBeforeWrapping);
 
     // min font size is 4
     UI.updateInput(input, "0");
@@ -627,12 +639,11 @@ describe("stats for multiple elements", () => {
     ) as HTMLInputElement;
     expect(fontSize).toBeDefined();
 
-    // changing width does not affect text
     UI.updateInput(width, "200");
 
     expect(rectangle?.width).toBe(200);
     expect(frame.width).toBe(200);
-    expect(text?.width).not.toBe(200);
+    expect(text?.width).toBe(200);
 
     UI.updateInput(angle, "40");
 
