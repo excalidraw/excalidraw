@@ -133,7 +133,6 @@ describe("binding with linear elements", () => {
     const inputX = UI.queryStatsProperty("X")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
     UI.updateInput(inputX, String("204"));
@@ -382,8 +381,7 @@ describe("stats for a non-generic element", () => {
   it("text element", async () => {
     UI.clickTool("text");
     mouse.clickAt(20, 30);
-    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
-    const editor = await getTextEditor(textEditorSelector, true);
+    const editor = await getTextEditor();
     updateTextEditor(editor, "Hello!");
     act(() => {
       editor.blur();
@@ -403,11 +401,23 @@ describe("stats for a non-generic element", () => {
     UI.updateInput(input, "36");
     expect(text.fontSize).toBe(36);
 
-    // cannot change width or height
-    const width = UI.queryStatsProperty("W")?.querySelector(".drag-input");
-    expect(width).toBeUndefined();
-    const height = UI.queryStatsProperty("H")?.querySelector(".drag-input");
-    expect(height).toBeUndefined();
+    // can change width or height
+    const width = UI.queryStatsProperty("W")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(width).toBeDefined();
+    const height = UI.queryStatsProperty("H")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(height).toBeDefined();
+
+    const textHeightBeforeWrapping = text.height;
+    const textBeforeWrapping = text.text;
+    const originalTextBeforeWrapping = textBeforeWrapping;
+    UI.updateInput(width, "30");
+    expect(text.height).toBeGreaterThan(textHeightBeforeWrapping);
+    expect(text.text).not.toBe(textBeforeWrapping);
+    expect(text.originalText).toBe(originalTextBeforeWrapping);
 
     // min font size is 4
     UI.updateInput(input, "0");
@@ -576,8 +586,7 @@ describe("stats for multiple elements", () => {
     // text, rectangle, frame
     UI.clickTool("text");
     mouse.clickAt(20, 30);
-    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
-    const editor = await getTextEditor(textEditorSelector, true);
+    const editor = await getTextEditor();
     updateTextEditor(editor, "Hello!");
     act(() => {
       editor.blur();
@@ -630,12 +639,11 @@ describe("stats for multiple elements", () => {
     ) as HTMLInputElement;
     expect(fontSize).toBeDefined();
 
-    // changing width does not affect text
     UI.updateInput(width, "200");
 
     expect(rectangle?.width).toBe(200);
     expect(frame.width).toBe(200);
-    expect(text?.width).not.toBe(200);
+    expect(text?.width).toBe(200);
 
     UI.updateInput(angle, "40");
 
@@ -657,6 +665,7 @@ describe("stats for multiple elements", () => {
 
       mouse.reset();
       Keyboard.withModifierKeys({ shift: true }, () => {
+        mouse.moveTo(10, 0);
         mouse.click();
       });
 

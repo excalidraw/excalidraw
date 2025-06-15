@@ -31,3 +31,30 @@ export const mockMermaidToExcalidraw = (opts: {
     });
   }
 };
+
+// Mock for HTMLImageElement (use with `vi.unstubAllGlobals()`)
+// as jsdom.resources: "usable" throws an error on image load
+export const mockHTMLImageElement = (
+  naturalWidth: number,
+  naturalHeight: number,
+) => {
+  vi.stubGlobal(
+    "Image",
+    class extends Image {
+      constructor() {
+        super();
+
+        Object.defineProperty(this, "naturalWidth", {
+          value: naturalWidth,
+        });
+        Object.defineProperty(this, "naturalHeight", {
+          value: naturalHeight,
+        });
+
+        queueMicrotask(() => {
+          this.onload?.({} as Event);
+        });
+      }
+    },
+  );
+};

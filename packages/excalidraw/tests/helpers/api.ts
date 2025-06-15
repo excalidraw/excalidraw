@@ -499,13 +499,21 @@ export class API {
       value: {
         files,
         getData: (type: string) => {
-          if (type === blob.type) {
+          if (type === blob.type || type === "text") {
             return text;
           }
           return "";
         },
+        types: [blob.type],
       },
     });
+    Object.defineProperty(fileDropEvent, "clientX", {
+      value: 0,
+    });
+    Object.defineProperty(fileDropEvent, "clientY", {
+      value: 0,
+    });
+    
     await fireEvent(GlobalTestState.interactiveCanvas, fileDropEvent);
   };
 
