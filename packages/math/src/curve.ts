@@ -3,7 +3,10 @@ import { type Bounds } from "@excalidraw/element";
 import { isPoint, pointDistance, pointFrom, pointFromVector } from "./point";
 import { vector, vectorNormal, vectorNormalize, vectorScale } from "./vector";
 import { LegendreGaussN24CValues, LegendreGaussN24TValues } from "./constants";
-import { doBoundsIntersect } from "./utils";
+import {
+  rectangleFromNumberSequence,
+  rectangleIntersectRectangle,
+} from "./rectangle";
 
 import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
 
@@ -114,7 +117,13 @@ export function curveIntersectLineSegment<
     Math.max(l[0][1], l[1][1]),
   ] as Bounds;
 
-  if (!doBoundsIntersect(b1, b2)) {
+  if (
+    //!doBoundsIntersect(b1, b2)
+    !rectangleIntersectRectangle(
+      rectangleFromNumberSequence(...b1),
+      rectangleFromNumberSequence(...b2),
+    )
+  ) {
     return [];
   }
 
