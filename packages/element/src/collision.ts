@@ -28,6 +28,7 @@ import {
   doBoundsIntersect,
   elementCenterPoint,
   getCenterForBounds,
+  getCubicBezierCurveBound,
   getElementBounds,
 } from "./bounds";
 import {
@@ -275,6 +276,19 @@ const intersectLinearOrFreeDrawWithLineSegment = (
   }
 
   for (const c of curves) {
+    // Optimize by doing a cheap bounding box check first
+    const b1 = getCubicBezierCurveBound(c[0], c[1], c[2], c[3]);
+    const b2 = [
+      Math.min(segment[0][0], segment[1][0]),
+      Math.min(segment[0][1], segment[1][1]),
+      Math.max(segment[0][0], segment[1][0]),
+      Math.max(segment[0][1], segment[1][1]),
+    ] as Bounds;
+
+    if (!doBoundsIntersect(b1, b2)) {
+      continue;
+    }
+
     const hits = curveIntersectLineSegment(c, segment);
 
     if (hits.length > 0) {
@@ -330,6 +344,19 @@ const intersectRectanguloidWithLineSegment = (
   }
 
   for (const t of corners) {
+    // Optimize by doing a cheap bounding box check first
+    const b1 = getCubicBezierCurveBound(t[0], t[1], t[2], t[3]);
+    const b2 = [
+      Math.min(l[0][0], l[1][0]),
+      Math.min(l[0][1], l[1][1]),
+      Math.max(l[0][0], l[1][0]),
+      Math.max(l[0][1], l[1][1]),
+    ] as Bounds;
+
+    if (!doBoundsIntersect(b1, b2)) {
+      continue;
+    }
+
     const hits = curveIntersectLineSegment(t, lineSegment(rotatedA, rotatedB));
 
     if (hits.length > 0) {
@@ -386,6 +413,19 @@ const intersectDiamondWithLineSegment = (
   }
 
   for (const t of corners) {
+    // Optimize by doing a cheap bounding box check first
+    const b1 = getCubicBezierCurveBound(t[0], t[1], t[2], t[3]);
+    const b2 = [
+      Math.min(l[0][0], l[1][0]),
+      Math.min(l[0][1], l[1][1]),
+      Math.max(l[0][0], l[1][0]),
+      Math.max(l[0][1], l[1][1]),
+    ] as Bounds;
+
+    if (!doBoundsIntersect(b1, b2)) {
+      continue;
+    }
+
     const hits = curveIntersectLineSegment(t, lineSegment(rotatedA, rotatedB));
 
     if (hits.length > 0) {

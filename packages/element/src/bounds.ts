@@ -584,7 +584,7 @@ const solveQuadratic = (
   return [s1, s2];
 };
 
-const getCubicBezierCurveBound = (
+export const getCubicBezierCurveBound = (
   p0: GlobalPoint,
   p1: GlobalPoint,
   p2: GlobalPoint,
