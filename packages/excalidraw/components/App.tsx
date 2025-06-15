@@ -100,6 +100,7 @@ import {
   randomInteger,
   CLASSES,
   Emitter,
+  STROKE_PRESSURE
 } from "@excalidraw/common";
 
 import {
@@ -7483,7 +7484,10 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
-    const simulatePressure = event.pressure === 0.5;
+    let simulatePressure = event.pressure === 0.5;
+    if (this.state.strokePressure === STROKE_PRESSURE.fixed) {
+      simulatePressure = false;
+    }
 
     const element = newFreeDrawElement({
       type: elementType,

@@ -419,6 +419,11 @@ export const STROKE_WIDTH = {
   extraBold: 4,
 } as const;
 
+export const STROKE_PRESSURE = {
+  variable: 0,
+  fixed: 1,
+} as const;
+
 export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: ExcalidrawElement["strokeColor"];
   backgroundColor: ExcalidrawElement["backgroundColor"];
