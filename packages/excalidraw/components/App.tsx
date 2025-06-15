@@ -9927,11 +9927,8 @@ class App extends React.Component<AppProps, AppState> {
     imagePlaceholder: ExcalidrawImageElement,
     fileId: FileId,
   ) => {
-    const sceneImageElement = this.scene.getElement(imagePlaceholder.id);
     const latestImageElement =
-      sceneImageElement && sceneImageElement.version > imagePlaceholder.version
-        ? sceneImageElement
-        : imagePlaceholder;
+      this.scene.getElement(imagePlaceholder.id) ?? imagePlaceholder;
 
     return newElementWith(
       latestImageElement as InitializedExcalidrawImageElement,
