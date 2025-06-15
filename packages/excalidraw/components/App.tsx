@@ -7638,7 +7638,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const placeholderSize = 100 / this.state.zoom.value;
 
-    const imageElement = newImageElement({
+    const placeholderImageElement = newImageElement({
       type: "image",
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
@@ -7657,7 +7657,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     const initializedImageElement = await this.insertImageElement(
-      imageElement,
+      placeholderImageElement,
       imageFile,
     );
 
@@ -9797,7 +9797,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private initializeImage = async (
-    imageElement: ExcalidrawImageElement,
+    placeholderImageElement: ExcalidrawImageElement,
     imageFile: File,
   ) => {
     // at this point this should be guaranteed image file, but we do this check
@@ -9863,7 +9863,7 @@ class App extends React.Component<AppProps, AppState> {
       async (resolve, reject) => {
         try {
           let initializedImageElement = this.getLatestInitializedImageElement(
-            imageElement,
+            placeholderImageElement,
             fileId,
           );
 
@@ -9896,7 +9896,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.newElement?.id !== initializedImageElement.id
           ) {
             initializedImageElement = this.getLatestInitializedImageElement(
-              imageElement,
+              placeholderImageElement,
               fileId,
             );
 
@@ -9945,7 +9945,7 @@ class App extends React.Component<AppProps, AppState> {
    * inserts image into elements array and rerenders
    */
   private insertImageElement = async (
-    imageElement: ExcalidrawImageElement,
+    placeholderImageElement: ExcalidrawImageElement,
     imageFile: File,
   ) => {
     // we should be handling all cases upstream, but in case we forget to handle
@@ -9955,11 +9955,11 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    this.scene.insertElement(imageElement);
+    this.scene.insertElement(placeholderImageElement);
 
     try {
       const initializedImageElement = await this.initializeImage(
-        imageElement,
+        placeholderImageElement,
         imageFile,
       );
 
@@ -9987,7 +9987,7 @@ class App extends React.Component<AppProps, AppState> {
       return initializedImageElement;
     } catch (error: any) {
       this.store.scheduleAction(CaptureUpdateAction.NEVER);
-      this.scene.mutateElement(imageElement, {
+      this.scene.mutateElement(placeholderImageElement, {
         isDeleted: true,
       });
       this.actionManager.executeAction(actionFinalize);
