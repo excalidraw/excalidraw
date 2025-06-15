@@ -40,6 +40,13 @@ export type DragInputCallbackType<
   setAppState: ReturnType<typeof useExcalidrawSetAppState>;
 }) => void;
 
+export type DragFinishedCallbackType<E = ExcalidrawElement> = (props: {
+  app: ReturnType<typeof useApp>;
+  setAppState: ReturnType<typeof useExcalidrawSetAppState>;
+  originalElements: readonly E[] | null;
+  originalAppState: AppState;
+}) => void;
+
 interface StatsDragInputProps<
   T extends StatsInputProperty,
   E = ExcalidrawElement,
@@ -56,6 +63,7 @@ interface StatsDragInputProps<
   appState: AppState;
   /** how many px you need to drag to get 1 unit change */
   sensitivity?: number;
+  dragFinishedCallback?: DragFinishedCallbackType;
 }
 
 const StatsDragInput = <
@@ -73,6 +81,7 @@ const StatsDragInput = <
   scene,
   appState,
   sensitivity = 1,
+  dragFinishedCallback,
 }: StatsDragInputProps<T, E>) => {
   const app = useApp();
   const setAppState = useExcalidrawSetAppState();
@@ -294,9 +303,12 @@ const StatsDragInput = <
                 captureUpdate: CaptureUpdateAction.IMMEDIATELY,
               });
 
-              // Clear frame highlighting
-              setAppState({
-                elementsToHighlight: null,
+              // Notify implementors
+              dragFinishedCallback?.({
+                app,
+                setAppState,
+                originalElements,
+                originalAppState,
               });
 
               lastPointer = null;
@@ -353,11 +365,6 @@ const StatsDragInput = <
           stateRef.current.originalAppState = cloneJSON(appState);
         }}
         onBlur={(event) => {
-          // Clear frame highlighting when input loses focus
-          setAppState({
-            elementsToHighlight: null,
-          });
-
           if (!inputValue) {
             setInputValue(value.toString());
           } else if (editable) {
