@@ -1,26 +1,65 @@
 import { simplify } from "points-on-curve";
 
-import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
-import { ROUGHNESS, isTransparent, assertNever } from "@excalidraw/common";
+import {
+  type GeometricShape,
+  getClosedCurveShape,
+  getCurveShape,
+  getEllipseShape,
+  getFreedrawShape,
+  getPolygonShape,
+} from "@excalidraw/utils/shape";
+
+import {
+  pointFrom,
+  pointDistance,
+  type LocalPoint,
+  pointRotateRads,
+} from "@excalidraw/math";
+import {
+  ROUGHNESS,
+  isTransparent,
+  assertNever,
+  COLOR_PALETTE,
+  LINE_POLYGON_POINT_MERGE_DISTANCE,
+} from "@excalidraw/common";
+
+import { RoughGenerator } from "roughjs/bin/generator";
+
+import type { GlobalPoint } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import type { EmbedsValidationStatus } from "@excalidraw/excalidraw/types";
-import type { ElementShapes } from "@excalidraw/excalidraw/scene/types";
+import type {
+  AppState,
+  EmbedsValidationStatus,
+} from "@excalidraw/excalidraw/types";
+import type {
+  ElementShape,
+  ElementShapes,
+} from "@excalidraw/excalidraw/scene/types";
+
+import { elementWithCanvasCache } from "./renderElement";
 
 import {
+  canBecomePolygon,
   isElbowArrow,
   isEmbeddableElement,
   isIframeElement,
   isIframeLikeElement,
   isLinearElement,
 } from "./typeChecks";
-import { getCornerRadius, isPathALoop } from "./shapes";
+import { getCornerRadius, isPathALoop } from "./utils";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
 import { generateFreeDrawShape } from "./renderElement";
-import { getArrowheadPoints, getDiamondPoints } from "./bounds";
+import {
+  getArrowheadPoints,
+  getCenterForBounds,
+  getDiamondPoints,
+  getElementAbsoluteCoords,
+} from "./bounds";
+import { shouldTestInside } from "./collision";
 
 import type {
   ExcalidrawElement,
@@ -28,11 +67,88 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawLinearElement,
   Arrowhead,
+  ExcalidrawFreeDrawElement,
+  ElementsMap,
+  ExcalidrawLineElement,
 } from "./types";
 
 import type { Drawable, Options } from "roughjs/bin/core";
-import type { RoughGenerator } from "roughjs/bin/generator";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+
+export class ShapeCache {
+  private static rg = new RoughGenerator();
+  private static cache = new WeakMap<ExcalidrawElement, ElementShape>();
+
+  /**
+   * Retrieves shape from cache if available. Use this only if shape
+   * is optional and you have a fallback in case it's not cached.
+   */
+  public static get = <T extends ExcalidrawElement>(element: T) => {
+    return ShapeCache.cache.get(
+      element,
+    ) as T["type"] extends keyof ElementShapes
+      ? ElementShapes[T["type"]] | undefined
+      : ElementShape | undefined;
+  };
+
+  public static set = <T extends ExcalidrawElement>(
+    element: T,
+    shape: T["type"] extends keyof ElementShapes
+      ? ElementShapes[T["type"]]
+      : Drawable,
+  ) => ShapeCache.cache.set(element, shape);
+
+  public static delete = (element: ExcalidrawElement) =>
+    ShapeCache.cache.delete(element);
+
+  public static destroy = () => {
+    ShapeCache.cache = new WeakMap();
+  };
+
+  /**
+   * Generates & caches shape for element if not already cached, otherwise
+   * returns cached shape.
+   */
+  public static generateElementShape = <
+    T extends Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+  >(
+    element: T,
+    renderConfig: {
+      isExporting: boolean;
+      canvasBackgroundColor: AppState["viewBackgroundColor"];
+      embedsValidationStatus: EmbedsValidationStatus;
+    } | null,
+  ) => {
+    // when exporting, always regenerated to guarantee the latest shape
+    const cachedShape = renderConfig?.isExporting
+      ? undefined
+      : ShapeCache.get(element);
+
+    // `null` indicates no rc shape applicable for this element type,
+    // but it's considered a valid cache value (= do not regenerate)
+    if (cachedShape !== undefined) {
+      return cachedShape;
+    }
+
+    elementWithCanvasCache.delete(element);
+
+    const shape = generateElementShape(
+      element,
+      ShapeCache.rg,
+      renderConfig || {
+        isExporting: false,
+        canvasBackgroundColor: COLOR_PALETTE.white,
+        embedsValidationStatus: null,
+      },
+    ) as T["type"] extends keyof ElementShapes
+      ? ElementShapes[T["type"]]
+      : Drawable | null;
+
+    ShapeCache.cache.set(element, shape);
+
+    return shape;
+  };
+}
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -303,6 +419,182 @@ const getArrowheadShapes = (
   }
 };
 
+export const generateLinearCollisionShape = (
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+) => {
+  const generator = new RoughGenerator();
+  const options: Options = {
+    seed: element.seed,
+    disableMultiStroke: true,
+    disableMultiStrokeFill: true,
+    roughness: 0,
+    preserveVertices: true,
+  };
+  const center = getCenterForBounds(
+    // Need a non-rotated center point
+    element.points.reduce(
+      (acc, point) => {
+        return [
+          Math.min(element.x + point[0], acc[0]),
+          Math.min(element.y + point[1], acc[1]),
+          Math.max(element.x + point[0], acc[2]),
+          Math.max(element.y + point[1], acc[3]),
+        ];
+      },
+      [Infinity, Infinity, -Infinity, -Infinity],
+    ),
+  );
+
+  switch (element.type) {
+    case "line":
+    case "arrow": {
+      // points array can be empty in the beginning, so it is important to add
+      // initial position to it
+      const points = element.points.length
+        ? element.points
+        : [pointFrom<LocalPoint>(0, 0)];
+
+      if (isElbowArrow(element)) {
+        return generator.path(generateElbowArrowShape(points, 16), options)
+          .sets[0].ops;
+      } else if (!element.roundness) {
+        return points.map((point, idx) => {
+          const p = pointRotateRads(
+            pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+            center,
+            element.angle,
+          );
+
+          return {
+            op: idx === 0 ? "move" : "lineTo",
+            data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+          };
+        });
+      }
+
+      return generator
+        .curve(points as unknown as RoughPoint[], options)
+        .sets[0].ops.slice(0, element.points.length)
+        .map((op, i) => {
+          if (i === 0) {
+            const p = pointRotateRads<GlobalPoint>(
+              pointFrom<GlobalPoint>(
+                element.x + op.data[0],
+                element.y + op.data[1],
+              ),
+              center,
+              element.angle,
+            );
+
+            return {
+              op: "move",
+              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+            };
+          }
+
+          return {
+            op: "bcurveTo",
+            data: [
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[0],
+                  element.y + op.data[1],
+                ),
+                center,
+                element.angle,
+              ),
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[2],
+                  element.y + op.data[3],
+                ),
+                center,
+                element.angle,
+              ),
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[4],
+                  element.y + op.data[5],
+                ),
+                center,
+                element.angle,
+              ),
+            ]
+              .map((p) =>
+                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+              )
+              .flat(),
+          };
+        });
+    }
+    case "freedraw": {
+      if (element.points.length < 2) {
+        return [];
+      }
+
+      const simplifiedPoints = simplify(
+        element.points as Mutable<LocalPoint[]>,
+        0.75,
+      );
+
+      return generator
+        .curve(simplifiedPoints as [number, number][], options)
+        .sets[0].ops.slice(0, element.points.length)
+        .map((op, i) => {
+          if (i === 0) {
+            const p = pointRotateRads<GlobalPoint>(
+              pointFrom<GlobalPoint>(
+                element.x + op.data[0],
+                element.y + op.data[1],
+              ),
+              center,
+              element.angle,
+            );
+
+            return {
+              op: "move",
+              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+            };
+          }
+
+          return {
+            op: "bcurveTo",
+            data: [
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[0],
+                  element.y + op.data[1],
+                ),
+                center,
+                element.angle,
+              ),
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[2],
+                  element.y + op.data[3],
+                ),
+                center,
+                element.angle,
+              ),
+              pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + op.data[4],
+                  element.y + op.data[5],
+                ),
+                center,
+                element.angle,
+              ),
+            ]
+              .map((p) =>
+                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+              )
+              .flat(),
+          };
+        });
+    }
+  }
+};
+
 /**
  * Generates the roughjs shape for given element.
  *
@@ -310,7 +602,7 @@ const getArrowheadShapes = (
  *
  * @private
  */
-export const _generateElementShape = (
+const generateElementShape = (
   element: Exclude<NonDeletedExcalidrawElement, ExcalidrawSelectionElement>,
   generator: RoughGenerator,
   {
@@ -610,4 +902,104 @@ const generateElbowArrowShape = (
   d.push(`L ${points[points.length - 1][0]} ${points[points.length - 1][1]}`);
 
   return d.join(" ");
+};
+
+/**
+ * get the pure geometric shape of an excalidraw elementw
+ * which is then used for hit detection
+ */
+export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+): GeometricShape<Point> => {
+  switch (element.type) {
+    case "rectangle":
+    case "diamond":
+    case "frame":
+    case "magicframe":
+    case "embeddable":
+    case "image":
+    case "iframe":
+    case "text":
+    case "selection":
+      return getPolygonShape(element);
+    case "arrow":
+    case "line": {
+      const roughShape =
+        ShapeCache.get(element)?.[0] ??
+        ShapeCache.generateElementShape(element, null)[0];
+      const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
+
+      return shouldTestInside(element)
+        ? getClosedCurveShape<Point>(
+            element,
+            roughShape,
+            pointFrom<Point>(element.x, element.y),
+            element.angle,
+            pointFrom(cx, cy),
+          )
+        : getCurveShape<Point>(
+            roughShape,
+            pointFrom<Point>(element.x, element.y),
+            element.angle,
+            pointFrom(cx, cy),
+          );
+    }
+
+    case "ellipse":
+      return getEllipseShape(element);
+
+    case "freedraw": {
+      const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
+      return getFreedrawShape(
+        element,
+        pointFrom(cx, cy),
+        shouldTestInside(element),
+      );
+    }
+  }
+};
+
+export const toggleLinePolygonState = (
+  element: ExcalidrawLineElement,
+  nextPolygonState: boolean,
+): {
+  polygon: ExcalidrawLineElement["polygon"];
+  points: ExcalidrawLineElement["points"];
+} | null => {
+  const updatedPoints = [...element.points];
+
+  if (nextPolygonState) {
+    if (!canBecomePolygon(element.points)) {
+      return null;
+    }
+
+    const firstPoint = updatedPoints[0];
+    const lastPoint = updatedPoints[updatedPoints.length - 1];
+
+    const distance = Math.hypot(
+      firstPoint[0] - lastPoint[0],
+      firstPoint[1] - lastPoint[1],
+    );
+
+    if (
+      distance > LINE_POLYGON_POINT_MERGE_DISTANCE ||
+      updatedPoints.length < 4
+    ) {
+      updatedPoints.push(pointFrom(firstPoint[0], firstPoint[1]));
+    } else {
+      updatedPoints[updatedPoints.length - 1] = pointFrom(
+        firstPoint[0],
+        firstPoint[1],
+      );
+    }
+  }
+
+  // TODO: satisfies ElementUpdate<ExcalidrawLineElement>
+  const ret = {
+    polygon: nextPolygonState,
+    points: updatedPoints,
+  };
+
+  return ret;
 };

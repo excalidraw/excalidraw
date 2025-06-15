@@ -1,7 +1,7 @@
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import { getBoundTextElement } from "@excalidraw/element";
-import { isFrameLikeElement, isTextElement } from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element";
 
 import {
   getSelectedGroupIds,
@@ -41,12 +41,6 @@ export const isPropertyEditable = (
   element: ExcalidrawElement,
   property: keyof ExcalidrawElement,
 ) => {
-  if (property === "height" && isTextElement(element)) {
-    return false;
-  }
-  if (property === "width" && isTextElement(element)) {
-    return false;
-  }
   if (property === "angle" && isFrameLikeElement(element)) {
     return false;
   }
