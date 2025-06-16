@@ -737,3 +737,196 @@ describe("stats for multiple elements", () => {
     expect(newGroupHeight).toBeCloseTo(500, 4);
   });
 });
+
+describe("frame resizing behavior", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    renderStaticScene.mockClear();
+    reseed(7);
+    setDateTimeForTests("201933152653");
+
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    API.setElements([]);
+
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: 1,
+      clientY: 1,
+    });
+    const contextMenu = UI.queryContextMenu();
+    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
+    stats = UI.queryStats();
+  });
+
+  beforeAll(() => {
+    mockBoundingClientRect();
+  });
+
+  afterAll(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  it("should add shapes to frame when resizing frame to encompass them", () => {
+    // Create a frame
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    // Create a rectangle outside the frame
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 150,
+      y: 50,
+      width: 50,
+      height: 50,
+    });
+
+    API.setElements([frame, rectangle]);
+
+    // Initially, rectangle should not be in the frame
+    expect(rectangle.frameId).toBe(null);
+
+    // Select the frame
+    API.setAppState({
+      selectedElementIds: {
+        [frame.id]: true,
+      },
+    });
+
+    elementStats = stats?.querySelector("#elementStats");
+
+    // Find the width input and update it to encompass the rectangle
+    const widthInput = UI.queryStatsProperty("W")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    expect(widthInput).toBeDefined();
+    expect(widthInput.value).toBe("100");
+
+    // Resize frame to width 250, which should encompass the rectangle
+    UI.updateInput(widthInput, "250");
+
+    // After resizing, the rectangle should now be part of the frame
+    expect(h.elements.find((el) => el.id === rectangle.id)?.frameId).toBe(
+      frame.id,
+    );
+  });
+
+  it("should add multiple shapes when frame encompasses them through height resize", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 100,
+    });
+
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 150,
+      width: 50,
+      height: 50,
+    });
+
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 180,
+      width: 40,
+      height: 40,
+    });
+
+    API.setElements([frame, rectangle1, rectangle2]);
+
+    // Initially, rectangles should not be in the frame
+    expect(rectangle1.frameId).toBe(null);
+    expect(rectangle2.frameId).toBe(null);
+
+    // Select the frame
+    API.setAppState({
+      selectedElementIds: {
+        [frame.id]: true,
+      },
+    });
+
+    elementStats = stats?.querySelector("#elementStats");
+
+    // Resize frame height to encompass both rectangles
+    const heightInput = UI.queryStatsProperty("H")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    // Resize frame to height 250, which should encompass both rectangles
+    UI.updateInput(heightInput, "250");
+
+    // After resizing, both rectangles should now be part of the frame
+    expect(h.elements.find((el) => el.id === rectangle1.id)?.frameId).toBe(
+      frame.id,
+    );
+    expect(h.elements.find((el) => el.id === rectangle2.id)?.frameId).toBe(
+      frame.id,
+    );
+  });
+
+  it("should not affect shapes that remain outside frame after resize", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    const insideRect = API.createElement({
+      type: "rectangle",
+      x: 120,
+      y: 50,
+      width: 30,
+      height: 30,
+    });
+
+    const outsideRect = API.createElement({
+      type: "rectangle",
+      x: 300,
+      y: 50,
+      width: 30,
+      height: 30,
+    });
+
+    API.setElements([frame, insideRect, outsideRect]);
+
+    // Initially, both rectangles should not be in the frame
+    expect(insideRect.frameId).toBe(null);
+    expect(outsideRect.frameId).toBe(null);
+
+    // Select the frame
+    API.setAppState({
+      selectedElementIds: {
+        [frame.id]: true,
+      },
+    });
+
+    elementStats = stats?.querySelector("#elementStats");
+
+    // Resize frame width to 200, which should only encompass insideRect
+    const widthInput = UI.queryStatsProperty("W")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    UI.updateInput(widthInput, "200");
+
+    // After resizing, only insideRect should be in the frame
+    expect(h.elements.find((el) => el.id === insideRect.id)?.frameId).toBe(
+      frame.id,
+    );
+    expect(h.elements.find((el) => el.id === outsideRect.id)?.frameId).toBe(
+      null,
+    );
+  });
+});
