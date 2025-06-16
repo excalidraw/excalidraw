@@ -20,6 +20,7 @@ import {
   getGridPoint,
   invariant,
   tupleToCoors,
+  viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
 import {
@@ -45,6 +46,7 @@ import {
   bindOrUnbindLinearElement,
   getHoveredElementForBinding,
   isBindingEnabled,
+  maybeSuggestBindingsForLinearElementAtCoords,
 } from "./binding";
 import {
   getElementAbsoluteCoords,
@@ -275,18 +277,13 @@ export class LinearElementEditor {
     app: AppClassProperties,
     scenePointerX: number,
     scenePointerY: number,
-    maybeSuggestBinding: (
-      element: NonDeleted<ExcalidrawLinearElement>,
-      pointSceneCoords: { x: number; y: number }[],
-    ) => void,
     linearElementEditor: LinearElementEditor,
-    scene: Scene,
-  ): LinearElementEditor | null {
+  ): Pick<AppState, keyof AppState> | null {
     if (!linearElementEditor) {
       return null;
     }
     const { elementId } = linearElementEditor;
-    const elementsMap = scene.getNonDeletedElementsMap();
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     let customLineAngle = linearElementEditor.customLineAngle;
     if (!element) {
@@ -347,7 +344,7 @@ export class LinearElementEditor {
 
         LinearElementEditor.movePoints(
           element,
-          scene,
+          app.scene,
           new Map([
             [
               selectedIndex,
@@ -375,7 +372,7 @@ export class LinearElementEditor {
 
         LinearElementEditor.movePoints(
           element,
-          scene,
+          app.scene,
           new Map(
             selectedPointsIndices.map((pointIndex) => {
               const newPointPosition: LocalPoint =
@@ -407,46 +404,59 @@ export class LinearElementEditor {
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
-        handleBindTextResize(element, scene, false);
+        handleBindTextResize(element, app.scene, false);
       }
 
       // suggest bindings for first and last point if selected
+      let suggestedBindings: ExcalidrawBindableElement[] = [];
       if (isBindingElement(element, false)) {
+        const firstSelectedIndex = selectedPointsIndices[0] === 0;
+        const lastSelectedIndex =
+          selectedPointsIndices[selectedPointsIndices.length - 1] ===
+          element.points.length - 1;
         const coords: { x: number; y: number }[] = [];
 
-        const firstSelectedIndex = selectedPointsIndices[0];
-        if (firstSelectedIndex === 0) {
-          coords.push(
-            tupleToCoors(
-              LinearElementEditor.getPointGlobalCoordinates(
-                element,
-                element.points[0],
-                elementsMap,
+        if (!firstSelectedIndex !== !lastSelectedIndex) {
+          coords.push({ x: scenePointerX, y: scenePointerY });
+        } else {
+          if (firstSelectedIndex) {
+            coords.push(
+              tupleToCoors(
+                LinearElementEditor.getPointGlobalCoordinates(
+                  element,
+                  element.points[0],
+                  elementsMap,
+                ),
               ),
-            ),
-          );
-        }
+            );
+          }
 
-        const lastSelectedIndex =
-          selectedPointsIndices[selectedPointsIndices.length - 1];
-        if (lastSelectedIndex === element.points.length - 1) {
-          coords.push(
-            tupleToCoors(
-              LinearElementEditor.getPointGlobalCoordinates(
-                element,
-                element.points[lastSelectedIndex],
-                elementsMap,
+          if (lastSelectedIndex) {
+            coords.push(
+              tupleToCoors(
+                LinearElementEditor.getPointGlobalCoordinates(
+                  element,
+                  element.points[
+                    selectedPointsIndices[selectedPointsIndices.length - 1]
+                  ],
+                  elementsMap,
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
 
         if (coords.length) {
-          maybeSuggestBinding(element, coords);
+          suggestedBindings = maybeSuggestBindingsForLinearElementAtCoords(
+            element,
+            coords,
+            app.scene,
+            app.state.zoom,
+          );
         }
       }
 
-      return {
+      const newLinearElementEditor = {
         ...linearElementEditor,
         selectedPointsIndices,
         segmentMidPointHoveredCoords:
@@ -466,6 +476,15 @@ export class LinearElementEditor {
         isDragging: true,
         customLineAngle,
       };
+
+      return {
+        ...app.state,
+        editingLinearElement: app.state.editingLinearElement
+          ? newLinearElementEditor
+          : null,
+        selectedLinearElement: newLinearElementEditor,
+        suggestedBindings,
+      };
     }
 
     return null;
@@ -479,6 +498,7 @@ export class LinearElementEditor {
   ): LinearElementEditor {
     const elementsMap = scene.getNonDeletedElementsMap();
     const elements = scene.getNonDeletedElements();
+    const pointerCoords = viewportCoordsToSceneCoords(event, appState);
 
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
@@ -534,13 +554,15 @@ export class LinearElementEditor {
 
           const bindingElement = isBindingEnabled(appState)
             ? getHoveredElementForBinding(
-                tupleToCoors(
-                  LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                    element,
-                    selectedPoint!,
-                    elementsMap,
-                  ),
-                ),
+                (selectedPointsIndices?.length ?? 0) > 1
+                  ? tupleToCoors(
+                      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                        element,
+                        selectedPoint!,
+                        elementsMap,
+                      ),
+                    )
+                  : pointerCoords,
                 elements,
                 elementsMap,
                 appState.zoom,
