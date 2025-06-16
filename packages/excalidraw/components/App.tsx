@@ -105,12 +105,12 @@ import {
 import {
   getObservedAppState,
   getCommonBounds,
+  maybeSuggestBindingsForLinearElementAtCoords,
   getElementAbsoluteCoords,
   bindOrUnbindLinearElements,
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
   isBindingEnabled,
-  isLinearElementSimpleAndAlreadyBound,
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
   getSuggestedBindingsForArrows,
@@ -237,7 +237,6 @@ import {
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
-  ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
@@ -5883,11 +5882,15 @@ class App extends React.Component<AppProps, AppState> {
       // and point
       const { newElement } = this.state;
       if (isBindingElement(newElement, false)) {
-        this.maybeSuggestBindingsForLinearElementAtCoords(
-          newElement,
-          [scenePointer],
-          this.state.startBoundElement,
-        );
+        this.setState({
+          suggestedBindings: maybeSuggestBindingsForLinearElementAtCoords(
+            newElement,
+            [scenePointer],
+            this.scene,
+            this.state.zoom,
+            this.state.startBoundElement,
+          ),
+        });
       } else {
         this.maybeSuggestBindingAtCursor(scenePointer, false);
       }
@@ -8217,31 +8220,19 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        const newLinearElementEditor = LinearElementEditor.handlePointDragging(
+        const newState = LinearElementEditor.handlePointDragging(
           event,
           this,
           pointerCoords.x,
           pointerCoords.y,
-          (element, pointsSceneCoords) => {
-            this.maybeSuggestBindingsForLinearElementAtCoords(
-              element,
-              pointsSceneCoords,
-            );
-          },
           linearElementEditor,
-          this.scene,
         );
-        if (newLinearElementEditor) {
+        if (newState) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
           pointerDownState.drag.hasOccurred = true;
 
-          this.setState({
-            editingLinearElement: this.state.editingLinearElement
-              ? newLinearElementEditor
-              : null,
-            selectedLinearElement: newLinearElementEditor,
-          });
+          this.setState(newState);
 
           return;
         }
@@ -8720,11 +8711,15 @@ class App extends React.Component<AppProps, AppState> {
 
           if (isBindingElement(newElement, false)) {
             // When creating a linear element by dragging
-            this.maybeSuggestBindingsForLinearElementAtCoords(
-              newElement,
-              [pointerCoords],
-              this.state.startBoundElement,
-            );
+            this.setState({
+              suggestedBindings: maybeSuggestBindingsForLinearElementAtCoords(
+                newElement,
+                [pointerCoords],
+                this.scene,
+                this.state.zoom,
+                this.state.startBoundElement,
+              ),
+            });
           }
         } else {
           pointerDownState.lastCoords.x = pointerCoords.x;
@@ -8919,16 +8914,17 @@ class App extends React.Component<AppProps, AppState> {
 
       const hitElements = pointerDownState.hit.allHitElements;
 
+      const sceneCoords = viewportCoordsToSceneCoords(
+        { clientX: childEvent.clientX, clientY: childEvent.clientY },
+        this.state,
+      );
+
       if (
         this.state.activeTool.type === "selection" &&
         !pointerDownState.boxSelection.hasOccurred &&
         !pointerDownState.resize.isResizing &&
         !hitElements.some((el) => this.state.selectedElementIds[el.id])
       ) {
-        const sceneCoords = viewportCoordsToSceneCoords(
-          { clientX: childEvent.clientX, clientY: childEvent.clientY },
-          this.state,
-        );
         const hitLockedElement = this.getElementAtPosition(
           sceneCoords.x,
           sceneCoords.y,
@@ -9029,6 +9025,7 @@ class App extends React.Component<AppProps, AppState> {
         } else if (this.state.selectedLinearElement.isDragging) {
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
+            sceneCoords,
           });
         }
       }
@@ -9123,7 +9120,10 @@ class App extends React.Component<AppProps, AppState> {
             isBindingEnabled(this.state) &&
             isBindingElement(newElement, false)
           ) {
-            this.actionManager.executeAction(actionFinalize);
+            this.actionManager.executeAction(actionFinalize, "ui", {
+              event: childEvent,
+              sceneCoords,
+            });
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
           if (!activeTool.locked) {
@@ -9706,7 +9706,8 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        pointerDownState.drag.hasOccurred ||
+        (pointerDownState.drag.hasOccurred &&
+          !this.state.selectedLinearElement) ||
         isResizing ||
         isRotating ||
         isCropping
@@ -10170,49 +10171,6 @@ class App extends React.Component<AppProps, AppState> {
       suggestedBindings:
         hoveredBindableElement != null ? [hoveredBindableElement] : [],
     });
-  };
-
-  private maybeSuggestBindingsForLinearElementAtCoords = (
-    linearElement: NonDeleted<ExcalidrawLinearElement>,
-    /** scene coords */
-    pointerCoords: {
-      x: number;
-      y: number;
-    }[],
-    // During line creation the start binding hasn't been written yet
-    // into `linearElement`
-    oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
-  ): void => {
-    if (!pointerCoords.length) {
-      return;
-    }
-
-    const suggestedBindings = pointerCoords.reduce(
-      (acc: NonDeleted<ExcalidrawBindableElement>[], coords) => {
-        const hoveredBindableElement = getHoveredElementForBinding(
-          coords,
-          this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
-          this.state.zoom,
-          isElbowArrow(linearElement),
-          isElbowArrow(linearElement),
-        );
-        if (
-          hoveredBindableElement != null &&
-          !isLinearElementSimpleAndAlreadyBound(
-            linearElement,
-            oppositeBindingBoundElement?.id,
-            hoveredBindableElement,
-          )
-        ) {
-          acc.push(hoveredBindableElement);
-        }
-        return acc;
-      },
-      [],
-    );
-
-    this.setState({ suggestedBindings });
   };
 
   private clearSelection(hitElement: ExcalidrawElement | null): void {
