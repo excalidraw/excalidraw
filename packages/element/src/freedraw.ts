@@ -10,7 +10,7 @@ import type { ExcalidrawFreeDrawElement } from "./types";
 
 export const DRAWING_CONFIGS = {
   default: {
-    streamline: 0.25,
+    streamline: 0.35,
     simplify: 0.25,
   },
   // for optimal performance, we use a lower streamline and simplify
@@ -62,10 +62,7 @@ const calculateVelocityBasedPressure = (
   return Math.max(0.1, Math.min(1.0, pressure));
 };
 
-export const getFreedrawStroke = (
-  element: ExcalidrawFreeDrawElement,
-  debugParams?: { streamline?: number; simplify?: number },
-) => {
+export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
   // Compose points as [x, y, pressure]
   let points: [number, number, number][];
   if (element.simulatePressure) {
@@ -105,17 +102,15 @@ export const getFreedrawStroke = (
     streamline,
     simplify,
     sizeMapping: ({ pressure: t }) => {
-      if (element.simulatePressure) {
-        return t + 0.2;
-      }
-
       if (element.drawingConfigs?.pressureSensitivity === 0) {
-        return 1;
+        return 0.5;
       }
 
-      const minSize = 0.2;
-      const maxSize = 2;
-      return minSize + t * (maxSize - minSize);
+      if (element.simulatePressure) {
+        return 0.2 + t * 0.6;
+      }
+
+      return 0.2 + t * 0.8;
     },
   });
 
@@ -134,14 +129,13 @@ export const getFreedrawStroke = (
  */
 export const getFreeDrawSvgPath = (
   element: ExcalidrawFreeDrawElement,
-  debugParams?: { streamline?: number; simplify?: number },
 ): string => {
   // legacy, for backwards compatibility
   if (element.drawingConfigs === null) {
     return _legacy_getFreeDrawSvgPath(element);
   }
 
-  return getSvgPathFromStroke(getFreedrawStroke(element, debugParams));
+  return getSvgPathFromStroke(getFreedrawStroke(element));
 };
 
 const roundPoint = (A: Point): string => {

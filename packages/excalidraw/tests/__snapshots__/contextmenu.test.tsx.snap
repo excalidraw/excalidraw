@@ -3127,7 +3127,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#e03131",
   "currentItemStrokeStyle": "dotted",
-  "currentItemStrokeWidth": 2,
+  "currentItemStrokeWidth": 4,
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
@@ -3241,11 +3241,11 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "seed": 449462985,
   "strokeColor": "#e03131",
   "strokeStyle": "dotted",
-  "strokeWidth": 2,
+  "strokeWidth": 4,
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 941653321,
+  "versionNonce": 1402203177,
   "width": 20,
   "x": -10,
   "y": 0,
@@ -3272,14 +3272,14 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "roundness": {
     "type": 3,
   },
-  "seed": 289600103,
+  "seed": 1898319239,
   "strokeColor": "#e03131",
   "strokeStyle": "dotted",
-  "strokeWidth": 2,
+  "strokeWidth": 4,
   "type": "rectangle",
   "updated": 1,
-  "version": 9,
-  "versionNonce": 640725609,
+  "version": 10,
+  "versionNonce": 941653321,
   "width": 20,
   "x": 20,
   "y": 30,
@@ -3288,7 +3288,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
 
 exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of renders 1`] = `16`;
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of renders 1`] = `17`;
 
 exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] redo stack 1`] = `[]`;
 
@@ -3482,6 +3482,29 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       "updated": {
         "id3": {
           "deleted": {
+            "strokeWidth": 4,
+          },
+          "inserted": {
+            "strokeWidth": 2,
+          },
+        },
+      },
+    },
+    "id": "id13",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id3": {
+          "deleted": {
             "strokeStyle": "dotted",
           },
           "inserted": {
@@ -3490,7 +3513,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
         },
       },
     },
-    "id": "id13",
+    "id": "id15",
   },
   {
     "appState": AppStateDelta {
@@ -3513,7 +3536,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
         },
       },
     },
-    "id": "id15",
+    "id": "id17",
   },
   {
     "appState": AppStateDelta {
@@ -3536,7 +3559,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
         },
       },
     },
-    "id": "id17",
+    "id": "id19",
   },
   {
     "appState": AppStateDelta {
@@ -3565,6 +3588,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
             "roughness": 2,
             "strokeColor": "#e03131",
             "strokeStyle": "dotted",
+            "strokeWidth": 4,
           },
           "inserted": {
             "backgroundColor": "transparent",
@@ -3573,11 +3597,12 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
             "roughness": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
+            "strokeWidth": 2,
           },
         },
       },
     },
-    "id": "id19",
+    "id": "id21",
   },
 ]
 `;

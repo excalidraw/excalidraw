@@ -6880,7 +6880,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "drawingConfigs": {
               "pressureSensitivity": 1,
               "simplify": "0.25000",
-              "streamline": "0.25000",
+              "streamline": "0.35000",
             },
             "fillStyle": "solid",
             "frameId": null,
@@ -9159,7 +9159,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] undo sta
             "drawingConfigs": {
               "pressureSensitivity": 1,
               "simplify": "0.25000",
-              "streamline": "0.25000",
+              "streamline": "0.35000",
             },
             "fillStyle": "solid",
             "frameId": null,
@@ -10167,7 +10167,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] undo sta
             "drawingConfigs": {
               "pressureSensitivity": 1,
               "simplify": "0.25000",
-              "streamline": "0.25000",
+              "streamline": "0.35000",
             },
             "fillStyle": "solid",
             "frameId": null,

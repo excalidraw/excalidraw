@@ -8913,7 +8913,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "drawingConfigs": {
     "pressureSensitivity": 1,
     "simplify": "0.25000",
-    "streamline": "0.25000",
+    "streamline": "0.35000",
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -9022,7 +9022,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
             "drawingConfigs": {
               "pressureSensitivity": 1,
               "simplify": "0.25000",
-              "streamline": "0.25000",
+              "streamline": "0.35000",
             },
             "fillStyle": "solid",
             "frameId": null,
@@ -12075,7 +12075,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "drawingConfigs": {
     "pressureSensitivity": 1,
     "simplify": "0.25000",
-    "streamline": "0.25000",
+    "streamline": "0.35000",
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -12130,7 +12130,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "drawingConfigs": {
     "pressureSensitivity": 1,
     "simplify": "0.25000",
-    "streamline": "0.25000",
+    "streamline": "0.35000",
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -12275,7 +12275,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
             "drawingConfigs": {
               "pressureSensitivity": 1,
               "simplify": "0.25000",
-              "streamline": "0.25000",
+              "streamline": "0.35000",
             },
             "fillStyle": "solid",
             "frameId": null,

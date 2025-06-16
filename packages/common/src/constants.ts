@@ -385,8 +385,9 @@ export const ROUGHNESS = {
 
 export const STROKE_WIDTH = {
   thin: 1,
-  bold: 2,
-  extraBold: 4,
+  medium: 2,
+  bold: 4,
+  extraBold: 6,
 } as const;
 
 export const DEFAULT_ELEMENT_PROPS: {
@@ -402,7 +403,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: COLOR_PALETTE.black,
   backgroundColor: COLOR_PALETTE.transparent,
   fillStyle: "solid",
-  strokeWidth: 2,
+  strokeWidth: STROKE_WIDTH.medium,
   strokeStyle: "solid",
   roughness: ROUGHNESS.artist,
   opacity: 100,

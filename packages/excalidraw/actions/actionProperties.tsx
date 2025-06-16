@@ -130,6 +130,7 @@ import {
   ArrowheadCrowfootOneOrManyIcon,
   strokeWidthFixedIcon,
   strokeWidthVariableIcon,
+  StrokeWidthMediumIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -509,6 +510,33 @@ export const actionChangeFillStyle = register({
   },
 });
 
+const WIDTHS = [
+  {
+    value: STROKE_WIDTH.thin,
+    text: t("labels.thin"),
+    icon: StrokeWidthBaseIcon,
+    testId: "strokeWidth-thin",
+  },
+  {
+    value: STROKE_WIDTH.medium,
+    text: t("labels.medium"),
+    icon: StrokeWidthMediumIcon,
+    testId: "strokeWidth-medium",
+  },
+  {
+    value: STROKE_WIDTH.bold,
+    text: t("labels.bold"),
+    icon: StrokeWidthBoldIcon,
+    testId: "strokeWidth-bold",
+  },
+  {
+    value: STROKE_WIDTH.extraBold,
+    text: t("labels.extraBold"),
+    icon: StrokeWidthExtraBoldIcon,
+    testId: "strokeWidth-extraBold",
+  },
+];
+
 export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
   label: "labels.strokeWidth",
@@ -530,26 +558,11 @@ export const actionChangeStrokeWidth = register({
       <div className="buttonList">
         <RadioSelection
           group="stroke-width"
-          options={[
-            {
-              value: STROKE_WIDTH.thin,
-              text: t("labels.thin"),
-              icon: StrokeWidthBaseIcon,
-              testId: "strokeWidth-thin",
-            },
-            {
-              value: STROKE_WIDTH.bold,
-              text: t("labels.bold"),
-              icon: StrokeWidthBoldIcon,
-              testId: "strokeWidth-bold",
-            },
-            {
-              value: STROKE_WIDTH.extraBold,
-              text: t("labels.extraBold"),
-              icon: StrokeWidthExtraBoldIcon,
-              testId: "strokeWidth-extraBold",
-            },
-          ]}
+          options={
+            appState.activeTool.type === "freedraw"
+              ? WIDTHS
+              : WIDTHS.slice(0, 3)
+          }
           value={getFormValue(
             elements,
             app,
