@@ -11,6 +11,11 @@ import type { ExcalidrawFreeDrawElement } from "./types";
 export const DRAWING_CONFIGS = {
   default: {
     streamline: 0.25,
+    simplify: 0.25,
+  },
+  // for optimal performance, we use a lower streamline and simplify
+  stylus: {
+    streamline: 0.1,
     simplify: 0.1,
   },
 } as const;

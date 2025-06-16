@@ -7594,11 +7594,9 @@ class App extends React.Component<AppProps, AppState> {
       simulatePressure,
       drawingConfigs: {
         pressureSensitivity: this.state.currentItemPressureSensitivity,
-        streamline:
-          window.h?.debugFreedraw?.streamline ??
-          DRAWING_CONFIGS.default.streamline,
-        simplify:
-          window.h?.debugFreedraw?.simplify ?? DRAWING_CONFIGS.default.simplify,
+        ...(event.pointerType === "pen"
+          ? DRAWING_CONFIGS.stylus
+          : DRAWING_CONFIGS.default),
       },
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
@@ -11382,10 +11380,6 @@ declare global {
       app: InstanceType<typeof App>;
       history: History;
       store: Store;
-      debugFreedraw?: {
-        streamline: number;
-        simplify: number;
-      };
     };
   }
 }
@@ -11393,9 +11387,6 @@ declare global {
 export const createTestHook = () => {
   if (isTestEnv() || isDevEnv()) {
     window.h = window.h || ({} as Window["h"]);
-
-    // Initialize debug freedraw parameters
-    window.h.debugFreedraw = window.h.debugFreedraw || DRAWING_CONFIGS.default;
 
     Object.defineProperties(window.h, {
       elements: {
