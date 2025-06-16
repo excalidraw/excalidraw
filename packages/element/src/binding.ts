@@ -24,7 +24,6 @@ import {
   pointsEqual,
   lineSegmentIntersectionPoints,
   PRECISION,
-  doBoundsIntersect,
 } from "@excalidraw/math";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -33,7 +32,11 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 
-import { getCenterForBounds, getElementBounds } from "./bounds";
+import {
+  doBoundsIntersect,
+  getCenterForBounds,
+  getElementBounds,
+} from "./bounds";
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToElement } from "./distance";
 import {

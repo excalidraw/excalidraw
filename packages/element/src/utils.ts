@@ -90,6 +90,12 @@ const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
   shapes.set(offset, shape);
 };
 
+/**
+ * Returns the **rotated** components of freedraw, line or arrow elements.
+ *
+ * @param element The linear element to deconstruct
+ * @returns The rotated in components.
+ */
 export function deconstructLinearOrFreeDrawElement(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
 ): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
@@ -171,11 +177,11 @@ export function deconstructLinearOrFreeDrawElement(
 
 /**
  * Get the building components of a rectanguloid element in the form of
- * line segments and curves.
+ * line segments and curves **unrotated**.
  *
  * @param element Target rectanguloid element
  * @param offset Optional offset to expand the rectanguloid shape
- * @returns Tuple of line segments (0) and curves (1)
+ * @returns Tuple of **unrotated** line segments (0) and curves (1)
  */
 export function deconstructRectanguloidElement(
   element: ExcalidrawRectanguloidElement,
@@ -310,12 +316,12 @@ export function deconstructRectanguloidElement(
 }
 
 /**
- * Get the building components of a diamond element in the form of
- * line segments and curves as a tuple, in this order.
+ * Get the **unrotated** building components of a diamond element
+ * in the form of line segments and curves as a tuple, in this order.
  *
  * @param element The element to deconstruct
  * @param offset An optional offset
- * @returns Tuple of line segments (0) and curves (1)
+ * @returns Tuple of line **unrotated** segments (0) and curves (1)
  */
 export function deconstructDiamondElement(
   element: ExcalidrawDiamondElement,

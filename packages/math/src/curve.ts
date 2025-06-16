@@ -1,9 +1,6 @@
-import { type Bounds } from "@excalidraw/element";
-
 import { isPoint, pointDistance, pointFrom, pointFromVector } from "./point";
 import { vector, vectorNormal, vectorNormalize, vectorScale } from "./vector";
 import { LegendreGaussN24CValues, LegendreGaussN24TValues } from "./constants";
-import { doBoundsIntersect } from "./utils";
 
 import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
 
@@ -105,19 +102,6 @@ export const bezierEquation = <Point extends GlobalPoint | LocalPoint>(
 export function curveIntersectLineSegment<
   Point extends GlobalPoint | LocalPoint,
 >(c: Curve<Point>, l: LineSegment<Point>): Point[] {
-  // Optimize by doing a cheap bounding box check first
-  const b1 = curveBounds(c);
-  const b2 = [
-    Math.min(l[0][0], l[1][0]),
-    Math.min(l[0][1], l[1][1]),
-    Math.max(l[0][0], l[1][0]),
-    Math.max(l[0][1], l[1][1]),
-  ] as Bounds;
-
-  if (!doBoundsIntersect(b1, b2)) {
-    return [];
-  }
-
   const line = (s: number) =>
     pointFrom<Point>(
       l[0][0] + s * (l[1][0] - l[0][0]),
@@ -293,15 +277,6 @@ export function curveTangent<Point extends GlobalPoint | LocalPoint>(
       6 * t * (1 - t) * p2[1] +
       3 * t * t * p3[1],
   );
-}
-
-function curveBounds<Point extends GlobalPoint | LocalPoint>(
-  c: Curve<Point>,
-): Bounds {
-  const [P0, P1, P2, P3] = c;
-  const x = [P0[0], P1[0], P2[0], P3[0]];
-  const y = [P0[1], P1[1], P2[1], P3[1]];
-  return [Math.min(...x), Math.min(...y), Math.max(...x), Math.max(...y)];
 }
 
 export function curveCatmullRomQuadraticApproxPoints(

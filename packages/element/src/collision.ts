@@ -11,7 +11,6 @@ import {
   vectorFromPoint,
   vectorNormalize,
   vectorScale,
-  doBoundsIntersect,
 } from "@excalidraw/math";
 
 import {
@@ -19,15 +18,22 @@ import {
   ellipseSegmentInterceptPoints,
 } from "@excalidraw/math/ellipse";
 
-import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math";
+import type {
+  Curve,
+  GlobalPoint,
+  LineSegment,
+  Radians,
+} from "@excalidraw/math";
 
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./utils";
 import {
   type Bounds,
+  doBoundsIntersect,
   elementCenterPoint,
   getCenterForBounds,
+  getCubicBezierCurveBound,
   getElementBounds,
 } from "./bounds";
 import {
@@ -255,13 +261,75 @@ export const intersectElementWithLineSegment = (
   }
 };
 
+const curveIntersections = (
+  curves: Curve<GlobalPoint>[],
+  segment: LineSegment<GlobalPoint>,
+  intersections: GlobalPoint[],
+  center: GlobalPoint,
+  angle: Radians,
+  onlyFirst = false,
+) => {
+  for (const c of curves) {
+    // Optimize by doing a cheap bounding box check first
+    const b1 = getCubicBezierCurveBound(c[0], c[1], c[2], c[3]);
+    const b2 = [
+      Math.min(segment[0][0], segment[1][0]),
+      Math.min(segment[0][1], segment[1][1]),
+      Math.max(segment[0][0], segment[1][0]),
+      Math.max(segment[0][1], segment[1][1]),
+    ] as Bounds;
+
+    if (!doBoundsIntersect(b1, b2)) {
+      continue;
+    }
+
+    const hits = curveIntersectLineSegment(c, segment);
+
+    if (hits.length > 0) {
+      for (const j of hits) {
+        intersections.push(pointRotateRads(j, center, angle));
+      }
+
+      if (onlyFirst) {
+        return intersections;
+      }
+    }
+  }
+
+  return intersections;
+};
+
+const lineIntersections = (
+  lines: LineSegment<GlobalPoint>[],
+  segment: LineSegment<GlobalPoint>,
+  intersections: GlobalPoint[],
+  center: GlobalPoint,
+  angle: Radians,
+  onlyFirst = false,
+) => {
+  for (const l of lines) {
+    const intersection = lineSegmentIntersectionPoints(l, segment);
+    if (intersection) {
+      intersections.push(pointRotateRads(intersection, center, angle));
+
+      if (onlyFirst) {
+        return intersections;
+      }
+    }
+  }
+
+  return intersections;
+};
+
 const intersectLinearOrFreeDrawWithLineSegment = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   segment: LineSegment<GlobalPoint>,
   onlyFirst = false,
 ): GlobalPoint[] => {
+  // NOTE: This is the only one which return the decomposed elements
+  // rotated! This is due to taking advantage of roughjs definitions.
   const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
-  const intersections = [];
+  const intersections: GlobalPoint[] = [];
 
   for (const l of lines) {
     const intersection = lineSegmentIntersectionPoints(l, segment);
@@ -275,6 +343,19 @@ const intersectLinearOrFreeDrawWithLineSegment = (
   }
 
   for (const c of curves) {
+    // Optimize by doing a cheap bounding box check first
+    const b1 = getCubicBezierCurveBound(c[0], c[1], c[2], c[3]);
+    const b2 = [
+      Math.min(segment[0][0], segment[1][0]),
+      Math.min(segment[0][1], segment[1][1]),
+      Math.max(segment[0][0], segment[1][0]),
+      Math.max(segment[0][1], segment[1][1]),
+    ] as Bounds;
+
+    if (!doBoundsIntersect(b1, b2)) {
+      continue;
+    }
+
     const hits = curveIntersectLineSegment(c, segment);
 
     if (hits.length > 0) {
@@ -292,7 +373,7 @@ const intersectLinearOrFreeDrawWithLineSegment = (
 const intersectRectanguloidWithLineSegment = (
   element: ExcalidrawRectanguloidElement,
   elementsMap: ElementsMap,
-  l: LineSegment<GlobalPoint>,
+  segment: LineSegment<GlobalPoint>,
   offset: number = 0,
   onlyFirst = false,
 ): GlobalPoint[] => {
@@ -300,48 +381,43 @@ const intersectRectanguloidWithLineSegment = (
   // To emulate a rotated rectangle we rotate the point in the inverse angle
   // instead. It's all the same distance-wise.
   const rotatedA = pointRotateRads<GlobalPoint>(
-    l[0],
+    segment[0],
     center,
     -element.angle as Radians,
   );
   const rotatedB = pointRotateRads<GlobalPoint>(
-    l[1],
+    segment[1],
     center,
     -element.angle as Radians,
   );
+  const rotatedIntersector = lineSegment(rotatedA, rotatedB);
 
   // Get the element's building components we can test against
   const [sides, corners] = deconstructRectanguloidElement(element, offset);
 
   const intersections: GlobalPoint[] = [];
 
-  for (const s of sides) {
-    const intersection = lineSegmentIntersectionPoints(
-      lineSegment(rotatedA, rotatedB),
-      s,
-    );
-    if (intersection) {
-      intersections.push(pointRotateRads(intersection, center, element.angle));
+  lineIntersections(
+    sides,
+    rotatedIntersector,
+    intersections,
+    center,
+    element.angle,
+    onlyFirst,
+  );
 
-      if (onlyFirst) {
-        return intersections;
-      }
-    }
+  if (onlyFirst && intersections.length > 0) {
+    return intersections;
   }
 
-  for (const t of corners) {
-    const hits = curveIntersectLineSegment(t, lineSegment(rotatedA, rotatedB));
-
-    if (hits.length > 0) {
-      for (const j of hits) {
-        intersections.push(pointRotateRads(j, center, element.angle));
-      }
-
-      if (onlyFirst) {
-        return intersections;
-      }
-    }
-  }
+  curveIntersections(
+    corners,
+    rotatedIntersector,
+    intersections,
+    center,
+    element.angle,
+    onlyFirst,
+  );
 
   return intersections;
 };
@@ -366,38 +442,32 @@ const intersectDiamondWithLineSegment = (
   // points. It's all the same distance-wise.
   const rotatedA = pointRotateRads(l[0], center, -element.angle as Radians);
   const rotatedB = pointRotateRads(l[1], center, -element.angle as Radians);
+  const rotatedIntersector = lineSegment(rotatedA, rotatedB);
 
   const [sides, corners] = deconstructDiamondElement(element, offset);
-
   const intersections: GlobalPoint[] = [];
 
-  for (const s of sides) {
-    const intersection = lineSegmentIntersectionPoints(
-      lineSegment(rotatedA, rotatedB),
-      s,
-    );
-    if (intersection) {
-      intersections.push(pointRotateRads(intersection, center, element.angle));
+  lineIntersections(
+    sides,
+    rotatedIntersector,
+    intersections,
+    center,
+    element.angle,
+    onlyFirst,
+  );
 
-      if (onlyFirst) {
-        return intersections;
-      }
-    }
+  if (onlyFirst && intersections.length > 0) {
+    return intersections;
   }
 
-  for (const t of corners) {
-    const hits = curveIntersectLineSegment(t, lineSegment(rotatedA, rotatedB));
-
-    if (hits.length > 0) {
-      for (const j of hits) {
-        intersections.push(pointRotateRads(j, center, element.angle));
-      }
-
-      if (onlyFirst) {
-        return intersections;
-      }
-    }
-  }
+  curveIntersections(
+    corners,
+    rotatedIntersector,
+    intersections,
+    center,
+    element.angle,
+    onlyFirst,
+  );
 
   return intersections;
 };
