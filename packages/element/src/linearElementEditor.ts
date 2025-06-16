@@ -20,6 +20,11 @@ import {
   tupleToCoors,
 } from "@excalidraw/common";
 
+import {
+  type SnapLine,
+  snapLinearElementPoint,
+} from "@excalidraw/element/snapping";
+
 import type { Store } from "@excalidraw/element";
 
 import type { Radians } from "@excalidraw/math";
@@ -32,11 +37,6 @@ import type {
   NullableGridSize,
   Zoom,
 } from "@excalidraw/excalidraw/types";
-
-import {
-  SnapLine,
-  snapLinearElementPoint,
-} from "@excalidraw/excalidraw/snapping";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
@@ -388,6 +388,7 @@ export class LinearElementEditor {
           app,
           event,
           elementsMap,
+          { includeSelfPoints: true }, // Include element's own points for snapping when editing
         );
 
         _snapLines = snapLines;
@@ -1045,10 +1046,12 @@ export class LinearElementEditor {
       return {
         ...appState.editingLinearElement,
         lastUncommittedPoint: null,
+        snapLines: [],
       };
     }
 
     let newPoint: LocalPoint;
+    let snapLines: SnapLine[] = [];
 
     if (shouldRotateWithDiscreteAngle(event) && points.length >= 2) {
       const lastCommittedPoint = points[points.length - 2];
@@ -1066,11 +1069,32 @@ export class LinearElementEditor {
         height + lastCommittedPoint[1],
       );
     } else {
+      const originalPointerX =
+        scenePointerX - appState.editingLinearElement.pointerOffset.x;
+      const originalPointerY =
+        scenePointerY - appState.editingLinearElement.pointerOffset.y;
+
+      const { snapOffset, snapLines: snappingLines } = snapLinearElementPoint(
+        app.scene.getNonDeletedElements(),
+        element,
+        points.length - 1,
+        { x: originalPointerX, y: originalPointerY },
+        app,
+        event,
+        elementsMap,
+        { includeSelfPoints: true },
+      );
+
+      snapLines = snappingLines;
+
+      const snappedPointerX = originalPointerX + snapOffset.x;
+      const snappedPointerY = originalPointerY + snapOffset.y;
+
       newPoint = LinearElementEditor.createPointAt(
         element,
         elementsMap,
-        scenePointerX - appState.editingLinearElement.pointerOffset.x,
-        scenePointerY - appState.editingLinearElement.pointerOffset.y,
+        snappedPointerX,
+        snappedPointerY,
         event[KEYS.CTRL_OR_CMD] || isElbowArrow(element)
           ? null
           : app.getEffectiveGridSize(),
@@ -1096,6 +1120,7 @@ export class LinearElementEditor {
     return {
       ...appState.editingLinearElement,
       lastUncommittedPoint: element.points[element.points.length - 1],
+      snapLines,
     };
   }
 

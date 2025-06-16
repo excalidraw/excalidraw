@@ -292,6 +292,20 @@ import { Scene } from "@excalidraw/element";
 
 import { Store, CaptureUpdateAction } from "@excalidraw/element";
 
+import {
+  getSnapLinesAtPointer,
+  snapDraggedElements,
+  isActiveToolNonLinearSnappable,
+  snapNewElement,
+  snapResizingElements,
+  isSnappingEnabled,
+  getVisibleGaps,
+  getReferenceSnapPoints,
+  SnapCache,
+  isGridModeEnabled,
+  snapLinearElementPoint,
+} from "@excalidraw/element";
+
 import type { ElementUpdate } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -424,18 +438,6 @@ import {
 import { Fonts } from "../fonts";
 import { editorJotaiStore, type WritableAtom } from "../editor-jotai";
 import { ImageSceneDataError } from "../errors";
-import {
-  getSnapLinesAtPointer,
-  snapDraggedElements,
-  isActiveToolNonLinearSnappable,
-  snapNewElement,
-  snapResizingElements,
-  isSnappingEnabled,
-  getVisibleGaps,
-  getReferenceSnapPoints,
-  SnapCache,
-  isGridModeEnabled,
-} from "../snapping";
 import { convertToExcalidrawElements } from "../data/transform";
 import { Renderer } from "../scene/Renderer";
 import {
@@ -5874,9 +5876,13 @@ class App extends React.Component<AppProps, AppState> {
     const scenePointer = viewportCoordsToSceneCoords(event, this.state);
     const { x: scenePointerX, y: scenePointerY } = scenePointer;
 
+    // snap origin of the new element that's to be created
     if (
       !this.state.newElement &&
-      isActiveToolNonLinearSnappable(this.state.activeTool.type)
+      (isActiveToolNonLinearSnappable(this.state.activeTool.type) ||
+        ((this.state.activeTool.type === "line" ||
+          this.state.activeTool.type === "arrow") &&
+          this.state.currentItemArrowType !== ARROW_TYPE.elbow))
     ) {
       const { originOffset, snapLines } = getSnapLinesAtPointer(
         this.scene.getNonDeletedElements(),
@@ -6047,12 +6053,32 @@ class App extends React.Component<AppProps, AppState> {
               gridX,
               gridY,
             ));
+        } else if (!isElbowArrow(multiElement)) {
+          const { snapOffset, snapLines } = snapLinearElementPoint(
+            this.scene.getNonDeletedElements(),
+            multiElement,
+            points.length - 1,
+            { x: gridX, y: gridY },
+            this,
+            event,
+            this.scene.getNonDeletedElementsMap(),
+            { includeSelfPoints: true },
+          );
+
+          const snappedGridX = gridX + snapOffset.x;
+          const snappedGridY = gridY + snapOffset.y;
+
+          dxFromLastCommitted = snappedGridX - rx - lastCommittedX;
+          dyFromLastCommitted = snappedGridY - ry - lastCommittedY;
+
+          this.setState({
+            snapLines,
+          });
         }
 
         if (isPathALoop(points, this.state.zoom.value)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
-
         // update last uncommitted point
         this.scene.mutateElement(
           multiElement,
@@ -8777,6 +8803,26 @@ class App extends React.Component<AppProps, AppState> {
           const points = newElement.points;
           let dx = gridX - newElement.x;
           let dy = gridY - newElement.y;
+
+          // snap a two-point line/arrow as well
+          if (!isElbowArrow(newElement)) {
+            const { snapOffset, snapLines } = snapLinearElementPoint(
+              this.scene.getNonDeletedElements(),
+              newElement,
+              points.length - 1,
+              { x: gridX, y: gridY },
+              this,
+              event,
+              this.scene.getNonDeletedElementsMap(),
+              { includeSelfPoints: true },
+            );
+            const snappedGridX = gridX + snapOffset.x;
+            const snappedGridY = gridY + snapOffset.y;
+            dx = snappedGridX - newElement.x;
+            dy = snappedGridY - newElement.y;
+
+            this.setState({ snapLines });
+          }
 
           if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
             ({ width: dx, height: dy } = getLockedLinearCursorAlignSize(

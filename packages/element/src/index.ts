@@ -107,6 +107,7 @@ export * from "./ShapeCache";
 export * from "./shapes";
 export * from "./showSelectedShapeActions";
 export * from "./sizeHelpers";
+export * from "./snapping";
 export * from "./sortElements";
 export * from "./store";
 export * from "./textElement";
