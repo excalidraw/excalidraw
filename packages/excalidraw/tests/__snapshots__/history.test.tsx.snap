@@ -224,7 +224,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 37,
+  "version": 35,
   "width": "98.40611",
   "x": 1,
   "y": 0,
@@ -348,7 +348,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               "focus": "0.02970",
               "gap": 1,
             },
-            "version": 35,
+            "version": 33,
           },
           "inserted": {
             "endBinding": {
@@ -372,7 +372,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               "focus": "0.02000",
               "gap": 1,
             },
-            "version": 32,
+            "version": 30,
           },
         },
       },
@@ -427,7 +427,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
             ],
             "startBinding": null,
-            "version": 37,
+            "version": 35,
             "y": 0,
           },
           "inserted": {
@@ -447,7 +447,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               "focus": "0.02970",
               "gap": 1,
             },
-            "version": 35,
+            "version": 33,
             "y": "35.82151",
           },
         },
@@ -828,7 +828,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 33,
+  "version": 31,
   "width": 0,
   "x": 149,
   "y": 0,
@@ -878,7 +878,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
         "id4": {
           "deleted": {
             "endBinding": null,
-            "version": 32,
+            "version": 30,
           },
           "inserted": {
             "endBinding": {
@@ -886,7 +886,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               "focus": -0,
               "gap": 1,
             },
-            "version": 30,
+            "version": 28,
           },
         },
       },
@@ -922,7 +922,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
         "id4": {
           "deleted": {
             "startBinding": null,
-            "version": 33,
+            "version": 31,
           },
           "inserted": {
             "startBinding": {
@@ -930,7 +930,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               "focus": 0,
               "gap": 1,
             },
-            "version": 32,
+            "version": 30,
           },
         },
       },
