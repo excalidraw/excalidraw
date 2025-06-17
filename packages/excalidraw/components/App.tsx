@@ -191,6 +191,7 @@ import {
   FlowChartNavigator,
   getLinkDirectionFromKey,
   cropElement,
+  getUncroppedImageElement,
   wrapText,
   isElementLink,
   parseElementLinkFromURL,
@@ -6541,7 +6542,50 @@ class App extends React.Component<AppProps, AppState> {
     this.clearSelectionIfNotUsingSelection();
     this.updateBindingEnabledOnPointerMove(event);
 
-    if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
+    // Check if we're in crop mode and hitting uncropped area - if so, skip selection handling
+    let skipSelectionHandling = false;
+    if (this.state.croppingElementId) {
+      const croppingElement = this.scene
+        .getNonDeletedElementsMap()
+        .get(this.state.croppingElementId);
+
+      if (
+        croppingElement &&
+        isImageElement(croppingElement) &&
+        croppingElement.crop
+      ) {
+        const uncroppedElement = getUncroppedImageElement(
+          croppingElement,
+          this.scene.getNonDeletedElementsMap(),
+        );
+        const hitUncroppedArea = hitElementItself({
+          point: pointFrom(
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ),
+          element: uncroppedElement,
+          threshold: this.getElementHitThreshold(uncroppedElement),
+          elementsMap: this.scene.getNonDeletedElementsMap(),
+        });
+
+        if (hitUncroppedArea) {
+          skipSelectionHandling = true;
+          // Set a dedicated flag for crop position movement
+          pointerDownState.cropPositionMovement.enabled = true;
+          pointerDownState.cropPositionMovement.croppingElementId =
+            croppingElement.id;
+          // Set isCropping state to true so crop mode UI stays active
+          this.setState({
+            isCropping: true,
+          });
+        }
+      }
+    }
+
+    if (
+      !skipSelectionHandling &&
+      this.handleSelectionOnPointerDown(event, pointerDownState)
+    ) {
       return;
     }
 
@@ -6952,6 +6996,9 @@ class App extends React.Component<AppProps, AppState> {
       boxSelection: {
         hasOccurred: false,
       },
+      cropPositionMovement: {
+        enabled: false,
+      },
     };
   }
 
@@ -7206,6 +7253,7 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.hit.allHitElements.some((element) =>
             this.isASelectedElement(element),
           );
+
         if (
           (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
@@ -8029,6 +8077,105 @@ class App extends React.Component<AppProps, AppState> {
       }
       const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
 
+      // #region dedicated crop position movement
+      if (
+        pointerDownState.cropPositionMovement.enabled &&
+        pointerDownState.cropPositionMovement.croppingElementId
+      ) {
+        const croppingElement = pointerDownState.cropPositionMovement
+          .croppingElementId
+          ? this.scene
+              .getNonDeletedElementsMap()
+              .get(pointerDownState.cropPositionMovement.croppingElementId)
+          : null;
+
+        if (
+          croppingElement &&
+          isImageElement(croppingElement) &&
+          croppingElement.crop
+        ) {
+          const crop = croppingElement.crop;
+          const image =
+            isInitializedImageElement(croppingElement) &&
+            this.imageCache.get(croppingElement.fileId)?.image;
+
+          if (image && !(image instanceof Promise)) {
+            const dragOffset = vectorScale(
+              vector(
+                pointerCoords.x - pointerDownState.lastCoords.x,
+                pointerCoords.y - pointerDownState.lastCoords.y,
+              ),
+              Math.max(this.state.zoom.value, 2),
+            );
+
+            const elementsMap = this.scene.getNonDeletedElementsMap();
+            const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+              croppingElement,
+              elementsMap,
+            );
+
+            const topLeft = vectorFromPoint(
+              pointRotateRads(
+                pointFrom(x1, y1),
+                pointFrom(cx, cy),
+                croppingElement.angle,
+              ),
+            );
+            const topRight = vectorFromPoint(
+              pointRotateRads(
+                pointFrom(x2, y1),
+                pointFrom(cx, cy),
+                croppingElement.angle,
+              ),
+            );
+            const bottomLeft = vectorFromPoint(
+              pointRotateRads(
+                pointFrom(x1, y2),
+                pointFrom(cx, cy),
+                croppingElement.angle,
+              ),
+            );
+            const topEdge = vectorNormalize(vectorSubtract(topRight, topLeft));
+            const leftEdge = vectorNormalize(
+              vectorSubtract(bottomLeft, topLeft),
+            );
+
+            // project dragOffset onto leftEdge and topEdge to decompose
+            const offsetVector = vector(
+              vectorDot(dragOffset, topEdge),
+              vectorDot(dragOffset, leftEdge),
+            );
+
+            const nextCrop = {
+              ...crop,
+              x: clamp(
+                crop.x - offsetVector[0] * Math.sign(croppingElement.scale[0]),
+                0,
+                image.naturalWidth - crop.width,
+              ),
+              y: clamp(
+                crop.y - offsetVector[1] * Math.sign(croppingElement.scale[1]),
+                0,
+                image.naturalHeight - crop.height,
+              ),
+            };
+
+            this.scene.mutateElement(croppingElement, {
+              crop: nextCrop,
+            });
+
+            // Update last coords for next move and set drag occurred flag
+            pointerDownState.lastCoords.x = pointerCoords.x;
+            pointerDownState.lastCoords.y = pointerCoords.y;
+            // @ts-ignore - we need to set this for proper shift direction locking
+            pointerDownState.drag.hasOccurred = true;
+
+            return;
+          }
+        }
+      }
+      // #endregion dedicated crop position movement
+
       if (this.state.activeLockedId) {
         this.setState({
           activeLockedId: null,
@@ -8322,8 +8469,7 @@ class App extends React.Component<AppProps, AppState> {
             if (
               croppingElement &&
               isImageElement(croppingElement) &&
-              croppingElement.crop !== null &&
-              pointerDownState.hit.element === croppingElement
+              croppingElement.crop !== null
             ) {
               const crop = croppingElement.crop;
               const image =
@@ -8331,74 +8477,107 @@ class App extends React.Component<AppProps, AppState> {
                 this.imageCache.get(croppingElement.fileId)?.image;
 
               if (image && !(image instanceof Promise)) {
-                const instantDragOffset = vectorScale(
-                  vector(
-                    pointerCoords.x - lastPointerCoords.x,
-                    pointerCoords.y - lastPointerCoords.y,
-                  ),
-                  Math.max(this.state.zoom.value, 2),
-                );
-
-                const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+                // Check if we're hitting either the cropped element or the uncropped area
+                const hitCroppedElement =
+                  pointerDownState.hit.element === croppingElement;
+                const uncroppedElement = getUncroppedImageElement(
                   croppingElement,
                   elementsMap,
                 );
+                const hitUncroppedArea =
+                  !hitCroppedElement &&
+                  hitElementItself({
+                    point: pointFrom(pointerCoords.x, pointerCoords.y),
+                    element: uncroppedElement,
+                    threshold: this.getElementHitThreshold(uncroppedElement),
+                    elementsMap,
+                  });
 
-                const topLeft = vectorFromPoint(
-                  pointRotateRads(
-                    pointFrom(x1, y1),
-                    pointFrom(cx, cy),
-                    croppingElement.angle,
-                  ),
-                );
-                const topRight = vectorFromPoint(
-                  pointRotateRads(
-                    pointFrom(x2, y1),
-                    pointFrom(cx, cy),
-                    croppingElement.angle,
-                  ),
-                );
-                const bottomLeft = vectorFromPoint(
-                  pointRotateRads(
-                    pointFrom(x1, y2),
-                    pointFrom(cx, cy),
-                    croppingElement.angle,
-                  ),
-                );
-                const topEdge = vectorNormalize(
-                  vectorSubtract(topRight, topLeft),
-                );
-                const leftEdge = vectorNormalize(
-                  vectorSubtract(bottomLeft, topLeft),
-                );
+                if (hitCroppedElement || hitUncroppedArea) {
+                  const instantDragOffset = vectorScale(
+                    vector(
+                      pointerCoords.x - lastPointerCoords.x,
+                      pointerCoords.y - lastPointerCoords.y,
+                    ),
+                    Math.max(this.state.zoom.value, 2),
+                  );
 
-                // project instantDrafOffset onto leftEdge and topEdge to decompose
-                const offsetVector = vector(
-                  vectorDot(instantDragOffset, topEdge),
-                  vectorDot(instantDragOffset, leftEdge),
-                );
+                  // Apply shift key constraint for directional movement
+                  let constrainedDragOffset = instantDragOffset;
+                  if (event.shiftKey) {
+                    const absX = Math.abs(instantDragOffset[0]);
+                    const absY = Math.abs(instantDragOffset[1]);
 
-                const nextCrop = {
-                  ...crop,
-                  x: clamp(
-                    crop.x -
-                      offsetVector[0] * Math.sign(croppingElement.scale[0]),
-                    0,
-                    image.naturalWidth - crop.width,
-                  ),
-                  y: clamp(
-                    crop.y -
-                      offsetVector[1] * Math.sign(croppingElement.scale[1]),
-                    0,
-                    image.naturalHeight - crop.height,
-                  ),
-                };
+                    if (absX > absY) {
+                      // Horizontal movement only
+                      constrainedDragOffset = vector(instantDragOffset[0], 0);
+                    } else {
+                      // Vertical movement only
+                      constrainedDragOffset = vector(0, instantDragOffset[1]);
+                    }
+                  }
 
-                this.scene.mutateElement(croppingElement, {
-                  crop: nextCrop,
-                });
+                  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+                    croppingElement,
+                    elementsMap,
+                  );
 
-                return;
+                  const topLeft = vectorFromPoint(
+                    pointRotateRads(
+                      pointFrom(x1, y1),
+                      pointFrom(cx, cy),
+                      croppingElement.angle,
+                    ),
+                  );
+                  const topRight = vectorFromPoint(
+                    pointRotateRads(
+                      pointFrom(x2, y1),
+                      pointFrom(cx, cy),
+                      croppingElement.angle,
+                    ),
+                  );
+                  const bottomLeft = vectorFromPoint(
+                    pointRotateRads(
+                      pointFrom(x1, y2),
+                      pointFrom(cx, cy),
+                      croppingElement.angle,
+                    ),
+                  );
+                  const topEdge = vectorNormalize(
+                    vectorSubtract(topRight, topLeft),
+                  );
+                  const leftEdge = vectorNormalize(
+                    vectorSubtract(bottomLeft, topLeft),
+                  );
+
+                  // project instantDragOffset onto leftEdge and topEdge to decompose
+                  const offsetVector = vector(
+                    vectorDot(constrainedDragOffset, topEdge),
+                    vectorDot(constrainedDragOffset, leftEdge),
+                  );
+
+                  const nextCrop = {
+                    ...crop,
+                    x: clamp(
+                      crop.x -
+                        offsetVector[0] * Math.sign(croppingElement.scale[0]),
+                      0,
+                      image.naturalWidth - crop.width,
+                    ),
+                    y: clamp(
+                      crop.y -
+                        offsetVector[1] * Math.sign(croppingElement.scale[1]),
+                      0,
+                      image.naturalHeight - crop.height,
+                    ),
+                  };
+
+                  this.scene.mutateElement(croppingElement, {
+                    crop: nextCrop,
+                  });
+
+                  return;
+                }
               }
             }
           }
@@ -8886,10 +9065,15 @@ class App extends React.Component<AppProps, AppState> {
         isCropping,
       } = this.state;
 
+      // Clean up crop position movement flag
+      const wasCropPositionMovement =
+        pointerDownState.cropPositionMovement.enabled;
+
       this.setState((prevState) => ({
         isResizing: false,
         isRotating: false,
-        isCropping: false,
+        // Keep isCropping true if we were doing crop position movement
+        isCropping: wasCropPositionMovement,
         resizingElement: null,
         selectionElement: null,
         frameToHighlight: null,
@@ -9430,8 +9614,10 @@ class App extends React.Component<AppProps, AppState> {
         !croppingElementId ||
         // in the cropping mode
         (croppingElementId &&
-          // not cropping and no hit element
-          ((!hitElement && !isCropping) ||
+          // not cropping and no hit element (but not doing crop position movement)
+          ((!hitElement &&
+            !isCropping &&
+            !pointerDownState.cropPositionMovement.enabled) ||
             // hitting something else
             (hitElement && hitElement.id !== croppingElementId)))
       ) {

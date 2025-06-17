@@ -797,6 +797,10 @@ export type PointerDownState = Readonly<{
   boxSelection: {
     hasOccurred: boolean;
   };
+  cropPositionMovement: {
+    croppingElementId?: string;
+    enabled: boolean;
+  };
 }>;
 
 export type UnsubscribeCallback = () => void;
