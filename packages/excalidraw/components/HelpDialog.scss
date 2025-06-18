@@ -1,15 +1,20 @@
 @import "../css/variables.module.scss";
 
+
+
 .excalidraw {
   .HelpDialog {
+
+    margin: 0rem 0.5rem;
+
     .Modal__content {
-      max-width: 960px;
+      max-width: 1120px;
     }
 
     h3 {
       margin: 1.5rem 0;
-      font-weight: 700;
-      font-size: 1.125rem;
+      font-weight: bolder;
+      font-size: 1.625rem;
     }
 
     &__header {
@@ -63,8 +68,8 @@
       @media screen and (min-width: 1024px) {
         grid-template-columns: 1fr 1fr;
       }
-      grid-column-gap: 1.5rem;
-      grid-row-gap: 2rem;
+      grid-column-gap: 3.0rem;
+      grid-row-gap: 2.5rem;
     }
 
     @media screen and (min-width: 1024px) {
