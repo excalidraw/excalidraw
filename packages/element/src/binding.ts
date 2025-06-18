@@ -37,7 +37,7 @@ import {
   getCenterForBounds,
   getElementBounds,
 } from "./bounds";
-import { intersectElementWithLineSegment } from "./collision";
+import { intersectElementWithLineSegment, isPointInElement } from "./collision";
 import { distanceToElement } from "./distance";
 import {
   headingForPointFromElement,
@@ -127,6 +127,9 @@ export const bindOrUnbindLinearElement = (
   endBindingElement: ExcalidrawBindableElement | null | "keep",
   scene: Scene,
 ): void => {
+  const bothEndBoundToTheSameElement =
+    linearElement.startBinding?.elementId ===
+      linearElement.endBinding?.elementId && !!linearElement.startBinding;
   const elementsMap = scene.getNonDeletedElementsMap();
   const boundToElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
   const unboundFromElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
@@ -151,18 +154,20 @@ export const bindOrUnbindLinearElement = (
     elementsMap,
   );
 
-  const onlyUnbound = Array.from(unboundFromElementIds).filter(
-    (id) => !boundToElementIds.has(id),
-  );
+  if (!bothEndBoundToTheSameElement) {
+    const onlyUnbound = Array.from(unboundFromElementIds).filter(
+      (id) => !boundToElementIds.has(id),
+    );
 
-  getNonDeletedElements(scene, onlyUnbound).forEach((element) => {
-    scene.mutateElement(element, {
-      boundElements: element.boundElements?.filter(
-        (element) =>
-          element.type !== "arrow" || element.id !== linearElement.id,
-      ),
+    getNonDeletedElements(scene, onlyUnbound).forEach((element) => {
+      scene.mutateElement(element, {
+        boundElements: element.boundElements?.filter(
+          (element) =>
+            element.type !== "arrow" || element.id !== linearElement.id,
+        ),
+      });
     });
-  });
+  }
 };
 
 const bindOrUnbindLinearElementEdge = (
@@ -203,6 +208,7 @@ const bindOrUnbindLinearElementEdge = (
             linearElement,
             bindableElement,
             startOrEnd,
+            elementsMap,
           )
         : startOrEnd === "start" ||
           otherEdgeBindableElement.id !== bindableElement.id)
@@ -459,6 +465,7 @@ export const maybeBindLinearElement = (
         linearElement,
         hoveredElement,
         "end",
+        elementsMap,
       )
     ) {
       bindLinearElement(linearElement, hoveredElement, "end", scene);
@@ -487,29 +494,64 @@ export const bindLinearElement = (
     return;
   }
 
-  let binding: PointBinding | FixedPointBinding = {
-    elementId: hoveredElement.id,
-    ...normalizePointBinding(
-      calculateFocusAndGap(
-        linearElement,
-        hoveredElement,
-        startOrEnd,
-        scene.getNonDeletedElementsMap(),
-      ),
-      hoveredElement,
-    ),
-  };
+  const elementsMap = scene.getNonDeletedElementsMap();
+  let binding: PointBinding | FixedPointBinding;
 
   if (isElbowArrow(linearElement)) {
     binding = {
-      ...binding,
+      elementId: hoveredElement.id,
+      ...normalizePointBinding(
+        calculateFocusAndGap(
+          linearElement,
+          hoveredElement,
+          startOrEnd,
+          elementsMap,
+        ),
+        hoveredElement,
+      ),
       ...calculateFixedPointForElbowArrowBinding(
         linearElement,
         hoveredElement,
         startOrEnd,
-        scene.getNonDeletedElementsMap(),
+        elementsMap,
       ),
     };
+  } else {
+    // For non-elbow arrows, check if the endpoint is inside the shape
+    const edgePoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      linearElement,
+      startOrEnd === "start" ? 0 : -1,
+      elementsMap,
+    );
+
+    if (isPointInElement(edgePoint, hoveredElement, elementsMap)) {
+      // Use FixedPoint binding when the arrow endpoint is inside the shape
+      binding = {
+        elementId: hoveredElement.id,
+        focus: 0,
+        gap: 0,
+        ...calculateFixedPointForNonElbowArrowBinding(
+          linearElement,
+          hoveredElement,
+          startOrEnd,
+          elementsMap,
+        ),
+      };
+    } else {
+      // Use traditional focus/gap binding when the endpoint is outside the shape
+      binding = {
+        elementId: hoveredElement.id,
+        ...normalizePointBinding(
+          calculateFocusAndGap(
+            linearElement,
+            hoveredElement,
+            startOrEnd,
+            elementsMap,
+          ),
+          hoveredElement,
+        ),
+      };
+    }
   }
 
   scene.mutateElement(linearElement, {
@@ -532,14 +574,36 @@ const isLinearElementSimpleAndAlreadyBoundOnOppositeEdge = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   bindableElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
+  elementsMap: ElementsMap,
 ): boolean => {
   const otherBinding =
     linearElement[startOrEnd === "start" ? "endBinding" : "startBinding"];
-  return isLinearElementSimpleAndAlreadyBound(
-    linearElement,
-    otherBinding?.elementId,
-    bindableElement,
-  );
+
+  // Only prevent binding if opposite end is bound to the same element
+  if (
+    otherBinding?.elementId !== bindableElement.id ||
+    !isLinearElementSimple(linearElement)
+  ) {
+    return false;
+  }
+
+  // For non-elbow arrows, allow FixedPoint binding even when both ends bind to the same element
+  if (!isElbowArrow(linearElement)) {
+    const currentEndPoint =
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        linearElement,
+        startOrEnd === "start" ? 0 : -1,
+        elementsMap,
+      );
+
+    // If current end would use FixedPoint binding, allow it
+    if (isPointInElement(currentEndPoint, bindableElement, elementsMap)) {
+      return false;
+    }
+  }
+
+  // Prevent traditional focus/gap binding when both ends would bind to the same element
+  return true;
 };
 
 export const isLinearElementSimpleAndAlreadyBound = (
@@ -1254,15 +1318,22 @@ const updateBoundPoint = (
   const direction = startOrEnd === "startBinding" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
 
-  if (isElbowArrow(linearElement) && isFixedPointBinding(binding)) {
+  if (isFixedPointBinding(binding)) {
     const fixedPoint =
       normalizeFixedPoint(binding.fixedPoint) ??
-      calculateFixedPointForElbowArrowBinding(
-        linearElement,
-        bindableElement,
-        startOrEnd === "startBinding" ? "start" : "end",
-        elementsMap,
-      ).fixedPoint;
+      (isElbowArrow(linearElement)
+        ? calculateFixedPointForElbowArrowBinding(
+            linearElement,
+            bindableElement,
+            startOrEnd === "startBinding" ? "start" : "end",
+            elementsMap,
+          ).fixedPoint
+        : calculateFixedPointForNonElbowArrowBinding(
+            linearElement,
+            bindableElement,
+            startOrEnd === "startBinding" ? "start" : "end",
+            elementsMap,
+          ).fixedPoint);
     const globalMidPoint = elementCenterPoint(bindableElement, elementsMap);
     const global = pointFrom<GlobalPoint>(
       bindableElement.x + fixedPoint[0] * bindableElement.width,
@@ -1398,6 +1469,42 @@ export const calculateFixedPointForElbowArrowBinding = (
       (nonRotatedSnappedGlobalPoint[1] - hoveredElement.y) /
         hoveredElement.height,
     ]),
+  };
+};
+
+export const calculateFixedPointForNonElbowArrowBinding = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  hoveredElement: ExcalidrawBindableElement,
+  startOrEnd: "start" | "end",
+  elementsMap: ElementsMap,
+): { fixedPoint: FixedPoint } => {
+  const edgePoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    startOrEnd === "start" ? 0 : -1,
+    elementsMap,
+  );
+
+  // Convert the global point to element-local coordinates
+  const elementCenter = pointFrom(
+    hoveredElement.x + hoveredElement.width / 2,
+    hoveredElement.y + hoveredElement.height / 2,
+  );
+
+  // Rotate the point to account for element rotation
+  const nonRotatedPoint = pointRotateRads(
+    edgePoint,
+    elementCenter,
+    -hoveredElement.angle as Radians,
+  );
+
+  // Calculate the ratio relative to the element's bounds
+  const fixedPointX =
+    (nonRotatedPoint[0] - hoveredElement.x) / hoveredElement.width;
+  const fixedPointY =
+    (nonRotatedPoint[1] - hoveredElement.y) / hoveredElement.height;
+
+  return {
+    fixedPoint: normalizeFixedPoint([fixedPointX, fixedPointY]),
   };
 };
 

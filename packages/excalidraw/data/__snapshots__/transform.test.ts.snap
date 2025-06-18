@@ -88,8 +88,12 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "ellipse-1",
-    "focus": -0.007519379844961235,
-    "gap": 11.562288374879595,
+    "fixedPoint": [
+      0.04,
+      0.4633333333333333,
+    ],
+    "focus": 0,
+    "gap": 0,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -174,8 +178,12 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "startArrowhead": null,
   "startBinding": {
     "elementId": "diamond-1",
+    "fixedPoint": [
+      0.9357142857142857,
+      0.5001,
+    ],
     "focus": 0,
-    "gap": 4.535423522449215,
+    "gap": 0,
   },
   "strokeColor": "#e67700",
   "strokeStyle": "solid",
@@ -1539,8 +1547,12 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "B",
+    "fixedPoint": [
+      0.46387050630528887,
+      0.48466257668711654,
+    ],
     "focus": 0,
-    "gap": 32,
+    "gap": 0,
   },
   "fillStyle": "solid",
   "frameId": null,
