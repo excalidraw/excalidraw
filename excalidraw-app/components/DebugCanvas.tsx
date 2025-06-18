@@ -18,9 +18,9 @@ import {
 } from "@excalidraw/math";
 import { isCurve } from "@excalidraw/math/curve";
 
-import type { DebugElement } from "@excalidraw/excalidraw/visualdebug";
-
 import type { Curve } from "@excalidraw/math";
+
+import type { DebugElement } from "@excalidraw/utils/visualdebug";
 
 import { STORAGE_KEYS } from "../app_constants";
 
