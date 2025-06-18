@@ -269,7 +269,7 @@ const generateElementCanvas = (
     context.filter = IMAGE_INVERT_FILTER;
   }
 
-  drawElementOnCanvas(element, rc, context, renderConfig, appState);
+  drawElementOnCanvas(element, rc, context, renderConfig);
 
   context.restore();
 
@@ -404,7 +404,6 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
 ) => {
   switch (element.type) {
     case "rectangle":
@@ -603,6 +602,41 @@ const generateElementWithCanvas = (
   return prevElementWithCanvas;
 };
 
+const drawElementHighlight = (
+  context: CanvasRenderingContext2D,
+  appState: StaticCanvasAppState,
+) => {
+  if (appState.suggestedBinding) {
+    const cx =
+      (appState.suggestedBinding.x +
+        appState.suggestedBinding.width / 2 +
+        appState.scrollX) *
+      window.devicePixelRatio;
+    const cy =
+      (appState.suggestedBinding.y +
+        appState.suggestedBinding.height / 2 +
+        appState.scrollY) *
+      window.devicePixelRatio;
+    context.save();
+
+    context.translate(cx, cy);
+    context.rotate(appState.suggestedBinding.angle);
+    context.translate(-cx, -cy);
+    context.translate(
+      appState.scrollX + appState.suggestedBinding.x,
+      appState.scrollY + appState.suggestedBinding.y,
+    );
+
+    const drawable = ShapeCache.generateBindableElementHighlight(
+      appState.suggestedBinding,
+      appState,
+    );
+    rough.canvas(context.canvas).draw(drawable);
+
+    context.restore();
+  }
+};
+
 const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   context: CanvasRenderingContext2D,
@@ -610,88 +644,99 @@ const drawElementFromCanvas = (
   appState: StaticCanvasAppState,
   allElementsMap: NonDeletedSceneElementsMap,
 ) => {
-  const element = elementWithCanvas.element;
-  const padding = getCanvasPadding(element);
-  const zoom = elementWithCanvas.scale;
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
-  const cx = ((x1 + x2) / 2 + appState.scrollX) * window.devicePixelRatio;
-  const cy = ((y1 + y2) / 2 + appState.scrollY) * window.devicePixelRatio;
+  const isHighlighted =
+    appState.suggestedBinding?.id === elementWithCanvas.element.id;
+  if (
+    !isHighlighted ||
+    ["image", "text"].includes(elementWithCanvas.element.type)
+  ) {
+    const element = elementWithCanvas.element;
+    const padding = getCanvasPadding(element);
+    const zoom = elementWithCanvas.scale;
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
+    const cx = ((x1 + x2) / 2 + appState.scrollX) * window.devicePixelRatio;
+    const cy = ((y1 + y2) / 2 + appState.scrollY) * window.devicePixelRatio;
 
-  context.save();
-  context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
+    context.save();
+    context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
 
-  const boundTextElement = getBoundTextElement(element, allElementsMap);
+    const boundTextElement = getBoundTextElement(element, allElementsMap);
 
-  if (isArrowElement(element) && boundTextElement) {
-    const offsetX =
-      (elementWithCanvas.boundTextCanvas.width -
-        elementWithCanvas.canvas!.width) /
-      2;
-    const offsetY =
-      (elementWithCanvas.boundTextCanvas.height -
-        elementWithCanvas.canvas!.height) /
-      2;
-    context.translate(cx, cy);
-    context.drawImage(
-      elementWithCanvas.boundTextCanvas,
-      (-(x2 - x1) / 2) * window.devicePixelRatio - offsetX / zoom - padding,
-      (-(y2 - y1) / 2) * window.devicePixelRatio - offsetY / zoom - padding,
-      elementWithCanvas.boundTextCanvas.width / zoom,
-      elementWithCanvas.boundTextCanvas.height / zoom,
-    );
-  } else {
-    // we translate context to element center so that rotation and scale
-    // originates from the element center
-    context.translate(cx, cy);
-
-    context.rotate(element.angle);
-
-    if (
-      "scale" in elementWithCanvas.element &&
-      !isPendingImageElement(element, renderConfig)
-    ) {
-      context.scale(
-        elementWithCanvas.element.scale[0],
-        elementWithCanvas.element.scale[1],
+    if (isArrowElement(element) && boundTextElement) {
+      const offsetX =
+        (elementWithCanvas.boundTextCanvas.width -
+          elementWithCanvas.canvas!.width) /
+        2;
+      const offsetY =
+        (elementWithCanvas.boundTextCanvas.height -
+          elementWithCanvas.canvas!.height) /
+        2;
+      context.translate(cx, cy);
+      context.drawImage(
+        elementWithCanvas.boundTextCanvas,
+        (-(x2 - x1) / 2) * window.devicePixelRatio - offsetX / zoom - padding,
+        (-(y2 - y1) / 2) * window.devicePixelRatio - offsetY / zoom - padding,
+        elementWithCanvas.boundTextCanvas.width / zoom,
+        elementWithCanvas.boundTextCanvas.height / zoom,
       );
-    }
+    } else {
+      // we translate context to element center so that rotation and scale
+      // originates from the element center
+      context.translate(cx, cy);
 
-    // revert afterwards we don't have account for it during drawing
-    context.translate(-cx, -cy);
+      context.rotate(element.angle);
 
-    context.drawImage(
-      elementWithCanvas.canvas!,
-      (x1 + appState.scrollX) * window.devicePixelRatio -
-        (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
-      (y1 + appState.scrollY) * window.devicePixelRatio -
-        (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
-      elementWithCanvas.canvas!.width / elementWithCanvas.scale,
-      elementWithCanvas.canvas!.height / elementWithCanvas.scale,
-    );
+      if (
+        "scale" in elementWithCanvas.element &&
+        !isPendingImageElement(element, renderConfig)
+      ) {
+        context.scale(
+          elementWithCanvas.element.scale[0],
+          elementWithCanvas.element.scale[1],
+        );
+      }
 
-    if (
-      import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
-        "true" &&
-      hasBoundTextElement(element)
-    ) {
-      const textElement = getBoundTextElement(
-        element,
-        allElementsMap,
-      ) as ExcalidrawTextElementWithContainer;
-      const coords = getContainerCoords(element);
-      context.strokeStyle = "#c92a2a";
-      context.lineWidth = 3;
-      context.strokeRect(
-        (coords.x + appState.scrollX) * window.devicePixelRatio,
-        (coords.y + appState.scrollY) * window.devicePixelRatio,
-        getBoundTextMaxWidth(element, textElement) * window.devicePixelRatio,
-        getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
+      // revert afterwards we don't have account for it during drawing
+      context.translate(-cx, -cy);
+
+      context.drawImage(
+        elementWithCanvas.canvas!,
+        (x1 + appState.scrollX) * window.devicePixelRatio -
+          (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
+        (y1 + appState.scrollY) * window.devicePixelRatio -
+          (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
+        elementWithCanvas.canvas!.width / elementWithCanvas.scale,
+        elementWithCanvas.canvas!.height / elementWithCanvas.scale,
       );
+
+      if (
+        import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
+          "true" &&
+        hasBoundTextElement(element)
+      ) {
+        const textElement = getBoundTextElement(
+          element,
+          allElementsMap,
+        ) as ExcalidrawTextElementWithContainer;
+        const coords = getContainerCoords(element);
+        context.strokeStyle = "#c92a2a";
+        context.lineWidth = 3;
+        context.strokeRect(
+          (coords.x + appState.scrollX) * window.devicePixelRatio,
+          (coords.y + appState.scrollY) * window.devicePixelRatio,
+          getBoundTextMaxWidth(element, textElement) * window.devicePixelRatio,
+          getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
+        );
+      }
     }
+    context.restore();
+
+    // Clear the nested element we appended to the DOM
   }
-  context.restore();
 
-  // Clear the nested element we appended to the DOM
+  if (isHighlighted) {
+    drawElementHighlight(context, appState);
+  }
 };
 
 export const renderSelectionElement = (
@@ -744,6 +789,11 @@ export const renderElement = (
     case "magicframe":
     case "frame": {
       if (appState.frameRendering.enabled && appState.frameRendering.outline) {
+        const isHighlighted = element.id === appState.suggestedBinding?.id;
+        const {
+          options: { stroke: highlightStroke },
+        } = ShapeCache.generateBindableElementHighlight(element, appState);
+
         context.save();
         context.translate(
           element.x + appState.scrollX,
@@ -752,12 +802,17 @@ export const renderElement = (
         context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
         context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle = FRAME_STYLE.strokeColor;
+        context.strokeStyle = isHighlighted
+          ? highlightStroke
+          : FRAME_STYLE.strokeColor;
 
         // TODO change later to only affect AI frames
         if (isMagicFrameElement(element)) {
-          context.strokeStyle =
-            appState.theme === THEME.LIGHT ? "#7affd7" : "#1d8264";
+          context.strokeStyle = isHighlighted
+            ? highlightStroke
+            : appState.theme === THEME.LIGHT
+            ? "#7affd7"
+            : "#1d8264";
         }
 
         if (FRAME_STYLE.radius && context.roundRect) {
@@ -795,7 +850,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig, appState);
+        drawElementOnCanvas(element, rc, context, renderConfig);
         context.restore();
       } else {
         const elementWithCanvas = generateElementWithCanvas(
@@ -888,13 +943,7 @@ export const renderElement = (
 
           tempCanvasContext.translate(-shiftX, -shiftY);
 
-          drawElementOnCanvas(
-            element,
-            tempRc,
-            tempCanvasContext,
-            renderConfig,
-            appState,
-          );
+          drawElementOnCanvas(element, tempRc, tempCanvasContext, renderConfig);
 
           tempCanvasContext.translate(shiftX, shiftY);
 
@@ -933,7 +982,7 @@ export const renderElement = (
           }
 
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig, appState);
+          drawElementOnCanvas(element, rc, context, renderConfig);
         }
 
         context.restore();

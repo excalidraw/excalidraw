@@ -662,8 +662,8 @@ const ExcalidrawWrapper = () => {
       debugRenderer(
         debugCanvasRef.current,
         appState,
+        elements,
         window.devicePixelRatio,
-        () => forceRefresh((prev) => !prev),
       );
     }
   };

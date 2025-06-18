@@ -201,8 +201,9 @@ const getRelevantAppStateProps = (
   selectedGroupIds: appState.selectedGroupIds,
   selectedLinearElement: appState.selectedLinearElement,
   multiElement: appState.multiElement,
+  newElement: appState.newElement,
   isBindingEnabled: appState.isBindingEnabled,
-  suggestedBindings: appState.suggestedBindings,
+  suggestedBinding: appState.suggestedBinding,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
   collaborators: appState.collaborators, // Necessary for collab. sessions

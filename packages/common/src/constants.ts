@@ -524,3 +524,5 @@ export enum UserIdleState {
 export const LINE_POLYGON_POINT_MERGE_DISTANCE = 20;
 
 export const DOUBLE_TAP_POSITION_THRESHOLD = 35;
+
+export const BIND_MODE_TIMEOUT = 800; // ms

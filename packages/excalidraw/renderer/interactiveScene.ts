@@ -16,7 +16,6 @@ import {
   throttleRAF,
 } from "@excalidraw/common";
 
-import { FIXED_BINDING_DISTANCE, maxBindingGap } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
 import {
   getOmitSidesForDevice,
@@ -45,18 +44,12 @@ import {
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
-  SuggestedBinding,
-  SuggestedPointBinding,
-} from "@excalidraw/element";
-
-import type {
   TransformHandles,
   TransformHandleType,
 } from "@excalidraw/element";
 
 import type {
   ElementsMap,
-  ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawImageElement,
@@ -79,11 +72,8 @@ import { getClientColor, renderRemoteCursors } from "../clients";
 
 import {
   bootstrapCanvas,
-  drawHighlightForDiamondWithRotation,
-  drawHighlightForRectWithRotation,
   fillCircle,
   getNormalizedCanvasDimensions,
-  strokeEllipseWithRotation,
   strokeRectWithRotation,
 } from "./helpers";
 
@@ -188,85 +178,6 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   );
 };
 
-const renderBindingHighlightForBindableElement = (
-  context: CanvasRenderingContext2D,
-  element: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-  zoom: InteractiveCanvasAppState["zoom"],
-) => {
-  const padding = maxBindingGap(element, element.width, element.height, zoom);
-
-  context.fillStyle = "rgba(0,0,0,.05)";
-
-  switch (element.type) {
-    case "rectangle":
-    case "text":
-    case "image":
-    case "iframe":
-    case "embeddable":
-    case "frame":
-    case "magicframe":
-      drawHighlightForRectWithRotation(context, element, elementsMap, padding);
-      break;
-    case "diamond":
-      drawHighlightForDiamondWithRotation(
-        context,
-        padding,
-        element,
-        elementsMap,
-      );
-      break;
-    case "ellipse": {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-      const width = x2 - x1;
-      const height = y2 - y1;
-
-      context.strokeStyle = "rgba(0,0,0,.05)";
-      context.lineWidth = padding - FIXED_BINDING_DISTANCE;
-
-      strokeEllipseWithRotation(
-        context,
-        width + padding + FIXED_BINDING_DISTANCE,
-        height + padding + FIXED_BINDING_DISTANCE,
-        x1 + width / 2,
-        y1 + height / 2,
-        element.angle,
-      );
-      break;
-    }
-  }
-};
-
-const renderBindingHighlightForSuggestedPointBinding = (
-  context: CanvasRenderingContext2D,
-  suggestedBinding: SuggestedPointBinding,
-  elementsMap: ElementsMap,
-  zoom: InteractiveCanvasAppState["zoom"],
-) => {
-  const [element, startOrEnd, bindableElement] = suggestedBinding;
-
-  const threshold = maxBindingGap(
-    bindableElement,
-    bindableElement.width,
-    bindableElement.height,
-    zoom,
-  );
-
-  context.strokeStyle = "rgba(0,0,0,0)";
-  context.fillStyle = "rgba(0,0,0,.05)";
-
-  const pointIndices =
-    startOrEnd === "both" ? [0, -1] : startOrEnd === "start" ? [0] : [-1];
-  pointIndices.forEach((index) => {
-    const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      element,
-      index,
-      elementsMap,
-    );
-    fillCircle(context, x, y, threshold, true);
-  });
-};
-
 type ElementSelectionBorder = {
   angle: number;
   x1: number;
@@ -333,23 +244,6 @@ const renderSelectionBorder = (
       angle,
     );
   }
-  context.restore();
-};
-
-const renderBindingHighlight = (
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  suggestedBinding: SuggestedBinding,
-  elementsMap: ElementsMap,
-) => {
-  const renderHighlight = Array.isArray(suggestedBinding)
-    ? renderBindingHighlightForSuggestedPointBinding
-    : renderBindingHighlightForBindableElement;
-
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-  renderHighlight(context, suggestedBinding as any, elementsMap, appState.zoom);
-
   context.restore();
 };
 
@@ -813,19 +707,6 @@ const _renderInteractiveScene = ({
     }
   }
 
-  if (appState.isBindingEnabled) {
-    appState.suggestedBindings
-      .filter((binding) => binding != null)
-      .forEach((suggestedBinding) => {
-        renderBindingHighlight(
-          context,
-          appState,
-          suggestedBinding!,
-          elementsMap,
-        );
-      });
-  }
-
   if (appState.frameToHighlight) {
     renderFrameHighlight(
       context,
@@ -891,7 +772,11 @@ const _renderInteractiveScene = ({
   }
 
   // Paint selected elements
-  if (!appState.multiElement && !appState.selectedLinearElement?.isEditing) {
+  if (
+    !appState.multiElement &&
+    !appState.newElement &&
+    !appState.selectedLinearElement?.isEditing
+  ) {
     const showBoundingBox = shouldShowBoundingBox(selectedElements, appState);
 
     const isSingleLinearElementSelected =

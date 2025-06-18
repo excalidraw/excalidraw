@@ -961,7 +961,7 @@ const CommandItem = ({
           <InlineIcon
             icon={
               typeof command.icon === "function"
-                ? command.icon(appState)
+                ? command.icon(appState, [])
                 : command.icon
             }
           />
