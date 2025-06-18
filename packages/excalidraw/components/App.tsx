@@ -108,7 +108,6 @@ import {
 } from "@excalidraw/element/bounds";
 
 import {
-  bindOrUnbindLinearElement,
   bindOrUnbindLinearElements,
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
