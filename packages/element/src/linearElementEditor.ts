@@ -45,6 +45,7 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 import {
   bindOrUnbindLinearElement,
   getHoveredElementForBinding,
+  getOutlineAvoidingPoint,
   isBindingEnabled,
   maybeSuggestBindingsForLinearElementAtCoords,
 } from "./binding";
@@ -58,6 +59,7 @@ import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
+  isArrowElement,
   isBindingElement,
   isElbowArrow,
   isFixedPointBinding,
@@ -290,15 +292,17 @@ export class LinearElementEditor {
       return null;
     }
 
+    const elbowed = isElbowArrow(element);
+
     if (
-      isElbowArrow(element) &&
+      elbowed &&
       !linearElementEditor.pointerDownState.lastClickedIsEndPoint &&
       linearElementEditor.pointerDownState.lastClickedPoint !== 0
     ) {
       return null;
     }
 
-    const selectedPointsIndices = isElbowArrow(element)
+    const selectedPointsIndices = elbowed
       ? [
           !!linearElementEditor.selectedPointsIndices?.includes(0)
             ? 0
@@ -308,7 +312,7 @@ export class LinearElementEditor {
             : undefined,
         ].filter((idx): idx is number => idx !== undefined)
       : linearElementEditor.selectedPointsIndices;
-    const lastClickedPoint = isElbowArrow(element)
+    const lastClickedPoint = elbowed
       ? linearElementEditor.pointerDownState.lastClickedPoint > 0
         ? element.points.length - 1
         : 0
@@ -375,7 +379,7 @@ export class LinearElementEditor {
           app.scene,
           new Map(
             selectedPointsIndices.map((pointIndex) => {
-              const newPointPosition: LocalPoint =
+              let newPointPosition: LocalPoint =
                 pointIndex === lastClickedPoint
                   ? LinearElementEditor.createPointAt(
                       element,
@@ -390,6 +394,67 @@ export class LinearElementEditor {
                       element.points[pointIndex][0] + deltaX,
                       element.points[pointIndex][1] + deltaY,
                     );
+
+              if (
+                pointIndex === 0 ||
+                pointIndex === element.points.length - 1
+              ) {
+                const [, , , , cx, cy] = getElementAbsoluteCoords(
+                  element,
+                  elementsMap,
+                  true,
+                );
+                let newGlobalPointPosition = pointRotateRads(
+                  pointFrom<GlobalPoint>(
+                    element.x + newPointPosition[0],
+                    element.y + newPointPosition[1],
+                  ),
+                  pointFrom<GlobalPoint>(cx, cy),
+                  element.angle,
+                );
+                const hoveredElement = getHoveredElementForBinding(
+                  {
+                    x: newGlobalPointPosition[0],
+                    y: newGlobalPointPosition[1],
+                  },
+                  app.scene.getNonDeletedElements(),
+                  elementsMap,
+                  app.state.zoom,
+                  true,
+                  isElbowArrow(element),
+                );
+
+                const otherBinding =
+                  element[pointIndex === 0 ? "endBinding" : "startBinding"];
+
+                // Allow binding inside the element if both ends are inside
+                if (
+                  isArrowElement(element) &&
+                  !(
+                    hoveredElement?.id === otherBinding?.elementId &&
+                    hoveredElement != null
+                  )
+                ) {
+                  newGlobalPointPosition = getOutlineAvoidingPoint(
+                    element,
+                    hoveredElement,
+                    newGlobalPointPosition,
+                    pointIndex,
+                    elementsMap,
+                  );
+                }
+
+                newPointPosition = LinearElementEditor.createPointAt(
+                  element,
+                  elementsMap,
+                  newGlobalPointPosition[0] -
+                    linearElementEditor.pointerOffset.x,
+                  newGlobalPointPosition[1] -
+                    linearElementEditor.pointerOffset.y,
+                  null,
+                );
+              }
+
               return [
                 pointIndex,
                 {
@@ -452,6 +517,7 @@ export class LinearElementEditor {
             coords,
             app.scene,
             app.state.zoom,
+            elementsMap,
           );
         }
       }

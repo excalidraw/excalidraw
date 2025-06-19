@@ -3,9 +3,6 @@ import {
   arrayToMap,
   isBindingFallthroughEnabled,
   tupleToCoors,
-  invariant,
-  isDevEnv,
-  isTestEnv,
 } from "@excalidraw/common";
 
 import {
@@ -399,10 +396,15 @@ export const maybeSuggestBindingsForLinearElementAtCoords = (
   }[],
   scene: Scene,
   zoom: AppState["zoom"],
+  elementsMap: ElementsMap,
+  // During line creation the start binding hasn't been written yet
+  // into `linearElement`
+  oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
 ): ExcalidrawBindableElement[] =>
   Array.from(
     pointerCoords.reduce(
       (acc: Set<NonDeleted<ExcalidrawBindableElement>>, coords) => {
+        const p = pointFrom<GlobalPoint>(coords.x, coords.y);
         const hoveredBindableElement = getHoveredElementForBinding(
           coords,
           scene.getNonDeletedElements(),
@@ -411,8 +413,20 @@ export const maybeSuggestBindingsForLinearElementAtCoords = (
           isElbowArrow(linearElement),
           isElbowArrow(linearElement),
         );
+        const pointIsInside =
+          hoveredBindableElement != null &&
+          isPointInElement(p, hoveredBindableElement, elementsMap);
 
-        if (hoveredBindableElement != null) {
+        if (
+          hoveredBindableElement != null &&
+          ((pointIsInside &&
+            oppositeBindingBoundElement?.id === hoveredBindableElement.id) ||
+            !isLinearElementSimpleAndAlreadyBound(
+              linearElement,
+              oppositeBindingBoundElement?.id,
+              hoveredBindableElement,
+            ))
+        ) {
           acc.add(hoveredBindableElement);
         }
 
@@ -996,35 +1010,40 @@ const getDistanceForBinding = (
 };
 
 export const bindPointToSnapToElementOutline = (
-  arrow: ExcalidrawElbowArrowElement,
+  linearElement: ExcalidrawLinearElement,
   bindableElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
 ): GlobalPoint => {
-  if (isDevEnv() || isTestEnv()) {
-    invariant(arrow.points.length > 1, "Arrow should have at least 2 points");
-  }
-
   const aabb = aabbForElement(bindableElement, elementsMap);
   const localP =
-    arrow.points[startOrEnd === "start" ? 0 : arrow.points.length - 1];
+    linearElement.points[
+      startOrEnd === "start" ? 0 : linearElement.points.length - 1
+    ];
   const globalP = pointFrom<GlobalPoint>(
-    arrow.x + localP[0],
-    arrow.y + localP[1],
+    linearElement.x + localP[0],
+    linearElement.y + localP[1],
   );
+
+  if (linearElement.points.length < 2) {
+    // New arrow creation, so no snapping
+    return globalP;
+  }
+
   const edgePoint = isRectanguloidElement(bindableElement)
     ? avoidRectangularCorner(bindableElement, elementsMap, globalP)
     : globalP;
-  const elbowed = isElbowArrow(arrow);
+  const elbowed = isElbowArrow(linearElement);
   const center = getCenterForBounds(aabb);
-  const adjacentPointIdx = startOrEnd === "start" ? 1 : arrow.points.length - 2;
+  const adjacentPointIdx =
+    startOrEnd === "start" ? 1 : linearElement.points.length - 2;
   const adjacentPoint = pointRotateRads(
     pointFrom<GlobalPoint>(
-      arrow.x + arrow.points[adjacentPointIdx][0],
-      arrow.y + arrow.points[adjacentPointIdx][1],
+      linearElement.x + linearElement.points[adjacentPointIdx][0],
+      linearElement.y + linearElement.points[adjacentPointIdx][1],
     ),
     center,
-    arrow.angle ?? 0,
+    linearElement.angle ?? 0,
   );
 
   let intersection: GlobalPoint | null = null;
@@ -1083,7 +1102,35 @@ export const bindPointToSnapToElementOutline = (
     return edgePoint;
   }
 
-  return elbowed ? intersection : edgePoint;
+  return intersection;
+};
+
+export const getOutlineAvoidingPoint = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+  hoveredElement: ExcalidrawBindableElement | null,
+  coords: GlobalPoint,
+  pointIndex: number,
+  elementsMap: ElementsMap,
+): GlobalPoint => {
+  if (hoveredElement) {
+    const newPoints = Array.from(element.points);
+    newPoints[pointIndex] = pointFrom<LocalPoint>(
+      coords[0] - element.x,
+      coords[1] - element.y,
+    );
+
+    return bindPointToSnapToElementOutline(
+      {
+        ...element,
+        points: newPoints,
+      },
+      hoveredElement,
+      pointIndex === 0 ? "start" : "end",
+      elementsMap,
+    );
+  }
+
+  return coords;
 };
 
 export const avoidRectangularCorner = (
