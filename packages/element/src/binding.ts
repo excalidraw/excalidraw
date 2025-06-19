@@ -399,9 +399,6 @@ export const maybeSuggestBindingsForLinearElementAtCoords = (
   }[],
   scene: Scene,
   zoom: AppState["zoom"],
-  // During line creation the start binding hasn't been written yet
-  // into `linearElement`
-  oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
 ): ExcalidrawBindableElement[] =>
   Array.from(
     pointerCoords.reduce(

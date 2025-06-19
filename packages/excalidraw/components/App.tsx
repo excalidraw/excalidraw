@@ -5894,7 +5894,6 @@ class App extends React.Component<AppProps, AppState> {
             [scenePointer],
             this.scene,
             this.state.zoom,
-            this.state.startBoundElement,
           ),
         });
       } else {
@@ -8723,7 +8722,6 @@ class App extends React.Component<AppProps, AppState> {
                 [pointerCoords],
                 this.scene,
                 this.state.zoom,
-                this.state.startBoundElement,
               ),
             });
           }
