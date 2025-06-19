@@ -415,14 +415,7 @@ export const maybeSuggestBindingsForLinearElementAtCoords = (
           isElbowArrow(linearElement),
         );
 
-        if (
-          hoveredBindableElement != null &&
-          !isLinearElementSimpleAndAlreadyBound(
-            linearElement,
-            oppositeBindingBoundElement?.id,
-            hoveredBindableElement,
-          )
-        ) {
+        if (hoveredBindableElement != null) {
           acc.add(hoveredBindableElement);
         }
 
