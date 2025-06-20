@@ -23,6 +23,8 @@ import {
   syncInvalidIndicesImmutable,
   hashElementsVersion,
   hashString,
+  isInitializedImageElement,
+  isImageElement,
 } from "./index";
 
 import type {
@@ -137,6 +139,8 @@ export class Store {
     } else {
       // immediately create an immutable change of the scheduled updates,
       // compared to the current state, so that they won't mutate later on during batching
+      // also, we have to compare against the current state,
+      // as comparing against the snapshot might include yet uncomitted changes (i.e. async freedraw / text / image, etc.)
       const currentSnapshot = StoreSnapshot.create(
         this.app.scene.getElementsMapIncludingDeleted(),
         this.app.state,
@@ -869,7 +873,7 @@ export class StoreSnapshot {
   }
 
   /**
-   * Detect if there any changed elements.
+   * Detect if there are any changed elements.
    */
   private detectChangedElements(
     nextElements: SceneElementsMap,
@@ -904,6 +908,14 @@ export class StoreSnapshot {
         !prevElement || // element was added
         prevElement.version < nextElement.version // element was updated
       ) {
+        if (
+          isImageElement(nextElement) &&
+          !isInitializedImageElement(nextElement)
+        ) {
+          // ignore any updates on uninitialized image elements
+          continue;
+        }
+
         changedElements.set(nextElement.id, nextElement);
       }
     }
