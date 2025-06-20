@@ -2,8 +2,6 @@ import { useState, useRef, useEffect, useDeferredValue } from "react";
 
 import { EDITOR_LS_KEYS, debounce, isDevEnv } from "@excalidraw/common";
 
-import { isElbowArrow } from "@excalidraw/element";
-
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useApp } from "../App";
