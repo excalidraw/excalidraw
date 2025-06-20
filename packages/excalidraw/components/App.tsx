@@ -10372,6 +10372,7 @@ class App extends React.Component<AppProps, AppState> {
         });
 
         this.setState({ isLoading: true });
+        this.props.onNewScene?.(ret.data.elements);
         this.syncActionResult({
           ...ret.data,
           appState: {
