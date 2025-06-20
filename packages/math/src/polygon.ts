@@ -94,8 +94,9 @@ function polygonClose<Point extends LocalPoint | GlobalPoint>(
     : ([...polygon, polygon[0]] as Polygon<Point>);
 }
 
-function polygonIsClosed<Point extends LocalPoint | GlobalPoint>(
-  polygon: Point[],
+export function polygonIsClosed<Point extends LocalPoint | GlobalPoint>(
+  polygon: readonly Point[],
+  tolerance: number = PRECISION,
 ) {
-  return pointsEqual(polygon[0], polygon[polygon.length - 1]);
+  return pointsEqual(polygon[0], polygon[polygon.length - 1], tolerance);
 }

@@ -232,6 +232,8 @@ import {
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
+  convertToShape,
+  maybeBindLinearElement,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -9081,6 +9083,45 @@ class App extends React.Component<AppProps, AppState> {
           pressures,
           lastCommittedPoint: pointFrom<LocalPoint>(dx, dy),
         });
+
+        if (this.state.isShapeSnapEnabled) {
+          const detectedElement = convertToShape(newElement);
+
+          if (detectedElement !== newElement) {
+            if (detectedElement.type === "arrow") {
+              const [x, y] =
+                LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                  detectedElement,
+                  1,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+
+              maybeBindLinearElement(
+                detectedElement,
+                this.state,
+                { x, y },
+                this.scene,
+              );
+
+              this.scene.mutateElement(detectedElement, {
+                startArrowhead: this.state.currentItemStartArrowhead,
+                endArrowhead: this.state.currentItemEndArrowhead,
+              });
+            }
+
+            this.scene.replaceAllElements([
+              ...this.scene
+                .getElementsIncludingDeleted()
+                .filter((el) => el.id !== newElement.id),
+              detectedElement,
+            ]);
+
+            makeNextSelectedElementIds(
+              { [detectedElement.id]: true },
+              this.state,
+            );
+          }
+        }
 
         this.actionManager.executeAction(actionFinalize);
 

@@ -2,6 +2,8 @@ import { throttleRAF } from "@excalidraw/common";
 
 import { renderElement } from "@excalidraw/element";
 
+import { convertToShape } from "@excalidraw/element/snapToShape";
+
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 
 import type { NewElementSceneRenderConfig } from "../scene/types";
@@ -45,6 +47,25 @@ const _renderNewElementScene = ({
       );
     } else {
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
+    }
+
+    if (appState.isShapeSnapEnabled && newElement?.type === "freedraw") {
+      const detectedElement = convertToShape(newElement);
+      if (detectedElement !== newElement) {
+        renderElement(
+          {
+            ...detectedElement,
+            roughness: 0,
+            backgroundColor: "rgba(0,0,0,.05)",
+          },
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+        );
+      }
     }
   }
 };
