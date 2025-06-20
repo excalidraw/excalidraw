@@ -2356,16 +2356,18 @@ export const getGlobalFixedPointForBindableElement = (
 };
 
 export const getGlobalFixedPoints = (
-  arrow: ExcalidrawElbowArrowElement,
+  arrow: ExcalidrawArrowElement,
   elementsMap: ElementsMap,
 ): [GlobalPoint, GlobalPoint] => {
   const startElement =
     arrow.startBinding &&
+    isFixedPointBinding(arrow.startBinding) &&
     (elementsMap.get(arrow.startBinding.elementId) as
       | ExcalidrawBindableElement
       | undefined);
   const endElement =
     arrow.endBinding &&
+    isFixedPointBinding(arrow.endBinding) &&
     (elementsMap.get(arrow.endBinding.elementId) as
       | ExcalidrawBindableElement
       | undefined);

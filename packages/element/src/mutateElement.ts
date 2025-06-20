@@ -12,7 +12,7 @@ import { ShapeCache } from "./shape";
 
 import { updateElbowArrowPoints } from "./elbowArrow";
 
-import { isElbowArrow } from "./typeChecks";
+import { isElbowArrow, isFixedPointBinding } from "./typeChecks";
 
 import type {
   ElementsMap,
@@ -54,8 +54,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     (Object.keys(updates).length === 0 || // normalization case
       typeof points !== "undefined" || // repositioning
       typeof fixedSegments !== "undefined" || // segment fixing
-      typeof startBinding !== "undefined" ||
-      typeof endBinding !== "undefined") // manual binding to element
+      isFixedPointBinding(startBinding) ||
+      isFixedPointBinding(endBinding)) // manual binding to element
   ) {
     updates = {
       ...updates,
