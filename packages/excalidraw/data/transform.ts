@@ -18,6 +18,7 @@ import {
 
 import {
   bindLinearElement,
+  calculateFixedPointForElbowArrowBinding,
   getBindingSideMidPoint,
   isElbowArrow,
 } from "@excalidraw/element";
@@ -520,6 +521,18 @@ const adjustElbowArrowPoints = (elements: ExcalidrawElement[]) => {
               ],
             ]),
           );
+
+          const newFixedPoint = calculateFixedPointForElbowArrowBinding(
+            element,
+            endBindableElement,
+            "end",
+          ).fixedPoint;
+
+          if (newFixedPoint) {
+            Object.assign(element.endBinding, {
+              fixedPoint: newFixedPoint,
+            });
+          }
         }
       }
 
@@ -550,6 +563,17 @@ const adjustElbowArrowPoints = (elements: ExcalidrawElement[]) => {
               ],
             ]),
           );
+
+          const newFixedPoint = calculateFixedPointForElbowArrowBinding(
+            element,
+            startBindableElement,
+            "start",
+          ).fixedPoint;
+          if (newFixedPoint) {
+            Object.assign(element.startBinding, {
+              fixedPoint: newFixedPoint,
+            });
+          }
         }
       }
     }
