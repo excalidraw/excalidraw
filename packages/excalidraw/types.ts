@@ -535,8 +535,6 @@ export interface ExcalidrawProps {
     appState: AppState,
     files: BinaryFiles,
   ) => void;
-  onLoad?: () => void;
-  onReset?: () => void;
   onIncrement?: (event: DurableIncrement | EphemeralIncrement) => void;
   initialData?:
     | (() => MaybePromise<ExcalidrawInitialDataState | null>)
@@ -735,6 +733,9 @@ export type AppClassProperties = {
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
+
+  onLoadEmitter: App["onLoadEmitter"];
+  onResetEmitter: App["onResetEmitter"];
 };
 
 export type PointerDownState = Readonly<{
@@ -844,6 +845,8 @@ export interface ExcalidrawImperativeAPI {
       files: BinaryFiles,
     ) => void,
   ) => UnsubscribeCallback;
+  onLoad: (callback: () => void) => UnsubscribeCallback;
+  onReset: (callback: () => void) => UnsubscribeCallback;
   onIncrement: (
     callback: (event: DurableIncrement | EphemeralIncrement) => void,
   ) => UnsubscribeCallback;
