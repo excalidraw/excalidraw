@@ -7,15 +7,17 @@ import {
   newElement,
   newLinearElement,
 } from "@excalidraw/element/newElement";
-
+import { polygonIsClosed } from "@excalidraw/math/polygon"
 import {
   angleBetween,
+  degreesToRadians,
   perpendicularDistance,
   pointDistance,
+  radiansToDegrees,
 } from "@excalidraw/math";
 import { ROUNDNESS } from "@excalidraw/common";
 
-import type { LocalPoint } from "@excalidraw/math";
+import type { Degrees, LocalPoint } from "@excalidraw/math";
 
 import type { BoundingBox, Bounds } from "@excalidraw/element/bounds";
 import type {
@@ -56,14 +58,14 @@ const DEFAULT_OPTIONS = {
   // RDP simplification tolerance (% of bbox diagonal)
   rdpTolerancePercent: 10,
   // Arrow specific thresholds
-  arrowMinTipAngle: 30, // Min angle degrees for the tip
-  arrowMaxTipAngle: 150, // Max angle degrees for the tip
+  arrowMinTipAngle: 30 as Degrees, // Min angle degrees for the tip
+  arrowMaxTipAngle: 150 as Degrees, // Max angle degrees for the tip
   arrowHeadMaxShaftRatio: 0.8, // Max length ratio of arrowhead segment to shaft
   // Quadrilateral specific thresholds
-  rectangleMinCornerAngle: 20, // Min deviation from 180 degrees for a valid corner
-  rectangleMaxCornerAngle: 160, // Max deviation from 0 degrees for a valid corner
+  rectangleMinCornerAngle: 20 as Degrees, // Min deviation from 180 degrees for a valid corner
+  rectangleMaxCornerAngle: 160 as Degrees, // Max deviation from 0 degrees for a valid corner
   // Angle difference (degrees) to nearest 0/90 orientation to classify as rectangle
-  rectangleOrientationAngleThreshold: 10,
+  rectangleOrientationAngleThreshold: 10 as Degrees,
   // Max variance in radius (normalized) to consider a shape an ellipse
   ellipseRadiusVarianceThreshold: 0.5,
 } as const; // Use 'as const' for stricter typing of default values
@@ -193,6 +195,7 @@ function calculateRadiusVariance(
     return 0; // Or handle as an error/special case
   }
 
+  // Not necessarily the element rotation center - freedraw elements are not rotated by default
   const [cx, cy] = getCenterForBounds([
     boundingBox.minX,
     boundingBox.minY,
@@ -252,8 +255,8 @@ function checkArrow(
   const tipAngle = angleBetween(arrowTip, arrowBase, arrowTailEnd);
 
   if (
-    tipAngle <= options.arrowMinTipAngle ||
-    tipAngle >= options.arrowMaxTipAngle
+    tipAngle <= degreesToRadians(options.arrowMinTipAngle) ||
+    tipAngle >= degreesToRadians(options.arrowMaxTipAngle)
   ) {
     return null;
   }
@@ -300,8 +303,8 @@ function checkQuadrilateral(
 
   const allCornersAreValid = angles.every(
     (a) =>
-      a > options.rectangleMinCornerAngle &&
-      a < options.rectangleMaxCornerAngle,
+      a > degreesToRadians(options.rectangleMinCornerAngle) &&
+      a < degreesToRadians(options.rectangleMaxCornerAngle),
   );
 
   if (!allCornersAreValid) {
@@ -364,10 +367,12 @@ export const recognizeShape = (
     boundingBoxDiagonal * (options.rdpTolerancePercent / 100);
   const simplifiedPoints = simplifyRDP(points, rdpTolerance);
 
-  const isClosed = isShapeClosed(
-    simplifiedPoints,
-    boundingBoxDiagonal,
-    options,
+  const isClosed = polygonIsClosed(
+    points,
+    Math.max(
+      options.shapeIsClosedDistanceThreshold,
+      boundingBoxDiagonal * (options.shapeIsClosedPercentThreshold / 100)
+    )
   );
 
   // --- Shape check order matters here ---
