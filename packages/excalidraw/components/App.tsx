@@ -623,6 +623,7 @@ class App extends React.Component<AppProps, AppState> {
 
   onLoadEmitter = new Emitter();
   onResetEmitter = new Emitter();
+  onSaveEmitter = new Emitter();
 
   onPointerDownEmitter = new Emitter<
     [
@@ -725,6 +726,7 @@ class App extends React.Component<AppProps, AppState> {
         onChange: (cb) => this.onChangeEmitter.on(cb),
         onLoad: (cb) => this.onLoadEmitter.on(cb),
         onReset: (cb) => this.onResetEmitter.on(cb),
+        onSave: (cb) => this.onSaveEmitter.on(cb),
         onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
@@ -2569,6 +2571,7 @@ class App extends React.Component<AppProps, AppState> {
     this.onChangeEmitter.clear();
     this.onLoadEmitter.clear();
     this.onResetEmitter.clear();
+    this.onSaveEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
     this.store.onDurableIncrementEmitter.clear();
     ShapeCache.destroy();
