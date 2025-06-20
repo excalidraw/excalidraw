@@ -2239,6 +2239,8 @@ class App extends React.Component<AppProps, AppState> {
     if (!didUpdate) {
       this.scene.triggerUpdate();
     }
+
+    actionResult.callback?.();
   });
 
   // Lifecycle
@@ -10414,7 +10416,6 @@ class App extends React.Component<AppProps, AppState> {
         });
 
         this.setState({ isLoading: true });
-        this.props.onNewScene?.(ret.data.elements);
         this.syncActionResult({
           ...ret.data,
           appState: {
@@ -10423,6 +10424,7 @@ class App extends React.Component<AppProps, AppState> {
           },
           replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          callback: this.props.onLoad,
         });
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library
