@@ -8727,9 +8727,6 @@ class App extends React.Component<AppProps, AppState> {
                 elementsMap,
               );
 
-              dx = outlinePointX - newElement.x;
-              dy = outlinePointY - newElement.y;
-
               if (!this.state.arrowOriginalEndpoint) {
                 this.setState({
                   arrowOriginalEndpoint: pointFrom<GlobalPoint>(
@@ -8754,6 +8751,9 @@ class App extends React.Component<AppProps, AppState> {
                 0,
                 elementsMap,
               );
+
+              dx = outlinePointX - firstPointX;
+              dy = outlinePointY - firstPointY;
             } else {
               firstPointX =
                 this.state.arrowOriginalEndpoint?.[0] ?? firstPointX;
@@ -8777,7 +8777,7 @@ class App extends React.Component<AppProps, AppState> {
               {
                 x: firstPointX,
                 y: firstPointY,
-                points: [...points, pointFrom<LocalPoint>(dx, dy)],
+                points: [points[0], pointFrom<LocalPoint>(dx, dy)],
               },
               { informMutation: false, isDragging: false },
             );
