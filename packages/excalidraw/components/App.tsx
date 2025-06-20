@@ -232,9 +232,9 @@ import {
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
+  convertToShape,
+  maybeBindLinearElement,
 } from "@excalidraw/element";
-
-import { convertToShape } from "@excalidraw/utils/snapToShape";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
@@ -9095,14 +9095,24 @@ class App extends React.Component<AppProps, AppState> {
 
           if (detectedElement !== newElement) {
             if (detectedElement.type === "arrow") {
-              this.scene.mutateElement(
+              const [x, y] =
+                LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                  detectedElement,
+                  1,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+
+              maybeBindLinearElement(
                 detectedElement,
-                {
-                  startArrowhead: this.state.currentItemStartArrowhead,
-                  endArrowhead: this.state.currentItemEndArrowhead,
-                },
-                // TODO: Make arrows bind to nearby elements if possible
+                this.state,
+                { x, y },
+                this.scene,
               );
+
+              this.scene.mutateElement(detectedElement, {
+                startArrowhead: this.state.currentItemStartArrowhead,
+                endArrowhead: this.state.currentItemEndArrowhead,
+              });
             }
 
             this.scene.replaceAllElements([
@@ -9112,9 +9122,10 @@ class App extends React.Component<AppProps, AppState> {
               detectedElement,
             ]);
 
-            this.setState({
-              selectedElementIds: { [detectedElement.id]: true },
-            });
+            makeNextSelectedElementIds(
+              { [detectedElement.id]: true },
+              this.state,
+            );
           }
         }
 

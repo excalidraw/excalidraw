@@ -2,7 +2,7 @@ import { throttleRAF } from "@excalidraw/common";
 
 import { renderElement } from "@excalidraw/element";
 
-import { convertToShape } from "@excalidraw/utils/snapToShape";
+import { convertToShape } from "@excalidraw/element/snapToShape";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 
