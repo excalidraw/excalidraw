@@ -13,10 +13,6 @@ import {
   isTestEnv,
 } from "@excalidraw/common";
 
-import { nanoid } from "nanoid";
-
-import { generateLastSave } from "@excalidraw/excalidraw/scene/export";
-
 import type { AppState, NormalizedZoomValue } from "./types";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
@@ -28,7 +24,6 @@ export const getDefaultAppState = (): Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 > => {
   return {
-    id: nanoid(),
     showWelcomeScreen: false,
     theme: THEME.LIGHT,
     collaborators: new Map(),
@@ -129,7 +124,6 @@ export const getDefaultAppState = (): Omit<
     searchMatches: null,
     lockedMultiSelections: {},
     activeLockedId: null,
-    lastSave: generateLastSave([]),
   };
 };
 
@@ -149,7 +143,6 @@ const APP_STATE_STORAGE_CONF = (<
   T extends Record<keyof AppState, Values>,
 >(config: { [K in keyof T]: K extends keyof AppState ? T[K] : never }) =>
   config)({
-  id: { browser: true, export: true, server: true },
   showWelcomeScreen: { browser: true, export: false, server: false },
   theme: { browser: true, export: false, server: false },
   collaborators: { browser: false, export: false, server: false },
@@ -256,7 +249,6 @@ const APP_STATE_STORAGE_CONF = (<
   searchMatches: { browser: false, export: false, server: false },
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
-  lastSave: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

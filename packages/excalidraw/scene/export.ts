@@ -15,12 +15,7 @@ import {
   toBrandedType,
 } from "@excalidraw/common";
 
-import {
-  getCommonBounds,
-  getElementAbsoluteCoords,
-  getNonDeletedElements,
-  hashElementsVersion,
-} from "@excalidraw/element";
+import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
@@ -52,7 +47,6 @@ import type {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-  OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
@@ -580,15 +574,4 @@ export const getExportSize = (
   );
 
   return [width, height];
-};
-
-export const generateLastSave = (
-  elements: readonly OrderedExcalidrawElement[],
-): AppState["lastSave"] => {
-  const nonDeletedElements = getNonDeletedElements(elements);
-  return {
-    hash: hashElementsVersion(nonDeletedElements),
-    timestamp: Date.now(),
-    elementsCount: nonDeletedElements.length,
-  };
 };
