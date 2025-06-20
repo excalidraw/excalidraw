@@ -10396,7 +10396,7 @@ class App extends React.Component<AppProps, AppState> {
           },
           replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-          callback: this.onLoadEmitter.trigger,
+          callback: () => this.onLoadEmitter.trigger(),
         });
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library
