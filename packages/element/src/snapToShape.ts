@@ -11,13 +11,12 @@ import { polygonIsClosed } from "@excalidraw/math/polygon"
 import {
   angleBetween,
   degreesToRadians,
-  perpendicularDistance,
   pointDistance,
 } from "@excalidraw/math";
 import { ROUNDNESS } from "@excalidraw/common";
+import { simplifyRDP } from "@excalidraw/math/utils";
 
 import type { Degrees, LocalPoint } from "@excalidraw/math";
-
 import type { BoundingBox, Bounds } from "@excalidraw/element/bounds";
 import type {
   ExcalidrawArrowElement,
@@ -75,42 +74,6 @@ type PartialShapeRecognitionOptions = Partial<ShapeRecognitionOptions>;
 interface QuadrilateralSides {
   length: number;
   angleRad: number; // Angle in radians [0, π) representing the line's orientation
-}
-
-/**
- * Simplify a polyline using Ramer-Douglas-Peucker algorithm.
- */
-function simplifyRDP(
-  points: readonly LocalPoint[],
-  epsilon: number,
-): readonly LocalPoint[] {
-  if (points.length < 3) {
-    return points;
-  }
-
-  const first = points[0];
-  const last = points[points.length - 1];
-  let index = -1;
-  let maxDist = 0;
-
-  // Find the point with the maximum distance from the line segment between first and last
-  for (let i = 1; i < points.length - 1; i++) {
-    const dist = perpendicularDistance(points[i], first, last);
-    if (dist > maxDist) {
-      maxDist = dist;
-      index = i;
-    }
-  }
-
-  // If max distance is greater than epsilon, recursively simplify
-  if (maxDist > epsilon && index !== -1) {
-    const left = simplifyRDP(points.slice(0, index + 1), epsilon);
-    const right = simplifyRDP(points.slice(index), epsilon);
-    // Concatenate results (omit duplicate point at junction)
-    return left.slice(0, -1).concat(right);
-  }
-  // Not enough deviation, return straight line segment (keep only endpoints)
-  return [first, last];
 }
 
 /**

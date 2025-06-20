@@ -56,7 +56,7 @@ const _renderNewElementScene = ({
           {
             ...detectedElement,
             roughness: 0,
-            strokeColor: "rgba(255, 0, 0, 0.8)",
+            backgroundColor: "rgba(0,0,0,.05)",
           },
           elementsMap,
           allElementsMap,
