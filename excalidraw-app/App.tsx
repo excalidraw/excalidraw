@@ -4,8 +4,6 @@ import {
   TTDDialogTrigger,
   CaptureUpdateAction,
   reconcileElements,
-  getNonDeletedElements,
-  hashElementsVersion,
 } from "@excalidraw/excalidraw";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
@@ -654,7 +652,7 @@ const ExcalidrawWrapper = () => {
   ) => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
-    } else if (excalidrawAPI) {
+    } /* else if (excalidrawAPI) {
       // reminder state here represented the state of last fired reminder
       // Now it should represent the current reminder state
       const now = Date.now();
@@ -680,7 +678,7 @@ const ExcalidrawWrapper = () => {
         }
       }
     }
-
+ */
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
     if (!LocalData.isSavePaused()) {
@@ -856,6 +854,7 @@ const ExcalidrawWrapper = () => {
       <Excalidraw
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
+        onNewScene={(elements) => console.log("New scene", elements)}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}

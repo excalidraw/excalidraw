@@ -266,6 +266,7 @@ export const actionLoadScene = register({
         appState: loadedAppState,
         files,
       } = await loadFromJSON(appState, elements);
+      app.props.onNewScene?.(loadedElements);
       return {
         elements: loadedElements,
         appState: loadedAppState,
