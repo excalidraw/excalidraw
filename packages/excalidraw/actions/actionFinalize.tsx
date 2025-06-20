@@ -14,7 +14,12 @@ import {
   isLineElement,
 } from "@excalidraw/element";
 
-import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
+import {
+  KEYS,
+  arrayToMap,
+  tupleToCoors,
+  updateActiveTool,
+} from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element";
 
 import { isInvisiblySmallElement } from "@excalidraw/element";
@@ -43,12 +48,16 @@ export const actionFinalize = register({
   trackEvent: false,
   perform: (elements, appState, data, app) => {
     const { interactiveCanvas, focusContainer, scene } = app;
-
+    const { event, sceneCoords } =
+      (data as {
+        event?: PointerEvent;
+        sceneCoords?: { x: number; y: number };
+      }) ?? {};
     const elementsMap = scene.getNonDeletedElementsMap();
 
-    if (data?.event && appState.selectedLinearElement) {
+    if (event && appState.selectedLinearElement) {
       const linearElementEditor = LinearElementEditor.handlePointerUp(
-        data.event,
+        event,
         appState.selectedLinearElement,
         appState,
         app.scene,
@@ -204,12 +213,17 @@ export const actionFinalize = register({
           element.points.length > 1 &&
           isBindingEnabled(appState)
         ) {
-          const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            element,
-            -1,
-            arrayToMap(elements),
-          );
-          maybeBindLinearElement(element, appState, { x, y }, scene);
+          const coords =
+            sceneCoords ??
+            tupleToCoors(
+              LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                element,
+                -1,
+                arrayToMap(elements),
+              ),
+            );
+
+          maybeBindLinearElement(element, appState, coords, scene);
         }
       }
     }
