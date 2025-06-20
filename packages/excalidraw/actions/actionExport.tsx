@@ -266,12 +266,12 @@ export const actionLoadScene = register({
         appState: loadedAppState,
         files,
       } = await loadFromJSON(appState, elements);
-      app.props.onNewScene?.(loadedElements);
       return {
         elements: loadedElements,
         appState: loadedAppState,
         files,
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        callback: app.props.onLoad,
       };
     } catch (error: any) {
       if (error?.name === "AbortError") {

@@ -125,10 +125,10 @@ export const actionClearCanvas = register({
             : appState.activeTool,
       },
     };
-    app.props.onNewScene?.(newScene.elements);
     return {
       ...newScene,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      callback: app.props.onReset,
     };
   },
 });
