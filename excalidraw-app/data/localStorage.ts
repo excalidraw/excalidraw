@@ -9,7 +9,7 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import { STORAGE_KEYS } from "../app_constants";
 
-import type { ReminderState } from "excalidraw-app/App";
+import type { SaveReminderState } from "excalidraw-app/save-reminder/SaveReminder";
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -24,7 +24,7 @@ export const saveUsernameToLocalStorage = (username: string) => {
 };
 
 export const saveReminderStateToLocalStorage = (
-  reminderState: ReminderState,
+  reminderState: SaveReminderState,
 ) => {
   try {
     localStorage.setItem(
@@ -51,20 +51,21 @@ export const importUsernameFromLocalStorage = (): string | null => {
   return null;
 };
 
-export const importReminderStateFromLocalStorage = (): ReminderState | null => {
-  try {
-    const data = localStorage.getItem(
-      STORAGE_KEYS.LOCAL_STORAGE_REMINDER_STATE,
-    );
-    if (data) {
-      return JSON.parse(data);
+export const importReminderStateFromLocalStorage =
+  (): SaveReminderState | null => {
+    try {
+      const data = localStorage.getItem(
+        STORAGE_KEYS.LOCAL_STORAGE_REMINDER_STATE,
+      );
+      if (data) {
+        return JSON.parse(data);
+      }
+    } catch (error: any) {
+      console.error(error);
     }
-  } catch (error: any) {
-    console.error(error);
-  }
 
-  return null;
-};
+    return null;
+  };
 
 export const importFromLocalStorage = () => {
   let savedElements = null;

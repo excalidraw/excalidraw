@@ -85,7 +85,6 @@ import {
 import {
   FIREBASE_STORAGE_PREFIXES,
   isExcalidrawPlusSignedUser,
-  REMINDER_THRESHOLDS,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
@@ -115,7 +114,6 @@ import {
   importFromLocalStorage,
   importReminderStateFromLocalStorage,
   importUsernameFromLocalStorage,
-  saveReminderStateToLocalStorage,
 } from "./data/localStorage";
 
 import { loadFilesFromFirebase } from "./data/firebase";
@@ -159,11 +157,6 @@ declare global {
   interface WindowEventMap {
     beforeinstallprompt: BeforeInstallPromptEvent;
   }
-}
-
-export interface ReminderState {
-  sceneId: string;
-  nextIndex: number;
 }
 
 let pwaEvent: BeforeInstallPromptEvent | null = null;
@@ -349,14 +342,6 @@ const ExcalidrawWrapper = () => {
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
   const [langCode, setLangCode] = useAppLangCode();
-
-  const [reminderState, setReminderState] = useState<ReminderState | null>(
-    null,
-  );
-  const updateReminderState = useCallback((newState: ReminderState) => {
-    setReminderState(newState);
-    saveReminderStateToLocalStorage(newState);
-  }, []);
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -652,33 +637,8 @@ const ExcalidrawWrapper = () => {
   ) => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
-    } /* else if (excalidrawAPI) {
-      // reminder state here represented the state of last fired reminder
-      // Now it should represent the current reminder state
-      const now = Date.now();
-      if (reminderState.tier < REMINDER_THRESHOLDS.length) {
-        const reminderThreshold = REMINDER_THRESHOLDS[reminderState.tier];
-        const nonDeletedElements = getNonDeletedElements(elements);
-        // Remind if we haven't saved for too long
-        if (
-          now - reminderState.lastSave.timestamp >= reminderThreshold.time &&
-          nonDeletedElements.length - reminderState.lastSave.elementsCount >=
-            reminderThreshold.elementsCount
-        ) {
-          excalidrawAPI.updateScene({
-            appState: {
-              toast: {
-                message: t("toast.rememberToSave"),
-              },
-            },
-          });
-          updateReminderState({
-            tier: reminderState.tier + 1,
-          });
-        }
-      }
     }
- */
+
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
     if (!LocalData.isSavePaused()) {

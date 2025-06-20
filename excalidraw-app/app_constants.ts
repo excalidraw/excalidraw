@@ -58,33 +58,3 @@ export const COOKIES = {
 export const isExcalidrawPlusSignedUser = document.cookie.includes(
   COOKIES.AUTH_STATE_COOKIE,
 );
-
-// Time is in ms
-// export const REMINDER_THRESHOLDS = [
-//   {
-//     time: 172800000, // 2 days
-//     elementsCount: 100,
-//   },
-//   {
-//     time: 345600000, // 4 days
-//     elementsCount: 200,
-//   },
-//   {
-//     time: 518400000, // 6 days
-//     elementsCount: 300,
-//   },
-// ];
-export const REMINDER_THRESHOLDS = [
-  {
-    time: 15000, // 2 days
-    elementsCount: 10,
-  },
-  {
-    time: 30000, // 4 days
-    elementsCount: 20,
-  },
-  {
-    time: 45000, // 6 days
-    elementsCount: 30,
-  },
-];
