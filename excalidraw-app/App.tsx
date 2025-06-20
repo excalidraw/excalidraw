@@ -655,28 +655,17 @@ const ExcalidrawWrapper = () => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
     } else if (excalidrawAPI) {
-      const currentReminderIndex =
-        reminderState && reminderState.sceneId === appState.id
-          ? reminderState.nextIndex
-          : 0;
+      // reminder state here represented the state of last fired reminder
+      // Now it should represent the current reminder state
       const now = Date.now();
-      // if delta is less than first threshold, then we recently saved
-      if (now - appState.lastSave.timestamp < REMINDER_THRESHOLDS[0].time) {
-        if (currentReminderIndex !== 0) {
-          updateReminderState({
-            nextIndex: 0,
-            sceneId: appState.id,
-          });
-        }
-      } else if (currentReminderIndex < REMINDER_THRESHOLDS.length) {
-        const reminderThreshold = REMINDER_THRESHOLDS[currentReminderIndex];
+      if (reminderState.tier < REMINDER_THRESHOLDS.length) {
+        const reminderThreshold = REMINDER_THRESHOLDS[reminderState.tier];
         const nonDeletedElements = getNonDeletedElements(elements);
         // Remind if we haven't saved for too long
         if (
-          now - appState.lastSave.timestamp >= reminderThreshold.time &&
-          nonDeletedElements.length - appState.lastSave.elementsCount >=
-            reminderThreshold.elementsCount &&
-          hashElementsVersion(nonDeletedElements) !== appState.lastSave.hash
+          now - reminderState.lastSave.timestamp >= reminderThreshold.time &&
+          nonDeletedElements.length - reminderState.lastSave.elementsCount >=
+            reminderThreshold.elementsCount
         ) {
           excalidrawAPI.updateScene({
             appState: {
@@ -686,8 +675,7 @@ const ExcalidrawWrapper = () => {
             },
           });
           updateReminderState({
-            nextIndex: currentReminderIndex + 1,
-            sceneId: appState.id,
+            tier: reminderState.tier + 1,
           });
         }
       }

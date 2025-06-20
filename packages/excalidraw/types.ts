@@ -271,8 +271,6 @@ export interface AppState {
     element: NonDeletedExcalidrawElement;
     state: "hover" | "active";
   } | null;
-  /* A unique identifier that is only changed on scene change */
-  id: string;
   /**
    * for a newly created element
    * - set on pointer down, updated during pointer move, used on pointer up
@@ -446,13 +444,6 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
-
-  /* Timestamp and hashed elements version of last time we stored on disk */
-  lastSave: {
-    timestamp: number;
-    hash: number;
-    elementsCount: number;
-  };
 }
 
 export type SearchMatch = {
