@@ -2279,6 +2279,7 @@ class App extends React.Component<AppProps, AppState> {
       }));
       this.resetStore();
       this.resetHistory();
+      this.props.onReset?.();
     },
   );
 
