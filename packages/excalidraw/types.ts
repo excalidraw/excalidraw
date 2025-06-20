@@ -736,6 +736,7 @@ export type AppClassProperties = {
 
   onLoadEmitter: App["onLoadEmitter"];
   onResetEmitter: App["onResetEmitter"];
+  onSaveEmitter: App["onSaveEmitter"];
 };
 
 export type PointerDownState = Readonly<{
@@ -847,6 +848,7 @@ export interface ExcalidrawImperativeAPI {
   ) => UnsubscribeCallback;
   onLoad: (callback: () => void) => UnsubscribeCallback;
   onReset: (callback: () => void) => UnsubscribeCallback;
+  onSave: (callback: () => void) => UnsubscribeCallback;
   onIncrement: (
     callback: (event: DurableIncrement | EphemeralIncrement) => void,
   ) => UnsubscribeCallback;
