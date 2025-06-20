@@ -10665,6 +10665,7 @@ class App extends React.Component<AppProps, AppState> {
       });
 
       //zsviczian - temporary fix: https://github.com/excalidraw/excalidraw/issues/9091
+      //removed in 0.18.0-24
       /*if (imageFile && !imageFile.type) {
         const extension = imageFile.name.split(".").pop()?.toLowerCase();
         const mimeType =
