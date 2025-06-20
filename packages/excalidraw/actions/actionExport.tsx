@@ -271,7 +271,7 @@ export const actionLoadScene = register({
         appState: loadedAppState,
         files,
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        callback: app.onLoadEmitter.trigger,
+        callback: () => app.onLoadEmitter.trigger(),
       };
     } catch (error: any) {
       if (error?.name === "AbortError") {
