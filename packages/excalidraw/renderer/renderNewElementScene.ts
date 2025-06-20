@@ -5,9 +5,8 @@ import {
   isInvisiblySmallElement,
   renderElement,
   shouldApplyFrameClip,
+  convertToShape,
 } from "@excalidraw/element";
-
-import { convertToShape } from "@excalidraw/utils";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 

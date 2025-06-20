@@ -262,9 +262,8 @@ import {
   getUncroppedWidthAndHeight,
   getActiveTextElement,
   isEligibleFrameChildType,
+  convertToShape,
 } from "@excalidraw/element";
-
-import { convertToShape } from "@excalidraw/utils";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 
@@ -503,6 +502,10 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
+
+function maybeBindLinearElement(...args: any) {
+  // TODO: Remove after rebase
+}
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -10868,14 +10871,24 @@ class App extends React.Component<AppProps, AppState> {
 
           if (detectedElement !== newElement) {
             if (detectedElement.type === "arrow") {
-              this.scene.mutateElement(
+              const [x, y] =
+                LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                  detectedElement,
+                  1,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+
+              maybeBindLinearElement(
                 detectedElement,
-                {
-                  startArrowhead: this.state.currentItemStartArrowhead,
-                  endArrowhead: this.state.currentItemEndArrowhead,
-                },
-                // TODO: Make arrows bind to nearby elements if possible
+                this.state,
+                { x, y },
+                this.scene,
               );
+
+              this.scene.mutateElement(detectedElement, {
+                startArrowhead: this.state.currentItemStartArrowhead,
+                endArrowhead: this.state.currentItemEndArrowhead,
+              });
             }
 
             this.scene.replaceAllElements([
@@ -10885,9 +10898,10 @@ class App extends React.Component<AppProps, AppState> {
               detectedElement,
             ]);
 
-            this.setState({
-              selectedElementIds: { [detectedElement.id]: true },
-            });
+            makeNextSelectedElementIds(
+              { [detectedElement.id]: true },
+              this.state,
+            );
           }
         }
 
