@@ -13,7 +13,6 @@ import {
   degreesToRadians,
   perpendicularDistance,
   pointDistance,
-  radiansToDegrees,
 } from "@excalidraw/math";
 import { ROUNDNESS } from "@excalidraw/common";
 
@@ -58,14 +57,13 @@ const DEFAULT_OPTIONS = {
   // RDP simplification tolerance (% of bbox diagonal)
   rdpTolerancePercent: 10,
   // Arrow specific thresholds
-  arrowMinTipAngle: 30 as Degrees, // Min angle degrees for the tip
-  arrowMaxTipAngle: 150 as Degrees, // Max angle degrees for the tip
+  arrowMinTipAngle: 30, // Min angle degrees for the tip
+  arrowMaxTipAngle: 150, // Max angle degrees for the tip
   arrowHeadMaxShaftRatio: 0.8, // Max length ratio of arrowhead segment to shaft
   // Quadrilateral specific thresholds
-  rectangleMinCornerAngle: 20 as Degrees, // Min deviation from 180 degrees for a valid corner
-  rectangleMaxCornerAngle: 160 as Degrees, // Max deviation from 0 degrees for a valid corner
-  // Angle difference (degrees) to nearest 0/90 orientation to classify as rectangle
-  rectangleOrientationAngleThreshold: 10 as Degrees,
+  rectangleMinCornerAngle: 20, // Min deviation from 180 degrees for a valid corner
+  rectangleMaxCornerAngle: 160, // Max deviation from 0 degrees for a valid corner
+  rectangleOrientationAngleThreshold: 10, // Angle difference (degrees) to nearest 0/90 orientation to classify as rectangle
   // Max variance in radius (normalized) to consider a shape an ellipse
   ellipseRadiusVarianceThreshold: 0.5,
 } as const; // Use 'as const' for stricter typing of default values
@@ -74,9 +72,9 @@ const DEFAULT_OPTIONS = {
 type ShapeRecognitionOptions = typeof DEFAULT_OPTIONS;
 type PartialShapeRecognitionOptions = Partial<ShapeRecognitionOptions>;
 
-interface Segment {
+interface QuadrilateralSides {
   length: number;
-  angleDeg: number; // Angle in degrees [0, 180) representing the line's orientation
+  angleRad: number; // Angle in radians [0, π) representing the line's orientation
 }
 
 /**
@@ -118,8 +116,8 @@ function simplifyRDP(
 /**
  * Calculates the properties (length, angle) of segments in a polygon.
  */
-function calculateSegments(vertices: readonly LocalPoint[]): Segment[] {
-  const segments: Segment[] = [];
+function calculateQuadrilateralSides(vertices: readonly LocalPoint[]): QuadrilateralSides[] {
+  const segments: QuadrilateralSides[] = [];
   const numVertices = vertices.length;
   for (let i = 0; i < numVertices; i++) {
     const p1 = vertices[i];
@@ -129,54 +127,36 @@ function calculateSegments(vertices: readonly LocalPoint[]): Segment[] {
     const dy = p2[1] - p1[1];
     const length = Math.hypot(dx, dy);
 
-    // Calculate angle in degrees [0, 360)
+    // Calculate angle in radians [0, 2π)
     let angleRad = Math.atan2(dy, dx);
     if (angleRad < 0) {
       angleRad += 2 * Math.PI;
     }
-    let angleDeg = (angleRad * 180) / Math.PI;
 
-    // Normalize angle to [0, 180) for undirected line orientation
-    if (angleDeg >= 180) {
-      angleDeg -= 180;
+    // Normalize angle to [0, π) for undirected line orientation
+    if (angleRad >= Math.PI) {
+      angleRad -= Math.PI;
     }
 
-    segments.push({ length, angleDeg });
+    segments.push({ length, angleRad });
   }
   return segments;
 }
 
-/**
- * Checks if the shape is closed based on the distance between start and end points.
- */
-function isShapeClosed(
-  points: readonly LocalPoint[],
-  boundingBoxDiagonal: number,
-  options: ShapeRecognitionOptions,
-): boolean {
-  const start = points[0];
-  const end = points[points.length - 1];
-  const closedDist = pointDistance(start, end);
-  const closedThreshold = Math.max(
-    options.shapeIsClosedDistanceThreshold,
-    boundingBoxDiagonal * (options.shapeIsClosedPercentThreshold / 100),
-  );
-  return closedDist < closedThreshold;
-}
 
 /**
  * Checks if a quadrilateral is likely axis-aligned based on its segment angles.
  */
 function isAxisAligned(
-  segments: Segment[],
+  sides: QuadrilateralSides[],
   orientationThreshold: number,
 ): boolean {
-  return segments.some((seg) => {
-    const angle = seg.angleDeg;
-    // Distance to horizontal (0 or 180 degrees)
-    const distToHoriz = Math.min(angle, 180 - angle);
-    // Distance to vertical (90 degrees)
-    const distToVert = Math.abs(angle - 90);
+  return sides.some((seg) => {
+    const angle = seg.angleRad;
+    // Distance to horizontal (0 or π radians)
+    const distToHoriz = Math.min(angle, Math.PI - angle);
+    // Distance to vertical (π/2 radians)
+    const distToVert = Math.abs(angle - Math.PI / 2);
     return (
       distToHoriz < orientationThreshold || distToVert < orientationThreshold
     );
@@ -225,7 +205,7 @@ function calculateRadiusVariance(
   return radiusVariance;
 }
 
-/** Checks if the points form a straight line segment. */
+/** Checks if the points form a straight line. */
 function checkLine(
   points: readonly LocalPoint[],
   isClosed: boolean,
@@ -255,8 +235,8 @@ function checkArrow(
   const tipAngle = angleBetween(arrowTip, arrowBase, arrowTailEnd);
 
   if (
-    tipAngle <= degreesToRadians(options.arrowMinTipAngle) ||
-    tipAngle >= degreesToRadians(options.arrowMaxTipAngle)
+    tipAngle <= degreesToRadians(options.arrowMinTipAngle as Degrees) ||
+    tipAngle >= degreesToRadians(options.arrowMaxTipAngle as Degrees)
   ) {
     return null;
   }
@@ -303,17 +283,17 @@ function checkQuadrilateral(
 
   const allCornersAreValid = angles.every(
     (a) =>
-      a > degreesToRadians(options.rectangleMinCornerAngle) &&
-      a < degreesToRadians(options.rectangleMaxCornerAngle),
+      a > degreesToRadians(options.rectangleMinCornerAngle as Degrees) &&
+      a < degreesToRadians(options.rectangleMaxCornerAngle as Degrees),
   );
 
   if (!allCornersAreValid) {
     return null;
   }
 
-  const segments = calculateSegments(vertices);
+  const sides = calculateQuadrilateralSides(vertices);
 
-  if (isAxisAligned(segments, options.rectangleOrientationAngleThreshold)) {
+  if (isAxisAligned(sides, degreesToRadians(options.rectangleOrientationAngleThreshold as Degrees))) {
     return "rectangle";
   }
   // Not axis-aligned, but quadrilateral => classify as diamond
