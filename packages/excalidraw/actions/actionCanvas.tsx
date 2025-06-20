@@ -102,7 +102,7 @@ export const actionClearCanvas = register({
   },
   perform: (elements, appState, _, app) => {
     app.imageCache.clear();
-    const newScene = {
+    return {
       elements: elements.map((element) =>
         newElementWith(element, { isDeleted: true }),
       ),
@@ -121,12 +121,9 @@ export const actionClearCanvas = register({
         pasteDialog: appState.pasteDialog,
         activeTool:
           appState.activeTool.type === "image"
-            ? { ...appState.activeTool, type: "selection" as const }
+            ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
       },
-    };
-    return {
-      ...newScene,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       callback: app.props.onReset,
     };
