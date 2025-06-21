@@ -17,11 +17,11 @@ import type {
 //     elementsCount: 300,
 //   },
 //   {
-//     time: 1209600000, // 2 weeks
+//     time: 604800000, // 1 week
 //     elementsCount: 600,
 //   },
 //   {
-//     time: 2419200000, // 4 weeks
+//     time: 1209600000, // 2 weeks
 //     elementsCount: 900,
 //   },
 // ];
@@ -31,21 +31,19 @@ export const REMINDER_TIERS = [
     elementsCount: 10,
   },
   {
-    time: 30000,
+    time: 15000,
     elementsCount: 20,
   },
   {
-    time: 45000,
+    time: 15000,
     elementsCount: 30,
   },
 ];
 
 export interface SaveReminderState {
   tier: number;
-  lastSave: {
-    timestamp: number;
-    elementsCount: number;
-  };
+  timestamp: number;
+  elementsCount: number;
 }
 
 export interface SaveReminderProps {
@@ -67,10 +65,8 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
   const handleNewScene = useCallback(() => {
     updateReminderState({
       tier: 0,
-      lastSave: {
-        timestamp: Date.now(),
-        elementsCount: excalidrawAPI.getSceneElements().length,
-      },
+      timestamp: Date.now(),
+      elementsCount: excalidrawAPI.getSceneElements().length,
     });
   }, [excalidrawAPI, updateReminderState]);
 
@@ -104,8 +100,8 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
         const reminderTier = REMINDER_TIERS[reminderState.tier];
         const nonDeletedElements = excalidrawAPI.getSceneElements();
         if (
-          now - reminderState.lastSave.timestamp >= reminderTier.time &&
-          nonDeletedElements.length - reminderState.lastSave.elementsCount >=
+          now - reminderState.timestamp >= reminderTier.time &&
+          nonDeletedElements.length - reminderState.elementsCount >=
             reminderTier.elementsCount
         ) {
           excalidrawAPI.updateScene({
@@ -118,6 +114,7 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
           updateReminderState({
             ...reminderState,
             tier: reminderState.tier + 1,
+            timestamp: Date.now(),
           });
         }
       }
