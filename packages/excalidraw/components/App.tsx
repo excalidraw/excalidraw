@@ -7714,18 +7714,34 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const { x: rx, y: ry, lastCommittedPoint } = multiElement;
+      const lastGlobalPoint = pointFrom<GlobalPoint>(
+        rx + multiElement.points[multiElement.points.length - 1][0],
+        ry + multiElement.points[multiElement.points.length - 1][1],
+      );
+      const hoveredElementForBinding = getHoveredElementForBinding(
+        {
+          x: lastGlobalPoint[0],
+          y: lastGlobalPoint[1],
+        },
+        this.scene.getNonDeletedElements(),
+        this.scene.getNonDeletedElementsMap(),
+        this.state.zoom,
+        true,
+        isElbowArrow(multiElement),
+      );
 
       // clicking inside commit zone → finalize arrow
       if (
-        multiElement.points.length > 1 &&
-        lastCommittedPoint &&
-        pointDistance(
-          pointFrom(
-            pointerDownState.origin.x - rx,
-            pointerDownState.origin.y - ry,
-          ),
-          lastCommittedPoint,
-        ) < LINE_CONFIRM_THRESHOLD
+        hoveredElementForBinding ||
+        (multiElement.points.length > 1 &&
+          lastCommittedPoint &&
+          pointDistance(
+            pointFrom(
+              pointerDownState.origin.x - rx,
+              pointerDownState.origin.y - ry,
+            ),
+            lastCommittedPoint,
+          ) < LINE_CONFIRM_THRESHOLD)
       ) {
         this.actionManager.executeAction(actionFinalize);
         return;
