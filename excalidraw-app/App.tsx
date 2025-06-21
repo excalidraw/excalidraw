@@ -30,6 +30,7 @@ import {
   resolvablePromise,
   isRunningInIframe,
   isDevEnv,
+  Emitter,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -112,7 +113,6 @@ import {
 import { updateStaleImageStatuses } from "./data/FileManager";
 import {
   importFromLocalStorage,
-  importReminderStateFromLocalStorage,
   importUsernameFromLocalStorage,
 } from "./data/localStorage";
 
@@ -137,6 +137,8 @@ import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
 import "./index.scss";
+
+import { SaveReminder } from "./save-reminder/SaveReminder";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -373,6 +375,11 @@ const ExcalidrawWrapper = () => {
     return isCollaborationLink(window.location.href);
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
+  const syncFromStorageEmitter = useRef(new Emitter());
+  const onSyncFromLocalStorage = useCallback(
+    (cb: () => void) => syncFromStorageEmitter.current.on(cb),
+    [],
+  );
 
   useHandleLibrary({
     excalidrawAPI,
@@ -397,10 +404,6 @@ const ExcalidrawWrapper = () => {
       forceRefresh((prev) => !prev);
     }
   }, [excalidrawAPI]);
-
-  useEffect(() => {
-    setReminderState(importReminderStateFromLocalStorage());
-  }, []);
 
   useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
@@ -521,7 +524,6 @@ const ExcalidrawWrapper = () => {
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
           const localDataState = importFromLocalStorage();
           const username = importUsernameFromLocalStorage();
-          const reminderState = importReminderStateFromLocalStorage();
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
             ...localDataState,
@@ -534,8 +536,8 @@ const ExcalidrawWrapper = () => {
               });
             }
           });
+          syncFromStorageEmitter.current.trigger();
           collabAPI?.setUsername(username || "");
-          setReminderState(reminderState);
         }
 
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_FILES)) {
@@ -928,6 +930,12 @@ const ExcalidrawWrapper = () => {
         )}
         {excalidrawAPI && !isCollabDisabled && (
           <Collab excalidrawAPI={excalidrawAPI} />
+        )}
+        {excalidrawAPI && (
+          <SaveReminder
+            excalidrawAPI={excalidrawAPI}
+            onSyncFromLocalStorage={onSyncFromLocalStorage}
+          />
         )}
 
         <ShareDialog
