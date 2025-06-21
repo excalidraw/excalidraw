@@ -1,11 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef } from "react";
 import {
   importReminderStateFromLocalStorage,
   saveReminderStateToLocalStorage,
 } from "excalidraw-app/data/localStorage";
 import { t } from "@excalidraw/excalidraw/i18n";
 
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import type {
+  ExcalidrawImperativeAPI,
+  UnsubscribeCallback,
+} from "@excalidraw/excalidraw/types";
 
 // Time is in ms
 // export const REMINDER_TIERS = [
@@ -47,15 +50,15 @@ export interface SaveReminderState {
 
 export interface SaveReminderProps {
   excalidrawAPI: ExcalidrawImperativeAPI;
+  onSyncFromLocalStorage: (cb: () => void) => UnsubscribeCallback;
 }
 
-export function SaveReminder(props: SaveReminderProps) {
-  const { excalidrawAPI } = props;
-  const [reminderState, setReminderState] = useState<SaveReminderState | null>(
-    null,
-  );
+export const SaveReminder = memo((props: SaveReminderProps) => {
+  const { excalidrawAPI, onSyncFromLocalStorage } = props;
+  const reminderStateRef = useRef<SaveReminderState | null>(null);
+
   const updateReminderState = useCallback((newState: SaveReminderState) => {
-    setReminderState(newState);
+    reminderStateRef.current = newState;
     saveReminderStateToLocalStorage(newState);
   }, []);
 
@@ -69,19 +72,27 @@ export function SaveReminder(props: SaveReminderProps) {
     });
   }, [excalidrawAPI, updateReminderState]);
 
-  useEffect(() => {
+  const syncFromLocalStorage = useCallback(() => {
     const localStorageReminderState = importReminderStateFromLocalStorage();
     if (localStorageReminderState === null) {
       handleNewScene();
     } else {
-      setReminderState(localStorageReminderState);
+      reminderStateRef.current = localStorageReminderState;
     }
+  }, [handleNewScene]);
 
+  useEffect(() => {
+    syncFromLocalStorage();
+  }, [syncFromLocalStorage]);
+
+  useEffect(() => {
     const unsubOnLoad = excalidrawAPI.onLoad(handleNewScene);
     const unsubOnSave = excalidrawAPI.onSave(handleNewScene);
     const unsubOnReset = excalidrawAPI.onReset(handleNewScene);
+    const unsubOnSync = onSyncFromLocalStorage(syncFromLocalStorage);
 
     const unsubOnChange = excalidrawAPI.onChange(() => {
+      const reminderState = reminderStateRef.current;
       if (!reminderState) {
         return;
       }
@@ -113,7 +124,16 @@ export function SaveReminder(props: SaveReminderProps) {
       unsubOnLoad();
       unsubOnSave();
       unsubOnReset();
+      unsubOnSync();
       unsubOnChange();
     };
-  }, [excalidrawAPI, handleNewScene, reminderState, updateReminderState]);
-}
+  }, [
+    excalidrawAPI,
+    handleNewScene,
+    onSyncFromLocalStorage,
+    syncFromLocalStorage,
+    updateReminderState,
+  ]);
+
+  return null;
+});
