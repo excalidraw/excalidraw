@@ -834,7 +834,7 @@ const convertElementType = <
         ...element,
         type: targetType,
         roundness:
-          targetType === "diamond" && element.roundness
+          CONVERTIBLE_GENERIC_TYPES.has(targetType) && element.roundness
             ? {
                 type: isUsingAdaptiveRadius(targetType)
                   ? ROUNDNESS.ADAPTIVE_RADIUS
