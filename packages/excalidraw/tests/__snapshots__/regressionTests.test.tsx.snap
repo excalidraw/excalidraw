@@ -6558,12 +6558,14 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
+          "editingLinearElementId": "id15",
           "selectedElementIds": {
             "id15": true,
           },
           "selectedLinearElementId": null,
         },
         "inserted": {
+          "editingLinearElementId": null,
           "selectedElementIds": {
             "id12": true,
           },
@@ -6694,9 +6696,11 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
+          "editingLinearElementId": null,
           "selectedLinearElementId": "id15",
         },
         "inserted": {
+          "editingLinearElementId": "id15",
           "selectedLinearElementId": null,
         },
       },
@@ -14520,9 +14524,11 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
+          "editingLinearElementId": "id6",
           "selectedLinearElementId": null,
         },
         "inserted": {
+          "editingLinearElementId": null,
           "selectedLinearElementId": "id6",
         },
       },
@@ -14597,11 +14603,13 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
+          "editingLinearElementId": null,
           "selectedElementIds": {
             "id3": true,
           },
         },
         "inserted": {
+          "editingLinearElementId": "id6",
           "selectedElementIds": {
             "id6": true,
           },

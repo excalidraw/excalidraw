@@ -1148,7 +1148,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(4);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.editingLinearElement).not.toBeNull();
       expect(h.state.selectedLinearElement).toBeNull(); // undo `actionFinalize`
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1165,7 +1165,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(1);
       expect(API.getRedoStack().length).toBe(5);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.editingLinearElement).not.toBeNull();
       expect(h.state.selectedLinearElement).toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1197,7 +1197,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(1);
       expect(API.getRedoStack().length).toBe(5);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.editingLinearElement).not.toBeNull();
       expect(h.state.selectedLinearElement).toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1213,7 +1213,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(4);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.editingLinearElement).not.toBeNull();
       expect(h.state.selectedLinearElement).toBeNull(); // undo `actionFinalize`
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1638,13 +1638,15 @@ describe("history", () => {
         expect(API.getUndoStack().length).toBe(5);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          focus: expect.toBeNonNaNNumber(),
-          gap: expect.toBeNonNaNNumber(),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
+          focus: 0,
+          gap: 0,
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          focus: expect.toBeNonNaNNumber(),
-          gap: expect.toBeNonNaNNumber(),
+          fixedPoint: expect.arrayContaining([0, 0.5001]),
+          focus: 0,
+          gap: 0,
         });
         expect(rect1.boundElements).toStrictEqual([
           { id: text.id, type: "text" },
@@ -1661,13 +1663,15 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          focus: expect.toBeNonNaNNumber(),
-          gap: expect.toBeNonNaNNumber(),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
+          focus: 0,
+          gap: 0,
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          focus: expect.toBeNonNaNNumber(),
-          gap: expect.toBeNonNaNNumber(),
+          fixedPoint: expect.arrayContaining([0, 0.5001]),
+          focus: 0,
+          gap: 0,
         });
         expect(h.elements).toEqual([
           expect.objectContaining({
@@ -1684,13 +1688,15 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          focus: expect.toBeNonNaNNumber(),
-          gap: expect.toBeNonNaNNumber(),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
+          focus: 0,
+          gap: 0,
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          focus: expect.toBeNonNaNNumber(),
-          gap: expect.toBeNonNaNNumber(),
+          fixedPoint: expect.arrayContaining([0, 0.5001]),
+          focus: 0,
+          gap: 0,
         });
         expect(h.elements).toEqual([
           expect.objectContaining({
@@ -1715,13 +1721,15 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          focus: expect.toBeNonNaNNumber(),
-          gap: expect.toBeNonNaNNumber(),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
+          focus: 0,
+          gap: 0,
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          focus: expect.toBeNonNaNNumber(),
-          gap: expect.toBeNonNaNNumber(),
+          fixedPoint: expect.arrayContaining([0, 0.5001]),
+          focus: 0,
+          gap: 0,
         });
         expect(h.elements).toEqual([
           expect.objectContaining({
@@ -1738,13 +1746,15 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          focus: expect.toBeNonNaNNumber(),
-          gap: expect.toBeNonNaNNumber(),
+          fixedPoint: expect.arrayContaining([1, 0.5001]),
+          focus: 0,
+          gap: 0,
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          focus: expect.toBeNonNaNNumber(),
-          gap: expect.toBeNonNaNNumber(),
+          fixedPoint: expect.arrayContaining([0, 0.5001]),
+          focus: 0,
+          gap: 0,
         });
         expect(h.elements).toEqual([
           expect.objectContaining({
@@ -5079,13 +5089,11 @@ describe("history", () => {
               id: arrowId,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                focus: 0,
-                gap: 1,
+                fixedPoint: expect.arrayContaining([1, 0.5001]),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                focus: -0,
-                gap: 1,
+                fixedPoint: expect.arrayContaining([0, 0.5001]),
               }),
               isDeleted: true,
             }),

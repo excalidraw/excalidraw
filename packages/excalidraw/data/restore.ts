@@ -29,13 +29,8 @@ import { bumpVersion } from "@excalidraw/element";
 import { getContainerElement } from "@excalidraw/element";
 import { detectLineHeight } from "@excalidraw/element";
 import {
-  isPointInElement,
-  calculateFixedPointForNonElbowArrowBinding,
-} from "@excalidraw/element";
-import {
   isArrowBoundToElement,
   isArrowElement,
-  isBindableElement,
   isElbowArrow,
   isFixedPointBinding,
   isLinearElement,
@@ -524,87 +519,6 @@ const repairFrameMembership = (
   }
 };
 
-/**
- * Migrates old PointBinding to FixedPointBinding for non-elbow arrows
- * when arrow endpoints are inside bindable shapes.
- *
- * NOTE mutates element.
- */
-const migratePointBindingToFixedPoint = (
-  element: Mutable<ExcalidrawElement>,
-  elementsMap: Map<string, Mutable<ExcalidrawElement>>,
-) => {
-  if (!isArrowElement(element) || isElbowArrow(element)) {
-    return;
-  }
-
-  let shouldUpdateElement = false;
-  let newStartBinding: FixedPointBinding | PointBinding | null =
-    element.startBinding;
-  let newEndBinding: FixedPointBinding | PointBinding | null =
-    element.endBinding;
-
-  // Check start binding
-  if (element.startBinding && !isFixedPointBinding(element.startBinding)) {
-    const boundElement = elementsMap.get(element.startBinding.elementId);
-    if (boundElement && isBindableElement(boundElement)) {
-      const edgePoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-        element,
-        0,
-        elementsMap,
-      );
-      if (isPointInElement(edgePoint, boundElement, elementsMap)) {
-        const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
-          element,
-          boundElement,
-          "start",
-          elementsMap,
-        );
-        newStartBinding = {
-          elementId: element.startBinding.elementId,
-          focus: 0,
-          gap: 0,
-          fixedPoint,
-        };
-        shouldUpdateElement = true;
-      }
-    }
-  }
-
-  // Check end binding
-  if (element.endBinding && !isFixedPointBinding(element.endBinding)) {
-    const boundElement = elementsMap.get(element.endBinding.elementId);
-    if (boundElement && isBindableElement(boundElement)) {
-      const edgePoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-        element,
-        -1,
-        elementsMap,
-      );
-      if (isPointInElement(edgePoint, boundElement, elementsMap)) {
-        const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
-          element,
-          boundElement,
-          "end",
-          elementsMap,
-        );
-        newEndBinding = {
-          elementId: element.endBinding.elementId,
-          focus: 0,
-          gap: 0,
-          fixedPoint,
-        };
-        shouldUpdateElement = true;
-      }
-    }
-  }
-
-  if (shouldUpdateElement) {
-    (element as Mutable<ExcalidrawLinearElement>).startBinding =
-      newStartBinding;
-    (element as Mutable<ExcalidrawLinearElement>).endBinding = newEndBinding;
-  }
-};
-
 export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
@@ -684,9 +598,6 @@ export const restoreElements = (
         (element as Mutable<ExcalidrawLinearElement>).endBinding = null;
       }
     }
-
-    // Migrate old PointBinding to FixedPointBinding for non-elbow arrows
-    migratePointBindingToFixedPoint(element, restoredElementsMap);
   }
 
   // NOTE (mtolmacs): Temporary fix for extremely large arrows

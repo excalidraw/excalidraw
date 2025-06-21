@@ -27,6 +27,7 @@ import {
   deconstructLinearOrFreeDrawElement,
   hitElementItself,
   isPathALoop,
+  shouldTestInside,
   type Store,
 } from "@excalidraw/element";
 
@@ -391,8 +392,6 @@ export class LinearElementEditor {
           scenePointerY,
           linearElementEditor,
           app.scene,
-          elements,
-          app.state.zoom,
           thresholdCallback,
         );
 
@@ -2053,7 +2052,7 @@ const pointDraggingUpdates = (
           elements,
           elementsMap,
           zoom,
-          true,
+          shouldTestInside(element),
           isElbowArrow(element),
         );
 
@@ -2105,8 +2104,6 @@ const pointDraggingOtherEndpoint = (
   scenePointerY: number,
   linearElementEditor: LinearElementEditor,
   scene: Scene,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  zoom: AppState["zoom"],
   thresholdCallback: (element: ExcalidrawElement) => number,
 ) => {
   let arrowOtherPoint = linearElementEditor.pointerDownState.arrowOtherPoint;

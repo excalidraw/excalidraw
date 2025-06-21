@@ -34,7 +34,7 @@ import {
   getCenterForBounds,
   getElementBounds,
 } from "./bounds";
-import { intersectElementWithLineSegment, isPointInElement } from "./collision";
+import { hitElementItself, intersectElementWithLineSegment } from "./collision";
 import { distanceToElement } from "./distance";
 import {
   headingForPointFromElement,
@@ -415,7 +415,12 @@ export const maybeSuggestBindingsForLinearElementAtCoords = (
         );
         const pointIsInside =
           hoveredBindableElement != null &&
-          isPointInElement(p, hoveredBindableElement, elementsMap);
+          hitElementItself({
+            point: p,
+            element: hoveredBindableElement,
+            elementsMap,
+            threshold: 0, // TODO: Not ideal, should be calculated from the same source
+          });
 
         if (
           hoveredBindableElement != null &&
@@ -528,7 +533,14 @@ export const bindLinearElement = (
       elementsMap,
     );
 
-    if (isPointInElement(edgePoint, hoveredElement, elementsMap)) {
+    if (
+      hitElementItself({
+        point: edgePoint,
+        element: hoveredElement,
+        elementsMap,
+        threshold: 0, // TODO: Not ideal, should be calculated from the same source
+      })
+    ) {
       // Use FixedPoint binding when the arrow endpoint is inside the shape
       binding = {
         elementId: hoveredElement.id,
@@ -601,7 +613,14 @@ const isLinearElementSimpleAndAlreadyBoundOnOppositeEdge = (
       );
 
     // If current end would use FixedPoint binding, allow it
-    if (isPointInElement(currentEndPoint, bindableElement, elementsMap)) {
+    if (
+      hitElementItself({
+        point: currentEndPoint,
+        element: bindableElement,
+        elementsMap,
+        threshold: 0, // TODO: Not ideal, should be calculated from the same source
+      })
+    ) {
       return false;
     }
   }
