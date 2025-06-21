@@ -94,7 +94,7 @@ export const actionFinalize = register({
       }
     }
 
-    if (appState.editingLinearElement) {
+    if (appState.editingLinearElement && !appState.newElement) {
       const { elementId, startBindingElement, endBindingElement } =
         appState.editingLinearElement;
       const element = LinearElementEditor.getElement(elementId, elementsMap);
@@ -282,6 +282,17 @@ export const actionFinalize = register({
           element && isLinearElement(element)
             ? new LinearElementEditor(element, arrayToMap(newElements))
             : appState.selectedLinearElement,
+        editingLinearElement: appState.newElement
+          ? null
+          : appState.editingLinearElement
+          ? {
+              ...appState.editingLinearElement,
+              pointerDownState: {
+                ...appState.editingLinearElement.pointerDownState,
+                arrowOtherPoint: undefined,
+              },
+            }
+          : null,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,

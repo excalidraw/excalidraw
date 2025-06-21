@@ -2177,8 +2177,6 @@ const pointDraggingOtherEndpoint = (
         }
         // Restore the saved point if we are back inside the element
         else if (arrowOtherPoint) {
-          console.warn("RESTORE");
-
           newOtherPointPosition = LinearElementEditor.createPointAt(
             element,
             elementsMap,

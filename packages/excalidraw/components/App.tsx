@@ -233,7 +233,7 @@ import {
   isLineElement,
   isSimpleArrow,
   getOutlineAvoidingPoint,
-  mutateElement,
+  isExcalidrawElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -5872,10 +5872,13 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
       }
-      if (editingLinearElement?.lastUncommittedPoint != null) {
+      if (
+        editingLinearElement?.lastUncommittedPoint != null ||
+        this.state.newElement
+      ) {
         this.maybeSuggestBindingAtCursor(
           scenePointer,
-          editingLinearElement.elbowed,
+          editingLinearElement?.elbowed || false,
         );
       } else {
         // causes stack overflow if not sync
@@ -7812,44 +7815,7 @@ class App extends React.Component<AppProps, AppState> {
               locked: false,
               frameId: topLayerFrame ? topLayerFrame.id : null,
             });
-      const hoveredElement = getHoveredElementForBinding(
-        {
-          x: gridX,
-          y: gridY,
-        },
-        this.scene.getNonDeletedElements(),
-        this.scene.getNonDeletedElementsMap(),
-        this.state.zoom,
-        true,
-        true,
-      );
 
-      if (!isElbowArrow(element) && hoveredElement) {
-        // We're hijacking the start binding to transport the hovered start element
-        mutateElement(element, this.scene.getNonDeletedElementsMap(), {
-          startBinding: {
-            elementId: hoveredElement.id,
-            focus: 0,
-            gap: 0,
-          },
-        });
-      }
-
-      this.setState((prevState) => {
-        const nextSelectedElementIds = {
-          ...prevState.selectedElementIds,
-        };
-        delete nextSelectedElementIds[element.id];
-        return {
-          selectedElementIds: makeNextSelectedElementIds(
-            nextSelectedElementIds,
-            prevState,
-          ),
-        };
-      });
-      this.scene.mutateElement(element, {
-        points: [...element.points, pointFrom<LocalPoint>(0, 0)],
-      });
       const boundElement = getHoveredElementForBinding(
         pointerDownState.origin,
         this.scene.getNonDeletedElements(),
@@ -7859,11 +7825,72 @@ class App extends React.Component<AppProps, AppState> {
         isElbowArrow(element),
       );
 
+      if (!isElbowArrow(element)) {
+        this.setState((prevState) => {
+          const linearElement = new LinearElementEditor(
+            element,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          const linearElementEditor = {
+            ...linearElement,
+            startBindingElement: boundElement,
+            pointerDownState: {
+              ...linearElement.pointerDownState,
+              arrowOtherPoint: pointFrom<GlobalPoint>(
+                pointerDownState.origin.x,
+                pointerDownState.origin.y,
+              ),
+            },
+          };
+          const nextSelectedElementIds = makeNextSelectedElementIds(
+            { [element.id]: true },
+            prevState,
+          );
+
+          return {
+            selectedElementIds: nextSelectedElementIds,
+            editingLinearElement: linearElementEditor,
+          };
+        });
+      }
+
+      this.scene.mutateElement(element, {
+        points: [...element.points, pointFrom<LocalPoint>(0, 0)],
+      });
       this.scene.insertElement(element);
-      this.setState({
-        newElement: element,
-        startBoundElement: boundElement,
-        suggestedBindings: [],
+      this.setState((prevState) => {
+        let linearElementEditor = null;
+        let nextSelectedElementIds = prevState.selectedElementIds;
+        if (!isElbowArrow(element)) {
+          const linearElement = new LinearElementEditor(
+            element,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          linearElementEditor = {
+            ...linearElement,
+            startBindingElement: boundElement,
+            pointerDownState: {
+              ...linearElement.pointerDownState,
+              arrowOtherPoint: pointFrom<GlobalPoint>(
+                pointerDownState.origin.x,
+                pointerDownState.origin.y,
+              ),
+            },
+          };
+          nextSelectedElementIds = makeNextSelectedElementIds(
+            { [element.id]: true },
+            prevState,
+          );
+        }
+
+        return {
+          ...prevState,
+          newElement: element,
+          startBoundElement: boundElement,
+          suggestedBindings: [],
+          selectedElementIds: nextSelectedElementIds,
+          editingLinearElement: linearElementEditor,
+        };
       });
     }
   };
@@ -8702,24 +8729,35 @@ class App extends React.Component<AppProps, AppState> {
         } else if (isLinearElement(newElement)) {
           pointerDownState.drag.hasOccurred = true;
           const points = newElement.points;
-          const hoveredElement = getHoveredElementForBinding(
-            { x: gridX, y: gridY },
-            this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
-            this.state.zoom,
-            isElbowArrow(newElement),
-            isElbowArrow(newElement),
-          );
-          const arrowIsInsideTheSameElement =
-            newElement.startBinding &&
-            hoveredElement?.id === newElement.startBinding.elementId;
-
+          const startBindingElement =
+            this.state.editingLinearElement?.startBindingElement;
+          let [firstPointX, firstPointY] =
+            LinearElementEditor.getPointGlobalCoordinates(
+              newElement,
+              newElement.points[0],
+              elementsMap,
+            );
           let dx = gridX - newElement.x;
           let dy = gridY - newElement.y;
-          let firstPointX = newElement.x + newElement.points[0][0];
-          let firstPointY = newElement.y + newElement.points[0][1];
 
-          if (isBindingElement(newElement, false)) {
+          if (
+            !isElbowArrow(newElement) &&
+            isExcalidrawElement(startBindingElement) &&
+            isBindingElement(newElement, false)
+          ) {
+            // Handles the case where we need to "jump out" the simple arrow
+            // start point as we drag-create it.
+            const hoveredElement = getHoveredElementForBinding(
+              { x: gridX, y: gridY },
+              this.scene.getNonDeletedElements(),
+              this.scene.getNonDeletedElementsMap(),
+              this.state.zoom,
+              isElbowArrow(newElement),
+              isElbowArrow(newElement),
+            );
+            const arrowIsInsideTheSameElement =
+              hoveredElement?.id === startBindingElement.id;
+
             if (!arrowIsInsideTheSameElement) {
               const [outlinePointX, outlinePointY] = getOutlineAvoidingPoint(
                 newElement,
@@ -8728,15 +8766,6 @@ class App extends React.Component<AppProps, AppState> {
                 newElement.points.length - 1,
                 elementsMap,
               );
-
-              if (!this.state.arrowOriginalEndpoint) {
-                this.setState({
-                  arrowOriginalEndpoint: pointFrom<GlobalPoint>(
-                    firstPointX,
-                    firstPointY,
-                  ),
-                });
-              }
 
               const otherHoveredElement = getHoveredElementForBinding(
                 { x: firstPointX, y: firstPointY },
@@ -8758,9 +8787,11 @@ class App extends React.Component<AppProps, AppState> {
               dy = outlinePointY - firstPointY;
             } else {
               firstPointX =
-                this.state.arrowOriginalEndpoint?.[0] ?? firstPointX;
+                this.state.editingLinearElement?.pointerDownState
+                  .arrowOtherPoint?.[0] ?? firstPointX;
               firstPointY =
-                this.state.arrowOriginalEndpoint?.[1] ?? firstPointY;
+                this.state.editingLinearElement?.pointerDownState
+                  .arrowOtherPoint?.[1] ?? firstPointY;
             }
           }
 
@@ -9049,7 +9080,6 @@ class App extends React.Component<AppProps, AppState> {
 
       this.setState({
         selectedElementsAreBeingDragged: false,
-        arrowOriginalEndpoint: null,
       });
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
@@ -9072,7 +9102,7 @@ class App extends React.Component<AppProps, AppState> {
 
       // Handle end of dragging a point of a linear element, might close a loop
       // and sets binding element
-      if (this.state.editingLinearElement) {
+      if (this.state.editingLinearElement && !this.state.newElement) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
           pointerDownState.hit?.element?.id !==

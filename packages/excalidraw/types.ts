@@ -47,7 +47,6 @@ import type {
   DurableIncrement,
   EphemeralIncrement,
 } from "@excalidraw/element";
-import type { GlobalPoint } from "@excalidraw/math";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
@@ -445,7 +444,6 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
-  arrowOriginalEndpoint: GlobalPoint | null;
 }
 
 export type SearchMatch = {
