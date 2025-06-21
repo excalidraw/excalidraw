@@ -100,6 +100,7 @@ import {
   randomInteger,
   CLASSES,
   Emitter,
+  STROKE_PRESSURE
 } from "@excalidraw/common";
 
 import {
@@ -7483,7 +7484,12 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
-    const simulatePressure = event.pressure === 0.5;
+    let simulatePressure = event.pressure === 0.5;
+    let pressures: number[] = simulatePressure ? [] : [event.pressure];
+    if (this.state.strokePressure === STROKE_PRESSURE.fixed) {
+      simulatePressure = false;
+      pressures = [];
+    }
 
     const element = newFreeDrawElement({
       type: elementType,
@@ -7501,7 +7507,7 @@ class App extends React.Component<AppProps, AppState> {
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [pointFrom<LocalPoint>(0, 0)],
-      pressures: simulatePressure ? [] : [event.pressure],
+      pressures,
     });
 
     this.scene.insertElement(element);

@@ -323,6 +323,7 @@ export interface AppState {
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
+  strokePressure: 0 | 1;
   exportScale: number;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;

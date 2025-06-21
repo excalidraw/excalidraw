@@ -21,9 +21,10 @@ import {
   getLineHeight,
   isTransparent,
   reduceToCommonValue,
+  STROKE_PRESSURE,
 } from "@excalidraw/common";
 
-import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
+import { canBecomePolygon, getNonDeletedElements, isFreeDrawElement } from "@excalidraw/element";
 
 import {
   bindLinearElement,
@@ -126,6 +127,8 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  VariablePressureIcon,
+  FixedPressureIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -551,6 +554,49 @@ export const actionChangeStrokeWidth = register({
             (element) => element.hasOwnProperty("strokeWidth"),
             (hasSelection) =>
               hasSelection ? null : appState.currentItemStrokeWidth,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </div>
+    </fieldset>
+  ),
+});
+
+export const actionChangestrokePressure = register({
+  name: "changestrokePressure",
+  label: "labels.strokePressure",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements,
+      appState: { ...appState, strokePressure: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ appState, updateData, app }) => (
+    <fieldset>
+      <legend>{t("labels.strokePressure")}</legend>
+      <div className="buttonList">
+        <RadioSelection
+          group="stroke-pressure"
+          options={[
+            {
+              value: STROKE_PRESSURE.variable,
+              text: t("labels.variable"),
+              icon: VariablePressureIcon,
+            },
+            {
+              value: STROKE_PRESSURE.fixed,
+              text: t("labels.fixed"),
+              icon: FixedPressureIcon,
+            }
+          ]}
+          value={getFormValue(
+            [],
+            app,
+            () => null,
+            () => false,
+            () => appState.strokePressure,
           )}
           onChange={(value) => updateData(value)}
         />
