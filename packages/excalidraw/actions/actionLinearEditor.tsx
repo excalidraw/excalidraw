@@ -16,7 +16,7 @@ import type {
   ExcalidrawLineElement,
 } from "@excalidraw/element/types";
 
-import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
+import { DEFAULT_CATEGORIES } from "../components/CommandPalette/constants/categories";
 import { ToolButton } from "../components/ToolButton";
 import { lineEditorIcon, polygonIcon } from "../components/icons";
 import { t } from "../i18n";
