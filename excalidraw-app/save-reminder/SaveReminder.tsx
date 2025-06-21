@@ -51,10 +51,12 @@ export interface SaveReminderState {
 export interface SaveReminderProps {
   excalidrawAPI: ExcalidrawImperativeAPI;
   onSyncFromLocalStorage: (cb: () => void) => UnsubscribeCallback;
+  onLoadedShareableLink: (cb: () => void) => UnsubscribeCallback;
 }
 
 export const SaveReminder = memo((props: SaveReminderProps) => {
-  const { excalidrawAPI, onSyncFromLocalStorage } = props;
+  const { excalidrawAPI, onSyncFromLocalStorage, onLoadedShareableLink } =
+    props;
   const reminderStateRef = useRef<SaveReminderState | null>(null);
 
   const updateReminderState = useCallback((newState: SaveReminderState) => {
@@ -89,6 +91,7 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
     const unsubOnLoad = excalidrawAPI.onLoad(handleNewScene);
     const unsubOnSave = excalidrawAPI.onSave(handleNewScene);
     const unsubOnReset = excalidrawAPI.onReset(handleNewScene);
+    const unsubOnLoadedShareableLink = onLoadedShareableLink(handleNewScene);
     const unsubOnSync = onSyncFromLocalStorage(syncFromLocalStorage);
 
     const unsubOnChange = excalidrawAPI.onChange(() => {
@@ -124,12 +127,14 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
       unsubOnLoad();
       unsubOnSave();
       unsubOnReset();
+      unsubOnLoadedShareableLink();
       unsubOnSync();
       unsubOnChange();
     };
   }, [
     excalidrawAPI,
     handleNewScene,
+    onLoadedShareableLink,
     onSyncFromLocalStorage,
     syncFromLocalStorage,
     updateReminderState,
