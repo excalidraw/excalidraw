@@ -634,6 +634,7 @@
       "close": "Close"
     },
     "recents": "Recently used",
+    "recentsSelection": "Recently used (selection)",
     "search": {
       "placeholder": "Search menus, commands, and discover hidden gems",
       "noMatch": "No matching commands..."
