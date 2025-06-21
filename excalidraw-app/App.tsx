@@ -948,7 +948,7 @@ const ExcalidrawWrapper = () => {
         {excalidrawAPI && !isCollabDisabled && (
           <Collab excalidrawAPI={excalidrawAPI} />
         )}
-        {excalidrawAPI && (
+        {excalidrawAPI && !isCollaborating && (
           <SaveReminder
             excalidrawAPI={excalidrawAPI}
             onSyncFromLocalStorage={onSyncFromLocalStorage}
