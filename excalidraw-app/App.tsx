@@ -30,6 +30,7 @@ import {
   resolvablePromise,
   isRunningInIframe,
   isDevEnv,
+  Emitter,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -137,6 +138,8 @@ import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
 import "./index.scss";
 
+import { SaveReminder } from "./save-reminder/SaveReminder";
+
 import type { CollabAPI } from "./collab/Collab";
 
 polyfill();
@@ -205,6 +208,7 @@ const shareableLinkConfirmDialog = {
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
   excalidrawAPI: ExcalidrawImperativeAPI;
+  shareableLinkEmitter: Emitter;
 }): Promise<
   { scene: ExcalidrawInitialDataState | null } & (
     | { isExternalScene: true; id: string; key: string }
@@ -236,6 +240,7 @@ const initializeScene = async (opts: {
       (await openConfirmModal(shareableLinkConfirmDialog))
     ) {
       if (jsonBackendMatch) {
+        opts.shareableLinkEmitter.trigger();
         scene = await loadScene(
           jsonBackendMatch[1],
           jsonBackendMatch[2],
@@ -373,6 +378,18 @@ const ExcalidrawWrapper = () => {
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
 
+  const syncFromStorageEmitter = useRef(new Emitter());
+  const onSyncFromLocalStorage = useCallback(
+    (cb: () => void) => syncFromStorageEmitter.current.on(cb),
+    [],
+  );
+
+  const shareableLinkEmitter = useRef(new Emitter());
+  const onLoadedShareableLink = useCallback(
+    (cb: () => void) => shareableLinkEmitter.current.on(cb),
+    [],
+  );
+
   useHandleLibrary({
     excalidrawAPI,
     adapter: LibraryIndexedDBAdapter,
@@ -469,7 +486,11 @@ const ExcalidrawWrapper = () => {
       }
     };
 
-    initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
+    initializeScene({
+      collabAPI,
+      excalidrawAPI,
+      shareableLinkEmitter: shareableLinkEmitter.current,
+    }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
     });
@@ -486,7 +507,11 @@ const ExcalidrawWrapper = () => {
         }
         excalidrawAPI.updateScene({ appState: { isLoading: true } });
 
-        initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
+        initializeScene({
+          collabAPI,
+          excalidrawAPI,
+          shareableLinkEmitter: shareableLinkEmitter.current,
+        }).then((data) => {
           loadImages(data);
           if (data.scene) {
             excalidrawAPI.updateScene({
@@ -528,6 +553,7 @@ const ExcalidrawWrapper = () => {
               });
             }
           });
+          syncFromStorageEmitter.current.trigger();
           collabAPI?.setUsername(username || "");
         }
 
@@ -921,6 +947,13 @@ const ExcalidrawWrapper = () => {
         )}
         {excalidrawAPI && !isCollabDisabled && (
           <Collab excalidrawAPI={excalidrawAPI} />
+        )}
+        {excalidrawAPI && !isCollaborating && (
+          <SaveReminder
+            excalidrawAPI={excalidrawAPI}
+            onSyncFromLocalStorage={onSyncFromLocalStorage}
+            onLoadedShareableLink={onLoadedShareableLink}
+          />
         )}
 
         <ShareDialog

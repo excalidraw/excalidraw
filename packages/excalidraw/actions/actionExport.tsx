@@ -185,6 +185,7 @@ export const actionSaveToActiveFile = register({
               }
             : null,
         },
+        callback: () => app.onSaveEmitter.trigger(),
       };
     } catch (error: any) {
       if (error?.name !== "AbortError") {
@@ -224,6 +225,7 @@ export const actionSaveFileToDisk = register({
           fileHandle,
           toast: { message: t("toast.fileSaved") },
         },
+        callback: () => app.onSaveEmitter.trigger(),
       };
     } catch (error: any) {
       if (error?.name !== "AbortError") {
@@ -271,6 +273,7 @@ export const actionLoadScene = register({
         appState: loadedAppState,
         files,
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        callback: () => app.onLoadEmitter.trigger(),
       };
     } catch (error: any) {
       if (error?.name === "AbortError") {

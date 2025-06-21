@@ -620,6 +620,10 @@ class App extends React.Component<AppProps, AppState> {
     ]
   >();
 
+  onLoadEmitter = new Emitter();
+  onResetEmitter = new Emitter();
+  onSaveEmitter = new Emitter();
+
   onPointerDownEmitter = new Emitter<
     [
       activeTool: AppState["activeTool"],
@@ -719,6 +723,9 @@ class App extends React.Component<AppProps, AppState> {
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
         onChange: (cb) => this.onChangeEmitter.on(cb),
+        onLoad: (cb) => this.onLoadEmitter.on(cb),
+        onReset: (cb) => this.onResetEmitter.on(cb),
+        onSave: (cb) => this.onSaveEmitter.on(cb),
         onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
@@ -2238,6 +2245,8 @@ class App extends React.Component<AppProps, AppState> {
     if (!didUpdate) {
       this.scene.triggerUpdate();
     }
+
+    actionResult.callback?.();
   });
 
   // Lifecycle
@@ -2277,6 +2286,7 @@ class App extends React.Component<AppProps, AppState> {
       }));
       this.resetStore();
       this.resetHistory();
+      this.onResetEmitter.trigger();
     },
   );
 
@@ -2558,6 +2568,9 @@ class App extends React.Component<AppProps, AppState> {
     this.laserTrails.stop();
     this.eraserTrail.stop();
     this.onChangeEmitter.clear();
+    this.onLoadEmitter.clear();
+    this.onResetEmitter.clear();
+    this.onSaveEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
     this.store.onDurableIncrementEmitter.clear();
     ShapeCache.destroy();
@@ -10380,6 +10393,7 @@ class App extends React.Component<AppProps, AppState> {
           },
           replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          callback: () => this.onLoadEmitter.trigger(),
         });
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library

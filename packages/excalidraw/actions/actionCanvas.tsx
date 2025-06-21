@@ -125,6 +125,7 @@ export const actionClearCanvas = register({
             : appState.activeTool,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      callback: () => app.onResetEmitter.trigger(),
     };
   },
 });
