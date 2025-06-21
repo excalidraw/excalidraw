@@ -323,8 +323,8 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     type: "line" | "arrow";
     points: readonly LocalPoint[];
     lastCommittedPoint: LocalPoint | null;
-    startBinding: PointBinding | null;
-    endBinding: PointBinding | null;
+    startBinding: FixedPointBinding | PointBinding | null;
+    endBinding: FixedPointBinding | PointBinding | null;
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
   }>;
@@ -351,9 +351,9 @@ export type ExcalidrawElbowArrowElement = Merge<
   ExcalidrawArrowElement,
   {
     elbowed: true;
+    fixedSegments: readonly FixedSegment[] | null;
     startBinding: FixedPointBinding | null;
     endBinding: FixedPointBinding | null;
-    fixedSegments: readonly FixedSegment[] | null;
     /**
      * Marks that the 3rd point should be used as the 2nd point of the arrow in
      * order to temporarily hide the first segment of the arrow without losing

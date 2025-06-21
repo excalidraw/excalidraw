@@ -4,8 +4,14 @@ import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
   isBindingEnabled,
+  getHoveredElementForBinding,
 } from "@excalidraw/element/binding";
-import { isValidPolygon, LinearElementEditor } from "@excalidraw/element";
+import {
+  isElbowArrow,
+  isValidPolygon,
+  LinearElementEditor,
+  shouldTestInside,
+} from "@excalidraw/element";
 
 import {
   isBindingElement,
@@ -26,7 +32,7 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { LocalPoint } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -94,7 +100,7 @@ export const actionFinalize = register({
       }
     }
 
-    if (appState.editingLinearElement) {
+    if (appState.editingLinearElement && !appState.newElement) {
       const { elementId, startBindingElement, endBindingElement } =
         appState.editingLinearElement;
       const element = LinearElementEditor.getElement(elementId, elementsMap);
@@ -159,10 +165,26 @@ export const actionFinalize = register({
         element.type !== "freedraw" &&
         appState.lastPointerDownWith !== "touch"
       ) {
-        const { points, lastCommittedPoint } = element;
+        const { x: rx, y: ry, points, lastCommittedPoint } = element;
+        const lastGlobalPoint = pointFrom<GlobalPoint>(
+          rx + points[points.length - 1][0],
+          ry + points[points.length - 1][1],
+        );
+        const hoveredElementForBinding = getHoveredElementForBinding(
+          {
+            x: lastGlobalPoint[0],
+            y: lastGlobalPoint[1],
+          },
+          elements,
+          elementsMap,
+          app.state.zoom,
+          shouldTestInside(element),
+          isElbowArrow(element),
+        );
         if (
-          !lastCommittedPoint ||
-          points[points.length - 1] !== lastCommittedPoint
+          !hoveredElementForBinding &&
+          (!lastCommittedPoint ||
+            points[points.length - 1] !== lastCommittedPoint)
         ) {
           scene.mutateElement(element, {
             points: element.points.slice(0, -1),
@@ -282,6 +304,17 @@ export const actionFinalize = register({
           element && isLinearElement(element)
             ? new LinearElementEditor(element, arrayToMap(newElements))
             : appState.selectedLinearElement,
+        editingLinearElement: appState.newElement
+          ? null
+          : appState.editingLinearElement
+          ? {
+              ...appState.editingLinearElement,
+              pointerDownState: {
+                ...appState.editingLinearElement.pointerDownState,
+                arrowOtherPoint: undefined,
+              },
+            }
+          : null,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,

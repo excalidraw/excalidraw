@@ -16,6 +16,8 @@ import {
   TEXT_EDITOR_SELECTOR,
 } from "../../excalidraw/tests/queries/dom";
 
+import type { ExcalidrawLinearElement, FixedPointBinding } from "../src/types";
+
 const { h } = window;
 
 const mouse = new Pointer("mouse");
@@ -474,5 +476,158 @@ describe("element binding", () => {
         }
       });
     });
+  });
+});
+
+describe("Fixed-point arrow binding", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it("should create fixed-point binding when both arrow endpoint is inside rectangle", () => {
+    // Create a filled solid rectangle
+    UI.clickTool("rectangle");
+    mouse.downAt(100, 100);
+    mouse.moveTo(200, 200);
+    mouse.up();
+
+    const rect = API.getSelectedElement();
+    API.updateElement(rect, { fillStyle: "solid", backgroundColor: "#a5d8ff" });
+
+    // Draw arrow with endpoint inside the filled rectangle, since only
+    // filled bindables bind inside the shape
+    UI.clickTool("arrow");
+    mouse.downAt(110, 110);
+    mouse.moveTo(160, 160);
+    mouse.up();
+
+    const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
+    expect(arrow.x).toBe(110);
+    expect(arrow.y).toBe(110);
+
+    // Should bind to the rectangle since endpoint is inside
+    expect(arrow.startBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+
+    const startBinding = arrow.startBinding as FixedPointBinding;
+    expect(startBinding.fixedPoint[0]).toBeGreaterThanOrEqual(0);
+    expect(startBinding.fixedPoint[0]).toBeLessThanOrEqual(1);
+    expect(startBinding.fixedPoint[1]).toBeGreaterThanOrEqual(0);
+    expect(startBinding.fixedPoint[1]).toBeLessThanOrEqual(1);
+
+    const endBinding = arrow.endBinding as FixedPointBinding;
+    expect(endBinding.fixedPoint[0]).toBeGreaterThanOrEqual(0);
+    expect(endBinding.fixedPoint[0]).toBeLessThanOrEqual(1);
+    expect(endBinding.fixedPoint[1]).toBeGreaterThanOrEqual(0);
+    expect(endBinding.fixedPoint[1]).toBeLessThanOrEqual(1);
+
+    mouse.reset();
+
+    // Move the bindable
+    mouse.downAt(130, 110);
+    mouse.moveTo(280, 110);
+    mouse.up();
+
+    // Check if the arrow moved
+    expect(arrow.x).toBe(260);
+    expect(arrow.y).toBe(110);
+  });
+
+  it("should create fixed-point binding when one of the arrow endpoint is inside rectangle", () => {
+    // Create a filled solid rectangle
+    UI.clickTool("rectangle");
+    mouse.downAt(100, 100);
+    mouse.moveTo(200, 200);
+    mouse.up();
+
+    const rect = API.getSelectedElement();
+    API.updateElement(rect, { fillStyle: "solid", backgroundColor: "#a5d8ff" });
+
+    // Draw arrow with endpoint inside the filled rectangle, since only
+    // filled bindables bind inside the shape
+    UI.clickTool("arrow");
+    mouse.downAt(10, 10);
+    mouse.moveTo(160, 160);
+    mouse.up();
+
+    const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
+    expect(arrow.x).toBe(10);
+    expect(arrow.y).toBe(10);
+    expect(arrow.width).toBe(150);
+    expect(arrow.height).toBe(150);
+
+    // Should bind to the rectangle since endpoint is inside
+    expect(arrow.startBinding).toBe(null);
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+
+    const endBinding = arrow.endBinding as FixedPointBinding;
+    expect(endBinding.fixedPoint[0]).toBeGreaterThanOrEqual(0);
+    expect(endBinding.fixedPoint[0]).toBeLessThanOrEqual(1);
+    expect(endBinding.fixedPoint[1]).toBeGreaterThanOrEqual(0);
+    expect(endBinding.fixedPoint[1]).toBeLessThanOrEqual(1);
+
+    mouse.reset();
+
+    // Move the bindable
+    mouse.downAt(130, 110);
+    mouse.moveTo(280, 110);
+    mouse.up();
+
+    // Check if the arrow moved
+    expect(arrow.x).toBe(10);
+    expect(arrow.y).toBe(10);
+    expect(arrow.width).toBe(300);
+    expect(arrow.height).toBe(150);
+  });
+
+  it("should maintain relative position when arrow start point is dragged outside and rectangle is moved", () => {
+    // Create a filled solid rectangle
+    UI.clickTool("rectangle");
+    mouse.downAt(100, 100);
+    mouse.moveTo(200, 200);
+    mouse.up();
+
+    const rect = API.getSelectedElement();
+    API.updateElement(rect, { fillStyle: "solid", backgroundColor: "#a5d8ff" });
+
+    // Draw arrow with both endpoints inside the filled rectangle, creating same-element binding
+    UI.clickTool("arrow");
+    mouse.downAt(120, 120);
+    mouse.moveTo(180, 180);
+    mouse.up();
+
+    const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
+
+    // Both ends should be bound to the same rectangle
+    expect(arrow.startBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+
+    // Store the original end point relative position
+    const originalEndBinding = arrow.endBinding as FixedPointBinding;
+    const originalEndFixedPoint = originalEndBinding.fixedPoint;
+
+    mouse.reset();
+
+    // Select the arrow and drag the start point outside the rectangle
+    mouse.downAt(120, 120);
+    mouse.moveTo(50, 50); // Move start point outside rectangle
+    mouse.up();
+
+    mouse.reset();
+
+    // Move the rectangle by dragging it
+    mouse.downAt(150, 110);
+    mouse.moveTo(300, 300);
+    mouse.up();
+
+    // The end point should maintain the same relative position within the rectangle
+    const endBinding = arrow.endBinding as FixedPointBinding;
+    expect(endBinding.fixedPoint[0]).toBeCloseTo(originalEndFixedPoint[0], 5);
+    expect(endBinding.fixedPoint[1]).toBeCloseTo(originalEndFixedPoint[1], 5);
+
+    expect(arrow.x).toBe(50);
+    expect(arrow.y).toBe(50);
+    expect(arrow.width).toBe(280);
+    expect(arrow.height).toBe(320);
   });
 });
