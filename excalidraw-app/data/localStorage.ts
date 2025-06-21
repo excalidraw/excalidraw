@@ -11,37 +11,20 @@ import { STORAGE_KEYS } from "../app_constants";
 
 import type { SaveReminderState } from "excalidraw-app/save-reminder/SaveReminder";
 
-export const saveUsernameToLocalStorage = (username: string) => {
+const saveObjectToLocalStorage = (localStorageKey: string, obj: any) => {
   try {
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_COLLAB,
-      JSON.stringify({ username }),
-    );
+    localStorage.setItem(localStorageKey, JSON.stringify(obj));
   } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
   }
 };
 
-export const saveReminderStateToLocalStorage = (
-  reminderState: SaveReminderState,
-) => {
+const importObjectFromLocalStorage = (localStorageKey: string) => {
   try {
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_REMINDER_STATE,
-      JSON.stringify(reminderState),
-    );
-  } catch (error: any) {
-    // Unable to access window.localStorage
-    console.error(error);
-  }
-};
-
-export const importUsernameFromLocalStorage = (): string | null => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
+    const data = localStorage.getItem(localStorageKey);
     if (data) {
-      return JSON.parse(data).username;
+      return JSON.parse(data);
     }
   } catch (error: any) {
     // Unable to access localStorage
@@ -51,21 +34,23 @@ export const importUsernameFromLocalStorage = (): string | null => {
   return null;
 };
 
-export const importReminderStateFromLocalStorage =
-  (): SaveReminderState | null => {
-    try {
-      const data = localStorage.getItem(
-        STORAGE_KEYS.LOCAL_STORAGE_REMINDER_STATE,
-      );
-      if (data) {
-        return JSON.parse(data);
-      }
-    } catch (error: any) {
-      console.error(error);
-    }
+export const saveUsernameToLocalStorage = (username: string) =>
+  saveObjectToLocalStorage(STORAGE_KEYS.LOCAL_STORAGE_COLLAB, { username });
 
-    return null;
-  };
+export const saveReminderStateToLocalStorage = (
+  reminderState: SaveReminderState,
+) =>
+  saveObjectToLocalStorage(
+    STORAGE_KEYS.LOCAL_STORAGE_REMINDER_STATE,
+    reminderState,
+  );
+
+export const importUsernameFromLocalStorage = (): string | null =>
+  importObjectFromLocalStorage(STORAGE_KEYS.LOCAL_STORAGE_COLLAB)?.username;
+
+export const importReminderStateFromLocalStorage =
+  (): SaveReminderState | null =>
+    importObjectFromLocalStorage(STORAGE_KEYS.LOCAL_STORAGE_REMINDER_STATE);
 
 export const importFromLocalStorage = () => {
   let savedElements = null;
