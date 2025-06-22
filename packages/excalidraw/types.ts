@@ -740,9 +740,9 @@ export type AppClassProperties = {
   visibleElements: App["visibleElements"];
   excalidrawContainerValue: App["excalidrawContainerValue"];
 
-  onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
 
+  onPointerUpEmitter: App["onPointerUpEmitter"];
   onLoadEmitter: App["onLoadEmitter"];
   onResetEmitter: App["onResetEmitter"];
   onSaveEmitter: App["onSaveEmitter"];

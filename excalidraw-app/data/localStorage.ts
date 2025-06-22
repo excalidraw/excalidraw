@@ -41,7 +41,7 @@ export const saveReminderStateToLocalStorage = (
   reminderState: SaveReminderState,
 ) =>
   saveObjectToLocalStorage(
-    STORAGE_KEYS.LOCAL_STORAGE_REMINDER_STATE,
+    STORAGE_KEYS.LOCAL_STORAGE_SAVE_REMINDER,
     reminderState,
   );
 
@@ -50,7 +50,7 @@ export const importUsernameFromLocalStorage = (): string | null =>
 
 export const importReminderStateFromLocalStorage =
   (): SaveReminderState | null =>
-    importObjectFromLocalStorage(STORAGE_KEYS.LOCAL_STORAGE_REMINDER_STATE);
+    importObjectFromLocalStorage(STORAGE_KEYS.LOCAL_STORAGE_SAVE_REMINDER);
 
 export const importFromLocalStorage = () => {
   let savedElements = null;
