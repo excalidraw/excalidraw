@@ -1,5 +1,7 @@
 import { PRECISION } from "./utils";
 
+import { vectorFromPoint, vectorDot } from "./vector";
+
 import type {
   Degrees,
   GlobalPoint,
@@ -7,7 +9,6 @@ import type {
   PolarCoords,
   Radians,
 } from "./types";
-import { vectorFromPoint, vectorDot } from "./vector";
 
 export const normalizeRadians = (angle: Radians): Radians =>
   angle < 0
@@ -89,7 +90,7 @@ export function radiansDifference(a: Radians, b: Radians): Radians {
 export const angleBetween = <P extends GlobalPoint | LocalPoint>(
   p0: P,
   p1: P,
-  p2: P
+  p2: P,
 ): Radians => {
   const v1 = vectorFromPoint(p0, p1);
   const v2 = vectorFromPoint(p1, p2);

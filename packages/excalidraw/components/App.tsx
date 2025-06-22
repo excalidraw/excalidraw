@@ -133,6 +133,7 @@ import {
   isArrowElement,
   isBindingElement,
   isBindingElementType,
+  isFreeDrawElementType,
   isBoundToContainer,
   isFrameLikeElement,
   isImageElement,
@@ -234,6 +235,7 @@ import {
   isSimpleArrow,
   convertToShape,
   maybeBindLinearElement,
+  isFreeDrawElement,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -5879,10 +5881,14 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    if (isBindingElementType(this.state.activeTool.type)) {
+    if (
+      isBindingElementType(this.state.activeTool.type) ||
+      isFreeDrawElementType(this.state.activeTool.type)
+    ) {
       // Hovering with a selected tool or creating new linear element via click
       // and point
       const { newElement } = this.state;
+
       if (isBindingElement(newElement, false)) {
         this.setState({
           suggestedBindings: maybeSuggestBindingsForLinearElementAtCoords(
@@ -5893,6 +5899,24 @@ class App extends React.Component<AppProps, AppState> {
             this.state.startBoundElement,
           ),
         });
+      } else if (newElement && isFreeDrawElement(newElement)) {
+        const detectedElement = convertToShape(newElement);
+        if (isBindingElement(detectedElement, false)) {
+          const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            detectedElement,
+            1,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          this.setState({
+            suggestedBindings: maybeSuggestBindingsForLinearElementAtCoords(
+              detectedElement,
+              [{ x, y }],
+              this.scene,
+              this.state.zoom,
+              this.state.startBoundElement,
+            ),
+          });
+        }
       } else {
         this.maybeSuggestBindingAtCursor(scenePointer, false);
       }

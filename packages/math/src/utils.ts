@@ -1,5 +1,7 @@
 import { type Bounds } from "@excalidraw/element";
+
 import { perpendicularDistance } from "./point";
+
 import type { LocalPoint } from "./types";
 
 export const PRECISION = 10e-5;
@@ -54,7 +56,8 @@ export const doBoundsIntersect = (
  */
 export function simplifyRDP(
   points: readonly LocalPoint[],
-  epsilon: number): readonly LocalPoint[] {
+  epsilon: number,
+): readonly LocalPoint[] {
   if (points.length < 3) {
     return points;
   }

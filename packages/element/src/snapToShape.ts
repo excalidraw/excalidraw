@@ -7,7 +7,7 @@ import {
   newElement,
   newLinearElement,
 } from "@excalidraw/element/newElement";
-import { polygonIsClosed } from "@excalidraw/math/polygon"
+import { polygonIsClosed } from "@excalidraw/math/polygon";
 import {
   angleBetween,
   degreesToRadians,
@@ -79,7 +79,9 @@ interface QuadrilateralSides {
 /**
  * Calculates the properties (length, angle) of segments in a polygon.
  */
-function calculateQuadrilateralSides(vertices: readonly LocalPoint[]): QuadrilateralSides[] {
+function calculateQuadrilateralSides(
+  vertices: readonly LocalPoint[],
+): QuadrilateralSides[] {
   const segments: QuadrilateralSides[] = [];
   const numVertices = vertices.length;
   for (let i = 0; i < numVertices; i++) {
@@ -105,7 +107,6 @@ function calculateQuadrilateralSides(vertices: readonly LocalPoint[]): Quadrilat
   }
   return segments;
 }
-
 
 /**
  * Checks if a quadrilateral is likely axis-aligned based on its segment angles.
@@ -256,7 +257,12 @@ function checkQuadrilateral(
 
   const sides = calculateQuadrilateralSides(vertices);
 
-  if (isAxisAligned(sides, degreesToRadians(options.rectangleOrientationAngleThreshold as Degrees))) {
+  if (
+    isAxisAligned(
+      sides,
+      degreesToRadians(options.rectangleOrientationAngleThreshold as Degrees),
+    )
+  ) {
     return "rectangle";
   }
   // Not axis-aligned, but quadrilateral => classify as diamond
@@ -314,8 +320,8 @@ export const recognizeShape = (
     points,
     Math.max(
       options.shapeIsClosedDistanceThreshold,
-      boundingBoxDiagonal * (options.shapeIsClosedPercentThreshold / 100)
-    )
+      boundingBoxDiagonal * (options.shapeIsClosedPercentThreshold / 100),
+    ),
   );
 
   // --- Shape check order matters here ---
