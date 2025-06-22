@@ -29,7 +29,6 @@ export type ActionResult =
       files?: BinaryFiles | null;
       captureUpdate: CaptureUpdateActionType;
       replaceFiles?: boolean;
-      callback?: () => void;
     }
   | false;
 

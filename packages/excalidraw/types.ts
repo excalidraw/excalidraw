@@ -1,3 +1,5 @@
+import type { RestoredAppState } from "@excalidraw/excalidraw/data/restore";
+
 import type {
   IMAGE_MIME_TYPES,
   UserIdleState,
@@ -846,9 +848,21 @@ export interface ExcalidrawImperativeAPI {
       files: BinaryFiles,
     ) => void,
   ) => UnsubscribeCallback;
-  onLoad: (callback: () => void) => UnsubscribeCallback;
+  onLoad: (
+    callback: (
+      elements: readonly ExcalidrawElement[],
+      appState: RestoredAppState,
+      files: BinaryFiles,
+    ) => void,
+  ) => UnsubscribeCallback;
   onReset: (callback: () => void) => UnsubscribeCallback;
-  onSave: (callback: () => void) => UnsubscribeCallback;
+  onSave: (
+    callback: (
+      elements: readonly ExcalidrawElement[],
+      appState: AppState,
+      files: BinaryFiles,
+    ) => void,
+  ) => UnsubscribeCallback;
   onIncrement: (
     callback: (event: DurableIncrement | EphemeralIncrement) => void,
   ) => UnsubscribeCallback;

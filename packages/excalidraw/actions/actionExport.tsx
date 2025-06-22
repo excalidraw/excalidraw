@@ -169,6 +169,7 @@ export const actionSaveToActiveFile = register({
           )
         : await saveAsJSON(elements, appState, app.files, app.getName());
 
+      app.onSaveEmitter.trigger(elements, appState, app.files);
       return {
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
@@ -185,7 +186,6 @@ export const actionSaveToActiveFile = register({
               }
             : null,
         },
-        callback: () => app.onSaveEmitter.trigger(),
       };
     } catch (error: any) {
       if (error?.name !== "AbortError") {
@@ -208,15 +208,17 @@ export const actionSaveFileToDisk = register({
   trackEvent: { category: "export" },
   perform: async (elements, appState, value, app) => {
     try {
+      const savedAppState = {
+        ...appState,
+        fileHandle: null,
+      };
       const { fileHandle } = await saveAsJSON(
         elements,
-        {
-          ...appState,
-          fileHandle: null,
-        },
+        savedAppState,
         app.files,
         app.getName(),
       );
+      app.onSaveEmitter.trigger(elements, savedAppState, app.files);
       return {
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
@@ -225,7 +227,6 @@ export const actionSaveFileToDisk = register({
           fileHandle,
           toast: { message: t("toast.fileSaved") },
         },
-        callback: () => app.onSaveEmitter.trigger(),
       };
     } catch (error: any) {
       if (error?.name !== "AbortError") {
@@ -268,12 +269,12 @@ export const actionLoadScene = register({
         appState: loadedAppState,
         files,
       } = await loadFromJSON(appState, elements);
+      app.onLoadEmitter.trigger(loadedElements, loadedAppState, files);
       return {
         elements: loadedElements,
         appState: loadedAppState,
         files,
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        callback: () => app.onLoadEmitter.trigger(),
       };
     } catch (error: any) {
       if (error?.name === "AbortError") {

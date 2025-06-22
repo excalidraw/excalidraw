@@ -102,6 +102,7 @@ export const actionClearCanvas = register({
   },
   perform: (elements, appState, _, app) => {
     app.imageCache.clear();
+    app.onResetEmitter.trigger();
     return {
       elements: elements.map((element) =>
         newElementWith(element, { isDeleted: true }),
@@ -125,7 +126,6 @@ export const actionClearCanvas = register({
             : appState.activeTool,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-      callback: () => app.onResetEmitter.trigger(),
     };
   },
 });
