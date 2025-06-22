@@ -209,7 +209,7 @@ const shareableLinkConfirmDialog = {
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
   excalidrawAPI: ExcalidrawImperativeAPI;
-  shareableLinkEmitter: Emitter<[elements: readonly ExcalidrawElement[]]>;
+  onLoadFromLinkEmitter: Emitter<[elements: readonly ExcalidrawElement[]]>;
 }): Promise<
   { scene: ExcalidrawInitialDataState | null } & (
     | { isExternalScene: true; id: string; key: string }
@@ -246,7 +246,7 @@ const initializeScene = async (opts: {
           jsonBackendMatch[2],
           localDataState,
         );
-        opts.shareableLinkEmitter.trigger(scene.elements);
+        opts.onLoadFromLinkEmitter.trigger(scene.elements);
       }
       scene.scrollToContent = true;
       if (!roomLinkData) {
@@ -379,18 +379,18 @@ const ExcalidrawWrapper = () => {
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
 
-  const syncFromStorageEmitter = useRef(new Emitter());
-  const onSyncFromLocalStorage = useCallback(
-    (cb: () => void) => syncFromStorageEmitter.current.on(cb),
+  const onOutdatedStateEmitter = useRef(new Emitter());
+  const onOutdatedState = useCallback(
+    (cb: () => void) => onOutdatedStateEmitter.current.on(cb),
     [],
   );
 
-  const shareableLinkEmitter = useRef(
+  const onLoadFromLinkEmitter = useRef(
     new Emitter<[elements: readonly ExcalidrawElement[]]>(),
   );
-  const onLoadedShareableLink = useCallback(
+  const onLoadFromLink = useCallback(
     (cb: (elements: readonly ExcalidrawElement[]) => void) =>
-      shareableLinkEmitter.current.on(cb),
+      onLoadFromLinkEmitter.current.on(cb),
     [],
   );
 
@@ -493,7 +493,7 @@ const ExcalidrawWrapper = () => {
     initializeScene({
       collabAPI,
       excalidrawAPI,
-      shareableLinkEmitter: shareableLinkEmitter.current,
+      onLoadFromLinkEmitter: onLoadFromLinkEmitter.current,
     }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
@@ -514,7 +514,7 @@ const ExcalidrawWrapper = () => {
         initializeScene({
           collabAPI,
           excalidrawAPI,
-          shareableLinkEmitter: shareableLinkEmitter.current,
+          onLoadFromLinkEmitter: onLoadFromLinkEmitter.current,
         }).then((data) => {
           loadImages(data);
           if (data.scene) {
@@ -557,7 +557,7 @@ const ExcalidrawWrapper = () => {
               });
             }
           });
-          syncFromStorageEmitter.current.trigger();
+          onOutdatedStateEmitter.current.trigger();
           collabAPI?.setUsername(username || "");
         }
 
@@ -955,8 +955,8 @@ const ExcalidrawWrapper = () => {
         {excalidrawAPI && !isCollaborating && (
           <SaveReminder
             excalidrawAPI={excalidrawAPI}
-            onSyncFromLocalStorage={onSyncFromLocalStorage}
-            onLoadedShareableLink={onLoadedShareableLink}
+            onOutdatedState={onOutdatedState}
+            onLoadFromLink={onLoadFromLink}
           />
         )}
 
