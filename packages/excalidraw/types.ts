@@ -848,7 +848,7 @@ export interface ExcalidrawImperativeAPI {
       files: BinaryFiles,
     ) => void,
   ) => UnsubscribeCallback;
-  onLoad: (
+  onLoadFromLife: (
     callback: (
       restoredElements: readonly ExcalidrawElement[],
       restoredAppState: RestoredAppState,

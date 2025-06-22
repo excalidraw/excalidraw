@@ -93,7 +93,7 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
   }, [syncFromLocalStorage]);
 
   useEffect(() => {
-    const unsubOnLoad = excalidrawAPI.onLoad(handleNewScene);
+    const unsubOnLoad = excalidrawAPI.onLoadFromLife(handleNewScene);
     const unsubOnSave = excalidrawAPI.onSave(() =>
       handleNewScene(excalidrawAPI.getSceneElements()),
     );
