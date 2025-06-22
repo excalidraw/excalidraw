@@ -537,6 +537,13 @@ export interface ExcalidrawProps {
     appState: AppState,
     files: BinaryFiles,
   ) => void;
+  onLoadFromFile?: (
+    restoredElements: readonly ExcalidrawElement[],
+    restoredAppState: RestoredAppState,
+    restoredFiles: BinaryFiles,
+  ) => void;
+  onReset?: () => void;
+  onSave?: () => void;
   onIncrement?: (event: DurableIncrement | EphemeralIncrement) => void;
   initialData?:
     | (() => MaybePromise<ExcalidrawInitialDataState | null>)
@@ -848,7 +855,7 @@ export interface ExcalidrawImperativeAPI {
       files: BinaryFiles,
     ) => void,
   ) => UnsubscribeCallback;
-  onLoadFromLife: (
+  onLoadFromFile: (
     callback: (
       restoredElements: readonly ExcalidrawElement[],
       restoredAppState: RestoredAppState,

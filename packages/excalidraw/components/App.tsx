@@ -736,7 +736,7 @@ class App extends React.Component<AppProps, AppState> {
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
         onChange: (cb) => this.onChangeEmitter.on(cb),
-        onLoadFromLife: (cb) => this.onLoadEmitter.on(cb),
+        onLoadFromFile: (cb) => this.onLoadEmitter.on(cb),
         onReset: (cb) => this.onResetEmitter.on(cb),
         onSave: (cb) => this.onSaveEmitter.on(cb),
         onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
@@ -2525,6 +2525,16 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene.onUpdate(this.triggerRender);
     this.addEventListeners();
+
+    if (this.props.onLoadFromFile) {
+      this.onLoadEmitter.on(this.props.onLoadFromFile);
+    }
+    if (this.props.onSave) {
+      this.onSaveEmitter.on(this.props.onSave);
+    }
+    if (this.props.onReset) {
+      this.onResetEmitter.on(this.props.onReset);
+    }
 
     if (this.props.autoFocus && this.excalidrawContainerRef.current) {
       this.focusContainer();
