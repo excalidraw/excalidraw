@@ -61,6 +61,7 @@ import {
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
 import type {
+  ExcalidrawElement,
   FileId,
   NonDeletedExcalidrawElement,
   OrderedExcalidrawElement,
@@ -208,7 +209,7 @@ const shareableLinkConfirmDialog = {
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
   excalidrawAPI: ExcalidrawImperativeAPI;
-  shareableLinkEmitter: Emitter;
+  shareableLinkEmitter: Emitter<[elements: readonly ExcalidrawElement[]]>;
 }): Promise<
   { scene: ExcalidrawInitialDataState | null } & (
     | { isExternalScene: true; id: string; key: string }
@@ -240,12 +241,12 @@ const initializeScene = async (opts: {
       (await openConfirmModal(shareableLinkConfirmDialog))
     ) {
       if (jsonBackendMatch) {
-        opts.shareableLinkEmitter.trigger();
         scene = await loadScene(
           jsonBackendMatch[1],
           jsonBackendMatch[2],
           localDataState,
         );
+        opts.shareableLinkEmitter.trigger(scene.elements);
       }
       scene.scrollToContent = true;
       if (!roomLinkData) {
@@ -384,9 +385,12 @@ const ExcalidrawWrapper = () => {
     [],
   );
 
-  const shareableLinkEmitter = useRef(new Emitter());
+  const shareableLinkEmitter = useRef(
+    new Emitter<[elements: readonly ExcalidrawElement[]]>(),
+  );
   const onLoadedShareableLink = useCallback(
-    (cb: () => void) => shareableLinkEmitter.current.on(cb),
+    (cb: (elements: readonly ExcalidrawElement[]) => void) =>
+      shareableLinkEmitter.current.on(cb),
     [],
   );
 

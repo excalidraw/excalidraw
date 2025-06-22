@@ -421,6 +421,8 @@ import { findShapeByKey } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
 
+import type { RestoredAppState } from "../data/restore";
+
 import type {
   RenderInteractiveSceneCallback,
   ScrollBars,
@@ -620,9 +622,23 @@ class App extends React.Component<AppProps, AppState> {
     ]
   >();
 
-  onLoadEmitter = new Emitter();
+  onLoadEmitter = new Emitter<
+    [
+      elements: readonly ExcalidrawElement[],
+      appState: RestoredAppState,
+      files: BinaryFiles,
+    ]
+  >();
+
   onResetEmitter = new Emitter();
-  onSaveEmitter = new Emitter();
+
+  onSaveEmitter = new Emitter<
+    [
+      elements: readonly ExcalidrawElement[],
+      appState: AppState,
+      files: BinaryFiles,
+    ]
+  >();
 
   onPointerDownEmitter = new Emitter<
     [
@@ -2245,8 +2261,6 @@ class App extends React.Component<AppProps, AppState> {
     if (!didUpdate) {
       this.scene.triggerUpdate();
     }
-
-    actionResult.callback?.();
   });
 
   // Lifecycle
@@ -10393,8 +10407,12 @@ class App extends React.Component<AppProps, AppState> {
           },
           replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-          callback: () => this.onLoadEmitter.trigger(),
         });
+        this.onLoadEmitter.trigger(
+          ret.data.elements,
+          ret.data.appState,
+          ret.data.files,
+        );
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library
           .updateLibrary({
