@@ -33,7 +33,7 @@ export const REMINDER_TIERS = [
 export interface SaveReminderState {
   tier: number;
   timestamp: number;
-  elementsCount: number;
+  baseElementsCount: number;
 }
 
 export interface SaveReminderProps {
@@ -53,12 +53,12 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
     saveReminderStateToLocalStorage(newState);
   }, []);
 
-  const handleNewScene = useCallback(
+  const resetReminderState = useCallback(
     (elements: readonly NonDeletedExcalidrawElement[]) => {
       updateReminderState({
         tier: 0,
         timestamp: Date.now(),
-        elementsCount: elements.length,
+        baseElementsCount: elements.length,
       });
     },
     [updateReminderState],
@@ -67,24 +67,24 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
   const syncFromLocalStorage = useCallback(() => {
     const localStorageReminderState = importReminderStateFromLocalStorage();
     if (localStorageReminderState === null) {
-      handleNewScene(excalidrawAPI.getSceneElements());
+      resetReminderState(excalidrawAPI.getSceneElements());
     } else {
       reminderStateRef.current = localStorageReminderState;
     }
-  }, [excalidrawAPI, handleNewScene]);
+  }, [excalidrawAPI, resetReminderState]);
 
   useEffect(() => {
     syncFromLocalStorage();
   }, [syncFromLocalStorage]);
 
   useEffect(() => {
-    const unsubOnLoad = excalidrawAPI.onLoadFromFile(handleNewScene);
+    const unsubOnLoad = excalidrawAPI.onLoadFromFile(resetReminderState);
     const unsubOnSave = excalidrawAPI.onSave(() =>
-      handleNewScene(excalidrawAPI.getSceneElements()),
+      resetReminderState(excalidrawAPI.getSceneElements()),
     );
-    const unsubOnReset = excalidrawAPI.onReset(() => handleNewScene([]));
-    const unsubOnLoadedShareableLink = onLoadFromLink(handleNewScene);
-    const unsubOnSync = onOutdatedState(syncFromLocalStorage);
+    const unsubOnReset = excalidrawAPI.onReset(() => resetReminderState([]));
+    const unsubOnLoadFromLink = onLoadFromLink(resetReminderState);
+    const unsubOnOutdatedState = onOutdatedState(syncFromLocalStorage);
 
     const unsubOnChange = excalidrawAPI.onChange(() => {
       const reminderState = reminderStateRef.current;
@@ -97,7 +97,7 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
         const nonDeletedElements = excalidrawAPI.getSceneElements();
         if (
           now - reminderState.timestamp >= reminderTier.time &&
-          nonDeletedElements.length - reminderState.elementsCount >=
+          nonDeletedElements.length - reminderState.baseElementsCount >=
             reminderTier.elementsCount
         ) {
           excalidrawAPI.updateScene({
@@ -120,13 +120,13 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
       unsubOnLoad();
       unsubOnSave();
       unsubOnReset();
-      unsubOnLoadedShareableLink();
-      unsubOnSync();
+      unsubOnLoadFromLink();
+      unsubOnOutdatedState();
       unsubOnChange();
     };
   }, [
     excalidrawAPI,
-    handleNewScene,
+    resetReminderState,
     onLoadFromLink,
     onOutdatedState,
     syncFromLocalStorage,
