@@ -208,13 +208,12 @@ export const actionSaveFileToDisk = register({
   trackEvent: { category: "export" },
   perform: async (elements, appState, value, app) => {
     try {
-      const savedAppState = {
-        ...appState,
-        fileHandle: null,
-      };
       const { fileHandle } = await saveAsJSON(
         elements,
-        savedAppState,
+        {
+          ...appState,
+          fileHandle: null,
+        },
         app.files,
         app.getName(),
       );
