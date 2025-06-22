@@ -5,8 +5,6 @@ import {
 } from "excalidraw-app/data/localStorage";
 import { t } from "@excalidraw/excalidraw/i18n";
 
-import { getNonDeletedElements } from "@excalidraw/excalidraw";
-
 import type {
   ExcalidrawImperativeAPI,
   UnsubscribeCallback,
@@ -96,8 +94,8 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
 
   useEffect(() => {
     const unsubOnLoad = excalidrawAPI.onLoad(handleNewScene);
-    const unsubOnSave = excalidrawAPI.onSave((elements) =>
-      handleNewScene(getNonDeletedElements(elements)),
+    const unsubOnSave = excalidrawAPI.onSave(() =>
+      handleNewScene(excalidrawAPI.getSceneElements()),
     );
     const unsubOnReset = excalidrawAPI.onReset(() => handleNewScene([]));
     const unsubOnLoadedShareableLink = onLoadedShareableLink(handleNewScene);

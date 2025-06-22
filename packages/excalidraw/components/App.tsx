@@ -635,14 +635,7 @@ class App extends React.Component<AppProps, AppState> {
   >();
 
   onResetEmitter = new Emitter();
-
-  onSaveEmitter = new Emitter<
-    [
-      elements: readonly ExcalidrawElement[],
-      appState: AppState,
-      files: BinaryFiles,
-    ]
-  >();
+  onSaveEmitter = new Emitter();
 
   onPointerDownEmitter = new Emitter<
     [

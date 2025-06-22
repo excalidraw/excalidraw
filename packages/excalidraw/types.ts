@@ -856,13 +856,7 @@ export interface ExcalidrawImperativeAPI {
     ) => void,
   ) => UnsubscribeCallback;
   onReset: (callback: () => void) => UnsubscribeCallback;
-  onSave: (
-    callback: (
-      elements: readonly ExcalidrawElement[],
-      appState: AppState,
-      files: BinaryFiles,
-    ) => void,
-  ) => UnsubscribeCallback;
+  onSave: (callback: () => void) => UnsubscribeCallback;
   onIncrement: (
     callback: (event: DurableIncrement | EphemeralIncrement) => void,
   ) => UnsubscribeCallback;
