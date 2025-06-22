@@ -169,7 +169,7 @@ export const actionSaveToActiveFile = register({
           )
         : await saveAsJSON(elements, appState, app.files, app.getName());
 
-      app.onSaveEmitter.trigger(elements, appState, app.files);
+      app.onSaveEmitter.trigger();
       return {
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
@@ -218,7 +218,7 @@ export const actionSaveFileToDisk = register({
         app.files,
         app.getName(),
       );
-      app.onSaveEmitter.trigger(elements, savedAppState, app.files);
+      app.onSaveEmitter.trigger();
       return {
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
