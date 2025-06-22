@@ -15,32 +15,18 @@ import type {
 } from "@excalidraw/element/types";
 
 // Time is in ms
-// export const REMINDER_TIERS = [
-//   {
-//     time: 604800000, // 1 week
-//     elementsCount: 300,
-//   },
-//   {
-//     time: 604800000, // 1 week
-//     elementsCount: 600,
-//   },
-//   {
-//     time: 1209600000, // 2 weeks
-//     elementsCount: 900,
-//   },
-// ];
 export const REMINDER_TIERS = [
   {
-    time: 15000,
-    elementsCount: 10,
+    time: 604800000, // 1 week
+    elementsCount: 300,
   },
   {
-    time: 15000,
-    elementsCount: 20,
+    time: 604800000, // 1 week
+    elementsCount: 600,
   },
   {
-    time: 15000,
-    elementsCount: 30,
+    time: 1209600000, // 2 weeks
+    elementsCount: 900,
   },
 ];
 
