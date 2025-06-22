@@ -141,6 +141,7 @@ import {
   isArrowElement,
   isBindingElement,
   isBindingElementType,
+  isFreeDrawElementType,
   isBoundToContainer,
   isFrameLikeElement,
   isImageElement,
@@ -263,6 +264,7 @@ import {
   getActiveTextElement,
   isEligibleFrameChildType,
   convertToShape,
+  isFreeDrawElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -7106,6 +7108,44 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({
             suggestedBinding: null,
           });
+        }
+      }
+    } else if (isFreeDrawElementType(this.state.activeTool.type)) {
+      const { newElement } = this.state;
+
+      if (newElement && isFreeDrawElement(newElement)) {
+        const detectedElement = convertToShape(newElement);
+
+        if (isBindingElement(detectedElement, false)) {
+          const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            detectedElement,
+            1,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          const bindableElement = getHoveredElementForBinding(
+            pointFrom<GlobalPoint>(x, y),
+            this.scene.getNonDeletedElements(),
+            this.scene.getNonDeletedElementsMap(),
+            maxBindingDistance_simple(this.state.zoom),
+          );
+
+          if (bindableElement) {
+            this.setState({
+              suggestedBinding: {
+                element: bindableElement,
+                midPoint: getSnapOutlineMidPoint(
+                  pointFrom<GlobalPoint>(x, y),
+                  bindableElement,
+                  this.scene.getNonDeletedElementsMap(),
+                  this.state.zoom,
+                ),
+              },
+            });
+          } else {
+            this.setState({
+              suggestedBinding: null,
+            });
+          }
         }
       }
     }
