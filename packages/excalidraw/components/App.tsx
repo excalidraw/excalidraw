@@ -624,9 +624,9 @@ class App extends React.Component<AppProps, AppState> {
 
   onLoadEmitter = new Emitter<
     [
-      elements: readonly ExcalidrawElement[],
-      appState: RestoredAppState,
-      files: BinaryFiles,
+      restoredElements: readonly ExcalidrawElement[],
+      restoredAppState: RestoredAppState,
+      restoredFiles: BinaryFiles,
     ]
   >();
 
