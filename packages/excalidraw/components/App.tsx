@@ -736,7 +736,7 @@ class App extends React.Component<AppProps, AppState> {
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
         onChange: (cb) => this.onChangeEmitter.on(cb),
-        onLoad: (cb) => this.onLoadEmitter.on(cb),
+        onLoadFromLife: (cb) => this.onLoadEmitter.on(cb),
         onReset: (cb) => this.onResetEmitter.on(cb),
         onSave: (cb) => this.onSaveEmitter.on(cb),
         onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
