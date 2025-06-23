@@ -4,6 +4,11 @@ import {
   saveReminderStateToLocalStorage,
 } from "excalidraw-app/data/localStorage";
 import { t } from "@excalidraw/excalidraw/i18n";
+import {
+  isBrowserStorageStateNewer,
+  updateBrowserStateVersion,
+} from "excalidraw-app/data/tabSync";
+import { STORAGE_KEYS } from "excalidraw-app/app_constants";
 
 import type {
   ExcalidrawImperativeAPI,
@@ -38,20 +43,21 @@ export interface SaveReminderState {
 
 export interface SaveReminderProps {
   excalidrawAPI: ExcalidrawImperativeAPI;
-  onOutdatedStateSubscriber?: (cb: () => void) => UnsubscribeCallback;
+  onSyncDataSubscriber?: (cb: () => void) => UnsubscribeCallback;
   onLoadFromLinkSubscriber?: (
     cb: (elements: readonly ExcalidrawElement[]) => void,
   ) => UnsubscribeCallback;
 }
 
 export const SaveReminder = memo((props: SaveReminderProps) => {
-  const { excalidrawAPI, onOutdatedStateSubscriber, onLoadFromLinkSubscriber } =
+  const { excalidrawAPI, onSyncDataSubscriber, onLoadFromLinkSubscriber } =
     props;
   const reminderStateRef = useRef<SaveReminderState | null>(null);
 
   const updateReminderState = useCallback((newState: SaveReminderState) => {
     reminderStateRef.current = newState;
     saveReminderStateToLocalStorage(newState);
+    updateBrowserStateVersion(STORAGE_KEYS.VERSION_SAVE_REMINDER);
   }, []);
 
   const resetReminderState = useCallback(
@@ -71,6 +77,7 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
       resetReminderState(excalidrawAPI.getSceneElements());
     } else {
       reminderStateRef.current = localStorageReminderState;
+      updateBrowserStateVersion(STORAGE_KEYS.VERSION_SAVE_REMINDER);
     }
   }, [excalidrawAPI, resetReminderState]);
 
@@ -85,8 +92,11 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
     );
     const unsubOnReset = excalidrawAPI.onReset(() => resetReminderState([]));
     const unsubOnLoadFromLink = onLoadFromLinkSubscriber?.(resetReminderState);
-    const unsubOnOutdatedState =
-      onOutdatedStateSubscriber?.(syncFromLocalStorage);
+    const unsubOnSyncData = onSyncDataSubscriber?.(() => {
+      if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_SAVE_REMINDER)) {
+        syncFromLocalStorage();
+      }
+    });
 
     const unsubOnChange = excalidrawAPI.onChange(() => {
       const reminderState = reminderStateRef.current;
@@ -123,14 +133,14 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
       unsubOnSave();
       unsubOnReset();
       unsubOnLoadFromLink?.();
-      unsubOnOutdatedState?.();
+      unsubOnSyncData?.();
       unsubOnChange();
     };
   }, [
     excalidrawAPI,
     resetReminderState,
     onLoadFromLinkSubscriber,
-    onOutdatedStateSubscriber,
+    onSyncDataSubscriber,
     syncFromLocalStorage,
     updateReminderState,
   ]);

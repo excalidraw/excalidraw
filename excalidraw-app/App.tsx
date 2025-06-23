@@ -379,9 +379,9 @@ const ExcalidrawWrapper = () => {
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
 
-  const onOutdatedStateEmitter = useRef(new Emitter());
-  const onOutdatedStateSubscriber = useCallback(
-    (cb: () => void) => onOutdatedStateEmitter.current.on(cb),
+  const onSyncDataEmitter = useRef(new Emitter());
+  const onSyncDataSubscriber = useCallback(
+    (cb: () => void) => onSyncDataEmitter.current.on(cb),
     [],
   );
 
@@ -541,6 +541,8 @@ const ExcalidrawWrapper = () => {
         !document.hidden &&
         ((collabAPI && !collabAPI.isCollaborating()) || isCollabDisabled)
       ) {
+        onSyncDataEmitter.current.trigger();
+
         // don't sync if local state is newer or identical to browser state
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
           const localDataState = importFromLocalStorage();
@@ -557,7 +559,6 @@ const ExcalidrawWrapper = () => {
               });
             }
           });
-          onOutdatedStateEmitter.current.trigger();
           collabAPI?.setUsername(username || "");
         }
 
@@ -955,7 +956,7 @@ const ExcalidrawWrapper = () => {
         {excalidrawAPI && !isCollaborating && (
           <SaveReminder
             excalidrawAPI={excalidrawAPI}
-            onOutdatedStateSubscriber={onOutdatedStateSubscriber}
+            onSyncDataSubscriber={onSyncDataSubscriber}
             onLoadFromLinkSubscriber={onLoadFromLinkSubscriber}
           />
         )}

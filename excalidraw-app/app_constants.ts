@@ -44,6 +44,7 @@ export const STORAGE_KEYS = {
   LOCAL_STORAGE_DEBUG: "excalidraw-debug",
   VERSION_DATA_STATE: "version-dataState",
   VERSION_FILES: "version-files",
+  VERSION_SAVE_REMINDER: "version-saveReminder",
 
   IDB_LIBRARY: "excalidraw-library",
 
