@@ -55,25 +55,27 @@ describe("Save reminder", () => {
     API.updateScene({ elements: [] });
   };
 
-  it("Should only fire after count threshold is exceeded if time threshold is already exceeded", async () => {
-    for (const tier of REMINDER_TIERS) {
+  it.each(REMINDER_TIERS)(
+    "Should show reminder after time then count threshold (%o)",
+    async (tier) => {
       exceedTierTime(tier);
-      expect(h.state.toast).toBe(null);
+      expect(h.state.toast).toBeNull();
       exceedTierElements(tier);
       expect(h.state.toast?.message).toBe(t("toast.rememberToSave"));
       clearToastAndElements();
-    }
-  });
+    },
+  );
 
-  it("Should only fire after time threshold is exceeded if count threshold is already exceeded", async () => {
-    for (const tier of REMINDER_TIERS) {
+  it.each(REMINDER_TIERS)(
+    "Should show reminder after count then time threshold (%o)",
+    async (tier) => {
       exceedTierElements(tier);
-      expect(h.state.toast).toBe(null);
+      expect(h.state.toast).toBeNull();
       exceedTierTime(tier);
       expect(h.state.toast?.message).toBe(t("toast.rememberToSave"));
       clearToastAndElements();
-    }
-  });
+    },
+  );
 
   afterAll(() => {
     vi.useRealTimers();
