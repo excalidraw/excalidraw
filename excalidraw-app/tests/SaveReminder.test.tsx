@@ -26,8 +26,9 @@ describe("Save reminder", () => {
     if (!currentTime) {
       throw new Error("No mocked date");
     }
-    currentTime.setTime(currentTime.getTime() + tier.time);
-    vi.setSystemTime(currentTime);
+
+    const newTime = new Date(currentTime.getTime() + tier.time);
+    vi.setSystemTime(newTime);
     act(() => {
       h.scene.triggerUpdate();
     });
@@ -55,27 +56,25 @@ describe("Save reminder", () => {
     API.updateScene({ elements: [] });
   };
 
-  it.each(REMINDER_TIERS)(
-    "Should show reminder after time then count threshold (%o)",
-    async (tier) => {
+  it("Should show reminder after time then count threshold", async () => {
+    for (const tier of REMINDER_TIERS) {
       exceedTierTime(tier);
       expect(h.state.toast).toBeNull();
       exceedTierElements(tier);
       expect(h.state.toast?.message).toBe(t("toast.rememberToSave"));
       clearToastAndElements();
-    },
-  );
+    }
+  });
 
-  it.each(REMINDER_TIERS)(
-    "Should show reminder after count then time threshold (%o)",
-    async (tier) => {
+  it("Should show reminder after count then time threshold", async () => {
+    for (const tier of REMINDER_TIERS) {
       exceedTierElements(tier);
       expect(h.state.toast).toBeNull();
       exceedTierTime(tier);
       expect(h.state.toast?.message).toBe(t("toast.rememberToSave"));
       clearToastAndElements();
-    },
-  );
+    }
+  });
 
   afterAll(() => {
     vi.useRealTimers();
