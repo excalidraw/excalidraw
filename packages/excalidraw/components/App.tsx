@@ -5955,24 +5955,21 @@ class App extends React.Component<AppProps, AppState> {
           { informMutation: false, isDragging: false },
         );
       } else {
-        const elbowed = isElbowArrow(multiElement);
-        const hoveredElement =
-          !elbowed &&
-          getHoveredElementForBinding(
-            {
-              x: scenePointerX,
-              y: scenePointerY,
-            },
-            this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
-            this.state.zoom,
-            false,
-            false,
-          );
+        const hoveredElement = getHoveredElementForBinding(
+          {
+            x: scenePointerX,
+            y: scenePointerY,
+          },
+          this.scene.getNonDeletedElements(),
+          this.scene.getNonDeletedElementsMap(),
+          this.state.zoom,
+          false,
+          false,
+        );
         const [gridX, gridY] = getGridPoint(
           scenePointerX,
           scenePointerY,
-          event[KEYS.CTRL_OR_CMD] || elbowed || hoveredElement
+          event[KEYS.CTRL_OR_CMD] || hoveredElement
             ? null
             : this.getEffectiveGridSize(),
         );
