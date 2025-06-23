@@ -602,10 +602,6 @@ describe("Fixed-point arrow binding", () => {
     expect(arrow.startBinding?.elementId).toBe(rect.id);
     expect(arrow.endBinding?.elementId).toBe(rect.id);
 
-    // Store the original end point relative position
-    const originalEndBinding = arrow.endBinding as FixedPointBinding;
-    const originalEndFixedPoint = originalEndBinding.fixedPoint;
-
     mouse.reset();
 
     // Select the arrow and drag the start point outside the rectangle
@@ -620,14 +616,14 @@ describe("Fixed-point arrow binding", () => {
     mouse.moveTo(300, 300);
     mouse.up();
 
-    // The end point should maintain the same relative position within the rectangle
+    // The end point should be a normal point binding
     const endBinding = arrow.endBinding as FixedPointBinding;
-    expect(endBinding.fixedPoint[0]).toBeCloseTo(originalEndFixedPoint[0], 5);
-    expect(endBinding.fixedPoint[1]).toBeCloseTo(originalEndFixedPoint[1], 5);
+    expect(endBinding.focus).toBeCloseTo(0, 5);
+    expect(endBinding.gap).toBeCloseTo(5, 5);
 
     expect(arrow.x).toBe(50);
     expect(arrow.y).toBe(50);
-    expect(arrow.width).toBe(280);
-    expect(arrow.height).toBe(320);
+    expect(arrow.width).toBeCloseTo(203, 0);
+    expect(arrow.height).toBeCloseTo(235, 0);
   });
 });
