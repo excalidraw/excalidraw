@@ -5,7 +5,6 @@ import { t } from "@excalidraw/excalidraw/i18n";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { syncInvalidIndices } from "@excalidraw/element";
 import ExcalidrawApp from "excalidraw-app/App";
-import { actionClearCanvas } from "@excalidraw/excalidraw/actions";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -18,6 +17,7 @@ describe("Save reminder", () => {
   });
 
   beforeEach(async () => {
+    localStorage.clear();
     await render(<ExcalidrawApp />);
   });
 
@@ -73,12 +73,6 @@ describe("Save reminder", () => {
       expect(h.state.toast?.message).toBe(t("toast.rememberToSave"));
       clearToastAndElements();
     }
-  });
-
-  afterEach(() => {
-    act(() => {
-      h.app.actionManager.executeAction(actionClearCanvas);
-    });
   });
 
   afterAll(() => {
