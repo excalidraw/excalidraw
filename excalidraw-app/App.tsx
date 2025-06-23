@@ -380,7 +380,7 @@ const ExcalidrawWrapper = () => {
   const collabError = useAtomValue(collabErrorIndicatorAtom);
 
   const onOutdatedStateEmitter = useRef(new Emitter());
-  const onOutdatedState = useCallback(
+  const onOutdatedStateSubscriber = useCallback(
     (cb: () => void) => onOutdatedStateEmitter.current.on(cb),
     [],
   );
@@ -388,7 +388,7 @@ const ExcalidrawWrapper = () => {
   const onLoadFromLinkEmitter = useRef(
     new Emitter<[elements: readonly ExcalidrawElement[]]>(),
   );
-  const onLoadFromLink = useCallback(
+  const onLoadFromLinkSubscriber = useCallback(
     (cb: (elements: readonly ExcalidrawElement[]) => void) =>
       onLoadFromLinkEmitter.current.on(cb),
     [],
@@ -955,8 +955,8 @@ const ExcalidrawWrapper = () => {
         {excalidrawAPI && !isCollaborating && (
           <SaveReminder
             excalidrawAPI={excalidrawAPI}
-            onOutdatedState={onOutdatedState}
-            onLoadFromLink={onLoadFromLink}
+            onOutdatedStateSubscriber={onOutdatedStateSubscriber}
+            onLoadFromLinkSubscriber={onLoadFromLinkSubscriber}
           />
         )}
 
