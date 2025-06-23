@@ -14932,6 +14932,7 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isShapeSnapEnabled": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
   "multiElement": null,
