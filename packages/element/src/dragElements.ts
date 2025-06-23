@@ -13,7 +13,7 @@ import type {
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { updateBoundElements } from "./binding";
+import { bindOrUnbindLinearElement, updateBoundElements } from "./binding";
 import { getCommonBounds } from "./bounds";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { getBoundTextElement } from "./textElement";
@@ -118,9 +118,16 @@ export const dragSelectedElements = (
           adjustedOffset,
         );
       }
+
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: Array.from(elementsToUpdate),
       });
+    } else {
+      // NOTE: Moving the bound arrow should unbind it, otherwise we would
+      // have weird situations, like 0 lenght arrow when the user moves
+      // the arrow outside a filled shape suddenly forcing the arrow start
+      // and end point to jump "outside" the shape.
+      bindOrUnbindLinearElement(element, null, null, scene);
     }
   });
 };

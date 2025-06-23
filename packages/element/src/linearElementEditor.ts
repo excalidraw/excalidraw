@@ -2056,14 +2056,29 @@ const pointDraggingUpdates = (
           isElbowArrow(element),
         );
 
-        const otherBinding =
-          element[pointIndex === 0 ? "endBinding" : "startBinding"];
+        const otherGlobalPoint =
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            element,
+            pointIndex === 0 ? element.points.length - 1 : 0,
+            elementsMap,
+          );
+        const otherHoveredElement = getHoveredElementForBinding(
+          {
+            x: otherGlobalPoint[0],
+            y: otherGlobalPoint[1],
+          },
+          elements,
+          elementsMap,
+          zoom,
+          shouldTestInside(element),
+          isElbowArrow(element),
+        );
 
         // Allow binding inside the element if both ends are inside
         if (
           isArrowElement(element) &&
           !(
-            hoveredElement?.id === otherBinding?.elementId &&
+            hoveredElement?.id === otherHoveredElement?.id &&
             hoveredElement != null
           )
         ) {

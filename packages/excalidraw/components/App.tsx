@@ -233,6 +233,7 @@ import {
   isLineElement,
   isSimpleArrow,
   getOutlineAvoidingPoint,
+  bindOrUnbindLinearElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -4393,6 +4394,14 @@ class App extends React.Component<AppProps, AppState> {
             },
             { informMutation: false, isDragging: false },
           );
+
+          if (isSimpleArrow(element)) {
+            // NOTE: Moving the bound arrow should unbind it, otherwise we would
+            // have weird situations, like 0 lenght arrow when the user moves
+            // the arrow outside a filled shape suddenly forcing the arrow start
+            // and end point to jump "outside" the shape.
+            bindOrUnbindLinearElement(element, null, null, this.scene);
+          }
 
           updateBoundElements(element, this.scene, {
             simultaneouslyUpdated: selectedElements,
