@@ -233,7 +233,6 @@ import {
   isLineElement,
   isSimpleArrow,
   getOutlineAvoidingPoint,
-  isExcalidrawElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -5956,19 +5955,45 @@ class App extends React.Component<AppProps, AppState> {
           { informMutation: false, isDragging: false },
         );
       } else {
+        const elbowed = isElbowArrow(multiElement);
+        const hoveredElement =
+          !elbowed &&
+          getHoveredElementForBinding(
+            {
+              x: scenePointerX,
+              y: scenePointerY,
+            },
+            this.scene.getNonDeletedElements(),
+            this.scene.getNonDeletedElementsMap(),
+            this.state.zoom,
+            false,
+            false,
+          );
         const [gridX, gridY] = getGridPoint(
           scenePointerX,
           scenePointerY,
-          event[KEYS.CTRL_OR_CMD] || isElbowArrow(multiElement)
+          event[KEYS.CTRL_OR_CMD] || elbowed || hoveredElement
             ? null
             : this.getEffectiveGridSize(),
         );
 
+        const avoidancePoint =
+          hoveredElement &&
+          getOutlineAvoidingPoint(
+            multiElement,
+            hoveredElement,
+            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+            multiElement.points.length - 1,
+            this.scene.getNonDeletedElementsMap(),
+          );
+
         const [lastCommittedX, lastCommittedY] =
           multiElement?.lastCommittedPoint ?? [0, 0];
 
-        let dxFromLastCommitted = gridX - rx - lastCommittedX;
-        let dyFromLastCommitted = gridY - ry - lastCommittedY;
+        let dxFromLastCommitted =
+          (avoidancePoint ? avoidancePoint[0] : gridX) - rx - lastCommittedX;
+        let dyFromLastCommitted =
+          (avoidancePoint ? avoidancePoint[1] : gridY) - ry - lastCommittedY;
 
         if (shouldRotateWithDiscreteAngle(event)) {
           ({ width: dxFromLastCommitted, height: dyFromLastCommitted } =
@@ -8758,7 +8783,7 @@ class App extends React.Component<AppProps, AppState> {
 
           if (
             !isElbowArrow(newElement) &&
-            isExcalidrawElement(startBindingElement) &&
+            this.state.editingLinearElement &&
             isBindingElement(newElement, false)
           ) {
             // Handles the case where we need to "jump out" the simple arrow
@@ -8772,13 +8797,17 @@ class App extends React.Component<AppProps, AppState> {
               isElbowArrow(newElement),
             );
             const arrowIsInsideTheSameElement =
+              startBindingElement &&
+              startBindingElement !== "keep" &&
               hoveredElement?.id === startBindingElement.id;
 
             if (!arrowIsInsideTheSameElement) {
               const [outlinePointX, outlinePointY] = getOutlineAvoidingPoint(
                 newElement,
                 hoveredElement,
-                pointFrom(gridX, gridY),
+                hoveredElement
+                  ? pointFrom(pointerCoords.x, pointerCoords.y)
+                  : pointFrom(gridX, gridY),
                 newElement.points.length - 1,
                 elementsMap,
               );
