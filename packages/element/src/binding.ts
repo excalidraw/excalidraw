@@ -863,7 +863,10 @@ export const updateBoundElements = (
       ? elementsMap.get(element.startBinding.elementId)
       : null;
     const endBindingElement = element.endBinding
-      ? elementsMap.get(element.endBinding.elementId)
+      ? // PERF: If the arrow is bound to the same element on both ends.
+        startBindingElement?.id === element.endBinding.elementId
+        ? startBindingElement
+        : elementsMap.get(element.endBinding.elementId)
       : null;
 
     let startBounds: Bounds | null = null;
@@ -936,6 +939,9 @@ export const updateBoundElements = (
       ...(changedElement.id === element.endBinding?.elementId
         ? { endBinding: bindings.endBinding }
         : {}),
+      moveMidPointsWithElement:
+        !!startBindingElement &&
+        startBindingElement?.id === endBindingElement?.id,
     });
 
     const boundText = getBoundTextElement(element, elementsMap);

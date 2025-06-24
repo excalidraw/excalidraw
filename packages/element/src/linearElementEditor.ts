@@ -1426,6 +1426,7 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
+      moveMidPointsWithElement?: boolean | null;
     },
   ) {
     const { points } = element;
@@ -1470,6 +1471,14 @@ export class LinearElementEditor {
         ]
       : points.map((p, idx) => {
           const current = pointUpdates.get(idx)?.point ?? p;
+
+          if (
+            otherUpdates?.moveMidPointsWithElement &&
+            idx !== 0 &&
+            idx !== points.length - 1
+          ) {
+            return pointFrom<LocalPoint>(current[0], current[1]);
+          }
 
           return pointFrom<LocalPoint>(
             current[0] - offsetX,
