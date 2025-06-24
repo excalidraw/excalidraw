@@ -626,4 +626,127 @@ describe("Fixed-point arrow binding", () => {
     expect(arrow.width).toBeCloseTo(203, 0);
     expect(arrow.height).toBeCloseTo(235, 0);
   });
+
+  it("should move inner points when arrow is bound to same element on both ends", () => {
+    // Create one rectangle as binding target
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 200,
+      height: 100,
+      fillStyle: "solid",
+      backgroundColor: "#a5d8ff",
+    });
+
+    // Create a non-elbowed arrow with inner points bound to the same element on both ends
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 100,
+      y: 75,
+      width: 100,
+      height: 50,
+      points: [
+        pointFrom(0, 0), // start point
+        pointFrom(25, -25), // first inner point
+        pointFrom(75, 25), // second inner point
+        pointFrom(100, 0), // end point
+      ],
+      startBinding: {
+        elementId: rect.id,
+        focus: 0,
+        gap: 0,
+        fixedPoint: [0.25, 0.5],
+      },
+      endBinding: {
+        elementId: rect.id,
+        focus: 0,
+        gap: 0,
+        fixedPoint: [0.75, 0.5],
+      },
+    });
+
+    API.setElements([rect, arrow]);
+
+    // Store original inner point positions (local coordinates)
+    const originalInnerPoint1 = [...arrow.points[1]];
+    const originalInnerPoint2 = [...arrow.points[2]];
+
+    // Move the rectangle
+    mouse.reset();
+    mouse.downAt(150, 100); // Click on the rectangle
+    mouse.moveTo(300, 200); // Move it down and to the right
+    mouse.up();
+
+    // Verify that inner points moved with the arrow (same local coordinates)
+    // When both ends are bound to the same element, inner points should maintain
+    // their local coordinates relative to the arrow's origin
+    expect(arrow.points[1][0]).toBe(originalInnerPoint1[0]);
+    expect(arrow.points[1][1]).toBe(originalInnerPoint1[1]);
+    expect(arrow.points[2][0]).toBe(originalInnerPoint2[0]);
+    expect(arrow.points[2][1]).toBe(originalInnerPoint2[1]);
+  });
+
+  it("should NOT move inner points when arrow is bound to different elements", () => {
+    // Create two rectangles as binding targets
+    const rectLeft = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    const rectRight = API.createElement({
+      type: "rectangle",
+      x: 300,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    // Create a non-elbowed arrow with inner points bound to different elements
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 100,
+      y: 50,
+      width: 200,
+      height: 0,
+      points: [
+        pointFrom(0, 0), // start point
+        pointFrom(50, -20), // first inner point
+        pointFrom(150, 20), // second inner point
+        pointFrom(200, 0), // end point
+      ],
+      startBinding: {
+        elementId: rectLeft.id,
+        focus: 0.5,
+        gap: 5,
+      },
+      endBinding: {
+        elementId: rectRight.id,
+        focus: 0.5,
+        gap: 5,
+      },
+    });
+
+    API.setElements([rectLeft, rectRight, arrow]);
+
+    // Store original inner point positions
+    const originalInnerPoint1 = [...arrow.points[1]];
+    const originalInnerPoint2 = [...arrow.points[2]];
+
+    // Move the right rectangle down by 50 pixels
+    mouse.reset();
+    mouse.downAt(350, 50); // Click on the right rectangle
+    mouse.moveTo(350, 100); // Move it down
+    mouse.up();
+
+    // Verify that inner points did NOT move when bound to different elements
+    // The arrow should NOT translate inner points proportionally when only one end moves
+    expect(arrow.points[1][0]).toBe(originalInnerPoint1[0]);
+    expect(arrow.points[1][1]).toBe(originalInnerPoint1[1]);
+    expect(arrow.points[2][0]).toBe(originalInnerPoint2[0]);
+    expect(arrow.points[2][1]).toBe(originalInnerPoint2[1]);
+  });
 });
