@@ -35,6 +35,7 @@ const createAndSelectTwoRectangles = () => {
   // The second rectangle is already reselected because it was the last element created
   mouse.reset();
   Keyboard.withModifierKeys({ shift: true }, () => {
+    mouse.moveTo(10, 0);
     mouse.click();
   });
 };
@@ -52,6 +53,7 @@ const createAndSelectTwoRectanglesWithDifferentSizes = () => {
   // The second rectangle is already reselected because it was the last element created
   mouse.reset();
   Keyboard.withModifierKeys({ shift: true }, () => {
+    mouse.moveTo(10, 0);
     mouse.click();
   });
 };
@@ -202,6 +204,7 @@ describe("aligning", () => {
     // The second rectangle is already reselected because it was the last element created
     mouse.reset();
     Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.moveTo(10, 0);
       mouse.click();
     });
 
@@ -215,6 +218,7 @@ describe("aligning", () => {
     // Add the created group to the current selection
     mouse.restorePosition(0, 0);
     Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.moveTo(10, 0);
       mouse.click();
     });
   };
@@ -316,6 +320,7 @@ describe("aligning", () => {
     // The second rectangle is already selected because it was the last element created
     mouse.reset();
     Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.moveTo(10, 0);
       mouse.click();
     });
 
@@ -330,7 +335,7 @@ describe("aligning", () => {
     mouse.down();
     mouse.up(100, 100);
 
-    mouse.restorePosition(200, 200);
+    mouse.restorePosition(210, 200);
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.click();
     });
@@ -341,6 +346,7 @@ describe("aligning", () => {
     // The second group is already selected because it was the last group created
     mouse.reset();
     Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.moveTo(10, 0);
       mouse.click();
     });
   };
@@ -454,6 +460,7 @@ describe("aligning", () => {
     // The second rectangle is already reselected because it was the last element created
     mouse.reset();
     Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.moveTo(10, 0);
       mouse.click();
     });
 
@@ -466,7 +473,7 @@ describe("aligning", () => {
     mouse.up(100, 100);
 
     // Add group to current selection
-    mouse.restorePosition(0, 0);
+    mouse.restorePosition(10, 0);
     Keyboard.withModifierKeys({ shift: true }, () => {
       mouse.click();
     });
@@ -482,6 +489,7 @@ describe("aligning", () => {
     // Select the nested group, the rectangle is already selected
     mouse.reset();
     Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.moveTo(10, 0);
       mouse.click();
     });
   };
