@@ -16,6 +16,8 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
+  line,
+  linesIntersectAt,
 } from "@excalidraw/math";
 import { isPointInShape } from "@excalidraw/utils/collision";
 import { getSelectionBoxShape } from "@excalidraw/utils/shape";
@@ -306,9 +308,9 @@ import {
   snapLinearElementPoint,
 } from "@excalidraw/element";
 
-import type { ElementUpdate } from "@excalidraw/element";
+import type { LocalPoint, GlobalPoint, Radians } from "@excalidraw/math";
 
-import type { LocalPoint, Radians } from "@excalidraw/math";
+import type { ElementUpdate } from "@excalidraw/element";
 
 import type {
   ExcalidrawBindableElement,
@@ -5948,6 +5950,7 @@ class App extends React.Component<AppProps, AppState> {
         flushSync(() => {
           this.setState({
             editingLinearElement,
+            snapLines: editingLinearElement.snapLines,
           });
         });
       }
@@ -6043,7 +6046,9 @@ class App extends React.Component<AppProps, AppState> {
         let dxFromLastCommitted = gridX - rx - lastCommittedX;
         let dyFromLastCommitted = gridY - ry - lastCommittedY;
 
-        if (shouldRotateWithDiscreteAngle(event)) {
+        const rotateWithDiscreteAngle = shouldRotateWithDiscreteAngle(event);
+
+        if (rotateWithDiscreteAngle) {
           ({ width: dxFromLastCommitted, height: dyFromLastCommitted } =
             getLockedLinearCursorAlignSize(
               // actual coordinate of the last committed point
@@ -6053,27 +6058,94 @@ class App extends React.Component<AppProps, AppState> {
               gridX,
               gridY,
             ));
-        } else if (!isElbowArrow(multiElement)) {
+        }
+
+        const effectiveGridX = lastCommittedX + dxFromLastCommitted + rx;
+        const effectiveGridY = lastCommittedY + dyFromLastCommitted + ry;
+
+        if (!isElbowArrow(multiElement)) {
           const { snapOffset, snapLines } = snapLinearElementPoint(
             this.scene.getNonDeletedElements(),
             multiElement,
             points.length - 1,
-            { x: gridX, y: gridY },
+            { x: effectiveGridX, y: effectiveGridY },
             this,
             event,
             this.scene.getNonDeletedElementsMap(),
             { includeSelfPoints: true },
           );
 
-          const snappedGridX = gridX + snapOffset.x;
-          const snappedGridY = gridY + snapOffset.y;
+          if (snapLines.length > 0) {
+            if (rotateWithDiscreteAngle) {
+              // Create line from effective position to last committed point
+              const angleLine = line<GlobalPoint>(
+                pointFrom(effectiveGridX, effectiveGridY),
+                pointFrom(lastCommittedX + rx, lastCommittedY + ry),
+              );
 
-          dxFromLastCommitted = snappedGridX - rx - lastCommittedX;
-          dyFromLastCommitted = snappedGridY - ry - lastCommittedY;
+              // Find intersection with first snap line
+              const firstSnapLine = snapLines[0];
+              if (
+                firstSnapLine.type === "points" &&
+                firstSnapLine.points.length > 1
+              ) {
+                const snapLine = line(
+                  firstSnapLine.points[0],
+                  firstSnapLine.points[1],
+                );
+                const intersection = linesIntersectAt<GlobalPoint>(
+                  angleLine,
+                  snapLine,
+                );
 
-          this.setState({
-            snapLines,
-          });
+                if (intersection) {
+                  dxFromLastCommitted = intersection[0] - rx - lastCommittedX;
+                  dyFromLastCommitted = intersection[1] - ry - lastCommittedY;
+
+                  // Find the furthest point from the intersection
+                  const furthestPoint = firstSnapLine.points.reduce(
+                    (furthest, point) => {
+                      const distance = pointDistance(intersection, point);
+                      if (distance > furthest.distance) {
+                        return { point, distance };
+                      }
+                      return furthest;
+                    },
+                    {
+                      point: firstSnapLine.points[0],
+                      distance: pointDistance(
+                        intersection,
+                        firstSnapLine.points[0],
+                      ),
+                    },
+                  );
+
+                  firstSnapLine.points = [furthestPoint.point, intersection];
+
+                  this.setState({
+                    snapLines: [firstSnapLine],
+                  });
+
+                  this.setState({
+                    snapLines: [firstSnapLine],
+                  });
+                }
+              }
+            } else {
+              const snappedGridX = effectiveGridX + snapOffset.x;
+              const snappedGridY = effectiveGridY + snapOffset.y;
+              dxFromLastCommitted = snappedGridX - rx - lastCommittedX;
+              dyFromLastCommitted = snappedGridY - ry - lastCommittedY;
+
+              this.setState({
+                snapLines,
+              });
+            }
+          } else {
+            this.setState({
+              snapLines: [],
+            });
+          }
         }
 
         if (isPathALoop(points, this.state.zoom.value)) {
@@ -8804,33 +8876,100 @@ class App extends React.Component<AppProps, AppState> {
           let dx = gridX - newElement.x;
           let dy = gridY - newElement.y;
 
-          // snap a two-point line/arrow as well
-          if (!isElbowArrow(newElement)) {
-            const { snapOffset, snapLines } = snapLinearElementPoint(
-              this.scene.getNonDeletedElements(),
-              newElement,
-              points.length - 1,
-              { x: gridX, y: gridY },
-              this,
-              event,
-              this.scene.getNonDeletedElementsMap(),
-              { includeSelfPoints: true },
-            );
-            const snappedGridX = gridX + snapOffset.x;
-            const snappedGridY = gridY + snapOffset.y;
-            dx = snappedGridX - newElement.x;
-            dy = snappedGridY - newElement.y;
+          const rotateWithDiscreteAngle =
+            shouldRotateWithDiscreteAngle(event) && points.length === 2;
 
-            this.setState({ snapLines });
-          }
-
-          if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
+          if (rotateWithDiscreteAngle) {
             ({ width: dx, height: dy } = getLockedLinearCursorAlignSize(
               newElement.x,
               newElement.y,
               pointerCoords.x,
               pointerCoords.y,
             ));
+          }
+
+          const effectiveGridX = newElement.x + dx;
+          const effectiveGridY = newElement.y + dy;
+
+          // Snap a two-point line/arrow as well
+          if (!isElbowArrow(newElement)) {
+            const { snapOffset, snapLines } = snapLinearElementPoint(
+              this.scene.getNonDeletedElements(),
+              newElement,
+              points.length - 1,
+              { x: effectiveGridX, y: effectiveGridY },
+              this,
+              event,
+              this.scene.getNonDeletedElementsMap(),
+              { includeSelfPoints: true },
+            );
+
+            if (snapLines.length > 0) {
+              if (rotateWithDiscreteAngle) {
+                const angleLine = line<GlobalPoint>(
+                  pointFrom(effectiveGridX, effectiveGridY),
+                  pointFrom(newElement.x, newElement.y),
+                );
+
+                const firstSnapLine = snapLines.find(
+                  (snapLine) =>
+                    snapLine.type === "points" && snapLine.points.length > 2,
+                );
+                if (firstSnapLine && firstSnapLine.points.length > 1) {
+                  const snapLine = line(
+                    firstSnapLine.points[0],
+                    firstSnapLine.points[1],
+                  );
+                  const intersection = linesIntersectAt<GlobalPoint>(
+                    angleLine,
+                    snapLine,
+                  );
+                  if (intersection) {
+                    dx = intersection[0] - newElement.x;
+                    dy = intersection[1] - newElement.y;
+
+                    // Find the furthest point from the intersection
+                    const furthestPoint = firstSnapLine.points.reduce(
+                      (furthest, point) => {
+                        const distance = pointDistance(intersection, point);
+                        if (distance > furthest.distance) {
+                          return { point, distance };
+                        }
+                        return furthest;
+                      },
+                      {
+                        point: firstSnapLine.points[0],
+                        distance: pointDistance(
+                          intersection,
+                          firstSnapLine.points[0],
+                        ),
+                      },
+                    );
+
+                    firstSnapLine.points = [furthestPoint.point, intersection];
+
+                    this.setState({
+                      snapLines: [firstSnapLine],
+                    });
+                  } else {
+                    this.setState({
+                      snapLines: [],
+                    });
+                  }
+                }
+              } else {
+                dx = gridX + snapOffset.x - newElement.x;
+                dy = gridY + snapOffset.y - newElement.y;
+
+                this.setState({
+                  snapLines,
+                });
+              }
+            } else {
+              this.setState({
+                snapLines: [],
+              });
+            }
           }
 
           if (points.length === 1) {

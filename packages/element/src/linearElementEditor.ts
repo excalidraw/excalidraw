@@ -7,6 +7,8 @@ import {
   type LocalPoint,
   pointDistance,
   vectorFromPoint,
+  line,
+  linesIntersectAt,
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/shape";
@@ -25,7 +27,7 @@ import {
   snapLinearElementPoint,
 } from "@excalidraw/element/snapping";
 
-import type { Store } from "@excalidraw/element";
+import { ShapeCache, type Store } from "@excalidraw/element";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -59,8 +61,6 @@ import {
   isElbowArrow,
   isFixedPointBinding,
 } from "./typeChecks";
-
-import { ShapeCache } from "./ShapeCache";
 
 import {
   isPathALoop,
@@ -327,7 +327,6 @@ export class LinearElementEditor {
         : 0
       : linearElementEditor.pointerDownState.lastClickedPoint;
 
-    // point that's being dragged (out of all selected points)
     const draggingPoint = element.points[lastClickedPoint];
 
     let _snapLines: SnapLine[] = [];
@@ -348,13 +347,119 @@ export class LinearElementEditor {
             element.points[selectedIndex][0] - referencePoint[0],
           );
 
-        const [width, height] = LinearElementEditor._getShiftLockedDelta(
-          element,
-          elementsMap,
-          referencePoint,
-          pointFrom(scenePointerX, scenePointerY),
-          event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
-          customLineAngle,
+        const referencePointCoords =
+          LinearElementEditor.getPointGlobalCoordinates(
+            element,
+            referencePoint,
+            elementsMap,
+          );
+
+        const [gridX, gridY] = getGridPoint(
+          scenePointerX,
+          scenePointerY,
+          event[KEYS.CTRL_OR_CMD] || isElbowArrow(element)
+            ? null
+            : app.getEffectiveGridSize(),
+        );
+
+        let dxFromReference = gridX - referencePointCoords[0];
+        let dyFromReference = gridY - referencePointCoords[1];
+
+        if (shouldRotateWithDiscreteAngle(event)) {
+          ({ width: dxFromReference, height: dyFromReference } =
+            getLockedLinearCursorAlignSize(
+              referencePointCoords[0],
+              referencePointCoords[1],
+              gridX,
+              gridY,
+              customLineAngle,
+            ));
+        }
+
+        const effectiveGridX = referencePointCoords[0] + dxFromReference;
+        const effectiveGridY = referencePointCoords[1] + dyFromReference;
+
+        let newDraggingPointPosition = pointFrom(
+          effectiveGridX,
+          effectiveGridY,
+        );
+
+        if (!isElbowArrow(element)) {
+          const { snapOffset, snapLines } = snapLinearElementPoint(
+            scene.getNonDeletedElements(),
+            element,
+            lastClickedPoint,
+            { x: effectiveGridX, y: effectiveGridY },
+            app,
+            event,
+            elementsMap,
+            { includeSelfPoints: true },
+          );
+
+          _snapLines = snapLines;
+
+          if (snapLines.length > 0 && shouldRotateWithDiscreteAngle(event)) {
+            const angleLine = line<GlobalPoint>(
+              pointFrom(effectiveGridX, effectiveGridY),
+              pointFrom(referencePointCoords[0], referencePointCoords[1]),
+            );
+
+            const firstSnapLine = snapLines[0];
+            if (
+              firstSnapLine.type === "points" &&
+              firstSnapLine.points.length > 1
+            ) {
+              const snapLine = line(
+                firstSnapLine.points[0],
+                firstSnapLine.points[1],
+              );
+              const intersection = linesIntersectAt<GlobalPoint>(
+                angleLine,
+                snapLine,
+              );
+
+              if (intersection) {
+                dxFromReference = intersection[0] - referencePointCoords[0];
+                dyFromReference = intersection[1] - referencePointCoords[1];
+
+                const furthestPoint = firstSnapLine.points.reduce(
+                  (furthest, point) => {
+                    const distance = pointDistance(intersection, point);
+                    if (distance > furthest.distance) {
+                      return { point, distance };
+                    }
+                    return furthest;
+                  },
+                  {
+                    point: firstSnapLine.points[0],
+                    distance: pointDistance(
+                      intersection,
+                      firstSnapLine.points[0],
+                    ),
+                  },
+                );
+
+                firstSnapLine.points = [furthestPoint.point, intersection];
+                _snapLines = [firstSnapLine];
+              }
+            }
+          } else if (snapLines.length > 0) {
+            const snappedGridX = effectiveGridX + snapOffset.x;
+            const snappedGridY = effectiveGridY + snapOffset.y;
+            dxFromReference = snappedGridX - referencePointCoords[0];
+            dyFromReference = snappedGridY - referencePointCoords[1];
+          }
+        }
+
+        const [rotatedX, rotatedY] = pointRotateRads(
+          pointFrom(dxFromReference, dyFromReference),
+          pointFrom(0, 0),
+          -element.angle as Radians,
+        );
+
+        newDraggingPointPosition = pointFrom(
+          referencePoint[0] + rotatedX,
+          referencePoint[1] + rotatedY,
         );
 
         LinearElementEditor.movePoints(
@@ -364,14 +469,11 @@ export class LinearElementEditor {
             [
               selectedIndex,
               {
-                point: pointFrom(
-                  width + referencePoint[0],
-                  height + referencePoint[1],
-                ),
+                point: newDraggingPointPosition,
                 isDragging: selectedIndex === lastClickedPoint,
               },
             ],
-          ]),
+          ]) as PointsPositionUpdates,
         );
       } else {
         // Apply object snapping for the point being dragged
@@ -388,7 +490,7 @@ export class LinearElementEditor {
           app,
           event,
           elementsMap,
-          { includeSelfPoints: true }, // Include element's own points for snapping when editing
+          { includeSelfPoints: true },
         );
 
         _snapLines = snapLines;
@@ -415,15 +517,7 @@ export class LinearElementEditor {
             selectedPointsIndices.map((pointIndex) => {
               const newPointPosition: LocalPoint =
                 pointIndex === lastClickedPoint
-                  ? LinearElementEditor.createPointAt(
-                      element,
-                      elementsMap,
-                      snappedPointerX,
-                      snappedPointerY,
-                      event[KEYS.CTRL_OR_CMD]
-                        ? null
-                        : app.getEffectiveGridSize(),
-                    )
+                  ? newDraggingPointPosition
                   : pointFrom(
                       element.points[pointIndex][0] + deltaX,
                       element.points[pointIndex][1] + deltaY,
@@ -1053,20 +1147,122 @@ export class LinearElementEditor {
     let newPoint: LocalPoint;
     let snapLines: SnapLine[] = [];
 
-    if (shouldRotateWithDiscreteAngle(event) && points.length >= 2) {
-      const lastCommittedPoint = points[points.length - 2];
+    const [gridX, gridY] = getGridPoint(
+      scenePointerX,
+      scenePointerY,
+      event[KEYS.CTRL_OR_CMD] || isElbowArrow(element)
+        ? null
+        : app.getEffectiveGridSize(),
+    );
 
-      const [width, height] = LinearElementEditor._getShiftLockedDelta(
+    const [lastCommittedX, lastCommittedY] = points[points.length - 2] ?? [
+      0, 0,
+    ];
+
+    const lastCommittedPointCoords =
+      LinearElementEditor.getPointGlobalCoordinates(
         element,
+        pointFrom(lastCommittedX, lastCommittedY),
         elementsMap,
-        lastCommittedPoint,
-        pointFrom(scenePointerX, scenePointerY),
-        event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
+      );
+
+    let dxFromLastCommitted = gridX - lastCommittedPointCoords[0];
+    let dyFromLastCommitted = gridY - lastCommittedPointCoords[1];
+
+    if (shouldRotateWithDiscreteAngle(event) && points.length >= 2) {
+      ({ width: dxFromLastCommitted, height: dyFromLastCommitted } =
+        getLockedLinearCursorAlignSize(
+          lastCommittedPointCoords[0],
+          lastCommittedPointCoords[1],
+          gridX,
+          gridY,
+        ));
+
+      const effectiveGridX = lastCommittedPointCoords[0] + dxFromLastCommitted;
+      const effectiveGridY = lastCommittedPointCoords[1] + dyFromLastCommitted;
+
+      if (!isElbowArrow(element)) {
+        const { snapOffset, snapLines: _snapLines } = snapLinearElementPoint(
+          app.scene.getNonDeletedElements(),
+          element,
+          points.length - 1,
+          { x: effectiveGridX, y: effectiveGridY },
+          app,
+          event,
+          elementsMap,
+          { includeSelfPoints: true },
+        );
+
+        snapLines = _snapLines;
+
+        if (_snapLines.length > 0 && shouldRotateWithDiscreteAngle(event)) {
+          const angleLine = line<GlobalPoint>(
+            pointFrom(effectiveGridX, effectiveGridY),
+            pointFrom(lastCommittedPointCoords[0], lastCommittedPointCoords[1]),
+          );
+
+          const firstSnapLine = _snapLines[0];
+          if (
+            firstSnapLine.type === "points" &&
+            firstSnapLine.points.length > 1
+          ) {
+            const snapLine = line(
+              firstSnapLine.points[0],
+              firstSnapLine.points[1],
+            );
+            const intersection = linesIntersectAt<GlobalPoint>(
+              angleLine,
+              snapLine,
+            );
+
+            if (intersection) {
+              dxFromLastCommitted =
+                intersection[0] - lastCommittedPointCoords[0];
+              dyFromLastCommitted =
+                intersection[1] - lastCommittedPointCoords[1];
+
+              const furthestPoint = firstSnapLine.points.reduce(
+                (furthest, point) => {
+                  const distance = pointDistance(intersection, point);
+                  if (distance > furthest.distance) {
+                    return { point, distance };
+                  }
+                  return furthest;
+                },
+                {
+                  point: firstSnapLine.points[0],
+                  distance: pointDistance(
+                    intersection,
+                    firstSnapLine.points[0],
+                  ),
+                },
+              );
+
+              firstSnapLine.points = [furthestPoint.point, intersection];
+              snapLines = [firstSnapLine];
+            }
+          } else {
+            snapLines = [];
+          }
+        } else if (_snapLines.length > 0) {
+          const snappedGridX = effectiveGridX + snapOffset.x;
+          const snappedGridY = effectiveGridY + snapOffset.y;
+          dxFromLastCommitted = snappedGridX - lastCommittedPointCoords[0];
+          dyFromLastCommitted = snappedGridY - lastCommittedPointCoords[1];
+        } else {
+          snapLines = [];
+        }
+      }
+
+      const [rotatedX, rotatedY] = pointRotateRads(
+        pointFrom(dxFromLastCommitted, dyFromLastCommitted),
+        pointFrom(0, 0),
+        -element.angle as Radians,
       );
 
       newPoint = pointFrom(
-        width + lastCommittedPoint[0],
-        height + lastCommittedPoint[1],
+        lastCommittedX + rotatedX,
+        lastCommittedY + rotatedY,
       );
     } else {
       const originalPointerX =
@@ -1107,7 +1303,7 @@ export class LinearElementEditor {
         app.scene,
         new Map([
           [
-            element.points.length - 1,
+            points.length - 1,
             {
               point: newPoint,
             },
@@ -1117,6 +1313,7 @@ export class LinearElementEditor {
     } else {
       LinearElementEditor.addPoints(element, app.scene, [newPoint]);
     }
+
     return {
       ...appState.editingLinearElement,
       lastUncommittedPoint: element.points[element.points.length - 1],

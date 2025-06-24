@@ -2,6 +2,7 @@ import {
   isCloseTo,
   pointFrom,
   pointRotateRads,
+  pointsEqual,
   rangeInclusive,
   rangeIntersection,
   rangesOverlap,
@@ -196,7 +197,7 @@ export const areRoughlyEqual = (a: number, b: number, precision = 0.01) => {
 };
 
 export const getLinearElementPoints = (
-  element: ExcalidrawElement,
+  element: ExcalidrawLinearElement,
   elementsMap: ElementsMap,
   options: {
     dragOffset?: Vector2D;
@@ -205,13 +206,11 @@ export const getLinearElementPoints = (
 ): GlobalPoint[] => {
   const { dragOffset, excludePointIndex } = options;
 
-  // Only process linear elements
-  if (element.type !== "line" && element.type !== "arrow") {
+  if (isElbowArrow(element)) {
     return [];
   }
 
-  const linearElement = element as ExcalidrawLinearElement;
-  if (!linearElement.points || linearElement.points.length === 0) {
+  if (!element.points || element.points.length === 0) {
     return [];
   }
 
@@ -225,13 +224,13 @@ export const getLinearElementPoints = (
 
   const globalPoints: GlobalPoint[] = [];
 
-  for (let i = 0; i < linearElement.points.length; i++) {
+  for (let i = 0; i < element.points.length; i++) {
     // Skip the point being edited if specified
     if (excludePointIndex !== undefined && i === excludePointIndex) {
       continue;
     }
 
-    const localPoint = linearElement.points[i];
+    const localPoint = element.points[i];
     const globalX = elementX + localPoint[0];
     const globalY = elementY + localPoint[1];
 
@@ -747,6 +746,21 @@ export const getReferenceSnapPointsForLinearElementPoint = (
     const elementPoints = getLinearElementPoints(editingElement, elementsMap, {
       excludePointIndex: editingPointIndex >= 0 ? editingPointIndex : undefined,
     });
+    const shouldSkipFirstOrLast =
+      editingElement.points.length > 2 &&
+      pointsEqual(
+        editingElement.points[0],
+        editingElement.points[editingElement.points.length - 1],
+      );
+
+    if (shouldSkipFirstOrLast) {
+      if (editingPointIndex === 0) {
+        elementPoints.pop();
+      }
+      if (editingPointIndex === editingElement.points.length - 1) {
+        elementPoints.shift();
+      }
+    }
     allSnapPoints.push(...elementPoints);
   }
 
