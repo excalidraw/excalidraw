@@ -106,7 +106,16 @@ export const actionFinalize = register({
       const element = LinearElementEditor.getElement(elementId, elementsMap);
 
       if (element) {
-        if (isBindingElement(element)) {
+        // NOTE: Dragging the entire arrow doesn't allow binding.
+        const allPointsSelected =
+          appState.editingLinearElement?.pointerDownState
+            .prevSelectedPointsIndices?.length === element.points.length;
+
+        if (
+          !allPointsSelected &&
+          isBindingEnabled(appState) &&
+          isBindingElement(element)
+        ) {
           bindOrUnbindLinearElement(
             element,
             startBindingElement,
@@ -114,6 +123,7 @@ export const actionFinalize = register({
             scene,
           );
         }
+
         if (isLineElement(element) && !isValidPolygon(element.points)) {
           scene.mutateElement(element, {
             polygon: false,

@@ -423,16 +423,14 @@ export class LinearElementEditor {
       // suggest bindings for first and last point if selected
       let suggestedBindings: ExcalidrawBindableElement[] = [];
       if (isBindingElement(element, false)) {
-        const firstSelectedIndex = selectedPointsIndices[0] === 0;
-        const lastSelectedIndex =
+        const firstIndexIsSelected = selectedPointsIndices[0] === 0;
+        const lastIndexIsSelected =
           selectedPointsIndices[selectedPointsIndices.length - 1] ===
           element.points.length - 1;
         const coords: { x: number; y: number }[] = [];
 
-        if (!firstSelectedIndex !== !lastSelectedIndex) {
-          coords.push({ x: scenePointerX, y: scenePointerY });
-        } else {
-          if (firstSelectedIndex) {
+        if (firstIndexIsSelected !== lastIndexIsSelected) {
+          if (firstIndexIsSelected) {
             coords.push(
               tupleToCoors(
                 LinearElementEditor.getPointGlobalCoordinates(
@@ -444,7 +442,7 @@ export class LinearElementEditor {
             );
           }
 
-          if (lastSelectedIndex) {
+          if (lastIndexIsSelected) {
             coords.push(
               tupleToCoors(
                 LinearElementEditor.getPointGlobalCoordinates(
@@ -965,8 +963,15 @@ export class LinearElementEditor {
       // from the end points of the `linearElement` - this is to allow disabling
       // binding (which needs to happen at the point the user finishes moving
       // the point).
+      const allPointSelected =
+        linearElementEditor.pointerDownState.prevSelectedPointsIndices
+          ?.length === element.points.length;
       const { startBindingElement, endBindingElement } = linearElementEditor;
-      if (isBindingEnabled(appState) && isBindingElement(element)) {
+      if (
+        !allPointSelected &&
+        isBindingEnabled(appState) &&
+        isBindingElement(element)
+      ) {
         bindOrUnbindLinearElement(
           element,
           startBindingElement,
