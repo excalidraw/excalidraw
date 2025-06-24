@@ -107,8 +107,21 @@ export const dragSelectedElements = (
   );
 
   elementsToUpdate.forEach((element) => {
-    updateElementCoords(pointerDownState, element, scene, adjustedOffset);
+    const isArrow = !isArrowElement(element);
+    const isStartBoundElementSelected =
+      isArrow ||
+      (element.startBinding
+        ? elementsToUpdateIds.has(element.startBinding.elementId)
+        : false);
+    const isEndBoundElementSelected =
+      isArrow ||
+      (element.endBinding
+        ? elementsToUpdateIds.has(element.endBinding.elementId)
+        : false);
+
     if (!isArrowElement(element)) {
+      updateElementCoords(pointerDownState, element, scene, adjustedOffset);
+
       // skip arrow labels since we calculate its position during render
       const textElement = getBoundTextElement(
         element,
@@ -126,13 +139,12 @@ export const dragSelectedElements = (
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: Array.from(elementsToUpdate),
       });
-    } else {
-      const isStartBoundElementSelected = element.startBinding
-        ? elementsToUpdateIds.has(element.startBinding.elementId)
-        : false;
-      const isEndBoundElementSelected = element.endBinding
-        ? elementsToUpdateIds.has(element.endBinding.elementId)
-        : false;
+    } else if (
+      // NOTE: Add a little initial drag to the arrow dragging to avoid
+      // accidentally unbinding the arrow when the user just wants to select it.
+      Math.max(Math.abs(adjustedOffset.x), Math.abs(adjustedOffset.y)) > 1
+    ) {
+      updateElementCoords(pointerDownState, element, scene, adjustedOffset);
 
       const shouldUnbindStart =
         element.startBinding && !isStartBoundElementSelected;
