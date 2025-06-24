@@ -1475,7 +1475,8 @@ export class LinearElementEditor {
           if (
             otherUpdates?.moveMidPointsWithElement &&
             idx !== 0 &&
-            idx !== points.length - 1
+            idx !== points.length - 1 &&
+            !pointUpdates.has(idx)
           ) {
             return pointFrom<LocalPoint>(current[0], current[1]);
           }
@@ -2023,6 +2024,11 @@ const pointDraggingUpdates = (
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   zoom: AppState["zoom"],
 ): PointsPositionUpdates => {
+  const hasMidPoints =
+    selectedPointsIndices.filter(
+      (_, idx) => idx > 0 && idx < element.points.length - 1,
+    ).length > 0;
+
   return new Map(
     selectedPointsIndices.map((pointIndex) => {
       let newPointPosition: LocalPoint =
@@ -2039,7 +2045,10 @@ const pointDraggingUpdates = (
               element.points[pointIndex][1] + deltaY,
             );
 
-      if (pointIndex === 0 || pointIndex === element.points.length - 1) {
+      if (
+        !hasMidPoints &&
+        (pointIndex === 0 || pointIndex === element.points.length - 1)
+      ) {
         const [, , , , cx, cy] = getElementAbsoluteCoords(
           element,
           elementsMap,
