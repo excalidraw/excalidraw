@@ -124,6 +124,35 @@ describe("Save reminder", () => {
     assertToastExists();
   });
 
+  it("Should reset the reminder state on loading from a file", async () => {
+    const firstTier = REMINDER_TIERS[0];
+
+    exceedTierElements(firstTier);
+    exceedTierTime(firstTier);
+    // We aren't going to clear the elements, we'll emit an empty loaded elements array
+    clearToast();
+
+    h.app.onLoadEmitter.trigger([], h.state, h.app.files);
+
+    exceedTierElements(firstTier);
+    exceedTierTime(firstTier);
+    assertToastExists();
+  });
+
+  it("Should reset the reminder state on resetting the scene", async () => {
+    const firstTier = REMINDER_TIERS[0];
+
+    exceedTierElements(firstTier);
+    exceedTierTime(firstTier);
+    clearToast();
+
+    h.app.onResetEmitter.trigger();
+
+    exceedTierElements(firstTier);
+    exceedTierTime(firstTier);
+    assertToastExists();
+  });
+
   afterAll(() => {
     vi.useRealTimers();
   });
