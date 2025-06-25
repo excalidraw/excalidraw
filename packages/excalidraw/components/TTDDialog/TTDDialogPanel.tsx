@@ -42,22 +42,28 @@ export const TTDDialogPanel = ({
         className={clsx("ttd-dialog-panel-button-container", {
           invisible: !panelAction,
         })}
-        style={{ display: "flex", alignItems: "center" }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
       >
-        <Button
-          className="ttd-dialog-panel-button"
-          onSelect={panelAction ? panelAction.action : () => {}}
-          disabled={panelActionDisabled || onTextSubmitInProgess}
-        >
-          <div className={clsx({ invisible: onTextSubmitInProgess })}>
-            {panelAction?.label}
-            {panelAction?.icon && <span>{panelAction.icon}</span>}
-          </div>
-          {onTextSubmitInProgess && <Spinner />}
-        </Button>
-        {!panelActionDisabled &&
-          !onTextSubmitInProgess &&
-          renderSubmitShortcut?.()}
+        <div className="ttd-dialog-panel-button-container-left">
+          <Button
+            className="ttd-dialog-panel-button"
+            onSelect={panelAction ? panelAction.action : () => {}}
+            disabled={panelActionDisabled || onTextSubmitInProgess}
+          >
+            <div className={clsx({ invisible: onTextSubmitInProgess })}>
+              {panelAction?.label}
+              {panelAction?.icon && <span>{panelAction.icon}</span>}
+            </div>
+            {onTextSubmitInProgess && <Spinner />}
+          </Button>
+          {!panelActionDisabled &&
+            !onTextSubmitInProgess &&
+            renderSubmitShortcut?.()}
+        </div>
         {renderBottomRight?.()}
       </div>
     </div>
