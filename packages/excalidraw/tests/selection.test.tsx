@@ -425,7 +425,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
     expect(renderStaticScene).toHaveBeenCalledTimes(6);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);

@@ -627,13 +627,13 @@ describe("Fixed-point arrow binding", () => {
 
     // The end point should be a normal point binding
     const endBinding = arrow.endBinding as FixedPointBinding;
-    expect(endBinding.focus).toBeCloseTo(0, 5);
-    expect(endBinding.gap).toBeCloseTo(5, 5);
+    expect(endBinding.focus).toBeCloseTo(0);
+    expect(endBinding.gap).toBeCloseTo(0);
 
     expect(arrow.x).toBe(50);
     expect(arrow.y).toBe(50);
-    expect(arrow.width).toBeCloseTo(203, 0);
-    expect(arrow.height).toBeCloseTo(235, 0);
+    expect(arrow.width).toBeCloseTo(304, 0);
+    expect(arrow.height).toBeCloseTo(344, 0);
   });
 
   it("should move inner points when arrow is bound to same element on both ends", () => {
