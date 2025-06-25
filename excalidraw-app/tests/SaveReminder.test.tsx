@@ -92,6 +92,17 @@ describe("Save reminder", () => {
     }
   });
 
+  it("Should not fire after last threshold", async () => {
+    for (const tier of REMINDER_TIERS) {
+      exceedTierTime(tier);
+      exceedTierElements(tier);
+      clearToast();
+    }
+    exceedTierTime(REMINDER_TIERS[REMINDER_TIERS.length - 1]);
+    exceedTierElements(REMINDER_TIERS[REMINDER_TIERS.length - 1]);
+    assertToastDoesNotExist();
+  });
+
   it("Should not reset the reminder state on remount", async () => {
     const firstTier = REMINDER_TIERS[0];
     exceedTierElements(firstTier);
@@ -151,6 +162,34 @@ describe("Save reminder", () => {
     exceedTierElements({
       elementsCount: firstTier.elementsCount * 2,
     });
+    assertToastExists();
+  });
+
+  it("Should use an empty elements count as the base count for future reminders after resetting", () => {
+    const firstTier = REMINDER_TIERS[0];
+
+    exceedTierElements(firstTier);
+    exceedTierTime(firstTier);
+    clearToast();
+
+    h.app.onResetEmitter.trigger();
+
+    exceedTierElements(firstTier);
+    exceedTierTime(firstTier);
+    assertToastExists();
+  });
+
+  it("Should use the loaded elements count as the base count for future reminders", () => {
+    const firstTier = REMINDER_TIERS[0];
+
+    exceedTierElements(firstTier);
+    exceedTierTime(firstTier);
+    clearToast();
+
+    h.app.onLoadEmitter.trigger([], h.state, h.app.files);
+
+    exceedTierElements(firstTier);
+    exceedTierTime(firstTier);
     assertToastExists();
   });
 
