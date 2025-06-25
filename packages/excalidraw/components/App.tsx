@@ -4124,7 +4124,7 @@ class App extends React.Component<AppProps, AppState> {
               this.updateEditorAtom(changeElementPropertyPopupAtom, {
                 type: "panel",
                 propertyType: propertyEditor.type,
-                context: propertyEditor.getContext?.(elements),
+                context: propertyEditor.getContext?.(this, elements),
               });
 
               return;

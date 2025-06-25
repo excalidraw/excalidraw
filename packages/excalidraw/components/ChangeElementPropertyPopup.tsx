@@ -18,7 +18,7 @@ import type {
 
 import { sceneCoordsToViewportCoords } from "..";
 
-import { atom, useAtom } from "../editor-jotai";
+import { atom } from "../editor-jotai";
 
 import { editorJotaiStore } from "../editor-jotai";
 import {
@@ -50,7 +50,7 @@ export interface PropertyEditor<T extends ExcalidrawElement, P> {
   /** Get the current property value from an element */
   getCurrentValue: (element: T, context?: any) => P;
   /** Get available options for this property */
-  getOptions: (context?: any) => PropertyOption<P>[];
+  getOptions: () => PropertyOption<P>[];
   /** Handle property change */
   onChange: (app: App, context?: any, element?: T, newValue?: P) => void;
   /** Handle property cycle */
@@ -60,7 +60,7 @@ export interface PropertyEditor<T extends ExcalidrawElement, P> {
     direction?: "left" | "right",
   ) => boolean;
   /** Get additional context data (e.g., position for arrowheads) */
-  getContext?: (elements: readonly T[]) => any;
+  getContext?: (app: App, elements: readonly T[]) => any;
 }
 
 // Generic popup state type
@@ -112,17 +112,12 @@ export const arrowheadPropertyEditor: PropertyEditor<
       : element.endArrowhead;
   },
 
-  getOptions: (_context?: ArrowheadContext) => {
+  getOptions: () => {
     const isRTL = getLanguage().rtl;
     return getArrowheadOptions(!!isRTL).slice(0, 4);
   },
 
-  onChange: (
-    app,
-    context: ArrowheadContext,
-    element?: ExcalidrawLinearElement,
-    newValue?: Arrowhead | null,
-  ) => {
+  onChange: (app, context, element?, newValue?) => {
     const result = actionChangeArrowhead.perform(
       [element as OrderedExcalidrawElement],
       app.state,
@@ -146,17 +141,12 @@ export const arrowheadPropertyEditor: PropertyEditor<
   },
 
   cycle: (app, elements, direction: "left" | "right" = "right") => {
-    const context = arrowheadPropertyEditor.getContext?.(elements);
+    const context = arrowheadPropertyEditor.getContext?.(app, elements);
 
     const isRTL = getLanguage().rtl;
     const arrowheadOptions = getArrowheadOptions(!!isRTL).slice(0, 4);
-    const element = app.scene.getSelectedElements(
-      app.state,
-    )[0] as ExcalidrawLinearElement;
-    const current =
-      context.position === "start"
-        ? element.startArrowhead
-        : element.endArrowhead;
+    const element = elements[0] as ExcalidrawLinearElement;
+    const current = arrowheadPropertyEditor.getCurrentValue(element, context);
     const idx = arrowheadOptions.findIndex(
       (option) => option.value === current,
     );
@@ -166,20 +156,20 @@ export const arrowheadPropertyEditor: PropertyEditor<
         (idx + delta + arrowheadOptions.length) % arrowheadOptions.length
       ];
 
-    arrowheadPropertyEditor.onChange(
-      app,
-      context,
-      element,
-      next.value as Arrowhead,
-    );
+    arrowheadPropertyEditor.onChange(app, context, element, next.value);
 
     return true;
   },
 
-  getContext: (_elements) => {
-    // For arrowheads, we could return default context or get it from current popup state
-    const popupState = editorJotaiStore.get(changeElementPropertyPopupAtom);
-    return (popupState?.context as ArrowheadContext) || { position: "start" };
+  getContext: (app, elements) => {
+    // Determine which endpoint of the linear element is currently selected
+    const { points } = elements[0];
+    const idx = app.state.selectedLinearElement?.selectedPointsIndices?.[0];
+
+    const position =
+      idx === 0 ? "start" : idx === points.length - 1 ? "end" : null;
+
+    return { position };
   },
 };
 
@@ -229,42 +219,12 @@ const Panel = <T extends ExcalidrawElement, P>({
   const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
   const positionRef = useRef("");
   const panelRef = useRef<HTMLDivElement>(null);
-
-  // Use the first element for positioning (most editors will work with single element)
   const element = elements[0];
 
-  // Subscribe to popup state changes to ensure immediate updates when context changes
-  const [currentPopupState] = useAtom(changeElementPropertyPopupAtom);
+  const context =
+    editor.getContext?.(app, elements) ||
+    editorJotaiStore.get(changeElementPropertyPopupAtom)?.context;
 
-  // Base context comes from the editor or popup state
-  const baseContext =
-    editor.getContext?.(elements) || currentPopupState?.context;
-
-  // Resolve dynamic context that may depend on the current linear editor
-  const context = ((): typeof baseContext => {
-    // For arrowheads, derive the endpoint (start/end) from the currently
-    // selected point in the linear editor, if applicable. This ensures the
-    // popup repositions as soon as the user switches endpoints, without
-    // waiting for any property change to occur.
-    if (
-      editor.type === "arrowhead" &&
-      isLinearElement(element) &&
-      app.state.selectedLinearElement?.selectedPointsIndices?.length === 1 &&
-      app.state.selectedLinearElement.elementId === element.id
-    ) {
-      const idx = app.state.selectedLinearElement.selectedPointsIndices[0];
-      const points = (element as ExcalidrawLinearElement).points;
-      if (idx === 0) {
-        return { position: "start" } as ArrowheadContext;
-      }
-      if (idx === points.length - 1) {
-        return { position: "end" } as ArrowheadContext;
-      }
-    }
-    return baseContext;
-  })();
-
-  // Re-calculate position whenever element or viewport changes.
   useEffect(() => {
     const contextKey = context ? JSON.stringify(context) : "";
     const key = `${app.state.scrollX}${app.state.scrollY}${app.state.offsetTop}${app.state.offsetLeft}${app.state.zoom.value}${element.id}_${element.version}_${contextKey}`;
@@ -327,7 +287,7 @@ const Panel = <T extends ExcalidrawElement, P>({
     setPanelPosition({ x, y });
   }, [element, app.scene, app.state, context]);
   const currentValue = editor.getCurrentValue(element, context);
-  const options = editor.getOptions(context);
+  const options = editor.getOptions();
 
   const handleChange = (nextValue: P) => {
     if (currentValue === nextValue) {
