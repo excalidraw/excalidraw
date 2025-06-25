@@ -4107,10 +4107,16 @@ class App extends React.Component<AppProps, AppState> {
             if (propertyEditor.isValidForElements(this, elements)) {
               this.updateEditorAtom(convertElementTypePopupAtom, null);
 
-              const currentPropertyPopup = editorJotaiStore.get(changeElementPropertyPopupAtom);
+              const currentPropertyPopup = editorJotaiStore.get(
+                changeElementPropertyPopupAtom,
+              );
 
               if (currentPropertyPopup?.type === "panel") {
-                propertyEditor.cycle(this, elements, event.shiftKey ? "left" : "right");
+                propertyEditor.cycle(
+                  this,
+                  elements,
+                  event.shiftKey ? "left" : "right",
+                );
 
                 this.store.scheduleCapture();
               }
