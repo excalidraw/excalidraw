@@ -109,7 +109,18 @@ describe("Save reminder", () => {
     assertToastExists();
   });
 
-  it("Should reset the reminder state on saving a file", async () => {
+  it.each([
+    { emitter: () => h.app.onSaveEmitter.trigger(), title: "saving to a file" },
+    {
+      emitter: () =>
+        h.app.onLoadEmitter.trigger(h.elements, h.state, h.app.files),
+      title: "loading from a file",
+    },
+    {
+      emitter: () => h.app.onResetEmitter.trigger(),
+      title: "resetting the scene",
+    },
+  ])("Should reset the reminder state on $title", ({ emitter }) => {
     const firstTier = REMINDER_TIERS[0];
 
     exceedTierElements(firstTier);
@@ -117,39 +128,29 @@ describe("Save reminder", () => {
     clearElements();
     clearToast();
 
+    emitter();
+
+    exceedTierElements(firstTier);
+    exceedTierTime(firstTier);
+    assertToastExists();
+  });
+
+  it("Should use the last saved elements count as the base count for future reminders", () => {
+    const firstTier = REMINDER_TIERS[0];
+
+    exceedTierElements(firstTier);
+    exceedTierTime(firstTier);
+    clearToast();
+
     h.app.onSaveEmitter.trigger();
 
     exceedTierElements(firstTier);
     exceedTierTime(firstTier);
-    assertToastExists();
-  });
+    assertToastDoesNotExist();
 
-  it("Should reset the reminder state on loading from a file", async () => {
-    const firstTier = REMINDER_TIERS[0];
-
-    exceedTierElements(firstTier);
-    exceedTierTime(firstTier);
-    // We aren't going to clear the elements, we'll emit an empty loaded elements array
-    clearToast();
-
-    h.app.onLoadEmitter.trigger([], h.state, h.app.files);
-
-    exceedTierElements(firstTier);
-    exceedTierTime(firstTier);
-    assertToastExists();
-  });
-
-  it("Should reset the reminder state on resetting the scene", async () => {
-    const firstTier = REMINDER_TIERS[0];
-
-    exceedTierElements(firstTier);
-    exceedTierTime(firstTier);
-    clearToast();
-
-    h.app.onResetEmitter.trigger();
-
-    exceedTierElements(firstTier);
-    exceedTierTime(firstTier);
+    exceedTierElements({
+      elementsCount: firstTier.elementsCount * 2,
+    });
     assertToastExists();
   });
 
