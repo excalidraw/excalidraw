@@ -4,6 +4,7 @@ import {
   isFlowchartNodeElement,
   isImageElement,
   isLinearElement,
+  isLineElement,
   isTextBindableContainer,
   isTextElement,
 } from "@excalidraw/element";
@@ -73,10 +74,6 @@ const getHints = ({
     return t("hints.embeddable");
   }
 
-  if (appState.activeTool.type === "image" && appState.pendingImageElementId) {
-    return t("hints.placeImage");
-  }
-
   const selectedElements = app.scene.getSelectedElements(appState);
 
   if (
@@ -138,7 +135,9 @@ const getHints = ({
             ? t("hints.lineEditor_pointSelected")
             : t("hints.lineEditor_nothingSelected");
         }
-        return t("hints.lineEditor_info");
+        return isLineElement(selectedElements[0])
+          ? t("hints.lineEditor_line_info")
+          : t("hints.lineEditor_info");
       }
       if (
         !appState.newElement &&
