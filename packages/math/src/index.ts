@@ -1,5 +1,6 @@
 export * from "./angle";
 export * from "./curve";
+export * from "./ellipse";
 export * from "./line";
 export * from "./point";
 export * from "./polygon";

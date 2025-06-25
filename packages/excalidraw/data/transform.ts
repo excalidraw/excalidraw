@@ -526,6 +526,7 @@ const adjustElbowArrowPoints = (elements: ExcalidrawElement[]) => {
             element,
             endBindableElement,
             "end",
+            elementsMap,
           ).fixedPoint;
 
           if (newFixedPoint) {
@@ -568,6 +569,7 @@ const adjustElbowArrowPoints = (elements: ExcalidrawElement[]) => {
             element,
             startBindableElement,
             "start",
+            elementsMap,
           ).fixedPoint;
           if (newFixedPoint) {
             Object.assign(element.startBinding, {

@@ -1,8 +1,6 @@
-import type { Bounds } from "@excalidraw/element";
-
-import { isPoint, pointDistance, pointFrom } from "./point";
-import { rectangle, rectangleIntersectLineSegment } from "./rectangle";
-import { vector } from "./vector";
+import { isPoint, pointDistance, pointFrom, pointFromVector } from "./point";
+import { vector, vectorNormal, vectorNormalize, vectorScale } from "./vector";
+import { LegendreGaussN24CValues, LegendreGaussN24TValues } from "./constants";
 
 import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
 
@@ -104,20 +102,6 @@ export const bezierEquation = <Point extends GlobalPoint | LocalPoint>(
 export function curveIntersectLineSegment<
   Point extends GlobalPoint | LocalPoint,
 >(c: Curve<Point>, l: LineSegment<Point>): Point[] {
-  // Optimize by doing a cheap bounding box check first
-  const bounds = curveBounds(c);
-  if (
-    rectangleIntersectLineSegment(
-      rectangle(
-        pointFrom(bounds[0], bounds[1]),
-        pointFrom(bounds[2], bounds[3]),
-      ),
-      l,
-    ).length === 0
-  ) {
-    return [];
-  }
-
   const line = (s: number) =>
     pointFrom<Point>(
       l[0][0] + s * (l[1][0] - l[0][0]),
@@ -295,11 +279,227 @@ export function curveTangent<Point extends GlobalPoint | LocalPoint>(
   );
 }
 
-function curveBounds<Point extends GlobalPoint | LocalPoint>(
-  c: Curve<Point>,
-): Bounds {
-  const [P0, P1, P2, P3] = c;
-  const x = [P0[0], P1[0], P2[0], P3[0]];
-  const y = [P0[1], P1[1], P2[1], P3[1]];
-  return [Math.min(...x), Math.min(...y), Math.max(...x), Math.max(...y)];
+export function curveCatmullRomQuadraticApproxPoints(
+  points: GlobalPoint[],
+  tension = 0.5,
+) {
+  if (points.length < 2) {
+    return;
+  }
+
+  const pointSets: [GlobalPoint, GlobalPoint][] = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1 < 0 ? 0 : i - 1];
+    const p1 = points[i];
+    const p2 = points[i + 1 >= points.length ? points.length - 1 : i + 1];
+    const cpX = p1[0] + ((p2[0] - p0[0]) * tension) / 2;
+    const cpY = p1[1] + ((p2[1] - p0[1]) * tension) / 2;
+
+    pointSets.push([
+      pointFrom<GlobalPoint>(cpX, cpY),
+      pointFrom<GlobalPoint>(p2[0], p2[1]),
+    ]);
+  }
+
+  return pointSets;
+}
+
+export function curveCatmullRomCubicApproxPoints<
+  Point extends GlobalPoint | LocalPoint,
+>(points: Point[], tension = 0.5) {
+  if (points.length < 2) {
+    return;
+  }
+
+  const pointSets: Curve<Point>[] = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1 < 0 ? 0 : i - 1];
+    const p1 = points[i];
+    const p2 = points[i + 1 >= points.length ? points.length - 1 : i + 1];
+    const p3 = points[i + 2 >= points.length ? points.length - 1 : i + 2];
+    const tangent1 = [(p2[0] - p0[0]) * tension, (p2[1] - p0[1]) * tension];
+    const tangent2 = [(p3[0] - p1[0]) * tension, (p3[1] - p1[1]) * tension];
+    const cp1x = p1[0] + tangent1[0] / 3;
+    const cp1y = p1[1] + tangent1[1] / 3;
+    const cp2x = p2[0] - tangent2[0] / 3;
+    const cp2y = p2[1] - tangent2[1] / 3;
+
+    pointSets.push(
+      curve(
+        pointFrom(p1[0], p1[1]),
+        pointFrom(cp1x, cp1y),
+        pointFrom(cp2x, cp2y),
+        pointFrom(p2[0], p2[1]),
+      ),
+    );
+  }
+
+  return pointSets;
+}
+
+export function curveOffsetPoints(
+  [p0, p1, p2, p3]: Curve<GlobalPoint>,
+  offset: number,
+  steps = 50,
+) {
+  const offsetPoints = [];
+
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const c = curve(p0, p1, p2, p3);
+    const point = bezierEquation(c, t);
+    const tangent = vectorNormalize(curveTangent(c, t));
+    const normal = vectorNormal(tangent);
+
+    offsetPoints.push(pointFromVector(vectorScale(normal, offset), point));
+  }
+
+  return offsetPoints;
+}
+
+export function offsetPointsForQuadraticBezier(
+  p0: GlobalPoint,
+  p1: GlobalPoint,
+  p2: GlobalPoint,
+  offsetDist: number,
+  steps = 50,
+) {
+  const offsetPoints = [];
+
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const t1 = 1 - t;
+    const point = pointFrom<GlobalPoint>(
+      t1 * t1 * p0[0] + 2 * t1 * t * p1[0] + t * t * p2[0],
+      t1 * t1 * p0[1] + 2 * t1 * t * p1[1] + t * t * p2[1],
+    );
+    const tangentX = 2 * (1 - t) * (p1[0] - p0[0]) + 2 * t * (p2[0] - p1[0]);
+    const tangentY = 2 * (1 - t) * (p1[1] - p0[1]) + 2 * t * (p2[1] - p1[1]);
+    const tangent = vectorNormalize(vector(tangentX, tangentY));
+    const normal = vectorNormal(tangent);
+
+    offsetPoints.push(pointFromVector(vectorScale(normal, offsetDist), point));
+  }
+
+  return offsetPoints;
+}
+
+/**
+ * Implementation based on Legendre-Gauss quadrature for more accurate arc
+ * length calculation.
+ *
+ * Reference: https://pomax.github.io/bezierinfo/#arclength
+ *
+ * @param c The curve to calculate the length of
+ * @returns The approximated length of the curve
+ */
+export function curveLength<P extends GlobalPoint | LocalPoint>(
+  c: Curve<P>,
+): number {
+  const z2 = 0.5;
+  let sum = 0;
+
+  for (let i = 0; i < 24; i++) {
+    const t = z2 * LegendreGaussN24TValues[i] + z2;
+    const derivativeVector = curveTangent(c, t);
+    const magnitude = Math.sqrt(
+      derivativeVector[0] * derivativeVector[0] +
+        derivativeVector[1] * derivativeVector[1],
+    );
+    sum += LegendreGaussN24CValues[i] * magnitude;
+  }
+
+  return z2 * sum;
+}
+
+/**
+ * Calculates the curve length from t=0 to t=parameter using the same
+ * Legendre-Gauss quadrature method used in curveLength
+ *
+ * @param c The curve to calculate the partial length for
+ * @param t The parameter value (0 to 1) to calculate length up to
+ * @returns The length of the curve from beginning to parameter t
+ */
+export function curveLengthAtParameter<P extends GlobalPoint | LocalPoint>(
+  c: Curve<P>,
+  t: number,
+): number {
+  if (t <= 0) {
+    return 0;
+  }
+  if (t >= 1) {
+    return curveLength(c);
+  }
+
+  // Scale and shift the integration interval from [0,t] to [-1,1]
+  // which is what the Legendre-Gauss quadrature expects
+  const z1 = t / 2;
+  const z2 = t / 2;
+
+  let sum = 0;
+
+  for (let i = 0; i < 24; i++) {
+    const parameter = z1 * LegendreGaussN24TValues[i] + z2;
+    const derivativeVector = curveTangent(c, parameter);
+    const magnitude = Math.sqrt(
+      derivativeVector[0] * derivativeVector[0] +
+        derivativeVector[1] * derivativeVector[1],
+    );
+    sum += LegendreGaussN24CValues[i] * magnitude;
+  }
+
+  return z1 * sum; // Scale the result back to the original interval
+}
+
+/**
+ * Calculates the point at a specific percentage of a curve's total length
+ * using binary search for improved efficiency and accuracy.
+ *
+ * @param c The curve to calculate point on
+ * @param percent A value between 0 and 1 representing the percentage of the curve's length
+ * @returns The point at the specified percentage of curve length
+ */
+export function curvePointAtLength<P extends GlobalPoint | LocalPoint>(
+  c: Curve<P>,
+  percent: number,
+): P {
+  if (percent <= 0) {
+    return bezierEquation(c, 0);
+  }
+
+  if (percent >= 1) {
+    return bezierEquation(c, 1);
+  }
+
+  const totalLength = curveLength(c);
+  const targetLength = totalLength * percent;
+
+  // Binary search to find parameter t where length at t equals target length
+  let tMin = 0;
+  let tMax = 1;
+  let t = percent; // Start with a reasonable guess (t = percent)
+  let currentLength = 0;
+
+  // Tolerance for length comparison and iteration limit to avoid infinite loops
+  const tolerance = totalLength * 0.0001;
+  const maxIterations = 20;
+
+  for (let iteration = 0; iteration < maxIterations; iteration++) {
+    currentLength = curveLengthAtParameter(c, t);
+    const error = Math.abs(currentLength - targetLength);
+
+    if (error < tolerance) {
+      break;
+    }
+
+    if (currentLength < targetLength) {
+      tMin = t;
+    } else {
+      tMax = t;
+    }
+
+    t = (tMin + tMax) / 2;
+  }
+
+  return bezierEquation(c, t);
 }
