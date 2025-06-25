@@ -100,6 +100,7 @@ import {
   randomInteger,
   CLASSES,
   Emitter,
+  BIND_MODE_TIMEOUT,
 } from "@excalidraw/common";
 
 import {
@@ -570,7 +571,6 @@ class App extends React.Component<AppProps, AppState> {
   public renderer: Renderer;
   public visibleElements: readonly NonDeletedExcalidrawElement[];
   private resizeObserver: ResizeObserver | undefined;
-  private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   public id: string;
@@ -603,6 +603,8 @@ class App extends React.Component<AppProps, AppState> {
 
   public flowChartCreator: FlowChartCreator = new FlowChartCreator();
   private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
+
+  private bindModeHandler: ReturnType<typeof setTimeout> | null = null;
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
@@ -650,11 +652,6 @@ class App extends React.Component<AppProps, AppState> {
     [event: PointerEvent | null]
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
-
-  // setState(s: any, t: any) {
-  //   s.editingLinearElement && console.trace(s.editingLinearElement);
-  //   super.setState(s, t);
-  // }
 
   constructor(props: AppProps) {
     super(props);
@@ -8327,6 +8324,32 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
+        // Timed bind mode handler for arrow elements
+        if (this.state.bindMode === "focus") {
+          const pointerMovementDistance = Math.hypot(
+            (this.lastPointerMoveCoords?.x ?? Infinity) - pointerCoords.x,
+          );
+          if (this.bindModeHandler && pointerMovementDistance < 1) {
+            clearTimeout(this.bindModeHandler);
+          }
+          this.bindModeHandler = setTimeout(() => {
+            const hoveredElement = getHoveredElementForBinding(
+              pointerCoords,
+              this.scene.getNonDeletedElements(),
+              elementsMap,
+              this.state.zoom,
+            );
+
+            if (hoveredElement) {
+              this.setState({
+                bindMode: "fixed",
+              });
+            } else {
+              this.bindModeHandler = null;
+            }
+          }, BIND_MODE_TIMEOUT);
+        }
+
         const newState = LinearElementEditor.handlePointDragging(
           event,
           this,
@@ -9133,8 +9156,14 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
+      if (this.bindModeHandler) {
+        clearTimeout(this.bindModeHandler);
+        this.bindModeHandler = null;
+      }
+
       this.setState({
         selectedElementsAreBeingDragged: false,
+        bindMode: "focus",
       });
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
