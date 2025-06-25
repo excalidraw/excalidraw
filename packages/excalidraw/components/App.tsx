@@ -5908,7 +5908,6 @@ class App extends React.Component<AppProps, AppState> {
             this.scene,
             this.state.zoom,
             this.scene.getNonDeletedElementsMap(),
-            //this.state.startBoundElement,
           ),
         });
       } else {

@@ -404,7 +404,6 @@ export const maybeSuggestBindingsForLinearElementAtCoords = (
   Array.from(
     pointerCoords.reduce(
       (acc: Set<NonDeleted<ExcalidrawBindableElement>>, coords) => {
-        const p = pointFrom<GlobalPoint>(coords.x, coords.y);
         const hoveredBindableElement = getHoveredElementForBinding(
           coords,
           scene.getNonDeletedElements(),
@@ -413,19 +412,10 @@ export const maybeSuggestBindingsForLinearElementAtCoords = (
           isElbowArrow(linearElement),
           isElbowArrow(linearElement),
         );
-        const pointIsInside =
-          hoveredBindableElement != null &&
-          hitElementItself({
-            point: p,
-            element: hoveredBindableElement,
-            elementsMap,
-            threshold: 0, // TODO: Not ideal, should be calculated from the same source
-          });
 
         if (
           hoveredBindableElement != null &&
-          ((pointIsInside &&
-            oppositeBindingBoundElement?.id === hoveredBindableElement.id) ||
+          (oppositeBindingBoundElement?.id === hoveredBindableElement.id ||
             !isLinearElementSimpleAndAlreadyBound(
               linearElement,
               oppositeBindingBoundElement?.id,
@@ -504,6 +494,11 @@ export const bindLinearElement = (
   }
 
   const elementsMap = scene.getNonDeletedElementsMap();
+  const edgePoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    startOrEnd === "start" ? 0 : -1,
+    elementsMap,
+  );
   let binding: PointBinding | FixedPointBinding;
 
   if (isElbowArrow(linearElement)) {
@@ -525,36 +520,67 @@ export const bindLinearElement = (
         elementsMap,
       ),
     };
+  } else if (
+    hitElementItself({
+      point: edgePoint,
+      element: hoveredElement,
+      elementsMap,
+      threshold: 0, // TODO: Not ideal, should be calculated from the same source
+    })
+  ) {
+    // Use FixedPoint binding when the arrow endpoint is inside the shape
+    binding = {
+      elementId: hoveredElement.id,
+      focus: 0,
+      gap: 0,
+      ...calculateFixedPointForNonElbowArrowBinding(
+        linearElement,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
+      ),
+    };
   } else {
-    // For non-elbow arrows, check if the endpoint is inside the shape
-    const edgePoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    // For non-elbow arrows, extend the last segment and check intersection
+    const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
       linearElement,
-      startOrEnd === "start" ? 0 : -1,
+      startOrEnd === "start" ? 1 : -2,
       elementsMap,
     );
-
-    if (
-      hitElementItself({
-        point: edgePoint,
-        element: hoveredElement,
-        elementsMap,
-        threshold: 0, // TODO: Not ideal, should be calculated from the same source
-      })
-    ) {
-      // Use FixedPoint binding when the arrow endpoint is inside the shape
-      binding = {
-        elementId: hoveredElement.id,
-        focus: 0,
-        gap: 0,
-        ...calculateFixedPointForNonElbowArrowBinding(
-          linearElement,
-          hoveredElement,
-          startOrEnd,
-          elementsMap,
+    const extendedDirection = vectorScale(
+      vectorNormalize(
+        vectorFromPoint(
+          pointFrom(
+            edgePoint[0] - adjacentPoint[0],
+            edgePoint[1] - adjacentPoint[1],
+          ),
         ),
-      };
-    } else {
-      // Use traditional focus/gap binding when the endpoint is outside the shape
+      ),
+      Math.max(hoveredElement.width, hoveredElement.height) * 2,
+    );
+    const intersector = lineSegment(
+      edgePoint,
+      pointFromVector(
+        vectorFromPoint(
+          pointFrom(
+            edgePoint[0] + extendedDirection[0],
+            edgePoint[1] + extendedDirection[1],
+          ),
+        ),
+      ),
+    );
+
+    // Check if this extended segment intersects the bindable element
+    const intersections = intersectElementWithLineSegment(
+      hoveredElement,
+      elementsMap,
+      intersector,
+    );
+
+    const intersectsElement = intersections.length > 0;
+
+    if (intersectsElement) {
+      // Use traditional focus/gap binding when the extended segment intersects
       binding = {
         elementId: hoveredElement.id,
         ...normalizePointBinding(
@@ -565,6 +591,19 @@ export const bindLinearElement = (
             elementsMap,
           ),
           hoveredElement,
+        ),
+      };
+    } else {
+      // Use FixedPoint binding when the extended segment doesn't intersect
+      binding = {
+        elementId: hoveredElement.id,
+        focus: 0,
+        gap: 0,
+        ...calculateFixedPointForNonElbowArrowBinding(
+          linearElement,
+          hoveredElement,
+          startOrEnd,
+          elementsMap,
         ),
       };
     }

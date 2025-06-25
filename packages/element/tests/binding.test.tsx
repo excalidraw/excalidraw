@@ -8,7 +8,13 @@ import { Excalidraw, isLinearElement } from "@excalidraw/excalidraw";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { UI, Pointer, Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
-import { fireEvent, render } from "@excalidraw/excalidraw/tests/test-utils";
+import {
+  act,
+  fireEvent,
+  render,
+} from "@excalidraw/excalidraw/tests/test-utils";
+
+import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
 
 import { getTransformHandles } from "../src/transformHandles";
 import {
@@ -73,8 +79,9 @@ describe("element binding", () => {
 
     expect(arrow.startBinding).toEqual({
       elementId: rect.id,
-      focus: expect.toBeNonNaNNumber(),
-      gap: expect.toBeNonNaNNumber(),
+      focus: 0,
+      gap: 0,
+      fixedPoint: expect.arrayContaining([1.1, 0]),
     });
 
     // Move the end point to the overlapping binding position
@@ -85,13 +92,15 @@ describe("element binding", () => {
     // Both the start and the end points should be bound
     expect(arrow.startBinding).toEqual({
       elementId: rect.id,
-      focus: expect.toBeNonNaNNumber(),
-      gap: expect.toBeNonNaNNumber(),
+      focus: 0,
+      gap: 0,
+      fixedPoint: expect.arrayContaining([1.1, 0]),
     });
     expect(arrow.endBinding).toEqual({
       elementId: rect.id,
-      focus: expect.toBeNonNaNNumber(),
-      gap: expect.toBeNonNaNNumber(),
+      focus: 0,
+      gap: 0,
+      fixedPoint: expect.arrayContaining([1.1, 0]),
     });
   });
 
@@ -190,9 +199,9 @@ describe("element binding", () => {
     // Test sticky connection
     expect(API.getSelectedElement().type).toBe("arrow");
     Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+    expect(arrow.endBinding?.elementId).not.toBe(rectangle.id);
     Keyboard.keyPress(KEYS.ARROW_LEFT);
-    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+    expect(arrow.endBinding?.elementId).not.toBe(rectangle.id);
 
     // Sever connection
     expect(API.getSelectedElement().type).toBe("arrow");
@@ -748,5 +757,84 @@ describe("Fixed-point arrow binding", () => {
     expect(arrow.points[1][1]).toBe(originalInnerPoint1[1]);
     expect(arrow.points[2][0]).toBe(originalInnerPoint2[0]);
     expect(arrow.points[2][1]).toBe(originalInnerPoint2[1]);
+  });
+});
+
+describe("line segment extension binding", () => {
+  beforeEach(async () => {
+    mouse.reset();
+
+    await act(() => {
+      return setLanguage(defaultLang);
+    });
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it("should use point binding when extended segment intersects element", () => {
+    // Create a rectangle that will be intersected by the extended arrow segment
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+
+    API.setElements([rect]);
+
+    // Draw an arrow that points at the rectangle (extended segment will intersect)
+    UI.clickTool("arrow");
+    mouse.downAt(0, 0); // Start point
+    mouse.moveTo(120, 95); // End point - arrow direction points toward rectangle
+    mouse.up();
+
+    const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
+
+    // Should create a normal point binding since the extended line segment
+    // from the last arrow segment intersects the rectangle
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding).toHaveProperty("focus");
+    expect(arrow.endBinding).toHaveProperty("gap");
+    expect(arrow.endBinding).not.toHaveProperty("fixedPoint");
+  });
+
+  it("should use fixed point binding when extended segment misses element", () => {
+    // Create a rectangle positioned so the extended arrow segment will miss it
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+
+    API.setElements([rect]);
+
+    // Draw an arrow that doesn't point at the rectangle (extended segment will miss)
+    UI.clickTool("arrow");
+    mouse.reset();
+    mouse.downAt(125, 93); // Start point
+    mouse.moveTo(175, 93); // End point - arrow direction is horizontal, misses rectangle
+    mouse.up();
+
+    const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
+
+    // Should create a fixed point binding since the extended line segment
+    // from the last arrow segment misses the rectangle
+    expect(arrow.startBinding?.elementId).toBe(rect.id);
+    expect(arrow.startBinding).toHaveProperty("fixedPoint");
+    expect(
+      (arrow.startBinding as FixedPointBinding).fixedPoint[0],
+    ).toBeGreaterThanOrEqual(0);
+    expect(
+      (arrow.startBinding as FixedPointBinding).fixedPoint[0],
+    ).toBeLessThanOrEqual(1);
+    expect(
+      (arrow.startBinding as FixedPointBinding).fixedPoint[1],
+    ).toBeLessThanOrEqual(0);
+    expect(
+      (arrow.startBinding as FixedPointBinding).fixedPoint[1],
+    ).toBeLessThanOrEqual(1);
+    expect(arrow.endBinding).toBe(null);
   });
 });
