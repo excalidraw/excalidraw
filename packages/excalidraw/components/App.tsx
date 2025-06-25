@@ -400,10 +400,8 @@ import ConvertElementTypePopup, {
 } from "./ConvertElementTypePopup";
 
 import ChangeElementPropertyPopup, {
-  arrowheadPropertyEditor,
+  propertyEditors,
   changeElementPropertyPopupAtom,
-  cycleArrowhead,
-  showArrowheadPropertyPopup,
 } from "./ChangeElementPropertyPopup";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
@@ -4096,49 +4094,28 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           event.preventDefault();
 
-          const arrowElements = getSelectedElements(
+          const elements = getSelectedElements(
             this.scene.getNonDeletedElementsMap(),
             this.state,
           );
 
-          if (
-            arrowheadPropertyEditor.isValidForElements(this, arrowElements)
-          ) {
-            const idx = this.state.selectedLinearElement?.selectedPointsIndices?.[0];
-            const { points } = arrowElements[0];
-
-            const arrowPosition: "start" | "end" | null = idx === 0 ? "start" : idx === points.length - 1 ? "end" : null;
-
-            if (arrowPosition) {
-              // Close the shape switching popup so only one popup is open at a time
+          for (const propertyEditor of propertyEditors.values()) {
+            if (propertyEditor.isValidForElements(this, elements)) {
               this.updateEditorAtom(convertElementTypePopupAtom, null);
 
-              // Determine if the arrowhead property popup is already open for
-              // this session. We only cycle the arrowhead when the popup is
-              // already visible; otherwise, we just open the popup so that the
-              // user first sees the current option highlighted.
-              const currentPropertyPopup = editorJotaiStore.get(
-                changeElementPropertyPopupAtom,
-              );
+              const currentPropertyPopup = editorJotaiStore.get(changeElementPropertyPopupAtom);
 
-              const isArrowheadPopupOpen =
-                currentPropertyPopup?.type === "panel" &&
-                currentPropertyPopup.propertyType === "arrowhead" &&
-                (currentPropertyPopup.context as any)?.position ===
-                arrowPosition;
+              if (currentPropertyPopup?.type === "panel") {
+                propertyEditor.cycle(this, elements, event.shiftKey ? "left" : "right");
 
-              // If the popup is already open, cycle to the next option.
-              if (isArrowheadPopupOpen && cycleArrowhead(this, {
-                position: arrowPosition,
-                direction: event.shiftKey ? "left" : "right",
-              })) {
                 this.store.scheduleCapture();
               }
 
-              // Show (or update) the arrowhead property popup for the current
-              // endpoint so the user can see the current value and available
-              // options.
-              showArrowheadPropertyPopup(this, arrowPosition);
+              this.updateEditorAtom(changeElementPropertyPopupAtom, {
+                type: "panel",
+                propertyType: propertyEditor.type,
+                context: propertyEditor.getContext?.(elements),
+              });
 
               return;
             }

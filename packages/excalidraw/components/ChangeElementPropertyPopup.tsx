@@ -11,7 +11,6 @@ import type {
     ExcalidrawLinearElement,
     Arrowhead,
     OrderedExcalidrawElement,
-    ExcalidrawArrowElement,
 } from "@excalidraw/element/types";
 
 import { sceneCoordsToViewportCoords } from "..";
@@ -40,7 +39,9 @@ export interface PropertyEditor<T extends ExcalidrawElement, P> {
     /** Get available options for this property */
     getOptions: (context?: any) => PropertyOption<P>[];
     /** Handle property change */
-    onChange: (app: App, element: T, newValue: P, context?: any) => void;
+    onChange: (app: App, context?: any, element?: T, newValue?: P) => void;
+    /** Handle property cycle */
+    cycle: (app: App, elements: readonly T[], direction?: "left" | "right") => boolean;
     /** Get additional context data (e.g., position for arrowheads) */
     getContext?: (elements: readonly T[]) => any;
 }
@@ -69,10 +70,12 @@ export const arrowheadPropertyEditor: PropertyEditor<ExcalidrawLinearElement, Ar
     type: "arrowhead",
     
     isValidForElements: (app,elements): elements is readonly ExcalidrawLinearElement[] => {
-        return elements.length === 1 && 
-               isLinearElement(elements[0]) && 
-               canHaveArrowheads(elements[0].type) &&
-               app.state.selectedLinearElement?.selectedPointsIndices?.length === 1;
+        if (elements.length !== 1 || !isLinearElement(elements[0]) || !canHaveArrowheads(elements[0].type)) {
+            return false;
+        }
+        const idx = app.state.selectedLinearElement?.selectedPointsIndices?.[0];
+        const { points } = elements[0];
+        return idx === 0 || idx === points.length - 1;
     },
     
     getCurrentValue: (element, context: ArrowheadContext) => {
@@ -84,11 +87,34 @@ export const arrowheadPropertyEditor: PropertyEditor<ExcalidrawLinearElement, Ar
         return getArrowheadOptions(!!isRTL).slice(0, 4);
     },
     
-    onChange: (app, _element, _newValue, context: ArrowheadContext) => {
-        cycleArrowhead(app, {
+    onChange: (app, context: ArrowheadContext, element?: ExcalidrawLinearElement, newValue?: Arrowhead | null) => {
+        const result = actionChangeArrowhead.perform([element as OrderedExcalidrawElement], app.state, {
             position: context.position,
-            direction: "right",
+            type: newValue as Arrowhead,
         });
+
+        const existingElements = app.scene.getNonDeletedElementsMap().values();
+        const newElements = result.elements;
+        const deduplicatedElements = new Map([...existingElements, ...newElements].map((element) => [element.id, element]));
+
+        app.scene.replaceAllElements(deduplicatedElements);
+        app.setState(result.appState);
+    },
+
+    cycle: (app, elements, direction: "left" | "right" = "right") => {
+        const context = arrowheadPropertyEditor.getContext?.(elements);
+
+        const isRTL = getLanguage().rtl;
+        const arrowheadOptions = getArrowheadOptions(!!isRTL).slice(0, 4);
+        const element = app.scene.getSelectedElements(app.state)[0] as ExcalidrawLinearElement;
+        const current = context.position === "start" ? element.startArrowhead : element.endArrowhead;
+        const idx = arrowheadOptions.findIndex((option) => option.value === current);
+        const delta = direction === "right" ? 1 : -1;
+        const next = arrowheadOptions[(idx + delta + arrowheadOptions.length) % arrowheadOptions.length];
+
+        arrowheadPropertyEditor.onChange(app, context, element, next.value as Arrowhead);
+
+        return true;
     },
     
     getContext: (_elements) => {
@@ -99,22 +125,10 @@ export const arrowheadPropertyEditor: PropertyEditor<ExcalidrawLinearElement, Ar
 };
 
 // Registry of property editors
-const propertyEditors = new Map<string, PropertyEditor<any, any>>();
-
-export const registerPropertyEditor = <T extends ExcalidrawElement, P>(
-    editor: PropertyEditor<T, P>
-) => {
-    propertyEditors.set(editor.type, editor);
-};
-
-export const getPropertyEditor = <T extends ExcalidrawElement, P>(
-    type: string
-): PropertyEditor<T, P> | undefined => {
-    return propertyEditors.get(type);
-};
+export const propertyEditors = new Map<string, PropertyEditor<any, any>>();
 
 // Register the arrowhead editor
-registerPropertyEditor(arrowheadPropertyEditor);
+propertyEditors.set("arrowhead", arrowheadPropertyEditor);
 
 export const ChangeElementPropertyPopup = ({ app }: { app: App }) => {
     const selectedElements = app.scene.getSelectedElements(app.state);
@@ -126,7 +140,7 @@ export const ChangeElementPropertyPopup = ({ app }: { app: App }) => {
             return;
         }
 
-        const editor = getPropertyEditor(popupState.propertyType);
+        const editor = propertyEditors.get(popupState.propertyType);
         if (!editor || !editor.isValidForElements(app, selectedElements)) {
             app.updateEditorAtom(changeElementPropertyPopupAtom, null);
         }
@@ -136,7 +150,7 @@ export const ChangeElementPropertyPopup = ({ app }: { app: App }) => {
         return null;
     }
 
-    const editor = getPropertyEditor(popupState.propertyType);
+    const editor = propertyEditors.get(popupState.propertyType);
     if (!editor || !editor.isValidForElements(app, selectedElements)) {
         return null;
     }
@@ -251,7 +265,7 @@ const Panel = <T extends ExcalidrawElement, P>({
         if (currentValue === nextValue) {
             return;
         }
-        editor.onChange(app, element, nextValue, context);
+        editor.onChange(app, context, element, nextValue);
     };
 
     return (
@@ -281,65 +295,6 @@ const Panel = <T extends ExcalidrawElement, P>({
             ))}
         </div>
     );
-};
-
-/**
- * Cycles arrowhead for currently selected arrow element. Returns `true` if
- * a change has been made.
- */
-export const cycleArrowhead = (
-    app: App,
-    {
-        position,
-        direction = "right",
-    }: {
-        position: "start" | "end";
-        direction?: "left" | "right";
-    },
-): boolean => {
-    const selectedElements = app.scene.getSelectedElements(app.state);
-    if (
-        selectedElements.length !== 1 ||
-        !isLinearElement(selectedElements[0]) ||
-        !canHaveArrowheads(selectedElements[0].type)
-    ) {
-        return false;
-    }
-    const isRTL = getLanguage().rtl;
-    const arrowheadOptions = getArrowheadOptions(!!isRTL).slice(0, 4);
-
-    const element = selectedElements[0] as ExcalidrawLinearElement;
-    const current = position === "start" ? element.startArrowhead : element.endArrowhead;
-    const idx = arrowheadOptions.findIndex((option) => option.value === current);
-    const delta = direction === "right" ? 1 : -1;
-    const next = arrowheadOptions[(idx + delta + arrowheadOptions.length) % arrowheadOptions.length];
-
-    const result = actionChangeArrowhead.perform([element as OrderedExcalidrawElement], app.state, {
-        position,
-        type: next.value as Arrowhead,
-    });
-
-    const existingElements = app.scene.getNonDeletedElementsMap().values();
-    const newElements = result.elements;
-    const deduplicatedElements = new Map([...existingElements, ...newElements].map((element) => [element.id, element]));
-
-    app.scene.replaceAllElements(deduplicatedElements);
-    app.setState(result.appState);
-
-    return true;
-};
-
-// Helper functions for showing specific property popups
-export const showArrowheadPropertyPopup = (app: App, position: "start" | "end") => {
-    app.updateEditorAtom(changeElementPropertyPopupAtom, {
-        type: "panel",
-        propertyType: "arrowhead",
-        context: { position },
-    });
-};
-
-export const hidePropertyPopup = (app: App) => {
-    app.updateEditorAtom(changeElementPropertyPopupAtom, null);
 };
 
 export default ChangeElementPropertyPopup; 
