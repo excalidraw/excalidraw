@@ -370,17 +370,12 @@ export class LinearElementEditor {
         const effectiveGridX = referencePointCoords[0] + dxFromReference;
         const effectiveGridY = referencePointCoords[1] + dyFromReference;
 
-        let newDraggingPointPosition = pointFrom(
-          effectiveGridX,
-          effectiveGridY,
-        );
-
         if (!isElbowArrow(element)) {
           const { snapOffset, snapLines } = snapLinearElementPoint(
             app.scene.getNonDeletedElements(),
             element,
             lastClickedPoint,
-            { x: effectiveGridX, y: effectiveGridY },
+            pointFrom<GlobalPoint>(effectiveGridX, effectiveGridY),
             app,
             event,
             elementsMap,
@@ -448,7 +443,7 @@ export class LinearElementEditor {
           -element.angle as Radians,
         );
 
-        newDraggingPointPosition = pointFrom(
+        const newDraggingPointPosition = pointFrom(
           referencePoint[0] + rotatedX,
           referencePoint[1] + rotatedY,
         );
@@ -477,11 +472,11 @@ export class LinearElementEditor {
           app.scene.getNonDeletedElements(),
           element,
           lastClickedPoint,
-          { x: originalPointerX, y: originalPointerY },
+          pointFrom(originalPointerX, originalPointerY),
           app,
           event,
           elementsMap,
-          { includeSelfPoints: true },
+          { includeSelfPoints: true, selectedPointsIndices },
         );
 
         _snapLines = snapLines;
@@ -1223,7 +1218,7 @@ export class LinearElementEditor {
           app.scene.getNonDeletedElements(),
           element,
           points.length - 1,
-          { x: effectiveGridX, y: effectiveGridY },
+          pointFrom(effectiveGridX, effectiveGridY),
           app,
           event,
           elementsMap,
@@ -1311,7 +1306,7 @@ export class LinearElementEditor {
         app.scene.getNonDeletedElements(),
         element,
         points.length - 1,
-        { x: originalPointerX, y: originalPointerY },
+        pointFrom(originalPointerX, originalPointerY),
         app,
         event,
         elementsMap,

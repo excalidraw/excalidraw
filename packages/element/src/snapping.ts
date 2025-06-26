@@ -2,7 +2,6 @@ import {
   isCloseTo,
   pointFrom,
   pointRotateRads,
-  pointsEqual,
   rangeInclusive,
   rangeIntersection,
   rangesOverlap,
@@ -198,13 +197,12 @@ export const areRoughlyEqual = (a: number, b: number, precision = 0.01) => {
 
 export const getLinearElementPoints = (
   element: ExcalidrawLinearElement,
-  elementsMap: ElementsMap,
   options: {
     dragOffset?: Vector2D;
-    excludePointIndex?: number;
+    excludePointsIndices?: readonly number[];
   } = {},
 ): GlobalPoint[] => {
-  const { dragOffset, excludePointIndex } = options;
+  const { dragOffset, excludePointsIndices } = options;
 
   if (isElbowArrow(element)) {
     return [];
@@ -226,27 +224,25 @@ export const getLinearElementPoints = (
 
   for (let i = 0; i < element.points.length; i++) {
     // Skip the point being edited if specified
-    if (excludePointIndex !== undefined && i === excludePointIndex) {
+    if (
+      excludePointsIndices?.length &&
+      excludePointsIndices.find((index) => index === i) !== undefined
+    ) {
       continue;
     }
 
-    const localPoint = element.points[i];
-    const globalX = elementX + localPoint[0];
-    const globalY = elementY + localPoint[1];
+    const point = element.points[i];
+    const globalX = elementX + point[0];
+    const globalY = elementY + point[1];
 
-    // Apply rotation if element is rotated
-    if (element.angle !== 0) {
-      const cx = elementX + element.width / 2;
-      const cy = elementY + element.height / 2;
-      const rotated = pointRotateRads<GlobalPoint>(
-        pointFrom(globalX, globalY),
-        pointFrom(cx, cy),
-        element.angle,
-      );
-      globalPoints.push(pointFrom(round(rotated[0]), round(rotated[1])));
-    } else {
-      globalPoints.push(pointFrom(round(globalX), round(globalY)));
-    }
+    const cx = elementX + element.width / 2;
+    const cy = elementY + element.height / 2;
+    const rotated = pointRotateRads<GlobalPoint>(
+      pointFrom(globalX, globalY),
+      pointFrom(cx, cy),
+      element.angle,
+    );
+    globalPoints.push(pointFrom(round(rotated[0]), round(rotated[1])));
   }
 
   return globalPoints;
@@ -296,7 +292,7 @@ export const getElementsCorners = (
       !boundingBoxCorners
     ) {
       // For linear elements, use actual points instead of bounding box
-      const linearPoints = getLinearElementPoints(element, elementsMap, {
+      const linearPoints = getLinearElementPoints(element, {
         dragOffset,
       });
       result = linearPoints;
@@ -714,6 +710,7 @@ export const getReferenceSnapPointsForLinearElementPoint = (
   elementsMap: ElementsMap,
   options: {
     includeSelfPoints?: boolean;
+    selectedPointsIndices?: readonly number[];
   } = {},
 ) => {
   const { includeSelfPoints = false } = options;
@@ -743,24 +740,9 @@ export const getReferenceSnapPointsForLinearElementPoint = (
 
   // Include other points from the same linear element when creating new points or in editing mode
   if (includeSelfPoints) {
-    const elementPoints = getLinearElementPoints(editingElement, elementsMap, {
-      excludePointIndex: editingPointIndex >= 0 ? editingPointIndex : undefined,
+    const elementPoints = getLinearElementPoints(editingElement, {
+      excludePointsIndices: options.selectedPointsIndices,
     });
-    const shouldSkipFirstOrLast =
-      editingElement.points.length > 2 &&
-      pointsEqual(
-        editingElement.points[0],
-        editingElement.points[editingElement.points.length - 1],
-      );
-
-    if (shouldSkipFirstOrLast) {
-      if (editingPointIndex === 0) {
-        elementPoints.pop();
-      }
-      if (editingPointIndex === editingElement.points.length - 1) {
-        elementPoints.shift();
-      }
-    }
     allSnapPoints.push(...elementPoints);
   }
 
@@ -771,12 +753,13 @@ export const snapLinearElementPoint = (
   elements: readonly NonDeletedExcalidrawElement[],
   editingElement: ExcalidrawLinearElement,
   editingPointIndex: number,
-  pointPosition: Vector2D,
+  pointerPosition: GlobalPoint,
   app: AppClassProperties,
   event: KeyboardModifiersObject,
   elementsMap: ElementsMap,
   options: {
     includeSelfPoints?: boolean;
+    selectedPointsIndices?: readonly number[];
   } = {},
 ) => {
   if (
@@ -808,16 +791,10 @@ export const snapLinearElementPoint = (
     options,
   );
 
-  // Create a snap point for the current point position
-  const currentPointGlobal = pointFrom<GlobalPoint>(
-    pointPosition.x,
-    pointPosition.y,
-  );
-
   // Find nearest snaps
   for (const referencePoint of referenceSnapPoints) {
-    const offsetX = referencePoint[0] - currentPointGlobal[0];
-    const offsetY = referencePoint[1] - currentPointGlobal[1];
+    const offsetX = referencePoint[0] - pointerPosition[0];
+    const offsetY = referencePoint[1] - pointerPosition[1];
 
     if (Math.abs(offsetX) <= minOffset.x) {
       if (Math.abs(offsetX) < minOffset.x) {
@@ -826,7 +803,7 @@ export const snapLinearElementPoint = (
 
       nearestSnapsX.push({
         type: "point",
-        points: [currentPointGlobal, referencePoint],
+        points: [pointerPosition, referencePoint],
         offset: offsetX,
       });
 
@@ -840,7 +817,7 @@ export const snapLinearElementPoint = (
 
       nearestSnapsY.push({
         type: "point",
-        points: [currentPointGlobal, referencePoint],
+        points: [pointerPosition, referencePoint],
         offset: offsetY,
       });
 
@@ -859,8 +836,8 @@ export const snapLinearElementPoint = (
   if (snapOffset.x !== 0 || snapOffset.y !== 0) {
     // Recalculate snap lines with the snapped position
     const snappedPosition = pointFrom<GlobalPoint>(
-      pointPosition.x + snapOffset.x,
-      pointPosition.y + snapOffset.y,
+      pointerPosition[0] + snapOffset.x,
+      pointerPosition[1] + snapOffset.y,
     );
 
     const snappedSnapsX: Snaps = [];
