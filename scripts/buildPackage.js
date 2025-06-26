@@ -34,6 +34,7 @@ const getConfig = (outdir) => ({
     "@excalidraw/math": path.resolve(__dirname, "../packages/math/src"),
     "@excalidraw/utils": path.resolve(__dirname, "../packages/utils/src"),
   },
+  external: ["@excalidraw/common", "@excalidraw/element", "@excalidraw/math"],
   loader: {
     ".woff2": "file",
   },
