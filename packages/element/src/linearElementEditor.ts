@@ -25,7 +25,6 @@ import {
 
 import {
   deconstructLinearOrFreeDrawElement,
-  hitElementItself,
   isPathALoop,
   shouldTestInside,
   type Store,
@@ -45,7 +44,6 @@ import type {
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import {
-  bindLinearElement,
   bindOrUnbindLinearElement,
   getHoveredElementForBinding,
   getOutlineAvoidingPoint,
@@ -63,7 +61,6 @@ import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isArrowElement,
-  isBindableElement,
   isBindingElement,
   isElbowArrow,
   isFixedPointBinding,
@@ -287,7 +284,6 @@ export class LinearElementEditor {
     scenePointerX: number,
     scenePointerY: number,
     linearElementEditor: LinearElementEditor,
-    thresholdCallback: (element: ExcalidrawElement) => number,
   ): Pick<AppState, keyof AppState> | null {
     if (!linearElementEditor) {
       return null;
@@ -296,8 +292,7 @@ export class LinearElementEditor {
     const elementsMap = app.scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     let customLineAngle = linearElementEditor.customLineAngle;
-    let arrowOtherPoint: GlobalPoint | undefined =
-      linearElementEditor.pointerDownState.arrowOtherPoint;
+
     if (!element) {
       return null;
     }
@@ -384,17 +379,6 @@ export class LinearElementEditor {
         const deltaY = newDraggingPointPosition[1] - draggingPoint[1];
         const elements = app.scene.getNonDeletedElements();
 
-        arrowOtherPoint = pointDraggingOtherEndpoint(
-          element,
-          elementsMap,
-          selectedPointsIndices,
-          scenePointerX,
-          scenePointerY,
-          linearElementEditor,
-          app.scene,
-          thresholdCallback,
-        );
-
         LinearElementEditor.movePoints(
           element,
           app.scene,
@@ -461,10 +445,14 @@ export class LinearElementEditor {
         if (coords.length) {
           suggestedBindings = maybeSuggestBindingsForLinearElementAtCoords(
             element,
-            coords,
+            //coords,
+            firstIndexIsSelected && lastIndexIsSelected
+              ? "both"
+              : firstIndexIsSelected
+              ? "start"
+              : "end",
             app.scene,
             app.state.zoom,
-            elementsMap,
           );
         }
       }
@@ -488,10 +476,6 @@ export class LinearElementEditor {
             : -1,
         isDragging: true,
         customLineAngle,
-        pointerDownState: {
-          ...linearElementEditor.pointerDownState,
-          arrowOtherPoint,
-        },
       };
 
       return {
@@ -2135,122 +2119,4 @@ const pointDraggingUpdates = (
       ];
     }),
   );
-};
-
-const pointDraggingOtherEndpoint = (
-  element: NonDeleted<ExcalidrawLinearElement>,
-  elementsMap: NonDeletedSceneElementsMap,
-  selectedPointsIndices: readonly number[],
-  scenePointerX: number,
-  scenePointerY: number,
-  linearElementEditor: LinearElementEditor,
-  scene: Scene,
-  thresholdCallback: (element: ExcalidrawElement) => number,
-) => {
-  let arrowOtherPoint = linearElementEditor.pointerDownState.arrowOtherPoint;
-
-  if (isArrowElement(element) && !isElbowArrow(element)) {
-    const startPointIsIncluded = selectedPointsIndices.includes(0);
-    const endPointIsIncluded = selectedPointsIndices.includes(
-      element.points.length - 1,
-    );
-    if (
-      // Make sure that not both of the endpoints are selected
-      (startPointIsIncluded || endPointIsIncluded) &&
-      startPointIsIncluded !== endPointIsIncluded
-    ) {
-      const otherBinding =
-        element[startPointIsIncluded ? "endBinding" : "startBinding"];
-      if (
-        // The other end is bound
-        otherBinding
-      ) {
-        const otherElement = elementsMap.get(otherBinding.elementId);
-
-        invariant(
-          isBindableElement(otherElement),
-          "Other element should exist in elementsMap at all times and be a bindable element",
-        );
-
-        let newOtherPointPosition;
-
-        // Only avoid shape if the start and end point is not inside
-        // the same element
-        if (
-          !hitElementItself({
-            point: pointFrom(scenePointerX, scenePointerY),
-            element: otherElement,
-            elementsMap,
-            threshold: thresholdCallback(otherElement),
-          })
-        ) {
-          // If we don't have a restore point, that means we need to jump out
-          // of the element but first, create the restore point
-          if (!arrowOtherPoint) {
-            arrowOtherPoint = LinearElementEditor.getPointGlobalCoordinates(
-              element,
-              element.points[
-                startPointIsIncluded ? element.points.length - 1 : 0
-              ],
-              elementsMap,
-            );
-          }
-
-          // Find a snap point outside the element
-          const newOtherGlobalPoint = getOutlineAvoidingPoint(
-            element,
-            otherElement,
-            arrowOtherPoint,
-            startPointIsIncluded ? element.points.length - 1 : 0,
-            elementsMap,
-          );
-
-          newOtherPointPosition = LinearElementEditor.createPointAt(
-            element,
-            elementsMap,
-            newOtherGlobalPoint[0] - linearElementEditor.pointerOffset.x,
-            newOtherGlobalPoint[1] - linearElementEditor.pointerOffset.y,
-            null,
-          );
-        }
-        // Restore the saved point if we are back inside the element
-        else if (arrowOtherPoint) {
-          newOtherPointPosition = LinearElementEditor.createPointAt(
-            element,
-            elementsMap,
-            arrowOtherPoint[0] - linearElementEditor.pointerOffset.x,
-            arrowOtherPoint[1] - linearElementEditor.pointerOffset.y,
-            null,
-          );
-
-          arrowOtherPoint = undefined;
-        }
-
-        // Finally, move the other endpoint if needed
-        if (newOtherPointPosition) {
-          LinearElementEditor.movePoints(
-            element,
-            scene,
-            new Map([
-              [
-                startPointIsIncluded ? element.points.length - 1 : 0,
-                {
-                  point: newOtherPointPosition,
-                },
-              ],
-            ]),
-          );
-
-          bindLinearElement(
-            element,
-            otherElement,
-            startPointIsIncluded ? "end" : "start",
-            scene,
-          );
-        }
-      }
-    }
-  }
-
-  return arrowOtherPoint;
 };

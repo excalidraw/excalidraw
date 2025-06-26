@@ -655,6 +655,11 @@ class App extends React.Component<AppProps, AppState> {
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
+  // setState(s: any, t?: any) {
+  //   s.suggestedBindings && console.trace(s.suggestedBindings);
+  //   super.setState(s, t);
+  // }
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -5945,10 +5950,10 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           suggestedBindings: maybeSuggestBindingsForLinearElementAtCoords(
             newElement,
-            [scenePointer],
+            //[[{ x: newElement.x, y: newElement.y }, scenePointer]],
+            "end",
             this.scene,
             this.state.zoom,
-            this.scene.getNonDeletedElementsMap(),
           ),
         });
       } else {
@@ -8397,7 +8402,6 @@ class App extends React.Component<AppProps, AppState> {
           pointerCoords.x,
           pointerCoords.y,
           linearElementEditor,
-          (element) => this.getElementHitThreshold(element),
         );
         if (newState) {
           pointerDownState.lastCoords.x = pointerCoords.x;
@@ -8957,11 +8961,10 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({
               suggestedBindings: maybeSuggestBindingsForLinearElementAtCoords(
                 newElement,
-                [pointerCoords],
+                //[[{ x: newElement.x, y: newElement.y }, pointerCoords]],
+                "end",
                 this.scene,
                 this.state.zoom,
-                elementsMap,
-                this.state.startBoundElement,
               ),
             });
           }
@@ -9288,39 +9291,75 @@ class App extends React.Component<AppProps, AppState> {
           // Update the fixed point bindings for non-elbow arrows
           // when the pointer is released, so that they are correctly positioned
           // after the drag.
+          let startBinding = element.startBinding;
+          let endBinding = element.endBinding;
+
           if (
             element.startBinding &&
             isFixedPointBinding(element.startBinding)
           ) {
-            this.scene.mutateElement(element, {
-              startBinding: {
-                ...element.startBinding,
-                ...calculateFixedPointForNonElbowArrowBinding(
-                  element,
-                  elementsMap.get(
-                    element.startBinding.elementId,
-                  ) as ExcalidrawBindableElement,
-                  "start",
-                  elementsMap,
-                ),
-              },
+            const point = LinearElementEditor.getPointGlobalCoordinates(
+              element,
+              element.points[0],
+              elementsMap,
+            );
+            const boundElement = elementsMap.get(
+              element.startBinding.elementId,
+            ) as ExcalidrawBindableElement;
+            const isHittingElement = hitElementItself({
+              element: boundElement,
+              elementsMap,
+              point,
+              threshold: this.getElementHitThreshold(element),
             });
+            startBinding = isHittingElement
+              ? {
+                  ...element.startBinding,
+                  ...calculateFixedPointForNonElbowArrowBinding(
+                    element,
+                    elementsMap.get(
+                      element.startBinding.elementId,
+                    ) as ExcalidrawBindableElement,
+                    "start",
+                    elementsMap,
+                  ),
+                }
+              : null;
           }
           if (element.endBinding && isFixedPointBinding(element.endBinding)) {
-            this.scene.mutateElement(element, {
-              endBinding: {
-                ...element.endBinding,
-                ...calculateFixedPointForNonElbowArrowBinding(
-                  element,
-                  elementsMap.get(
-                    element.endBinding.elementId,
-                  ) as ExcalidrawBindableElement,
-                  "end",
-                  elementsMap,
-                ),
-              },
+            const point = LinearElementEditor.getPointGlobalCoordinates(
+              element,
+              element.points[element.points.length - 1],
+              elementsMap,
+            );
+            const boundElement = elementsMap.get(
+              element.endBinding.elementId,
+            ) as ExcalidrawBindableElement;
+            const isHittingElement = hitElementItself({
+              element: boundElement,
+              elementsMap,
+              point,
+              threshold: this.getElementHitThreshold(element),
             });
+            endBinding = isHittingElement
+              ? {
+                  ...element.endBinding,
+                  ...calculateFixedPointForNonElbowArrowBinding(
+                    element,
+                    elementsMap.get(
+                      element.endBinding.elementId,
+                    ) as ExcalidrawBindableElement,
+                    "end",
+                    elementsMap,
+                  ),
+                }
+              : null;
           }
+
+          this.scene.mutateElement(element, {
+            startBinding,
+            endBinding,
+          });
         });
 
       this.missingPointerEventCleanupEmitter.clear();

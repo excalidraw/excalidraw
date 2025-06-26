@@ -389,47 +389,63 @@ export const getSuggestedBindingsForArrows = (
 
 export const maybeSuggestBindingsForLinearElementAtCoords = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
-  /** scene coords */
-  pointerCoords: {
-    x: number;
-    y: number;
-  }[],
+  startOrEndOrBoth: "start" | "end" | "both",
   scene: Scene,
   zoom: AppState["zoom"],
-  elementsMap: ElementsMap,
-  // During line creation the start binding hasn't been written yet
-  // into `linearElement`
-  oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
-): ExcalidrawBindableElement[] =>
-  Array.from(
-    pointerCoords.reduce(
-      (acc: Set<NonDeleted<ExcalidrawBindableElement>>, coords) => {
-        const hoveredBindableElement = getHoveredElementForBinding(
-          coords,
-          scene.getNonDeletedElements(),
-          scene.getNonDeletedElementsMap(),
-          zoom,
-          isElbowArrow(linearElement),
-          isElbowArrow(linearElement),
-        );
-
-        if (
-          hoveredBindableElement != null &&
-          (oppositeBindingBoundElement?.id === hoveredBindableElement.id ||
-            !isLinearElementSimpleAndAlreadyBound(
-              linearElement,
-              oppositeBindingBoundElement?.id,
-              hoveredBindableElement,
-            ))
-        ) {
-          acc.add(hoveredBindableElement);
-        }
-
-        return acc;
-      },
-      new Set() as Set<NonDeleted<ExcalidrawBindableElement>>,
-    ),
+): ExcalidrawBindableElement[] => {
+  const startCoords = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    0,
+    scene.getNonDeletedElementsMap(),
   );
+  const endCoords = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    -1,
+    scene.getNonDeletedElementsMap(),
+  );
+  const startHovered = getHoveredElementForBinding(
+    { x: startCoords[0], y: startCoords[1] },
+    scene.getNonDeletedElements(),
+    scene.getNonDeletedElementsMap(),
+    zoom,
+    isElbowArrow(linearElement),
+    isElbowArrow(linearElement),
+  );
+  const endHovered = getHoveredElementForBinding(
+    { x: endCoords[0], y: endCoords[1] },
+    scene.getNonDeletedElements(),
+    scene.getNonDeletedElementsMap(),
+    zoom,
+    isElbowArrow(linearElement),
+    isElbowArrow(linearElement),
+  );
+
+  const suggestedBindings = [];
+
+  if (startHovered != null && startHovered.id === endHovered?.id) {
+    const hitStart = hitElementItself({
+      element: startHovered,
+      elementsMap: scene.getNonDeletedElementsMap(),
+      point: pointFrom<GlobalPoint>(startCoords[0], startCoords[1]),
+      threshold: 0,
+    });
+    const hitEnd = hitElementItself({
+      element: endHovered,
+      elementsMap: scene.getNonDeletedElementsMap(),
+      point: pointFrom<GlobalPoint>(endCoords[0], endCoords[1]),
+      threshold: 0,
+    });
+    if (hitStart && hitEnd) {
+      suggestedBindings.push(startHovered);
+    }
+  } else if (startOrEndOrBoth === "start" && startHovered != null) {
+    suggestedBindings.push(startHovered);
+  } else if (startOrEndOrBoth === "end" && endHovered != null) {
+    suggestedBindings.push(endHovered);
+  }
+
+  return suggestedBindings;
+};
 
 export const maybeBindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
