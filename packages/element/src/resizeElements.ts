@@ -791,8 +791,10 @@ export const resizeSingleElement = (
       nextWidth = snappingResult.width ? snappingResult.width : nextWidth;
       nextHeight = snappingResult.height ? snappingResult.height : nextHeight;
       newOrigin.x = snappingResult.x ? snappingResult.x : newOrigin.x;
+      newOrigin.y = snappingResult.y ? snappingResult.y : newOrigin.y;
     }
   }
+
   if (isLinearElement(origElement) && rescaledPoints.points) {
     const offsetX = origElement.x - previousOrigin[0];
     const offsetY = origElement.y - previousOrigin[1];

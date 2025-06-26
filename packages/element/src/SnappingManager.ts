@@ -101,7 +101,6 @@ export default class SnappingManager {
 
   snap(): FixedBoxToDraw {
     const bools = this.getSnappingBools();
-
     if (bools.e) {
       this.fixedBoxToDraw.width =
         this.childAtribs.x - this.ObjAtribs.x + this.childAtribs.width;
@@ -117,7 +116,19 @@ export default class SnappingManager {
     }
 
     if (bools.w) {
-      this.fixedBoxToDraw.x = this.fixedBoxToDraw.x;
+      this.fixedBoxToDraw.x = this.childAtribs.x;
+      this.fixedBoxToDraw.width =
+        this.ObjAtribs.width - (this.childAtribs.x - this.ObjAtribs.x);
+    } else {
+      this.fixedBoxToDraw.x = null;
+    }
+
+    if (bools.n) {
+      this.fixedBoxToDraw.y = this.childAtribs.y;
+      this.fixedBoxToDraw.height =
+        this.ObjAtribs.height - (this.childAtribs.y - this.ObjAtribs.y);
+    } else {
+      this.fixedBoxToDraw.y = null;
     }
 
     return this.fixedBoxToDraw;
