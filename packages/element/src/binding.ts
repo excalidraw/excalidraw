@@ -1400,7 +1400,7 @@ export const snapToMid = (
   return p;
 };
 
-const updateBoundPoint = (
+export const updateBoundPoint = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "startBinding" | "endBinding",
   binding: PointBinding | null | undefined,
