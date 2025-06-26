@@ -425,7 +425,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
     expect(renderStaticScene).toHaveBeenCalledTimes(6);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
@@ -487,7 +487,12 @@ describe("tool locking & selection", () => {
     expect(h.state.activeTool.locked).toBe(true);
 
     for (const { value } of Object.values(SHAPES)) {
-      if (value !== "image" && value !== "selection" && value !== "eraser") {
+      if (
+        value !== "image" &&
+        value !== "selection" &&
+        value !== "eraser" &&
+        value !== "arrow"
+      ) {
         const element = UI.createElement(value);
         expect(h.state.selectedElementIds[element.id]).not.toBe(true);
       }

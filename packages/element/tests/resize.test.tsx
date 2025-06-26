@@ -27,6 +27,7 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
+  PointBinding,
 } from "../src/types";
 
 unmountComponent();
@@ -1023,8 +1024,20 @@ describe("multiple selection", () => {
       1 - move[0] / selectionWidth,
       1 - move[1] / selectionHeight,
     );
-    const leftArrowBinding = { ...leftBoundArrow.endBinding };
-    const rightArrowBinding = { ...rightBoundArrow.endBinding };
+    const leftArrowBinding: {
+      elementId: string;
+      gap?: number;
+      focus?: number;
+    } = {
+      ...leftBoundArrow.endBinding,
+    } as PointBinding;
+    const rightArrowBinding: {
+      elementId: string;
+      gap?: number;
+      focus?: number;
+    } = {
+      ...rightBoundArrow.endBinding,
+    } as PointBinding;
     delete rightArrowBinding.gap;
 
     UI.resize([rectangle, rightBoundArrow], "nw", move, {

@@ -433,11 +433,11 @@ describe("Test Transform", () => {
         startBinding: {
           elementId: rectangle.id,
           focus: 0,
-          gap: 1,
+          gap: 0,
         },
         endBinding: {
           elementId: ellipse.id,
-          focus: -0,
+          focus: 0,
         },
       });
 
@@ -518,11 +518,11 @@ describe("Test Transform", () => {
         startBinding: {
           elementId: text2.id,
           focus: 0,
-          gap: 1,
+          gap: 0,
         },
         endBinding: {
           elementId: text3.id,
-          focus: -0,
+          focus: 0,
         },
       });
 

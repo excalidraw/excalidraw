@@ -362,6 +362,7 @@ export const isFixedPointBinding = (
   binding: PointBinding | FixedPointBinding,
 ): binding is FixedPointBinding => {
   return (
+    binding != null &&
     Object.hasOwn(binding, "fixedPoint") &&
     (binding as FixedPointBinding).fixedPoint != null
   );
