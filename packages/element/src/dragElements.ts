@@ -107,14 +107,14 @@ export const dragSelectedElements = (
   );
 
   elementsToUpdate.forEach((element) => {
-    const isArrow = !isArrowElement(element);
+    const isArrow = isArrowElement(element);
     const isStartBoundElementSelected =
-      isArrow ||
+      !isArrow ||
       (element.startBinding
         ? elementsToUpdateIds.has(element.startBinding.elementId)
         : false);
     const isEndBoundElementSelected =
-      isArrow ||
+      !isArrow ||
       (element.endBinding
         ? elementsToUpdateIds.has(element.endBinding.elementId)
         : false);

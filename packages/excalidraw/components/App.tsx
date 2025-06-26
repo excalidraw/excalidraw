@@ -5985,6 +5985,7 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         const avoidancePoint =
+          multiElement &&
           hoveredElement &&
           getOutlineAvoidingPoint(
             multiElement,
@@ -8328,6 +8329,7 @@ class App extends React.Component<AppProps, AppState> {
         if (this.state.bindMode === "focus") {
           const pointerMovementDistance = Math.hypot(
             (this.lastPointerMoveCoords?.x ?? Infinity) - pointerCoords.x,
+            (this.lastPointerMoveCoords?.y ?? Infinity) - pointerCoords.y,
           );
           if (this.bindModeHandler && pointerMovementDistance < 1) {
             clearTimeout(this.bindModeHandler);
