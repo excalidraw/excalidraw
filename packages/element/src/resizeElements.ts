@@ -790,6 +790,7 @@ export const resizeSingleElement = (
       const snappingResult = snappingManager.snap();
       nextWidth = snappingResult.width ? snappingResult.width : nextWidth;
       nextHeight = snappingResult.height ? snappingResult.height : nextHeight;
+      newOrigin.x = snappingResult.x ? snappingResult.x : newOrigin.x;
     }
   }
   if (isLinearElement(origElement) && rescaledPoints.points) {

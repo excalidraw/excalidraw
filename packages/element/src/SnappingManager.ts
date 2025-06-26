@@ -116,6 +116,10 @@ export default class SnappingManager {
       this.fixedBoxToDraw.height = null;
     }
 
+    if (bools.w) {
+      this.fixedBoxToDraw.x = this.fixedBoxToDraw.x;
+    }
+
     return this.fixedBoxToDraw;
   }
 }
