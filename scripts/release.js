@@ -6,8 +6,8 @@ const { execSync } = require("child_process");
 const updateChangelog = require("./updateChangelog");
 
 // skipping utils for now, as it has independent release process
-const PACKAGES = ["common", "element", "math", "excalidraw"];
-const PACKAGES_DIR = path.resolve(`${__dirname}/../packages`);
+const PACKAGES = ["common", "math", "element", "excalidraw"];
+const PACKAGES_DIR = path.resolve(__dirname, "../packages");
 
 /**
  * Returns the arguments for the release script.
@@ -80,7 +80,7 @@ const validatePackageName = (packageName) => {
 
 const getPackageJsonPath = (packageName) => {
   validatePackageName(packageName);
-  return path.resolve(`${PACKAGES_DIR}/${packageName}/package.json`);
+  return path.resolve(PACKAGES_DIR, packageName, "package.json");
 };
 
 const updatePackageJsons = (nextVersion) => {
@@ -158,7 +158,7 @@ const buildPackages = () => {
   for (const packageName of PACKAGES) {
     console.info(`Building "@excalidraw/${packageName}"...`);
     execSync(`yarn run build:esm`, {
-      cwd: path.resolve(`${PACKAGES_DIR}/${packageName}`),
+      cwd: path.resolve(PACKAGES_DIR, packageName),
       stdio: "inherit",
     });
   }
@@ -190,7 +190,8 @@ const askToPublish = (tag, version) => {
 
 const publishPackages = (tag, version) => {
   for (const packageName of PACKAGES) {
-    execSync(`yarn --cwd ${PACKAGES_DIR}/${packageName} publish --tag ${tag}`, {
+    execSync(`yarn publish --tag ${tag}`, {
+      cwd: path.resolve(PACKAGES_DIR, packageName),
       stdio: "inherit",
     });
 
