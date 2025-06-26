@@ -11,10 +11,6 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 const { h } = window;
 
-vi.mock("@excalidraw/excalidraw/data", () => ({
-  saveAsJSON: () => ({ fileHandle: null }),
-}));
-
 describe("Save reminder", () => {
   beforeAll(() => {
     vi.useFakeTimers();
