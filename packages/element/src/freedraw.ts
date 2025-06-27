@@ -8,34 +8,70 @@ import type { StrokeOptions } from "perfect-freehand";
 
 import type { ExcalidrawFreeDrawElement, PointerType } from "./types";
 
+type FreedrawStrokeType = "constant" | "variable";
+
+export const getElementStrokeType = (
+  element: ExcalidrawFreeDrawElement,
+): FreedrawStrokeType => {
+  return element.drawingConfigs?.fixedStrokeWidth ? "constant" : "variable";
+};
+
 export const DRAWING_CONFIGS: Record<
   PointerType | "default",
-  { streamline: number; simplify: number }
+  Record<FreedrawStrokeType, { streamline: number; simplify: number }>
 > = {
   default: {
-    streamline: 0.35,
-    simplify: 0.1,
+    constant: {
+      streamline: 0.35,
+      simplify: 0.1,
+    },
+    variable: {
+      streamline: 0.35,
+      simplify: 0.1,
+    },
   },
   mouse: {
-    streamline: 0.6,
-    simplify: 0.1,
+    constant: {
+      streamline: 0.6,
+      simplify: 0.1,
+    },
+    variable: {
+      streamline: 0.6,
+      simplify: 0.1,
+    },
   },
   pen: {
-    // for optimal performance, we use a lower streamline and simplify
-    streamline: 0.2,
-    simplify: 0.1,
+    constant: {
+      // for optimal performance, we use a lower streamline and simplify
+      streamline: 0.2,
+      simplify: 0.1,
+    },
+    variable: {
+      // for optimal performance, we use a lower streamline and simplify
+      streamline: 0.2,
+      simplify: 0.1,
+    },
   },
   touch: {
-    streamline: 0.65,
-    simplify: 0.1,
+    constant: {
+      streamline: 0.65,
+      simplify: 0.1,
+    },
+    variable: {
+      streamline: 0.65,
+      simplify: 0.1,
+    },
   },
 } as const;
 
-export const getFreedrawConfig = (eventType: string | null | undefined) => {
-  return (
+export const getFreedrawConfig = (
+  eventType: string | null | undefined,
+  strokeType: FreedrawStrokeType,
+): { streamline: number; simplify: number } => {
+  const inputConfig =
     DRAWING_CONFIGS[(eventType as PointerType | null) || "default"] ||
-    DRAWING_CONFIGS.default
-  );
+    DRAWING_CONFIGS.default;
+  return inputConfig[strokeType];
 };
 
 /**
@@ -105,9 +141,11 @@ export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
   }
 
   const streamline =
-    element.drawingConfigs?.streamline ?? DRAWING_CONFIGS.default.streamline;
+    element.drawingConfigs?.streamline ??
+    getFreedrawConfig("default", getElementStrokeType(element)).streamline;
   const simplify =
-    element.drawingConfigs?.simplify ?? DRAWING_CONFIGS.default.simplify;
+    element.drawingConfigs?.simplify ??
+    getFreedrawConfig("default", getElementStrokeType(element)).simplify;
 
   const laser = new LaserPointer({
     size: element.strokeWidth,

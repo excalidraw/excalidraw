@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 
 export const FreedrawDebugSliders = () => {
   const [streamline, setStreamline] = useState<number>(
-    DRAWING_CONFIGS.default.streamline,
+    DRAWING_CONFIGS.default.variable.streamline,
   );
   const [simplify, setSimplify] = useState<number>(
-    DRAWING_CONFIGS.default.simplify,
+    DRAWING_CONFIGS.default.variable.simplify,
   );
 
   useEffect(() => {
@@ -14,7 +14,7 @@ export const FreedrawDebugSliders = () => {
       window.h = {} as any;
     }
     if (!window.h.debugFreedraw) {
-      window.h.debugFreedraw = DRAWING_CONFIGS.default;
+      window.h.debugFreedraw = DRAWING_CONFIGS.default.variable;
     }
 
     setStreamline(window.h.debugFreedraw.streamline);
@@ -39,7 +39,7 @@ export const FreedrawDebugSliders = () => {
     <div
       style={{
         position: "absolute",
-        bottom: "10px",
+        bottom: "70px",
         left: "50%",
         transform: "translateX(-50%)",
         zIndex: 9999,
