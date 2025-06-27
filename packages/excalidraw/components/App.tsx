@@ -233,6 +233,7 @@ import {
   isLineElement,
   isSimpleArrow,
   DRAWING_CONFIGS,
+  getFreedrawConfig,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -7475,6 +7476,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const simulatePressure = event.pressure === 0.5 || event.pressure === 0;
 
+    const freedrawConfig = getFreedrawConfig(event.pointerType);
+
     const element = newFreeDrawElement({
       type: elementType,
       x: gridX,
@@ -7491,10 +7494,8 @@ class App extends React.Component<AppProps, AppState> {
       drawingConfigs: {
         fixedStrokeWidth: this.state.currentItemFixedStrokeWidth,
         streamline:
-          window.h?.debugFreedraw?.streamline ??
-          DRAWING_CONFIGS.default.streamline,
-        simplify:
-          window.h?.debugFreedraw?.simplify ?? DRAWING_CONFIGS.default.simplify,
+          window.h?.debugFreedraw?.streamline ?? freedrawConfig.streamline,
+        simplify: window.h?.debugFreedraw?.simplify ?? freedrawConfig.simplify,
       },
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,

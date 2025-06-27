@@ -6,19 +6,37 @@ import getStroke from "perfect-freehand";
 
 import type { StrokeOptions } from "perfect-freehand";
 
-import type { ExcalidrawFreeDrawElement } from "./types";
+import type { ExcalidrawFreeDrawElement, PointerType } from "./types";
 
-export const DRAWING_CONFIGS = {
+export const DRAWING_CONFIGS: Record<
+  PointerType | "default",
+  { streamline: number; simplify: number }
+> = {
   default: {
     streamline: 0.35,
     simplify: 0.1,
   },
-  // for optimal performance, we use a lower streamline and simplify
-  stylus: {
-    streamline: 0.35,
+  mouse: {
+    streamline: 0.6,
+    simplify: 0.1,
+  },
+  pen: {
+    // for optimal performance, we use a lower streamline and simplify
+    streamline: 0.2,
+    simplify: 0.1,
+  },
+  touch: {
+    streamline: 0.65,
     simplify: 0.1,
   },
 } as const;
+
+export const getFreedrawConfig = (eventType: string | null | undefined) => {
+  return (
+    DRAWING_CONFIGS[(eventType as PointerType | null) || "default"] ||
+    DRAWING_CONFIGS.default
+  );
+};
 
 /**
  * Calculates simulated pressure based on velocity between consecutive points.
