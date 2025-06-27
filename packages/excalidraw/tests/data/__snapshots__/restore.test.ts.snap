@@ -169,7 +169,7 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "boundElements": [],
   "customData": undefined,
   "drawingConfigs": {
-    "pressureSensitivity": 1,
+    "fixedStrokeWidth": true,
     "simplify": "0.10000",
     "streamline": "0.25000",
   },
