@@ -712,14 +712,12 @@ export const actionChangePressureSensitivity = register({
     const selectedElements = app.scene.getSelectedElements(app.state);
     const freedraws = selectedElements.filter(isFreeDrawElement);
 
-    const commonFixedStrokeWidth =
-      freedraws.length > 0
-        ? freedraws.every((e) => e.drawingConfigs?.fixedStrokeWidth)
-        : null;
-
     const currentValue =
       freedraws.length > 0
-        ? freedraws.every((e) => e.drawingConfigs?.fixedStrokeWidth) || null
+        ? reduceToCommonValue(
+            freedraws,
+            (element) => element.drawingConfigs?.fixedStrokeWidth,
+          ) ?? null
         : appState.currentItemFixedStrokeWidth;
 
     return (

@@ -455,7 +455,7 @@ export const newFreeDrawElement = (
     simulatePressure: opts.simulatePressure,
     lastCommittedPoint: null,
     drawingConfigs: opts.drawingConfigs || {
-      pressureSensitivity: 1,
+      fixedStrokeWidth: true,
       streamline: 0.25,
       simplify: 0.1,
     },
