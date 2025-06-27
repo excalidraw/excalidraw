@@ -2,7 +2,6 @@ import {
   pointCenter,
   normalizeRadians,
   pointFrom,
-  pointFromPair,
   pointRotateRads,
   type Radians,
   type LocalPoint,
@@ -104,18 +103,6 @@ export const transformElements = (
         );
         updateBoundElements(element, scene);
       }
-    } else if (isTextElement(element) && transformHandleType) {
-      resizeSingleTextElement(
-        originalElements,
-        element,
-        scene,
-        transformHandleType,
-        shouldResizeFromCenter,
-        pointerX,
-        pointerY,
-      );
-      updateBoundElements(element, scene);
-      return true;
     } else if (transformHandleType) {
       const elementId = selectedElements[0].id;
       const latestElement = elementsMap.get(elementId);
@@ -149,6 +136,9 @@ export const transformElements = (
           },
         );
       }
+    }
+    if (isTextElement(element)) {
+      updateBoundElements(element, scene);
     }
     return true;
   } else if (selectedElements.length > 1) {
@@ -282,151 +272,50 @@ export const measureFontSizeFromWidth = (
   };
 };
 
-const resizeSingleTextElement = (
-  originalElements: PointerDownState["originalElements"],
+export const resizeSingleTextElement = (
+  origElement: NonDeleted<ExcalidrawTextElement>,
   element: NonDeleted<ExcalidrawTextElement>,
   scene: Scene,
   transformHandleType: TransformHandleDirection,
   shouldResizeFromCenter: boolean,
-  pointerX: number,
-  pointerY: number,
+  nextWidth: number,
+  nextHeight: number,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
-    element,
-    elementsMap,
-  );
-  // rotation pointer with reverse angle
-  const [rotatedX, rotatedY] = pointRotateRads(
-    pointFrom(pointerX, pointerY),
-    pointFrom(cx, cy),
-    -element.angle as Radians,
-  );
-  let scaleX = 0;
-  let scaleY = 0;
 
-  if (transformHandleType !== "e" && transformHandleType !== "w") {
-    if (transformHandleType.includes("e")) {
-      scaleX = (rotatedX - x1) / (x2 - x1);
-    }
-    if (transformHandleType.includes("w")) {
-      scaleX = (x2 - rotatedX) / (x2 - x1);
-    }
-    if (transformHandleType.includes("n")) {
-      scaleY = (y2 - rotatedY) / (y2 - y1);
-    }
-    if (transformHandleType.includes("s")) {
-      scaleY = (rotatedY - y1) / (y2 - y1);
-    }
+  const metricsWidth = element.width * (nextHeight / element.height);
+
+  const metrics = measureFontSizeFromWidth(element, elementsMap, metricsWidth);
+  if (metrics === null) {
+    return;
   }
 
-  const scale = Math.max(scaleX, scaleY);
+  if (transformHandleType.includes("n") || transformHandleType.includes("s")) {
+    const previousOrigin = pointFrom<GlobalPoint>(origElement.x, origElement.y);
 
-  if (scale > 0) {
-    const nextWidth = element.width * scale;
-    const nextHeight = element.height * scale;
-    const metrics = measureFontSizeFromWidth(element, elementsMap, nextWidth);
-    if (metrics === null) {
-      return;
-    }
-
-    const startTopLeft = [x1, y1];
-    const startBottomRight = [x2, y2];
-    const startCenter = [cx, cy];
-
-    let newTopLeft = pointFrom<GlobalPoint>(x1, y1);
-    if (["n", "w", "nw"].includes(transformHandleType)) {
-      newTopLeft = pointFrom<GlobalPoint>(
-        startBottomRight[0] - Math.abs(nextWidth),
-        startBottomRight[1] - Math.abs(nextHeight),
-      );
-    }
-    if (transformHandleType === "ne") {
-      const bottomLeft = [startTopLeft[0], startBottomRight[1]];
-      newTopLeft = pointFrom<GlobalPoint>(
-        bottomLeft[0],
-        bottomLeft[1] - Math.abs(nextHeight),
-      );
-    }
-    if (transformHandleType === "sw") {
-      const topRight = [startBottomRight[0], startTopLeft[1]];
-      newTopLeft = pointFrom<GlobalPoint>(
-        topRight[0] - Math.abs(nextWidth),
-        topRight[1],
-      );
-    }
-
-    if (["s", "n"].includes(transformHandleType)) {
-      newTopLeft[0] = startCenter[0] - nextWidth / 2;
-    }
-    if (["e", "w"].includes(transformHandleType)) {
-      newTopLeft[1] = startCenter[1] - nextHeight / 2;
-    }
-
-    if (shouldResizeFromCenter) {
-      newTopLeft[0] = startCenter[0] - Math.abs(nextWidth) / 2;
-      newTopLeft[1] = startCenter[1] - Math.abs(nextHeight) / 2;
-    }
-
-    const angle = element.angle;
-    const rotatedTopLeft = pointRotateRads(
-      newTopLeft,
-      pointFrom(cx, cy),
-      angle,
+    const newOrigin = getResizedOrigin(
+      previousOrigin,
+      origElement.width,
+      origElement.height,
+      metricsWidth,
+      nextHeight,
+      origElement.angle,
+      transformHandleType,
+      false,
+      shouldResizeFromCenter,
     );
-    const newCenter = pointFrom<GlobalPoint>(
-      newTopLeft[0] + Math.abs(nextWidth) / 2,
-      newTopLeft[1] + Math.abs(nextHeight) / 2,
-    );
-    const rotatedNewCenter = pointRotateRads(
-      newCenter,
-      pointFrom(cx, cy),
-      angle,
-    );
-    newTopLeft = pointRotateRads(
-      rotatedTopLeft,
-      rotatedNewCenter,
-      -angle as Radians,
-    );
-    const [nextX, nextY] = newTopLeft;
 
     scene.mutateElement(element, {
       fontSize: metrics.size,
-      width: nextWidth,
+      width: metricsWidth,
       height: nextHeight,
-      x: nextX,
-      y: nextY,
+      x: newOrigin.x,
+      y: newOrigin.y,
     });
+    return;
   }
 
   if (transformHandleType === "e" || transformHandleType === "w") {
-    const stateAtResizeStart = originalElements.get(element.id)!;
-    const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
-      stateAtResizeStart,
-      stateAtResizeStart.width,
-      stateAtResizeStart.height,
-      true,
-    );
-    const startTopLeft = pointFrom<GlobalPoint>(x1, y1);
-    const startBottomRight = pointFrom<GlobalPoint>(x2, y2);
-    const startCenter = pointCenter(startTopLeft, startBottomRight);
-
-    const rotatedPointer = pointRotateRads(
-      pointFrom(pointerX, pointerY),
-      startCenter,
-      -stateAtResizeStart.angle as Radians,
-    );
-
-    const [esx1, , esx2] = getResizedElementAbsoluteCoords(
-      element,
-      element.width,
-      element.height,
-      true,
-    );
-
-    const boundsCurrentWidth = esx2 - esx1;
-
-    const atStartBoundsWidth = startBottomRight[0] - startTopLeft[0];
     const minWidth = getMinTextElementWidth(
       getFontString({
         fontSize: element.fontSize,
@@ -435,17 +324,7 @@ const resizeSingleTextElement = (
       element.lineHeight,
     );
 
-    let scaleX = atStartBoundsWidth / boundsCurrentWidth;
-
-    if (transformHandleType.includes("e")) {
-      scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
-    }
-    if (transformHandleType.includes("w")) {
-      scaleX = (startBottomRight[0] - rotatedPointer[0]) / boundsCurrentWidth;
-    }
-
-    const newWidth =
-      element.width * scaleX < minWidth ? minWidth : element.width * scaleX;
+    const newWidth = Math.max(minWidth, nextWidth);
 
     const text = wrapText(
       element.originalText,
@@ -458,49 +337,27 @@ const resizeSingleTextElement = (
       element.lineHeight,
     );
 
-    const eleNewHeight = metrics.height;
+    const newHeight = metrics.height;
 
-    const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] =
-      getResizedElementAbsoluteCoords(
-        stateAtResizeStart,
-        newWidth,
-        eleNewHeight,
-        true,
-      );
-    const newBoundsWidth = newBoundsX2 - newBoundsX1;
-    const newBoundsHeight = newBoundsY2 - newBoundsY1;
+    const previousOrigin = pointFrom<GlobalPoint>(origElement.x, origElement.y);
 
-    let newTopLeft = [...startTopLeft] as [number, number];
-    if (["n", "w", "nw"].includes(transformHandleType)) {
-      newTopLeft = [
-        startBottomRight[0] - Math.abs(newBoundsWidth),
-        startTopLeft[1],
-      ];
-    }
-
-    // adjust topLeft to new rotation point
-    const angle = stateAtResizeStart.angle;
-    const rotatedTopLeft = pointRotateRads(
-      pointFromPair(newTopLeft),
-      startCenter,
-      angle,
-    );
-    const newCenter = pointFrom(
-      newTopLeft[0] + Math.abs(newBoundsWidth) / 2,
-      newTopLeft[1] + Math.abs(newBoundsHeight) / 2,
-    );
-    const rotatedNewCenter = pointRotateRads(newCenter, startCenter, angle);
-    newTopLeft = pointRotateRads(
-      rotatedTopLeft,
-      rotatedNewCenter,
-      -angle as Radians,
+    const newOrigin = getResizedOrigin(
+      previousOrigin,
+      origElement.width,
+      origElement.height,
+      newWidth,
+      newHeight,
+      element.angle,
+      transformHandleType,
+      false,
+      shouldResizeFromCenter,
     );
 
     const resizedElement: Partial<ExcalidrawTextElement> = {
       width: Math.abs(newWidth),
       height: Math.abs(metrics.height),
-      x: newTopLeft[0],
-      y: newTopLeft[1],
+      x: newOrigin.x,
+      y: newOrigin.y,
       text,
       autoResize: false,
     };
@@ -821,6 +678,18 @@ export const resizeSingleElement = (
     shouldInformMutation?: boolean;
   } = {},
 ) => {
+  if (isTextElement(latestElement) && isTextElement(origElement)) {
+    return resizeSingleTextElement(
+      origElement,
+      latestElement,
+      scene,
+      handleDirection,
+      shouldResizeFromCenter,
+      nextWidth,
+      nextHeight,
+    );
+  }
+
   let boundTextFont: { fontSize?: number } = {};
   const elementsMap = scene.getNonDeletedElementsMap();
   const boundTextElement = getBoundTextElement(latestElement, elementsMap);
@@ -1518,11 +1387,7 @@ export const resizeMultipleElements = (
     } of elementsAndUpdates) {
       const { width, height, angle } = update;
 
-      scene.mutateElement(element, update, {
-        informMutation: true,
-        // needed for the fixed binding point udpate to take effect
-        isDragging: true,
-      });
+      scene.mutateElement(element, update);
 
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: elementsToUpdate,

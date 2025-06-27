@@ -4,14 +4,81 @@ import {
   CaptureUpdateAction,
   StoreChange,
   StoreDelta,
-  type Store,
 } from "@excalidraw/element";
+
+import type { StoreSnapshot, Store } from "@excalidraw/element";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
 import type { AppState } from "./types";
 
-class HistoryEntry extends StoreDelta {}
+export class HistoryDelta extends StoreDelta {
+  /**
+   * Apply the delta to the passed elements and appState, does not modify the snapshot.
+   */
+  public applyTo(
+    elements: SceneElementsMap,
+    appState: AppState,
+    snapshot: StoreSnapshot,
+  ): [SceneElementsMap, AppState, boolean] {
+    const [nextElements, elementsContainVisibleChange] = this.elements.applyTo(
+      elements,
+      // used to fallback into local snapshot in case we couldn't apply the delta
+      // due to a missing (force deleted) elements in the scene
+      snapshot.elements,
+      // we don't want to apply the `version` and `versionNonce` properties for history
+      // as we always need to end up with a new version due to collaboration,
+      // approaching each undo / redo as a new user action
+      {
+        excludedProperties: new Set(["version", "versionNonce"]),
+      },
+    );
+
+    const [nextAppState, appStateContainsVisibleChange] = this.appState.applyTo(
+      appState,
+      nextElements,
+    );
+
+    const appliedVisibleChanges =
+      elementsContainVisibleChange || appStateContainsVisibleChange;
+
+    return [nextElements, nextAppState, appliedVisibleChanges];
+  }
+
+  /**
+   * Overriding once to avoid type casting everywhere.
+   */
+  public static override calculate(
+    prevSnapshot: StoreSnapshot,
+    nextSnapshot: StoreSnapshot,
+  ) {
+    return super.calculate(prevSnapshot, nextSnapshot) as HistoryDelta;
+  }
+
+  /**
+   * Overriding once to avoid type casting everywhere.
+   */
+  public static override inverse(delta: StoreDelta): HistoryDelta {
+    return super.inverse(delta) as HistoryDelta;
+  }
+
+  /**
+   * Overriding once to avoid type casting everywhere.
+   */
+  public static override applyLatestChanges(
+    delta: StoreDelta,
+    prevElements: SceneElementsMap,
+    nextElements: SceneElementsMap,
+    modifierOptions?: "deleted" | "inserted",
+  ) {
+    return super.applyLatestChanges(
+      delta,
+      prevElements,
+      nextElements,
+      modifierOptions,
+    ) as HistoryDelta;
+  }
+}
 
 export class HistoryChangedEvent {
   constructor(
@@ -25,8 +92,8 @@ export class History {
     [HistoryChangedEvent]
   >();
 
-  public readonly undoStack: HistoryEntry[] = [];
-  public readonly redoStack: HistoryEntry[] = [];
+  public readonly undoStack: HistoryDelta[] = [];
+  public readonly redoStack: HistoryDelta[] = [];
 
   public get isUndoStackEmpty() {
     return this.undoStack.length === 0;
@@ -48,16 +115,16 @@ export class History {
    * Do not re-record history entries, which were already pushed to undo / redo stack, as part of history action.
    */
   public record(delta: StoreDelta) {
-    if (delta.isEmpty() || delta instanceof HistoryEntry) {
+    if (delta.isEmpty() || delta instanceof HistoryDelta) {
       return;
     }
 
     // construct history entry, so once it's emitted, it's not recorded again
-    const entry = HistoryEntry.inverse(delta);
+    const historyDelta = HistoryDelta.inverse(delta);
 
-    this.undoStack.push(entry);
+    this.undoStack.push(historyDelta);
 
-    if (!entry.elements.isEmpty()) {
+    if (!historyDelta.elements.isEmpty()) {
       // don't reset redo stack on local appState changes,
       // as a simple click (unselect) could lead to losing all the redo entries
       // only reset on non empty elements changes!
@@ -74,7 +141,7 @@ export class History {
       elements,
       appState,
       () => History.pop(this.undoStack),
-      (entry: HistoryEntry) => History.push(this.redoStack, entry, elements),
+      (entry: HistoryDelta) => History.push(this.redoStack, entry),
     );
   }
 
@@ -83,20 +150,20 @@ export class History {
       elements,
       appState,
       () => History.pop(this.redoStack),
-      (entry: HistoryEntry) => History.push(this.undoStack, entry, elements),
+      (entry: HistoryDelta) => History.push(this.undoStack, entry),
     );
   }
 
   private perform(
     elements: SceneElementsMap,
     appState: AppState,
-    pop: () => HistoryEntry | null,
-    push: (entry: HistoryEntry) => void,
+    pop: () => HistoryDelta | null,
+    push: (entry: HistoryDelta) => void,
   ): [SceneElementsMap, AppState] | void {
     try {
-      let historyEntry = pop();
+      let historyDelta = pop();
 
-      if (historyEntry === null) {
+      if (historyDelta === null) {
         return;
       }
 
@@ -108,41 +175,47 @@ export class History {
       let nextAppState = appState;
       let containsVisibleChange = false;
 
-      // iterate through the history entries in case they result in no visible changes
-      while (historyEntry) {
+      // iterate through the history entries in case ;they result in no visible changes
+      while (historyDelta) {
         try {
           [nextElements, nextAppState, containsVisibleChange] =
-            StoreDelta.applyTo(
-              historyEntry,
-              nextElements,
-              nextAppState,
-              prevSnapshot,
-            );
+            historyDelta.applyTo(nextElements, nextAppState, prevSnapshot);
 
+          const prevElements = prevSnapshot.elements;
           const nextSnapshot = prevSnapshot.maybeClone(
             action,
             nextElements,
             nextAppState,
           );
 
-          // schedule immediate capture, so that it's emitted for the sync purposes
-          this.store.scheduleMicroAction({
-            action,
-            change: StoreChange.create(prevSnapshot, nextSnapshot),
-            delta: historyEntry,
-          });
+          const change = StoreChange.create(prevSnapshot, nextSnapshot);
+          const delta = HistoryDelta.applyLatestChanges(
+            historyDelta,
+            prevElements,
+            nextElements,
+          );
+
+          if (!delta.isEmpty()) {
+            // schedule immediate capture, so that it's emitted for the sync purposes
+            this.store.scheduleMicroAction({
+              action,
+              change,
+              delta,
+            });
+
+            historyDelta = delta;
+          }
 
           prevSnapshot = nextSnapshot;
         } finally {
-          // make sure to always push, even if the delta is corrupted
-          push(historyEntry);
+          push(historyDelta);
         }
 
         if (containsVisibleChange) {
           break;
         }
 
-        historyEntry = pop();
+        historyDelta = pop();
       }
 
       return [nextElements, nextAppState];
@@ -155,7 +228,7 @@ export class History {
     }
   }
 
-  private static pop(stack: HistoryEntry[]): HistoryEntry | null {
+  private static pop(stack: HistoryDelta[]): HistoryDelta | null {
     if (!stack.length) {
       return null;
     }
@@ -169,18 +242,8 @@ export class History {
     return null;
   }
 
-  private static push(
-    stack: HistoryEntry[],
-    entry: HistoryEntry,
-    prevElements: SceneElementsMap,
-  ) {
-    const inversedEntry = HistoryEntry.inverse(entry);
-    const updatedEntry = HistoryEntry.applyLatestChanges(
-      inversedEntry,
-      prevElements,
-      "inserted",
-    );
-
-    return stack.push(updatedEntry);
+  private static push(stack: HistoryDelta[], entry: HistoryDelta) {
+    const inversedEntry = HistoryDelta.inverse(entry);
+    return stack.push(inversedEntry);
   }
 }

@@ -53,9 +53,9 @@ import {
   isImageElement,
 } from "./typeChecks";
 import { getContainingFrame } from "./frame";
-import { getCornerRadius } from "./shapes";
+import { getCornerRadius } from "./utils";
 
-import { ShapeCache } from "./ShapeCache";
+import { ShapeCache } from "./shape";
 
 import { getFreeDrawSvgPath } from "./freedraw";
 

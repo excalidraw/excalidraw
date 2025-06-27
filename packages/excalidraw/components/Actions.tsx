@@ -356,7 +356,6 @@ export const ShapesSwitcher = ({
               if (value === "image") {
                 app.setActiveTool({
                   type: value,
-                  insertOnCanvasDirectly: pointerType !== "mouse",
                 });
               } else {
                 app.setActiveTool({ type: value });
