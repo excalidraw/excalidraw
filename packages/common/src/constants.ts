@@ -417,7 +417,7 @@ export const STROKE_WIDTH = {
   thin: 1,
   medium: 2,
   bold: 4,
-  extraBold: 6,
+  extraBold: 8,
 } as const;
 
 export const DEFAULT_ELEMENT_PROPS: {
