@@ -28,32 +28,12 @@ To start the example app using the `@excalidraw/excalidraw` package, follow the 
 
 ## Releasing
 
-### Create a test release
-
-You can create a test release by posting the below comment in your pull request:
-
-```bash
-@excalibot trigger release
-```
-
-Once the version is released `@excalibot` will post a comment with the release version.
-
 ### Creating a production release
 
 To release the next stable version follow the below steps:
 
 ```bash
-yarn prerelease:excalidraw
+yarn release --tag=latest --version=0.19.0
 ```
 
-You need to pass the `version` for which you want to create the release. This will make the changes needed before making the release like updating `package.json`, `changelog` and more.
-
-The next step is to run the `release` script:
-
-```bash
-yarn release:excalidraw
-```
-
-This will publish the package.
-
-Right now there are two steps to create a production release but once this works fine these scripts will be combined and more automation will be done.
+You will need to pass the `latest` tag with `version` for which you want to create the release. This will make the changes needed before publishing the packages into NPM, like updating dependencies of all `@excalidraw/*` packages, generating new entries in `CHANGELOG.md` and more.
