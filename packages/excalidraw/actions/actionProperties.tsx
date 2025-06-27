@@ -559,7 +559,10 @@ export const actionChangeStrokeWidth = register({
         <RadioSelection
           group="stroke-width"
           options={
-            appState.activeTool.type === "freedraw"
+            appState.activeTool.type === "freedraw" ||
+            app.scene
+              .getSelectedElements(app.state)
+              .every((element) => isFreeDrawElement(element))
               ? WIDTHS
               : WIDTHS.slice(0, 3)
           }
@@ -690,31 +693,37 @@ export const actionChangePressureSensitivity = register({
   label: "labels.strokeType",
   trackEvent: false,
   perform: (elements, appState, value) => {
+    const updatedElements = changeProperty(elements, appState, (el) => {
+      if (isFreeDrawElement(el)) {
+        return newElementWith(el, {
+          drawingConfigs: {
+            ...el.drawingConfigs,
+            fixedStrokeWidth: value,
+          },
+        });
+      }
+      return el;
+    });
+
     return {
-      elements,
-      appState: { ...appState, currentItemPressureSensitivity: value },
+      elements: updatedElements,
+      appState: { ...appState, currentItemFixedStrokeWidth: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ app, appState, updateData }) => {
-    if (appState.activeTool.type !== "freedraw") {
-      return null;
-    }
-
     const selectedElements = app.scene.getSelectedElements(app.state);
-    const firstElement = selectedElements.find(isFreeDrawElement);
-    const commonPressureSensitivity = selectedElements
-      .filter(isFreeDrawElement)
-      .reduce((acc, element) => {
-        const sensitivity = element.drawingConfigs?.pressureSensitivity ?? 1;
-        if (acc !== null && acc !== sensitivity) {
-          return null; // No common value
-        }
-        return sensitivity;
-      }, firstElement?.drawingConfigs?.pressureSensitivity ?? null);
+    const freedraws = selectedElements.filter(isFreeDrawElement);
+
+    const commonFixedStrokeWidth =
+      freedraws.length > 0
+        ? freedraws.every((e) => e.drawingConfigs?.fixedStrokeWidth)
+        : null;
 
     const currentValue =
-      commonPressureSensitivity ?? appState.currentItemPressureSensitivity;
+      freedraws.length > 0
+        ? freedraws.every((e) => e.drawingConfigs?.fixedStrokeWidth) || null
+        : appState.currentItemFixedStrokeWidth;
 
     return (
       <fieldset>
@@ -724,13 +733,13 @@ export const actionChangePressureSensitivity = register({
             group="pressure-sensitivity"
             options={[
               {
-                value: 0,
+                value: true,
                 text: t("labels.strokeWidthFixed"),
                 icon: strokeWidthFixedIcon,
                 testId: "pressure-fixed",
               },
               {
-                value: 1,
+                value: false,
                 text: t("labels.strokeWidthVariable"),
                 icon: strokeWidthVariableIcon,
                 testId: "pressure-variable",

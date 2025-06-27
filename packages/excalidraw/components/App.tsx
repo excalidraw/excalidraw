@@ -7593,7 +7593,7 @@ class App extends React.Component<AppProps, AppState> {
       roundness: null,
       simulatePressure,
       drawingConfigs: {
-        pressureSensitivity: this.state.currentItemPressureSensitivity,
+        fixedStrokeWidth: this.state.currentItemFixedStrokeWidth,
         streamline:
           window.h?.debugFreedraw?.streamline ??
           DRAWING_CONFIGS.default.streamline,

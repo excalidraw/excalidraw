@@ -33,7 +33,7 @@ export const getDefaultAppState = (): Omit<
     currentItemFontFamily: DEFAULT_FONT_FAMILY,
     currentItemFontSize: DEFAULT_FONT_SIZE,
     currentItemOpacity: DEFAULT_ELEMENT_PROPS.opacity,
-    currentItemPressureSensitivity: 1,
+    currentItemFixedStrokeWidth: true,
     currentItemRoughness: DEFAULT_ELEMENT_PROPS.roughness,
     currentItemStartArrowhead: null,
     currentItemStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
@@ -164,7 +164,7 @@ const APP_STATE_STORAGE_CONF = (<
     server: false,
   },
   currentItemOpacity: { browser: true, export: false, server: false },
-  currentItemPressureSensitivity: {
+  currentItemFixedStrokeWidth: {
     browser: true,
     export: false,
     server: false,

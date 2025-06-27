@@ -170,6 +170,11 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "backgroundColor": "transparent",
   "boundElements": [],
   "customData": undefined,
+  "drawingConfigs": {
+    "pressureSensitivity": 1,
+    "simplify": "0.10000",
+    "streamline": "0.25000",
+  },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
@@ -191,7 +196,6 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
       10,
     ],
   ],
-  "pressureSensitivity": 1,
   "pressures": [],
   "roughness": 1,
   "roundness": {

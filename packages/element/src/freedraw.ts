@@ -11,11 +11,11 @@ import type { ExcalidrawFreeDrawElement } from "./types";
 export const DRAWING_CONFIGS = {
   default: {
     streamline: 0.35,
-    simplify: 0.25,
+    simplify: 0.1,
   },
   // for optimal performance, we use a lower streamline and simplify
   stylus: {
-    streamline: 0.1,
+    streamline: 0.35,
     simplify: 0.1,
   },
 } as const;
@@ -28,15 +28,11 @@ export const DRAWING_CONFIGS = {
 const calculateVelocityBasedPressure = (
   points: readonly LocalPoint[],
   index: number,
-  pressureSensitivity: number | undefined,
+  fixedStrokeWidth: boolean | undefined,
   maxDistance = 8, // Maximum expected distance for normalization
 ): number => {
-  // Handle pressure sensitivity
-  const sensitivity = pressureSensitivity ?? 1; // Default to 1 for backwards compatibility
-
-  // If sensitivity is 0, return constant pressure
-  if (sensitivity === 0) {
-    return 0.6;
+  if (fixedStrokeWidth) {
+    return 1;
   }
 
   // First point gets highest pressure
@@ -56,8 +52,7 @@ const calculateVelocityBasedPressure = (
   const basePressure = Math.max(0.1, 1 - normalizedDistance * 0.7); // Range: 0.1 to 1.0
 
   const constantPressure = 0.5;
-  const pressure =
-    constantPressure + (basePressure - constantPressure) * sensitivity;
+  const pressure = constantPressure + (basePressure - constantPressure);
 
   return Math.max(0.1, Math.min(1.0, pressure));
 };
@@ -65,7 +60,11 @@ const calculateVelocityBasedPressure = (
 export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
   // Compose points as [x, y, pressure]
   let points: [number, number, number][];
-  if (element.simulatePressure) {
+  if (element.drawingConfigs?.fixedStrokeWidth) {
+    points = element.points.map(
+      ([x, y]: LocalPoint): [number, number, number] => [x, y, 1],
+    );
+  } else if (element.simulatePressure) {
     // Simulate pressure based on velocity between consecutive points
     points = element.points.map(([x, y]: LocalPoint, i) => [
       x,
@@ -73,20 +72,15 @@ export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
       calculateVelocityBasedPressure(
         element.points,
         i,
-        element.drawingConfigs?.pressureSensitivity,
+        element.drawingConfigs?.fixedStrokeWidth,
       ),
     ]);
   } else {
-    const sensitivity = element.drawingConfigs?.pressureSensitivity ?? 1;
     points = element.points.map(([x, y]: LocalPoint, i) => {
-      if (sensitivity === 0) {
-        return [x, y, 0.5];
-      }
-
       const rawPressure = element.pressures?.[i] ?? 0.5;
 
       const amplifiedPressure = Math.pow(rawPressure, 0.6);
-      const adjustedPressure = amplifiedPressure * sensitivity;
+      const adjustedPressure = amplifiedPressure;
 
       return [x, y, clamp(adjustedPressure, 0.1, 1.0)];
     });
@@ -102,7 +96,7 @@ export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
     streamline,
     simplify,
     sizeMapping: ({ pressure: t }) => {
-      if (element.drawingConfigs?.pressureSensitivity === 0) {
+      if (element.drawingConfigs?.fixedStrokeWidth) {
         return 0.5;
       }
 
@@ -186,15 +180,11 @@ function _legacy_getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
     : [[0, 0, 0.5]];
 
-  const sensitivity = element.drawingConfigs?.pressureSensitivity;
-
   // Consider changing the options for simulated pressure vs real pressure
   const options: StrokeOptions = {
     simulatePressure: element.simulatePressure,
-    // if sensitivity is not set, times 4.25 for backwards compatibility
-    size: element.strokeWidth * (sensitivity !== null ? 1 : 4.25),
-    // if sensitivity is not set, set thinning to 0.6 for backwards compatibility
-    thinning: sensitivity !== undefined ? 0.5 * sensitivity : 0.6,
+    size: element.strokeWidth * 4.25,
+    thinning: 0.6,
     smoothing: 0.5,
     streamline: 0.5,
     easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine

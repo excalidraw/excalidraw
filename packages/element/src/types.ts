@@ -382,7 +382,7 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     drawingConfigs: {
       streamline?: number;
       simplify?: number;
-      pressureSensitivity?: number;
+      fixedStrokeWidth?: boolean;
     } | null;
   }>;
 
