@@ -806,15 +806,21 @@ const generateElementShape = (
       generateFreeDrawShape(element);
 
       if (isPathALoop(element.points)) {
-        // generate rough polygon to fill freedraw shape
-        const simplifiedPoints = simplify(
-          element.points as Mutable<LocalPoint[]>,
-          0.75,
-        );
-        shape = generator.curve(simplifiedPoints as [number, number][], {
-          ...generateRoughOptions(element),
-          stroke: "none",
-        });
+        const points =
+          element.drawingConfigs === null
+            ? simplify(element.points as LocalPoint[], 0.75)
+            : simplify(element.points as LocalPoint[], 1.5);
+
+        shape =
+          element.drawingConfigs === null
+            ? generator.curve(points, {
+                ...generateRoughOptions(element),
+                stroke: "none",
+              })
+            : generator.polygon(points, {
+                ...generateRoughOptions(element),
+                stroke: "none",
+              });
       } else {
         shape = null;
       }

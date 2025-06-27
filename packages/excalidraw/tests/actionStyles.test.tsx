@@ -78,7 +78,7 @@ describe("actionStyles", () => {
     expect(firstRect.strokeColor).toBe("#e03131");
     expect(firstRect.backgroundColor).toBe("#a5d8ff");
     expect(firstRect.fillStyle).toBe("cross-hatch");
-    expect(firstRect.strokeWidth).toBe(2); // Bold: 2
+    expect(firstRect.strokeWidth).toBe(4); // Bold: 4
     expect(firstRect.strokeStyle).toBe("dotted");
     expect(firstRect.roughness).toBe(2); // Cartoonist: 2
     expect(firstRect.opacity).toBe(60);
