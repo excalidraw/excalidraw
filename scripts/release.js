@@ -12,32 +12,49 @@ const PACKAGES_DIR = path.resolve(__dirname, "../packages");
 /**
  * Returns the arguments for the release script.
  *
- * Usage examples (order matters):
- * - yarn release                   -> publishes `@excalidraw` packages with "test" tag and "-[hash]" version suffix
- * - yarn release test              -> same as above
- * - yarn release next              -> publishes `@excalidraw` packages with "next" tag and "-[hash]" version suffix
- * - yarn release next - ci         -> skips interactive prompts (runs on CI/CD), otherwise same as above
- * - yarn release latest 0.19.0     -> publishes `@excalidraw` packages with "latest" tag and version "0.19.0" & prepares changelog for the release
+ * Usage examples:
+ * - yarn release --help                          -> prints this help message
+ * - yarn release                                 -> publishes `@excalidraw` packages with "test" tag and "-[hash]" version suffix
+ * - yarn release --tag=test                      -> same as above
+ * - yarn release --tag=next                      -> publishes `@excalidraw` packages with "next" tag and version "-[hash]" suffix
+ * - yarn release --tag=next --non-interactive    -> skips interactive prompts (runs on CI/CD), otherwise same as above
+ * - yarn release --tag=latest --version=0.19.0   -> publishes `@excalidraw` packages with "latest" tag and version "0.19.0" & prepares changelog for the release
  *
- * @returns [tag, version, ci]
- *
- * tag: test (default), next (~autorelease), latest (~stable release)
- * version: 20.0.0 for latest, nothing or "-" for next and test
- * ci: disables interactive prompts (optional)
+ * @returns [tag, version, nonInteractive]
  */
 const getArguments = () => {
-  let [tag, version, ci] = process.argv.slice(2);
+  let tag = "test";
+  let version = "";
+  let nonInteractive = false;
 
-  if (ci && ci.toLowerCase() !== "ci") {
-    console.error(
-      `Invalid argument, expected "ci" to turn off interactive prompts, got "${ci}".`,
-    );
-    process.exit(1);
-  }
+  for (const argument of process.argv.slice(2)) {
+    if (/--help/.test(argument)) {
+      console.info(`Available arguments:
+  --tag=<tag>                                    -> (optional) "test" (default), "next" for auto release, "latest" for stable release
+  --version=<version>                            -> (optional) for "next" and "test", (required) for "latest" i.e. "0.19.0"
+  --non-interactive                              -> (optional) disables interactive prompts`);
 
-  if (!tag) {
-    // test is default tag
-    tag = "test";
+      console.info(`\nUsage examples:
+  - yarn release                                 -> publishes \`@excalidraw\` packages with "test" tag and "-[hash]" version suffix
+  - yarn release --tag=test                      -> same as above
+  - yarn release --tag=next                      -> publishes \`@excalidraw\` packages with "next" tag and version "-[hash]" suffix
+  - yarn release --tag=next --non-interactive    -> skips interactive prompts (runs on CI/CD), otherwise same as above
+  - yarn release --tag=latest --version=0.19.0   -> publishes \`@excalidraw\` packages with "latest" tag and version "0.19.0" & prepares changelog for the release`);
+
+      process.exit(0);
+    }
+
+    if (/--tag=/.test(argument)) {
+      tag = argument.split("=")[1];
+    }
+
+    if (/--version=/.test(argument)) {
+      version = argument.split("=")[1];
+    }
+
+    if (/--non-interactive/.test(argument)) {
+      nonInteractive = true;
+    }
   }
 
   if (tag !== "latest" && tag !== "next" && tag !== "test") {
@@ -50,7 +67,7 @@ const getArguments = () => {
     process.exit(1);
   }
 
-  if (!version || version === "-") {
+  if (!version) {
     // set the next version based on the excalidraw package version + commit hash
     const excalidrawPackageVersion = require(getPackageJsonPath(
       "excalidraw",
@@ -68,7 +85,7 @@ const getArguments = () => {
 
   console.info(`Running with tag "${tag}" and version "${version}"...`);
 
-  return [tag, version, !!ci];
+  return [tag, version, nonInteractive];
 };
 
 const validatePackageName = (packageName) => {
@@ -203,7 +220,7 @@ const publishPackages = (tag, version) => {
 
 /** main */
 (async () => {
-  const [tag, version, ci] = getArguments();
+  const [tag, version, nonInteractive] = getArguments();
 
   buildPackages();
 
@@ -213,10 +230,10 @@ const publishPackages = (tag, version) => {
 
   updatePackageJsons(version);
 
-  if (!ci) {
+  if (nonInteractive) {
+    publishPackages(tag, version);
+  } else {
     await askToCommit(tag, version);
     await askToPublish(tag, version);
-  } else {
-    publishPackages(tag, version);
   }
 })();

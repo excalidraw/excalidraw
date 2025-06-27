@@ -81,9 +81,9 @@
     "prepare": "husky install",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "release": "node scripts/release.js",
-    "release:test": "node scripts/release.js test",
-    "release:next": "node scripts/release.js next",
-    "release:latest": "node scripts/release.js latest",
+    "release:test": "node scripts/release.js --tag=test",
+    "release:next": "node scripts/release.js --tag=next",
+    "release:latest": "node scripts/release.js --tag=latest",
     "rm:build": "rimraf --glob excalidraw-app/build excalidraw-app/dist excalidraw-app/dev-dist packages/*/dist packages/*/build examples/*/build examples/*/dist",
     "rm:node_modules": "rimraf --glob node_modules excalidraw-app/node_modules packages/*/node_modules",
     "clean-install": "yarn rm:node_modules && yarn install"
