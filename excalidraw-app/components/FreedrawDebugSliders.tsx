@@ -1,5 +1,10 @@
-import { DRAWING_CONFIGS } from "@excalidraw/element";
+import { DRAWING_CONFIGS, isFreeDrawElement } from "@excalidraw/element";
 import { useState, useEffect } from "react";
+
+import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
+import { useExcalidrawElements } from "@excalidraw/excalidraw/components/App";
+
+import { round } from "../../packages/math/src";
 
 export const FreedrawDebugSliders = () => {
   const [streamline, setStreamline] = useState<number>(
@@ -14,7 +19,10 @@ export const FreedrawDebugSliders = () => {
       window.h = {} as any;
     }
     if (!window.h.debugFreedraw) {
-      window.h.debugFreedraw = DRAWING_CONFIGS.default.variable;
+      window.h.debugFreedraw = {
+        enabled: true,
+        ...DRAWING_CONFIGS.default.variable,
+      };
     }
 
     setStreamline(window.h.debugFreedraw.streamline);
@@ -35,6 +43,29 @@ export const FreedrawDebugSliders = () => {
     }
   };
 
+  const [enabled, setEnabled] = useState<boolean>(
+    window.h?.debugFreedraw?.enabled ?? true,
+  );
+
+  // counter incrasing each 50ms
+  const [, setCounter] = useState<number>(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCounter((prev) => prev + 1);
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const elements = useExcalidrawElements();
+  const appState = useUIAppState();
+
+  const newFreedrawElement =
+    appState.newElement && isFreeDrawElement(appState.newElement)
+      ? appState.newElement
+      : null;
+
   return (
     <div
       style={{
@@ -53,6 +84,37 @@ export const FreedrawDebugSliders = () => {
         fontFamily: "monospace",
       }}
     >
+      {newFreedrawElement && (
+        <div>
+          pressures:{" "}
+          {newFreedrawElement.simulatePressure
+            ? "simulated"
+            : JSON.stringify(
+                newFreedrawElement.pressures
+                  .slice(-4)
+                  .map((x) => round(x, 2))
+                  .join(" ") || [],
+              )}{" "}
+          ({round(window.__lastPressure__ || 0, 2) || "?"})
+        </div>
+      )}
+      <div>
+        <label>
+          {" "}
+          enabled
+          <br />
+          <input
+            type="checkbox"
+            checked={enabled}
+            onChange={(e) => {
+              if (window.h.debugFreedraw) {
+                window.h.debugFreedraw.enabled = e.target.checked;
+                setEnabled(e.target.checked);
+              }
+            }}
+          />
+        </label>
+      </div>
       <div>
         <label>
           Streamline: {streamline.toFixed(2)}

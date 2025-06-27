@@ -7474,7 +7474,10 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
-    const simulatePressure = event.pressure === 0.5 || event.pressure === 0;
+    const simulatePressure =
+      event.pressure === 0.5 || event.pressure === 0 || event.pressure === 1;
+
+    window.__lastPressure__ = event.pressure;
 
     const freedrawConfig = getFreedrawConfig(
       event.pointerType,
@@ -7497,8 +7500,13 @@ class App extends React.Component<AppProps, AppState> {
       drawingConfigs: {
         fixedStrokeWidth: this.state.currentItemFixedStrokeWidth,
         streamline:
-          window.h?.debugFreedraw?.streamline ?? freedrawConfig.streamline,
-        simplify: window.h?.debugFreedraw?.simplify ?? freedrawConfig.simplify,
+          (window.h?.debugFreedraw?.enabled
+            ? window.h?.debugFreedraw?.streamline
+            : null) ?? freedrawConfig.streamline,
+        simplify:
+          (window.h?.debugFreedraw?.enabled
+            ? window.h?.debugFreedraw?.simplify
+            : null) ?? freedrawConfig.simplify,
       },
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
@@ -11141,6 +11149,7 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 declare global {
   interface Window {
+    __lastPressure__?: number;
     h: {
       scene: Scene;
       elements: readonly ExcalidrawElement[];
@@ -11152,6 +11161,7 @@ declare global {
       debugFreedraw?: {
         streamline: number;
         simplify: number;
+        enabled: boolean;
       };
     };
   }
@@ -11162,8 +11172,10 @@ export const createTestHook = () => {
     window.h = window.h || ({} as Window["h"]);
 
     // Initialize debug freedraw parameters
-    window.h.debugFreedraw =
-      window.h.debugFreedraw || DRAWING_CONFIGS.default.variable;
+    window.h.debugFreedraw = {
+      enabled: true,
+      ...(window.h.debugFreedraw || DRAWING_CONFIGS.default.variable),
+    };
 
     Object.defineProperties(window.h, {
       elements: {
