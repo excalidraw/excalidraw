@@ -1812,39 +1812,39 @@ export const actionChangeArrowType = register({
   },
 });
 
-export const actionToggleShapeSnap = register({
-  name: "toggleShapeSnap",
-  label: "Toggle Snap to Shape",
+export const actionToggleConvertToShape = register({
+  name: "toggleConvertToShape",
+  label: "Toggle Convert to Shape",
   trackEvent: false,
   perform: (elements, appState) => {
     return {
       elements,
       appState: {
         ...appState,
-        isShapeSnapEnabled: !appState.isShapeSnapEnabled,
+        isConvertToShapeEnabled: !appState.isConvertToShapeEnabled,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ appState, updateData }) => (
     <fieldset>
-      <legend>{t("labels.shapeSnap")}</legend>
+      <legend>{t("labels.convertToShape")}</legend>
       <div className="buttonList">
         <RadioSelection
           group="button"
           options={[
             {
               value: false,
-              text: t("labels.shapeSnapDisable"),
+              text: t("labels.convertToShapeDisable"),
               icon: snapShapeDisabledIcon,
             },
             {
               value: true,
-              text: t("labels.shapeSnapEnable"),
+              text: t("labels.convertToShapeEnable"),
               icon: snapShapeEnabledIcon,
             },
           ]}
-          value={appState.isShapeSnapEnabled}
+          value={appState.isConvertToShapeEnabled}
           onChange={(value) => updateData(value)}
         />
       </div>

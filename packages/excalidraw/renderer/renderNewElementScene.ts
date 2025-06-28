@@ -2,7 +2,7 @@ import { throttleRAF } from "@excalidraw/common";
 
 import { renderElement } from "@excalidraw/element";
 
-import { convertToShape } from "@excalidraw/element/snapToShape";
+import { convertToShape } from "@excalidraw/element/convertToShape";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 
@@ -49,7 +49,7 @@ const _renderNewElementScene = ({
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
     }
 
-    if (appState.isShapeSnapEnabled && newElement?.type === "freedraw") {
+    if (appState.isConvertToShapeEnabled && newElement?.type === "freedraw") {
       const detectedElement = convertToShape(newElement);
       if (detectedElement !== newElement) {
         renderElement(

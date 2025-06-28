@@ -9108,7 +9108,7 @@ class App extends React.Component<AppProps, AppState> {
           lastCommittedPoint: pointFrom<LocalPoint>(dx, dy),
         });
 
-        if (this.state.isShapeSnapEnabled) {
+        if (this.state.isConvertToShapeEnabled) {
           const detectedElement = convertToShape(newElement);
 
           if (detectedElement !== newElement) {
