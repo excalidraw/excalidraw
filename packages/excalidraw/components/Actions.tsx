@@ -205,7 +205,7 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => element.type === "freedraw")) && (
         <>
           {renderAction("changeStrokeShape")}
-          {renderAction("toggleShapeSnap")}
+          {renderAction("toggleConvertToShape")}
         </>
       )}
       {(hasStrokeStyle(appState.activeTool.type) ||

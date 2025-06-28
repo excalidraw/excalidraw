@@ -10906,7 +10906,7 @@ class App extends React.Component<AppProps, AppState> {
           pressures,
         });
 
-        if (this.state.isShapeSnapEnabled) {
+        if (this.state.isConvertToShapeEnabled) {
           const detectedElement = convertToShape(newElement);
 
           if (detectedElement !== newElement) {

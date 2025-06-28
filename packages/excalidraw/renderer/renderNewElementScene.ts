@@ -1,5 +1,4 @@
 import { throttleRAF } from "@excalidraw/common";
-
 import {
   getTargetFrame,
   isInvisiblySmallElement,
@@ -9,7 +8,6 @@ import {
 } from "@excalidraw/element";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
-
 import { frameClip } from "./staticScene";
 
 import type { NewElementSceneRenderConfig } from "../scene/types";
@@ -85,7 +83,7 @@ const _renderNewElementScene = ({
     context.restore();
     context.save();
 
-    if (appState.isShapeSnapEnabled && newElement?.type === "freedraw") {
+    if (appState.isConvertToShapeEnabled && newElement?.type === "freedraw") {
       const detectedElement = convertToShape(newElement);
       if (detectedElement !== newElement) {
         renderElement(
