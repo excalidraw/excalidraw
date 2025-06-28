@@ -1,3 +1,5 @@
+import type { RestoredAppState } from "@excalidraw/excalidraw/data/restore";
+
 import type {
   IMAGE_MIME_TYPES,
   UserIdleState,
@@ -535,6 +537,13 @@ export interface ExcalidrawProps {
     appState: AppState,
     files: BinaryFiles,
   ) => void;
+  onLoadFromFile?: (
+    restoredElements: readonly ExcalidrawElement[],
+    restoredAppState: RestoredAppState,
+    restoredFiles: BinaryFiles,
+  ) => void;
+  onReset?: () => void;
+  onSave?: () => void;
   onIncrement?: (event: DurableIncrement | EphemeralIncrement) => void;
   initialData?:
     | (() => MaybePromise<ExcalidrawInitialDataState | null>)
@@ -731,8 +740,12 @@ export type AppClassProperties = {
   visibleElements: App["visibleElements"];
   excalidrawContainerValue: App["excalidrawContainerValue"];
 
-  onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
+
+  onPointerUpEmitter: App["onPointerUpEmitter"];
+  onLoadEmitter: App["onLoadEmitter"];
+  onResetEmitter: App["onResetEmitter"];
+  onSaveEmitter: App["onSaveEmitter"];
 };
 
 export type PointerDownState = Readonly<{
@@ -842,6 +855,15 @@ export interface ExcalidrawImperativeAPI {
       files: BinaryFiles,
     ) => void,
   ) => UnsubscribeCallback;
+  onLoadFromFile: (
+    callback: (
+      restoredElements: readonly ExcalidrawElement[],
+      restoredAppState: RestoredAppState,
+      restoredFiles: BinaryFiles,
+    ) => void,
+  ) => UnsubscribeCallback;
+  onReset: (callback: () => void) => UnsubscribeCallback;
+  onSave: (callback: () => void) => UnsubscribeCallback;
   onIncrement: (
     callback: (event: DurableIncrement | EphemeralIncrement) => void,
   ) => UnsubscribeCallback;

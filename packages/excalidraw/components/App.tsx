@@ -421,6 +421,8 @@ import { findShapeByKey } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
 
+import type { RestoredAppState } from "../data/restore";
+
 import type {
   RenderInteractiveSceneCallback,
   ScrollBars,
@@ -620,6 +622,17 @@ class App extends React.Component<AppProps, AppState> {
     ]
   >();
 
+  onLoadEmitter = new Emitter<
+    [
+      restoredElements: readonly ExcalidrawElement[],
+      restoredAppState: RestoredAppState,
+      restoredFiles: BinaryFiles,
+    ]
+  >();
+
+  onResetEmitter = new Emitter();
+  onSaveEmitter = new Emitter();
+
   onPointerDownEmitter = new Emitter<
     [
       activeTool: AppState["activeTool"],
@@ -719,6 +732,9 @@ class App extends React.Component<AppProps, AppState> {
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
         onChange: (cb) => this.onChangeEmitter.on(cb),
+        onLoadFromFile: (cb) => this.onLoadEmitter.on(cb),
+        onReset: (cb) => this.onResetEmitter.on(cb),
+        onSave: (cb) => this.onSaveEmitter.on(cb),
         onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
@@ -2277,6 +2293,7 @@ class App extends React.Component<AppProps, AppState> {
       }));
       this.resetStore();
       this.resetHistory();
+      this.onResetEmitter.trigger();
     },
   );
 
@@ -2503,6 +2520,16 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.onUpdate(this.triggerRender);
     this.addEventListeners();
 
+    if (this.props.onLoadFromFile) {
+      this.onLoadEmitter.on(this.props.onLoadFromFile);
+    }
+    if (this.props.onSave) {
+      this.onSaveEmitter.on(this.props.onSave);
+    }
+    if (this.props.onReset) {
+      this.onResetEmitter.on(this.props.onReset);
+    }
+
     if (this.props.autoFocus && this.excalidrawContainerRef.current) {
       this.focusContainer();
     }
@@ -2558,6 +2585,9 @@ class App extends React.Component<AppProps, AppState> {
     this.laserTrails.stop();
     this.eraserTrail.stop();
     this.onChangeEmitter.clear();
+    this.onLoadEmitter.clear();
+    this.onResetEmitter.clear();
+    this.onSaveEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
     this.store.onDurableIncrementEmitter.clear();
     ShapeCache.destroy();
@@ -10381,6 +10411,11 @@ class App extends React.Component<AppProps, AppState> {
           replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
+        this.onLoadEmitter.trigger(
+          ret.data.elements,
+          ret.data.appState,
+          ret.data.files,
+        );
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library
           .updateLibrary({
