@@ -291,6 +291,8 @@ export {
 
 export { refreshTextDimensions } from "@excalidraw/element/newElement"; //zsviczian
 
+export { syncMovedIndices, syncInvalidIndices } from "@excalidraw/element"; //zsviczian
+
 export { getContainerElement } from "@excalidraw/element/textElement"; //zsviczian
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
