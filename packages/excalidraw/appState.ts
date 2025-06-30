@@ -124,6 +124,14 @@ export const getDefaultAppState = (): Omit<
     searchMatches: null,
     lockedMultiSelections: {},
     activeLockedId: null,
+    // Raster layer initialization for bitmap-based drawing tools
+    // Provides performance benefits by using canvas drawing instead of vector elements
+    rasterLayer: {
+      canvas: null,           // Will be created when first raster tool is used
+      isDirty: false,         // Tracks if layer needs redrawing
+      isDrawing: false,       // Tracks active drawing state
+      lastPoint: null,        // For smooth line interpolation
+    },
   };
 };
 
@@ -249,6 +257,8 @@ const APP_STATE_STORAGE_CONF = (<
   searchMatches: { browser: false, export: false, server: false },
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
+  // Raster layer should be exported/saved but not stored in browser for performance
+  rasterLayer: { browser: false, export: true, server: true },
 });
 
 const _clearAppStateForStorage = <
@@ -292,6 +302,33 @@ export const isEraserActive = ({
 }: {
   activeTool: AppState["activeTool"];
 }) => activeTool.type === "eraser";
+
+// Helper functions for raster tool state checking
+// These provide clean abstraction for checking which raster tool is active
+export const isRasterEraserActive = ({
+  activeTool,
+}: {
+  activeTool: AppState["activeTool"];
+}) => activeTool.type === "rastereraser";
+
+export const isRasterPencilActive = ({
+  activeTool,
+}: {
+  activeTool: AppState["activeTool"];
+}) => activeTool.type === "rasterpencil";
+
+export const isRasterLassoActive = ({
+  activeTool,
+}: {
+  activeTool: AppState["activeTool"];
+}) => activeTool.type === "rasterlasso";
+
+// Check if any raster tool is currently active
+export const isRasterToolActive = ({
+  activeTool,
+}: {
+  activeTool: AppState["activeTool"];
+}) => activeTool.type === "rasterpencil" || activeTool.type === "rastereraser" || activeTool.type === "rasterlasso";
 
 export const isHandToolActive = ({
   activeTool,
