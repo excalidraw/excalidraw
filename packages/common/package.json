@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/common",
-  "version": "0.1.0",
+  "version": "0.18.0",
   "type": "module",
   "types": "./dist/types/common/src/index.d.ts",
   "main": "./dist/prod/index.js",
@@ -13,7 +13,10 @@
       "default": "./dist/prod/index.js"
     },
     "./*": {
-      "types": "./dist/types/common/src/*.d.ts"
+      "types": "./dist/types/common/src/*.d.ts",
+      "development": "./dist/dev/index.js",
+      "production": "./dist/prod/index.js",
+      "default": "./dist/prod/index.js"
     }
   },
   "files": [

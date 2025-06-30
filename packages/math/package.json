@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/math",
-  "version": "0.1.0",
+  "version": "0.18.0",
   "type": "module",
   "types": "./dist/types/math/src/index.d.ts",
   "main": "./dist/prod/index.js",
@@ -13,7 +13,10 @@
       "default": "./dist/prod/index.js"
     },
     "./*": {
-      "types": "./dist/types/math/src/*.d.ts"
+      "types": "./dist/types/math/src/*.d.ts",
+      "development": "./dist/dev/index.js",
+      "production": "./dist/prod/index.js",
+      "default": "./dist/prod/index.js"
     }
   },
   "files": [
@@ -56,5 +59,8 @@
   "scripts": {
     "gen:types": "rimraf types && tsc",
     "build:esm": "rimraf dist && node ../../scripts/buildBase.js && yarn gen:types"
+  },
+  "dependencies": {
+    "@excalidraw/common": "0.18.0"
   }
 }

@@ -24,4 +24,4 @@ jobs:
       - name: Auto release
         run: |
           yarn add @actions/core -W
-          yarn autorelease
+          yarn release --tag=next --non-interactive
