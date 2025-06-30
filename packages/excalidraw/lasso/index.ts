@@ -199,6 +199,7 @@ export class LassoTrail extends AnimatedTrail {
       const { selectedElementIds } = getLassoSelectedElementIds({
         lassoPath,
         elements: this.app.visibleElements,
+        elementsMap: this.app.scene.getNonDeletedElementsMap(),
         elementsSegments: this.elementsSegments,
         intersectedElements: this.intersectedElements,
         enclosedElements: this.enclosedElements,
