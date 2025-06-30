@@ -2,7 +2,7 @@ import OpenColor from "open-color";
 
 import { CURSOR_TYPE, MIME_TYPES, THEME } from "@excalidraw/common";
 
-import { isHandToolActive, isEraserActive } from "./appState";
+import { isHandToolActive, isEraserActive, isRasterEraserActive, isRasterPencilActive, isRasterLassoActive } from "./appState";
 
 import type { AppState, DataURL } from "./types";
 
@@ -91,6 +91,12 @@ export const setCursorForShape = (
     interactiveCanvas.style.cursor = CURSOR_TYPE.GRAB;
   } else if (isEraserActive(appState)) {
     setEraserCursor(interactiveCanvas, appState.theme);
+  } else if (isRasterEraserActive(appState)) {
+    setEraserCursor(interactiveCanvas, appState.theme);
+  } else if (isRasterPencilActive(appState)) {
+    interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
+  } else if (isRasterLassoActive(appState)) {
+    interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
     // Ignore custom type as well and let host decide
