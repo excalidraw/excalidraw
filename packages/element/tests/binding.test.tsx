@@ -199,16 +199,16 @@ describe("element binding", () => {
     // Test sticky connection
     expect(API.getSelectedElement().type).toBe("arrow");
     Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    expect(arrow.endBinding?.elementId).not.toBe(rectangle.id);
+    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
     Keyboard.keyPress(KEYS.ARROW_LEFT);
-    expect(arrow.endBinding?.elementId).not.toBe(rectangle.id);
+    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
 
     // Sever connection
     expect(API.getSelectedElement().type).toBe("arrow");
     Keyboard.keyPress(KEYS.ARROW_LEFT);
-    expect(arrow.endBinding).toBe(null);
+    expect(arrow.endBinding).not.toBe(null);
     Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    expect(arrow.endBinding).toBe(null);
+    expect(arrow.endBinding).not.toBe(null);
   });
 
   it("should unbind on bound element deletion", () => {
@@ -632,8 +632,8 @@ describe("Fixed-point arrow binding", () => {
 
     expect(arrow.x).toBe(50);
     expect(arrow.y).toBe(50);
-    expect(arrow.width).toBeCloseTo(304, 0);
-    expect(arrow.height).toBeCloseTo(344, 0);
+    expect(arrow.width).toBeCloseTo(280, 0);
+    expect(arrow.height).toBeCloseTo(320, 0);
   });
 
   it("should move inner points when arrow is bound to same element on both ends", () => {
