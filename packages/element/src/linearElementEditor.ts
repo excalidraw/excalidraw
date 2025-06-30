@@ -445,7 +445,6 @@ export class LinearElementEditor {
         if (coords.length) {
           suggestedBindings = maybeSuggestBindingsForLinearElementAtCoords(
             element,
-            //coords,
             firstIndexIsSelected && lastIndexIsSelected
               ? "both"
               : firstIndexIsSelected
