@@ -71,9 +71,7 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 2,
-  },
+  "roundness": null,
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -107,9 +105,7 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 2,
-  },
+  "roundness": null,
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -155,9 +151,7 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   ],
   "polygon": false,
   "roughness": 1,
-  "roundness": {
-    "type": 2,
-  },
+  "roundness": null,
   "seed": 1278240551,
   "startArrowhead": null,
   "startBinding": null,
@@ -193,9 +187,7 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
+  "roundness": null,
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",

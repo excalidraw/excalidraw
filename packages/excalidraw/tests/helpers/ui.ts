@@ -1,6 +1,10 @@
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
-import { getCommonBounds, getElementPointsCoords } from "@excalidraw/element";
+import {
+  elementCenterPoint,
+  getCommonBounds,
+  getElementPointsCoords,
+} from "@excalidraw/element";
 import { cropElement } from "@excalidraw/element";
 import {
   getTransformHandles,
@@ -16,7 +20,7 @@ import {
   isTextElement,
   isFrameLikeElement,
 } from "@excalidraw/element";
-import { KEYS, arrayToMap, elementCenterPoint } from "@excalidraw/common";
+import { KEYS, arrayToMap } from "@excalidraw/common";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 
@@ -32,10 +36,11 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   ExcalidrawImageElement,
+  ElementsMap,
 } from "@excalidraw/element/types";
 
 import { createTestHook } from "../../components/App";
-import { getTextEditor } from "../queries/dom";
+import { getTextEditor, TEXT_EDITOR_SELECTOR } from "../queries/dom";
 import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
 
 import { API } from "./api";
@@ -146,6 +151,7 @@ export class Keyboard {
 
 const getElementPointForSelection = (
   element: ExcalidrawElement,
+  elementsMap: ElementsMap,
 ): GlobalPoint => {
   const { x, y, width, angle } = element;
   const target = pointFrom<GlobalPoint>(
@@ -162,7 +168,7 @@ const getElementPointForSelection = (
       (bounds[1] + bounds[3]) / 2,
     );
   } else {
-    center = elementCenterPoint(element);
+    center = elementCenterPoint(element, elementsMap);
   }
 
   if (isTextElement(element)) {
@@ -299,7 +305,12 @@ export class Pointer {
       elements = Array.isArray(elements) ? elements : [elements];
       elements.forEach((element) => {
         this.reset();
-        this.click(...getElementPointForSelection(element));
+        this.click(
+          ...getElementPointForSelection(
+            element,
+            h.app.scene.getElementsMapIncludingDeleted(),
+          ),
+        );
       });
     });
 
@@ -308,13 +319,23 @@ export class Pointer {
 
   clickOn(element: ExcalidrawElement) {
     this.reset();
-    this.click(...getElementPointForSelection(element));
+    this.click(
+      ...getElementPointForSelection(
+        element,
+        h.app.scene.getElementsMapIncludingDeleted(),
+      ),
+    );
     this.reset();
   }
 
   doubleClickOn(element: ExcalidrawElement) {
     this.reset();
-    this.doubleClick(...getElementPointForSelection(element));
+    this.doubleClick(
+      ...getElementPointForSelection(
+        element,
+        h.app.scene.getElementsMapIncludingDeleted(),
+      ),
+    );
     this.reset();
   }
 }
@@ -532,16 +553,15 @@ export class UI {
   static async editText<
     T extends ExcalidrawTextElement | ExcalidrawTextContainer,
   >(element: T, text: string) {
-    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
     const openedEditor =
-      document.querySelector<HTMLTextAreaElement>(textEditorSelector);
+      document.querySelector<HTMLTextAreaElement>(TEXT_EDITOR_SELECTOR);
 
     if (!openedEditor) {
       mouse.select(element);
       Keyboard.keyPress(KEYS.ENTER);
     }
 
-    const editor = await getTextEditor(textEditorSelector);
+    const editor = await getTextEditor();
     if (!editor) {
       throw new Error("Can't find wysiwyg text editor in the dom");
     }
@@ -598,6 +618,7 @@ export class UI {
 
     const mutations = cropElement(
       element,
+      h.scene.getNonDeletedElementsMap(),
       handle,
       naturalWidth,
       naturalHeight,

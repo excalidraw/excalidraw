@@ -6,7 +6,10 @@ import {
 } from "@excalidraw/element";
 import { arrayToMap } from "@excalidraw/common";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import {
+  toggleLinePolygonState,
+  CaptureUpdateAction,
+} from "@excalidraw/element";
 
 import { useContext } from "react";
 
@@ -25,8 +28,6 @@ import { ExcalidrawPropsCustomOptionsContext } from "../types";
 import { ButtonIcon } from "../components/ButtonIcon";
 
 import { newElementWith } from "../../element/src/mutateElement";
-
-import { toggleLinePolygonState } from "../../element/src/shapes";
 
 import { register } from "./register";
 
