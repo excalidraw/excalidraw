@@ -197,82 +197,80 @@ function CommandPaletteInner({
       autofocus
       className="command-palette-dialog"
     >
-      <div data-testid="command-palette-dialog">
-        <div
-          className="search-container"
-          role="combobox"
-          aria-expanded={hasCommands || showNoResults}
-          aria-controls="command-palette-commands"
-          aria-activedescendant={activeCommandId}
-          tabIndex={0}
-        >
-          <TextField
-            value={commandSearch}
-            placeholder={t("commandPalette.search.placeholder")}
-            onChange={(value) => {
-              setCommandSearch(value);
-            }}
-            selectOnRender
-            ref={inputRef}
-          />
-        </div>
+      <div
+        className="search-container"
+        role="combobox"
+        aria-expanded={hasCommands || showNoResults}
+        aria-controls="command-palette-commands"
+        aria-activedescendant={activeCommandId}
+        tabIndex={0}
+      >
+        <TextField
+          value={commandSearch}
+          placeholder={t("commandPalette.search.placeholder")}
+          onChange={(value) => {
+            setCommandSearch(value);
+          }}
+          selectOnRender
+          ref={inputRef}
+        />
+      </div>
 
-        {!app.device.viewport.isMobile && (
-          <div
-            className="shortcuts-wrapper"
-            data-testid="command-palette-shortcuts"
-          >
-            <CommandShortcutHint shortcut="↑↓">
-              {t("commandPalette.shortcuts.select")}
-            </CommandShortcutHint>
-            <CommandShortcutHint shortcut="↵">
-              {t("commandPalette.shortcuts.confirm")}
-            </CommandShortcutHint>
-            <CommandShortcutHint shortcut={getShortcutKey("Esc")}>
-              {t("commandPalette.shortcuts.close")}
-            </CommandShortcutHint>
-          </div>
+      {!app.device.viewport.isMobile && (
+        <div
+          className="shortcuts-wrapper"
+          data-testid="command-palette-shortcuts"
+        >
+          <CommandShortcutHint shortcut="↑↓">
+            {t("commandPalette.shortcuts.select")}
+          </CommandShortcutHint>
+          <CommandShortcutHint shortcut="↵">
+            {t("commandPalette.shortcuts.confirm")}
+          </CommandShortcutHint>
+          <CommandShortcutHint shortcut={getShortcutKey("Esc")}>
+            {t("commandPalette.shortcuts.close")}
+          </CommandShortcutHint>
+        </div>
+      )}
+
+      <div
+        id="command-palette-commands"
+        className="commands"
+        role="listbox"
+        aria-label="Available commands"
+        data-testid="command-palette-commands"
+      >
+        {lastUsed && !commandSearch && (
+          <RecentCommand
+            lastUsed={lastUsed}
+            currentCommand={currentCommand}
+            onExecute={executeCommand}
+            onMouseMove={setCurrentCommand}
+          />
         )}
 
-        <div
-          id="command-palette-commands"
-          className="commands"
-          role="listbox"
-          aria-label="Available commands"
-          data-testid="command-palette-commands"
-        >
-          {lastUsed && !commandSearch && (
-            <RecentCommand
-              lastUsed={lastUsed}
-              currentCommand={currentCommand}
-              onExecute={executeCommand}
-              onMouseMove={setCurrentCommand}
-            />
-          )}
-
-          {commandsByCategory && Object.keys(commandsByCategory).length > 0 ? (
-            Object.keys(commandsByCategory).map((category) => {
-              return (
-                <div className="command-category" key={category} role="group">
-                  <h3 className="command-category-title">{category}</h3>
-                  {commandsByCategory[category]?.map((command) => (
-                    <CommandItem
-                      key={command.label}
-                      command={command}
-                      isSelected={command.label === currentCommand?.label}
-                      onClick={(event) => executeCommand(command, event)}
-                      onMouseMove={() => setCurrentCommand(command)}
-                      showShortcut={!app.device.viewport.isMobile}
-                      appState={uiAppState}
-                    />
-                  ))}
-                </div>
-              );
-            })
-          ) : showNoResults ? (
-            <CommandEmpty />
-          ) : null}
-        </div>
+        {commandsByCategory && Object.keys(commandsByCategory).length > 0 ? (
+          Object.keys(commandsByCategory).map((category) => {
+            return (
+              <div className="command-category" key={category} role="group">
+                <h3 className="command-category-title">{category}</h3>
+                {commandsByCategory[category]?.map((command) => (
+                  <CommandItem
+                    key={command.label}
+                    command={command}
+                    isSelected={command.label === currentCommand?.label}
+                    onClick={(event) => executeCommand(command, event)}
+                    onMouseMove={() => setCurrentCommand(command)}
+                    showShortcut={!app.device.viewport.isMobile}
+                    appState={uiAppState}
+                  />
+                ))}
+              </div>
+            );
+          })
+        ) : showNoResults ? (
+          <CommandEmpty />
+        ) : null}
       </div>
     </Dialog>
   );

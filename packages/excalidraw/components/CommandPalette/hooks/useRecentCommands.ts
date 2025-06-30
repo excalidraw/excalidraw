@@ -40,10 +40,8 @@ export const useRecentCommands = (allCommands: CommandPaletteItem[]) => {
 
   useEffect(() => {
     setRecentCommands((previousRecentCommands) =>
-      allCommands.filter((command) =>
-        previousRecentCommands
-          .map((recentCommand) => recentCommand.label)
-          .includes(command.label),
+      previousRecentCommands.filter((command) =>
+        allCommands.some((c) => c.label === command.label),
       ),
     );
   }, [allCommands, setRecentCommands]);

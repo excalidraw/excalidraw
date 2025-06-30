@@ -54,7 +54,7 @@ describe("CommandPalette", () => {
         "shortcut",
       );
 
-      const dialog = screen.getByTestId("command-palette-dialog");
+      const dialog = document.querySelector(".command-palette-dialog");
       expect(dialog).toBeInTheDocument();
     });
 
@@ -73,7 +73,7 @@ describe("CommandPalette", () => {
         "shortcut",
       );
 
-      const dialog = screen.getByTestId("command-palette-dialog");
+      const dialog = document.querySelector(".command-palette-dialog");
       expect(dialog).toBeInTheDocument();
     });
 
@@ -101,7 +101,12 @@ describe("CommandPalette", () => {
 
       expect(h.state.openDialog).toEqual({ name: "commandPalette" });
 
-      const dialog = screen.getByTestId("command-palette-dialog");
+      const dialog = document.querySelector(".command-palette-dialog");
+
+      if (!dialog) {
+        throw new Error("Dialog not found");
+      }
+
       fireEvent.keyDown(dialog, { key: KEYS.ESCAPE });
 
       expect(h.state.openDialog).toBeNull();
@@ -145,7 +150,7 @@ describe("CommandPalette", () => {
 
       expect(h.state.openDialog).toEqual({ name: "commandPalette" });
 
-      const dialog = screen.getByTestId("command-palette-dialog");
+      const dialog = document.querySelector(".command-palette-dialog");
       expect(dialog).toBeInTheDocument();
     });
 
@@ -199,7 +204,12 @@ describe("CommandPalette", () => {
       fireEvent.change(input, { target: { value: "test" } });
       expect(input.value).toBe("test");
 
-      const dialog = screen.getByTestId("command-palette-dialog");
+      const dialog = document.querySelector(".command-palette-dialog");
+
+      if (!dialog) {
+        throw new Error("Dialog not found");
+      }
+
       fireEvent.keyDown(dialog, { key: KEYS.ESCAPE });
 
       expect(h.state.openDialog).toBeNull();
@@ -225,7 +235,12 @@ describe("CommandPalette", () => {
 
       expect(h.state.openDialog).toEqual({ name: "commandPalette" });
 
-      const dialog = screen.getByTestId("command-palette-dialog");
+      const dialog = document.querySelector(".command-palette-dialog");
+
+      if (!dialog) {
+        throw new Error("Dialog not found");
+      }
+
       expect(dialog).toBeInTheDocument();
     });
 
@@ -316,7 +331,7 @@ describe("CommandPalette", () => {
 
       expect(h.state.openDialog).toEqual({ name: "commandPalette" });
 
-      const dialog = screen.getByTestId("command-palette-dialog");
+      const dialog = document.querySelector(".command-palette-dialog");
       expect(dialog).toBeInTheDocument();
     });
 
@@ -481,7 +496,12 @@ describe("CommandPalette", () => {
       expect(recentCommand).toBeInTheDocument();
       expect(recentCommand?.textContent).toContain(ELEMENT_COMMAND_NAME);
 
-      const dialog = screen.getByTestId("command-palette-dialog");
+      const dialog = document.querySelector(".command-palette-dialog");
+
+      if (!dialog) {
+        throw new Error("Dialog not found");
+      }
+
       fireEvent.keyDown(dialog, { key: KEYS.ESCAPE });
       expect(h.state.openDialog).toBeNull();
 
@@ -510,7 +530,11 @@ describe("CommandPalette", () => {
 
       expect(h.state.openDialog).toEqual({ name: "commandPalette" });
 
-      const dialog = screen.getByTestId("command-palette-dialog");
+      const dialog = document.querySelector(".command-palette-dialog");
+      if (!dialog) {
+        throw new Error("Dialog not found");
+      }
+
       expect(dialog).toBeInTheDocument();
     });
 
@@ -542,7 +566,11 @@ describe("CommandPalette", () => {
 
       expect(h.state.openDialog).toEqual({ name: "commandPalette" });
 
-      const dialog = screen.getByTestId("command-palette-dialog");
+      const dialog = document.querySelector(".command-palette-dialog");
+      if (!dialog) {
+        throw new Error("Dialog not found");
+      }
+
       expect(dialog).toBeInTheDocument();
     });
 
@@ -579,7 +607,11 @@ describe("CommandPalette", () => {
         writable: true,
       });
 
-      const dialog = screen.getByTestId("command-palette-dialog");
+      const dialog = document.querySelector(".command-palette-dialog");
+      if (!dialog) {
+        throw new Error("Dialog not found");
+      }
+
       fireEvent.keyDown(dialog, { key: KEYS.ESCAPE });
       expect(h.state.openDialog).toBeNull();
 
