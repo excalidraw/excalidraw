@@ -7,7 +7,7 @@
       --toast-text-color: var(--popup-text-color);
     }
     &--warning {
-      --toast-bg: var(--color-warning-background);
+      --toast-bg: var(--color-warning-dark);
       --toast-text-color: var(--color-warning-color);
       .close {
         &:active {
