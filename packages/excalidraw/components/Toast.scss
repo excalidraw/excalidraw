@@ -11,14 +11,14 @@
       --toast-text-color: var(--color-warning-color);
       .close {
         &:active {
-          background-color: var(--color-warning-icon-background);
+          background-color: var(--color-warning);
         }
         .ToolIcon__icon {
           &:active {
-            background-color: var(--color-warning-icon-background);
+            background-color: var(--color-warning);
           }
           &:hover {
-            background-color: var(--color-warning-icon-background);
+            background-color: var(--color-warning);
           }
           svg {
             color: var(--color-warning-color);
