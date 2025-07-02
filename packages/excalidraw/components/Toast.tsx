@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import clsx from "clsx";
 
 import { CloseIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
@@ -6,6 +7,8 @@ import { ToolButton } from "./ToolButton";
 import "./Toast.scss";
 
 import type { CSSProperties } from "react";
+
+export type ToastType = "info" | "warning";
 
 const DEFAULT_TOAST_TIMEOUT = 5000;
 
@@ -15,12 +18,14 @@ export const Toast = ({
   closable = false,
   // To prevent autoclose, pass duration as Infinity
   duration = DEFAULT_TOAST_TIMEOUT,
+  type = "info",
   style,
 }: {
   message: string;
   onClose: () => void;
   closable?: boolean;
   duration?: number;
+  type?: ToastType;
   style?: CSSProperties;
 }) => {
   const timerRef = useRef<number>(0);
@@ -46,7 +51,7 @@ export const Toast = ({
   const onMouseLeave = shouldAutoClose ? scheduleTimeout : undefined;
   return (
     <div
-      className="Toast"
+      className={clsx("Toast", `Toast--${type}`)}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       style={style}

@@ -1,3 +1,5 @@
+import type { ToastType } from "@excalidraw/excalidraw/components/Toast";
+
 import type { RestoredAppState } from "@excalidraw/excalidraw/data/restore";
 
 import type {
@@ -380,7 +382,12 @@ export interface AppState {
   previousSelectedElementIds: { [id: string]: true };
   selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
-  toast: { message: string; closable?: boolean; duration?: number } | null;
+  toast: {
+    message: string;
+    closable?: boolean;
+    duration?: number;
+    type?: ToastType;
+  } | null;
   zenModeEnabled: boolean;
   theme: Theme;
   /** grid cell px size */

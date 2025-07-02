@@ -2,6 +2,26 @@
 
 .excalidraw {
   .Toast {
+    &--warning {
+      background-color: var(--color-warning-background);
+      color: var(--color-warning-color);
+      .close {
+        &:active {
+          background-color: var(--color-warning-icon-background);
+        }
+        .ToolIcon__icon {
+          &:active {
+            background-color: var(--color-warning-icon-background);
+          }
+          &:hover {
+            background-color: var(--color-warning-icon-background);
+          }
+          svg {
+            color: var(--color-warning-color);
+          }
+        }
+      }
+    }
     $closeButtonSize: 1.2rem;
     $closeButtonPadding: 0.4rem;
 

@@ -1734,6 +1734,7 @@ class App extends React.Component<AppProps, AppState> {
                             onClose={this.handleToastClose}
                             duration={this.state.toast.duration}
                             closable={this.state.toast.closable}
+                            type={this.state.toast.type}
                           />
                         )}
 

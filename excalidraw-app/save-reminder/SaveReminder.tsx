@@ -116,6 +116,9 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
             appState: {
               toast: {
                 message: t("toast.rememberToSave"),
+                closable: true,
+                duration: 10000,
+                type: "warning",
               },
             },
           });

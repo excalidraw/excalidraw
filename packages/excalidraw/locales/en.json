@@ -521,7 +521,7 @@
     "copyToClipboardAsPng": "Copied {{exportSelection}} to clipboard as PNG\n({{exportColorScheme}})",
     "copyToClipboardAsSvg": "Copied {{exportSelection}} to clipboard as SVG\n({{exportColorScheme}})",
     "fileSaved": "File saved.",
-    "rememberToSave": "Don't forget to save to a file for extra safety.",
+    "rememberToSave": "Remember to Save to a File as a backup.",
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
     "selection": "selection",
