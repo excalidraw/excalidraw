@@ -2,9 +2,13 @@
 
 .excalidraw {
   .Toast {
+    &--info {
+      --toast-bg: var(--button-gray-1);
+      --toast-text-color: var(--popup-text-color);
+    }
     &--warning {
-      background-color: var(--color-warning-background);
-      color: var(--color-warning-color);
+      --toast-bg: var(--color-warning-background);
+      --toast-text-color: var(--color-warning-color);
       .close {
         &:active {
           background-color: var(--color-warning-icon-background);
@@ -26,7 +30,7 @@
     $closeButtonPadding: 0.4rem;
 
     animation: fade-in 0.5s;
-    background-color: var(--button-gray-1);
+    background-color: var(--toast-bg);
     border-radius: 4px;
     bottom: 10px;
     box-sizing: border-box;
@@ -41,7 +45,7 @@
 
     .Toast__message {
       padding: 0 $closeButtonSize + ($closeButtonPadding);
-      color: var(--popup-text-color);
+      color: var(--toast-text-color);
       white-space: pre-wrap;
     }
 
