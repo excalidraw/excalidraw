@@ -63,7 +63,21 @@ import {
   laserPointerToolIcon,
   MagicIcon,
   LassoIcon,
+  FreedrawIcon,
+  EraserIcon,
+  SelectionIcon,
 } from "./icons";
+
+// Raster Tools Implementation
+// These tools provide bitmap-based drawing for improved performance on tablets and less powerful hardware
+// - RasterPencil: Draws directly onto a bitmap canvas layer, reducing GPU load compared to vector drawing
+// - RasterEraser: Erases bitmap content using canvas composite operations  
+// - RasterLasso: Selection tool for raster content (placeholder implementation)
+// The raster layer is rendered beneath all vector elements in staticScene.ts
+// Temporary icons for raster tools - we'll use variations of existing icons
+const RasterPencilIcon = FreedrawIcon;
+const RasterEraserIcon = EraserIcon;
+const RasterLassoIcon = SelectionIcon;
 
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import type { ActionManager } from "../actions/manager";
@@ -425,6 +439,33 @@ export const ShapesSwitcher = ({
             selected={lassoToolSelected}
           >
             {t("toolBar.lasso")}
+          </DropdownMenu.Item>
+          <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
+            Raster Tools
+          </div>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "rasterpencil" })}
+            icon={RasterPencilIcon}
+            data-testid="toolbar-rasterpencil"
+            selected={activeTool.type === "rasterpencil"}
+          >
+            {t("toolBar.rasterpencil")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "rastereraser" })}
+            icon={RasterEraserIcon}
+            data-testid="toolbar-rastereraser"
+            selected={activeTool.type === "rastereraser"}
+          >
+            {t("toolBar.rastereraser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "rasterlasso" })}
+            icon={RasterLassoIcon}
+            data-testid="toolbar-rasterlasso"
+            selected={activeTool.type === "rasterlasso"}
+          >
+            {t("toolBar.rasterlasso")}
           </DropdownMenu.Item>
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate
