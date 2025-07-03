@@ -8486,9 +8486,27 @@ class App extends React.Component<AppProps, AppState> {
           } else if (!this.bindModeHandler && hoveredElement) {
             this.bindModeHandler = setTimeout(() => {
               if (hoveredElement) {
-                this.setState({
-                  bindMode: "fixed",
+                flushSync(() => {
+                  this.setState({
+                    bindMode: "fixed",
+                  });
                 });
+                const newState = LinearElementEditor.handlePointDragging(
+                  event,
+                  this,
+                  this.lastPointerMoveCoords?.x ?? pointerDownState.origin.x,
+                  this.lastPointerMoveCoords?.y ?? pointerDownState.origin.y,
+                  linearElementEditor,
+                );
+                if (newState) {
+                  pointerDownState.lastCoords.x =
+                    this.lastPointerMoveCoords?.x ?? pointerDownState.origin.x;
+                  pointerDownState.lastCoords.y =
+                    this.lastPointerMoveCoords?.y ?? pointerDownState.origin.y;
+                  pointerDownState.drag.hasOccurred = true;
+
+                  this.setState(newState);
+                }
               } else {
                 this.bindModeHandler = null;
               }
