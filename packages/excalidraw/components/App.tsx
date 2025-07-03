@@ -594,9 +594,8 @@ class App extends React.Component<AppProps, AppState> {
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
   private handleToastClose = () => {
-  this.setToast(null);
+    this.setToast(null);
   };
-
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
 
@@ -1712,14 +1711,14 @@ class App extends React.Component<AppProps, AppState> {
                               />
                             </ElementCanvasButtons>
                           )}
-                        
+
                         {this.state.toast !== null && (
-                        <Toast
-                         message={this.state.toast.message}
-                         onClose={this.handleToastClose} // ✅ Stable reference
-                         duration={this.state.toast.duration}
-                         closable={this.state.toast.closable}
-                         />
+                          <Toast
+                            message={this.state.toast.message}
+                            onClose={this.handleToastClose}
+                            duration={this.state.toast.duration}
+                            closable={this.state.toast.closable}
+                          />
                         )}
 
                         {this.state.contextMenu && (
