@@ -4369,7 +4369,7 @@ class App extends React.Component<AppProps, AppState> {
         const arrowIdsToRemove = new Set<string>();
 
         selectedElements
-          .filter(isElbowArrow)
+          .filter(isArrowElement)
           .filter((arrow) => {
             const startElementNotInSelection =
               arrow.startBinding &&
@@ -6352,8 +6352,8 @@ class App extends React.Component<AppProps, AppState> {
             });
           } else if (
             !hitElement ||
-            // Ebow arrows can only be moved when unconnected
-            !isElbowArrow(hitElement) ||
+            // Arrows can only be moved when unconnected
+            !isArrowElement(hitElement) ||
             !(hitElement.startBinding || hitElement.endBinding)
           ) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
@@ -6461,8 +6461,8 @@ class App extends React.Component<AppProps, AppState> {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
           if (
-            // Ebow arrows can only be moved when unconnected
-            !isElbowArrow(element) ||
+            // Arrows can only be moved when unconnected
+            !isArrowElement(element) ||
             !(element.startBinding || element.endBinding)
           ) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
@@ -6470,8 +6470,8 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
         if (
-          // Ebow arrows can only be moved when unconnected
-          !isElbowArrow(element) ||
+          // Arrows can only be moved when unconnected
+          !isArrowElement(element) ||
           !(element.startBinding || element.endBinding)
         ) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
