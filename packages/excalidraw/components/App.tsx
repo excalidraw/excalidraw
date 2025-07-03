@@ -4326,6 +4326,19 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      // Handle Alt key for bind mode
+      if (event.key === KEYS.ALT && this.state.bindMode === "focus") {
+        // Cancel any pending bind mode timer
+        if (this.bindModeHandler) {
+          clearTimeout(this.bindModeHandler);
+          this.bindModeHandler = null;
+        }
+        // Immediately switch to skip bind mode
+        this.setState({
+          bindMode: "skip",
+        });
+      }
+
       if (this.actionManager.handleKeyDown(event)) {
         return;
       }
@@ -4335,6 +4348,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
+        if (this.bindModeHandler) {
+          clearTimeout(this.bindModeHandler);
+          this.bindModeHandler = null;
+        }
         this.setState({ isBindingEnabled: false });
       }
 
@@ -4624,6 +4641,45 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
       isHoldingSpace = false;
+    }
+    if (
+      (event.key === KEYS.ALT && this.state.bindMode === "skip") ||
+      (!event[KEYS.CTRL_OR_CMD] && !isBindingEnabled(this.state))
+    ) {
+      // Handle Alt key release for bind mode
+      this.setState({
+        bindMode: "focus",
+      });
+
+      // Restart the timer if we're creating/editing a linear element and hovering over an element
+      if (this.lastPointerMoveEvent) {
+        const scenePointer = viewportCoordsToSceneCoords(
+          {
+            clientX: this.lastPointerMoveEvent.clientX,
+            clientY: this.lastPointerMoveEvent.clientY,
+          },
+          this.state,
+        );
+
+        const hoveredElement = getHoveredElementForBinding(
+          scenePointer,
+          this.scene.getNonDeletedElements(),
+          this.scene.getNonDeletedElementsMap(),
+          this.state.zoom,
+        );
+
+        if (hoveredElement && !this.bindModeHandler) {
+          this.bindModeHandler = setTimeout(() => {
+            if (hoveredElement) {
+              this.setState({
+                bindMode: "fixed",
+              });
+            } else {
+              this.bindModeHandler = null;
+            }
+          }, BIND_MODE_TIMEOUT);
+        }
+      }
     }
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
       this.setState({ isBindingEnabled: true });
@@ -5906,12 +5962,14 @@ class App extends React.Component<AppProps, AppState> {
       this.state.editingLinearElement &&
       !this.state.editingLinearElement.isDragging
     ) {
-      const editingLinearElement = LinearElementEditor.handlePointerMove(
-        event,
-        scenePointerX,
-        scenePointerY,
-        this,
-      );
+      const editingLinearElement = this.state.newElement
+        ? null
+        : LinearElementEditor.handlePointerMove(
+            event,
+            scenePointerX,
+            scenePointerY,
+            this,
+          );
 
       if (
         editingLinearElement &&
@@ -6033,43 +6091,52 @@ class App extends React.Component<AppProps, AppState> {
           { informMutation: false, isDragging: false },
         );
       } else {
-        const hoveredElement = getHoveredElementForBinding(
-          {
-            x: scenePointerX,
-            y: scenePointerY,
-          },
-          this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
-          this.state.zoom,
-          false,
-          false,
-        );
-        const [gridX, gridY] = getGridPoint(
+        let [gridX, gridY] = getGridPoint(
           scenePointerX,
           scenePointerY,
-          event[KEYS.CTRL_OR_CMD] || hoveredElement
-            ? null
-            : this.getEffectiveGridSize(),
+          event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
         );
 
-        const avoidancePoint =
-          multiElement &&
-          hoveredElement &&
-          getOutlineAvoidingPoint(
-            multiElement,
-            hoveredElement,
-            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-            multiElement.points.length - 1,
+        if (this.state.bindMode === "focus" && isBindingEnabled(this.state)) {
+          const hoveredElement = getHoveredElementForBinding(
+            {
+              x: scenePointerX,
+              y: scenePointerY,
+            },
+            this.scene.getNonDeletedElements(),
             this.scene.getNonDeletedElementsMap(),
+            this.state.zoom,
+            false,
+            false,
           );
+
+          const avoidancePoint =
+            multiElement &&
+            hoveredElement &&
+            getOutlineAvoidingPoint(
+              multiElement,
+              hoveredElement,
+              pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+              multiElement.points.length - 1,
+              this.scene.getNonDeletedElementsMap(),
+            );
+          gridX = avoidancePoint
+            ? avoidancePoint[0]
+            : hoveredElement
+            ? scenePointerX
+            : gridX;
+          gridY = avoidancePoint
+            ? avoidancePoint[1]
+            : hoveredElement
+            ? scenePointerY
+            : gridY;
+        }
 
         const [lastCommittedX, lastCommittedY] =
           multiElement?.lastCommittedPoint ?? [0, 0];
 
-        let dxFromLastCommitted =
-          (avoidancePoint ? avoidancePoint[0] : gridX) - rx - lastCommittedX;
-        let dyFromLastCommitted =
-          (avoidancePoint ? avoidancePoint[1] : gridY) - ry - lastCommittedY;
+        let dxFromLastCommitted = gridX - rx - lastCommittedX;
+        let dyFromLastCommitted = gridY - ry - lastCommittedY;
 
         if (shouldRotateWithDiscreteAngle(event)) {
           ({ width: dxFromLastCommitted, height: dyFromLastCommitted } =
@@ -6763,7 +6830,7 @@ class App extends React.Component<AppProps, AppState> {
     this.lastPointerUpEvent = event;
 
     // Cancel any pending timeout for bind mode change
-    if (this.state.bindMode === "fixed") {
+    if (this.state.bindMode === "fixed" || this.state.bindMode === "skip") {
       if (this.bindModeHandler) {
         clearTimeout(this.bindModeHandler);
       }
@@ -8914,7 +8981,7 @@ class App extends React.Component<AppProps, AppState> {
 
             if (!arrowIsInsideTheSameElement) {
               const [targetPointX, targetPointY] =
-                this.state.bindMode === "focus"
+                this.state.bindMode === "focus" && isBindingEnabled(this.state)
                   ? getOutlineAvoidingPoint(
                       newElement,
                       hoveredElement,
