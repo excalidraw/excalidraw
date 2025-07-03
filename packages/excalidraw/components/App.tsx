@@ -593,6 +593,10 @@ class App extends React.Component<AppProps, AppState> {
    * insert to DOM before user initially scrolls to them) */
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
+  private handleToastClose = () => {
+    this.setToast(null);
+  };
+
   private elementsPendingErasure: ElementsPendingErasure = new Set();
 
   public flowChartCreator: FlowChartCreator = new FlowChartCreator();
@@ -1707,14 +1711,16 @@ class App extends React.Component<AppProps, AppState> {
                               />
                             </ElementCanvasButtons>
                           )}
+
                         {this.state.toast !== null && (
                           <Toast
                             message={this.state.toast.message}
-                            onClose={() => this.setToast(null)}
+                            onClose={this.handleToastClose}
                             duration={this.state.toast.duration}
                             closable={this.state.toast.closable}
                           />
                         )}
+
                         {this.state.contextMenu && (
                           <ContextMenu
                             items={this.state.contextMenu.items}
