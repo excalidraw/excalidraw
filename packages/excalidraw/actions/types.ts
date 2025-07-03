@@ -64,6 +64,7 @@ export type ActionName =
   | "changeBackgroundColor"
   | "changeFillStyle"
   | "changeStrokeWidth"
+  | "changestrokePressure"
   | "changeStrokeShape"
   | "changeSloppiness"
   | "changeStrokeStyle"
