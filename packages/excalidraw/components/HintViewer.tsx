@@ -11,11 +11,10 @@ import {
 
 import { getShortcutKey } from "@excalidraw/common";
 
-import { isNodeInFlowchart } from "@excalidraw/element";
+import { isNodeInFlowchart, isGridModeEnabled } from "@excalidraw/element";
 
 import { t } from "../i18n";
 import { isEraserActive } from "../appState";
-import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
 
