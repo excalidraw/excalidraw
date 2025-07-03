@@ -427,6 +427,7 @@ export type ElementsMapOrArray =
   | readonly ExcalidrawElement[]
   | Readonly<ElementsMap>;
 
+export type ArrangeAlgorithms = "bin-packing"; // Add more here if required
 export type ExcalidrawLinearElementSubType =
   | "line"
   | "sharpArrow"

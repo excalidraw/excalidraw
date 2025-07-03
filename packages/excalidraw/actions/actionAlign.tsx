@@ -10,6 +10,8 @@ import { alignElements } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
+import { getMaximumGroups } from "@excalidraw/element/groups";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Alignment } from "@excalidraw/element";
@@ -37,8 +39,12 @@ export const alignActionsPredicate = (
   app: AppClassProperties,
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
+  const groups = getMaximumGroups(
+    selectedElements,
+    app.scene.getNonDeletedElementsMap(),
+  );
   return (
-    selectedElements.length > 1 &&
+    groups.length > 1 &&
     // TODO enable aligning frames when implemented properly
     !selectedElements.some((el) => isFrameLikeElement(el))
   );

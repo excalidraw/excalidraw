@@ -25,6 +25,10 @@ export const getDefaultAppState = (): Omit<
 > => {
   return {
     showWelcomeScreen: false,
+    arrangeConfiguration: {
+      gap: 10,
+      algorithm: "bin-packing",
+    },
     theme: THEME.LIGHT,
     collaborators: new Map(),
     currentChartType: "bar",
@@ -144,6 +148,7 @@ const APP_STATE_STORAGE_CONF = (<
 >(config: { [K in keyof T]: K extends keyof AppState ? T[K] : never }) =>
   config)({
   showWelcomeScreen: { browser: true, export: false, server: false },
+  arrangeConfiguration: { browser: true, export: false, server: false },
   theme: { browser: true, export: false, server: false },
   collaborators: { browser: false, export: false, server: false },
   currentChartType: { browser: true, export: false, server: false },
