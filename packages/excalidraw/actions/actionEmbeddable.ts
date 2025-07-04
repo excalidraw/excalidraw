@@ -11,6 +11,7 @@ export const actionSetEmbeddableAsActiveTool = register({
   trackEvent: { category: "toolbar" },
   target: "Tool",
   label: "toolBar.embeddable",
+  keywords: ["embeddable", "embed", "iframe"],
   perform: (elements, appState, _, app) => {
     const nextActiveTool = updateActiveTool(appState, {
       type: "embeddable",
