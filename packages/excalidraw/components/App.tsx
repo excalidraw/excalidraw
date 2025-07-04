@@ -5984,7 +5984,10 @@ class App extends React.Component<AppProps, AppState> {
         this.state.newElement
       ) {
         // Timed bind mode handler for arrow elements
-        if (this.state.bindMode === "focus") {
+        if (
+          isArrowElement(this.state.newElement) &&
+          this.state.bindMode === "focus"
+        ) {
           const hoveredElement = getHoveredElementForBinding(
             scenePointer,
             this.scene.getNonDeletedElements(),
@@ -6121,7 +6124,11 @@ class App extends React.Component<AppProps, AppState> {
           event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
         );
 
-        if (this.state.bindMode === "focus" && isBindingEnabled(this.state)) {
+        if (
+          isArrowElement(multiElement) &&
+          this.state.bindMode === "focus" &&
+          isBindingEnabled(this.state)
+        ) {
           const hoveredElement = getHoveredElementForBinding(
             {
               x: scenePointerX,
