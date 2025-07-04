@@ -655,11 +655,6 @@ class App extends React.Component<AppProps, AppState> {
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
-  // setState(s: any, t?: any) {
-  //   s.suggestedBindings && console.trace(s.suggestedBindings);
-  //   super.setState(s, t);
-  // }
-
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -6003,9 +5998,38 @@ class App extends React.Component<AppProps, AppState> {
           } else if (!this.bindModeHandler && hoveredElement) {
             this.bindModeHandler = setTimeout(() => {
               if (hoveredElement) {
-                this.setState({
-                  bindMode: "fixed",
+                flushSync(() => {
+                  this.setState({
+                    bindMode: "fixed",
+                  });
                 });
+
+                if (isArrowElement(this.state.newElement)) {
+                  const lastSceneCoords = viewportCoordsToSceneCoords(
+                    {
+                      clientX: this.lastPointerMoveEvent?.clientX ?? 0,
+                      clientY: this.lastPointerMoveEvent?.clientY ?? 0,
+                    },
+                    this.state,
+                  );
+                  this.scene.mutateElement(
+                    this.state.newElement,
+                    {
+                      points: [
+                        ...this.state.newElement.points.slice(0, -1),
+                        LinearElementEditor.pointFromAbsoluteCoords(
+                          this.state.newElement,
+                          pointFrom<GlobalPoint>(
+                            lastSceneCoords.x,
+                            lastSceneCoords.y,
+                          ),
+                          this.scene.getNonDeletedElementsMap(),
+                        ),
+                      ],
+                    },
+                    { informMutation: false, isDragging: false },
+                  );
+                }
               } else {
                 this.bindModeHandler = null;
               }
@@ -6109,27 +6133,50 @@ class App extends React.Component<AppProps, AppState> {
             false,
             false,
           );
-
-          const avoidancePoint =
-            multiElement &&
-            hoveredElement &&
-            getOutlineAvoidingPoint(
+          const otherPoint =
+            LinearElementEditor.getPointAtIndexGlobalCoordinates(
               multiElement,
-              hoveredElement,
-              pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-              multiElement.points.length - 1,
+              0,
               this.scene.getNonDeletedElementsMap(),
             );
-          gridX = avoidancePoint
-            ? avoidancePoint[0]
-            : hoveredElement
-            ? scenePointerX
-            : gridX;
-          gridY = avoidancePoint
-            ? avoidancePoint[1]
-            : hoveredElement
-            ? scenePointerY
-            : gridY;
+          const otherHoveredElement = getHoveredElementForBinding(
+            {
+              x: otherPoint[0],
+              y: otherPoint[1],
+            },
+            this.scene.getNonDeletedElements(),
+            this.scene.getNonDeletedElementsMap(),
+            this.state.zoom,
+            false,
+            false,
+          );
+
+          if (
+            hoveredElement &&
+            otherHoveredElement &&
+            hoveredElement.id !== otherHoveredElement.id
+          ) {
+            const avoidancePoint =
+              multiElement &&
+              hoveredElement &&
+              getOutlineAvoidingPoint(
+                multiElement,
+                hoveredElement,
+                pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+                multiElement.points.length - 1,
+                this.scene.getNonDeletedElementsMap(),
+              );
+            gridX = avoidancePoint
+              ? avoidancePoint[0]
+              : hoveredElement
+              ? scenePointerX
+              : gridX;
+            gridY = avoidancePoint
+              ? avoidancePoint[1]
+              : hoveredElement
+              ? scenePointerY
+              : gridY;
+          }
         }
 
         const [lastCommittedX, lastCommittedY] =
