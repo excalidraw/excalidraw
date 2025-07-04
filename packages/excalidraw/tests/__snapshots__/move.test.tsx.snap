@@ -193,6 +193,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "lastCommittedPoint": null,
   "link": null,
   "locked": false,
+  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [

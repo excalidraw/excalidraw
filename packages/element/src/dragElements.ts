@@ -44,7 +44,7 @@ export const dragSelectedElements = (
 ) => {
   if (
     _selectedElements.length === 1 &&
-    isElbowArrow(_selectedElements[0]) &&
+    isArrowElement(_selectedElements[0]) &&
     (_selectedElements[0].startBinding || _selectedElements[0].endBinding)
   ) {
     return;
