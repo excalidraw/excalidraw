@@ -194,7 +194,7 @@ export interface Action {
           | "export"
           | "history"
           | "menu"
-                  | "search_menu"
+          | "search_menu"
           | "shape_switch";
         action?: string;
         predicate?: (

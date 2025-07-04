@@ -4536,10 +4536,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         hitElementIndex = index;
       }
-      if (
-        element.link &&
-        index >= hitElementIndex 
-      ) {
+      if (element.link && index >= hitElementIndex) {
         return element;
       }
     }
@@ -4559,7 +4556,7 @@ class App extends React.Component<AppProps, AppState> {
         this.lastPointerUpEvent!.clientY,
       ),
     );
-    if( draggedDistance > DRAGGING_THRESHOLD) {
+    if (draggedDistance > DRAGGING_THRESHOLD) {
       return;
     }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
@@ -4571,7 +4568,6 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerUpEvent!,
       this.state,
     );
-
   };
 
   private getTopLayerFrameAtSceneCoords = (sceneCoords: {
@@ -5488,7 +5484,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
- if (this.state.viewModeEnabled) {
+    if (this.state.viewModeEnabled) {
       this.setState({
         selectedElementIds: {},
       });
@@ -5941,7 +5937,6 @@ class App extends React.Component<AppProps, AppState> {
             );
         }
 
-   
         if (
           this.state.croppingElementId &&
           pointerDownState.hit.element?.id !== this.state.croppingElementId

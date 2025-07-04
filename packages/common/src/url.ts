@@ -9,5 +9,3 @@ export const normalizeLink = (link: string) => {
   }
   return sanitizeUrl(escapeDoubleQuotes(link));
 };
-
-

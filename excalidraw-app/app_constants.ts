@@ -20,4 +20,3 @@ export const STORAGE_KEYS = {
   VERSION_DATA_STATE: "version-dataState",
   VERSION_FILES: "version-files",
 } as const;
-

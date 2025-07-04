@@ -18,7 +18,6 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 
 import type {
@@ -278,7 +277,6 @@ const _renderStaticScene = ({
       }
 
       context.restore();
-
     } catch (error: any) {
       console.error(
         error,

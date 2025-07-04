@@ -15,10 +15,7 @@ import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionTo
 
 import type { MarkRequired } from "@excalidraw/common/utility-types";
 
-import {
-  actionClearCanvas,
-  actionToggleSearchMenu,
-} from "../../actions";
+import { actionClearCanvas, actionToggleSearchMenu } from "../../actions";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { trackEvent } from "../../analytics";
 import { useUIAppState } from "../../context/ui-appState";

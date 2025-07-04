@@ -64,7 +64,6 @@ export const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
   return byteStringToArrayBuffer(atob(base64));
 };
 
-
 // -----------------------------------------------------------------------------
 // text encoding
 // -----------------------------------------------------------------------------
