@@ -89,6 +89,12 @@ export class EraserTrail extends AnimatedTrail {
 
     const candidateElementsMap = arrayToMap(candidateElements);
 
+    const topMostElement = candidateElements[candidateElements.length - 1];
+
+    const isSegmentInsideTopElementOnly = shouldTestInside(topMostElement) &&
+      isPointInElement(pathSegment[0], topMostElement, candidateElementsMap) &&
+      isPointInElement(pathSegment[1], topMostElement, candidateElementsMap);
+
     for (const element of candidateElements) {
       // restore only if already added to the to-be-erased set
       if (restoreToErase && this.elementsToErase.has(element.id)) {
@@ -127,6 +133,10 @@ export class EraserTrail extends AnimatedTrail {
           this.elementsToErase.delete(element.id);
         }
       } else if (!restoreToErase && !this.elementsToErase.has(element.id)) {
+        if (isSegmentInsideTopElementOnly && element !== topMostElement) {
+          continue;
+        }
+
         const intersects = eraserTest(
           pathSegment,
           element,
