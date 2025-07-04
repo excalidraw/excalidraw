@@ -71,9 +71,9 @@ import { ShapeCache, toggleLinePolygonState } from "./shape";
 import { getLockedLinearCursorAlignSize } from "./sizeHelpers";
 
 import { isLineElement } from "./typeChecks";
+import { moveAllRight } from "./zindex";
 
 import type { Scene } from "./Scene";
-import { moveAllRight } from "./zindex";
 
 import type { Bounds } from "./bounds";
 import type {
@@ -481,7 +481,7 @@ export class LinearElementEditor {
       if (isArrowElement(element)) {
         const updatedElements = moveAllRight(
           app.scene.getElementsIncludingDeleted(),
-          app.state
+          app.state,
         );
         app.scene.replaceAllElements(updatedElements);
       }
