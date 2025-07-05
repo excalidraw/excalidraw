@@ -5,6 +5,7 @@ import { STORAGE_KEYS } from "../app_constants";
 const LOCAL_STATE_VERSIONS = {
   [STORAGE_KEYS.VERSION_DATA_STATE]: -1,
   [STORAGE_KEYS.VERSION_FILES]: -1,
+  [STORAGE_KEYS.VERSION_SAVE_REMINDER]: -1,
 };
 
 type BrowserStateTypes = keyof typeof LOCAL_STATE_VERSIONS;
