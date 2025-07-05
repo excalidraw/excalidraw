@@ -22,6 +22,7 @@ export const alignElements = (
 ): ExcalidrawElement[] => {
   const groups: ExcalidrawElement[][] = getSelectedElementsByGroup(
     selectedElements,
+    scene.getNonDeletedElementsMap(),
     appState,
   );
   const selectionBoundingBox = getCommonBoundingBox(selectedElements);

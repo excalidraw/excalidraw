@@ -40,8 +40,11 @@ export const alignActionsPredicate = (
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
   return (
-    getSelectedElementsByGroup(selectedElements, appState as Readonly<AppState>)
-      .length > 1 &&
+    getSelectedElementsByGroup(
+      selectedElements,
+      app.scene.getNonDeletedElementsMap(),
+      appState as Readonly<AppState>,
+    ).length > 1 &&
     // TODO enable aligning frames when implemented properly
     !selectedElements.some((el) => isFrameLikeElement(el))
   );

@@ -33,8 +33,11 @@ import type { AppClassProperties, AppState } from "../types";
 const enableActionGroup = (appState: AppState, app: AppClassProperties) => {
   const selectedElements = app.scene.getSelectedElements(appState);
   return (
-    getSelectedElementsByGroup(selectedElements, appState as Readonly<AppState>)
-      .length > 2 &&
+    getSelectedElementsByGroup(
+      selectedElements,
+      app.scene.getNonDeletedElementsMap(),
+      appState as Readonly<AppState>,
+    ).length > 2 &&
     // TODO enable distributing frames when implemented properly
     !selectedElements.some((el) => isFrameLikeElement(el))
   );

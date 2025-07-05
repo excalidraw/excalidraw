@@ -24,7 +24,11 @@ export const distributeElements = (
       : (["minY", "midY", "maxY", "height"] as const);
 
   const bounds = getCommonBoundingBox(selectedElements);
-  const groups = getSelectedElementsByGroup(selectedElements, appState)
+  const groups = getSelectedElementsByGroup(
+    selectedElements,
+    elementsMap,
+    appState,
+  )
     .map((group) => [group, getCommonBoundingBox(group)] as const)
     .sort((a, b) => a[1][mid] - b[1][mid]);
 
