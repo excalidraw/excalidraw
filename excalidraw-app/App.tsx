@@ -206,140 +206,6 @@ const shareableLinkConfirmDialog = {
   color: "danger",
 } as const;
 
-const initializeScene = async (opts: {
-  collabAPI: CollabAPI | null;
-  excalidrawAPI: ExcalidrawImperativeAPI;
-  onLoadFromLinkEmitter: Emitter<[elements: readonly ExcalidrawElement[]]>;
-}): Promise<
-  { scene: ExcalidrawInitialDataState | null } & (
-    | { isExternalScene: true; id: string; key: string }
-    | { isExternalScene: false; id?: null; key?: null }
-  )
-> => {
-  const searchParams = new URLSearchParams(window.location.search);
-  const id = searchParams.get("id");
-  const jsonBackendMatch = window.location.hash.match(
-    /^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/,
-  );
-  const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
-
-  const localDataState = importFromLocalStorage();
-
-  let scene: RestoredDataState & {
-    scrollToContent?: boolean;
-  } = await loadScene(null, null, localDataState);
-
-  let roomLinkData = getCollaborationLinkData(window.location.href);
-  const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
-  if (isExternalScene) {
-    if (
-      // don't prompt if scene is empty
-      !scene.elements.length ||
-      // don't prompt for collab scenes because we don't override local storage
-      roomLinkData ||
-      // otherwise, prompt whether user wants to override current scene
-      (await openConfirmModal(shareableLinkConfirmDialog))
-    ) {
-      if (jsonBackendMatch) {
-        scene = await loadScene(
-          jsonBackendMatch[1],
-          jsonBackendMatch[2],
-          localDataState,
-        );
-        opts.onLoadFromLinkEmitter.trigger(scene.elements);
-      }
-      scene.scrollToContent = true;
-      if (!roomLinkData) {
-        window.history.replaceState({}, APP_NAME, window.location.origin);
-      }
-    } else {
-      // https://github.com/excalidraw/excalidraw/issues/1919
-      if (document.hidden) {
-        return new Promise((resolve, reject) => {
-          window.addEventListener(
-            "focus",
-            () => initializeScene(opts).then(resolve).catch(reject),
-            {
-              once: true,
-            },
-          );
-        });
-      }
-
-      roomLinkData = null;
-      window.history.replaceState({}, APP_NAME, window.location.origin);
-    }
-  } else if (externalUrlMatch) {
-    window.history.replaceState({}, APP_NAME, window.location.origin);
-
-    const url = externalUrlMatch[1];
-    try {
-      const request = await fetch(window.decodeURIComponent(url));
-      const data = await loadFromBlob(await request.blob(), null, null);
-      if (
-        !scene.elements.length ||
-        (await openConfirmModal(shareableLinkConfirmDialog))
-      ) {
-        return { scene: data, isExternalScene };
-      }
-    } catch (error: any) {
-      return {
-        scene: {
-          appState: {
-            errorMessage: t("alerts.invalidSceneUrl"),
-          },
-        },
-        isExternalScene,
-      };
-    }
-  }
-
-  if (roomLinkData && opts.collabAPI) {
-    const { excalidrawAPI } = opts;
-
-    const scene = await opts.collabAPI.startCollaboration(roomLinkData);
-
-    return {
-      // when collaborating, the state may have already been updated at this
-      // point (we may have received updates from other clients), so reconcile
-      // elements and appState with existing state
-      scene: {
-        ...scene,
-        appState: {
-          ...restoreAppState(
-            {
-              ...scene?.appState,
-              theme: localDataState?.appState?.theme || scene?.appState?.theme,
-            },
-            excalidrawAPI.getAppState(),
-          ),
-          // necessary if we're invoking from a hashchange handler which doesn't
-          // go through App.initializeScene() that resets this flag
-          isLoading: false,
-        },
-        elements: reconcileElements(
-          scene?.elements || [],
-          excalidrawAPI.getSceneElementsIncludingDeleted() as RemoteExcalidrawElement[],
-          excalidrawAPI.getAppState(),
-        ),
-      },
-      isExternalScene: true,
-      id: roomLinkData.roomId,
-      key: roomLinkData.roomKey,
-    };
-  } else if (scene) {
-    return isExternalScene && jsonBackendMatch
-      ? {
-          scene,
-          isExternalScene,
-          id: jsonBackendMatch[1],
-          key: jsonBackendMatch[2],
-        }
-      : { scene, isExternalScene: false };
-  }
-  return { scene: null, isExternalScene: false };
-};
-
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
@@ -400,6 +266,143 @@ const ExcalidrawWrapper = () => {
     // TODO maybe remove this in several months (shipped: 24-03-11)
     migrationAdapter: LibraryLocalStorageMigrationAdapter,
   });
+
+  const initializeScene = useCallback(
+    async (opts: {
+      collabAPI: CollabAPI | null;
+      excalidrawAPI: ExcalidrawImperativeAPI;
+    }): Promise<
+      { scene: ExcalidrawInitialDataState | null } & (
+        | { isExternalScene: true; id: string; key: string }
+        | { isExternalScene: false; id?: null; key?: null }
+      )
+    > => {
+      const searchParams = new URLSearchParams(window.location.search);
+      const id = searchParams.get("id");
+      const jsonBackendMatch = window.location.hash.match(
+        /^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/,
+      );
+      const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
+
+      const localDataState = importFromLocalStorage();
+
+      let scene: RestoredDataState & {
+        scrollToContent?: boolean;
+      } = await loadScene(null, null, localDataState);
+
+      let roomLinkData = getCollaborationLinkData(window.location.href);
+      const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
+      if (isExternalScene) {
+        if (
+          // don't prompt if scene is empty
+          !scene.elements.length ||
+          // don't prompt for collab scenes because we don't override local storage
+          roomLinkData ||
+          // otherwise, prompt whether user wants to override current scene
+          (await openConfirmModal(shareableLinkConfirmDialog))
+        ) {
+          if (jsonBackendMatch) {
+            scene = await loadScene(
+              jsonBackendMatch[1],
+              jsonBackendMatch[2],
+              localDataState,
+            );
+            onLoadFromLinkEmitter.current.trigger(scene.elements);
+          }
+          scene.scrollToContent = true;
+          if (!roomLinkData) {
+            window.history.replaceState({}, APP_NAME, window.location.origin);
+          }
+        } else {
+          // https://github.com/excalidraw/excalidraw/issues/1919
+          if (document.hidden) {
+            return new Promise((resolve, reject) => {
+              window.addEventListener(
+                "focus",
+                () => initializeScene(opts).then(resolve).catch(reject),
+                {
+                  once: true,
+                },
+              );
+            });
+          }
+
+          roomLinkData = null;
+          window.history.replaceState({}, APP_NAME, window.location.origin);
+        }
+      } else if (externalUrlMatch) {
+        window.history.replaceState({}, APP_NAME, window.location.origin);
+
+        const url = externalUrlMatch[1];
+        try {
+          const request = await fetch(window.decodeURIComponent(url));
+          const data = await loadFromBlob(await request.blob(), null, null);
+          if (
+            !scene.elements.length ||
+            (await openConfirmModal(shareableLinkConfirmDialog))
+          ) {
+            return { scene: data, isExternalScene };
+          }
+        } catch (error: any) {
+          return {
+            scene: {
+              appState: {
+                errorMessage: t("alerts.invalidSceneUrl"),
+              },
+            },
+            isExternalScene,
+          };
+        }
+      }
+
+      if (roomLinkData && opts.collabAPI) {
+        const { excalidrawAPI } = opts;
+
+        const scene = await opts.collabAPI.startCollaboration(roomLinkData);
+
+        return {
+          // when collaborating, the state may have already been updated at this
+          // point (we may have received updates from other clients), so reconcile
+          // elements and appState with existing state
+          scene: {
+            ...scene,
+            appState: {
+              ...restoreAppState(
+                {
+                  ...scene?.appState,
+                  theme:
+                    localDataState?.appState?.theme || scene?.appState?.theme,
+                },
+                excalidrawAPI.getAppState(),
+              ),
+              // necessary if we're invoking from a hashchange handler which doesn't
+              // go through App.initializeScene() that resets this flag
+              isLoading: false,
+            },
+            elements: reconcileElements(
+              scene?.elements || [],
+              excalidrawAPI.getSceneElementsIncludingDeleted() as RemoteExcalidrawElement[],
+              excalidrawAPI.getAppState(),
+            ),
+          },
+          isExternalScene: true,
+          id: roomLinkData.roomId,
+          key: roomLinkData.roomKey,
+        };
+      } else if (scene) {
+        return isExternalScene && jsonBackendMatch
+          ? {
+              scene,
+              isExternalScene,
+              id: jsonBackendMatch[1],
+              key: jsonBackendMatch[2],
+            }
+          : { scene, isExternalScene: false };
+      }
+      return { scene: null, isExternalScene: false };
+    },
+    [],
+  );
 
   const [, forceRefresh] = useState(false);
 
@@ -493,7 +496,6 @@ const ExcalidrawWrapper = () => {
     initializeScene({
       collabAPI,
       excalidrawAPI,
-      onLoadFromLinkEmitter: onLoadFromLinkEmitter.current,
     }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
@@ -514,7 +516,6 @@ const ExcalidrawWrapper = () => {
         initializeScene({
           collabAPI,
           excalidrawAPI,
-          onLoadFromLinkEmitter: onLoadFromLinkEmitter.current,
         }).then((data) => {
           loadImages(data);
           if (data.scene) {
@@ -627,7 +628,13 @@ const ExcalidrawWrapper = () => {
       );
       clearTimeout(titleTimeout);
     };
-  }, [isCollabDisabled, collabAPI, excalidrawAPI, setLangCode]);
+  }, [
+    isCollabDisabled,
+    collabAPI,
+    excalidrawAPI,
+    setLangCode,
+    initializeScene,
+  ]);
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
