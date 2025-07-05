@@ -493,10 +493,7 @@ const ExcalidrawWrapper = () => {
       }
     };
 
-    initializeScene({
-      collabAPI,
-      excalidrawAPI,
-    }).then(async (data) => {
+    initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
     });
@@ -513,10 +510,7 @@ const ExcalidrawWrapper = () => {
         }
         excalidrawAPI.updateScene({ appState: { isLoading: true } });
 
-        initializeScene({
-          collabAPI,
-          excalidrawAPI,
-        }).then((data) => {
+        initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
           loadImages(data);
           if (data.scene) {
             excalidrawAPI.updateScene({
