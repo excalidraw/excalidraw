@@ -408,21 +408,18 @@ export const getNewGroupIdsForDuplication = (
 // in the same group, and if it is not in a group, it will be returned
 // as a single-element array
 export const getSelectedElementsByGroup = (
-	selectedElements: ExcalidrawElement[],
-	appState: Readonly<AppState>,
+  selectedElements: ExcalidrawElement[],
+  appState: Readonly<AppState>,
 ): ExcalidrawElement[][] => {
-	const selectedGroupIds = getSelectedGroupIds(appState);
-    const selectedElementsInGroups = selectedGroupIds.map((groupId) =>
-        getElementsInGroup(selectedElements, groupId),
-    );
-    const elementSet = new Set<ExcalidrawElement>(
-        selectedElementsInGroups.flatMap((elements) => elements),
-    );
-    const selectedElementsNoGroups = selectedElements
-        .filter((element) => !elementSet.has(element))
-        .map((element) => [element]);
-    return [
-    ...selectedElementsInGroups,
-    ...selectedElementsNoGroups,
-  ];
+  const selectedGroupIds = getSelectedGroupIds(appState);
+  const selectedElementsInGroups = selectedGroupIds.map((groupId) =>
+    getElementsInGroup(selectedElements, groupId),
+  );
+  const elementSet = new Set<ExcalidrawElement>(
+    selectedElementsInGroups.flatMap((elements) => elements),
+  );
+  const selectedElementsNoGroups = selectedElements
+    .filter((element) => !elementSet.has(element))
+    .map((element) => [element]);
+  return [...selectedElementsInGroups, ...selectedElementsNoGroups];
 };
