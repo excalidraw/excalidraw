@@ -359,7 +359,7 @@ export const getDefaultRoundnessTypeForElement = (
 };
 
 export const isFixedPointBinding = (
-  binding: PointBinding | FixedPointBinding,
+  binding: PointBinding | FixedPointBinding | null | undefined,
 ): binding is FixedPointBinding => {
   return (
     binding != null &&

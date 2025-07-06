@@ -2090,23 +2090,27 @@ const pointDraggingUpdates = (
           isElbowArrow(element),
         );
 
-        // Allow binding inside the element if both ends are inside
+        const binding =
+          element[pointIndex === 0 ? "startBinding" : "endBinding"];
         if (
+          isBindingEnabled(appState) &&
           isArrowElement(element) &&
-          !(
-            hoveredElement?.id === otherHoveredElement?.id &&
-            hoveredElement != null
-          ) &&
-          appState.bindMode === "focus" &&
-          isBindingEnabled(appState)
+          hoveredElement &&
+          appState.bindMode === "focus"
         ) {
-          newGlobalPointPosition = getOutlineAvoidingPoint(
-            element,
-            hoveredElement,
-            newGlobalPointPosition,
-            pointIndex,
-            elementsMap,
-          );
+          if (
+            isFixedPointBinding(binding)
+              ? hoveredElement.id !== binding.elementId
+              : hoveredElement.id !== otherHoveredElement?.id
+          ) {
+            newGlobalPointPosition = getOutlineAvoidingPoint(
+              element,
+              hoveredElement,
+              newGlobalPointPosition,
+              pointIndex,
+              elementsMap,
+            );
+          }
         }
 
         newPointPosition = LinearElementEditor.createPointAt(
