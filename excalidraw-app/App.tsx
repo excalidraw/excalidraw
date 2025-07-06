@@ -140,9 +140,8 @@ const initializeScene = async (opts: {
       // https://github.com/excalidraw/excalidraw/issues/1919
       if (document.hidden) {
         return new Promise((resolve, reject) => {
-          window.addEventListener(
-            "focus",
-            () => initializeScene(opts).then(resolve).catch(reject)
+          window.addEventListener("focus", () =>
+            initializeScene(opts).then(resolve).catch(reject),
           );
         });
       }
