@@ -578,7 +578,7 @@ export const convertToExcalidrawElements = (
         break;
       }
       case "freedraw":
-
+      // fallthrough
       case "frame": {
         excalidrawElement = newFrameElement({
           x: 0,

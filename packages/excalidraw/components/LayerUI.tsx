@@ -4,9 +4,7 @@ import React from "react";
 import {
   CLASSES,
   DEFAULT_SIDEBAR,
-  TOOL_TYPE,
   arrayToMap,
-  capitalizeString,
   isShallowEqual,
 } from "@excalidraw/common";
 
@@ -54,7 +52,6 @@ import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
-import { LaserPointerButton } from "./LaserPointerButton";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";

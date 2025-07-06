@@ -137,7 +137,6 @@ import {
   isElementCompletelyInViewport,
   isElementInViewport,
   isInvisiblySmallElement,
-  getCornerRadius,
   isPathALoop,
   getInitializedImageElements,
   loadHTMLImageElement,
@@ -161,7 +160,6 @@ import {
   updateFrameMembershipOfSelectedElements,
   isElementInFrame,
   getFrameLikeTitle,
-  getElementsOverlappingFrame,
   filterElementsEligibleAsFrameChildren,
   hitElementBoundText,
   hitElementBoundingBoxOnly,
@@ -182,7 +180,6 @@ import {
   getApproxMinLineHeight,
   getMinTextElementWidth,
   ShapeCache,
-  getRenderOpacity,
   editGroupForSelectedElement,
   getElementsInGroup,
   getSelectedGroupIdForElement,
@@ -214,8 +211,6 @@ import {
   isSimpleArrow,
 } from "@excalidraw/element";
 
-import type { YOUTUBE_STATES } from "@excalidraw/common";
-
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -232,14 +227,13 @@ import type {
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
   ExcalidrawFrameLikeElement,
-  Ordered,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
+import type { Mutable } from "@excalidraw/common/utility-types";
 
 import {
   actionBringForward,
@@ -293,7 +287,7 @@ import {
   isEraserActive,
   isHandToolActive,
 } from "../appState";
-import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
+import { parseClipboard } from "../clipboard";
 import { exportCanvas, loadFromBlob } from "../data";
 import { restore, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
@@ -489,14 +483,6 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
-
-/**
- * Map of youtube embed video states
- */
-const YOUTUBE_VIDEO_STATES = new Map<
-  ExcalidrawElement["id"],
-  ValueOf<typeof YOUTUBE_STATES>
->();
 
 let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
@@ -1638,8 +1624,6 @@ class App extends React.Component<AppProps, AppState> {
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     }
-
-    const searchParams = new URLSearchParams(window.location.search.slice(1));
 
     this.updateDOMRect(this.initializeScene);
 
@@ -4559,15 +4543,9 @@ class App extends React.Component<AppProps, AppState> {
     if (draggedDistance > DRAGGING_THRESHOLD) {
       return;
     }
-    const lastPointerDownCoords = viewportCoordsToSceneCoords(
-      this.lastPointerDownEvent!,
-      this.state,
-    );
-    const elementsMap = this.scene.getNonDeletedElementsMap();
-    const lastPointerUpCoords = viewportCoordsToSceneCoords(
-      this.lastPointerUpEvent!,
-      this.state,
-    );
+    viewportCoordsToSceneCoords(this.lastPointerDownEvent!, this.state);
+    this.scene.getNonDeletedElementsMap();
+    viewportCoordsToSceneCoords(this.lastPointerUpEvent!, this.state);
   };
 
   private getTopLayerFrameAtSceneCoords = (sceneCoords: {
@@ -5468,20 +5446,13 @@ class App extends React.Component<AppProps, AppState> {
       event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
 
     if (this.device.editor.isMobile && clicklength < 300) {
-      const hitElement = this.getElementAtPosition(
-        scenePointer.x,
-        scenePointer.y,
-      );
+      this.getElementAtPosition(scenePointer.x, scenePointer.y);
     }
 
     if (this.device.isTouchScreen) {
-      const hitElement = this.getElementAtPosition(
-        scenePointer.x,
-        scenePointer.y,
-        {
-          includeLockedElements: true,
-        },
-      );
+      this.getElementAtPosition(scenePointer.x, scenePointer.y, {
+        includeLockedElements: true,
+      });
     }
 
     if (this.state.viewModeEnabled) {
@@ -8993,7 +8964,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (event.dataTransfer?.types?.includes("text/plain")) {
-      const text = event.dataTransfer?.getData("text");
+      event.dataTransfer?.getData("text");
     }
   };
 

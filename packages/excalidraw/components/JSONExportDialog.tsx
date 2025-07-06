@@ -4,7 +4,6 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { actionSaveFileToDisk } from "../actions/actionExport";
 
-import { trackEvent } from "../analytics";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { t } from "../i18n";
 

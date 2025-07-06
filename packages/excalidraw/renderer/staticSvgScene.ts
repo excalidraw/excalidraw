@@ -1,5 +1,4 @@
 import {
-  FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
@@ -88,7 +87,6 @@ const renderElementToSvg = (
   offsetY: number,
   renderConfig: SVGRenderConfig,
 ) => {
-  const offset = { x: offsetX, y: offsetY };
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   let cx = (x2 - x1) / 2 - (element.x - x1);
   let cy = (y2 - y1) / 2 - (element.y - y1);

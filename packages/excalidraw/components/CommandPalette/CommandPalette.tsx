@@ -3,7 +3,6 @@ import fuzzy from "fuzzy";
 import { useEffect, useRef, useState } from "react";
 
 import {
-  DEFAULT_SIDEBAR,
   EVENT,
   KEYS,
   capitalizeString,

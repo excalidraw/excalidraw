@@ -1,14 +1,12 @@
 import clsx from "clsx";
 
-import "./ToolIcon.scss";
-
 import { KEYS } from "@excalidraw/common";
+
+import "./ToolIcon.scss";
 
 import { ToolButton } from "./ToolButton";
 
 import { laserPointerToolIcon } from "./icons";
-
-import type { ToolButtonSize } from "./ToolButton";
 
 type LaserPointerIconProps = {
   title?: string;
@@ -17,8 +15,6 @@ type LaserPointerIconProps = {
   onChange?(): void;
   isMobile?: boolean;
 };
-
-const DEFAULT_SIZE: ToolButtonSize = "small";
 
 export const LaserPointerButton = (props: LaserPointerIconProps) => {
   return (

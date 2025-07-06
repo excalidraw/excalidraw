@@ -7,7 +7,7 @@ import { InitializeApp } from "./components/InitializeApp";
 import Footer from "./components/footer/FooterCenter";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
-import { defaultLang } from "./i18n";
+import "./i18n";
 import { EditorJotaiProvider, editorJotaiStore } from "./editor-jotai";
 import polyfill from "./polyfill";
 

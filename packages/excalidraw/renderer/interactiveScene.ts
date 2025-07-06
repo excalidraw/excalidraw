@@ -78,7 +78,6 @@ import { type InteractiveCanvasAppState } from "../types";
 import {
   bootstrapCanvas,
   drawHighlightForDiamondWithRotation,
-  drawHighlightForRectWithRotation,
   fillCircle,
   getNormalizedCanvasDimensions,
   strokeEllipseWithRotation,

@@ -29,8 +29,6 @@ import {
 
 import type { MaybePromise, ResolutionType } from "./utility-types";
 
-import type { EVENT } from "./constants";
-
 let mockDateTime: string | null = null;
 
 export const setDateTimeForTests = (dateTime: string) => {

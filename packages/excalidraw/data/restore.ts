@@ -18,7 +18,7 @@ import {
   normalizeLink,
   getLineHeight,
 } from "@excalidraw/common";
-import { getNonDeletedElements, isValidPolygon } from "@excalidraw/element";
+import { isValidPolygon } from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
 import {
   updateElbowArrowPoints,
@@ -65,7 +65,7 @@ import type {
   StrokeRoundness,
 } from "@excalidraw/element/types";
 
-import type { MarkOptional, Mutable } from "@excalidraw/common/utility-types";
+import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { getDefaultAppState } from "../appState";
 

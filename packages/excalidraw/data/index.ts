@@ -31,7 +31,6 @@ import { exportToCanvas, exportToSvg } from "../scene/export";
 
 import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
-import { serializeAsJSON } from "./json";
 
 import type { FileSystemHandle } from "./filesystem";
 

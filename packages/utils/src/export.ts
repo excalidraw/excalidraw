@@ -5,8 +5,6 @@ import {
   copyTextToSystemClipboard,
   copyToClipboard,
 } from "@excalidraw/excalidraw/clipboard";
-import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
-import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import { restore } from "@excalidraw/excalidraw/data/restore";
 import {
   exportToCanvas as _exportToCanvas,

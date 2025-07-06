@@ -1,10 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-import {
-  CURSOR_TYPE,
-  isShallowEqual,
-  sceneCoordsToViewportCoords,
-} from "@excalidraw/common";
+import { CURSOR_TYPE, isShallowEqual } from "@excalidraw/common";
 
 import type {
   NonDeletedExcalidrawElement,
@@ -12,11 +8,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import { t } from "../../i18n";
-import { isRenderThrottlingEnabled } from "../../reactUtils";
-import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
 import type {
-  InteractiveCanvasRenderConfig,
   RenderableElementsMap,
   RenderInteractiveSceneCallback,
 } from "../../scene/types";
@@ -76,15 +69,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   useEffect(() => {
     if (!isComponentMounted.current) {
       isComponentMounted.current = true;
-      return;
     }
-
-    const selectionColor =
-      (props.containerRef?.current &&
-        getComputedStyle(props.containerRef.current).getPropertyValue(
-          "--color-selection",
-        )) ||
-      "#6965db";
   });
 
   return (

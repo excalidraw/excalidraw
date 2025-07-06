@@ -1,6 +1,5 @@
 import clsx from "clsx";
 
-import { actionShortcuts } from "../../actions";
 import { useTunnels } from "../../context/tunnels";
 import {
   ExitZenModeAction,

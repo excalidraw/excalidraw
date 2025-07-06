@@ -1,12 +1,6 @@
 import clsx from "clsx";
-import { useState } from "react";
 
-import {
-  CLASSES,
-  KEYS,
-  capitalizeString,
-  isTransparent,
-} from "@excalidraw/common";
+import { CLASSES, capitalizeString, isTransparent } from "@excalidraw/common";
 
 import {
   shouldAllowVerticalAlign,
@@ -34,7 +28,6 @@ import { actionToggleZenMode } from "../actions";
 
 import { alignActionsPredicate } from "../actions/actionAlign";
 import { trackEvent } from "../analytics";
-import { useTunnels } from "../context/tunnels";
 
 import { t } from "../i18n";
 import {
@@ -54,8 +47,7 @@ import { useDevice } from "./App";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
-import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import { extraToolsIcon, frameToolIcon, laserPointerToolIcon } from "./icons";
+import "./icons";
 
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import type { ActionManager } from "../actions/manager";
@@ -126,9 +118,6 @@ export const SelectedShapeActions = ({
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     );
-
-  const showLinkIcon =
-    targetElements.length === 1 || isSingleElementBoundContainer;
 
   const showLineEditorAction =
     !appState.editingLinearElement &&
@@ -281,11 +270,6 @@ export const ShapesSwitcher = ({
   app: AppClassProperties;
   UIOptions: AppProps["UIOptions"];
 }) => {
-  const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
-
-  const frameToolSelected = activeTool.type === "frame";
-  const laserToolSelected = activeTool.type === "laser";
-
   return (
     <>
       {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {

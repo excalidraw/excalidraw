@@ -133,24 +133,6 @@ export const generateRoughOptions = (
   }
 };
 
-const modifyIframeLikeForRoughOptions = (
-  element: NonDeletedExcalidrawElement,
-  isExporting: boolean,
-) => {
-  if (
-    isTransparent(element.backgroundColor) &&
-    isTransparent(element.strokeColor)
-  ) {
-    return {
-      ...element,
-      roughness: 0,
-      backgroundColor: "#d3d3d3",
-      fillStyle: "solid",
-    } as const;
-  }
-  return element;
-};
-
 const getArrowheadShapes = (
   element: ExcalidrawLinearElement,
   shape: Drawable[],

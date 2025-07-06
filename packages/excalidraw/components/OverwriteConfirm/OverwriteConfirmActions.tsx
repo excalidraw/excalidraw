@@ -38,7 +38,6 @@ export const Action = ({
 
 export const ExportToImage = () => {
   const { t } = useI18n();
-  const actionManager = useExcalidrawActionManager();
   const setAppState = useExcalidrawSetAppState();
 
   return (

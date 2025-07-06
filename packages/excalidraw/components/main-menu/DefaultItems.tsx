@@ -1,5 +1,3 @@
-import clsx from "clsx";
-
 import { THEME } from "@excalidraw/common";
 
 import type { Theme } from "@excalidraw/element/types";
@@ -8,7 +6,6 @@ import {
   actionClearCanvas,
   actionLoadScene,
   actionSaveToActiveFile,
-  actionShortcuts,
   actionToggleSearchMenu,
   actionToggleTheme,
 } from "../../actions";
@@ -39,7 +36,6 @@ import {
   searchIcon,
   SunIcon,
   TrashIcon,
-  usersIcon,
 } from "../icons";
 
 import "./DefaultItems.scss";

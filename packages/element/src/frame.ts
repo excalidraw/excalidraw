@@ -21,11 +21,7 @@ import {
 } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, getContainerElement } from "./textElement";
-import {
-  isFrameElement,
-  isFrameLikeElement,
-  isTextElement,
-} from "./typeChecks";
+import { isFrameLikeElement, isTextElement } from "./typeChecks";
 
 import type { ExcalidrawElementsIncludingDeleted } from "./Scene";
 

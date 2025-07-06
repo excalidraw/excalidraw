@@ -1,6 +1,6 @@
 import throttle from "lodash.throttle";
 
-import { arrayToMap, isDevEnv, isTestEnv } from "@excalidraw/common";
+import { isDevEnv, isTestEnv } from "@excalidraw/common";
 
 import {
   orderByFractionalIndex,

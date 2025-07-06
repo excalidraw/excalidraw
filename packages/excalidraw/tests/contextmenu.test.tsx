@@ -20,7 +20,6 @@ import {
   screen,
   queryByText,
   queryAllByText,
-  waitFor,
   togglePopover,
   unmountComponent,
   checkpointHistory,

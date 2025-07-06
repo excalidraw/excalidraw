@@ -5,8 +5,6 @@ import type { NestedKeyOf } from "@excalidraw/common/utility-types";
 import { useAtomValue, editorJotaiStore, atom } from "./editor-jotai";
 import fallbackLangData from "./locales/en.json";
 
-const COMPLETION_THRESHOLD = 85;
-
 export interface Language {
   code: string;
   label: string;

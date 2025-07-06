@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 
 import { KEYS, queryFocusableElements } from "@excalidraw/common";
 
-import { useSetAtom } from "../editor-jotai";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
 
