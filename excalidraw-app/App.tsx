@@ -21,7 +21,6 @@ import {
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useEffect, useRef, useState } from "react";
-import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
 
@@ -49,8 +48,6 @@ import CustomStats from "./CustomStats";
 import { Provider, appJotaiStore } from "./app-jotai";
 import { STORAGE_KEYS, SYNC_BROWSER_TABS_TIMEOUT } from "./app_constants";
 import { AppMainMenu } from "./components/AppMainMenu";
-
-import { TopErrorBoundary } from "./components/TopErrorBoundary";
 
 import { loadScene } from "./data";
 
@@ -119,7 +116,6 @@ const initializeScene = async (opts: {
   const jsonBackendMatch = window.location.hash.match(
     /^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/,
   );
-  const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
 
@@ -146,35 +142,12 @@ const initializeScene = async (opts: {
         return new Promise((resolve, reject) => {
           window.addEventListener(
             "focus",
-            () => initializeScene(opts).then(resolve).catch(reject),
-            {
-              once: true,
-            },
+            () => initializeScene(opts).then(resolve).catch(reject)
           );
         });
       }
 
       window.history.replaceState({}, APP_NAME, window.location.origin);
-    }
-  } else if (externalUrlMatch) {
-    window.history.replaceState({}, APP_NAME, window.location.origin);
-
-    const url = externalUrlMatch[1];
-    try {
-      const request = await fetch(window.decodeURIComponent(url));
-      const data = await loadFromBlob(await request.blob(), null, null);
-      if (!scene.elements.length || true) {
-        return { scene: data, isExternalScene };
-      }
-    } catch (error: any) {
-      return {
-        scene: {
-          appState: {
-            errorMessage: t("alerts.invalidSceneUrl"),
-          },
-        },
-        isExternalScene,
-      };
     }
   }
 
@@ -542,11 +515,11 @@ const ExcalidrawWrapper = () => {
 
 const ExcalidrawApp = () => {
   return (
-    <TopErrorBoundary>
+    <>
       <Provider store={appJotaiStore}>
         <ExcalidrawWrapper />
       </Provider>
-    </TopErrorBoundary>
+    </>
   );
 };
 

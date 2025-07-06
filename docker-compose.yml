@@ -8,7 +8,7 @@ services:
         - NODE_ENV=development
     container_name: excalidraw
     ports:
-      - "3000:80"
+      - "9000:80"
     restart: on-failure
     stdin_open: true
     healthcheck:

@@ -1,3 +1,0 @@
-files:
-  - source: /packages/excalidraw/locales/en.json
-    translation: /packages/excalidraw/locales/%locale%.json

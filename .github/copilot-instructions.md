@@ -35,11 +35,44 @@
 - Implement proper error boundaries in React components
 - Always log errors with contextual information
 
-## Testing
-
-- Always attempt to fix #problems
-- Always offer to run `yarn test:app` in the project root after modifications are complete and attempt fixing the issues reported
-
 ## Types
 
 - Always include `packages/math/src/types.ts` in the context when your write math related code and always use the Point type instead of { x, y}
+
+# GEMINI.md
+
+DO NOT EDIT MARKDOWN OR COMMENTS ALWAYS CREATE A DETAIELD PLAN AND APPROVE IT BY ME FIRST BEFORE STARTING TO CHANGE ANYTHING
+
+## Project Structure
+
+Excalidraw is a **monorepo** with a clear separation between the core library and the application:
+
+- **`packages/excalidraw/`** - Main React component library published to npm as `@excalidraw/excalidraw`
+- **`excalidraw-app/`** - Full-featured web application (excalidraw.com) that uses the library
+- **`packages/`** - Core packages: `@excalidraw/common`, `@excalidraw/element`, `@excalidraw/math`, `@excalidraw/utils`
+- **`examples/`** - Integration examples (NextJS, browser script)
+
+## Development Workflow
+
+1. **Package Development**: Work in `packages/*` for editor features
+2. **App Development**: Work in `excalidraw-app/` for app-specific features
+3. **Type Safety**: Use `yarn test:typecheck` to verify TypeScript
+4. test with yarn build
+
+## Development Commands
+
+```bash
+yarn test:typecheck  # TypeScript type checking
+yarn build     # Run all tests (with snapshot updates)
+yarn fix             # Auto-fix formatting and linting issues
+```
+
+## Architecture Notes
+
+### Package System
+
+- Uses Yarn workspaces for monorepo management
+- Internal packages use path aliases (see `vitest.config.mts`)
+- Build system uses esbuild for packages, Vite for the app
+- TypeScript throughout with strict configuration
+- explain the changes

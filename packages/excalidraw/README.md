@@ -30,8 +30,6 @@ Excalidraw takes _100%_ of `width` and `height` of the containing block so make 
 
 ## Demo
 
-Go to [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/master/examples/with-script-in-browser) example.
-
 ## Integration
 
 Head over to the [docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/integration).
