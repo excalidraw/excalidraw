@@ -6994,6 +6994,8 @@ class App extends React.Component<AppProps, AppState> {
       },
       cropPositionMovement: {
         enabled: false,
+        croppingElementId: undefined,
+        directionLock: null,
       },
     };
   }
@@ -8134,20 +8136,47 @@ class App extends React.Component<AppProps, AppState> {
               };
 
               // apply shift key constraint for directional movement
+              const threshold = 20;
+              let snappingToOrigin = false;
               if (event.shiftKey) {
-                const distanceX = Math.abs(totalDragOffset.x);
-                const distanceY = Math.abs(totalDragOffset.y);
-
-                const lockX = distanceX < distanceY;
-                const lockY = distanceX > distanceY;
-
-                if (lockX) {
-                  totalDragOffset.x = 0;
+                if (!pointerDownState.cropPositionMovement.directionLock) {
+                  if (
+                    Math.abs(totalDragOffset.x) > threshold ||
+                    Math.abs(totalDragOffset.y) > threshold
+                  ) {
+                    pointerDownState.cropPositionMovement.directionLock =
+                      Math.abs(totalDragOffset.x) > Math.abs(totalDragOffset.y)
+                        ? "x"
+                        : "y";
+                  } else {
+                    // if within threshold and not locked, always snap to origin
+                    snappingToOrigin = true;
+                  }
+                } else {
+                  // if user moves back within threshold, unlock and snap back
+                  if (
+                    Math.abs(totalDragOffset.x) < threshold &&
+                    Math.abs(totalDragOffset.y) < threshold
+                  ) {
+                    pointerDownState.cropPositionMovement.directionLock = null;
+                    snappingToOrigin = true;
+                  }
                 }
+              } else {
+                pointerDownState.cropPositionMovement.directionLock = null;
+              }
 
-                if (lockY) {
-                  totalDragOffset.y = 0;
-                }
+              if (snappingToOrigin) {
+                totalDragOffset.x = 0;
+                totalDragOffset.y = 0;
+              }
+
+              if (pointerDownState.cropPositionMovement.directionLock === "x") {
+                totalDragOffset.y = 0;
+              } else if (
+                pointerDownState.cropPositionMovement.directionLock === "y"
+              ) {
+                totalDragOffset.x = 0;
               }
 
               // scale the drag offset

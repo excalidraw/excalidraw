@@ -444,6 +444,11 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+  cropPositionMovement: {
+    croppingElementId?: string;
+    enabled: boolean;
+    directionLock: "x" | "y" | null;
+  };
 }
 
 export type SearchMatch = {
@@ -800,6 +805,7 @@ export type PointerDownState = Readonly<{
   cropPositionMovement: {
     croppingElementId?: string;
     enabled: boolean;
+    directionLock: "x" | "y" | null;
   };
 }>;
 
