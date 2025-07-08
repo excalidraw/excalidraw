@@ -15,7 +15,6 @@ export const showSelectedShapeActions = (
         (appState.editingTextElement ||
           (appState.activeTool.type !== "selection" &&
             appState.activeTool.type !== "lasso" &&
-            appState.activeTool.type !== "eraser" &&
             appState.activeTool.type !== "hand" &&
             appState.activeTool.type !== "laser"))) ||
         getSelectedElements(elements, appState).length),
