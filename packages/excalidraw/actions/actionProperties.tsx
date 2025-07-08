@@ -555,14 +555,7 @@ export const actionChangeStrokeWidth = register({
       <div className="buttonList">
         <RadioSelection
           group="stroke-width"
-          options={
-            appState.activeTool.type === "freedraw" ||
-            app.scene
-              .getSelectedElements(app.state)
-              .every((element) => isFreeDrawElement(element))
-              ? WIDTHS
-              : WIDTHS.slice(0, 3)
-          }
+          options={WIDTHS}
           value={getFormValue(
             elements,
             app,

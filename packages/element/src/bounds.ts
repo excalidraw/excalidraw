@@ -5,6 +5,7 @@ import {
   invariant,
   rescalePoints,
   sizeOf,
+  STROKE_WIDTH,
 } from "@excalidraw/common";
 
 import {
@@ -808,9 +809,15 @@ export const getArrowheadPoints = (
   // This value is selected by minimizing a minimum size with the last segment of the arrowhead
   const lengthMultiplier =
     arrowhead === "diamond" || arrowhead === "diamond_outline" ? 0.25 : 0.5;
-  const minSize = Math.min(size, length * lengthMultiplier);
-  const xs = x2 - nx * minSize;
-  const ys = y2 - ny * minSize;
+  // make arrowheads bigger for thick strokes
+  const strokeWidthMultiplier =
+    element.strokeWidth >= STROKE_WIDTH.extraBold ? 1.5 : 1;
+
+  const adjustedSize =
+    Math.min(size, length * lengthMultiplier) * strokeWidthMultiplier;
+
+  const xs = x2 - nx * adjustedSize;
+  const ys = y2 - ny * adjustedSize;
 
   if (
     arrowhead === "dot" ||
@@ -859,7 +866,7 @@ export const getArrowheadPoints = (
       const [px, py] = element.points.length > 1 ? element.points[1] : [0, 0];
 
       [ox, oy] = pointRotateRads(
-        pointFrom(x2 + minSize * 2, y2),
+        pointFrom(x2 + adjustedSize * 2, y2),
         pointFrom(x2, y2),
         Math.atan2(py - y2, px - x2) as Radians,
       );
@@ -870,7 +877,7 @@ export const getArrowheadPoints = (
           : [0, 0];
 
       [ox, oy] = pointRotateRads(
-        pointFrom(x2 - minSize * 2, y2),
+        pointFrom(x2 - adjustedSize * 2, y2),
         pointFrom(x2, y2),
         Math.atan2(y2 - py, x2 - px) as Radians,
       );

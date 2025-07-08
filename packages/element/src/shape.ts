@@ -21,6 +21,7 @@ import {
   assertNever,
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
+  STROKE_WIDTH,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -202,7 +203,7 @@ export const generateRoughOptions = (
     // hachureGap because if not specified, roughjs uses strokeWidth to
     // calculate them (and we don't want the fills to be modified)
     fillWeight: element.strokeWidth / 2,
-    hachureGap: element.strokeWidth * 4,
+    hachureGap: Math.min(element.strokeWidth, STROKE_WIDTH.bold) * 4,
     roughness: adjustRoughness(element),
     stroke: element.strokeColor,
     preserveVertices:
