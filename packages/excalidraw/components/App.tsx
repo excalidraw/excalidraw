@@ -7479,10 +7479,7 @@ class App extends React.Component<AppProps, AppState> {
 
     window.__lastPressure__ = event.pressure;
 
-    const freedrawConfig = getFreedrawConfig(
-      event.pointerType,
-      this.state.currentItemFixedStrokeWidth ? "constant" : "variable",
-    );
+    const freedrawConfig = getFreedrawConfig(event.pointerType);
 
     const element = newFreeDrawElement({
       type: elementType,
@@ -11174,7 +11171,7 @@ export const createTestHook = () => {
     // Initialize debug freedraw parameters
     window.h.debugFreedraw = {
       enabled: true,
-      ...(window.h.debugFreedraw || DRAWING_CONFIGS.default.variable),
+      ...(window.h.debugFreedraw || DRAWING_CONFIGS.default),
     };
 
     Object.defineProperties(window.h, {

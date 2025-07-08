@@ -8,10 +8,10 @@ import { round } from "../../packages/math/src";
 
 export const FreedrawDebugSliders = () => {
   const [streamline, setStreamline] = useState<number>(
-    DRAWING_CONFIGS.default.variable.streamline,
+    DRAWING_CONFIGS.default.streamline,
   );
   const [simplify, setSimplify] = useState<number>(
-    DRAWING_CONFIGS.default.variable.simplify,
+    DRAWING_CONFIGS.default.simplify,
   );
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export const FreedrawDebugSliders = () => {
     if (!window.h.debugFreedraw) {
       window.h.debugFreedraw = {
         enabled: true,
-        ...DRAWING_CONFIGS.default.variable,
+        ...DRAWING_CONFIGS.default,
       };
     }
 
