@@ -6,12 +6,7 @@ import {
   isBindingEnabled,
   getHoveredElementForBinding,
 } from "@excalidraw/element/binding";
-import {
-  isElbowArrow,
-  isValidPolygon,
-  LinearElementEditor,
-  shouldTestInside,
-} from "@excalidraw/element";
+import { isValidPolygon, LinearElementEditor } from "@excalidraw/element";
 
 import {
   isBindingElement,
@@ -77,6 +72,7 @@ export const actionFinalize = register({
           startBindingElement,
           endBindingElement,
           app.scene,
+          app.state.zoom,
         );
       }
 
@@ -121,6 +117,7 @@ export const actionFinalize = register({
             startBindingElement,
             endBindingElement,
             scene,
+            app.state.zoom,
           );
         }
 
@@ -181,15 +178,10 @@ export const actionFinalize = register({
           ry + points[points.length - 1][1],
         );
         const hoveredElementForBinding = getHoveredElementForBinding(
-          {
-            x: lastGlobalPoint[0],
-            y: lastGlobalPoint[1],
-          },
+          lastGlobalPoint,
           elements,
           elementsMap,
           app.state.zoom,
-          shouldTestInside(element),
-          isElbowArrow(element),
         );
         if (
           !hoveredElementForBinding &&
@@ -255,7 +247,13 @@ export const actionFinalize = register({
               ),
             );
 
-          maybeBindLinearElement(element, appState, coords, scene);
+          maybeBindLinearElement(
+            element,
+            appState,
+            coords,
+            scene,
+            appState.zoom,
+          );
         }
       }
     }

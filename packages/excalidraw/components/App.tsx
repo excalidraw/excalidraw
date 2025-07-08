@@ -4657,7 +4657,7 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         const hoveredElement = getHoveredElementForBinding(
-          scenePointer,
+          pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
           this.scene.getNonDeletedElements(),
           this.scene.getNonDeletedElementsMap(),
           this.state.zoom,
@@ -5989,7 +5989,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state.bindMode === "focus"
         ) {
           const hoveredElement = getHoveredElementForBinding(
-            scenePointer,
+            pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
             this.scene.getNonDeletedElements(),
             this.scene.getNonDeletedElementsMap(),
             this.state.zoom,
@@ -6040,10 +6040,7 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        this.maybeSuggestBindingAtCursor(
-          scenePointer,
-          editingLinearElement?.elbowed || false,
-        );
+        this.maybeSuggestBindingAtCursor(scenePointer);
       } else {
         // causes stack overflow if not sync
         flushSync(() => {
@@ -6066,7 +6063,7 @@ class App extends React.Component<AppProps, AppState> {
           ),
         });
       } else {
-        this.maybeSuggestBindingAtCursor(scenePointer, false);
+        this.maybeSuggestBindingAtCursor(scenePointer);
       }
     }
 
@@ -6130,15 +6127,10 @@ class App extends React.Component<AppProps, AppState> {
           isBindingEnabled(this.state)
         ) {
           const hoveredElement = getHoveredElementForBinding(
-            {
-              x: scenePointerX,
-              y: scenePointerY,
-            },
+            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
             this.scene.getNonDeletedElements(),
             this.scene.getNonDeletedElementsMap(),
             this.state.zoom,
-            false,
-            false,
           );
           const otherPoint =
             LinearElementEditor.getPointAtIndexGlobalCoordinates(
@@ -6147,15 +6139,10 @@ class App extends React.Component<AppProps, AppState> {
               this.scene.getNonDeletedElementsMap(),
             );
           const otherHoveredElement = getHoveredElementForBinding(
-            {
-              x: otherPoint[0],
-              y: otherPoint[1],
-            },
+            otherPoint,
             this.scene.getNonDeletedElements(),
             this.scene.getNonDeletedElementsMap(),
             this.state.zoom,
-            false,
-            false,
           );
 
           if (
@@ -7752,7 +7739,10 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     const boundElement = getHoveredElementForBinding(
-      pointerDownState.origin,
+      pointFrom<GlobalPoint>(
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+      ),
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
       this.state.zoom,
@@ -7952,15 +7942,10 @@ class App extends React.Component<AppProps, AppState> {
         ry + multiElement.points[multiElement.points.length - 1][1],
       );
       const hoveredElementForBinding = getHoveredElementForBinding(
-        {
-          x: lastGlobalPoint[0],
-          y: lastGlobalPoint[1],
-        },
+        lastGlobalPoint,
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
         this.state.zoom,
-        true,
-        isElbowArrow(multiElement),
       );
 
       // clicking inside commit zone → finalize arrow
@@ -8066,12 +8051,13 @@ class App extends React.Component<AppProps, AppState> {
             });
 
       const boundElement = getHoveredElementForBinding(
-        pointerDownState.origin,
+        pointFrom<GlobalPoint>(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        ),
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
         this.state.zoom,
-        isElbowArrow(element),
-        isElbowArrow(element),
       );
 
       if (isSimpleArrow(element)) {
@@ -8528,7 +8514,7 @@ class App extends React.Component<AppProps, AppState> {
         // Timed bind mode handler for arrow elements
         if (this.state.bindMode === "focus") {
           const hoveredElement = getHoveredElementForBinding(
-            pointerCoords,
+            pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
             this.scene.getNonDeletedElements(),
             elementsMap,
             this.state.zoom,
@@ -9039,12 +9025,10 @@ class App extends React.Component<AppProps, AppState> {
             // Handles the case where we need to "jump out" the simple arrow
             // start point as we drag-create it.
             const hoveredElement = getHoveredElementForBinding(
-              { x: gridX, y: gridY },
+              pointFrom<GlobalPoint>(gridX, gridY),
               this.scene.getNonDeletedElements(),
               this.scene.getNonDeletedElementsMap(),
               this.state.zoom,
-              isElbowArrow(newElement),
-              isElbowArrow(newElement),
             );
             const arrowIsInsideTheSameElement =
               startBindingElement &&
@@ -9066,12 +9050,10 @@ class App extends React.Component<AppProps, AppState> {
                   : pointFrom(gridX, gridY);
 
               const otherHoveredElement = getHoveredElementForBinding(
-                { x: firstPointX, y: firstPointY },
+                pointFrom<GlobalPoint>(firstPointX, firstPointY),
                 this.scene.getNonDeletedElements(),
                 this.scene.getNonDeletedElementsMap(),
                 this.state.zoom,
-                isElbowArrow(newElement),
-                isElbowArrow(newElement),
               );
               [firstPointX, firstPointY] = getOutlineAvoidingPoint(
                 newElement,
@@ -10655,20 +10637,15 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private maybeSuggestBindingAtCursor = (
-    pointerCoords: {
-      x: number;
-      y: number;
-    },
-    considerAll: boolean,
-  ): void => {
+  private maybeSuggestBindingAtCursor = (pointerCoords: {
+    x: number;
+    y: number;
+  }): void => {
     const hoveredBindableElement = getHoveredElementForBinding(
-      pointerCoords,
+      pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
       this.state.zoom,
-      false,
-      considerAll,
     );
     this.setState({
       suggestedBindings:

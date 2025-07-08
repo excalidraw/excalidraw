@@ -90,6 +90,7 @@ describe("move element", () => {
         rectA.get() as ExcalidrawRectangleElement,
         rectB.get() as ExcalidrawRectangleElement,
         h.app.scene,
+        h.app.state.zoom,
       );
     });
 

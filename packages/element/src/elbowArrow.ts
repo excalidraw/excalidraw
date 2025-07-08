@@ -17,7 +17,6 @@ import {
   BinaryHeap,
   invariant,
   isAnyTrue,
-  tupleToCoors,
   getSizeFromPoints,
   isDevEnv,
   arrayToMap,
@@ -63,6 +62,7 @@ import type {
   FixedPointBinding,
   FixedSegment,
   NonDeletedExcalidrawElement,
+  Ordered,
 } from "./types";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
@@ -2249,17 +2249,10 @@ const getBindPointHeading = (
 const getHoveredElement = (
   origPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   zoom?: AppState["zoom"],
 ) => {
-  return getHoveredElementForBinding(
-    tupleToCoors(origPoint),
-    elements,
-    elementsMap,
-    zoom,
-    true,
-    true,
-  );
+  return getHoveredElementForBinding(origPoint, elements, elementsMap, zoom);
 };
 
 const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>

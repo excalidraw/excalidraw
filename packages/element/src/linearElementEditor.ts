@@ -26,7 +26,6 @@ import {
 import {
   deconstructLinearOrFreeDrawElement,
   isPathALoop,
-  shouldTestInside,
   type Store,
 } from "@excalidraw/element";
 
@@ -564,19 +563,15 @@ export class LinearElementEditor {
           const bindingElement = isBindingEnabled(appState)
             ? getHoveredElementForBinding(
                 (selectedPointsIndices?.length ?? 0) > 1
-                  ? tupleToCoors(
-                      LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                        element,
-                        selectedPoint!,
-                        elementsMap,
-                      ),
+                  ? LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                      element,
+                      selectedPoint!,
+                      elementsMap,
                     )
-                  : pointerCoords,
+                  : pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
                 elements,
                 elementsMap,
                 appState.zoom,
-                isElbowArrow(element),
-                isElbowArrow(element),
               )
             : null;
 
@@ -927,11 +922,10 @@ export class LinearElementEditor {
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
         endBindingElement: getHoveredElementForBinding(
-          scenePointer,
+          pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
           elements,
           elementsMap,
           app.state.zoom,
-          linearElementEditor.elbowed,
         ),
       };
 
@@ -970,6 +964,7 @@ export class LinearElementEditor {
           startBindingElement,
           endBindingElement,
           scene,
+          app.state.zoom,
         );
       }
     }
@@ -2061,15 +2056,10 @@ const pointDraggingUpdates = (
           element.angle,
         );
         const hoveredElement = getHoveredElementForBinding(
-          {
-            x: newGlobalPointPosition[0],
-            y: newGlobalPointPosition[1],
-          },
+          newGlobalPointPosition,
           elements,
           elementsMap,
           appState.zoom,
-          shouldTestInside(element),
-          isElbowArrow(element),
         );
 
         const otherGlobalPoint =
@@ -2079,15 +2069,10 @@ const pointDraggingUpdates = (
             elementsMap,
           );
         const otherHoveredElement = getHoveredElementForBinding(
-          {
-            x: otherGlobalPoint[0],
-            y: otherGlobalPoint[1],
-          },
+          otherGlobalPoint,
           elements,
           elementsMap,
           appState.zoom,
-          shouldTestInside(element),
-          isElbowArrow(element),
         );
 
         const binding =

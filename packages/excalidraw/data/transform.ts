@@ -60,8 +60,9 @@ import type {
   TextAlign,
   VerticalAlign,
 } from "@excalidraw/element/types";
-
 import type { MarkOptional } from "@excalidraw/common/utility-types";
+
+import type { AppState, NormalizedZoomValue } from "../types";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -249,6 +250,7 @@ const bindLinearElementToElement = (
   end: ValidLinearElement["end"],
   elementStore: ElementStore,
   scene: Scene,
+  zoom: AppState["zoom"],
 ): {
   linearElement: ExcalidrawLinearElement;
   startBoundElement?: ExcalidrawElement;
@@ -335,6 +337,7 @@ const bindLinearElementToElement = (
         startBoundElement as ExcalidrawBindableElement,
         "start",
         scene,
+        zoom,
       );
     }
   }
@@ -410,6 +413,7 @@ const bindLinearElementToElement = (
         endBoundElement as ExcalidrawBindableElement,
         "end",
         scene,
+        zoom,
       );
     }
   }
@@ -695,6 +699,7 @@ export const convertToExcalidrawElements = (
                 originalEnd,
                 elementStore,
                 scene,
+                { value: 1 as NormalizedZoomValue },
               );
             container = linearElement;
             elementStore.add(linearElement);
@@ -720,6 +725,7 @@ export const convertToExcalidrawElements = (
                   end,
                   elementStore,
                   scene,
+                  { value: 1 as NormalizedZoomValue },
                 );
 
               elementStore.add(linearElement);
