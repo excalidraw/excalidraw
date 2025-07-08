@@ -9,23 +9,22 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import { STORAGE_KEYS } from "../app_constants";
 
-export const saveUsernameToLocalStorage = (username: string) => {
+import type { SaveReminderState } from "excalidraw-app/save-reminder/SaveReminder";
+
+const saveObjectToLocalStorage = (localStorageKey: string, obj: any) => {
   try {
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_COLLAB,
-      JSON.stringify({ username }),
-    );
+    localStorage.setItem(localStorageKey, JSON.stringify(obj));
   } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
   }
 };
 
-export const importUsernameFromLocalStorage = (): string | null => {
+const importObjectFromLocalStorage = (localStorageKey: string) => {
   try {
-    const data = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
+    const data = localStorage.getItem(localStorageKey);
     if (data) {
-      return JSON.parse(data).username;
+      return JSON.parse(data);
     }
   } catch (error: any) {
     // Unable to access localStorage
@@ -34,6 +33,24 @@ export const importUsernameFromLocalStorage = (): string | null => {
 
   return null;
 };
+
+export const saveUsernameToLocalStorage = (username: string) =>
+  saveObjectToLocalStorage(STORAGE_KEYS.LOCAL_STORAGE_COLLAB, { username });
+
+export const saveReminderStateToLocalStorage = (
+  reminderState: SaveReminderState,
+) =>
+  saveObjectToLocalStorage(
+    STORAGE_KEYS.LOCAL_STORAGE_SAVE_REMINDER,
+    reminderState,
+  );
+
+export const importUsernameFromLocalStorage = (): string | null =>
+  importObjectFromLocalStorage(STORAGE_KEYS.LOCAL_STORAGE_COLLAB)?.username;
+
+export const importReminderStateFromLocalStorage =
+  (): SaveReminderState | null =>
+    importObjectFromLocalStorage(STORAGE_KEYS.LOCAL_STORAGE_SAVE_REMINDER);
 
 export const importFromLocalStorage = () => {
   let savedElements = null;
