@@ -201,6 +201,8 @@ export const SelectedShapeActions = ({
         </>
       )}
 
+      {appState.activeTool.type === "eraser" && renderAction("changeEraserTargets")}
+
       {shouldAllowVerticalAlign(targetElements, elementsMap) &&
         renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(appState.activeTool.type) ||
