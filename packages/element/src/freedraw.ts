@@ -153,7 +153,7 @@ export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
     simplify,
     sizeMapping: ({ pressure: t }) => {
       if (element.drawingConfigs?.fixedStrokeWidth) {
-        return 0.5;
+        return 0.6;
       }
 
       if (element.simulatePressure) {
