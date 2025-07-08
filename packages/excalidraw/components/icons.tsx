@@ -2286,28 +2286,28 @@ export const strokeWidthFixedIcon = createIcon(
     <path
       d="M4 12 C 5 8, 6 8, 8 12"
       fill="none"
-      strokeWidth="2"
+      strokeWidth="1"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M8 12 C 9 16, 10 16, 12 12"
       fill="none"
-      strokeWidth="2"
+      strokeWidth="1"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M12 12 C 14 8, 15 8, 16 12"
       fill="none"
-      strokeWidth="2"
+      strokeWidth="1"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M16 12 C 17 16, 18 16, 19 12"
       fill="none"
-      strokeWidth="2"
+      strokeWidth="1"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
@@ -2320,28 +2320,28 @@ export const strokeWidthVariableIcon = createIcon(
     <path
       d="M4 12 C 5 8, 6 8, 8 12"
       fill="none"
-      strokeWidth="3.5"
+      strokeWidth="4"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M8 12 C 9 16, 10 16, 12 12"
       fill="none"
-      strokeWidth="2.75"
+      strokeWidth="3"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M12 12 C 14 8, 15 8, 16 12"
       fill="none"
-      strokeWidth="2.25"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M16 12 C 17 16, 18 16, 19 12"
       fill="none"
-      strokeWidth="1.5"
+      strokeWidth="1.75"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
