@@ -2357,15 +2357,13 @@ describe("history", () => {
             ],
             startBinding: {
               elementId: "KPrBI4g_v9qUB1XxYLgSz",
-              focus: -0.001587301587301948,
-              gap: 5,
               fixedPoint: [1.0318471337579618, 0.49920634920634904],
+              mode: "outline",
             } as FixedPointBinding,
             endBinding: {
               elementId: "u2JGnnmoJ0VATV4vCNJE5",
-              focus: -0.0016129032258049847,
-              gap: 3.537079145500037,
               fixedPoint: [0.4991935483870975, -0.03875193720914723],
+              mode: "outline",
             } as FixedPointBinding,
           },
         ],
@@ -4763,9 +4761,8 @@ describe("history", () => {
             newElementWith(h.elements[2] as ExcalidrawElbowArrowElement, {
               endBinding: {
                 elementId: remoteContainer.id,
-                gap: 1,
-                focus: 0,
                 fixedPoint: [0.5, 1],
+                mode: "outline",
               },
             }),
             remoteContainer,
@@ -4852,15 +4849,13 @@ describe("history", () => {
           type: "arrow",
           startBinding: {
             elementId: rect1.id,
-            gap: 1,
-            focus: 0,
             fixedPoint: [1, 0.5],
+            mode: "outline",
           },
           endBinding: {
             elementId: rect2.id,
-            gap: 1,
-            focus: 0,
             fixedPoint: [0.5, 1],
+            mode: "outline",
           },
         });
 
@@ -4961,15 +4956,13 @@ describe("history", () => {
             newElementWith(h.elements[0] as ExcalidrawElbowArrowElement, {
               startBinding: {
                 elementId: rect1.id,
-                gap: 1,
-                focus: 0,
                 fixedPoint: [0.5, 1],
+                mode: "outline",
               },
               endBinding: {
                 elementId: rect2.id,
-                gap: 1,
-                focus: 0,
                 fixedPoint: [1, 0.5],
+                mode: "outline",
               },
             }),
             newElementWith(rect1, {

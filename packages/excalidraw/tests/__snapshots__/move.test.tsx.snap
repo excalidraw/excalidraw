@@ -180,13 +180,16 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id3",
-    "focus": "-0.46667",
-    "gap": 10,
+    "fixedPoint": [
+      "0.50000",
+      "0.50000",
+    ],
+    "mode": "outline",
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "81.40630",
+  "height": "102.02000",
   "id": "id6",
   "index": "a2",
   "isDeleted": false,
@@ -201,8 +204,8 @@ exports[`move element > rectangles with binding arrow 7`] = `
       0,
     ],
     [
-      "81.00000",
-      "81.40630",
+      "301.02000",
+      "102.02000",
     ],
   ],
   "roughness": 1,
@@ -213,8 +216,11 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
-    "focus": "-0.60000",
-    "gap": 10,
+    "fixedPoint": [
+      "0.50000",
+      "0.50000",
+    ],
+    "mode": "outline",
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -223,8 +229,8 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "updated": 1,
   "version": 11,
   "versionNonce": 1573789895,
-  "width": "81.00000",
-  "x": "110.00000",
-  "y": 50,
+  "width": "301.02000",
+  "x": "50.01000",
+  "y": "50.01000",
 }
 `;

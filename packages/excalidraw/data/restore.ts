@@ -32,7 +32,6 @@ import {
   isArrowBoundToElement,
   isArrowElement,
   isElbowArrow,
-  isFixedPointBinding,
   isLinearElement,
   isLineElement,
   isTextElement,
@@ -61,7 +60,6 @@ import type {
   FontFamilyValues,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
-  PointBinding,
   StrokeRoundness,
 } from "@excalidraw/element/types";
 
@@ -123,26 +121,20 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 
 const repairBinding = <T extends ExcalidrawLinearElement>(
   element: T,
-  binding: PointBinding | FixedPointBinding | null,
-): T extends ExcalidrawElbowArrowElement
-  ? FixedPointBinding | null
-  : PointBinding | FixedPointBinding | null => {
+  binding: FixedPointBinding | null,
+): FixedPointBinding | null => {
   if (!binding) {
     return null;
   }
 
-  const focus = binding.focus || 0;
-
   if (isElbowArrow(element)) {
     const fixedPointBinding:
       | ExcalidrawElbowArrowElement["startBinding"]
-      | ExcalidrawElbowArrowElement["endBinding"] = isFixedPointBinding(binding)
-      ? {
-          ...binding,
-          focus,
-          fixedPoint: normalizeFixedPoint(binding.fixedPoint ?? [0, 0]),
-        }
-      : null;
+      | ExcalidrawElbowArrowElement["endBinding"] = {
+      ...binding,
+      fixedPoint: normalizeFixedPoint(binding.fixedPoint ?? [0, 0]),
+      mode: binding.mode || "outline",
+    };
 
     return fixedPointBinding;
   }
@@ -150,9 +142,7 @@ const repairBinding = <T extends ExcalidrawLinearElement>(
   return {
     ...binding,
     focus,
-  } as T extends ExcalidrawElbowArrowElement
-    ? FixedPointBinding | null
-    : PointBinding | FixedPointBinding | null;
+  } as FixedPointBinding | null;
 };
 
 const restoreElementWithProperties = <

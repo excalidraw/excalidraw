@@ -189,8 +189,8 @@ describe("elbow arrow routing", () => {
     scene.insertElement(rectangle2);
     scene.insertElement(arrow);
 
-    bindLinearElement(arrow, rectangle1, "start", scene, h.app.state.zoom);
-    bindLinearElement(arrow, rectangle2, "end", scene, h.app.state.zoom);
+    bindLinearElement(arrow, rectangle1, "start", scene);
+    bindLinearElement(arrow, rectangle2, "end", scene);
 
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);

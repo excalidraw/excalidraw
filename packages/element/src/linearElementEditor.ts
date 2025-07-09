@@ -58,12 +58,7 @@ import {
 import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
-import {
-  isArrowElement,
-  isBindingElement,
-  isElbowArrow,
-  isFixedPointBinding,
-} from "./typeChecks";
+import { isArrowElement, isBindingElement, isElbowArrow } from "./typeChecks";
 
 import { ShapeCache, toggleLinePolygonState } from "./shape";
 
@@ -79,7 +74,6 @@ import type {
   NonDeleted,
   ExcalidrawLinearElement,
   ExcalidrawElement,
-  PointBinding,
   ExcalidrawBindableElement,
   ExcalidrawTextElementWithContainer,
   ElementsMap,
@@ -560,24 +554,26 @@ export class LinearElementEditor {
             );
           }
 
-          const bindingElement = isBindingEnabled(appState)
-            ? getHoveredElementForBinding(
-                (selectedPointsIndices?.length ?? 0) > 1
-                  ? LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                      element,
-                      selectedPoint!,
-                      elementsMap,
-                    )
-                  : pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
-                elements,
-                elementsMap,
-                appState.zoom,
-              )
-            : null;
+          const propName =
+            selectedPoint === 0 ? "startBindingElement" : "endBindingElement";
+          const point =
+            (selectedPointsIndices?.length ?? 0) > 1
+              ? LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                  element,
+                  selectedPoint!,
+                  elementsMap,
+                )
+              : pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y);
+          const hoveredElement = getHoveredElementForBinding(
+            point,
+            elements,
+            elementsMap,
+            appState.zoom,
+          );
 
-          bindings[
-            selectedPoint === 0 ? "startBindingElement" : "endBindingElement"
-          ] = bindingElement;
+          bindings[propName] = isBindingEnabled(appState)
+            ? hoveredElement
+            : null;
         }
       }
     }
@@ -964,7 +960,6 @@ export class LinearElementEditor {
           startBindingElement,
           endBindingElement,
           scene,
-          app.state.zoom,
         );
       }
     }
@@ -1150,7 +1145,6 @@ export class LinearElementEditor {
 
   static getPointAtIndexGlobalCoordinates(
     element: NonDeleted<ExcalidrawLinearElement>,
-
     indexMaybeFromEnd: number, // -1 for last element
     elementsMap: ElementsMap,
   ): GlobalPoint {
@@ -1417,8 +1411,8 @@ export class LinearElementEditor {
     scene: Scene,
     pointUpdates: PointsPositionUpdates,
     otherUpdates?: {
-      startBinding?: PointBinding | null;
-      endBinding?: PointBinding | null;
+      startBinding?: FixedPointBinding | null;
+      endBinding?: FixedPointBinding | null;
       moveMidPointsWithElement?: boolean | null;
     },
   ) {
@@ -1596,8 +1590,8 @@ export class LinearElementEditor {
     offsetX: number,
     offsetY: number,
     otherUpdates?: {
-      startBinding?: PointBinding | null;
-      endBinding?: PointBinding | null;
+      startBinding?: FixedPointBinding | null;
+      endBinding?: FixedPointBinding | null;
     },
     options?: {
       isDragging?: boolean;
@@ -1612,18 +1606,10 @@ export class LinearElementEditor {
         points?: LocalPoint[];
       } = {};
       if (otherUpdates?.startBinding !== undefined) {
-        updates.startBinding =
-          otherUpdates.startBinding !== null &&
-          isFixedPointBinding(otherUpdates.startBinding)
-            ? otherUpdates.startBinding
-            : null;
+        updates.startBinding = otherUpdates.startBinding;
       }
       if (otherUpdates?.endBinding !== undefined) {
-        updates.endBinding =
-          otherUpdates.endBinding !== null &&
-          isFixedPointBinding(otherUpdates.endBinding)
-            ? otherUpdates.endBinding
-            : null;
+        updates.endBinding = otherUpdates.endBinding;
       }
 
       updates.points = Array.from(nextPoints);
@@ -2062,40 +2048,19 @@ const pointDraggingUpdates = (
           appState.zoom,
         );
 
-        const otherGlobalPoint =
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            element,
-            pointIndex === 0 ? element.points.length - 1 : 0,
-            elementsMap,
-          );
-        const otherHoveredElement = getHoveredElementForBinding(
-          otherGlobalPoint,
-          elements,
-          elementsMap,
-          appState.zoom,
-        );
-
-        const binding =
-          element[pointIndex === 0 ? "startBinding" : "endBinding"];
         if (
           isBindingEnabled(appState) &&
           isArrowElement(element) &&
           hoveredElement &&
           appState.bindMode === "focus"
         ) {
-          if (
-            isFixedPointBinding(binding)
-              ? hoveredElement.id !== binding.elementId
-              : hoveredElement.id !== otherHoveredElement?.id
-          ) {
-            newGlobalPointPosition = getOutlineAvoidingPoint(
-              element,
-              hoveredElement,
-              newGlobalPointPosition,
-              pointIndex,
-              elementsMap,
-            );
-          }
+          newGlobalPointPosition = getOutlineAvoidingPoint(
+            element,
+            hoveredElement,
+            newGlobalPointPosition,
+            pointIndex,
+            elementsMap,
+          );
         }
 
         newPointPosition = LinearElementEditor.createPointAt(

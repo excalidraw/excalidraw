@@ -337,7 +337,6 @@ const bindLinearElementToElement = (
         startBoundElement as ExcalidrawBindableElement,
         "start",
         scene,
-        zoom,
       );
     }
   }
@@ -413,7 +412,6 @@ const bindLinearElementToElement = (
         endBoundElement as ExcalidrawBindableElement,
         "end",
         scene,
-        zoom,
       );
     }
   }

@@ -12,9 +12,6 @@ import {
   pointFromVector,
   vectorScale,
   vectorNormalize,
-  vectorCross,
-  pointsEqual,
-  lineSegmentIntersectionPoints,
   PRECISION,
 } from "@excalidraw/math";
 
@@ -45,7 +42,6 @@ import {
   isBindableElement,
   isBoundToContainer,
   isElbowArrow,
-  isFixedPointBinding,
   isFrameLikeElement,
   isLinearElement,
   isRectanguloidElement,
@@ -64,7 +60,6 @@ import type {
   ExcalidrawElement,
   NonDeleted,
   ExcalidrawLinearElement,
-  PointBinding,
   NonDeletedExcalidrawElement,
   ElementsMap,
   NonDeletedSceneElementsMap,
@@ -116,10 +111,9 @@ const getNonDeletedElements = (
 
 export const bindOrUnbindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
-  startBindingElement: ExcalidrawBindableElement | null | "keep",
-  endBindingElement: ExcalidrawBindableElement | null | "keep",
+  startBindingStrategy: ExcalidrawBindableElement | null | "keep",
+  endBindingStrategy: ExcalidrawBindableElement | null | "keep",
   scene: Scene,
-  zoom: AppState["zoom"],
 ): void => {
   const bothEndBoundToTheSameElement =
     linearElement.startBinding?.elementId ===
@@ -129,25 +123,23 @@ export const bindOrUnbindLinearElement = (
   const unboundFromElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
   bindOrUnbindLinearElementEdge(
     linearElement,
-    startBindingElement,
-    endBindingElement,
+    startBindingStrategy,
+    endBindingStrategy,
     "start",
     boundToElementIds,
     unboundFromElementIds,
     scene,
     elementsMap,
-    zoom,
   );
   bindOrUnbindLinearElementEdge(
     linearElement,
-    endBindingElement,
-    startBindingElement,
+    endBindingStrategy,
+    startBindingStrategy,
     "end",
     boundToElementIds,
     unboundFromElementIds,
     scene,
     elementsMap,
-    zoom,
   );
 
   if (!bothEndBoundToTheSameElement) {
@@ -177,7 +169,6 @@ const bindOrUnbindLinearElementEdge = (
   unboundFromElementIds: Set<ExcalidrawBindableElement["id"]>,
   scene: Scene,
   elementsMap: ElementsMap,
-  zoom: AppState["zoom"],
 ): void => {
   // "keep" is for method chaining convenience, a "no-op", so just bail out
   if (bindableElement === "keep") {
@@ -210,17 +201,11 @@ const bindOrUnbindLinearElementEdge = (
         : startOrEnd === "start" ||
           otherEdgeBindableElement.id !== bindableElement.id)
     ) {
-      bindLinearElement(
-        linearElement,
-        bindableElement,
-        startOrEnd,
-        scene,
-        zoom,
-      );
+      bindLinearElement(linearElement, bindableElement, startOrEnd, scene);
       boundToElementIds.add(bindableElement.id);
     }
   } else {
-    bindLinearElement(linearElement, bindableElement, startOrEnd, scene, zoom);
+    bindLinearElement(linearElement, bindableElement, startOrEnd, scene);
     boundToElementIds.add(bindableElement.id);
   }
 };
@@ -231,7 +216,13 @@ const getOriginalBindingsIfStillCloseToArrowEnds = (
   zoom?: AppState["zoom"],
 ): (NonDeleted<ExcalidrawElement> | null)[] =>
   (["start", "end"] as const).map((edge) => {
-    const coors = getLinearElementEdgeCoors(linearElement, edge, elementsMap);
+    const coors = tupleToCoors(
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        linearElement,
+        edge === "start" ? 0 : -1,
+        elementsMap,
+      ),
+    );
     const elementId =
       edge === "start"
         ? linearElement.startBinding?.elementId
@@ -240,12 +231,12 @@ const getOriginalBindingsIfStillCloseToArrowEnds = (
       const element = elementsMap.get(elementId);
       if (
         isBindableElement(element) &&
-        bindingTestForElementAtPoint(
+        bindingProjectionIntersectionCountForElementAtPoint(
           element,
           pointFrom<GlobalPoint>(coors.x, coors.y),
           elementsMap,
           zoom,
-        )
+        ) > 0
       ) {
         return element;
       }
@@ -362,7 +353,7 @@ export const bindOrUnbindLinearElements = (
           zoom,
         );
 
-    bindOrUnbindLinearElement(selectedElement, start, end, scene, zoom);
+    bindOrUnbindLinearElement(selectedElement, start, end, scene);
   });
 };
 
@@ -459,7 +450,6 @@ export const maybeBindLinearElement = (
   appState: AppState,
   pointerCoords: { x: number; y: number },
   scene: Scene,
-  zoom: AppState["zoom"],
 ): void => {
   const elements = scene.getNonDeletedElements();
   const elementsMap = scene.getNonDeletedElementsMap();
@@ -470,7 +460,6 @@ export const maybeBindLinearElement = (
       appState.startBoundElement,
       "start",
       scene,
-      zoom,
     );
   }
 
@@ -490,57 +479,29 @@ export const maybeBindLinearElement = (
         elementsMap,
       )
     ) {
-      bindLinearElement(linearElement, hoveredElement, "end", scene, zoom);
+      bindLinearElement(linearElement, hoveredElement, "end", scene);
     }
   }
 };
-
-const normalizePointBinding = (
-  binding: { focus: number; gap: number },
-  hoveredElement: ExcalidrawBindableElement,
-) => ({
-  ...binding,
-  gap: Math.min(
-    binding.gap,
-    maxBindingDistanceFromOutline(
-      hoveredElement,
-      hoveredElement.width,
-      hoveredElement.height,
-    ),
-  ),
-});
 
 export const bindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   scene: Scene,
-  zoom: AppState["zoom"],
 ): void => {
   if (!isArrowElement(linearElement)) {
     return;
   }
 
   const elementsMap = scene.getNonDeletedElementsMap();
-  const edgePoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    linearElement,
-    startOrEnd === "start" ? 0 : -1,
-    elementsMap,
-  );
-  let binding: PointBinding | FixedPointBinding;
+
+  let binding: FixedPointBinding;
 
   if (isElbowArrow(linearElement)) {
     binding = {
       elementId: hoveredElement.id,
-      ...normalizePointBinding(
-        calculateFocusAndGap(
-          linearElement,
-          hoveredElement,
-          startOrEnd,
-          elementsMap,
-        ),
-        hoveredElement,
-      ),
+      mode: "outline",
       ...calculateFixedPointForElbowArrowBinding(
         linearElement,
         hoveredElement,
@@ -548,14 +509,15 @@ export const bindLinearElement = (
         elementsMap,
       ),
     };
-  } else if (
-    bindingTestForElementAtPoint(hoveredElement, edgePoint, elementsMap, zoom)
+  }
+  if (
+    linearElement[startOrEnd === "start" ? "endBinding" : "startBinding"]
+      ?.elementId === hoveredElement.id
   ) {
-    // Use FixedPoint binding when the arrow endpoint is inside the shape
+    // Use inside binding when the arrow endpoint is inside the shape
     binding = {
       elementId: hoveredElement.id,
-      focus: 0,
-      gap: 0,
+      mode: "inside",
       ...calculateFixedPointForNonElbowArrowBinding(
         linearElement,
         hoveredElement,
@@ -564,72 +526,31 @@ export const bindLinearElement = (
       ),
     };
   } else {
-    // For non-elbow arrows, extend the last segment and check intersection
-    const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    const edgePoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
       linearElement,
-      startOrEnd === "start" ? 1 : -2,
+      startOrEnd === "start" ? 0 : -1,
       elementsMap,
     );
-    const extendedDirection = vectorScale(
-      vectorNormalize(
-        vectorFromPoint(
-          pointFrom(
-            edgePoint[0] - adjacentPoint[0],
-            edgePoint[1] - adjacentPoint[1],
-          ),
-        ),
+    const intersectionCount =
+      bindingProjectionIntersectionCountForElementAtPoint(
+        hoveredElement,
+        edgePoint,
+        elementsMap,
+      );
+    binding = {
+      elementId: hoveredElement.id,
+      ...calculateFixedPointForNonElbowArrowBinding(
+        linearElement,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
       ),
-      Math.max(hoveredElement.width, hoveredElement.height) * 2,
-    );
-    const intersector = lineSegment(
-      edgePoint,
-      pointFromVector(
-        vectorFromPoint(
-          pointFrom(
-            edgePoint[0] + extendedDirection[0],
-            edgePoint[1] + extendedDirection[1],
-          ),
-        ),
-      ),
-    );
-
-    // Check if this extended segment intersects the bindable element
-    const intersections = intersectElementWithLineSegment(
-      hoveredElement,
-      elementsMap,
-      intersector,
-    );
-
-    const intersectsElement = intersections.length > 0;
-
-    if (intersectsElement) {
-      // Use traditional focus/gap binding when the extended segment intersects
-      binding = {
-        elementId: hoveredElement.id,
-        ...normalizePointBinding(
-          calculateFocusAndGap(
-            linearElement,
-            hoveredElement,
-            startOrEnd,
-            elementsMap,
-          ),
-          hoveredElement,
-        ),
-      };
-    } else {
-      // Use FixedPoint binding when the extended segment doesn't intersect
-      binding = {
-        elementId: hoveredElement.id,
-        focus: 0,
-        gap: 0,
-        ...calculateFixedPointForNonElbowArrowBinding(
-          linearElement,
-          hoveredElement,
-          startOrEnd,
-          elementsMap,
-        ),
-      };
-    }
+      mode:
+        intersectionCount < 2
+          ? // The point is outside the shape
+            "outline"
+          : "inside",
+    };
   }
 
   scene.mutateElement(linearElement, {
@@ -738,11 +659,18 @@ export const getHoveredElementForBinding = (
       "Elements in the function parameter for getAllElementsAtPositionForBinding() should not contain deleted elements",
     );
 
-    if (
-      isBindableElement(element, false) &&
-      bindingTestForElementAtPoint(element, point, elementsMap, zoom)
-    ) {
-      candidateElements.push(element);
+    if (isBindableElement(element, false)) {
+      const intersectionCount =
+        bindingProjectionIntersectionCountForElementAtPoint(
+          element,
+          point,
+          elementsMap,
+          zoom,
+        );
+
+      if (intersectionCount > 0) {
+        candidateElements.push(element);
+      }
     }
   }
 
@@ -751,7 +679,7 @@ export const getHoveredElementForBinding = (
   }
 
   if (candidateElements.length === 1) {
-    return candidateElements[0] as NonDeleted<ExcalidrawBindableElement>;
+    return candidateElements[0];
   }
 
   // Prefer smaller shapes
@@ -762,38 +690,6 @@ export const getHoveredElementForBinding = (
     .pop() as NonDeleted<ExcalidrawBindableElement>;
 };
 
-const calculateFocusAndGap = (
-  linearElement: NonDeleted<ExcalidrawLinearElement>,
-  hoveredElement: ExcalidrawBindableElement,
-  startOrEnd: "start" | "end",
-  elementsMap: NonDeletedSceneElementsMap,
-): { focus: number; gap: number } => {
-  const direction = startOrEnd === "start" ? -1 : 1;
-  const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
-  const adjacentPointIndex = edgePointIndex - direction;
-
-  const edgePoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    linearElement,
-    edgePointIndex,
-    elementsMap,
-  );
-  const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    linearElement,
-    adjacentPointIndex,
-    elementsMap,
-  );
-
-  return {
-    focus: determineFocusDistance(
-      hoveredElement,
-      elementsMap,
-      adjacentPoint,
-      edgePoint,
-    ),
-    gap: Math.max(1, distanceToElement(hoveredElement, elementsMap, edgePoint)),
-  };
-};
-
 // Supports translating, rotating and scaling `changedElement` with bound
 // linear elements.
 export const updateBoundElements = (
@@ -801,7 +697,6 @@ export const updateBoundElements = (
   scene: Scene,
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
-    newSize?: { width: number; height: number };
     changedElements?: Map<string, ExcalidrawElement>;
   },
 ) => {
@@ -809,7 +704,7 @@ export const updateBoundElements = (
     return;
   }
 
-  const { newSize, simultaneouslyUpdated } = options ?? {};
+  const { simultaneouslyUpdated } = options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
@@ -850,22 +745,8 @@ export const updateBoundElements = (
       endBounds = getElementBounds(endBindingElement, elementsMap);
     }
 
-    const bindings = {
-      startBinding: maybeCalculateNewGapWhenScaling(
-        changedElement,
-        element.startBinding,
-        newSize,
-      ),
-      endBinding: maybeCalculateNewGapWhenScaling(
-        changedElement,
-        element.endBinding,
-        newSize,
-      ),
-    };
-
     // `linearElement` is being moved/scaled already, just update the binding
     if (simultaneouslyUpdatedElementIds.has(element.id)) {
-      scene.mutateElement(element, bindings);
       return;
     }
 
@@ -887,7 +768,7 @@ export const updateBoundElements = (
           const point = updateBoundPoint(
             element,
             bindingProp,
-            bindings[bindingProp],
+            element[bindingProp],
             bindableElement,
             elementsMap,
           );
@@ -907,12 +788,6 @@ export const updateBoundElements = (
     );
 
     LinearElementEditor.movePoints(element, scene, new Map(updates), {
-      ...(changedElement.id === element.startBinding?.elementId
-        ? { startBinding: bindings.startBinding }
-        : {}),
-      ...(changedElement.id === element.endBinding?.elementId
-        ? { endBinding: bindings.endBinding }
-        : {}),
       moveMidPointsWithElement:
         !!startBindingElement &&
         startBindingElement?.id === endBindingElement?.id,
@@ -1338,7 +1213,7 @@ export const snapToMid = (
 export const updateBoundPoint = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "startBinding" | "endBinding",
-  binding: PointBinding | null | undefined,
+  binding: FixedPointBinding | null | undefined,
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ): LocalPoint | null => {
@@ -1351,121 +1226,31 @@ export const updateBoundPoint = (
     return null;
   }
 
-  const direction = startOrEnd === "startBinding" ? -1 : 1;
-  const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
-
-  if (isFixedPointBinding(binding)) {
-    const fixedPoint =
-      normalizeFixedPoint(binding.fixedPoint) ??
-      (isElbowArrow(linearElement)
-        ? calculateFixedPointForElbowArrowBinding(
-            linearElement,
-            bindableElement,
-            startOrEnd === "startBinding" ? "start" : "end",
-            elementsMap,
-          ).fixedPoint
-        : calculateFixedPointForNonElbowArrowBinding(
-            linearElement,
-            bindableElement,
-            startOrEnd === "startBinding" ? "start" : "end",
-            elementsMap,
-          ).fixedPoint);
-    const globalMidPoint = elementCenterPoint(bindableElement, elementsMap);
-    const global = pointFrom<GlobalPoint>(
-      bindableElement.x + fixedPoint[0] * bindableElement.width,
-      bindableElement.y + fixedPoint[1] * bindableElement.height,
-    );
-    const rotatedGlobal = pointRotateRads(
-      global,
-      globalMidPoint,
-      bindableElement.angle,
-    );
-
-    return LinearElementEditor.pointFromAbsoluteCoords(
-      linearElement,
-      rotatedGlobal,
-      elementsMap,
-    );
-  }
-
-  const adjacentPointIndex = edgePointIndex - direction;
-  const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    linearElement,
-    adjacentPointIndex,
-    elementsMap,
+  const fixedPoint = normalizeFixedPoint(binding.fixedPoint);
+  const globalMidPoint = elementCenterPoint(bindableElement, elementsMap);
+  const global = pointFrom<GlobalPoint>(
+    bindableElement.x + fixedPoint[0] * bindableElement.width,
+    bindableElement.y + fixedPoint[1] * bindableElement.height,
   );
-  const focusPointAbsolute = determineFocusPoint(
-    bindableElement,
-    elementsMap,
-    binding.focus,
-    adjacentPoint,
+  const rotatedGlobal = pointRotateRads(
+    global,
+    globalMidPoint,
+    bindableElement.angle,
   );
-
-  let newEdgePoint: GlobalPoint;
-
-  // The linear element was not originally pointing inside the bound shape,
-  // we can point directly at the focus point
-  if (binding.gap === 0) {
-    newEdgePoint = focusPointAbsolute;
-  } else {
-    const edgePointAbsolute =
-      LinearElementEditor.getPointAtIndexGlobalCoordinates(
-        linearElement,
-        edgePointIndex,
-        elementsMap,
-      );
-
-    const center = elementCenterPoint(bindableElement, elementsMap);
-    const interceptorLength =
-      pointDistance(adjacentPoint, edgePointAbsolute) +
-      pointDistance(adjacentPoint, center) +
-      Math.max(bindableElement.width, bindableElement.height) * 2;
-    const intersections = [
-      ...intersectElementWithLineSegment(
-        bindableElement,
-        elementsMap,
-        lineSegment<GlobalPoint>(
-          adjacentPoint,
-          pointFromVector(
-            vectorScale(
-              vectorNormalize(
-                vectorFromPoint(focusPointAbsolute, adjacentPoint),
-              ),
-              interceptorLength,
-            ),
-            adjacentPoint,
-          ),
-        ),
-        binding.gap,
-      ).sort(
-        (g, h) =>
-          pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
-      ),
-      // Fallback when arrow doesn't point to the shape
-      pointFromVector(
-        vectorScale(
-          vectorNormalize(vectorFromPoint(focusPointAbsolute, adjacentPoint)),
-          pointDistance(adjacentPoint, edgePointAbsolute),
-        ),
-        adjacentPoint,
-      ),
-    ];
-
-    if (intersections.length > 1) {
-      // The adjacent point is outside the shape (+ gap)
-      newEdgePoint = intersections[0];
-    } else if (intersections.length === 1) {
-      // The adjacent point is inside the shape (+ gap)
-      newEdgePoint = focusPointAbsolute;
-    } else {
-      // Shouldn't happend, but just in case
-      newEdgePoint = edgePointAbsolute;
-    }
-  }
+  const maybeOutlineGlobal =
+    binding.mode === "outline"
+      ? getOutlineAvoidingPoint(
+          linearElement,
+          bindableElement,
+          rotatedGlobal,
+          startOrEnd === "startBinding" ? 0 : linearElement.points.length - 1,
+          elementsMap,
+        )
+      : rotatedGlobal;
 
   return LinearElementEditor.pointFromAbsoluteCoords(
     linearElement,
-    newEdgePoint,
+    maybeOutlineGlobal,
     elementsMap,
   );
 };
@@ -1544,28 +1329,6 @@ export const calculateFixedPointForNonElbowArrowBinding = (
   };
 };
 
-const maybeCalculateNewGapWhenScaling = (
-  changedElement: ExcalidrawBindableElement,
-  currentBinding: PointBinding | null | undefined,
-  newSize: { width: number; height: number } | undefined,
-): PointBinding | null | undefined => {
-  if (currentBinding == null || newSize == null) {
-    return currentBinding;
-  }
-  const { width: newWidth, height: newHeight } = newSize;
-  const { width, height } = changedElement;
-  const newGap = Math.max(
-    1,
-    Math.min(
-      maxBindingDistanceFromOutline(changedElement, newWidth, newHeight),
-      currentBinding.gap *
-        (newWidth < newHeight ? newWidth / width : newHeight / height),
-    ),
-  );
-
-  return { ...currentBinding, gap: newGap };
-};
-
 const getEligibleElementForBindingElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
@@ -1573,32 +1336,22 @@ const getEligibleElementForBindingElement = (
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   zoom?: AppState["zoom"],
 ): NonDeleted<ExcalidrawBindableElement> | null => {
-  const { x, y } = getLinearElementEdgeCoors(
-    linearElement,
-    startOrEnd,
-    elementsMap,
+  const { x, y } = tupleToCoors(
+    LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      linearElement,
+      startOrEnd === "start" ? 0 : -1,
+      elementsMap,
+    ),
   );
-  return getHoveredElementForBinding(
+
+  const hoveredElement = getHoveredElementForBinding(
     pointFrom<GlobalPoint>(x, y),
     elements,
     elementsMap,
     zoom,
   );
-};
 
-const getLinearElementEdgeCoors = (
-  linearElement: NonDeleted<ExcalidrawLinearElement>,
-  startOrEnd: "start" | "end",
-  elementsMap: NonDeletedSceneElementsMap,
-): { x: number; y: number } => {
-  const index = startOrEnd === "start" ? 0 : -1;
-  return tupleToCoors(
-    LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      linearElement,
-      index,
-      elementsMap,
-    ),
-  );
+  return hoveredElement;
 };
 
 export const fixDuplicatedBindingsAfterDuplication = (
@@ -1714,12 +1467,12 @@ const newBoundElements = (
   return nextBoundElements;
 };
 
-const bindingTestForElementAtPoint = (
+const bindingProjectionIntersectionCountForElementAtPoint = (
   element: NonDeleted<ExcalidrawBindableElement>,
   [x, y]: Readonly<GlobalPoint>,
   elementsMap: NonDeletedSceneElementsMap,
   zoom?: AppState["zoom"],
-): boolean => {
+): number => {
   const p = pointFrom<GlobalPoint>(x, y);
   const threshold = maxBindingDistanceFromOutline(
     element,
@@ -1742,7 +1495,7 @@ const bindingTestForElementAtPoint = (
   ] as Bounds;
   const elementBounds = getElementBounds(element, elementsMap);
   if (!doBoundsIntersect(bounds, elementBounds)) {
-    return false;
+    return 0;
   }
 
   // Do the intersection test against the element since it's close enough
@@ -1753,9 +1506,18 @@ const bindingTestForElementAtPoint = (
   );
   const distance = distanceToElement(element, elementsMap, p);
 
-  return shouldTestInside
-    ? intersections.length === 0 || distance <= threshold
-    : intersections.length > 0 && distance <= threshold;
+  if (shouldTestInside) {
+    if (intersections.length === 0 || distance <= 0) {
+      return 2;
+    }
+    if (distance <= threshold) {
+      return 1;
+    }
+
+    return 0;
+  }
+
+  return intersections.length > 0 && distance <= threshold ? 1 : 0;
 };
 
 export const maxBindingDistanceFromOutline = (
@@ -1777,262 +1539,6 @@ export const maxBindingDistanceFromOutline = (
     // keep in sync with the zoomed highlight
     BINDING_HIGHLIGHT_THICKNESS / zoomValue + FIXED_BINDING_DISTANCE,
   );
-};
-
-// The focus distance is the oriented ratio between the size of
-// the `element` and the "focus image" of the element on which
-// all focus points lie, so it's a number between -1 and 1.
-// The line going through `a` and `b` is a tangent to the "focus image"
-// of the element.
-const determineFocusDistance = (
-  element: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-  // Point on the line, in absolute coordinates
-  a: GlobalPoint,
-  // Another point on the line, in absolute coordinates (closer to element)
-  b: GlobalPoint,
-): number => {
-  const center = elementCenterPoint(element, elementsMap);
-
-  if (pointsEqual(a, b)) {
-    return 0;
-  }
-
-  const rotatedA = pointRotateRads(a, center, -element.angle as Radians);
-  const rotatedB = pointRotateRads(b, center, -element.angle as Radians);
-  const sign =
-    Math.sign(
-      vectorCross(
-        vectorFromPoint(rotatedB, a),
-        vectorFromPoint(rotatedB, center),
-      ),
-    ) * -1;
-  const rotatedInterceptor = lineSegment(
-    rotatedB,
-    pointFromVector(
-      vectorScale(
-        vectorNormalize(vectorFromPoint(rotatedB, rotatedA)),
-        Math.max(element.width * 2, element.height * 2),
-      ),
-      rotatedB,
-    ),
-  );
-  const axes =
-    element.type === "diamond"
-      ? [
-          lineSegment(
-            pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
-            pointFrom<GlobalPoint>(
-              element.x + element.width / 2,
-              element.y + element.height,
-            ),
-          ),
-          lineSegment(
-            pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
-            pointFrom<GlobalPoint>(
-              element.x + element.width,
-              element.y + element.height / 2,
-            ),
-          ),
-        ]
-      : [
-          lineSegment(
-            pointFrom<GlobalPoint>(element.x, element.y),
-            pointFrom<GlobalPoint>(
-              element.x + element.width,
-              element.y + element.height,
-            ),
-          ),
-          lineSegment(
-            pointFrom<GlobalPoint>(element.x + element.width, element.y),
-            pointFrom<GlobalPoint>(element.x, element.y + element.height),
-          ),
-        ];
-  const interceptees =
-    element.type === "diamond"
-      ? [
-          lineSegment(
-            pointFrom<GlobalPoint>(
-              element.x + element.width / 2,
-              element.y - element.height,
-            ),
-            pointFrom<GlobalPoint>(
-              element.x + element.width / 2,
-              element.y + element.height * 2,
-            ),
-          ),
-          lineSegment(
-            pointFrom<GlobalPoint>(
-              element.x - element.width,
-              element.y + element.height / 2,
-            ),
-            pointFrom<GlobalPoint>(
-              element.x + element.width * 2,
-              element.y + element.height / 2,
-            ),
-          ),
-        ]
-      : [
-          lineSegment(
-            pointFrom<GlobalPoint>(
-              element.x - element.width,
-              element.y - element.height,
-            ),
-            pointFrom<GlobalPoint>(
-              element.x + element.width * 2,
-              element.y + element.height * 2,
-            ),
-          ),
-          lineSegment(
-            pointFrom<GlobalPoint>(
-              element.x + element.width * 2,
-              element.y - element.height,
-            ),
-            pointFrom<GlobalPoint>(
-              element.x - element.width,
-              element.y + element.height * 2,
-            ),
-          ),
-        ];
-
-  const ordered = [
-    lineSegmentIntersectionPoints(rotatedInterceptor, interceptees[0]),
-    lineSegmentIntersectionPoints(rotatedInterceptor, interceptees[1]),
-  ]
-    .filter((p): p is GlobalPoint => p !== null)
-    .sort((g, h) => pointDistanceSq(g, b) - pointDistanceSq(h, b))
-    .map(
-      (p, idx): number =>
-        (sign * pointDistance(center, p)) /
-        (element.type === "diamond"
-          ? pointDistance(axes[idx][0], axes[idx][1]) / 2
-          : Math.sqrt(element.width ** 2 + element.height ** 2) / 2),
-    )
-    .sort((g, h) => Math.abs(g) - Math.abs(h));
-
-  const signedDistanceRatio = ordered[0] ?? 0;
-
-  return signedDistanceRatio;
-};
-
-const determineFocusPoint = (
-  element: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-  // The oriented, relative distance from the center of `element` of the
-  // returned focusPoint
-  focus: number,
-  adjacentPoint: GlobalPoint,
-): GlobalPoint => {
-  const center = elementCenterPoint(element, elementsMap);
-
-  if (focus === 0) {
-    return center;
-  }
-
-  const candidates = (
-    element.type === "diamond"
-      ? [
-          pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
-          pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
-          pointFrom<GlobalPoint>(
-            element.x + element.width,
-            element.y + element.height / 2,
-          ),
-          pointFrom<GlobalPoint>(
-            element.x + element.width / 2,
-            element.y + element.height,
-          ),
-        ]
-      : [
-          pointFrom<GlobalPoint>(element.x, element.y),
-          pointFrom<GlobalPoint>(element.x + element.width, element.y),
-          pointFrom<GlobalPoint>(
-            element.x + element.width,
-            element.y + element.height,
-          ),
-          pointFrom<GlobalPoint>(element.x, element.y + element.height),
-        ]
-  )
-    .map((p) =>
-      pointFromVector(
-        vectorScale(vectorFromPoint(p, center), Math.abs(focus)),
-        center,
-      ),
-    )
-    .map((p) => pointRotateRads(p, center, element.angle as Radians));
-
-  const selected = [
-    vectorCross(
-      vectorFromPoint(adjacentPoint, candidates[0]),
-      vectorFromPoint(candidates[1], candidates[0]),
-    ) > 0 && // TOP
-      (focus > 0
-        ? vectorCross(
-            vectorFromPoint(adjacentPoint, candidates[1]),
-            vectorFromPoint(candidates[2], candidates[1]),
-          ) < 0
-        : vectorCross(
-            vectorFromPoint(adjacentPoint, candidates[3]),
-            vectorFromPoint(candidates[0], candidates[3]),
-          ) < 0),
-    vectorCross(
-      vectorFromPoint(adjacentPoint, candidates[1]),
-      vectorFromPoint(candidates[2], candidates[1]),
-    ) > 0 && // RIGHT
-      (focus > 0
-        ? vectorCross(
-            vectorFromPoint(adjacentPoint, candidates[2]),
-            vectorFromPoint(candidates[3], candidates[2]),
-          ) < 0
-        : vectorCross(
-            vectorFromPoint(adjacentPoint, candidates[0]),
-            vectorFromPoint(candidates[1], candidates[0]),
-          ) < 0),
-    vectorCross(
-      vectorFromPoint(adjacentPoint, candidates[2]),
-      vectorFromPoint(candidates[3], candidates[2]),
-    ) > 0 && // BOTTOM
-      (focus > 0
-        ? vectorCross(
-            vectorFromPoint(adjacentPoint, candidates[3]),
-            vectorFromPoint(candidates[0], candidates[3]),
-          ) < 0
-        : vectorCross(
-            vectorFromPoint(adjacentPoint, candidates[1]),
-            vectorFromPoint(candidates[2], candidates[1]),
-          ) < 0),
-    vectorCross(
-      vectorFromPoint(adjacentPoint, candidates[3]),
-      vectorFromPoint(candidates[0], candidates[3]),
-    ) > 0 && // LEFT
-      (focus > 0
-        ? vectorCross(
-            vectorFromPoint(adjacentPoint, candidates[0]),
-            vectorFromPoint(candidates[1], candidates[0]),
-          ) < 0
-        : vectorCross(
-            vectorFromPoint(adjacentPoint, candidates[2]),
-            vectorFromPoint(candidates[3], candidates[2]),
-          ) < 0),
-  ];
-
-  const focusPoint = selected[0]
-    ? focus > 0
-      ? candidates[1]
-      : candidates[0]
-    : selected[1]
-    ? focus > 0
-      ? candidates[2]
-      : candidates[1]
-    : selected[2]
-    ? focus > 0
-      ? candidates[3]
-      : candidates[2]
-    : focus > 0
-    ? candidates[0]
-    : candidates[3];
-
-  return focusPoint;
 };
 
 export const bindingProperties: Set<BindableProp | BindingProp> = new Set([
@@ -2366,13 +1872,11 @@ export const getGlobalFixedPoints = (
 ): [GlobalPoint, GlobalPoint] => {
   const startElement =
     arrow.startBinding &&
-    isFixedPointBinding(arrow.startBinding) &&
     (elementsMap.get(arrow.startBinding.elementId) as
       | ExcalidrawBindableElement
       | undefined);
   const endElement =
     arrow.endBinding &&
-    isFixedPointBinding(arrow.endBinding) &&
     (elementsMap.get(arrow.endBinding.elementId) as
       | ExcalidrawBindableElement
       | undefined);

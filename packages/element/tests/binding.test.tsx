@@ -323,15 +323,13 @@ describe("element binding", () => {
       points: [pointFrom(0, 0), pointFrom(0, -87.45777932247563)],
       startBinding: {
         elementId: "rectangle1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [0.5, 1],
+        mode: "outline",
       },
       endBinding: {
         elementId: "text1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [1, 0.5],
+        mode: "outline",
       },
     });
 
@@ -341,15 +339,13 @@ describe("element binding", () => {
       points: [pointFrom(0, 0), pointFrom(0, -87.45777932247563)],
       startBinding: {
         elementId: "text1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [0.5, 1],
+        mode: "outline",
       },
       endBinding: {
         elementId: "rectangle1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [1, 0.5],
+        mode: "outline",
       },
     });
 
@@ -625,11 +621,6 @@ describe("Fixed-point arrow binding", () => {
     mouse.moveTo(300, 300);
     mouse.up();
 
-    // The end point should be a normal point binding
-    const endBinding = arrow.endBinding as FixedPointBinding;
-    expect(endBinding.focus).toBeCloseTo(0);
-    expect(endBinding.gap).toBeCloseTo(0);
-
     expect(arrow.x).toBe(50);
     expect(arrow.y).toBe(50);
     expect(arrow.width).toBeCloseTo(280, 0);
@@ -663,15 +654,13 @@ describe("Fixed-point arrow binding", () => {
       ],
       startBinding: {
         elementId: rect.id,
-        focus: 0,
-        gap: 0,
         fixedPoint: [0.25, 0.5],
+        mode: "outline",
       },
       endBinding: {
         elementId: rect.id,
-        focus: 0,
-        gap: 0,
         fixedPoint: [0.75, 0.5],
+        mode: "outline",
       },
     });
 
@@ -729,13 +718,13 @@ describe("Fixed-point arrow binding", () => {
       ],
       startBinding: {
         elementId: rectLeft.id,
-        focus: 0.5,
-        gap: 5,
+        fixedPoint: [0.5, 0.5],
+        mode: "outline",
       },
       endBinding: {
         elementId: rectRight.id,
-        focus: 0.5,
-        gap: 5,
+        fixedPoint: [0.5, 0.5],
+        mode: "outline",
       },
     });
 
@@ -795,7 +784,6 @@ describe("line segment extension binding", () => {
     expect(arrow.endBinding?.elementId).toBe(rect.id);
     expect(arrow.endBinding).toHaveProperty("focus");
     expect(arrow.endBinding).toHaveProperty("gap");
-    expect(arrow.endBinding).not.toHaveProperty("fixedPoint");
   });
 
   it("should use fixed point binding when extended segment misses element", () => {
@@ -831,7 +819,7 @@ describe("line segment extension binding", () => {
     ).toBeLessThanOrEqual(1);
     expect(
       (arrow.startBinding as FixedPointBinding).fixedPoint[1],
-    ).toBeLessThanOrEqual(0);
+    ).toBeLessThanOrEqual(0.5);
     expect(
       (arrow.startBinding as FixedPointBinding).fixedPoint[1],
     ).toBeLessThanOrEqual(1);

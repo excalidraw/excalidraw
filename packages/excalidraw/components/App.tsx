@@ -234,8 +234,8 @@ import {
   isLineElement,
   isSimpleArrow,
   getOutlineAvoidingPoint,
-  isFixedPointBinding,
   calculateFixedPointForNonElbowArrowBinding,
+  bindLinearElement,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -4666,9 +4666,9 @@ class App extends React.Component<AppProps, AppState> {
         if (hoveredElement && !this.bindModeHandler) {
           this.bindModeHandler = setTimeout(() => {
             if (hoveredElement) {
-              this.setState({
-                bindMode: "fixed",
-              });
+              // this.setState({
+              //   bindMode: "fixed",
+              // });
             } else {
               this.bindModeHandler = null;
             }
@@ -4697,10 +4697,7 @@ class App extends React.Component<AppProps, AppState> {
           // Update the fixed point bindings for non-elbow arrows
           // when the pointer is released, so that they are correctly positioned
           // after the drag.
-          if (
-            element.startBinding &&
-            isFixedPointBinding(element.startBinding)
-          ) {
+          if (element.startBinding) {
             this.scene.mutateElement(element, {
               startBinding: {
                 ...element.startBinding,
@@ -4715,7 +4712,7 @@ class App extends React.Component<AppProps, AppState> {
               },
             });
           }
-          if (element.endBinding && isFixedPointBinding(element.endBinding)) {
+          if (element.endBinding) {
             this.scene.mutateElement(element, {
               endBinding: {
                 ...element.endBinding,
@@ -6002,9 +5999,9 @@ class App extends React.Component<AppProps, AppState> {
             this.bindModeHandler = setTimeout(() => {
               if (hoveredElement) {
                 flushSync(() => {
-                  this.setState({
-                    bindMode: "fixed",
-                  });
+                  // this.setState({
+                  //   bindMode: "fixed",
+                  // });
                 });
 
                 if (isArrowElement(this.state.newElement)) {
@@ -6145,11 +6142,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.zoom,
           );
 
-          if (
-            hoveredElement &&
-            otherHoveredElement &&
-            hoveredElement.id !== otherHoveredElement.id
-          ) {
+          if (hoveredElement?.id !== otherHoveredElement?.id) {
             const avoidancePoint =
               multiElement &&
               hoveredElement &&
@@ -8093,6 +8086,9 @@ class App extends React.Component<AppProps, AppState> {
         points: [...element.points, pointFrom<LocalPoint>(0, 0)],
       });
       this.scene.insertElement(element);
+      if (isBindingEnabled(this.state) && boundElement) {
+        bindLinearElement(element, boundElement, "start", this.scene);
+      }
       this.setState((prevState) => {
         let linearElementEditor = null;
         let nextSelectedElementIds = prevState.selectedElementIds;
@@ -8527,9 +8523,9 @@ class App extends React.Component<AppProps, AppState> {
             this.bindModeHandler = setTimeout(() => {
               if (hoveredElement) {
                 flushSync(() => {
-                  this.setState({
-                    bindMode: "fixed",
-                  });
+                  // this.setState({
+                  //   bindMode: "fixed",
+                  // });
                 });
                 const newState = LinearElementEditor.handlePointDragging(
                   event,
@@ -9450,10 +9446,7 @@ class App extends React.Component<AppProps, AppState> {
           let startBinding = element.startBinding;
           let endBinding = element.endBinding;
 
-          if (
-            element.startBinding &&
-            isFixedPointBinding(element.startBinding)
-          ) {
+          if (element.startBinding) {
             const point = LinearElementEditor.getPointGlobalCoordinates(
               element,
               element.points[0],
@@ -9482,7 +9475,7 @@ class App extends React.Component<AppProps, AppState> {
                 }
               : null;
           }
-          if (element.endBinding && isFixedPointBinding(element.endBinding)) {
+          if (element.endBinding) {
             const point = LinearElementEditor.getPointGlobalCoordinates(
               element,
               element.points[element.points.length - 1],
@@ -11139,12 +11132,7 @@ class App extends React.Component<AppProps, AppState> {
           ),
         );
 
-        updateBoundElements(croppingElement, this.scene, {
-          newSize: {
-            width: croppingElement.width,
-            height: croppingElement.height,
-          },
-        });
+        updateBoundElements(croppingElement, this.scene);
 
         this.setState({
           isCropping: transformHandleType && transformHandleType !== "rotation",

@@ -279,23 +279,22 @@ export type ExcalidrawTextElementWithContainer = {
 
 export type FixedPoint = [number, number];
 
-export type PointBinding = {
-  elementId: ExcalidrawBindableElement["id"];
-  focus: number;
-  gap: number;
-};
+export type BindMode = "inside" | "outline";
 
-export type FixedPointBinding = Merge<
-  PointBinding,
-  {
-    // Represents the fixed point binding information in form of a vertical and
-    // horizontal ratio (i.e. a percentage value in the 0.0-1.0 range). This ratio
-    // gives the user selected fixed point by multiplying the bound element width
-    // with fixedPoint[0] and the bound element height with fixedPoint[1] to get the
-    // bound element-local point coordinate.
-    fixedPoint: FixedPoint;
-  }
->;
+export type FixedPointBinding = {
+  elementId: ExcalidrawBindableElement["id"];
+
+  // Represents the fixed point binding information in form of a vertical and
+  // horizontal ratio (i.e. a percentage value in the 0.0-1.0 range). This ratio
+  // gives the user selected fixed point by multiplying the bound element width
+  // with fixedPoint[0] and the bound element height with fixedPoint[1] to get the
+  // bound element-local point coordinate.
+  fixedPoint: FixedPoint;
+
+  // Determines whether the arrow remains outside the shape or is allowed to
+  // go all the way inside the shape up to the exact fixed point.
+  mode: BindMode;
+};
 
 type Index = number;
 
@@ -323,8 +322,8 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     type: "line" | "arrow";
     points: readonly LocalPoint[];
     lastCommittedPoint: LocalPoint | null;
-    startBinding: FixedPointBinding | PointBinding | null;
-    endBinding: FixedPointBinding | PointBinding | null;
+    startBinding: FixedPointBinding | null;
+    endBinding: FixedPointBinding | null;
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
   }>;

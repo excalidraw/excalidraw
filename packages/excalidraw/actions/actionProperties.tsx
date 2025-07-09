@@ -1717,13 +1717,7 @@ export const actionChangeArrowType = register({
             newElement.startBinding.elementId,
           ) as ExcalidrawBindableElement;
           if (startElement) {
-            bindLinearElement(
-              newElement,
-              startElement,
-              "start",
-              app.scene,
-              app.state.zoom,
-            );
+            bindLinearElement(newElement, startElement, "start", app.scene);
           }
         }
         if (newElement.endBinding) {
@@ -1731,13 +1725,7 @@ export const actionChangeArrowType = register({
             newElement.endBinding.elementId,
           ) as ExcalidrawBindableElement;
           if (endElement) {
-            bindLinearElement(
-              newElement,
-              endElement,
-              "end",
-              app.scene,
-              app.state.zoom,
-            );
+            bindLinearElement(newElement, endElement, "end", app.scene);
           }
         }
       }
