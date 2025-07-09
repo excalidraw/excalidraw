@@ -7,6 +7,8 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { getBoundTextElement } from "./textElement";
 
+import { isBoundToContainer } from "./typeChecks";
+
 import { makeNextSelectedElementIds, getSelectedElements } from "./selection";
 
 import type {
@@ -416,7 +418,45 @@ export const getSelectedElementsByGroup = (
     String,
     ExcalidrawElement[]
   >();
-  selectedElements.forEach((element: ExcalidrawElement) => {
+  //console.log("appState.selectedGroupIds", appState.selectedGroupIds);
+  //console.log("selectedElements", selectedElements);
+  const selectedGroupIds = getSelectedGroupIds(appState);
+  const isAllSelectedInSameGroup = selectedElements
+    .map((element) => isSelectedViaGroup(appState, element))
+    .every((isSelected) => isSelected);
+  const unboundElements = selectedElements.filter(
+    (element) => !isBoundToContainer(element),
+  );
+  if (selectedGroupIds.length === 1 && isAllSelectedInSameGroup) {
+    const selectedGroupId = selectedGroupIds[0];
+    unboundElements.forEach((element) => {
+      const indexOfSelectedGroupId = element.groupIds.indexOf(
+        selectedGroupId,
+        0,
+      );
+
+      if (element.groupIds.slice(0, indexOfSelectedGroupId).length > 0) {
+        const containedGroupId = element.groupIds[indexOfSelectedGroupId - 1];
+        const currentGroupMembers = groups.get(containedGroupId) || [];
+        const boundTextElement = getBoundTextElement(element, elementsMap);
+        if (boundTextElement) {
+          currentGroupMembers.push(boundTextElement);
+        }
+        groups.set(containedGroupId, [...currentGroupMembers, element]);
+      } else {
+        const currentGroupMembers = groups.get(element.id) || [];
+        const boundTextElement = getBoundTextElement(element, elementsMap);
+        if (boundTextElement) {
+          currentGroupMembers.push(boundTextElement);
+        }
+        groups.set(element.id, [...currentGroupMembers, element]);
+      }
+    });
+    //console.log("groupsA", groups);
+    return Array.from(groups.values());
+  }
+
+  unboundElements.forEach((element: ExcalidrawElement) => {
     const groupId =
       getSelectedGroupIdForElement(element, appState.selectedGroupIds) ||
       element.id;
@@ -428,5 +468,6 @@ export const getSelectedElementsByGroup = (
     }
     groups.set(groupId, [...currentGroupMembers, element]);
   });
+  //console.log("groupsB", groups)
   return Array.from(groups.values());
 };
