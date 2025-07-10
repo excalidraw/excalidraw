@@ -87,7 +87,9 @@ describe("move element", () => {
       bindOrUnbindLinearElement(
         arrow.get() as NonDeleted<ExcalidrawLinearElement>,
         rectA.get(),
+        "outline",
         rectB.get(),
+        "outline",
         h.app.scene,
       );
     });

@@ -1,17 +1,12 @@
 import { pointFrom } from "@excalidraw/math";
 
 import {
-  maybeBindLinearElement,
   bindOrUnbindLinearElement,
   isBindingEnabled,
   getHoveredElementForBinding,
   bindLinearElement,
 } from "@excalidraw/element/binding";
-import {
-  isElbowArrow,
-  isValidPolygon,
-  LinearElementEditor,
-} from "@excalidraw/element";
+import { isValidPolygon, LinearElementEditor } from "@excalidraw/element";
 
 import {
   isBindingElement,
@@ -74,13 +69,26 @@ export const actionFinalize = register({
       if (isBindingElement(element)) {
         bindOrUnbindLinearElement(
           element,
-          startBindingElement,
-          endBindingElement,
+          startBindingElement === "keep" ? undefined : startBindingElement,
+          startBindingElement === "keep"
+            ? "keep"
+            : appState.bindMode === "fixed"
+            ? "inside"
+            : "outline",
+          endBindingElement === "keep" ? undefined : endBindingElement,
+          endBindingElement === "keep"
+            ? "keep"
+            : appState.bindMode === "fixed"
+            ? "inside"
+            : "outline",
           app.scene,
         );
       }
 
       if (linearElementEditor !== appState.selectedLinearElement) {
+        // `handlePointerUp()` updated the linear element instance,
+        // so filter out this element if it is too small,
+        // but do an update to all new elements anyway for undo/redo purposes.
         let newElements = elements;
         if (element && isInvisiblySmallElement(element)) {
           // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
@@ -118,8 +126,18 @@ export const actionFinalize = register({
         ) {
           bindOrUnbindLinearElement(
             element,
-            startBindingElement,
-            endBindingElement,
+            startBindingElement === "keep" ? undefined : startBindingElement,
+            startBindingElement === "keep"
+              ? "keep"
+              : appState.bindMode === "fixed"
+              ? "inside"
+              : "outline",
+            endBindingElement === "keep" ? undefined : endBindingElement,
+            endBindingElement === "keep"
+              ? "keep"
+              : appState.bindMode === "fixed"
+              ? "inside"
+              : "outline",
             scene,
           );
         }
@@ -238,8 +256,7 @@ export const actionFinalize = register({
           isBindingElement(element) &&
           !isLoop &&
           element.points.length > 1 &&
-          isBindingEnabled(appState) &&
-          appState.startBoundElement
+          isBindingEnabled(appState)
         ) {
           const coords =
             sceneCoords ??
@@ -251,15 +268,16 @@ export const actionFinalize = register({
               ),
             );
 
-          if (isElbowArrow(element)) {
-            maybeBindLinearElement(element, appState, coords, scene);
-          } else {
-            bindLinearElement(
-              element,
-              appState.startBoundElement,
-              "end",
-              scene,
-            );
+          const hoveredElement = getHoveredElementForBinding(
+            pointFrom<GlobalPoint>(coords.x, coords.y),
+            scene.getNonDeletedElements(),
+            elementsMap,
+            appState.zoom,
+          );
+          if (hoveredElement) {
+            const strategy =
+              appState.bindMode === "fixed" ? "inside" : "outline";
+            bindLinearElement(element, hoveredElement, strategy, "end", scene);
           }
         }
       }

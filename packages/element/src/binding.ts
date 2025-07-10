@@ -70,6 +70,7 @@ import type {
   FixedPointBinding,
   PointsPositionUpdates,
   Ordered,
+  BindMode,
 } from "./types";
 
 export type SuggestedBinding =
@@ -82,6 +83,9 @@ export type SuggestedPointBinding = [
   NonDeleted<ExcalidrawBindableElement>,
 ];
 
+export const FIXED_BINDING_DISTANCE = 5;
+export const BINDING_HIGHLIGHT_THICKNESS = 10;
+
 export const shouldEnableBindingForPointerEvent = (
   event: React.PointerEvent<HTMLElement>,
 ) => {
@@ -92,121 +96,46 @@ export const isBindingEnabled = (appState: AppState): boolean => {
   return appState.isBindingEnabled;
 };
 
-export const FIXED_BINDING_DISTANCE = 5;
-export const BINDING_HIGHLIGHT_THICKNESS = 10;
-
-const getNonDeletedElements = (
-  scene: Scene,
-  ids: readonly ExcalidrawElement["id"][],
-): NonDeleted<ExcalidrawElement>[] => {
-  const result: NonDeleted<ExcalidrawElement>[] = [];
-  ids.forEach((id) => {
-    const element = scene.getNonDeletedElement(id);
-    if (element != null) {
-      result.push(element);
-    }
-  });
-  return result;
-};
-
 export const bindOrUnbindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
-  startBindingStrategy: ExcalidrawBindableElement | null | "keep",
-  endBindingStrategy: ExcalidrawBindableElement | null | "keep",
+  startBindingElement: ExcalidrawBindableElement | null | undefined,
+  startBindingStrategy: BindMode | "keep",
+  endBindingElement: ExcalidrawBindableElement | null | undefined,
+  endBindingStrategy: BindMode | "keep",
   scene: Scene,
 ): void => {
-  const bothEndBoundToTheSameElement =
-    linearElement.startBinding?.elementId ===
-      linearElement.endBinding?.elementId && !!linearElement.startBinding;
-  const elementsMap = scene.getNonDeletedElementsMap();
-  const boundToElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
-  const unboundFromElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
-  bindOrUnbindLinearElementEdge(
-    linearElement,
-    startBindingStrategy,
-    endBindingStrategy,
-    "start",
-    boundToElementIds,
-    unboundFromElementIds,
-    scene,
-    elementsMap,
-  );
-  bindOrUnbindLinearElementEdge(
-    linearElement,
-    endBindingStrategy,
-    startBindingStrategy,
-    "end",
-    boundToElementIds,
-    unboundFromElementIds,
-    scene,
-    elementsMap,
-  );
-
-  if (!bothEndBoundToTheSameElement) {
-    const onlyUnbound = Array.from(unboundFromElementIds).filter(
-      (id) => !boundToElementIds.has(id),
+  if (startBindingStrategy !== "keep" && startBindingElement !== undefined) {
+    bindOrUnbindLinearElementEdge(
+      linearElement,
+      startBindingElement,
+      startBindingStrategy,
+      "start",
+      scene,
     );
-
-    getNonDeletedElements(scene, onlyUnbound).forEach((element) => {
-      scene.mutateElement(element, {
-        boundElements: element.boundElements?.filter(
-          (element) =>
-            element.type !== "arrow" || element.id !== linearElement.id,
-        ),
-      });
-    });
+  }
+  if (endBindingStrategy !== "keep" && endBindingElement !== undefined) {
+    bindOrUnbindLinearElementEdge(
+      linearElement,
+      endBindingElement,
+      endBindingStrategy,
+      "end",
+      scene,
+    );
   }
 };
 
 const bindOrUnbindLinearElementEdge = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
-  bindableElement: ExcalidrawBindableElement | null | "keep",
-  otherEdgeBindableElement: ExcalidrawBindableElement | null | "keep",
+  bindableElement: ExcalidrawBindableElement | null,
+  mode: BindMode,
   startOrEnd: "start" | "end",
-  // Is mutated
-  boundToElementIds: Set<ExcalidrawBindableElement["id"]>,
-  // Is mutated
-  unboundFromElementIds: Set<ExcalidrawBindableElement["id"]>,
   scene: Scene,
-  elementsMap: ElementsMap,
 ): void => {
-  // "keep" is for method chaining convenience, a "no-op", so just bail out
-  if (bindableElement === "keep") {
-    return;
-  }
-
-  // null means break the bind, so nothing to consider here
   if (bindableElement === null) {
-    const unbound = unbindLinearElement(linearElement, startOrEnd, scene);
-    if (unbound != null) {
-      unboundFromElementIds.add(unbound);
-    }
-    return;
-  }
-
-  // While complext arrows can do anything, simple arrow with both ends trying
-  // to bind to the same bindable should not be allowed, start binding takes
-  // precedence
-  if (isLinearElementSimple(linearElement)) {
-    if (
-      otherEdgeBindableElement == null ||
-      (otherEdgeBindableElement === "keep"
-        ? // TODO: Refactor - Needlessly complex
-          !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
-            linearElement,
-            bindableElement,
-            startOrEnd,
-            elementsMap,
-          )
-        : startOrEnd === "start" ||
-          otherEdgeBindableElement.id !== bindableElement.id)
-    ) {
-      bindLinearElement(linearElement, bindableElement, startOrEnd, scene);
-      boundToElementIds.add(bindableElement.id);
-    }
+    // null means break the binding
+    unbindLinearElement(linearElement, startOrEnd, scene);
   } else {
-    bindLinearElement(linearElement, bindableElement, startOrEnd, scene);
-    boundToElementIds.add(bindableElement.id);
+    bindLinearElement(linearElement, bindableElement, mode, startOrEnd, scene);
   }
 };
 
@@ -245,83 +174,106 @@ const getOriginalBindingsIfStillCloseToArrowEnds = (
     return null;
   });
 
+const hoveredElementAndIfItsPrecise = (
+  selectedElement: NonDeleted<ExcalidrawLinearElement>,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elementsMap: NonDeletedSceneElementsMap,
+  zoom: AppState["zoom"],
+  pointIndex: number,
+): [NonDeleted<ExcalidrawBindableElement> | null, boolean] => {
+  const { x, y } = tupleToCoors(
+    LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      selectedElement,
+      pointIndex,
+      elementsMap,
+    ),
+  );
+  const hoveredElement = getHoveredElementForBinding(
+    pointFrom<GlobalPoint>(x, y),
+    elements,
+    elementsMap,
+    zoom,
+  );
+  const hit =
+    !!hoveredElement &&
+    hitElementItself({
+      element: hoveredElement,
+      elementsMap,
+      point: pointFrom<GlobalPoint>(x, y),
+      threshold: 0,
+    });
+
+  return [hoveredElement, hit];
+};
+
 const getBindingStrategyForDraggingArrowEndpoints = (
   selectedElement: NonDeleted<ExcalidrawLinearElement>,
   isBindingEnabled: boolean,
   draggingPoints: readonly number[],
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  zoom?: AppState["zoom"],
-): (NonDeleted<ExcalidrawBindableElement> | null | "keep")[] => {
+  zoom: AppState["zoom"],
+  globalBindMode?: BindMode,
+): [
+  {
+    element: NonDeleted<ExcalidrawBindableElement> | null | undefined;
+    mode: BindMode | "keep";
+  },
+  {
+    element: NonDeleted<ExcalidrawBindableElement> | null | undefined;
+    mode: BindMode | "keep";
+  },
+] => {
   const startIdx = 0;
   const endIdx = selectedElement.points.length - 1;
   const startDragged = draggingPoints.findIndex((i) => i === startIdx) > -1;
   const endDragged = draggingPoints.findIndex((i) => i === endIdx) > -1;
-  const start = startDragged
-    ? isBindingEnabled
-      ? getEligibleElementForBindingElement(
-          selectedElement,
-          "start",
-          elementsMap,
-          elements,
-          zoom,
-        )
-      : null // If binding is disabled and start is dragged, break all binds
-    : "keep";
-  const end = endDragged
-    ? isBindingEnabled
-      ? getEligibleElementForBindingElement(
-          selectedElement,
-          "end",
-          elementsMap,
-          elements,
-          zoom,
-        )
-      : null // If binding is disabled and end is dragged, break all binds
-    : "keep";
 
-  return [start, end];
-};
-
-const getBindingStrategyForDraggingArrowOrJoints = (
-  selectedElement: NonDeleted<ExcalidrawLinearElement>,
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  isBindingEnabled: boolean,
-  zoom?: AppState["zoom"],
-): (NonDeleted<ExcalidrawBindableElement> | null | "keep")[] => {
-  // Elbow arrows don't bind when dragged as a whole
-  if (isElbowArrow(selectedElement)) {
-    return ["keep", "keep"];
+  // If both ends are dragged, we don't bind to anything and break existing bindings
+  if (startDragged && endDragged) {
+    return [
+      { element: null, mode: "outline" },
+      { element: null, mode: "outline" },
+    ];
   }
 
-  const [startIsClose, endIsClose] = getOriginalBindingsIfStillCloseToArrowEnds(
-    selectedElement,
-    elementsMap,
-    zoom,
-  );
-  const start = startIsClose
-    ? isBindingEnabled
-      ? getEligibleElementForBindingElement(
-          selectedElement,
-          "start",
-          elementsMap,
-          elements,
-          zoom,
-        )
-      : null
-    : null;
-  const end = endIsClose
-    ? isBindingEnabled
-      ? getEligibleElementForBindingElement(
-          selectedElement,
-          "end",
-          elementsMap,
-          elements,
-          zoom,
-        )
-      : null
-    : null;
+  let start: {
+    element: NonDeleted<ExcalidrawBindableElement> | null | undefined;
+    mode: BindMode | "keep";
+  } = { element: undefined, mode: "keep" };
+  if (startDragged && isBindingEnabled) {
+    const [hoveredElement, hit] = hoveredElementAndIfItsPrecise(
+      selectedElement,
+      elements,
+      elementsMap,
+      zoom,
+      startIdx,
+    );
+
+    start = {
+      element: hoveredElement,
+      mode: globalBindMode || hit ? "inside" : "outline",
+    };
+  }
+
+  let end: {
+    element: NonDeleted<ExcalidrawBindableElement> | null | undefined;
+    mode: BindMode | "keep";
+  } = { element: undefined, mode: "keep" };
+  if (endDragged && isBindingEnabled) {
+    const [hoveredElement, hit] = hoveredElementAndIfItsPrecise(
+      selectedElement,
+      elements,
+      elementsMap,
+      zoom,
+      endIdx,
+    );
+
+    end = {
+      element: hoveredElement,
+      mode: globalBindMode || hit ? "inside" : "outline",
+    };
+  }
 
   return [start, end];
 };
@@ -329,31 +281,42 @@ const getBindingStrategyForDraggingArrowOrJoints = (
 export const bindOrUnbindLinearElements = (
   selectedElements: NonDeleted<ExcalidrawLinearElement>[],
   isBindingEnabled: boolean,
-  draggingPoints: readonly number[] | null,
+  draggingPoints: readonly number[],
   scene: Scene,
   zoom: AppState["zoom"],
 ): void => {
   selectedElements.forEach((selectedElement) => {
-    const [start, end] = draggingPoints?.length
-      ? // The arrow edge points are dragged (i.e. start, end)
-        getBindingStrategyForDraggingArrowEndpoints(
-          selectedElement,
-          isBindingEnabled,
-          draggingPoints ?? [],
-          scene.getNonDeletedElementsMap(),
-          scene.getNonDeletedElements(),
-          zoom,
-        )
-      : // The arrow itself (the shaft) or the inner joins are dragged
-        getBindingStrategyForDraggingArrowOrJoints(
-          selectedElement,
-          scene.getNonDeletedElementsMap(),
-          scene.getNonDeletedElements(),
-          isBindingEnabled,
-          zoom,
-        );
-
-    bindOrUnbindLinearElement(selectedElement, start, end, scene);
+    if (draggingPoints.length) {
+      // The arrow edge points are dragged (i.e. start, end)
+      const [
+        { element: startElement, mode: startMode },
+        { element: endElement, mode: endMode },
+      ] = getBindingStrategyForDraggingArrowEndpoints(
+        selectedElement,
+        isBindingEnabled,
+        draggingPoints,
+        scene.getNonDeletedElementsMap(),
+        scene.getNonDeletedElements(),
+        zoom,
+      );
+      bindOrUnbindLinearElement(
+        selectedElement,
+        startElement,
+        startMode,
+        endElement,
+        endMode,
+        scene,
+      );
+    } else {
+      bindOrUnbindLinearElement(
+        selectedElement,
+        null,
+        "outline",
+        null,
+        "outline",
+        scene,
+      );
+    }
   });
 };
 
@@ -445,48 +408,10 @@ export const maybeSuggestBindingsForLinearElementAtCoords = (
   return suggestedBindings;
 };
 
-export const maybeBindLinearElement = (
-  linearElement: NonDeleted<ExcalidrawLinearElement>,
-  appState: AppState,
-  pointerCoords: { x: number; y: number },
-  scene: Scene,
-): void => {
-  const elements = scene.getNonDeletedElements();
-  const elementsMap = scene.getNonDeletedElementsMap();
-
-  if (appState.startBoundElement != null) {
-    bindLinearElement(
-      linearElement,
-      appState.startBoundElement,
-      "start",
-      scene,
-    );
-  }
-
-  const hoveredElement = getHoveredElementForBinding(
-    pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
-    elements,
-    elementsMap,
-    appState.zoom,
-  );
-
-  if (hoveredElement !== null) {
-    if (
-      !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
-        linearElement,
-        hoveredElement,
-        "end",
-        elementsMap,
-      )
-    ) {
-      bindLinearElement(linearElement, hoveredElement, "end", scene);
-    }
-  }
-};
-
 export const bindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   hoveredElement: ExcalidrawBindableElement,
+  mode: BindMode,
   startOrEnd: "start" | "end",
   scene: Scene,
 ): void => {
@@ -509,47 +434,16 @@ export const bindLinearElement = (
         elementsMap,
       ),
     };
-  }
-  if (
-    linearElement[startOrEnd === "start" ? "endBinding" : "startBinding"]
-      ?.elementId === hoveredElement.id
-  ) {
-    // Use inside binding when the arrow endpoint is inside the shape
-    binding = {
-      elementId: hoveredElement.id,
-      mode: "inside",
-      ...calculateFixedPointForNonElbowArrowBinding(
-        linearElement,
-        hoveredElement,
-        startOrEnd,
-        elementsMap,
-      ),
-    };
   } else {
-    const edgePoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      linearElement,
-      startOrEnd === "start" ? 0 : -1,
-      elementsMap,
-    );
-    const intersectionCount =
-      bindingProjectionIntersectionCountForElementAtPoint(
-        hoveredElement,
-        edgePoint,
-        elementsMap,
-      );
     binding = {
       elementId: hoveredElement.id,
+      mode,
       ...calculateFixedPointForNonElbowArrowBinding(
         linearElement,
         hoveredElement,
         startOrEnd,
         elementsMap,
       ),
-      mode:
-        intersectionCount < 2
-          ? // The point is outside the shape
-            "outline"
-          : "inside",
     };
   }
 
@@ -566,50 +460,6 @@ export const bindLinearElement = (
       }),
     });
   }
-};
-
-// Don't bind both ends of a simple segment
-const isLinearElementSimpleAndAlreadyBoundOnOppositeEdge = (
-  linearElement: NonDeleted<ExcalidrawLinearElement>,
-  bindableElement: ExcalidrawBindableElement,
-  startOrEnd: "start" | "end",
-  elementsMap: ElementsMap,
-): boolean => {
-  const otherBinding =
-    linearElement[startOrEnd === "start" ? "endBinding" : "startBinding"];
-
-  // Only prevent binding if opposite end is bound to the same element
-  if (
-    otherBinding?.elementId !== bindableElement.id ||
-    !isLinearElementSimple(linearElement)
-  ) {
-    return false;
-  }
-
-  // For non-elbow arrows, allow FixedPoint binding even when both ends bind to the same element
-  if (!isElbowArrow(linearElement)) {
-    const currentEndPoint =
-      LinearElementEditor.getPointAtIndexGlobalCoordinates(
-        linearElement,
-        startOrEnd === "start" ? 0 : -1,
-        elementsMap,
-      );
-
-    // If current end would use FixedPoint binding, allow it
-    if (
-      hitElementItself({
-        point: currentEndPoint,
-        element: bindableElement,
-        elementsMap,
-        threshold: 0, // TODO: Not ideal, should be calculated from the same source
-      })
-    ) {
-      return false;
-    }
-  }
-
-  // Prevent traditional focus/gap binding when both ends would bind to the same element
-  return true;
 };
 
 export const isLinearElementSimpleAndAlreadyBound = (
@@ -634,10 +484,29 @@ const unbindLinearElement = (
 ): ExcalidrawBindableElement["id"] | null => {
   const field = startOrEnd === "start" ? "startBinding" : "endBinding";
   const binding = linearElement[field];
+
   if (binding == null) {
     return null;
   }
+
+  const oppositeBinding =
+    linearElement[startOrEnd === "start" ? "endBinding" : "startBinding"];
+
+  if (oppositeBinding?.elementId !== binding.elementId) {
+    // Only remove the record on the bound element if the other
+    // end is not bound to the same element
+    const boundElement = scene
+      .getNonDeletedElementsMap()
+      .get(binding.elementId) as ExcalidrawBindableElement;
+    scene.mutateElement(boundElement, {
+      boundElements: boundElement.boundElements?.filter(
+        (element) => element.id !== linearElement.id,
+      ),
+    });
+  }
+
   scene.mutateElement(linearElement, { [field]: null });
+
   return binding.elementId;
 };
 
@@ -1327,31 +1196,6 @@ export const calculateFixedPointForNonElbowArrowBinding = (
   return {
     fixedPoint: normalizeFixedPoint([fixedPointX, fixedPointY]),
   };
-};
-
-const getEligibleElementForBindingElement = (
-  linearElement: NonDeleted<ExcalidrawLinearElement>,
-  startOrEnd: "start" | "end",
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  zoom?: AppState["zoom"],
-): NonDeleted<ExcalidrawBindableElement> | null => {
-  const { x, y } = tupleToCoors(
-    LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      linearElement,
-      startOrEnd === "start" ? 0 : -1,
-      elementsMap,
-    ),
-  );
-
-  const hoveredElement = getHoveredElementForBinding(
-    pointFrom<GlobalPoint>(x, y),
-    elements,
-    elementsMap,
-    zoom,
-  );
-
-  return hoveredElement;
 };
 
 export const fixDuplicatedBindingsAfterDuplication = (

@@ -155,8 +155,10 @@ export const dragSelectedElements = (
         // and end point to jump "outside" the shape.
         bindOrUnbindLinearElement(
           element,
-          shouldUnbindStart ? null : "keep",
-          shouldUnbindEnd ? null : "keep",
+          shouldUnbindStart ? null : undefined,
+          shouldUnbindStart ? "outline" : "keep",
+          shouldUnbindEnd ? null : undefined,
+          shouldUnbindEnd ? "outline" : "keep",
           scene,
         );
       }

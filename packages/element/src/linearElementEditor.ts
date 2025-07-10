@@ -957,8 +957,18 @@ export class LinearElementEditor {
       ) {
         bindOrUnbindLinearElement(
           element,
-          startBindingElement,
-          endBindingElement,
+          startBindingElement === "keep" ? undefined : startBindingElement,
+          startBindingElement === "keep"
+            ? "keep"
+            : app.state.bindMode === "fixed"
+            ? "inside"
+            : "outline",
+          endBindingElement === "keep" ? undefined : endBindingElement,
+          endBindingElement === "keep"
+            ? "keep"
+            : app.state.bindMode === "fixed"
+            ? "inside"
+            : "outline",
           scene,
         );
       }

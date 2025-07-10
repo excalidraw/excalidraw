@@ -16,6 +16,7 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
+  pointsEqual,
 } from "@excalidraw/math";
 
 import {
@@ -236,6 +237,7 @@ import {
   getOutlineAvoidingPoint,
   calculateFixedPointForNonElbowArrowBinding,
   bindLinearElement,
+  normalizeFixedPoint,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6206,6 +6208,59 @@ class App extends React.Component<AppProps, AppState> {
           },
         );
 
+        // If start is bound then snap the fixed binding point if needed
+        if (
+          multiElement.startBinding &&
+          multiElement.startBinding.mode === "outline"
+        ) {
+          const elementsMap = this.scene.getNonDeletedElementsMap();
+          const startPoint =
+            LinearElementEditor.getPointAtIndexGlobalCoordinates(
+              multiElement,
+              0,
+              elementsMap,
+            );
+          const startElement = this.scene.getElement(
+            multiElement.startBinding.elementId,
+          ) as ExcalidrawBindableElement;
+          const avoidancePoint = getOutlineAvoidingPoint(
+            multiElement,
+            startElement,
+            startPoint,
+            0,
+            elementsMap,
+          );
+          if (!pointsEqual(startPoint, avoidancePoint)) {
+            LinearElementEditor.movePoints(
+              multiElement,
+              this.scene,
+              new Map([
+                [
+                  0,
+                  {
+                    point: LinearElementEditor.pointFromAbsoluteCoords(
+                      multiElement,
+                      avoidancePoint,
+                      elementsMap,
+                    ),
+                  },
+                ],
+              ]),
+              {
+                startBinding: {
+                  ...multiElement.startBinding,
+                  ...calculateFixedPointForNonElbowArrowBinding(
+                    multiElement,
+                    startElement,
+                    "start",
+                    elementsMap,
+                  ),
+                },
+              },
+            );
+          }
+        }
+
         // in this path, we're mutating multiElement to reflect
         // how it will be after adding pointer position as the next point
         // trigger update here so that new element canvas renders again to reflect this
@@ -8087,7 +8142,7 @@ class App extends React.Component<AppProps, AppState> {
       });
       this.scene.insertElement(element);
       if (isBindingEnabled(this.state) && boundElement) {
-        bindLinearElement(element, boundElement, "start", this.scene);
+        bindLinearElement(element, boundElement, "inside", "start", this.scene);
       }
       this.setState((prevState) => {
         let linearElementEditor = null;
@@ -9010,6 +9065,7 @@ class App extends React.Component<AppProps, AppState> {
               newElement.points[0],
               elementsMap,
             );
+          let startBinding = newElement.startBinding;
           let dx = gridX - newElement.x;
           let dy = gridY - newElement.y;
 
@@ -9045,22 +9101,41 @@ class App extends React.Component<AppProps, AppState> {
                     )
                   : pointFrom(gridX, gridY);
 
-              const otherHoveredElement = getHoveredElementForBinding(
-                pointFrom<GlobalPoint>(firstPointX, firstPointY),
-                this.scene.getNonDeletedElements(),
-                this.scene.getNonDeletedElementsMap(),
-                this.state.zoom,
-              );
-              [firstPointX, firstPointY] = getOutlineAvoidingPoint(
-                newElement,
-                otherHoveredElement,
-                pointFrom(firstPointX, firstPointY),
-                0,
-                elementsMap,
-              );
+              // We might need to snap the first point of our arrow
+              const otherBoundElement = startBindingElement
+                ? (elementsMap.get(
+                    startBindingElement === "keep"
+                      ? newElement.startBinding!.elementId
+                      : startBindingElement.id,
+                  ) as ExcalidrawBindableElement)
+                : null;
+              if (otherBoundElement) {
+                const [newX, newY] = getOutlineAvoidingPoint(
+                  newElement,
+                  otherBoundElement,
+                  pointFrom(
+                    otherBoundElement.x + otherBoundElement.width / 2,
+                    otherBoundElement.y + otherBoundElement.height / 2,
+                  ),
+                  0,
+                  elementsMap,
+                );
 
-              dx = targetPointX - firstPointX;
-              dy = targetPointY - firstPointY;
+                if (
+                  Math.abs(firstPointX - newX) > 1 ||
+                  Math.abs(firstPointY - newY) > 1
+                ) {
+                  startBinding = {
+                    elementId: otherBoundElement.id,
+                    fixedPoint: normalizeFixedPoint([0.5, 0.5]),
+                    mode: "outline",
+                  };
+                  firstPointX = newX;
+                  firstPointY = newY;
+                  dx = targetPointX - newX;
+                  dy = targetPointY - newY;
+                }
+              }
             } else {
               firstPointX =
                 this.state.editingLinearElement?.pointerDownState
@@ -9087,6 +9162,7 @@ class App extends React.Component<AppProps, AppState> {
                 x: firstPointX,
                 y: firstPointY,
                 points: [...points, pointFrom<LocalPoint>(dx, dy)],
+                startBinding,
               },
               { informMutation: false, isDragging: false },
             );
@@ -9100,6 +9176,7 @@ class App extends React.Component<AppProps, AppState> {
                 x: firstPointX,
                 y: firstPointY,
                 points: [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
+                startBinding,
               },
               { isDragging: true, informMutation: false },
             );
@@ -9435,81 +9512,6 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
       }
-
-      this.scene
-        .getSelectedElements(this.state)
-        .filter(isSimpleArrow)
-        .forEach((element) => {
-          // Update the fixed point bindings for non-elbow arrows
-          // when the pointer is released, so that they are correctly positioned
-          // after the drag.
-          let startBinding = element.startBinding;
-          let endBinding = element.endBinding;
-
-          if (element.startBinding) {
-            const point = LinearElementEditor.getPointGlobalCoordinates(
-              element,
-              element.points[0],
-              elementsMap,
-            );
-            const boundElement = elementsMap.get(
-              element.startBinding.elementId,
-            ) as ExcalidrawBindableElement;
-            const isHittingElement = hitElementItself({
-              element: boundElement,
-              elementsMap,
-              point,
-              threshold: this.getElementHitThreshold(element),
-            });
-            startBinding = isHittingElement
-              ? {
-                  ...element.startBinding,
-                  ...calculateFixedPointForNonElbowArrowBinding(
-                    element,
-                    elementsMap.get(
-                      element.startBinding.elementId,
-                    ) as ExcalidrawBindableElement,
-                    "start",
-                    elementsMap,
-                  ),
-                }
-              : null;
-          }
-          if (element.endBinding) {
-            const point = LinearElementEditor.getPointGlobalCoordinates(
-              element,
-              element.points[element.points.length - 1],
-              elementsMap,
-            );
-            const boundElement = elementsMap.get(
-              element.endBinding.elementId,
-            ) as ExcalidrawBindableElement;
-            const isHittingElement = hitElementItself({
-              element: boundElement,
-              elementsMap,
-              point,
-              threshold: this.getElementHitThreshold(element),
-            });
-            endBinding = isHittingElement
-              ? {
-                  ...element.endBinding,
-                  ...calculateFixedPointForNonElbowArrowBinding(
-                    element,
-                    elementsMap.get(
-                      element.endBinding.elementId,
-                    ) as ExcalidrawBindableElement,
-                    "end",
-                    elementsMap,
-                  ),
-                }
-              : null;
-          }
-
-          this.scene.mutateElement(element, {
-            startBinding,
-            endBinding,
-          });
-        });
 
       this.missingPointerEventCleanupEmitter.clear();
 
