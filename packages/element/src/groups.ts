@@ -405,69 +405,70 @@ export const getNewGroupIdsForDuplication = (
   return copy;
 };
 
-// given a list of selected elements, return the elements grouped by their immediate active group
-// i.e. if an element is in a group, it will be grouped with other elements
-// in the same group, and if it is not in a group, it will be returned
-// as a single-element array
+// given a list of selected elements, return the element grouped by their immediate group selected state
+// in the case if only one group is selected and all elements selected are within the group, it will respect group hierarchy in accordance to their nested grouping order
+// in all cases in which an element is not in a selected or nested group, it will be returned as a single-element array
 export const getSelectedElementsByGroup = (
   selectedElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
   appState: Readonly<AppState>,
 ): ExcalidrawElement[][] => {
-  const groups: Map<String, ExcalidrawElement[]> = new Map<
-    String,
-    ExcalidrawElement[]
-  >();
-  //console.log("appState.selectedGroupIds", appState.selectedGroupIds);
-  //console.log("selectedElements", selectedElements);
+  const groups: Map<string, ExcalidrawElement[]> = new Map();
   const selectedGroupIds = getSelectedGroupIds(appState);
-  const isAllSelectedInSameGroup = selectedElements
-    .map((element) => isSelectedViaGroup(appState, element))
-    .every((isSelected) => isSelected);
   const unboundElements = selectedElements.filter(
     (element) => !isBoundToContainer(element),
   );
-  if (selectedGroupIds.length === 1 && isAllSelectedInSameGroup) {
-    const selectedGroupId = selectedGroupIds[0];
-    unboundElements.forEach((element) => {
-      const indexOfSelectedGroupId = element.groupIds.indexOf(
-        selectedGroupId,
-        0,
-      );
 
-      if (element.groupIds.slice(0, indexOfSelectedGroupId).length > 0) {
-        const containedGroupId = element.groupIds[indexOfSelectedGroupId - 1];
-        const currentGroupMembers = groups.get(containedGroupId) || [];
-        const boundTextElement = getBoundTextElement(element, elementsMap);
-        if (boundTextElement) {
-          currentGroupMembers.push(boundTextElement);
-        }
-        groups.set(containedGroupId, [...currentGroupMembers, element]);
-      } else {
-        const currentGroupMembers = groups.get(element.id) || [];
-        const boundTextElement = getBoundTextElement(element, elementsMap);
-        if (boundTextElement) {
-          currentGroupMembers.push(boundTextElement);
-        }
-        groups.set(element.id, [...currentGroupMembers, element]);
-      }
-    });
-    //console.log("groupsA", groups);
-    return Array.from(groups.values());
-  }
+  // Helper to get groupId for highest-order nested group within a selected group (single-group case), if element is not nested, return elements id
+  const getKeyIdForNestedElement = (
+    element: ExcalidrawElement,
+    selectedGroupId: GroupId,
+  ) => {
+    const indexOfSelectedGroupId = element.groupIds.indexOf(selectedGroupId, 0);
+    const nestedGroupCount = element.groupIds.slice(
+      0,
+      indexOfSelectedGroupId,
+    ).length;
+    return nestedGroupCount > 0
+      ? element.groupIds[indexOfSelectedGroupId - 1]
+      : element.id;
+  };
 
-  unboundElements.forEach((element: ExcalidrawElement) => {
-    const groupId =
-      getSelectedGroupIdForElement(element, appState.selectedGroupIds) ||
-      element.id;
-    const currentGroupMembers = groups.get(groupId) || [];
+  // Helper function to add elements into their respective groups
+  const addElementToGroup = (
+    element: ExcalidrawElement,
+    isSameGroupCase = false,
+  ) => {
+    const selectedGroupId =
+      getSelectedGroupIdForElement(element, appState.selectedGroupIds) || "";
+    const keyId = isSameGroupCase
+      ? getKeyIdForNestedElement(element, selectedGroupId)
+      : selectedGroupId || element.id;
 
+    const currentGroupMembers = groups.get(keyId) || [];
     const boundTextElement = getBoundTextElement(element, elementsMap);
+
     if (boundTextElement) {
       currentGroupMembers.push(boundTextElement);
     }
-    groups.set(groupId, [...currentGroupMembers, element]);
-  });
-  //console.log("groupsB", groups)
+
+    groups.set(keyId, [...currentGroupMembers, element]);
+  };
+
+  const isAllInSameGroup = selectedElements.every((element) =>
+    isSelectedViaGroup(appState, element),
+  );
+
+  // If there is only one group selected, and are all in the same group, we account for nested groups
+  if (selectedGroupIds.length === 1 && isAllInSameGroup) {
+    unboundElements.forEach((element) => {
+      addElementToGroup(element, true);
+    });
+  } else {
+    unboundElements.forEach((element) => {
+      addElementToGroup(element);
+    });
+  }
+
   return Array.from(groups.values());
 };
