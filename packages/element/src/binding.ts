@@ -414,6 +414,7 @@ export const bindLinearElement = (
   mode: BindMode,
   startOrEnd: "start" | "end",
   scene: Scene,
+  focusPoint?: GlobalPoint,
 ): void => {
   if (!isArrowElement(linearElement)) {
     return;
@@ -443,6 +444,7 @@ export const bindLinearElement = (
         hoveredElement,
         startOrEnd,
         elementsMap,
+        focusPoint,
       ),
     };
   }
@@ -477,7 +479,7 @@ const isLinearElementSimple = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
 ): boolean => linearElement.points.length < 3 && !isElbowArrow(linearElement);
 
-const unbindLinearElement = (
+export const unbindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
   scene: Scene,
@@ -1167,12 +1169,15 @@ export const calculateFixedPointForNonElbowArrowBinding = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
+  focusPoint?: GlobalPoint,
 ): { fixedPoint: FixedPoint } => {
-  const edgePoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    linearElement,
-    startOrEnd === "start" ? 0 : -1,
-    elementsMap,
-  );
+  const edgePoint = focusPoint
+    ? focusPoint
+    : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        linearElement,
+        startOrEnd === "start" ? 0 : -1,
+        elementsMap,
+      );
 
   // Convert the global point to element-local coordinates
   const elementCenter = pointFrom(

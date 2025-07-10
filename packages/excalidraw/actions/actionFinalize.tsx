@@ -5,8 +5,13 @@ import {
   isBindingEnabled,
   getHoveredElementForBinding,
   bindLinearElement,
+  unbindLinearElement,
 } from "@excalidraw/element/binding";
-import { isValidPolygon, LinearElementEditor } from "@excalidraw/element";
+import {
+  hitElementItself,
+  isValidPolygon,
+  LinearElementEditor,
+} from "@excalidraw/element";
 
 import {
   isBindingElement,
@@ -275,9 +280,51 @@ export const actionFinalize = register({
             appState.zoom,
           );
           if (hoveredElement) {
+            const otherHit = hitElementItself({
+              element: hoveredElement,
+              point: LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                element,
+                0,
+                elementsMap,
+              ),
+              elementsMap,
+              threshold: 0,
+            });
+            const hit = hitElementItself({
+              element: hoveredElement,
+              point: LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                element,
+                -1,
+                elementsMap,
+              ),
+              elementsMap,
+              threshold: 0,
+            });
             const strategy =
-              appState.bindMode === "fixed" ? "inside" : "outline";
-            bindLinearElement(element, hoveredElement, strategy, "end", scene);
+              appState.bindMode === "fixed" ||
+              (hit && element.startBinding?.elementId === hoveredElement.id)
+                ? "inside"
+                : "outline";
+            bindLinearElement(
+              element,
+              hoveredElement,
+              strategy,
+              "end",
+              scene,
+              strategy === "outline"
+                ? pointFrom<GlobalPoint>(
+                    hoveredElement.x + hoveredElement.width / 2,
+                    hoveredElement.y + hoveredElement.height / 2,
+                  )
+                : undefined,
+            );
+
+            if (
+              element.startBinding?.elementId === hoveredElement.id &&
+              !otherHit
+            ) {
+              unbindLinearElement(element, "start", scene);
+            }
           }
         }
       }
