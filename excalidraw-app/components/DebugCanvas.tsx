@@ -8,7 +8,7 @@ import {
   getNormalizedCanvasDimensions,
 } from "@excalidraw/excalidraw/renderer/helpers";
 import { type AppState } from "@excalidraw/excalidraw/types";
-import { arrayToMap, throttleRAF } from "@excalidraw/common";
+import { arrayToMap, invariant, throttleRAF } from "@excalidraw/common";
 import { useCallback, useImperativeHandle, useRef } from "react";
 
 import { isArrowElement, isBindableElement } from "@excalidraw/element";
@@ -164,6 +164,13 @@ const renderBindings = (
 
     if (isArrowElement(element)) {
       if (element.startBinding) {
+        invariant(
+          elementsMap
+            .get(element.startBinding.elementId)
+            ?.boundElements?.find((e) => e.id === element.id),
+          "Missing record in boundElements for arrow",
+        );
+
         _renderBinding(
           context,
           element.startBinding,
@@ -176,6 +183,13 @@ const renderBindings = (
       }
 
       if (element.endBinding) {
+        invariant(
+          elementsMap
+            .get(element.endBinding.elementId)
+            ?.boundElements?.find((e) => e.id === element.id),
+          "Missing record in boundElements for arrow",
+        );
+
         _renderBinding(
           context,
           element.endBinding,
@@ -197,6 +211,16 @@ const renderBindings = (
         const arrow = elementsMap.get(
           boundElement.id,
         ) as ExcalidrawArrowElement;
+
+        invariant(
+          arrow,
+          "Arrow element registered as a bound object not found in elementsMap",
+        );
+        invariant(
+          arrow.startBinding?.elementId === element.id ||
+            arrow.endBinding?.elementId === element.id,
+          "Arrow element registered as a bound object not found in binding on the arrow element",
+        );
 
         if (arrow.startBinding?.elementId === element.id) {
           _renderBindableBinding(
