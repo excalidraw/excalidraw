@@ -9103,19 +9103,23 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (!pointerDownState.drag.hasOccurred && newElement && !multiElement) {
-          this.scene.mutateElement(
-            newElement,
-            {
-              points: [
-                ...newElement.points,
-                pointFrom<LocalPoint>(
-                  pointerCoords.x - newElement.x,
-                  pointerCoords.y - newElement.y,
-                ),
-              ],
-            },
-            { informMutation: false, isDragging: false },
-          );
+          const dx = pointerCoords.x - newElement.x;
+          const dy = pointerCoords.y - newElement.y;
+          const MIN_DISTANCE_TO_ADD_POINT_ON_TOUCH = 10;
+          const shouldAddPoint = this.device.isTouchScreen
+            ? Math.abs(dx) >= MIN_DISTANCE_TO_ADD_POINT_ON_TOUCH ||
+              Math.abs(dy) >= MIN_DISTANCE_TO_ADD_POINT_ON_TOUCH
+            : true;
+
+          if (shouldAddPoint) {
+            this.scene.mutateElement(
+              newElement,
+              {
+                points: [...newElement.points, pointFrom<LocalPoint>(dx, dy)],
+              },
+              { informMutation: false, isDragging: false },
+            );
+          }
 
           this.setState({
             multiElement: newElement,

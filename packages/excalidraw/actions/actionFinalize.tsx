@@ -157,7 +157,9 @@ export const actionFinalize = register({
       if (
         appState.multiElement &&
         element.type !== "freedraw" &&
-        appState.lastPointerDownWith !== "touch"
+        appState.lastPointerDownWith !== "touch" &&
+        // don't remove the last point on touch devices
+        !app.device.isTouchScreen
       ) {
         const { points, lastCommittedPoint } = element;
         if (
