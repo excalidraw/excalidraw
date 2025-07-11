@@ -416,6 +416,7 @@ import {
 } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { Toast } from "./Toast";
+import { FinalizeAction } from "./Actions";
 
 import { findShapeByKey } from "./shapes";
 
@@ -1502,6 +1503,46 @@ class App extends React.Component<AppProps, AppState> {
       event.type === "pointerenter" ? "none" : "auto";
   }
 
+  // Render floating finalize button near the last point during multi-point creation on touch devices
+  private renderFloatingFinalize = () => {
+    if (!this.device.isTouchScreen) {
+      return null;
+    }
+
+    const { multiElement } = this.state;
+    if (!multiElement) {
+      return null;
+    }
+
+    const elementsMap = arrayToMap(this.scene.getNonDeletedElements());
+    const globalPt = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      multiElement as any,
+      -1,
+      elementsMap,
+    );
+
+    const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
+      { sceneX: globalPt[0], sceneY: globalPt[1] },
+      this.state,
+    );
+
+    const OFFSET = 12;
+
+    return (
+      <div
+        className={CLASSES.CONVERT_ELEMENT_TYPE_POPUP}
+        style={{
+          position: "absolute",
+          left: viewportX + OFFSET,
+          top: viewportY - OFFSET,
+          zIndex: 1000,
+        }}
+      >
+        <FinalizeAction actionManager={this.actionManager} />
+      </div>
+    );
+  };
+
   public render() {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderCustomStats } = this.props;
@@ -1818,6 +1859,7 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
+                        {this.renderFloatingFinalize()}
                         {this.state.activeLockedId && (
                           <UnlockPopup
                             app={this}

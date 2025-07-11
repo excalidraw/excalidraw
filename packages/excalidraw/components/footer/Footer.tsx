@@ -62,7 +62,7 @@ const Footer = ({
             )}
             {showFinalize && (
               <FinalizeAction
-                renderAction={actionManager.renderAction}
+                actionManager={actionManager}
                 className={clsx("zen-mode-transition", {
                   "layer-ui__wrapper__footer-left--transition-left":
                     appState.zenModeEnabled,
