@@ -8083,16 +8083,12 @@ class App extends React.Component<AppProps, AppState> {
           this.scene,
         );
 
-        flushSync(() => {
-          if (this.state.selectedLinearElement) {
-            this.setState({
-              selectedLinearElement: {
-                ...this.state.selectedLinearElement,
-                segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
-                pointerDownState: ret.pointerDownState,
-              },
-            });
-          }
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
+            pointerDownState: ret.pointerDownState,
+          },
         });
         return;
       }
