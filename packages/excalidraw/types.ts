@@ -782,6 +782,8 @@ export type PointerDownState = Readonly<{
     // by default same as PointerDownState.origin. On alt-duplication, reset
     // to current pointer position at time of duplication.
     origin: { x: number; y: number };
+    // used to block drag after lasso selection until next pointerdown
+    blockDragAfterLasso: boolean;
   };
   // We need to have these in the state so that we can unsubscribe them
   eventListeners: {

@@ -6013,6 +6013,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       hasDeselectedButton ||
       (this.state.activeTool.type !== "selection" &&
+        this.state.activeTool.type !== "lasso" &&
         this.state.activeTool.type !== "text" &&
         this.state.activeTool.type !== "eraser")
     ) {
@@ -6184,7 +6185,12 @@ class App extends React.Component<AppProps, AppState> {
             !isElbowArrow(hitElement) ||
             !(hitElement.startBinding || hitElement.endBinding)
           ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            if (
+              this.state.activeTool.type !== "lasso" ||
+              selectedElements.length > 0
+            ) {
+              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            }
             if (this.state.activeEmbeddable?.state === "hover") {
               this.setState({ activeEmbeddable: null });
             }
@@ -6293,7 +6299,12 @@ class App extends React.Component<AppProps, AppState> {
             !isElbowArrow(element) ||
             !(element.startBinding || element.endBinding)
           ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            if (
+              this.state.activeTool.type !== "lasso" ||
+              Object.keys(this.state.selectedElementIds).length > 0
+            ) {
+              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            }
           }
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
@@ -6302,7 +6313,12 @@ class App extends React.Component<AppProps, AppState> {
           !isElbowArrow(element) ||
           !(element.startBinding || element.endBinding)
         ) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          if (
+            this.state.activeTool.type !== "lasso" ||
+            Object.keys(this.state.selectedElementIds).length > 0
+          ) {
+            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          }
         }
       }
 
@@ -6564,11 +6580,25 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (this.state.activeTool.type === "lasso") {
-      this.lassoTrail.startPath(
-        pointerDownState.origin.x,
-        pointerDownState.origin.y,
-        event.shiftKey,
-      );
+      const hitSelectedElement =
+        pointerDownState.hit.element &&
+        this.isASelectedElement(pointerDownState.hit.element);
+
+      // Start a new lasso ONLY if we're not interacting with an existing
+      // selection (move/resize/rotate).
+      if (
+        !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
+        !pointerDownState.resize.handleType &&
+        !hitSelectedElement
+      ) {
+        this.lassoTrail.startPath(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          event.shiftKey,
+        );
+        // Block drag until next pointerdown if a lasso selection is made
+        pointerDownState.drag.blockDragAfterLasso = true;
+      }
     } else if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
     } else if (
@@ -6948,6 +6978,7 @@ class App extends React.Component<AppProps, AppState> {
         hasOccurred: false,
         offset: null,
         origin: { ...origin },
+        blockDragAfterLasso: false,
       },
       eventListeners: {
         onMove: null,
@@ -7023,7 +7054,10 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
-    if (this.state.activeTool.type === "selection") {
+    if (
+      this.state.activeTool.type === "selection" ||
+      this.state.activeTool.type === "lasso"
+    ) {
       const elements = this.scene.getNonDeletedElements();
       const elementsMap = this.scene.getNonDeletedElementsMap();
       const selectedElements = this.scene.getSelectedElements(this.state);
@@ -8257,7 +8291,10 @@ class App extends React.Component<AppProps, AppState> {
         (hasHitASelectedElement ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
         !isSelectingPointsInLineEditor &&
-        this.state.activeTool.type !== "lasso"
+        (this.state.activeTool.type !== "lasso" ||
+          pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements ||
+          hasHitASelectedElement) &&
+        !pointerDownState.drag.blockDragAfterLasso
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
 
@@ -8878,6 +8915,7 @@ class App extends React.Component<AppProps, AppState> {
   ): (event: PointerEvent) => void {
     return withBatchedUpdates((childEvent: PointerEvent) => {
       this.removePointer(childEvent);
+      pointerDownState.drag.blockDragAfterLasso = false;
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
       }
