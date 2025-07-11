@@ -445,7 +445,7 @@ export const getSelectedElementsByGroup = (
   };
 
   // helper function to get the nested group id for an element
-  const getKeyIdForNestedElement = (
+  const handleSingleSelectedGroupCase = (
     element: ExcalidrawElement,
     selectedGroupId: GroupId,
   ) => {
@@ -455,8 +455,8 @@ export const getSelectedElementsByGroup = (
       indexOfSelectedGroupId,
     ).length;
     return nestedGroupCount > 0
-      ? element.groupIds[indexOfSelectedGroupId - 1]
-      : element.id;
+      ? addToGroupsMap(element, element.groupIds[indexOfSelectedGroupId - 1])
+      : addToElementsMap(element);
   };
 
   const isAllInSameGroup = selectedElements.every((element) =>
@@ -472,16 +472,9 @@ export const getSelectedElementsByGroup = (
       addToElementsMap(element);
       return;
     }
-    const indexOfSelectedGroupId = selectedGroupId
-      ? element.groupIds.indexOf(selectedGroupId, 0)
-      : -1;
-    if (
-      selectedGroupIds.length === 1 &&
-      isAllInSameGroup &&
-      indexOfSelectedGroupId >= 0
-    ) {
-      const groupId = getKeyIdForNestedElement(element, selectedGroupId);
-      addToGroupsMap(element, groupId);
+
+    if (selectedGroupIds.length === 1 && isAllInSameGroup) {
+      handleSingleSelectedGroupCase(element, selectedGroupId);
     } else {
       addToGroupsMap(element, selectedGroupId);
     }
