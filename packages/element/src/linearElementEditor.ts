@@ -25,6 +25,7 @@ import {
 
 import {
   deconstructLinearOrFreeDrawElement,
+  hitElementItself,
   isPathALoop,
   type Store,
 } from "@excalidraw/element";
@@ -556,6 +557,8 @@ export class LinearElementEditor {
 
           const propName =
             selectedPoint === 0 ? "startBindingElement" : "endBindingElement";
+          const otherBinding =
+            element[selectedPoint === 0 ? "endBinding" : "startBinding"];
           const point =
             (selectedPointsIndices?.length ?? 0) > 1
               ? LinearElementEditor.getPointAtIndexGlobalCoordinates(
@@ -571,9 +574,11 @@ export class LinearElementEditor {
             appState.zoom,
           );
 
-          bindings[propName] = isBindingEnabled(appState)
-            ? hoveredElement
-            : null;
+          bindings[propName] =
+            isBindingEnabled(appState) &&
+            otherBinding?.elementId !== hoveredElement?.id
+              ? hoveredElement
+              : null;
         }
       }
     }
@@ -2057,12 +2062,27 @@ const pointDraggingUpdates = (
           elementsMap,
           appState.zoom,
         );
+        const otherGlobalPoint =
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            element,
+            pointIndex === 0 ? -1 : 0,
+            elementsMap,
+          );
+        const otherPointInsideElement =
+          !!hoveredElement &&
+          hitElementItself({
+            element: hoveredElement,
+            point: otherGlobalPoint,
+            elementsMap,
+            threshold: 0,
+          });
 
         if (
           isBindingEnabled(appState) &&
           isArrowElement(element) &&
           hoveredElement &&
-          appState.bindMode === "focus"
+          appState.bindMode === "focus" &&
+          !otherPointInsideElement
         ) {
           newGlobalPointPosition = getOutlineAvoidingPoint(
             element,

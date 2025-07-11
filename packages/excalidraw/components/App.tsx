@@ -9132,10 +9132,10 @@ class App extends React.Component<AppProps, AppState> {
                   };
                   firstPointX = newX;
                   firstPointY = newY;
-                  dx = targetPointX - newX;
-                  dy = targetPointY - newY;
                 }
               }
+              dx = targetPointX - firstPointX;
+              dy = targetPointY - firstPointY;
             } else {
               firstPointX =
                 this.state.editingLinearElement?.pointerDownState
