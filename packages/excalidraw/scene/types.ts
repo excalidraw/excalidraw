@@ -37,7 +37,7 @@ export type StaticCanvasRenderConfig = {
   embedsValidationStatus: EmbedsValidationStatus;
   elementsPendingErasure: ElementsPendingErasure;
   pendingFlowchartNodes: PendingExcalidrawElements | null;
-  isHighlighterPenDrawing?: boolean;
+  isHighlighterPenDrawing?: boolean; //zsiviczian
 };
 
 export type SVGRenderConfig = {
