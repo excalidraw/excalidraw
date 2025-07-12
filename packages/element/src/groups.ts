@@ -407,7 +407,6 @@ export const getNewGroupIdsForDuplication = (
 
 // given a list of selected elements, return the element grouped by their immediate group selected state
 // in the case if only one group is selected and all elements selected are within the group, it will respect group hierarchy in accordance to their nested grouping order
-// in all cases in which an element is not in a selected or nested group, it will be returned as a single-element array
 export const getSelectedElementsByGroup = (
   selectedElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
@@ -433,18 +432,20 @@ export const getSelectedElementsByGroup = (
   };
 
   // helper function to add an element to the groups map
-  const addToGroupsMap = (element: ExcalidrawElement, keyId: string) => {
+  const addToGroupsMap = (element: ExcalidrawElement, groupId: string) => {
     // groups
-    const currentGroupMembers = groups.get(keyId) || [];
+    const currentGroupMembers = groups.get(groupId) || [];
     const boundTextElement = getBoundTextElement(element, elementsMap);
 
     if (boundTextElement) {
       currentGroupMembers.push(boundTextElement);
     }
-    groups.set(keyId, [...currentGroupMembers, element]);
+    groups.set(groupId, [...currentGroupMembers, element]);
   };
 
-  // helper function to get the nested group id for an element
+  // helper function to handle the case where a single group is selected
+  // and all elements selected are within the group, it will respect group hierarchy in accordance to
+  // their nested grouping order
   const handleSingleSelectedGroupCase = (
     element: ExcalidrawElement,
     selectedGroupId: GroupId,
@@ -470,10 +471,7 @@ export const getSelectedElementsByGroup = (
     );
     if (!selectedGroupId) {
       addToElementsMap(element);
-      return;
-    }
-
-    if (selectedGroupIds.length === 1 && isAllInSameGroup) {
+    } else if (selectedGroupIds.length === 1 && isAllInSameGroup) {
       handleSingleSelectedGroupCase(element, selectedGroupId);
     } else {
       addToGroupsMap(element, selectedGroupId);
