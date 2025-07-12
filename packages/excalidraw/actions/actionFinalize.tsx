@@ -1,11 +1,17 @@
 import { pointFrom } from "@excalidraw/math";
 
 import {
-  maybeBindLinearElement,
   bindOrUnbindLinearElement,
   isBindingEnabled,
+  getHoveredElementForBinding,
+  bindLinearElement,
+  unbindLinearElement,
 } from "@excalidraw/element/binding";
-import { isValidPolygon, LinearElementEditor } from "@excalidraw/element";
+import {
+  hitElementItself,
+  isValidPolygon,
+  LinearElementEditor,
+} from "@excalidraw/element";
 
 import {
   isBindingElement,
@@ -26,8 +32,9 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { LocalPoint } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 import type {
+  BindMode,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
@@ -68,13 +75,26 @@ export const actionFinalize = register({
       if (isBindingElement(element)) {
         bindOrUnbindLinearElement(
           element,
-          startBindingElement,
-          endBindingElement,
+          startBindingElement === "keep" ? undefined : startBindingElement,
+          startBindingElement === "keep"
+            ? "keep"
+            : appState.bindMode === "fixed"
+            ? "inside"
+            : "orbit",
+          endBindingElement === "keep" ? undefined : endBindingElement,
+          endBindingElement === "keep"
+            ? "keep"
+            : appState.bindMode === "fixed"
+            ? "inside"
+            : "orbit",
           app.scene,
         );
       }
 
       if (linearElementEditor !== appState.selectedLinearElement) {
+        // `handlePointerUp()` updated the linear element instance,
+        // so filter out this element if it is too small,
+        // but do an update to all new elements anyway for undo/redo purposes.
         let newElements = elements;
         if (element && isInvisiblySmallElement(element)) {
           // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
@@ -94,20 +114,40 @@ export const actionFinalize = register({
       }
     }
 
-    if (appState.editingLinearElement) {
+    if (appState.editingLinearElement && !appState.newElement) {
       const { elementId, startBindingElement, endBindingElement } =
         appState.editingLinearElement;
       const element = LinearElementEditor.getElement(elementId, elementsMap);
 
       if (element) {
-        if (isBindingElement(element)) {
+        // NOTE: Dragging the entire arrow doesn't allow binding.
+        const allPointsSelected =
+          appState.editingLinearElement?.pointerDownState
+            .prevSelectedPointsIndices?.length === element.points.length;
+
+        if (
+          !allPointsSelected &&
+          isBindingEnabled(appState) &&
+          isBindingElement(element)
+        ) {
           bindOrUnbindLinearElement(
             element,
-            startBindingElement,
-            endBindingElement,
+            startBindingElement === "keep" ? undefined : startBindingElement,
+            startBindingElement === "keep"
+              ? "keep"
+              : appState.bindMode === "fixed"
+              ? "inside"
+              : "orbit",
+            endBindingElement === "keep" ? undefined : endBindingElement,
+            endBindingElement === "keep"
+              ? "keep"
+              : appState.bindMode === "fixed"
+              ? "inside"
+              : "orbit",
             scene,
           );
         }
+
         if (isLineElement(element) && !isValidPolygon(element.points)) {
           scene.mutateElement(element, {
             polygon: false,
@@ -159,10 +199,21 @@ export const actionFinalize = register({
         element.type !== "freedraw" &&
         appState.lastPointerDownWith !== "touch"
       ) {
-        const { points, lastCommittedPoint } = element;
+        const { x: rx, y: ry, points, lastCommittedPoint } = element;
+        const lastGlobalPoint = pointFrom<GlobalPoint>(
+          rx + points[points.length - 1][0],
+          ry + points[points.length - 1][1],
+        );
+        const hoveredElementForBinding = getHoveredElementForBinding(
+          lastGlobalPoint,
+          app.scene.getNonDeletedElements(),
+          elementsMap,
+          app.state.zoom,
+        );
         if (
-          !lastCommittedPoint ||
-          points[points.length - 1] !== lastCommittedPoint
+          !hoveredElementForBinding &&
+          (!lastCommittedPoint ||
+            points[points.length - 1] !== lastCommittedPoint)
         ) {
           scene.mutateElement(element, {
             points: element.points.slice(0, -1),
@@ -223,7 +274,59 @@ export const actionFinalize = register({
               ),
             );
 
-          maybeBindLinearElement(element, appState, coords, scene);
+          const hoveredElement = getHoveredElementForBinding(
+            pointFrom<GlobalPoint>(coords.x, coords.y),
+            scene.getNonDeletedElements(),
+            elementsMap,
+            appState.zoom,
+          );
+          if (hoveredElement) {
+            const otherHit = hitElementItself({
+              element: hoveredElement,
+              point: LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                element,
+                0,
+                elementsMap,
+              ),
+              elementsMap,
+              threshold: 0,
+            });
+            const hit = hitElementItself({
+              element: hoveredElement,
+              point: LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                element,
+                -1,
+                elementsMap,
+              ),
+              elementsMap,
+              threshold: 0,
+            });
+            const strategy: BindMode =
+              appState.bindMode === "fixed" ||
+              (hit && element.startBinding?.elementId === hoveredElement.id)
+                ? "inside"
+                : "orbit";
+            bindLinearElement(
+              element,
+              hoveredElement,
+              strategy,
+              "end",
+              scene,
+              strategy === "orbit"
+                ? pointFrom<GlobalPoint>(
+                    hoveredElement.x + hoveredElement.width / 2,
+                    hoveredElement.y + hoveredElement.height / 2,
+                  )
+                : undefined,
+            );
+
+            if (
+              element.startBinding?.elementId === hoveredElement.id &&
+              !otherHit
+            ) {
+              unbindLinearElement(element, "start", scene);
+            }
+          }
         }
       }
     }
@@ -282,6 +385,17 @@ export const actionFinalize = register({
           element && isLinearElement(element)
             ? new LinearElementEditor(element, arrayToMap(newElements))
             : appState.selectedLinearElement,
+        editingLinearElement: appState.newElement
+          ? null
+          : appState.editingLinearElement
+          ? {
+              ...appState.editingLinearElement,
+              pointerDownState: {
+                ...appState.editingLinearElement.pointerDownState,
+                arrowOtherPoint: undefined,
+              },
+            }
+          : null,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,

@@ -111,6 +111,7 @@ export const moveElement = (
   originalElement: ExcalidrawElement,
   scene: Scene,
   originalElementsMap: ElementsMap,
+  zoom: AppState["zoom"],
   shouldInformMutation = true,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
@@ -145,7 +146,7 @@ export const moveElement = (
     },
     { informMutation: shouldInformMutation, isDragging: false },
   );
-  updateBindings(latestElement, scene);
+  updateBindings(latestElement, scene, zoom);
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -203,7 +204,7 @@ export const moveElement = (
         },
         { informMutation: shouldInformMutation, isDragging: false },
       );
-      updateBindings(latestChildElement, scene, {
+      updateBindings(latestChildElement, scene, zoom, {
         simultaneouslyUpdated: originalChildren,
       });
     });

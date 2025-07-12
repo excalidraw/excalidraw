@@ -60,7 +60,6 @@ import type {
   TextAlign,
   VerticalAlign,
 } from "@excalidraw/element/types";
-
 import type { MarkOptional } from "@excalidraw/common/utility-types";
 
 export type ValidLinearElement = {
@@ -333,6 +332,7 @@ const bindLinearElementToElement = (
       bindLinearElement(
         linearElement,
         startBoundElement as ExcalidrawBindableElement,
+        "orbit",
         "start",
         scene,
       );
@@ -408,6 +408,7 @@ const bindLinearElementToElement = (
       bindLinearElement(
         linearElement,
         endBoundElement as ExcalidrawBindableElement,
+        "orbit",
         "end",
         scene,
       );
