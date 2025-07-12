@@ -7,6 +7,8 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { getBoundTextElement } from "./textElement";
 
+import { isBoundToContainer } from "./typeChecks";
+
 import { makeNextSelectedElementIds, getSelectedElements } from "./selection";
 
 import type {
@@ -401,4 +403,79 @@ export const getNewGroupIdsForDuplication = (
   }
 
   return copy;
+};
+
+// given a list of selected elements, return the element grouped by their immediate group selected state
+// in the case if only one group is selected and all elements selected are within the group, it will respect group hierarchy in accordance to their nested grouping order
+export const getSelectedElementsByGroup = (
+  selectedElements: ExcalidrawElement[],
+  elementsMap: ElementsMap,
+  appState: Readonly<AppState>,
+): ExcalidrawElement[][] => {
+  const selectedGroupIds = getSelectedGroupIds(appState);
+  const unboundElements = selectedElements.filter(
+    (element) => !isBoundToContainer(element),
+  );
+  const groups: Map<string, ExcalidrawElement[]> = new Map();
+  const elements: Map<string, ExcalidrawElement[]> = new Map();
+
+  // helper function to add an element to the elements map
+  const addToElementsMap = (element: ExcalidrawElement) => {
+    // elements
+    const currentElementMembers = elements.get(element.id) || [];
+    const boundTextElement = getBoundTextElement(element, elementsMap);
+
+    if (boundTextElement) {
+      currentElementMembers.push(boundTextElement);
+    }
+    elements.set(element.id, [...currentElementMembers, element]);
+  };
+
+  // helper function to add an element to the groups map
+  const addToGroupsMap = (element: ExcalidrawElement, groupId: string) => {
+    // groups
+    const currentGroupMembers = groups.get(groupId) || [];
+    const boundTextElement = getBoundTextElement(element, elementsMap);
+
+    if (boundTextElement) {
+      currentGroupMembers.push(boundTextElement);
+    }
+    groups.set(groupId, [...currentGroupMembers, element]);
+  };
+
+  // helper function to handle the case where a single group is selected
+  // and all elements selected are within the group, it will respect group hierarchy in accordance to
+  // their nested grouping order
+  const handleSingleSelectedGroupCase = (
+    element: ExcalidrawElement,
+    selectedGroupId: GroupId,
+  ) => {
+    const indexOfSelectedGroupId = element.groupIds.indexOf(selectedGroupId, 0);
+    const nestedGroupCount = element.groupIds.slice(
+      0,
+      indexOfSelectedGroupId,
+    ).length;
+    return nestedGroupCount > 0
+      ? addToGroupsMap(element, element.groupIds[indexOfSelectedGroupId - 1])
+      : addToElementsMap(element);
+  };
+
+  const isAllInSameGroup = selectedElements.every((element) =>
+    isSelectedViaGroup(appState, element),
+  );
+
+  unboundElements.forEach((element) => {
+    const selectedGroupId = getSelectedGroupIdForElement(
+      element,
+      appState.selectedGroupIds,
+    );
+    if (!selectedGroupId) {
+      addToElementsMap(element);
+    } else if (selectedGroupIds.length === 1 && isAllInSameGroup) {
+      handleSingleSelectedGroupCase(element, selectedGroupId);
+    } else {
+      addToGroupsMap(element, selectedGroupId);
+    }
+  });
+  return Array.from(groups.values()).concat(Array.from(elements.values()));
 };
