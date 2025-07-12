@@ -2358,12 +2358,12 @@ describe("history", () => {
             startBinding: {
               elementId: "KPrBI4g_v9qUB1XxYLgSz",
               fixedPoint: [1.0318471337579618, 0.49920634920634904],
-              mode: "outline",
+              mode: "orbit",
             } as FixedPointBinding,
             endBinding: {
               elementId: "u2JGnnmoJ0VATV4vCNJE5",
               fixedPoint: [0.4991935483870975, -0.03875193720914723],
-              mode: "outline",
+              mode: "orbit",
             } as FixedPointBinding,
           },
         ],
@@ -4762,7 +4762,7 @@ describe("history", () => {
               endBinding: {
                 elementId: remoteContainer.id,
                 fixedPoint: [0.5, 1],
-                mode: "outline",
+                mode: "orbit",
               },
             }),
             remoteContainer,
@@ -4850,12 +4850,12 @@ describe("history", () => {
           startBinding: {
             elementId: rect1.id,
             fixedPoint: [1, 0.5],
-            mode: "outline",
+            mode: "orbit",
           },
           endBinding: {
             elementId: rect2.id,
             fixedPoint: [0.5, 1],
-            mode: "outline",
+            mode: "orbit",
           },
         });
 
@@ -4957,12 +4957,12 @@ describe("history", () => {
               startBinding: {
                 elementId: rect1.id,
                 fixedPoint: [0.5, 1],
-                mode: "outline",
+                mode: "orbit",
               },
               endBinding: {
                 elementId: rect2.id,
                 fixedPoint: [1, 0.5],
-                mode: "outline",
+                mode: "orbit",
               },
             }),
             newElementWith(rect1, {

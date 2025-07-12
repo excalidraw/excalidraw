@@ -99,9 +99,9 @@ export const isBindingEnabled = (appState: AppState): boolean => {
 export const bindOrUnbindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startBindingElement: ExcalidrawBindableElement | null | undefined,
-  startBindingStrategy: BindMode | "keep",
+  startBindingStrategy: BindMode | "keep" | null,
   endBindingElement: ExcalidrawBindableElement | null | undefined,
-  endBindingStrategy: BindMode | "keep",
+  endBindingStrategy: BindMode | "keep" | null,
   scene: Scene,
 ): void => {
   if (startBindingStrategy !== "keep" && startBindingElement !== undefined) {
@@ -127,11 +127,11 @@ export const bindOrUnbindLinearElement = (
 const bindOrUnbindLinearElementEdge = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   bindableElement: ExcalidrawBindableElement | null,
-  mode: BindMode,
+  mode: BindMode | null,
   startOrEnd: "start" | "end",
   scene: Scene,
 ): void => {
-  if (bindableElement === null) {
+  if (bindableElement === null || mode === null) {
     // null means break the binding
     unbindLinearElement(linearElement, startOrEnd, scene);
   } else {
@@ -160,12 +160,12 @@ const getOriginalBindingsIfStillCloseToArrowEnds = (
       const element = elementsMap.get(elementId);
       if (
         isBindableElement(element) &&
-        bindingProjectionIntersectionCountForElementAtPoint(
+        bindingBorderTest(
           element,
           pointFrom<GlobalPoint>(coors.x, coors.y),
           elementsMap,
           zoom,
-        ) > 0
+        )
       ) {
         return element;
       }
@@ -217,11 +217,11 @@ const getBindingStrategyForDraggingArrowEndpoints = (
 ): [
   {
     element: NonDeleted<ExcalidrawBindableElement> | null | undefined;
-    mode: BindMode | "keep";
+    mode: BindMode | "keep" | null;
   },
   {
     element: NonDeleted<ExcalidrawBindableElement> | null | undefined;
-    mode: BindMode | "keep";
+    mode: BindMode | "keep" | null;
   },
 ] => {
   const startIdx = 0;
@@ -232,8 +232,8 @@ const getBindingStrategyForDraggingArrowEndpoints = (
   // If both ends are dragged, we don't bind to anything and break existing bindings
   if (startDragged && endDragged) {
     return [
-      { element: null, mode: "outline" },
-      { element: null, mode: "outline" },
+      { element: null, mode: null },
+      { element: null, mode: null },
     ];
   }
 
@@ -252,7 +252,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
 
     start = {
       element: hoveredElement,
-      mode: globalBindMode || hit ? "inside" : "outline",
+      mode: globalBindMode || hit ? "inside" : "orbit",
     };
   }
 
@@ -271,7 +271,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
 
     end = {
       element: hoveredElement,
-      mode: globalBindMode || hit ? "inside" : "outline",
+      mode: globalBindMode || hit ? "inside" : "orbit",
     };
   }
 
@@ -311,9 +311,9 @@ export const bindOrUnbindLinearElements = (
       bindOrUnbindLinearElement(
         selectedElement,
         null,
-        "outline",
+        "orbit",
         null,
-        "outline",
+        "orbit",
         scene,
       );
     }
@@ -427,7 +427,7 @@ export const bindLinearElement = (
   if (isElbowArrow(linearElement)) {
     binding = {
       elementId: hoveredElement.id,
-      mode: "outline",
+      mode: "orbit",
       ...calculateFixedPointForElbowArrowBinding(
         linearElement,
         hoveredElement,
@@ -530,18 +530,11 @@ export const getHoveredElementForBinding = (
       "Elements in the function parameter for getAllElementsAtPositionForBinding() should not contain deleted elements",
     );
 
-    if (isBindableElement(element, false)) {
-      const intersectionCount =
-        bindingProjectionIntersectionCountForElementAtPoint(
-          element,
-          point,
-          elementsMap,
-          zoom,
-        );
-
-      if (intersectionCount > 0) {
-        candidateElements.push(element);
-      }
+    if (
+      isBindableElement(element, false) &&
+      bindingBorderTest(element, point, elementsMap, zoom)
+    ) {
+      candidateElements.push(element);
     }
   }
 
@@ -1109,7 +1102,7 @@ export const updateBoundPoint = (
     bindableElement.angle,
   );
   const maybeOutlineGlobal =
-    binding.mode === "outline"
+    binding.mode === "orbit"
       ? getOutlineAvoidingPoint(
           linearElement,
           bindableElement,
@@ -1316,12 +1309,12 @@ const newBoundElements = (
   return nextBoundElements;
 };
 
-const bindingProjectionIntersectionCountForElementAtPoint = (
+const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
   [x, y]: Readonly<GlobalPoint>,
   elementsMap: NonDeletedSceneElementsMap,
   zoom?: AppState["zoom"],
-): number => {
+): boolean => {
   const p = pointFrom<GlobalPoint>(x, y);
   const threshold = maxBindingDistanceFromOutline(
     element,
@@ -1344,7 +1337,7 @@ const bindingProjectionIntersectionCountForElementAtPoint = (
   ] as Bounds;
   const elementBounds = getElementBounds(element, elementsMap);
   if (!doBoundsIntersect(bounds, elementBounds)) {
-    return 0;
+    return false;
   }
 
   // Do the intersection test against the element since it's close enough
@@ -1355,18 +1348,9 @@ const bindingProjectionIntersectionCountForElementAtPoint = (
   );
   const distance = distanceToElement(element, elementsMap, p);
 
-  if (shouldTestInside) {
-    if (intersections.length === 0 || distance <= 0) {
-      return 2;
-    }
-    if (distance <= threshold) {
-      return 1;
-    }
-
-    return 0;
-  }
-
-  return intersections.length > 0 && distance <= threshold ? 1 : 0;
+  return shouldTestInside
+    ? intersections.length === 0 || distance <= threshold
+    : intersections.length > 0 && distance <= threshold;
 };
 
 export const maxBindingDistanceFromOutline = (

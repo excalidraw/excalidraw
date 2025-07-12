@@ -34,6 +34,7 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 import type {
+  BindMode,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
@@ -79,13 +80,13 @@ export const actionFinalize = register({
             ? "keep"
             : appState.bindMode === "fixed"
             ? "inside"
-            : "outline",
+            : "orbit",
           endBindingElement === "keep" ? undefined : endBindingElement,
           endBindingElement === "keep"
             ? "keep"
             : appState.bindMode === "fixed"
             ? "inside"
-            : "outline",
+            : "orbit",
           app.scene,
         );
       }
@@ -136,13 +137,13 @@ export const actionFinalize = register({
               ? "keep"
               : appState.bindMode === "fixed"
               ? "inside"
-              : "outline",
+              : "orbit",
             endBindingElement === "keep" ? undefined : endBindingElement,
             endBindingElement === "keep"
               ? "keep"
               : appState.bindMode === "fixed"
               ? "inside"
-              : "outline",
+              : "orbit",
             scene,
           );
         }
@@ -300,18 +301,18 @@ export const actionFinalize = register({
               elementsMap,
               threshold: 0,
             });
-            const strategy =
+            const strategy: BindMode =
               appState.bindMode === "fixed" ||
               (hit && element.startBinding?.elementId === hoveredElement.id)
                 ? "inside"
-                : "outline";
+                : "orbit";
             bindLinearElement(
               element,
               hoveredElement,
               strategy,
               "end",
               scene,
-              strategy === "outline"
+              strategy === "orbit"
                 ? pointFrom<GlobalPoint>(
                     hoveredElement.x + hoveredElement.width / 2,
                     hoveredElement.y + hoveredElement.height / 2,

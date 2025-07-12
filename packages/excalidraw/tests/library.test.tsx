@@ -106,7 +106,7 @@ describe("library", () => {
       endBinding: {
         elementId: "rectangle1",
         fixedPoint: [0.5, 1],
-        mode: "outline",
+        mode: "orbit",
       },
     });
 

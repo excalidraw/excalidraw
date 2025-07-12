@@ -6211,7 +6211,7 @@ class App extends React.Component<AppProps, AppState> {
         // If start is bound then snap the fixed binding point if needed
         if (
           multiElement.startBinding &&
-          multiElement.startBinding.mode === "outline"
+          multiElement.startBinding.mode === "orbit"
         ) {
           const elementsMap = this.scene.getNonDeletedElementsMap();
           const startPoint =
@@ -8098,13 +8098,15 @@ class App extends React.Component<AppProps, AppState> {
               frameId: topLayerFrame ? topLayerFrame.id : null,
             });
 
+      const point = pointFrom<GlobalPoint>(
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+      );
+      const elementsMap = this.scene.getNonDeletedElementsMap();
       const boundElement = getHoveredElementForBinding(
-        pointFrom<GlobalPoint>(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-        ),
+        point,
         this.scene.getNonDeletedElements(),
-        this.scene.getNonDeletedElementsMap(),
+        elementsMap,
         this.state.zoom,
       );
 
@@ -8142,7 +8144,19 @@ class App extends React.Component<AppProps, AppState> {
       });
       this.scene.insertElement(element);
       if (isBindingEnabled(this.state) && boundElement) {
-        bindLinearElement(element, boundElement, "inside", "start", this.scene);
+        const hitElement = hitElementItself({
+          element: boundElement,
+          point,
+          elementsMap,
+          threshold: 0,
+        });
+        bindLinearElement(
+          element,
+          boundElement,
+          hitElement ? "inside" : "outside",
+          "start",
+          this.scene,
+        );
       }
       this.setState((prevState) => {
         let linearElementEditor = null;
@@ -9065,6 +9079,7 @@ class App extends React.Component<AppProps, AppState> {
               newElement.points[0],
               elementsMap,
             );
+
           let startBinding = newElement.startBinding;
           let dx = gridX - newElement.x;
           let dy = gridY - newElement.y;
@@ -9101,7 +9116,7 @@ class App extends React.Component<AppProps, AppState> {
                     )
                   : pointFrom(gridX, gridY);
 
-              // We might need to snap the first point of our arrow
+              // We might need to "jump" and snap the first point of our arrow
               const otherBoundElement = startBindingElement
                 ? (elementsMap.get(
                     startBindingElement === "keep"
@@ -9128,7 +9143,7 @@ class App extends React.Component<AppProps, AppState> {
                   startBinding = {
                     elementId: otherBoundElement.id,
                     fixedPoint: normalizeFixedPoint([0.5, 0.5]),
-                    mode: "outline",
+                    mode: "orbit",
                   };
                   firstPointX = newX;
                   firstPointY = newY;
@@ -9137,12 +9152,14 @@ class App extends React.Component<AppProps, AppState> {
               dx = targetPointX - firstPointX;
               dy = targetPointY - firstPointY;
             } else {
+              // Use the original start point of the arrow if previously it
+              // was "jumping" on the outline of the element.
               firstPointX =
                 this.state.editingLinearElement?.pointerDownState
-                  .arrowOtherPoint?.[0] ?? firstPointX;
+                  .arrowOriginalStartPoint?.[0] ?? firstPointX;
               firstPointY =
                 this.state.editingLinearElement?.pointerDownState
-                  .arrowOtherPoint?.[1] ?? firstPointY;
+                  .arrowOriginalStartPoint?.[1] ?? firstPointY;
             }
           }
 

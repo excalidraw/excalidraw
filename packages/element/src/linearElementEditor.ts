@@ -134,7 +134,7 @@ export class LinearElementEditor {
       index: number | null;
       added: boolean;
     };
-    arrowOtherPoint?: GlobalPoint;
+    arrowOriginalStartPoint?: GlobalPoint;
   }>;
 
   /** whether you're dragging a point */
@@ -612,7 +612,7 @@ export class LinearElementEditor {
       customLineAngle: null,
       pointerDownState: {
         ...editingLinearElement.pointerDownState,
-        arrowOtherPoint: undefined,
+        arrowOriginalStartPoint: undefined,
       },
     };
   }
@@ -967,13 +967,13 @@ export class LinearElementEditor {
             ? "keep"
             : app.state.bindMode === "fixed"
             ? "inside"
-            : "outline",
+            : "orbit",
           endBindingElement === "keep" ? undefined : endBindingElement,
           endBindingElement === "keep"
             ? "keep"
             : app.state.bindMode === "fixed"
             ? "inside"
-            : "outline",
+            : "orbit",
           scene,
         );
       }

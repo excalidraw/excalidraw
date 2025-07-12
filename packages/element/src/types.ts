@@ -279,7 +279,7 @@ export type ExcalidrawTextElementWithContainer = {
 
 export type FixedPoint = [number, number];
 
-export type BindMode = "inside" | "outline";
+export type BindMode = "inside" | "outside" | "orbit";
 
 export type FixedPointBinding = {
   elementId: ExcalidrawBindableElement["id"];

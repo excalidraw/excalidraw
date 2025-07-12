@@ -189,8 +189,8 @@ describe("elbow arrow routing", () => {
     scene.insertElement(rectangle2);
     scene.insertElement(arrow);
 
-    bindLinearElement(arrow, rectangle1, "outline", "start", scene);
-    bindLinearElement(arrow, rectangle2, "outline", "end", scene);
+    bindLinearElement(arrow, rectangle1, "orbit", "start", scene);
+    bindLinearElement(arrow, rectangle2, "orbit", "end", scene);
 
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);

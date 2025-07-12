@@ -446,14 +446,8 @@ const createBindingArrow = (
 
   const elementsMap = scene.getNonDeletedElementsMap();
 
-  bindLinearElement(
-    bindingArrow,
-    startBindingElement,
-    "outline",
-    "start",
-    scene,
-  );
-  bindLinearElement(bindingArrow, endBindingElement, "outline", "end", scene);
+  bindLinearElement(bindingArrow, startBindingElement, "orbit", "start", scene);
+  bindLinearElement(bindingArrow, endBindingElement, "orbit", "end", scene);
 
   const changedElements = new Map<string, OrderedExcalidrawElement>();
   changedElements.set(

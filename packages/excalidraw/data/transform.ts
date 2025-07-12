@@ -332,7 +332,7 @@ const bindLinearElementToElement = (
       bindLinearElement(
         linearElement,
         startBoundElement as ExcalidrawBindableElement,
-        "outline",
+        "orbit",
         "start",
         scene,
       );
@@ -408,7 +408,7 @@ const bindLinearElementToElement = (
       bindLinearElement(
         linearElement,
         endBoundElement as ExcalidrawBindableElement,
-        "outline",
+        "orbit",
         "end",
         scene,
       );

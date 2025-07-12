@@ -324,12 +324,12 @@ describe("element binding", () => {
       startBinding: {
         elementId: "rectangle1",
         fixedPoint: [0.5, 1],
-        mode: "outline",
+        mode: "orbit",
       },
       endBinding: {
         elementId: "text1",
         fixedPoint: [1, 0.5],
-        mode: "outline",
+        mode: "orbit",
       },
     });
 
@@ -340,12 +340,12 @@ describe("element binding", () => {
       startBinding: {
         elementId: "text1",
         fixedPoint: [0.5, 1],
-        mode: "outline",
+        mode: "orbit",
       },
       endBinding: {
         elementId: "rectangle1",
         fixedPoint: [1, 0.5],
-        mode: "outline",
+        mode: "orbit",
       },
     });
 
@@ -655,12 +655,12 @@ describe("Fixed-point arrow binding", () => {
       startBinding: {
         elementId: rect.id,
         fixedPoint: [0.25, 0.5],
-        mode: "outline",
+        mode: "orbit",
       },
       endBinding: {
         elementId: rect.id,
         fixedPoint: [0.75, 0.5],
-        mode: "outline",
+        mode: "orbit",
       },
     });
 
@@ -719,12 +719,12 @@ describe("Fixed-point arrow binding", () => {
       startBinding: {
         elementId: rectLeft.id,
         fixedPoint: [0.5, 0.5],
-        mode: "outline",
+        mode: "orbit",
       },
       endBinding: {
         elementId: rectRight.id,
         fixedPoint: [0.5, 0.5],
-        mode: "outline",
+        mode: "orbit",
       },
     });
 

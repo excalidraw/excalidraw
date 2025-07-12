@@ -39,12 +39,12 @@ describe("flipping re-centers selection", () => {
         startBinding: {
           elementId: "rec1",
           fixedPoint: [0.49, -0.05],
-          mode: "outline",
+          mode: "orbit",
         },
         endBinding: {
           elementId: "rec2",
           fixedPoint: [-0.05, 0.49],
-          mode: "outline",
+          mode: "orbit",
         },
         startArrowhead: null,
         endArrowhead: "arrow",
@@ -98,7 +98,7 @@ describe("flipping arrowheads", () => {
       endBinding: {
         elementId: rect.id,
         fixedPoint: [0.5, 0.5],
-        mode: "outline",
+        mode: "orbit",
       },
     });
 
@@ -138,12 +138,12 @@ describe("flipping arrowheads", () => {
       startBinding: {
         elementId: rect.id,
         fixedPoint: [0.5, 0.5],
-        mode: "outline",
+        mode: "orbit",
       },
       endBinding: {
         elementId: rect2.id,
         fixedPoint: [0.5, 0.5],
-        mode: "outline",
+        mode: "orbit",
       },
     });
 
@@ -194,7 +194,7 @@ describe("flipping arrowheads", () => {
       endBinding: {
         elementId: rect.id,
         fixedPoint: [0.5, 0.5],
-        mode: "outline",
+        mode: "orbit",
       },
     });
 

@@ -156,9 +156,9 @@ export const dragSelectedElements = (
         bindOrUnbindLinearElement(
           element,
           shouldUnbindStart ? null : undefined,
-          shouldUnbindStart ? "outline" : "keep",
+          shouldUnbindStart ? "orbit" : "keep",
           shouldUnbindEnd ? null : undefined,
-          shouldUnbindEnd ? "outline" : "keep",
+          shouldUnbindEnd ? "orbit" : "keep",
           scene,
         );
       }
