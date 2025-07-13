@@ -3827,13 +3827,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setState(state);
   };
 
-  setToast = (
-    toast: {
-      message: string;
-      closable?: boolean;
-      duration?: number;
-    } | null,
-  ) => {
+  setToast = (toast: AppState["toast"]) => {
     this.setState({ toast });
   };
 

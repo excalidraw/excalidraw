@@ -112,15 +112,11 @@ export const SaveReminder = memo((props: SaveReminderProps) => {
           nonDeletedElements.length - reminderState.baseElementsCount >=
             reminderTier.elementsCount
         ) {
-          excalidrawAPI.updateScene({
-            appState: {
-              toast: {
-                message: t("toast.rememberToSave"),
-                closable: true,
-                duration: 10000,
-                type: "warning",
-              },
-            },
+          excalidrawAPI.setToast({
+            message: t("toast.rememberToSave"),
+            closable: true,
+            duration: 10000,
+            type: "warning",
           });
           updateReminderState({
             ...reminderState,
