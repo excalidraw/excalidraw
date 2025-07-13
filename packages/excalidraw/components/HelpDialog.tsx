@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import { isDarwin, isFirefox, isWindows } from "@excalidraw/common";
+import { EVENT, isDarwin, isFirefox, isWindows } from "@excalidraw/common";
 
 import { KEYS, getShortcutKey } from "@excalidraw/common";
 
@@ -14,6 +14,8 @@ import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
 import "./HelpDialog.scss";
 
 import type { JSX } from "react";
+import { TextField } from "./TextField";
+import { useStableCallback } from "../hooks/useStableCallback";
 
 const Header = () => (
   <div className="HelpDialog__header">
@@ -125,9 +127,35 @@ const ShortcutKey = (props: { children: React.ReactNode }) => (
 export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
   const handleClose = React.useCallback(() => {
     if (onClose) {
+      setCommandSearch("");
       onClose();
     }
   }, [onClose]);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const handleKeyDown = useStableCallback((event: KeyboardEvent) => {
+    
+
+    // if alphanumeric keypress and we're not inside the input, focus it
+    if (/^[a-zA-Z0-9]$/.test(event.key)) {
+      event.stopPropagation();
+      inputRef?.current?.focus();
+      return;
+    }
+
+  });
+
+  useEffect(() => {
+    window.addEventListener(EVENT.KEYDOWN, handleKeyDown, {
+      capture: true,
+    });
+    return () =>
+      window.removeEventListener(EVENT.KEYDOWN, handleKeyDown, {
+        capture: true,
+      });
+  }, [handleKeyDown]);
+
+  const [commandSearch, setCommandSearch] = useState("");
 
   return (
     <>
@@ -136,6 +164,15 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
         title={t("helpDialog.title")}
         className={"HelpDialog"}
       >
+        <TextField
+                value={commandSearch}
+                placeholder={t("commandPalette.search.placeholder")}
+                onChange={(value) => {
+                  setCommandSearch(value);
+                }}
+                selectOnRender
+                ref={inputRef}
+        />
         <Header />
         <Section title={t("helpDialog.shortcuts")}>
           <ShortcutIsland
