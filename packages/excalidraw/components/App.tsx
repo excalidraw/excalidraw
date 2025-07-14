@@ -6596,8 +6596,94 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.origin.y,
           event.shiftKey,
         );
-        // Block drag until next pointerdown if a lasso selection is made
-        pointerDownState.drag.blockDragAfterLasso = true;
+      }
+
+      // For lasso tool, if we hit an element, select it immediately like normal selection
+      if (pointerDownState.hit.element && !hitSelectedElement) {
+        this.setState((prevState) => {
+          let nextSelectedElementIds: { [id: string]: true } = {
+            ...prevState.selectedElementIds,
+            [pointerDownState.hit.element!.id]: true,
+          };
+
+          const previouslySelectedElements: ExcalidrawElement[] = [];
+
+          Object.keys(prevState.selectedElementIds).forEach((id) => {
+            const element = this.scene.getElement(id);
+            element && previouslySelectedElements.push(element);
+          });
+
+          const hitElement = pointerDownState.hit.element!;
+
+          // if hitElement is frame-like, deselect all of its elements
+          // if they are selected
+          if (isFrameLikeElement(hitElement)) {
+            getFrameChildren(previouslySelectedElements, hitElement.id).forEach(
+              (element) => {
+                delete nextSelectedElementIds[element.id];
+              },
+            );
+          } else if (hitElement.frameId) {
+            // if hitElement is in a frame and its frame has been selected
+            // disable selection for the given element
+            if (nextSelectedElementIds[hitElement.frameId]) {
+              delete nextSelectedElementIds[hitElement.id];
+            }
+          } else {
+            // hitElement is neither a frame nor an element in a frame
+            // but since hitElement could be in a group with some frames
+            // this means selecting hitElement will have the frames selected as well
+            // because we want to keep the invariant:
+            // - frames and their elements are not selected at the same time
+            // we deselect elements in those frames that were previously selected
+
+            const groupIds = hitElement.groupIds;
+            const framesInGroups = new Set(
+              groupIds
+                .flatMap((gid) =>
+                  getElementsInGroup(this.scene.getNonDeletedElements(), gid),
+                )
+                .filter((element) => isFrameLikeElement(element))
+                .map((frame) => frame.id),
+            );
+
+            if (framesInGroups.size > 0) {
+              previouslySelectedElements.forEach((element) => {
+                if (element.frameId && framesInGroups.has(element.frameId)) {
+                  // deselect element and groups containing the element
+                  delete nextSelectedElementIds[element.id];
+                  element.groupIds
+                    .flatMap((gid) =>
+                      getElementsInGroup(
+                        this.scene.getNonDeletedElements(),
+                        gid,
+                      ),
+                    )
+                    .forEach((element) => {
+                      delete nextSelectedElementIds[element.id];
+                    });
+                }
+              });
+            }
+          }
+
+          return {
+            ...selectGroupsForSelectedElements(
+              {
+                editingGroupId: prevState.editingGroupId,
+                selectedElementIds: nextSelectedElementIds,
+              },
+              this.scene.getNonDeletedElements(),
+              prevState,
+              this,
+            ),
+            showHyperlinkPopup:
+              hitElement.link || isEmbeddableElement(hitElement)
+                ? "info"
+                : false,
+          };
+        });
+        pointerDownState.hit.wasAddedToSelection = true;
       }
     } else if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
@@ -6978,7 +7064,6 @@ class App extends React.Component<AppProps, AppState> {
         hasOccurred: false,
         offset: null,
         origin: { ...origin },
-        blockDragAfterLasso: false,
       },
       eventListeners: {
         onMove: null,
@@ -8289,12 +8374,14 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.hit.element?.id;
       if (
         (hasHitASelectedElement ||
-          pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
+          pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements ||
+          (this.state.activeTool.type === "lasso" &&
+            pointerDownState.hit.element)) &&
         !isSelectingPointsInLineEditor &&
         (this.state.activeTool.type !== "lasso" ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements ||
-          hasHitASelectedElement) &&
-        !pointerDownState.drag.blockDragAfterLasso
+          hasHitASelectedElement ||
+          pointerDownState.hit.element)
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
 
@@ -8318,6 +8405,11 @@ class App extends React.Component<AppProps, AppState> {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
         pointerDownState.drag.hasOccurred = true;
+
+        // Clear lasso trail when starting to drag with lasso tool
+        if (this.state.activeTool.type === "lasso") {
+          this.lassoTrail.endPath();
+        }
 
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
@@ -8915,7 +9007,6 @@ class App extends React.Component<AppProps, AppState> {
   ): (event: PointerEvent) => void {
     return withBatchedUpdates((childEvent: PointerEvent) => {
       this.removePointer(childEvent);
-      pointerDownState.drag.blockDragAfterLasso = false;
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
       }
