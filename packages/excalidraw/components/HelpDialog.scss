@@ -12,6 +12,19 @@
       font-size: 1.125rem;
     }
 
+    .no-match {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 36px;
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 6px;
+    }
+
     &__header {
       display: flex;
       flex-wrap: wrap;

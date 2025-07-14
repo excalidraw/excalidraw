@@ -9,7 +9,7 @@ import { probablySupportsClipboardBlob } from "../clipboard";
 import { t } from "../i18n";
 
 import { Dialog } from "./Dialog";
-import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
+import { ExternalLinkIcon, GithubIcon, searchIcon, youtubeIcon } from "./icons";
 
 import "./HelpDialog.scss";
 
@@ -562,7 +562,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
       >
         <TextField
           value={commandSearch}
-          placeholder={t("commandPalette.search.placeholder")}
+          placeholder={t("helpDialog.search.placeholder")}
           onChange={(value) => {
             setCommandSearch(value);
           }}
@@ -582,8 +582,11 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               ))}
             </ShortcutIsland>
           ))}
-
         </Section>
+        {filteredIslands.length === 0 && <div className="no-match">
+            <div className="icon">{searchIcon}</div>{" "}
+            {t("helpDialog.search.noMatch")}
+          </div>}
       </Dialog>
     </>
   );
