@@ -68,6 +68,7 @@ import type { AppProps, AppState, UIAppState } from "../../types";
 import type { ShortcutName } from "../../actions/shortcuts";
 import type { TranslationKeys } from "../../i18n";
 import type { Action } from "../../actions/types";
+import { Ellipsify } from "../Ellipsify";
 
 const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 
@@ -964,7 +965,7 @@ const CommandItem = ({
             }
           />
         )}
-        {command.label}
+        <Ellipsify>{command.label}</Ellipsify>
       </div>
       {showShortcut && command.shortcut && (
         <CommandShortcutHint shortcut={command.shortcut} />
