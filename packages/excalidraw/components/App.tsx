@@ -416,7 +416,6 @@ import {
 } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { Toast } from "./Toast";
-import { FinalizeAction } from "./Actions";
 
 import { findShapeByKey } from "./shapes";
 
@@ -1503,46 +1502,6 @@ class App extends React.Component<AppProps, AppState> {
       event.type === "pointerenter" ? "none" : "auto";
   }
 
-  // Render floating finalize button near the last point during multi-point creation on touch devices
-  private renderFloatingFinalize = () => {
-    if (!this.device.isTouchScreen) {
-      return null;
-    }
-
-    const { multiElement } = this.state;
-    if (!multiElement) {
-      return null;
-    }
-
-    const elementsMap = arrayToMap(this.scene.getNonDeletedElements());
-    const globalPt = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      multiElement as any,
-      -1,
-      elementsMap,
-    );
-
-    const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
-      { sceneX: globalPt[0], sceneY: globalPt[1] },
-      this.state,
-    );
-
-    const OFFSET = 12;
-
-    return (
-      <div
-        className={CLASSES.CONVERT_ELEMENT_TYPE_POPUP}
-        style={{
-          position: "absolute",
-          left: viewportX + OFFSET,
-          top: viewportY - OFFSET,
-          zIndex: 1000,
-        }}
-      >
-        <FinalizeAction actionManager={this.actionManager} />
-      </div>
-    );
-  };
-
   public render() {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderCustomStats } = this.props;
@@ -1859,7 +1818,6 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
-                        {this.renderFloatingFinalize()}
                         {this.state.activeLockedId && (
                           <UnlockPopup
                             app={this}
@@ -9145,15 +9103,45 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (!pointerDownState.drag.hasOccurred && newElement && !multiElement) {
-          const dx = pointerCoords.x - newElement.x;
-          const dy = pointerCoords.y - newElement.y;
-          const MIN_DISTANCE_TO_ADD_POINT_ON_TOUCH = 10;
-          const shouldAddPoint = this.device.isTouchScreen
-            ? Math.abs(dx) >= MIN_DISTANCE_TO_ADD_POINT_ON_TOUCH ||
-              Math.abs(dy) >= MIN_DISTANCE_TO_ADD_POINT_ON_TOUCH
-            : true;
+          if (this.device.isTouchScreen) {
+            const FIXED_DELTA_X = 100;
 
-          if (shouldAddPoint) {
+            this.scene.mutateElement(
+              newElement,
+              {
+                points: [
+                  pointFrom<LocalPoint>(0, 0),
+                  pointFrom<LocalPoint>(FIXED_DELTA_X, 0),
+                ],
+              },
+              { informMutation: false, isDragging: false },
+            );
+
+            LinearElementEditor.movePoints(
+              newElement,
+              this.scene,
+              new Map([
+                [
+                  1,
+                  {
+                    point: pointFrom<LocalPoint>(FIXED_DELTA_X, 0),
+                    isDragging: true,
+                  },
+                ],
+              ]),
+            );
+
+            this.actionManager.executeAction(actionFinalize);
+            this.setState({
+              editingLinearElement: new LinearElementEditor(
+                newElement,
+                this.scene.getNonDeletedElementsMap(),
+              ),
+            });
+          } else {
+            const dx = pointerCoords.x - newElement.x;
+            const dy = pointerCoords.y - newElement.y;
+
             this.scene.mutateElement(
               newElement,
               {
@@ -9161,12 +9149,12 @@ class App extends React.Component<AppProps, AppState> {
               },
               { informMutation: false, isDragging: false },
             );
-          }
 
-          this.setState({
-            multiElement: newElement,
-            newElement,
-          });
+            this.setState({
+              multiElement: newElement,
+              newElement,
+            });
+          }
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
           if (
             isBindingEnabled(this.state) &&
