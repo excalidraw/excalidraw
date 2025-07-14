@@ -380,7 +380,7 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     pressures: readonly number[];
     simulatePressure: boolean;
     lastCommittedPoint: LocalPoint | null;
-    drawingConfigs: {
+    freedrawOptions: {
       streamline?: number;
       simplify?: number;
       fixedStrokeWidth?: boolean;

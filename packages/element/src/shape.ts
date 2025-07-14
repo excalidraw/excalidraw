@@ -808,12 +808,12 @@ const generateElementShape = (
 
       if (isPathALoop(element.points)) {
         const points =
-          element.drawingConfigs === null
+          element.freedrawOptions === null
             ? simplify(element.points as LocalPoint[], 0.75)
             : simplify(element.points as LocalPoint[], 1.5);
 
         shape =
-          element.drawingConfigs === null
+          element.freedrawOptions === null
             ? generator.curve(points, {
                 ...generateRoughOptions(element),
                 stroke: "none",

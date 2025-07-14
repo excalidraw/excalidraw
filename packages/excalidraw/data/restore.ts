@@ -303,7 +303,7 @@ const restoreElement = (
         simulatePressure: element.simulatePressure,
         pressures: element.pressures,
         // legacy, for backwards compatibility
-        drawingConfigs: element.drawingConfigs ?? null,
+        freedrawOptions: element.freedrawOptions ?? null,
       });
     }
     case "image":

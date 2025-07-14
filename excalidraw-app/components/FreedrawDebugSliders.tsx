@@ -1,4 +1,4 @@
-import { DRAWING_CONFIGS, isFreeDrawElement } from "@excalidraw/element";
+import { STROKE_OPTIONS, isFreeDrawElement } from "@excalidraw/element";
 import { useState, useEffect } from "react";
 
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
@@ -8,10 +8,10 @@ import { round } from "../../packages/math/src";
 
 export const FreedrawDebugSliders = () => {
   const [streamline, setStreamline] = useState<number>(
-    DRAWING_CONFIGS.default.streamline,
+    STROKE_OPTIONS.default.streamline,
   );
   const [simplify, setSimplify] = useState<number>(
-    DRAWING_CONFIGS.default.simplify,
+    STROKE_OPTIONS.default.simplify,
   );
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export const FreedrawDebugSliders = () => {
     if (!window.h.debugFreedraw) {
       window.h.debugFreedraw = {
         enabled: true,
-        ...DRAWING_CONFIGS.default,
+        ...STROKE_OPTIONS.default,
       };
     }
 

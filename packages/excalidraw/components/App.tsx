@@ -232,7 +232,7 @@ import {
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
-  DRAWING_CONFIGS,
+  STROKE_OPTIONS,
   getFreedrawConfig,
 } from "@excalidraw/element";
 
@@ -7494,7 +7494,7 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
-      drawingConfigs: {
+      strokeOptions: {
         fixedStrokeWidth: this.state.currentItemFixedStrokeWidth,
         streamline:
           (window.h?.debugFreedraw?.enabled
@@ -11171,7 +11171,7 @@ export const createTestHook = () => {
     // Initialize debug freedraw parameters
     window.h.debugFreedraw = {
       enabled: true,
-      ...(window.h.debugFreedraw || DRAWING_CONFIGS.default),
+      ...(window.h.debugFreedraw || STROKE_OPTIONS.default),
     };
 
     Object.defineProperties(window.h, {

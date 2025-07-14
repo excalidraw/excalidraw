@@ -8,7 +8,7 @@ import type { StrokeOptions } from "perfect-freehand";
 
 import type { ExcalidrawFreeDrawElement, PointerType } from "./types";
 
-export const DRAWING_CONFIGS: Record<
+export const STROKE_OPTIONS: Record<
   PointerType | "default",
   { streamline: number; simplify: number }
 > = {
@@ -33,8 +33,8 @@ export const DRAWING_CONFIGS: Record<
 
 export const getFreedrawConfig = (eventType: string | null | undefined) => {
   return (
-    DRAWING_CONFIGS[(eventType as PointerType | null) || "default"] ||
-    DRAWING_CONFIGS.default
+    STROKE_OPTIONS[(eventType as PointerType | null) || "default"] ||
+    STROKE_OPTIONS.default
   );
 };
 
@@ -78,7 +78,7 @@ const calculateVelocityBasedPressure = (
 export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
   // Compose points as [x, y, pressure]
   let points: [number, number, number][];
-  if (element.drawingConfigs?.fixedStrokeWidth) {
+  if (element.freedrawOptions?.fixedStrokeWidth) {
     points = element.points.map(
       ([x, y]: LocalPoint): [number, number, number] => [x, y, 1],
     );
@@ -90,7 +90,7 @@ export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
       calculateVelocityBasedPressure(
         element.points,
         i,
-        element.drawingConfigs?.fixedStrokeWidth,
+        element.freedrawOptions?.fixedStrokeWidth,
       ),
     ]);
   } else {
@@ -105,16 +105,16 @@ export const getFreedrawStroke = (element: ExcalidrawFreeDrawElement) => {
   }
 
   const streamline =
-    element.drawingConfigs?.streamline ?? DRAWING_CONFIGS.default.streamline;
+    element.freedrawOptions?.streamline ?? STROKE_OPTIONS.default.streamline;
   const simplify =
-    element.drawingConfigs?.simplify ?? DRAWING_CONFIGS.default.simplify;
+    element.freedrawOptions?.simplify ?? STROKE_OPTIONS.default.simplify;
 
   const laser = new LaserPointer({
     size: element.strokeWidth,
     streamline,
     simplify,
     sizeMapping: ({ pressure: t }) => {
-      if (element.drawingConfigs?.fixedStrokeWidth) {
+      if (element.freedrawOptions?.fixedStrokeWidth) {
         return 0.6;
       }
 
@@ -143,7 +143,7 @@ export const getFreeDrawSvgPath = (
   element: ExcalidrawFreeDrawElement,
 ): string => {
   // legacy, for backwards compatibility
-  if (element.drawingConfigs === null) {
+  if (element.freedrawOptions === null) {
     return _legacy_getFreeDrawSvgPath(element);
   }
 

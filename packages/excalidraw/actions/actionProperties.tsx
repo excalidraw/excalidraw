@@ -686,8 +686,8 @@ export const actionChangePressureSensitivity = register({
     const updatedElements = changeProperty(elements, appState, (el) => {
       if (isFreeDrawElement(el)) {
         return newElementWith(el, {
-          drawingConfigs: {
-            ...el.drawingConfigs,
+          freedrawOptions: {
+            ...el.freedrawOptions,
             fixedStrokeWidth: value,
           },
         });
@@ -709,7 +709,7 @@ export const actionChangePressureSensitivity = register({
       freedraws.length > 0
         ? reduceToCommonValue(
             freedraws,
-            (element) => element.drawingConfigs?.fixedStrokeWidth,
+            (element) => element.freedrawOptions?.fixedStrokeWidth,
           ) ?? null
         : appState.currentItemFixedStrokeWidth;
 
