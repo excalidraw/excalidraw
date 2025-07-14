@@ -9104,7 +9104,10 @@ class App extends React.Component<AppProps, AppState> {
 
         if (!pointerDownState.drag.hasOccurred && newElement && !multiElement) {
           if (this.device.isTouchScreen) {
-            const FIXED_DELTA_X = 100;
+            const FIXED_DELTA_X = Math.min(
+              (this.state.width * 0.7) / this.state.zoom.value,
+              100,
+            );
 
             this.scene.mutateElement(
               newElement,
