@@ -584,9 +584,9 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
           ))}
         </Section>
         {filteredIslands.length === 0 && <div className="no-match">
-            <div className="icon">{searchIcon}</div>{" "}
-            {t("helpDialog.search.noMatch")}
-          </div>}
+          <div className="icon">{searchIcon}</div>{" "}
+          {t("helpDialog.search.noMatch")}
+        </div>}
       </Dialog>
     </>
   );
