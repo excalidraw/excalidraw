@@ -6601,7 +6601,7 @@ class App extends React.Component<AppProps, AppState> {
       // For lasso tool, if we hit an element, select it immediately like normal selection
       if (pointerDownState.hit.element && !hitSelectedElement) {
         this.setState((prevState) => {
-          let nextSelectedElementIds: { [id: string]: true } = {
+          const nextSelectedElementIds: { [id: string]: true } = {
             ...prevState.selectedElementIds,
             [pointerDownState.hit.element!.id]: true,
           };
