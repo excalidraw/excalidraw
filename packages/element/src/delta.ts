@@ -1733,6 +1733,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         continue;
       }
 
+      if (!boundText.text) {
+        // skip redraw if the text is empty, as it would redraw the container incorreclty, according to the with empty text dimensions
+        continue;
+      }
+
       redrawTextBoundingBox(boundText, container, scene);
     }
   }
