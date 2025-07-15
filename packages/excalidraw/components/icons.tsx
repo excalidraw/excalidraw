@@ -2320,28 +2320,28 @@ export const strokeWidthVariableIcon = createIcon(
     <path
       d="M4 12 C 5 8, 6 8, 8 12"
       fill="none"
-      strokeWidth="4"
+      stroke-width="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M8 12 C 9 16, 10 16, 12 12"
       fill="none"
-      strokeWidth="3"
+      stroke-width="2"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M12 12 C 14 8, 15 8, 16 12"
       fill="none"
-      strokeWidth="2"
+      stroke-width="2.75"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M16 12 C 17 16, 18 16, 19 12"
       fill="none"
-      strokeWidth="1.75"
+      stroke-width="3.25"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
