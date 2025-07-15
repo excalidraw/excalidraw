@@ -9120,20 +9120,6 @@ class App extends React.Component<AppProps, AppState> {
               { informMutation: false, isDragging: false },
             );
 
-            LinearElementEditor.movePoints(
-              newElement,
-              this.scene,
-              new Map([
-                [
-                  1,
-                  {
-                    point: pointFrom<LocalPoint>(FIXED_DELTA_X, 0),
-                    isDragging: true,
-                  },
-                ],
-              ]),
-            );
-
             this.actionManager.executeAction(actionFinalize);
             this.setState({
               editingLinearElement: new LinearElementEditor(
