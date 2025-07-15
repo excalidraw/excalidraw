@@ -59,6 +59,8 @@ import { useStableCallback } from "../../hooks/useStableCallback";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { useStable } from "../../hooks/useStable";
 
+import { Ellipsify } from "../Ellipsify";
+
 import * as defaultItems from "./defaultCommandPaletteItems";
 
 import "./CommandPalette.scss";
@@ -68,7 +70,6 @@ import type { AppProps, AppState, UIAppState } from "../../types";
 import type { ShortcutName } from "../../actions/shortcuts";
 import type { TranslationKeys } from "../../i18n";
 import type { Action } from "../../actions/types";
-import { Ellipsify } from "../Ellipsify";
 
 const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 
