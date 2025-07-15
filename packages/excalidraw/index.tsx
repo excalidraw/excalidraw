@@ -281,6 +281,7 @@ export { Sidebar } from "./components/Sidebar/Sidebar";
 export { Button } from "./components/Button";
 export { Footer };
 export { MainMenu };
+export { Ellipsify } from "./components/Ellipsify";
 export { useDevice } from "./components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
