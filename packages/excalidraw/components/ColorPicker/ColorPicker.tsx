@@ -67,6 +67,7 @@ interface ColorPickerProps {
   palette?: ColorPaletteCustom | null;
   topPicks?: ColorTuple;
   updateData: (formData?: any) => void;
+  hideTopPicks?: boolean;
 }
 
 const ColorPickerPopupContent = ({
@@ -224,17 +225,26 @@ export const ColorPicker = ({
   topPicks,
   updateData,
   appState,
+  hideTopPicks = false,
 }: ColorPickerProps) => {
   return (
     <div>
-      <div role="dialog" aria-modal="true" className="color-picker-container">
-        <TopPicks
-          activeColor={color}
-          onChange={onChange}
-          type={type}
-          topPicks={topPicks}
-        />
-        <ButtonSeparator />
+      <div
+        role="dialog"
+        aria-modal="true"
+        className={clsx("color-picker-container", {
+          "color-picker-container--no-top-picks": hideTopPicks,
+        })}
+      >
+        {!hideTopPicks && (
+          <TopPicks
+            activeColor={color}
+            onChange={onChange}
+            type={type}
+            topPicks={topPicks}
+          />
+        )}
+        {!hideTopPicks && <ButtonSeparator />}
         <Popover.Root
           open={appState.openPopup === type}
           onOpenChange={(open) => {

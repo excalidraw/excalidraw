@@ -22,6 +22,12 @@
     @include isMobile {
       max-width: 11rem;
     }
+
+    &.color-picker-container--no-top-picks {
+      display: flex;
+      justify-content: center;
+      grid-template-columns: unset;
+    }
   }
 
   .color-picker__top-picks {
