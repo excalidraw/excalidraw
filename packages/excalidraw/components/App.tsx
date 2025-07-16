@@ -4925,7 +4925,17 @@ class App extends React.Component<AppProps, AppState> {
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
         const isDeleted = !nextOriginalText.trim();
-        updateElement(nextOriginalText, isDeleted);
+
+        if (isDeleted && !isExistingElement) {
+          // let's just remove the element from the scene, as it's an empty just created text element
+          this.scene.replaceAllElements(
+            this.scene
+              .getElementsIncludingDeleted()
+              .filter((x) => x.id !== element.id),
+          );
+        } else {
+          updateElement(nextOriginalText, isDeleted);
+        }
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -4954,9 +4964,10 @@ class App extends React.Component<AppProps, AppState> {
             element,
           ]);
         }
-        if (!isDeleted || isExistingElement) {
-          this.store.scheduleCapture();
-        }
+
+        // we need to record either way, whether the text element was added or removed
+        // since we need to sync this delta to other clients, otherwise it would end up with inconsistencies
+        this.store.scheduleCapture();
 
         flushSync(() => {
           this.setState({
