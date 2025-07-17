@@ -100,6 +100,7 @@ import {
   randomInteger,
   CLASSES,
   Emitter,
+  MINIMUM_ARROW_SIZE,
 } from "@excalidraw/common";
 
 import {
@@ -8151,7 +8152,9 @@ class App extends React.Component<AppProps, AppState> {
           pointDistance(
             pointFrom(pointerCoords.x, pointerCoords.y),
             pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
-          ) < DRAGGING_THRESHOLD
+          ) *
+            this.state.zoom.value <
+          MINIMUM_ARROW_SIZE
         ) {
           return;
         }
@@ -9102,7 +9105,18 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
-        if (!pointerDownState.drag.hasOccurred && newElement && !multiElement) {
+        const dragDistance =
+          pointDistance(
+            pointFrom(pointerCoords.x, pointerCoords.y),
+            pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
+          ) * this.state.zoom.value;
+
+        if (
+          (!pointerDownState.drag.hasOccurred ||
+            dragDistance < MINIMUM_ARROW_SIZE) &&
+          newElement &&
+          !multiElement
+        ) {
           if (this.device.isTouchScreen) {
             const FIXED_DELTA_X = Math.min(
               (this.state.width * 0.7) / this.state.zoom.value,
