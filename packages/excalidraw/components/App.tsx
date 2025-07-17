@@ -100,6 +100,8 @@ import {
   randomInteger,
   CLASSES,
   Emitter,
+  isMobileUA,
+  isMobilePlatform,
 } from "@excalidraw/common";
 
 import {
@@ -2384,6 +2386,19 @@ class App extends React.Component<AppProps, AppState> {
     if (isElementLink(window.location.href)) {
       this.scrollToContent(window.location.href, { animate: false });
     }
+  };
+
+  private isMobileOrTablet = (): boolean => {
+    // Touch + pointer accuracy
+    const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    const hasCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
+    const isTouchMobile = hasTouch && hasCoarsePointer;
+
+    // At least two indicators should be true
+    const indicators = [isMobileUA, isTouchMobile, isMobilePlatform];
+    const hasMultipleIndicators = indicators.filter(Boolean).length >= 2;
+
+    return hasMultipleIndicators;
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
@@ -6013,7 +6028,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       hasDeselectedButton ||
       (this.state.activeTool.type !== "selection" &&
-        this.state.activeTool.type !== "lasso" &&
+        (this.state.activeTool.type !== "lasso" || !this.isMobileOrTablet()) &&
         this.state.activeTool.type !== "text" &&
         this.state.activeTool.type !== "eraser")
     ) {
@@ -6187,7 +6202,7 @@ class App extends React.Component<AppProps, AppState> {
           ) {
             if (
               this.state.activeTool.type !== "lasso" ||
-              selectedElements.length > 0
+              (selectedElements.length > 0 && this.isMobileOrTablet())
             ) {
               setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
             }
@@ -6301,7 +6316,8 @@ class App extends React.Component<AppProps, AppState> {
           ) {
             if (
               this.state.activeTool.type !== "lasso" ||
-              Object.keys(this.state.selectedElementIds).length > 0
+              (Object.keys(this.state.selectedElementIds).length > 0 &&
+                this.isMobileOrTablet())
             ) {
               setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
             }
@@ -6315,7 +6331,8 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           if (
             this.state.activeTool.type !== "lasso" ||
-            Object.keys(this.state.selectedElementIds).length > 0
+            (Object.keys(this.state.selectedElementIds).length > 0 &&
+              this.isMobileOrTablet())
           ) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
           }
@@ -6583,13 +6600,16 @@ class App extends React.Component<AppProps, AppState> {
       const hitSelectedElement =
         pointerDownState.hit.element &&
         this.isASelectedElement(pointerDownState.hit.element);
+      const isMobileOrTablet = this.isMobileOrTablet();
 
-      // Start a new lasso ONLY if we're not interacting with an existing
+      // On PCs, we always want to start a new lasso path even when we're hitting some elements
+      // Otherwise, start a new lasso ONLY if we're not interacting with an existing
       // selection (move/resize/rotate).
       if (
-        !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
-        !pointerDownState.resize.handleType &&
-        !hitSelectedElement
+        !isMobileOrTablet ||
+        (!pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
+          !pointerDownState.resize.handleType &&
+          !hitSelectedElement)
       ) {
         this.lassoTrail.startPath(
           pointerDownState.origin.x,
@@ -6598,8 +6618,13 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
-      // For lasso tool, if we hit an element, select it immediately like normal selection
-      if (pointerDownState.hit.element && !hitSelectedElement) {
+      // When mobile & tablet, for lasso tool
+      // if we hit an element, select it immediately like normal selection
+      if (
+        isMobileOrTablet &&
+        pointerDownState.hit.element &&
+        !hitSelectedElement
+      ) {
         this.setState((prevState) => {
           const nextSelectedElementIds: { [id: string]: true } = {
             ...prevState.selectedElementIds,
@@ -7141,7 +7166,7 @@ class App extends React.Component<AppProps, AppState> {
   ): boolean => {
     if (
       this.state.activeTool.type === "selection" ||
-      this.state.activeTool.type === "lasso"
+      (this.state.activeTool.type === "lasso" && this.isMobileOrTablet())
     ) {
       const elements = this.scene.getNonDeletedElements();
       const elementsMap = this.scene.getNonDeletedElementsMap();
@@ -8387,7 +8412,8 @@ class App extends React.Component<AppProps, AppState> {
         (hasHitASelectedElement ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements ||
           (this.state.activeTool.type === "lasso" &&
-            pointerDownState.hit.element)) &&
+            pointerDownState.hit.element &&
+            this.isMobileOrTablet())) &&
         !isSelectingPointsInLineEditor &&
         (this.state.activeTool.type !== "lasso" ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements ||
@@ -8437,7 +8463,9 @@ class App extends React.Component<AppProps, AppState> {
           selectedElements.length > 0 &&
           !pointerDownState.withCmdOrCtrl &&
           !this.state.editingTextElement &&
-          this.state.activeEmbeddable?.state !== "active"
+          this.state.activeEmbeddable?.state !== "active" &&
+          // for lasso tool, only allow dragging on mobile or tablet devices
+          (this.state.activeTool.type !== "lasso" || this.isMobileOrTablet())
         ) {
           const dragOffset = {
             x: pointerCoords.x - pointerDownState.drag.origin.x,

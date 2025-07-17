@@ -25,6 +25,18 @@ export const isIOS =
 export const isBrave = () =>
   (navigator as any).brave?.isBrave?.name === "isBrave";
 
+// Mobile user agent detection
+export const isMobileUA =
+  /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
+    navigator.userAgent.toLowerCase(),
+  );
+
+// Mobile platform detection
+export const isMobilePlatform =
+  /android|ios|iphone|ipad|ipod|blackberry|windows phone/i.test(
+    navigator.platform.toLowerCase(),
+  );
+
 export const supportsResizeObserver =
   typeof window !== "undefined" && "ResizeObserver" in window;
 
