@@ -8094,16 +8094,12 @@ class App extends React.Component<AppProps, AppState> {
           this.scene,
         );
 
-        flushSync(() => {
-          if (this.state.selectedLinearElement) {
-            this.setState({
-              selectedLinearElement: {
-                ...this.state.selectedLinearElement,
-                segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
-                pointerDownState: ret.pointerDownState,
-              },
-            });
-          }
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
+            pointerDownState: ret.pointerDownState,
+          },
         });
         return;
       }
@@ -8615,23 +8611,21 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         if (event.altKey) {
-          flushSync(() => {
-            this.setActiveTool(
-              { type: "lasso", fromSelection: true },
-              event.shiftKey,
-            );
-            this.lassoTrail.startPath(
-              pointerDownState.origin.x,
-              pointerDownState.origin.y,
-              event.shiftKey,
-            );
-            this.setAppState({
-              selectionElement: null,
-            });
+          this.setActiveTool(
+            { type: "lasso", fromSelection: true },
+            event.shiftKey,
+          );
+          this.lassoTrail.startPath(
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            event.shiftKey,
+          );
+          this.setAppState({
+            selectionElement: null,
           });
-        } else {
-          this.maybeDragNewGenericElement(pointerDownState, event);
+          return;
         }
+        this.maybeDragNewGenericElement(pointerDownState, event);
       } else if (this.state.activeTool.type === "lasso") {
         if (!event.altKey && this.state.activeTool.fromSelection) {
           this.setActiveTool({ type: "selection" });
