@@ -46,8 +46,6 @@ import {
   hasStrokeWidth,
 } from "../scene";
 
-import { actionFinalize } from "../actions";
-
 import { SHAPES } from "./shapes";
 
 import "./Actions.scss";
@@ -506,19 +504,4 @@ export const ExitZenModeAction = ({
   >
     {t("buttons.exitZenMode")}
   </button>
-);
-
-export const FinalizeAction = ({
-  actionManager,
-  className,
-}: {
-  actionManager: ActionManager;
-  className?: string;
-}) => (
-  <div
-    className={`finalize-button ${className ?? ""}`}
-    onClick={() => actionManager.executeAction(actionFinalize)}
-  >
-    Finish
-  </div>
 );
