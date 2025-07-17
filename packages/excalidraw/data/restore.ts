@@ -302,6 +302,8 @@ const restoreElement = (
         lastCommittedPoint: null,
         simulatePressure: element.simulatePressure,
         pressures: element.pressures,
+        // legacy, for backwards compatibility
+        freedrawOptions: element.freedrawOptions ?? null,
       });
     }
     case "image":

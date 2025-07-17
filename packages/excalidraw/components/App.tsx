@@ -232,6 +232,8 @@ import {
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
+  STROKE_OPTIONS,
+  getFreedrawConfig,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -7489,7 +7491,12 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
-    const simulatePressure = event.pressure === 0.5;
+    const simulatePressure =
+      event.pressure === 0.5 || event.pressure === 0 || event.pressure === 1;
+
+    window.__lastPressure__ = event.pressure;
+
+    const freedrawConfig = getFreedrawConfig(event.pointerType);
 
     const element = newFreeDrawElement({
       type: elementType,
@@ -7504,6 +7511,17 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
+      strokeOptions: {
+        fixedStrokeWidth: this.state.currentItemFixedStrokeWidth,
+        streamline:
+          (window.h?.debugFreedraw?.enabled
+            ? window.h?.debugFreedraw?.streamline
+            : null) ?? freedrawConfig.streamline,
+        simplify:
+          (window.h?.debugFreedraw?.enabled
+            ? window.h?.debugFreedraw?.simplify
+            : null) ?? freedrawConfig.simplify,
+      },
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [pointFrom<LocalPoint>(0, 0)],
@@ -11145,6 +11163,7 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 declare global {
   interface Window {
+    __lastPressure__?: number;
     h: {
       scene: Scene;
       elements: readonly ExcalidrawElement[];
@@ -11153,6 +11172,11 @@ declare global {
       app: InstanceType<typeof App>;
       history: History;
       store: Store;
+      debugFreedraw?: {
+        streamline: number;
+        simplify: number;
+        enabled: boolean;
+      };
     };
   }
 }
@@ -11160,6 +11184,12 @@ declare global {
 export const createTestHook = () => {
   if (isTestEnv() || isDevEnv()) {
     window.h = window.h || ({} as Window["h"]);
+
+    // Initialize debug freedraw parameters
+    window.h.debugFreedraw = {
+      enabled: true,
+      ...(window.h.debugFreedraw || STROKE_OPTIONS.default),
+    };
 
     Object.defineProperties(window.h, {
       elements: {
