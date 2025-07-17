@@ -339,6 +339,12 @@ export interface AppState {
   currentHoveredFontFamily: FontFamilyValues | null;
   currentItemRoundness: StrokeRoundness;
   currentItemArrowType: "sharp" | "round" | "elbow";
+  eraserTargets: {
+    freedraw: boolean,
+    shape: boolean,
+    text: boolean,
+    image: boolean
+  },
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
