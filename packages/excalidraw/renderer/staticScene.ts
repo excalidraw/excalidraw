@@ -279,6 +279,19 @@ const _renderStaticScene = ({
 
   const inFrameGroupsMap = new Map<string, boolean>();
 
+  // Render raster layer (bitmap drawing) beneath all vector elements
+  if (appState.rasterLayer?.canvas && !isExporting) {
+    context.save();
+    
+    // Calculate the position to draw the raster layer
+    const rasterCanvas = appState.rasterLayer.canvas;
+    const canvasOffsetX = -rasterCanvas.width / 2 + appState.scrollX;
+    const canvasOffsetY = -rasterCanvas.height / 2 + appState.scrollY;
+    
+    context.drawImage(rasterCanvas, canvasOffsetX, canvasOffsetY);
+    context.restore();
+  }
+
   // Paint visible elements
   visibleElements
     .filter((el) => !isIframeLikeElement(el))

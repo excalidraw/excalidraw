@@ -147,9 +147,12 @@ export type ToolType =
   | "arrow"
   | "line"
   | "freedraw"
+  | "rasterpencil"  // Raster pencil tool for bitmap-based drawing (performance optimization)
   | "text"
   | "image"
   | "eraser"
+  | "rastereraser"  // Raster eraser tool for erasing bitmap content
+  | "rasterlasso"   // Raster lasso tool for selecting/moving bitmap content (placeholder)
   | "hand"
   | "frame"
   | "magicframe"
@@ -206,6 +209,8 @@ export type StaticCanvasAppState = Readonly<
     hoveredElementIds: AppState["hoveredElementIds"];
     // Cropping
     croppingElementId: AppState["croppingElementId"];
+    // Raster layer - bitmap drawing layer for improved performance on tablets/less powerful hardware
+    rasterLayer: AppState["rasterLayer"];
   }
 >;
 
@@ -444,6 +449,22 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+
+  /** 
+   * Raster layer for bitmap-based drawing tools
+   * Provides performance optimization for drawing operations by using a separate canvas
+   * for bitmap drawing instead of creating vector elements, reducing GPU load
+   */
+  rasterLayer: {
+    /** canvas element containing the bitmap data */
+    canvas: HTMLCanvasElement | null;
+    /** whether the raster layer needs to be redrawn */
+    isDirty: boolean;
+    /** whether we're currently drawing on the raster layer */
+    isDrawing: boolean;
+    /** last drawing point for smooth line interpolation */
+    lastPoint: { x: number; y: number } | null;
+  };
 }
 
 export type SearchMatch = {
