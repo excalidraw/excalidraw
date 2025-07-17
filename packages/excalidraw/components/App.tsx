@@ -9112,6 +9112,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.mutateElement(
               newElement,
               {
+                x: newElement.x - FIXED_DELTA_X / 2,
                 points: [
                   pointFrom<LocalPoint>(0, 0),
                   pointFrom<LocalPoint>(FIXED_DELTA_X, 0),
