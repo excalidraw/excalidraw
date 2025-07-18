@@ -1,0 +1,32 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .excalidraw-rulers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 10;
+
+    &__horizontal {
+      pointer-events: none;
+      user-select: none;
+    }
+
+    &__vertical {
+      pointer-events: none;
+      user-select: none;
+    }
+
+    &__corner {
+      pointer-events: none;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 500;
+      color: var(--text-color-secondary);
+    }
+  }
+}

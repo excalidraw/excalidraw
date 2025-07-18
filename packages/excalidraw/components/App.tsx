@@ -405,6 +405,7 @@ import { activeEyeDropperAtom } from "./EyeDropper";
 import FollowMode from "./FollowMode/FollowMode";
 import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
+import Rulers from "./Rulers";
 import { SVGLayer } from "./SVGLayer";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
@@ -1808,6 +1809,11 @@ class App extends React.Component<AppProps, AppState> {
                           onTouchMove={this.handleTouchMove}
                           onPointerDown={this.handleCanvasPointerDown}
                           onDoubleClick={this.handleCanvasDoubleClick}
+                        />
+                        <Rulers
+                          appState={this.state}
+                          width={this.state.width}
+                          height={this.state.height}
                         />
                         {this.state.userToFollow && (
                           <FollowMode
