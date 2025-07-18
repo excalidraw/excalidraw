@@ -154,11 +154,7 @@ export const actionFinalize = register({
 
     if (element) {
       // pen and mouse have hover
-      if (
-        appState.multiElement &&
-        element.type !== "freedraw" &&
-        appState.lastPointerDownWith !== "touch"
-      ) {
+      if (appState.multiElement && element.type !== "freedraw") {
         const { points, lastCommittedPoint } = element;
         if (
           !lastCommittedPoint ||
