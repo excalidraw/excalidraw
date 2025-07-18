@@ -5867,6 +5867,9 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerY,
         this,
       );
+      const linearElement = editingLinearElement
+        ? this.scene.getElement(editingLinearElement.elementId)
+        : null;
 
       if (
         editingLinearElement &&
@@ -5881,7 +5884,11 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
       }
-      if (editingLinearElement?.lastUncommittedPoint != null) {
+      if (
+        editingLinearElement?.lastUncommittedPoint != null &&
+        linearElement &&
+        isBindingElementType(linearElement.type)
+      ) {
         this.maybeSuggestBindingAtCursor(
           scenePointer,
           editingLinearElement.elbowed,
