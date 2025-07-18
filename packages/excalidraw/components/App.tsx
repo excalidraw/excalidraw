@@ -100,6 +100,7 @@ import {
   randomInteger,
   CLASSES,
   Emitter,
+  isMobile,
 } from "@excalidraw/common";
 
 import {
@@ -2384,6 +2385,14 @@ class App extends React.Component<AppProps, AppState> {
     if (isElementLink(window.location.href)) {
       this.scrollToContent(window.location.href, { animate: false });
     }
+  };
+
+  private isMobileOrTablet = (): boolean => {
+    const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    const hasCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
+    const isTouchMobile = hasTouch && hasCoarsePointer;
+
+    return isMobile || isTouchMobile;
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
@@ -6024,6 +6033,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       hasDeselectedButton ||
       (this.state.activeTool.type !== "selection" &&
+        this.state.activeTool.type !== "lasso" &&
         this.state.activeTool.type !== "text" &&
         this.state.activeTool.type !== "eraser")
     ) {
@@ -6195,7 +6205,12 @@ class App extends React.Component<AppProps, AppState> {
             !isElbowArrow(hitElement) ||
             !(hitElement.startBinding || hitElement.endBinding)
           ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            if (
+              this.state.activeTool.type !== "lasso" ||
+              selectedElements.length > 0
+            ) {
+              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            }
             if (this.state.activeEmbeddable?.state === "hover") {
               this.setState({ activeEmbeddable: null });
             }
@@ -6304,7 +6319,12 @@ class App extends React.Component<AppProps, AppState> {
             !isElbowArrow(element) ||
             !(element.startBinding || element.endBinding)
           ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            if (
+              this.state.activeTool.type !== "lasso" ||
+              Object.keys(this.state.selectedElementIds).length > 0
+            ) {
+              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            }
           }
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
@@ -6313,7 +6333,12 @@ class App extends React.Component<AppProps, AppState> {
           !isElbowArrow(element) ||
           !(element.startBinding || element.endBinding)
         ) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          if (
+            this.state.activeTool.type !== "lasso" ||
+            Object.keys(this.state.selectedElementIds).length > 0
+          ) {
+            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          }
         }
       }
 
@@ -6575,11 +6600,119 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (this.state.activeTool.type === "lasso") {
-      this.lassoTrail.startPath(
-        pointerDownState.origin.x,
-        pointerDownState.origin.y,
-        event.shiftKey,
-      );
+      const hitSelectedElement =
+        pointerDownState.hit.element &&
+        this.isASelectedElement(pointerDownState.hit.element);
+
+      const isMobileOrTablet = this.isMobileOrTablet();
+
+      if (
+        !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
+        !pointerDownState.resize.handleType &&
+        !hitSelectedElement
+      ) {
+        this.lassoTrail.startPath(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          event.shiftKey,
+        );
+
+        // block dragging after lasso selection on PCs until the next pointer down
+        // (on mobile or tablet, we want to allow user to drag immediately)
+        pointerDownState.drag.blockDragging = !isMobileOrTablet;
+      }
+
+      // only for mobile or tablet, if we hit an element, select it immediately like normal selection
+      if (
+        isMobileOrTablet &&
+        pointerDownState.hit.element &&
+        !hitSelectedElement
+      ) {
+        this.setState((prevState) => {
+          const nextSelectedElementIds: { [id: string]: true } = {
+            ...prevState.selectedElementIds,
+            [pointerDownState.hit.element!.id]: true,
+          };
+
+          const previouslySelectedElements: ExcalidrawElement[] = [];
+
+          Object.keys(prevState.selectedElementIds).forEach((id) => {
+            const element = this.scene.getElement(id);
+            element && previouslySelectedElements.push(element);
+          });
+
+          const hitElement = pointerDownState.hit.element!;
+
+          // if hitElement is frame-like, deselect all of its elements
+          // if they are selected
+          if (isFrameLikeElement(hitElement)) {
+            getFrameChildren(previouslySelectedElements, hitElement.id).forEach(
+              (element) => {
+                delete nextSelectedElementIds[element.id];
+              },
+            );
+          } else if (hitElement.frameId) {
+            // if hitElement is in a frame and its frame has been selected
+            // disable selection for the given element
+            if (nextSelectedElementIds[hitElement.frameId]) {
+              delete nextSelectedElementIds[hitElement.id];
+            }
+          } else {
+            // hitElement is neither a frame nor an element in a frame
+            // but since hitElement could be in a group with some frames
+            // this means selecting hitElement will have the frames selected as well
+            // because we want to keep the invariant:
+            // - frames and their elements are not selected at the same time
+            // we deselect elements in those frames that were previously selected
+
+            const groupIds = hitElement.groupIds;
+            const framesInGroups = new Set(
+              groupIds
+                .flatMap((gid) =>
+                  getElementsInGroup(this.scene.getNonDeletedElements(), gid),
+                )
+                .filter((element) => isFrameLikeElement(element))
+                .map((frame) => frame.id),
+            );
+
+            if (framesInGroups.size > 0) {
+              previouslySelectedElements.forEach((element) => {
+                if (element.frameId && framesInGroups.has(element.frameId)) {
+                  // deselect element and groups containing the element
+                  delete nextSelectedElementIds[element.id];
+                  element.groupIds
+                    .flatMap((gid) =>
+                      getElementsInGroup(
+                        this.scene.getNonDeletedElements(),
+                        gid,
+                      ),
+                    )
+                    .forEach((element) => {
+                      delete nextSelectedElementIds[element.id];
+                    });
+                }
+              });
+            }
+          }
+
+          return {
+            ...selectGroupsForSelectedElements(
+              {
+                editingGroupId: prevState.editingGroupId,
+                selectedElementIds: nextSelectedElementIds,
+              },
+              this.scene.getNonDeletedElements(),
+              prevState,
+              this,
+            ),
+            showHyperlinkPopup:
+              hitElement.link || isEmbeddableElement(hitElement)
+                ? "info"
+                : false,
+          };
+        });
+        pointerDownState.hit.wasAddedToSelection = true;
+      }
     } else if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
     } else if (
@@ -6959,6 +7092,7 @@ class App extends React.Component<AppProps, AppState> {
         hasOccurred: false,
         offset: null,
         origin: { ...origin },
+        blockDragging: false,
       },
       eventListeners: {
         onMove: null,
@@ -7034,7 +7168,10 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
-    if (this.state.activeTool.type === "selection") {
+    if (
+      this.state.activeTool.type === "selection" ||
+      this.state.activeTool.type === "lasso"
+    ) {
       const elements = this.scene.getNonDeletedElements();
       const elementsMap = this.scene.getNonDeletedElementsMap();
       const selectedElements = this.scene.getSelectedElements(this.state);
@@ -7246,7 +7383,18 @@ class App extends React.Component<AppProps, AppState> {
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
           if (event[KEYS.CTRL_OR_CMD]) {
             if (event.altKey) {
-              // ctrl + alt means we're lasso selecting
+              // ctrl + alt means we're lasso selecting - start lasso trail and switch to lasso tool
+
+              // Close any open dialogs that might interfere with lasso selection
+              if (this.state.openDialog?.name === "elementLinkSelector") {
+                this.setOpenDialog(null);
+              }
+              this.lassoTrail.startPath(
+                pointerDownState.origin.x,
+                pointerDownState.origin.y,
+                event.shiftKey,
+              );
+              this.setActiveTool({ type: "lasso", fromSelection: true });
               return false;
             }
             if (!this.state.selectedElementIds[hitElement.id]) {
@@ -8268,11 +8416,13 @@ class App extends React.Component<AppProps, AppState> {
         (hasHitASelectedElement ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
         !isSelectingPointsInLineEditor &&
-        this.state.activeTool.type !== "lasso"
+        !pointerDownState.drag.blockDragging
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
-
-        if (selectedElements.every((element) => element.locked)) {
+        if (
+          selectedElements.length > 0 &&
+          selectedElements.every((element) => element.locked)
+        ) {
           return;
         }
 
@@ -8292,6 +8442,17 @@ class App extends React.Component<AppProps, AppState> {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
         pointerDownState.drag.hasOccurred = true;
+
+        // Clear lasso trail when starting to drag selected elements with lasso tool
+        // Only clear if we're actually dragging (not during lasso selection)
+        if (
+          this.state.activeTool.type === "lasso" &&
+          selectedElements.length > 0 &&
+          pointerDownState.drag.hasOccurred &&
+          !this.state.activeTool.fromSelection
+        ) {
+          this.lassoTrail.endPath();
+        }
 
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
@@ -8889,6 +9050,7 @@ class App extends React.Component<AppProps, AppState> {
   ): (event: PointerEvent) => void {
     return withBatchedUpdates((childEvent: PointerEvent) => {
       this.removePointer(childEvent);
+      pointerDownState.drag.blockDragging = false;
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
       }
