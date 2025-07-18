@@ -100,8 +100,7 @@ import {
   randomInteger,
   CLASSES,
   Emitter,
-  isMobileUA,
-  isMobilePlatform,
+  isMobile,
 } from "@excalidraw/common";
 
 import {
@@ -2389,16 +2388,11 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private isMobileOrTablet = (): boolean => {
-    // Touch + pointer accuracy
     const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     const hasCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
     const isTouchMobile = hasTouch && hasCoarsePointer;
 
-    // At least two indicators should be true
-    const indicators = [isMobileUA, isTouchMobile, isMobilePlatform];
-    const hasMultipleIndicators = indicators.filter(Boolean).length >= 2;
-
-    return hasMultipleIndicators;
+    return isMobile || isTouchMobile;
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
