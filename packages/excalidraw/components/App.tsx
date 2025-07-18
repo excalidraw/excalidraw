@@ -9136,12 +9136,6 @@ class App extends React.Component<AppProps, AppState> {
             );
 
             this.actionManager.executeAction(actionFinalize);
-            this.setState({
-              editingLinearElement: new LinearElementEditor(
-                newElement,
-                this.scene.getNonDeletedElementsMap(),
-              ),
-            });
           } else {
             const dx = pointerCoords.x - newElement.x;
             const dy = pointerCoords.y - newElement.y;
