@@ -294,12 +294,18 @@ const Panel = ({
 
   const SHAPES: [string, ReactNode][] =
     conversionType === "linear"
-      ? [
-          ["line", LineIcon],
-          ["sharpArrow", sharpArrowIcon],
-          ["curvedArrow", roundArrowIcon],
-          ["elbowArrow", elbowArrowIcon],
-        ]
+      ? hasBoundArrows(elements)
+        ? [
+            ["sharpArrow", sharpArrowIcon],
+            ["curvedArrow", roundArrowIcon],
+            ["elbowArrow", elbowArrowIcon],
+          ]
+        : [
+            ["line", LineIcon],
+            ["sharpArrow", sharpArrowIcon],
+            ["curvedArrow", roundArrowIcon],
+            ["elbowArrow", elbowArrowIcon],
+          ]
       : conversionType === "generic"
       ? [
           ["rectangle", RectangleIcon],
@@ -522,6 +528,10 @@ export const convertElementTypes = (
         LINEAR_TYPES[
           (index + LINEAR_TYPES.length + advancement) % LINEAR_TYPES.length
         ];
+
+      if (hasBoundArrows(selectedElements) && nextType === "line") {
+        nextType = LINEAR_TYPES[LINEAR_TYPES.indexOf("line") + 1];
+      }
     }
 
     if (isConvertibleLinearType(nextType)) {
@@ -657,8 +667,7 @@ export const getConversionTypeFromElements = (
 const isEligibleLinearElement = (element: ExcalidrawElement) => {
   return (
     isLinearElement(element) &&
-    (!isArrowElement(element) ||
-      (!isArrowBoundToElement(element) && !hasBoundTextElement(element)))
+    (!isArrowElement(element) || !hasBoundTextElement(element))
   );
 };
 
@@ -868,6 +877,8 @@ const convertElementType = <
             roundness: null,
             startArrowhead: app.state.currentItemStartArrowhead,
             endArrowhead: app.state.currentItemEndArrowhead,
+            startBinding: isArrowElement(element) ? element.startBinding : null,
+            endBinding: isArrowElement(element) ? element.endBinding : null,
           }),
         );
       }
@@ -882,6 +893,8 @@ const convertElementType = <
             },
             startArrowhead: app.state.currentItemStartArrowhead,
             endArrowhead: app.state.currentItemEndArrowhead,
+            startBinding: isArrowElement(element) ? element.startBinding : null,
+            endBinding: isArrowElement(element) ? element.endBinding : null,
           }),
         );
       }
@@ -891,8 +904,10 @@ const convertElementType = <
             ...element,
             type: "arrow",
             elbowed: true,
-            fixedSegments: null,
+            fixedSegments: [],
             roundness: null,
+            startBinding: isArrowElement(element) ? element.startBinding : null,
+            endBinding: isArrowElement(element) ? element.endBinding : null,
           }),
         );
       }
@@ -934,6 +949,15 @@ const getConvertibleType = (
     return getLinearElementSubType(element);
   }
   return element.type;
+};
+
+const hasBoundArrows = (elements: ExcalidrawElement[]) => {
+  for (const element of elements) {
+    if (isArrowElement(element) && isArrowBoundToElement(element)) {
+      return true;
+    }
+  }
+  return false;
 };
 
 export default ConvertElementTypePopup;
