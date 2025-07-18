@@ -88,6 +88,8 @@ import {
   ExportToExcalidrawPlus,
   exportToExcalidrawPlus,
 } from "./components/ExportToExcalidrawPlus";
+import { exportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
+import { ExcalLogo, exportToPlus, share, usersIcon } from "@excalidraw/excalidraw/components/icons";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 
 import {
@@ -746,7 +748,8 @@ const ExcalidrawWrapper = () => {
     );
   }
 
-  label: "GamifyBoard",
+    const ExcalidrawPlusCommand = {
+    label: "GamifyBoard",
     category: DEFAULT_CATEGORIES.links,
     predicate: true,
     icon: <img src="/new-logo.svg" style={{ width: 14 }} alt="GamifyBoard Logo" />,
