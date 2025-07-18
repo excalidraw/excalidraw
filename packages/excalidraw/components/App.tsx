@@ -5894,10 +5894,7 @@ class App extends React.Component<AppProps, AppState> {
           editingLinearElement.elbowed,
         );
       } else if (this.state.suggestedBindings.length) {
-        // causes stack overflow if not sync
-        flushSync(() => {
-          this.setState({ suggestedBindings: [] });
-        });
+        this.setState({ suggestedBindings: [] });
       }
     }
 
