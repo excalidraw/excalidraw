@@ -91,6 +91,7 @@ import {
 import { exportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 import { ExcalLogo, exportToPlus, share, usersIcon } from "@excalidraw/excalidraw/components/icons";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
+import { GamifyToolbar } from "./components/GamifyToolbar";
 
 import {
   exportToBackend,
@@ -852,6 +853,7 @@ const ExcalidrawWrapper = () => {
             </div>
           );
         }}
+        renderCustomSidebar={() => <GamifyToolbar />}
         onLinkOpen={(element, event) => {
           if (element.link && isElementLink(element.link)) {
             event.preventDefault();
