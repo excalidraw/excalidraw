@@ -26,7 +26,7 @@ import {
 import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
 
 import {
-  bindLinearElement,
+  bindBindingElement,
   calculateFixedPointForElbowArrowBinding,
   updateBoundElements,
 } from "@excalidraw/element";
@@ -1717,7 +1717,13 @@ export const actionChangeArrowType = register({
             newElement.startBinding.elementId,
           ) as ExcalidrawBindableElement;
           if (startElement) {
-            bindLinearElement(newElement, startElement, "start", app.scene);
+            bindBindingElement(
+              newElement,
+              startElement,
+              appState.bindMode === "inside" ? "inside" : "orbit",
+              "start",
+              app.scene,
+            );
           }
         }
         if (newElement.endBinding) {
@@ -1725,7 +1731,13 @@ export const actionChangeArrowType = register({
             newElement.endBinding.elementId,
           ) as ExcalidrawBindableElement;
           if (endElement) {
-            bindLinearElement(newElement, endElement, "end", app.scene);
+            bindBindingElement(
+              newElement,
+              endElement,
+              appState.bindMode === "inside" ? "inside" : "orbit",
+              "end",
+              app.scene,
+            );
           }
         }
       }

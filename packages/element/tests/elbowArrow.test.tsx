@@ -1,13 +1,10 @@
 import { ARROW_TYPE } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 import { Excalidraw } from "@excalidraw/excalidraw";
-
 import { actionSelectAll } from "@excalidraw/excalidraw/actions";
 import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions/actionDuplicateSelection";
-
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
-
 import {
   act,
   fireEvent,
@@ -15,12 +12,10 @@ import {
   queryByTestId,
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
-
 import "@excalidraw/utils/test-utils";
+import { bindBindingElement } from "@excalidraw/element";
 
 import type { LocalPoint } from "@excalidraw/math";
-
-import { bindLinearElement } from "../src/binding";
 
 import { Scene } from "../src/Scene";
 
@@ -189,8 +184,8 @@ describe("elbow arrow routing", () => {
     scene.insertElement(rectangle2);
     scene.insertElement(arrow);
 
-    bindLinearElement(arrow, rectangle1, "start", scene);
-    bindLinearElement(arrow, rectangle2, "end", scene);
+    bindBindingElement(arrow, rectangle1, "orbit", "start", scene);
+    bindBindingElement(arrow, rectangle2, "orbit", "end", scene);
 
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);

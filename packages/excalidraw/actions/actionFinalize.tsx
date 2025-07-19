@@ -1,11 +1,13 @@
 import { pointFrom } from "@excalidraw/math";
 
+import { bindOrUnbindBindingElement } from "@excalidraw/element/binding";
 import {
-  maybeBindLinearElement,
-  bindOrUnbindLinearElement,
-  isBindingEnabled,
-} from "@excalidraw/element/binding";
-import { isValidPolygon, LinearElementEditor } from "@excalidraw/element";
+  getHoveredElementForBinding,
+  isArrowElement,
+  isValidPolygon,
+  LinearElementEditor,
+  moveArrowAboveBindable,
+} from "@excalidraw/element";
 
 import {
   isBindingElement,
@@ -17,7 +19,7 @@ import {
 import {
   KEYS,
   arrayToMap,
-  tupleToCoors,
+  invariant,
   updateActiveTool,
 } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element";
@@ -26,8 +28,9 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { LocalPoint } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
@@ -47,6 +50,7 @@ export const actionFinalize = register({
   label: "",
   trackEvent: false,
   perform: (elements, appState, data, app) => {
+    let newElements = elements;
     const { interactiveCanvas, focusContainer, scene } = app;
     const { event, sceneCoords } =
       (data as {
@@ -56,6 +60,28 @@ export const actionFinalize = register({
     const elementsMap = scene.getNonDeletedElementsMap();
 
     if (event && appState.selectedLinearElement) {
+      const element = LinearElementEditor.getElement<ExcalidrawArrowElement>(
+        appState.selectedLinearElement.elementId,
+        elementsMap,
+      );
+
+      invariant(
+        element,
+        "Arrow element should exist if selectedLinearElement is set",
+      );
+
+      const draggedPoints =
+        appState.selectedLinearElement.selectedPointsIndices?.reduce(
+          (map, index) => {
+            map.set(index, {
+              point: element.points[index],
+              draggedPoints: true,
+            });
+
+            return map;
+          },
+          new Map(),
+        ) ?? new Map();
       const linearElementEditor = LinearElementEditor.handlePointerUp(
         event,
         appState.selectedLinearElement,
@@ -63,19 +89,22 @@ export const actionFinalize = register({
         app.scene,
       );
 
-      const { startBindingElement, endBindingElement } = linearElementEditor;
-      const element = app.scene.getElement(linearElementEditor.elementId);
-      if (isBindingElement(element)) {
-        bindOrUnbindLinearElement(
-          element,
-          startBindingElement,
-          endBindingElement,
-          app.scene,
-        );
-      }
+      const { start, end } = bindOrUnbindBindingElement(
+        element,
+        draggedPoints,
+        scene,
+        appState,
+      );
+      const bindableIds = [];
+      start.element && bindableIds.push(start.element.id);
+      end.element && bindableIds.push(end.element.id);
+      newElements = moveArrowAboveBindable(element, bindableIds, scene);
 
       if (linearElementEditor !== appState.selectedLinearElement) {
-        let newElements = elements;
+        // `handlePointerUp()` updated the linear element instance,
+        // so filter out this element if it is too small,
+        // but do an update to all new elements anyway for undo/redo purposes.
+
         if (element && isInvisiblySmallElement(element)) {
           // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
           newElements = newElements.filter((el) => el.id !== element!.id);
@@ -94,20 +123,34 @@ export const actionFinalize = register({
       }
     }
 
-    if (appState.editingLinearElement) {
-      const { elementId, startBindingElement, endBindingElement } =
-        appState.editingLinearElement;
+    if (appState.editingLinearElement && !appState.newElement) {
+      const { elementId } = appState.editingLinearElement;
       const element = LinearElementEditor.getElement(elementId, elementsMap);
 
       if (element) {
-        if (isBindingElement(element)) {
-          bindOrUnbindLinearElement(
-            element,
-            startBindingElement,
-            endBindingElement,
-            scene,
-          );
+        if (isArrowElement(element)) {
+          const updates =
+            appState.editingLinearElement?.pointerDownState.prevSelectedPointsIndices?.reduce(
+              (updates, index) => {
+                updates.set(index, {
+                  point: element.points[index],
+                  draggedPoints: true,
+                });
+
+                return updates;
+              },
+              new Map(),
+            ) ?? new Map();
+          const allPointsSelected =
+            appState.editingLinearElement?.pointerDownState
+              .prevSelectedPointsIndices?.length === element.points.length;
+
+          // Dragging the entire arrow doesn't allow binding.
+          if (!allPointsSelected) {
+            bindOrUnbindBindingElement(element, updates, scene, appState);
+          }
         }
+
         if (isLineElement(element) && !isValidPolygon(element.points)) {
           scene.mutateElement(element, {
             polygon: false,
@@ -117,7 +160,7 @@ export const actionFinalize = register({
         return {
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
-              ? elements.filter((el) => el.id !== element.id)
+              ? newElements.filter((el) => el.id !== element.id)
               : undefined,
           appState: {
             ...appState,
@@ -128,8 +171,6 @@ export const actionFinalize = register({
         };
       }
     }
-
-    let newElements = elements;
 
     if (window.document.activeElement instanceof HTMLElement) {
       focusContainer();
@@ -159,10 +200,21 @@ export const actionFinalize = register({
         element.type !== "freedraw" &&
         appState.lastPointerDownWith !== "touch"
       ) {
-        const { points, lastCommittedPoint } = element;
+        const { x: rx, y: ry, points, lastCommittedPoint } = element;
+        const lastGlobalPoint = pointFrom<GlobalPoint>(
+          rx + points[points.length - 1][0],
+          ry + points[points.length - 1][1],
+        );
+        const hoveredElementForBinding = getHoveredElementForBinding(
+          lastGlobalPoint,
+          app.scene.getNonDeletedElements(),
+          elementsMap,
+          app.state.zoom,
+        );
         if (
-          !lastCommittedPoint ||
-          points[points.length - 1] !== lastCommittedPoint
+          !hoveredElementForBinding &&
+          (!lastCommittedPoint ||
+            points[points.length - 1] !== lastCommittedPoint)
         ) {
           scene.mutateElement(element, {
             points: element.points.slice(0, -1),
@@ -207,23 +259,34 @@ export const actionFinalize = register({
           });
         }
 
-        if (
-          isBindingElement(element) &&
-          !isLoop &&
-          element.points.length > 1 &&
-          isBindingEnabled(appState)
-        ) {
-          const coords =
-            sceneCoords ??
-            tupleToCoors(
-              LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        if (isBindingElement(element) && !isLoop && element.points.length > 1) {
+          const coords = sceneCoords
+            ? pointFrom<GlobalPoint>(sceneCoords.x, sceneCoords.y)
+            : LinearElementEditor.getPointAtIndexGlobalCoordinates(
                 element,
                 -1,
-                arrayToMap(elements),
-              ),
-            );
-
-          maybeBindLinearElement(element, appState, coords, scene);
+                arrayToMap(newElements),
+              );
+          const point = LinearElementEditor.pointFromAbsoluteCoords(
+            element,
+            coords,
+            elementsMap,
+          );
+          bindOrUnbindBindingElement(
+            element,
+            new Map([
+              [
+                element.points.length - 1,
+                {
+                  point,
+                  isDragging: false,
+                },
+              ],
+            ]),
+            scene,
+            appState,
+            { newArrow: true },
+          );
         }
       }
     }
@@ -282,6 +345,17 @@ export const actionFinalize = register({
           element && isLinearElement(element)
             ? new LinearElementEditor(element, arrayToMap(newElements))
             : appState.selectedLinearElement,
+        editingLinearElement: appState.newElement
+          ? null
+          : appState.editingLinearElement
+          ? {
+              ...appState.editingLinearElement,
+              pointerDownState: {
+                ...appState.editingLinearElement.pointerDownState,
+                arrowOriginalStartPoint: undefined,
+              },
+            }
+          : null,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,

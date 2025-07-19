@@ -17,7 +17,6 @@ import {
   BinaryHeap,
   invariant,
   isAnyTrue,
-  tupleToCoors,
   getSizeFromPoints,
   isDevEnv,
   arrayToMap,
@@ -30,7 +29,6 @@ import {
   FIXED_BINDING_DISTANCE,
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
-  getHoveredElementForBinding,
 } from "./binding";
 import { distanceToElement } from "./distance";
 import {
@@ -51,8 +49,8 @@ import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
 } from "./types";
-
 import { aabbForElement, pointInsideBounds } from "./bounds";
+import { getHoveredElementForBinding } from "./collision";
 
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
@@ -63,6 +61,7 @@ import type {
   FixedPointBinding,
   FixedSegment,
   NonDeletedExcalidrawElement,
+  Ordered,
 } from "./types";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
@@ -2249,17 +2248,10 @@ const getBindPointHeading = (
 const getHoveredElement = (
   origPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   zoom?: AppState["zoom"],
 ) => {
-  return getHoveredElementForBinding(
-    tupleToCoors(origPoint),
-    elements,
-    elementsMap,
-    zoom,
-    true,
-    true,
-  );
+  return getHoveredElementForBinding(origPoint, elements, elementsMap, zoom);
 };
 
 const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>

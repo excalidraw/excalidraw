@@ -16,7 +16,7 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import { bindLinearElement } from "@excalidraw/element";
+import { bindBindingElement } from "@excalidraw/element";
 import {
   newArrowElement,
   newElement,
@@ -60,7 +60,6 @@ import type {
   TextAlign,
   VerticalAlign,
 } from "@excalidraw/element/types";
-
 import type { MarkOptional } from "@excalidraw/common/utility-types";
 
 export type ValidLinearElement = {
@@ -330,9 +329,10 @@ const bindLinearElementToElement = (
         }
       }
 
-      bindLinearElement(
+      bindBindingElement(
         linearElement,
         startBoundElement as ExcalidrawBindableElement,
+        "orbit",
         "start",
         scene,
       );
@@ -405,9 +405,10 @@ const bindLinearElementToElement = (
         }
       }
 
-      bindLinearElement(
+      bindBindingElement(
         linearElement,
         endBoundElement as ExcalidrawBindableElement,
+        "orbit",
         "end",
         scene,
       );

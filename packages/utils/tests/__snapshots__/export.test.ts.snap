@@ -11,6 +11,7 @@ exports[`exportToSvg > with default arguments 1`] = `
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
