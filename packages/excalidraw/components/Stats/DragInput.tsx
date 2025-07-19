@@ -346,10 +346,29 @@ const StatsDragInput = <
             const eventTarget = event.target;
             if (
               eventTarget instanceof HTMLInputElement &&
-              event.key === KEYS.ENTER
+              (
+                [KEYS.ENTER, KEYS.ARROW_UP, KEYS.ARROW_DOWN] as string[]
+              ).includes(event.key)
             ) {
+              if (!isNaN(eventTarget.value)) {
+                if (event.key === KEYS.ARROW_UP) {
+                  stateRef.current.updatePending = true;
+                  eventTarget.value = (
+                    parseFloat(eventTarget.value) + 1
+                  ).toString();
+                } else if (event.key === KEYS.ARROW_DOWN) {
+                  stateRef.current.updatePending = true;
+                  eventTarget.value = (
+                    parseFloat(eventTarget.value) - 1
+                  ).toString();
+                }
+              }
+
               handleInputValue(eventTarget.value, elements, appState);
-              app.focusContainer();
+
+              if (event.key === KEYS.ENTER) {
+                app.focusContainer();
+              }
             }
           }
         }}
