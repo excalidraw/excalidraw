@@ -99,17 +99,11 @@ export const ExportToExcalidrawPlus: React.FC<{
   return (
     <Card color="primary">
       <div className="Card-icon">
-        <ExcalidrawLogo
-          style={{
-            [`--color-logo-icon` as any]: "#fff",
-            width: "2.8rem",
-            height: "2.8rem",
-          }}
-        />
+        <img src="/new-logo.svg" alt="GamifyBoard Logo" style={{ width: "2.8rem", height: "2.8rem" }} />
       </div>
-      <h2>Excalidraw+</h2>
+      <h2>GamifyBoard</h2>
       <div className="Card-details">
-        {t("exportDialog.excalidrawplus_description")}
+        {t("exportDialog.gamifyboard_description")}
       </div>
       <ToolButton
         className="Card-button"
