@@ -24,17 +24,27 @@ Jeder Entwickler (menschlich oder KI) ist verpflichtet, vor Arbeitsbeginn die ne
 
 - **Datum:** 20. Juli 2025
 - **Tasks:**
-    - [x] Task 1.1: `index.html` <title> auf "GamifyBoard" geändert.
-    - [x] Task 1.1.1: Alle Metadaten und h1-Tags in `index.html` auf "GamifyBoard" aktualisiert.
-    - [x] Task 1.2: Social-Media-Links aus `DefaultItems.tsx` entfernt, um Snapshot-Konflikte zu lösen.
-    - [ ] Task 1.3 & 1.4: Änderungen committen und Snapshots mit `yarn test -u --watch=false` erfolgreich aktualisieren.
+  - [x] Task 1.1: `index.html` <title> auf "GamifyBoard" geändert.
+  - [x] Task 1.1.1: Alle Metadaten und h1-Tags in `index.html` auf "GamifyBoard" aktualisiert.
+  - [x] Task 1.2: Social-Media-Links aus `DefaultItems.tsx` entfernt, um Snapshot-Konflikte zu lösen.
+  - [ ] Task 1.3 & 1.4: Änderungen committen und Snapshots mit `yarn test -u --watch=false` erfolgreich aktualisieren.
 - **Status:** Abgeschlossen. Die Tests laufen nun sauber durch.
 
 ## Meilenstein 2: Implementierung der Gamify-Toolbar (Als nächstes)
 
 - **Datum:** 20. Juli 2025
 - **Tasks:**
-    - [ ] Task 2.1: Erstellung der `GamifyToolbar.tsx` Komponente.
-    - [ ] Task 2.2: Implementierung der Logik für den "Spiel-Set erstellen"-Button.
-    - [ ] Task 2.3: Integration der Toolbar in `App.tsx`.
-- **Status:** Offen.
+  - [ ] Task 2.1: Erstellung der `GamifyToolbar.tsx` Komponente.
+  - [ ] Task 2.2: Implementierung der Logik für den "Spiel-Set erstellen"-Button.
+  - [ ] Task 2.3: Integration der Toolbar in `App.tsx`.
+- **Status:** In Bearbeitung.
+
+- **Update:**
+  - **Datum:** 20. Juli 2025
+  - **Fortschritt:**
+    - Task 2.1: `GamifyToolbar.tsx` Komponente erstellt.
+    - Task 2.2: Logik für den "Spiel-Set erstellen"-Button implementiert.
+    - TypeScript- und ESLint-Fehler in `GamifyToolbar.tsx` und `ExportToExcalidrawPlus.tsx` behoben.
+  - **Nächste Schritte:**
+    - Task 2.3: Integration der Toolbar in `App.tsx` abschließen.
+    - Runtime-Verhalten verifizieren.
