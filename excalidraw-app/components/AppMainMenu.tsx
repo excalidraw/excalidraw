@@ -1,8 +1,4 @@
-import {
-  loginIcon,
-  ExcalLogo,
-  eyeIcon,
-} from "@excalidraw/excalidraw/components/icons";
+import { loginIcon, eyeIcon } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
 
@@ -40,7 +36,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
-      
+
       <MainMenu.DefaultItems.Socials />
       <MainMenu.ItemLink
         icon={loginIcon}
