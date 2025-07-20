@@ -443,6 +443,39 @@ const ExcalidrawWrapper = () => {
   }, [excalidrawAPI]);
 
   useEffect(() => {
+    if (!excalidrawAPI) {
+      return;
+    }
+
+    const sceneElements = excalidrawAPI.getSceneElements();
+    const elementsToUpdate = [];
+
+    for (const [zoneId, isSolved] of Object.entries(gameState)) {
+      const zoneElement = sceneElements.find(
+        (el) => el.customData?.id === zoneId,
+      );
+
+      if (zoneElement) {
+        const newBackgroundColor = isSolved ? "#d4edda" : "transparent"; // Grün für gelöst, sonst transparent
+
+        // Nur aktualisieren, wenn sich die Farbe tatsächlich ändert
+        if (zoneElement.backgroundColor !== newBackgroundColor) {
+          elementsToUpdate.push({
+            ...zoneElement,
+            backgroundColor: newBackgroundColor,
+          });
+        }
+      }
+    }
+
+    if (elementsToUpdate.length > 0) {
+      excalidrawAPI.updateScene({
+        elements: elementsToUpdate,
+      });
+    }
+  }, [gameState, excalidrawAPI]);
+
+  useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
       return;
     }
@@ -839,6 +872,32 @@ const ExcalidrawWrapper = () => {
           }
         }}
       >
+        {/* NEU: Statusanzeige für das Spiel */}
+        <div
+          style={{
+            position: "absolute",
+            top: "1rem",
+            right: "1rem",
+            zIndex: 10,
+            background: "rgba(255, 255, 240, 0.9)", // Leicht gelblich-transparent
+            padding: "0.5rem 1rem",
+            border: "1px solid #e0e0e0",
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            minWidth: "150px",
+          }}
+        >
+          <strong>Spielstatus:</strong>
+          <ul style={{ listStyle: "none", padding: 0, margin: "0.5rem 0 0 0" }}>
+            {Object.entries(gameState).map(([zoneId, isSolved]) => (
+              <li key={zoneId}>
+                {zoneId.substring(0, 8)}...:{" "}
+                {isSolved ? "✅ Gelöst" : "❌ Offen"}
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
           isCollaborating={isCollaborating}
