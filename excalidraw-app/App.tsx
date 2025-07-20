@@ -853,7 +853,7 @@ const ExcalidrawWrapper = () => {
             </div>
           );
         }}
-        renderCustomSidebar={() => <GamifyToolbar />}
+        renderCustomSidebar={() => <GamifyToolbar excalidrawAPI={excalidrawAPI} />}
         onLinkOpen={(element, event) => {
           if (element.link && isElementLink(element.link)) {
             event.preventDefault();
