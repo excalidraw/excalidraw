@@ -33,28 +33,39 @@ import {
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
+
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
 
-import { newElementWith } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
+import { restoreAppState, restore } from "@excalidraw/excalidraw";
+import { isElementLink } from "@excalidraw/excalidraw";
 import clsx from "clsx";
 import {
   parseLibraryTokensFromUrl,
   useHandleLibrary,
 } from "@excalidraw/excalidraw/data/library";
 
+import {
+  exportToPlus,
+  share,
+  usersIcon,
+} from "@excalidraw/excalidraw/components/icons";
+
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
 import type {
   FileId,
   NonDeletedExcalidrawElement,
+  ExcalidrawElement,
   OrderedExcalidrawElement,
+  ExcalidrawRectangleElement,
 } from "@excalidraw/element/types";
 import type {
   AppState,
   ExcalidrawImperativeAPI,
+  ExcalidrawProps,
   BinaryFiles,
   ExcalidrawInitialDataState,
   UIAppState,
@@ -88,8 +99,6 @@ import {
   ExportToExcalidrawPlus,
   exportToExcalidrawPlus,
 } from "./components/ExportToExcalidrawPlus";
-import { exportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
-import { ExcalLogo, exportToPlus, share, usersIcon } from "@excalidraw/excalidraw/components/icons";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import { GamifyToolbar } from "./components/GamifyToolbar";
 
@@ -119,7 +128,6 @@ import { useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
 import { useAppLangCode } from "./app-language/language-state";
 import DebugCanvas, {
-  debugRenderer,
   isVisualDebuggerEnabled,
   loadSavedDebugState,
 } from "./components/DebugCanvas";
@@ -326,12 +334,66 @@ const initializeScene = async (opts: {
 };
 
 const ExcalidrawWrapper = () => {
+  // Single instance of state declarations
+  const [collabAPI] = useAtom(collabAPIAtom);
+  const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () =>
+    isCollaborationLink(window.location.href),
+  );
+  const [, setShareDialogState] = useAtom(shareDialogStateAtom);
+  const collabError = useAtomValue(collabErrorIndicatorAtom);
+  const [excalidrawAPI, excalidrawRefCallback] =
+    useCallbackRefState<ExcalidrawImperativeAPI>();
+
+  const [gameState, setGameState] = useState<Record<string, boolean>>({});
+
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
 
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
   const [langCode, setLangCode] = useAppLangCode();
+
+  const handleCanvasChange: ExcalidrawProps["onChange"] = useCallback(
+    (
+      elements: readonly ExcalidrawElement[],
+      appState: AppState,
+      files: BinaryFiles,
+    ) => {
+      if (collabAPI?.isCollaborating()) {
+        collabAPI.syncElements(elements as OrderedExcalidrawElement[]);
+      }
+
+      const zones = elements.filter(
+        (el) => el.customData?.isZone,
+      ) as ExcalidrawRectangleElement[];
+      const cards = elements.filter(
+        (el) => el.customData?.isCard,
+      ) as ExcalidrawRectangleElement[];
+
+      const newGameState: Record<string, boolean> = {};
+
+      zones.forEach((zone) => {
+        const acceptedCardId = zone.customData?.accepts;
+        const matchingCard = cards.find(
+          (card) => card.customData?.id === acceptedCardId,
+        );
+
+        if (matchingCard) {
+          const isOverlapping =
+            matchingCard.x >= zone.x &&
+            matchingCard.x + matchingCard.width <= zone.x + zone.width &&
+            matchingCard.y >= zone.y &&
+            matchingCard.y + matchingCard.height <= zone.y + zone.height;
+          newGameState[zone.id] = isOverlapping;
+        } else {
+          newGameState[zone.id] = false;
+        }
+      });
+
+      setGameState(newGameState);
+    },
+    [collabAPI],
+  );
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -354,15 +416,7 @@ const ExcalidrawWrapper = () => {
     }, VERSION_TIMEOUT);
   }, []);
 
-  const [excalidrawAPI, excalidrawRefCallback] =
-    useCallbackRefState<ExcalidrawImperativeAPI>();
-
-  const [, setShareDialogState] = useAtom(shareDialogStateAtom);
-  const [collabAPI] = useAtom(collabAPIAtom);
-  const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
-    return isCollaborationLink(window.location.href);
-  });
-  const collabError = useAtomValue(collabErrorIndicatorAtom);
+  // Removed duplicate declarations
 
   useHandleLibrary({
     excalidrawAPI,
@@ -614,58 +668,6 @@ const ExcalidrawWrapper = () => {
     };
   }, [excalidrawAPI]);
 
-  const onChange = (
-    elements: readonly OrderedExcalidrawElement[],
-    appState: AppState,
-    files: BinaryFiles,
-  ) => {
-    if (collabAPI?.isCollaborating()) {
-      collabAPI.syncElements(elements);
-    }
-
-    // this check is redundant, but since this is a hot path, it's best
-    // not to evaludate the nested expression every time
-    if (!LocalData.isSavePaused()) {
-      LocalData.save(elements, appState, files, () => {
-        if (excalidrawAPI) {
-          let didChange = false;
-
-          const elements = excalidrawAPI
-            .getSceneElementsIncludingDeleted()
-            .map((element) => {
-              if (
-                LocalData.fileStorage.shouldUpdateImageElementStatus(element)
-              ) {
-                const newElement = newElementWith(element, { status: "saved" });
-                if (newElement !== element) {
-                  didChange = true;
-                }
-                return newElement;
-              }
-              return element;
-            });
-
-          if (didChange) {
-            excalidrawAPI.updateScene({
-              elements,
-              captureUpdate: CaptureUpdateAction.NEVER,
-            });
-          }
-        }
-      });
-    }
-
-    // Render the debug scene if the debug canvas is available
-    if (debugCanvasRef.current && excalidrawAPI) {
-      debugRenderer(
-        debugCanvasRef.current,
-        appState,
-        window.devicePixelRatio,
-        () => forceRefresh((prev) => !prev),
-      );
-    }
-  };
-
   const [latestShareableLink, setLatestShareableLink] = useState<string | null>(
     null,
   );
@@ -749,40 +751,16 @@ const ExcalidrawWrapper = () => {
     );
   }
 
-    const ExcalidrawPlusCommand = {
+  const ExcalidrawPlusCommand = {
     label: "GamifyBoard",
     category: DEFAULT_CATEGORIES.links,
     predicate: true,
-    icon: <img src="/new-logo.svg" style={{ width: 14 }} alt="GamifyBoard Logo" />,
+    icon: (
+      <img src="/new-logo.svg" style={{ width: 14 }} alt="GamifyBoard Logo" />
+    ),
     keywords: ["plus", "cloud", "server"],
     perform: () => {
-      window.open(
-        `https://gamifyboard.ndy.onl`,
-        "_blank",
-      );
-    },
-  };
-  const ExcalidrawPlusAppCommand = {
-    label: "Sign up",
-    category: DEFAULT_CATEGORIES.links,
-    predicate: true,
-    icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
-    keywords: [
-      "excalidraw",
-      "plus",
-      "cloud",
-      "server",
-      "signin",
-      "login",
-      "signup",
-    ],
-    perform: () => {
-      window.open(
-        `${
-          import.meta.env.VITE_APP_PLUS_APP
-        }?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
-        "_blank",
-      );
+      window.open(`https://gamifyboard.ndy.onl`, "_blank");
     },
   };
 
@@ -837,7 +815,7 @@ const ExcalidrawWrapper = () => {
         handleKeyboardGlobally={true}
         autoFocus={true}
         theme={editorTheme}
-        renderTopRightUI={(isMobile) => {
+        renderTopRightUI={(isMobile: boolean) => {
           if (isMobile || !collabAPI || isCollabDisabled) {
             return null;
           }
@@ -850,10 +828,10 @@ const ExcalidrawWrapper = () => {
                   setShareDialogState({ isOpen: true, type: "share" })
                 }
               />
+              {excalidrawAPI && <GamifyToolbar excalidrawAPI={excalidrawAPI} />}
             </div>
           );
         }}
-        renderCustomSidebar={() => <GamifyToolbar excalidrawAPI={excalidrawAPI} />}
         onLinkOpen={(element, event) => {
           if (element.link && isElementLink(element.link)) {
             event.preventDefault();
@@ -999,10 +977,8 @@ const ExcalidrawWrapper = () => {
                 setShareDialogState({ isOpen: true, type: "share" });
               },
             },
-            
-            ...(isExcalidrawPlusSignedUser
-              ? []
-              : [ExcalidrawPlusCommand]),
+
+            ...(isExcalidrawPlusSignedUser ? [] : [ExcalidrawPlusCommand]),
 
             {
               label: t("overwriteConfirm.action.excalidrawPlus.button"),

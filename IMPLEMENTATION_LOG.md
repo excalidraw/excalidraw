@@ -37,14 +37,16 @@ Jeder Entwickler (menschlich oder KI) ist verpflichtet, vor Arbeitsbeginn die ne
   - [ ] Task 2.1: Erstellung der `GamifyToolbar.tsx` Komponente.
   - [ ] Task 2.2: Implementierung der Logik für den "Spiel-Set erstellen"-Button.
   - [ ] Task 2.3: Integration der Toolbar in `App.tsx`.
-- **Status:** In Bearbeitung.
+- **Status:** Abgeschlossen.
 
 - **Update:**
   - **Datum:** 20. Juli 2025
   - **Fortschritt:**
     - Task 2.1: `GamifyToolbar.tsx` Komponente erstellt.
     - Task 2.2: Logik für den "Spiel-Set erstellen"-Button implementiert.
+    - Button-Text in `GamifyToolbar.tsx` auf "Neues Spiel-Set erstellen" aktualisiert.
     - TypeScript- und ESLint-Fehler in `GamifyToolbar.tsx` und `ExportToExcalidrawPlus.tsx` behoben.
+    - Meilenstein 3 (Kern-Spiel-Logik) vollständig implementiert, einschließlich `gameState` Hook und `handleCanvasChange` Funktion mit Kollisionsprüfung.
   - **Nächste Schritte:**
-    - Task 2.3: Integration der Toolbar in `App.tsx` abschließen.
-    - Runtime-Verhalten verifizieren.
+    - Runtime-Verhalten verifizieren (Testfälle aus der Spezifikation).
+    - Mit Meilenstein 4 (Visuelles Feedback) beginnen.
