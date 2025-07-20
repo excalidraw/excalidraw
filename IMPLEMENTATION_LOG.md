@@ -49,4 +49,7 @@ Jeder Entwickler (menschlich oder KI) ist verpflichtet, vor Arbeitsbeginn die ne
     - Meilenstein 3 (Kern-Spiel-Logik) vollständig implementiert, einschließlich `gameState` Hook und `handleCanvasChange` Funktion mit Kollisionsprüfung.
   - **Nächste Schritte:**
     - Runtime-Verhalten verifizieren (Testfälle aus der Spezifikation).
-    - Mit Meilenstein 4 (Visuelles Feedback) beginnen.
+    - Meilenstein 4 (Visuelles Feedback) vollständig implementiert, einschließlich Statusanzeige und Farbwechsel der Zonen.
+  - **Nächste Schritte:**
+    - Finale Verifizierung des MVP (Test-Szenario aus Task 4.3).
+    - Projekt-Abschluss und Dokumentation.
