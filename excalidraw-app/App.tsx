@@ -1001,13 +1001,8 @@ const ExcalidrawWrapper = () => {
             },
             
             ...(isExcalidrawPlusSignedUser
-              ? [
-                  {
-                    ...ExcalidrawPlusAppCommand,
-                    label: "Sign in / Go to Excalidraw+",
-                  },
-                ]
-              : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
+              ? []
+              : [ExcalidrawPlusCommand]),
 
             {
               label: t("overwriteConfirm.action.excalidrawPlus.button"),
