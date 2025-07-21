@@ -22,16 +22,7 @@ export const GamifyToolbar: React.FC<GamifyToolbarProps> = ({
     const cardId = `card_${nanoid()}`;
     const zoneId = `zone_${nanoid()}`;
 
-    const cardElement = newElement({
-      type: "rectangle",
-      x: 400,
-      y: 200,
-      width: 180,
-      height: 130,
-      strokeColor: "#ff4757",
-      backgroundColor: "transparent",
-      customData: { isCard: true, id: cardId },
-    });
+    const existingElements = excalidrawAPI.getSceneElements();
 
     const zoneElement = newElement({
       type: "rectangle",
@@ -45,9 +36,22 @@ export const GamifyToolbar: React.FC<GamifyToolbarProps> = ({
       customData: { isZone: true, accepts: cardId, id: zoneId },
     });
 
-    const newElements = [cardElement, zoneElement];
+    const cardElement = newElement({
+      type: "rectangle",
+      x: 400,
+      y: 200,
+      width: 180,
+      height: 130,
+      strokeColor: "#ff4757",
+      backgroundColor: "transparent",
+      customData: { isCard: true, id: cardId },
+    });
+
+    const newElements = [...existingElements, zoneElement, cardElement];
     excalidrawAPI.updateScene({ elements: newElements });
-    excalidrawAPI.scrollToContent(newElements, { fitToContent: true });
+    excalidrawAPI.scrollToContent([cardElement, zoneElement], {
+      fitToContent: true,
+    });
   };
 
   return (
