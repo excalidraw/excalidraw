@@ -1,5 +1,7 @@
 GamifyBoard
 
+![GamifyBoard Social Media Banner](public/gamifyboard-og-image.png)
+
 Eine Open-Source Whiteboard-Plattform zur Erstellung interaktiver, kollaborativer Lernspiele.
 
 Live-Anwendung: [gamifyboard.ndy.onl](https://gamifyboard.ndy.onl)

@@ -19,7 +19,7 @@ const Header = () => (
   <div className="HelpDialog__header">
     <a
       className="HelpDialog__btn"
-      href="https://docs.excalidraw.com"
+      href="https://docs.GamifyBoard.com"
       target="_blank"
       rel="noopener"
     >
@@ -28,7 +28,7 @@ const Header = () => (
     </a>
     <a
       className="HelpDialog__btn"
-      href="https://plus.excalidraw.com/blog"
+      href="https://blog.GamifyBoard.com"
       target="_blank"
       rel="noopener"
     >
@@ -37,22 +37,14 @@ const Header = () => (
     </a>
     <a
       className="HelpDialog__btn"
-      href="https://github.com/excalidraw/excalidraw/issues"
+      href="https://github.com/ndy-onl/gamifyboard"
       target="_blank"
       rel="noopener noreferrer"
     >
       <div className="HelpDialog__link-icon">{GithubIcon}</div>
       {t("helpDialog.github")}
     </a>
-    <a
-      className="HelpDialog__btn"
-      href="https://youtube.com/@excalidraw"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <div className="HelpDialog__link-icon">{youtubeIcon}</div>
-      YouTube
-    </a>
+    
   </div>
 );
 
