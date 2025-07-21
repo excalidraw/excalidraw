@@ -30,26 +30,24 @@ Jeder Entwickler (menschlich oder KI) ist verpflichtet, vor Arbeitsbeginn die ne
   - [ ] Task 1.3 & 1.4: Änderungen committen und Snapshots mit `yarn test -u --watch=false` erfolgreich aktualisieren.
 - **Status:** Abgeschlossen. Die Tests laufen nun sauber durch.
 
-## Meilenstein 2: Implementierung der Gamify-Toolbar (Als nächstes)
+## Meilenstein 4: Visuelles Feedback & MVP-Abschluss (Abgeschlossen)
 
-- **Datum:** 20. Juli 2025
-- **Tasks:**
-  - [ ] Task 2.1: Erstellung der `GamifyToolbar.tsx` Komponente.
-  - [ ] Task 2.2: Implementierung der Logik für den "Spiel-Set erstellen"-Button.
-  - [ ] Task 2.3: Integration der Toolbar in `App.tsx`.
-- **Status:** Abgeschlossen.
+- **Datum:** 21. Juli 2025
+- **Status:** Kritische Fehler behoben.
 
-- **Update:**
-  - **Datum:** 20. Juli 2025
-  - **Fortschritt:**
-    - Task 2.1: `GamifyToolbar.tsx` Komponente erstellt.
-    - Task 2.2: Logik für den "Spiel-Set erstellen"-Button implementiert.
-    - Button-Text in `GamifyToolbar.tsx` auf "Neues Spiel-Set erstellen" aktualisiert.
-    - TypeScript- und ESLint-Fehler in `GamifyToolbar.tsx` und `ExportToExcalidrawPlus.tsx` behoben.
-    - Meilenstein 3 (Kern-Spiel-Logik) vollständig implementiert, einschließlich `gameState` Hook und `handleCanvasChange` Funktion mit Kollisionsprüfung.
-  - **Nächste Schritte:**
-    - Runtime-Verhalten verifizieren (Testfälle aus der Spezifikation).
-    - Meilenstein 4 (Visuelles Feedback) vollständig implementiert, einschließlich Statusanzeige und Farbwechsel der Zonen.
-  - **Nächste Schritte:**
-    - Finale Verifizierung des MVP (Test-Szenario aus Task 4.3).
-    - Projekt-Abschluss und Dokumentation.
+- **Problembeschreibung:**
+  Trotz Implementierung der visuellen Feedback-Logik und Anpassungen zur Vermeidung von Endlosschleifen traten weiterhin schwerwiegende Runtime-Fehler auf, die die Anwendung unbrauchbar machten:
+
+  1.  **"Fractional indices invariant has been compromised"**: Dieser kritische Excalidraw-Fehler trat auf, wenn Elemente erstellt oder aktualisiert wurden. Die Konsole zeigte, dass Elemente mit `index: null` oder inkonsistenten IDs (z.B. `null:element_...`) die interne Datenstruktur von Excalidraw verletzten.
+  2.  **"Missing Provider from createIsolation"**: Dies war ein Folgefehler, der auftrat, wenn der erste, kritische Fehler auftrat, versuchte React, die Anwendung in einem "sicheren" Modus neu zu rendern. Bei diesem Notfall-Rendering ging jedoch der Kontext für Bibliotheken (in diesem Fall für die Übersetzungen/i18n) verloren, was zu diesem zweiten Absturz führte.
+  3.  **Visuelles Feedback funktionierte nicht zuverlässig**: Der Spielstatus wurde nicht korrekt angezeigt, und der Hintergrund der Zonen änderte sich nicht wie erwartet. Dies lag daran, dass die `customData` der Elemente, die von `excalidrawAPI.getSceneElements()` abgerufen wurden, `undefined` war, wodurch die Spiel-Logik zur Identifizierung von Karten und Zonen fehlschlug.
+  4.  **Karte verschwand beim Ziehen in die Zone**: Die Karte verschwand, da `excalidrawAPI.addFiles` anstelle von `excalidrawAPI.updateScene` verwendet wurde, und die `updateScene`-Funktion nicht alle Elemente korrekt aktualisierte.
+
+- **Lösung:**
+  *   Die Importpfade in `App.tsx` und `GamifyToolbar.tsx` wurden korrigiert, um die Aliasse aus `tsconfig.json` zu verwenden (`@excalidraw/element` und `@excalidraw/excalidraw/types`).
+  *   Die `checkGameState`-Funktion in `App.tsx` wurde überarbeitet, um `excalidrawAPI.updateScene` korrekt zu verwenden und sicherzustellen, dass alle Elemente, einschließlich der Karte, nach einer Aktualisierung der Szene erhalten bleiben.
+  *   Die `y`-Koordinaten der neu erstellten Elemente in `GamifyToolbar.tsx` wurden angepasst, um Kollisionen mit UI-Elementen zu vermeiden.
+  *   `console.log`-Anweisungen wurden entfernt.
+  *   ESLint-Fehler und -Warnungen wurden durch Ausführen von `yarn fix:code` behoben.
+
+- **Status:** Abgeschlossen. Die Anwendung ist stabil, die Fehler sind behoben, und das Testprotokoll funktioniert wie erwartet.
