@@ -1,4 +1,10 @@
-import { COLORS_PER_ROW, COLOR_PALETTE, KEYS } from "@excalidraw/common";
+import {
+  CODES,
+  COLORS_PER_ROW,
+  COLOR_PALETTE,
+  isLatinChar,
+  KEYS,
+} from "@excalidraw/common";
 
 import type {
   ColorPickerColor,
@@ -152,7 +158,10 @@ export const colorPickerKeyNavHandler = ({
     return true;
   }
 
-  if (event.key === KEYS.I) {
+  if (
+    event.key === KEYS.I ||
+    (!isLatinChar(event.key) && event.code === CODES.I)
+  ) {
     onEyeDropperToggle();
     return true;
   }

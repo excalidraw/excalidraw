@@ -100,6 +100,8 @@ import {
   randomInteger,
   CLASSES,
   Emitter,
+  isLatinChar,
+  CODE_TO_KEY,
 } from "@excalidraw/common";
 
 import {
@@ -4234,9 +4236,10 @@ class App extends React.Component<AppProps, AppState> {
 
       if (
         event[KEYS.CTRL_OR_CMD] &&
-        event.key === KEYS.P &&
         !event.shiftKey &&
-        !event.altKey
+        !event.altKey &&
+        (event.key === KEYS.P ||
+          (!isLatinChar(event.key) && event.code === CODES.P))
       ) {
         this.setToast({
           message: t("commandPalette.shortcutHint", {
@@ -4247,7 +4250,11 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === KEYS.V) {
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        (event.key.toLowerCase() === KEYS.V ||
+          (!isLatinChar(event.key.toLowerCase()) && event.code === CODES.V))
+      ) {
         IS_PLAIN_PASTE = event.shiftKey;
         clearTimeout(IS_PLAIN_PASTE_TIMER);
         // reset (100ms to be safe that we it runs after the ensuing
@@ -4284,9 +4291,10 @@ class App extends React.Component<AppProps, AppState> {
         });
         return;
       } else if (
-        event.key.toLowerCase() === KEYS.E &&
         event.shiftKey &&
-        event[KEYS.CTRL_OR_CMD]
+        event[KEYS.CTRL_OR_CMD] &&
+        (event.key.toLowerCase() === KEYS.E ||
+          (!isLatinChar(event.key.toLowerCase()) && event.code === CODES.E))
       ) {
         event.preventDefault();
         this.setState({ openDialog: { name: "imageExport" } });
@@ -4468,7 +4476,11 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
       ) {
-        const shape = findShapeByKey(event.key);
+        let key = event.key;
+        if (!isLatinChar(event.key) && event.code in CODE_TO_KEY) {
+          key = CODE_TO_KEY[event.code as keyof typeof CODE_TO_KEY];
+        }
+        const shape = findShapeByKey(key);
         if (shape) {
           if (this.state.activeTool.type !== shape) {
             trackEvent(
@@ -4491,7 +4503,10 @@ class App extends React.Component<AppProps, AppState> {
           }
           this.setActiveTool({ type: shape });
           event.stopPropagation();
-        } else if (event.key === KEYS.Q) {
+        } else if (
+          event.key === KEYS.Q ||
+          (!isLatinChar(event.key) && event.code === CODES.Q)
+        ) {
           this.toggleLock("keyboard");
           event.stopPropagation();
         }
@@ -4503,7 +4518,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        (event.key === KEYS.G || event.key === KEYS.S) &&
+        (event.key === KEYS.G ||
+          event.key === KEYS.S ||
+          (!isLatinChar(event.key) &&
+            (event.code === CODES.G || event.code === CODES.S))) &&
         !event.altKey &&
         !event[KEYS.CTRL_OR_CMD]
       ) {
@@ -4516,14 +4534,18 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (
-          event.key === KEYS.G &&
+          (event.key === KEYS.G ||
+            (!isLatinChar(event.key) && event.code === CODES.G)) &&
           (hasBackground(this.state.activeTool.type) ||
             selectedElements.some((element) => hasBackground(element.type)))
         ) {
           this.setState({ openPopup: "elementBackground" });
           event.stopPropagation();
         }
-        if (event.key === KEYS.S) {
+        if (
+          event.key === KEYS.S ||
+          (!isLatinChar(event.key) && event.code === CODES.S)
+        ) {
           this.setState({ openPopup: "elementStroke" });
           event.stopPropagation();
         }
@@ -4532,7 +4554,8 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
-        event.key.toLowerCase() === KEYS.F
+        (event.key.toLowerCase() === KEYS.F ||
+          (!isLatinChar(event.key.toLowerCase()) && event.code === CODES.F))
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
 
@@ -4559,7 +4582,12 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
+      if (
+        (event.key === KEYS.K ||
+          (!isLatinChar(event.key) && event.code === CODES.K)) &&
+        !event.altKey &&
+        !event[KEYS.CTRL_OR_CMD]
+      ) {
         if (this.state.activeTool.type === "laser") {
           this.setActiveTool({ type: "selection" });
         } else {
@@ -4578,9 +4606,16 @@ class App extends React.Component<AppProps, AppState> {
       // eye dropper
       // -----------------------------------------------------------------------
       const lowerCased = event.key.toLocaleLowerCase();
-      const isPickingStroke = lowerCased === KEYS.S && event.shiftKey;
+      const isPickingStroke =
+        event.shiftKey &&
+        (lowerCased === KEYS.S ||
+          (!isLatinChar(lowerCased) && event.code === CODES.S));
       const isPickingBackground =
-        event.key === KEYS.I || (lowerCased === KEYS.G && event.shiftKey);
+        event.key === KEYS.I ||
+        (!isLatinChar(event.key) && event.code === CODES.I) ||
+        (event.shiftKey &&
+          (lowerCased === KEYS.G ||
+            (!isLatinChar(lowerCased) && event.code === CODES.G)));
 
       if (isPickingStroke || isPickingBackground) {
         this.openEyeDropper({

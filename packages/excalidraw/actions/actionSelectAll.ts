@@ -2,7 +2,7 @@ import { getNonDeletedElements } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
 import { isLinearElement, isTextElement } from "@excalidraw/element";
 
-import { arrayToMap, KEYS } from "@excalidraw/common";
+import { arrayToMap, CODES, isLatinChar, KEYS } from "@excalidraw/common";
 
 import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
@@ -59,5 +59,8 @@ export const actionSelectAll = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.A,
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    (event.key === KEYS.A ||
+      (!isLatinChar(event.key) && event.code === CODES.A)),
 });

@@ -8,7 +8,13 @@ import {
   useState,
 } from "react";
 
-import { EVENT, HYPERLINK_TOOLTIP_DELAY, KEYS } from "@excalidraw/common";
+import {
+  CODES,
+  EVENT,
+  HYPERLINK_TOOLTIP_DELAY,
+  isLatinChar,
+  KEYS,
+} from "@excalidraw/common";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
@@ -269,7 +275,11 @@ export const Hyperlink = ({
           onKeyDown={(event) => {
             event.stopPropagation();
             // prevent cmd/ctrl+k shortcut when editing link
-            if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K) {
+            if (
+              event[KEYS.CTRL_OR_CMD] &&
+              (event.key === KEYS.K ||
+                (!isLatinChar(event.key) && event.code === CODES.K))
+            ) {
               event.preventDefault();
             }
             if (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) {

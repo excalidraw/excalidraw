@@ -1,4 +1,4 @@
-import { KEYS } from "@excalidraw/common";
+import { CODES, isLatinChar, KEYS } from "@excalidraw/common";
 
 import type { Node } from "@excalidraw/common";
 
@@ -26,7 +26,8 @@ export const fontPickerKeyHandler = ({
   if (
     !event[KEYS.CTRL_OR_CMD] &&
     event.shiftKey &&
-    event.key.toLowerCase() === KEYS.F
+    (event.key.toLowerCase() === KEYS.F ||
+      (!isLatinChar(event.key.toLowerCase()) && event.code === CODES.F))
   ) {
     // refocus input on the popup trigger shortcut
     inputRef.current?.focus();
