@@ -147,7 +147,9 @@ export const getFreeDrawSvgPath = (
     return _legacy_getFreeDrawSvgPath(element);
   }
 
-  return getSvgPathFromStroke(getFreedrawStroke(element));
+  return _transition_getFreeDrawSvgPath(element);
+
+  // return getSvgPathFromStroke(getFreedrawStroke(element));
 };
 
 const roundPoint = (A: Point): string => {
@@ -162,7 +164,7 @@ const average = (A: Point, B: Point): string => {
   )} `;
 };
 
-const getSvgPathFromStroke = (points: Point[]): string => {
+export const getSvgPathFromStroke = (points: Point[]): string => {
   const len = points.length;
 
   if (len < 2) {
@@ -189,6 +191,35 @@ const getSvgPathFromStroke = (points: Point[]): string => {
     points[2],
   )}${points.length > 3 ? "T" : ""}${result}L${roundPoint(points[len - 1])}`;
 };
+
+function _transition_getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
+  const inputPoints = element.simulatePressure
+    ? element.points
+    : element.points.length
+    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
+    : [[0, 0, 0.5]];
+
+  // Consider changing the options for simulated pressure vs real pressure
+  const options: StrokeOptions = {
+    simulatePressure: element.simulatePressure,
+    size: element.strokeWidth,
+    thinning: 0.6,
+    smoothing: 0.5,
+    streamline: 0.5,
+    easing: (t) => {
+      if (element.freedrawOptions?.fixedStrokeWidth) {
+        return 0.5;
+      }
+
+      return Math.sin((t * Math.PI) / 2) * 0.65;
+    }, // https://easings.net/#easeOutSine
+    last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
+  };
+
+  return _legacy_getSvgPathFromStroke(
+    getStroke(inputPoints as number[][], options),
+  );
+}
 
 function _legacy_getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
   // If input points are empty (should they ever be?) return a dot
