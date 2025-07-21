@@ -44,63 +44,45 @@ const App = () => {
 
     const elements = excalidrawAPI.getSceneElements();
     const newGameState: Record<string, boolean> = {};
-    const updatedElements: NonDeletedExcalidrawElement[] = [];
+    let sceneUpdated = false;
 
-    const zones = elements.filter(
-      (el: NonDeletedExcalidrawElement) => el.customData?.isZone,
-    );
+    const updatedElements = elements.map((element) => {
+      if (element.customData?.isZone) {
+        const zone = element;
+        if (!zone.customData?.id || !zone.customData?.accepts) {
+          return element;
+        }
 
-    for (const zone of zones) {
-      if (!zone.customData?.id || !zone.customData?.accepts) {
-        continue;
-      }
+        const zoneId = zone.customData.id;
+        const acceptedCardId = zone.customData.accepts;
+        const card = elements.find(
+          (el: NonDeletedExcalidrawElement) =>
+            el.customData?.id === acceptedCardId,
+        );
+        let isSolved = false;
 
-      const zoneId = zone.customData.id;
-      const acceptedCardId = zone.customData.accepts;
-      const card = elements.find(
-        (el: NonDeletedExcalidrawElement) =>
-          el.customData?.id === acceptedCardId,
-      );
-      let isSolved = false;
+        if (card) {
+          isSolved =
+            card.x >= zone.x &&
+            card.x + card.width <= zone.x + zone.width &&
+            card.y >= zone.y &&
+            card.y + card.height <= zone.y + zone.height;
+        }
 
-      if (card) {
-        isSolved =
-          card.x >= zone.x &&
-          card.x + card.width <= zone.x + zone.width &&
-          card.y >= zone.y &&
-          card.y + card.height <= zone.y + zone.height;
-      }
+        newGameState[zoneId] = isSolved;
 
-      newGameState[zoneId] = isSolved;
-
-      const zoneElement = elements.find(
-        (el) => el.id === zone.id,
-      ) as NonDeletedExcalidrawElement;
-
-      if (zoneElement) {
         const newBackgroundColor = isSolved ? "#d4edda" : "transparent";
-        if (zoneElement.backgroundColor !== newBackgroundColor) {
-          updatedElements.push({
-            ...zoneElement,
+
+        if (zone.backgroundColor !== newBackgroundColor) {
+          sceneUpdated = true;
+          return {
+            ...zone,
             backgroundColor: newBackgroundColor,
-          });
+          };
         }
       }
-
-      if (
-        isSolved &&
-        card &&
-        !updatedElements.some((el) => el.id === card.id)
-      ) {
-        updatedElements.push(card);
-      }
-    }
-
-    for (const element of elements) {
-      if (!updatedElements.some((el) => el.id === element.id)) {
-        updatedElements.push(element);
-      }
-    }
+      return element;
+    });
 
     setGameState((prevGameState) => {
       if (areGameStatesDifferent(prevGameState, newGameState)) {
@@ -109,10 +91,12 @@ const App = () => {
       return prevGameState;
     });
 
-    excalidrawAPI.updateScene({
-      elements: updatedElements,
-    });
-  }, [excalidrawAPI]);
+    if (sceneUpdated) {
+      excalidrawAPI.updateScene({
+        elements: updatedElements,
+      });
+    }
+  }, [excalidrawAPI, setGameState]);
 
   return (
     <TopErrorBoundary>
