@@ -27,3 +27,5 @@ dev-dist
 html
 meta*.json
 .claude
+.env.development
+.env.production
