@@ -28,7 +28,11 @@ import { useAtom, useAtomValue } from "../editor-jotai";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 
-import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
+import {
+  SelectedShapeActions,
+  ShapesSwitcher,
+  CompactShapeActions,
+} from "./Actions";
 import { LoadingMessage } from "./LoadingMessage";
 import { LockButton } from "./LockButton";
 import { MobileMenu } from "./MobileMenu";
@@ -209,31 +213,58 @@ const LayerUI = ({
     </div>
   );
 
-  const renderSelectedShapeActions = () => (
-    <Section
-      heading="selectedShapeActions"
-      className={clsx("selected-shape-actions zen-mode-transition", {
-        "transition-left": appState.zenModeEnabled,
-      })}
-    >
-      <Island
-        className={CLASSES.SHAPE_ACTIONS_MENU}
-        padding={2}
-        style={{
-          // we want to make sure this doesn't overflow so subtracting the
-          // approximate height of hamburgerMenu + footer
-          maxHeight: `${appState.height - 166}px`,
-        }}
+  const renderSelectedShapeActions = (isTablet: boolean) => {
+    // Use compact layout for tablets (when device is mobile but not too small)
+
+    return (
+      <Section
+        heading="selectedShapeActions"
+        className={clsx("selected-shape-actions zen-mode-transition", {
+          "transition-left": appState.zenModeEnabled,
+        })}
       >
-        <SelectedShapeActions
-          appState={appState}
-          elementsMap={app.scene.getNonDeletedElementsMap()}
-          renderAction={actionManager.renderAction}
-          app={app}
-        />
-      </Island>
-    </Section>
-  );
+        {isTablet ? (
+          <Island
+            className={clsx(
+              // CLASSES.SHAPE_ACTIONS_MENU,
+              "compact-shape-actions-island",
+            )}
+            padding={0}
+            style={{
+              // we want to make sure this doesn't overflow so subtracting the
+              // approximate height of hamburgerMenu + footer
+              maxHeight: `${appState.height - 166}px`,
+            }}
+          >
+            <CompactShapeActions
+              appState={appState}
+              elementsMap={app.scene.getNonDeletedElementsMap()}
+              renderAction={actionManager.renderAction}
+              app={app}
+              setAppState={setAppState}
+            />
+          </Island>
+        ) : (
+          <Island
+            className={CLASSES.SHAPE_ACTIONS_MENU}
+            padding={2}
+            style={{
+              // we want to make sure this doesn't overflow so subtracting the
+              // approximate height of hamburgerMenu + footer
+              maxHeight: `${appState.height - 166}px`,
+            }}
+          >
+            <SelectedShapeActions
+              appState={appState}
+              elementsMap={app.scene.getNonDeletedElementsMap()}
+              renderAction={actionManager.renderAction}
+              app={app}
+            />
+          </Island>
+        )}
+      </Section>
+    );
+  };
 
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
@@ -252,7 +283,8 @@ const LayerUI = ({
         <div className="App-menu App-menu_top">
           <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
             {renderCanvasActions()}
-            {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
+            {shouldRenderSelectedShapeActions &&
+              renderSelectedShapeActions(device.isTouchScreen)}
           </Stack.Col>
           {!appState.viewModeEnabled &&
             appState.openDialog?.name !== "elementLinkSelector" && (

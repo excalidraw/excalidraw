@@ -321,9 +321,9 @@ export const actionChangeStrokeColor = register({
         : CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <>
-      <h3 aria-hidden="true">{t("labels.stroke")}</h3>
+      {!data?.compactMode && <h3 aria-hidden="true">{t("labels.stroke")}</h3>}
       <ColorPicker
         topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
         palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
@@ -341,6 +341,7 @@ export const actionChangeStrokeColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
+        compactMode={data?.compactMode}
       />
     </>
   ),
@@ -398,9 +399,11 @@ export const actionChangeBackgroundColor = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <>
-      <h3 aria-hidden="true">{t("labels.background")}</h3>
+      {!data?.compactMode && (
+        <h3 aria-hidden="true">{t("labels.background")}</h3>
+      )}
       <ColorPicker
         topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
         palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
@@ -418,6 +421,7 @@ export const actionChangeBackgroundColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
+        compactMode={data?.compactMode}
       />
     </>
   ),
@@ -518,9 +522,9 @@ export const actionChangeStrokeWidth = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      <legend>{t("labels.strokeWidth")}</legend>
+      {!data?.compactMode && <legend>{t("labels.strokeWidth")}</legend>}
       <div className="buttonList">
         <RadioSelection
           group="stroke-width"
@@ -575,9 +579,9 @@ export const actionChangeSloppiness = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      <legend>{t("labels.sloppiness")}</legend>
+      {!data?.compactMode && <legend>{t("labels.sloppiness")}</legend>}
       <div className="buttonList">
         <RadioSelection
           group="sloppiness"
@@ -628,9 +632,9 @@ export const actionChangeStrokeStyle = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      <legend>{t("labels.strokeStyle")}</legend>
+      {!data?.compactMode && <legend>{t("labels.strokeStyle")}</legend>}
       <div className="buttonList">
         <RadioSelection
           group="strokeStyle"
@@ -1016,7 +1020,7 @@ export const actionChangeFontFamily = register({
 
     return result;
   },
-  PanelComponent: ({ elements, appState, app, updateData }) => {
+  PanelComponent: ({ elements, appState, app, updateData, data }) => {
     const cachedElementsRef = useRef<ElementsMap>(new Map());
     const prevSelectedFontFamilyRef = useRef<number | null>(null);
     // relying on state batching as multiple `FontPicker` handlers could be called in rapid succession and we want to combine them
@@ -1094,11 +1098,12 @@ export const actionChangeFontFamily = register({
 
     return (
       <fieldset>
-        <legend>{t("labels.fontFamily")}</legend>
+        {!data?.compactMode && <legend>{t("labels.fontFamily")}</legend>}
         <FontPicker
           isOpened={appState.openPopup === "fontFamily"}
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
+          compactMode={data?.compactMode}
           onSelect={(fontFamily) => {
             setBatchedData({
               openPopup: null,
@@ -1612,6 +1617,25 @@ export const actionChangeArrowhead = register({
           />
         </div>
       </fieldset>
+    );
+  },
+});
+
+export const actionChangeArrowProperties = register({
+  name: "changeArrowProperties",
+  label: "Change arrow properties",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    // This action doesn't perform any changes directly
+    // It's just a container for the arrow type and arrowhead actions
+    return false;
+  },
+  PanelComponent: ({ elements, appState, updateData, app, renderAction }) => {
+    return (
+      <div className="selected-shape-actions">
+        {renderAction("changeArrowType")}
+        {renderAction("changeArrowhead")}
+      </div>
     );
   },
 });

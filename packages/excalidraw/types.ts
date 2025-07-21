@@ -354,6 +354,9 @@ export interface AppState {
     | "elementBackground"
     | "elementStroke"
     | "fontFamily"
+    | "fontSize"
+    | "textAlign"
+    | "arrowProperties"
     | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:

@@ -18,7 +18,7 @@ import { useExcalidrawContainer } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
-import { slashIcon } from "../icons";
+import { backgroundIcon, slashIcon, strokeIcon } from "../icons";
 
 import { ColorInput } from "./ColorInput";
 import { Picker } from "./Picker";
@@ -189,10 +189,14 @@ const ColorPickerTrigger = ({
   label,
   color,
   type,
+  compactMode = false,
+  mode = "background",
 }: {
   color: string | null;
   label: string;
   type: ColorPickerType;
+  compactMode?: boolean;
+  mode?: "background" | "stroke";
 }) => {
   return (
     <Popover.Trigger
@@ -211,6 +215,33 @@ const ColorPickerTrigger = ({
       }
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
+      {compactMode && color && (
+        <div className="color-picker__button-background">
+          {mode === "background" ? (
+            <span
+              style={{
+                color:
+                  color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
+                    ? "#fff"
+                    : "#111",
+              }}
+            >
+              {backgroundIcon}
+            </span>
+          ) : (
+            <span
+              style={{
+                color:
+                  color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
+                    ? "#fff"
+                    : "#111",
+              }}
+            >
+              {strokeIcon}
+            </span>
+          )}
+        </div>
+      )}
     </Popover.Trigger>
   );
 };
@@ -252,7 +283,13 @@ export const ColorPicker = ({
           }}
         >
           {/* serves as an active color indicator as well */}
-          <ColorPickerTrigger color={color} label={label} type={type} />
+          <ColorPickerTrigger
+            color={color}
+            label={label}
+            type={type}
+            compactMode={compactMode}
+            mode={type === "elementStroke" ? "stroke" : "background"}
+          />
           {/* popup content */}
           {appState.openPopup === type && (
             <ColorPickerPopupContent

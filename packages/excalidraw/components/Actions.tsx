@@ -1,5 +1,6 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import * as Popover from "@radix-ui/react-popover";
 
 import {
   CLASSES,
@@ -19,6 +20,8 @@ import {
   isImageElement,
   isLinearElement,
   isTextElement,
+  getBoundTextElement,
+  isArrowElement,
 } from "@excalidraw/element";
 
 import { hasStrokeColor, toolIsArrow } from "@excalidraw/element";
@@ -46,15 +49,19 @@ import {
   hasStrokeWidth,
 } from "../scene";
 
+import { getFormValue } from "../actions/actionProperties";
+
 import { SHAPES } from "./shapes";
 
 import "./Actions.scss";
 
-import { useDevice } from "./App";
+import { useDevice, useExcalidrawContainer } from "./App";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
+import { PropertiesPopover } from "./PropertiesPopover";
+import { RadioSelection } from "./RadioSelection";
 import {
   EmbedIcon,
   extraToolsIcon,
@@ -63,9 +70,21 @@ import {
   laserPointerToolIcon,
   MagicIcon,
   LassoIcon,
+  sharpArrowIcon,
+  roundArrowIcon,
+  elbowArrowIcon,
+  TextSizeIcon,
+  resizeIcon,
+  settingsPlusIcon,
 } from "./icons";
 
-import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
+import type {
+  AppClassProperties,
+  AppProps,
+  UIAppState,
+  Zoom,
+  AppState,
+} from "../types";
 import type { ActionManager } from "../actions/manager";
 
 export const canChangeStrokeColor = (
@@ -275,6 +294,365 @@ export const SelectedShapeActions = ({
             {showLineEditorAction && renderAction("toggleLinearEditor")}
           </div>
         </fieldset>
+      )}
+    </div>
+  );
+};
+
+export const CompactShapeActions = ({
+  appState,
+  elementsMap,
+  renderAction,
+  app,
+  setAppState,
+}: {
+  appState: UIAppState;
+  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
+  renderAction: ActionManager["renderAction"];
+  app: AppClassProperties;
+  setAppState: React.Component<any, AppState>["setState"];
+}) => {
+  const targetElements = getTargetElements(elementsMap, appState);
+  const [strokePopoverOpen, setStrokePopoverOpen] = useState(false);
+  const [otherActionsPopoverOpen, setOtherActionsPopoverOpen] = useState(false);
+  const fontSizePopoverOpen = appState.openPopup === "fontSize";
+  const setFontSizePopoverOpen = useCallback(
+    (open: boolean) => {
+      setAppState({ openPopup: open ? "fontSize" : null });
+    },
+    [setAppState],
+  );
+  const { container } = useExcalidrawContainer();
+
+  const isEditingTextOrNewElement = Boolean(
+    appState.editingTextElement || appState.newElement,
+  );
+
+  const showFillIcons =
+    (hasBackground(appState.activeTool.type) &&
+      !isTransparent(appState.currentItemBackgroundColor)) ||
+    targetElements.some(
+      (element) =>
+        hasBackground(element.type) && !isTransparent(element.backgroundColor),
+    );
+
+  const showLinkIcon = targetElements.length === 1;
+
+  const showLineEditorAction =
+    !appState.editingLinearElement &&
+    targetElements.length === 1 &&
+    isLinearElement(targetElements[0]) &&
+    !isElbowArrow(targetElements[0]);
+
+  const showCropEditorAction =
+    !appState.croppingElementId &&
+    targetElements.length === 1 &&
+    isImageElement(targetElements[0]);
+
+  const showAlignActions = alignActionsPredicate(appState, app);
+
+  let isSingleElementBoundContainer = false;
+  if (
+    targetElements.length === 2 &&
+    (hasBoundTextElement(targetElements[0]) ||
+      hasBoundTextElement(targetElements[1]))
+  ) {
+    isSingleElementBoundContainer = true;
+  }
+
+  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
+
+  return (
+    <div className="compact-shape-actions">
+      {/* Stroke Color */}
+      {canChangeStrokeColor(appState, targetElements) && (
+        <div className={clsx("compact-action-item")}>
+          {renderAction("changeStrokeColor", { compactMode: true })}
+        </div>
+      )}
+
+      {/* Background Color */}
+      {canChangeBackgroundColor(appState, targetElements) && (
+        <div className="compact-action-item">
+          {renderAction("changeBackgroundColor", { compactMode: true })}
+        </div>
+      )}
+
+      {/* Combined Properties (Fill, Stroke, Opacity) */}
+      {(showFillIcons ||
+        hasStrokeWidth(appState.activeTool.type) ||
+        targetElements.some((element) => hasStrokeWidth(element.type)) ||
+        hasStrokeStyle(appState.activeTool.type) ||
+        targetElements.some((element) => hasStrokeStyle(element.type)) ||
+        canChangeRoundness(appState.activeTool.type) ||
+        targetElements.some((element) => canChangeRoundness(element.type))) && (
+        <div className="compact-action-item">
+          <Popover.Root
+            open={strokePopoverOpen}
+            onOpenChange={setStrokePopoverOpen}
+          >
+            <Popover.Trigger asChild>
+              <button
+                type="button"
+                className="compact-action-button"
+                title={t("labels.stroke")}
+              >
+                {resizeIcon}
+              </button>
+            </Popover.Trigger>
+            {strokePopoverOpen && (
+              <PropertiesPopover
+                container={container}
+                style={{ maxWidth: "13rem" }}
+                onClose={() => setStrokePopoverOpen(false)}
+              >
+                <div className="selected-shape-actions">
+                  {showFillIcons && renderAction("changeFillStyle")}
+                  {(hasStrokeWidth(appState.activeTool.type) ||
+                    targetElements.some((element) =>
+                      hasStrokeWidth(element.type),
+                    )) &&
+                    renderAction("changeStrokeWidth")}
+                  {(hasStrokeStyle(appState.activeTool.type) ||
+                    targetElements.some((element) =>
+                      hasStrokeStyle(element.type),
+                    )) && (
+                    <>
+                      {renderAction("changeStrokeStyle")}
+                      {renderAction("changeSloppiness")}
+                    </>
+                  )}
+                  {(canChangeRoundness(appState.activeTool.type) ||
+                    targetElements.some((element) =>
+                      canChangeRoundness(element.type),
+                    )) &&
+                    renderAction("changeRoundness")}
+                  {renderAction("changeOpacity")}
+                </div>
+              </PropertiesPopover>
+            )}
+          </Popover.Root>
+        </div>
+      )}
+
+      {/* Combined Arrow Properties */}
+      {(toolIsArrow(appState.activeTool.type) ||
+        targetElements.some((element) => toolIsArrow(element.type))) && (
+        <div className="compact-action-item">
+          <Popover.Root
+            open={appState.openPopup === "arrowProperties"}
+            onOpenChange={(open) => {
+              setAppState({ openPopup: open ? "arrowProperties" : null });
+            }}
+          >
+            <Popover.Trigger asChild>
+              <button
+                type="button"
+                className="compact-action-button"
+                title={t("labels.arrowtypes")}
+              >
+                {(() => {
+                  // Show an icon based on the current arrow type
+                  const arrowType = getFormValue(
+                    targetElements,
+                    app,
+                    (element) => {
+                      if (isArrowElement(element)) {
+                        return element.elbowed
+                          ? "elbow"
+                          : element.roundness
+                          ? "round"
+                          : "sharp";
+                      }
+                      return null;
+                    },
+                    (element) => isArrowElement(element),
+                    (hasSelection) =>
+                      hasSelection ? null : appState.currentItemArrowType,
+                  );
+
+                  if (arrowType === "elbow") {
+                    return elbowArrowIcon;
+                  }
+                  if (arrowType === "round") {
+                    return roundArrowIcon;
+                  }
+                  return sharpArrowIcon; // default
+                })()}
+              </button>
+            </Popover.Trigger>
+            {appState.openPopup === "arrowProperties" && (
+              <PropertiesPopover
+                container={container}
+                style={{ maxWidth: "13rem" }}
+                onClose={() => setAppState({ openPopup: null })}
+              >
+                {renderAction("changeArrowProperties")}
+              </PropertiesPopover>
+            )}
+          </Popover.Root>
+        </div>
+      )}
+
+      {/* Linear Editor */}
+      {showLineEditorAction && (
+        <div className="compact-action-item">
+          {renderAction("toggleLinearEditor", { compactMode: true })}
+        </div>
+      )}
+
+      {/* Text Properties */}
+      {(appState.activeTool.type === "text" ||
+        targetElements.some(isTextElement)) && (
+        <>
+          <div className="compact-action-item">
+            {renderAction("changeFontFamily", {
+              compactMode: true,
+            })}
+          </div>
+          <div className="compact-action-item">
+            <Popover.Root
+              open={appState.openPopup === "textAlign"}
+              onOpenChange={(open) => {
+                setAppState({ openPopup: open ? "textAlign" : null });
+              }}
+            >
+              <Popover.Trigger asChild>
+                <button
+                  type="button"
+                  className="compact-action-button"
+                  title={t("labels.textAlign")}
+                >
+                  {TextSizeIcon}
+                </button>
+              </Popover.Trigger>
+              {appState.openPopup === "textAlign" && (
+                <PropertiesPopover
+                  container={container}
+                  style={{ maxWidth: "13rem" }}
+                  onClose={() => setAppState({ openPopup: null })}
+                >
+                  <div className="selected-shape-actions">
+                    {(appState.activeTool.type === "text" ||
+                      suppportsHorizontalAlign(targetElements, elementsMap)) &&
+                      renderAction("changeTextAlign")}
+                    {shouldAllowVerticalAlign(targetElements, elementsMap) &&
+                      renderAction("changeVerticalAlign")}
+                    {(appState.activeTool.type === "text" ||
+                      targetElements.some(isTextElement)) &&
+                      renderAction("changeFontSize")}
+                  </div>
+                </PropertiesPopover>
+              )}
+            </Popover.Root>
+          </div>
+        </>
+      )}
+
+      {/* Dedicated Copy Button */}
+      {!isEditingTextOrNewElement && targetElements.length > 0 && (
+        <div className="compact-action-item">
+          {renderAction("duplicateSelection", { compactMode: true })}
+        </div>
+      )}
+
+      {/* Dedicated Delete Button */}
+      {!isEditingTextOrNewElement && targetElements.length > 0 && (
+        <div className="compact-action-item">
+          {renderAction("deleteSelectedElements", { compactMode: true })}
+        </div>
+      )}
+
+      {/* Combined Other Actions */}
+      {!isEditingTextOrNewElement && targetElements.length > 0 && (
+        <div className="compact-action-item">
+          <Popover.Root
+            open={otherActionsPopoverOpen}
+            onOpenChange={setOtherActionsPopoverOpen}
+          >
+            <Popover.Trigger asChild>
+              <button
+                type="button"
+                className="compact-action-button"
+                title={t("labels.actions")}
+              >
+                {settingsPlusIcon}
+              </button>
+            </Popover.Trigger>
+            {otherActionsPopoverOpen && (
+              <PropertiesPopover
+                container={container}
+                style={{
+                  maxWidth: "12rem",
+                  // center the popover content
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onClose={() => setOtherActionsPopoverOpen(false)}
+              >
+                <div className="selected-shape-actions">
+                  <fieldset>
+                    <legend>{t("labels.layers")}</legend>
+                    <div className="buttonList">
+                      {renderAction("sendToBack")}
+                      {renderAction("sendBackward")}
+                      {renderAction("bringForward")}
+                      {renderAction("bringToFront")}
+                    </div>
+                  </fieldset>
+
+                  {showAlignActions && !isSingleElementBoundContainer && (
+                    <fieldset>
+                      <legend>{t("labels.align")}</legend>
+                      <div className="buttonList">
+                        {isRTL ? (
+                          <>
+                            {renderAction("alignRight")}
+                            {renderAction("alignHorizontallyCentered")}
+                            {renderAction("alignLeft")}
+                          </>
+                        ) : (
+                          <>
+                            {renderAction("alignLeft")}
+                            {renderAction("alignHorizontallyCentered")}
+                            {renderAction("alignRight")}
+                          </>
+                        )}
+                        {targetElements.length > 2 &&
+                          renderAction("distributeHorizontally")}
+                        {/* breaks the row ˇˇ */}
+                        <div style={{ flexBasis: "100%", height: 0 }} />
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: ".5rem",
+                            marginTop: "-0.5rem",
+                          }}
+                        >
+                          {renderAction("alignTop")}
+                          {renderAction("alignVerticallyCentered")}
+                          {renderAction("alignBottom")}
+                          {targetElements.length > 2 &&
+                            renderAction("distributeVertically")}
+                        </div>
+                      </div>
+                    </fieldset>
+                  )}
+                  <fieldset>
+                    <legend>{t("labels.actions")}</legend>
+                    <div className="buttonList">
+                      {renderAction("group")}
+                      {renderAction("ungroup")}
+                      {showLinkIcon && renderAction("hyperlink")}
+                      {showCropEditorAction && renderAction("cropEditor")}
+                    </div>
+                  </fieldset>
+                </div>
+              </PropertiesPopover>
+            )}
+          </Popover.Root>
+        </div>
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import * as Popover from "@radix-ui/react-popover";
+import clsx from "clsx";
 import React, { useCallback, useMemo } from "react";
 
 import { FONT_FAMILY } from "@excalidraw/common";
@@ -83,7 +84,13 @@ export const FontPicker = React.memo(
     );
 
     return (
-      <div role="dialog" aria-modal="true" className="FontPicker__container">
+      <div
+        role="dialog"
+        aria-modal="true"
+        className={clsx("FontPicker__container", {
+          "FontPicker__container--compact": compactMode,
+        })}
+      >
         {!compactMode && (
           <div className="buttonList">
             <RadioSelection<FontFamilyValues | false>
