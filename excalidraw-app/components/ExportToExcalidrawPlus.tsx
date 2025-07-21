@@ -99,7 +99,7 @@ export const ExportToExcalidrawPlus: React.FC<{
     <Card color="primary">
       <div className="Card-icon">
         <img
-          src="/new-logo.svg"
+          src="/gamifyboard-icon.svg"
           alt="GamifyBoard Logo"
           style={{ width: "2.8rem", height: "2.8rem" }}
         />
