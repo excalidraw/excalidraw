@@ -385,6 +385,8 @@ export interface AppState {
   gridSize: number;
   gridStep: number;
   gridModeEnabled: boolean;
+  /** 10px grid snapping enabled */
+  tenPxGridSnapEnabled: boolean;
   viewModeEnabled: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
@@ -575,6 +577,7 @@ export interface ExcalidrawProps {
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
   objectsSnapModeEnabled?: boolean;
+  tenPxGridSnapEnabled?: boolean;
   libraryReturnUrl?: string;
   theme?: Theme;
   // @TODO come with better API before v0.18.0

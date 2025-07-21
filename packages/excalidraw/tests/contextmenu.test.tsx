@@ -96,6 +96,7 @@ describe("contextMenu element", () => {
       "zenMode",
       "viewMode",
       "objectsSnapMode",
+      "toggle10pxGridSnap",
       "stats",
     ];
 

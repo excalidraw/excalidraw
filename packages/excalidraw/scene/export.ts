@@ -263,6 +263,7 @@ export const exportToCanvas = async (
       canvasBackgroundColor: viewBackgroundColor,
       imageCache,
       renderGrid: false,
+      effectiveGridSize: null,
       isExporting: true,
       // empty disables embeddable rendering
       embedsValidationStatus: new Map(),

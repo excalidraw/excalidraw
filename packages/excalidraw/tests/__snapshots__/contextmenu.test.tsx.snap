@@ -983,6 +983,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -1175,6 +1176,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": {
     "message": "Added to library",
@@ -1388,6 +1390,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -1718,6 +1721,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -2048,6 +2052,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": {
     "message": "Copied styles.",
@@ -2259,6 +2264,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -2501,6 +2507,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -2803,6 +2810,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -3169,6 +3177,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": {
     "message": "Copied styles.",
@@ -3661,6 +3670,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -3983,6 +3993,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -4308,6 +4319,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -5592,6 +5604,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -6810,6 +6823,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -7452,6 +7466,64 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
+            strokeWidth={"1.50000"}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 6h18"
+            />
+            <path
+              d="M3 12h18"
+            />
+            <path
+              d="M3 18h18"
+            />
+            <path
+              d="M6 3v18"
+            />
+            <path
+              d="M12 3v18"
+            />
+            <path
+              d="M18 3v18"
+            />
+          </g>
+        </svg>,
+        "keyTest": [Function],
+        "keywords": [
+          "snap",
+          "grid",
+          "10px",
+        ],
+        "label": "labels.toggle10pxGridSnap",
+        "name": "toggle10pxGridSnap",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "canvas",
+          "predicate": [Function],
+        },
+        "viewMode": true,
+      },
+      {
+        "checked": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
             strokeWidth={"1.25000"}
           >
             <path
@@ -7740,6 +7812,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -8738,6 +8811,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,
@@ -9731,6 +9805,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,

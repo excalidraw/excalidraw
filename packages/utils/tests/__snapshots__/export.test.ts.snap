@@ -102,6 +102,7 @@ exports[`exportToSvg > with default arguments 1`] = `
     "panels": 3,
   },
   "suggestedBindings": [],
+  "tenPxGridSnapEnabled": false,
   "theme": "light",
   "toast": null,
   "userToFollow": null,

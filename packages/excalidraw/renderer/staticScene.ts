@@ -245,9 +245,10 @@ const _renderStaticScene = ({
 
   // Grid
   if (renderGrid) {
+    const gridSize = renderConfig.effectiveGridSize || appState.gridSize;
     strokeGrid(
       context,
-      appState.gridSize,
+      gridSize,
       appState.gridStep,
       appState.scrollX,
       appState.scrollY,

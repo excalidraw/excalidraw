@@ -159,6 +159,9 @@ export class SnapCache {
 export const isGridModeEnabled = (app: AppClassProperties): boolean =>
   app.props.gridModeEnabled ?? app.state.gridModeEnabled;
 
+export const is10pxGridSnapEnabled = (app: AppClassProperties): boolean =>
+  app.props.tenPxGridSnapEnabled ?? app.state.tenPxGridSnapEnabled;
+
 export const isSnappingEnabled = ({
   event,
   app,
