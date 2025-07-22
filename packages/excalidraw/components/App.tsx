@@ -5447,13 +5447,8 @@ class App extends React.Component<AppProps, AppState> {
           this.state.selectedLinearElement.elementId !==
             selectedLinearElement.id)
       ) {
-        this.store.scheduleCapture();
-        this.setState({
-          selectedLinearElement: LinearElementEditor.createEditingInstance(
-            selectedLinearElement,
-            this.scene.getNonDeletedElementsMap(),
-          ),
-        });
+        // Use the proper action to ensure immediate history capture
+        this.actionManager.executeAction(actionToggleLinearEditor);
         return;
       } else if (
         this.state.selectedLinearElement &&

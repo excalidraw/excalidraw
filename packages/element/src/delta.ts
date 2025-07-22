@@ -548,6 +548,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         selectedElementIds: addedSelectedElementIds = {},
         selectedGroupIds: addedSelectedGroupIds = {},
         selectedLinearElementId,
+        selectedLinearElementIsEditing,
         ...directlyApplicablePartial
       } = this.delta.inserted;
 
@@ -563,15 +564,37 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         removedSelectedGroupIds,
       );
 
-      const selectedLinearElement =
-        selectedLinearElementId && nextElements.has(selectedLinearElementId)
-          ? new LinearElementEditor(
-              nextElements.get(
-                selectedLinearElementId,
-              ) as NonDeleted<ExcalidrawLinearElement>,
-              nextElements,
-            )
-          : null;
+      let selectedLinearElement: LinearElementEditor | null = null;
+      if (
+        selectedLinearElementId &&
+        nextElements.has(selectedLinearElementId)
+      ) {
+        const element = nextElements.get(
+          selectedLinearElementId,
+        ) as NonDeleted<ExcalidrawLinearElement>;
+
+        if (selectedLinearElementIsEditing === true) {
+          // Create editing instance with proper state
+          selectedLinearElement = new LinearElementEditor(
+            element,
+            nextElements,
+            true, // isEditing
+          );
+        } else if (selectedLinearElementIsEditing === false) {
+          // Create non-editing instance
+          selectedLinearElement = new LinearElementEditor(
+            element,
+            nextElements,
+            false, // not editing
+          );
+        } else {
+          // Legacy case - create basic instance
+          selectedLinearElement = new LinearElementEditor(
+            element,
+            nextElements,
+          );
+        }
+      }
 
       const nextAppState = {
         ...appState,
@@ -748,6 +771,18 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
             break;
           }
+          case "selectedLinearElementIsEditing": {
+            // Changes in editing state are always visible
+            const prevIsEditing =
+              prevAppState.selectedLinearElement?.isEditing ?? false;
+            const nextIsEditing =
+              nextAppState.selectedLinearElement?.isEditing ?? false;
+
+            if (prevIsEditing !== nextIsEditing) {
+              visibleDifferenceFlag.value = true;
+            }
+            break;
+          }
           default: {
             assertNever(
               key,
@@ -836,6 +871,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       selectedGroupIds,
       selectedElementIds,
       selectedLinearElementId,
+      selectedLinearElementIsEditing,
       croppingElementId,
       lockedMultiSelections,
       activeLockedId,

@@ -248,8 +248,9 @@ export type ObservedElementsAppState = {
   editingGroupId: AppState["editingGroupId"];
   selectedElementIds: AppState["selectedElementIds"];
   selectedGroupIds: AppState["selectedGroupIds"];
-  // Avoiding storing whole instance, as it could lead into state incosistencies, empty undos/redos and etc.
+  // Storing essential LinearElementEditor state for proper history restoration
   selectedLinearElementId: LinearElementEditor["elementId"] | null;
+  selectedLinearElementIsEditing: boolean | null;
   croppingElementId: AppState["croppingElementId"];
   lockedMultiSelections: AppState["lockedMultiSelections"];
   activeLockedId: AppState["activeLockedId"];
