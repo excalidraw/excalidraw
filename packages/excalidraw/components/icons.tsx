@@ -1197,6 +1197,22 @@ export const StrokeStyleDottedIcon = createIcon(
   tablerIconProps,
 );
 
+export const VariablePressureIcon = createIcon(
+  <path
+    d="M.224 10a.2.2 0 0 1-.05.033c-.797.32 1.394-1.66 1.514-1.753 1.379-1.062 3.04-1.88 4.817-1.57 4.898.855 6.295 8.486 11.858 4.85a16 16 0 0 0 2.32-1.856c.526-.503.265.554.15.746-.166.28-.33.564-.509.837q-.233.36-.483.708c-1.111 1.55-2.803 2.9-4.818 2.61-5.083-.736-6.013-10.34-12.32-6.583C1.789 8.566.992 9.268.224 10"
+    fill="#fff"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const FixedPressureIcon = createIcon(
+  <path
+    d="M1 10C11.5678 0.35 11.5678 21.085 21 10" 
+    strokeWidth="1.25" 
+  />,
+  modifiedTablerIconProps,
+);
+
 export const SloppinessArchitectIcon = createIcon(
   <path
     d="M2.5 12.038c1.655-.885 5.9-3.292 8.568-4.354 2.668-1.063.101 2.821 1.32 3.104 1.218.283 5.112-1.814 5.112-1.814"
