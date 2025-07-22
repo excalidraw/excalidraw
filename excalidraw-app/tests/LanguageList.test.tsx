@@ -19,16 +19,20 @@ describe("Test LanguageList", () => {
     UI.clickTool("rectangle");
     // english lang should display `thin` label
     expect(screen.queryByTitle(/thin/i)).not.toBeNull();
-    fireEvent.click(document.querySelector(".dropdown-menu-button")!);
+    fireEvent.click(screen.getByTestId("main-menu-trigger"));
 
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "de-DE" },
+    await waitFor(() => {
+      fireEvent.change(screen.getByTestId("dropdown-select-language"), {
+        target: { value: "de-DE" },
+      });
     });
     // switching to german, `thin` label should no longer exist
     await waitFor(() => expect(screen.queryByTitle(/thin/i)).toBeNull());
     // reset language
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: defaultLang.code },
+    await waitFor(() => {
+      fireEvent.change(screen.getByTestId("dropdown-select-language"), {
+        target: { value: defaultLang.code },
+      });
     });
     // switching back to English
     await waitFor(() => expect(screen.queryByTitle(/thin/i)).not.toBeNull());

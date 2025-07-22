@@ -4,12 +4,19 @@ import React, { useState, useCallback } from "react";
 
 import { Excalidraw, MainMenu, WelcomeScreen } from "@excalidraw/excalidraw";
 
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import type {
+  NonDeletedExcalidrawElement,
+  ExcalidrawElement,
+} from "@excalidraw/element/types";
+import type {
+  ExcalidrawImperativeAPI,
+  AppState,
+} from "@excalidraw/excalidraw/types";
 
 // Importieren Sie Ihre GamifyToolbar-Komponente
 import { GamifyToolbar } from "./components/GamifyToolbar";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
+import PropertiesSidebar from "./components/PropertiesSidebar";
 
 // Hilfsfunktion, um zu prüfen, ob sich zwei GameState-Objekte unterscheiden.
 const areGameStatesDifferent = (
@@ -36,6 +43,8 @@ const App = () => {
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
   const [gameState, setGameState] = useState<Record<string, boolean>>({});
+  const [selectedElement, setSelectedElement] =
+    useState<NonDeletedExcalidrawElement | null>(null);
 
   const checkGameState = useCallback(() => {
     if (!excalidrawAPI) {
@@ -98,12 +107,50 @@ const App = () => {
     }
   }, [excalidrawAPI, setGameState]);
 
+  const handleCanvasChange = useCallback(
+    (elements: readonly ExcalidrawElement[], appState: AppState) => {
+      if (
+        appState.selectedElementIds &&
+        Object.keys(appState.selectedElementIds).length === 1
+      ) {
+        const selectedId = Object.keys(appState.selectedElementIds)[0];
+        const element = elements.find((el) => el.id === selectedId);
+        if (
+          element &&
+          (element.customData?.isCard || element.customData?.isZone)
+        ) {
+          setSelectedElement(element as NonDeletedExcalidrawElement);
+        } else {
+          setSelectedElement(null);
+        }
+      } else {
+        setSelectedElement(null);
+      }
+    },
+    [],
+  );
+
+  const handleUpdateElement = (updatedData: any) => {
+    if (!excalidrawAPI || !selectedElement) return;
+
+    const updatedElement = {
+      ...selectedElement,
+      customData: { ...selectedElement.customData, ...updatedData },
+    };
+    excalidrawAPI.updateScene({
+      elements: [updatedElement],
+      commitToHistory: true,
+    });
+    setSelectedElement(updatedElement as NonDeletedExcalidrawElement);
+  };
+
   return (
     <TopErrorBoundary>
       <div style={{ height: "100vh" }}>
         <Excalidraw
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
           onPointerUp={checkGameState}
+          onChange={handleCanvasChange}
           renderTopRightUI={() => (
             <div
               style={{
@@ -141,6 +188,10 @@ const App = () => {
                   ))}
                 </ul>
               </div>
+              <PropertiesSidebar
+                selectedElement={selectedElement}
+                onUpdateElement={handleUpdateElement}
+              />
             </div>
           )}
         >
