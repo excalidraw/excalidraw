@@ -113,10 +113,6 @@ const _debugRenderer = (
     scale,
   );
 
-  if (appState.height !== canvas.height || appState.width !== canvas.width) {
-    refresh();
-  }
-
   const context = bootstrapCanvas({
     canvas,
     scale,
