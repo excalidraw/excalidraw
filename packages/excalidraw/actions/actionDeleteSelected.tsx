@@ -205,13 +205,13 @@ export const actionDeleteSelected = register({
   icon: TrashIcon,
   trackEvent: { category: "element", action: "delete" },
   perform: (elements, appState, formData, app) => {
-    if (appState.editingLinearElement) {
+    if (appState.selectedLinearElement?.isEditing) {
       const {
         elementId,
         selectedPointsIndices,
         startBindingElement,
         endBindingElement,
-      } = appState.editingLinearElement;
+      } = appState.selectedLinearElement;
       const elementsMap = app.scene.getNonDeletedElementsMap();
       const element = LinearElementEditor.getElement(elementId, elementsMap);
       if (!element) {
@@ -242,7 +242,7 @@ export const actionDeleteSelected = register({
           elements: nextElements,
           appState: {
             ...nextAppState,
-            editingLinearElement: null,
+            selectedLinearElement: null,
           },
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
@@ -267,8 +267,8 @@ export const actionDeleteSelected = register({
         elements,
         appState: {
           ...appState,
-          editingLinearElement: {
-            ...appState.editingLinearElement,
+          selectedLinearElement: {
+            ...appState.selectedLinearElement,
             ...binding,
             selectedPointsIndices:
               selectedPointsIndices?.[0] > 0

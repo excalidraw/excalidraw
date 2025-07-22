@@ -548,7 +548,6 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         selectedElementIds: addedSelectedElementIds = {},
         selectedGroupIds: addedSelectedGroupIds = {},
         selectedLinearElementId,
-        editingLinearElementId,
         ...directlyApplicablePartial
       } = this.delta.inserted;
 
@@ -574,16 +573,6 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             )
           : null;
 
-      const editingLinearElement =
-        editingLinearElementId && nextElements.has(editingLinearElementId)
-          ? new LinearElementEditor(
-              nextElements.get(
-                editingLinearElementId,
-              ) as NonDeleted<ExcalidrawLinearElement>,
-              nextElements,
-            )
-          : null;
-
       const nextAppState = {
         ...appState,
         ...directlyApplicablePartial,
@@ -593,10 +582,6 @@ export class AppStateDelta implements DeltaContainer<AppState> {
           typeof selectedLinearElementId !== "undefined"
             ? selectedLinearElement // element was either inserted or deleted
             : appState.selectedLinearElement, // otherwise assign what we had before
-        editingLinearElement:
-          typeof editingLinearElementId !== "undefined"
-            ? editingLinearElement // element was either inserted or deleted
-            : appState.editingLinearElement, // otherwise assign what we had before
       };
 
       const constainsVisibleChanges = this.filterInvisibleChanges(
@@ -726,7 +711,6 @@ export class AppStateDelta implements DeltaContainer<AppState> {
 
             break;
           case "selectedLinearElementId":
-          case "editingLinearElementId":
             const appStateKey = AppStateDelta.convertToAppStateKey(key);
             const linearElement = nextAppState[appStateKey];
 
@@ -779,16 +763,11 @@ export class AppStateDelta implements DeltaContainer<AppState> {
   }
 
   private static convertToAppStateKey(
-    key: keyof Pick<
-      ObservedElementsAppState,
-      "selectedLinearElementId" | "editingLinearElementId"
-    >,
-  ): keyof Pick<AppState, "selectedLinearElement" | "editingLinearElement"> {
+    key: keyof Pick<ObservedElementsAppState, "selectedLinearElementId">,
+  ): keyof Pick<AppState, "selectedLinearElement"> {
     switch (key) {
       case "selectedLinearElementId":
         return "selectedLinearElement";
-      case "editingLinearElementId":
-        return "editingLinearElement";
     }
   }
 
@@ -856,7 +835,6 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       editingGroupId,
       selectedGroupIds,
       selectedElementIds,
-      editingLinearElementId,
       selectedLinearElementId,
       croppingElementId,
       lockedMultiSelections,

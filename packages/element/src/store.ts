@@ -978,7 +978,6 @@ const getDefaultObservedAppState = (): ObservedAppState => {
     viewBackgroundColor: COLOR_PALETTE.white,
     selectedElementIds: {},
     selectedGroupIds: {},
-    editingLinearElementId: null,
     selectedLinearElementId: null,
     croppingElementId: null,
     activeLockedId: null,
@@ -998,10 +997,6 @@ export const getObservedAppState = (
     croppingElementId: appState.croppingElementId,
     activeLockedId: appState.activeLockedId,
     lockedMultiSelections: appState.lockedMultiSelections,
-    editingLinearElementId:
-      (appState as AppState).editingLinearElement?.elementId ?? // prefer app state, as it's likely newer
-      (appState as ObservedAppState).editingLinearElementId ?? // fallback to observed app state, as it's likely older coming from a previous snapshot
-      null,
     selectedLinearElementId:
       (appState as AppState).selectedLinearElement?.elementId ??
       (appState as ObservedAppState).selectedLinearElementId ??

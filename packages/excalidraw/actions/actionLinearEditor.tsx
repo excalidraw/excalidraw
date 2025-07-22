@@ -46,7 +46,7 @@ export const actionToggleLinearEditor = register({
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     if (
-      !appState.editingLinearElement &&
+      !appState.selectedLinearElement?.isEditing &&
       selectedElements.length === 1 &&
       isLinearElement(selectedElements[0]) &&
       !isElbowArrow(selectedElements[0])
@@ -62,13 +62,17 @@ export const actionToggleLinearEditor = register({
     })[0] as ExcalidrawLinearElement;
 
     const editingLinearElement =
-      appState.editingLinearElement?.elementId === selectedElement.id
-        ? null
-        : new LinearElementEditor(selectedElement, arrayToMap(elements));
+      appState.selectedLinearElement?.isEditing &&
+      appState.selectedLinearElement.elementId === selectedElement.id
+        ? new LinearElementEditor(selectedElement, arrayToMap(elements), false) // exit editing
+        : LinearElementEditor.createEditingInstance(
+            selectedElement,
+            arrayToMap(elements),
+          );
     return {
       appState: {
         ...appState,
-        editingLinearElement,
+        selectedLinearElement: editingLinearElement,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
