@@ -41,7 +41,7 @@ Jeder Entwickler (menschlich oder KI) ist verpflichtet, vor Arbeitsbeginn die ne
   1.  **"Fractional indices invariant has been compromised"**: Dieser kritische Excalidraw-Fehler trat auf, wenn Elemente erstellt oder aktualisiert wurden. Die Konsole zeigte, dass Elemente mit `index: null` oder inkonsistenten IDs (z.B. `null:element_...`) die interne Datenstruktur von Excalidraw verletzten.
   2.  **"Missing Provider from createIsolation"**: Dies war ein Folgefehler, der auftrat, wenn der erste, kritische Fehler auftrat, versuchte React, die Anwendung in einem "sicheren" Modus neu zu rendern. Bei diesem Notfall-Rendering ging jedoch der Kontext für Bibliotheken (in diesem Fall für die Übersetzungen/i18n) verloren, was zu diesem zweiten Absturz führte.
   3.  **Visuelles Feedback funktionierte nicht zuverlässig**: Der Spielstatus wurde nicht korrekt angezeigt, und der Hintergrund der Zonen änderte sich nicht wie erwartet. Dies lag daran, dass die `customData` der Elemente, die von `excalidrawAPI.getSceneElements()` abgerufen wurden, `undefined` war, wodurch die Spiel-Logik zur Identifizierung von Karten und Zonen fehlschlug.
-  4.  **Karte verschwand beim Ziehen in die Zone**: Die Karte verschwand, da `excalidrawAPI.addFiles` anstelle von `excalidrawAPI.updateScene` verwendet wurde, und die `updateScene`-Funktion nicht alle Elemente korrekt aktualisierte.
+  4.  **Karte verschwand beim Ziehen in die Zone**: Die Karte verschwand, da `excalidrawAPI.addFiles` anstelle von `excalidrawAPI.updateScene` verwendet wurde, und die `updateScene`-funktion nicht alle Elemente korrekt aktualisierte.
 
 - **Lösung:**
   *   Die Importpfade in `App.tsx` und `GamifyToolbar.tsx` wurden korrigiert, um die Aliasse aus `tsconfig.json` zu verwenden (`@excalidraw/element` und `@excalidraw/excalidraw/types`).
@@ -51,3 +51,33 @@ Jeder Entwickler (menschlich oder KI) ist verpflichtet, vor Arbeitsbeginn die ne
   *   ESLint-Fehler und -Warnungen wurden durch Ausführen von `yarn fix:code` behoben.
 
 - **Status:** Abgeschlossen. Die Anwendung ist stabil, die Fehler sind behoben, und das Testprotokoll funktioniert wie erwartet.
+
+## Meilenstein 5: Vollständiges Re-Branding der UI
+
+- **Datum:** 21. Juli 2025
+- **Status:** Abgeschlossen.
+
+- **Problembeschreibung:**
+  Nach dem initialen Re-Branding blieben alte Excalidraw-Assets und -Referenzen in der Anwendung sichtbar, insbesondere:
+  1.  Altes Excalidraw-Favicon und -Logo wurden weiterhin angezeigt.
+  2.  Meta-Tags und Open Graph-Informationen in `index.html` enthielten noch Excalidraw-Referenzen.
+  3.  Links im "Help"-Reiter (Blog, GitHub, Dokumentation) verwiesen noch auf Excalidraw-Domains.
+  4.  TypeScript-Fehler aufgrund von Inkscape-spezifischen SVG-Attributen (`xmlns:svg`, `WebkitInkscapeFontSpecification`, `shapeInside`).
+  5.  Das neue Logo im Welcome Screen hatte eine falsche Größe.
+
+- **Lösung:**
+  1.  **Asset-Ersetzung:**
+      -   `new-logo.svg` wurde gelöscht.
+      -   Neue `gamifyboard-icon.svg` und `gamifyboard-wordmark.svg` wurden als Quell-SVGs verwendet.
+      -   Alle benötigten PNG-Favicons und App-Icons (`favicon-16x16.png`, `favicon-32x32.png`, `apple-touch-icon.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png`, `maskable_icon_x192.png`, `maskable_icon_x512.png`) sowie `favicon.ico` wurden aus `gamifyboard-icon.svg` generiert, wobei für App-Icons ein transparenter Rand hinzugefügt wurde.
+      -   `gamifyboard-og-image.png` wurde als Social Media Banner in `README.md` eingefügt.
+  2.  **Code-Aktualisierung:**
+      -   Referenzen zu `new-logo.svg` in `excalidraw-app/components/ExportToExcalidrawPlus.tsx` wurden auf `gamifyboard-icon.svg` aktualisiert.
+      -   Alle "Excalidraw"-Texte und URLs in `excalidraw-app/index.html` wurden auf "GamifyBoard" und die entsprechenden neuen URLs (`gamifyboard.com`, `blog.GamifyBoard.com`, `docs.GamifyBoard.com`, `github.com/ndy-onl/gamifyboard`) aktualisiert.
+      -   Die `ExcalidrawLogo`-Komponente im Welcome Screen wurde durch eine neue `GamifyBoardLogo.tsx`-Komponente ersetzt, die `gamifyboard-wordmark.svg` verwendet.
+      -   Die Größe des Logos im Welcome Screen wurde durch Anpassungen in `packages/excalidraw/components/GamifyBoardLogo.scss` korrigiert.
+      -   Links im "Help"-Reiter in `packages/excalidraw/components/HelpDialog.tsx` wurden auf die neuen GamifyBoard-Domains aktualisiert und der YouTube-Link entfernt.
+  3.  **Fehlerbehebung:**
+      -   TypeScript-Fehler in `GamifyBoardLogo.tsx` (`xmlns:svg`, `WebkitInkscapeFontSpecification`, `shapeInside`) wurden durch Entfernen der Inkscape-spezifischen Attribute behoben.
+
+- **Status:** Abgeschlossen.
