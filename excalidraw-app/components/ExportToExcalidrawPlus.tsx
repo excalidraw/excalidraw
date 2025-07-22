@@ -4,7 +4,6 @@ import { nanoid } from "nanoid";
 
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { Card } from "@excalidraw/excalidraw/components/Card";
-import { ExcalidrawLogo } from "@excalidraw/excalidraw/components/ExcalidrawLogo";
 import { ToolButton } from "@excalidraw/excalidraw/components/ToolButton";
 import { MIME_TYPES, getFrame } from "@excalidraw/common";
 import {
@@ -99,18 +98,14 @@ export const ExportToExcalidrawPlus: React.FC<{
   return (
     <Card color="primary">
       <div className="Card-icon">
-        <ExcalidrawLogo
-          style={{
-            [`--color-logo-icon` as any]: "#fff",
-            width: "2.8rem",
-            height: "2.8rem",
-          }}
+        <img
+          src="/gamifyboard-icon.svg"
+          alt="GamifyBoard Logo"
+          style={{ width: "2.8rem", height: "2.8rem" }}
         />
       </div>
-      <h2>Excalidraw+</h2>
-      <div className="Card-details">
-        {t("exportDialog.excalidrawplus_description")}
-      </div>
+      <h2>GamifyBoard</h2>
+      <div className="Card-details">{t("exportDialog.link_details")}</div>
       <ToolButton
         className="Card-button"
         type="button"

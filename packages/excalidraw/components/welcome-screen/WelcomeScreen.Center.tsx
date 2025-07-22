@@ -4,7 +4,7 @@ import { useTunnels } from "../../context/tunnels";
 import { useUIAppState } from "../../context/ui-appState";
 import { t, useI18n } from "../../i18n";
 import { useDevice, useExcalidrawActionManager } from "../App";
-import { ExcalidrawLogo } from "../ExcalidrawLogo";
+import { GamifyBoardLogo } from "../GamifyBoardLogo";
 import { HelpIcon, LoadIcon, usersIcon } from "../icons";
 
 import type { JSX } from "react";
@@ -112,7 +112,7 @@ Center.displayName = "Center";
 const Logo = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className="welcome-screen-center__logo excalifont welcome-screen-decor">
-      {children || <ExcalidrawLogo withText />}
+      {children || <GamifyBoardLogo />}
     </div>
   );
 };
