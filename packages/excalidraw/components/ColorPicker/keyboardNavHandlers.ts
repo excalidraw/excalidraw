@@ -16,6 +16,7 @@ import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import {
   colorPickerHotkeyBindings,
+  colorPickerHotkeyBindingsAsCodes,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
 
@@ -97,8 +98,11 @@ const hotkeyHandler = ({
     }
   }
 
-  if (colorPickerHotkeyBindings.includes(e.key)) {
-    const index = colorPickerHotkeyBindings.indexOf(e.key);
+  if (colorPickerHotkeyBindings.includes(e.key) || (!isLatinChar(e.key) && colorPickerHotkeyBindingsAsCodes.includes(e.code))) {
+    let index = colorPickerHotkeyBindings.indexOf(e.key);
+    if (index === -1) {
+      index = colorPickerHotkeyBindingsAsCodes.indexOf(e.code);
+    }
     const paletteKey = Object.keys(palette)[index] as keyof ColorPalette;
     const paletteValue = palette[paletteKey];
     const r = Array.isArray(paletteValue)
