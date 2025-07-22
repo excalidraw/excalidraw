@@ -4434,6 +4434,7 @@ class App extends React.Component<AppProps, AppState> {
                     selectedLinearElement: new LinearElementEditor(
                       selectedElement,
                       this.scene.getNonDeletedElementsMap(),
+                      true,
                     ),
                   });
                 }
