@@ -127,7 +127,7 @@ export const KeyCodeMap = new Map<ValueOf<typeof KEYS>, ValueOf<typeof CODES>>([
 ]);
 
 export const isLatinChar = (key: string) =>
-  /^[a-z0-9]$/.test(key.toLowerCase());
+  /^[?a-z0-9]$/.test(key.toLowerCase());
 
 /**
  * Used to match key events for any keyboard layout, especially on Windows and Linux,

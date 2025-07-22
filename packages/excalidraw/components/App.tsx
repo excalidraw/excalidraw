@@ -4285,7 +4285,12 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (event.key === KEYS.QUESTION_MARK) {
+      if (
+        event.key === KEYS.QUESTION_MARK ||
+        (event.shiftKey &&
+          !isLatinChar(event.key) &&
+          event.code === CODES.SLASH)
+      ) {
         this.setState({
           openDialog: { name: "help" },
         });
