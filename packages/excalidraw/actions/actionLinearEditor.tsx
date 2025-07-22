@@ -61,14 +61,12 @@ export const actionToggleLinearEditor = register({
       includeBoundTextElement: true,
     })[0] as ExcalidrawLinearElement;
 
-    const editingLinearElement =
-      appState.selectedLinearElement?.isEditing &&
-      appState.selectedLinearElement.elementId === selectedElement.id
-        ? new LinearElementEditor(selectedElement, arrayToMap(elements), false) // exit editing
-        : LinearElementEditor.createEditingInstance(
-            selectedElement,
-            arrayToMap(elements),
-          );
+    const editingLinearElement = new LinearElementEditor(
+      selectedElement,
+      arrayToMap(elements),
+      !appState.selectedLinearElement?.isEditing ||
+        appState.selectedLinearElement.elementId !== selectedElement.id,
+    );
     return {
       appState: {
         ...appState,

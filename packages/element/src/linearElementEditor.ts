@@ -200,16 +200,6 @@ export class LinearElementEditor {
   static POINT_HANDLE_SIZE = 10;
 
   /**
-   * Creates a LinearElementEditor instance that is in editing mode
-   */
-  static createEditingInstance(
-    element: NonDeleted<ExcalidrawLinearElement>,
-    elementsMap: ElementsMap,
-  ): LinearElementEditor {
-    return new LinearElementEditor(element, elementsMap, true);
-  }
-
-  /**
    * @param id the `elementId` from the instance of this class (so that we can
    *  statically guarantee this method returns an ExcalidrawLinearElement)
    */
