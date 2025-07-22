@@ -1,4 +1,4 @@
-import throttle from "lodash.throttle";
+import throttle from "es-toolkit/compat/throttle";
 import { useEffect } from "react";
 
 import { atom, useAtom } from "../editor-jotai";

@@ -1,6 +1,6 @@
 import { round } from "@excalidraw/math";
 import clsx from "clsx";
-import debounce from "lodash.debounce";
+import debounce from "es-toolkit/compat/debounce";
 import { Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
 
 import {

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import throttle from "lodash.throttle";
+import throttle from "es-toolkit/compat/throttle";
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
 import rough from "roughjs/bin/rough";
