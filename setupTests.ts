@@ -16,6 +16,15 @@ Object.assign(globalThis, testPolyfills);
 
 require("fake-indexeddb/auto");
 
+vi.mock("./excalidraw-app/data/firebase.ts", () => ({
+  loadFromFirebase: vi.fn(),
+  saveToFirebase: vi.fn(),
+  isSavedToFirebase: vi.fn(() => true),
+  firebaseSceneVersion: vi.fn(() => 1),
+  saveFilesToFirebase: vi.fn(),
+  loadFilesFromFirebase: vi.fn(),
+}));
+
 polyfill();
 
 Object.defineProperty(window, "matchMedia", {

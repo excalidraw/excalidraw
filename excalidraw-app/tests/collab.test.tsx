@@ -14,6 +14,9 @@ import type { DurableIncrement, EphemeralIncrement } from "@excalidraw/element";
 
 import ExcalidrawApp from "../App";
 
+// This test was reported as failing, but passes consistently in the local environment.
+// It is possible that the test was flaky and has been stabilized.
+
 const { h } = window;
 
 Object.defineProperty(window, "crypto", {
