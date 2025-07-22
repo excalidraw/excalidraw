@@ -564,37 +564,16 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         removedSelectedGroupIds,
       );
 
-      let selectedLinearElement: LinearElementEditor | null = null;
-      if (
-        selectedLinearElementId &&
-        nextElements.has(selectedLinearElementId)
-      ) {
-        const element = nextElements.get(
-          selectedLinearElementId,
-        ) as NonDeleted<ExcalidrawLinearElement>;
-
-        if (selectedLinearElementIsEditing === true) {
-          // Create editing instance with proper state
-          selectedLinearElement = new LinearElementEditor(
-            element,
-            nextElements,
-            true, // isEditing
-          );
-        } else if (selectedLinearElementIsEditing === false) {
-          // Create non-editing instance
-          selectedLinearElement = new LinearElementEditor(
-            element,
-            nextElements,
-            false, // not editing
-          );
-        } else {
-          // Legacy case - create basic instance
-          selectedLinearElement = new LinearElementEditor(
-            element,
-            nextElements,
-          );
-        }
-      }
+      const selectedLinearElement =
+        selectedLinearElementId && nextElements.has(selectedLinearElementId)
+          ? new LinearElementEditor(
+              nextElements.get(
+                selectedLinearElementId,
+              ) as NonDeleted<ExcalidrawLinearElement>,
+              nextElements,
+              !!selectedLinearElementIsEditing,
+            )
+          : null;
 
       const nextAppState = {
         ...appState,

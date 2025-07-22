@@ -248,7 +248,6 @@ export type ObservedElementsAppState = {
   editingGroupId: AppState["editingGroupId"];
   selectedElementIds: AppState["selectedElementIds"];
   selectedGroupIds: AppState["selectedGroupIds"];
-  // Storing essential LinearElementEditor state for proper history restoration
   selectedLinearElementId: LinearElementEditor["elementId"] | null;
   selectedLinearElementIsEditing: boolean | null;
   croppingElementId: AppState["croppingElementId"];
