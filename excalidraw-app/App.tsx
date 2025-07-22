@@ -134,6 +134,7 @@ import DebugCanvas, {
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import { PropertiesSidebar } from "./components/PropertiesSidebar";
 
 import "./index.scss";
 
@@ -341,6 +342,7 @@ const ExcalidrawWrapper = () => {
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
   const [langCode, setLangCode] = useAppLangCode();
+  const [selectedElement, setSelectedElement] = useState<NonDeletedExcalidrawElement | null>(null);
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -623,13 +625,25 @@ const ExcalidrawWrapper = () => {
     };
   }, [excalidrawAPI]);
 
-  const onChange = (
+  const handleCanvasChange = (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
+    }
+
+    if (appState.selectedElementIds && Object.keys(appState.selectedElementIds).length === 1) {
+      const selectedId = Object.keys(appState.selectedElementIds)[0];
+      const element = elements.find(el => el.id === selectedId);
+      if (element && (element.customData?.isCard || element.customData?.isZone)) {
+          setSelectedElement(element as NonDeletedExcalidrawElement);
+      } else {
+          setSelectedElement(null);
+      }
+    } else {
+        setSelectedElement(null);
     }
 
     // this check is redundant, but since this is a hot path, it's best
@@ -739,6 +753,19 @@ const ExcalidrawWrapper = () => {
     [setShareDialogState],
   );
 
+  const handleUpdateElement = (updatedData: any) => {
+    if (!excalidrawAPI || !selectedElement) return;
+
+    const updatedElement = {
+        ...selectedElement,
+        customData: { ...selectedElement.customData, ...updatedData },
+    };
+    excalidrawAPI.updateScene({
+        elements: [updatedElement],
+        commitToHistory: true,
+    });
+  };
+
   // browsers generally prevent infinite self-embedding, there are
   // cases where it still happens, and while we disallow self-embedding
   // by not whitelisting our own origin, this serves as an additional guard
@@ -806,7 +833,7 @@ const ExcalidrawWrapper = () => {
     >
       <Excalidraw
         excalidrawAPI={excalidrawRefCallback}
-        onChange={onChange}
+        onChange={handleCanvasChange}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
@@ -854,6 +881,7 @@ const ExcalidrawWrapper = () => {
           }
           return (
             <div className="top-right-ui">
+              <PropertiesSidebar element={selectedElement} onUpdate={handleUpdateElement} />
               {collabError.message && <CollabError collabError={collabError} />}
               <LiveCollaborationTrigger
                 isCollaborating={isCollaborating}
