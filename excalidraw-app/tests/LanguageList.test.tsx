@@ -22,7 +22,7 @@ describe("Test LanguageList", () => {
     fireEvent.click(screen.getByTestId("main-menu-trigger"));
 
     await waitFor(() => {
-      fireEvent.change(screen.getByTestId("dropdown-select-language"), {
+      fireEvent.change(screen.getByDisplayValue("English"), {
         target: { value: "de-DE" },
       });
     });
@@ -30,7 +30,7 @@ describe("Test LanguageList", () => {
     await waitFor(() => expect(screen.queryByTitle(/thin/i)).toBeNull());
     // reset language
     await waitFor(() => {
-      fireEvent.change(screen.getByTestId("dropdown-select-language"), {
+      fireEvent.change(screen.getByDisplayValue("Deutsch"), {
         target: { value: defaultLang.code },
       });
     });

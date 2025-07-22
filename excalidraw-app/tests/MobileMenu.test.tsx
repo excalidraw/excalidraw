@@ -109,57 +109,6 @@ describe("Test MobileMenu", () => {
           class="welcome-screen-menu"
         >
           <button
-            class="welcome-screen-menu-item welcome-screen-menu-item--primary"
-            type="button"
-          >
-            <div
-              class="welcome-screen-menu-item__icon"
-            >
-              <svg
-                aria-hidden="true"
-                class=""
-                fill="none"
-                focusable="false"
-                role="img"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <g
-                  stroke-width="1.5"
-                >
-                  <path
-                    d="M0 0h24v24H0z"
-                    fill="none"
-                    stroke="none"
-                  />
-                  <path
-                    d="M4 21v-13a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-9l-4 4"
-                  />
-                  <line
-                    x1="8"
-                    x2="14"
-                    y1="9"
-                    y2="9"
-                  />
-                  <line
-                    x1="8"
-                    x2="14"
-                    y1="13"
-                    y2="13"
-                  />
-                </g>
-              </svg>
-            </div>
-            <div
-              class="welcome-screen-menu-item__text"
-            >
-              Canvas
-            </div>
-          </button>
-          <button
             class="welcome-screen-menu-item "
             type="button"
           >
@@ -175,48 +124,23 @@ describe("Test MobileMenu", () => {
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
+                viewBox="0 0 20 20"
               >
-                <g
-                  stroke-width="1.5"
-                >
-                  <path
-                    d="M0 0h24v24H0z"
-                    fill="none"
-                    stroke="none"
-                  />
-                  <path
-                    d="M14 3v4a1 1 0 0 0 1 1h4"
-                  />
-                  <path
-                    d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
-                  />
-                  <line
-                    x1="9"
-                    x2="10"
-                    y1="9"
-                    y2="9"
-                  />
-                  <line
-                    x1="9"
-                    x2="15"
-                    y1="13"
-                    y2="13"
-                  />
-                  <line
-                    x1="9"
-                    x2="15"
-                    y1="17"
-                    y2="17"
-                  />
-                </g>
+                <path
+                  d="m9.257 6.351.183.183H15.819c.34 0 .727.182 1.051.506.323.323.505.708.505 1.05v5.819c0 .316-.183.7-.52 1.035-.337.338-.723.522-1.037.522H4.182c-.352 0-.74-.181-1.058-.5-.318-.318-.499-.705-.499-1.057V5.182c0-.351.181-.736.5-1.054.32-.321.71-.503 1.057-.503H6.53l2.726 2.726Z"
+                  stroke-width="1.25"
+                />
               </svg>
             </div>
             <div
               class="welcome-screen-menu-item__text"
             >
-              Load session...
+              Open
+            </div>
+            <div
+              class="welcome-screen-menu-item__shortcut"
+            >
+              Ctrl+O
             </div>
           </button>
           <button
@@ -254,14 +178,11 @@ describe("Test MobileMenu", () => {
                   <line
                     x1="12"
                     x2="12"
-                    y1="8"
-                    y2="12"
+                    y1="17"
+                    y2="17.01"
                   />
-                  <line
-                    x1="12"
-                    x2="12.01"
-                    y1="16"
-                    y2="16"
+                  <path
+                    d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"
                   />
                 </g>
               </svg>
