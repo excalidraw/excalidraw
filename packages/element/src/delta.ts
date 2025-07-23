@@ -2,6 +2,7 @@ import {
   arrayToMap,
   arrayToObject,
   assertNever,
+  invariant,
   isDevEnv,
   isShallowEqual,
   isTestEnv,
@@ -564,20 +565,39 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         removedSelectedGroupIds,
       );
 
-      const selectedLinearElement =
-        selectedLinearElementId && nextElements.has(selectedLinearElementId)
-          ? new LinearElementEditor(
-              nextElements.get(
-                selectedLinearElementId,
-              ) as NonDeleted<ExcalidrawLinearElement>,
-              nextElements,
-              !!selectedLinearElementIsEditing,
-            )
-          : appState.selectedLinearElement
-          ? selectedLinearElementIsEditing
-            ? { ...appState.selectedLinearElement, isEditing: true }
-            : appState.selectedLinearElement
-          : null;
+      let selectedLinearElement = appState.selectedLinearElement;
+
+      if (selectedLinearElementId === null) {
+        // Unselect linear element (visible change)
+        selectedLinearElement = null;
+      } else if (
+        selectedLinearElementId &&
+        nextElements.has(selectedLinearElementId)
+      ) {
+        selectedLinearElement = new LinearElementEditor(
+          nextElements.get(
+            selectedLinearElementId,
+          ) as NonDeleted<ExcalidrawLinearElement>,
+          nextElements,
+          selectedLinearElementIsEditing === true, // Can be unknown which is defaulted to false
+        );
+      }
+
+      if (
+        // Value being 'null' is equivaluent to unknown in this case because it only gets set
+        // to null when 'selectedLinearElementId' is set to null
+        selectedLinearElementIsEditing != null
+      ) {
+        invariant(
+          selectedLinearElement,
+          `selectedLinearElement is null when selectedLinearElementIsEditing is set to ${selectedLinearElementIsEditing}`,
+        );
+
+        selectedLinearElement = {
+          ...selectedLinearElement,
+          isEditing: selectedLinearElementIsEditing,
+        };
+      }
 
       const nextAppState = {
         ...appState,
