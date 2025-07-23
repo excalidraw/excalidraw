@@ -733,6 +733,8 @@ export type AppClassProperties = {
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
+
+  defaultSelectionTool: "selection" | "lasso";
 };
 
 export type PointerDownState = Readonly<{

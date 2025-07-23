@@ -458,6 +458,7 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
+  ActiveTool,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -650,9 +651,14 @@ class App extends React.Component<AppProps, AppState> {
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
+  defaultSelectionTool: "selection" | "lasso" = "selection";
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
+    this.defaultSelectionTool = this.isMobileOrTablet()
+      ? ("lasso" as const)
+      : ("selection" as const);
     const {
       excalidrawAPI,
       viewModeEnabled = false,
@@ -2338,6 +2344,7 @@ class App extends React.Component<AppProps, AppState> {
       };
     }
     const scene = restore(initialData, null, null, { repairBindings: true });
+    const activeTool = scene.appState.activeTool;
     scene.appState = {
       ...scene.appState,
       theme: this.props.theme || scene.appState.theme,
@@ -2347,8 +2354,13 @@ class App extends React.Component<AppProps, AppState> {
       // with a library install link, which should auto-open the library)
       openSidebar: scene.appState?.openSidebar || this.state.openSidebar,
       activeTool:
-        scene.appState.activeTool.type === "image"
-          ? { ...scene.appState.activeTool, type: "selection" }
+        activeTool.type === "image" ||
+        activeTool.type === "lasso" ||
+        activeTool.type === "selection"
+          ? {
+              ...activeTool,
+              type: this.defaultSelectionTool,
+            }
           : scene.appState.activeTool,
       isLoading: false,
       toast: this.state.toast,
