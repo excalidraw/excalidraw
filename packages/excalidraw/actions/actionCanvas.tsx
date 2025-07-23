@@ -494,13 +494,13 @@ export const actionToggleEraserTool = register({
   name: "toggleEraserTool",
   label: "toolBar.eraser",
   trackEvent: { category: "toolbar" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
 
     if (isEraserActive(appState)) {
       activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveTool || {
-          type: "selection",
+          type: app.defaultSelectionTool,
         }),
         lastActiveToolBeforeEraser: null,
       });
