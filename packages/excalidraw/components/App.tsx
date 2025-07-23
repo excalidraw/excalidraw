@@ -5424,7 +5424,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     // we should only be able to double click when mode is selection
-    if (this.state.activeTool.type !== "selection") {
+    if (this.state.activeTool.type !== this.defaultSelectionTool) {
       return;
     }
 
