@@ -3029,8 +3029,8 @@ describe("history", () => {
 
       expect(API.getUndoStack().length).toBe(4);
       expect(API.getRedoStack().length).toBe(0);
-      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
       expect(h.state.selectedLinearElement).not.toBeNull();
+      expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
       // Simulate remote update
       API.updateScene({
@@ -3043,16 +3043,16 @@ describe("history", () => {
       });
 
       Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(3);
-      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
-      expect(h.state.selectedLinearElement).toBeNull();
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.state.selectedLinearElement).not.toBeNull();
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
 
       Keyboard.redo();
       expect(API.getUndoStack().length).toBe(4);
       expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.selectedLinearElement).not.toBeNull();
       expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
-      expect(h.state.selectedLinearElement).toBeNull();
     });
 
     it("should iterate through the history when z-index changes do not produce visible change and we synced changed indices", async () => {

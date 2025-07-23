@@ -362,7 +362,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
                 0,
               ],
               [
-                "98.00000",
+                98,
                 "-0.00656",
               ],
             ],
@@ -7103,7 +7103,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "removed": {},
       "updated": {},
     },
-    "id": "id12",
+    "id": "id4",
   },
   {
     "appState": AppStateDelta {
@@ -7121,7 +7121,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "removed": {},
       "updated": {},
     },
-    "id": "id13",
+    "id": "id6",
   },
   {
     "appState": AppStateDelta {
@@ -7139,7 +7139,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "removed": {},
       "updated": {},
     },
-    "id": "id14",
+    "id": "id10",
   },
 ]
 `;
@@ -20367,7 +20367,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 10,
+  "height": 20,
   "id": "id0",
   "index": "a0",
   "isDeleted": false,
@@ -20389,7 +20389,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
     ],
     [
       20,
-      0,
+      20,
     ],
   ],
   "roughness": 1,
@@ -20403,7 +20403,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
+  "version": 15,
   "width": 20,
   "x": 0,
   "y": 0,
@@ -20412,83 +20412,9 @@ exports[`history > singleplayer undo/redo > should support linear element creati
 
 exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of elements 1`] = `1`;
 
-exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of renders 1`] = `9`;
+exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of renders 1`] = `20`;
 
-exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] redo stack 1`] = `
-[
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedLinearElementIsEditing": true,
-        },
-        "inserted": {
-          "selectedLinearElementIsEditing": false,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id14",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {},
-        "inserted": {},
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {
-        "id0": {
-          "deleted": {
-            "height": 10,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                10,
-                10,
-              ],
-              [
-                20,
-                0,
-              ],
-            ],
-            "version": 10,
-          },
-          "inserted": {
-            "height": 20,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                10,
-                10,
-              ],
-              [
-                20,
-                20,
-              ],
-            ],
-            "version": 9,
-          },
-        },
-      },
-    },
-    "id": "id15",
-  },
-]
-`;
+exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] redo stack 1`] = `[]`;
 
 exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] undo stack 1`] = `
 [
@@ -20550,20 +20476,20 @@ exports[`history > singleplayer undo/redo > should support linear element creati
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 6,
+            "version": 13,
             "width": 10,
             "x": 0,
             "y": 0,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 5,
+            "version": 12,
           },
         },
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id23",
   },
   {
     "appState": AppStateDelta {
@@ -20596,7 +20522,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
                 0,
               ],
             ],
-            "version": 8,
+            "version": 14,
             "width": 20,
           },
           "inserted": {
@@ -20614,13 +20540,13 @@ exports[`history > singleplayer undo/redo > should support linear element creati
                 10,
               ],
             ],
-            "version": 6,
+            "version": 13,
             "width": 10,
           },
         },
       },
     },
-    "id": "id4",
+    "id": "id24",
   },
   {
     "appState": AppStateDelta {
@@ -20640,7 +20566,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
       "removed": {},
       "updated": {},
     },
-    "id": "id6",
+    "id": "id25",
   },
   {
     "appState": AppStateDelta {
@@ -20658,7 +20584,78 @@ exports[`history > singleplayer undo/redo > should support linear element creati
       "removed": {},
       "updated": {},
     },
-    "id": "id8",
+    "id": "id26",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "height": 20,
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                10,
+                10,
+              ],
+              [
+                20,
+                20,
+              ],
+            ],
+            "version": 15,
+          },
+          "inserted": {
+            "height": 10,
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                10,
+                10,
+              ],
+              [
+                20,
+                0,
+              ],
+            ],
+            "version": 14,
+          },
+        },
+      },
+    },
+    "id": "id27",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedLinearElementIsEditing": false,
+        },
+        "inserted": {
+          "selectedLinearElementIsEditing": true,
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id28",
   },
 ]
 `;
