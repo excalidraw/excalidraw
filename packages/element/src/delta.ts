@@ -573,6 +573,10 @@ export class AppStateDelta implements DeltaContainer<AppState> {
               nextElements,
               !!selectedLinearElementIsEditing,
             )
+          : appState.selectedLinearElement
+          ? selectedLinearElementIsEditing
+            ? { ...appState.selectedLinearElement, isEditing: true }
+            : appState.selectedLinearElement
           : null;
 
       const nextAppState = {
@@ -580,10 +584,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         ...directlyApplicablePartial,
         selectedElementIds: mergedSelectedElementIds,
         selectedGroupIds: mergedSelectedGroupIds,
-        selectedLinearElement:
-          typeof selectedLinearElementId !== "undefined"
-            ? selectedLinearElement // element was either inserted or deleted
-            : appState.selectedLinearElement, // otherwise assign what we had before
+        selectedLinearElement,
       };
 
       const constainsVisibleChanges = this.filterInvisibleChanges(
