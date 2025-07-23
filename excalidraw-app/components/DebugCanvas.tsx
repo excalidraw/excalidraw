@@ -9,7 +9,7 @@ import {
 } from "@excalidraw/excalidraw/renderer/helpers";
 import { type AppState } from "@excalidraw/excalidraw/types";
 import { throttleRAF } from "@excalidraw/common";
-import { useCallback, useImperativeHandle, useRef } from "react";
+import { useCallback } from "react";
 
 import {
   isLineSegment,
