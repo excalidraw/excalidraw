@@ -18,12 +18,21 @@ export const isChrome = navigator.userAgent.indexOf("Chrome") !== -1;
 export const isSafari =
   !isChrome && navigator.userAgent.indexOf("Safari") !== -1;
 export const isIOS =
-  /iPad|iPhone/.test(navigator.platform) ||
+  /iPad|iPhone/i.test(navigator.platform) ||
   // iPadOS 13+
   (navigator.userAgent.includes("Mac") && "ontouchend" in document);
 // keeping function so it can be mocked in test
 export const isBrave = () =>
   (navigator as any).brave?.isBrave?.name === "isBrave";
+
+export const isMobile =
+  isIOS ||
+  /android|webos|ipod|blackberry|iemobile|opera mini/i.test(
+    navigator.userAgent.toLowerCase(),
+  ) ||
+  /android|ios|ipod|blackberry|windows phone/i.test(
+    navigator.platform.toLowerCase(),
+  );
 
 export const supportsResizeObserver =
   typeof window !== "undefined" && "ResizeObserver" in window;
