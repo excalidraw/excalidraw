@@ -3125,7 +3125,7 @@ class App extends React.Component<AppProps, AppState> {
         this.addElementsFromPasteOrLibrary({
           elements,
           files: data.files || null,
-          position: "cursor",
+          position: this.isMobileOrTablet() ? "center" : "cursor",
           retainSeed: isPlainPaste,
         });
       } else if (data.text) {
@@ -3143,7 +3143,7 @@ class App extends React.Component<AppProps, AppState> {
             this.addElementsFromPasteOrLibrary({
               elements,
               files,
-              position: "cursor",
+              position: this.isMobileOrTablet() ? "center" : "cursor",
             });
 
             return;
