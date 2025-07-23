@@ -3203,7 +3203,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         this.addTextFromPaste(data.text, isPlainPaste);
       }
-      this.setActiveTool({ type: "selection" });
+      this.setActiveTool({ type: this.defaultSelectionTool }, true);
       event?.preventDefault();
     },
   );
@@ -3347,7 +3347,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.setActiveTool({ type: "selection" });
+    this.setActiveTool({ type: this.defaultSelectionTool }, true);
 
     if (opts.fitToContent) {
       this.scrollToContent(duplicatedElements, {
