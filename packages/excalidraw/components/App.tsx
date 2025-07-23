@@ -458,7 +458,6 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
-  ActiveTool,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
