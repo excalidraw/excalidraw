@@ -3593,7 +3593,7 @@ class App extends React.Component<AppProps, AppState> {
           ...updateActiveTool(
             this.state,
             prevState.activeTool.locked
-              ? { type: "selection" }
+              ? { type: this.defaultSelectionTool }
               : prevState.activeTool,
           ),
           locked: !prevState.activeTool.locked,
@@ -7616,7 +7616,9 @@ class App extends React.Component<AppProps, AppState> {
     resetCursor(this.interactiveCanvas);
     if (!this.state.activeTool.locked) {
       this.setState({
-        activeTool: updateActiveTool(this.state, { type: "selection" }),
+        activeTool: updateActiveTool(this.state, {
+          type: this.defaultSelectionTool,
+        }),
       });
     }
   };
