@@ -1,66 +1,76 @@
-
-import React from "react";
-import { NonDeletedExcalidrawElement } from "../../../../packages/excalidraw/element/types";
+import React, { useState, useEffect } from 'react';
+import type { NonDeletedExcalidrawElement } from '@excalidraw/element/types';
 
 interface PropertiesSidebarProps {
-  selectedElement: NonDeletedExcalidrawElement | null;
-  onUpdateElement: (updatedData: any) => void;
+  element: NonDeletedExcalidrawElement | null;
+  onUpdate: (data: any) => void;
 }
 
-const PropertiesSidebar: React.FC<PropertiesSidebarProps> = ({
-  selectedElement,
-  onUpdateElement,
-}) => {
-  if (!selectedElement) {
+const PropertiesSidebar: React.FC<PropertiesSidebarProps> = ({ element, onUpdate }) => {
+  const [isCard, setIsCard] = useState(false);
+  const [isZone, setIsZone] = useState(false);
+  const [acceptedCardIds, setAcceptedCardIds] = useState('');
+
+  useEffect(() => {
+    if (element?.customData) {
+      setIsCard(!!element.customData.isCard);
+      setIsZone(!!element.customData.isZone);
+      setAcceptedCardIds(element.customData.acceptedCardIds || '');
+    } else {
+      setIsCard(false);
+      setIsZone(false);
+      setAcceptedCardIds('');
+    }
+  }, [element]);
+
+  const handleUpdate = () => {
+    onUpdate({
+      isCard,
+      isZone,
+      acceptedCardIds,
+    });
+  };
+
+  if (!element) {
     return null;
   }
 
-  const isZone = selectedElement.customData?.isZone;
-
-  const handleAcceptsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdateElement({ accepts: event.target.value });
-  };
-
   return (
-    <div className="properties-sidebar" style={{
-      position: "absolute",
-      top: "60px",
-      right: "10px",
-      width: "250px",
-      backgroundColor: "rgb(255, 255, 255)",
-      border: "1px solid rgb(233, 233, 233)",
-      borderRadius: "8px",
-      padding: "16px",
-      zIndex: 10,
-      boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
-    }}>
-      <h4>Eigenschaften</h4>
+    <div style={{ background: '#fff', padding: '1rem', width: '250px' }}>
+      <h3>Element Properties</h3>
       <div>
-        <strong>Typ:</strong> {isZone ? "Zone" : "Karte"}
+        <label>
+          <input
+            type="checkbox"
+            checked={isCard}
+            onChange={(e) => setIsCard(e.target.checked)}
+          />
+          Is Card
+        </label>
       </div>
       <div>
-        <strong>ID:</strong> <span style={{ fontSize: "0.8em", color: "#666" }}>{selectedElement.id}</span>
+        <label>
+          <input
+            type="checkbox"
+            checked={isZone}
+            onChange={(e) => setIsZone(e.target.checked)}
+          />
+          Is Zone
+        </label>
       </div>
       {isZone && (
-        <div style={{ marginTop: "10px" }}>
-          <label htmlFor="accepts-input">
-            <strong>Akzeptiert:</strong>
+        <div>
+          <label>
+            Accepted Card IDs (comma-separated):
+            <input
+              type="text"
+              value={acceptedCardIds}
+              onChange={(e) => setAcceptedCardIds(e.target.value)}
+            />
           </label>
-          <input
-            id="accepts-input"
-            type="text"
-            value={selectedElement.customData?.accepts || ""}
-            onChange={handleAcceptsChange}
-            style={{
-              width: "100%",
-              marginTop: "5px",
-              padding: "4px 8px",
-              border: "1px solid #ccc",
-              borderRadius: "4px"
-            }}
-          />
         </div>
       )}
+      <button onClick={handleUpdate}>Update</button>
     </div>
   );
 };
