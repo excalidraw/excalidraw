@@ -9311,7 +9311,7 @@ class App extends React.Component<AppProps, AppState> {
             this.setState((prevState) => ({
               newElement: null,
               activeTool: updateActiveTool(this.state, {
-                type: "selection",
+                type: this.defaultSelectionTool,
               }),
               selectedElementIds: makeNextSelectedElementIds(
                 {
@@ -9923,7 +9923,9 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           newElement: null,
           suggestedBindings: [],
-          activeTool: updateActiveTool(this.state, { type: "selection" }),
+          activeTool: updateActiveTool(this.state, {
+            type: this.defaultSelectionTool,
+          }),
         });
       } else {
         this.setState({
@@ -10217,7 +10219,9 @@ class App extends React.Component<AppProps, AppState> {
       this.setState(
         {
           newElement: null,
-          activeTool: updateActiveTool(this.state, { type: "selection" }),
+          activeTool: updateActiveTool(this.state, {
+            type: this.defaultSelectionTool,
+          }),
         },
         () => {
           this.actionManager.executeAction(actionFinalize);
