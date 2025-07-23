@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Einfügen",
-    "pasteAsPlaintext": "Als unformatierten Text einfügen",
+    "pasteAsPlaintext": "Als reinen Text einfügen",
     "pasteCharts": "Diagramme einfügen",
     "selectAll": "Alle auswählen",
     "multiSelect": "Element zur Auswahl hinzufügen",
@@ -122,8 +122,8 @@
     "theme": "Design",
     "personalLib": "Persönliche Bibliothek",
     "excalidrawLib": "Excalidraw Bibliothek",
-    "decreaseFontSize": "Schriftgröße verringern",
-    "increaseFontSize": "Schriftgröße erhöhen",
+    "decreaseFontSize": "Schriftgröße verkleinern",
+    "increaseFontSize": "Schrift vergrößern",
     "unbindText": "Text lösen",
     "bindText": "Text an Container binden",
     "createContainerFromText": "Text in Container einbetten",
@@ -165,7 +165,7 @@
     "unCroppedDimension": "Nicht zugeschnittene Dimension",
     "copyElementLink": "Link zum Objekt kopieren",
     "linkToElement": "Link zum Objekt",
-    "wrapSelectionInFrame": "Auswahl in Rahmen einbetten"
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "Link zum Objekt",
