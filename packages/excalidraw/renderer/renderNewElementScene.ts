@@ -1,6 +1,6 @@
 import { throttleRAF } from "@excalidraw/common";
 
-import { renderElement } from "@excalidraw/element";
+import { isInvisiblySmallElement, renderElement } from "@excalidraw/element";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 
@@ -34,6 +34,14 @@ const _renderNewElementScene = ({
     context.scale(appState.zoom.value, appState.zoom.value);
 
     if (newElement && newElement.type !== "selection") {
+      // e.g. when creating arrows and we're still below the arrow drag distance
+      // threshold
+      // (for now we skip render only with elements while we're creating to be
+      // safe)
+      if (isInvisiblySmallElement(newElement)) {
+        return;
+      }
+
       renderElement(
         newElement,
         elementsMap,
