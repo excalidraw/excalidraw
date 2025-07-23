@@ -629,11 +629,7 @@ const ExcalidrawWrapper = () => {
       if (appState.selectedElementIds && Object.keys(appState.selectedElementIds).length === 1) {
           const selectedId = Object.keys(appState.selectedElementIds)[0];
           const element = elements.find(el => el.id === selectedId);
-          if (element && (element.customData?.isCard || element.customData?.isZone)) {
-              setSelectedElement(element as NonDeletedExcalidrawElement);
-          } else {
-              setSelectedElement(null);
-          }
+          setSelectedElement(element as NonDeletedExcalidrawElement);
       } else {
           setSelectedElement(null);
       }
