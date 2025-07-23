@@ -234,6 +234,11 @@ $verticalBreakpoint: 861px;
     }
   }
 
+  .ttd-dialog-panel-button-container-left {
+    display: flex;
+    align-items: center;
+  }
+
   .ttd-dialog-panel-button {
     &.excalidraw-button {
       font-family: inherit;
