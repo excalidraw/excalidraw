@@ -530,6 +530,9 @@ export const actionToggleLassoTool = register({
   label: "toolBar.lasso",
   icon: LassoIcon,
   trackEvent: { category: "toolbar" },
+  predicate: (elements, appState, props, app) => {
+    return app.defaultSelectionTool !== "lasso";
+  },
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
 
