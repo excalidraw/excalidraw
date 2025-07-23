@@ -232,6 +232,7 @@ import {
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
+  isInGroup,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -7450,6 +7451,10 @@ class App extends React.Component<AppProps, AppState> {
 
     // FIXME
     let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
+
+    if (container && isInGroup(container)) {
+      container = null;
+    }
 
     if (hasBoundTextElement(element)) {
       container = element as ExcalidrawTextContainer;
