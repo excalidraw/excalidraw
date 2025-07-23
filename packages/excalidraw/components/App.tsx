@@ -9695,16 +9695,17 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         if (this.state.selectedLinearElement?.isEditing) {
           // Exit editing mode but keep the element selected
-          this.setState({
-            selectedLinearElement: new LinearElementEditor(
-              LinearElementEditor.getElement(
-                this.state.selectedLinearElement.elementId,
-                this.scene.getNonDeletedElementsMap(),
-              )!,
-              this.scene.getNonDeletedElementsMap(),
-              false, // exit editing mode
-            ),
-          });
+          this.actionManager.executeAction(actionToggleLinearEditor);
+          // this.setState({
+          //   selectedLinearElement: new LinearElementEditor(
+          //     LinearElementEditor.getElement(
+          //       this.state.selectedLinearElement.elementId,
+          //       this.scene.getNonDeletedElementsMap(),
+          //     )!,
+          //     this.scene.getNonDeletedElementsMap(),
+          //     false, // exit editing mode
+          //   ),
+          // });
         } else {
           // Deselect selected elements
           this.setState({

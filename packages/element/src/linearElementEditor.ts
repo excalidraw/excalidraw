@@ -149,7 +149,6 @@ export class LinearElementEditor {
   public readonly segmentMidPointHoveredCoords: GlobalPoint | null;
   public readonly elbowed: boolean;
   public readonly customLineAngle: number | null;
-  /** whether the linear element is currently being edited (adding/moving points) */
   public readonly isEditing: boolean;
 
   constructor(
@@ -226,8 +225,8 @@ export class LinearElementEditor {
     ) {
       return false;
     }
-    const editingLinearElement = appState.selectedLinearElement;
-    const { selectedPointsIndices, elementId } = editingLinearElement;
+    const { selectedLinearElement } = appState;
+    const { selectedPointsIndices, elementId } = selectedLinearElement;
 
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
@@ -269,7 +268,7 @@ export class LinearElementEditor {
 
     setState({
       selectedLinearElement: {
-        ...editingLinearElement,
+        ...selectedLinearElement,
         selectedPointsIndices: nextSelectedPoints.length
           ? nextSelectedPoints
           : null,
