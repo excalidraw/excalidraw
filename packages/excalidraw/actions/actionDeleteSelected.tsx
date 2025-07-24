@@ -229,7 +229,7 @@ export const actionDeleteSelected = register({
       }
 
       // case: deleting all points
-      if (selectedPointsIndices.length >= linearElement.points.length - 1) {
+      if (selectedPointsIndices.length >= linearElement.points.length) {
         const nextElements = elements.map((el) => {
           if (el.id === linearElement.id) {
             return newElementWith(el, { isDeleted: true });
