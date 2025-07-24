@@ -733,7 +733,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
 
             break;
-          case "selectedLinearElementId":
+          case "selectedLinearElementId": {
             const appStateKey = AppStateDelta.convertToAppStateKey(key);
             const linearElement = nextAppState[appStateKey];
 
@@ -753,6 +753,19 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
 
             break;
+          }
+          case "selectedLinearElementIsEditing": {
+            // Changes in editing state are always visible
+            const prevIsEditing =
+              prevAppState.selectedLinearElement?.isEditing ?? false;
+            const nextIsEditing =
+              nextAppState.selectedLinearElement?.isEditing ?? false;
+
+            if (prevIsEditing !== nextIsEditing) {
+              visibleDifferenceFlag.value = true;
+            }
+            break;
+          }
           case "lockedMultiSelections": {
             const prevLockedUnits = prevAppState[key] || {};
             const nextLockedUnits = nextAppState[key] || {};
@@ -767,18 +780,6 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             const nextHitLockedId = nextAppState[key] || null;
 
             if (prevHitLockedId !== nextHitLockedId) {
-              visibleDifferenceFlag.value = true;
-            }
-            break;
-          }
-          case "selectedLinearElementIsEditing": {
-            // Changes in editing state are always visible
-            const prevIsEditing =
-              prevAppState.selectedLinearElement?.isEditing ?? false;
-            const nextIsEditing =
-              nextAppState.selectedLinearElement?.isEditing ?? false;
-
-            if (prevIsEditing !== nextIsEditing) {
               visibleDifferenceFlag.value = true;
             }
             break;
