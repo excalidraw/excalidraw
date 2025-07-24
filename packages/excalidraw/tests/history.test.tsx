@@ -1073,7 +1073,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(6);
       expect(API.getRedoStack().length).toBe(0);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
       expect(h.state.selectedLinearElement).not.toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1090,7 +1090,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(5);
       expect(API.getRedoStack().length).toBe(1);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
       expect(h.state.selectedLinearElement?.elementId).toBe(h.elements[0].id);
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1114,7 +1114,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(4);
       expect(API.getRedoStack().length).toBe(2);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
       expect(h.state.selectedLinearElement?.elementId).toBe(h.elements[0].id);
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1131,7 +1131,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(3);
       expect(API.getRedoStack().length).toBe(3);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement).toBeNull(); // undo `open editor`
+      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false); // undo `open editor`
       expect(h.state.selectedLinearElement?.elementId).toBe(h.elements[0].id);
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1148,7 +1148,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(4);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
       expect(h.state.selectedLinearElement).toBeNull(); // undo `actionFinalize`
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1165,7 +1165,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(1);
       expect(API.getRedoStack().length).toBe(5);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
       expect(h.state.selectedLinearElement).toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1181,7 +1181,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(0);
       expect(API.getRedoStack().length).toBe(6);
       expect(API.getSelectedElements().length).toBe(0);
-      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
       expect(h.state.selectedLinearElement).toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1197,7 +1197,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(1);
       expect(API.getRedoStack().length).toBe(5);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
       expect(h.state.selectedLinearElement).toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1213,7 +1213,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(4);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
       expect(h.state.selectedLinearElement).toBeNull(); // undo `actionFinalize`
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1230,7 +1230,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(3);
       expect(API.getRedoStack().length).toBe(3);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement).toBeNull(); // undo `open editor`
+      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false); // undo `open editor`
       expect(h.state.selectedLinearElement?.elementId).toBe(h.elements[0].id);
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1247,7 +1247,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(4);
       expect(API.getRedoStack().length).toBe(2);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
       expect(h.state.selectedLinearElement?.elementId).toBe(h.elements[0].id);
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1264,7 +1264,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(5);
       expect(API.getRedoStack().length).toBe(1);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
       expect(h.state.selectedLinearElement?.elementId).toBe(h.elements[0].id);
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -1281,7 +1281,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(6);
       expect(API.getRedoStack().length).toBe(0);
       expect(assertSelectedElements(h.elements[0]));
-      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
       expect(h.state.selectedLinearElement).not.toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -3029,8 +3029,8 @@ describe("history", () => {
 
       expect(API.getUndoStack().length).toBe(4);
       expect(API.getRedoStack().length).toBe(0);
-      expect(h.state.editingLinearElement).toBeNull();
       expect(h.state.selectedLinearElement).not.toBeNull();
+      expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
       // Simulate remote update
       API.updateScene({
@@ -3043,16 +3043,16 @@ describe("history", () => {
       });
 
       Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(3);
-      expect(h.state.editingLinearElement).toBeNull();
-      expect(h.state.selectedLinearElement).toBeNull();
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.state.selectedLinearElement).not.toBeNull();
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
 
       Keyboard.redo();
       expect(API.getUndoStack().length).toBe(4);
       expect(API.getRedoStack().length).toBe(0);
-      expect(h.state.editingLinearElement).toBeNull();
-      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).not.toBeNull();
+      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
     });
 
     it("should iterate through the history when z-index changes do not produce visible change and we synced changed indices", async () => {

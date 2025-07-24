@@ -34,7 +34,6 @@ exports[`exportToSvg > with default arguments 1`] = `
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,

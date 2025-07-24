@@ -94,9 +94,9 @@ export const actionFinalize = register({
       }
     }
 
-    if (appState.editingLinearElement) {
+    if (appState.selectedLinearElement?.isEditing) {
       const { elementId, startBindingElement, endBindingElement } =
-        appState.editingLinearElement;
+        appState.selectedLinearElement;
       const element = LinearElementEditor.getElement(elementId, elementsMap);
 
       if (element) {
@@ -122,7 +122,11 @@ export const actionFinalize = register({
           appState: {
             ...appState,
             cursorButton: "up",
-            editingLinearElement: null,
+            selectedLinearElement: new LinearElementEditor(
+              element,
+              arrayToMap(elementsMap),
+              false, // exit editing mode
+            ),
           },
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
@@ -285,7 +289,7 @@ export const actionFinalize = register({
   },
   keyTest: (event, appState) =>
     (event.key === KEYS.ESCAPE &&
-      (appState.editingLinearElement !== null ||
+      (appState.selectedLinearElement?.isEditing ||
         (!appState.newElement && appState.multiElement === null))) ||
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),

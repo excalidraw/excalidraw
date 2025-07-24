@@ -140,7 +140,7 @@ export const SelectedShapeActions = ({
     targetElements.length === 1 || isSingleElementBoundContainer;
 
   const showLineEditorAction =
-    !appState.editingLinearElement &&
+    !appState.selectedLinearElement?.isEditing &&
     targetElements.length === 1 &&
     isLinearElement(targetElements[0]) &&
     !isElbowArrow(targetElements[0]);

@@ -39,7 +39,7 @@ export const actionDuplicateSelection = register({
     }
 
     // duplicate selected point(s) if editing a line
-    if (appState.editingLinearElement) {
+    if (appState.selectedLinearElement?.isEditing) {
       // TODO: Invariants should be checked here instead of duplicateSelectedPoints()
       try {
         const newAppState = LinearElementEditor.duplicateSelectedPoints(

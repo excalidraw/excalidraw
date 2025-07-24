@@ -155,10 +155,10 @@ describe("element binding", () => {
       // NOTE this mouse down/up + await needs to be done in order to repro
       // the issue, due to https://github.com/excalidraw/excalidraw/blob/46bff3daceb602accf60c40a84610797260fca94/src/components/App.tsx#L740
       mouse.reset();
-      expect(h.state.editingLinearElement).not.toBe(null);
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
       mouse.down(0, 0);
       await new Promise((r) => setTimeout(r, 100));
-      expect(h.state.editingLinearElement).toBe(null);
+      expect(h.state.selectedLinearElement?.isEditing).toBe(false);
       expect(API.getSelectedElement().type).toBe("rectangle");
       mouse.up();
       expect(API.getSelectedElement().type).toBe("rectangle");
