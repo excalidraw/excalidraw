@@ -213,8 +213,11 @@ export const actionDeleteSelected = register({
         endBindingElement,
       } = appState.selectedLinearElement;
       const elementsMap = app.scene.getNonDeletedElementsMap();
-      const element = LinearElementEditor.getElement(elementId, elementsMap);
-      if (!element) {
+      const linearElement = LinearElementEditor.getElement(
+        elementId,
+        elementsMap,
+      );
+      if (!linearElement) {
         return false;
       }
       // case: no point selected → do nothing, as deleting the whole element
@@ -226,12 +229,9 @@ export const actionDeleteSelected = register({
       }
 
       // case: deleting all points
-      if (
-        element.points.length < 2 ||
-        selectedPointsIndices.length === element.points.length
-      ) {
+      if (selectedPointsIndices.length >= linearElement.points.length - 1) {
         const nextElements = elements.map((el) => {
-          if (el.id === element.id) {
+          if (el.id === linearElement.id) {
             return newElementWith(el, { isDeleted: true });
           }
           return el;
@@ -255,13 +255,17 @@ export const actionDeleteSelected = register({
           ? null
           : startBindingElement,
         endBindingElement: selectedPointsIndices?.includes(
-          element.points.length - 1,
+          linearElement.points.length - 1,
         )
           ? null
           : endBindingElement,
       };
 
-      LinearElementEditor.deletePoints(element, app, selectedPointsIndices);
+      LinearElementEditor.deletePoints(
+        linearElement,
+        app,
+        selectedPointsIndices,
+      );
 
       return {
         elements,
