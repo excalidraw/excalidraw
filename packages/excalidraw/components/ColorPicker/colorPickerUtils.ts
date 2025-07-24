@@ -38,6 +38,12 @@ export const colorPickerHotkeyBindings = [
   ["z", "x", "c", "v", "b"],
 ].flat();
 
+export const colorPickerHotkeyBindingsAsCodes = [
+  ["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT"],
+  ["KeyA", "KeyS", "KeyD", "KeyF", "KeyG"],
+  ["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB"],
+].flat();
+
 export const isCustomColor = ({
   color,
   palette,

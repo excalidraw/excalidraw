@@ -8,7 +8,7 @@ import {
 } from "@excalidraw/element";
 import { getFrameChildren } from "@excalidraw/element";
 
-import { KEYS, updateActiveTool } from "@excalidraw/common";
+import { CODES, isLatinChar, KEYS, updateActiveTool } from "@excalidraw/common";
 
 import { getElementsInGroup } from "@excalidraw/element";
 
@@ -157,7 +157,8 @@ export const actionSetFrameAsActiveTool = register({
     !event[KEYS.CTRL_OR_CMD] &&
     !event.shiftKey &&
     !event.altKey &&
-    event.key.toLocaleLowerCase() === KEYS.F,
+    (event.key.toLocaleLowerCase() === KEYS.F ||
+      (!isLatinChar(event.key.toLocaleLowerCase()) && event.code === CODES.F)),
 });
 
 export const actionWrapSelectionInFrame = register({

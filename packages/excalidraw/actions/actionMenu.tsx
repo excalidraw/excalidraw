@@ -1,4 +1,4 @@
-import { KEYS } from "@excalidraw/common";
+import { CODES, isLatinChar, KEYS } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
 
@@ -83,5 +83,7 @@ export const actionShortcuts = register({
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  keyTest: (event) => event.key === KEYS.QUESTION_MARK,
+  keyTest: (event) =>
+    event.key === KEYS.QUESTION_MARK ||
+    (event.shiftKey && !isLatinChar(event.key) && event.code === CODES.SLASH),
 });

@@ -17,14 +17,48 @@ export const CODES = {
   QUOTE: "Quote",
   ZERO: "Digit0",
   SLASH: "Slash",
+  A: "KeyA",
   C: "KeyC",
   D: "KeyD",
+  E: "KeyE",
+  F: "KeyF",
+  G: "KeyG",
   H: "KeyH",
-  V: "KeyV",
-  Z: "KeyZ",
-  Y: "KeyY",
+  I: "KeyI",
+  K: "KeyK",
+  L: "KeyL",
+  O: "KeyO",
+  P: "KeyP",
+  Q: "KeyQ",
   R: "KeyR",
   S: "KeyS",
+  V: "KeyV",
+  X: "KeyX",
+  Y: "KeyY",
+  Z: "KeyZ",
+} as const;
+
+export const CODE_TO_KEY = {
+  Digit0: "0",
+  Digit1: "1",
+  Digit2: "2",
+  Digit3: "3",
+  Digit4: "4",
+  Digit5: "5",
+  Digit6: "6",
+  Digit7: "7",
+  Digit8: "8",
+  Digit9: "9",
+  KeyA: "a",
+  KeyD: "d",
+  KeyE: "e",
+  KeyL: "l",
+  KeyO: "o",
+  KeyP: "p",
+  KeyR: "r",
+  KeyT: "t",
+  KeyV: "v",
+  KeyX: "x",
 } as const;
 
 export const KEYS = {
@@ -92,7 +126,8 @@ export const KeyCodeMap = new Map<ValueOf<typeof KEYS>, ValueOf<typeof CODES>>([
   [KEYS.Y, CODES.Y],
 ]);
 
-export const isLatinChar = (key: string) => /^[a-z]$/.test(key.toLowerCase());
+export const isLatinChar = (key: string) =>
+  /^[?a-z0-9]$/.test(key.toLowerCase());
 
 /**
  * Used to match key events for any keyboard layout, especially on Windows and Linux,

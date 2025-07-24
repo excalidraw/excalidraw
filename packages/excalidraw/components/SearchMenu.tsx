@@ -5,10 +5,12 @@ import { Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   CLASSES,
+  CODES,
   EVENT,
   FONT_FAMILY,
   FRAME_STYLE,
   getLineHeight,
+  isLatinChar,
 } from "@excalidraw/common";
 
 import { isElementCompletelyInViewport } from "@excalidraw/element";
@@ -293,7 +295,11 @@ export const SearchMenu = () => {
         return;
       }
 
-      if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        (event.key === KEYS.F ||
+          (!isLatinChar(event.key) && event.code === CODES.F))
+      ) {
         event.preventDefault();
         event.stopPropagation();
 
