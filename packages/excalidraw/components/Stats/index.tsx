@@ -1,6 +1,6 @@
 import { round } from "@excalidraw/math";
 import clsx from "clsx";
-import throttle from "lodash.throttle";
+import throttle from "es-toolkit/compat/throttle";
 import { useEffect, useMemo, useState, memo } from "react";
 
 import { STATS_PANELS } from "@excalidraw/common";
