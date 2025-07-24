@@ -30,9 +30,9 @@ export class LaserTrails implements Trail {
   }
 
   private getTrailOptions() {
-    const size = 1.5;
+    const size = 1.2;
     const DECAY_DELAY = 0;
-    const DECAY_TIME = 3000;
+    const DECAY_TIME = 1500;
 
     return {
       simplify: 0,
