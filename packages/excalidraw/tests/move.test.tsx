@@ -1,16 +1,12 @@
 import React from "react";
 import { vi } from "vitest";
-
-import { bindOrUnbindLinearElement } from "@excalidraw/element";
-
 import { KEYS, reseed } from "@excalidraw/common";
-
+import { bindBindingElement } from "@excalidraw/element";
 import "@excalidraw/utils/test-utils";
 
 import type {
-  ExcalidrawLinearElement,
+  ExcalidrawArrowElement,
   NonDeleted,
-  ExcalidrawRectangleElement,
 } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
@@ -85,10 +81,18 @@ describe("move element", () => {
     const arrow = UI.createElement("arrow", { x: 110, y: 50, size: 80 });
     act(() => {
       // bind line to two rectangles
-      bindOrUnbindLinearElement(
-        arrow.get() as NonDeleted<ExcalidrawLinearElement>,
-        rectA.get() as ExcalidrawRectangleElement,
-        rectB.get() as ExcalidrawRectangleElement,
+      bindBindingElement(
+        arrow.get() as NonDeleted<ExcalidrawArrowElement>,
+        rectA.get(),
+        "orbit",
+        "start",
+        h.app.scene,
+      );
+      bindBindingElement(
+        arrow.get() as NonDeleted<ExcalidrawArrowElement>,
+        rectB.get(),
+        "orbit",
+        "start",
         h.app.scene,
       );
     });
@@ -124,8 +128,10 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
-    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[110, 50]]);
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[81, 81.4]]);
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[50, 50]]);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([
+      [301.02, 102.02],
+    ]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });

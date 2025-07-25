@@ -110,6 +110,7 @@ export const moveElement = (
   newTopLeftY: number,
   originalElement: ExcalidrawElement,
   scene: Scene,
+  appState: AppState,
   originalElementsMap: ElementsMap,
   shouldInformMutation = true,
 ) => {
@@ -145,7 +146,7 @@ export const moveElement = (
     },
     { informMutation: shouldInformMutation, isDragging: false },
   );
-  updateBindings(latestElement, scene);
+  updateBindings(latestElement, scene, appState);
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -203,7 +204,7 @@ export const moveElement = (
         },
         { informMutation: shouldInformMutation, isDragging: false },
       );
-      updateBindings(latestChildElement, scene, {
+      updateBindings(latestChildElement, scene, appState, {
         simultaneouslyUpdated: originalChildren,
       });
     });
