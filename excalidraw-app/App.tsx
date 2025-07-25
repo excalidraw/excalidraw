@@ -1,210 +1,164 @@
-// Datei: /var/www/gamifyboard/excalidraw-app/App.tsx
+import { Excalidraw } from "@excalidraw/excalidraw";
 
-import React, { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
-import { Excalidraw, MainMenu, WelcomeScreen } from "@excalidraw/excalidraw";
+import type { ExcalidrawImperativeAPI, AppState } from "@excalidraw/excalidraw/types";
+import type { ExcalidrawElement, NonDeletedExcalidrawElement, StrokeStyle } from "@excalidraw/element/types";
 
-import type {
-  NonDeletedExcalidrawElement,
-  ExcalidrawElement,
-} from "@excalidraw/element/types";
-import type {
-  ExcalidrawImperativeAPI,
-  AppState,
-} from "@excalidraw/excalidraw/types";
-
-// Importieren Sie Ihre GamifyToolbar-Komponente
-import { GamifyToolbar } from "./components/GamifyToolbar";
-import { TopErrorBoundary } from "./components/TopErrorBoundary";
-import PropertiesSidebar from "./components/PropertiesSidebar";
-
-// Hilfsfunktion, um zu prüfen, ob sich zwei GameState-Objekte unterscheiden.
-const areGameStatesDifferent = (
-  oldState: Record<string, boolean>,
-  newState: Record<string, boolean>,
-): boolean => {
-  const oldKeys = Object.keys(oldState);
-  const newKeys = Object.keys(newState);
-
-  if (oldKeys.length !== newKeys.length) {
-    return true;
-  }
-
-  for (const key of oldKeys) {
-    if (oldState[key] !== newState[key]) {
-      return true;
-    }
-  }
-
-  return false;
-};
+import { PropertiesSidebar } from "./components/PropertiesSidebar";
+import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 
 const App = () => {
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
-  const [gameState, setGameState] = useState<Record<string, boolean>>({});
   const [selectedElement, setSelectedElement] =
     useState<NonDeletedExcalidrawElement | null>(null);
 
-  const checkGameState = useCallback(() => {
-    if (!excalidrawAPI) {
-      return;
-    }
-
-    const elements = excalidrawAPI.getSceneElements();
-    const newGameState: Record<string, boolean> = {};
-    let sceneUpdated = false;
-
-    const updatedElements = elements.map((element) => {
-      if (element.customData?.isZone) {
-        const zone = element;
-        if (!zone.customData?.id || !zone.customData?.accepts) {
-          return element;
-        }
-
-        const zoneId = zone.customData.id;
-        const acceptedCardId = zone.customData.accepts;
-        const card = elements.find(
-          (el: NonDeletedExcalidrawElement) =>
-            el.customData?.id === acceptedCardId,
-        );
-        let isSolved = false;
-
-        if (card) {
-          isSolved =
-            card.x >= zone.x &&
-            card.x + card.width <= zone.x + zone.width &&
-            card.y >= zone.y &&
-            card.y + card.height <= zone.y + zone.height;
-        }
-
-        newGameState[zoneId] = isSolved;
-
-        const newBackgroundColor = isSolved ? "#d4edda" : "transparent";
-
-        if (zone.backgroundColor !== newBackgroundColor) {
-          sceneUpdated = true;
-          return {
-            ...zone,
-            backgroundColor: newBackgroundColor,
-          };
-        }
-      }
-      return element;
-    });
-
-    setGameState((prevGameState) => {
-      if (areGameStatesDifferent(prevGameState, newGameState)) {
-        return newGameState;
-      }
-      return prevGameState;
-    });
-
-    if (sceneUpdated) {
-      excalidrawAPI.updateScene({
-        elements: updatedElements,
-      });
-    }
-  }, [excalidrawAPI, setGameState]);
-
   const handleCanvasChange = useCallback(
     (elements: readonly ExcalidrawElement[], appState: AppState) => {
+      if (!excalidrawAPI) {
+        return;
+      }
+
+      // 1. Initialisiere customData für neue Elemente
+      let currentElements = elements.map((el) => {
+        if (el.type === "rectangle" && el.customData === undefined) {
+          return {
+            ...el,
+            customData: {
+              isCard: false,
+              isZone: false,
+              cardType: "",
+              acceptedCardTypes: "",
+            },
+          };
+        }
+        return el;
+      });
+
+      // 2. Spielzustand prüfen (Logik von checkGameState)
+      const cards = currentElements.filter((el) => el.customData?.isCard);
+      let needsUpdate = false;
+
+      const updatedElementsAfterGameStateCheck = currentElements.map((el) => {
+        if (!el.customData?.isZone) {
+          return el;
+        }
+
+        const acceptedTypes = (el.customData.acceptedCardTypes || "")
+          .split(",")
+          .filter(Boolean);
+        if (acceptedTypes.length === 0) {
+          return el;
+        }
+
+        const cardsInZone = cards.filter(
+          (card) =>
+            card.x > el.x &&
+            card.x < el.x + el.width &&
+            card.y > el.y &&
+            card.y < el.y + el.height,
+        );
+
+        const isCorrect =
+          cardsInZone.length > 0 &&
+          cardsInZone.every((card) =>
+            acceptedTypes.includes(card.customData?.cardType),
+          );
+        const newBackgroundColor = isCorrect ? "#aaffaa" : "#ffaaaa";
+
+        if (el.backgroundColor !== newBackgroundColor) {
+          needsUpdate = true;
+          return { ...el, backgroundColor: newBackgroundColor };
+        }
+        return el;
+      });
+
+      if (needsUpdate) {
+        currentElements = updatedElementsAfterGameStateCheck;
+      }
+
+      // 3. Update des ausgewählten Elements für die Sidebar
       if (
         appState.selectedElementIds &&
         Object.keys(appState.selectedElementIds).length === 1
       ) {
         const selectedId = Object.keys(appState.selectedElementIds)[0];
-        const element = elements.find((el) => el.id === selectedId);
-        setSelectedElement(element as NonDeletedExcalidrawElement);
+        const element = currentElements.find((el) => el.id === selectedId);
+        if (element && (element.customData?.isCard || element.customData?.isZone)) {
+          setSelectedElement(element as NonDeletedExcalidrawElement);
+        } else {
+          setSelectedElement(null);
+        }
       } else {
         setSelectedElement(null);
       }
+
+      // Nur updaten, wenn sich was geändert hat
+      if (JSON.stringify(elements) !== JSON.stringify(currentElements)) {
+        excalidrawAPI?.updateScene({ elements: currentElements });
+      }
     },
-    [],
+    [excalidrawAPI],
   );
 
   const handleUpdateElement = (updatedData: any) => {
-    if (!excalidrawAPI || !selectedElement) return;
+    if (!excalidrawAPI || !selectedElement) {
+      return;
+    }
+
+    const sceneElements = excalidrawAPI.getSceneElements();
+    const elementIndex = sceneElements.findIndex(
+      (el) => el.id === selectedElement.id,
+    );
+    if (elementIndex === -1) {
+      return;
+    }
+
+    const newCustomData = { ...selectedElement.customData, ...updatedData };
 
     const updatedElement = {
       ...selectedElement,
-      customData: { ...selectedElement.customData, ...updatedData },
+      customData: newCustomData,
+      strokeStyle: (newCustomData.isZone ? "dashed" : "solid") as StrokeStyle,
+      backgroundColor: selectedElement.backgroundColor, // Behalte die aktuelle Farbe bei, checkGameState kümmert sich darum
     };
-    excalidrawAPI.updateScene({
-      elements: [updatedElement],
-      commitToHistory: true,
-    });
+
+    const newSceneElements = [
+      ...sceneElements.slice(0, elementIndex),
+      updatedElement,
+      ...sceneElements.slice(elementIndex + 1),
+    ];
+
+    excalidrawAPI.updateScene({ elements: newSceneElements });
     setSelectedElement(updatedElement as NonDeletedExcalidrawElement);
+    checkGameState(newSceneElements); // Spielzustand sofort prüfen
   };
 
   return (
-    <TopErrorBoundary>
-      <div style={{ height: "100vh" }}>
-        <Excalidraw
-          excalidrawAPI={(api) => setExcalidrawAPI(api)}
-          onPointerUp={checkGameState}
-          onChange={handleCanvasChange}
-          renderTopRightUI={() => (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-end",
-                gap: "0.5rem",
-                padding: "0.5rem",
-              }}
-            >
-              {excalidrawAPI && <GamifyToolbar excalidrawAPI={excalidrawAPI} />}
-              <div
-                style={{
-                  background: "rgba(255, 255, 240, 0.9)",
-                  padding: "0.5rem 1rem",
-                  border: "1px solid #e0e0e0",
-                  borderRadius: "8px",
-                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                  minWidth: "150px",
-                }}
-              >
-                <strong>Spielstatus:</strong>
-                <ul
-                  style={{
-                    listStyle: "none",
-                    padding: 0,
-                    margin: "0.5rem 0 0 0",
-                  }}
-                >
-                  {Object.entries(gameState).map(([zoneId, isSolved]) => (
-                    <li key={zoneId}>
-                      {zoneId.substring(0, 8)}...:{" "}
-                      {isSolved ? "✅ Gelöst" : "❌ Offen"}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+    <div style={{ height: "100vh" }}>
+      <Excalidraw
+        excalidrawAPI={setExcalidrawAPI}
+        onChange={handleCanvasChange}
+        renderTopRightUI={() => (
+          <div style={{ padding: "10px" }}>
+            {selectedElement && (
               <PropertiesSidebar
-                selectedElement={selectedElement}
-                onUpdateElement={handleUpdateElement}
+                element={selectedElement}
+                onUpdate={handleUpdateElement}
               />
-            </div>
-          )}
-        >
-          <MainMenu>
-            <MainMenu.DefaultItems.LoadScene />
-            <MainMenu.DefaultItems.SaveToActiveFile />
-            <MainMenu.DefaultItems.Export />
-            <MainMenu.DefaultItems.SaveAsImage />
-            <MainMenu.DefaultItems.Help />
-            <MainMenu.DefaultItems.ClearCanvas />
-            <MainMenu.Separator />
-            <MainMenu.DefaultItems.Socials />
-            <MainMenu.Separator />
-            <MainMenu.DefaultItems.ToggleTheme />
-            <MainMenu.DefaultItems.ChangeCanvasBackground />
-          </MainMenu>
-          <WelcomeScreen />
-        </Excalidraw>
-      </div>
-    </TopErrorBoundary>
+            )}
+          </div>
+        )}
+        renderWelcomeScreen={() => (
+          <AppWelcomeScreen
+            onCollabDialogOpen={() => {}}
+            isCollabEnabled={false}
+          />
+        )}
+        
+      />
+    </div>
   );
 };
 
