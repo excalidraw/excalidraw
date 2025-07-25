@@ -1,4 +1,4 @@
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw, WelcomeScreen } from "@excalidraw/excalidraw";
 
 import { useState, useCallback, useEffect } from "react";
 
@@ -6,7 +6,6 @@ import type { ExcalidrawImperativeAPI, AppState } from "@excalidraw/excalidraw/t
 import type { ExcalidrawElement, NonDeletedExcalidrawElement, StrokeStyle } from "@excalidraw/element/types";
 
 import { PropertiesSidebar } from "./components/PropertiesSidebar";
-import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 
 const App = () => {
   const [excalidrawAPI, setExcalidrawAPI] =
@@ -150,14 +149,9 @@ const App = () => {
             )}
           </div>
         )}
-        renderWelcomeScreen={() => (
-          <AppWelcomeScreen
-            onCollabDialogOpen={() => {}}
-            isCollabEnabled={false}
-          />
-        )}
-        
-      />
+      >
+          <WelcomeScreen />
+        </Excalidraw>
     </div>
   );
 };
