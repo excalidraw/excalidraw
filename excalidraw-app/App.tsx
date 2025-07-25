@@ -6,6 +6,7 @@ import type { ExcalidrawImperativeAPI, AppState } from "@excalidraw/excalidraw/t
 import type { ExcalidrawElement, NonDeletedExcalidrawElement, StrokeStyle } from "@excalidraw/element/types";
 
 import { PropertiesSidebar } from "./components/PropertiesSidebar";
+import { GamifyToolbar } from "./components/GamifyToolbar";
 
 const App = () => {
   const [excalidrawAPI, setExcalidrawAPI] =
@@ -13,33 +14,16 @@ const App = () => {
   const [selectedElement, setSelectedElement] =
     useState<NonDeletedExcalidrawElement | null>(null);
 
-  const handleCanvasChange = useCallback(
-    (elements: readonly ExcalidrawElement[], appState: AppState) => {
+  const checkGameState = useCallback(
+    (elements: readonly ExcalidrawElement[]) => {
       if (!excalidrawAPI) {
         return;
       }
 
-      // 1. Initialisiere customData für neue Elemente
-      let currentElements = elements.map((el) => {
-        if (el.type === "rectangle" && el.customData === undefined) {
-          return {
-            ...el,
-            customData: {
-              isCard: false,
-              isZone: false,
-              cardType: "",
-              acceptedCardTypes: "",
-            },
-          };
-        }
-        return el;
-      });
-
-      // 2. Spielzustand prüfen (Logik von checkGameState)
-      const cards = currentElements.filter((el) => el.customData?.isCard);
+      const cards = elements.filter((el) => el.customData?.isCard);
       let needsUpdate = false;
 
-      const updatedElementsAfterGameStateCheck = currentElements.map((el) => {
+      const updatedElements = elements.map((el) => {
         if (!el.customData?.isZone) {
           return el;
         }
@@ -74,17 +58,26 @@ const App = () => {
       });
 
       if (needsUpdate) {
-        currentElements = updatedElementsAfterGameStateCheck;
+        excalidrawAPI.updateScene({ elements: updatedElements });
+      }
+    },
+    [excalidrawAPI],
+  );
+
+  const handleCanvasChange = useCallback(
+    (elements: readonly ExcalidrawElement[], appState: AppState) => {
+      if (!excalidrawAPI) {
+        return;
       }
 
-      // 3. Update des ausgewählten Elements für die Sidebar
+      // Update des ausgewählten Elements für die Sidebar
       if (
         appState.selectedElementIds &&
         Object.keys(appState.selectedElementIds).length === 1
       ) {
         const selectedId = Object.keys(appState.selectedElementIds)[0];
-        const element = currentElements.find((el) => el.id === selectedId);
-        if (element && (element.customData?.isCard || element.customData?.isZone)) {
+        const element = elements.find((el) => el.id === selectedId);
+        if (element) {
           setSelectedElement(element as NonDeletedExcalidrawElement);
         } else {
           setSelectedElement(null);
@@ -92,14 +85,15 @@ const App = () => {
       } else {
         setSelectedElement(null);
       }
-
-      // Nur updaten, wenn sich was geändert hat
-      if (JSON.stringify(elements) !== JSON.stringify(currentElements)) {
-        excalidrawAPI?.updateScene({ elements: currentElements });
-      }
     },
     [excalidrawAPI],
   );
+
+  const handlePointerUp = useCallback(() => {
+    if (excalidrawAPI) {
+      checkGameState(excalidrawAPI.getSceneElements());
+    }
+  }, [excalidrawAPI, checkGameState]);
 
   const handleUpdateElement = (updatedData: any) => {
     if (!excalidrawAPI || !selectedElement) {
@@ -131,16 +125,44 @@ const App = () => {
 
     excalidrawAPI.updateScene({ elements: newSceneElements });
     setSelectedElement(updatedElement as NonDeletedExcalidrawElement);
-    checkGameState(newSceneElements); // Spielzustand sofort prüfen
   };
+
+  useEffect(() => {
+    if (!excalidrawAPI) {
+      return;
+    }
+
+    const elements = excalidrawAPI.getSceneElements();
+    let elementsToUpdate: ExcalidrawElement[] = [];
+
+    elements.forEach((el) => {
+      if ((el.type === "rectangle" || el.type === "diamond") && el.customData === undefined) {
+        elementsToUpdate.push({
+          ...el,
+          customData: {
+            isCard: false,
+            isZone: false,
+            cardType: "",
+            acceptedCardTypes: "",
+          },
+        });
+      }
+    });
+
+    if (elementsToUpdate.length > 0) {
+      excalidrawAPI.updateScene({ elements: elementsToUpdate });
+    }
+  }, [excalidrawAPI]);
 
   return (
     <div style={{ height: "100vh" }}>
       <Excalidraw
         excalidrawAPI={setExcalidrawAPI}
         onChange={handleCanvasChange}
+        onPointerUp={handlePointerUp}
         renderTopRightUI={() => (
           <div style={{ padding: "10px" }}>
+            {excalidrawAPI && <GamifyToolbar excalidrawAPI={excalidrawAPI} />}
             {selectedElement && (
               <PropertiesSidebar
                 element={selectedElement}

@@ -14,57 +14,5 @@ interface GamifyToolbarProps {
 export const GamifyToolbar: React.FC<GamifyToolbarProps> = ({
   excalidrawAPI,
 }) => {
-  const createGameSet = () => {
-    if (!excalidrawAPI) {
-      return;
-    }
-
-    const cardId = `card_${nanoid()}`;
-    const zoneId = `zone_${nanoid()}`;
-
-    const existingElements = excalidrawAPI.getSceneElements();
-
-    const zoneElement = newElement({
-      type: "rectangle",
-      x: 100,
-      y: 200,
-      width: 200,
-      height: 150,
-      strokeColor: "#1e90ff",
-      backgroundColor: "transparent",
-      strokeStyle: "dashed",
-      customData: { isZone: true, accepts: cardId, id: zoneId },
-    });
-
-    const cardElement = newElement({
-      type: "rectangle",
-      x: 400,
-      y: 200,
-      width: 180,
-      height: 130,
-      strokeColor: "#ff4757",
-      backgroundColor: "transparent",
-      customData: { isCard: true, id: cardId },
-    });
-
-    const newElements = [...existingElements, zoneElement, cardElement];
-    excalidrawAPI.updateScene({ elements: newElements });
-    excalidrawAPI.scrollToContent([cardElement, zoneElement], {
-      fitToContent: true,
-    });
-  };
-
-  return (
-    <div
-      style={{
-        background: "white",
-        padding: "0.5rem 1rem",
-        borderRadius: "8px",
-        border: "1px solid #e0e0e0",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-      }}
-    >
-      <button onClick={createGameSet}>Neues Spiel-Set erstellen</button>
-    </div>
-  );
+  return null; // Render nothing if no elements are selected
 };

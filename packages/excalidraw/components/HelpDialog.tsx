@@ -9,7 +9,7 @@ import { probablySupportsClipboardBlob } from "../clipboard";
 import { t } from "../i18n";
 
 import { Dialog } from "./Dialog";
-import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
+import { ExternalLinkIcon, GithubIcon } from "./icons";
 
 import "./HelpDialog.scss";
 
@@ -44,7 +44,6 @@ const Header = () => (
       <div className="HelpDialog__link-icon">{GithubIcon}</div>
       {t("helpDialog.github")}
     </a>
-    
   </div>
 );
 

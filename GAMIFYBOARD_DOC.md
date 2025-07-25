@@ -1,9 +1,6 @@
 GamifyBoard: Umfassende Projektdokumentation & Roadmap
 
-Version: 1.1
-Datum: 20. Juli 2025
-Status: In Entwicklung
-Inhaltsverzeichnis
+Version: 1.1 Datum: 20. Juli 2025 Status: In Entwicklung Inhaltsverzeichnis
 
 Teil I: Strategische Grundlagen
 
@@ -27,38 +24,15 @@ Teil I: Strategische Grundlagen
     3.3. Strategische Positionierung: Vom Tool zur Plattform
     3.4. Go-to-Market-Strategie (Zusammenfassung)
 
-Teil II: Produkt & Features
-4.  Kernkonzepte & Terminologie
-4.1. Das Board
-4.2. Spiel-Elemente (Karten & Zonen)
-4.3. Regeln, Trigger & Aktionen
-4.4. Spiel-Zustand & Auswertung
-4.5. Vorlagen
-5.  Detaillierte Feature-Roadmap
-5.1. Phase 1: Minimum Viable Product (MVP) - (Meilensteine 0-4)
-5.2. Phase 2: Post-MVP / Version 1.0 - (Meilensteine 5-8)
-5.3. Phase 3: Zukünftige Entwicklung / Version 2.0+ - (Meilensteine 9-11)
+Teil II: Produkt & Features 4. Kernkonzepte & Terminologie 4.1. Das Board 4.2. Spiel-Elemente (Karten & Zonen) 4.3. Regeln, Trigger & Aktionen 4.4. Spiel-Zustand & Auswertung 4.5. Vorlagen 5. Detaillierte Feature-Roadmap 5.1. Phase 1: Minimum Viable Product (MVP) - (Meilensteine 0-4) 5.2. Phase 2: Post-MVP / Version 1.0 - (Meilensteine 5-8) 5.3. Phase 3: Zukünftige Entwicklung / Version 2.0+ - (Meilensteine 9-11)
 
-Teil III: Technische Grundlagen
-6.  Architektur-Übersicht
-6.1. Frontend: Die Wahl von Excalidraw
-6.2. Backend: Anforderungen & Technologie-Stack
-6.3. Datenmodell (Detailliert)
-6.4. Deployment & Skalierbarkeit
-7.  Projektmanagement & Workflow
-7.1. Tracking mit GitHub Milestones & Issues
-7.2. Das Projekt-Logbuch (IMPLEMENTATION_LOG.md)
-7.3. Steuerung von KI-Agenten
+Teil III: Technische Grundlagen 6. Architektur-Übersicht 6.1. Frontend: Die Wahl von Excalidraw 6.2. Backend: Anforderungen & Technologie-Stack 6.3. Datenmodell (Detailliert) 6.4. Deployment & Skalierbarkeit 7. Projektmanagement & Workflow 7.1. Tracking mit GitHub Milestones & Issues 7.2. Das Projekt-Logbuch (IMPLEMENTATION_LOG.md) 7.3. Steuerung von KI-Agenten
 
-Anhang
-A. Referenzdokumente
-B. Glossar
-C. Detaillierte Monetarisierungs-Matrix
-Teil I: Strategische Grundlagen
+Anhang A. Referenzdokumente B. Glossar C. Detaillierte Monetarisierungs-Matrix Teil I: Strategische Grundlagen
+
 1. Executive Summary
 
-Dieses Dokument dient als umfassender Leitfaden für die Konzeption, Entwicklung und Markteinführung von GamifyBoard. Es konsolidiert die Ergebnisse der initialen Markt- und Technologieanalysen und skizziert eine detaillierte Roadmap, die über die Prototypenphase hinausgeht.
-1.1. Vision & Mission
+Dieses Dokument dient als umfassender Leitfaden für die Konzeption, Entwicklung und Markteinführung von GamifyBoard. Es konsolidiert die Ergebnisse der initialen Markt- und Technologieanalysen und skizziert eine detaillierte Roadmap, die über die Prototypenphase hinausgeht. 1.1. Vision & Mission
 
     Vision: Die weltweit führende Plattform für kollaborative, spielbasierte Lernerfahrungen zu werden.
 
@@ -72,19 +46,15 @@ Unternehmen und Bildungseinrichtungen stehen vor der Herausforderung, in einer z
 
     E-Learning-Authoring-Tools (Articulate, Genially): Gut für die Erstellung interaktiver, aber linearer Inhalte, jedoch ungeeignet für die dynamische Echtzeit-Kollaboration von Teams.
 
-Diese Lücke führt zu ineffektiven Schulungen, mangelndem Engagement, Compliance-Risiken und einem schwer messbaren Return on Investment (ROI).
-1.3. Die Lösung: GamifyBoard
+Diese Lücke führt zu ineffektiven Schulungen, mangelndem Engagement, Compliance-Risiken und einem schwer messbaren Return on Investment (ROI). 1.3. Die Lösung: GamifyBoard
 
 GamifyBoard ist eine innovative SaaS-Plattform, die diese Lücke schließt. Wir kombinieren die Flexibilität eines kollaborativen Online-Whiteboards mit einer intuitiven, visuellen No-Code-Engine zur Erstellung von Lernspielen.
 
-Unsere Plattform ermöglicht es Teams, nahtlos von einem kreativen Brainstorming in ein strukturiertes, interaktives und automatisch ausgewertetes Lernspiel überzugehen.
-1.4. Alleinstellungsmerkmal (USP)
+Unsere Plattform ermöglicht es Teams, nahtlos von einem kreativen Brainstorming in ein strukturiertes, interaktives und automatisch ausgewertetes Lernspiel überzugehen. 1.4. Alleinstellungsmerkmal (USP)
 
-GamifyBoard ist die einzige Plattform, die freie Kollaboration und strukturierte, auswertbare Gamification in einem einzigen, intuitiven Werkzeug vereint.
-2. Marktanalyse & Positionierung
+GamifyBoard ist die einzige Plattform, die freie Kollaboration und strukturierte, auswertbare Gamification in einem einzigen, intuitiven Werkzeug vereint. 2. Marktanalyse & Positionierung
 
-2.2. Zielgruppen & Personas
-2.2.1. Primär: Corporate L&D Manager (Claudia, 45)
+2.2. Zielgruppen & Personas 2.2.1. Primär: Corporate L&D Manager (Claudia, 45)
 
     Rolle: Leiterin der Personalentwicklung in einem mittelständischen Unternehmen (500 Mitarbeiter).
 
@@ -118,12 +88,9 @@ GamifyBoard ist die einzige Plattform, die freie Kollaboration und strukturierte
 
 Kategorie
 
-
 Wettbewerber
 
-
 Stärken
-
 
 Schwächen (Unsere Chance)
 
@@ -131,31 +98,23 @@ Whiteboards
 
 Miro, Mural
 
-
 Etabliert, riesiger Funktionsumfang
-
 
 Keine integrierte, auswertbare Spiellogik.
 
 Authoring-Tools
 
-
 Articulate, Genially, H5P
 
-
 Starke Interaktivität, SCORM-Exporte
-
 
 Keine Echtzeit-Kollaboration, oft linear.
 
 Nischen-Tools
 
-
 Kahoot!, Mentimeter
 
-
 Sehr gut für Live-Quizze
-
 
 Nicht für komplexe, asynchrone Lernpfade geeignet.
 
@@ -169,11 +128,9 @@ SWOT-Analyse:
 
     Risiken (Threats): Etablierte Wettbewerber könnten ähnliche Funktionen entwickeln, technologische Hürden bei der Skalierung.
 
-3. Produktvision & Strategie
-3.1. Langfristige Vision
+3. Produktvision & Strategie 3.1. Langfristige Vision
 
-GamifyBoard soll sich von einem reinen Tool zu einem Ökosystem entwickeln. In der Zukunft sehen wir eine Plattform mit einem Community-Marktplatz, auf dem Trainer und Bildungsexperten ihre erstellten Spiel-Vorlagen teilen und verkaufen können. Integrationen in gängige Learning Management Systeme (LMS) und HR-Plattformen werden GamifyBoard zu einem unverzichtbaren Bestandteil der digitalen Lernlandschaft machen.
-3.2. Produktprinzipien
+GamifyBoard soll sich von einem reinen Tool zu einem Ökosystem entwickeln. In der Zukunft sehen wir eine Plattform mit einem Community-Marktplatz, auf dem Trainer und Bildungsexperten ihre erstellten Spiel-Vorlagen teilen und verkaufen können. Integrationen in gängige Learning Management Systeme (LMS) und HR-Plattformen werden GamifyBoard zu einem unverzichtbaren Bestandteil der digitalen Lernlandschaft machen. 3.2. Produktprinzipien
 
     Einfachheit zuerst: Die Erstellung eines Lernspiels muss so einfach sein wie das Erstellen einer Präsentationsfolie.
 
@@ -199,8 +156,7 @@ GamifyBoard soll sich von einem reinen Tool zu einem Ökosystem entwickeln. In d
 
     Skalierungsphase: Aufbau von Partnerschaften mit Beratungsunternehmen, LMS-Anbietern und Influencern im EdTech-Bereich.
 
-Teil II: Produkt & Features
-4. Kernkonzepte & Terminologie
+Teil II: Produkt & Features 4. Kernkonzepte & Terminologie
 
     4.1. Das Board: Die unendliche, kollaborative Leinwand, auf der alles stattfindet. Ein Board repräsentiert eine Lerneinheit oder ein Spiel.
 
@@ -222,8 +178,7 @@ Teil II: Produkt & Features
 
     4.5. Vorlagen (Template): Ein komplettes, wiederverwendbares GamifyBoard mit allen Elementen und Regeln, das als Ausgangspunkt für neue Spiele dient.
 
-5. Detaillierte Feature-Roadmap
-5.1. Phase 1: Minimum Viable Product (MVP) - (Meilensteine 0-4)
+5. Detaillierte Feature-Roadmap 5.1. Phase 1: Minimum Viable Product (MVP) - (Meilensteine 0-4)
 
 Ziel: Validierung der Kernidee mit minimalem Funktionsumfang.
 
@@ -269,8 +224,6 @@ Ziel: Das Produkt kommerziell nutzbar machen und die Kernfunktionen erweitern.
 
         Feature: Teams & Freigaben: Nutzer können Teams erstellen, Kollegen einladen und Boards mit unterschiedlichen Berechtigungen (Ansehen, Bearbeiten) für Teammitglieder freigeben.
 
-    
-
 5.3. Phase 3: Zukünftige Entwicklung / Version 2.0+ - (Meilensteine 9-11)
 
 Ziel: GamifyBoard von einem Tool zu einer integrierten Plattform ausbauen.
@@ -283,7 +236,7 @@ Ziel: GamifyBoard von einem Tool zu einer integrierten Plattform ausbauen.
 
         Feature: Andere Nutzer können diese Vorlagen durchsuchen, nach Kategorien filtern, bewerten und in ihre eigenen Accounts kopieren.
 
-        
+
 
     Meilenstein 10: Integrationen
 
@@ -301,9 +254,7 @@ Ziel: GamifyBoard von einem Tool zu einer integrierten Plattform ausbauen.
 
         Feature: Pfad-Analyse: Visuelle Darstellung der Lösungswege, die Spieler eingeschlagen haben, um Denkprozesse nachzuvollziehen.
 
-Teil III: Technische Grundlagen
-6. Architektur-Übersicht
-6.1. Frontend: Die Wahl von Excalidraw
+Teil III: Technische Grundlagen 6. Architektur-Übersicht 6.1. Frontend: Die Wahl von Excalidraw
 
 Die Entscheidung für Excalidraw als Basis-Technologie wurde aufgrund der folgenden Schlüsseleigenschaften getroffen:
 
@@ -359,8 +310,7 @@ Für die Funktionen ab Meilenstein 7 wird ein Backend benötigt.
 
     7.3. Steuerung von KI-Agenten
 
-Anhang
-A. Referenzdokumente
+Anhang A. Referenzdokumente
 
     Marktanalyse für kollaborative Whiteboard-Plattform
 
@@ -377,4 +327,3 @@ B. Glossar
     MVP (Minimum Viable Product): Eine Version eines Produkts mit gerade genug Funktionen, um für frühe Kunden attraktiv zu sein und wertvolles Feedback für die zukünftige Produktentwicklung zu sammeln.
 
     LMS (Learning Management System): Eine Software-Anwendung für die Verwaltung, Dokumentation, Verfolgung, Berichterstattung und Bereitstellung von Bildungskursen oder Schulungsprogrammen.
-

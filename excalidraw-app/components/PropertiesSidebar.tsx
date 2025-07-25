@@ -1,78 +1,67 @@
-import React, { useState, useEffect } from 'react';
-import type { NonDeletedExcalidrawElement } from '@excalidraw/element/types';
+import React from "react";
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 interface PropertiesSidebarProps {
-  element: NonDeletedExcalidrawElement | null;
+  element: NonDeletedExcalidrawElement;
   onUpdate: (data: any) => void;
 }
 
-const PropertiesSidebar: React.FC<PropertiesSidebarProps> = ({ element, onUpdate }) => {
-  const [isCard, setIsCard] = useState(false);
-  const [isZone, setIsZone] = useState(false);
-  const [acceptedCardIds, setAcceptedCardIds] = useState('');
-
-  useEffect(() => {
-    if (element?.customData) {
-      setIsCard(!!element.customData.isCard);
-      setIsZone(!!element.customData.isZone);
-      setAcceptedCardIds(element.customData.acceptedCardIds || '');
-    } else {
-      setIsCard(false);
-      setIsZone(false);
-      setAcceptedCardIds('');
-    }
-  }, [element]);
-
-  const handleUpdate = () => {
-    onUpdate({
-      isCard,
-      isZone,
-      acceptedCardIds,
-    });
-  };
-
-  if (!element) {
-    return null;
-  }
+export const PropertiesSidebar: React.FC<PropertiesSidebarProps> = ({ element, onUpdate }) => {
+  const { customData = {} } = element;
 
   return (
-    <div style={{ background: '#fff', padding: '1rem', width: '250px' }}>
-      <h3>Element Properties</h3>
-      <div>
+    <div style={{ background: '#fff', padding: '1rem', width: '250px', border: '1px solid #ccc', borderRadius: '8px' }}>
+      <h4>Eigenschaften</h4>
+      <div style={{ marginBottom: '1rem' }}>
+        <label style={{ display: 'block', marginBottom: '0.5rem' }}>Element ID (schreibgeschützt)</label>
+        <input type="text" value={element.id} readOnly style={{ width: '100%' }} />
+      </div>
+      <div style={{ marginBottom: '1rem' }}>
         <label>
           <input
             type="checkbox"
-            checked={isCard}
-            onChange={(e) => setIsCard(e.target.checked)}
+            checked={!!customData.isCard}
+            onChange={(e) => onUpdate({ isCard: e.target.checked, isZone: false })}
           />
-          Is Card
+          Ist eine Karte
         </label>
       </div>
-      <div>
+      <div style={{ marginBottom: '1rem' }}>
         <label>
           <input
             type="checkbox"
-            checked={isZone}
-            onChange={(e) => setIsZone(e.target.checked)}
+            checked={!!customData.isZone}
+            onChange={(e) => onUpdate({ isZone: e.target.checked, isCard: false })}
           />
-          Is Zone
+          Ist eine Zone
         </label>
       </div>
-      {isZone && (
-        <div>
-          <label>
-            Accepted Card IDs (comma-separated):
-            <input
-              type="text"
-              value={acceptedCardIds}
-              onChange={(e) => setAcceptedCardIds(e.target.value)}
-            />
-          </label>
+
+      {customData.isCard && (
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem' }}>Karten-Typ</label>
+          <input
+            type="text"
+            placeholder="z.B. 'apfel' oder 'frage_1'"
+            defaultValue={customData.cardType || ''}
+            onBlur={(e) => onUpdate({ cardType: e.target.value })}
+            style={{ width: '100%' }}
+          />
         </div>
       )}
-      <button onClick={handleUpdate}>Update</button>
+
+      {customData.isZone && (
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem' }}>Akzeptierte Karten-Typen (kommagetrennt)</label>
+          <input
+            type="text"
+            placeholder="z.B. 'apfel,birne'"
+            defaultValue={customData.acceptedCardTypes || ''}
+            onBlur={(e) => onUpdate({ acceptedCardTypes: e.target.value })}
+            style={{ width: '100%' }}
+          />
+        </div>
+      )}
     </div>
   );
 };
-
-export default PropertiesSidebar;

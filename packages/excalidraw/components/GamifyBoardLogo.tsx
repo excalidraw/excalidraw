@@ -25,7 +25,6 @@ export const GamifyBoardLogo = ({
         version="1.1"
         id="svg1"
         xmlns="http://www.w3.org/2000/svg"
-        
       >
         <defs id="defs1">
           <rect
@@ -48,9 +47,9 @@ export const GamifyBoardLogo = ({
             style={{
               fontSize: "192px",
               fontFamily: "'Baloo 2'",
-              
+
               whiteSpace: "pre",
-              
+
               fill: "#000000",
               strokeWidth: "29.3065px",
             }}

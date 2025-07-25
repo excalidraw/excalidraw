@@ -44,7 +44,8 @@ describe("Test MobileMenu", () => {
   });
 
   it.skip("should initialize with welcome screen and hide once user interacts", () => {
-    expect(document.querySelector(".welcome-screen-center")).toMatchInlineSnapshot(`
+    expect(document.querySelector(".welcome-screen-center"))
+      .toMatchInlineSnapshot(`
       <div
         class="welcome-screen-center"
       >

@@ -1,0 +1,20 @@
+.properties-container {
+  background: #fff;
+  padding: 1rem;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.full-width {
+  width: 100%;
+}

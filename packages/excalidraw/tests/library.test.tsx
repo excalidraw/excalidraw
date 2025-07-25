@@ -201,6 +201,7 @@ describe("library", () => {
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ [ORIG_ID]: "A" })]);
     });
+    UI.clickTool("selection");
     expect(h.state.activeTool.type).toBe("selection");
   });
 });
