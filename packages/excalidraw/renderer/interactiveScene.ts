@@ -118,7 +118,8 @@ const renderLinearElementPointHighlight = (
 ) => {
   const { elementId, hoverPointIndex } = appState.selectedLinearElement!;
   if (
-    appState.editingLinearElement?.selectedPointsIndices?.includes(
+    appState.selectedLinearElement?.isEditing &&
+    appState.selectedLinearElement?.selectedPointsIndices?.includes(
       hoverPointIndex,
     )
   ) {
@@ -180,7 +181,7 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
     point[0],
     point[1],
     (isOverlappingPoint
-      ? radius * (appState.editingLinearElement ? 1.5 : 2)
+      ? radius * (appState.selectedLinearElement?.isEditing ? 1.5 : 2)
       : radius) / appState.zoom.value,
     !isPhantomPoint,
     !isOverlappingPoint || isSelected,
@@ -457,7 +458,7 @@ const renderLinearPointHandles = (
   );
 
   const { POINT_HANDLE_SIZE } = LinearElementEditor;
-  const radius = appState.editingLinearElement
+  const radius = appState.selectedLinearElement?.isEditing
     ? POINT_HANDLE_SIZE
     : POINT_HANDLE_SIZE / 2;
 
@@ -479,7 +480,8 @@ const renderLinearPointHandles = (
       );
 
     let isSelected =
-      !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
+      !!appState.selectedLinearElement?.isEditing &&
+      !!appState.selectedLinearElement?.selectedPointsIndices?.includes(idx);
     // when element is a polygon, highlight the last point as well if first
     // point is selected since they overlap and the last point tends to be
     // rendered on top
@@ -488,7 +490,8 @@ const renderLinearPointHandles = (
       element.polygon &&
       !isSelected &&
       idx === element.points.length - 1 &&
-      !!appState.editingLinearElement?.selectedPointsIndices?.includes(0)
+      !!appState.selectedLinearElement?.isEditing &&
+      !!appState.selectedLinearElement?.selectedPointsIndices?.includes(0)
     ) {
       isSelected = true;
     }
@@ -544,7 +547,7 @@ const renderLinearPointHandles = (
     );
 
     midPoints.forEach((segmentMidPoint) => {
-      if (appState.editingLinearElement || points.length === 2) {
+      if (appState.selectedLinearElement?.isEditing || points.length === 2) {
         renderSingleLinearPoint(
           context,
           appState,
@@ -769,7 +772,10 @@ const _renderInteractiveScene = ({
     // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
     // ShapeCache returns empty hence making sure that we get the
     // correct element from visible elements
-    if (appState.editingLinearElement?.elementId === element.id) {
+    if (
+      appState.selectedLinearElement?.isEditing &&
+      appState.selectedLinearElement.elementId === element.id
+    ) {
       if (element) {
         editingLinearElement = element as NonDeleted<ExcalidrawLinearElement>;
       }
@@ -862,7 +868,8 @@ const _renderInteractiveScene = ({
   // correct element from visible elements
   if (
     selectedElements.length === 1 &&
-    appState.editingLinearElement?.elementId === selectedElements[0].id
+    appState.selectedLinearElement?.isEditing &&
+    appState.selectedLinearElement.elementId === selectedElements[0].id
   ) {
     renderLinearPointHandles(
       context,
@@ -893,7 +900,7 @@ const _renderInteractiveScene = ({
   }
 
   // Paint selected elements
-  if (!appState.multiElement && !appState.editingLinearElement) {
+  if (!appState.multiElement && !appState.selectedLinearElement?.isEditing) {
     const showBoundingBox = shouldShowBoundingBox(selectedElements, appState);
 
     const isSingleLinearElementSelected =

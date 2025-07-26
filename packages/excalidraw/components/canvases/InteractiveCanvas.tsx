@@ -190,7 +190,6 @@ const getRelevantAppStateProps = (
   viewModeEnabled: appState.viewModeEnabled,
   openDialog: appState.openDialog,
   editingGroupId: appState.editingGroupId,
-  editingLinearElement: appState.editingLinearElement,
   selectedElementIds: appState.selectedElementIds,
   frameToHighlight: appState.frameToHighlight,
   offsetLeft: appState.offsetLeft,
