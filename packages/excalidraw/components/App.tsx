@@ -4044,22 +4044,29 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   //zsviczian
-  startLineEditor = (
-    el: ExcalidrawLinearElement,
-    selectedPointsIndices: number[] | null = null,
-  ) => {
-    if (!el || !isLinearElement(el)) {
-      return;
-    }
-    const editingLinearElement = new LinearElementEditor(el, this.scene.getNonDeletedElementsMap());
+startLineEditor = (
+  el: ExcalidrawLinearElement,
+  selectedPointsIndices: number[] | null = null,
+) => {
+  if (!el || !isLinearElement(el)) {
+    return;
+  }
+  
+  // First select the element
+  this.setState({
+    selectedElementIds: { [el.id]: true }
+  }, () => {
+    // Then set up the editor
+    const linearElementEditor = new LinearElementEditor(el, this.scene.getNonDeletedElementsMap());
     this.setState({
-      selectedLinearElement: editingLinearElement,
-      editingLinearElement: {
-        ...editingLinearElement,
+      selectedLinearElement: {
+        ...linearElementEditor,
+        isEditing: true,
         selectedPointsIndices,
-      },
+      }
     });
-  };
+  });
+};
 
   //zsviczian
   updateContainerSize = withBatchedUpdates(
