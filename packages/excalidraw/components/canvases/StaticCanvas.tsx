@@ -35,6 +35,13 @@ const StaticCanvas = (props: StaticCanvasProps) => {
   const isComponentMounted = useRef(false);
 
   useEffect(() => {
+    props.canvas.style.width = `${props.appState.width}px`;
+    props.canvas.style.height = `${props.appState.height}px`;
+    props.canvas.width = props.appState.width * props.scale;
+    props.canvas.height = props.appState.height * props.scale;
+  }, [props.appState.height, props.appState.width, props.canvas, props.scale]);
+
+  useEffect(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper) {
       return;
@@ -63,13 +70,6 @@ const StaticCanvas = (props: StaticCanvasProps) => {
       isRenderThrottlingEnabled(),
     );
   });
-
-  useEffect(() => {
-    props.canvas.style.width = `${props.appState.width}px`;
-    props.canvas.style.height = `${props.appState.height}px`;
-    props.canvas.width = props.appState.width * props.scale;
-    props.canvas.height = props.appState.height * props.scale;
-  }, [props.appState.height, props.appState.width, props.canvas, props.scale]);
 
   return <div className="excalidraw__canvas-wrapper" ref={wrapperRef} />;
 };
