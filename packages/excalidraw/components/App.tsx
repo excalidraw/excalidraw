@@ -2408,7 +2408,8 @@ class App extends React.Component<AppProps, AppState> {
   private isMobileOrTablet = (): boolean => {
     const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     const hasCoarsePointer =
-      "matchMedia" in window && window.matchMedia("(pointer: coarse)").matches;
+      "matchMedia" in window &&
+      window?.matchMedia("(pointer: coarse)")?.matches;
     const isTouchMobile = hasTouch && hasCoarsePointer;
 
     return isMobile || isTouchMobile;
