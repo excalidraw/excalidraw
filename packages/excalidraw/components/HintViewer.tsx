@@ -115,7 +115,7 @@ const getHints = ({
       appState.selectionElement &&
       !selectedElements.length &&
       !appState.editingTextElement &&
-      !appState.editingLinearElement
+      !appState.selectedLinearElement?.isEditing
     ) {
       return [t("hints.deepBoxSelect")];
     }
@@ -130,8 +130,8 @@ const getHints = ({
 
     if (selectedElements.length === 1) {
       if (isLinearElement(selectedElements[0])) {
-        if (appState.editingLinearElement) {
-          return appState.editingLinearElement.selectedPointsIndices
+        if (appState.selectedLinearElement?.isEditing) {
+          return appState.selectedLinearElement.selectedPointsIndices
             ? t("hints.lineEditor_pointSelected")
             : t("hints.lineEditor_nothingSelected");
         }
