@@ -1009,4 +1009,48 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[1].x).toEqual(150);
     expect(API.getSelectedElements()[2].x).toEqual(100);
   });
+
+  const createAndSelectChildOfFrameAndExternalRectangle = () => {
+    const frame = API.createElement({
+      id: "id0",
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    const child = API.createElement({
+      id: "id1",
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 50,
+      height: 50,
+      frameId: frame.id,
+    });
+    const external = API.createElement({
+      id: "id2",
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 200,
+    });
+
+    API.setElements([frame, child, external]);
+    API.setSelectedElements([child, external]);
+  };
+
+  it("removes frame membership on alignment outside bounds of frame", () => {
+    createAndSelectChildOfFrameAndExternalRectangle();
+
+    expect(API.getSelectedElements()[0].x).toEqual(10);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+
+    API.executeAction(actionAlignRight);
+
+    expect(API.getSelectedElements()[0].x).toEqual(250);
+    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[1].frameId).toEqual(null);
+  });
 });
