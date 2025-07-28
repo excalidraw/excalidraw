@@ -1,8 +1,15 @@
 import { throttleRAF } from "@excalidraw/common";
 
-import { isInvisiblySmallElement, renderElement } from "@excalidraw/element";
+import {
+  getTargetFrame,
+  isInvisiblySmallElement,
+  renderElement,
+  shouldApplyFrameClip,
+} from "@excalidraw/element";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+
+import { frameClip } from "./staticScene";
 
 import type { NewElementSceneRenderConfig } from "../scene/types";
 
@@ -42,6 +49,25 @@ const _renderNewElementScene = ({
         return;
       }
 
+      const frameId = newElement.frameId || appState.frameToHighlight?.id;
+
+      context.save();
+
+      if (
+        frameId &&
+        appState.frameRendering.enabled &&
+        appState.frameRendering.clip
+      ) {
+        const frame = getTargetFrame(newElement, elementsMap, appState);
+
+        if (
+          frame &&
+          shouldApplyFrameClip(newElement, frame, appState, elementsMap)
+        ) {
+          frameClip(frame, context, renderConfig, appState);
+        }
+      }
+
       renderElement(
         newElement,
         elementsMap,
@@ -51,6 +77,8 @@ const _renderNewElementScene = ({
         renderConfig,
         appState,
       );
+
+      context.restore();
     } else {
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
     }
