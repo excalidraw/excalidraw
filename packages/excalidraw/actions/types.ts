@@ -143,7 +143,10 @@ export type ActionName =
   | "wrapSelectionInFrame"
   | "toggleLassoTool"
   | "toggleShapeSwitch"
-  | "togglePolygon";
+  | "togglePolygon"
+  | "setRasterPencilAsActiveTool"
+  | "setRasterEraserAsActiveTool"
+  | "setRasterLassoAsActiveTool";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
