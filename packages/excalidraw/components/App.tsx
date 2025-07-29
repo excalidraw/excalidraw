@@ -9330,12 +9330,12 @@ class App extends React.Component<AppProps, AppState> {
                     this.state.editingGroupId!,
                   );
 
-                  mutateElement(
+                  this.scene.mutateElement(
                     boundText,
                     {
                       groupIds: boundText.groupIds.slice(0, boundTextIndex),
                     },
-                    false,
+                    { informMutation: false, isDragging: false },
                   );
                 }
               }
