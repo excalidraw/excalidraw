@@ -140,7 +140,7 @@ export const SelectedShapeActions = ({
     targetElements.length === 1 || isSingleElementBoundContainer;
 
   const showLineEditorAction =
-    !appState.editingLinearElement &&
+    !appState.selectedLinearElement?.isEditing &&
     targetElements.length === 1 &&
     isLinearElement(targetElements[0]) &&
     !isElbowArrow(targetElements[0]);
@@ -504,16 +504,4 @@ export const ExitZenModeAction = ({
   >
     {t("buttons.exitZenMode")}
   </button>
-);
-
-export const FinalizeAction = ({
-  renderAction,
-  className,
-}: {
-  renderAction: ActionManager["renderAction"];
-  className?: string;
-}) => (
-  <div className={`finalize-button ${className}`}>
-    {renderAction("finalize", { size: "small" })}
-  </div>
 );
