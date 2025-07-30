@@ -49,7 +49,6 @@ export const getDefaultAppState = (): Omit<
     newElement: null,
     editingTextElement: null,
     editingGroupId: null,
-    editingLinearElement: null,
     activeTool: {
       type: "selection",
       customType: null,
@@ -177,7 +176,6 @@ const APP_STATE_STORAGE_CONF = (<
   newElement: { browser: false, export: false, server: false },
   editingTextElement: { browser: false, export: false, server: false },
   editingGroupId: { browser: true, export: false, server: false },
-  editingLinearElement: { browser: false, export: false, server: false },
   activeTool: { browser: true, export: false, server: false },
   penMode: { browser: true, export: false, server: false },
   penDetected: { browser: true, export: false, server: false },

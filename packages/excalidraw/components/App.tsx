@@ -104,6 +104,7 @@ import {
   setShouldSnapping,
   CLASSES,
   Emitter,
+  MINIMUM_ARROW_SIZE,
 } from "@excalidraw/common";
 
 import {
@@ -600,6 +601,10 @@ class App extends React.Component<AppProps, AppState> {
   /** embeds that have been inserted to DOM (as a perf optim, we don't want to
    * insert to DOM before user initially scrolls to them) */
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
+
+  private handleToastClose = () => {
+    this.setToast(null);
+  };
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
 
@@ -1720,14 +1725,16 @@ class App extends React.Component<AppProps, AppState> {
                                 />
                               </ElementCanvasButtons>
                             )}
+
                           {this.state.toast !== null && (
                             <Toast
                               message={this.state.toast.message}
-                              onClose={() => this.setToast(null)}
+                              onClose={this.handleToastClose}
                               duration={this.state.toast.duration}
                               closable={this.state.toast.closable}
                             />
                           )}
+
                           {this.state.contextMenu &&
                             !this.props.customOptions?.hideContextMenu && (
                               <ContextMenu
@@ -2168,9 +2175,14 @@ class App extends React.Component<AppProps, AppState> {
 
   public dismissLinearEditor = () => {
     setTimeout(() => {
-      this.setState({
-        editingLinearElement: null,
-      });
+      if (this.state.selectedLinearElement?.isEditing) {
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            isEditing: false,
+          },
+        });
+      }
     });
   };
 
@@ -2868,15 +2880,15 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (
-      this.state.editingLinearElement &&
-      !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
+      this.state.selectedLinearElement?.isEditing &&
+      !this.state.selectedElementIds[this.state.selectedLinearElement.elementId]
     ) {
       // defer so that the scheduleCapture flag isn't reset via current update
       setTimeout(() => {
         // execute only if the condition still holds when the deferred callback
         // executes (it can be scheduled multiple times depending on how
         // many times the component renders)
-        this.state.editingLinearElement &&
+        this.state.selectedLinearElement?.isEditing &&
           this.actionManager.executeAction(actionFinalize);
       });
     }
@@ -4439,17 +4451,13 @@ class App extends React.Component<AppProps, AppState> {
           if (event[KEYS.CTRL_OR_CMD] || isLineElement(selectedElement)) {
             if (isLinearElement(selectedElement)) {
               if (
-                !this.state.editingLinearElement ||
-                this.state.editingLinearElement.elementId !== selectedElement.id
+                !this.state.selectedLinearElement?.isEditing ||
+                this.state.selectedLinearElement.elementId !==
+                  selectedElement.id
               ) {
                 this.store.scheduleCapture();
                 if (!isElbowArrow(selectedElement)) {
-                  this.setState({
-                    editingLinearElement: new LinearElementEditor(
-                      selectedElement,
-                      this.scene.getNonDeletedElementsMap(),
-                    ),
-                  });
+                  this.actionManager.executeAction(actionToggleLinearEditor);
                 }
               }
             }
@@ -4946,7 +4954,17 @@ class App extends React.Component<AppProps, AppState> {
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
         const isDeleted = !nextOriginalText.trim();
-        updateElement(nextOriginalText, isDeleted);
+
+        if (isDeleted && !isExistingElement) {
+          // let's just remove the element from the scene, as it's an empty just created text element
+          this.scene.replaceAllElements(
+            this.scene
+              .getElementsIncludingDeleted()
+              .filter((x) => x.id !== element.id),
+          );
+        } else {
+          updateElement(nextOriginalText, isDeleted);
+        }
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -4975,9 +4993,10 @@ class App extends React.Component<AppProps, AppState> {
             element,
           ]);
         }
-        if (!isDeleted || isExistingElement) {
-          this.store.scheduleCapture();
-        }
+
+        // we need to record either way, whether the text element was added or removed
+        // since we need to sync this delta to other clients, otherwise it would end up with inconsistencies
+        this.store.scheduleCapture();
 
         flushSync(() => {
           this.setState({
@@ -5441,15 +5460,12 @@ class App extends React.Component<AppProps, AppState> {
       if (
         ((event[KEYS.CTRL_OR_CMD] && isSimpleArrow(selectedLinearElement)) ||
           isLineElement(selectedLinearElement)) &&
-        this.state.editingLinearElement?.elementId !== selectedLinearElement.id
+        (!this.state.selectedLinearElement?.isEditing ||
+          this.state.selectedLinearElement.elementId !==
+            selectedLinearElement.id)
       ) {
-        this.store.scheduleCapture();
-        this.setState({
-          editingLinearElement: new LinearElementEditor(
-            selectedLinearElement,
-            this.scene.getNonDeletedElementsMap(),
-          ),
-        });
+        // Use the proper action to ensure immediate history capture
+        this.actionManager.executeAction(actionToggleLinearEditor);
         return;
       } else if (
         this.state.selectedLinearElement &&
@@ -5514,8 +5530,8 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
       } else if (
-        this.state.editingLinearElement &&
-        this.state.editingLinearElement.elementId ===
+        this.state.selectedLinearElement?.isEditing &&
+        this.state.selectedLinearElement.elementId ===
           selectedLinearElement.id &&
         isLineElement(selectedLinearElement)
       ) {
@@ -5570,7 +5586,7 @@ class App extends React.Component<AppProps, AppState> {
 
       // shouldn't edit/create text when inside line editor (often false positive)
 
-      if (!this.state.editingLinearElement) {
+      if (!this.state.selectedLinearElement?.isEditing) {
         const container = this.getTextBindableContainerAtPosition(
           sceneX,
           sceneY,
@@ -5868,8 +5884,8 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      this.state.editingLinearElement &&
-      !this.state.editingLinearElement.isDragging
+      this.state.selectedLinearElement?.isEditing &&
+      !this.state.selectedLinearElement.isDragging
     ) {
       const editingLinearElement = LinearElementEditor.handlePointerMove(
         event,
@@ -5877,30 +5893,34 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerY,
         this,
       );
+      const linearElement = editingLinearElement
+        ? this.scene.getElement(editingLinearElement.elementId)
+        : null;
 
       if (
         editingLinearElement &&
-        editingLinearElement !== this.state.editingLinearElement
+        editingLinearElement !== this.state.selectedLinearElement
       ) {
         // Since we are reading from previous state which is not possible with
         // automatic batching in React 18 hence using flush sync to synchronously
         // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
         flushSync(() => {
           this.setState({
-            editingLinearElement,
+            selectedLinearElement: editingLinearElement,
           });
         });
       }
-      if (editingLinearElement?.lastUncommittedPoint != null) {
+      if (
+        editingLinearElement?.lastUncommittedPoint != null &&
+        linearElement &&
+        isBindingElementType(linearElement.type)
+      ) {
         this.maybeSuggestBindingAtCursor(
           scenePointer,
           editingLinearElement.elbowed,
         );
-      } else {
-        // causes stack overflow if not sync
-        flushSync(() => {
-          this.setState({ suggestedBindings: [] });
-        });
+      } else if (this.state.suggestedBindings.length) {
+        this.setState({ suggestedBindings: [] });
       }
     }
 
@@ -6051,7 +6071,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       selectedElements.length === 1 &&
       !isOverScrollBar &&
-      !this.state.editingLinearElement
+      !this.state.selectedLinearElement?.isEditing
     ) {
       // for linear elements, we'd like to prioritize point dragging over edge resizing
       // therefore, we update and check hovered point index first
@@ -6170,15 +6190,6 @@ class App extends React.Component<AppProps, AppState> {
       } else if (isOverScrollBar) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       } else if (
-        this.state.selectedLinearElement &&
-        hitElement?.id === this.state.selectedLinearElement.elementId
-      ) {
-        this.handleHoverSelectedLinearElement(
-          this.state.selectedLinearElement,
-          scenePointerX,
-          scenePointerY,
-        );
-      } else if (
         // if using cmd/ctrl, we're not dragging
         !event[KEYS.CTRL_OR_CMD]
       ) {
@@ -6218,6 +6229,14 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+      }
+
+      if (this.state.selectedLinearElement) {
+        this.handleHoverSelectedLinearElement(
+          this.state.selectedLinearElement,
+          scenePointerX,
+          scenePointerY,
+        );
       }
     }
 
@@ -7057,7 +7076,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (
         selectedElements.length === 1 &&
-        !this.state.editingLinearElement &&
+        !this.state.selectedLinearElement?.isEditing &&
         !isElbowArrow(selectedElements[0]) &&
         !(
           this.state.selectedLinearElement &&
@@ -7128,8 +7147,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else {
         if (this.state.selectedLinearElement) {
-          const linearElementEditor =
-            this.state.editingLinearElement || this.state.selectedLinearElement;
+          const linearElementEditor = this.state.selectedLinearElement;
           const ret = LinearElementEditor.handlePointerDown(
             event,
             this,
@@ -7143,10 +7161,6 @@ class App extends React.Component<AppProps, AppState> {
           }
           if (ret.linearElementEditor) {
             this.setState({ selectedLinearElement: ret.linearElementEditor });
-
-            if (this.state.editingLinearElement) {
-              this.setState({ editingLinearElement: ret.linearElementEditor });
-            }
           }
           if (ret.didAddPoint) {
             return true;
@@ -7247,11 +7261,11 @@ class App extends React.Component<AppProps, AppState> {
           this.clearSelection(hitElement);
         }
 
-        if (this.state.editingLinearElement) {
+        if (this.state.selectedLinearElement?.isEditing) {
           this.setState({
             selectedElementIds: makeNextSelectedElementIds(
               {
-                [this.state.editingLinearElement.elementId]: true,
+                [this.state.selectedLinearElement.elementId]: true,
               },
               this.state,
             ),
@@ -8116,16 +8130,12 @@ class App extends React.Component<AppProps, AppState> {
           this.scene,
         );
 
-        flushSync(() => {
-          if (this.state.selectedLinearElement) {
-            this.setState({
-              selectedLinearElement: {
-                ...this.state.selectedLinearElement,
-                segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
-                pointerDownState: ret.pointerDownState,
-              },
-            });
-          }
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
+            pointerDownState: ret.pointerDownState,
+          },
         });
         return;
       }
@@ -8184,7 +8194,9 @@ class App extends React.Component<AppProps, AppState> {
           pointDistance(
             pointFrom(pointerCoords.x, pointerCoords.y),
             pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
-          ) < DRAGGING_THRESHOLD
+          ) *
+            this.state.zoom.value <
+          MINIMUM_ARROW_SIZE
         ) {
           return;
         }
@@ -8202,8 +8214,7 @@ class App extends React.Component<AppProps, AppState> {
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
       if (this.state.selectedLinearElement) {
-        const linearElementEditor =
-          this.state.editingLinearElement || this.state.selectedLinearElement;
+        const linearElementEditor = this.state.selectedLinearElement;
 
         if (
           LinearElementEditor.shouldAddMidpoint(
@@ -8233,16 +8244,6 @@ class App extends React.Component<AppProps, AppState> {
               this.setState({
                 selectedLinearElement: {
                   ...this.state.selectedLinearElement,
-                  pointerDownState: ret.pointerDownState,
-                  selectedPointsIndices: ret.selectedPointsIndices,
-                  segmentMidPointHoveredCoords: null,
-                },
-              });
-            }
-            if (this.state.editingLinearElement) {
-              this.setState({
-                editingLinearElement: {
-                  ...this.state.editingLinearElement,
                   pointerDownState: ret.pointerDownState,
                   selectedPointsIndices: ret.selectedPointsIndices,
                   segmentMidPointHoveredCoords: null,
@@ -8282,9 +8283,9 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       const isSelectingPointsInLineEditor =
-        this.state.editingLinearElement &&
+        this.state.selectedLinearElement?.isEditing &&
         event.shiftKey &&
-        this.state.editingLinearElement.elementId ===
+        this.state.selectedLinearElement.elementId ===
           pointerDownState.hit.element?.id;
       if (
         (hasHitASelectedElement ||
@@ -8637,23 +8638,21 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         if (event.altKey) {
-          flushSync(() => {
-            this.setActiveTool(
-              { type: "lasso", fromSelection: true },
-              event.shiftKey,
-            );
-            this.lassoTrail.startPath(
-              pointerDownState.origin.x,
-              pointerDownState.origin.y,
-              event.shiftKey,
-            );
-            this.setAppState({
-              selectionElement: null,
-            });
+          this.setActiveTool(
+            { type: "lasso", fromSelection: true },
+            event.shiftKey,
+          );
+          this.lassoTrail.startPath(
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            event.shiftKey,
+          );
+          this.setAppState({
+            selectionElement: null,
           });
-        } else {
-          this.maybeDragNewGenericElement(pointerDownState, event);
+          return;
         }
+        this.maybeDragNewGenericElement(pointerDownState, event);
       } else if (this.state.activeTool.type === "lasso") {
         if (!event.altKey && this.state.activeTool.fromSelection) {
           this.setActiveTool({ type: "selection" });
@@ -8779,7 +8778,7 @@ class App extends React.Component<AppProps, AppState> {
         const elements = this.scene.getNonDeletedElements();
 
         // box-select line editor points
-        if (this.state.editingLinearElement) {
+        if (this.state.selectedLinearElement?.isEditing) {
           LinearElementEditor.handleBoxSelection(
             event,
             this.state,
@@ -9022,23 +9021,23 @@ class App extends React.Component<AppProps, AppState> {
 
       // Handle end of dragging a point of a linear element, might close a loop
       // and sets binding element
-      if (this.state.editingLinearElement) {
+      if (this.state.selectedLinearElement?.isEditing) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
           pointerDownState.hit?.element?.id !==
-            this.state.editingLinearElement.elementId
+            this.state.selectedLinearElement.elementId
         ) {
           this.actionManager.executeAction(actionFinalize);
         } else {
           const editingLinearElement = LinearElementEditor.handlePointerUp(
             childEvent,
-            this.state.editingLinearElement,
+            this.state.selectedLinearElement,
             this.state,
             this.scene,
           );
-          if (editingLinearElement !== this.state.editingLinearElement) {
+          if (editingLinearElement !== this.state.selectedLinearElement) {
             this.setState({
-              editingLinearElement,
+              selectedLinearElement: editingLinearElement,
               suggestedBindings: [],
             });
           }
@@ -9141,25 +9140,54 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
-        if (!pointerDownState.drag.hasOccurred && newElement && !multiElement) {
-          this.scene.mutateElement(
-            newElement,
-            {
-              points: [
-                ...newElement.points,
-                pointFrom<LocalPoint>(
-                  pointerCoords.x - newElement.x,
-                  pointerCoords.y - newElement.y,
-                ),
-              ],
-            },
-            { informMutation: false, isDragging: false },
-          );
+        const dragDistance =
+          pointDistance(
+            pointFrom(pointerCoords.x, pointerCoords.y),
+            pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
+          ) * this.state.zoom.value;
 
-          this.setState({
-            multiElement: newElement,
-            newElement,
-          });
+        if (
+          (!pointerDownState.drag.hasOccurred ||
+            dragDistance < MINIMUM_ARROW_SIZE) &&
+          newElement &&
+          !multiElement
+        ) {
+          if (this.device.isTouchScreen) {
+            const FIXED_DELTA_X = Math.min(
+              (this.state.width * 0.7) / this.state.zoom.value,
+              100,
+            );
+
+            this.scene.mutateElement(
+              newElement,
+              {
+                x: newElement.x - FIXED_DELTA_X / 2,
+                points: [
+                  pointFrom<LocalPoint>(0, 0),
+                  pointFrom<LocalPoint>(FIXED_DELTA_X, 0),
+                ],
+              },
+              { informMutation: false, isDragging: false },
+            );
+
+            this.actionManager.executeAction(actionFinalize);
+          } else {
+            const dx = pointerCoords.x - newElement.x;
+            const dy = pointerCoords.y - newElement.y;
+
+            this.scene.mutateElement(
+              newElement,
+              {
+                points: [...newElement.points, pointFrom<LocalPoint>(dx, dy)],
+              },
+              { informMutation: false, isDragging: false },
+            );
+
+            this.setState({
+              multiElement: newElement,
+              newElement,
+            });
+          }
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
           if (
             isBindingEnabled(this.state) &&
@@ -9522,14 +9550,17 @@ class App extends React.Component<AppProps, AppState> {
         !pointerDownState.hit.wasAddedToSelection &&
         // if we're editing a line, pointerup shouldn't switch selection if
         // box selected
-        (!this.state.editingLinearElement ||
+        (!this.state.selectedLinearElement?.isEditing ||
           !pointerDownState.boxSelection.hasOccurred) &&
         // hitElement can be set when alt + ctrl to toggle lasso and we will
         // just respect the selected elements from lasso instead
         this.state.activeTool.type !== "lasso"
       ) {
         // when inside line editor, shift selects points instead
-        if (childEvent.shiftKey && !this.state.editingLinearElement) {
+        if (
+          childEvent.shiftKey &&
+          !this.state.selectedLinearElement?.isEditing
+        ) {
           if (this.state.selectedElementIds[hitElement.id]) {
             if (isSelectedViaGroup(this.state, hitElement)) {
               this.setState((_prevState) => {
@@ -9707,8 +9738,9 @@ class App extends React.Component<AppProps, AppState> {
           (!hitElement &&
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
       ) {
-        if (this.state.editingLinearElement) {
-          this.setState({ editingLinearElement: null });
+        if (this.state.selectedLinearElement?.isEditing) {
+          // Exit editing mode but keep the element selected
+          this.actionManager.executeAction(actionToggleLinearEditor);
         } else {
           // Deselect selected elements
           this.setState({
