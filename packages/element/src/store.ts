@@ -27,6 +27,8 @@ import {
   isImageElement,
 } from "./index";
 
+import type { ApplyToOptions } from "./delta";
+
 import type {
   ExcalidrawElement,
   OrderedExcalidrawElement,
@@ -570,9 +572,15 @@ export class StoreDelta {
     delta: StoreDelta,
     elements: SceneElementsMap,
     appState: AppState,
+    options: ApplyToOptions = {
+      excludedProperties: new Set(),
+    },
   ): [SceneElementsMap, AppState, boolean] {
-    const [nextElements, elementsContainVisibleChange] =
-      delta.elements.applyTo(elements);
+    const [nextElements, elementsContainVisibleChange] = delta.elements.applyTo(
+      elements,
+      StoreSnapshot.empty().elements,
+      options,
+    );
 
     const [nextAppState, appStateContainsVisibleChange] =
       delta.appState.applyTo(appState, nextElements);
@@ -970,8 +978,8 @@ const getDefaultObservedAppState = (): ObservedAppState => {
     viewBackgroundColor: COLOR_PALETTE.white,
     selectedElementIds: {},
     selectedGroupIds: {},
-    editingLinearElementId: null,
     selectedLinearElementId: null,
+    selectedLinearElementIsEditing: null,
     croppingElementId: null,
     activeLockedId: null,
     lockedMultiSelections: {},
@@ -990,13 +998,13 @@ export const getObservedAppState = (
     croppingElementId: appState.croppingElementId,
     activeLockedId: appState.activeLockedId,
     lockedMultiSelections: appState.lockedMultiSelections,
-    editingLinearElementId:
-      (appState as AppState).editingLinearElement?.elementId ?? // prefer app state, as it's likely newer
-      (appState as ObservedAppState).editingLinearElementId ?? // fallback to observed app state, as it's likely older coming from a previous snapshot
-      null,
     selectedLinearElementId:
       (appState as AppState).selectedLinearElement?.elementId ??
       (appState as ObservedAppState).selectedLinearElementId ??
+      null,
+    selectedLinearElementIsEditing:
+      (appState as AppState).selectedLinearElement?.isEditing ??
+      (appState as ObservedAppState).selectedLinearElementIsEditing ??
       null,
   };
 
