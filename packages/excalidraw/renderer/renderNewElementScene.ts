@@ -36,8 +36,9 @@ const _renderNewElementScene = ({
       normalizedHeight,
     });
 
-    // Apply zoom
     context.save();
+
+    // Apply zoom
     context.scale(appState.zoom.value, appState.zoom.value);
 
     if (newElement && newElement.type !== "selection") {
@@ -50,8 +51,6 @@ const _renderNewElementScene = ({
       }
 
       const frameId = newElement.frameId || appState.frameToHighlight?.id;
-
-      context.save();
 
       if (
         frameId &&
@@ -77,11 +76,11 @@ const _renderNewElementScene = ({
         renderConfig,
         appState,
       );
-
-      context.restore();
     } else {
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
     }
+
+    context.restore();
   }
 };
 
