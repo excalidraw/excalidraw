@@ -759,6 +759,26 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.registerAll(actions);
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
+
+    // 初始化一些配置
+    if (this.props.customOptions?.shouldResizeFromCenter) {
+      setShouldResizeFromCenter(
+        this.props.customOptions.shouldResizeFromCenter,
+      );
+    }
+    if (this.props.customOptions?.shouldMaintainAspectRatio) {
+      setShouldMaintainAspectRatio(
+        this.props.customOptions.shouldMaintainAspectRatio,
+      );
+    }
+    if (this.props.customOptions?.shouldRotateWithDiscreteAngle) {
+      setShouldRotateWithDiscreteAngle(
+        this.props.customOptions.shouldRotateWithDiscreteAngle,
+      );
+    }
+    if (this.props.customOptions?.shouldSnapping) {
+      setShouldSnapping(this.props.customOptions.shouldSnapping);
+    }
   }
 
   updateEditorAtom = <Value, Args extends unknown[], Result>(
