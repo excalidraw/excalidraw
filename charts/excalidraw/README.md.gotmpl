@@ -1,0 +1,94 @@
+{{- define "repository.organization" -}}
+  johanneskastl-excalidraw
+{{- end -}}
+
+{{- define "repository.url" -}}
+  https://github.com/johanneskastl/excalidraw-helm-chart
+{{- end -}}
+
+{{- define "helm.url" -}}
+  https://johanneskastl.github.io/excalidraw-helm-chart/
+{{- end -}}
+
+{{- define "helm.path" -}}
+    {{ template "repository.organization" . }}/{{ template "chart.name" . }}
+{{- end -}}
+
+{{- define "dependenciesHeader" -}}
+## Dependencies
+{{- end -}}
+
+{{- define "install.tldr" -}}
+## TL;DR
+```console
+$ helm repo add {{ template "repository.organization" . }} {{ template "helm.url" . }}
+$ helm repo update
+$ helm install {{ template "chart.name" . }} {{ template "helm.path" . }}
+```
+{{- end -}}
+
+{{- define "install" -}}
+## Installing the Chart
+To install the chart with the release name `{{ template "chart.name" . }}`:
+```console
+helm install {{ template "chart.name" . }} {{ template "helm.path" . }}
+```
+{{- end -}}
+
+{{- define "uninstall" -}}
+## Uninstalling the Chart
+To uninstall the `{{ template "chart.name" . }}` deployment:
+```console
+helm uninstall {{ template "chart.name" . }}
+```
+The command removes all the Kubernetes components associated with the chart and deletes the release.
+{{- end -}}
+
+{{- define "configuration.header" -}}
+## Configuration
+{{- end -}}
+
+{{- define "configuration.readValues" -}}
+Read through the [values.yaml](./values.yaml) file. It has several commented out suggested values.
+{{- end -}}
+
+{{- define "configuration.example.set" -}}
+Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
+```console
+helm install {{ template "chart.name" . }} \
+  --set env.TZ="America/New York" \
+    {{ template "helm.path" . }}
+```
+{{- end -}}
+
+{{- define "configuration.example.file" -}}
+Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart.
+For example,
+```console
+helm install {{ template "chart.name" . }} {{ template "helm.path" . }} -f values.yaml
+```
+{{- end -}}
+
+{{ template "chart.header" . }}
+
+{{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.kubeVersionLine" . }}
+
+{{ template "install.tldr" . }}
+
+{{ template "install" . }}
+
+{{ template "uninstall" . }}
+
+{{ template "configuration.header" . }}
+
+{{ template "configuration.readValues" . }}
+
+{{ template "configuration.example.set" . }}
+
+{{ template "configuration.example.file" . }}
+
+{{ template "helm-docs.versionFooter" . }}
