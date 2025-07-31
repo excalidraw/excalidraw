@@ -2,5 +2,5 @@ apiVersion: v2
 name: excalidraw
 description: Virtual whiteboard for sketching hand-drawn like diagrams
 type: application
-version: 0.1.0
+version: 1.0.0
 
