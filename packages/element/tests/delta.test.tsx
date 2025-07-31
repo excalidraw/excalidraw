@@ -16,6 +16,7 @@ describe("AppStateDelta", () => {
         editingGroupId: null,
         croppingElementId: null,
         editingLinearElementId: null,
+        selectedLinearElementIsEditing: null,
         lockedMultiSelections: {},
         activeLockedId: null,
       };
@@ -58,6 +59,7 @@ describe("AppStateDelta", () => {
         editingGroupId: null,
         croppingElementId: null,
         selectedLinearElementId: null,
+        selectedLinearElementIsEditing: null,
         editingLinearElementId: null,
         activeLockedId: null,
         lockedMultiSelections: {},
@@ -105,6 +107,7 @@ describe("AppStateDelta", () => {
         editingGroupId: null,
         croppingElementId: null,
         selectedLinearElementId: null,
+        selectedLinearElementIsEditing: null,
         editingLinearElementId: null,
         activeLockedId: null,
         lockedMultiSelections: {},
