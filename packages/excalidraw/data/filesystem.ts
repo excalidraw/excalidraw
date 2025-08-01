@@ -4,7 +4,13 @@ import {
   supported as nativeFileSystemSupported,
 } from "browser-fs-access";
 
-import { EVENT, MIME_TYPES, debounce } from "@excalidraw/common";
+import {
+  EVENT,
+  MIME_TYPES,
+  debounce,
+  isIOS,
+  isAndroid,
+} from "@excalidraw/common";
 
 import { AbortError } from "../errors";
 
@@ -13,6 +19,8 @@ import type { FileSystemHandle } from "browser-fs-access";
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 
 const INPUT_CHANGE_INTERVAL_MS = 500;
+// increase timeout for mobile devices to give more time for file selection
+const MOBILE_INPUT_CHANGE_INTERVAL_MS = 2000;
 
 export const fileOpen = <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
@@ -41,13 +49,22 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
     mimeTypes,
     multiple: opts.multiple ?? false,
     legacySetup: (resolve, reject, input) => {
-      const scheduleRejection = debounce(reject, INPUT_CHANGE_INTERVAL_MS);
+      const isMobile = isIOS || isAndroid;
+      const intervalMs = isMobile
+        ? MOBILE_INPUT_CHANGE_INTERVAL_MS
+        : INPUT_CHANGE_INTERVAL_MS;
+      const scheduleRejection = debounce(reject, intervalMs);
+
       const focusHandler = () => {
         checkForFile();
-        document.addEventListener(EVENT.KEYUP, scheduleRejection);
-        document.addEventListener(EVENT.POINTER_UP, scheduleRejection);
-        scheduleRejection();
+        // on mobile, be less aggressive with rejection
+        if (!isMobile) {
+          document.addEventListener(EVENT.KEYUP, scheduleRejection);
+          document.addEventListener(EVENT.POINTER_UP, scheduleRejection);
+          scheduleRejection();
+        }
       };
+
       const checkForFile = () => {
         // this hack might not work when expecting multiple files
         if (input.files?.length) {
@@ -55,12 +72,15 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
           resolve(ret as RetType);
         }
       };
+
       requestAnimationFrame(() => {
         window.addEventListener(EVENT.FOCUS, focusHandler);
       });
+
       const interval = window.setInterval(() => {
         checkForFile();
-      }, INPUT_CHANGE_INTERVAL_MS);
+      }, intervalMs);
+
       return (rejectPromise) => {
         clearInterval(interval);
         scheduleRejection.cancel();
@@ -69,7 +89,9 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
         document.removeEventListener(EVENT.POINTER_UP, scheduleRejection);
         if (rejectPromise) {
           // so that something is shown in console if we need to debug this
-          console.warn("Opening the file was canceled (legacy-fs).");
+          console.warn(
+            "Opening the file was canceled (legacy-fs). This may happen on mobile devices.",
+          );
           rejectPromise(new AbortError());
         }
       };
