@@ -8412,6 +8412,7 @@ class App extends React.Component<AppProps, AppState> {
         event.shiftKey &&
         this.state.selectedLinearElement.elementId ===
           pointerDownState.hit.element?.id;
+
       if (
         (hasHitASelectedElement ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
@@ -8443,6 +8444,15 @@ class App extends React.Component<AppProps, AppState> {
         // if elements should be deselected on pointerup
         pointerDownState.drag.hasOccurred = true;
 
+        // prevent immediate dragging during lasso selection to avoid element displacement
+        // only allow dragging if we're not in the middle of lasso selection
+        if (
+          this.state.activeTool.type === "lasso" &&
+          this.lassoTrail.hasCurrentTrail
+        ) {
+          return;
+        }
+
         // Clear lasso trail when starting to drag selected elements with lasso tool
         // Only clear if we're actually dragging (not during lasso selection)
         if (
@@ -8452,16 +8462,6 @@ class App extends React.Component<AppProps, AppState> {
           !this.state.activeTool.fromSelection
         ) {
           this.lassoTrail.endPath();
-        }
-
-        // prevent immediate dragging during lasso selection to avoid element displacement
-        // only allow dragging if we're not in the middle of lasso selection
-        if (
-          this.state.activeTool.type === "lasso" &&
-          !this.state.activeTool.fromSelection &&
-          this.lassoTrail.hasCurrentTrail
-        ) {
-          return;
         }
 
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
