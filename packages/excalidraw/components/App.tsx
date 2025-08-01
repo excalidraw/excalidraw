@@ -8454,6 +8454,16 @@ class App extends React.Component<AppProps, AppState> {
           this.lassoTrail.endPath();
         }
 
+        // prevent immediate dragging during lasso selection to avoid element displacement
+        // only allow dragging if we're not in the middle of lasso selection
+        if (
+          this.state.activeTool.type === "lasso" &&
+          !this.state.activeTool.fromSelection &&
+          this.lassoTrail.hasCurrentTrail
+        ) {
+          return;
+        }
+
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
         // Checking for editingTextElement to avoid jump while editing on mobile #6503
