@@ -63,6 +63,7 @@ import {
   laserPointerToolIcon,
   MagicIcon,
   LassoIcon,
+  LassoIconMobile,
 } from "./icons";
 
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
@@ -295,15 +296,31 @@ export const ShapesSwitcher = ({
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
-  const lassoToolSelected = activeTool.type === "lasso";
+  const lassoToolSelected =
+    activeTool.type === "lasso" && app.defaultSelectionTool !== "lasso";
 
   const embeddableToolSelected = activeTool.type === "embeddable";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
+  // we'll need to update SHAPES to swap lasso and selection
+  const _SHAPES =
+    app.defaultSelectionTool === "lasso"
+      ? ([
+          {
+            value: "lasso",
+            icon: LassoIconMobile,
+            key: KEYS.L,
+            numericKey: KEYS["1"],
+            fillable: true,
+          },
+          ...SHAPES.slice(1),
+        ] as const)
+      : SHAPES;
+
   return (
     <>
-      {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
+      {_SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
         if (
           UIOptions.tools?.[
             value as Extract<typeof value, keyof AppProps["UIOptions"]["tools"]>
@@ -418,14 +435,16 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.laser")}
           </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "lasso" })}
-            icon={LassoIcon}
-            data-testid="toolbar-lasso"
-            selected={lassoToolSelected}
-          >
-            {t("toolBar.lasso")}
-          </DropdownMenu.Item>
+          {app.defaultSelectionTool !== "lasso" && (
+            <DropdownMenu.Item
+              onSelect={() => app.setActiveTool({ type: "lasso" })}
+              icon={LassoIcon}
+              data-testid="toolbar-lasso"
+              selected={lassoToolSelected}
+            >
+              {t("toolBar.lasso")}
+            </DropdownMenu.Item>
+          )}
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate
           </div>
