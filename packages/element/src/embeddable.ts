@@ -23,7 +23,7 @@ type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 const embeddedLinkCache = new Map<string, IframeDataWithSandbox>();
 
 const RE_YOUTUBE =
-  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=|\?start=|&start=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)/;
 
 const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}\.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
@@ -55,6 +55,35 @@ const RE_REDDIT =
 
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
+
+const parseYouTubeTimestamp = (url: string): number => {
+  let timeParam: string | null | undefined;
+
+  try {
+    const urlObj = new URL(url.startsWith("http") ? url : `https://${url}`);
+    timeParam =
+      urlObj.searchParams.get("t") || urlObj.searchParams.get("start");
+  } catch (error) {
+    const timeMatch = url.match(/[?&#](?:t|start)=([^&#\s]+)/);
+    timeParam = timeMatch?.[1];
+  }
+
+  if (!timeParam) {
+    return 0;
+  }
+
+  if (/^\d+$/.test(timeParam)) {
+    return parseInt(timeParam, 10);
+  }
+
+  const timeMatch = timeParam.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/);
+  if (!timeMatch) {
+    return 0;
+  }
+
+  const [, hours = "0", minutes = "0", seconds = "0"] = timeMatch;
+  return parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
+};
 
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
@@ -113,7 +142,8 @@ export const getEmbedLink = (
   let aspectRatio = { w: 560, h: 840 };
   const ytLink = link.match(RE_YOUTUBE);
   if (ytLink?.[2]) {
-    const time = ytLink[3] ? `&start=${ytLink[3]}` : ``;
+    const startTime = parseYouTubeTimestamp(originalLink);
+    const time = startTime > 0 ? `&start=${startTime}` : ``;
     const isPortrait = link.includes("shorts");
     type = "video";
     switch (ytLink[1]) {

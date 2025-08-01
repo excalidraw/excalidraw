@@ -330,7 +330,7 @@ export const shouldShowBoundingBox = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: InteractiveCanvasAppState,
 ) => {
-  if (appState.editingLinearElement) {
+  if (appState.selectedLinearElement?.isEditing) {
     return false;
   }
   if (elements.length > 1) {
