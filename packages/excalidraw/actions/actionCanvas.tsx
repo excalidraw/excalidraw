@@ -2,6 +2,7 @@ import { clamp, roundToStep } from "@excalidraw/math";
 
 import {
   DEFAULT_CANVAS_BACKGROUND_PICKS,
+  DEFAULT_CANVAS_BACKGROUND_PICKS_DARK,
   CURSOR_TYPE,
   MAX_ZOOM,
   MIN_ZOOM,
@@ -74,7 +75,7 @@ export const actionChangeViewBackgroundColor = register({
     return (
       <ColorPicker
         palette={null}
-        topPicks={DEFAULT_CANVAS_BACKGROUND_PICKS}
+        topPicks={appState.theme === THEME.DARK ? DEFAULT_CANVAS_BACKGROUND_PICKS_DARK : DEFAULT_CANVAS_BACKGROUND_PICKS}
         label={t("labels.canvasBackground")}
         type="canvasBackground"
         color={appState.viewBackgroundColor}
