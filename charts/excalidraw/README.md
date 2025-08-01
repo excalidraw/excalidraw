@@ -29,14 +29,7 @@ The command removes all the Kubernetes components associated with the chart and 
 
 Read through the [values.yaml](./values.yaml) file. It has several commented out suggested values.
 
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
-```console
-helm install excalidraw \
-  --set env.TZ="America/New York" \
-    excalidraw/excalidraw
-```
-
-Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart.
+YAML file that specifies the values for the above parameters can be provided while installing the chart.
 For example,
 ```console
 helm install excalidraw excalidraw/excalidraw -f values.yaml
