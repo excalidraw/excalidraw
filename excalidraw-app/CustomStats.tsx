@@ -21,11 +21,23 @@ type StorageSizes = { scene: number; total: number };
 
 const STORAGE_SIZE_TIMEOUT = 500;
 
-const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
-  cb({
-    scene: getElementsStorageSize(),
-    total: getTotalStorageSize(),
-  });
+const getStorageSizes = debounce(async (cb: (sizes: StorageSizes) => void) => {
+  try {
+    const [scene, total] = await Promise.all([
+      getElementsStorageSize(),
+      getTotalStorageSize(),
+    ]);
+    cb({
+      scene,
+      total,
+    });
+  } catch (error) {
+    console.error("Failed to get storage sizes:", error);
+    cb({
+      scene: 0,
+      total: 0,
+    });
+  }
 }, STORAGE_SIZE_TIMEOUT);
 
 type Props = {
