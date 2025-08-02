@@ -8,13 +8,21 @@ import { Excalidraw, isLinearElement } from "@excalidraw/excalidraw";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { UI, Pointer, Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
-import { fireEvent, render } from "@excalidraw/excalidraw/tests/test-utils";
+import {
+  act,
+  fireEvent,
+  render,
+} from "@excalidraw/excalidraw/tests/test-utils";
+
+import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
 
 import { getTransformHandles } from "../src/transformHandles";
 import {
   getTextEditor,
   TEXT_EDITOR_SELECTOR,
 } from "../../excalidraw/tests/queries/dom";
+
+import type { ExcalidrawLinearElement, FixedPointBinding } from "../src/types";
 
 const { h } = window;
 
@@ -71,8 +79,9 @@ describe("element binding", () => {
 
     expect(arrow.startBinding).toEqual({
       elementId: rect.id,
-      focus: expect.toBeNonNaNNumber(),
-      gap: expect.toBeNonNaNNumber(),
+      focus: 0,
+      gap: 0,
+      fixedPoint: expect.arrayContaining([1.1, 0]),
     });
 
     // Move the end point to the overlapping binding position
@@ -83,13 +92,15 @@ describe("element binding", () => {
     // Both the start and the end points should be bound
     expect(arrow.startBinding).toEqual({
       elementId: rect.id,
-      focus: expect.toBeNonNaNNumber(),
-      gap: expect.toBeNonNaNNumber(),
+      focus: 0,
+      gap: 0,
+      fixedPoint: expect.arrayContaining([1.1, 0]),
     });
     expect(arrow.endBinding).toEqual({
       elementId: rect.id,
-      focus: expect.toBeNonNaNNumber(),
-      gap: expect.toBeNonNaNNumber(),
+      focus: 0,
+      gap: 0,
+      fixedPoint: expect.arrayContaining([1.1, 0]),
     });
   });
 
@@ -195,9 +206,9 @@ describe("element binding", () => {
     // Sever connection
     expect(API.getSelectedElement().type).toBe("arrow");
     Keyboard.keyPress(KEYS.ARROW_LEFT);
-    expect(arrow.endBinding).toBe(null);
+    expect(arrow.endBinding).not.toBe(null);
     Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    expect(arrow.endBinding).toBe(null);
+    expect(arrow.endBinding).not.toBe(null);
   });
 
   it("should unbind on bound element deletion", () => {
@@ -312,15 +323,13 @@ describe("element binding", () => {
       points: [pointFrom(0, 0), pointFrom(0, -87.45777932247563)],
       startBinding: {
         elementId: "rectangle1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [0.5, 1],
+        mode: "orbit",
       },
       endBinding: {
         elementId: "text1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [1, 0.5],
+        mode: "orbit",
       },
     });
 
@@ -330,15 +339,13 @@ describe("element binding", () => {
       points: [pointFrom(0, 0), pointFrom(0, -87.45777932247563)],
       startBinding: {
         elementId: "text1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [0.5, 1],
+        mode: "orbit",
       },
       endBinding: {
         elementId: "rectangle1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [1, 0.5],
+        mode: "orbit",
       },
     });
 
@@ -474,5 +481,348 @@ describe("element binding", () => {
         }
       });
     });
+  });
+});
+
+describe("Fixed-point arrow binding", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it("should create fixed-point binding when both arrow endpoint is inside rectangle", () => {
+    // Create a filled solid rectangle
+    UI.clickTool("rectangle");
+    mouse.downAt(100, 100);
+    mouse.moveTo(200, 200);
+    mouse.up();
+
+    const rect = API.getSelectedElement();
+    API.updateElement(rect, { fillStyle: "solid", backgroundColor: "#a5d8ff" });
+
+    // Draw arrow with endpoint inside the filled rectangle, since only
+    // filled bindables bind inside the shape
+    UI.clickTool("arrow");
+    mouse.downAt(110, 110);
+    mouse.moveTo(160, 160);
+    mouse.up();
+
+    const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
+    expect(arrow.x).toBe(110);
+    expect(arrow.y).toBe(110);
+
+    // Should bind to the rectangle since endpoint is inside
+    expect(arrow.startBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+
+    const startBinding = arrow.startBinding as FixedPointBinding;
+    expect(startBinding.fixedPoint[0]).toBeGreaterThanOrEqual(0);
+    expect(startBinding.fixedPoint[0]).toBeLessThanOrEqual(1);
+    expect(startBinding.fixedPoint[1]).toBeGreaterThanOrEqual(0);
+    expect(startBinding.fixedPoint[1]).toBeLessThanOrEqual(1);
+
+    const endBinding = arrow.endBinding as FixedPointBinding;
+    expect(endBinding.fixedPoint[0]).toBeGreaterThanOrEqual(0);
+    expect(endBinding.fixedPoint[0]).toBeLessThanOrEqual(1);
+    expect(endBinding.fixedPoint[1]).toBeGreaterThanOrEqual(0);
+    expect(endBinding.fixedPoint[1]).toBeLessThanOrEqual(1);
+
+    mouse.reset();
+
+    // Move the bindable
+    mouse.downAt(130, 110);
+    mouse.moveTo(280, 110);
+    mouse.up();
+
+    // Check if the arrow moved
+    expect(arrow.x).toBe(260);
+    expect(arrow.y).toBe(110);
+  });
+
+  it("should create fixed-point binding when one of the arrow endpoint is inside rectangle", () => {
+    // Create a filled solid rectangle
+    UI.clickTool("rectangle");
+    mouse.downAt(100, 100);
+    mouse.moveTo(200, 200);
+    mouse.up();
+
+    const rect = API.getSelectedElement();
+    API.updateElement(rect, { fillStyle: "solid", backgroundColor: "#a5d8ff" });
+
+    // Draw arrow with endpoint inside the filled rectangle, since only
+    // filled bindables bind inside the shape
+    UI.clickTool("arrow");
+    mouse.downAt(10, 10);
+    mouse.moveTo(160, 160);
+    mouse.up();
+
+    const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
+    expect(arrow.x).toBe(10);
+    expect(arrow.y).toBe(10);
+    expect(arrow.width).toBe(150);
+    expect(arrow.height).toBe(150);
+
+    // Should bind to the rectangle since endpoint is inside
+    expect(arrow.startBinding).toBe(null);
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+
+    const endBinding = arrow.endBinding as FixedPointBinding;
+    expect(endBinding.fixedPoint[0]).toBeGreaterThanOrEqual(0);
+    expect(endBinding.fixedPoint[0]).toBeLessThanOrEqual(1);
+    expect(endBinding.fixedPoint[1]).toBeGreaterThanOrEqual(0);
+    expect(endBinding.fixedPoint[1]).toBeLessThanOrEqual(1);
+
+    mouse.reset();
+
+    // Move the bindable
+    mouse.downAt(130, 110);
+    mouse.moveTo(280, 110);
+    mouse.up();
+
+    // Check if the arrow moved
+    expect(arrow.x).toBe(10);
+    expect(arrow.y).toBe(10);
+    expect(arrow.width).toBe(300);
+    expect(arrow.height).toBe(150);
+  });
+
+  it("should maintain relative position when arrow start point is dragged outside and rectangle is moved", () => {
+    // Create a filled solid rectangle
+    UI.clickTool("rectangle");
+    mouse.downAt(100, 100);
+    mouse.moveTo(200, 200);
+    mouse.up();
+
+    const rect = API.getSelectedElement();
+    API.updateElement(rect, { fillStyle: "solid", backgroundColor: "#a5d8ff" });
+
+    // Draw arrow with both endpoints inside the filled rectangle, creating same-element binding
+    UI.clickTool("arrow");
+    mouse.downAt(120, 120);
+    mouse.moveTo(180, 180);
+    mouse.up();
+
+    const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
+
+    // Both ends should be bound to the same rectangle
+    expect(arrow.startBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+
+    mouse.reset();
+
+    // Select the arrow and drag the start point outside the rectangle
+    mouse.downAt(120, 120);
+    mouse.moveTo(50, 50); // Move start point outside rectangle
+    mouse.up();
+
+    mouse.reset();
+
+    // Move the rectangle by dragging it
+    mouse.downAt(150, 110);
+    mouse.moveTo(300, 300);
+    mouse.up();
+
+    expect(arrow.x).toBe(50);
+    expect(arrow.y).toBe(50);
+    expect(arrow.width).toBeCloseTo(280, 0);
+    expect(arrow.height).toBeCloseTo(320, 0);
+  });
+
+  it("should move inner points when arrow is bound to same element on both ends", () => {
+    // Create one rectangle as binding target
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 200,
+      height: 100,
+      fillStyle: "solid",
+      backgroundColor: "#a5d8ff",
+    });
+
+    // Create a non-elbowed arrow with inner points bound to the same element on both ends
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 100,
+      y: 75,
+      width: 100,
+      height: 50,
+      points: [
+        pointFrom(0, 0), // start point
+        pointFrom(25, -25), // first inner point
+        pointFrom(75, 25), // second inner point
+        pointFrom(100, 0), // end point
+      ],
+      startBinding: {
+        elementId: rect.id,
+        fixedPoint: [0.25, 0.5],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: rect.id,
+        fixedPoint: [0.75, 0.5],
+        mode: "orbit",
+      },
+    });
+
+    API.setElements([rect, arrow]);
+
+    // Store original inner point positions (local coordinates)
+    const originalInnerPoint1 = [...arrow.points[1]];
+    const originalInnerPoint2 = [...arrow.points[2]];
+
+    // Move the rectangle
+    mouse.reset();
+    mouse.downAt(150, 100); // Click on the rectangle
+    mouse.moveTo(300, 200); // Move it down and to the right
+    mouse.up();
+
+    // Verify that inner points moved with the arrow (same local coordinates)
+    // When both ends are bound to the same element, inner points should maintain
+    // their local coordinates relative to the arrow's origin
+    expect(arrow.points[1][0]).toBe(originalInnerPoint1[0]);
+    expect(arrow.points[1][1]).toBe(originalInnerPoint1[1]);
+    expect(arrow.points[2][0]).toBe(originalInnerPoint2[0]);
+    expect(arrow.points[2][1]).toBe(originalInnerPoint2[1]);
+  });
+
+  it("should NOT move inner points when arrow is bound to different elements", () => {
+    // Create two rectangles as binding targets
+    const rectLeft = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    const rectRight = API.createElement({
+      type: "rectangle",
+      x: 300,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    // Create a non-elbowed arrow with inner points bound to different elements
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 100,
+      y: 50,
+      width: 200,
+      height: 0,
+      points: [
+        pointFrom(0, 0), // start point
+        pointFrom(50, -20), // first inner point
+        pointFrom(150, 20), // second inner point
+        pointFrom(200, 0), // end point
+      ],
+      startBinding: {
+        elementId: rectLeft.id,
+        fixedPoint: [0.5, 0.5],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: rectRight.id,
+        fixedPoint: [0.5, 0.5],
+        mode: "orbit",
+      },
+    });
+
+    API.setElements([rectLeft, rectRight, arrow]);
+
+    // Store original inner point positions
+    const originalInnerPoint1 = [...arrow.points[1]];
+    const originalInnerPoint2 = [...arrow.points[2]];
+
+    // Move the right rectangle down by 50 pixels
+    mouse.reset();
+    mouse.downAt(350, 50); // Click on the right rectangle
+    mouse.moveTo(350, 100); // Move it down
+    mouse.up();
+
+    // Verify that inner points did NOT move when bound to different elements
+    // The arrow should NOT translate inner points proportionally when only one end moves
+    expect(arrow.points[1][0]).toBe(originalInnerPoint1[0]);
+    expect(arrow.points[1][1]).toBe(originalInnerPoint1[1]);
+    expect(arrow.points[2][0]).toBe(originalInnerPoint2[0]);
+    expect(arrow.points[2][1]).toBe(originalInnerPoint2[1]);
+  });
+});
+
+describe("line segment extension binding", () => {
+  beforeEach(async () => {
+    mouse.reset();
+
+    await act(() => {
+      return setLanguage(defaultLang);
+    });
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it("should use point binding when extended segment intersects element", () => {
+    // Create a rectangle that will be intersected by the extended arrow segment
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+
+    API.setElements([rect]);
+
+    // Draw an arrow that points at the rectangle (extended segment will intersect)
+    UI.clickTool("arrow");
+    mouse.downAt(0, 0); // Start point
+    mouse.moveTo(120, 95); // End point - arrow direction points toward rectangle
+    mouse.up();
+
+    const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
+
+    // Should create a normal point binding since the extended line segment
+    // from the last arrow segment intersects the rectangle
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding).toHaveProperty("focus");
+    expect(arrow.endBinding).toHaveProperty("gap");
+  });
+
+  it("should use fixed point binding when extended segment misses element", () => {
+    // Create a rectangle positioned so the extended arrow segment will miss it
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+
+    API.setElements([rect]);
+
+    // Draw an arrow that doesn't point at the rectangle (extended segment will miss)
+    UI.clickTool("arrow");
+    mouse.reset();
+    mouse.downAt(125, 93); // Start point
+    mouse.moveTo(175, 93); // End point - arrow direction is horizontal, misses rectangle
+    mouse.up();
+
+    const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
+
+    // Should create a fixed point binding since the extended line segment
+    // from the last arrow segment misses the rectangle
+    expect(arrow.startBinding?.elementId).toBe(rect.id);
+    expect(arrow.startBinding).toHaveProperty("fixedPoint");
+    expect(
+      (arrow.startBinding as FixedPointBinding).fixedPoint[0],
+    ).toBeGreaterThanOrEqual(0);
+    expect(
+      (arrow.startBinding as FixedPointBinding).fixedPoint[0],
+    ).toBeLessThanOrEqual(1);
+    expect(
+      (arrow.startBinding as FixedPointBinding).fixedPoint[1],
+    ).toBeLessThanOrEqual(0.5);
+    expect(
+      (arrow.startBinding as FixedPointBinding).fixedPoint[1],
+    ).toBeLessThanOrEqual(1);
+    expect(arrow.endBinding).toBe(null);
   });
 });

@@ -20,12 +20,12 @@ import { t } from "../i18n";
 import { actionDeleteSelected } from "./actionDeleteSelected";
 import { register } from "./register";
 
-export const actionCopy = register({
+export const actionCopy = register<ClipboardEvent | null>({
   name: "copy",
   label: "labels.copy",
   icon: DuplicateIcon,
   trackEvent: { category: "element" },
-  perform: async (elements, appState, event: ClipboardEvent | null, app) => {
+  perform: async (elements, appState, event, app) => {
     const elementsToCopy = app.scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: true,
@@ -109,12 +109,12 @@ export const actionPaste = register({
   keyTest: undefined,
 });
 
-export const actionCut = register({
+export const actionCut = register<ClipboardEvent | null>({
   name: "cut",
   label: "labels.cut",
   icon: cutIcon,
   trackEvent: { category: "element" },
-  perform: (elements, appState, event: ClipboardEvent | null, app) => {
+  perform: (elements, appState, event, app) => {
     actionCopy.perform(elements, appState, event, app);
     return actionDeleteSelected.perform(elements, appState, null, app);
   },

@@ -49,9 +49,3 @@ exports[`Test Linear Elements > Test bound text element > should wrap the bound 
 "Online whiteboard
 collaboration made easy"
 `;
-
-exports[`Test Linear Elements > Test bound text element > should wrap the bound text when arrow bound container moves 2`] = `
-"Online whiteboard
-collaboration made
-easy"
-`;

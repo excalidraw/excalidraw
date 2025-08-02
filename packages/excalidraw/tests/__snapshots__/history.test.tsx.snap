@@ -11,6 +11,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -34,6 +35,70 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
+  "editingLinearElement": {
+    "customLineAngle": null,
+    "elbowed": false,
+    "elementId": "id4",
+    "hoverPointIndex": -1,
+    "isDragging": false,
+    "isEditing": false,
+    "lastUncommittedPoint": null,
+    "pointerDownState": {
+      "arrowOriginalStartPoint": [
+        0,
+        0,
+      ],
+      "lastClickedIsEndPoint": false,
+      "lastClickedPoint": -1,
+      "origin": null,
+      "prevSelectedPointsIndices": null,
+      "segmentMidpoint": {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
+    },
+    "pointerOffset": {
+      "x": 0,
+      "y": 0,
+    },
+    "segmentMidPointHoveredCoords": null,
+    "selectedPointsIndices": null,
+    "startBindingElement": {
+      "angle": 0,
+      "backgroundColor": "transparent",
+      "boundElements": [
+        {
+          "id": "id4",
+          "type": "arrow",
+        },
+      ],
+      "customData": undefined,
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "height": 100,
+      "id": "id0",
+      "index": "a0",
+      "isDeleted": false,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "roughness": 1,
+      "roundness": null,
+      "seed": 1,
+      "strokeColor": "#1e1e1e",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "type": "rectangle",
+      "updated": 1,
+      "version": 3,
+      "versionNonce": 493213705,
+      "width": 100,
+      "x": -100,
+      "y": -50,
+    },
+  },
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -118,7 +183,12 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [],
+  "boundElements": [
+    {
+      "id": "id4",
+      "type": "arrow",
+    },
+  ],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -137,7 +207,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 18,
+  "version": 3,
   "width": 100,
   "x": -100,
   "y": -50,
@@ -148,7 +218,12 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [],
+  "boundElements": [
+    {
+      "id": "id4",
+      "type": "arrow",
+    },
+  ],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -167,7 +242,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 9,
+  "version": 3,
   "width": 100,
   "x": 100,
   "y": -50,
@@ -183,18 +258,17 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id15",
+    "elementId": "id1",
     "fixedPoint": [
-      "0.50000",
-      1,
+      "-0.05000",
+      "0.50997",
     ],
-    "focus": 0,
-    "gap": 1,
+    "mode": "orbit",
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "99.19972",
+  "height": "0.04737",
   "id": "id4",
   "index": "a2",
   "isDeleted": false,
@@ -208,8 +282,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      "98.40611",
-      "99.19972",
+      90,
+      "0.04737",
     ],
   ],
   "roughness": 1,
@@ -217,245 +291,31 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     "type": 2,
   },
   "startArrowhead": null,
-  "startBinding": null,
+  "startBinding": {
+    "elementId": "id0",
+    "fixedPoint": [
+      "1.05000",
+      "0.50950",
+    ],
+    "mode": "orbit",
+  },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 35,
-  "width": "98.40611",
-  "x": 1,
-  "y": 0,
+  "version": 9,
+  "width": 90,
+  "x": 5,
+  "y": "0.95000",
 }
 `;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] element 3 1`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id4",
-      "type": "arrow",
-    },
-  ],
-  "customData": undefined,
-  "fillStyle": "solid",
-  "frameId": null,
-  "groupIds": [],
-  "height": 50,
-  "id": "id15",
-  "index": "a3",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": null,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 2,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 14,
-  "width": 50,
-  "x": 100,
-  "y": 100,
-}
-`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of elements 1`] = `4`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of renders 1`] = `10`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of renders 1`] = `21`;
-
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] redo stack 1`] = `
-[
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {},
-        "inserted": {},
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {
-        "id0": {
-          "deleted": {
-            "version": 17,
-          },
-          "inserted": {
-            "version": 15,
-          },
-        },
-        "id1": {
-          "deleted": {
-            "boundElements": [],
-            "version": 9,
-          },
-          "inserted": {
-            "boundElements": [
-              {
-                "id": "id4",
-                "type": "arrow",
-              },
-            ],
-            "version": 8,
-          },
-        },
-        "id15": {
-          "deleted": {
-            "boundElements": [
-              {
-                "id": "id4",
-                "type": "arrow",
-              },
-            ],
-            "version": 12,
-          },
-          "inserted": {
-            "boundElements": [],
-            "version": 11,
-          },
-        },
-        "id4": {
-          "deleted": {
-            "endBinding": {
-              "elementId": "id15",
-              "fixedPoint": [
-                "0.50000",
-                1,
-              ],
-              "focus": 0,
-              "gap": 1,
-            },
-            "height": "68.58402",
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                98,
-                "68.58402",
-              ],
-            ],
-            "startBinding": {
-              "elementId": "id0",
-              "focus": "0.02970",
-              "gap": 1,
-            },
-            "version": 33,
-          },
-          "inserted": {
-            "endBinding": {
-              "elementId": "id1",
-              "focus": "-0.02000",
-              "gap": 1,
-            },
-            "height": "0.00656",
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                "98.00000",
-                "-0.00656",
-              ],
-            ],
-            "startBinding": {
-              "elementId": "id0",
-              "focus": "0.02000",
-              "gap": 1,
-            },
-            "version": 30,
-          },
-        },
-      },
-    },
-    "id": "id22",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {},
-        "inserted": {},
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {
-        "id0": {
-          "deleted": {
-            "boundElements": [],
-            "version": 18,
-          },
-          "inserted": {
-            "boundElements": [
-              {
-                "id": "id4",
-                "type": "arrow",
-              },
-            ],
-            "version": 17,
-          },
-        },
-        "id15": {
-          "deleted": {
-            "version": 14,
-          },
-          "inserted": {
-            "version": 12,
-          },
-        },
-        "id4": {
-          "deleted": {
-            "height": "99.19972",
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                "98.40611",
-                "99.19972",
-              ],
-            ],
-            "startBinding": null,
-            "version": 35,
-            "y": 0,
-          },
-          "inserted": {
-            "height": "68.58402",
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                98,
-                "68.58402",
-              ],
-            ],
-            "startBinding": {
-              "elementId": "id0",
-              "focus": "0.02970",
-              "gap": 1,
-            },
-            "version": 33,
-            "y": "35.82151",
-          },
-        },
-      },
-    },
-    "id": "id23",
-  },
-]
-`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] redo stack 1`] = `[]`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] undo stack 1`] = `
 [
@@ -590,25 +450,282 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               "type": 2,
             },
             "startArrowhead": null,
-            "startBinding": null,
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 4,
+            "version": 5,
             "width": 100,
             "x": 0,
             "y": 0,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 3,
+            "version": 4,
           },
         },
       },
-      "updated": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "boundElements": [
+              {
+                "id": "id4",
+                "type": "arrow",
+              },
+            ],
+            "version": 3,
+          },
+          "inserted": {
+            "boundElements": [],
+            "version": 2,
+          },
+        },
+      },
     },
     "id": "id6",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id4": {
+          "deleted": {
+            "height": "0.95000",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                95,
+                "-0.95000",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
+            },
+            "version": 6,
+            "width": 95,
+            "x": 5,
+            "y": "0.95000",
+          },
+          "inserted": {
+            "height": 0,
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                100,
+                0,
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
+            },
+            "version": 5,
+            "width": 100,
+            "x": 0,
+            "y": 0,
+          },
+        },
+      },
+    },
+    "id": "id9",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id4": {
+          "deleted": {
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "1.05000",
+                "0.50950",
+              ],
+              "mode": "orbit",
+            },
+            "version": 7,
+          },
+          "inserted": {
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
+            },
+            "version": 6,
+          },
+        },
+      },
+    },
+    "id": "id11",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id4": {
+          "deleted": {
+            "height": "0.04737",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                90,
+                "0.04737",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "1.05000",
+                "0.50950",
+              ],
+              "mode": "orbit",
+            },
+            "version": 8,
+            "width": 90,
+            "y": "0.95000",
+          },
+          "inserted": {
+            "height": "0.95000",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                95,
+                "-0.95000",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "1.05000",
+                "0.50950",
+              ],
+              "mode": "orbit",
+            },
+            "version": 7,
+            "width": 95,
+            "y": "0.95000",
+          },
+        },
+      },
+    },
+    "id": "id14",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id1": {
+          "deleted": {
+            "boundElements": [
+              {
+                "id": "id4",
+                "type": "arrow",
+              },
+            ],
+            "version": 3,
+          },
+          "inserted": {
+            "boundElements": [],
+            "version": 2,
+          },
+        },
+        "id4": {
+          "deleted": {
+            "endBinding": {
+              "elementId": "id1",
+              "fixedPoint": [
+                "-0.05000",
+                "0.50997",
+              ],
+              "mode": "orbit",
+            },
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "1.05000",
+                "0.50950",
+              ],
+              "mode": "orbit",
+            },
+            "version": 9,
+          },
+          "inserted": {
+            "endBinding": null,
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "1.05000",
+                "0.50950",
+              ],
+              "mode": "orbit",
+            },
+            "version": 8,
+          },
+        },
+      },
+    },
+    "id": "id16",
   },
 ]
 `;
@@ -624,6 +741,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -647,6 +765,70 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
+  "editingLinearElement": {
+    "customLineAngle": null,
+    "elbowed": false,
+    "elementId": "id4",
+    "hoverPointIndex": -1,
+    "isDragging": false,
+    "isEditing": false,
+    "lastUncommittedPoint": null,
+    "pointerDownState": {
+      "arrowOriginalStartPoint": [
+        0,
+        0,
+      ],
+      "lastClickedIsEndPoint": false,
+      "lastClickedPoint": -1,
+      "origin": null,
+      "prevSelectedPointsIndices": null,
+      "segmentMidpoint": {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
+    },
+    "pointerOffset": {
+      "x": 0,
+      "y": 0,
+    },
+    "segmentMidPointHoveredCoords": null,
+    "selectedPointsIndices": null,
+    "startBindingElement": {
+      "angle": 0,
+      "backgroundColor": "transparent",
+      "boundElements": [
+        {
+          "id": "id4",
+          "type": "arrow",
+        },
+      ],
+      "customData": undefined,
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "height": 100,
+      "id": "id0",
+      "index": "a0",
+      "isDeleted": false,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "roughness": 1,
+      "roundness": null,
+      "seed": 1,
+      "strokeColor": "#1e1e1e",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "type": "rectangle",
+      "updated": 1,
+      "version": 3,
+      "versionNonce": 493213705,
+      "width": 100,
+      "x": -100,
+      "y": -50,
+    },
+  },
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -731,7 +913,12 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [],
+  "boundElements": [
+    {
+      "id": "id4",
+      "type": "arrow",
+    },
+  ],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -750,9 +937,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 19,
+  "version": 3,
   "width": 100,
-  "x": 150,
+  "x": -100,
   "y": -50,
 }
 `;
@@ -761,7 +948,12 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [],
+  "boundElements": [
+    {
+      "id": "id4",
+      "type": "arrow",
+    },
+  ],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -780,9 +972,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 9,
+  "version": 3,
   "width": 100,
-  "x": 150,
+  "x": 100,
   "y": -50,
 }
 `;
@@ -795,11 +987,18 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "customData": undefined,
   "elbowed": false,
   "endArrowhead": "arrow",
-  "endBinding": null,
+  "endBinding": {
+    "elementId": "id1",
+    "fixedPoint": [
+      "-0.05000",
+      "0.50010",
+    ],
+    "mode": "orbit",
+  },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0,
+  "height": "0.00947",
   "id": "id4",
   "index": "a2",
   "isDeleted": false,
@@ -813,8 +1012,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      0,
-      0,
+      90,
+      "-0.00947",
     ],
   ],
   "roughness": 1,
@@ -822,123 +1021,31 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     "type": 2,
   },
   "startArrowhead": null,
-  "startBinding": null,
+  "startBinding": {
+    "elementId": "id0",
+    "fixedPoint": [
+      "1.05000",
+      "0.50010",
+    ],
+    "mode": "orbit",
+  },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 31,
-  "width": 0,
-  "x": 149,
-  "y": 0,
+  "version": 11,
+  "width": 90,
+  "x": 5,
+  "y": "0.01000",
 }
 `;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of renders 1`] = `23`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of renders 1`] = `12`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] redo stack 1`] = `
-[
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {},
-        "inserted": {},
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {
-        "id0": {
-          "deleted": {
-            "version": 18,
-          },
-          "inserted": {
-            "version": 16,
-          },
-        },
-        "id1": {
-          "deleted": {
-            "boundElements": [],
-            "version": 9,
-          },
-          "inserted": {
-            "boundElements": [
-              {
-                "id": "id4",
-                "type": "arrow",
-              },
-            ],
-            "version": 8,
-          },
-        },
-        "id4": {
-          "deleted": {
-            "endBinding": null,
-            "version": 30,
-          },
-          "inserted": {
-            "endBinding": {
-              "elementId": "id1",
-              "focus": -0,
-              "gap": 1,
-            },
-            "version": 28,
-          },
-        },
-      },
-    },
-    "id": "id21",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {},
-        "inserted": {},
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {
-        "id0": {
-          "deleted": {
-            "boundElements": [],
-            "version": 19,
-          },
-          "inserted": {
-            "boundElements": [
-              {
-                "id": "id4",
-                "type": "arrow",
-              },
-            ],
-            "version": 18,
-          },
-        },
-        "id4": {
-          "deleted": {
-            "startBinding": null,
-            "version": 31,
-          },
-          "inserted": {
-            "startBinding": {
-              "elementId": "id0",
-              "focus": 0,
-              "gap": 1,
-            },
-            "version": 30,
-          },
-        },
-      },
-    },
-    "id": "id22",
-  },
-]
-`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] redo stack 1`] = `[]`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] undo stack 1`] = `
 [
@@ -1073,25 +1180,408 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               "type": 2,
             },
             "startArrowhead": null,
-            "startBinding": null,
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
+            },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 4,
+            "version": 5,
             "width": 100,
             "x": 0,
             "y": 0,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 3,
+            "version": 4,
           },
         },
       },
-      "updated": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "boundElements": [
+              {
+                "id": "id4",
+                "type": "arrow",
+              },
+            ],
+            "version": 3,
+          },
+          "inserted": {
+            "boundElements": [],
+            "version": 2,
+          },
+        },
+      },
     },
     "id": "id6",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id4": {
+          "deleted": {
+            "height": "0.95000",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                95,
+                "-0.95000",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
+            },
+            "version": 6,
+            "width": 95,
+            "x": 5,
+            "y": "0.95000",
+          },
+          "inserted": {
+            "height": 0,
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                100,
+                0,
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
+            },
+            "version": 5,
+            "width": 100,
+            "x": 0,
+            "y": 0,
+          },
+        },
+      },
+    },
+    "id": "id9",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id4": {
+          "deleted": {
+            "height": 0,
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                95,
+                0,
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
+            },
+            "version": 7,
+            "y": 0,
+          },
+          "inserted": {
+            "height": "0.95000",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                95,
+                "-0.95000",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
+            },
+            "version": 6,
+            "y": "0.95000",
+          },
+        },
+      },
+    },
+    "id": "id11",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id4": {
+          "deleted": {
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "1.05000",
+                "0.50010",
+              ],
+              "mode": "orbit",
+            },
+            "version": 8,
+          },
+          "inserted": {
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
+            },
+            "version": 7,
+          },
+        },
+      },
+    },
+    "id": "id13",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id4": {
+          "deleted": {
+            "height": "0.93737",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                "90.00000",
+                "0.93737",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "1.05000",
+                "0.50010",
+              ],
+              "mode": "orbit",
+            },
+            "version": 9,
+            "width": "90.00000",
+            "y": "0.01000",
+          },
+          "inserted": {
+            "height": 0,
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                95,
+                0,
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "1.05000",
+                "0.50010",
+              ],
+              "mode": "orbit",
+            },
+            "version": 8,
+            "width": 95,
+            "y": 0,
+          },
+        },
+      },
+    },
+    "id": "id16",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id4": {
+          "deleted": {
+            "height": "0.00947",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                90,
+                "-0.00947",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "1.05000",
+                "0.50010",
+              ],
+              "mode": "orbit",
+            },
+            "version": 10,
+            "width": 90,
+          },
+          "inserted": {
+            "height": "0.93737",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                "90.00000",
+                "0.93737",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "1.05000",
+                "0.50010",
+              ],
+              "mode": "orbit",
+            },
+            "version": 9,
+            "width": "90.00000",
+          },
+        },
+      },
+    },
+    "id": "id18",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id1": {
+          "deleted": {
+            "boundElements": [
+              {
+                "id": "id4",
+                "type": "arrow",
+              },
+            ],
+            "version": 3,
+          },
+          "inserted": {
+            "boundElements": [],
+            "version": 2,
+          },
+        },
+        "id4": {
+          "deleted": {
+            "endBinding": {
+              "elementId": "id1",
+              "fixedPoint": [
+                "-0.05000",
+                "0.50010",
+              ],
+              "mode": "orbit",
+            },
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "1.05000",
+                "0.50010",
+              ],
+              "mode": "orbit",
+            },
+            "version": 11,
+          },
+          "inserted": {
+            "endBinding": null,
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "1.05000",
+                "0.50010",
+              ],
+              "mode": "orbit",
+            },
+            "version": 10,
+          },
+        },
+      },
+    },
+    "id": "id20",
   },
 ]
 `;
@@ -1107,6 +1597,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -1223,19 +1714,19 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "0.50000",
       1,
     ],
-    "focus": 0,
-    "gap": 1,
+    "mode": "orbit",
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "1.36342",
+  "height": "31.25668",
   "id": "id4",
   "index": "Zz",
   "isDeleted": false,
   "lastCommittedPoint": null,
   "link": null,
   "locked": false,
+  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [
@@ -1243,8 +1734,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      98,
-      "1.36342",
+      90,
+      "31.25668",
     ],
   ],
   "roughness": 1,
@@ -1256,18 +1747,17 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       1,
       "0.50000",
     ],
-    "focus": 0,
-    "gap": 1,
+    "mode": "orbit",
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 11,
-  "width": 98,
-  "x": 1,
-  "y": 0,
+  "version": 7,
+  "width": 90,
+  "x": 5,
+  "y": "1.67603",
 }
 `;
 
@@ -1299,7 +1789,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 7,
+  "version": 5,
   "width": 100,
   "x": -100,
   "y": -50,
@@ -1334,7 +1824,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 7,
+  "version": 5,
   "width": 100,
   "x": 100,
   "y": -50,
@@ -1343,7 +1833,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added arrow when it's bindable elements are added through the history > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added arrow when it's bindable elements are added through the history > [end of test] number of renders 1`] = `9`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added arrow when it's bindable elements are added through the history > [end of test] number of renders 1`] = `7`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added arrow when it's bindable elements are added through the history > [end of test] redo stack 1`] = `[]`;
 
@@ -1380,14 +1870,14 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
-            "version": 7,
+            "version": 5,
             "width": 100,
             "x": -100,
             "y": -50,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 6,
+            "version": 4,
           },
         },
         "id1": {
@@ -1411,14 +1901,14 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
-            "version": 7,
+            "version": 5,
             "width": 100,
             "x": 100,
             "y": -50,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 6,
+            "version": 4,
           },
         },
       },
@@ -1431,8 +1921,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
                 "0.50000",
                 1,
               ],
-              "focus": 0,
-              "gap": 1,
+              "mode": "orbit",
             },
             "startBinding": {
               "elementId": "id0",
@@ -1440,20 +1929,19 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
                 1,
                 "0.50000",
               ],
-              "focus": 0,
-              "gap": 1,
+              "mode": "orbit",
             },
-            "version": 11,
+            "version": 7,
           },
           "inserted": {
             "endBinding": null,
             "startBinding": null,
-            "version": 8,
+            "version": 4,
           },
         },
       },
     },
-    "id": "id8",
+    "id": "id6",
   },
 ]
 `;
@@ -1469,6 +1957,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -1585,16 +2074,15 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       1,
       "0.50000",
     ],
-    "focus": 0,
-    "gap": 1,
+    "mode": "orbit",
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "1.36342",
+  "height": 100,
   "id": "id5",
   "index": "a0",
-  "isDeleted": false,
+  "isDeleted": true,
   "lastCommittedPoint": null,
   "link": null,
   "locked": false,
@@ -1605,8 +2093,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      98,
-      "1.36342",
+      100,
+      100,
     ],
   ],
   "roughness": 1,
@@ -1618,17 +2106,16 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "0.50000",
       1,
     ],
-    "focus": 0,
-    "gap": 1,
+    "mode": "orbit",
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 11,
-  "width": 98,
-  "x": 1,
+  "version": 4,
+  "width": 100,
+  "x": 0,
   "y": 0,
 }
 `;
@@ -1637,12 +2124,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id5",
-      "type": "arrow",
-    },
-  ],
+  "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -1661,7 +2143,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 12,
+  "version": 5,
   "width": 100,
   "x": -100,
   "y": -50,
@@ -1672,12 +2154,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id5",
-      "type": "arrow",
-    },
-  ],
+  "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -1696,7 +2173,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 11,
+  "version": 4,
   "width": 100,
   "x": 100,
   "y": -50,
@@ -1705,11 +2182,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added bindable elements when it's arrow is added through the history > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added bindable elements when it's arrow is added through the history > [end of test] number of renders 1`] = `11`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added bindable elements when it's arrow is added through the history > [end of test] number of renders 1`] = `8`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added bindable elements when it's arrow is added through the history > [end of test] redo stack 1`] = `[]`;
-
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added bindable elements when it's arrow is added through the history > [end of test] undo stack 1`] = `
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added bindable elements when it's arrow is added through the history > [end of test] redo stack 1`] = `
 [
   {
     "appState": AppStateDelta {
@@ -1719,10 +2194,13 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       },
     },
     "elements": {
-      "added": {},
-      "removed": {
+      "added": {
         "id5": {
           "deleted": {
+            "isDeleted": true,
+            "version": 4,
+          },
+          "inserted": {
             "angle": 0,
             "backgroundColor": "transparent",
             "boundElements": null,
@@ -1735,13 +2213,12 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
                 1,
                 "0.50000",
               ],
-              "focus": 0,
-              "gap": 1,
+              "mode": "orbit",
             },
             "fillStyle": "solid",
             "frameId": null,
             "groupIds": [],
-            "height": "1.36342",
+            "height": 100,
             "index": "a0",
             "isDeleted": false,
             "lastCommittedPoint": null,
@@ -1754,8 +2231,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
                 0,
               ],
               [
-                98,
-                "1.36342",
+                100,
+                100,
               ],
             ],
             "roughness": 1,
@@ -1767,61 +2244,59 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
                 "0.50000",
                 1,
               ],
-              "focus": 0,
-              "gap": 1,
+              "mode": "orbit",
             },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 11,
-            "width": 98,
-            "x": 1,
+            "version": 3,
+            "width": 100,
+            "x": 0,
             "y": 0,
-          },
-          "inserted": {
-            "isDeleted": true,
-            "version": 8,
           },
         },
       },
+      "removed": {},
       "updated": {
         "id0": {
           "deleted": {
+            "boundElements": [],
+            "version": 5,
+          },
+          "inserted": {
             "boundElements": [
               {
                 "id": "id5",
                 "type": "arrow",
               },
             ],
-            "version": 12,
-          },
-          "inserted": {
-            "boundElements": [],
-            "version": 9,
+            "version": 4,
           },
         },
         "id1": {
           "deleted": {
+            "boundElements": [],
+            "version": 4,
+          },
+          "inserted": {
             "boundElements": [
               {
                 "id": "id5",
                 "type": "arrow",
               },
             ],
-            "version": 11,
-          },
-          "inserted": {
-            "boundElements": [],
-            "version": 8,
+            "version": 3,
           },
         },
       },
     },
-    "id": "id11",
+    "id": "id8",
   },
 ]
 `;
+
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added bindable elements when it's arrow is added through the history > [end of test] undo stack 1`] = `[]`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should unbind remotely deleted bindable elements from arrow when the arrow is added through the history > [end of test] appState 1`] = `
 {
@@ -1834,6 +2309,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -2095,6 +2571,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -2118,6 +2595,70 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
+  "editingLinearElement": {
+    "customLineAngle": null,
+    "elbowed": false,
+    "elementId": "id4",
+    "hoverPointIndex": -1,
+    "isDragging": false,
+    "isEditing": false,
+    "lastUncommittedPoint": null,
+    "pointerDownState": {
+      "arrowOriginalStartPoint": [
+        0,
+        0,
+      ],
+      "lastClickedIsEndPoint": false,
+      "lastClickedPoint": -1,
+      "origin": null,
+      "prevSelectedPointsIndices": null,
+      "segmentMidpoint": {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
+    },
+    "pointerOffset": {
+      "x": 0,
+      "y": 0,
+    },
+    "segmentMidPointHoveredCoords": null,
+    "selectedPointsIndices": null,
+    "startBindingElement": {
+      "angle": 0,
+      "backgroundColor": "transparent",
+      "boundElements": [
+        {
+          "id": "id4",
+          "type": "arrow",
+        },
+      ],
+      "customData": undefined,
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "height": 100,
+      "id": "id0",
+      "index": "a0",
+      "isDeleted": false,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "roughness": 1,
+      "roundness": null,
+      "seed": 1,
+      "strokeColor": "#1e1e1e",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "type": "rectangle",
+      "updated": 1,
+      "version": 3,
+      "versionNonce": 493213705,
+      "width": 100,
+      "x": -100,
+      "y": -50,
+    },
+  },
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -2167,9 +2708,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "scrollX": 0,
   "scrollY": 0,
   "searchMatches": null,
-  "selectedElementIds": {
-    "id4": true,
-  },
+  "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectionElement": null,
@@ -2200,12 +2739,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id4",
-      "type": "arrow",
-    },
-  ],
+  "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -2224,7 +2758,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 7,
+  "version": 4,
   "width": 100,
   "x": -100,
   "y": -50,
@@ -2235,12 +2769,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id4",
-      "type": "arrow",
-    },
-  ],
+  "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -2259,10 +2788,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 8,
+  "version": 4,
   "width": 100,
-  "x": 500,
-  "y": -500,
+  "x": 100,
+  "y": -50,
 }
 `;
 
@@ -2276,16 +2805,19 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id1",
-    "focus": -0,
-    "gap": 1,
+    "fixedPoint": [
+      "0.50010",
+      "0.50010",
+    ],
+    "mode": "orbit",
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "370.26975",
+  "height": "0.00633",
   "id": "id4",
   "index": "a2",
-  "isDeleted": false,
+  "isDeleted": true,
   "lastCommittedPoint": null,
   "link": null,
   "locked": false,
@@ -2296,8 +2828,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      "498.00000",
-      "-370.26975",
+      "95.00000",
+      "0.00633",
     ],
   ],
   "roughness": 1,
@@ -2307,26 +2839,151 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
-    "focus": 0,
-    "gap": 1,
+    "fixedPoint": [
+      1,
+      "0.50010",
+    ],
+    "mode": "inside",
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
-  "width": "498.00000",
-  "x": 1,
-  "y": "-37.92697",
+  "version": 8,
+  "width": "95.00000",
+  "x": 0,
+  "y": 0,
 }
 `;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should update bound element points when rectangle was remotely moved and arrow is added back through the history > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should update bound element points when rectangle was remotely moved and arrow is added back through the history > [end of test] number of renders 1`] = `9`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should update bound element points when rectangle was remotely moved and arrow is added back through the history > [end of test] number of renders 1`] = `7`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should update bound element points when rectangle was remotely moved and arrow is added back through the history > [end of test] redo stack 1`] = `[]`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should update bound element points when rectangle was remotely moved and arrow is added back through the history > [end of test] redo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {},
+          "selectedLinearElementId": null,
+          "selectedLinearElementIsEditing": null,
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id4": true,
+          },
+          "selectedLinearElementId": "id4",
+          "selectedLinearElementIsEditing": false,
+        },
+      },
+    },
+    "elements": {
+      "added": {
+        "id4": {
+          "deleted": {
+            "isDeleted": true,
+            "version": 8,
+          },
+          "inserted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "elbowed": false,
+            "endArrowhead": "arrow",
+            "endBinding": {
+              "elementId": "id1",
+              "fixedPoint": [
+                "0.50010",
+                "0.50010",
+              ],
+              "mode": "orbit",
+            },
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": "0.00633",
+            "index": "a2",
+            "isDeleted": false,
+            "lastCommittedPoint": null,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                "95.00000",
+                "0.00633",
+              ],
+            ],
+            "roughness": 1,
+            "roundness": {
+              "type": 2,
+            },
+            "startArrowhead": null,
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
+            },
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "arrow",
+            "version": 7,
+            "width": "95.00000",
+            "x": 0,
+            "y": 0,
+          },
+        },
+      },
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "boundElements": [],
+            "version": 4,
+          },
+          "inserted": {
+            "boundElements": [
+              {
+                "id": "id4",
+                "type": "arrow",
+              },
+            ],
+            "version": 3,
+          },
+        },
+        "id1": {
+          "deleted": {
+            "boundElements": [],
+            "version": 4,
+          },
+          "inserted": {
+            "boundElements": [
+              {
+                "id": "id4",
+                "type": "arrow",
+              },
+            ],
+            "version": 3,
+          },
+        },
+      },
+    },
+    "id": "id7",
+  },
+]
+`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should update bound element points when rectangle was remotely moved and arrow is added back through the history > [end of test] undo stack 1`] = `
 [
@@ -2407,119 +3064,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     },
     "id": "id3",
   },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id4": true,
-          },
-          "selectedLinearElementId": "id4",
-          "selectedLinearElementIsEditing": false,
-        },
-        "inserted": {
-          "selectedElementIds": {},
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {
-        "id4": {
-          "deleted": {
-            "angle": 0,
-            "backgroundColor": "transparent",
-            "boundElements": null,
-            "customData": undefined,
-            "elbowed": false,
-            "endArrowhead": "arrow",
-            "endBinding": {
-              "elementId": "id1",
-              "focus": -0,
-              "gap": 1,
-            },
-            "fillStyle": "solid",
-            "frameId": null,
-            "groupIds": [],
-            "height": "370.26975",
-            "index": "a2",
-            "isDeleted": false,
-            "lastCommittedPoint": null,
-            "link": null,
-            "locked": false,
-            "opacity": 100,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                "498.00000",
-                "-370.26975",
-              ],
-            ],
-            "roughness": 1,
-            "roundness": {
-              "type": 2,
-            },
-            "startArrowhead": null,
-            "startBinding": {
-              "elementId": "id0",
-              "focus": 0,
-              "gap": 1,
-            },
-            "strokeColor": "#1e1e1e",
-            "strokeStyle": "solid",
-            "strokeWidth": 2,
-            "type": "arrow",
-            "version": 10,
-            "width": "498.00000",
-            "x": 1,
-            "y": "-37.92697",
-          },
-          "inserted": {
-            "isDeleted": true,
-            "version": 7,
-          },
-        },
-      },
-      "updated": {
-        "id0": {
-          "deleted": {
-            "boundElements": [
-              {
-                "id": "id4",
-                "type": "arrow",
-              },
-            ],
-            "version": 7,
-          },
-          "inserted": {
-            "boundElements": [],
-            "version": 4,
-          },
-        },
-        "id1": {
-          "deleted": {
-            "boundElements": [
-              {
-                "id": "id4",
-                "type": "arrow",
-              },
-            ],
-            "version": 8,
-          },
-          "inserted": {
-            "boundElements": [],
-            "version": 5,
-          },
-        },
-      },
-    },
-    "id": "id8",
-  },
 ]
 `;
 
@@ -2534,6 +3078,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -2794,6 +3339,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -3058,6 +3604,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -3350,6 +3897,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -3634,6 +4182,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -3867,6 +4416,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -4122,6 +4672,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -4391,6 +4942,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -4618,6 +5170,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -4845,6 +5398,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -5070,6 +5624,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -5295,6 +5850,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -5549,6 +6105,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -5809,6 +6366,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -6170,6 +6728,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -6542,6 +7101,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -6852,6 +7412,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -6875,6 +7436,37 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
+  "editingLinearElement": {
+    "customLineAngle": null,
+    "elbowed": false,
+    "elementId": "id0",
+    "hoverPointIndex": -1,
+    "isDragging": false,
+    "isEditing": false,
+    "lastUncommittedPoint": null,
+    "pointerDownState": {
+      "arrowOriginalStartPoint": [
+        0,
+        0,
+      ],
+      "lastClickedIsEndPoint": false,
+      "lastClickedPoint": -1,
+      "origin": null,
+      "prevSelectedPointsIndices": null,
+      "segmentMidpoint": {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
+    },
+    "pointerOffset": {
+      "x": 0,
+      "y": 0,
+    },
+    "segmentMidPointHoveredCoords": null,
+    "selectedPointsIndices": null,
+    "startBindingElement": null,
+  },
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -7155,6 +7747,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -7351,6 +7944,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -7701,6 +8295,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -8051,6 +8646,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -8455,6 +9051,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
     "locked": false,
     "type": "freedraw",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -8740,6 +9337,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -9002,6 +9600,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -9265,6 +9864,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -9495,6 +10095,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -9790,6 +10391,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -9813,6 +10415,37 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
+  "editingLinearElement": {
+    "customLineAngle": null,
+    "elbowed": false,
+    "elementId": "id0",
+    "hoverPointIndex": -1,
+    "isDragging": false,
+    "isEditing": false,
+    "lastUncommittedPoint": null,
+    "pointerDownState": {
+      "arrowOriginalStartPoint": [
+        0,
+        0,
+      ],
+      "lastClickedIsEndPoint": false,
+      "lastClickedPoint": -1,
+      "origin": null,
+      "prevSelectedPointsIndices": null,
+      "segmentMidpoint": {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
+    },
+    "pointerOffset": {
+      "x": 0,
+      "y": 0,
+    },
+    "segmentMidPointHoveredCoords": null,
+    "selectedPointsIndices": null,
+    "startBindingElement": null,
+  },
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -10136,6 +10769,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -10359,6 +10993,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -10535,8 +11170,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
       "0.49919",
       "-0.03875",
     ],
-    "focus": "-0.00161",
-    "gap": "3.53708",
+    "mode": "orbit",
   },
   "endIsSpecial": false,
   "fillStyle": "solid",
@@ -10574,8 +11208,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
       "1.03185",
       "0.49921",
     ],
-    "focus": "-0.00159",
-    "gap": 5,
+    "mode": "orbit",
   },
   "startIsSpecial": false,
   "strokeColor": "#1e1e1e",
@@ -10623,8 +11256,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
                 "0.49919",
                 "-0.03875",
               ],
-              "focus": "-0.00161",
-              "gap": "3.53708",
+              "mode": "orbit",
             },
             "endIsSpecial": false,
             "fillStyle": "solid",
@@ -10661,8 +11293,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
                 "1.03185",
                 "0.49921",
               ],
-              "focus": "-0.00159",
-              "gap": 5,
+              "mode": "orbit",
             },
             "startIsSpecial": false,
             "strokeColor": "#1e1e1e",
@@ -10805,6 +11436,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -11063,6 +11695,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -11296,6 +11929,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -11531,6 +12165,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
     "locked": false,
     "type": "freedraw",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -11932,6 +12567,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -12140,6 +12776,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -12348,6 +12985,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -12570,6 +13208,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -12792,6 +13431,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -13035,6 +13675,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -13270,6 +13911,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -13505,6 +14147,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -13750,6 +14393,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -14079,6 +14723,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -14247,6 +14892,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -14529,6 +15175,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -14790,6 +15437,7 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -14941,6 +15589,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -15221,6 +15870,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -15381,6 +16031,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -15404,6 +16055,74 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
+  "editingLinearElement": {
+    "customLineAngle": null,
+    "elbowed": false,
+    "elementId": "id13",
+    "hoverPointIndex": -1,
+    "isDragging": false,
+    "isEditing": false,
+    "lastUncommittedPoint": null,
+    "pointerDownState": {
+      "arrowOriginalStartPoint": [
+        0,
+        0,
+      ],
+      "lastClickedIsEndPoint": false,
+      "lastClickedPoint": -1,
+      "origin": null,
+      "prevSelectedPointsIndices": null,
+      "segmentMidpoint": {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
+    },
+    "pointerOffset": {
+      "x": 0,
+      "y": 0,
+    },
+    "segmentMidPointHoveredCoords": null,
+    "selectedPointsIndices": null,
+    "startBindingElement": {
+      "angle": 0,
+      "backgroundColor": "transparent",
+      "boundElements": [
+        {
+          "id": "id1",
+          "type": "text",
+        },
+        {
+          "id": "id13",
+          "type": "arrow",
+        },
+      ],
+      "customData": undefined,
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "height": 100,
+      "id": "id0",
+      "index": "a0",
+      "isDeleted": false,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "roughness": 1,
+      "roundness": null,
+      "seed": 1,
+      "strokeColor": "#1e1e1e",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "type": "rectangle",
+      "updated": 1,
+      "version": 4,
+      "versionNonce": 941653321,
+      "width": 100,
+      "x": -100,
+      "y": -50,
+    },
+  },
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -15516,7 +16235,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 8,
+  "version": 4,
   "width": 100,
   "x": -100,
   "y": -50,
@@ -15554,7 +16273,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "textAlign": "center",
   "type": "text",
   "updated": 1,
-  "version": 6,
+  "version": 4,
   "verticalAlign": "middle",
   "width": 30,
   "x": -65,
@@ -15590,7 +16309,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 7,
+  "version": 3,
   "width": 100,
   "x": 100,
   "y": -50,
@@ -15607,13 +16326,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id2",
-    "focus": -0,
-    "gap": 1,
+    "fixedPoint": [
+      "0.50010",
+      "0.50010",
+    ],
+    "mode": "orbit",
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0,
+  "height": "0.00633",
   "id": "id13",
   "index": "a3",
   "isDeleted": false,
@@ -15627,8 +16349,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      98,
-      0,
+      "95.00000",
+      "0.00633",
     ],
   ],
   "roughness": 1,
@@ -15638,103 +16360,29 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
-    "focus": 0,
-    "gap": 1,
+    "fixedPoint": [
+      1,
+      "0.50010",
+    ],
+    "mode": "inside",
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
-  "width": 98,
-  "x": 1,
+  "version": 7,
+  "width": "95.00000",
+  "x": 0,
   "y": 0,
 }
 `;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on deletion and rebind on undo > [end of test] number of elements 1`] = `4`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on deletion and rebind on undo > [end of test] number of renders 1`] = `12`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on deletion and rebind on undo > [end of test] number of renders 1`] = `10`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on deletion and rebind on undo > [end of test] redo stack 1`] = `
-[
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id13": true,
-          },
-          "selectedLinearElementId": "id13",
-          "selectedLinearElementIsEditing": false,
-        },
-        "inserted": {
-          "selectedElementIds": {},
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {
-        "id13": {
-          "deleted": {
-            "isDeleted": false,
-            "version": 10,
-          },
-          "inserted": {
-            "isDeleted": true,
-            "version": 7,
-          },
-        },
-      },
-      "updated": {
-        "id0": {
-          "deleted": {
-            "boundElements": [
-              {
-                "id": "id13",
-                "type": "arrow",
-              },
-            ],
-            "version": 8,
-          },
-          "inserted": {
-            "boundElements": [],
-            "version": 5,
-          },
-        },
-        "id1": {
-          "deleted": {
-            "version": 6,
-          },
-          "inserted": {
-            "version": 4,
-          },
-        },
-        "id2": {
-          "deleted": {
-            "boundElements": [
-              {
-                "id": "id13",
-                "type": "arrow",
-              },
-            ],
-            "version": 7,
-          },
-          "inserted": {
-            "boundElements": [],
-            "version": 4,
-          },
-        },
-      },
-    },
-    "id": "id18",
-  },
-]
-`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on deletion and rebind on undo > [end of test] redo stack 1`] = `[]`;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on deletion and rebind on undo > [end of test] undo stack 1`] = `
 [
@@ -15985,13 +16633,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "endArrowhead": "arrow",
             "endBinding": {
               "elementId": "id2",
-              "focus": -0,
-              "gap": 1,
+              "fixedPoint": [
+                "0.50010",
+                "0.50010",
+              ],
+              "mode": "orbit",
             },
             "fillStyle": "solid",
             "frameId": null,
             "groupIds": [],
-            "height": 0,
+            "height": "0.00633",
             "index": "a3",
             "isDeleted": false,
             "lastCommittedPoint": null,
@@ -16004,8 +16655,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
                 0,
               ],
               [
-                100,
-                0,
+                "95.00000",
+                "0.00633",
               ],
             ],
             "roughness": 1,
@@ -16015,21 +16666,24 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
-              "focus": 0,
-              "gap": 1,
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
             },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 6,
-            "width": 100,
+            "version": 7,
+            "width": "95.00000",
             "x": 0,
             "y": 0,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 5,
+            "version": 6,
           },
         },
       },
@@ -16082,6 +16736,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -16105,6 +16760,74 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
+  "editingLinearElement": {
+    "customLineAngle": null,
+    "elbowed": false,
+    "elementId": "id13",
+    "hoverPointIndex": -1,
+    "isDragging": false,
+    "isEditing": false,
+    "lastUncommittedPoint": null,
+    "pointerDownState": {
+      "arrowOriginalStartPoint": [
+        0,
+        0,
+      ],
+      "lastClickedIsEndPoint": false,
+      "lastClickedPoint": -1,
+      "origin": null,
+      "prevSelectedPointsIndices": null,
+      "segmentMidpoint": {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
+    },
+    "pointerOffset": {
+      "x": 0,
+      "y": 0,
+    },
+    "segmentMidPointHoveredCoords": null,
+    "selectedPointsIndices": null,
+    "startBindingElement": {
+      "angle": 0,
+      "backgroundColor": "transparent",
+      "boundElements": [
+        {
+          "id": "id1",
+          "type": "text",
+        },
+        {
+          "id": "id13",
+          "type": "arrow",
+        },
+      ],
+      "customData": undefined,
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "height": 100,
+      "id": "id0",
+      "index": "a0",
+      "isDeleted": false,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "roughness": 1,
+      "roundness": null,
+      "seed": 1,
+      "strokeColor": "#1e1e1e",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "type": "rectangle",
+      "updated": 1,
+      "version": 4,
+      "versionNonce": 941653321,
+      "width": 100,
+      "x": -100,
+      "y": -50,
+    },
+  },
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -16217,7 +16940,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 8,
+  "version": 4,
   "width": 100,
   "x": -100,
   "y": -50,
@@ -16255,7 +16978,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "textAlign": "center",
   "type": "text",
   "updated": 1,
-  "version": 8,
+  "version": 4,
   "verticalAlign": "middle",
   "width": 30,
   "x": -65,
@@ -16291,7 +17014,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 7,
+  "version": 3,
   "width": 100,
   "x": 100,
   "y": -50,
@@ -16308,13 +17031,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id2",
-    "focus": -0,
-    "gap": 1,
+    "fixedPoint": [
+      "0.50010",
+      "0.50010",
+    ],
+    "mode": "orbit",
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0,
+  "height": "0.00633",
   "id": "id13",
   "index": "a3",
   "isDeleted": false,
@@ -16328,8 +17054,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      98,
-      0,
+      "95.00000",
+      "0.00633",
     ],
   ],
   "roughness": 1,
@@ -16339,24 +17065,27 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
-    "focus": 0,
-    "gap": 1,
+    "fixedPoint": [
+      1,
+      "0.50010",
+    ],
+    "mode": "inside",
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
-  "width": 98,
-  "x": 1,
+  "version": 7,
+  "width": "95.00000",
+  "x": 0,
   "y": 0,
 }
 `;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on undo and rebind on redo > [end of test] number of elements 1`] = `4`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on undo and rebind on redo > [end of test] number of renders 1`] = `12`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on undo and rebind on redo > [end of test] number of renders 1`] = `10`;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on undo and rebind on redo > [end of test] redo stack 1`] = `[]`;
 
@@ -16609,13 +17338,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "endArrowhead": "arrow",
             "endBinding": {
               "elementId": "id2",
-              "focus": -0,
-              "gap": 1,
+              "fixedPoint": [
+                "0.50010",
+                "0.50010",
+              ],
+              "mode": "orbit",
             },
             "fillStyle": "solid",
             "frameId": null,
             "groupIds": [],
-            "height": 0,
+            "height": "0.00633",
             "index": "a3",
             "isDeleted": false,
             "lastCommittedPoint": null,
@@ -16628,8 +17360,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
                 0,
               ],
               [
-                98,
-                0,
+                "95.00000",
+                "0.00633",
               ],
             ],
             "roughness": 1,
@@ -16639,21 +17371,24 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
-              "focus": 0,
-              "gap": 1,
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
             },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 10,
-            "width": 98,
-            "x": 1,
+            "version": 7,
+            "width": "95.00000",
+            "x": 0,
             "y": 0,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 7,
+            "version": 6,
           },
         },
       },
@@ -16666,19 +17401,11 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
                 "type": "arrow",
               },
             ],
-            "version": 8,
+            "version": 4,
           },
           "inserted": {
             "boundElements": [],
-            "version": 5,
-          },
-        },
-        "id1": {
-          "deleted": {
-            "version": 8,
-          },
-          "inserted": {
-            "version": 6,
+            "version": 3,
           },
         },
         "id2": {
@@ -16689,16 +17416,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
                 "type": "arrow",
               },
             ],
-            "version": 7,
+            "version": 3,
           },
           "inserted": {
             "boundElements": [],
-            "version": 4,
+            "version": 2,
           },
         },
       },
     },
-    "id": "id17",
+    "id": "id15",
   },
 ]
 `;
@@ -16714,6 +17441,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -16737,6 +17465,74 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
+  "editingLinearElement": {
+    "customLineAngle": null,
+    "elbowed": false,
+    "elementId": "id13",
+    "hoverPointIndex": -1,
+    "isDragging": false,
+    "isEditing": false,
+    "lastUncommittedPoint": null,
+    "pointerDownState": {
+      "arrowOriginalStartPoint": [
+        0,
+        0,
+      ],
+      "lastClickedIsEndPoint": false,
+      "lastClickedPoint": -1,
+      "origin": null,
+      "prevSelectedPointsIndices": null,
+      "segmentMidpoint": {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
+    },
+    "pointerOffset": {
+      "x": 0,
+      "y": 0,
+    },
+    "segmentMidPointHoveredCoords": null,
+    "selectedPointsIndices": null,
+    "startBindingElement": {
+      "angle": 0,
+      "backgroundColor": "transparent",
+      "boundElements": [
+        {
+          "id": "id1",
+          "type": "text",
+        },
+        {
+          "id": "id13",
+          "type": "arrow",
+        },
+      ],
+      "customData": undefined,
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "height": 100,
+      "id": "id0",
+      "index": "a0",
+      "isDeleted": false,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "roughness": 1,
+      "roundness": null,
+      "seed": 1,
+      "strokeColor": "#1e1e1e",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "type": "rectangle",
+      "updated": 1,
+      "version": 4,
+      "versionNonce": 941653321,
+      "width": 100,
+      "x": -100,
+      "y": -50,
+    },
+  },
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -16849,7 +17645,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 12,
+  "version": 4,
   "width": 100,
   "x": -100,
   "y": -50,
@@ -16887,7 +17683,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "textAlign": "center",
   "type": "text",
   "updated": 1,
-  "version": 12,
+  "version": 4,
   "verticalAlign": "middle",
   "width": 30,
   "x": -65,
@@ -16923,7 +17719,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 9,
+  "version": 3,
   "width": 100,
   "x": 100,
   "y": -50,
@@ -16940,13 +17736,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id2",
-    "focus": -0,
-    "gap": 1,
+    "fixedPoint": [
+      "0.50010",
+      "0.50010",
+    ],
+    "mode": "orbit",
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0,
+  "height": "0.00633",
   "id": "id13",
   "index": "a3",
   "isDeleted": false,
@@ -16960,8 +17759,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      98,
-      0,
+      "95.00000",
+      "0.00633",
     ],
   ],
   "roughness": 1,
@@ -16971,24 +17770,27 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
-    "focus": 0,
-    "gap": 1,
+    "fixedPoint": [
+      1,
+      "0.50010",
+    ],
+    "mode": "inside",
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
-  "width": 98,
-  "x": 1,
+  "version": 7,
+  "width": "95.00000",
+  "x": 0,
   "y": 0,
 }
 `;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind everything from non deleted elements when iterating through the whole undo stack and vice versa rebind everything on redo > [end of test] number of elements 1`] = `4`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind everything from non deleted elements when iterating through the whole undo stack and vice versa rebind everything on redo > [end of test] number of renders 1`] = `20`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind everything from non deleted elements when iterating through the whole undo stack and vice versa rebind everything on redo > [end of test] number of renders 1`] = `10`;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind everything from non deleted elements when iterating through the whole undo stack and vice versa rebind everything on redo > [end of test] redo stack 1`] = `[]`;
 
@@ -17025,14 +17827,14 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
-            "version": 8,
+            "version": 2,
             "width": 100,
             "x": -100,
             "y": -50,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 7,
+            "version": 1,
           },
         },
         "id1": {
@@ -17064,7 +17866,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "text": "ola",
             "textAlign": "left",
             "type": "text",
-            "version": 9,
+            "version": 2,
             "verticalAlign": "top",
             "width": 100,
             "x": -200,
@@ -17072,7 +17874,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           },
           "inserted": {
             "isDeleted": true,
-            "version": 8,
+            "version": 1,
           },
         },
         "id2": {
@@ -17096,20 +17898,20 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "rectangle",
-            "version": 6,
+            "version": 2,
             "width": 100,
             "x": 100,
             "y": -50,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 5,
+            "version": 1,
           },
         },
       },
       "updated": {},
     },
-    "id": "id21",
+    "id": "id4",
   },
   {
     "appState": AppStateDelta {
@@ -17129,7 +17931,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "removed": {},
       "updated": {},
     },
-    "id": "id22",
+    "id": "id7",
   },
   {
     "appState": AppStateDelta {
@@ -17149,7 +17951,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "removed": {},
       "updated": {},
     },
-    "id": "id23",
+    "id": "id10",
   },
   {
     "appState": AppStateDelta {
@@ -17176,11 +17978,11 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
                 "type": "text",
               },
             ],
-            "version": 9,
+            "version": 3,
           },
           "inserted": {
             "boundElements": [],
-            "version": 8,
+            "version": 2,
           },
         },
         "id1": {
@@ -17188,7 +17990,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "containerId": "id0",
             "height": 25,
             "textAlign": "center",
-            "version": 10,
+            "version": 4,
             "verticalAlign": "middle",
             "width": 30,
             "x": -65,
@@ -17198,7 +18000,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "containerId": null,
             "height": 100,
             "textAlign": "left",
-            "version": 9,
+            "version": 2,
             "verticalAlign": "top",
             "width": 100,
             "x": -200,
@@ -17207,7 +18009,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
         },
       },
     },
-    "id": "id24",
+    "id": "id12",
   },
   {
     "appState": AppStateDelta {
@@ -17241,13 +18043,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "endArrowhead": "arrow",
             "endBinding": {
               "elementId": "id2",
-              "focus": -0,
-              "gap": 1,
+              "fixedPoint": [
+                "0.50010",
+                "0.50010",
+              ],
+              "mode": "orbit",
             },
             "fillStyle": "solid",
             "frameId": null,
             "groupIds": [],
-            "height": 0,
+            "height": "0.00633",
             "index": "a3",
             "isDeleted": false,
             "lastCommittedPoint": null,
@@ -17260,8 +18065,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
                 0,
               ],
               [
-                98,
-                0,
+                "95.00000",
+                "0.00633",
               ],
             ],
             "roughness": 1,
@@ -17271,21 +18076,24 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
-              "focus": 0,
-              "gap": 1,
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
             },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 10,
-            "width": 98,
-            "x": 1,
+            "version": 7,
+            "width": "95.00000",
+            "x": 0,
             "y": 0,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 7,
+            "version": 6,
           },
         },
       },
@@ -17298,19 +18106,11 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
                 "type": "arrow",
               },
             ],
-            "version": 12,
+            "version": 4,
           },
           "inserted": {
             "boundElements": [],
-            "version": 9,
-          },
-        },
-        "id1": {
-          "deleted": {
-            "version": 12,
-          },
-          "inserted": {
-            "version": 10,
+            "version": 3,
           },
         },
         "id2": {
@@ -17321,16 +18121,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
                 "type": "arrow",
               },
             ],
-            "version": 9,
+            "version": 3,
           },
           "inserted": {
             "boundElements": [],
-            "version": 6,
+            "version": 2,
           },
         },
       },
     },
-    "id": "id25",
+    "id": "id15",
   },
 ]
 `;
@@ -17346,6 +18146,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -17369,6 +18170,74 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
+  "editingLinearElement": {
+    "customLineAngle": null,
+    "elbowed": false,
+    "elementId": "id13",
+    "hoverPointIndex": -1,
+    "isDragging": false,
+    "isEditing": false,
+    "lastUncommittedPoint": null,
+    "pointerDownState": {
+      "arrowOriginalStartPoint": [
+        0,
+        0,
+      ],
+      "lastClickedIsEndPoint": false,
+      "lastClickedPoint": -1,
+      "origin": null,
+      "prevSelectedPointsIndices": null,
+      "segmentMidpoint": {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
+    },
+    "pointerOffset": {
+      "x": 0,
+      "y": 0,
+    },
+    "segmentMidPointHoveredCoords": null,
+    "selectedPointsIndices": null,
+    "startBindingElement": {
+      "angle": 0,
+      "backgroundColor": "transparent",
+      "boundElements": [
+        {
+          "id": "id1",
+          "type": "text",
+        },
+        {
+          "id": "id13",
+          "type": "arrow",
+        },
+      ],
+      "customData": undefined,
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "height": 100,
+      "id": "id0",
+      "index": "a0",
+      "isDeleted": false,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "roughness": 1,
+      "roundness": null,
+      "seed": 1,
+      "strokeColor": "#1e1e1e",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "type": "rectangle",
+      "updated": 1,
+      "version": 4,
+      "versionNonce": 941653321,
+      "width": 100,
+      "x": -100,
+      "y": -50,
+    },
+  },
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -17413,13 +18282,15 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   },
   "penDetected": false,
   "penMode": false,
-  "previousSelectedElementIds": {},
+  "previousSelectedElementIds": {
+    "id0": true,
+  },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "searchMatches": null,
   "selectedElementIds": {
-    "id0": true,
+    "id13": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -17453,12 +18324,12 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id13",
-      "type": "arrow",
-    },
-    {
       "id": "id1",
       "type": "text",
+    },
+    {
+      "id": "id13",
+      "type": "arrow",
     },
   ],
   "customData": undefined,
@@ -17479,7 +18350,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 8,
+  "version": 4,
   "width": 100,
   "x": -100,
   "y": -50,
@@ -17517,7 +18388,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "textAlign": "center",
   "type": "text",
   "updated": 1,
-  "version": 8,
+  "version": 4,
   "verticalAlign": "middle",
   "width": 30,
   "x": -65,
@@ -17553,7 +18424,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 5,
+  "version": 3,
   "width": 100,
   "x": 100,
   "y": -50,
@@ -17570,13 +18441,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id2",
-    "focus": -0,
-    "gap": 1,
+    "fixedPoint": [
+      "0.50010",
+      "0.50010",
+    ],
+    "mode": "orbit",
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0,
+  "height": "0.00633",
   "id": "id13",
   "index": "a3",
   "isDeleted": false,
@@ -17590,8 +18464,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      98,
-      0,
+      "95.00000",
+      "0.00633",
     ],
   ],
   "roughness": 1,
@@ -17601,93 +18475,29 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
-    "focus": 0,
-    "gap": 1,
+    "fixedPoint": [
+      1,
+      "0.50010",
+    ],
+    "mode": "inside",
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
-  "width": 98,
-  "x": 1,
+  "version": 7,
+  "width": "95.00000",
+  "x": 0,
   "y": 0,
 }
 `;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangle from arrow on deletion and rebind on undo > [end of test] number of elements 1`] = `4`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangle from arrow on deletion and rebind on undo > [end of test] number of renders 1`] = `14`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangle from arrow on deletion and rebind on undo > [end of test] number of renders 1`] = `10`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangle from arrow on deletion and rebind on undo > [end of test] redo stack 1`] = `
-[
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id0": true,
-          },
-        },
-        "inserted": {
-          "selectedElementIds": {},
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {
-        "id0": {
-          "deleted": {
-            "isDeleted": false,
-            "version": 8,
-          },
-          "inserted": {
-            "isDeleted": true,
-            "version": 5,
-          },
-        },
-        "id1": {
-          "deleted": {
-            "isDeleted": false,
-            "version": 8,
-          },
-          "inserted": {
-            "isDeleted": true,
-            "version": 5,
-          },
-        },
-      },
-      "updated": {
-        "id13": {
-          "deleted": {
-            "startBinding": {
-              "elementId": "id0",
-              "focus": 0,
-              "gap": 1,
-            },
-            "version": 10,
-          },
-          "inserted": {
-            "startBinding": null,
-            "version": 7,
-          },
-        },
-        "id2": {
-          "deleted": {
-            "version": 5,
-          },
-          "inserted": {
-            "version": 3,
-          },
-        },
-      },
-    },
-    "id": "id21",
-  },
-]
-`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangle from arrow on deletion and rebind on undo > [end of test] redo stack 1`] = `[]`;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangle from arrow on deletion and rebind on undo > [end of test] undo stack 1`] = `
 [
@@ -17938,13 +18748,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "endArrowhead": "arrow",
             "endBinding": {
               "elementId": "id2",
-              "focus": -0,
-              "gap": 1,
+              "fixedPoint": [
+                "0.50010",
+                "0.50010",
+              ],
+              "mode": "orbit",
             },
             "fillStyle": "solid",
             "frameId": null,
             "groupIds": [],
-            "height": 0,
+            "height": "0.00633",
             "index": "a3",
             "isDeleted": false,
             "lastCommittedPoint": null,
@@ -17957,8 +18770,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
                 0,
               ],
               [
-                100,
-                0,
+                "95.00000",
+                "0.00633",
               ],
             ],
             "roughness": 1,
@@ -17968,21 +18781,24 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
-              "focus": 0,
-              "gap": 1,
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
             },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 6,
-            "width": 100,
+            "version": 7,
+            "width": "95.00000",
             "x": 0,
             "y": 0,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 5,
+            "version": 6,
           },
         },
       },
@@ -18021,32 +18837,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
     },
     "id": "id15",
   },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id0": true,
-          },
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
-        },
-        "inserted": {
-          "selectedElementIds": {
-            "id13": true,
-          },
-          "selectedLinearElementId": "id13",
-          "selectedLinearElementIsEditing": false,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id18",
-  },
 ]
 `;
 
@@ -18061,6 +18851,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -18084,6 +18875,74 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
+  "editingLinearElement": {
+    "customLineAngle": null,
+    "elbowed": false,
+    "elementId": "id13",
+    "hoverPointIndex": -1,
+    "isDragging": false,
+    "isEditing": false,
+    "lastUncommittedPoint": null,
+    "pointerDownState": {
+      "arrowOriginalStartPoint": [
+        0,
+        0,
+      ],
+      "lastClickedIsEndPoint": false,
+      "lastClickedPoint": -1,
+      "origin": null,
+      "prevSelectedPointsIndices": null,
+      "segmentMidpoint": {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
+    },
+    "pointerOffset": {
+      "x": 0,
+      "y": 0,
+    },
+    "segmentMidPointHoveredCoords": null,
+    "selectedPointsIndices": null,
+    "startBindingElement": {
+      "angle": 0,
+      "backgroundColor": "transparent",
+      "boundElements": [
+        {
+          "id": "id1",
+          "type": "text",
+        },
+        {
+          "id": "id13",
+          "type": "arrow",
+        },
+      ],
+      "customData": undefined,
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "height": 100,
+      "id": "id0",
+      "index": "a0",
+      "isDeleted": false,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "roughness": 1,
+      "roundness": null,
+      "seed": 1,
+      "strokeColor": "#1e1e1e",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "type": "rectangle",
+      "updated": 1,
+      "version": 4,
+      "versionNonce": 941653321,
+      "width": 100,
+      "x": -100,
+      "y": -50,
+    },
+  },
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -18136,8 +18995,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "scrollY": 0,
   "searchMatches": null,
   "selectedElementIds": {
-    "id0": true,
-    "id2": true,
+    "id13": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -18171,12 +19029,12 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id13",
-      "type": "arrow",
-    },
-    {
       "id": "id1",
       "type": "text",
+    },
+    {
+      "id": "id13",
+      "type": "arrow",
     },
   ],
   "customData": undefined,
@@ -18197,7 +19055,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 8,
+  "version": 4,
   "width": 100,
   "x": -100,
   "y": -50,
@@ -18235,7 +19093,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "textAlign": "center",
   "type": "text",
   "updated": 1,
-  "version": 8,
+  "version": 4,
   "verticalAlign": "middle",
   "width": 30,
   "x": -65,
@@ -18271,7 +19129,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 5,
+  "version": 3,
   "width": 100,
   "x": 100,
   "y": -50,
@@ -18288,13 +19146,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id2",
-    "focus": -0,
-    "gap": 1,
+    "fixedPoint": [
+      "0.50010",
+      "0.50010",
+    ],
+    "mode": "orbit",
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0,
+  "height": "0.00633",
   "id": "id13",
   "index": "a3",
   "isDeleted": false,
@@ -18308,8 +19169,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      98,
-      0,
+      "95.00000",
+      "0.00633",
     ],
   ],
   "roughness": 1,
@@ -18319,102 +19180,29 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
-    "focus": 0,
-    "gap": 1,
+    "fixedPoint": [
+      1,
+      "0.50010",
+    ],
+    "mode": "inside",
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 11,
-  "width": 98,
-  "x": 1,
+  "version": 7,
+  "width": "95.00000",
+  "x": 0,
   "y": 0,
 }
 `;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangles from arrow on deletion and rebind on undo > [end of test] number of elements 1`] = `4`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangles from arrow on deletion and rebind on undo > [end of test] number of renders 1`] = `15`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangles from arrow on deletion and rebind on undo > [end of test] number of renders 1`] = `10`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangles from arrow on deletion and rebind on undo > [end of test] redo stack 1`] = `
-[
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id0": true,
-            "id2": true,
-          },
-        },
-        "inserted": {
-          "selectedElementIds": {},
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {
-        "id0": {
-          "deleted": {
-            "isDeleted": false,
-            "version": 8,
-          },
-          "inserted": {
-            "isDeleted": true,
-            "version": 5,
-          },
-        },
-        "id1": {
-          "deleted": {
-            "isDeleted": false,
-            "version": 8,
-          },
-          "inserted": {
-            "isDeleted": true,
-            "version": 5,
-          },
-        },
-        "id2": {
-          "deleted": {
-            "isDeleted": false,
-            "version": 5,
-          },
-          "inserted": {
-            "isDeleted": true,
-            "version": 4,
-          },
-        },
-      },
-      "updated": {
-        "id13": {
-          "deleted": {
-            "endBinding": {
-              "elementId": "id2",
-              "focus": -0,
-              "gap": 1,
-            },
-            "startBinding": {
-              "elementId": "id0",
-              "focus": 0,
-              "gap": 1,
-            },
-            "version": 11,
-          },
-          "inserted": {
-            "endBinding": null,
-            "startBinding": null,
-            "version": 8,
-          },
-        },
-      },
-    },
-    "id": "id24",
-  },
-]
-`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangles from arrow on deletion and rebind on undo > [end of test] redo stack 1`] = `[]`;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangles from arrow on deletion and rebind on undo > [end of test] undo stack 1`] = `
 [
@@ -18665,13 +19453,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "endArrowhead": "arrow",
             "endBinding": {
               "elementId": "id2",
-              "focus": -0,
-              "gap": 1,
+              "fixedPoint": [
+                "0.50010",
+                "0.50010",
+              ],
+              "mode": "orbit",
             },
             "fillStyle": "solid",
             "frameId": null,
             "groupIds": [],
-            "height": 0,
+            "height": "0.00633",
             "index": "a3",
             "isDeleted": false,
             "lastCommittedPoint": null,
@@ -18684,8 +19475,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
                 0,
               ],
               [
-                100,
-                0,
+                "95.00000",
+                "0.00633",
               ],
             ],
             "roughness": 1,
@@ -18695,21 +19486,24 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
-              "focus": 0,
-              "gap": 1,
+              "fixedPoint": [
+                1,
+                "0.50010",
+              ],
+              "mode": "inside",
             },
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 6,
-            "width": 100,
+            "version": 7,
+            "width": "95.00000",
             "x": 0,
             "y": 0,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 5,
+            "version": 6,
           },
         },
       },
@@ -18748,52 +19542,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
     },
     "id": "id15",
   },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id0": true,
-          },
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
-        },
-        "inserted": {
-          "selectedElementIds": {
-            "id13": true,
-          },
-          "selectedLinearElementId": "id13",
-          "selectedLinearElementIsEditing": false,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id18",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedElementIds": {
-            "id2": true,
-          },
-        },
-        "inserted": {
-          "selectedElementIds": {},
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id21",
-  },
 ]
 `;
 
@@ -18808,6 +19556,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -19286,6 +20035,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -19795,6 +20545,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -20252,6 +21003,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
     "locked": false,
     "type": "selection",
   },
+  "bindMode": "orbit",
   "collaborators": Map {},
   "contextMenu": null,
   "croppingElementId": null,
@@ -20275,6 +21027,37 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
+  "editingLinearElement": {
+    "customLineAngle": null,
+    "elbowed": false,
+    "elementId": "id0",
+    "hoverPointIndex": -1,
+    "isDragging": false,
+    "isEditing": false,
+    "lastUncommittedPoint": null,
+    "pointerDownState": {
+      "arrowOriginalStartPoint": [
+        0,
+        0,
+      ],
+      "lastClickedIsEndPoint": false,
+      "lastClickedPoint": -1,
+      "origin": null,
+      "prevSelectedPointsIndices": null,
+      "segmentMidpoint": {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
+    },
+    "pointerOffset": {
+      "x": 0,
+      "y": 0,
+    },
+    "segmentMidPointHoveredCoords": null,
+    "selectedPointsIndices": null,
+    "startBindingElement": null,
+  },
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -20367,7 +21150,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 20,
+  "height": 10,
   "id": "id0",
   "index": "a0",
   "isDeleted": false,
@@ -20389,7 +21172,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
     ],
     [
       20,
-      20,
+      0,
     ],
   ],
   "roughness": 1,
@@ -20403,7 +21186,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 15,
+  "version": 10,
   "width": 20,
   "x": 0,
   "y": 0,
@@ -20412,9 +21195,121 @@ exports[`history > singleplayer undo/redo > should support linear element creati
 
 exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of elements 1`] = `1`;
 
-exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of renders 1`] = `20`;
+exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of renders 1`] = `12`;
 
-exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] redo stack 1`] = `[]`;
+exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] redo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedLinearElementIsEditing": true,
+        },
+        "inserted": {
+          "selectedLinearElementIsEditing": false,
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id14",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "height": 10,
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                10,
+                10,
+              ],
+              [
+                20,
+                0,
+              ],
+            ],
+            "version": 10,
+          },
+          "inserted": {
+            "height": 20,
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                10,
+                10,
+              ],
+              [
+                20,
+                20,
+              ],
+            ],
+            "version": 9,
+          },
+        },
+      },
+    },
+    "id": "id18",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedLinearElementIsEditing": false,
+        },
+        "inserted": {
+          "selectedLinearElementIsEditing": true,
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id19",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedLinearElementId": null,
+          "selectedLinearElementIsEditing": null,
+        },
+        "inserted": {
+          "selectedLinearElementId": "id0",
+          "selectedLinearElementIsEditing": false,
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id20",
+  },
+]
+`;
 
 exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] undo stack 1`] = `
 [
@@ -20476,20 +21371,20 @@ exports[`history > singleplayer undo/redo > should support linear element creati
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 13,
+            "version": 6,
             "width": 10,
             "x": 0,
             "y": 0,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 12,
+            "version": 5,
           },
         },
       },
       "updated": {},
     },
-    "id": "id23",
+    "id": "id2",
   },
   {
     "appState": AppStateDelta {
@@ -20522,7 +21417,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
                 0,
               ],
             ],
-            "version": 14,
+            "version": 8,
             "width": 20,
           },
           "inserted": {
@@ -20540,122 +21435,13 @@ exports[`history > singleplayer undo/redo > should support linear element creati
                 10,
               ],
             ],
-            "version": 13,
+            "version": 6,
             "width": 10,
           },
         },
       },
     },
-    "id": "id24",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedLinearElementId": "id0",
-          "selectedLinearElementIsEditing": false,
-        },
-        "inserted": {
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id25",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedLinearElementIsEditing": true,
-        },
-        "inserted": {
-          "selectedLinearElementIsEditing": false,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id26",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {},
-        "inserted": {},
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {
-        "id0": {
-          "deleted": {
-            "height": 20,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                10,
-                10,
-              ],
-              [
-                20,
-                20,
-              ],
-            ],
-            "version": 15,
-          },
-          "inserted": {
-            "height": 10,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                10,
-                10,
-              ],
-              [
-                20,
-                0,
-              ],
-            ],
-            "version": 14,
-          },
-        },
-      },
-    },
-    "id": "id27",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedLinearElementIsEditing": false,
-        },
-        "inserted": {
-          "selectedLinearElementIsEditing": true,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id28",
+    "id": "id4",
   },
 ]
 `;

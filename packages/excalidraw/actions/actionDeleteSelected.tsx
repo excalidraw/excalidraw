@@ -206,12 +206,8 @@ export const actionDeleteSelected = register({
   trackEvent: { category: "element", action: "delete" },
   perform: (elements, appState, formData, app) => {
     if (appState.selectedLinearElement?.isEditing) {
-      const {
-        elementId,
-        selectedPointsIndices,
-        startBindingElement,
-        endBindingElement,
-      } = appState.selectedLinearElement;
+      const { elementId, selectedPointsIndices } =
+        appState.selectedLinearElement;
       const elementsMap = app.scene.getNonDeletedElementsMap();
       const linearElement = LinearElementEditor.getElement(
         elementId,
@@ -248,19 +244,6 @@ export const actionDeleteSelected = register({
         };
       }
 
-      // We cannot do this inside `movePoint` because it is also called
-      // when deleting the uncommitted point (which hasn't caused any binding)
-      const binding = {
-        startBindingElement: selectedPointsIndices?.includes(0)
-          ? null
-          : startBindingElement,
-        endBindingElement: selectedPointsIndices?.includes(
-          linearElement.points.length - 1,
-        )
-          ? null
-          : endBindingElement,
-      };
-
       LinearElementEditor.deletePoints(
         linearElement,
         app,
@@ -273,7 +256,6 @@ export const actionDeleteSelected = register({
           ...appState,
           selectedLinearElement: {
             ...appState.selectedLinearElement,
-            ...binding,
             selectedPointsIndices:
               selectedPointsIndices?.[0] > 0
                 ? [selectedPointsIndices[0] - 1]
