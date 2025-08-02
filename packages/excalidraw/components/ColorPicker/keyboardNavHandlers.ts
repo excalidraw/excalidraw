@@ -1,4 +1,10 @@
-import { COLORS_PER_ROW, COLOR_PALETTE, KEYS } from "@excalidraw/common";
+import {
+  CODES,
+  COLORS_PER_ROW,
+  COLOR_PALETTE,
+  isLatinChar,
+  KEYS,
+} from "@excalidraw/common";
 
 import type {
   ColorPickerColor,
@@ -10,6 +16,7 @@ import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import {
   colorPickerHotkeyBindings,
+  colorPickerHotkeyBindingsAsCodes,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
 
@@ -91,8 +98,11 @@ const hotkeyHandler = ({
     }
   }
 
-  if (colorPickerHotkeyBindings.includes(e.key)) {
-    const index = colorPickerHotkeyBindings.indexOf(e.key);
+  if (colorPickerHotkeyBindings.includes(e.key) || (!isLatinChar(e.key) && colorPickerHotkeyBindingsAsCodes.includes(e.code))) {
+    let index = colorPickerHotkeyBindings.indexOf(e.key);
+    if (index === -1) {
+      index = colorPickerHotkeyBindingsAsCodes.indexOf(e.code);
+    }
     const paletteKey = Object.keys(palette)[index] as keyof ColorPalette;
     const paletteValue = palette[paletteKey];
     const r = Array.isArray(paletteValue)
@@ -152,7 +162,10 @@ export const colorPickerKeyNavHandler = ({
     return true;
   }
 
-  if (event.key === KEYS.I) {
+  if (
+    event.key === KEYS.I ||
+    (!isLatinChar(event.key) && event.code === CODES.I)
+  ) {
     onEyeDropperToggle();
     return true;
   }

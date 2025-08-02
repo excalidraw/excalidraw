@@ -9,6 +9,8 @@ import {
   capitalizeString,
   getShortcutKey,
   isWritableElement,
+  isLatinChar,
+  CODES,
 } from "@excalidraw/common";
 
 import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionToggleShapeSwitch";
@@ -130,7 +132,9 @@ const isCommandPaletteToggleShortcut = (event: KeyboardEvent) => {
   return (
     !event.altKey &&
     event[KEYS.CTRL_OR_CMD] &&
-    ((event.shiftKey && event.key.toLowerCase() === KEYS.P) ||
+    ((event.shiftKey &&
+      (event.key.toLowerCase() === KEYS.P ||
+        (!isLatinChar(event.key.toLowerCase()) && event.code === CODES.P))) ||
       event.key === KEYS.SLASH)
   );
 };
