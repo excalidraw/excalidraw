@@ -1,7 +1,8 @@
-import { vi } from "vitest";
 import * as MermaidToExcalidraw from "@excalidraw/mermaid-to-excalidraw";
-import type { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
 import React from "react";
+import { vi } from "vitest";
+
+import type { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
 
 export const mockMermaidToExcalidraw = (opts: {
   parseMermaidToExcalidraw: typeof parseMermaidToExcalidraw;
@@ -29,4 +30,31 @@ export const mockMermaidToExcalidraw = (opts: {
       },
     });
   }
+};
+
+// Mock for HTMLImageElement (use with `vi.unstubAllGlobals()`)
+// as jsdom.resources: "usable" throws an error on image load
+export const mockHTMLImageElement = (
+  naturalWidth: number,
+  naturalHeight: number,
+) => {
+  vi.stubGlobal(
+    "Image",
+    class extends Image {
+      constructor() {
+        super();
+
+        Object.defineProperty(this, "naturalWidth", {
+          value: naturalWidth,
+        });
+        Object.defineProperty(this, "naturalHeight", {
+          value: naturalHeight,
+        });
+
+        queueMicrotask(() => {
+          this.onload?.({} as Event);
+        });
+      }
+    },
+  );
 };

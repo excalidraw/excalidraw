@@ -1,13 +1,16 @@
-import { t } from "../i18n";
-import type { DialogProps } from "./Dialog";
-import { Dialog } from "./Dialog";
+import { flushSync } from "react-dom";
 
-import "./ConfirmDialog.scss";
+import { useSetAtom } from "../editor-jotai";
+import { t } from "../i18n";
+
+import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
-import { useSetAtom } from "jotai";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
-import { jotaiScope } from "../jotai";
+
+import "./ConfirmDialog.scss";
+
+import type { DialogProps } from "./Dialog";
 
 interface Props extends Omit<DialogProps, "onCloseRequest"> {
   onConfirm: () => void;
@@ -26,7 +29,7 @@ const ConfirmDialog = (props: Props) => {
     ...rest
   } = props;
   const setAppState = useExcalidrawSetAppState();
-  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom, jotaiScope);
+  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
   const { container } = useExcalidrawContainer();
 
   return (
@@ -43,7 +46,14 @@ const ConfirmDialog = (props: Props) => {
           onClick={() => {
             setAppState({ openMenu: null });
             setIsLibraryMenuOpen(false);
-            onCancel();
+            // flush any pending updates synchronously,
+            // otherwise it could lead to crash in some chromium versions (131.0.6778.86),
+            // when `.focus` is invoked with container in some intermediate state
+            // (container seems mounted in DOM, but focus still causes a crash)
+            flushSync(() => {
+              onCancel();
+            });
+
             container?.focus();
           }}
         />
@@ -52,7 +62,14 @@ const ConfirmDialog = (props: Props) => {
           onClick={() => {
             setAppState({ openMenu: null });
             setIsLibraryMenuOpen(false);
-            onConfirm();
+            // flush any pending updates synchronously,
+            // otherwise it leads to crash in some chromium versions (131.0.6778.86),
+            // when `.focus` is invoked with container in some intermediate state
+            // (container seems mounted in DOM, but focus still causes a crash)
+            flushSync(() => {
+              onConfirm();
+            });
+
             container?.focus();
           }}
           actionType="danger"

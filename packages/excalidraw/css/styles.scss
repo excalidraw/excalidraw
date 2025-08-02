@@ -140,7 +140,7 @@ body.excalidraw-cursor-resize * {
     justify-content: space-between;
   }
 
-  .panelColumn {
+  .selected-shape-actions {
     display: flex;
     flex-direction: column;
     row-gap: 0.75rem;
@@ -245,10 +245,6 @@ body.excalidraw-cursor-resize * {
     left: 0;
     right: 0;
     --bar-padding: calc(4 * var(--space-factor));
-    padding-top: #{"max(var(--bar-padding), var(--sat,0))"};
-    padding-right: var(--sar, 0);
-    padding-bottom: var(--sab, 0);
-    padding-left: var(--sal, 0);
     z-index: 4;
     display: flex;
     align-items: flex-end;
@@ -263,10 +259,6 @@ body.excalidraw-cursor-resize * {
       display: flex;
       flex-direction: column;
       pointer-events: var(--ui-pointerEvents);
-
-      .panelColumn {
-        padding: 8px 8px 0 8px;
-      }
     }
   }
 
@@ -302,6 +294,10 @@ body.excalidraw-cursor-resize * {
     overflow-y: auto;
     box-sizing: border-box;
     margin-bottom: var(--bar-padding);
+
+    .selected-shape-actions {
+      padding: 8px 8px 0 8px;
+    }
   }
 
   .App-menu {
@@ -649,15 +645,21 @@ body.excalidraw-cursor-resize * {
     @include filledButtonOnCanvas;
   }
 
+  .App-mobile-menu,
   .App-menu__left {
     --button-border: transparent;
     --button-bg: var(--color-surface-mid);
+  }
 
-    @at-root .excalidraw.theme--dark#{&} {
+  @at-root .excalidraw.theme--dark#{&} {
+    .App-mobile-menu,
+    .App-menu__left {
       --button-hover-bg: #363541;
       --button-bg: var(--color-surface-high);
     }
+  }
 
+  .App-menu__left {
     .buttonList {
       padding: 0.25rem 0;
     }

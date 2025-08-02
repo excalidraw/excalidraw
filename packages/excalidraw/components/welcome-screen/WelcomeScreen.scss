@@ -1,6 +1,6 @@
 .excalidraw {
   .excalifont {
-    font-family: "Excalifont";
+    font-family: "Excalifont", "Xiaolai";
   }
 
   // WelcomeSreen common
@@ -221,16 +221,6 @@
     .welcome-screen-menu-item__icon,
     .welcome-screen-menu-item__text {
       color: var(--color-gray-100);
-    }
-
-    &--promo {
-      color: var(--color-promo) !important;
-
-      &:hover {
-        .welcome-screen-menu-item__text {
-          color: var(--color-promo) !important;
-        }
-      }
     }
   }
 

@@ -1,9 +1,17 @@
-import { KEYS } from "../keys";
-import { register } from "./register";
-import type { AppState } from "../types";
+import {
+  KEYS,
+  CANVAS_SEARCH_TAB,
+  CLASSES,
+  DEFAULT_SIDEBAR,
+} from "@excalidraw/common";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
 import { searchIcon } from "../components/icons";
-import { StoreAction } from "../store";
-import { CANVAS_SEARCH_TAB, CLASSES, DEFAULT_SIDEBAR } from "../constants";
+
+import { register } from "./register";
+
+import type { AppState } from "../types";
 
 export const actionToggleSearchMenu = register({
   name: "searchMenu",
@@ -17,6 +25,10 @@ export const actionToggleSearchMenu = register({
     predicate: (appState) => appState.gridModeEnabled,
   },
   perform(elements, appState, _, app) {
+    if (appState.openDialog) {
+      return false;
+    }
+
     if (
       appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
       appState.openSidebar.tab === CANVAS_SEARCH_TAB
@@ -25,13 +37,6 @@ export const actionToggleSearchMenu = register({
         app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
           `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
         );
-
-      if (searchInput?.matches(":focus")) {
-        return {
-          appState: { ...appState, openSidebar: null },
-          storeAction: StoreAction.NONE,
-        };
-      }
 
       searchInput?.focus();
       searchInput?.select();
@@ -44,7 +49,7 @@ export const actionToggleSearchMenu = register({
         openSidebar: { name: DEFAULT_SIDEBAR.name, tab: CANVAS_SEARCH_TAB },
         openDialog: null,
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   checked: (appState: AppState) => appState.gridModeEnabled,

@@ -1,26 +1,41 @@
+import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 import { useMemo } from "react";
-import { getCommonBounds, isTextElement } from "../../element";
-import { updateBoundElements } from "../../element/binding";
-import { mutateElement } from "../../element/mutateElement";
-import { rescalePointsInElement } from "../../element/resizeElements";
+
+import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
 import {
-  getBoundTextElement,
-  handleBindTextResize,
-} from "../../element/textElement";
+  getElementsInResizingFrame,
+  isFrameLikeElement,
+  replaceAllElementsInFrame,
+  updateBoundElements,
+} from "@excalidraw/element";
+import {
+  rescalePointsInElement,
+  resizeSingleElement,
+} from "@excalidraw/element";
+import { getBoundTextElement, handleBindTextResize } from "@excalidraw/element";
+
+import { isTextElement } from "@excalidraw/element";
+
+import { getCommonBounds } from "@excalidraw/utils";
+
 import type {
   ElementsMap,
   ExcalidrawElement,
   NonDeletedSceneElementsMap,
-} from "../../element/types";
-import type Scene from "../../scene/Scene";
-import type { AppState } from "../../types";
+} from "@excalidraw/element/types";
+
+import type { Scene } from "@excalidraw/element";
+
 import DragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
-import { getElementsInAtomicUnit, resizeElement } from "./utils";
+import { getElementsInAtomicUnit } from "./utils";
+
+import type {
+  DragFinishedCallbackType,
+  DragInputCallbackType,
+} from "./DragInput";
 import type { AtomicUnit } from "./utils";
-import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
-import { pointFrom, type GlobalPoint } from "../../../math";
+import type { AppState } from "../../types";
 
 interface MultiDimensionProps {
   property: "width" | "height";
@@ -65,34 +80,31 @@ const resizeElementInGroup = (
   scale: number,
   latestElement: ExcalidrawElement,
   origElement: ExcalidrawElement,
-  elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
+  scene: Scene,
 ) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
   const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
-  const { width: oldWidth, height: oldHeight } = latestElement;
 
-  mutateElement(latestElement, updates, false);
+  scene.mutateElement(latestElement, updates);
+
   const boundTextElement = getBoundTextElement(
     origElement,
     originalElementsMap,
   );
   if (boundTextElement) {
     const newFontSize = boundTextElement.fontSize * scale;
-    updateBoundElements(latestElement, elementsMap, {
-      oldSize: { width: oldWidth, height: oldHeight },
+    updateBoundElements(latestElement, scene, {
+      newSize: { width: updates.width, height: updates.height },
     });
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
     if (latestBoundTextElement && isTextElement(latestBoundTextElement)) {
-      mutateElement(
-        latestBoundTextElement,
-        {
-          fontSize: newFontSize,
-        },
-        false,
-      );
+      scene.mutateElement(latestBoundTextElement, {
+        fontSize: newFontSize,
+      });
       handleBindTextResize(
         latestElement,
-        elementsMap,
+        scene,
         property === "width" ? "e" : "s",
         true,
       );
@@ -109,8 +121,8 @@ const resizeGroup = (
   property: MultiDimensionProps["property"],
   latestElements: ExcalidrawElement[],
   originalElements: ExcalidrawElement[],
-  elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
+  scene: Scene,
 ) => {
   // keep aspect ratio for groups
   if (property === "width") {
@@ -132,8 +144,8 @@ const resizeGroup = (
       scale,
       latestElement,
       origElement,
-      elementsMap,
       originalElementsMap,
+      scene,
     );
   }
 };
@@ -149,9 +161,10 @@ const handleDimensionChange: DragInputCallbackType<
   nextValue,
   scene,
   property,
+  setAppState,
+  app,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const elements = scene.getNonDeletedElements();
   const atomicUnits = getAtomicUnits(originalElements, originalAppState);
   if (nextValue !== undefined) {
     for (const atomicUnit of atomicUnits) {
@@ -186,8 +199,8 @@ const handleDimensionChange: DragInputCallbackType<
           property,
           latestElements,
           originalElements,
-          elementsMap,
           originalElementsMap,
+          scene,
         );
       } else {
         const [el] = elementsInUnit;
@@ -224,16 +237,37 @@ const handleDimensionChange: DragInputCallbackType<
           nextWidth = Math.max(MIN_WIDTH_OR_HEIGHT, nextWidth);
           nextHeight = Math.max(MIN_WIDTH_OR_HEIGHT, nextHeight);
 
-          resizeElement(
+          resizeSingleElement(
             nextWidth,
             nextHeight,
-            false,
+            latestElement,
             origElement,
-            elementsMap,
-            elements,
+            originalElementsMap,
             scene,
-            false,
+            property === "width" ? "e" : "s",
+            {
+              shouldInformMutation: false,
+            },
           );
+
+          // Handle frame membership update for resized frames
+          if (isFrameLikeElement(latestElement)) {
+            const nextElementsInFrame = getElementsInResizingFrame(
+              scene.getElementsIncludingDeleted(),
+              latestElement,
+              originalAppState,
+              scene.getNonDeletedElementsMap(),
+            );
+
+            const updatedElements = replaceAllElementsInFrame(
+              scene.getElementsIncludingDeleted(),
+              nextElementsInFrame,
+              latestElement,
+              app,
+            );
+
+            scene.replaceAllElements(updatedElements);
+          }
         }
       }
     }
@@ -245,6 +279,7 @@ const handleDimensionChange: DragInputCallbackType<
 
   const changeInWidth = property === "width" ? accumulatedChange : 0;
   const changeInHeight = property === "height" ? accumulatedChange : 0;
+  const elementsToHighlight: ExcalidrawElement[] = [];
 
   for (const atomicUnit of atomicUnits) {
     const elementsInUnit = getElementsInAtomicUnit(
@@ -291,8 +326,8 @@ const handleDimensionChange: DragInputCallbackType<
         property,
         latestElements,
         originalElements,
-        elementsMap,
         originalElementsMap,
+        scene,
       );
     } else {
       const [el] = elementsInUnit;
@@ -325,20 +360,73 @@ const handleDimensionChange: DragInputCallbackType<
         nextWidth = Math.max(MIN_WIDTH_OR_HEIGHT, nextWidth);
         nextHeight = Math.max(MIN_WIDTH_OR_HEIGHT, nextHeight);
 
-        resizeElement(
+        resizeSingleElement(
           nextWidth,
           nextHeight,
-          false,
+          latestElement,
           origElement,
-          elementsMap,
-          elements,
+          originalElementsMap,
           scene,
+          property === "width" ? "e" : "s",
+          {
+            shouldInformMutation: false,
+          },
         );
+
+        // Handle highlighting frame element candidates
+        if (isFrameLikeElement(latestElement)) {
+          const nextElementsInFrame = getElementsInResizingFrame(
+            scene.getElementsIncludingDeleted(),
+            latestElement,
+            originalAppState,
+            scene.getNonDeletedElementsMap(),
+          );
+
+          elementsToHighlight.push(...nextElementsInFrame);
+        }
       }
     }
   }
 
+  setAppState({
+    elementsToHighlight,
+  });
+
   scene.triggerUpdate();
+};
+
+const handleDragFinished: DragFinishedCallbackType = ({
+  setAppState,
+  app,
+  originalElements,
+  originalAppState,
+}) => {
+  const elementsMap = app.scene.getNonDeletedElementsMap();
+  const origElement = originalElements?.[0];
+  const latestElement = origElement && elementsMap.get(origElement.id);
+
+  // Handle frame membership update for resized frames
+  if (latestElement && isFrameLikeElement(latestElement)) {
+    const nextElementsInFrame = getElementsInResizingFrame(
+      app.scene.getElementsIncludingDeleted(),
+      latestElement,
+      originalAppState,
+      app.scene.getNonDeletedElementsMap(),
+    );
+
+    const updatedElements = replaceAllElementsInFrame(
+      app.scene.getElementsIncludingDeleted(),
+      nextElementsInFrame,
+      latestElement,
+      app,
+    );
+
+    app.scene.replaceAllElements(updatedElements);
+
+    setAppState({
+      elementsToHighlight: null,
+    });
+  }
 };
 
 const MultiDimension = ({
@@ -388,6 +476,7 @@ const MultiDimension = ({
       appState={appState}
       property={property}
       scene={scene}
+      dragFinishedCallback={handleDragFinished}
     />
   );
 };

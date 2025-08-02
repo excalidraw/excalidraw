@@ -1,18 +1,25 @@
-import type { Radians } from "../math";
-import { pointFrom } from "../math";
+import { pointFrom } from "@excalidraw/math";
+
 import {
   COLOR_PALETTE,
   DEFAULT_CHART_COLOR_INDEX,
   getAllColorsSpecificShade,
-} from "./colors";
-import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   VERTICAL_ALIGN,
-} from "./constants";
-import { newElement, newLinearElement, newTextElement } from "./element";
-import type { NonDeletedExcalidrawElement } from "./element/types";
-import { randomId } from "./random";
+  randomId,
+  isDevEnv,
+} from "@excalidraw/common";
+
+import {
+  newTextElement,
+  newLinearElement,
+  newElement,
+} from "@excalidraw/element";
+
+import type { Radians } from "@excalidraw/math";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 export type ChartElements = readonly NonDeletedExcalidrawElement[];
 
@@ -370,7 +377,7 @@ const chartTypeBar = (
       y,
       groupId,
       backgroundColor,
-      import.meta.env.DEV,
+      isDevEnv(),
     ),
   ];
 };
@@ -452,7 +459,7 @@ const chartTypeLine = (
       y,
       groupId,
       backgroundColor,
-      import.meta.env.DEV,
+      isDevEnv(),
     ),
     line,
     ...lines,

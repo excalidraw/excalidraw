@@ -1,31 +1,37 @@
-import React from "react";
+import { degreesToRadians, pointFrom, pointRotateRads } from "@excalidraw/math";
 import { act, fireEvent, queryByTestId } from "@testing-library/react";
+import React from "react";
+import { vi } from "vitest";
+
+import { setDateTimeForTests, reseed } from "@excalidraw/common";
+
+import { isInGroup } from "@excalidraw/element";
+
+import { isTextElement } from "@excalidraw/element";
+
+import type { Degrees } from "@excalidraw/math";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
+
+import { Excalidraw, getCommonBounds } from "../..";
+import { actionGroup } from "../../actions";
+import { t } from "../../i18n";
+import * as StaticScene from "../../renderer/staticScene";
+import { API } from "../../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
-import { getStepSizedValue } from "./utils";
+import { getTextEditor, updateTextEditor } from "../../tests/queries/dom";
 import {
   GlobalTestState,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
 } from "../../tests/test-utils";
-import * as StaticScene from "../../renderer/staticScene";
-import { vi } from "vitest";
-import { reseed } from "../../random";
-import { setDateTimeForTests } from "../../utils";
-import { Excalidraw, mutateElement } from "../..";
-import { t } from "../../i18n";
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-} from "../../element/types";
-import { getTextEditor, updateTextEditor } from "../../tests/queries/dom";
-import { getCommonBounds, isTextElement } from "../../element";
-import { API } from "../../tests/helpers/api";
-import { actionGroup } from "../../actions";
-import { isInGroup } from "../../groups";
-import type { Degrees } from "../../../math";
-import { degreesToRadians, pointFrom, pointRotateRads } from "../../../math";
+
+import { getStepSizedValue } from "./utils";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -127,7 +133,6 @@ describe("binding with linear elements", () => {
     const inputX = UI.queryStatsProperty("X")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
     UI.updateInput(inputX, String("204"));
@@ -376,8 +381,7 @@ describe("stats for a non-generic element", () => {
   it("text element", async () => {
     UI.clickTool("text");
     mouse.clickAt(20, 30);
-    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
-    const editor = await getTextEditor(textEditorSelector, true);
+    const editor = await getTextEditor();
     updateTextEditor(editor, "Hello!");
     act(() => {
       editor.blur();
@@ -397,11 +401,23 @@ describe("stats for a non-generic element", () => {
     UI.updateInput(input, "36");
     expect(text.fontSize).toBe(36);
 
-    // cannot change width or height
-    const width = UI.queryStatsProperty("W")?.querySelector(".drag-input");
-    expect(width).toBeUndefined();
-    const height = UI.queryStatsProperty("H")?.querySelector(".drag-input");
-    expect(height).toBeUndefined();
+    // can change width or height
+    const width = UI.queryStatsProperty("W")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(width).toBeDefined();
+    const height = UI.queryStatsProperty("H")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(height).toBeDefined();
+
+    const textHeightBeforeWrapping = text.height;
+    const textBeforeWrapping = text.text;
+    const originalTextBeforeWrapping = textBeforeWrapping;
+    UI.updateInput(width, "30");
+    expect(text.height).toBeGreaterThan(textHeightBeforeWrapping);
+    expect(text.text).not.toBe(textBeforeWrapping);
+    expect(text.originalText).toBe(originalTextBeforeWrapping);
 
     // min font size is 4
     UI.updateInput(input, "0");
@@ -472,7 +488,7 @@ describe("stats for a non-generic element", () => {
       containerId: container.id,
       fontSize: 20,
     });
-    mutateElement(container, {
+    h.app.scene.mutateElement(container, {
       boundElements: [{ type: "text", id: text.id }],
     });
     API.setElements([container, text]);
@@ -570,8 +586,7 @@ describe("stats for multiple elements", () => {
     // text, rectangle, frame
     UI.clickTool("text");
     mouse.clickAt(20, 30);
-    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
-    const editor = await getTextEditor(textEditorSelector, true);
+    const editor = await getTextEditor();
     updateTextEditor(editor, "Hello!");
     act(() => {
       editor.blur();
@@ -624,12 +639,11 @@ describe("stats for multiple elements", () => {
     ) as HTMLInputElement;
     expect(fontSize).toBeDefined();
 
-    // changing width does not affect text
     UI.updateInput(width, "200");
 
     expect(rectangle?.width).toBe(200);
     expect(frame.width).toBe(200);
-    expect(text?.width).not.toBe(200);
+    expect(text?.width).toBe(200);
 
     UI.updateInput(angle, "40");
 
@@ -651,6 +665,7 @@ describe("stats for multiple elements", () => {
 
       mouse.reset();
       Keyboard.withModifierKeys({ shift: true }, () => {
+        mouse.moveTo(10, 0);
         mouse.click();
       });
 
@@ -720,5 +735,198 @@ describe("stats for multiple elements", () => {
     [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
     const newGroupHeight = y2 - y1;
     expect(newGroupHeight).toBeCloseTo(500, 4);
+  });
+});
+
+describe("frame resizing behavior", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    renderStaticScene.mockClear();
+    reseed(7);
+    setDateTimeForTests("201933152653");
+
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    API.setElements([]);
+
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: 1,
+      clientY: 1,
+    });
+    const contextMenu = UI.queryContextMenu();
+    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
+    stats = UI.queryStats();
+  });
+
+  beforeAll(() => {
+    mockBoundingClientRect();
+  });
+
+  afterAll(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  it("should add shapes to frame when resizing frame to encompass them", () => {
+    // Create a frame
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    // Create a rectangle outside the frame
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 150,
+      y: 50,
+      width: 50,
+      height: 50,
+    });
+
+    API.setElements([frame, rectangle]);
+
+    // Initially, rectangle should not be in the frame
+    expect(rectangle.frameId).toBe(null);
+
+    // Select the frame
+    API.setAppState({
+      selectedElementIds: {
+        [frame.id]: true,
+      },
+    });
+
+    elementStats = stats?.querySelector("#elementStats");
+
+    // Find the width input and update it to encompass the rectangle
+    const widthInput = UI.queryStatsProperty("W")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    expect(widthInput).toBeDefined();
+    expect(widthInput.value).toBe("100");
+
+    // Resize frame to width 250, which should encompass the rectangle
+    UI.updateInput(widthInput, "250");
+
+    // After resizing, the rectangle should now be part of the frame
+    expect(h.elements.find((el) => el.id === rectangle.id)?.frameId).toBe(
+      frame.id,
+    );
+  });
+
+  it("should add multiple shapes when frame encompasses them through height resize", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 100,
+    });
+
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 150,
+      width: 50,
+      height: 50,
+    });
+
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 180,
+      width: 40,
+      height: 40,
+    });
+
+    API.setElements([frame, rectangle1, rectangle2]);
+
+    // Initially, rectangles should not be in the frame
+    expect(rectangle1.frameId).toBe(null);
+    expect(rectangle2.frameId).toBe(null);
+
+    // Select the frame
+    API.setAppState({
+      selectedElementIds: {
+        [frame.id]: true,
+      },
+    });
+
+    elementStats = stats?.querySelector("#elementStats");
+
+    // Resize frame height to encompass both rectangles
+    const heightInput = UI.queryStatsProperty("H")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    // Resize frame to height 250, which should encompass both rectangles
+    UI.updateInput(heightInput, "250");
+
+    // After resizing, both rectangles should now be part of the frame
+    expect(h.elements.find((el) => el.id === rectangle1.id)?.frameId).toBe(
+      frame.id,
+    );
+    expect(h.elements.find((el) => el.id === rectangle2.id)?.frameId).toBe(
+      frame.id,
+    );
+  });
+
+  it("should not affect shapes that remain outside frame after resize", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    const insideRect = API.createElement({
+      type: "rectangle",
+      x: 120,
+      y: 50,
+      width: 30,
+      height: 30,
+    });
+
+    const outsideRect = API.createElement({
+      type: "rectangle",
+      x: 300,
+      y: 50,
+      width: 30,
+      height: 30,
+    });
+
+    API.setElements([frame, insideRect, outsideRect]);
+
+    // Initially, both rectangles should not be in the frame
+    expect(insideRect.frameId).toBe(null);
+    expect(outsideRect.frameId).toBe(null);
+
+    // Select the frame
+    API.setAppState({
+      selectedElementIds: {
+        [frame.id]: true,
+      },
+    });
+
+    elementStats = stats?.querySelector("#elementStats");
+
+    // Resize frame width to 200, which should only encompass insideRect
+    const widthInput = UI.queryStatsProperty("W")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    UI.updateInput(widthInput, "200");
+
+    // After resizing, only insideRect should be in the frame
+    expect(h.elements.find((el) => el.id === insideRect.id)?.frameId).toBe(
+      frame.id,
+    );
+    expect(h.elements.find((el) => el.id === outsideRect.id)?.frameId).toBe(
+      null,
+    );
   });
 });

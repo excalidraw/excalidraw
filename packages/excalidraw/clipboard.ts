@@ -1,23 +1,33 @@
-import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "./element/types";
-import type { BinaryFiles } from "./types";
-import type { Spreadsheet } from "./charts";
-import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
 import {
   ALLOWED_PASTE_MIME_TYPES,
   EXPORT_DATA_TYPES,
   MIME_TYPES,
-} from "./constants";
+  arrayToMap,
+  isMemberOf,
+  isPromiseLike,
+} from "@excalidraw/common";
+
+import { mutateElement } from "@excalidraw/element";
+import { deepCopyElement } from "@excalidraw/element";
 import {
   isFrameLikeElement,
   isInitializedImageElement,
-} from "./element/typeChecks";
-import { deepCopyElement } from "./element/newElement";
-import { mutateElement } from "./element/mutateElement";
-import { getContainingFrame } from "./frame";
-import { arrayToMap, isMemberOf, isPromiseLike } from "./utils";
+} from "@excalidraw/element";
+
+import { getContainingFrame } from "@excalidraw/element";
+
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
+
+import { ExcalidrawError } from "./errors";
+import { createFile, isSupportedImageFileType } from "./data/blob";
+import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
+
+import type { Spreadsheet } from "./charts";
+
+import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
@@ -39,7 +49,7 @@ export interface ClipboardData {
 
 type AllowedPasteMimeTypes = typeof ALLOWED_PASTE_MIME_TYPES[number];
 
-type ParsedClipboardEvent =
+type ParsedClipboardEventTextData =
   | { type: "text"; value: string }
   | { type: "mixedContent"; value: PastedMixedContent };
 
@@ -75,7 +85,7 @@ export const createPasteEvent = ({
   types,
   files,
 }: {
-  types?: { [key in AllowedPasteMimeTypes]?: string };
+  types?: { [key in AllowedPasteMimeTypes]?: string | File };
   files?: File[];
 }) => {
   if (!types && !files) {
@@ -88,6 +98,11 @@ export const createPasteEvent = ({
 
   if (types) {
     for (const [type, value] of Object.entries(types)) {
+      if (typeof value !== "string") {
+        files = files || [];
+        files.push(value);
+        continue;
+      }
       try {
         event.clipboardData?.setData(type, value);
         if (event.clipboardData?.getData(type) !== value) {
@@ -157,7 +172,7 @@ export const serializeAsClipboardJSON = ({
         !framesToCopy.has(getContainingFrame(element, elementsMap)!)
       ) {
         const copiedElement = deepCopyElement(element);
-        mutateElement(copiedElement, {
+        mutateElement(copiedElement, elementsMap, {
           frameId: null,
         });
         return copiedElement;
@@ -217,14 +232,14 @@ function parseHTMLTree(el: ChildNode) {
 const maybeParseHTMLPaste = (
   event: ClipboardEvent,
 ): { type: "mixedContent"; value: PastedMixedContent } | null => {
-  const html = event.clipboardData?.getData("text/html");
+  const html = event.clipboardData?.getData(MIME_TYPES.html);
 
   if (!html) {
     return null;
   }
 
   try {
-    const doc = new DOMParser().parseFromString(html, "text/html");
+    const doc = new DOMParser().parseFromString(html, MIME_TYPES.html);
 
     const content = parseHTMLTree(doc.body);
 
@@ -238,34 +253,44 @@ const maybeParseHTMLPaste = (
   return null;
 };
 
+/**
+ * Reads OS clipboard programmatically. May not work on all browsers.
+ * Will prompt user for permission if not granted.
+ */
 export const readSystemClipboard = async () => {
-  const types: { [key in AllowedPasteMimeTypes]?: string } = {};
-
-  try {
-    if (navigator.clipboard?.readText) {
-      return { "text/plain": await navigator.clipboard?.readText() };
-    }
-  } catch (error: any) {
-    // @ts-ignore
-    if (navigator.clipboard?.read) {
-      console.warn(
-        `navigator.clipboard.readText() failed (${error.message}). Failling back to navigator.clipboard.read()`,
-      );
-    } else {
-      throw error;
-    }
-  }
+  const types: { [key in AllowedPasteMimeTypes]?: string | File } = {};
 
   let clipboardItems: ClipboardItems;
 
   try {
     clipboardItems = await navigator.clipboard?.read();
   } catch (error: any) {
-    if (error.name === "DataError") {
-      console.warn(
-        `navigator.clipboard.read() error, clipboard is probably empty: ${error.message}`,
-      );
-      return types;
+    try {
+      if (navigator.clipboard?.readText) {
+        console.warn(
+          `navigator.clipboard.readText() failed (${error.message}). Failling back to navigator.clipboard.read()`,
+        );
+        const readText = await navigator.clipboard?.readText();
+        if (readText) {
+          return { [MIME_TYPES.text]: readText };
+        }
+      }
+    } catch (error: any) {
+      // @ts-ignore
+      if (navigator.clipboard?.read) {
+        console.warn(
+          `navigator.clipboard.readText() failed (${error.message}). Failling back to navigator.clipboard.read()`,
+        );
+      } else {
+        if (error.name === "DataError") {
+          console.warn(
+            `navigator.clipboard.read() error, clipboard is probably empty: ${error.message}`,
+          );
+          return types;
+        }
+
+        throw error;
+      }
     }
     throw error;
   }
@@ -276,10 +301,20 @@ export const readSystemClipboard = async () => {
         continue;
       }
       try {
-        types[type] = await (await item.getType(type)).text();
+        if (type === MIME_TYPES.text || type === MIME_TYPES.html) {
+          types[type] = await (await item.getType(type)).text();
+        } else if (isSupportedImageFileType(type)) {
+          const imageBlob = await item.getType(type);
+          const file = createFile(imageBlob, type, undefined);
+          types[type] = file;
+        } else {
+          throw new ExcalidrawError(`Unsupported clipboard type: ${type}`);
+        }
       } catch (error: any) {
         console.warn(
-          `Cannot retrieve ${type} from clipboardItem: ${error.message}`,
+          error instanceof ExcalidrawError
+            ? error.message
+            : `Cannot retrieve ${type} from clipboardItem: ${error.message}`,
         );
       }
     }
@@ -296,10 +331,10 @@ export const readSystemClipboard = async () => {
 /**
  * Parses "paste" ClipboardEvent.
  */
-const parseClipboardEvent = async (
+const parseClipboardEventTextData = async (
   event: ClipboardEvent,
   isPlainPaste = false,
-): Promise<ParsedClipboardEvent> => {
+): Promise<ParsedClipboardEventTextData> => {
   try {
     const mixedContent = !isPlainPaste && event && maybeParseHTMLPaste(event);
 
@@ -308,7 +343,7 @@ const parseClipboardEvent = async (
         return {
           type: "text",
           value:
-            event.clipboardData?.getData("text/plain") ||
+            event.clipboardData?.getData(MIME_TYPES.text) ||
             mixedContent.value
               .map((item) => item.value)
               .join("\n")
@@ -319,7 +354,7 @@ const parseClipboardEvent = async (
       return mixedContent;
     }
 
-    const text = event.clipboardData?.getData("text/plain");
+    const text = event.clipboardData?.getData(MIME_TYPES.text);
 
     return { type: "text", value: (text || "").trim() };
   } catch {
@@ -328,13 +363,16 @@ const parseClipboardEvent = async (
 };
 
 /**
- * Attempts to parse clipboard. Prefers system clipboard.
+ * Attempts to parse clipboard event.
  */
 export const parseClipboard = async (
   event: ClipboardEvent,
   isPlainPaste = false,
 ): Promise<ClipboardData> => {
-  const parsedEventData = await parseClipboardEvent(event, isPlainPaste);
+  const parsedEventData = await parseClipboardEventTextData(
+    event,
+    isPlainPaste,
+  );
 
   if (parsedEventData.type === "mixedContent") {
     return {
@@ -423,8 +461,8 @@ export const copyTextToSystemClipboard = async (
   // (2) if fails and we have access to ClipboardEvent, use plain old setData()
   try {
     if (clipboardEvent) {
-      clipboardEvent.clipboardData?.setData("text/plain", text || "");
-      if (clipboardEvent.clipboardData?.getData("text/plain") !== text) {
+      clipboardEvent.clipboardData?.setData(MIME_TYPES.text, text || "");
+      if (clipboardEvent.clipboardData?.getData(MIME_TYPES.text) !== text) {
         throw new Error("Failed to setData on clipboardEvent");
       }
       return;

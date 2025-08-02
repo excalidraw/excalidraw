@@ -1,8 +1,14 @@
+import { exportToCanvas, exportToSvg } from "@excalidraw/utils";
+
+import { FONT_FAMILY, FRAME_STYLE } from "@excalidraw/common";
+
 import type {
   ExcalidrawTextElement,
   FractionalIndex,
   NonDeletedExcalidrawElement,
-} from "../../element/types";
+} from "@excalidraw/element/types";
+
+import { prepareElementsForExport } from "../../data";
 import * as exportUtils from "../../scene/export";
 import {
   diamondFixture,
@@ -11,9 +17,6 @@ import {
   textFixture,
 } from "../fixtures/elementFixture";
 import { API } from "../helpers/api";
-import { exportToCanvas, exportToSvg } from "../../../utils";
-import { FONT_FAMILY, FRAME_STYLE } from "../../constants";
-import { prepareElementsForExport } from "../../data";
 
 describe("exportToSvg", () => {
   const ELEMENT_HEIGHT = 100;
@@ -114,7 +117,7 @@ describe("exportToSvg", () => {
     );
 
     expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(
-      `"_themeFilter_1883f3"`,
+      `"invert(93%) hue-rotate(180deg)"`,
     );
   });
 

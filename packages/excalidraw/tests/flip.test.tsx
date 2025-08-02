@@ -1,50 +1,60 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import {
-  fireEvent,
-  GlobalTestState,
-  render,
-  screen,
-  waitFor,
-} from "./test-utils";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { API } from "./helpers/api";
-import { actionFlipHorizontal, actionFlipVertical } from "../actions";
-import { getElementAbsoluteCoords } from "../element";
+import { vi } from "vitest";
+
+import { ROUNDNESS, KEYS, arrayToMap, cloneJSON } from "@excalidraw/common";
+
+import { pointFrom, type Radians } from "@excalidraw/math";
+
+import { getBoundTextElementPosition } from "@excalidraw/element";
+import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { newLinearElement } from "@excalidraw/element";
+
+import type { LocalPoint } from "@excalidraw/math";
+
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   FileId,
-} from "../element/types";
-import { newLinearElement } from "../element";
-import { Excalidraw } from "../index";
-import type { NormalizedZoomValue } from "../types";
-import { ROUNDNESS } from "../constants";
-import { vi } from "vitest";
-import { KEYS } from "../keys";
-import { getBoundTextElementPosition } from "../element/textElement";
+} from "@excalidraw/element/types";
+
+import { actionFlipHorizontal, actionFlipVertical } from "../actions";
 import { createPasteEvent } from "../clipboard";
-import { arrayToMap, cloneJSON } from "../utils";
-import type { LocalPoint } from "../../math";
-import { pointFrom, type Radians } from "../../math";
+import { Excalidraw } from "../index";
+
+// Importing to spy on it and mock the implementation (mocking does not work with simple vi.mock for some reason)
+import * as blobModule from "../data/blob";
+
+import { API } from "./helpers/api";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
+import {
+  fireEvent,
+  GlobalTestState,
+  render,
+  screen,
+  unmountComponent,
+  waitFor,
+} from "./test-utils";
+
+import { getTextEditor } from "./queries/dom";
+
+import { mockHTMLImageElement } from "./helpers/mocks";
+
+import type { NormalizedZoomValue } from "../types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
 
-vi.mock("../data/blob", async (actual) => {
-  const orig: Object = await actual();
-  return {
-    ...orig,
-    resizeImageFile: (imageFile: File) => imageFile,
-    generateIdFromFile: () => "fileId" as FileId,
-  };
+beforeEach(() => {
+  const generateIdSpy = vi.spyOn(blobModule, "generateIdFromFile");
+  const resizeFileSpy = vi.spyOn(blobModule, "resizeImageFile");
+
+  generateIdSpy.mockImplementation(() => Promise.resolve("fileId" as FileId));
+  resizeFileSpy.mockImplementation((file: File) => Promise.resolve(file));
 });
 
 beforeEach(async () => {
-  // Unmount ReactDOM from root
-  ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+  unmountComponent();
 
   mouse.reset();
   localStorage.clear();
@@ -734,6 +744,28 @@ describe("freedraw", () => {
 //image
 //TODO: currently there is no test for pixel colors at flipped positions.
 describe("image", () => {
+  const smileyImageDimensions = {
+    width: 56,
+    height: 77,
+  };
+
+  beforeEach(() => {
+    // it's necessary to specify the height in order to calculate natural dimensions of the image
+    h.state.height = 1000;
+  });
+
+  beforeAll(() => {
+    mockHTMLImageElement(
+      smileyImageDimensions.width,
+      smileyImageDimensions.height,
+    );
+  });
+
+  afterAll(() => {
+    vi.unstubAllGlobals();
+    h.state.height = 0;
+  });
+
   const createImage = async () => {
     const sendPasteEvent = (file?: File) => {
       const clipboardEvent = createPasteEvent({ files: file ? [file] : [] });
@@ -839,9 +871,7 @@ describe("mutliple elements", () => {
     });
 
     Keyboard.keyPress(KEYS.ENTER);
-    let editor = document.querySelector<HTMLTextAreaElement>(
-      ".excalidraw-textEditorContainer > textarea",
-    )!;
+    let editor = await getTextEditor();
     fireEvent.input(editor, { target: { value: "arrow" } });
     Keyboard.exitTextEditor(editor);
 
@@ -853,9 +883,7 @@ describe("mutliple elements", () => {
     });
 
     Keyboard.keyPress(KEYS.ENTER);
-    editor = document.querySelector<HTMLTextAreaElement>(
-      ".excalidraw-textEditorContainer > textarea",
-    )!;
+    editor = await getTextEditor();
     fireEvent.input(editor, { target: { value: "rect\ntext" } });
     Keyboard.exitTextEditor(editor);
 

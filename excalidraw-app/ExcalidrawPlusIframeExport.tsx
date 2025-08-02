@@ -1,13 +1,15 @@
+import { base64urlToString } from "@excalidraw/excalidraw/data/encode";
+import { ExcalidrawError } from "@excalidraw/excalidraw/errors";
 import { useLayoutEffect, useRef } from "react";
-import { STORAGE_KEYS } from "./app_constants";
-import { LocalData } from "./data/LocalData";
+
 import type {
   FileId,
   OrderedExcalidrawElement,
-} from "../packages/excalidraw/element/types";
-import type { AppState, BinaryFileData } from "../packages/excalidraw/types";
-import { ExcalidrawError } from "../packages/excalidraw/errors";
-import { base64urlToString } from "../packages/excalidraw/data/encode";
+} from "@excalidraw/element/types";
+import type { AppState, BinaryFileData } from "@excalidraw/excalidraw/types";
+
+import { STORAGE_KEYS } from "./app_constants";
+import { LocalData } from "./data/LocalData";
 
 const EVENT_REQUEST_SCENE = "REQUEST_SCENE";
 

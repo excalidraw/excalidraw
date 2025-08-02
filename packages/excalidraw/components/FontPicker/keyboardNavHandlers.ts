@@ -1,10 +1,12 @@
-import type { Node } from "../../utils";
-import { KEYS } from "../../keys";
+import { KEYS } from "@excalidraw/common";
+
+import type { Node } from "@excalidraw/common";
+
 import { type FontDescriptor } from "./FontPickerList";
 
 interface FontPickerKeyNavHandlerProps {
   event: React.KeyboardEvent<HTMLDivElement>;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   hoveredFont: Node<FontDescriptor> | undefined;
   filteredFonts: Node<FontDescriptor>[];
   onClose: () => void;

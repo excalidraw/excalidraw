@@ -1,9 +1,10 @@
+const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const { execSync } = require("child_process");
-const which = require("which");
-const wawoff = require("wawoff2");
+
 const { Font } = require("fonteditor-core");
+const wawoff = require("wawoff2");
+const which = require("which");
 
 /**
  * Custom esbuild plugin to:
@@ -20,8 +21,6 @@ module.exports.woff2ServerPlugin = (options = {}) => {
   return {
     name: "woff2ServerPlugin",
     setup(build) {
-      const { outdir, generateTtf } = options;
-      const outputDir = path.resolve(outdir);
       const fonts = new Map();
 
       build.onResolve({ filter: /\.woff2$/ }, (args) => {
@@ -94,9 +93,12 @@ module.exports.woff2ServerPlugin = (options = {}) => {
       );
 
       build.onEnd(async () => {
-        if (!generateTtf) {
+        const { outdir } = options;
+
+        if (!outdir) {
           return;
         }
+        const outputDir = path.resolve(outdir);
 
         const isFontToolsInstalled = await which("fonttools", {
           nothrow: true,
@@ -123,10 +125,25 @@ module.exports.woff2ServerPlugin = (options = {}) => {
           "./assets/NotoEmoji-Regular-2048.ttf",
         );
 
+        const liberationPath = path.resolve(
+          __dirname,
+          "./assets/LiberationSans-Regular.ttf",
+        );
+
+        // need to use the same em size as built-in fonts, otherwise pyftmerge throws (modified manually with font forge)
+        const liberationPath_2048 = path.resolve(
+          __dirname,
+          "./assets/LiberationSans-Regular-2048.ttf",
+        );
+
         const xiaolaiFont = Font.create(fs.readFileSync(xiaolaiPath), {
           type: "ttf",
         });
         const emojiFont = Font.create(fs.readFileSync(emojiPath), {
+          type: "ttf",
+        });
+
+        const liberationFont = Font.create(fs.readFileSync(liberationPath), {
           type: "ttf",
         });
 
@@ -139,13 +156,6 @@ module.exports.woff2ServerPlugin = (options = {}) => {
           if (family.includes("Xiaolai")) {
             // don't generate ttf for Xiaolai, as we have it hardcoded as one ttf
             continue;
-          }
-
-          const fallbackFontsPaths = [];
-          const shouldIncludeXiaolaiFallback = family.includes("Excalifont");
-
-          if (shouldIncludeXiaolaiFallback) {
-            fallbackFontsPaths.push(xiaolaiPath);
           }
 
           const baseFont = Regular[0];
@@ -165,10 +175,18 @@ module.exports.woff2ServerPlugin = (options = {}) => {
 
           const mergedFontPath = path.resolve(outputDir, `${family}.ttf`);
 
+          const fallbackFontsPaths = [];
+          const shouldIncludeXiaolaiFallback = family.includes("Excalifont");
+
+          if (shouldIncludeXiaolaiFallback) {
+            fallbackFontsPaths.push(xiaolaiPath);
+          }
+
+          // add liberation as fallback to all fonts, so that unknown characters are rendered similarly to how browser renders them (Helvetica, Arial, etc.)
           if (baseFont.data.head.unitsPerEm === 2048) {
-            fallbackFontsPaths.push(emojiPath_2048);
+            fallbackFontsPaths.push(emojiPath_2048, liberationPath_2048);
           } else {
-            fallbackFontsPaths.push(emojiPath);
+            fallbackFontsPaths.push(emojiPath, liberationPath);
           }
 
           // drop Vertical related metrics, otherwise it does not allow us to merge the fonts
@@ -196,10 +214,12 @@ module.exports.woff2ServerPlugin = (options = {}) => {
             const base = baseFont.data.name[field];
             const xiaolai = xiaolaiFont.data.name[field];
             const emoji = emojiFont.data.name[field];
+            const liberation = liberationFont.data.name[field];
+            // liberation font
 
             return shouldIncludeXiaolaiFallback
-              ? `${base} & ${xiaolai} & ${emoji}`
-              : `${base} & ${emoji}`;
+              ? `${base} & ${xiaolai} & ${emoji} & ${liberation}`
+              : `${base} & ${emoji} & ${liberation}`;
           };
 
           mergedFont.set({

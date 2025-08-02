@@ -3,15 +3,17 @@ import {
   COLOR_VOICE_CALL,
   COLOR_WHITE,
   THEME,
-} from "./constants";
+  UserIdleState,
+} from "@excalidraw/common";
+
 import { roundRect } from "./renderer/roundRect";
+
 import type { InteractiveCanvasRenderConfig } from "./scene/types";
 import type {
   Collaborator,
   InteractiveCanvasAppState,
   SocketId,
 } from "./types";
-import { UserIdleState } from "./types";
 
 function hashToInteger(id: string) {
   let hash = 0;

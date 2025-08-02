@@ -1,12 +1,14 @@
-import type { FileSystemHandle } from "browser-fs-access";
 import {
   fileOpen as _fileOpen,
   fileSave as _fileSave,
   supported as nativeFileSystemSupported,
 } from "browser-fs-access";
-import { EVENT, MIME_TYPES } from "../constants";
+
+import { EVENT, MIME_TYPES, debounce } from "@excalidraw/common";
+
 import { AbortError } from "../errors";
-import { debounce } from "../utils";
+
+import type { FileSystemHandle } from "browser-fs-access";
 
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 
@@ -82,6 +84,7 @@ export const fileSave = (
     name: string;
     /** file extension */
     extension: FILE_EXTENSION;
+    mimeTypes?: string[];
     description: string;
     /** existing FileSystemHandle */
     fileHandle?: FileSystemHandle | null;
@@ -93,10 +96,11 @@ export const fileSave = (
       fileName: `${opts.name}.${opts.extension}`,
       description: opts.description,
       extensions: [`.${opts.extension}`],
+      mimeTypes: opts.mimeTypes,
     },
     opts.fileHandle,
   );
 };
 
-export type { FileSystemHandle };
 export { nativeFileSystemSupported };
+export type { FileSystemHandle };

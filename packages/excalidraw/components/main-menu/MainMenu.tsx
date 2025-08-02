@@ -1,16 +1,17 @@
 import React from "react";
-import { useDevice, useExcalidrawSetAppState } from "../App";
-import DropdownMenu from "../dropdownMenu/DropdownMenu";
 
-import * as DefaultItems from "./DefaultItems";
+import { composeEventHandlers } from "@excalidraw/common";
 
-import { UserList } from "../UserList";
-import { t } from "../../i18n";
-import { HamburgerMenuIcon } from "../icons";
-import { withInternalFallback } from "../hoc/withInternalFallback";
-import { composeEventHandlers } from "../../utils";
 import { useTunnels } from "../../context/tunnels";
 import { useUIAppState } from "../../context/ui-appState";
+import { t } from "../../i18n";
+import { useDevice, useExcalidrawSetAppState } from "../App";
+import { UserList } from "../UserList";
+import DropdownMenu from "../dropdownMenu/DropdownMenu";
+import { withInternalFallback } from "../hoc/withInternalFallback";
+import { HamburgerMenuIcon } from "../icons";
+
+import * as DefaultItems from "./DefaultItems";
 
 const MainMenu = Object.assign(
   withInternalFallback(

@@ -1,16 +1,20 @@
 import oc from "open-color";
 import React, { useLayoutEffect, useRef, useState } from "react";
+
+import type { ChartType } from "@excalidraw/element/types";
+
 import { trackEvent } from "../analytics";
-import type { ChartElements, Spreadsheet } from "../charts";
 import { renderSpreadsheet } from "../charts";
-import type { ChartType } from "../element/types";
 import { t } from "../i18n";
 import { exportToSvg } from "../scene/export";
-import type { UIAppState } from "../types";
+
 import { useApp } from "./App";
 import { Dialog } from "./Dialog";
 
 import "./PasteChartDialog.scss";
+
+import type { ChartElements, Spreadsheet } from "../charts";
+import type { UIAppState } from "../types";
 
 type OnInsertChart = (chartType: ChartType, elements: ChartElements) => void;
 

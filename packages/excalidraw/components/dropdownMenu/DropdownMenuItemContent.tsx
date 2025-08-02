@@ -1,5 +1,9 @@
 import { useDevice } from "../App";
 
+import { Ellipsify } from "../Ellipsify";
+
+import type { JSX } from "react";
+
 const MenuItemContent = ({
   textStyle,
   icon,
@@ -16,7 +20,7 @@ const MenuItemContent = ({
     <>
       {icon && <div className="dropdown-menu-item__icon">{icon}</div>}
       <div style={textStyle} className="dropdown-menu-item__text">
-        {children}
+        <Ellipsify>{children}</Ellipsify>
       </div>
       {shortcut && !device.editor.isMobile && (
         <div className="dropdown-menu-item__shortcut">{shortcut}</div>

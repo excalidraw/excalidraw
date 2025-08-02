@@ -1,9 +1,10 @@
+import { loginIcon } from "@excalidraw/excalidraw/components/icons";
+import { POINTER_EVENTS } from "@excalidraw/common";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
+import { WelcomeScreen } from "@excalidraw/excalidraw/index";
 import React from "react";
-import { loginIcon } from "../../packages/excalidraw/components/icons";
-import { useI18n } from "../../packages/excalidraw/i18n";
-import { WelcomeScreen } from "../../packages/excalidraw/index";
+
 import { isExcalidrawPlusSignedUser } from "../app_constants";
-import { POINTER_EVENTS } from "../../packages/excalidraw/constants";
 
 export const AppWelcomeScreen: React.FC<{
   onCollabDialogOpen: () => any;

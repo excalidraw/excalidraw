@@ -19,6 +19,8 @@
         border-radius: var(--border-radius-lg);
         position: relative;
         transition: box-shadow 0.5s ease-in-out;
+        display: flex;
+        flex-direction: column;
 
         &.zen-mode {
           box-shadow: none;
@@ -100,6 +102,7 @@
       align-items: center;
       cursor: pointer;
       border-radius: var(--border-radius-md);
+      flex: 1 0 auto;
 
       @media screen and (min-width: 1921px) {
         height: 2.25rem;

@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import React from "react";
+
 import { searchIcon } from "./icons";
 
 import "./QuickSearch.scss";

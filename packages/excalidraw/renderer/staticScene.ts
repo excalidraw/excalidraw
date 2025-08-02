@@ -1,35 +1,41 @@
-import { FRAME_STYLE } from "../constants";
-import { getElementAbsoluteCoords } from "../element";
-
-import {
-  elementOverlapsWithFrame,
-  getTargetFrame,
-  isElementInFrame,
-} from "../frame";
+import { FRAME_STYLE, throttleRAF } from "@excalidraw/common";
+import { isElementLink } from "@excalidraw/element";
+import { createPlaceholderEmbeddableLabel } from "@excalidraw/element";
+import { getBoundTextElement } from "@excalidraw/element";
 import {
   isEmbeddableElement,
   isIframeLikeElement,
   isTextElement,
-} from "../element/typeChecks";
-import { renderElement } from "../renderer/renderElement";
-import { createPlaceholderEmbeddableLabel } from "../element/embeddable";
-import type { StaticCanvasAppState, Zoom } from "../types";
+} from "@excalidraw/element";
+import {
+  elementOverlapsWithFrame,
+  getTargetFrame,
+  shouldApplyFrameClip,
+} from "@excalidraw/element";
+
+import { renderElement } from "@excalidraw/element";
+
+import { getElementAbsoluteCoords } from "@excalidraw/element";
+
 import type {
   ElementsMap,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import {
+  EXTERNAL_LINK_IMG,
+  ELEMENT_LINK_IMG,
+  getLinkHandleFromCoords,
+} from "../components/hyperlink/helpers";
+
+import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+
 import type {
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
 } from "../scene/types";
-import {
-  EXTERNAL_LINK_IMG,
-  getLinkHandleFromCoords,
-} from "../components/hyperlink/helpers";
-import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
-import { throttleRAF } from "../utils";
-import { getBoundTextElement } from "../element/textElement";
+import type { StaticCanvasAppState, Zoom } from "../types";
 
 const GridLineColor = {
   Bold: "#dddddd",
@@ -107,7 +113,7 @@ const strokeGrid = (
   context.restore();
 };
 
-const frameClip = (
+export const frameClip = (
   frame: ExcalidrawFrameLikeElement,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
@@ -133,7 +139,16 @@ const frameClip = (
   );
 };
 
-let linkCanvasCache: any;
+type LinkIconCanvas = HTMLCanvasElement & { zoom: number };
+
+const linkIconCanvasCache: {
+  regularLink: LinkIconCanvas | null;
+  elementLink: LinkIconCanvas | null;
+} = {
+  regularLink: null,
+  elementLink: null,
+};
+
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
@@ -153,38 +168,44 @@ const renderLinkIcon = (
     context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
     context.rotate(element.angle);
 
-    if (!linkCanvasCache || linkCanvasCache.zoom !== appState.zoom.value) {
-      linkCanvasCache = document.createElement("canvas");
-      linkCanvasCache.zoom = appState.zoom.value;
-      linkCanvasCache.width =
-        width * window.devicePixelRatio * appState.zoom.value;
-      linkCanvasCache.height =
+    const canvasKey = isElementLink(element.link)
+      ? "elementLink"
+      : "regularLink";
+
+    let linkCanvas = linkIconCanvasCache[canvasKey];
+
+    if (!linkCanvas || linkCanvas.zoom !== appState.zoom.value) {
+      linkCanvas = Object.assign(document.createElement("canvas"), {
+        zoom: appState.zoom.value,
+      });
+      linkCanvas.width = width * window.devicePixelRatio * appState.zoom.value;
+      linkCanvas.height =
         height * window.devicePixelRatio * appState.zoom.value;
-      const linkCanvasCacheContext = linkCanvasCache.getContext("2d")!;
+      linkIconCanvasCache[canvasKey] = linkCanvas;
+
+      const linkCanvasCacheContext = linkCanvas.getContext("2d")!;
       linkCanvasCacheContext.scale(
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
       );
-      linkCanvasCacheContext.fillStyle = "#fff";
+      linkCanvasCacheContext.fillStyle = appState.viewBackgroundColor || "#fff";
       linkCanvasCacheContext.fillRect(0, 0, width, height);
-      linkCanvasCacheContext.drawImage(EXTERNAL_LINK_IMG, 0, 0, width, height);
+
+      if (canvasKey === "elementLink") {
+        linkCanvasCacheContext.drawImage(ELEMENT_LINK_IMG, 0, 0, width, height);
+      } else {
+        linkCanvasCacheContext.drawImage(
+          EXTERNAL_LINK_IMG,
+          0,
+          0,
+          width,
+          height,
+        );
+      }
+
       linkCanvasCacheContext.restore();
-      context.drawImage(
-        linkCanvasCache,
-        x - centerX,
-        y - centerY,
-        width,
-        height,
-      );
-    } else {
-      context.drawImage(
-        linkCanvasCache,
-        x - centerX,
-        y - centerY,
-        width,
-        height,
-      );
     }
+    context.drawImage(linkCanvas, x - centerX, y - centerY, width, height);
     context.restore();
   }
 };
@@ -256,6 +277,8 @@ const _renderStaticScene = ({
     }
   });
 
+  const inFrameGroupsMap = new Map<string, boolean>();
+
   // Paint visible elements
   visibleElements
     .filter((el) => !isIframeLikeElement(el))
@@ -280,9 +303,16 @@ const _renderStaticScene = ({
           appState.frameRendering.clip
         ) {
           const frame = getTargetFrame(element, elementsMap, appState);
-
-          // TODO do we need to check isElementInFrame here?
-          if (frame && isElementInFrame(element, elementsMap, appState)) {
+          if (
+            frame &&
+            shouldApplyFrameClip(
+              element,
+              frame,
+              appState,
+              elementsMap,
+              inFrameGroupsMap,
+            )
+          ) {
             frameClip(frame, context, renderConfig, appState);
           }
           renderElement(
@@ -325,7 +355,14 @@ const _renderStaticScene = ({
           renderLinkIcon(element, context, appState, elementsMap);
         }
       } catch (error: any) {
-        console.error(error);
+        console.error(
+          error,
+          element.id,
+          element.x,
+          element.y,
+          element.width,
+          element.height,
+        );
       }
     });
 
@@ -383,7 +420,16 @@ const _renderStaticScene = ({
 
           const frame = getTargetFrame(element, elementsMap, appState);
 
-          if (frame && isElementInFrame(element, elementsMap, appState)) {
+          if (
+            frame &&
+            shouldApplyFrameClip(
+              element,
+              frame,
+              appState,
+              elementsMap,
+              inFrameGroupsMap,
+            )
+          ) {
             frameClip(frame, context, renderConfig, appState);
           }
           render();

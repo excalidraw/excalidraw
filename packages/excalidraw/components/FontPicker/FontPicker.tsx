@@ -1,18 +1,21 @@
-import React, { useCallback, useMemo } from "react";
 import * as Popover from "@radix-ui/react-popover";
+import React, { useCallback, useMemo } from "react";
 
-import { FontPickerList } from "./FontPickerList";
-import { FontPickerTrigger } from "./FontPickerTrigger";
-import { ButtonIconSelect } from "../ButtonIconSelect";
+import { FONT_FAMILY } from "@excalidraw/common";
+
+import type { FontFamilyValues } from "@excalidraw/element/types";
+
+import { t } from "../../i18n";
+import { RadioSelection } from "../RadioSelection";
+import { ButtonSeparator } from "../ButtonSeparator";
 import {
   FontFamilyCodeIcon,
   FontFamilyNormalIcon,
   FreedrawIcon,
 } from "../icons";
-import { ButtonSeparator } from "../ButtonSeparator";
-import type { FontFamilyValues } from "../../element/types";
-import { FONT_FAMILY } from "../../constants";
-import { t } from "../../i18n";
+
+import { FontPickerList } from "./FontPickerList";
+import { FontPickerTrigger } from "./FontPickerTrigger";
 
 import "./FontPicker.scss";
 
@@ -79,12 +82,14 @@ export const FontPicker = React.memo(
 
     return (
       <div role="dialog" aria-modal="true" className="FontPicker__container">
-        <ButtonIconSelect<FontFamilyValues | false>
-          type="button"
-          options={defaultFonts}
-          value={selectedFontFamily}
-          onClick={onSelectCallback}
-        />
+        <div className="buttonList">
+          <RadioSelection<FontFamilyValues | false>
+            type="button"
+            options={defaultFonts}
+            value={selectedFontFamily}
+            onClick={onSelectCallback}
+          />
+        </div>
         <ButtonSeparator />
         <Popover.Root open={isOpened} onOpenChange={onPopupChange}>
           <FontPickerTrigger selectedFontFamily={selectedFontFamily} />

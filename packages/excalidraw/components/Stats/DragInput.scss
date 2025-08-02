@@ -2,10 +2,12 @@
   .drag-input-container {
     display: flex;
     width: 100%;
+    border-radius: var(--border-radius-lg);
 
     &:focus-within {
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
       border-radius: var(--border-radius-md);
+      background: transparent;
     }
   }
 
@@ -16,23 +18,13 @@
 
   .drag-input-label {
     flex-shrink: 0;
-    border: 1px solid var(--default-border-color);
-    border-right: 0;
-    padding: 0 0.5rem 0 0.75rem;
+    border: 0;
+    padding: 0 0.5rem 0 0.25rem;
     min-width: 1rem;
+    width: 1.5rem;
     height: 2rem;
-    box-sizing: border-box;
+    box-sizing: content-box;
     color: var(--popup-text-color);
-
-    :root[dir="ltr"] & {
-      border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
-    }
-
-    :root[dir="rtl"] & {
-      border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
-      border-right: 1px solid var(--default-border-color);
-      border-left: 0;
-    }
 
     display: flex;
     align-items: center;
@@ -51,19 +43,7 @@
     border: 0;
     outline: none;
     height: 2rem;
-    border: 1px solid var(--default-border-color);
-    border-left: 0;
     letter-spacing: 0.4px;
-
-    :root[dir="ltr"] & {
-      border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
-    }
-
-    :root[dir="rtl"] & {
-      border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
-      border-left: 1px solid var(--default-border-color);
-      border-right: 0;
-    }
 
     padding: 0.5rem;
     padding-left: 0.25rem;

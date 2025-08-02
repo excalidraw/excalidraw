@@ -1,15 +1,8 @@
 {
-  "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"],
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "strict": true,
-    "outDir": "dist",
-    "skipLibCheck": true,
-    "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "jsx": "react-jsx"
-  }
+    "outDir": "./dist/types"
+  },
+  "include": ["**/*"],
+  "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]
 }

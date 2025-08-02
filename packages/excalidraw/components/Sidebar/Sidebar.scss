@@ -30,7 +30,7 @@
 
     overflow: hidden;
     border-radius: 0;
-    width: calc(#{$right-sidebar-width} - var(--space-factor) * 2);
+    width: calc(var(--right-sidebar-width) - var(--space-factor) * 2);
 
     border-left: 1px solid var(--sidebar-border-color);
 

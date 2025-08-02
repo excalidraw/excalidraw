@@ -1,4 +1,5 @@
-import { ENCRYPTION_KEY_BITS } from "../constants";
+import { ENCRYPTION_KEY_BITS } from "@excalidraw/common";
+
 import { blobToArrayBuffer } from "./blob";
 
 export const IV_LENGTH_BYTES = 12;

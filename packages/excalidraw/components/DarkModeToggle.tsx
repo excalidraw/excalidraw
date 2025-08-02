@@ -1,9 +1,12 @@
-import "./ToolIcon.scss";
+import { THEME } from "@excalidraw/common";
+
+import type { Theme } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
+
 import { ToolButton } from "./ToolButton";
-import { THEME } from "../constants";
-import type { Theme } from "../element/types";
+
+import "./ToolIcon.scss";
 
 // We chose to use only explicit toggle and not a third option for system value,
 // but this could be added in the future.

@@ -1,5 +1,6 @@
+import { debounce } from "@excalidraw/common";
+
 import { WorkerInTheMainChunkError, WorkerUrlNotDefinedError } from "./errors";
-import { debounce } from "./utils";
 
 class IdleWorker {
   public instance: Worker;

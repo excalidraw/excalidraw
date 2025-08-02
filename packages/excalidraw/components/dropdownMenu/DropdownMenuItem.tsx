@@ -1,12 +1,18 @@
 import React, { useEffect, useRef } from "react";
+
+import { THEME } from "@excalidraw/common";
+
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
+import { useExcalidrawAppState } from "../App";
+
+import MenuItemContent from "./DropdownMenuItemContent";
 import {
   getDropdownMenuItemClassName,
   useHandleDropdownMenuItemClick,
 } from "./common";
-import MenuItemContent from "./DropdownMenuItemContent";
-import { useExcalidrawAppState } from "../App";
-import { THEME } from "../../constants";
-import type { ValueOf } from "../../utility-types";
+
+import type { JSX } from "react";
 
 const DropdownMenuItem = ({
   icon,

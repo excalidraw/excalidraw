@@ -1,7 +1,7 @@
-import "./Stack.scss";
-
 import React, { forwardRef } from "react";
 import clsx from "clsx";
+
+import "./Stack.scss";
 
 type StackProps = {
   children: React.ReactNode;
@@ -10,7 +10,6 @@ type StackProps = {
   justifyContent?: "center" | "space-around" | "space-between";
   className?: string | boolean;
   style?: React.CSSProperties;
-  ref: React.RefObject<HTMLDivElement>;
 };
 
 const RowStack = forwardRef(

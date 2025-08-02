@@ -17,5 +17,3 @@ With PNPM, similarly install the package with this command:
 ```bash
 pnpm add @excalidraw/math
 ```
-
-## API

@@ -1,0 +1,18 @@
+@import "../css//variables.module.scss";
+
+.excalidraw {
+  .ConvertElementTypePopup {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.2rem;
+    border-radius: 0.5rem;
+    background: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
+    padding: 0.5rem;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}

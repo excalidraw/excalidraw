@@ -1,18 +1,31 @@
 import { nanoid } from "nanoid";
+
+import {
+  IMAGE_MIME_TYPES,
+  MIME_TYPES,
+  bytesToHexString,
+  isPromiseLike,
+} from "@excalidraw/common";
+
+import { clearElementsForExport } from "@excalidraw/element";
+
+import type { ValueOf } from "@excalidraw/common/utility-types";
+import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
+
 import { cleanAppStateForExport } from "../appState";
-import { IMAGE_MIME_TYPES, MIME_TYPES } from "../constants";
-import { clearElementsForExport } from "../element";
-import type { ExcalidrawElement, FileId } from "../element/types";
+
 import { CanvasError, ImageSceneDataError } from "../errors";
 import { calculateScrollCenter } from "../scene";
-import type { AppState, DataURL, LibraryItem } from "../types";
-import type { ValueOf } from "../utility-types";
-import { bytesToHexString, isPromiseLike } from "../utils";
+import { decodeSvgBase64Payload } from "../scene/export";
+
 import { base64ToString, stringToBase64, toByteString } from "./encode";
-import type { FileSystemHandle } from "./filesystem";
 import { nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
 import { restore, restoreLibraryItems } from "./restore";
+
+import type { AppState, DataURL, LibraryItem } from "../types";
+
+import type { FileSystemHandle } from "./filesystem";
 import type { ImportedLibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File): Promise<string> => {
@@ -47,7 +60,7 @@ const parseFileContents = async (blob: Blob | File): Promise<string> => {
     }
     if (blob.type === MIME_TYPES.svg) {
       try {
-        return (await import("./image")).decodeSvgMetadata({
+        return decodeSvgBase64Payload({
           svg: contents,
         });
       } catch (error: any) {
@@ -106,11 +119,15 @@ export const isImageFileHandle = (handle: FileSystemHandle | null) => {
   return type === "png" || type === "svg";
 };
 
+export const isSupportedImageFileType = (type: string | null | undefined) => {
+  return !!type && (Object.values(IMAGE_MIME_TYPES) as string[]).includes(type);
+};
+
 export const isSupportedImageFile = (
   blob: Blob | null | undefined,
 ): blob is Blob & { type: ValueOf<typeof IMAGE_MIME_TYPES> } => {
   const { type } = blob || {};
-  return !!type && (Object.values(IMAGE_MIME_TYPES) as string[]).includes(type);
+  return isSupportedImageFileType(type);
 };
 
 export const loadSceneOrLibraryFromBlob = async (
@@ -329,7 +346,7 @@ export const resizeImageFile = async (
   }
 
   return new File(
-    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight })],
+    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight, alpha: true })],
     file.name,
     {
       type: opts.outputType || file.type,

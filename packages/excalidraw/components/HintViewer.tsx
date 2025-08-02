@@ -1,19 +1,25 @@
-import { t } from "../i18n";
-import type { AppClassProperties, Device, UIAppState } from "../types";
+import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "@excalidraw/common";
+
 import {
   isFlowchartNodeElement,
   isImageElement,
   isLinearElement,
+  isLineElement,
   isTextBindableContainer,
   isTextElement,
-} from "../element/typeChecks";
-import { getShortcutKey } from "../utils";
+} from "@excalidraw/element";
+
+import { getShortcutKey } from "@excalidraw/common";
+
+import { isNodeInFlowchart } from "@excalidraw/element";
+
+import { t } from "../i18n";
 import { isEraserActive } from "../appState";
+import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
-import { isNodeInFlowchart } from "../element/flowchart";
-import { isGridModeEnabled } from "../snapping";
-import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "../constants";
+
+import type { AppClassProperties, Device, UIAppState } from "../types";
 
 interface HintViewerProps {
   appState: UIAppState;
@@ -34,7 +40,7 @@ const getHints = ({
   if (
     appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
     appState.openSidebar.tab === CANVAS_SEARCH_TAB &&
-    appState.searchMatches?.length
+    appState.searchMatches?.matches.length
   ) {
     return t("hints.dismissSearch");
   }
@@ -66,10 +72,6 @@ const getHints = ({
 
   if (activeTool.type === "embeddable") {
     return t("hints.embeddable");
-  }
-
-  if (appState.activeTool.type === "image" && appState.pendingImageElementId) {
-    return t("hints.placeImage");
   }
 
   const selectedElements = app.scene.getSelectedElements(appState);
@@ -113,9 +115,9 @@ const getHints = ({
       appState.selectionElement &&
       !selectedElements.length &&
       !appState.editingTextElement &&
-      !appState.editingLinearElement
+      !appState.selectedLinearElement?.isEditing
     ) {
-      return t("hints.deepBoxSelect");
+      return [t("hints.deepBoxSelect")];
     }
 
     if (isGridModeEnabled(app) && appState.selectedElementsAreBeingDragged) {
@@ -123,17 +125,19 @@ const getHints = ({
     }
 
     if (!selectedElements.length && !isMobile) {
-      return t("hints.canvasPanning");
+      return [t("hints.canvasPanning")];
     }
 
     if (selectedElements.length === 1) {
       if (isLinearElement(selectedElements[0])) {
-        if (appState.editingLinearElement) {
-          return appState.editingLinearElement.selectedPointsIndices
+        if (appState.selectedLinearElement?.isEditing) {
+          return appState.selectedLinearElement.selectedPointsIndices
             ? t("hints.lineEditor_pointSelected")
             : t("hints.lineEditor_nothingSelected");
         }
-        return t("hints.lineEditor_info");
+        return isLineElement(selectedElements[0])
+          ? t("hints.lineEditor_line_info")
+          : t("hints.lineEditor_info");
       }
       if (
         !appState.newElement &&

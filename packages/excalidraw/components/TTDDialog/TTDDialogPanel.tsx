@@ -1,7 +1,9 @@
-import type { ReactNode } from "react";
-import { Button } from "../Button";
 import clsx from "clsx";
+
+import { Button } from "../Button";
 import Spinner from "../Spinner";
+
+import type { ReactNode } from "react";
 
 interface TTDDialogPanelProps {
   label: string;

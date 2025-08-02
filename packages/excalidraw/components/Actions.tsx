@@ -1,13 +1,42 @@
+import clsx from "clsx";
 import { useState } from "react";
-import type { ActionManager } from "../actions/manager";
+
+import {
+  CLASSES,
+  KEYS,
+  capitalizeString,
+  isTransparent,
+} from "@excalidraw/common";
+
+import {
+  shouldAllowVerticalAlign,
+  suppportsHorizontalAlign,
+} from "@excalidraw/element";
+
+import {
+  hasBoundTextElement,
+  isElbowArrow,
+  isImageElement,
+  isLinearElement,
+  isTextElement,
+} from "@excalidraw/element";
+
+import { hasStrokeColor, toolIsArrow } from "@excalidraw/element";
+
 import type {
   ExcalidrawElement,
   ExcalidrawElementType,
   NonDeletedElementsMap,
   NonDeletedSceneElementsMap,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import { actionToggleZenMode } from "../actions";
+
+import { alignActionsPredicate } from "../actions/actionAlign";
+import { trackEvent } from "../analytics";
+import { useTunnels } from "../context/tunnels";
+
 import { t } from "../i18n";
-import { useDevice } from "./App";
 import {
   canChangeRoundness,
   canHaveArrowheads,
@@ -16,29 +45,15 @@ import {
   hasStrokeStyle,
   hasStrokeWidth,
 } from "../scene";
-import { SHAPES } from "../shapes";
-import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
-import { capitalizeString, isTransparent } from "../utils";
-import Stack from "./Stack";
-import { ToolButton } from "./ToolButton";
-import { hasStrokeColor, toolIsArrow } from "../scene/comparisons";
-import { trackEvent } from "../analytics";
-import {
-  hasBoundTextElement,
-  isElbowArrow,
-  isImageElement,
-  isLinearElement,
-  isTextElement,
-} from "../element/typeChecks";
-import clsx from "clsx";
-import { actionToggleZenMode } from "../actions";
-import { Tooltip } from "./Tooltip";
-import {
-  shouldAllowVerticalAlign,
-  suppportsHorizontalAlign,
-} from "../element/textElement";
+
+import { SHAPES } from "./shapes";
 
 import "./Actions.scss";
+
+import { useDevice } from "./App";
+import Stack from "./Stack";
+import { ToolButton } from "./ToolButton";
+import { Tooltip } from "./Tooltip";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
   EmbedIcon,
@@ -47,10 +62,11 @@ import {
   mermaidLogoIcon,
   laserPointerToolIcon,
   MagicIcon,
+  LassoIcon,
 } from "./icons";
-import { KEYS } from "../keys";
-import { useTunnels } from "../context/tunnels";
-import { CLASSES } from "../constants";
+
+import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
+import type { ActionManager } from "../actions/manager";
 
 export const canChangeStrokeColor = (
   appState: UIAppState,
@@ -68,7 +84,6 @@ export const canChangeStrokeColor = (
 
   return (
     (hasStrokeColor(appState.activeTool.type) &&
-      appState.activeTool.type !== "image" &&
       commonSelectedType !== "image" &&
       commonSelectedType !== "frame" &&
       commonSelectedType !== "magicframe") ||
@@ -90,10 +105,12 @@ export const SelectedShapeActions = ({
   appState,
   elementsMap,
   renderAction,
+  app,
 }: {
   appState: UIAppState;
   elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
   renderAction: ActionManager["renderAction"];
+  app: AppClassProperties;
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
 
@@ -123,7 +140,7 @@ export const SelectedShapeActions = ({
     targetElements.length === 1 || isSingleElementBoundContainer;
 
   const showLineEditorAction =
-    !appState.editingLinearElement &&
+    !appState.selectedLinearElement?.isEditing &&
     targetElements.length === 1 &&
     isLinearElement(targetElements[0]) &&
     !isElbowArrow(targetElements[0]);
@@ -133,8 +150,11 @@ export const SelectedShapeActions = ({
     targetElements.length === 1 &&
     isImageElement(targetElements[0]);
 
+  const showAlignActions =
+    !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
+
   return (
-    <div className="panelColumn">
+    <div className="selected-shape-actions">
       <div>
         {canChangeStrokeColor(appState, targetElements) &&
           renderAction("changeStrokeColor")}
@@ -200,7 +220,7 @@ export const SelectedShapeActions = ({
         </div>
       </fieldset>
 
-      {targetElements.length > 1 && !isSingleElementBoundContainer && (
+      {showAlignActions && !isSingleElementBoundContainer && (
         <fieldset>
           <legend>{t("labels.align")}</legend>
           <div className="buttonList">
@@ -275,6 +295,8 @@ export const ShapesSwitcher = ({
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
+  const lassoToolSelected = activeTool.type === "lasso";
+
   const embeddableToolSelected = activeTool.type === "embeddable";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
@@ -296,6 +318,7 @@ export const ShapesSwitcher = ({
         const shortcut = letter
           ? `${letter} ${t("helpDialog.or")} ${numericKey}`
           : `${numericKey}`;
+
         return (
           <ToolButton
             className={clsx("Shape", { fillable })}
@@ -313,6 +336,14 @@ export const ShapesSwitcher = ({
               if (!appState.penDetected && pointerType === "pen") {
                 app.togglePenMode(true);
               }
+
+              if (value === "selection") {
+                if (appState.activeTool.type === "selection") {
+                  app.setActiveTool({ type: "lasso" });
+                } else {
+                  app.setActiveTool({ type: "selection" });
+                }
+              }
             }}
             onChange={({ pointerType }) => {
               if (appState.activeTool.type !== value) {
@@ -321,7 +352,6 @@ export const ShapesSwitcher = ({
               if (value === "image") {
                 app.setActiveTool({
                   type: value,
-                  insertOnCanvasDirectly: pointerType !== "mouse",
                 });
               } else {
                 app.setActiveTool({ type: value });
@@ -338,6 +368,7 @@ export const ShapesSwitcher = ({
             "App-toolbar__extra-tools-trigger--selected":
               frameToolSelected ||
               embeddableToolSelected ||
+              lassoToolSelected ||
               // in collab we're already highlighting the laser button
               // outside toolbar, so let's not highlight extra-tools button
               // on top of it
@@ -346,26 +377,15 @@ export const ShapesSwitcher = ({
           onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
           title={t("toolBar.extraTools")}
         >
-          {extraToolsIcon}
-          {app.props.aiEnabled !== false && (
-            <div
-              style={{
-                display: "inline-flex",
-                marginLeft: "auto",
-                padding: "2px 4px",
-                borderRadius: 6,
-                fontSize: 8,
-                fontFamily: "Cascadia, monospace",
-                position: "absolute",
-                background: "var(--color-promo)",
-                color: "var(--color-surface-lowest)",
-                bottom: 3,
-                right: 4,
-              }}
-            >
-              AI
-            </div>
-          )}
+          {frameToolSelected
+            ? frameToolIcon
+            : embeddableToolSelected
+            ? EmbedIcon
+            : laserToolSelected && !app.props.isCollaborating
+            ? laserPointerToolIcon
+            : lassoToolSelected
+            ? LassoIcon
+            : extraToolsIcon}
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => setIsExtraToolsMenuOpen(false)}
@@ -397,6 +417,14 @@ export const ShapesSwitcher = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "lasso" })}
+            icon={LassoIcon}
+            data-testid="toolbar-lasso"
+            selected={lassoToolSelected}
+          >
+            {t("toolBar.lasso")}
           </DropdownMenu.Item>
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate
@@ -476,16 +504,4 @@ export const ExitZenModeAction = ({
   >
     {t("buttons.exitZenMode")}
   </button>
-);
-
-export const FinalizeAction = ({
-  renderAction,
-  className,
-}: {
-  renderAction: ActionManager["renderAction"];
-  className?: string;
-}) => (
-  <div className={`finalize-button ${className}`}>
-    {renderAction("finalize", { size: "small" })}
-  </div>
 );
