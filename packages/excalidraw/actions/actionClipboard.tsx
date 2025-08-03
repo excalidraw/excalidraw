@@ -1,7 +1,7 @@
 import { isTextElement } from "@excalidraw/element";
 import { getTextFromElements } from "@excalidraw/element";
 
-import { CODES, KEYS, isFirefox } from "@excalidraw/common";
+import { CODES, isFirefox, isIOS, KEYS } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
@@ -25,7 +25,12 @@ export const actionCopy = register({
   label: "labels.copy",
   icon: DuplicateIcon,
   trackEvent: { category: "element" },
-  perform: async (elements, appState, event: ClipboardEvent | null, app) => {
+  perform: async (
+    elements,
+    appState,
+    event: ClipboardEvent | KeyboardEvent | null,
+    app,
+  ) => {
     const elementsToCopy = app.scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: true,
@@ -33,7 +38,11 @@ export const actionCopy = register({
     });
 
     try {
-      await copyToClipboard(elementsToCopy, app.files, event);
+      await copyToClipboard(
+        elementsToCopy,
+        app.files,
+        event instanceof ClipboardEvent ? event : null,
+      );
     } catch (error: any) {
       return {
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
@@ -49,7 +58,9 @@ export const actionCopy = register({
     };
   },
   // don't supply a shortcut since we handle this conditionally via onCopy event
-  keyTest: undefined,
+  keyTest: (event) =>
+    (isIOS && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.C) ||
+    (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.C),
 });
 
 export const actionPaste = register({
@@ -106,7 +117,9 @@ export const actionPaste = register({
     };
   },
   // don't supply a shortcut since we handle this conditionally via onCopy event
-  keyTest: undefined,
+  keyTest: (event) =>
+    (isIOS && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.V) ||
+    (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.V),
 });
 
 export const actionCut = register({
