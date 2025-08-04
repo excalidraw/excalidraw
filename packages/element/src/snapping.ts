@@ -35,6 +35,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeletedExcalidrawElement,
+  NonDeleted,
 } from "@excalidraw/element/types";
 
 import type {
@@ -42,6 +43,8 @@ import type {
   AppState,
   KeyboardModifiersObject,
 } from "@excalidraw/excalidraw/types";
+
+import { LinearElementEditor } from "./linearElementEditor";
 
 const SNAP_DISTANCE = 8;
 
@@ -194,59 +197,6 @@ export const areRoughlyEqual = (a: number, b: number, precision = 0.01) => {
   return Math.abs(a - b) <= precision;
 };
 
-export const getLinearElementPoints = (
-  element: ExcalidrawLinearElement,
-  options: {
-    dragOffset?: Vector2D;
-    excludePointsIndices?: readonly number[];
-  } = {},
-): GlobalPoint[] => {
-  const { dragOffset, excludePointsIndices } = options;
-
-  if (isElbowArrow(element)) {
-    return [];
-  }
-
-  if (!element.points || element.points.length === 0) {
-    return [];
-  }
-
-  let elementX = element.x;
-  let elementY = element.y;
-
-  if (dragOffset) {
-    elementX += dragOffset.x;
-    elementY += dragOffset.y;
-  }
-
-  const globalPoints: GlobalPoint[] = [];
-
-  for (let i = 0; i < element.points.length; i++) {
-    // Skip the point being edited if specified
-    if (
-      excludePointsIndices?.length &&
-      excludePointsIndices.find((index) => index === i) !== undefined
-    ) {
-      continue;
-    }
-
-    const point = element.points[i];
-    const globalX = elementX + point[0];
-    const globalY = elementY + point[1];
-
-    const cx = elementX + element.width / 2;
-    const cy = elementY + element.height / 2;
-    const rotated = pointRotateRads<GlobalPoint>(
-      pointFrom(globalX, globalY),
-      pointFrom(cx, cy),
-      element.angle,
-    );
-    globalPoints.push(pointFrom(round(rotated[0]), round(rotated[1])));
-  }
-
-  return globalPoints;
-};
-
 export const getElementsCorners = (
   elements: ExcalidrawElement[],
   elementsMap: ElementsMap,
@@ -291,9 +241,13 @@ export const getElementsCorners = (
       !boundingBoxCorners
     ) {
       // For linear elements, use actual points instead of bounding box
-      const linearPoints = getLinearElementPoints(element, {
-        dragOffset,
-      });
+      const linearPoints = LinearElementEditor.getPointsGlobalCoordinates(
+        element as NonDeleted<ExcalidrawLinearElement>,
+        elementsMap,
+        {
+          dragOffset,
+        },
+      );
       result = linearPoints;
     } else if (
       (element.type === "diamond" || element.type === "ellipse") &&
@@ -732,9 +686,13 @@ export const getReferenceSnapPointsForLinearElementPoint = (
 
   // Include other points from the same linear element when creating new points or in editing mode
   if (includeSelfPoints) {
-    const elementPoints = getLinearElementPoints(editingElement, {
-      excludePointsIndices: options.selectedPointsIndices,
-    });
+    const elementPoints = LinearElementEditor.getPointsGlobalCoordinates(
+      editingElement as NonDeleted<ExcalidrawLinearElement>,
+      elementsMap,
+      {
+        excludePointsIndices: options.selectedPointsIndices,
+      },
+    );
     allSnapPoints.push(...elementPoints);
   }
 

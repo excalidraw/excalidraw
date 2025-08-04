@@ -1319,18 +1319,53 @@ export class LinearElementEditor {
   static getPointsGlobalCoordinates(
     element: NonDeleted<ExcalidrawLinearElement>,
     elementsMap: ElementsMap,
+    options: {
+      dragOffset?: { x: number; y: number };
+      excludePointsIndices?: readonly number[];
+    } = {},
   ): GlobalPoint[] {
+    const { dragOffset, excludePointsIndices } = options;
+
+    if (!element.points || element.points.length === 0) {
+      return [];
+    }
+
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
-    return element.points.map((p) => {
-      const { x, y } = element;
-      return pointRotateRads(
-        pointFrom(x + p[0], y + p[1]),
+
+    let elementX = element.x;
+    let elementY = element.y;
+
+    if (dragOffset) {
+      elementX += dragOffset.x;
+      elementY += dragOffset.y;
+    }
+
+    const globalPoints: GlobalPoint[] = [];
+
+    for (let i = 0; i < element.points.length; i++) {
+      // Skip the point being edited if specified
+      if (
+        excludePointsIndices?.length &&
+        excludePointsIndices.find((index) => index === i) !== undefined
+      ) {
+        continue;
+      }
+
+      const p = element.points[i];
+      const globalX = elementX + p[0];
+      const globalY = elementY + p[1];
+
+      const rotated = pointRotateRads<GlobalPoint>(
+        pointFrom(globalX, globalY),
         pointFrom(cx, cy),
         element.angle,
       );
-    });
+      globalPoints.push(rotated);
+    }
+
+    return globalPoints;
   }
 
   static getPointAtIndexGlobalCoordinates(
