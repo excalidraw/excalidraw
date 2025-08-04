@@ -8446,9 +8446,11 @@ class App extends React.Component<AppProps, AppState> {
 
         // prevent immediate dragging during lasso selection to avoid element displacement
         // only allow dragging if we're not in the middle of lasso selection
+        // (on mobile, allow dragging if we hit an element)
         if (
           this.state.activeTool.type === "lasso" &&
-          this.lassoTrail.hasCurrentTrail
+          this.lassoTrail.hasCurrentTrail &&
+          !(this.isMobileOrTablet() && pointerDownState.hit.element)
         ) {
           return;
         }
