@@ -464,9 +464,13 @@ export const TOOL_TYPE = {
   arrow: "arrow",
   line: "line",
   freedraw: "freedraw",
+  // Raster tools for bitmap-based drawing (performance optimization for tablets/stylus)
+  rasterpencil: "rasterpencil",   // Draw directly on bitmap canvas
   text: "text",
   image: "image",
   eraser: "eraser",
+  rastereraser: "rastereraser",   // Erase bitmap content
+  rasterlasso: "rasterlasso",     // Select/move bitmap content (placeholder)
   hand: "hand",
   frame: "frame",
   magicframe: "magicframe",
