@@ -11,7 +11,7 @@ import {
 import {
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
-} from "@excalidraw/element/textElement";
+} from "@excalidraw/element";
 
 import {
   hasBoundTextElement,
@@ -19,9 +19,9 @@ import {
   isImageElement,
   isLinearElement,
   isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
-import { hasStrokeColor, toolIsArrow } from "@excalidraw/element/comparisons";
+import { hasStrokeColor, toolIsArrow } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
@@ -140,7 +140,7 @@ export const SelectedShapeActions = ({
     targetElements.length === 1 || isSingleElementBoundContainer;
 
   const showLineEditorAction =
-    !appState.editingLinearElement &&
+    !appState.selectedLinearElement?.isEditing &&
     targetElements.length === 1 &&
     isLinearElement(targetElements[0]) &&
     !isElbowArrow(targetElements[0]);
@@ -154,7 +154,7 @@ export const SelectedShapeActions = ({
     !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
 
   return (
-    <div className="panelColumn">
+    <div className="selected-shape-actions">
       <div>
         {canChangeStrokeColor(appState, targetElements) &&
           renderAction("changeStrokeColor")}
@@ -352,7 +352,6 @@ export const ShapesSwitcher = ({
               if (value === "image") {
                 app.setActiveTool({
                   type: value,
-                  insertOnCanvasDirectly: pointerType !== "mouse",
                 });
               } else {
                 app.setActiveTool({ type: value });
@@ -505,16 +504,4 @@ export const ExitZenModeAction = ({
   >
     {t("buttons.exitZenMode")}
   </button>
-);
-
-export const FinalizeAction = ({
-  renderAction,
-  className,
-}: {
-  renderAction: ActionManager["renderAction"];
-  className?: string;
-}) => (
-  <div className={`finalize-button ${className}`}>
-    {renderAction("finalize", { size: "small" })}
-  </div>
 );

@@ -21,7 +21,7 @@ import {
 import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import { newArrowElement, newElement } from "./newElement";
-import { aabbForElement } from "./shapes";
+import { aabbForElement } from "./bounds";
 import { elementsAreInFrameBounds, elementOverlapsWithFrame } from "./frame";
 import {
   isBindableElement,
@@ -38,6 +38,8 @@ import {
   type Ordered,
   type OrderedExcalidrawElement,
 } from "./types";
+
+import type { Scene } from "./Scene";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 
@@ -93,10 +95,11 @@ const getNodeRelatives = (
           type === "predecessors" ? el.points[el.points.length - 1] : [0, 0]
         ) as Readonly<LocalPoint>;
 
-        const heading = headingForPointFromElement(node, aabbForElement(node), [
-          edgePoint[0] + el.x,
-          edgePoint[1] + el.y,
-        ] as Readonly<GlobalPoint>);
+        const heading = headingForPointFromElement(
+          node,
+          aabbForElement(node, elementsMap),
+          [edgePoint[0] + el.x, edgePoint[1] + el.y] as Readonly<GlobalPoint>,
+        );
 
         acc.push({
           relative,
@@ -236,10 +239,11 @@ const getOffsets = (
 
 const addNewNode = (
   element: ExcalidrawFlowchartNodeElement,
-  elementsMap: ElementsMap,
   appState: AppState,
   direction: LinkDirection,
+  scene: Scene,
 ) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
   const successors = getSuccessors(element, elementsMap, direction);
   const predeccessors = getPredecessors(element, elementsMap, direction);
 
@@ -274,9 +278,9 @@ const addNewNode = (
   const bindingArrow = createBindingArrow(
     element,
     nextNode,
-    elementsMap,
     direction,
     appState,
+    scene,
   );
 
   return {
@@ -287,9 +291,9 @@ const addNewNode = (
 
 export const addNewNodes = (
   startNode: ExcalidrawFlowchartNodeElement,
-  elementsMap: ElementsMap,
   appState: AppState,
   direction: LinkDirection,
+  scene: Scene,
   numberOfNodes: number,
 ) => {
   // always start from 0 and distribute evenly
@@ -352,9 +356,9 @@ export const addNewNodes = (
     const bindingArrow = createBindingArrow(
       startNode,
       nextNode,
-      elementsMap,
       direction,
       appState,
+      scene,
     );
 
     newNodes.push(nextNode);
@@ -367,9 +371,9 @@ export const addNewNodes = (
 const createBindingArrow = (
   startBindingElement: ExcalidrawFlowchartNodeElement,
   endBindingElement: ExcalidrawFlowchartNodeElement,
-  elementsMap: ElementsMap,
   direction: LinkDirection,
   appState: AppState,
+  scene: Scene,
 ) => {
   let startX: number;
   let startY: number;
@@ -440,18 +444,10 @@ const createBindingArrow = (
     elbowed: true,
   });
 
-  bindLinearElement(
-    bindingArrow,
-    startBindingElement,
-    "start",
-    elementsMap as NonDeletedSceneElementsMap,
-  );
-  bindLinearElement(
-    bindingArrow,
-    endBindingElement,
-    "end",
-    elementsMap as NonDeletedSceneElementsMap,
-  );
+  const elementsMap = scene.getNonDeletedElementsMap();
+
+  bindLinearElement(bindingArrow, startBindingElement, "start", scene);
+  bindLinearElement(bindingArrow, endBindingElement, "end", scene);
 
   const changedElements = new Map<string, OrderedExcalidrawElement>();
   changedElements.set(
@@ -467,12 +463,18 @@ const createBindingArrow = (
     bindingArrow as OrderedExcalidrawElement,
   );
 
-  LinearElementEditor.movePoints(bindingArrow, [
-    {
-      index: 1,
-      point: bindingArrow.points[1],
-    },
-  ]);
+  LinearElementEditor.movePoints(
+    bindingArrow,
+    scene,
+    new Map([
+      [
+        1,
+        {
+          point: bindingArrow.points[1],
+        },
+      ],
+    ]),
+  );
 
   const update = updateElbowArrowPoints(
     bindingArrow,
@@ -632,16 +634,17 @@ export class FlowChartCreator {
 
   createNodes(
     startNode: ExcalidrawFlowchartNodeElement,
-    elementsMap: ElementsMap,
     appState: AppState,
     direction: LinkDirection,
+    scene: Scene,
   ) {
+    const elementsMap = scene.getNonDeletedElementsMap();
     if (direction !== this.direction) {
       const { nextNode, bindingArrow } = addNewNode(
         startNode,
-        elementsMap,
         appState,
         direction,
+        scene,
       );
 
       this.numberOfNodes = 1;
@@ -652,9 +655,9 @@ export class FlowChartCreator {
       this.numberOfNodes += 1;
       const newNodes = addNewNodes(
         startNode,
-        elementsMap,
         appState,
         direction,
+        scene,
         this.numberOfNodes,
       );
 
@@ -682,13 +685,9 @@ export class FlowChartCreator {
         )
       ) {
         this.pendingNodes = this.pendingNodes.map((node) =>
-          mutateElement(
-            node,
-            {
-              frameId: startNode.frameId,
-            },
-            false,
-          ),
+          mutateElement(node, elementsMap, {
+            frameId: startNode.frameId,
+          }),
         );
       }
     }

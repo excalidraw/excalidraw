@@ -175,7 +175,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "startBinding": {
     "elementId": "diamond-1",
     "focus": 0,
-    "gap": 4.545343408287929,
+    "gap": 4.535423522449215,
   },
   "strokeColor": "#e67700",
   "strokeStyle": "solid",
@@ -335,7 +335,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "endBinding": {
     "elementId": "text-2",
     "focus": 0,
-    "gap": 14,
+    "gap": 16,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -948,6 +948,7 @@ exports[`Test Transform > should transform linear elements 3`] = `
       0,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
@@ -995,6 +996,7 @@ exports[`Test Transform > should transform linear elements 4`] = `
       0,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
@@ -1538,7 +1540,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "endBinding": {
     "elementId": "B",
     "focus": 0,
-    "gap": 14,
+    "gap": 32,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -1789,7 +1791,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 120,
-  "x": 187.7545,
+  "x": 187.75450000000004,
   "y": 44.5,
 }
 `;

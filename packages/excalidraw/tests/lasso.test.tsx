@@ -19,9 +19,10 @@ import {
   type LocalPoint,
   pointFrom,
   type Radians,
+  type ElementsSegmentsMap,
 } from "@excalidraw/math";
 
-import { getElementLineSegments } from "@excalidraw/element/bounds";
+import { getElementLineSegments } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -32,8 +33,6 @@ import { getSelectedElements } from "../scene";
 import { getLassoSelectedElementIds } from "../lasso/utils";
 
 import { act, render } from "./test-utils";
-
-import type { ElementsSegmentsMap } from "../lasso/utils";
 
 const { h } = window;
 
@@ -71,6 +70,7 @@ const updatePath = (startPoint: GlobalPoint, points: LocalPoint[]) => {
           ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1])) ??
         [],
       elements: h.elements,
+      elementsMap: h.scene.getNonDeletedElementsMap(),
       elementsSegments,
       intersectedElements: new Set(),
       enclosedElements: new Set(),

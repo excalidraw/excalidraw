@@ -2,14 +2,27 @@ import {
   SHIFT_LOCKING_ANGLE,
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
+import {
+  normalizeRadians,
+  radiansBetweenAngles,
+  radiansDifference,
+  type Radians,
+} from "@excalidraw/math";
+
+import { pointsEqual } from "@excalidraw/math";
 
 import type { AppState, Offsets, Zoom } from "@excalidraw/excalidraw/types";
 
 import { getCommonBounds, getElementBounds } from "./bounds";
-import { mutateElement } from "./mutateElement";
-import { isFreeDrawElement, isLinearElement } from "./typeChecks";
+import {
+  isArrowElement,
+  isFreeDrawElement,
+  isLinearElement,
+} from "./typeChecks";
 
 import type { ElementsMap, ExcalidrawElement } from "./types";
+
+export const INVISIBLY_SMALL_ELEMENT_SIZE = 0.1;
 
 // TODO:  remove invisible elements consistently actions, so that invisible elements are not recorded by the store, exported, broadcasted or persisted
 //        - perhaps could be as part of a standalone 'cleanup' action, in addition to 'finalize'
@@ -18,8 +31,18 @@ export const isInvisiblySmallElement = (
   element: ExcalidrawElement,
 ): boolean => {
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    return element.points.length < 2;
+    return (
+      element.points.length < 2 ||
+      (element.points.length === 2 &&
+        isArrowElement(element) &&
+        pointsEqual(
+          element.points[0],
+          element.points[element.points.length - 1],
+          INVISIBLY_SMALL_ELEMENT_SIZE,
+        ))
+    );
   }
+
   return element.width === 0 && element.height === 0;
 };
 
@@ -135,13 +158,42 @@ export const getLockedLinearCursorAlignSize = (
   originY: number,
   x: number,
   y: number,
+  customAngle?: number,
 ) => {
   let width = x - originX;
   let height = y - originY;
 
-  const lockedAngle =
-    Math.round(Math.atan(height / width) / SHIFT_LOCKING_ANGLE) *
-    SHIFT_LOCKING_ANGLE;
+  const angle = Math.atan2(height, width) as Radians;
+  let lockedAngle = (Math.round(angle / SHIFT_LOCKING_ANGLE) *
+    SHIFT_LOCKING_ANGLE) as Radians;
+
+  if (customAngle) {
+    // If custom angle is provided, we check if the angle is close to the
+    // custom angle, snap to that if close engough, otherwise snap to the
+    // higher or lower angle depending on the current angle vs custom angle.
+    const lower = (Math.floor(customAngle / SHIFT_LOCKING_ANGLE) *
+      SHIFT_LOCKING_ANGLE) as Radians;
+    if (
+      radiansBetweenAngles(
+        angle,
+        lower,
+        (lower + SHIFT_LOCKING_ANGLE) as Radians,
+      )
+    ) {
+      if (
+        radiansDifference(angle, customAngle as Radians) <
+        SHIFT_LOCKING_ANGLE / 6
+      ) {
+        lockedAngle = customAngle as Radians;
+      } else if (
+        normalizeRadians(angle) > normalizeRadians(customAngle as Radians)
+      ) {
+        lockedAngle = (lower + SHIFT_LOCKING_ANGLE) as Radians;
+      } else {
+        lockedAngle = lower;
+      }
+    }
+  }
 
   if (lockedAngle === 0) {
     height = 0;
@@ -168,41 +220,6 @@ export const getLockedLinearCursorAlignSize = (
   }
 
   return { width, height };
-};
-
-export const resizePerfectLineForNWHandler = (
-  element: ExcalidrawElement,
-  x: number,
-  y: number,
-) => {
-  const anchorX = element.x + element.width;
-  const anchorY = element.y + element.height;
-  const distanceToAnchorX = x - anchorX;
-  const distanceToAnchorY = y - anchorY;
-  if (Math.abs(distanceToAnchorX) < Math.abs(distanceToAnchorY) / 2) {
-    mutateElement(element, {
-      x: anchorX,
-      width: 0,
-      y,
-      height: -distanceToAnchorY,
-    });
-  } else if (Math.abs(distanceToAnchorY) < Math.abs(element.width) / 2) {
-    mutateElement(element, {
-      y: anchorY,
-      height: 0,
-    });
-  } else {
-    const nextHeight =
-      Math.sign(distanceToAnchorY) *
-      Math.sign(distanceToAnchorX) *
-      element.width;
-    mutateElement(element, {
-      x,
-      y: anchorY - nextHeight,
-      width: -distanceToAnchorX,
-      height: nextHeight,
-    });
-  }
 };
 
 export const getNormalizedDimensions = (

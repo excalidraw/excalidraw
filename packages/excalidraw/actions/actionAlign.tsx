@@ -1,16 +1,20 @@
 import { getNonDeletedElements } from "@excalidraw/element";
 
-import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import { isFrameLikeElement } from "@excalidraw/element";
 
-import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/frame";
+import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
 
 import { KEYS, arrayToMap, getShortcutKey } from "@excalidraw/common";
 
-import { alignElements } from "@excalidraw/element/align";
+import { alignElements } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import { getSelectedElementsByGroup } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type { Alignment } from "@excalidraw/element/align";
+import type { Alignment } from "@excalidraw/element";
 
 import { ToolButton } from "../components/ToolButton";
 import {
@@ -25,7 +29,6 @@ import {
 import { t } from "../i18n";
 
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
@@ -37,7 +40,11 @@ export const alignActionsPredicate = (
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
   return (
-    selectedElements.length > 1 &&
+    getSelectedElementsByGroup(
+      selectedElements,
+      app.scene.getNonDeletedElementsMap(),
+      appState as Readonly<AppState>,
+    ).length > 1 &&
     // TODO enable aligning frames when implemented properly
     !selectedElements.some((el) => isFrameLikeElement(el))
   );
@@ -50,13 +57,12 @@ const alignSelectedElements = (
   alignment: Alignment,
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
-  const elementsMap = arrayToMap(elements);
 
   const updatedElements = alignElements(
     selectedElements,
-    elementsMap,
     alignment,
     app.scene,
+    appState,
   );
 
   const updatedElementsMap = arrayToMap(updatedElements);

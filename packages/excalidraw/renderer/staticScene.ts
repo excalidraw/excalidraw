@@ -1,21 +1,21 @@
 import { FRAME_STYLE, throttleRAF } from "@excalidraw/common";
-import { isElementLink } from "@excalidraw/element/elementLink";
-import { createPlaceholderEmbeddableLabel } from "@excalidraw/element/embeddable";
-import { getBoundTextElement } from "@excalidraw/element/textElement";
+import { isElementLink } from "@excalidraw/element";
+import { createPlaceholderEmbeddableLabel } from "@excalidraw/element";
+import { getBoundTextElement } from "@excalidraw/element";
 import {
   isEmbeddableElement,
   isIframeLikeElement,
   isTextElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 import {
   elementOverlapsWithFrame,
   getTargetFrame,
   shouldApplyFrameClip,
-} from "@excalidraw/element/frame";
+} from "@excalidraw/element";
 
-import { renderElement } from "@excalidraw/element/renderElement";
+import { renderElement } from "@excalidraw/element";
 
-import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+import { getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   ElementsMap,
@@ -113,7 +113,7 @@ const strokeGrid = (
   context.restore();
 };
 
-const frameClip = (
+export const frameClip = (
   frame: ExcalidrawFrameLikeElement,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
@@ -188,7 +188,7 @@ const renderLinkIcon = (
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
       );
-      linkCanvasCacheContext.fillStyle = "#fff";
+      linkCanvasCacheContext.fillStyle = appState.viewBackgroundColor || "#fff";
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
       if (canvasKey === "elementLink") {

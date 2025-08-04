@@ -1,10 +1,9 @@
-import { average, pointFrom, type GlobalPoint } from "@excalidraw/math";
+import { average } from "@excalidraw/math";
 
 import type {
   ExcalidrawBindableElement,
   FontFamilyValues,
   FontString,
-  ExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type {
@@ -101,7 +100,6 @@ export const getFontFamilyString = ({
 }) => {
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
-      // TODO: we should fallback first to generic family names first
       return `${fontFamilyString}${getFontFamilyFallbacks(id)
         .map((x) => `, ${x}`)
         .join("")}`;
@@ -544,6 +542,20 @@ export const findLastIndex = <T>(
   return -1;
 };
 
+/** returns the first non-null mapped value */
+export const mapFind = <T, K>(
+  collection: readonly T[],
+  iteratee: (value: T, index: number) => K | undefined | null,
+): K | undefined => {
+  for (let idx = 0; idx < collection.length; idx++) {
+    const result = iteratee(collection[idx], idx);
+    if (result != null) {
+      return result;
+    }
+  }
+  return undefined;
+};
+
 export const isTransparent = (color: string) => {
   const isRGBTransparent = color.length === 5 && color.substr(4, 1) === "0";
   const isRRGGBBTransparent = color.length === 9 && color.substr(7, 2) === "00";
@@ -680,7 +692,7 @@ export const arrayToMap = <T extends { id: string } | string>(
   return items.reduce((acc: Map<string, T>, element) => {
     acc.set(typeof element === "string" ? element : element.id, element);
     return acc;
-  }, new Map());
+  }, new Map() as Map<string, T>);
 };
 
 export const arrayToMapWithIndex = <T extends { id: string }>(
@@ -698,8 +710,8 @@ export const arrayToObject = <T>(
   array: readonly T[],
   groupBy?: (value: T) => string | number,
 ) =>
-  array.reduce((acc, value) => {
-    acc[groupBy ? groupBy(value) : String(value)] = value;
+  array.reduce((acc, value, idx) => {
+    acc[groupBy ? groupBy(value) : idx] = value;
     return acc;
   }, {} as { [key: string]: T });
 
@@ -734,6 +746,25 @@ export const arrayToList = <T>(array: readonly T[]): Node<T>[] =>
 
     return acc;
   }, [] as Node<T>[]);
+
+/**
+ * Converts a readonly array or map into an iterable.
+ * Useful for avoiding entry allocations when iterating object / map on each iteration.
+ */
+export const toIterable = <T>(
+  values: readonly T[] | ReadonlyMap<string, T>,
+): Iterable<T> => {
+  return Array.isArray(values) ? values : values.values();
+};
+
+/**
+ * Converts a readonly array or map into an array.
+ */
+export const toArray = <T>(
+  values: readonly T[] | ReadonlyMap<string, T>,
+): T[] => {
+  return Array.isArray(values) ? values : Array.from(toIterable(values));
+};
 
 export const isTestEnv = () => import.meta.env.MODE === ENV.TEST;
 
@@ -1205,16 +1236,45 @@ export const escapeDoubleQuotes = (str: string) => {
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
 
-export const elementCenterPoint = (
-  element: ExcalidrawElement,
-  xOffset: number = 0,
-  yOffset: number = 0,
-) => {
-  const { x, y, width, height } = element;
+/** hack for Array.isArray type guard not working with readonly value[] */
+export const isReadonlyArray = (value?: any): value is readonly any[] => {
+  return Array.isArray(value);
+};
 
-  const centerXPoint = x + width / 2 + xOffset;
+export const sizeOf = (
+  value:
+    | readonly unknown[]
+    | Readonly<Map<string, unknown>>
+    | Readonly<Record<string, unknown>>
+    | ReadonlySet<unknown>,
+): number => {
+  return isReadonlyArray(value)
+    ? value.length
+    : value instanceof Map || value instanceof Set
+    ? value.size
+    : Object.keys(value).length;
+};
 
-  const centerYPoint = y + height / 2 + yOffset;
+export const reduceToCommonValue = <T, R = T>(
+  collection: readonly T[] | ReadonlySet<T>,
+  getValue?: (item: T) => R,
+): R | null => {
+  if (sizeOf(collection) === 0) {
+    return null;
+  }
 
-  return pointFrom<GlobalPoint>(centerXPoint, centerYPoint);
+  const valueExtractor = getValue || ((item: T) => item as unknown as R);
+
+  let commonValue: R | null = null;
+
+  for (const item of collection) {
+    const value = valueExtractor(item);
+    if ((commonValue === null || commonValue === value) && value != null) {
+      commonValue = value;
+    } else {
+      return null;
+    }
+  }
+
+  return commonValue;
 };

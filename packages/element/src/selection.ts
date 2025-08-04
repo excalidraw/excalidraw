@@ -1,4 +1,4 @@
-import { isShallowEqual } from "@excalidraw/common";
+import { arrayToMap, isShallowEqual } from "@excalidraw/common";
 
 import type {
   AppState,
@@ -7,12 +7,19 @@ import type {
 
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { isElementInViewport } from "./sizeHelpers";
-import { isBoundToContainer, isFrameLikeElement } from "./typeChecks";
+import {
+  isBoundToContainer,
+  isFrameLikeElement,
+  isLinearElement,
+} from "./typeChecks";
 import {
   elementOverlapsWithFrame,
   getContainingFrame,
   getFrameChildren,
 } from "./frame";
+
+import { LinearElementEditor } from "./linearElementEditor";
+import { selectGroupsForSelectedElements } from "./groups";
 
 import type {
   ElementsMap,
@@ -162,25 +169,6 @@ export const isSomeElementSelected = (function () {
   return ret;
 })();
 
-/**
- * Returns common attribute (picked by `getAttribute` callback) of selected
- *  elements. If elements don't share the same value, returns `null`.
- */
-export const getCommonAttributeOfSelectedElements = <T>(
-  elements: readonly NonDeletedExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds">,
-  getAttribute: (element: ExcalidrawElement) => T,
-): T | null => {
-  const attributes = Array.from(
-    new Set(
-      getSelectedElements(elements, appState).map((element) =>
-        getAttribute(element),
-      ),
-    ),
-  );
-  return attributes.length === 1 ? attributes[0] : null;
-};
-
 export const getSelectedElements = (
   elements: ElementsMapOrArray,
   appState: Pick<InteractiveCanvasAppState, "selectedElementIds">,
@@ -253,4 +241,50 @@ export const makeNextSelectedElementIds = (
   }
 
   return nextSelectedElementIds;
+};
+
+const _getLinearElementEditor = (
+  targetElements: readonly ExcalidrawElement[],
+  allElements: readonly NonDeletedExcalidrawElement[],
+) => {
+  const linears = targetElements.filter(isLinearElement);
+  if (linears.length === 1) {
+    const linear = linears[0];
+    const boundElements = linear.boundElements?.map((def) => def.id) ?? [];
+    const onlySingleLinearSelected = targetElements.every(
+      (el) => el.id === linear.id || boundElements.includes(el.id),
+    );
+
+    if (onlySingleLinearSelected) {
+      return new LinearElementEditor(linear, arrayToMap(allElements));
+    }
+  }
+
+  return null;
+};
+
+export const getSelectionStateForElements = (
+  targetElements: readonly ExcalidrawElement[],
+  allElements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+) => {
+  return {
+    selectedLinearElement: _getLinearElementEditor(targetElements, allElements),
+    ...selectGroupsForSelectedElements(
+      {
+        editingGroupId: appState.editingGroupId,
+        selectedElementIds: excludeElementsInFramesFromSelection(
+          targetElements,
+        ).reduce((acc: Record<ExcalidrawElement["id"], true>, element) => {
+          if (!isBoundToContainer(element)) {
+            acc[element.id] = true;
+          }
+          return acc;
+        }, {}),
+      },
+      allElements,
+      appState,
+      null,
+    ),
+  };
 };

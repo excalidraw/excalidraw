@@ -11,6 +11,8 @@ import {
   isWritableElement,
 } from "@excalidraw/common";
 
+import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionToggleShapeSwitch";
+
 import type { MarkRequired } from "@excalidraw/common/utility-types";
 
 import {
@@ -56,6 +58,8 @@ import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { useStable } from "../../hooks/useStable";
+
+import { Ellipsify } from "../Ellipsify";
 
 import * as defaultItems from "./defaultCommandPaletteItems";
 
@@ -291,6 +295,7 @@ function CommandPaletteInner({
         actionManager.actions.decreaseFontSize,
         actionManager.actions.toggleLinearEditor,
         actionManager.actions.cropEditor,
+        actionManager.actions.togglePolygon,
         actionLink,
         actionCopyElementLink,
         actionLinkToElement,
@@ -411,6 +416,14 @@ function CommandPaletteInner({
           },
         },
         {
+          label: t("labels.shapeSwitch"),
+          category: DEFAULT_CATEGORIES.elements,
+          icon: boltIcon,
+          perform: () => {
+            actionManager.executeAction(actionToggleShapeSwitch);
+          },
+        },
+        {
           label: t("labels.changeStroke"),
           keywords: ["color", "outline"],
           category: DEFAULT_CATEGORIES.elements,
@@ -492,7 +505,6 @@ function CommandPaletteInner({
               if (value === "image") {
                 app.setActiveTool({
                   type: value,
-                  insertOnCanvasDirectly: event.type === EVENT.KEYDOWN,
                 });
               } else {
                 app.setActiveTool({ type: value });
@@ -954,7 +966,7 @@ const CommandItem = ({
             }
           />
         )}
-        {command.label}
+        <Ellipsify>{command.label}</Ellipsify>
       </div>
       {showShortcut && command.shortcut && (
         <CommandShortcutHint shortcut={command.shortcut} />

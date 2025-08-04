@@ -195,7 +195,8 @@ export type ExcalidrawRectanguloidElement =
   | ExcalidrawFreeDrawElement
   | ExcalidrawIframeLikeElement
   | ExcalidrawFrameLikeElement
-  | ExcalidrawEmbeddableElement;
+  | ExcalidrawEmbeddableElement
+  | ExcalidrawSelectionElement;
 
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
@@ -296,6 +297,13 @@ export type FixedPointBinding = Merge<
   }
 >;
 
+type Index = number;
+
+export type PointsPositionUpdates = Map<
+  Index,
+  { point: LocalPoint; isDragging?: boolean }
+>;
+
 export type Arrowhead =
   | "arrow"
   | "bar"
@@ -321,10 +329,16 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     endArrowhead: Arrowhead | null;
   }>;
 
+export type ExcalidrawLineElement = ExcalidrawLinearElement &
+  Readonly<{
+    type: "line";
+    polygon: boolean;
+  }>;
+
 export type FixedSegment = {
   start: LocalPoint;
   end: LocalPoint;
-  index: number;
+  index: Index;
 };
 
 export type ExcalidrawArrowElement = ExcalidrawLinearElement &
@@ -412,3 +426,13 @@ export type NonDeletedSceneElementsMap = Map<
 export type ElementsMapOrArray =
   | readonly ExcalidrawElement[]
   | Readonly<ElementsMap>;
+
+export type ExcalidrawLinearElementSubType =
+  | "line"
+  | "sharpArrow"
+  | "curvedArrow"
+  | "elbowArrow";
+
+export type ConvertibleGenericTypes = "rectangle" | "diamond" | "ellipse";
+export type ConvertibleLinearTypes = ExcalidrawLinearElementSubType;
+export type ConvertibleTypes = ConvertibleGenericTypes | ConvertibleLinearTypes;

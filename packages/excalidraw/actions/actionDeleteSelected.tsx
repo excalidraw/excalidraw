@@ -1,30 +1,28 @@
 import { KEYS, updateActiveTool } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
-import { fixBindingsAfterDeletion } from "@excalidraw/element/binding";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import {
-  mutateElement,
-  newElementWith,
-} from "@excalidraw/element/mutateElement";
-import { getContainerElement } from "@excalidraw/element/textElement";
+import { fixBindingsAfterDeletion } from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element";
+import { getContainerElement } from "@excalidraw/element";
 import {
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
-} from "@excalidraw/element/typeChecks";
-import { getFrameChildren } from "@excalidraw/element/frame";
+} from "@excalidraw/element";
+import { getFrameChildren } from "@excalidraw/element";
 
 import {
   getElementsInGroup,
   selectGroupsForSelectedElements,
-} from "@excalidraw/element/groups";
+} from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
 import { TrashIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 
@@ -94,7 +92,7 @@ const deleteSelectedElements = (
         el.boundElements.forEach((candidate) => {
           const bound = app.scene.getNonDeletedElementsMap().get(candidate.id);
           if (bound && isElbowArrow(bound)) {
-            mutateElement(bound, {
+            app.scene.mutateElement(bound, {
               startBinding:
                 el.id === bound.startBinding?.elementId
                   ? null
@@ -102,7 +100,6 @@ const deleteSelectedElements = (
               endBinding:
                 el.id === bound.endBinding?.elementId ? null : bound.endBinding,
             });
-            mutateElement(bound, { points: bound.points });
           }
         });
       }
@@ -208,16 +205,19 @@ export const actionDeleteSelected = register({
   icon: TrashIcon,
   trackEvent: { category: "element", action: "delete" },
   perform: (elements, appState, formData, app) => {
-    if (appState.editingLinearElement) {
+    if (appState.selectedLinearElement?.isEditing) {
       const {
         elementId,
         selectedPointsIndices,
         startBindingElement,
         endBindingElement,
-      } = appState.editingLinearElement;
+      } = appState.selectedLinearElement;
       const elementsMap = app.scene.getNonDeletedElementsMap();
-      const element = LinearElementEditor.getElement(elementId, elementsMap);
-      if (!element) {
+      const linearElement = LinearElementEditor.getElement(
+        elementId,
+        elementsMap,
+      );
+      if (!linearElement) {
         return false;
       }
       // case: no point selected → do nothing, as deleting the whole element
@@ -228,10 +228,10 @@ export const actionDeleteSelected = register({
         return false;
       }
 
-      // case: deleting last remaining point
-      if (element.points.length < 2) {
+      // case: deleting all points
+      if (selectedPointsIndices.length >= linearElement.points.length) {
         const nextElements = elements.map((el) => {
-          if (el.id === element.id) {
+          if (el.id === linearElement.id) {
             return newElementWith(el, { isDeleted: true });
           }
           return el;
@@ -242,7 +242,7 @@ export const actionDeleteSelected = register({
           elements: nextElements,
           appState: {
             ...nextAppState,
-            editingLinearElement: null,
+            selectedLinearElement: null,
           },
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
@@ -255,20 +255,24 @@ export const actionDeleteSelected = register({
           ? null
           : startBindingElement,
         endBindingElement: selectedPointsIndices?.includes(
-          element.points.length - 1,
+          linearElement.points.length - 1,
         )
           ? null
           : endBindingElement,
       };
 
-      LinearElementEditor.deletePoints(element, selectedPointsIndices);
+      LinearElementEditor.deletePoints(
+        linearElement,
+        app,
+        selectedPointsIndices,
+      );
 
       return {
         elements,
         appState: {
           ...appState,
-          editingLinearElement: {
-            ...appState.editingLinearElement,
+          selectedLinearElement: {
+            ...appState.selectedLinearElement,
             ...binding,
             selectedPointsIndices:
               selectedPointsIndices?.[0] > 0

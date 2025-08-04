@@ -179,6 +179,7 @@ export class ActionManager {
           appProps={this.app.props}
           app={this.app}
           data={data}
+          renderAction={this.renderAction}
         />
       );
     }

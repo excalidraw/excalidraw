@@ -11,6 +11,10 @@ import { UI, Pointer, Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
 import { fireEvent, render } from "@excalidraw/excalidraw/tests/test-utils";
 
 import { getTransformHandles } from "../src/transformHandles";
+import {
+  getTextEditor,
+  TEXT_EDITOR_SELECTOR,
+} from "../../excalidraw/tests/queries/dom";
 
 const { h } = window;
 
@@ -151,10 +155,10 @@ describe("element binding", () => {
       // NOTE this mouse down/up + await needs to be done in order to repro
       // the issue, due to https://github.com/excalidraw/excalidraw/blob/46bff3daceb602accf60c40a84610797260fca94/src/components/App.tsx#L740
       mouse.reset();
-      expect(h.state.editingLinearElement).not.toBe(null);
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
       mouse.down(0, 0);
       await new Promise((r) => setTimeout(r, 100));
-      expect(h.state.editingLinearElement).toBe(null);
+      expect(h.state.selectedLinearElement?.isEditing).toBe(false);
       expect(API.getSelectedElement().type).toBe("rectangle");
       mouse.up();
       expect(API.getSelectedElement().type).toBe("rectangle");
@@ -172,12 +176,12 @@ describe("element binding", () => {
     const arrow = UI.createElement("arrow", {
       x: 0,
       y: 0,
-      size: 50,
+      size: 49,
     });
 
     expect(arrow.endBinding).toBe(null);
 
-    mouse.downAt(50, 50);
+    mouse.downAt(49, 49);
     mouse.moveTo(51, 0);
     mouse.up(0, 0);
 
@@ -244,18 +248,12 @@ describe("element binding", () => {
 
     mouse.clickAt(text.x + 50, text.y + 50);
 
-    const editor = document.querySelector(
-      ".excalidraw-textEditorContainer > textarea",
-    ) as HTMLTextAreaElement;
-
-    expect(editor).not.toBe(null);
+    const editor = await getTextEditor();
 
     fireEvent.change(editor, { target: { value: "" } });
     fireEvent.keyDown(editor, { key: KEYS.ESCAPE });
 
-    expect(
-      document.querySelector(".excalidraw-textEditorContainer > textarea"),
-    ).toBe(null);
+    expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
     expect(arrow.endBinding).toBe(null);
   });
 
@@ -285,18 +283,14 @@ describe("element binding", () => {
     UI.clickTool("text");
 
     mouse.clickAt(text.x + 50, text.y + 50);
-    const editor = document.querySelector(
-      ".excalidraw-textEditorContainer > textarea",
-    ) as HTMLTextAreaElement;
+    const editor = await getTextEditor();
 
     expect(editor).not.toBe(null);
 
     fireEvent.change(editor, { target: { value: "asdasdasdasdas" } });
     fireEvent.keyDown(editor, { key: KEYS.ESCAPE });
 
-    expect(
-      document.querySelector(".excalidraw-textEditorContainer > textarea"),
-    ).toBe(null);
+    expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
     expect(arrow.endBinding?.elementId).toBe(text.id);
   });
 

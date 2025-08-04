@@ -1,8 +1,5 @@
-import { newArrowElement } from "@excalidraw/element/newElement";
-
 import { pointCenter, pointFrom } from "@excalidraw/math";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
-import React from "react";
 import { vi } from "vitest";
 
 import {
@@ -13,36 +10,39 @@ import {
   arrayToMap,
 } from "@excalidraw/common";
 
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import {
-  getBoundTextElementPosition,
-  getBoundTextMaxWidth,
-} from "@excalidraw/element/textElement";
-import * as textElementUtils from "@excalidraw/element/textElement";
-import { wrapText } from "@excalidraw/element/textWrapping";
+import { Excalidraw } from "@excalidraw/excalidraw";
+import * as InteractiveCanvas from "@excalidraw/excalidraw/renderer/interactiveScene";
+import * as StaticScene from "@excalidraw/excalidraw/renderer/staticScene";
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
-
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElementWithContainer,
-  FontString,
-} from "@excalidraw/element/types";
-
-import { Excalidraw, mutateElement } from "../index";
-import * as InteractiveCanvas from "../renderer/interactiveScene";
-import * as StaticScene from "../renderer/staticScene";
-import { API } from "../tests/helpers/api";
-
-import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   screen,
   render,
   fireEvent,
   GlobalTestState,
   unmountComponent,
-} from "./test-utils";
+} from "@excalidraw/excalidraw/tests/test-utils";
+
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
+
+import { wrapText } from "../src";
+import * as textElementUtils from "../src/textElement";
+import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
+import { LinearElementEditor } from "../src";
+import { newArrowElement } from "../src";
+
+import {
+  getTextEditor,
+  TEXT_EDITOR_SELECTOR,
+} from "../../excalidraw/tests/queries/dom";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
+  FontString,
+} from "../src/types";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,
@@ -118,7 +118,7 @@ describe("Test Linear Elements", () => {
       ],
       roundness,
     });
-    mutateElement(line, { points: line.points });
+    h.app.scene.mutateElement(line, { points: line.points });
     API.setElements([line]);
     mouse.clickAt(p1[0], p1[1]);
     return line;
@@ -136,7 +136,8 @@ describe("Test Linear Elements", () => {
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.ENTER);
     });
-    expect(h.state.editingLinearElement?.elementId).toEqual(line.id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(line.id);
   };
 
   const drag = (startPoint: GlobalPoint, endPoint: GlobalPoint) => {
@@ -177,7 +178,7 @@ describe("Test Linear Elements", () => {
       pointFrom<LocalPoint>(0.5, 0),
       pointFrom<LocalPoint>(100, 100),
     ]);
-    new LinearElementEditor(element);
+    new LinearElementEditor(element, arrayToMap(h.elements));
     expect(element.points).toEqual([
       pointFrom<LocalPoint>(0, 0),
       pointFrom<LocalPoint>(99.5, 100),
@@ -253,17 +254,99 @@ describe("Test Linear Elements", () => {
     });
     fireEvent.click(queryByText(contextMenu as HTMLElement, "Edit line")!);
 
-    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
-  it("should enter line editor when using double clicked with ctrl key", () => {
+  it("should enter line editor via enter (line)", () => {
     createTwoPointerLinearElement("line");
-    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
+
+    mouse.clickAt(midpoint[0], midpoint[1]);
+    Keyboard.keyPress(KEYS.ENTER);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  // ctrl+enter alias (to align with arrows)
+  it("should enter line editor via ctrl+enter (line)", () => {
+    createTwoPointerLinearElement("line");
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
+
+    mouse.clickAt(midpoint[0], midpoint[1]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ENTER);
+    });
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor via ctrl+enter (arrow)", () => {
+    createTwoPointerLinearElement("arrow");
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
+
+    mouse.clickAt(midpoint[0], midpoint[1]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ENTER);
+    });
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor on ctrl+dblclick (simple arrow)", () => {
+    createTwoPointerLinearElement("arrow");
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       mouse.doubleClick();
     });
-    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor on ctrl+dblclick (line)", () => {
+    createTwoPointerLinearElement("line");
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.doubleClick();
+    });
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should enter line editor on dblclick (line)", () => {
+    createTwoPointerLinearElement("line");
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
+
+    mouse.doubleClick();
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
+  });
+
+  it("should not enter line editor on dblclick (arrow)", async () => {
+    createTwoPointerLinearElement("arrow");
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
+
+    mouse.doubleClick();
+    expect(h.state.selectedLinearElement).toBe(null);
+    await getTextEditor();
+  });
+
+  it("shouldn't create text element on double click in line editor (arrow)", async () => {
+    createTwoPointerLinearElement("arrow");
+    const arrow = h.elements[0] as ExcalidrawLinearElement;
+    enterLineEditingMode(arrow);
+
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(arrow.id);
+
+    mouse.doubleClick();
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(arrow.id);
+    expect(h.elements.length).toEqual(1);
+
+    expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
   });
 
   describe("Inside editor", () => {
@@ -294,7 +377,7 @@ describe("Test Linear Elements", () => {
       // drag line from midpoint
       drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `12`,
+        `11`,
       );
       expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
@@ -350,12 +433,12 @@ describe("Test Linear Elements", () => {
       expect(midPointsWithRoundEdge).toMatchInlineSnapshot(`
         [
           [
-            "55.96978",
-            "47.44233",
+            "54.27552",
+            "46.16120",
           ],
           [
-            "76.08587",
-            "43.29417",
+            "76.95494",
+            "44.56052",
           ],
         ]
       `);
@@ -396,7 +479,7 @@ describe("Test Linear Elements", () => {
       drag(startPoint, endPoint);
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `12`,
+        `11`,
       );
       expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -415,12 +498,12 @@ describe("Test Linear Elements", () => {
       expect(newMidPoints).toMatchInlineSnapshot(`
         [
           [
-            "105.96978",
-            "67.44233",
+            "104.27552",
+            "66.16120",
           ],
           [
-            "126.08587",
-            "63.29417",
+            "126.95494",
+            "64.56052",
           ],
         ]
       `);
@@ -464,7 +547,7 @@ describe("Test Linear Elements", () => {
         );
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `16`,
+          `14`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -515,7 +598,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] - delta, hitCoords[1] - delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `12`,
+          `11`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
@@ -556,7 +639,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] + delta, hitCoords[1] + delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `12`,
+          `11`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
@@ -604,7 +687,7 @@ describe("Test Linear Elements", () => {
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `18`,
+          `17`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -662,7 +745,7 @@ describe("Test Linear Elements", () => {
           ),
         );
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `16`,
+          `14`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
         expect(line.points.length).toEqual(5);
@@ -731,12 +814,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              "31.88408",
-              "23.13276",
+              "29.28349",
+              "20.91105",
             ],
             [
-              "77.74793",
-              "44.57841",
+              "78.86048",
+              "46.12277",
             ],
           ]
         `);
@@ -760,7 +843,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] + delta, hitCoords[1] + delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `12`,
+          `11`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
@@ -820,12 +903,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              "55.96978",
-              "47.44233",
+              "54.27552",
+              "46.16120",
             ],
             [
-              "76.08587",
-              "43.29417",
+              "76.95494",
+              "44.56052",
             ],
           ]
         `);
@@ -987,19 +1070,17 @@ describe("Test Linear Elements", () => {
         );
         expect(position).toMatchInlineSnapshot(`
           {
-            "x": "85.82202",
-            "y": "75.63461",
+            "x": "86.17305",
+            "y": "76.11251",
           }
         `);
       });
     });
 
-    it("should match styles for text editor", () => {
+    it("should match styles for text editor", async () => {
       createTwoPointerLinearElement("arrow");
       Keyboard.keyPress(KEYS.ENTER);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = await getTextEditor();
       expect(editor).toMatchSnapshot();
     });
 
@@ -1016,9 +1097,7 @@ describe("Test Linear Elements", () => {
       expect(text.type).toBe("text");
       expect(text.containerId).toBe(arrow.id);
       mouse.down();
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = await getTextEditor();
 
       fireEvent.change(editor, {
         target: { value: DEFAULT_TEXT },
@@ -1046,9 +1125,7 @@ describe("Test Linear Elements", () => {
       const textElement = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(textElement.type).toBe("text");
       expect(textElement.containerId).toBe(arrow.id);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = await getTextEditor();
 
       fireEvent.change(editor, {
         target: { value: DEFAULT_TEXT },
@@ -1067,13 +1144,7 @@ describe("Test Linear Elements", () => {
 
       expect(h.elements.length).toBe(1);
       mouse.doubleClickAt(line.x, line.y);
-
-      expect(h.elements.length).toBe(2);
-
-      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      expect(text.type).toBe("text");
-      expect(text.containerId).toBeNull();
-      expect(line.boundElements).toBeNull();
+      expect(h.elements.length).toBe(1);
     });
 
     // TODO fix #7029 and rewrite this test
@@ -1238,9 +1309,7 @@ describe("Test Linear Elements", () => {
 
       mouse.select(arrow);
       Keyboard.keyPress(KEYS.ENTER);
-      const editor = document.querySelector(
-        ".excalidraw-textEditorContainer > textarea",
-      ) as HTMLTextAreaElement;
+      const editor = await getTextEditor();
       fireEvent.change(editor, { target: { value: DEFAULT_TEXT } });
       Keyboard.exitTextEditor(editor);
 
@@ -1266,12 +1335,12 @@ describe("Test Linear Elements", () => {
       mouse.downAt(rect.x, rect.y);
       mouse.moveTo(200, 0);
       mouse.upAt(200, 0);
-      expect(arrow.width).toBeCloseTo(204, 0);
+      expect(arrow.width).toBeCloseTo(200, 0);
       expect(rect.x).toBe(200);
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(
         h.elements[0],
-        arrayToMap(h.elements),
+        h.app.scene,
         "nw",
         false,
       );
@@ -1384,25 +1453,86 @@ describe("Test Linear Elements", () => {
       const [origStartX, origStartY] = [line.x, line.y];
 
       act(() => {
-        LinearElementEditor.movePoints(line, [
-          {
-            index: 0,
-            point: pointFrom(line.points[0][0] + 10, line.points[0][1] + 10),
-          },
-          {
-            index: line.points.length - 1,
-            point: pointFrom(
-              line.points[line.points.length - 1][0] - 10,
-              line.points[line.points.length - 1][1] - 10,
-            ),
-          },
-        ]);
+        LinearElementEditor.movePoints(
+          line,
+          h.app.scene,
+          new Map([
+            [
+              0,
+              {
+                point: pointFrom(
+                  line.points[0][0] + 10,
+                  line.points[0][1] + 10,
+                ),
+              },
+            ],
+            [
+              line.points.length - 1,
+              {
+                point: pointFrom(
+                  line.points[line.points.length - 1][0] - 10,
+                  line.points[line.points.length - 1][1] - 10,
+                ),
+              },
+            ],
+          ]),
+        );
       });
       expect(line.x).toBe(origStartX + 10);
       expect(line.y).toBe(origStartY + 10);
 
       expect(line.points[line.points.length - 1][0]).toBe(20);
       expect(line.points[line.points.length - 1][1]).toBe(-20);
+    });
+
+    it("should preserve original angle when dragging endpoint with SHIFT key", () => {
+      createTwoPointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      enterLineEditingMode(line);
+
+      const elementsMap = arrayToMap(h.elements);
+      const points = LinearElementEditor.getPointsGlobalCoordinates(
+        line,
+        elementsMap,
+      );
+
+      // Calculate original angle between first and last point
+      const originalAngle = Math.atan2(
+        points[1][1] - points[0][1],
+        points[1][0] - points[0][0],
+      );
+
+      // Drag the second point (endpoint) with SHIFT key pressed
+      const startPoint = pointFrom<GlobalPoint>(points[1][0], points[1][1]);
+      const endPoint = pointFrom<GlobalPoint>(
+        startPoint[0] + 4,
+        startPoint[1] + 4,
+      );
+
+      // Perform drag with SHIFT key modifier
+      Keyboard.withModifierKeys({ shift: true }, () => {
+        mouse.downAt(startPoint[0], startPoint[1]);
+        mouse.moveTo(endPoint[0], endPoint[1]);
+        mouse.upAt(endPoint[0], endPoint[1]);
+      });
+
+      // Get updated points after drag
+      const updatedPoints = LinearElementEditor.getPointsGlobalCoordinates(
+        line,
+        elementsMap,
+      );
+
+      // Calculate new angle
+      const newAngle = Math.atan2(
+        updatedPoints[1][1] - updatedPoints[0][1],
+        updatedPoints[1][0] - updatedPoints[0][0],
+      );
+
+      // The angle should be preserved (within a small tolerance for floating point precision)
+      const angleDifference = Math.abs(newAngle - originalAngle);
+      const tolerance = 0.01; // Small tolerance for floating point precision
+
+      expect(angleDifference).toBeLessThan(tolerance);
     });
   });
 });

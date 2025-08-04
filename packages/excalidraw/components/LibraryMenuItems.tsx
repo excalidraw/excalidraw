@@ -8,7 +8,7 @@ import React, {
 
 import { MIME_TYPES, arrayToMap } from "@excalidraw/common";
 
-import { duplicateElements } from "@excalidraw/element/duplicate";
+import { duplicateElements } from "@excalidraw/element";
 
 import { serializeLibraryAsJSON } from "../data/json";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
@@ -166,7 +166,7 @@ export default function LibraryMenuItems({
             type: "everything",
             elements: item.elements,
             randomizeSeed: true,
-          }).newElements,
+          }).duplicatedElements,
         };
       });
     },

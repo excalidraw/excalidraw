@@ -34,6 +34,7 @@ type InteractiveCanvasProps = {
   selectionNonce: number | undefined;
   scale: number;
   appState: InteractiveCanvasAppState;
+  renderScrollbars: boolean;
   device: Device;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
@@ -143,7 +144,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           remotePointerUsernames,
           remotePointerUserStates,
           selectionColor,
-          renderScrollbars: false,
+          renderScrollbars: props.renderScrollbars,
         },
         device: props.device,
         callback: props.renderInteractiveSceneCallback,
@@ -191,13 +192,11 @@ const getRelevantAppStateProps = (
   viewModeEnabled: appState.viewModeEnabled,
   openDialog: appState.openDialog,
   editingGroupId: appState.editingGroupId,
-  editingLinearElement: appState.editingLinearElement,
   selectedElementIds: appState.selectedElementIds,
   frameToHighlight: appState.frameToHighlight,
   offsetLeft: appState.offsetLeft,
   offsetTop: appState.offsetTop,
   theme: appState.theme,
-  pendingImageElementId: appState.pendingImageElementId,
   selectionElement: appState.selectionElement,
   selectedGroupIds: appState.selectedGroupIds,
   selectedLinearElement: appState.selectedLinearElement,
@@ -214,6 +213,7 @@ const getRelevantAppStateProps = (
   isCropping: appState.isCropping,
   croppingElementId: appState.croppingElementId,
   searchMatches: appState.searchMatches,
+  activeLockedId: appState.activeLockedId,
 });
 
 const areEqual = (
@@ -230,7 +230,8 @@ const areEqual = (
     // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||
-    prevProps.selectedElements !== nextProps.selectedElements
+    prevProps.selectedElements !== nextProps.selectedElements ||
+    prevProps.renderScrollbars !== nextProps.renderScrollbars
   ) {
     return false;
   }

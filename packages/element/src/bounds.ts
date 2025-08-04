@@ -1,12 +1,17 @@
 import rough from "roughjs/bin/rough";
 
-import { rescalePoints, arrayToMap, invariant } from "@excalidraw/common";
+import {
+  arrayToMap,
+  invariant,
+  rescalePoints,
+  sizeOf,
+} from "@excalidraw/common";
 
 import {
   degreesToRadians,
   lineSegment,
-  pointFrom,
   pointDistance,
+  pointFrom,
   pointFromArray,
   pointRotateRads,
 } from "@excalidraw/math";
@@ -28,8 +33,8 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { ShapeCache } from "./ShapeCache";
-import { generateRoughOptions } from "./Shape";
+import { generateRoughOptions } from "./shape";
+import { ShapeCache } from "./shape";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
@@ -40,26 +45,27 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import { getElementShape } from "./shapes";
+import { getElementShape } from "./shape";
 
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
 } from "./utils";
 
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  Arrowhead,
-  ExcalidrawFreeDrawElement,
-  NonDeleted,
-  ExcalidrawTextElementWithContainer,
-  ElementsMap,
-  ExcalidrawRectanguloidElement,
-  ExcalidrawEllipseElement,
-} from "./types";
 import type { Drawable, Op } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+import type {
+  Arrowhead,
+  ElementsMap,
+  ElementsMapOrArray,
+  ExcalidrawElement,
+  ExcalidrawEllipseElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawRectanguloidElement,
+  ExcalidrawTextElementWithContainer,
+  NonDeleted,
+} from "./types";
 
 export type RectangleBox = {
   x: number;
@@ -96,9 +102,23 @@ export class ElementBounds {
       version: ExcalidrawElement["version"];
     }
   >();
+  private static nonRotatedBoundsCache = new WeakMap<
+    ExcalidrawElement,
+    {
+      bounds: Bounds;
+      version: ExcalidrawElement["version"];
+    }
+  >();
 
-  static getBounds(element: ExcalidrawElement, elementsMap: ElementsMap) {
-    const cachedBounds = ElementBounds.boundsCache.get(element);
+  static getBounds(
+    element: ExcalidrawElement,
+    elementsMap: ElementsMap,
+    nonRotated: boolean = false,
+  ) {
+    const cachedBounds =
+      nonRotated && element.angle !== 0
+        ? ElementBounds.nonRotatedBoundsCache.get(element)
+        : ElementBounds.boundsCache.get(element);
 
     if (
       cachedBounds?.version &&
@@ -109,6 +129,23 @@ export class ElementBounds {
     ) {
       return cachedBounds.bounds;
     }
+
+    if (nonRotated && element.angle !== 0) {
+      const nonRotatedBounds = ElementBounds.calculateBounds(
+        {
+          ...element,
+          angle: 0 as Radians,
+        },
+        elementsMap,
+      );
+      ElementBounds.nonRotatedBoundsCache.set(element, {
+        version: element.version,
+        bounds: nonRotatedBounds,
+      });
+
+      return nonRotatedBounds;
+    }
+
     const bounds = ElementBounds.calculateBounds(element, elementsMap);
 
     ElementBounds.boundsCache.set(element, {
@@ -547,7 +584,7 @@ const solveQuadratic = (
   return [s1, s2];
 };
 
-const getCubicBezierCurveBound = (
+export const getCubicBezierCurveBound = (
   p0: GlobalPoint,
   p1: GlobalPoint,
   p2: GlobalPoint,
@@ -933,15 +970,16 @@ const getLinearElementRotatedBounds = (
 export const getElementBounds = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
+  nonRotated: boolean = false,
 ): Bounds => {
-  return ElementBounds.getBounds(element, elementsMap);
+  return ElementBounds.getBounds(element, elementsMap, nonRotated);
 };
 
 export const getCommonBounds = (
-  elements: readonly ExcalidrawElement[],
+  elements: ElementsMapOrArray,
   elementsMap?: ElementsMap,
 ): Bounds => {
-  if (!elements.length) {
+  if (!sizeOf(elements)) {
     return [0, 0, 0, 0];
   }
 
@@ -1127,6 +1165,71 @@ export const getCenterForBounds = (bounds: Bounds): GlobalPoint =>
     bounds[1] + (bounds[3] - bounds[1]) / 2,
   );
 
+/**
+ * Get the axis-aligned bounding box for a given element
+ */
+export const aabbForElement = (
+  element: Readonly<ExcalidrawElement>,
+  elementsMap: ElementsMap,
+  offset?: [number, number, number, number],
+) => {
+  const bbox = {
+    minX: element.x,
+    minY: element.y,
+    maxX: element.x + element.width,
+    maxY: element.y + element.height,
+    midX: element.x + element.width / 2,
+    midY: element.y + element.height / 2,
+  };
+
+  const center = elementCenterPoint(element, elementsMap);
+  const [topLeftX, topLeftY] = pointRotateRads(
+    pointFrom(bbox.minX, bbox.minY),
+    center,
+    element.angle,
+  );
+  const [topRightX, topRightY] = pointRotateRads(
+    pointFrom(bbox.maxX, bbox.minY),
+    center,
+    element.angle,
+  );
+  const [bottomRightX, bottomRightY] = pointRotateRads(
+    pointFrom(bbox.maxX, bbox.maxY),
+    center,
+    element.angle,
+  );
+  const [bottomLeftX, bottomLeftY] = pointRotateRads(
+    pointFrom(bbox.minX, bbox.maxY),
+    center,
+    element.angle,
+  );
+
+  const bounds = [
+    Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX),
+    Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY),
+    Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX),
+    Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY),
+  ] as Bounds;
+
+  if (offset) {
+    const [topOffset, rightOffset, downOffset, leftOffset] = offset;
+    return [
+      bounds[0] - leftOffset,
+      bounds[1] - topOffset,
+      bounds[2] + rightOffset,
+      bounds[3] + downOffset,
+    ] as Bounds;
+  }
+
+  return bounds;
+};
+
+export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  bounds: Bounds,
+): boolean =>
+  p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
+
 export const doBoundsIntersect = (
   bounds1: Bounds | null,
   bounds2: Bounds | null,
@@ -1139,4 +1242,15 @@ export const doBoundsIntersect = (
   const [minX2, minY2, maxX2, maxY2] = bounds2;
 
   return minX1 < maxX2 && maxX1 > minX2 && minY1 < maxY2 && maxY1 > minY2;
+};
+
+export const elementCenterPoint = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  xOffset: number = 0,
+  yOffset: number = 0,
+) => {
+  const [x, y] = getCenterForBounds(getElementBounds(element, elementsMap));
+
+  return pointFrom<GlobalPoint>(x + xOffset, y + yOffset);
 };
