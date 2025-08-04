@@ -6016,7 +6016,10 @@ class App extends React.Component<AppProps, AppState> {
             this,
             event,
             this.scene.getNonDeletedElementsMap(),
-            { includeSelfPoints: true },
+            {
+              includeSelfPoints: true,
+              selectedPointsIndices: [points.length - 1],
+            },
           );
 
           if (snapLines.length > 0) {
@@ -8798,7 +8801,10 @@ class App extends React.Component<AppProps, AppState> {
               this,
               event,
               this.scene.getNonDeletedElementsMap(),
-              { includeSelfPoints: true },
+              {
+                includeSelfPoints: true,
+                selectedPointsIndices: [points.length - 1],
+              },
             );
 
             if (snapLines.length > 0) {
