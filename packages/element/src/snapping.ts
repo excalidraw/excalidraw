@@ -1,5 +1,8 @@
 import {
   isCloseTo,
+  line,
+  linesIntersectAt,
+  pointDistance,
   pointFrom,
   pointRotateRads,
   rangeInclusive,
@@ -1642,4 +1645,80 @@ export const isActiveToolNonLinearSnappable = (
     activeToolType === TOOL_TYPE.image ||
     activeToolType === TOOL_TYPE.text
   );
+};
+
+/**
+ * Snaps to discrete angle rotation logic.
+ * This function handles the common pattern of finding intersections between
+ * angle lines and snap lines, and updating the snap lines accordingly.
+ *
+ * @param snapLines - The original snap lines from snapping
+ * @param angleLine - The line representing the discrete angle constraint
+ * @param gridPosition - The grid position (original pointer position)
+ * @param referencePosition - The reference position (usually the start point)
+ * @returns Object containing updated snap lines and position deltas
+ */
+export const snapToDiscreteAngle = (
+  snapLines: SnapLine[],
+  angleLine: [GlobalPoint, GlobalPoint],
+  gridPosition: GlobalPoint,
+  referencePosition: GlobalPoint,
+): {
+  snapLines: SnapLine[];
+  dxFromReference: number;
+  dyFromReference: number;
+} => {
+  if (snapLines.length === 0) {
+    return {
+      snapLines: [],
+      dxFromReference: gridPosition[0] - referencePosition[0],
+      dyFromReference: gridPosition[1] - referencePosition[1],
+    };
+  }
+
+  const firstSnapLine = snapLines[0];
+  if (firstSnapLine.type === "points" && firstSnapLine.points.length > 1) {
+    const snapLine = line(firstSnapLine.points[0], firstSnapLine.points[1]);
+    const intersection = linesIntersectAt<GlobalPoint>(
+      line(angleLine[0], angleLine[1]),
+      snapLine,
+    );
+
+    if (intersection) {
+      const dxFromReference = intersection[0] - referencePosition[0];
+      const dyFromReference = intersection[1] - referencePosition[1];
+
+      const furthestPoint = firstSnapLine.points.reduce(
+        (furthest, point) => {
+          const distance = pointDistance(intersection, point);
+          if (distance > furthest.distance) {
+            return { point, distance };
+          }
+          return furthest;
+        },
+        {
+          point: firstSnapLine.points[0],
+          distance: pointDistance(intersection, firstSnapLine.points[0]),
+        },
+      );
+
+      const updatedSnapLine: PointSnapLine = {
+        type: "points",
+        points: [furthestPoint.point, intersection],
+      };
+
+      return {
+        snapLines: [updatedSnapLine],
+        dxFromReference,
+        dyFromReference,
+      };
+    }
+  }
+
+  // If no intersection found, return original snap lines with grid position
+  return {
+    snapLines,
+    dxFromReference: gridPosition[0] - referencePosition[0],
+    dyFromReference: gridPosition[1] - referencePosition[1],
+  };
 };

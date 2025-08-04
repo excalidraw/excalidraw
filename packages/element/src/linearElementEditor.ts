@@ -8,7 +8,6 @@ import {
   pointDistance,
   vectorFromPoint,
   line,
-  linesIntersectAt,
   curveLength,
   curvePointAtLength,
 } from "@excalidraw/math";
@@ -29,6 +28,7 @@ import {
   deconstructLinearOrFreeDrawElement,
   isPathALoop,
   snapLinearElementPoint,
+  snapToDiscreteAngle,
   type SnapLine,
   type Store,
 } from "@excalidraw/element";
@@ -397,45 +397,16 @@ export class LinearElementEditor {
               pointFrom(referencePointCoords[0], referencePointCoords[1]),
             );
 
-            const firstSnapLine = snapLines[0];
-            if (
-              firstSnapLine.type === "points" &&
-              firstSnapLine.points.length > 1
-            ) {
-              const snapLine = line(
-                firstSnapLine.points[0],
-                firstSnapLine.points[1],
-              );
-              const intersection = linesIntersectAt<GlobalPoint>(
-                angleLine,
-                snapLine,
-              );
+            const result = snapToDiscreteAngle(
+              snapLines,
+              angleLine,
+              pointFrom(gridX, gridY),
+              referencePointCoords,
+            );
 
-              if (intersection) {
-                dxFromReference = intersection[0] - referencePointCoords[0];
-                dyFromReference = intersection[1] - referencePointCoords[1];
-
-                const furthestPoint = firstSnapLine.points.reduce(
-                  (furthest, point) => {
-                    const distance = pointDistance(intersection, point);
-                    if (distance > furthest.distance) {
-                      return { point, distance };
-                    }
-                    return furthest;
-                  },
-                  {
-                    point: firstSnapLine.points[0],
-                    distance: pointDistance(
-                      intersection,
-                      firstSnapLine.points[0],
-                    ),
-                  },
-                );
-
-                firstSnapLine.points = [furthestPoint.point, intersection];
-                _snapLines = [firstSnapLine];
-              }
-            }
+            dxFromReference = result.dxFromReference;
+            dyFromReference = result.dyFromReference;
+            _snapLines = result.snapLines;
           } else if (snapLines.length > 0) {
             const snappedGridX = effectiveGridX + snapOffset.x;
             const snappedGridY = effectiveGridY + snapOffset.y;
@@ -1237,49 +1208,16 @@ export class LinearElementEditor {
             pointFrom(lastCommittedPointCoords[0], lastCommittedPointCoords[1]),
           );
 
-          const firstSnapLine = _snapLines[0];
-          if (
-            firstSnapLine.type === "points" &&
-            firstSnapLine.points.length > 1
-          ) {
-            const snapLine = line(
-              firstSnapLine.points[0],
-              firstSnapLine.points[1],
-            );
-            const intersection = linesIntersectAt<GlobalPoint>(
-              angleLine,
-              snapLine,
-            );
+          const result = snapToDiscreteAngle(
+            _snapLines,
+            angleLine,
+            pointFrom(gridX, gridY),
+            lastCommittedPointCoords,
+          );
 
-            if (intersection) {
-              dxFromLastCommitted =
-                intersection[0] - lastCommittedPointCoords[0];
-              dyFromLastCommitted =
-                intersection[1] - lastCommittedPointCoords[1];
-
-              const furthestPoint = firstSnapLine.points.reduce(
-                (furthest, point) => {
-                  const distance = pointDistance(intersection, point);
-                  if (distance > furthest.distance) {
-                    return { point, distance };
-                  }
-                  return furthest;
-                },
-                {
-                  point: firstSnapLine.points[0],
-                  distance: pointDistance(
-                    intersection,
-                    firstSnapLine.points[0],
-                  ),
-                },
-              );
-
-              firstSnapLine.points = [furthestPoint.point, intersection];
-              snapLines = [firstSnapLine];
-            }
-          } else {
-            snapLines = [];
-          }
+          dxFromLastCommitted = result.dxFromReference;
+          dyFromLastCommitted = result.dyFromReference;
+          snapLines = result.snapLines;
         } else if (_snapLines.length > 0) {
           const snappedGridX = effectiveGridX + snapOffset.x;
           const snappedGridY = effectiveGridY + snapOffset.y;

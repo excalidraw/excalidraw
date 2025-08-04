@@ -17,7 +17,6 @@ import {
   vectorDot,
   vectorNormalize,
   line,
-  linesIntersectAt,
 } from "@excalidraw/math";
 
 import {
@@ -240,6 +239,7 @@ import {
   isActiveToolNonLinearSnappable,
   getSnapLinesAtPointer,
   snapLinearElementPoint,
+  snapToDiscreteAngle,
   isSnappingEnabled,
   getReferenceSnapPoints,
   getVisibleGaps,
@@ -6030,54 +6030,19 @@ class App extends React.Component<AppProps, AppState> {
                 pointFrom(lastCommittedX + rx, lastCommittedY + ry),
               );
 
-              // Find intersection with first snap line
-              const firstSnapLine = snapLines[0];
-              if (
-                firstSnapLine.type === "points" &&
-                firstSnapLine.points.length > 1
-              ) {
-                const snapLine = line(
-                  firstSnapLine.points[0],
-                  firstSnapLine.points[1],
-                );
-                const intersection = linesIntersectAt<GlobalPoint>(
-                  angleLine,
-                  snapLine,
-                );
+              const result = snapToDiscreteAngle(
+                snapLines,
+                angleLine,
+                pointFrom(gridX, gridY),
+                pointFrom(lastCommittedX + rx, lastCommittedY + ry),
+              );
 
-                if (intersection) {
-                  dxFromLastCommitted = intersection[0] - rx - lastCommittedX;
-                  dyFromLastCommitted = intersection[1] - ry - lastCommittedY;
+              dxFromLastCommitted = result.dxFromReference;
+              dyFromLastCommitted = result.dyFromReference;
 
-                  // Find the furthest point from the intersection
-                  const furthestPoint = firstSnapLine.points.reduce(
-                    (furthest, point) => {
-                      const distance = pointDistance(intersection, point);
-                      if (distance > furthest.distance) {
-                        return { point, distance };
-                      }
-                      return furthest;
-                    },
-                    {
-                      point: firstSnapLine.points[0],
-                      distance: pointDistance(
-                        intersection,
-                        firstSnapLine.points[0],
-                      ),
-                    },
-                  );
-
-                  firstSnapLine.points = [furthestPoint.point, intersection];
-
-                  this.setState({
-                    snapLines: [firstSnapLine],
-                  });
-
-                  this.setState({
-                    snapLines: [firstSnapLine],
-                  });
-                }
-              }
+              this.setState({
+                snapLines: result.snapLines,
+              });
             } else {
               const snappedGridX = effectiveGridX + snapOffset.x;
               const snappedGridY = effectiveGridY + snapOffset.y;
@@ -8814,52 +8779,19 @@ class App extends React.Component<AppProps, AppState> {
                   pointFrom(newElement.x, newElement.y),
                 );
 
-                const firstSnapLine = snapLines.find(
-                  (snapLine) =>
-                    snapLine.type === "points" && snapLine.points.length > 2,
+                const result = snapToDiscreteAngle(
+                  snapLines,
+                  angleLine,
+                  pointFrom(gridX, gridY),
+                  pointFrom(newElement.x, newElement.y),
                 );
-                if (firstSnapLine && firstSnapLine.points.length > 1) {
-                  const snapLine = line(
-                    firstSnapLine.points[0],
-                    firstSnapLine.points[1],
-                  );
-                  const intersection = linesIntersectAt<GlobalPoint>(
-                    angleLine,
-                    snapLine,
-                  );
-                  if (intersection) {
-                    dx = intersection[0] - newElement.x;
-                    dy = intersection[1] - newElement.y;
 
-                    // Find the furthest point from the intersection
-                    const furthestPoint = firstSnapLine.points.reduce(
-                      (furthest, point) => {
-                        const distance = pointDistance(intersection, point);
-                        if (distance > furthest.distance) {
-                          return { point, distance };
-                        }
-                        return furthest;
-                      },
-                      {
-                        point: firstSnapLine.points[0],
-                        distance: pointDistance(
-                          intersection,
-                          firstSnapLine.points[0],
-                        ),
-                      },
-                    );
+                dx = result.dxFromReference;
+                dy = result.dyFromReference;
 
-                    firstSnapLine.points = [furthestPoint.point, intersection];
-
-                    this.setState({
-                      snapLines: [firstSnapLine],
-                    });
-                  } else {
-                    this.setState({
-                      snapLines: [],
-                    });
-                  }
-                }
+                this.setState({
+                  snapLines: result.snapLines,
+                });
               } else {
                 dx = gridX + snapOffset.x - newElement.x;
                 dy = gridY + snapOffset.y - newElement.y;
