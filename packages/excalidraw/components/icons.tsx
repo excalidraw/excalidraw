@@ -314,28 +314,6 @@ export const LassoIcon = createIcon(
   { fill: "none", width: 22, height: 22, strokeWidth: 1.25 },
 );
 
-export const LassoIconMobile = createIcon(
-  <g>
-    <path
-      d="M2.5 12
-       C2.5 6.5, 8 4.5, 15 7.5
-       C21 9, 22 12, 20 14.5
-       C18 17, 11.5 17.5, 7 16
-       C4 15.2, 2.5 13.5, 2.5 12Z"
-      fill="none"
-      stroke="black"
-      strokeDasharray="2 2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </g>,
-  {
-    width: 24,
-    height: 24,
-    strokeWidth: 1.5,
-  },
-);
-
 // tabler-icons: square
 export const RectangleIcon = createIcon(
   <g strokeWidth="1.5">

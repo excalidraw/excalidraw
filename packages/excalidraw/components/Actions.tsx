@@ -63,7 +63,7 @@ import {
   laserPointerToolIcon,
   MagicIcon,
   LassoIcon,
-  LassoIconMobile,
+  SelectionIcon,
 } from "./icons";
 
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
@@ -309,7 +309,7 @@ export const ShapesSwitcher = ({
       ? ([
           {
             value: "lasso",
-            icon: LassoIconMobile,
+            icon: SelectionIcon,
             key: KEYS.L,
             numericKey: KEYS["1"],
             fillable: true,
