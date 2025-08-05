@@ -614,7 +614,7 @@ const getGapSnaps = (
   }
 };
 
-export const getReferenceSnapPoints = (
+const getReferenceSnapPointsDefault = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: ExcalidrawElement[],
   appState: AppState,
@@ -632,6 +632,23 @@ export const getReferenceSnapPoints = (
         !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
     )
     .flatMap((elementGroup) => getElementsCorners(elementGroup, elementsMap));
+};
+
+let getReferenceSnapPointsFunction: typeof getReferenceSnapPointsDefault =
+  getReferenceSnapPointsDefault;
+
+export const setReferenceSnapPointsFunction = (
+  fn: (
+    defaultFn: typeof getReferenceSnapPointsDefault,
+  ) => typeof getReferenceSnapPointsDefault,
+) => {
+  getReferenceSnapPointsFunction = fn(getReferenceSnapPointsDefault);
+};
+
+export const getReferenceSnapPoints = (
+  ...args: Parameters<typeof getReferenceSnapPointsDefault>
+) => {
+  return getReferenceSnapPointsFunction(...args);
 };
 
 const getPointSnaps = (

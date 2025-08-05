@@ -1437,6 +1437,15 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@excalidraw/common@file:packages/common":
+  version "0.18.0"
+
+"@excalidraw/element@file:packages/element":
+  version "0.18.0"
+  dependencies:
+    "@excalidraw/common" "file:C:/Users/Magic/AppData/Local/Yarn/Cache/v6/npm-@excalidraw-element-0.18.0-3219b2a1-42bb-4b9b-9a71-38547795454f-1754163757383/node_modules/@excalidraw/common"
+    "@excalidraw/math" "file:C:/Users/Magic/AppData/Local/Yarn/Cache/v6/npm-@excalidraw-element-0.18.0-3219b2a1-42bb-4b9b-9a71-38547795454f-1754163757383/node_modules/@excalidraw/math"
+
 "@excalidraw/eslint-config@1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@excalidraw/eslint-config/-/eslint-config-1.0.3.tgz#2122ef7413ae77874ae9848ce0f1c6b3f0d8bbbd"
@@ -1451,6 +1460,11 @@
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@excalidraw/markdown-to-text/-/markdown-to-text-0.1.2.tgz#1703705e7da608cf478f17bfe96fb295f55a23eb"
   integrity sha512-1nDXBNAojfi3oSFwJswKREkFm5wrSjqay81QlyRv2pkITG/XYB5v+oChENVBQLcxQwX4IUATWvXM5BcaNhPiIg==
+
+"@excalidraw/math@file:packages/math":
+  version "0.18.0"
+  dependencies:
+    "@excalidraw/common" "file:C:/Users/Magic/AppData/Local/Yarn/Cache/v6/npm-@excalidraw-math-0.18.0-c60a6d41-b650-48f2-9462-c094d050efac-1754163757379/node_modules/@excalidraw/common"
 
 "@excalidraw/mermaid-to-excalidraw@1.1.2":
   version "1.1.2"

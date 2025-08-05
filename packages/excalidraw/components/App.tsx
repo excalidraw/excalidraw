@@ -377,6 +377,7 @@ import {
   getReferenceSnapPoints,
   SnapCache,
   isGridModeEnabled,
+  setReferenceSnapPointsFunction,
 } from "../snapping";
 import { convertToExcalidrawElements } from "../data/transform";
 import { Renderer } from "../scene/Renderer";
@@ -778,6 +779,11 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (this.props.customOptions?.shouldSnapping) {
       setShouldSnapping(this.props.customOptions.shouldSnapping);
+    }
+    if (this.props.customOptions?.getReferenceSnapPoints) {
+      setReferenceSnapPointsFunction(
+        this.props.customOptions.getReferenceSnapPoints,
+      );
     }
   }
 

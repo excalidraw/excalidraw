@@ -61,7 +61,7 @@ import type App from "./components/App";
 import type Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ContextMenuItems } from "./components/ContextMenu";
-import type { SnapLine } from "./snapping";
+import type { getReferenceSnapPoints, SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
 
 import type { Language } from "./i18n";
@@ -556,6 +556,9 @@ export interface ExcalidrawPropsCustomOptions {
     event: MouseEvent | KeyboardEvent | React.PointerEvent<HTMLCanvasElement>,
   ) => boolean;
   shouldSnapping?: (event: KeyboardModifiersObject) => boolean;
+  getReferenceSnapPoints?: (
+    defaultFn: typeof getReferenceSnapPoints,
+  ) => typeof getReferenceSnapPoints;
   onHandleEraser?: (elements: Set<ExcalidrawElement["id"]>) => void;
   layoutRenders?: {
     menuRender?: (props: { children: React.ReactNode }) => React.ReactNode;
