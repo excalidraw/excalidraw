@@ -91,8 +91,9 @@ let currentLangData = {};
 
 export const setLanguage = async (lang: Language) => {
   currentLang = lang;
-  document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
-  document.documentElement.lang = currentLang.code;
+  //zsviczian https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/2423
+  //document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
+  //document.documentElement.lang = currentLang.code;
 
   if (lang.code.startsWith(TEST_LANG_CODE)) {
     currentLangData = {};
