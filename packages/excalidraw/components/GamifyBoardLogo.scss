@@ -1,0 +1,35 @@
+.excalidraw {
+  .GamifyBoardLogo {
+    display: flex;
+    align-items: center;
+
+    svg {
+      height: var(--logo-height--normal);
+      width: auto;
+    }
+
+    &.is-xs {
+      svg {
+        height: var(--logo-height--xs, 3.32rem);
+      }
+    }
+
+    &.is-small {
+      svg {
+        height: var(--logo-height--small, 4.16rem);
+      }
+    }
+
+    &.is-normal {
+      svg {
+        height: var(--logo-height--normal, 5rem);
+      }
+    }
+
+    &.is-large {
+      svg {
+        height: var(--logo-height--large, 150px);
+      }
+    }
+  }
+}
