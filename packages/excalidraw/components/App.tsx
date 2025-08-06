@@ -8450,7 +8450,8 @@ class App extends React.Component<AppProps, AppState> {
         if (
           this.state.activeTool.type === "lasso" &&
           this.lassoTrail.hasCurrentTrail &&
-          !(this.isMobileOrTablet() && pointerDownState.hit.element)
+          !(this.isMobileOrTablet() && pointerDownState.hit.element) &&
+          !this.state.activeTool.fromSelection
         ) {
           return;
         }
