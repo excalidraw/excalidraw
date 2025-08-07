@@ -8,8 +8,14 @@ import {
   getNormalizedCanvasDimensions,
 } from "@excalidraw/excalidraw/renderer/helpers";
 import { type AppState } from "@excalidraw/excalidraw/types";
-import { throttleRAF } from "@excalidraw/common";
+import { arrayToMap, invariant, throttleRAF } from "@excalidraw/common";
 import { useCallback } from "react";
+
+import {
+  getGlobalFixedPointForBindableElement,
+  isArrowElement,
+  isBindableElement,
+} from "@excalidraw/element";
 
 import {
   isLineSegment,
@@ -21,8 +27,14 @@ import { isCurve } from "@excalidraw/math/curve";
 import React from "react";
 
 import type { Curve } from "@excalidraw/math";
-
-import type { DebugElement } from "@excalidraw/utils/visualdebug";
+import type { DebugElement } from "@excalidraw/common";
+import type {
+  ElementsMap,
+  ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
+  FixedPointBinding,
+  OrderedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import { STORAGE_KEYS } from "../app_constants";
 
@@ -75,6 +87,168 @@ const renderOrigin = (context: CanvasRenderingContext2D, zoom: number) => {
   context.save();
 };
 
+const _renderBinding = (
+  context: CanvasRenderingContext2D,
+  binding: FixedPointBinding,
+  elementsMap: ElementsMap,
+  zoom: number,
+  width: number,
+  height: number,
+  color: string,
+) => {
+  if (!binding.fixedPoint) {
+    console.warn("Binding must have a fixedPoint");
+    return;
+  }
+
+  const bindable = elementsMap.get(
+    binding.elementId,
+  ) as ExcalidrawBindableElement;
+  const [x, y] = getGlobalFixedPointForBindableElement(
+    binding.fixedPoint,
+    bindable,
+    elementsMap,
+  );
+
+  context.save();
+  context.strokeStyle = color;
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(x * zoom, y * zoom);
+  context.bezierCurveTo(
+    x * zoom - width,
+    y * zoom - height,
+    x * zoom - width,
+    y * zoom + height,
+    x * zoom,
+    y * zoom,
+  );
+  context.stroke();
+  context.restore();
+};
+
+const _renderBindableBinding = (
+  binding: FixedPointBinding,
+  context: CanvasRenderingContext2D,
+  elementsMap: ElementsMap,
+  zoom: number,
+  width: number,
+  height: number,
+  color: string,
+) => {
+  const bindable = elementsMap.get(
+    binding.elementId,
+  ) as ExcalidrawBindableElement;
+  if (!binding.fixedPoint) {
+    console.warn("Binding must have a fixedPoint");
+    return;
+  }
+
+  const [x, y] = getGlobalFixedPointForBindableElement(
+    binding.fixedPoint,
+    bindable,
+    elementsMap,
+  );
+
+  context.save();
+  context.strokeStyle = color;
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(x * zoom, y * zoom);
+  context.bezierCurveTo(
+    x * zoom + width,
+    y * zoom + height,
+    x * zoom + width,
+    y * zoom - height,
+    x * zoom,
+    y * zoom,
+  );
+  context.stroke();
+  context.restore();
+};
+
+const renderBindings = (
+  context: CanvasRenderingContext2D,
+  elements: readonly OrderedExcalidrawElement[],
+  zoom: number,
+) => {
+  const elementsMap = arrayToMap(elements);
+  const dim = 16;
+  elements.forEach((element) => {
+    if (element.isDeleted) {
+      return;
+    }
+
+    if (isArrowElement(element)) {
+      if (element.startBinding) {
+        invariant(
+          elementsMap
+            .get(element.startBinding.elementId)
+            ?.boundElements?.find((e) => e.id === element.id),
+          "Missing record in boundElements for arrow",
+        );
+
+        _renderBinding(
+          context,
+          element.startBinding,
+          elementsMap,
+          zoom,
+          dim,
+          dim,
+          "red",
+        );
+      }
+
+      if (element.endBinding) {
+        _renderBinding(
+          context,
+          element.endBinding,
+          elementsMap,
+          zoom,
+          dim,
+          dim,
+          "red",
+        );
+      }
+    }
+
+    if (isBindableElement(element) && element.boundElements?.length) {
+      element.boundElements.forEach((boundElement) => {
+        if (boundElement.type !== "arrow") {
+          return;
+        }
+
+        const arrow = elementsMap.get(
+          boundElement.id,
+        ) as ExcalidrawArrowElement;
+
+        if (arrow && arrow.startBinding?.elementId === element.id) {
+          _renderBindableBinding(
+            arrow.startBinding,
+            context,
+            elementsMap,
+            zoom,
+            dim,
+            dim,
+            "green",
+          );
+        }
+        if (arrow && arrow.endBinding?.elementId === element.id) {
+          _renderBindableBinding(
+            arrow.endBinding,
+            context,
+            elementsMap,
+            zoom,
+            dim,
+            dim,
+            "green",
+          );
+        }
+      });
+    }
+  });
+};
+
 const render = (
   frame: DebugElement[],
   context: CanvasRenderingContext2D,
@@ -107,8 +281,8 @@ const render = (
 const _debugRenderer = (
   canvas: HTMLCanvasElement,
   appState: AppState,
+  elements: readonly OrderedExcalidrawElement[],
   scale: number,
-  refresh: () => void,
 ) => {
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,
@@ -131,6 +305,7 @@ const _debugRenderer = (
   );
 
   renderOrigin(context, appState.zoom.value);
+  renderBindings(context, elements, appState.zoom.value);
 
   if (
     window.visualDebug?.currentFrame &&
@@ -182,10 +357,10 @@ export const debugRenderer = throttleRAF(
   (
     canvas: HTMLCanvasElement,
     appState: AppState,
+    elements: readonly OrderedExcalidrawElement[],
     scale: number,
-    refresh: () => void,
   ) => {
-    _debugRenderer(canvas, appState, scale, refresh);
+    _debugRenderer(canvas, appState, elements, scale);
   },
   { trailing: true },
 );

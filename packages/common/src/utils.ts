@@ -1,4 +1,5 @@
 import { average } from "@excalidraw/math";
+import { isImageElement } from "@excalidraw/element";
 
 import type {
   ExcalidrawBindableElement,
@@ -566,8 +567,8 @@ export const isTransparent = (color: string) => {
   );
 };
 
-export const isBindingFallthroughEnabled = (el: ExcalidrawBindableElement) =>
-  el.fillStyle !== "solid" || isTransparent(el.backgroundColor);
+export const isAlwaysInsideBinding = (element: ExcalidrawBindableElement) =>
+  isImageElement(element);
 
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined]
