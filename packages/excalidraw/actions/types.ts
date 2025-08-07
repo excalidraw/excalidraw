@@ -71,6 +71,7 @@ export type ActionName =
   | "changeArrowType"
   | "changeOpacity"
   | "changeFontSize"
+  | "changeEraserTargets"
   | "toggleCanvasMenu"
   | "toggleEditMenu"
   | "undo"
