@@ -14,6 +14,7 @@ import type {
   Merge,
   ValueOf,
 } from "@excalidraw/common/utility-types";
+import SnappingManager from "./SnappingManager";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
