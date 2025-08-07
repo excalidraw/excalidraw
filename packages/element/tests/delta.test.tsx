@@ -7,7 +7,10 @@ describe("AppStateDelta", () => {
   describe("ensure stable delta properties order", () => {
     it("should maintain stable order for root properties", () => {
       const name = "untitled scene";
-      const selectedLinearElementId = "id1" as LinearElementEditor["elementId"];
+      const activeLinearElement = {
+        id: "id1" as LinearElementEditor["elementId"],
+        isEditing: false,
+      };
 
       const commonAppState = {
         viewBackgroundColor: "#ffffff",
@@ -24,23 +27,23 @@ describe("AppStateDelta", () => {
       const prevAppState1: ObservedAppState = {
         ...commonAppState,
         name: "",
-        selectedLinearElementId: null,
+        activeLinearElement: null,
       };
 
       const nextAppState1: ObservedAppState = {
         ...commonAppState,
         name,
-        selectedLinearElementId,
+        activeLinearElement,
       };
 
       const prevAppState2: ObservedAppState = {
-        selectedLinearElementId: null,
+        activeLinearElement: null,
         name: "",
         ...commonAppState,
       };
 
       const nextAppState2: ObservedAppState = {
-        selectedLinearElementId,
+        activeLinearElement,
         name,
         ...commonAppState,
       };
@@ -58,9 +61,7 @@ describe("AppStateDelta", () => {
         selectedGroupIds: {},
         editingGroupId: null,
         croppingElementId: null,
-        selectedLinearElementId: null,
-        selectedLinearElementIsEditing: null,
-        editingLinearElementId: null,
+        activeLinearElement: null,
         activeLockedId: null,
         lockedMultiSelections: {},
       };
@@ -106,9 +107,7 @@ describe("AppStateDelta", () => {
         selectedElementIds: {},
         editingGroupId: null,
         croppingElementId: null,
-        selectedLinearElementId: null,
-        selectedLinearElementIsEditing: null,
-        editingLinearElementId: null,
+        activeLinearElement: null,
         activeLockedId: null,
         lockedMultiSelections: {},
       };

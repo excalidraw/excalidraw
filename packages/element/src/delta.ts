@@ -2,7 +2,6 @@ import {
   arrayToMap,
   arrayToObject,
   assertNever,
-  invariant,
   isDevEnv,
   isShallowEqual,
   isTestEnv,
@@ -568,8 +567,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       const {
         selectedElementIds: addedSelectedElementIds = {},
         selectedGroupIds: addedSelectedGroupIds = {},
-        selectedLinearElementId,
-        selectedLinearElementIsEditing,
+        activeLinearElement,
         ...directlyApplicablePartial
       } = this.delta.inserted;
 
@@ -585,46 +583,26 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         removedSelectedGroupIds,
       );
 
-      let selectedLinearElement = appState.selectedLinearElement;
-
-      if (selectedLinearElementId === null) {
-        // Unselect linear element (visible change)
-        selectedLinearElement = null;
-      } else if (
-        selectedLinearElementId &&
-        nextElements.has(selectedLinearElementId)
-      ) {
-        selectedLinearElement = new LinearElementEditor(
-          nextElements.get(
-            selectedLinearElementId,
-          ) as NonDeleted<ExcalidrawLinearElement>,
-          nextElements,
-          selectedLinearElementIsEditing === true, // Can be unknown which is defaulted to false
-        );
-      }
-
-      if (
-        // Value being 'null' is equivaluent to unknown in this case because it only gets set
-        // to null when 'selectedLinearElementId' is set to null
-        selectedLinearElementIsEditing != null
-      ) {
-        invariant(
-          selectedLinearElement,
-          `selectedLinearElement is null when selectedLinearElementIsEditing is set to ${selectedLinearElementIsEditing}`,
-        );
-
-        selectedLinearElement = {
-          ...selectedLinearElement,
-          isEditing: selectedLinearElementIsEditing,
-        };
-      }
+      const selectedLinearElement =
+        activeLinearElement && nextElements.has(activeLinearElement.id)
+          ? new LinearElementEditor(
+              nextElements.get(
+                activeLinearElement.id,
+              ) as NonDeleted<ExcalidrawLinearElement>,
+              nextElements,
+              activeLinearElement.isEditing,
+            )
+          : null;
 
       const nextAppState = {
         ...appState,
         ...directlyApplicablePartial,
         selectedElementIds: mergedSelectedElementIds,
         selectedGroupIds: mergedSelectedGroupIds,
-        selectedLinearElement,
+        selectedLinearElement:
+          typeof activeLinearElement !== "undefined"
+            ? selectedLinearElement
+            : appState.selectedLinearElement,
       };
 
       const constainsVisibleChanges = this.filterInvisibleChanges(
@@ -753,15 +731,15 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
 
             break;
-          case "selectedLinearElementId": {
+          case "activeLinearElement":
             const appStateKey = AppStateDelta.convertToAppStateKey(key);
-            const linearElement = nextAppState[appStateKey];
+            const nextLinearElement = nextAppState[appStateKey];
 
-            if (!linearElement) {
+            if (!nextLinearElement) {
               // previously there was a linear element (assuming visible), now there is none
               visibleDifferenceFlag.value = true;
             } else {
-              const element = nextElements.get(linearElement.elementId);
+              const element = nextElements.get(nextLinearElement.elementId);
 
               if (element && !element.isDeleted) {
                 // previously there wasn't a linear element, now there is one which is visible
@@ -773,44 +751,34 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
 
             break;
-          }
-          case "selectedLinearElementIsEditing": {
-            // Changes in editing state are always visible
-            const prevIsEditing =
-              prevAppState.selectedLinearElement?.isEditing ?? false;
-            const nextIsEditing =
-              nextAppState.selectedLinearElement?.isEditing ?? false;
-
-            if (prevIsEditing !== nextIsEditing) {
-              visibleDifferenceFlag.value = true;
-            }
-            break;
-          }
-          case "lockedMultiSelections": {
+          case "lockedMultiSelections":
             const prevLockedUnits = prevAppState[key] || {};
             const nextLockedUnits = nextAppState[key] || {};
 
+            // TODO: this seems wrong, we are already doing this comparison generically above,
+            // hence instead we should check whether elements are actually visible,
+            // so that once these changes are applied they actually result in a visible change to the user
             if (!isShallowEqual(prevLockedUnits, nextLockedUnits)) {
               visibleDifferenceFlag.value = true;
             }
             break;
-          }
-          case "activeLockedId": {
+          case "activeLockedId":
             const prevHitLockedId = prevAppState[key] || null;
             const nextHitLockedId = nextAppState[key] || null;
 
+            // TODO: this seems wrong, we are already doing this comparison generically above,
+            // hence instead we should check whether elements are actually visible,
+            // so that once these changes are applied they actually result in a visible change to the user
             if (prevHitLockedId !== nextHitLockedId) {
               visibleDifferenceFlag.value = true;
             }
             break;
-          }
-          default: {
+          default:
             assertNever(
               key,
               `Unknown ObservedElementsAppState's key "${key}"`,
               true,
             );
-          }
         }
       }
     }
@@ -819,14 +787,13 @@ export class AppStateDelta implements DeltaContainer<AppState> {
   }
 
   private static convertToAppStateKey(
-    key: keyof Pick<ObservedElementsAppState, "selectedLinearElementId">,
+    key: keyof Pick<ObservedElementsAppState, "activeLinearElement">,
   ): keyof Pick<AppState, "selectedLinearElement"> {
     switch (key) {
-      case "selectedLinearElementId":
+      case "activeLinearElement":
         return "selectedLinearElement";
     }
   }
-
   private static filterSelectedElements(
     selectedElementIds: AppState["selectedElementIds"],
     elements: SceneElementsMap,
@@ -891,8 +858,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       editingGroupId,
       selectedGroupIds,
       selectedElementIds,
-      selectedLinearElementId,
-      selectedLinearElementIsEditing,
+      activeLinearElement,
       croppingElementId,
       lockedMultiSelections,
       activeLockedId,
