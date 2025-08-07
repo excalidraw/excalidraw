@@ -560,37 +560,38 @@ export class AppStateDelta implements DeltaContainer<AppState> {
   ): [AppState, boolean] {
     try {
       const {
-        selectedElementIds: removedSelectedElementIds = {},
-        selectedGroupIds: removedSelectedGroupIds = {},
+        selectedElementIds: deletedSelectedElementIds = {},
+        selectedGroupIds: deletedSelectedGroupIds = {},
       } = this.delta.deleted;
 
       const {
-        selectedElementIds: addedSelectedElementIds = {},
-        selectedGroupIds: addedSelectedGroupIds = {},
-        activeLinearElement,
+        selectedElementIds: insertedSelectedElementIds = {},
+        selectedGroupIds: insertedSelectedGroupIds = {},
+        selectedLinearElement: insertedSelectedLinearElement,
         ...directlyApplicablePartial
       } = this.delta.inserted;
 
       const mergedSelectedElementIds = Delta.mergeObjects(
         appState.selectedElementIds,
-        addedSelectedElementIds,
-        removedSelectedElementIds,
+        insertedSelectedElementIds,
+        deletedSelectedElementIds,
       );
 
       const mergedSelectedGroupIds = Delta.mergeObjects(
         appState.selectedGroupIds,
-        addedSelectedGroupIds,
-        removedSelectedGroupIds,
+        insertedSelectedGroupIds,
+        deletedSelectedGroupIds,
       );
 
       const selectedLinearElement =
-        activeLinearElement && nextElements.has(activeLinearElement.id)
+        insertedSelectedLinearElement &&
+        nextElements.has(insertedSelectedLinearElement.elementId)
           ? new LinearElementEditor(
               nextElements.get(
-                activeLinearElement.id,
+                insertedSelectedLinearElement.elementId,
               ) as NonDeleted<ExcalidrawLinearElement>,
               nextElements,
-              activeLinearElement.isEditing,
+              insertedSelectedLinearElement.isEditing,
             )
           : null;
 
@@ -600,7 +601,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         selectedElementIds: mergedSelectedElementIds,
         selectedGroupIds: mergedSelectedGroupIds,
         selectedLinearElement:
-          typeof activeLinearElement !== "undefined"
+          typeof insertedSelectedLinearElement !== "undefined"
             ? selectedLinearElement
             : appState.selectedLinearElement,
       };
@@ -731,9 +732,8 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
 
             break;
-          case "activeLinearElement":
-            const appStateKey = AppStateDelta.convertToAppStateKey(key);
-            const nextLinearElement = nextAppState[appStateKey];
+          case "selectedLinearElement":
+            const nextLinearElement = nextAppState[key];
 
             if (!nextLinearElement) {
               // previously there was a linear element (assuming visible), now there is none
@@ -746,7 +746,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
                 visibleDifferenceFlag.value = true;
               } else {
                 // there was assigned a linear element now, but it's deleted
-                nextAppState[appStateKey] = null;
+                nextAppState[key] = null;
               }
             }
 
@@ -786,14 +786,6 @@ export class AppStateDelta implements DeltaContainer<AppState> {
     return visibleDifferenceFlag.value;
   }
 
-  private static convertToAppStateKey(
-    key: keyof Pick<ObservedElementsAppState, "activeLinearElement">,
-  ): keyof Pick<AppState, "selectedLinearElement"> {
-    switch (key) {
-      case "activeLinearElement":
-        return "selectedLinearElement";
-    }
-  }
   private static filterSelectedElements(
     selectedElementIds: AppState["selectedElementIds"],
     elements: SceneElementsMap,
@@ -858,7 +850,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       editingGroupId,
       selectedGroupIds,
       selectedElementIds,
-      activeLinearElement,
+      selectedLinearElement,
       croppingElementId,
       lockedMultiSelections,
       activeLockedId,

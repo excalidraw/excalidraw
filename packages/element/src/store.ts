@@ -978,7 +978,7 @@ const getDefaultObservedAppState = (): ObservedAppState => {
     viewBackgroundColor: COLOR_PALETTE.white,
     selectedElementIds: {},
     selectedGroupIds: {},
-    activeLinearElement: null,
+    selectedLinearElement: null,
     croppingElementId: null,
     activeLockedId: null,
     lockedMultiSelections: {},
@@ -988,8 +988,6 @@ const getDefaultObservedAppState = (): ObservedAppState => {
 export const getObservedAppState = (
   appState: AppState | ObservedAppState,
 ): ObservedAppState => {
-  const selectedLinearElement = (appState as AppState).selectedLinearElement;
-
   const observedAppState = {
     name: appState.name,
     editingGroupId: appState.editingGroupId,
@@ -999,12 +997,12 @@ export const getObservedAppState = (
     croppingElementId: appState.croppingElementId,
     activeLockedId: appState.activeLockedId,
     lockedMultiSelections: appState.lockedMultiSelections,
-    activeLinearElement: selectedLinearElement
+    selectedLinearElement: appState.selectedLinearElement
       ? {
-          id: selectedLinearElement.elementId,
-          isEditing: !!selectedLinearElement.isEditing,
+          elementId: appState.selectedLinearElement.elementId,
+          isEditing: !!appState.selectedLinearElement.isEditing,
         }
-      : (appState as ObservedAppState).activeLinearElement ?? null,
+      : null,
   };
 
   Reflect.defineProperty(observedAppState, hiddenObservedAppStateProp, {

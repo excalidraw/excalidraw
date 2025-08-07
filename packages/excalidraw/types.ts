@@ -248,8 +248,8 @@ export type ObservedElementsAppState = {
   editingGroupId: AppState["editingGroupId"];
   selectedElementIds: AppState["selectedElementIds"];
   selectedGroupIds: AppState["selectedGroupIds"];
-  activeLinearElement: {
-    id: LinearElementEditor["elementId"];
+  selectedLinearElement: {
+    elementId: LinearElementEditor["elementId"];
     isEditing: boolean;
   } | null;
   croppingElementId: AppState["croppingElementId"];

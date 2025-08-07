@@ -7,8 +7,8 @@ describe("AppStateDelta", () => {
   describe("ensure stable delta properties order", () => {
     it("should maintain stable order for root properties", () => {
       const name = "untitled scene";
-      const activeLinearElement = {
-        id: "id1" as LinearElementEditor["elementId"],
+      const selectedLinearElement = {
+        elementId: "id1" as LinearElementEditor["elementId"],
         isEditing: false,
       };
 
@@ -27,23 +27,23 @@ describe("AppStateDelta", () => {
       const prevAppState1: ObservedAppState = {
         ...commonAppState,
         name: "",
-        activeLinearElement: null,
+        selectedLinearElement: null,
       };
 
       const nextAppState1: ObservedAppState = {
         ...commonAppState,
         name,
-        activeLinearElement,
+        selectedLinearElement,
       };
 
       const prevAppState2: ObservedAppState = {
-        activeLinearElement: null,
+        selectedLinearElement: null,
         name: "",
         ...commonAppState,
       };
 
       const nextAppState2: ObservedAppState = {
-        activeLinearElement,
+        selectedLinearElement,
         name,
         ...commonAppState,
       };
@@ -61,7 +61,7 @@ describe("AppStateDelta", () => {
         selectedGroupIds: {},
         editingGroupId: null,
         croppingElementId: null,
-        activeLinearElement: null,
+        selectedLinearElement: null,
         activeLockedId: null,
         lockedMultiSelections: {},
       };
@@ -107,7 +107,7 @@ describe("AppStateDelta", () => {
         selectedElementIds: {},
         editingGroupId: null,
         croppingElementId: null,
-        activeLinearElement: null,
+        selectedLinearElement: null,
         activeLockedId: null,
         lockedMultiSelections: {},
       };
