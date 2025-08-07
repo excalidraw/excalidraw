@@ -152,6 +152,16 @@ export class Delta<T> {
   }
 
   /**
+   * Merges two deltas into a new one.
+   */
+  public static merge<T>(delta1: Delta<T>, delta2: Delta<T>) {
+    return Delta.create(
+      { ...delta1.deleted, ...delta2.deleted },
+      { ...delta1.inserted, ...delta2.inserted },
+    );
+  }
+
+  /**
    * Merges deleted and inserted object partials.
    */
   public static mergeObjects<T extends { [key: string]: unknown }>(
@@ -498,13 +508,18 @@ export interface DeltaContainer<T> {
   applyTo(previous: T, ...options: unknown[]): [T, boolean];
 
   /**
+   * Squashes the current delta with the given one.
+   */
+  squash(delta: DeltaContainer<T>): this;
+
+  /**
    * Checks whether all `Delta`s are empty.
    */
   isEmpty(): boolean;
 }
 
 export class AppStateDelta implements DeltaContainer<AppState> {
-  private constructor(public readonly delta: Delta<ObservedAppState>) {}
+  private constructor(public delta: Delta<ObservedAppState>) {}
 
   public static calculate<T extends ObservedAppState>(
     prevAppState: T,
@@ -533,6 +548,11 @@ export class AppStateDelta implements DeltaContainer<AppState> {
   public inverse(): AppStateDelta {
     const inversedDelta = Delta.create(this.delta.inserted, this.delta.deleted);
     return new AppStateDelta(inversedDelta);
+  }
+
+  public squash(delta: AppStateDelta): this {
+    this.delta = Delta.merge(this.delta, delta.delta);
+    return this;
   }
 
   public applyTo(
@@ -1196,8 +1216,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     const inverseInternal = (deltas: Record<string, Delta<ElementPartial>>) => {
       const inversedDeltas: Record<string, Delta<ElementPartial>> = {};
 
-      for (const [id, delta] of Object.entries(deltas)) {
-        inversedDeltas[id] = Delta.create(delta.inserted, delta.deleted);
+      for (const [id, { inserted, deleted }] of Object.entries(deltas)) {
+        inversedDeltas[id] = Delta.create({ ...inserted }, { ...deleted });
       }
 
       return inversedDeltas;
@@ -1393,6 +1413,42 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     } finally {
       return [nextElements, flags.containsVisibleDifference];
     }
+  }
+
+  public squash(delta: ElementsDelta): this {
+    const { added, removed, updated } = delta;
+
+    for (const [id, nextDelta] of Object.entries(added)) {
+      const prevDelta = this.added[id];
+
+      if (!prevDelta) {
+        this.added[id] = nextDelta;
+      } else {
+        this.added[id] = Delta.merge(prevDelta, nextDelta);
+      }
+    }
+
+    for (const [id, nextDelta] of Object.entries(removed)) {
+      const prevDelta = this.removed[id];
+
+      if (!prevDelta) {
+        this.removed[id] = nextDelta;
+      } else {
+        this.removed[id] = Delta.merge(prevDelta, nextDelta);
+      }
+    }
+
+    for (const [id, nextDelta] of Object.entries(updated)) {
+      const prevDelta = this.updated[id];
+
+      if (!prevDelta) {
+        this.updated[id] = nextDelta;
+      } else {
+        this.updated[id] = Delta.merge(prevDelta, nextDelta);
+      }
+    }
+
+    return this;
   }
 
   private static createApplier =
@@ -1624,24 +1680,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       Array.from(prevElements).filter(([id]) => nextAffectedElements.has(id)),
     );
 
-    // calculate complete deltas for affected elements, and assign them back to all the deltas
-    // technically we could do better here if perf. would become an issue
-    const { added, removed, updated } = ElementsDelta.calculate(
-      prevAffectedElements,
-      nextAffectedElements,
+    // calculate complete deltas for affected elements, and squash them back to the current deltas
+    this.squash(
+      // technically we could do better here if perf. would become an issue
+      ElementsDelta.calculate(prevAffectedElements, nextAffectedElements),
     );
-
-    for (const [id, delta] of Object.entries(added)) {
-      this.added[id] = delta;
-    }
-
-    for (const [id, delta] of Object.entries(removed)) {
-      this.removed[id] = delta;
-    }
-
-    for (const [id, delta] of Object.entries(updated)) {
-      this.updated[id] = delta;
-    }
 
     return nextAffectedElements;
   }
