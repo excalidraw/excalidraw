@@ -291,6 +291,7 @@ const restoreElement = (
       // if empty text, mark as deleted. We keep in array
       // for data integrity purposes (collab etc.)
       if (!text && !element.isDeleted) {
+        // TODO: we should not do this since it breaks sync / versioning when we exchange / apply just deltas and restore the elements (deletion isn't recorded)
         element = { ...element, originalText: text, isDeleted: true };
         element = bumpVersion(element);
       }

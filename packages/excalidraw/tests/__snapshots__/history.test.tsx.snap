@@ -543,13 +543,14 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "selectedElementIds": {
             "id4": true,
           },
-          "selectedLinearElementId": "id4",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id4",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {},
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -1026,13 +1027,14 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "selectedElementIds": {
             "id4": true,
           },
-          "selectedLinearElementId": "id4",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id4",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {},
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -2414,13 +2416,14 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
           "selectedElementIds": {
             "id4": true,
           },
-          "selectedLinearElementId": "id4",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id4",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {},
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -7028,9 +7031,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "scrollX": 0,
   "scrollY": 0,
   "searchMatches": null,
-  "selectedElementIds": {
-    "id0": true,
-  },
+  "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectionElement": null,
@@ -7131,74 +7132,70 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     },
     "elements": {
       "added": {},
-      "removed": {
-        "id0": {
-          "deleted": {
-            "angle": 0,
-            "backgroundColor": "transparent",
-            "boundElements": null,
-            "customData": undefined,
-            "elbowed": false,
-            "endArrowhead": "arrow",
-            "endBinding": null,
-            "fillStyle": "solid",
-            "frameId": null,
-            "groupIds": [],
-            "height": 10,
-            "index": "a0",
-            "isDeleted": false,
-            "lastCommittedPoint": [
-              10,
-              10,
-            ],
-            "link": null,
-            "locked": false,
-            "opacity": 100,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                10,
-                10,
-              ],
-            ],
-            "roughness": 1,
-            "roundness": {
-              "type": 2,
-            },
-            "startArrowhead": null,
-            "startBinding": null,
-            "strokeColor": "#1e1e1e",
-            "strokeStyle": "solid",
-            "strokeWidth": 2,
-            "type": "arrow",
-            "version": 6,
-            "width": 10,
-            "x": 0,
-            "y": 0,
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id13",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
           },
-          "inserted": {
-            "isDeleted": true,
-            "version": 5,
+        },
+        "inserted": {
+          "selectedLinearElement": null,
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id14",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": true,
+          },
+        },
+        "inserted": {
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
           },
         },
       },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
       "updated": {},
     },
-    "id": "id2",
+    "id": "id15",
   },
   {
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
-          "selectedLinearElementId": "id0",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
+          },
         },
         "inserted": {
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": true,
+          },
         },
       },
     },
@@ -7207,43 +7204,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "removed": {},
       "updated": {},
     },
-    "id": "id4",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedLinearElementIsEditing": true,
-        },
-        "inserted": {
-          "selectedLinearElementIsEditing": false,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id6",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedLinearElementIsEditing": false,
-        },
-        "inserted": {
-          "selectedLinearElementIsEditing": true,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id10",
+    "id": "id16",
   },
 ]
 `;
@@ -10210,12 +10171,13 @@ exports[`history > multiplayer undo/redo > should override remotely added points
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
-          "selectedLinearElementId": "id0",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
+          },
         },
         "inserted": {
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -15770,13 +15732,14 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "selectedElementIds": {
             "id13": true,
           },
-          "selectedLinearElementId": "id13",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id13",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {},
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -16064,15 +16027,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "selectedElementIds": {
             "id13": true,
           },
-          "selectedLinearElementId": "id13",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id13",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {
             "id0": true,
           },
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -16688,15 +16652,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "selectedElementIds": {
             "id13": true,
           },
-          "selectedLinearElementId": "id13",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id13",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {
             "id0": true,
           },
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -17320,15 +17285,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "selectedElementIds": {
             "id13": true,
           },
-          "selectedLinearElementId": "id13",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id13",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {
             "id0": true,
           },
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -18017,15 +17983,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "selectedElementIds": {
             "id13": true,
           },
-          "selectedLinearElementId": "id13",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id13",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {
             "id0": true,
           },
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -18132,15 +18099,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "selectedElementIds": {
             "id0": true,
           },
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
         "inserted": {
           "selectedElementIds": {
             "id13": true,
           },
-          "selectedLinearElementId": "id13",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id13",
+            "isEditing": false,
+          },
         },
       },
     },
@@ -18744,15 +18712,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "selectedElementIds": {
             "id13": true,
           },
-          "selectedLinearElementId": "id13",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id13",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {
             "id0": true,
           },
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -18859,15 +18828,16 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "selectedElementIds": {
             "id0": true,
           },
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
         "inserted": {
           "selectedElementIds": {
             "id13": true,
           },
-          "selectedLinearElementId": "id13",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id13",
+            "isEditing": false,
+          },
         },
       },
     },
@@ -20656,12 +20626,13 @@ exports[`history > singleplayer undo/redo > should support linear element creati
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
-          "selectedLinearElementId": "id0",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
+          },
         },
         "inserted": {
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -20676,10 +20647,16 @@ exports[`history > singleplayer undo/redo > should support linear element creati
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
-          "selectedLinearElementIsEditing": true,
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": true,
+          },
         },
         "inserted": {
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
+          },
         },
       },
     },
@@ -20747,10 +20724,16 @@ exports[`history > singleplayer undo/redo > should support linear element creati
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
+          },
         },
         "inserted": {
-          "selectedLinearElementIsEditing": true,
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": true,
+          },
         },
       },
     },
