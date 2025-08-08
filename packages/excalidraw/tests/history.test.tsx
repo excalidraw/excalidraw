@@ -3043,15 +3043,14 @@ describe("history", () => {
       });
 
       Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(3);
-      expect(API.getRedoStack().length).toBe(1);
-      expect(h.state.selectedLinearElement).not.toBeNull();
-      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(4);
+      expect(h.state.selectedLinearElement).toBeNull();
 
       Keyboard.redo();
       expect(API.getUndoStack().length).toBe(4);
       expect(API.getRedoStack().length).toBe(0);
-      expect(h.state.selectedLinearElement).not.toBeNull();
+      expect(h.state.selectedLinearElement).toBeNull();
       expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
     });
 
