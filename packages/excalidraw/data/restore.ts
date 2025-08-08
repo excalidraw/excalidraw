@@ -533,24 +533,35 @@ export const restoreElements = (
     (elements || []).reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
-      if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-        let migratedElement: ExcalidrawElement | null = restoreElement(element);
-        if (migratedElement) {
-          const localElement = localElementsMap?.get(element.id);
-          if (localElement && localElement.version > migratedElement.version) {
-            migratedElement = bumpVersion(
-              migratedElement,
-              localElement.version,
-            );
-          }
-          if (existingIds.has(migratedElement.id)) {
-            migratedElement = { ...migratedElement, id: randomId() };
-          }
-          existingIds.add(migratedElement.id);
-
-          elements.push(migratedElement);
-        }
+      if (element.type === "selection") {
+        return elements;
       }
+
+      let migratedElement: ExcalidrawElement | null = restoreElement(element);
+      if (migratedElement) {
+        const localElement = localElementsMap?.get(element.id);
+
+        const isInvisible = isInvisiblySmallElement(element);
+
+        if (
+          isInvisible ||
+          (localElement && localElement.version > migratedElement.version)
+        ) {
+          migratedElement = bumpVersion(migratedElement, localElement?.version);
+        }
+
+        if (isInvisible) {
+          migratedElement = { ...migratedElement, isDeleted: true };
+        }
+
+        if (existingIds.has(migratedElement.id)) {
+          migratedElement = { ...migratedElement, id: randomId() };
+        }
+        existingIds.add(migratedElement.id);
+
+        elements.push(migratedElement);
+      }
+
       return elements;
     }, [] as ExcalidrawElement[]),
   );
