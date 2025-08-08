@@ -60,7 +60,9 @@ describe("restoreElements", () => {
     const rectElement = API.createElement({ type: "rectangle" });
     mockSizeHelper.mockImplementation(() => true);
 
-    expect(restore.restoreElements([rectElement], null).length).toBe(0);
+    expect(restore.restoreElements([rectElement], null)).toEqual([
+      expect.objectContaining({ isDeleted: true }),
+    ]);
   });
 
   it("should restore text element correctly passing value for each attribute", () => {
@@ -183,7 +185,8 @@ describe("restoreElements", () => {
       | ExcalidrawArrowElement
       | undefined;
 
-    expect(restoredArrow).toBeUndefined();
+    expect(restoredArrow).not.toBeUndefined();
+    expect(restoredArrow?.isDeleted).toBe(true);
   });
 
   it("should keep 'imperceptibly' small freedraw/line elements", () => {
@@ -856,6 +859,11 @@ describe("repairing bindings", () => {
         boundElements: [obsoleteBinding, invisibleBinding, nonExistentBinding],
       }),
       expect.objectContaining({
+        id: invisibleBoundElement.id,
+        containerId: container.id,
+        isDeleted: true,
+      }),
+      expect.objectContaining({
         id: boundElement.id,
         containerId: container.id,
       }),
@@ -871,6 +879,11 @@ describe("repairing bindings", () => {
       expect.objectContaining({
         id: container.id,
         boundElements: [],
+      }),
+      expect.objectContaining({
+        id: invisibleBoundElement.id,
+        containerId: container.id,
+        isDeleted: true,
       }),
       expect.objectContaining({
         id: boundElement.id,
