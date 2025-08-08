@@ -25,11 +25,14 @@ function gradient(
   f: (t: number, s: number) => number,
   t0: number,
   s0: number,
-  delta: number = 1e-6,
+  delta: number = 1e-7,
 ): number[] {
+  const dt = delta * Math.max(Math.abs(t0), 1);
+  const ds = delta * Math.max(Math.abs(s0), 1);
+
   return [
-    (f(t0 + delta, s0) - f(t0 - delta, s0)) / (2 * delta),
-    (f(t0, s0 + delta) - f(t0, s0 - delta)) / (2 * delta),
+    (f(t0 + dt, s0) - f(t0 - dt, s0)) / (2 * dt),
+    (f(t0, s0 + ds) - f(t0, s0 - ds)) / (2 * ds),
   ];
 }
 
