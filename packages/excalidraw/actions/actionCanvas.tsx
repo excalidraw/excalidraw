@@ -63,8 +63,33 @@ export const actionChangeViewBackgroundColor = register({
     );
   },
   perform: (_, appState, value) => {
+    const newAppState = { ...appState, ...value };
+    
+    // 如果有新的背景色值，需要判断是否为默认选项
+    if (value.viewBackgroundColor) {
+      const currentTheme = appState.theme;
+      const topPicks = currentTheme === THEME.DARK 
+        ? DEFAULT_CANVAS_BACKGROUND_PICKS_DARK 
+        : DEFAULT_CANVAS_BACKGROUND_PICKS;
+      
+      const defaultIndex = topPicks.indexOf(value.viewBackgroundColor);
+      
+      if (defaultIndex !== -1) {
+        // 是默认选项
+        newAppState.viewBackgroundColorSource = {
+          type: 'default',
+          defaultIndex,
+        };
+      } else {
+        // 是自定义颜色
+        newAppState.viewBackgroundColorSource = {
+          type: 'custom',
+        };
+      }
+    }
+    
     return {
-      appState: { ...appState, ...value },
+      appState: newAppState,
       captureUpdate: !!value.viewBackgroundColor
         ? CaptureUpdateAction.IMMEDIATELY
         : CaptureUpdateAction.EVENTUALLY,
@@ -476,11 +501,36 @@ export const actionToggleTheme = register({
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value) => {
+    const newTheme = value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT);
+    let newViewBackgroundColor = appState.viewBackgroundColor;
+    let newViewBackgroundColorSource = appState.viewBackgroundColorSource;
+    
+    // If the default background color is currently in use, switch to the default color corresponding to the new theme
+    if (appState.viewBackgroundColorSource.type === 'default' && 
+        typeof appState.viewBackgroundColorSource.defaultIndex === 'number') {
+      
+      const newTopPicks = newTheme === THEME.DARK 
+        ? DEFAULT_CANVAS_BACKGROUND_PICKS_DARK 
+        : DEFAULT_CANVAS_BACKGROUND_PICKS;
+      
+      const index = appState.viewBackgroundColorSource.defaultIndex;
+      if (index < newTopPicks.length) {
+        newViewBackgroundColor = newTopPicks[index];
+        // maintain the same source information
+        newViewBackgroundColorSource = {
+          type: 'default',
+          defaultIndex: index,
+        };
+      }
+    }
+    // If a custom color is used, do not change the background color
+
     return {
       appState: {
         ...appState,
-        theme:
-          value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
+        theme: newTheme,
+        viewBackgroundColor: newViewBackgroundColor,
+        viewBackgroundColorSource: newViewBackgroundColorSource,
       },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };

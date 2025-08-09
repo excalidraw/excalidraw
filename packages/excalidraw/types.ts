@@ -336,6 +336,10 @@ export interface AppState {
   currentItemRoundness: StrokeRoundness;
   currentItemArrowType: "sharp" | "round" | "elbow";
   viewBackgroundColor: string;
+  viewBackgroundColorSource: {
+    type: 'default' | 'custom';
+    defaultIndex?: number; // Set when type is 'default'
+  };
   scrollX: number;
   scrollY: number;
   cursorButton: "up" | "down";
