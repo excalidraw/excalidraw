@@ -76,8 +76,9 @@ type MicroActionsQueue = (() => void)[];
  * Store which captures the observed changes and emits them as `StoreIncrement` events.
  */
 export class Store {
-  // internally used by history
+  // for internal use by history
   public readonly onDurableIncrementEmitter = new Emitter<[DurableIncrement]>();
+  // for public use as part of onIncrement API
   public readonly onStoreIncrementEmitter = new Emitter<
     [DurableIncrement | EphemeralIncrement]
   >();
@@ -239,7 +240,6 @@ export class Store {
     if (!storeDelta.isEmpty()) {
       const increment = new DurableIncrement(storeChange, storeDelta);
 
-      // Notify listeners with the increment
       this.onDurableIncrementEmitter.trigger(increment);
       this.onStoreIncrementEmitter.trigger(increment);
     }
@@ -978,8 +978,7 @@ const getDefaultObservedAppState = (): ObservedAppState => {
     viewBackgroundColor: COLOR_PALETTE.white,
     selectedElementIds: {},
     selectedGroupIds: {},
-    selectedLinearElementId: null,
-    selectedLinearElementIsEditing: null,
+    selectedLinearElement: null,
     croppingElementId: null,
     activeLockedId: null,
     lockedMultiSelections: {},
@@ -998,14 +997,12 @@ export const getObservedAppState = (
     croppingElementId: appState.croppingElementId,
     activeLockedId: appState.activeLockedId,
     lockedMultiSelections: appState.lockedMultiSelections,
-    selectedLinearElementId:
-      (appState as AppState).selectedLinearElement?.elementId ??
-      (appState as ObservedAppState).selectedLinearElementId ??
-      null,
-    selectedLinearElementIsEditing:
-      (appState as AppState).selectedLinearElement?.isEditing ??
-      (appState as ObservedAppState).selectedLinearElementIsEditing ??
-      null,
+    selectedLinearElement: appState.selectedLinearElement
+      ? {
+          elementId: appState.selectedLinearElement.elementId,
+          isEditing: !!appState.selectedLinearElement.isEditing,
+        }
+      : null,
   };
 
   Reflect.defineProperty(observedAppState, hiddenObservedAppStateProp, {
