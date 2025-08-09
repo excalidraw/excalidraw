@@ -2,7 +2,6 @@ import {
   arrayToMap,
   arrayToObject,
   assertNever,
-  invariant,
   isDevEnv,
   isShallowEqual,
   isTestEnv,
@@ -148,6 +147,16 @@ export class Delta<T> {
   public static isEmpty<T>(delta: Delta<T>): boolean {
     return (
       !Object.keys(delta.deleted).length && !Object.keys(delta.inserted).length
+    );
+  }
+
+  /**
+   * Merges two deltas into a new one.
+   */
+  public static merge<T>(delta1: Delta<T>, delta2: Delta<T>) {
+    return Delta.create(
+      { ...delta1.deleted, ...delta2.deleted },
+      { ...delta1.inserted, ...delta2.inserted },
     );
   }
 
@@ -498,13 +507,18 @@ export interface DeltaContainer<T> {
   applyTo(previous: T, ...options: unknown[]): [T, boolean];
 
   /**
+   * Squashes the current delta with the given one.
+   */
+  squash(delta: DeltaContainer<T>): this;
+
+  /**
    * Checks whether all `Delta`s are empty.
    */
   isEmpty(): boolean;
 }
 
 export class AppStateDelta implements DeltaContainer<AppState> {
-  private constructor(public readonly delta: Delta<ObservedAppState>) {}
+  private constructor(public delta: Delta<ObservedAppState>) {}
 
   public static calculate<T extends ObservedAppState>(
     prevAppState: T,
@@ -535,76 +549,61 @@ export class AppStateDelta implements DeltaContainer<AppState> {
     return new AppStateDelta(inversedDelta);
   }
 
+  public squash(delta: AppStateDelta): this {
+    this.delta = Delta.merge(this.delta, delta.delta);
+    return this;
+  }
+
   public applyTo(
     appState: AppState,
     nextElements: SceneElementsMap,
   ): [AppState, boolean] {
     try {
       const {
-        selectedElementIds: removedSelectedElementIds = {},
-        selectedGroupIds: removedSelectedGroupIds = {},
+        selectedElementIds: deletedSelectedElementIds = {},
+        selectedGroupIds: deletedSelectedGroupIds = {},
       } = this.delta.deleted;
 
       const {
-        selectedElementIds: addedSelectedElementIds = {},
-        selectedGroupIds: addedSelectedGroupIds = {},
-        selectedLinearElementId,
-        selectedLinearElementIsEditing,
+        selectedElementIds: insertedSelectedElementIds = {},
+        selectedGroupIds: insertedSelectedGroupIds = {},
+        selectedLinearElement: insertedSelectedLinearElement,
         ...directlyApplicablePartial
       } = this.delta.inserted;
 
       const mergedSelectedElementIds = Delta.mergeObjects(
         appState.selectedElementIds,
-        addedSelectedElementIds,
-        removedSelectedElementIds,
+        insertedSelectedElementIds,
+        deletedSelectedElementIds,
       );
 
       const mergedSelectedGroupIds = Delta.mergeObjects(
         appState.selectedGroupIds,
-        addedSelectedGroupIds,
-        removedSelectedGroupIds,
+        insertedSelectedGroupIds,
+        deletedSelectedGroupIds,
       );
 
-      let selectedLinearElement = appState.selectedLinearElement;
-
-      if (selectedLinearElementId === null) {
-        // Unselect linear element (visible change)
-        selectedLinearElement = null;
-      } else if (
-        selectedLinearElementId &&
-        nextElements.has(selectedLinearElementId)
-      ) {
-        selectedLinearElement = new LinearElementEditor(
-          nextElements.get(
-            selectedLinearElementId,
-          ) as NonDeleted<ExcalidrawLinearElement>,
-          nextElements,
-          selectedLinearElementIsEditing === true, // Can be unknown which is defaulted to false
-        );
-      }
-
-      if (
-        // Value being 'null' is equivaluent to unknown in this case because it only gets set
-        // to null when 'selectedLinearElementId' is set to null
-        selectedLinearElementIsEditing != null
-      ) {
-        invariant(
-          selectedLinearElement,
-          `selectedLinearElement is null when selectedLinearElementIsEditing is set to ${selectedLinearElementIsEditing}`,
-        );
-
-        selectedLinearElement = {
-          ...selectedLinearElement,
-          isEditing: selectedLinearElementIsEditing,
-        };
-      }
+      const selectedLinearElement =
+        insertedSelectedLinearElement &&
+        nextElements.has(insertedSelectedLinearElement.elementId)
+          ? new LinearElementEditor(
+              nextElements.get(
+                insertedSelectedLinearElement.elementId,
+              ) as NonDeleted<ExcalidrawLinearElement>,
+              nextElements,
+              insertedSelectedLinearElement.isEditing,
+            )
+          : null;
 
       const nextAppState = {
         ...appState,
         ...directlyApplicablePartial,
         selectedElementIds: mergedSelectedElementIds,
         selectedGroupIds: mergedSelectedGroupIds,
-        selectedLinearElement,
+        selectedLinearElement:
+          typeof insertedSelectedLinearElement !== "undefined"
+            ? selectedLinearElement
+            : appState.selectedLinearElement,
       };
 
       const constainsVisibleChanges = this.filterInvisibleChanges(
@@ -733,78 +732,58 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
 
             break;
-          case "selectedLinearElementId": {
-            const appStateKey = AppStateDelta.convertToAppStateKey(key);
-            const linearElement = nextAppState[appStateKey];
+          case "selectedLinearElement":
+            const nextLinearElement = nextAppState[key];
 
-            if (!linearElement) {
+            if (!nextLinearElement) {
               // previously there was a linear element (assuming visible), now there is none
               visibleDifferenceFlag.value = true;
             } else {
-              const element = nextElements.get(linearElement.elementId);
+              const element = nextElements.get(nextLinearElement.elementId);
 
               if (element && !element.isDeleted) {
                 // previously there wasn't a linear element, now there is one which is visible
                 visibleDifferenceFlag.value = true;
               } else {
                 // there was assigned a linear element now, but it's deleted
-                nextAppState[appStateKey] = null;
+                nextAppState[key] = null;
               }
             }
 
             break;
-          }
-          case "selectedLinearElementIsEditing": {
-            // Changes in editing state are always visible
-            const prevIsEditing =
-              prevAppState.selectedLinearElement?.isEditing ?? false;
-            const nextIsEditing =
-              nextAppState.selectedLinearElement?.isEditing ?? false;
-
-            if (prevIsEditing !== nextIsEditing) {
-              visibleDifferenceFlag.value = true;
-            }
-            break;
-          }
-          case "lockedMultiSelections": {
+          case "lockedMultiSelections":
             const prevLockedUnits = prevAppState[key] || {};
             const nextLockedUnits = nextAppState[key] || {};
 
+            // TODO: this seems wrong, we are already doing this comparison generically above,
+            // hence instead we should check whether elements are actually visible,
+            // so that once these changes are applied they actually result in a visible change to the user
             if (!isShallowEqual(prevLockedUnits, nextLockedUnits)) {
               visibleDifferenceFlag.value = true;
             }
             break;
-          }
-          case "activeLockedId": {
+          case "activeLockedId":
             const prevHitLockedId = prevAppState[key] || null;
             const nextHitLockedId = nextAppState[key] || null;
 
+            // TODO: this seems wrong, we are already doing this comparison generically above,
+            // hence instead we should check whether elements are actually visible,
+            // so that once these changes are applied they actually result in a visible change to the user
             if (prevHitLockedId !== nextHitLockedId) {
               visibleDifferenceFlag.value = true;
             }
             break;
-          }
-          default: {
+          default:
             assertNever(
               key,
               `Unknown ObservedElementsAppState's key "${key}"`,
               true,
             );
-          }
         }
       }
     }
 
     return visibleDifferenceFlag.value;
-  }
-
-  private static convertToAppStateKey(
-    key: keyof Pick<ObservedElementsAppState, "selectedLinearElementId">,
-  ): keyof Pick<AppState, "selectedLinearElement"> {
-    switch (key) {
-      case "selectedLinearElementId":
-        return "selectedLinearElement";
-    }
   }
 
   private static filterSelectedElements(
@@ -871,8 +850,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       editingGroupId,
       selectedGroupIds,
       selectedElementIds,
-      selectedLinearElementId,
-      selectedLinearElementIsEditing,
+      selectedLinearElement,
       croppingElementId,
       lockedMultiSelections,
       activeLockedId,
@@ -1196,8 +1174,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     const inverseInternal = (deltas: Record<string, Delta<ElementPartial>>) => {
       const inversedDeltas: Record<string, Delta<ElementPartial>> = {};
 
-      for (const [id, delta] of Object.entries(deltas)) {
-        inversedDeltas[id] = Delta.create(delta.inserted, delta.deleted);
+      for (const [id, { inserted, deleted }] of Object.entries(deltas)) {
+        inversedDeltas[id] = Delta.create({ ...inserted }, { ...deleted });
       }
 
       return inversedDeltas;
@@ -1393,6 +1371,42 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     } finally {
       return [nextElements, flags.containsVisibleDifference];
     }
+  }
+
+  public squash(delta: ElementsDelta): this {
+    const { added, removed, updated } = delta;
+
+    for (const [id, nextDelta] of Object.entries(added)) {
+      const prevDelta = this.added[id];
+
+      if (!prevDelta) {
+        this.added[id] = nextDelta;
+      } else {
+        this.added[id] = Delta.merge(prevDelta, nextDelta);
+      }
+    }
+
+    for (const [id, nextDelta] of Object.entries(removed)) {
+      const prevDelta = this.removed[id];
+
+      if (!prevDelta) {
+        this.removed[id] = nextDelta;
+      } else {
+        this.removed[id] = Delta.merge(prevDelta, nextDelta);
+      }
+    }
+
+    for (const [id, nextDelta] of Object.entries(updated)) {
+      const prevDelta = this.updated[id];
+
+      if (!prevDelta) {
+        this.updated[id] = nextDelta;
+      } else {
+        this.updated[id] = Delta.merge(prevDelta, nextDelta);
+      }
+    }
+
+    return this;
   }
 
   private static createApplier =
@@ -1624,24 +1638,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       Array.from(prevElements).filter(([id]) => nextAffectedElements.has(id)),
     );
 
-    // calculate complete deltas for affected elements, and assign them back to all the deltas
-    // technically we could do better here if perf. would become an issue
-    const { added, removed, updated } = ElementsDelta.calculate(
-      prevAffectedElements,
-      nextAffectedElements,
+    // calculate complete deltas for affected elements, and squash them back to the current deltas
+    this.squash(
+      // technically we could do better here if perf. would become an issue
+      ElementsDelta.calculate(prevAffectedElements, nextAffectedElements),
     );
-
-    for (const [id, delta] of Object.entries(added)) {
-      this.added[id] = delta;
-    }
-
-    for (const [id, delta] of Object.entries(removed)) {
-      this.removed[id] = delta;
-    }
-
-    for (const [id, delta] of Object.entries(updated)) {
-      this.updated[id] = delta;
-    }
 
     return nextAffectedElements;
   }

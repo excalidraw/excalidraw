@@ -144,7 +144,7 @@ const askToCommit = (tag, nextVersion) => {
     });
 
     rl.question(
-      "Do you want to commit these changes to git? (Y/n): ",
+      "Would you like to commit these changes to git? (Y/n): ",
       (answer) => {
         rl.close();
 
@@ -189,7 +189,7 @@ const askToPublish = (tag, version) => {
     });
 
     rl.question(
-      "Do you want to publish these changes to npm? (Y/n): ",
+      "Would you like to publish these changes to npm? (Y/n): ",
       (answer) => {
         rl.close();
 

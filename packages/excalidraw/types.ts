@@ -248,8 +248,10 @@ export type ObservedElementsAppState = {
   editingGroupId: AppState["editingGroupId"];
   selectedElementIds: AppState["selectedElementIds"];
   selectedGroupIds: AppState["selectedGroupIds"];
-  selectedLinearElementId: LinearElementEditor["elementId"] | null;
-  selectedLinearElementIsEditing: boolean | null;
+  selectedLinearElement: {
+    elementId: LinearElementEditor["elementId"];
+    isEditing: boolean;
+  } | null;
   croppingElementId: AppState["croppingElementId"];
   lockedMultiSelections: AppState["lockedMultiSelections"];
   activeLockedId: AppState["activeLockedId"];
