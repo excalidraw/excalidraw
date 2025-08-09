@@ -3,10 +3,7 @@ import {
   DEFAULT_CANVAS_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   CURSOR_TYPE,
-  MAX_ZOOM,
-  MIN_ZOOM,
   THEME,
-  ZOOM_STEP,
   getShortcutKey,
   updateActiveTool,
   CODES,
@@ -52,7 +49,7 @@ import { getStateForZoom } from "../scene/zoom";
 import { register } from "./register";
 
 import type { AppClassProperties, AppState, Offsets } from "../types";
-import { getMaxZoom } from "../obsidianUtils";
+import { getMaxZoom, getZoomMax, getZoomMin, getZoomStep } from "../obsidianUtils";
 import { excludeElementsInFramesFromSelection } from "@excalidraw/element/selection";
 
 export const actionChangeViewBackgroundColor = register({
@@ -161,7 +158,7 @@ export const actionZoomIn = register({
           {
             viewportX: appState.width / 2 + appState.offsetLeft,
             viewportY: appState.height / 2 + appState.offsetTop,
-            nextZoom: getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
+            nextZoom: getNormalizedZoom(appState.zoom.value + getZoomStep()),
           },
           appState,
         ),
@@ -177,7 +174,7 @@ export const actionZoomIn = register({
       icon={ZoomInIcon}
       title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
-      disabled={appState.zoom.value >= MAX_ZOOM}
+      disabled={appState.zoom.value >= getZoomMax()}
       onClick={() => {
         updateData(null);
       }}
@@ -202,7 +199,7 @@ export const actionZoomOut = register({
           {
             viewportX: appState.width / 2 + appState.offsetLeft,
             viewportY: appState.height / 2 + appState.offsetTop,
-            nextZoom: getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
+            nextZoom: getNormalizedZoom(appState.zoom.value - getZoomStep()),
           },
           appState,
         ),
@@ -218,7 +215,7 @@ export const actionZoomOut = register({
       icon={ZoomOutIcon}
       title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
       aria-label={t("buttons.zoomOut")}
-      disabled={appState.zoom.value <= MIN_ZOOM}
+      disabled={appState.zoom.value <= getZoomMin()}
       onClick={() => {
         updateData(null);
       }}
@@ -314,7 +311,7 @@ export const zoomToFitBounds = ({
   minZoom?: number;
   maxZoom?: number;
 }) => {
-  viewportZoomFactor = clamp(viewportZoomFactor, MIN_ZOOM, MAX_ZOOM);
+  viewportZoomFactor = clamp(viewportZoomFactor, getZoomMin(), getZoomMax());
 
   const [x1, y1, x2, y2] = bounds;
   const centerX = (x1 + x2) / 2;
@@ -353,7 +350,7 @@ export const zoomToFitBounds = ({
   }
 
   const newZoomValue = getNormalizedZoom(
-    clamp(roundToStep(adjustedZoomValue, ZOOM_STEP, "floor"), minZoom, maxZoom),
+    clamp(roundToStep(adjustedZoomValue, getZoomStep(), "floor"), minZoom, maxZoom),
   );
 
   const centerScroll = centerScrollOn({

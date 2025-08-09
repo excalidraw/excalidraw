@@ -55,7 +55,6 @@ import {
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
   YOUTUBE_STATES,
-  ZOOM_STEP,
   POINTER_EVENTS,
   TOOL_TYPE,
   isIOS,
@@ -466,7 +465,7 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionName, ActionResult } from "../actions/types";
-import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode } from "../obsidianUtils";
+import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode } from "../obsidianUtils";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
 
@@ -9757,7 +9756,7 @@ startLineEditor = (
           newElement &&
           !multiElement
         ) {
-          if (this.device.isTouchScreen) {
+          if (this.device.isTouchScreen && newElement.points.length > 1) { //zsviczian
             const FIXED_DELTA_X = Math.min(
               (this.state.width * 0.7) / this.state.zoom.value,
               100,
@@ -11683,7 +11682,7 @@ startLineEditor = (
         (!(event.metaKey || event.ctrlKey) && this.state.allowWheelZoom)
       ) {
         const sign = Math.sign(deltaY);
-        const MAX_STEP = ZOOM_STEP * 100;
+        const MAX_STEP = getZoomStep() * 100;
         const absDelta = Math.abs(deltaY);
         let delta = deltaY;
         if (absDelta > MAX_STEP) {
