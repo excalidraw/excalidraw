@@ -99,7 +99,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     <!------------------------------------------------------------------------->
-    <% if (typeof PROD != 'undefined' && PROD == true) { %>
+    <!-- Removed EJS templating for development -->
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -129,11 +129,9 @@
       type="text/css"
     />
 
-    <% } else { %>
     <script>
       window.EXCALIDRAW_ASSET_PATH = window.origin;
     </script>
-    <% } %>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -142,23 +140,7 @@
     <!-- Excalidraw version -->
     <meta name="version" content="{version}" />
 
-    <% if (typeof VITE_APP_DEV_DISABLE_LIVE_RELOAD != 'undefined' &&
-    VITE_APP_DEV_DISABLE_LIVE_RELOAD == true) { %>
-    <script>
-      {
-        const _WebSocket = window.WebSocket;
-        window.WebSocket = function (url) {
-          if (/ws:\/\/localhost:.+?\/sockjs-node/.test(url)) {
-            console.info(
-              "[!!!] Live reload is disabled via VITE_APP_DEV_DISABLE_LIVE_RELOAD [!!!]",
-            );
-          } else {
-            return new _WebSocket(url);
-          }
-        };
-      }
-    </script>
-    <% } %>
+    <!-- Live reload script removed for development -->
     <script>
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
@@ -216,39 +198,6 @@
     </header>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
-    <% if (typeof PROD != 'undefined' && PROD == true) { %>
-    <!-- 100% privacy friendly analytics -->
-    <script>
-      // need to load this script dynamically bcs. of iframe embed tracking
-      var scriptEle = document.createElement("script");
-      scriptEle.setAttribute(
-        "src",
-        "https://scripts.simpleanalyticscdn.com/latest.js",
-      );
-      scriptEle.setAttribute("type", "text/javascript");
-      scriptEle.setAttribute("defer", true);
-      scriptEle.setAttribute("async", true);
-      // if iframe
-      if (window.self !== window.top) {
-        scriptEle.setAttribute("data-auto-collect", true);
-      }
-
-      document.body.appendChild(scriptEle);
-
-      // if iframe
-      if (window.self !== window.top) {
-        scriptEle.addEventListener("load", () => {
-          if (window.sa_pageview) {
-            window.window.sa_event(action, {
-              category: "iframe",
-              label: "embed",
-              value: window.location.pathname,
-            });
-          }
-        });
-      }
-    </script>
-    <!-- end LEGACY GOOGLE ANALYTICS -->
-    <% } %>
+    <!-- Analytics removed for development -->
   </body>
 </html>

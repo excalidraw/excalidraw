@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Excalidraw | Hand-drawn look & feel • Collaborative • Secure</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no"
+    />
+    <meta name="referrer" content="origin" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <meta name="theme-color" content="#121212" />
+
+    <!-- General tags -->
+    <meta
+      name="description"
+      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+    />
+    <meta name="image" content="https://excalidraw.com/og-image-2.png" />
+
+    <!-- OpenGraph tags -->
+    <meta property="og:url" content="https://excalidraw.com" />
+    <meta property="og:site_name" content="Excalidraw" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Excalidraw" />
+    <meta
+      property="og:description"
+      content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+    />
+    <meta property="og:image" content="https://excalidraw.com/og-image-2.png" />
+
+    <!-- Twitter Card tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Excalidraw" />
+    <meta
+      name="twitter:description"
+      content="Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
+    />
+    <meta name="twitter:image" content="https://excalidraw.com/og-image-2.png" />
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000" />
+    <meta name="msapplication-TileColor" content="#da532c" />
+
+    <script>
+      window.EXCALIDRAW_ASSET_PATH = window.origin;
+    </script>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        -webkit-text-size-adjust: 100%;
+
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+
+        font-family: Assistant, system-ui, BlinkMacSystemFont, Segoe UI, Helvetica,
+          Arial, sans-serif;
+      }
+
+      .excalidraw,
+      .excalidraw-app {
+        height: 100%;
+        width: 100%;
+      }
+
+      /* FIXME move this to the package */
+      .dropdown-select__language .dropdown-select__language-item .flag {
+        border: 1px solid #ced4da;
+      }
+
+      .rtl-mirror {
+        transform: scaleX(-1);
+      }
+
+      /* Dark theme style overrides */
+      .dark .dropdown-select__language .dropdown-select__language-item .flag {
+        border: 1px solid #4c6ef5;
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript> You need to enable JavaScript to run this app. </noscript>
+    <div id="root">
+      <div
+        style="
+          height: 100%;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: Assistant, Arial, sans-serif;
+          font-size: 20px;
+          color: #8b8b8b;
+        "
+      >
+        Loading scene...
+      </div>
+    </div>
+
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
