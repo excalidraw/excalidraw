@@ -99,3 +99,29 @@ export const getTotalStorageSize = () => {
     return 0;
   }
 };
+
+export const saveAuthToken = (token: string) => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_AUTH_TOKEN, token);
+  } catch (error: any) {
+    // Unable to access window.localStorage
+    console.error(error);
+  }
+};
+
+export const getAuthToken = (): string | null => {
+  try {
+    return localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_AUTH_TOKEN);
+  } catch (error: any) {
+    console.error(error);
+    return null;
+  }
+};
+
+export const deleteAuthToken = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_AUTH_TOKEN);
+  } catch (error: any) {
+    console.error(error);
+  }
+};

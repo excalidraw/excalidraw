@@ -46,6 +46,9 @@ export const STORAGE_KEYS = {
 
   IDB_LIBRARY: "excalidraw-library",
 
+  // Rangga-BE related
+  LOCAL_STORAGE_AUTH_TOKEN: "excalidraw-auth-token",
+
   // do not use apart from migrations
   __LEGACY_LOCAL_STORAGE_LIBRARY: "excalidraw-library",
 } as const;

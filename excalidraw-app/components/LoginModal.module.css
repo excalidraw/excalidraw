@@ -1,0 +1,83 @@
+/* Modal overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal box */
+.modal {
+  background: var(--color-background-primary, #fff);
+  color: var(--color-text-primary, #222);
+  border-radius: 8px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  padding: 2rem 2.5rem 2rem 2.5rem;
+  min-width: 320px;
+  max-width: 90vw;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-icon-primary, #888);
+  cursor: pointer;
+}
+
+.title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.label {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: 4px;
+  font-size: 1rem;
+  background: var(--color-background-secondary, #fafafa);
+  color: var(--color-text-primary, #222);
+}
+
+.loginButton {
+  margin-top: 1rem;
+  padding: 0.6rem 0;
+  background: var(--color-primary, #4f8cff);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.loginButton:hover {
+  background: var(--color-primary-darker, #3a6fd8);
+}

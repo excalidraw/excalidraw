@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  padding: 0;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 32px 0 rgba(0,0,0,0.08);
+  padding: 48px 32px 32px 32px;
+  min-width: 340px;
+  max-width: 360px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  margin: 0 auto;
+}
+
+.logoRow {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+.logoIcon {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 28px;
+  color: #1a2330;
+  letter-spacing: 1px;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+.title {
+  margin: 0;
+  margin-bottom: 24px;
+  font-weight: 600;
+  font-size: 22px;
+  color: #1a2330;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+.label {
+  width: 100%;
+  font-weight: 500;
+  color: #374151;
+  font-size: 15px;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border 0.2s;
+  background: #f9fafb;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+}
+
+.button {
+  margin-top: 8px;
+  width: 100%;
+  padding: 12px 0;
+  background: #4f46e5;
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px 0 rgba(79,70,229,0.08);
+  transition: background 0.2s;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+.footer {
+  margin-top: 24px;
+  font-size: 14px;
+  color: #6b7280;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+.link {
+  color: #4f46e5;
+  text-decoration: underline;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}

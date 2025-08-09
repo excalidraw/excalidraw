@@ -57,6 +57,8 @@ import {
   useHandleLibrary,
 } from "@excalidraw/excalidraw/data/library";
 
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
 import type {
@@ -82,6 +84,7 @@ import {
   useAtomWithInitialValue,
   appJotaiStore,
 } from "./app-jotai";
+import LoginPage from "./components/LoginPage";
 import {
   FIREBASE_STORAGE_PREFIXES,
   isExcalidrawPlusSignedUser,
@@ -1155,11 +1158,16 @@ const ExcalidrawApp = () => {
   }
 
   return (
-    <TopErrorBoundary>
-      <Provider store={appJotaiStore}>
-        <ExcalidrawWrapper />
-      </Provider>
-    </TopErrorBoundary>
+    <BrowserRouter>
+      <TopErrorBoundary>
+        <Provider store={appJotaiStore}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="*" element={<ExcalidrawWrapper />} />
+          </Routes>
+        </Provider>
+      </TopErrorBoundary>
+    </BrowserRouter>
   );
 };
 

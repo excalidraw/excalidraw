@@ -28,15 +28,20 @@
   "dependencies": {
     "@excalidraw/random-username": "1.0.0",
     "@sentry/browser": "9.0.1",
+    "axios": "1.11.0",
     "callsites": "4.2.0",
     "firebase": "11.3.1",
     "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
     "jotai": "2.11.0",
+    "jwt-decode": "4.0.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "react-hook-form": "7.62.0",
+    "react-router-dom": "6",
     "socket.io-client": "4.7.2",
-    "vite-plugin-html": "3.2.2"
+    "vite-plugin-html": "3.2.2",
+    "zustand": "5.0.7"
   },
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
@@ -51,6 +56,7 @@
     "build:preview": "yarn build && vite preview --port 5000"
   },
   "devDependencies": {
+    "@types/jwt-decode": "3.1.0",
     "vite-plugin-sitemap": "0.7.1"
   }
 }
