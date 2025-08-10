@@ -5709,8 +5709,7 @@ class App extends React.Component<AppProps, AppState> {
     const frames = this.scene
       .getNonDeletedFramesLikes()
       .filter((frame): frame is ExcalidrawFrameLikeElement =>
-        !frame.locked &&
-        isCursorInFrame(sceneCoords, frame, elementsMap),
+        !frame.locked && isCursorInFrame(sceneCoords, frame, elementsMap),
       );
 
     return frames.length ? frames[frames.length - 1] : null;
