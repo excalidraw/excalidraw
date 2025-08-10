@@ -6297,9 +6297,10 @@ startLineEditor = (
     const elementsMap = this.scene.getNonDeletedElementsMap();
     const frames = this.scene
       .getNonDeletedFramesLikes()
-      .filter((frame): frame is ExcalidrawFrameLikeElement =>
-        //zsviczian
-        !frame.locked && isCursorInFrame(sceneCoords, frame, elementsMap),
+      .filter(
+        (frame): frame is ExcalidrawFrameLikeElement =>
+          //zsviczian
+          !frame.locked && isCursorInFrame(sceneCoords, frame, elementsMap),
       );
 
     return frames.length ? frames[frames.length - 1] : null;
