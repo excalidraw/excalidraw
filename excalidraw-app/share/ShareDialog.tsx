@@ -11,12 +11,15 @@ import {
   share,
   shareIOS,
   shareWindows,
+  TrashIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 import { useCopyStatus } from "@excalidraw/excalidraw/hooks/useCopiedIndicator";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { KEYS, getFrame } from "@excalidraw/common";
 import { useEffect, useRef, useState } from "react";
+
+import { roomManager } from "excalidraw-app/data/roomManager";
 
 import { atom, useAtom, useAtomValue } from "../app-jotai";
 import { activeRoomLinkAtom } from "../collab/Collab";
@@ -68,6 +71,19 @@ const ActiveRoomDialog = ({
   const ref = useRef<HTMLInputElement>(null);
   const isShareSupported = "share" in navigator;
   const { onCopy, copyStatus } = useCopyStatus();
+
+  const [isRoomOwner, setIsRoomOwner] = useState(false);
+  useEffect(() => {
+    roomManager
+      .isRoomOwnedByUser(activeRoomLink)
+      .then((isOwned) => {
+        setIsRoomOwner(isOwned);
+      })
+      .catch((error) => {
+        console.warn("Failed to check room ownership:", error);
+        setIsRoomOwner(false);
+      });
+  }, [activeRoomLink]);
 
   const copyRoomLink = async () => {
     try {
@@ -153,7 +169,10 @@ const ActiveRoomDialog = ({
           </span>
           {t("roomDialog.desc_privacy")}
         </p>
+        <h3>Stop Session</h3>
         <p>{t("roomDialog.desc_exitSession")}</p>
+        {isRoomOwner && <h3>Delete Session</h3>}
+        {isRoomOwner && <p>{t("roomDialog.desc_deleteSession")}</p>}
       </div>
 
       <div className="ShareDialog__active__actions">
@@ -171,6 +190,21 @@ const ActiveRoomDialog = ({
             }
           }}
         />
+        {isRoomOwner && (
+          <FilledButton
+            size="large"
+            label={t("roomDialog.button_deleteSession")}
+            icon={TrashIcon}
+            color="danger"
+            onClick={() => {
+              trackEvent("share", "room deleted");
+              collabAPI.deleteRoom();
+              if (!collabAPI.isCollaborating()) {
+                handleClose();
+              }
+            }}
+          />
+        )}
       </div>
     </>
   );
@@ -180,7 +214,6 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
   const { t } = useI18n();
 
   const { collabAPI } = props;
-
   const startCollabJSX = collabAPI ? (
     <>
       <div className="ShareDialog__picker__header">
@@ -188,8 +221,15 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
       </div>
 
       <div className="ShareDialog__picker__description">
-        <div style={{ marginBottom: "1em" }}>{t("roomDialog.desc_intro")}</div>
-        {t("roomDialog.desc_privacy")}
+        <div className="ShareDialog__picker__description__text">
+          {t("roomDialog.desc_intro")}
+        </div>
+        <div className="ShareDialog__picker__description__text">
+          {t("roomDialog.desc_privacy")}
+        </div>
+        <div className="ShareDialog__picker__description__text">
+          {t("roomDialog.desc_warning")}
+        </div>
       </div>
 
       <div className="ShareDialog__picker__button">
@@ -203,6 +243,14 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
           }}
         />
       </div>
+
+      <div
+        style={{
+          height: "1px",
+          backgroundColor: "var(--color-border)",
+          width: "100%",
+        }}
+      ></div>
 
       {props.type === "share" && (
         <div className="ShareDialog__separator">

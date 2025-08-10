@@ -119,6 +119,13 @@ export type SocketUpdateDataSource = {
       username: string;
     };
   };
+  ROOM_DELETED: {
+    type: WS_SUBTYPES.DELETE;
+    payload: {
+      socketId: SocketId;
+      roomId: string;
+    };
+  };
 };
 
 export type SocketUpdateDataIncoming =
@@ -310,7 +317,7 @@ export const exportToBackend = async (
 
     const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
-      body: payload.buffer,
+      body: new Uint8Array(payload.buffer),
     });
     const json = await response.json();
     if (json.id) {
