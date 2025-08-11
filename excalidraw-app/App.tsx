@@ -134,6 +134,7 @@ import DebugCanvas, {
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import ChatPanel from "./components/ChatPanel";
 
 import "./index.scss";
 
@@ -336,6 +337,7 @@ const initializeScene = async (opts: {
 
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
+  const [isChatVisible, setIsChatVisible] = useState(false);
   const isCollabDisabled = isRunningInIframe();
 
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
@@ -855,6 +857,23 @@ const ExcalidrawWrapper = () => {
           return (
             <div className="top-right-ui">
               {collabError.message && <CollabError collabError={collabError} />}
+              <button
+                onClick={() => setIsChatVisible(!isChatVisible)}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  marginRight: '8px'
+                }}
+                title="Toggle AI Chat"
+              >
+                💬 Chat
+              </button>
               <LiveCollaborationTrigger
                 isCollaborating={isCollaborating}
                 onSelect={() =>
@@ -905,6 +924,13 @@ const ExcalidrawWrapper = () => {
         </OverwriteConfirmDialog>
         <AppFooter onChange={() => excalidrawAPI?.refresh()} />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
+        {excalidrawAPI && (
+          <ChatPanel 
+            excalidrawAPI={excalidrawAPI} 
+            isVisible={isChatVisible}
+            onToggle={() => setIsChatVisible(!isChatVisible)}
+          />
+        )}
 
         <TTDDialogTrigger />
         {isCollaborating && isOffline && (
