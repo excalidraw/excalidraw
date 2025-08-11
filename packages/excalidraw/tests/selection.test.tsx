@@ -537,3 +537,42 @@ describe("selectedElementIds stability", () => {
     expect(h.state.selectedElementIds).toBe(selectedElementIds_2);
   });
 });
+
+describe("select text over group", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("should select text element created over a grouped element", () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    API.setElements([rect1, rect2]);
+
+    const textElement = UI.createElement("text", {
+      x: 10,
+      y: 20,
+      width: 100,
+      height: 50,
+    });
+
+    mouse.down(10, 20);
+    mouse.up();
+
+    expect(h.state.selectedElementIds[textElement.id]).toBeTruthy();
+    expect(h.state.selectedGroupIds).toEqual({});
+  });
+});
