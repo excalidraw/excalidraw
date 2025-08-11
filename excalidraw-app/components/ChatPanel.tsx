@@ -7,6 +7,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
+import { useAtomValue } from '../app-jotai';
+import { collabAPIAtom } from '../collab/Collab';
+import { getCollaborationLinkData } from '../data';
 
 interface ChatPanelProps {
   excalidrawAPI: ExcalidrawImperativeAPI;
@@ -32,6 +35,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const invitedRoomRef = useRef<string | null>(null);
+  const collabAPI = useAtomValue(collabAPIAtom);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -42,6 +47,36 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   useEffect(() => {
     checkServiceHealth();
   }, []);
+
+  // Invite AI bot when chat opens in a collaboration session
+  useEffect(() => {
+    const inviteAIIfNeeded = async () => {
+      try {
+        if (!isVisible || !collabAPI || !collabAPI.isCollaborating()) return;
+        const activeLink = collabAPI.getActiveRoomLink?.() || window.location.href;
+        const linkData = getCollaborationLinkData(activeLink);
+        if (!linkData) return;
+        const { roomId, roomKey } = linkData;
+        if (!roomId || !roomKey) return;
+        if (invitedRoomRef.current === roomId) return;
+
+        const username = collabAPI.getUsername?.() || 'AI Assistant';
+        const resp = await fetch('/api/ai/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ roomId, roomKey, username })
+        });
+        if (resp.ok) {
+          invitedRoomRef.current = roomId;
+          // optional: console.log('AI invited to room', roomId);
+        }
+      } catch (err) {
+        // swallow errors to avoid impacting chat UX
+        // console.error('Failed to invite AI:', err);
+      }
+    };
+    inviteAIIfNeeded();
+  }, [isVisible, collabAPI]);
 
   const checkServiceHealth = async () => {
     try {
