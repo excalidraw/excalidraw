@@ -1088,7 +1088,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       const nextElement = nextElements.get(prevElement.id);
 
       if (!nextElement) {
-        const deleted = { ...prevElement, isDeleted: false } as ElementPartial;
+        const deleted = { ...prevElement } as ElementPartial;
 
         const inserted = {
           isDeleted: true,
@@ -1102,7 +1102,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           ElementsDelta.stripIrrelevantProps,
         );
 
-        removed[prevElement.id] = delta;
+        if (!prevElement.isDeleted) {
+          removed[prevElement.id] = delta;
+        } else {
+          updated[prevElement.id] = delta;
+        }
       }
     }
 
@@ -1118,7 +1122,6 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
         const inserted = {
           ...nextElement,
-          isDeleted: false,
         } as ElementPartial;
 
         const delta = Delta.create(
@@ -1127,7 +1130,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           ElementsDelta.stripIrrelevantProps,
         );
 
-        added[nextElement.id] = delta;
+        if (!nextElement.isDeleted) {
+          added[nextElement.id] = delta;
+        } else {
+          updated[nextElement.id] = delta;
+        }
 
         continue;
       }

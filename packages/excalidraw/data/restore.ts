@@ -241,8 +241,9 @@ const restoreElementWithProperties = <
   return ret;
 };
 
-const restoreElement = (
+export const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+  opts?: { deleteEmptyTextElements?: boolean },
 ): typeof element | null => {
   element = { ...element };
 
@@ -290,7 +291,7 @@ const restoreElement = (
 
       // if empty text, mark as deleted. We keep in array
       // for data integrity purposes (collab etc.)
-      if (!text && !element.isDeleted) {
+      if (opts?.deleteEmptyTextElements && !text && !element.isDeleted) {
         // TODO: we should not do this since it breaks sync / versioning when we exchange / apply just deltas and restore the elements (deletion isn't recorded)
         element = { ...element, originalText: text, isDeleted: true };
         element = bumpVersion(element);
@@ -524,7 +525,13 @@ export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
-  opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,
+  opts?:
+    | {
+        refreshDimensions?: boolean;
+        repairBindings?: boolean;
+        deleteEmptyTextElements?: boolean;
+      }
+    | undefined,
 ): OrderedExcalidrawElement[] => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
@@ -534,7 +541,12 @@ export const restoreElements = (
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
       if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-        let migratedElement: ExcalidrawElement | null = restoreElement(element);
+        let migratedElement: ExcalidrawElement | null = restoreElement(
+          element,
+          {
+            deleteEmptyTextElements: opts?.deleteEmptyTextElements,
+          },
+        );
         if (migratedElement) {
           const localElement = localElementsMap?.get(element.id);
           if (localElement && localElement.version > migratedElement.version) {
@@ -791,7 +803,11 @@ export const restore = (
    */
   localAppState: Partial<AppState> | null | undefined,
   localElements: readonly ExcalidrawElement[] | null | undefined,
-  elementsConfig?: { refreshDimensions?: boolean; repairBindings?: boolean },
+  elementsConfig?: {
+    refreshDimensions?: boolean;
+    repairBindings?: boolean;
+    deleteEmptyTextElements?: boolean;
+  },
 ): RestoredDataState => {
   return {
     elements: restoreElements(data?.elements, localElements, elementsConfig),
