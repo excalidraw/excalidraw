@@ -1161,20 +1161,13 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           continue;
         }
 
-        const {
-          version: _,
-          versionNonce: ___,
-          ...strippedDeleted
-        } = delta.deleted;
-
-        const {
-          version: __,
-          versionNonce: ____,
-          ...strippedInserted
-        } = delta.inserted;
+        const strippedDeleted = ElementsDelta.stripVersionProps(delta.deleted);
+        const strippedInserted = ElementsDelta.stripVersionProps(
+          delta.inserted,
+        );
 
         // making sure there are at least some changes and only changed version & versionNonce does not count!
-        if (Delta.isDifferent(strippedDeleted, strippedInserted, true)) {
+        if (Delta.isInnerDifferent(strippedDeleted, strippedInserted, true)) {
           updated[nextElement.id] = delta;
         }
       }
@@ -1290,8 +1283,15 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           latestDelta = delta;
         }
 
+        const strippedDeleted = ElementsDelta.stripVersionProps(
+          latestDelta.deleted,
+        );
+        const strippedInserted = ElementsDelta.stripVersionProps(
+          latestDelta.inserted,
+        );
+
         // it might happen that after applying latest changes the delta itself does not contain any changes
-        if (Delta.isInnerDifferent(latestDelta.deleted, latestDelta.inserted)) {
+        if (Delta.isInnerDifferent(strippedDeleted, strippedInserted)) {
           modifiedDeltas[id] = latestDelta;
         }
       }
@@ -1868,6 +1868,14 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     partial: Partial<OrderedExcalidrawElement>,
   ): ElementPartial {
     const { id, updated, ...strippedPartial } = partial;
+
+    return strippedPartial;
+  }
+
+  private static stripVersionProps(
+    partial: Partial<OrderedExcalidrawElement>,
+  ): ElementPartial {
+    const { version, versionNonce, ...strippedPartial } = partial;
 
     return strippedPartial;
   }

@@ -4932,6 +4932,7 @@ class App extends React.Component<AppProps, AppState> {
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
         const isDeleted = !nextOriginalText.trim();
+        updateElement(nextOriginalText, isDeleted);
 
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
@@ -4963,7 +4964,7 @@ class App extends React.Component<AppProps, AppState> {
           ]);
         }
 
-        if (!isDeleted) {
+        if (!isDeleted || isExistingElement) {
           this.store.scheduleCapture();
         }
 
