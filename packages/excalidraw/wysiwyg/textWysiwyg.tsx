@@ -569,6 +569,7 @@ export const textWysiwyg = ({
           bumpVersion(container);
         }
       } else {
+        app.scene.mutateElement(element, { isDeleted: true });
         app.scene.mutateElement(container, {
           boundElements: container.boundElements?.filter(
             (ele) =>

@@ -1102,10 +1102,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           ElementsDelta.stripIrrelevantProps,
         );
 
+        // ignore updates which would "delete" already deleted element
         if (!prevElement.isDeleted) {
           removed[prevElement.id] = delta;
-        } else {
-          updated[prevElement.id] = delta;
         }
       }
     }
@@ -1130,10 +1129,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           ElementsDelta.stripIrrelevantProps,
         );
 
+        // ignore updates which would "delete" already deleted element
         if (!nextElement.isDeleted) {
           added[nextElement.id] = delta;
-        } else {
-          updated[nextElement.id] = delta;
         }
 
         continue;
@@ -1163,8 +1161,20 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           continue;
         }
 
-        // making sure there are at least some changes
-        if (!Delta.isEmpty(delta)) {
+        const {
+          version: _,
+          versionNonce: ___,
+          ...strippedDeleted
+        } = delta.deleted;
+
+        const {
+          version: __,
+          versionNonce: ____,
+          ...strippedInserted
+        } = delta.inserted;
+
+        // making sure there are at least some changes and only changed version & versionNonce does not count!
+        if (Delta.isDifferent(strippedDeleted, strippedInserted, true)) {
           updated[nextElement.id] = delta;
         }
       }
