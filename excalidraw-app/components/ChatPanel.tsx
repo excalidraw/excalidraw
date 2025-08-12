@@ -34,6 +34,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [aiInvited, setAiInvited] = useState(false);
+  const [isInvitingAI, setIsInvitingAI] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const invitedRoomRef = useRef<string | null>(null);
   const collabAPI = useAtomValue(collabAPIAtom);
@@ -48,35 +50,85 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     checkServiceHealth();
   }, []);
 
-  // Invite AI bot when chat opens in a collaboration session
-  useEffect(() => {
-    const inviteAIIfNeeded = async () => {
-      try {
-        if (!isVisible || !collabAPI || !collabAPI.isCollaborating()) return;
+  // Manual AI invitation function
+  const inviteAI = async () => {
+    if (!collabAPI || isInvitingAI) return;
+    
+    setIsInvitingAI(true);
+    try {
+      let roomId, roomKey;
+      
+      // Check if already in a collaboration session
+      if (collabAPI.isCollaborating()) {
         const activeLink = collabAPI.getActiveRoomLink?.() || window.location.href;
         const linkData = getCollaborationLinkData(activeLink);
-        if (!linkData) return;
-        const { roomId, roomKey } = linkData;
-        if (!roomId || !roomKey) return;
-        if (invitedRoomRef.current === roomId) return;
-
-        const username = collabAPI.getUsername?.() || 'AI Assistant';
-        const resp = await fetch('/api/ai/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ roomId, roomKey, username })
-        });
-        if (resp.ok) {
-          invitedRoomRef.current = roomId;
-          // optional: console.log('AI invited to room', roomId);
+        if (linkData) {
+          roomId = linkData.roomId;
+          roomKey = linkData.roomKey;
+          console.log('Using existing collaboration room for AI:', { roomId });
         }
-      } catch (err) {
-        // swallow errors to avoid impacting chat UX
-        // console.error('Failed to invite AI:', err);
       }
+      
+      // If no existing collaboration, start a new collaboration session
+      if (!roomId || !roomKey) {
+        console.log('Starting new collaboration session for AI chat');
+        
+        // Start collaboration - this will create roomId and roomKey automatically
+        const scene = await collabAPI.startCollaboration(null);
+        
+        // Wait a moment for collaboration to initialize
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Now get the collaboration link data
+        const activeLink = collabAPI.getActiveRoomLink?.() || window.location.href;
+        const linkData = getCollaborationLinkData(activeLink);
+        
+        if (linkData) {
+          roomId = linkData.roomId;
+          roomKey = linkData.roomKey;
+          console.log('Created new collaboration session for AI:', { roomId });
+        } else {
+          throw new Error('Failed to get collaboration link data after starting collaboration');
+        }
+      }
+
+      // Register AI bot with the collaboration room
+      const username = 'AI Assistant';
+      const resp = await fetch('http://localhost:3000/api/ai/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomId, roomKey, username })
+      });
+      
+      if (resp.ok) {
+        invitedRoomRef.current = roomId;
+        setAiInvited(true);
+        console.log('AI bot successfully registered for collaboration room:', roomId);
+      } else {
+        throw new Error(`Failed to register AI bot: ${await resp.text()}`);
+      }
+    } catch (err) {
+      console.error('Failed to invite AI to collaboration:', err);
+      setError(`Failed to invite AI: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsInvitingAI(false);
+    }
+  };
+
+  // Auto-invite AI when chat opens (enhanced behavior)
+  useEffect(() => {
+    const autoInviteIfNeeded = async () => {
+      if (!isVisible || !collabAPI || aiInvited) return;
+      
+      // Auto-invite: start collaboration + invite AI when chat opens
+      console.log('Chat opened - auto-inviting AI with collaboration');
+      await inviteAI();
     };
-    inviteAIIfNeeded();
-  }, [isVisible, collabAPI]);
+    
+    if (isVisible && collabAPI) {
+      setTimeout(autoInviteIfNeeded, 100);
+    }
+  }, [isVisible, collabAPI, aiInvited]);
 
   const checkServiceHealth = async () => {
     try {
@@ -230,6 +282,35 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           }} title={isConnected ? 'Connected' : 'Disconnected'} />
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
+          {!aiInvited && (
+            <button
+              onClick={inviteAI}
+              disabled={isInvitingAI || !collabAPI}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: isInvitingAI ? '#ccc' : '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: isInvitingAI ? 'not-allowed' : 'pointer',
+                fontSize: '12px'
+              }}
+              title="Invite AI to collaborate on canvas"
+            >
+              {isInvitingAI ? 'Inviting...' : '+ AI'}
+            </button>
+          )}
+          {aiInvited && (
+            <span style={{
+              padding: '4px 8px',
+              backgroundColor: '#28a745',
+              color: 'white',
+              borderRadius: '4px',
+              fontSize: '12px'
+            }}>
+              ✓ AI Active
+            </span>
+          )}
           <button
             onClick={clearHistory}
             style={{
@@ -277,8 +358,19 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
             fontSize: '14px',
             padding: '20px'
           }}>
-            Start a conversation with the AI assistant. 
-            <br />Try: "Create a blue rectangle"
+            {!aiInvited ? (
+              <>
+                Click "+ AI" above to invite the AI assistant to collaborate on your canvas.
+                <br />
+                <small>The AI will join as a real collaborator and can create/modify elements.</small>
+              </>
+            ) : (
+              <>
+                AI assistant is now collaborating on your canvas!
+                <br />
+                Try: "Create a blue rectangle" or "Add a text box saying 'Hello'"
+              </>
+            )}
           </div>
         )}
 
