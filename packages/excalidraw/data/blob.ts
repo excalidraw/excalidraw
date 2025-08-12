@@ -173,7 +173,7 @@ export const loadSceneOrLibraryFromBlob = async (
           {
             repairBindings: true,
             refreshDimensions: false,
-            deleteEmptyTextElements: true,
+            deleteInvisibleElements: true,
           },
         ),
       };

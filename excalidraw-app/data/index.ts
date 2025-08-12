@@ -261,13 +261,13 @@ export const loadScene = async (
       {
         repairBindings: true,
         refreshDimensions: false,
-        deleteEmptyTextElements: true,
+        deleteInvisibleElements: true,
       },
     );
   } else {
     data = restore(localDataState || null, null, null, {
       repairBindings: true,
-      deleteEmptyTextElements: true,
+      deleteInvisibleElements: true,
     });
   }
 

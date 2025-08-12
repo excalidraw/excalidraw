@@ -2344,7 +2344,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     const scene = restore(initialData, null, null, {
       repairBindings: true,
-      deleteEmptyTextElements: true,
+      deleteInvisibleElements: true,
     });
     scene.appState = {
       ...scene.appState,
@@ -3204,7 +3204,7 @@ class App extends React.Component<AppProps, AppState> {
     fitToContent?: boolean;
   }) => {
     const elements = restoreElements(opts.elements, null, {
-      deleteEmptyTextElements: true,
+      deleteInvisibleElements: true,
     });
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
