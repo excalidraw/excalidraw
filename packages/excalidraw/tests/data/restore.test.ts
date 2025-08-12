@@ -60,9 +60,11 @@ describe("restoreElements", () => {
     const rectElement = API.createElement({ type: "rectangle" });
     mockSizeHelper.mockImplementation(() => true);
 
-    expect(restore.restoreElements([rectElement], null)).toEqual([
-      expect.objectContaining({ isDeleted: true }),
-    ]);
+    expect(
+      restore.restoreElements([rectElement], null, {
+        deleteInvisibleElements: true,
+      }),
+    ).toEqual([expect.objectContaining({ isDeleted: true })]);
   });
 
   it("should restore text element correctly passing value for each attribute", () => {
@@ -87,6 +89,23 @@ describe("restoreElements", () => {
     });
   });
 
+  it("should not delete empty text element when opts.deleteInvisibleElements is not defined", () => {
+    const textElement = API.createElement({
+      type: "text",
+      text: "",
+      isDeleted: false,
+    });
+
+    const restoredElements = restore.restoreElements([textElement], null);
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: textElement.id,
+        isDeleted: false,
+      }),
+    ]);
+  });
+
   it("should restore text element correctly with unknown font family, null text and undefined alignment", () => {
     const textElement: any = API.createElement({
       type: "text",
@@ -99,10 +118,9 @@ describe("restoreElements", () => {
     textElement.font = "10 unknown";
 
     expect(textElement.isDeleted).toBe(false);
-    const restoredText = restore.restoreElements(
-      [textElement],
-      null,
-    )[0] as ExcalidrawTextElement;
+    const restoredText = restore.restoreElements([textElement], null, {
+      deleteInvisibleElements: true,
+    })[0] as ExcalidrawTextElement;
     expect(restoredText.isDeleted).toBe(true);
     expect(restoredText).toMatchSnapshot({
       seed: expect.any(Number),
@@ -179,7 +197,9 @@ describe("restoreElements", () => {
       y: 0,
     });
 
-    const restoredElements = restore.restoreElements([arrowElement], null);
+    const restoredElements = restore.restoreElements([arrowElement], null, {
+      deleteInvisibleElements: true,
+    });
 
     const restoredArrow = restoredElements[0] as
       | ExcalidrawArrowElement
@@ -851,6 +871,7 @@ describe("repairing bindings", () => {
     let restoredElements = restore.restoreElements(
       [container, invisibleBoundElement, boundElement],
       null,
+      { deleteInvisibleElements: true },
     );
 
     expect(restoredElements).toEqual([
@@ -872,7 +893,7 @@ describe("repairing bindings", () => {
     restoredElements = restore.restoreElements(
       [container, invisibleBoundElement, boundElement],
       null,
-      { repairBindings: true },
+      { repairBindings: true, deleteInvisibleElements: true },
     );
 
     expect(restoredElements).toEqual([

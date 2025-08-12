@@ -241,8 +241,9 @@ const restoreElementWithProperties = <
   return ret;
 };
 
-const restoreElement = (
+export const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+  opts?: { deleteInvisibleElements?: boolean },
 ): typeof element | null => {
   element = { ...element };
 
@@ -290,7 +291,7 @@ const restoreElement = (
 
       // if empty text, mark as deleted. We keep in array
       // for data integrity purposes (collab etc.)
-      if (!text && !element.isDeleted) {
+      if (opts?.deleteInvisibleElements && !text && !element.isDeleted) {
         // TODO: we should not do this since it breaks sync / versioning when we exchange / apply just deltas and restore the elements (deletion isn't recorded)
         element = { ...element, originalText: text, isDeleted: true };
         element = bumpVersion(element);
@@ -524,7 +525,13 @@ export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
-  opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,
+  opts?:
+    | {
+        refreshDimensions?: boolean;
+        repairBindings?: boolean;
+        deleteInvisibleElements?: boolean;
+      }
+    | undefined,
 ): OrderedExcalidrawElement[] => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
@@ -537,20 +544,23 @@ export const restoreElements = (
         return elements;
       }
 
-      let migratedElement: ExcalidrawElement | null = restoreElement(element);
+      let migratedElement: ExcalidrawElement | null = restoreElement(element, {
+        deleteInvisibleElements: opts?.deleteInvisibleElements,
+      });
       if (migratedElement) {
         const localElement = localElementsMap?.get(element.id);
 
-        const isInvisible = isInvisiblySmallElement(element);
+        const shouldMarkAsDeleted =
+          opts?.deleteInvisibleElements && isInvisiblySmallElement(element);
 
         if (
-          isInvisible ||
+          shouldMarkAsDeleted ||
           (localElement && localElement.version > migratedElement.version)
         ) {
           migratedElement = bumpVersion(migratedElement, localElement?.version);
         }
 
-        if (isInvisible) {
+        if (shouldMarkAsDeleted) {
           migratedElement = { ...migratedElement, isDeleted: true };
         }
 
@@ -802,7 +812,11 @@ export const restore = (
    */
   localAppState: Partial<AppState> | null | undefined,
   localElements: readonly ExcalidrawElement[] | null | undefined,
-  elementsConfig?: { refreshDimensions?: boolean; repairBindings?: boolean },
+  elementsConfig?: {
+    refreshDimensions?: boolean;
+    repairBindings?: boolean;
+    deleteInvisibleElements?: boolean;
+  },
 ): RestoredDataState => {
   return {
     elements: restoreElements(data?.elements, localElements, elementsConfig),
