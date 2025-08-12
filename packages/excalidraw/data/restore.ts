@@ -243,7 +243,7 @@ const restoreElementWithProperties = <
 
 export const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-  opts?: { deleteEmptyTextElements?: boolean },
+  opts?: { deleteInvisibleElements?: boolean },
 ): typeof element | null => {
   element = { ...element };
 
@@ -291,7 +291,7 @@ export const restoreElement = (
 
       // if empty text, mark as deleted. We keep in array
       // for data integrity purposes (collab etc.)
-      if (opts?.deleteEmptyTextElements && !text && !element.isDeleted) {
+      if (opts?.deleteInvisibleElements && !text && !element.isDeleted) {
         // TODO: we should not do this since it breaks sync / versioning when we exchange / apply just deltas and restore the elements (deletion isn't recorded)
         element = { ...element, originalText: text, isDeleted: true };
         element = bumpVersion(element);
@@ -529,7 +529,7 @@ export const restoreElements = (
     | {
         refreshDimensions?: boolean;
         repairBindings?: boolean;
-        deleteEmptyTextElements?: boolean;
+        deleteInvisibleElements?: boolean;
       }
     | undefined,
 ): OrderedExcalidrawElement[] => {
@@ -540,29 +540,38 @@ export const restoreElements = (
     (elements || []).reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
-      if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-        let migratedElement: ExcalidrawElement | null = restoreElement(
-          element,
-          {
-            deleteEmptyTextElements: opts?.deleteEmptyTextElements,
-          },
-        );
-        if (migratedElement) {
-          const localElement = localElementsMap?.get(element.id);
-          if (localElement && localElement.version > migratedElement.version) {
-            migratedElement = bumpVersion(
-              migratedElement,
-              localElement.version,
-            );
-          }
-          if (existingIds.has(migratedElement.id)) {
-            migratedElement = { ...migratedElement, id: randomId() };
-          }
-          existingIds.add(migratedElement.id);
-
-          elements.push(migratedElement);
-        }
+      if (element.type === "selection") {
+        return elements;
       }
+
+      let migratedElement: ExcalidrawElement | null = restoreElement(element, {
+        deleteInvisibleElements: opts?.deleteInvisibleElements,
+      });
+      if (migratedElement) {
+        const localElement = localElementsMap?.get(element.id);
+
+        const shouldMarkAsDeleted =
+          opts?.deleteInvisibleElements && isInvisiblySmallElement(element);
+
+        if (
+          shouldMarkAsDeleted ||
+          (localElement && localElement.version > migratedElement.version)
+        ) {
+          migratedElement = bumpVersion(migratedElement, localElement?.version);
+        }
+
+        if (shouldMarkAsDeleted) {
+          migratedElement = { ...migratedElement, isDeleted: true };
+        }
+
+        if (existingIds.has(migratedElement.id)) {
+          migratedElement = { ...migratedElement, id: randomId() };
+        }
+        existingIds.add(migratedElement.id);
+
+        elements.push(migratedElement);
+      }
+
       return elements;
     }, [] as ExcalidrawElement[]),
   );
@@ -806,7 +815,7 @@ export const restore = (
   elementsConfig?: {
     refreshDimensions?: boolean;
     repairBindings?: boolean;
-    deleteEmptyTextElements?: boolean;
+    deleteInvisibleElements?: boolean;
   },
 ): RestoredDataState => {
   return {
