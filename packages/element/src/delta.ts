@@ -1088,7 +1088,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       const nextElement = nextElements.get(prevElement.id);
 
       if (!nextElement) {
-        const deleted = { ...prevElement, isDeleted: false } as ElementPartial;
+        const deleted = { ...prevElement } as ElementPartial;
 
         const inserted = {
           isDeleted: true,
@@ -1102,7 +1102,10 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           ElementsDelta.stripIrrelevantProps,
         );
 
-        removed[prevElement.id] = delta;
+        // ignore updates which would "delete" already deleted element
+        if (!prevElement.isDeleted) {
+          removed[prevElement.id] = delta;
+        }
       }
     }
 
@@ -1118,7 +1121,6 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
         const inserted = {
           ...nextElement,
-          isDeleted: false,
         } as ElementPartial;
 
         const delta = Delta.create(
@@ -1127,7 +1129,10 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           ElementsDelta.stripIrrelevantProps,
         );
 
-        added[nextElement.id] = delta;
+        // ignore updates which would "delete" already deleted element
+        if (!nextElement.isDeleted) {
+          added[nextElement.id] = delta;
+        }
 
         continue;
       }
@@ -1156,8 +1161,13 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           continue;
         }
 
-        // making sure there are at least some changes
-        if (!Delta.isEmpty(delta)) {
+        const strippedDeleted = ElementsDelta.stripVersionProps(delta.deleted);
+        const strippedInserted = ElementsDelta.stripVersionProps(
+          delta.inserted,
+        );
+
+        // making sure there are at least some changes and only changed version & versionNonce does not count!
+        if (Delta.isInnerDifferent(strippedDeleted, strippedInserted, true)) {
           updated[nextElement.id] = delta;
         }
       }
@@ -1273,8 +1283,15 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           latestDelta = delta;
         }
 
+        const strippedDeleted = ElementsDelta.stripVersionProps(
+          latestDelta.deleted,
+        );
+        const strippedInserted = ElementsDelta.stripVersionProps(
+          latestDelta.inserted,
+        );
+
         // it might happen that after applying latest changes the delta itself does not contain any changes
-        if (Delta.isInnerDifferent(latestDelta.deleted, latestDelta.inserted)) {
+        if (Delta.isInnerDifferent(strippedDeleted, strippedInserted)) {
           modifiedDeltas[id] = latestDelta;
         }
       }
@@ -1851,6 +1868,14 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     partial: Partial<OrderedExcalidrawElement>,
   ): ElementPartial {
     const { id, updated, ...strippedPartial } = partial;
+
+    return strippedPartial;
+  }
+
+  private static stripVersionProps(
+    partial: Partial<OrderedExcalidrawElement>,
+  ): ElementPartial {
+    const { version, versionNonce, ...strippedPartial } = partial;
 
     return strippedPartial;
   }

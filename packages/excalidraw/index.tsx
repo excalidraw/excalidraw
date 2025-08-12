@@ -229,6 +229,7 @@ export { defaultLang, useI18n, languages } from "./i18n";
 export {
   restore,
   restoreAppState,
+  restoreElement,
   restoreElements,
   restoreLibraryItems,
 } from "./data/restore";

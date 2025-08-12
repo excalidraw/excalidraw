@@ -85,6 +85,23 @@ describe("restoreElements", () => {
     });
   });
 
+  it("should not delete empty text element when deleteEmptyTextElements is not defined", () => {
+    const textElement = API.createElement({
+      type: "text",
+      text: "",
+      isDeleted: false,
+    });
+
+    const restoredElements = restore.restoreElements([textElement], null);
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: textElement.id,
+        isDeleted: false,
+      }),
+    ]);
+  });
+
   it("should restore text element correctly with unknown font family, null text and undefined alignment", () => {
     const textElement: any = API.createElement({
       type: "text",
@@ -97,10 +114,9 @@ describe("restoreElements", () => {
     textElement.font = "10 unknown";
 
     expect(textElement.isDeleted).toBe(false);
-    const restoredText = restore.restoreElements(
-      [textElement],
-      null,
-    )[0] as ExcalidrawTextElement;
+    const restoredText = restore.restoreElements([textElement], null, {
+      deleteEmptyTextElements: true,
+    })[0] as ExcalidrawTextElement;
     expect(restoredText.isDeleted).toBe(true);
     expect(restoredText).toMatchSnapshot({
       seed: expect.any(Number),

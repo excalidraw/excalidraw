@@ -282,14 +282,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "added": {},
       "removed": {},
       "updated": {
-        "id0": {
-          "deleted": {
-            "version": 17,
-          },
-          "inserted": {
-            "version": 15,
-          },
-        },
         "id1": {
           "deleted": {
             "boundElements": [],
@@ -402,14 +394,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               },
             ],
             "version": 17,
-          },
-        },
-        "id15": {
-          "deleted": {
-            "version": 14,
-          },
-          "inserted": {
-            "version": 12,
           },
         },
         "id4": {
@@ -853,14 +837,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "added": {},
       "removed": {},
       "updated": {
-        "id0": {
-          "deleted": {
-            "version": 18,
-          },
-          "inserted": {
-            "version": 16,
-          },
-        },
         "id1": {
           "deleted": {
             "boundElements": [],
@@ -2656,7 +2632,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "height": 100,
   "id": "id0",
   "index": "a0",
-  "isDeleted": false,
+  "isDeleted": true,
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -2667,7 +2643,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 6,
+  "version": 9,
   "width": 100,
   "x": 10,
   "y": 10,
@@ -2719,7 +2695,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id0",
+  "containerId": null,
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -2744,7 +2720,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "textAlign": "left",
   "type": "text",
   "updated": 1,
-  "version": 7,
+  "version": 10,
   "verticalAlign": "top",
   "width": 30,
   "x": 15,
@@ -2766,15 +2742,49 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
       },
     },
     "elements": {
-      "added": {},
+      "added": {
+        "id0": {
+          "deleted": {
+            "isDeleted": true,
+            "version": 9,
+          },
+          "inserted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 100,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 8,
+            "width": 100,
+            "x": 10,
+            "y": 10,
+          },
+        },
+      },
       "removed": {},
       "updated": {
         "id5": {
           "deleted": {
-            "version": 7,
+            "containerId": null,
+            "version": 10,
           },
           "inserted": {
-            "version": 5,
+            "containerId": "id0",
+            "version": 9,
           },
         },
       },
@@ -3084,14 +3094,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
               },
             ],
             "version": 10,
-          },
-        },
-        "id5": {
-          "deleted": {
-            "version": 11,
-          },
-          "inserted": {
-            "version": 9,
           },
         },
       },
@@ -4643,15 +4645,15 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
         "id1": {
           "deleted": {
             "angle": 0,
-            "version": 5,
+            "version": 4,
             "x": 15,
             "y": 15,
           },
           "inserted": {
-            "angle": 0,
-            "version": 7,
-            "x": 15,
-            "y": 15,
+            "angle": 90,
+            "version": 3,
+            "x": 205,
+            "y": 205,
           },
         },
       },
@@ -5630,12 +5632,12 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
       "updated": {
         "id1": {
           "deleted": {
-            "frameId": null,
-            "version": 10,
+            "frameId": "id0",
+            "version": 5,
           },
           "inserted": {
             "frameId": null,
-            "version": 8,
+            "version": 6,
           },
         },
       },
@@ -15773,14 +15775,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "version": 5,
           },
         },
-        "id1": {
-          "deleted": {
-            "version": 6,
-          },
-          "inserted": {
-            "version": 4,
-          },
-        },
         "id2": {
           "deleted": {
             "boundElements": [
@@ -16742,14 +16736,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "version": 5,
           },
         },
-        "id1": {
-          "deleted": {
-            "version": 8,
-          },
-          "inserted": {
-            "version": 6,
-          },
-        },
         "id2": {
           "deleted": {
             "boundElements": [
@@ -17375,14 +17361,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "version": 9,
           },
         },
-        "id1": {
-          "deleted": {
-            "version": 12,
-          },
-          "inserted": {
-            "version": 10,
-          },
-        },
         "id2": {
           "deleted": {
             "boundElements": [
@@ -17742,14 +17720,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "inserted": {
             "startBinding": null,
             "version": 7,
-          },
-        },
-        "id2": {
-          "deleted": {
-            "version": 5,
-          },
-          "inserted": {
-            "version": 3,
           },
         },
       },

@@ -1,7 +1,74 @@
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+
 import type { ObservedAppState } from "@excalidraw/excalidraw/types";
 import type { LinearElementEditor } from "@excalidraw/element";
+import type { SceneElementsMap } from "@excalidraw/element/types";
 
-import { AppStateDelta } from "../src/delta";
+import { AppStateDelta, ElementsDelta } from "../src/delta";
+
+describe("ElementsDelta", () => {
+  describe("elements delta calculation", () => {
+    it("should not create removed delta when element gets removed but was already deleted", () => {
+      const element = API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        isDeleted: true,
+      });
+
+      const prevElements = new Map([[element.id, element]]);
+      const nextElements = new Map();
+
+      const delta = ElementsDelta.calculate(prevElements, nextElements);
+
+      expect(delta.isEmpty()).toBeTruthy();
+    });
+
+    it("should not create added delta when adding element as already deleted", () => {
+      const element = API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        isDeleted: true,
+      });
+
+      const prevElements = new Map();
+      const nextElements = new Map([[element.id, element]]);
+
+      const delta = ElementsDelta.calculate(prevElements, nextElements);
+
+      expect(delta.isEmpty()).toBeTruthy();
+    });
+
+    it("should not create updated delta when there is only version and versionNonce change", () => {
+      const baseElement = API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        strokeColor: "#000000",
+        backgroundColor: "#ffffff",
+      });
+
+      const modifiedElement = {
+        ...baseElement,
+        version: baseElement.version + 1,
+        versionNonce: baseElement.versionNonce + 1,
+      };
+
+      // Create maps for the delta calculation
+      const prevElements = new Map([[baseElement.id, baseElement]]);
+      const nextElements = new Map([[modifiedElement.id, modifiedElement]]);
+
+      // Calculate the delta
+      const delta = ElementsDelta.calculate(
+        prevElements as SceneElementsMap,
+        nextElements as SceneElementsMap,
+      );
+
+      expect(delta.isEmpty()).toBeTruthy();
+    });
+  });
+});
 
 describe("AppStateDelta", () => {
   describe("ensure stable delta properties order", () => {
