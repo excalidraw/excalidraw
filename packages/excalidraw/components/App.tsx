@@ -6299,8 +6299,8 @@ startLineEditor = (
       .getNonDeletedFramesLikes()
       .filter(
         (frame): frame is ExcalidrawFrameLikeElement =>
-          //zsviczian
-          !frame.locked && isCursorInFrame(sceneCoords, frame, elementsMap),
+          !frame.locked && isCursorInFrame(sceneCoords, frame, elementsMap) &&
+          !frame.customData?.printFrame, //zsviczian
       );
 
     return frames.length ? frames[frames.length - 1] : null;

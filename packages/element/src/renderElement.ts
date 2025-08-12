@@ -780,7 +780,14 @@ export const renderElement = (
             appState.theme === THEME.LIGHT ? "#7affd7" : "#1d8264";
         }
 
-        if (FRAME_STYLE.radius && context.roundRect) {
+        //zsviczian
+        if (element.customData?.printFrame) {
+          const dash = 8 / appState.zoom.value;
+          const gap = 6 / appState.zoom.value;
+          context.setLineDash([dash, gap]);
+        }
+
+        if (FRAME_STYLE.radius && context.roundRect && !element.customData?.printFrame) { //zsviczian
           context.beginPath();
           context.roundRect(
             0,

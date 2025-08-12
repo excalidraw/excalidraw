@@ -165,6 +165,14 @@ export type InitializedExcalidrawImageElement = MarkNonNullable<
 export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
   type: "frame";
   name: string | null;
+  customData?: { 
+    printFrame?: boolean,
+    frameColor? : {
+      fill: string,
+      stroke: string,
+      nameColor: string
+    },
+  }; //zsviczian
 };
 
 export type ExcalidrawMagicFrameElement = _ExcalidrawElementBase & {

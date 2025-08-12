@@ -213,8 +213,12 @@ export const exportToCanvas = async (
     frameRendering.clip = false;
   }
 
+  const filteredElements = elements.filter(
+    (el) => !el.customData?.printFrame,
+  ); //zsviczian
+
   const elementsForRender = prepareElementsForRender({
-    elements,
+    elements: filteredElements, //zsviczian
     exportingFrame,
     exportWithDarkMode: appState.exportWithDarkMode,
     frameRendering,
@@ -322,8 +326,12 @@ export const exportToSvg = async (
 
   const { exportingFrame = null } = opts || {};
 
+  const filteredElements = elements.filter(
+    (el) => !el.customData?.printFrame,
+  ); //zsviczian
+
   const elementsForRender = prepareElementsForRender({
-    elements,
+    elements: filteredElements, //zsviczian
     exportingFrame,
     exportWithDarkMode,
     frameRendering,
@@ -381,7 +389,7 @@ export const exportToSvg = async (
         // elements which don't contain the temp frame labels.
         // But it also requires that the exportToSvg is being supplied with
         // only the elements that we're exporting, and no extra.
-        payload: serializeAsJSON(elements, appState, files || {}, "local"),
+        payload: serializeAsJSON(filteredElements, appState, files || {}, "local"), //zsviczian
       });
     } catch (error: any) {
       console.error(error);
@@ -392,10 +400,10 @@ export const exportToSvg = async (
   // frame clip paths
   // ---------------------------------------------------------------------------
 
-  const frameElements = getFrameLikeElements(elements);
+  const frameElements = getFrameLikeElements(filteredElements); //zsviczian
 
   if (frameElements.length) {
-    const elementsMap = arrayToMap(elements);
+    const elementsMap = arrayToMap(filteredElements); //zsviczian
 
     for (const frame of frameElements) {
       const clipPath = svgRoot.ownerDocument.createElementNS(
