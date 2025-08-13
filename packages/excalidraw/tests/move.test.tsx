@@ -169,11 +169,18 @@ describe("duplicate element on move when ALT is clicked", () => {
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`4`);
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`3`);
     expect(h.state.selectionElement).toBeNull();
-    expect(h.elements.length).toEqual(2);
 
-    // previous element should stay intact
-    expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
-    expect([h.elements[1].x, h.elements[1].y]).toEqual([-10, 60]);
+    // NOTE: https://github.com/excalidraw/excalidraw/issues/9750
+    // We duplicate the selected element if alt is pressed on pointer move
+
+    if (!h.app.state.isAltKeyPressedBeforeLastPointerDown) {
+      expect(h.elements.length).toEqual(1);
+    } else {
+      expect(h.elements.length).toEqual(2);
+      // previous element should stay intact
+      expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
+      expect([h.elements[1].x, h.elements[1].y]).toEqual([-10, 60]);
+    }
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });

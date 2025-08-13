@@ -561,7 +561,6 @@ class App extends React.Component<AppProps, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
   device: Device = deviceContextInitialValue;
-  isAltKeyPressedBeforePointerDown: boolean = false;
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
@@ -6352,12 +6351,6 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
-    if (event.altKey) {
-      this.isAltKeyPressedBeforePointerDown = true;
-    } else {
-      this.isAltKeyPressedBeforePointerDown = false;
-    }
-
     const target = event.target as HTMLElement;
     // capture subsequent pointer events to the canvas
     // this makes other elements non-interactive until pointer up
@@ -6484,6 +6477,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.setState({
+      isAltKeyPressedBeforeLastPointerDown: event.altKey,
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
     });
@@ -8464,7 +8458,7 @@ class App extends React.Component<AppProps, AppState> {
           // We duplicate the selected element if alt is pressed on pointer move
           if (
             event.altKey &&
-            this.isAltKeyPressedBeforePointerDown &&
+            this.state.isAltKeyPressedBeforeLastPointerDown &&
             !pointerDownState.hit.hasBeenDuplicated
           ) {
             // Move the currently selected elements to the top of the z index stack, and

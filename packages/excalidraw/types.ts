@@ -371,6 +371,8 @@ export interface AppState {
   defaultSidebarDockedPreference: boolean;
 
   lastPointerDownWith: PointerType;
+  // NOTE: should rename to something else
+  isAltKeyPressedBeforeLastPointerDown: boolean;
   selectedElementIds: Readonly<{ [id: string]: true }>;
   hoveredElementIds: Readonly<{ [id: string]: true }>;
   previousSelectedElementIds: { [id: string]: true };
