@@ -530,7 +530,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       return null;
     }
 
-    if (!existingRoomLinkData) {
+    if (existingRoomLinkData) {
+      // Local elements not needed in this case
+      this.excalidrawAPI.resetScene();
+    } else {
       const elements = this.excalidrawAPI.getSceneElements().map((element) => {
         if (isImageElement(element) && element.status === "saved") {
           return newElementWith(element, { status: "pending" });
