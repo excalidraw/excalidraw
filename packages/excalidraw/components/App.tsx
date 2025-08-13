@@ -1507,8 +1507,6 @@ class App extends React.Component<AppProps, AppState> {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderCustomStats } = this.props;
 
-    debugger;
-
     const sceneNonce = this.scene.getSceneNonce();
     const { elementsMap, visibleElements } =
       this.renderer.getRenderableElements({
