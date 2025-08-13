@@ -380,6 +380,11 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     pressures: readonly number[];
     simulatePressure: boolean;
     lastCommittedPoint: LocalPoint | null;
+    freedrawOptions: {
+      streamline?: number;
+      simplify?: number;
+      fixedStrokeWidth?: boolean;
+    } | null;
   }>;
 
 export type FileId = string & { _brand: "FileId" };
