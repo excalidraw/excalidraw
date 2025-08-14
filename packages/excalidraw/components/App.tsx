@@ -235,6 +235,8 @@ import {
   isSimpleArrow,
   StoreDelta,
   type ApplyToOptions,
+  ElementsDelta,
+  AppStateDelta,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -3960,15 +3962,27 @@ class App extends React.Component<AppProps, AppState> {
 
     const [head, ...tail] = deltas;
 
-    // create new delta isntance, so we don't accidentaly mutate existing one
-    const mainDelta = StoreDelta.load(head);
+    // create new aggregated delta instance with new delta instances, so we don't accidentaly mutate existing ones
+    const aggregatedDelta = StoreDelta.create(
+      ElementsDelta.create(
+        { ...head.elements.added },
+        { ...head.elements.removed },
+        { ...head.elements.updated },
+      ),
+      AppStateDelta.create({ ...head.appState.delta }),
+    );
 
     // squash all deltas together, mutating the main delta
     for (const delta of tail) {
-      mainDelta.squash(delta);
+      aggregatedDelta.squash(delta);
     }
 
-    return StoreDelta.applyTo(mainDelta, nextElements, nextAppState, options);
+    return StoreDelta.applyTo(
+      aggregatedDelta,
+      nextElements,
+      nextAppState,
+      options,
+    );
   };
 
   public mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
