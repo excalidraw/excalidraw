@@ -143,6 +143,8 @@ const getFrameRenderingConfig = (
     outline: exportingFrame ? false : frameRendering.outline,
     name: exportingFrame ? false : frameRendering.name,
     clip: exportingFrame ? true : frameRendering.clip,
+    markerName: false, //zsviczian
+    markerOutline: false, //zsviczian
   };
 };
 
@@ -214,7 +216,7 @@ export const exportToCanvas = async (
   }
 
   const filteredElements = elements.filter(
-    (el) => !el.customData?.printFrame,
+    (el) => el.type === "frame" && el.frameRole !== "marker",
   ); //zsviczian
 
   const elementsForRender = prepareElementsForRender({
@@ -327,7 +329,7 @@ export const exportToSvg = async (
   const { exportingFrame = null } = opts || {};
 
   const filteredElements = elements.filter(
-    (el) => !el.customData?.printFrame,
+    (el) => el.type === "frame" && el.frameRole !== "marker",
   ); //zsviczian
 
   const elementsForRender = prepareElementsForRender({

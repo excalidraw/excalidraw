@@ -309,6 +309,8 @@ export interface AppState {
     name: boolean;
     outline: boolean;
     clip: boolean;
+    markerName: boolean; //zsviczian
+    markerOutline: boolean; //zsviczian
   };
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
@@ -347,6 +349,7 @@ export interface AppState {
   currentHoveredFontFamily: FontFamilyValues | null;
   currentItemRoundness: StrokeRoundness;
   currentItemArrowType: "sharp" | "round" | "elbow";
+  currentItemFrameRole: ExcalidrawFrameLikeElement["frameRole"] | null; //zsviczian
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;

@@ -162,11 +162,13 @@ export type InitializedExcalidrawImageElement = MarkNonNullable<
   "fileId"
 >;
 
+type FrameRole = null | "marker"; //zsviczian
+
 export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
   type: "frame";
   name: string | null;
-  customData?: { 
-    printFrame?: boolean,
+  frameRole?: FrameRole; //zsviczian
+  customData?: {
     frameColor? : {
       fill: string,
       stroke: string,
@@ -178,6 +180,7 @@ export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
 export type ExcalidrawMagicFrameElement = _ExcalidrawElementBase & {
   type: "magicframe";
   name: string | null;
+  frameRole?: FrameRole; //zsviczian
 };
 
 export type ExcalidrawFrameLikeElement =

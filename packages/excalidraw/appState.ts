@@ -44,6 +44,7 @@ export const getDefaultAppState = (): Omit<
     currentItemStrokeWidth: DEFAULT_ELEMENT_PROPS.strokeWidth,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     currentHoveredFontFamily: null,
+    currentItemFrameRole: null, //zsviczian
     cursorButton: "up",
     activeEmbeddable: null,
     newElement: null,
@@ -98,7 +99,7 @@ export const getDefaultAppState = (): Omit<
     },
     startBoundElement: null,
     suggestedBindings: [],
-    frameRendering: { enabled: true, clip: true, name: true, outline: true },
+    frameRendering: { enabled: true, clip: true, name: true, outline: true, markerName: true, markerOutline: true }, //zsviczian
     frameToHighlight: null,
     editingFrame: null,
     elementsToHighlight: null,
@@ -189,6 +190,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemStrokeWidth: { browser: true, export: false, server: false },
   currentItemTextAlign: { browser: true, export: false, server: false },
   currentHoveredFontFamily: { browser: false, export: false, server: false },
+  currentItemFrameRole: { browser: true, export: false, server: false }, //zsviczian
   cursorButton: { browser: true, export: false, server: false },
   activeEmbeddable: { browser: false, export: false, server: false },
   newElement: { browser: false, export: false, server: false },

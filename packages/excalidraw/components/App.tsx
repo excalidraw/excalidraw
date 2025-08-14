@@ -1403,7 +1403,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const isDarkTheme = this.state.theme === THEME.DARK;
-    const nonDeletedFramesLikes = this.scene.getNonDeletedFramesLikes();
+    //zsviczian
+    const nonDeletedFramesLikes = this.state.frameRendering.markerName
+      ? this.scene.getNonDeletedFramesLikes()
+      : this.scene.getNonDeletedFramesLikes().filter(f => f.frameRole !== "marker");
 
     const focusedSearchMatch =
       nonDeletedFramesLikes.length > 0
@@ -3774,6 +3777,9 @@ class App extends React.Component<AppProps, AppState> {
           clip: next?.clip ?? prevState.frameRendering.clip,
           name: next?.name ?? prevState.frameRendering.name,
           outline: next?.outline ?? prevState.frameRendering.outline,
+          //zsviczian
+          markerName: next?.markerName ?? prevState.frameRendering.markerName,
+          markerOutline: next?.markerOutline ?? prevState.frameRendering.markerOutline,
         },
       };
     });
@@ -6300,7 +6306,7 @@ startLineEditor = (
       .filter(
         (frame): frame is ExcalidrawFrameLikeElement =>
           !frame.locked && isCursorInFrame(sceneCoords, frame, elementsMap) &&
-          !frame.customData?.printFrame, //zsviczian
+          frame.frameRole !== "marker", //zsviczian
       );
 
     return frames.length ? frames[frames.length - 1] : null;

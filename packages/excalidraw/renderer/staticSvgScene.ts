@@ -595,7 +595,9 @@ const renderElementToSvg = (
     case "magicframe": {
       if (
         renderConfig.frameRendering.enabled &&
-        renderConfig.frameRendering.outline
+        renderConfig.frameRendering.outline &&
+        !(!renderConfig.frameRendering.markerOutline &&
+          element.frameRole === "marker") //zsviczian
       ) {
         const rect = document.createElementNS(SVG_NS, "rect");
 
