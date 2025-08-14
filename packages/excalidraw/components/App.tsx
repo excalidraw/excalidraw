@@ -10038,24 +10038,35 @@ class App extends React.Component<AppProps, AppState> {
       const clientX = this.state.width / 2 + this.state.offsetLeft;
       const clientY = this.state.height / 2 + this.state.offsetTop;
 
-      const { x, y } = viewportCoordsToSceneCoords(
+            const { x: baseX, y: baseY } = viewportCoordsToSceneCoords(
         { clientX, clientY },
         this.state,
       );
 
-      const imageFile = await fileOpen({
+      // Allow multiple images
+      const imageFiles = await fileOpen({
         description: "Image",
         extensions: Object.keys(
           IMAGE_MIME_TYPES,
         ) as (keyof typeof IMAGE_MIME_TYPES)[],
+        multiple: true,
       });
 
-      await this.createImageElement({
-        sceneX: x,
-        sceneY: y,
-        addToFrameUnderCursor: false,
-        imageFile,
-      });
+      // treat as array
+      const filesArray = Array.isArray(imageFiles) ? imageFiles : [imageFiles];
+      const gridSize = 40;
+      let imageIndex = 0;
+      for (const imageFile of filesArray) {
+        const sceneX = baseX + (imageIndex % 4) * gridSize;
+        const sceneY = baseY + Math.floor(imageIndex / 4) * gridSize;
+        await this.createImageElement({
+          sceneX,
+          sceneY,
+          addToFrameUnderCursor: false,
+          imageFile,
+        });
+        imageIndex++;
+      }
 
       // avoid being batched (just in case)
       this.setState({}, () => {
