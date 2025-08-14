@@ -949,6 +949,7 @@ export type ApplyToOptions = {
 type ApplyToFlags = {
   containsVisibleDifference: boolean;
   containsZindexDifference: boolean;
+  applyDirection: "forward" | "backward" | undefined;
 };
 
 /**
@@ -1324,11 +1325,13 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     const flags: ApplyToFlags = {
       containsVisibleDifference: false,
       containsZindexDifference: false,
+      applyDirection: undefined,
     };
 
     // mimic a transaction by applying deltas into `nextElements` (always new instance, no mutation)
     try {
       const applyDeltas = ElementsDelta.createApplier(
+        elements,
         nextElements,
         snapshot,
         flags,
@@ -1339,7 +1342,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       const removedElements = applyDeltas(this.removed);
       const updatedElements = applyDeltas(this.updated);
 
-      const affectedElements = this.resolveConflicts(elements, nextElements);
+      const affectedElements = this.resolveConflicts(
+        elements,
+        nextElements,
+        flags.applyDirection,
+      );
 
       // TODO: #7348 validate elements semantically and syntactically the changed elements, in case they would result data integrity issues
       changedElements = new Map([
@@ -1426,6 +1433,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
   private static createApplier =
     (
+      prevElements: SceneElementsMap,
       nextElements: SceneElementsMap,
       snapshot: StoreSnapshot["elements"],
       flags: ApplyToFlags,
@@ -1442,15 +1450,26 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         const element = getElement(id, delta.inserted);
 
         if (element) {
-          const newElement = ElementsDelta.applyDelta(
+          const nextElement = ElementsDelta.applyDelta(
             element,
             delta,
             flags,
             options,
           );
 
-          nextElements.set(newElement.id, newElement);
-          acc.set(newElement.id, newElement);
+          nextElements.set(nextElement.id, nextElement);
+          acc.set(nextElement.id, nextElement);
+
+          if (!flags.applyDirection) {
+            const prevElement = prevElements.get(id);
+
+            if (prevElement) {
+              flags.applyDirection =
+                prevElement.version > nextElement.version
+                  ? "backward"
+                  : "forward";
+            }
+          }
         }
 
         return acc;
@@ -1590,6 +1609,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   private resolveConflicts(
     prevElements: SceneElementsMap,
     nextElements: SceneElementsMap,
+    applyDirection: "forward" | "backward" = "forward",
   ) {
     const nextAffectedElements = new Map<string, OrderedExcalidrawElement>();
     const updater = (
@@ -1602,6 +1622,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       }
 
       const prevElement = prevElements.get(element.id);
+      const elementUpdates = updates as ElementUpdate<OrderedExcalidrawElement>;
 
       let affectedElement: OrderedExcalidrawElement;
 
@@ -1610,16 +1631,21 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         // so that we won't end up in an incosistent state in case we would fail in the middle of mutations
         affectedElement = newElementWith(
           nextElement,
-          updates as ElementUpdate<OrderedExcalidrawElement>,
+          {
+            ...elementUpdates,
+            version:
+              applyDirection === "forward"
+                ? nextElement.version + 1
+                : nextElement.version - 1,
+          },
           true,
         );
       } else {
-        affectedElement = mutateElement(
-          nextElement,
-          nextElements,
-          updates as ElementUpdate<OrderedExcalidrawElement>,
-          { force: true },
-        );
+        affectedElement = mutateElement(nextElement, nextElements, {
+          ...elementUpdates,
+          // don't modify the version further, as we've already updated it
+          version: nextElement.version,
+        });
       }
 
       nextAffectedElements.set(affectedElement.id, affectedElement);

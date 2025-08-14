@@ -40,7 +40,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   updates: ElementUpdate<TElement>,
   options?: {
     isDragging?: boolean;
-    force?: boolean;
   },
 ) => {
   let didChange = false;
@@ -125,7 +124,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     }
   }
 
-  if (!didChange && !options?.force) {
+  if (!didChange) {
     return element;
   }
 
