@@ -99,7 +99,7 @@ export const getDefaultAppState = (): Omit<
     },
     startBoundElement: null,
     suggestedBindings: [],
-    frameRendering: { enabled: true, clip: true, name: true, outline: true, markerName: true, markerOutline: true }, //zsviczian
+    frameRendering: { enabled: true, clip: true, name: true, outline: true, markerName: true, markerEnabled: true }, //zsviczian
     frameToHighlight: null,
     editingFrame: null,
     elementsToHighlight: null,

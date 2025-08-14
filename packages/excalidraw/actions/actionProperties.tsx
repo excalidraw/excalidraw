@@ -2094,7 +2094,8 @@ export const actionToggleFrameRole = register({
       ? frames.every((el) => el.frameRole === "marker")
       : appState.currentItemFrameRole === "marker";
 
-    const label = "Marker-frame";
+    const label = "Toggle Marker Frame. Guide-only frames to define slides/print areas/image references. " +
+      "Hidden in image exports; doesn't contain elements. Hide/show frames via canvas context menu.";
     return (
       <RadioSelection<"marker" | false>
         type="button"

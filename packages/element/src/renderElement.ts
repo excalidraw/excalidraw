@@ -759,7 +759,7 @@ export const renderElement = (
     case "frame": {
       if ( //zsviczian
         appState.frameRendering.enabled && appState.frameRendering.outline &&
-        !(!appState.frameRendering.markerOutline && element.frameRole === "marker")
+        !(!appState.frameRendering.markerEnabled && element.frameRole === "marker")
       ) {
         context.save();
         context.translate(

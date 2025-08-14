@@ -144,7 +144,7 @@ const getFrameRenderingConfig = (
     name: exportingFrame ? false : frameRendering.name,
     clip: exportingFrame ? true : frameRendering.clip,
     markerName: false, //zsviczian
-    markerOutline: false, //zsviczian
+    markerEnabled: false, //zsviczian
   };
 };
 
@@ -329,7 +329,7 @@ export const exportToSvg = async (
   const { exportingFrame = null } = opts || {};
 
   const filteredElements = elements.filter(
-    (el) => el.type === "frame" && el.frameRole !== "marker",
+    (el) => !(el.type === "frame" && el.frameRole === "marker"),
   ); //zsviczian
 
   const elementsForRender = prepareElementsForRender({

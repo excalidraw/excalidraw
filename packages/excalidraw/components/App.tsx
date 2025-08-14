@@ -1404,7 +1404,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const isDarkTheme = this.state.theme === THEME.DARK;
     //zsviczian
-    const nonDeletedFramesLikes = this.state.frameRendering.markerName
+    const nonDeletedFramesLikes = this.state.frameRendering.markerName && this.state.frameRendering.markerEnabled
       ? this.scene.getNonDeletedFramesLikes()
       : this.scene.getNonDeletedFramesLikes().filter(f => f.frameRole !== "marker");
 
@@ -3779,7 +3779,7 @@ class App extends React.Component<AppProps, AppState> {
           outline: next?.outline ?? prevState.frameRendering.outline,
           //zsviczian
           markerName: next?.markerName ?? prevState.frameRendering.markerName,
-          markerOutline: next?.markerOutline ?? prevState.frameRendering.markerOutline,
+          markerEnabled: next?.markerEnabled ?? prevState.frameRendering.markerEnabled,
         },
       };
     });
@@ -8586,6 +8586,9 @@ startLineEditor = (
       y: gridY,
       opacity: this.state.currentItemOpacity,
       locked: false,
+      ...this.state.currentItemFrameRole //zsviczian
+        ? { frameRole: this.state.currentItemFrameRole }
+        : {},
       ...FRAME_STYLE,
       ...(this.state.frameColor
         ? {

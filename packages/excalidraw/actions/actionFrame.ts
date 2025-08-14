@@ -15,7 +15,6 @@ import { getElementsInGroup } from "@excalidraw/element";
 import { getCommonBounds } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
-import { newElementWith } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -179,17 +178,12 @@ export const actionWrapSelectionInFrame = register({
 
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements, elementsMap);
     const PADDING = 16;
-    const baseFrame = newFrameElement({ //zsviczian
+    const frame = newFrameElement({
       x: x1 - PADDING,
       y: y1 - PADDING,
       width: x2 - x1 + PADDING * 2,
       height: y2 - y1 + PADDING * 2,
     });
-    // zsviczian: set frameRole from currentItemFrameRole if defined
-    const frame =
-      appState.currentItemFrameRole != null
-        ? newElementWith(baseFrame, { frameRole: appState.currentItemFrameRole })
-        : baseFrame;
 
     // for a selected partial group, we want to remove it from the remainder of the group
     if (appState.editingGroupId) {

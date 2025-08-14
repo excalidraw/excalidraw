@@ -310,7 +310,7 @@ export interface AppState {
     outline: boolean;
     clip: boolean;
     markerName: boolean; //zsviczian
-    markerOutline: boolean; //zsviczian
+    markerEnabled: boolean; //zsviczian
   };
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
