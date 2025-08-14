@@ -1550,7 +1550,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         delta.deleted.index !== delta.inserted.index;
     }
 
-    return newElementWith(element, directlyApplicablePartial);
+    return newElementWith(element, directlyApplicablePartial, true);
   }
 
   /**
@@ -1611,12 +1611,14 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         affectedElement = newElementWith(
           nextElement,
           updates as ElementUpdate<OrderedExcalidrawElement>,
+          true,
         );
       } else {
         affectedElement = mutateElement(
           nextElement,
           nextElements,
           updates as ElementUpdate<OrderedExcalidrawElement>,
+          { force: true },
         );
       }
 
