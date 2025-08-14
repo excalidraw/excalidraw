@@ -1688,6 +1688,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       }
 
       const prevElement = prevElements.get(element.id);
+      const nextVersion =
+        applyDirection === "forward"
+          ? nextElement.version + 1
+          : nextElement.version - 1;
+
       const elementUpdates = updates as ElementUpdate<OrderedExcalidrawElement>;
 
       let affectedElement: OrderedExcalidrawElement;
@@ -1699,18 +1704,18 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           nextElement,
           {
             ...elementUpdates,
-            version:
-              applyDirection === "forward"
-                ? nextElement.version + 1
-                : nextElement.version - 1,
+            version: nextVersion,
           },
           true,
         );
       } else {
         affectedElement = mutateElement(nextElement, nextElements, {
           ...elementUpdates,
-          // don't modify the version further, as we've already updated it
-          version: nextElement.version,
+          // don't modify the version further, if it's already different
+          version:
+            prevElement?.version !== nextElement.version
+              ? nextElement.version
+              : nextVersion,
         });
       }
 

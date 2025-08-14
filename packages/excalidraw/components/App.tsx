@@ -234,8 +234,7 @@ import {
   isLineElement,
   isSimpleArrow,
   StoreDelta,
-  ElementsDelta,
-  ApplyToOptions,
+  type ApplyToOptions,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -3948,6 +3947,10 @@ class App extends React.Component<AppProps, AppState> {
     deltas: StoreDelta[],
     options?: ApplyToOptions,
   ): [SceneElementsMap, AppState, boolean] => {
+    if (!deltas.length) {
+      throw new Error("No deltas were passed in!");
+    }
+
     // create new instance of elements map & appState, so we don't accidentaly mutate existing ones
     const nextElements = new Map(
       this.scene.getElementsMapIncludingDeleted(),
