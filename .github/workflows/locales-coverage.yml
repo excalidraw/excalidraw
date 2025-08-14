@@ -15,7 +15,7 @@ jobs:
           token: ${{ secrets.PUSH_TRANSLATIONS_COVERAGE_PAT }}
 
       - name: Setup Node.js 18.x
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -37,7 +37,7 @@ jobs:
           body="${body//'%'/'%25'}"
           body="${body//$'\n'/'%0A'}"
           body="${body//$'\r'/'%0D'}"
-          echo ::set-output name=body::$body
+          echo "body=$body" >> $GITHUB_OUTPUT
 
       - name: Update description with coverage
         uses: kt3k/update-pr-description@v1.0.1
