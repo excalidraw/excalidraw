@@ -156,11 +156,11 @@ export class Delta<T> {
   public static merge<T>(
     delta1: Delta<T>,
     delta2: Delta<T>,
-    delta3?: Delta<T>,
+    delta3: Delta<T> = Delta.empty(),
   ) {
     return Delta.create(
-      { ...delta1.deleted, ...delta2.deleted, ...(delta3?.deleted ?? {}) },
-      { ...delta1.inserted, ...delta2.inserted, ...(delta3?.inserted ?? {}) },
+      { ...delta1.deleted, ...delta2.deleted, ...delta3.deleted },
+      { ...delta1.inserted, ...delta2.inserted, ...delta3.inserted },
     );
   }
 
@@ -170,11 +170,11 @@ export class Delta<T> {
   public static mergeObjects<T extends { [key: string]: unknown }>(
     prev: T,
     added: T,
-    removed?: T,
+    removed: T = {} as T,
   ) {
     const cloned = { ...prev };
 
-    for (const key of Object.keys(removed ?? {})) {
+    for (const key of Object.keys(removed)) {
       delete cloned[key];
     }
 
@@ -508,7 +508,7 @@ export interface DeltaContainer<T> {
    *
    * @returns a tuple of the next object `T` with applied `Delta`s, and `boolean`, indicating whether the applied deltas resulted in a visible change.
    */
-  applyTo(previous: T, ...options: unknown[]): [T, boolean, ...unknown[]];
+  applyTo(previous: T, ...options: unknown[]): [T, boolean];
 
   /**
    * Squashes the current delta with the given one.
@@ -1930,7 +1930,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   ) {
     for (const element of changed.values()) {
       if (!element.isDeleted && isBindableElement(element)) {
-        // TODO: with precise bindings this is quite expensive, so consider optimisation so it's only triggered when the arrow does not intersect (impresice) element bounds
+        // TODO: with precise bindings this is quite expensive, so consider optimisation so it's only triggered when the arrow does not intersect (imprecise) element bounds
         updateBoundElements(element, scene, {
           changedElements: changed,
         });
