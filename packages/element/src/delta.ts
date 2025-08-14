@@ -153,10 +153,14 @@ export class Delta<T> {
   /**
    * Merges two deltas into a new one.
    */
-  public static merge<T>(delta1: Delta<T>, delta2: Delta<T>) {
+  public static merge<T>(
+    delta1: Delta<T>,
+    delta2: Delta<T>,
+    delta3?: Delta<T>,
+  ) {
     return Delta.create(
-      { ...delta1.deleted, ...delta2.deleted },
-      { ...delta1.inserted, ...delta2.inserted },
+      { ...delta1.deleted, ...delta2.deleted, ...(delta3?.deleted ?? {}) },
+      { ...delta1.inserted, ...delta2.inserted, ...(delta3?.inserted ?? {}) },
     );
   }
 
@@ -166,11 +170,11 @@ export class Delta<T> {
   public static mergeObjects<T extends { [key: string]: unknown }>(
     prev: T,
     added: T,
-    removed: T,
+    removed?: T,
   ) {
     const cloned = { ...prev };
 
-    for (const key of Object.keys(removed)) {
+    for (const key of Object.keys(removed ?? {})) {
       delete cloned[key];
     }
 
@@ -554,7 +558,39 @@ export class AppStateDelta implements DeltaContainer<AppState> {
   }
 
   public squash(delta: AppStateDelta): this {
-    this.delta = Delta.merge(this.delta, delta.delta);
+    const mergedDeletedSelectedElementIds = Delta.mergeObjects(
+      this.delta.deleted.selectedElementIds ?? {},
+      delta.delta.deleted.selectedElementIds ?? {},
+    );
+
+    const mergedInsertedSelectedElementIds = Delta.mergeObjects(
+      this.delta.inserted.selectedElementIds ?? {},
+      delta.delta.inserted.selectedElementIds ?? {},
+    );
+
+    const mergedInsertedSelectedGroupIds = Delta.mergeObjects(
+      this.delta.inserted.selectedGroupIds ?? {},
+      delta.delta.inserted.selectedGroupIds ?? {},
+    );
+
+    const mergedDeletedSelectedGroupIds = Delta.mergeObjects(
+      this.delta.deleted.selectedGroupIds ?? {},
+      delta.delta.deleted.selectedGroupIds ?? {},
+    );
+
+    const mergedDelta = Delta.create(
+      {
+        selectedElementIds: mergedDeletedSelectedElementIds,
+        selectedGroupIds: mergedDeletedSelectedGroupIds,
+      },
+      {
+        selectedElementIds: mergedInsertedSelectedElementIds,
+        selectedGroupIds: mergedInsertedSelectedGroupIds,
+      },
+    );
+
+    this.delta = Delta.merge(this.delta, delta.delta, mergedDelta);
+
     return this;
   }
 
@@ -1395,13 +1431,44 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   public squash(delta: ElementsDelta): this {
     const { added, removed, updated } = delta;
 
+    function mergeBoundElements(
+      prevDelta: Delta<ElementPartial>,
+      nextDelta: Delta<ElementPartial>,
+    ) {
+      const mergedDeletedBoundElements =
+        Delta.mergeArrays(
+          prevDelta.deleted.boundElements ?? [],
+          nextDelta.deleted.boundElements ?? [],
+          undefined,
+          (x) => x.id,
+        ) ?? [];
+
+      const mergedInsertedBoundElements =
+        Delta.mergeArrays(
+          prevDelta.inserted.boundElements ?? [],
+          nextDelta.inserted.boundElements ?? [],
+          undefined,
+          (x) => x.id,
+        ) ?? [];
+
+      return Delta.create(
+        {
+          boundElements: mergedDeletedBoundElements,
+        },
+        {
+          boundElements: mergedInsertedBoundElements,
+        },
+      );
+    }
+
     for (const [id, nextDelta] of Object.entries(added)) {
       const prevDelta = this.added[id];
 
       if (!prevDelta) {
         this.added[id] = nextDelta;
       } else {
-        this.added[id] = Delta.merge(prevDelta, nextDelta);
+        const mergedDelta = mergeBoundElements(prevDelta, nextDelta);
+        this.added[id] = Delta.merge(prevDelta, nextDelta, mergedDelta);
       }
     }
 
@@ -1411,7 +1478,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       if (!prevDelta) {
         this.removed[id] = nextDelta;
       } else {
-        this.removed[id] = Delta.merge(prevDelta, nextDelta);
+        const mergedDelta = mergeBoundElements(prevDelta, nextDelta);
+        this.removed[id] = Delta.merge(prevDelta, nextDelta, mergedDelta);
       }
     }
 
@@ -1421,7 +1489,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       if (!prevDelta) {
         this.updated[id] = nextDelta;
       } else {
-        this.updated[id] = Delta.merge(prevDelta, nextDelta);
+        const mergedDelta = mergeBoundElements(prevDelta, nextDelta);
+        this.updated[id] = Delta.merge(prevDelta, nextDelta, mergedDelta);
       }
     }
 
