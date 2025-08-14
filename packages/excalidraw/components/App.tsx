@@ -345,7 +345,6 @@ import {
   generateIdFromFile,
   getDataURL,
   getDataURL_sync,
-  getFileFromEvent,
   getFilesFromEvent,
   ImageURLToFile,
   isImageFileHandle,
@@ -3100,6 +3099,16 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
+      const filesData = await getFilesFromEvent(event);
+
+      const imageFiles = filesData
+        .map((data) => data.file)
+        .filter((file): file is File => isSupportedImageFile(file));
+
+      if (imageFiles.length > 0 && this.isToolSupported("image")) {
+        return this.insertMultipleImages(imageFiles, sceneX, sceneY);
+      }
+
       // must be called in the same frame (thus before any awaits) as the paste
       // event else some browsers (FF...) will clear the clipboardData
       // (something something security)
@@ -4807,7 +4816,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ suggestedBindings: [] });
     }
     if (nextActiveTool.type === "image") {
-      this.onImageAction();
+      this.onImageToolbarButtonClick();
     }
 
     this.setState((prevState) => {
@@ -10273,7 +10282,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private onImageAction = async () => {
+  private onImageToolbarButtonClick = async () => {
     try {
       const clientX = this.state.width / 2 + this.state.offsetLeft;
       const clientY = this.state.height / 2 + this.state.offsetTop;
@@ -10283,24 +10292,15 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
-      const imageFile = await fileOpen({
+      const imageFiles = await fileOpen({
         description: "Image",
         extensions: Object.keys(
           IMAGE_MIME_TYPES,
         ) as (keyof typeof IMAGE_MIME_TYPES)[],
+        multiple: true,
       });
 
-      await this.createImageElement({
-        sceneX: x,
-        sceneY: y,
-        addToFrameUnderCursor: false,
-        imageFile,
-      });
-
-      // avoid being batched (just in case)
-      this.setState({}, () => {
-        this.actionManager.executeAction(actionFinalize);
-      });
+      this.insertMultipleImages(imageFiles, x, y);
     } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error(error);
@@ -10642,59 +10642,53 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
-    // must be retrieved first, in the same frame
-    const { file, fileHandle } = await getFileFromEvent(event);
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
       this.state,
     );
 
-    try {
-      // if image tool not supported, don't show an error here and let it fall
-      // through so we still support importing scene data from images. If no
-      // scene data encoded, we'll show an error then
-      if (isSupportedImageFile(file) && this.isToolSupported("image")) {
-        // first attempt to decode scene from the image if it's embedded
-        // ---------------------------------------------------------------------
+    // must be retrieved first, in the same frame
+    const filesData = await getFilesFromEvent(event);
 
-        if (file?.type === MIME_TYPES.png || file?.type === MIME_TYPES.svg) {
-          try {
-            const scene = await loadFromBlob(
-              file,
-              this.state,
-              this.scene.getElementsIncludingDeleted(),
-              fileHandle,
-            );
-            this.syncActionResult({
-              ...scene,
-              appState: {
-                ...(scene.appState || this.state),
-                isLoading: false,
-              },
-              replaceFiles: true,
-              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-            });
-            return;
-          } catch (error: any) {
-            // Don't throw for image scene daa
-            if (error.name !== "EncodingError") {
-              throw new Error(t("alerts.couldNotLoadInvalidFile"));
-            }
+    if (filesData.length === 1) {
+      const { file, fileHandle } = filesData[0];
+
+      if (
+        file &&
+        (file.type === MIME_TYPES.png || file.type === MIME_TYPES.svg)
+      ) {
+        try {
+          const scene = await loadFromBlob(
+            file,
+            this.state,
+            this.scene.getElementsIncludingDeleted(),
+            fileHandle,
+          );
+          this.syncActionResult({
+            ...scene,
+            appState: {
+              ...(scene.appState || this.state),
+              isLoading: false,
+            },
+            replaceFiles: true,
+            captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          });
+          return;
+        } catch (error: any) {
+          if (error.name !== "EncodingError") {
+            throw new Error(t("alerts.couldNotLoadInvalidFile"));
           }
+          // if EncodingError, fall through to insert as regular image
         }
-
-        // if no scene is embedded or we fail for whatever reason, fall back
-        // to importing as regular image
-        // ---------------------------------------------------------------------
-        this.createImageElement({ sceneX, sceneY, imageFile: file });
-
-        return;
       }
-    } catch (error: any) {
-      return this.setState({
-        isLoading: false,
-        errorMessage: error.message,
-      });
+    }
+
+    const imageFiles = filesData
+      .map((data) => data.file)
+      .filter((file): file is File => isSupportedImageFile(file));
+
+    if (imageFiles.length > 0 && this.isToolSupported("image")) {
+      return this.insertMultipleImages(imageFiles, sceneX, sceneY);
     }
 
     const libraryJSON = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
@@ -10712,9 +10706,12 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (file) {
-      // Attempt to parse an excalidraw/excalidrawlib file
-      await this.loadFileToCanvas(file, fileHandle);
+    if (filesData.length > 1) {
+      const { file, fileHandle } = filesData[0];
+      if (file) {
+        // Attempt to parse an excalidraw/excalidrawlib file
+        await this.loadFileToCanvas(file, fileHandle);
+      }
     }
 
     if (event.dataTransfer?.types?.includes("text/plain")) {
@@ -10731,7 +10728,6 @@ class App extends React.Component<AppProps, AppState> {
           link: normalizeLink(text),
         });
         if (embeddable) {
-          this.store.scheduleCapture();
           this.setState({ selectedElementIds: { [embeddable.id]: true } });
         }
       }
