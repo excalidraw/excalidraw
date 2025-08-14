@@ -55,9 +55,9 @@ import { getNonDeletedGroupIds } from "./groups";
 
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 
-import { Scene } from "./Scene";
-
 import { StoreSnapshot } from "./store";
+
+import { Scene } from "./Scene";
 
 import type { BindableProp, BindingProp } from "./binding";
 
@@ -504,7 +504,7 @@ export interface DeltaContainer<T> {
    *
    * @returns a tuple of the next object `T` with applied `Delta`s, and `boolean`, indicating whether the applied deltas resulted in a visible change.
    */
-  applyTo(previous: T, ...options: unknown[]): [T, boolean];
+  applyTo(previous: T, ...options: unknown[]): [T, boolean, ...unknown[]];
 
   /**
    * Squashes the current delta with the given one.
@@ -519,6 +519,10 @@ export interface DeltaContainer<T> {
 
 export class AppStateDelta implements DeltaContainer<AppState> {
   private constructor(public delta: Delta<ObservedAppState>) {}
+
+  public static create(delta: Delta<ObservedAppState>): AppStateDelta {
+    return new AppStateDelta(delta);
+  }
 
   public static calculate<T extends ObservedAppState>(
     prevAppState: T,
@@ -938,7 +942,8 @@ type ElementPartial<TElement extends ExcalidrawElement = ExcalidrawElement> =
   Omit<Partial<Ordered<TElement>>, "id" | "updated" | "seed">;
 
 export type ApplyToOptions = {
-  excludedProperties: Set<keyof ElementPartial>;
+  excludedProperties?: Set<keyof ElementPartial>;
+  skipRedraw?: true;
 };
 
 type ApplyToFlags = {
@@ -1311,9 +1316,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   public applyTo(
     elements: SceneElementsMap,
     snapshot: StoreSnapshot["elements"] = StoreSnapshot.empty().elements,
-    options: ApplyToOptions = {
-      excludedProperties: new Set(),
-    },
+    options?: ApplyToOptions,
   ): [SceneElementsMap, boolean] {
     let nextElements = new Map(elements) as SceneElementsMap;
     let changedElements: Map<string, OrderedExcalidrawElement>;
@@ -1328,8 +1331,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       const applyDeltas = ElementsDelta.createApplier(
         nextElements,
         snapshot,
-        options,
         flags,
+        options,
       );
 
       const addedElements = applyDeltas(this.added);
@@ -1360,22 +1363,17 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     }
 
     try {
-      // the following reorder performs also mutations, but only on new instances of changed elements
-      // (unless something goes really bad and it fallbacks to fixing all invalid indices)
+      // the following reorder performs mutations, but only on new instances of changed elements,
+      // unless something goes really bad and it fallbacks to fixing all invalid indices
       nextElements = ElementsDelta.reorderElements(
         nextElements,
         changedElements,
         flags,
       );
 
-      // we don't have an up-to-date scene, as we can be just in the middle of applying history entry
-      // we also don't have a scene on the server
-      // so we are creating a temp scene just to query and mutate elements
-      const tempScene = new Scene(nextElements);
-
-      ElementsDelta.redrawTextBoundingBoxes(tempScene, changedElements);
-      // Need ordered nextElements to avoid z-index binding issues
-      ElementsDelta.redrawBoundArrows(tempScene, changedElements);
+      if (!options?.skipRedraw) {
+        ElementsDelta.redrawElements(nextElements, changedElements);
+      }
     } catch (e) {
       console.error(
         `Couldn't mutate elements after applying elements change`,
@@ -1430,8 +1428,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     (
       nextElements: SceneElementsMap,
       snapshot: StoreSnapshot["elements"],
-      options: ApplyToOptions,
       flags: ApplyToFlags,
+      options?: ApplyToOptions,
     ) =>
     (deltas: Record<string, Delta<ElementPartial>>) => {
       const getElement = ElementsDelta.createGetter(
@@ -1447,8 +1445,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           const newElement = ElementsDelta.applyDelta(
             element,
             delta,
-            options,
             flags,
+            options,
           );
 
           nextElements.set(newElement.id, newElement);
@@ -1497,8 +1495,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   private static applyDelta(
     element: OrderedExcalidrawElement,
     delta: Delta<ElementPartial>,
-    options: ApplyToOptions,
     flags: ApplyToFlags,
+    options?: ApplyToOptions,
   ) {
     const directlyApplicablePartial: Mutable<ElementPartial> = {};
 
@@ -1512,7 +1510,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         continue;
       }
 
-      if (options.excludedProperties.has(key)) {
+      if (options?.excludedProperties?.has(key)) {
         continue;
       }
 
@@ -1603,9 +1601,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         return;
       }
 
+      const prevElement = prevElements.get(element.id);
+
       let affectedElement: OrderedExcalidrawElement;
 
-      if (prevElements.get(element.id) === nextElement) {
+      if (prevElement === nextElement) {
         // create the new element instance in case we didn't modify the element yet
         // so that we won't end up in an incosistent state in case we would fail in the middle of mutations
         affectedElement = newElementWith(
@@ -1722,6 +1722,31 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     BindableElement.rebindAffected(nextElements, nextElement(), updater);
   }
 
+  public static redrawElements(
+    nextElements: SceneElementsMap,
+    changedElements: Map<string, OrderedExcalidrawElement>,
+  ) {
+    try {
+      // we don't have an up-to-date scene, as we can be just in the middle of applying history entry
+      // we also don't have a scene on the server
+      // so we are creating a temp scene just to query and mutate elements
+      const tempScene = new Scene(nextElements, { skipValidation: true });
+
+      ElementsDelta.redrawTextBoundingBoxes(tempScene, changedElements);
+
+      // needs ordered nextElements to avoid z-index binding issues
+      ElementsDelta.redrawBoundArrows(tempScene, changedElements);
+    } catch (e) {
+      console.error(`Couldn't redraw elements`, e);
+
+      if (isTestEnv() || isDevEnv()) {
+        throw e;
+      }
+    } finally {
+      return nextElements;
+    }
+  }
+
   private static redrawTextBoundingBoxes(
     scene: Scene,
     changed: Map<string, OrderedExcalidrawElement>,
@@ -1776,6 +1801,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   ) {
     for (const element of changed.values()) {
       if (!element.isDeleted && isBindableElement(element)) {
+        // TODO: with precise bindings this is quite expensive, so consider optimisation so it's only triggered when the arrow does not intersect (impresice) element bounds
         updateBoundElements(element, scene, {
           changedElements: changed,
         });

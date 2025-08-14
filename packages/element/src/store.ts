@@ -552,10 +552,12 @@ export class StoreDelta {
   public static load({
     id,
     elements: { added, removed, updated },
+    appState: { delta: appStateDelta },
   }: DTO<StoreDelta>) {
     const elements = ElementsDelta.create(added, removed, updated);
+    const appState = AppStateDelta.create(appStateDelta);
 
-    return new this(id, elements, AppStateDelta.empty());
+    return new this(id, elements, appState);
   }
 
   /**
@@ -572,9 +574,7 @@ export class StoreDelta {
     delta: StoreDelta,
     elements: SceneElementsMap,
     appState: AppState,
-    options: ApplyToOptions = {
-      excludedProperties: new Set(),
-    },
+    options?: ApplyToOptions,
   ): [SceneElementsMap, AppState, boolean] {
     const [nextElements, elementsContainVisibleChange] = delta.elements.applyTo(
       elements,

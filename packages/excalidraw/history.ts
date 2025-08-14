@@ -175,7 +175,7 @@ export class History {
       let nextAppState = appState;
       let containsVisibleChange = false;
 
-      // iterate through the history entries in case ;they result in no visible changes
+      // iterate through the history entries in case they result in no visible changes
       while (historyDelta) {
         try {
           [nextElements, nextAppState, containsVisibleChange] =

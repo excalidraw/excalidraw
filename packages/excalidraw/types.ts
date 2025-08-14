@@ -5,7 +5,7 @@ import type {
   MIME_TYPES,
 } from "@excalidraw/common";
 
-import type { SuggestedBinding } from "@excalidraw/element";
+import type { ApplyToOptions, SuggestedBinding } from "@excalidraw/element";
 
 import type { LinearElementEditor } from "@excalidraw/element";
 
@@ -627,6 +627,8 @@ export type SceneData = {
   captureUpdate?: CaptureUpdateActionType;
 };
 
+export type ApplyDeltasOptions = Omit<ApplyToOptions, "skipRedraw">;
+
 export type ExportOpts = {
   saveFileToDisk?: boolean;
   onExportToBackend?: (
@@ -801,6 +803,7 @@ export type UnsubscribeCallback = () => void;
 
 export interface ExcalidrawImperativeAPI {
   updateScene: InstanceType<typeof App>["updateScene"];
+  applyDeltas: InstanceType<typeof App>["applyDeltas"];
   mutateElement: InstanceType<typeof App>["mutateElement"];
   updateLibrary: InstanceType<typeof Library>["updateLibrary"];
   resetScene: InstanceType<typeof App>["resetScene"];
