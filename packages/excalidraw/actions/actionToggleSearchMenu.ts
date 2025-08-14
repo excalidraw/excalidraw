@@ -3,6 +3,8 @@ import {
   CANVAS_SEARCH_TAB,
   CLASSES,
   DEFAULT_SIDEBAR,
+  isLatinChar,
+  CODES,
 } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
@@ -56,5 +58,8 @@ export const actionToggleSearchMenu = register({
   predicate: (element, appState, props) => {
     return props.gridModeEnabled === undefined;
   },
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F,
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    (event.key === KEYS.F ||
+      (!isLatinChar(event.key) && event.code === CODES.F)),
 });
