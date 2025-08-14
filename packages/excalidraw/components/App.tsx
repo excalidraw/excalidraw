@@ -235,6 +235,7 @@ import {
   isSimpleArrow,
   StoreDelta,
   ElementsDelta,
+  ApplyToOptions,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -462,7 +463,6 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
-  ApplyDeltasOptions,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -3946,46 +3946,26 @@ class App extends React.Component<AppProps, AppState> {
 
   public applyDeltas = (
     deltas: StoreDelta[],
-    options?: ApplyDeltasOptions,
+    options?: ApplyToOptions,
   ): [SceneElementsMap, AppState, boolean] => {
-    const prevElements = this.scene.getElementsMapIncludingDeleted();
-
-    let nextElements = new Map(
+    // create new instance of elements map & appState, so we don't accidentaly mutate existing ones
+    const nextElements = new Map(
       this.scene.getElementsMapIncludingDeleted(),
     ) as SceneElementsMap;
-    let nextAppState = { ...this.state };
-    let containsVisibleChange = false;
 
-    for (const delta of deltas) {
-      // use new temp instance, so that `applyTo` won't mutate existing deltas
-      const loadedDelta = StoreDelta.load(delta);
+    const nextAppState = { ...this.state };
 
-      [nextElements, nextAppState, containsVisibleChange] = StoreDelta.applyTo(
-        loadedDelta,
-        nextElements,
-        nextAppState,
-        {
-          ...options,
-          // let's always skip redraw after applying each delta, as it can be expensive, so we will do it just once at the end
-          skipRedraw: true,
-        },
-      );
+    const [head, ...tail] = deltas;
+
+    // create new delta isntance, so we don't accidentaly mutate existing one
+    const mainDelta = StoreDelta.load(head);
+
+    // squash all deltas together, mutating the main delta
+    for (const delta of tail) {
+      mainDelta.squash(delta);
     }
 
-    const changedElements = Array.from(nextElements.values()).reduce(
-      (acc, nextElement) => {
-        // we rely on applyTo being immutable, so we can only compare the instances do detect changed elements
-        if (prevElements.get(nextElement.id) !== nextElement) {
-          acc.set(nextElement.id, nextElement);
-        }
-        return acc;
-      },
-      new Map<string, OrderedExcalidrawElement>(),
-    );
-
-    ElementsDelta.redrawElements(nextElements, changedElements);
-
-    return [nextElements, nextAppState, containsVisibleChange];
+    return StoreDelta.applyTo(mainDelta, nextElements, nextAppState, options);
   };
 
   public mutateElement = <TElement extends Mutable<ExcalidrawElement>>(

@@ -627,8 +627,6 @@ export type SceneData = {
   captureUpdate?: CaptureUpdateActionType;
 };
 
-export type ApplyDeltasOptions = Omit<ApplyToOptions, "skipRedraw">;
-
 export type ExportOpts = {
   saveFileToDisk?: boolean;
   onExportToBackend?: (

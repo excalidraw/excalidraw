@@ -943,7 +943,6 @@ type ElementPartial<TElement extends ExcalidrawElement = ExcalidrawElement> =
 
 export type ApplyToOptions = {
   excludedProperties?: Set<keyof ElementPartial>;
-  skipRedraw?: true;
 };
 
 type ApplyToFlags = {
@@ -1378,9 +1377,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         flags,
       );
 
-      if (!options?.skipRedraw) {
-        ElementsDelta.redrawElements(nextElements, changedElements);
-      }
+      ElementsDelta.redrawElements(nextElements, changedElements);
     } catch (e) {
       console.error(
         `Couldn't mutate elements after applying elements change`,

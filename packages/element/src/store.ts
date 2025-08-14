@@ -561,6 +561,16 @@ export class StoreDelta {
   }
 
   /**
+   * Squash the passed delta into the current instance.
+   */
+  public squash(delta: StoreDelta) {
+    this.elements.squash(delta.elements);
+    this.appState.squash(delta.appState);
+
+    return this;
+  }
+
+  /**
    * Inverse store delta, creates new instance of `StoreDelta`.
    */
   public static inverse(delta: StoreDelta) {
