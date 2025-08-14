@@ -263,7 +263,6 @@ import type {
   MagicGenerationData,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
-  OrderedExcalidrawElement,
   SceneElementsMap,
 } from "@excalidraw/element/types";
 

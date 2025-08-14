@@ -5,7 +5,7 @@ import type {
   MIME_TYPES,
 } from "@excalidraw/common";
 
-import type { ApplyToOptions, SuggestedBinding } from "@excalidraw/element";
+import type { SuggestedBinding } from "@excalidraw/element";
 
 import type { LinearElementEditor } from "@excalidraw/element";
 
