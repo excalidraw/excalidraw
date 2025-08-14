@@ -134,6 +134,7 @@ export type ActionName =
   | "createContainerFromText"
   | "wrapTextInContainer"
   | "toggleLaserPointerTool" //zsviczian
+  | "toggleFrameRole" //zsviczian
   | "commandPalette"
   | "autoResize"
   | "elementStats"

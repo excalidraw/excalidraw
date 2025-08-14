@@ -189,6 +189,7 @@ export const newIframeElement = (
 export const newFrameElement = (
   opts: {
     name?: string;
+    frameRole?: ExcalidrawFrameElement["frameRole"]; //zsviczian
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFrameElement> => {
   const frameElement = newElementWith(
@@ -196,6 +197,9 @@ export const newFrameElement = (
       ..._newElementBase<ExcalidrawFrameElement>("frame", opts),
       type: "frame",
       name: opts?.name || null,
+      ...opts?.frameRole //zsvciczian
+        ? {frameRole: opts?.frameRole}
+        : {}
     },
     {},
   );

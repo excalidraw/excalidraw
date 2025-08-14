@@ -757,7 +757,10 @@ export const renderElement = (
   switch (element.type) {
     case "magicframe":
     case "frame": {
-      if (appState.frameRendering.enabled && appState.frameRendering.outline) {
+      if ( //zsviczian
+        appState.frameRendering.enabled && appState.frameRendering.outline &&
+        !(!appState.frameRendering.markerEnabled && element.frameRole === "marker")
+      ) {
         context.save();
         context.translate(
           element.x + appState.scrollX,
@@ -780,7 +783,14 @@ export const renderElement = (
             appState.theme === THEME.LIGHT ? "#7affd7" : "#1d8264";
         }
 
-        if (FRAME_STYLE.radius && context.roundRect) {
+        //zsviczian
+        if (element.frameRole === "marker") {
+          const dash = 8 / appState.zoom.value;
+          const gap = 6 / appState.zoom.value;
+          context.setLineDash([dash, gap]);
+        }
+
+        if (FRAME_STYLE.radius && context.roundRect && element.frameRole !== "marker") { //zsviczian
           context.beginPath();
           context.roundRect(
             0,

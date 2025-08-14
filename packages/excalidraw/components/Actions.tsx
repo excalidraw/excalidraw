@@ -153,6 +153,12 @@ export const SelectedShapeActions = ({
   const showAlignActions =
     !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
 
+  // zsviczian
+  const showToggleFrameRoleAction =
+    targetElements.length > 0 &&
+    targetElements.every((el) => el.type === "frame") ||
+    appState.activeTool.type === "frame";
+
   return (
     <div className="selected-shape-actions">
       <div>
@@ -206,6 +212,16 @@ export const SelectedShapeActions = ({
       {(canHaveArrowheads(appState.activeTool.type) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
+      )}
+
+      {/* //zsviczian: add frame role toggle  */}
+      {showToggleFrameRoleAction && (
+        <fieldset>
+          <legend>{"Frame Actions"}</legend>
+          <div className="buttonList">
+            {renderAction("toggleFrameRole")}
+          </div>
+        </fieldset>
       )}
 
       {renderAction("changeOpacity")}
