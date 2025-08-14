@@ -1441,10 +1441,10 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   public squash(delta: ElementsDelta): this {
     const { added, removed, updated } = delta;
 
-    function mergeBoundElements(
+    const mergeBoundElements = (
       prevDelta: Delta<ElementPartial>,
       nextDelta: Delta<ElementPartial>,
-    ) {
+    ) => {
       const mergedDeletedBoundElements =
         Delta.mergeArrays(
           prevDelta.deleted.boundElements ?? [],
@@ -1469,7 +1469,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           boundElements: mergedInsertedBoundElements,
         },
       );
-    }
+    };
 
     for (const [id, nextDelta] of Object.entries(added)) {
       const prevDelta = this.added[id] ?? this.removed[id] ?? this.updated[id];
@@ -1478,6 +1478,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         this.added[id] = nextDelta;
       } else {
         const mergedDelta = mergeBoundElements(prevDelta, nextDelta);
+        delete this.removed[id];
+        delete this.updated[id];
+
         this.added[id] = Delta.merge(prevDelta, nextDelta, mergedDelta);
       }
     }
@@ -1489,6 +1492,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         this.removed[id] = nextDelta;
       } else {
         const mergedDelta = mergeBoundElements(prevDelta, nextDelta);
+        delete this.added[id];
+        delete this.updated[id];
+
         this.removed[id] = Delta.merge(prevDelta, nextDelta, mergedDelta);
       }
     }
@@ -1500,14 +1506,14 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         this.updated[id] = nextDelta;
       } else {
         const mergedDelta = mergeBoundElements(prevDelta, nextDelta);
-        this.updated[id] = Delta.merge(prevDelta, nextDelta, mergedDelta);
+        const updatedDelta = Delta.merge(prevDelta, nextDelta, mergedDelta);
 
         if (prevDelta === this.added[id]) {
-          this.added[id] = nextDelta;
+          this.added[id] = updatedDelta;
         } else if (prevDelta === this.removed[id]) {
-          this.removed[id] = nextDelta;
+          this.removed[id] = updatedDelta;
         } else {
-          this.updated[id] = nextDelta;
+          this.updated[id] = updatedDelta;
         }
       }
     }
