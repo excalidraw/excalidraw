@@ -1085,6 +1085,15 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       deleted.version !== inserted.version
     );
 
+  private static satisfiesUniqueInvariants = (
+    elementsDelta: ElementsDelta,
+    id: string,
+  ) => {
+    const { added, removed, updated } = elementsDelta;
+    // it's required that there is only one unique delta type per element
+    return [added[id], removed[id], updated[id]].filter(Boolean).length === 1;
+  };
+
   private static validate(
     elementsDelta: ElementsDelta,
     type: "added" | "removed" | "updated",
@@ -1093,6 +1102,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     for (const [id, delta] of Object.entries(elementsDelta[type])) {
       if (
         !this.satisfiesCommmonInvariants(delta) ||
+        !this.satisfiesUniqueInvariants(elementsDelta, id) ||
         !satifiesSpecialInvariants(delta)
       ) {
         console.error(
@@ -1462,7 +1472,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     }
 
     for (const [id, nextDelta] of Object.entries(added)) {
-      const prevDelta = this.added[id];
+      const prevDelta = this.added[id] ?? this.removed[id] ?? this.updated[id];
 
       if (!prevDelta) {
         this.added[id] = nextDelta;
@@ -1473,7 +1483,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     }
 
     for (const [id, nextDelta] of Object.entries(removed)) {
-      const prevDelta = this.removed[id];
+      const prevDelta = this.added[id] ?? this.removed[id] ?? this.updated[id];
 
       if (!prevDelta) {
         this.removed[id] = nextDelta;
@@ -1484,14 +1494,28 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     }
 
     for (const [id, nextDelta] of Object.entries(updated)) {
-      const prevDelta = this.updated[id];
+      const prevDelta = this.added[id] ?? this.removed[id] ?? this.updated[id];
 
       if (!prevDelta) {
         this.updated[id] = nextDelta;
       } else {
         const mergedDelta = mergeBoundElements(prevDelta, nextDelta);
         this.updated[id] = Delta.merge(prevDelta, nextDelta, mergedDelta);
+
+        if (prevDelta === this.added[id]) {
+          this.added[id] = nextDelta;
+        } else if (prevDelta === this.removed[id]) {
+          this.removed[id] = nextDelta;
+        } else {
+          this.updated[id] = nextDelta;
+        }
       }
+    }
+
+    if (isTestEnv() || isDevEnv()) {
+      ElementsDelta.validate(this, "added", ElementsDelta.satisfiesAddition);
+      ElementsDelta.validate(this, "removed", ElementsDelta.satisfiesRemoval);
+      ElementsDelta.validate(this, "updated", ElementsDelta.satisfiesUpdate);
     }
 
     return this;
