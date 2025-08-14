@@ -67,6 +67,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  ExcalidrawFrameElement,
   FontFamilyValues,
   TextAlign,
   VerticalAlign,
@@ -127,6 +128,7 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  markerFrameIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -2027,6 +2029,91 @@ export const actionChangeArrowType = register({
           />
         </div>
       </fieldset>
+    );
+  },
+});
+
+// zsviczian
+export const actionToggleFrameRole = register({
+  name: "toggleFrameRole",
+  label: "labels.toggleFrameRole",
+  icon: markerFrameIcon,
+  trackEvent: { category: "element" },
+  perform: (elements, appState, value, app) => {
+    const selected = getSelectedElements(elements, appState);
+    const frames = selected.filter(el => el.type === "frame") as ExcalidrawFrameElement[];
+    const onlyFramesSelected = selected.length > 0 && selected.length === frames.length;
+
+    if (onlyFramesSelected) {
+      const selectedIds = new Set(selected.map((el) => el.id));
+      const hasNonMarker = frames.some((el) => el.frameRole !== "marker");
+
+      const explicit = (value as { frameRole?: "marker" | null })?.frameRole;
+      const targetRole =
+        explicit !== undefined ? explicit : hasNonMarker ? null : "marker";
+
+      const next = elements.map((el) => {
+        if (selectedIds.has(el.id) && el.type === "frame") {
+          return newElementWith(el, { frameRole: targetRole });
+        }
+        return el;
+      });
+
+      return {
+        elements: next,
+        appState,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
+    }
+
+    // no (or non-frame) selection → toggle current item default
+    const nextRole =
+      appState.currentItemFrameRole === "marker" ? null : "marker";
+    return {
+      elements,
+      appState: { ...appState, currentItemFrameRole: nextRole },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  predicate: (_elements, appState, _props, app) => {
+    if(appState.activeTool.type === "frame") {
+      return true;
+    }
+    const selected = app.scene.getSelectedElements(appState);
+    return selected.length > 0
+      ? selected.every((el) => el.type === "frame")
+      : false;
+  },
+  checked: (appState) => appState.currentItemFrameRole === "marker",
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const selected = getSelectedElements(elements, appState);
+    const frames = selected.filter(el => el.type === "frame") as ExcalidrawFrameElement[];
+    const onlyFramesSelected = selected.length > 0 && selected.length === frames.length;
+
+    const isMarker = onlyFramesSelected
+      ? frames.every((el) => el.frameRole === "marker")
+      : appState.currentItemFrameRole === "marker";
+
+    const label = "Marker-frame";
+    return (
+      <RadioSelection<"marker" | false>
+        type="button"
+        options={[
+          {
+            value: "marker",
+            text: label,
+            icon: markerFrameIcon,
+            active: isMarker ? true : undefined,
+            testId: "frame-role-marker",
+          },
+        ]}
+        value={isMarker ? "marker" : false}
+        onClick={() =>
+          updateData({
+            frameRole: isMarker ? null : "marker",
+          })
+        }
+      />
     );
   },
 });

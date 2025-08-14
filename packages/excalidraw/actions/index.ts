@@ -42,6 +42,7 @@ export {
   actionSaveFileToDisk,
   actionLoadScene,
 } from "./actionExport";
+export { actionToggleFrameRole } from "./actionProperties";
 
 export { actionCopyStyles, actionPasteStyles } from "./actionStyles";
 export {

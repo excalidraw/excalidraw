@@ -153,6 +153,11 @@ export const SelectedShapeActions = ({
   const showAlignActions =
     !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
 
+  // zsviczian
+  const showToggleFrameRoleAction =
+    targetElements.length > 0 &&
+    targetElements.every((el) => el.type === "frame");
+
   return (
     <div className="selected-shape-actions">
       <div>
@@ -273,6 +278,8 @@ export const SelectedShapeActions = ({
             {showLinkIcon && renderAction("hyperlink")}
             {showCropEditorAction && renderAction("cropEditor")}
             {showLineEditorAction && renderAction("toggleLinearEditor")}
+            {/* zsviczian: add frame role toggle under Actions for frames */}
+            {showToggleFrameRoleAction && renderAction("toggleFrameRole")}
           </div>
         </fieldset>
       )}
