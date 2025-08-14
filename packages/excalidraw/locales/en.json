@@ -175,7 +175,8 @@
     "linkToElement": "Link to object",
     "wrapSelectionInFrame": "Wrap selection in frame",
     "tab": "Tab",
-    "shapeSwitch": "Switch shape"
+    "shapeSwitch": "Switch shape",
+    "toggleFrameRole": "Toggle frame role" //zsviczian
   },
   "elementLink": {
     "title": "Link to object",

@@ -278,7 +278,7 @@ export const getElementsInResizingFrame = (
   elementsMap: ElementsMap,
 ): ExcalidrawElement[] => {
   const prevElementsInFrame = getFrameChildren(allElements, frame.id);
-  //zsviczian: do not suggest adding new elements to print frames while resizing
+  //zsviczian: do not suggest adding new elements to marker frames while resizing
   if (frame.frameRole === "marker") {
     return prevElementsInFrame.filter(
       (element) => !(isTextElement(element) && element.containerId),
@@ -445,7 +445,7 @@ export const filterElementsEligibleAsFrameChildren = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
 ) => {
-  //zsviczian: nothing is eligible for print frames
+  //zsviczian: nothing is eligible for marker frames
   if (frame.frameRole === "marker") {
     return [];
   }
