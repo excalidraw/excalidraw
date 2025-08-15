@@ -65,7 +65,7 @@ class LocalFileManager extends FileManager {
   };
 }
 
-const saveDataStateToLocalStorage = (
+const saveDataStateToIndexedDB = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
@@ -79,17 +79,15 @@ const saveDataStateToLocalStorage = (
       _appState.openSidebar = null;
     }
 
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(clearElementsForLocalStorage(elements)),
-    );
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-      JSON.stringify(_appState),
-    );
+    // save to IndexedDB
+    await Promise.all([
+      ElementsIndexedDBAdapter.save(clearElementsForLocalStorage(elements)),
+      AppStateIndexedDBAdapter.save(_appState),
+    ]);
+
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
   } catch (error: any) {
-    // Unable to access window.localStorage
+    // unable to access IndexedDB
     console.error(error);
   }
 };
@@ -104,7 +102,7 @@ export class LocalData {
       files: BinaryFiles,
       onFilesSaved: () => void,
     ) => {
-      saveDataStateToLocalStorage(elements, appState);
+      await saveDataStateToIndexedDB(elements, appState);
 
       await this.fileStorage.saveFiles({
         elements,
@@ -254,5 +252,65 @@ export class LibraryLocalStorageMigrationAdapter {
   }
   static clear() {
     localStorage.removeItem(STORAGE_KEYS.__LEGACY_LOCAL_STORAGE_LIBRARY);
+  }
+}
+
+/** IndexedDB Adapter for storing app state */
+export class AppStateIndexedDBAdapter {
+  /** IndexedDB database and store name */
+  private static idb_name = "excalidraw-app-state";
+  /** app state data store key */
+  private static key = "appStateData";
+
+  private static store = createStore(
+    `${AppStateIndexedDBAdapter.idb_name}-db`,
+    `${AppStateIndexedDBAdapter.idb_name}-store`,
+  );
+
+  static async load() {
+    const IDBData = await get<Partial<AppState>>(
+      AppStateIndexedDBAdapter.key,
+      AppStateIndexedDBAdapter.store,
+    );
+
+    return IDBData || null;
+  }
+
+  static save(data: Partial<AppState>): MaybePromise<void> {
+    return set(
+      AppStateIndexedDBAdapter.key,
+      data,
+      AppStateIndexedDBAdapter.store,
+    );
+  }
+}
+
+/** IndexedDB Adapter for storing elements */
+export class ElementsIndexedDBAdapter {
+  /** IndexedDB database and store name */
+  private static idb_name = "excalidraw-elements";
+  /** elements data store key */
+  private static key = "elementsData";
+
+  private static store = createStore(
+    `${ElementsIndexedDBAdapter.idb_name}-db`,
+    `${ElementsIndexedDBAdapter.idb_name}-store`,
+  );
+
+  static async load() {
+    const IDBData = await get<ExcalidrawElement[]>(
+      ElementsIndexedDBAdapter.key,
+      ElementsIndexedDBAdapter.store,
+    );
+
+    return IDBData || null;
+  }
+
+  static save(data: ExcalidrawElement[]): MaybePromise<void> {
+    return set(
+      ElementsIndexedDBAdapter.key,
+      data,
+      ElementsIndexedDBAdapter.store,
+    );
   }
 }
