@@ -558,6 +558,10 @@ export class AppStateDelta implements DeltaContainer<AppState> {
   }
 
   public squash(delta: AppStateDelta): this {
+    if (delta.isEmpty()) {
+      return this;
+    }
+
     const mergedDeletedSelectedElementIds = Delta.mergeObjects(
       this.delta.deleted.selectedElementIds ?? {},
       delta.delta.deleted.selectedElementIds ?? {},
@@ -1439,6 +1443,10 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   }
 
   public squash(delta: ElementsDelta): this {
+    if (delta.isEmpty()) {
+      return this;
+    }
+
     const { added, removed, updated } = delta;
 
     const mergeBoundElements = (
