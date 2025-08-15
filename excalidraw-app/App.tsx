@@ -20,6 +20,8 @@ import {
   APP_NAME,
   EVENT,
   THEME,
+  DEFAULT_CANVAS_BACKGROUND_PICKS,
+  DEFAULT_CANVAS_BACKGROUND_PICKS_DARK,
   TITLE_TIMEOUT,
   VERSION_TIMEOUT,
   debounce,
@@ -365,6 +367,48 @@ const ExcalidrawWrapper = () => {
 
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
+
+  useEffect(() => {
+    const api = excalidrawAPI;
+    if (!api) {
+      // Do nothing without API
+      return;
+    }
+
+    const prev = api.getAppState();
+    const nextTheme = editorTheme;
+
+    // synchronize theme changes
+    if (prev.theme !== nextTheme) {
+      const picks =
+        nextTheme === THEME.DARK
+          ? DEFAULT_CANVAS_BACKGROUND_PICKS_DARK
+          : DEFAULT_CANVAS_BACKGROUND_PICKS;
+
+      let nextBG = prev.viewBackgroundColor;
+      let nextSrc = prev.viewBackgroundColorSource;
+
+      // Map to the new theme's color palette with the same index only when the source is the default color palette
+      if (
+        nextSrc?.type === "default" &&
+        typeof nextSrc.defaultIndex === "number"
+      ) {
+        const idx = Math.min(nextSrc.defaultIndex, picks.length - 1);
+        nextBG = picks[idx];
+        nextSrc = { type: "default", defaultIndex: nextSrc.defaultIndex };
+      }
+
+      api.updateScene({
+        appState: {
+          ...prev,
+          theme: nextTheme,
+          viewBackgroundColor: nextBG,
+          viewBackgroundColorSource: nextSrc,
+        },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      });
+    }
+  }, [editorTheme, excalidrawAPI]);
 
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);

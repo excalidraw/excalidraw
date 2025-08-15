@@ -107,6 +107,14 @@ export const DEFAULT_ELEMENT_BACKGROUND_PICKS = [
 ] as ColorTuple;
 
 // ORDER matters for positioning in quick picker
+export const DEFAULT_CANVAS_BACKGROUND_PICKS_DARK = [
+  "#121212", // radix slate1
+  "#1e1e1e", // radix slate2
+  "#2c2c2c", // radix slate3
+  "#383838", // radix slate4
+  "#444444", // radix slate5
+] as ColorTuple;
+
 export const DEFAULT_CANVAS_BACKGROUND_PICKS = [
   COLOR_PALETTE.white,
   // radix slate2
@@ -171,3 +179,4 @@ export const rgbToHex = (r: number, g: number, b: number) =>
   `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 
 // -----------------------------------------------------------------------------
+
