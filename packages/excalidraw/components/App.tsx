@@ -10439,11 +10439,10 @@ class App extends React.Component<AppProps, AppState> {
     centerX: number,
     centerY: number,
     padding = 50,
-  ): ExcalidrawElement[] => {
-    const res: ExcalidrawElement[] = [];
+  ) => {
     // Ensure there are elements to position
     if (!elements || elements.length === 0) {
-      return [];
+      return;
     }
 
     // Normalize input to work with atomic units (groups of elements)
@@ -10522,16 +10521,10 @@ class App extends React.Component<AppProps, AppState> {
 
         // Apply the offset to all elements in this atomic unit
         unitBound.elements.forEach((element) => {
-          res.push(
-            mutateElement(
-              element,
-              this.scene.getElementsMapIncludingDeleted(),
-              {
-                x: element.x + offsetX,
-                y: element.y + offsetY,
-              },
-            ),
-          );
+          this.scene.mutateElement(element, {
+            x: element.x + offsetX,
+            y: element.y + offsetY,
+          });
         });
 
         // Move X for the next unit in the row
@@ -10542,7 +10535,6 @@ class App extends React.Component<AppProps, AppState> {
       // This accounts for the tallest unit in the current row and the inter-row padding
       currentY += rowMaxHeight + padding;
     });
-    return res;
   };
 
   private insertImages = async (
@@ -10577,16 +10569,22 @@ class App extends React.Component<AppProps, AppState> {
         }),
       );
 
-      const positionedImageElements = this.positionElementsOnGrid(
-        initializedImageElements,
-        sceneX,
-        sceneY,
-      );
-
       const selectedElementIds: Record<ExcalidrawElement["id"], true> = {};
-      positionedImageElements.forEach((element) => {
+      const initializedImageElementsMap: Map<
+        ExcalidrawElement["id"],
+        ExcalidrawElement
+      > = new Map();
+
+      initializedImageElements.forEach((element) => {
         selectedElementIds[element.id] = true;
+        initializedImageElementsMap.set(element.id, element);
       });
+
+      const nextElements = this.scene
+        .getElementsIncludingDeleted()
+        .map(
+          (element) => initializedImageElementsMap.get(element.id) ?? element,
+        );
 
       this.updateScene({
         appState: {
@@ -10595,10 +10593,11 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           ),
         },
-        elements: positionedImageElements,
-        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        elements: nextElements,
       });
+      this.positionElementsOnGrid(initializedImageElements, sceneX, sceneY);
       this.setState({}, () => {
+        // actionFinalize after all state values have been updated
         this.actionManager.executeAction(actionFinalize);
       });
     } catch (error: any) {
