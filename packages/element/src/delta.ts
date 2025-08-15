@@ -572,28 +572,59 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       delta.delta.inserted.selectedElementIds ?? {},
     );
 
-    const mergedInsertedSelectedGroupIds = Delta.mergeObjects(
-      this.delta.inserted.selectedGroupIds ?? {},
-      delta.delta.inserted.selectedGroupIds ?? {},
-    );
-
     const mergedDeletedSelectedGroupIds = Delta.mergeObjects(
       this.delta.deleted.selectedGroupIds ?? {},
       delta.delta.deleted.selectedGroupIds ?? {},
     );
 
-    const mergedDelta = Delta.create(
-      {
-        selectedElementIds: mergedDeletedSelectedElementIds,
-        selectedGroupIds: mergedDeletedSelectedGroupIds,
-      },
-      {
-        selectedElementIds: mergedInsertedSelectedElementIds,
-        selectedGroupIds: mergedInsertedSelectedGroupIds,
-      },
+    const mergedInsertedSelectedGroupIds = Delta.mergeObjects(
+      this.delta.inserted.selectedGroupIds ?? {},
+      delta.delta.inserted.selectedGroupIds ?? {},
     );
 
-    this.delta = Delta.merge(this.delta, delta.delta, mergedDelta);
+    const mergedDeletedLockedMultiSelections = Delta.mergeObjects(
+      this.delta.deleted.lockedMultiSelections ?? {},
+      delta.delta.deleted.lockedMultiSelections ?? {},
+    );
+
+    const mergedInsertedLockedMultiSelections = Delta.mergeObjects(
+      this.delta.inserted.lockedMultiSelections ?? {},
+      delta.delta.inserted.lockedMultiSelections ?? {},
+    );
+
+    const mergedInserted: Partial<ObservedAppState> = {};
+    const mergedDeleted: Partial<ObservedAppState> = {};
+
+    if (
+      Object.keys(mergedDeletedSelectedElementIds).length ||
+      Object.keys(mergedInsertedSelectedElementIds).length
+    ) {
+      mergedDeleted.selectedElementIds = mergedDeletedSelectedElementIds;
+      mergedInserted.selectedElementIds = mergedInsertedSelectedElementIds;
+    }
+
+    if (
+      Object.keys(mergedDeletedSelectedGroupIds).length ||
+      Object.keys(mergedInsertedSelectedGroupIds).length
+    ) {
+      mergedDeleted.selectedGroupIds = mergedDeletedSelectedGroupIds;
+      mergedInserted.selectedGroupIds = mergedInsertedSelectedGroupIds;
+    }
+
+    if (
+      Object.keys(mergedDeletedLockedMultiSelections).length ||
+      Object.keys(mergedInsertedLockedMultiSelections).length
+    ) {
+      mergedDeleted.lockedMultiSelections = mergedDeletedLockedMultiSelections;
+      mergedInserted.lockedMultiSelections =
+        mergedInsertedLockedMultiSelections;
+    }
+
+    this.delta = Delta.merge(
+      this.delta,
+      delta.delta,
+      Delta.create(mergedDeleted, mergedInserted),
+    );
 
     return this;
   }
@@ -606,11 +637,13 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       const {
         selectedElementIds: deletedSelectedElementIds = {},
         selectedGroupIds: deletedSelectedGroupIds = {},
+        lockedMultiSelections: deletedLockedMultiSelections = {},
       } = this.delta.deleted;
 
       const {
         selectedElementIds: insertedSelectedElementIds = {},
         selectedGroupIds: insertedSelectedGroupIds = {},
+        lockedMultiSelections: insertedLockedMultiSelections = {},
         selectedLinearElement: insertedSelectedLinearElement,
         ...directlyApplicablePartial
       } = this.delta.inserted;
@@ -625,6 +658,12 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         appState.selectedGroupIds,
         insertedSelectedGroupIds,
         deletedSelectedGroupIds,
+      );
+
+      const mergedLockedMultiSelections = Delta.mergeObjects(
+        appState.lockedMultiSelections,
+        insertedLockedMultiSelections,
+        deletedLockedMultiSelections,
       );
 
       const selectedLinearElement =
@@ -644,6 +683,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         ...directlyApplicablePartial,
         selectedElementIds: mergedSelectedElementIds,
         selectedGroupIds: mergedSelectedGroupIds,
+        lockedMultiSelections: mergedLockedMultiSelections,
         selectedLinearElement:
           typeof insertedSelectedLinearElement !== "undefined"
             ? selectedLinearElement
@@ -947,12 +987,6 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         inserted,
         "lockedMultiSelections",
         (prevValue) => (prevValue ?? {}) as ValueOf<T["lockedMultiSelections"]>,
-      );
-      Delta.diffObjects(
-        deleted,
-        inserted,
-        "activeLockedId",
-        (prevValue) => (prevValue ?? null) as ValueOf<T["activeLockedId"]>,
       );
     } catch (e) {
       // if postprocessing fails it does not make sense to bubble up, but let's make sure we know about it
@@ -1468,6 +1502,13 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           undefined,
           (x) => x.id,
         ) ?? [];
+
+      if (
+        !mergedDeletedBoundElements.length &&
+        !mergedInsertedBoundElements.length
+      ) {
+        return;
+      }
 
       return Delta.create(
         {
