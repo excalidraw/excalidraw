@@ -561,13 +561,17 @@ export class StoreDelta {
   }
 
   /**
-   * Squash the passed delta into the current instance.
+   * Squash the passed deltas into the aggregated delta instance.
    */
-  public squash(delta: StoreDelta) {
-    this.elements.squash(delta.elements);
-    this.appState.squash(delta.appState);
+  public static squash(...deltas: StoreDelta[]) {
+    const aggregatedDelta = StoreDelta.empty();
 
-    return this;
+    for (const delta of deltas) {
+      aggregatedDelta.elements.squash(delta.elements);
+      aggregatedDelta.appState.squash(delta.appState);
+    }
+
+    return aggregatedDelta;
   }
 
   /**
@@ -621,6 +625,10 @@ export class StoreDelta {
         id: delta.id,
       },
     );
+  }
+
+  public static empty() {
+    return StoreDelta.create(ElementsDelta.empty(), AppStateDelta.empty());
   }
 
   public isEmpty() {

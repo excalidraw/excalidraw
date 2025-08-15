@@ -235,8 +235,6 @@ import {
   isSimpleArrow,
   StoreDelta,
   type ApplyToOptions,
-  ElementsDelta,
-  AppStateDelta,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -3948,33 +3946,14 @@ class App extends React.Component<AppProps, AppState> {
     deltas: StoreDelta[],
     options?: ApplyToOptions,
   ): [SceneElementsMap, AppState, boolean] => {
-    if (!deltas.length) {
-      throw new Error("No deltas were passed in!");
-    }
+    // squash all deltas together, starting with a fresh new delta instance
+    const aggregatedDelta = StoreDelta.squash(...deltas);
 
     // create new instance of elements map & appState, so we don't accidentaly mutate existing ones
+    const nextAppState = { ...this.state };
     const nextElements = new Map(
       this.scene.getElementsMapIncludingDeleted(),
     ) as SceneElementsMap;
-
-    const nextAppState = { ...this.state };
-
-    const [head, ...tail] = deltas;
-
-    // create new aggregated delta instance with new delta instances, so we don't accidentaly mutate existing ones
-    const aggregatedDelta = StoreDelta.create(
-      ElementsDelta.create(
-        { ...head.elements.added },
-        { ...head.elements.removed },
-        { ...head.elements.updated },
-      ),
-      AppStateDelta.create({ ...head.appState.delta }),
-    );
-
-    // squash all deltas together, mutating the main delta
-    for (const delta of tail) {
-      aggregatedDelta.squash(delta);
-    }
 
     return StoreDelta.applyTo(
       aggregatedDelta,
