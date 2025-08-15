@@ -465,7 +465,7 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionName, ActionResult } from "../actions/types";
-import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode } from "../obsidianUtils";
+import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode, isPanWithRightMouseEnabled } from "../obsidianUtils";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
 
@@ -2725,7 +2725,7 @@ class App extends React.Component<AppProps, AppState> {
     // this.eraserTrail.terminate(); //zsviczian
     /*
     Object.keys(this).forEach((key) => {
-      //@ts-ignore    
+      //@ts-ignore
       delete this[key];
     });*/
   }
@@ -4056,7 +4056,7 @@ startLineEditor = (
   if (!el || !isLinearElement(el)) {
     return;
   }
-  
+
   // First select the element
   this.setState({
     selectedElementIds: { [el.id]: true }
@@ -4736,6 +4736,49 @@ startLineEditor = (
         // or unless using arrows (to move between buttons)
         (isArrowKey(event.key) && isInputLike(event.target))
       ) {
+        return;
+      }
+
+      if (
+        // open context menu with 'm' if not editing text and container focused
+        event.key.toLowerCase() === 'm' &&
+        !this.state.editingTextElement &&
+        // don't trigger when typing in inputs
+        !isInputLike(event.target) &&
+        // ensure focus is within excalidraw container
+        this.excalidrawContainerRef?.current?.contains(
+          document.activeElement,
+        )
+      ) {
+        // open context menu at current cursor position
+        const container = this.excalidrawContainerRef.current!;
+        const { top: offsetTop, left: offsetLeft } =
+          container.getBoundingClientRect();
+        const left = this.lastViewportPosition.x - offsetLeft;
+        const top = this.lastViewportPosition.y - offsetTop;
+
+        const { x, y } = viewportCoordsToSceneCoords(
+          {
+            clientX: this.lastViewportPosition.x,
+            clientY: this.lastViewportPosition.y,
+          } as any,
+          this.state,
+        );
+        const element = this.getElementAtPosition(x, y, {
+          preferSelected: true,
+          includeLockedElements: true,
+        });
+        const selectedElements = this.scene.getSelectedElements(this.state);
+        const isHittingCommonBoundBox =
+          this.isHittingCommonBoundingBoxOfSelectedElements(
+            { x, y },
+            selectedElements,
+          );
+        const type = element || isHittingCommonBoundBox ? 'element' : 'canvas';
+        this.setState({
+          contextMenu: { top, left, items: this.getContextMenuItems(type) },
+        });
+        event.preventDefault();
         return;
       }
 
@@ -6162,7 +6205,7 @@ startLineEditor = (
           let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
 
           const selectedElements = this.scene.getSelectedElements(this.state);
-      
+
           if (selectedElements.length === 1) {
             if (isTextElement(selectedElements[0])) {
               existingTextElement = selectedElements[0];
@@ -6962,6 +7005,24 @@ startLineEditor = (
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    // Right-click pan support when enabled via host plugin setting
+    if (
+      event.pointerType === "mouse" &&
+      event.button === POINTER_BUTTON.SECONDARY &&
+      isPanWithRightMouseEnabled() &&
+      !this.state.editingTextElement
+    ) {
+      // prevent native context menu
+      const onContextMenu = (e: MouseEvent) => {
+        e.preventDefault();
+      };
+      window.addEventListener('contextmenu', onContextMenu, { once: true });
+
+      // Start right-click panning
+      this.startRightClickPanning(event);
+      return;
+    }
+
     this.focusContainer(); //zsviczian
     const target = event.target as HTMLElement;
     // capture subsequent pointer events to the canvas
@@ -7507,6 +7568,57 @@ startLineEditor = (
     });
     window.addEventListener(EVENT.POINTER_UP, teardown);
     return true;
+  };
+
+  private startRightClickPanning(
+    event: React.PointerEvent<HTMLElement>,
+  ): void {
+    // Set up right-click panning similar to hand tool
+    isPanning = true;
+    this.focusContainer();
+
+    if (!this.state.editingTextElement) {
+      event.preventDefault();
+    }
+
+    setCursor(this.interactiveCanvas, CURSOR_TYPE.GRABBING);
+
+    let { clientX: lastX, clientY: lastY } = event;
+
+    const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
+      const deltaX = lastX - event.clientX;
+      const deltaY = lastY - event.clientY;
+      lastX = event.clientX;
+      lastY = event.clientY;
+
+      this.translateCanvas({
+        scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
+        scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
+      });
+    });
+
+    const teardown = withBatchedUpdates(() => {
+      isPanning = false;
+      if (this.state.viewModeEnabled) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+      } else {
+        setCursorForShape(this.interactiveCanvas, this.state);
+      }
+      this.setState({
+        cursorButton: "up",
+      });
+      this.savePointer(event.clientX, event.clientY, "up");
+      window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      window.removeEventListener(EVENT.POINTER_UP, teardown);
+      window.removeEventListener(EVENT.BLUR, teardown);
+      onPointerMove.flush();
+    });
+
+    window.addEventListener(EVENT.BLUR, teardown);
+    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
+      passive: true,
+    });
+    window.addEventListener(EVENT.POINTER_UP, teardown);
   };
 
   private updateGestureOnPointerDown(
@@ -11145,7 +11257,12 @@ startLineEditor = (
   private handleCanvasContextMenu = (
     event: React.MouseEvent<HTMLElement | HTMLCanvasElement>,
   ) => {
+    // Always prevent native context menu, but if right-click pan is enabled
+    // we suppress opening our custom menu too.
     event.preventDefault();
+    if (isPanWithRightMouseEnabled()) {
+      return;
+    }
 
     if (
       (("pointerType" in event.nativeEvent &&
