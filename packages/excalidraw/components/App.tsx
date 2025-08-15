@@ -3106,7 +3106,7 @@ class App extends React.Component<AppProps, AppState> {
         .filter((file): file is File => isSupportedImageFile(file));
 
       if (imageFiles.length > 0 && this.isToolSupported("image")) {
-        return this.insertMultipleImages(imageFiles, sceneX, sceneY);
+        return this.insertImages(imageFiles, sceneX, sceneY);
       }
 
       // must be called in the same frame (thus before any awaits) as the paste
@@ -10236,7 +10236,7 @@ class App extends React.Component<AppProps, AppState> {
         multiple: true,
       });
 
-      this.insertMultipleImages(imageFiles, x, y);
+      this.insertImages(imageFiles, x, y);
     } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error(error);
@@ -10545,7 +10545,7 @@ class App extends React.Component<AppProps, AppState> {
     return res;
   };
 
-  private insertMultipleImages = async (
+  private insertImages = async (
     imageFiles: File[],
     sceneX: number,
     sceneY: number,
@@ -10658,7 +10658,7 @@ class App extends React.Component<AppProps, AppState> {
       .filter((file): file is File => isSupportedImageFile(file));
 
     if (imageFiles.length > 0 && this.isToolSupported("image")) {
-      return this.insertMultipleImages(imageFiles, sceneX, sceneY);
+      return this.insertImages(imageFiles, sceneX, sceneY);
     }
 
     const libraryJSON = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
