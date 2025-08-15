@@ -3138,7 +3138,7 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        this.createImageElement({ sceneX, sceneY, imageFile: file });
+        this.createImagePlaceholder({ sceneX, sceneY, imageFile: file });
 
         return;
       }
@@ -3446,7 +3446,7 @@ class App extends React.Component<AppProps, AppState> {
       const nextSelectedIds: Record<ExcalidrawElement["id"], true> = {};
       for (const response of responses) {
         if (response.file) {
-          const initializedImageElement = await this.createImageElement({
+          const initializedImageElement = await this.createImagePlaceholder({
             sceneX,
             sceneY: y,
             imageFile: response.file,
@@ -7852,16 +7852,14 @@ class App extends React.Component<AppProps, AppState> {
     return element;
   };
 
-  private createImageElement = async ({
+  private createImagePlaceholder = ({
     sceneX,
     sceneY,
     addToFrameUnderCursor = true,
-    imageFile,
   }: {
     sceneX: number;
     sceneY: number;
     addToFrameUnderCursor?: boolean;
-    imageFile: File;
   }) => {
     const [gridX, gridY] = getGridPoint(
       sceneX,
@@ -7898,12 +7896,7 @@ class App extends React.Component<AppProps, AppState> {
       height: placeholderSize,
     });
 
-    const initializedImageElement = await this.insertImageElement(
-      placeholderImageElement,
-      imageFile,
-    );
-
-    return initializedImageElement;
+    return placeholderImageElement;
   };
 
   private handleLinearElementOnPointerDown = (
@@ -10225,63 +10218,6 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  /**
-   * inserts image into elements array and rerenders
-   */
-  private insertImageElement = async (
-    placeholderImageElement: ExcalidrawImageElement,
-    imageFile: File,
-  ) => {
-    // we should be handling all cases upstream, but in case we forget to handle
-    // a future case, let's throw here
-    if (!this.isToolSupported("image")) {
-      this.setState({ errorMessage: t("errors.imageToolNotSupported") });
-      return placeholderImageElement;
-    }
-
-    this.scene.insertElement(placeholderImageElement);
-
-    try {
-      const initializedImageElement = await this.initializeImage(
-        placeholderImageElement,
-        imageFile,
-      );
-
-      const nextElements = this.scene
-        .getElementsIncludingDeleted()
-        .map((element) => {
-          if (element.id === initializedImageElement.id) {
-            return initializedImageElement;
-          }
-
-          return element;
-        });
-
-      this.updateScene({
-        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        elements: nextElements,
-        appState: {
-          selectedElementIds: makeNextSelectedElementIds(
-            { [initializedImageElement.id]: true },
-            this.state,
-          ),
-        },
-      });
-
-      return initializedImageElement;
-    } catch (error: any) {
-      this.store.scheduleAction(CaptureUpdateAction.NEVER);
-      this.scene.mutateElement(placeholderImageElement, {
-        isDeleted: true,
-      });
-      this.actionManager.executeAction(actionFinalize);
-      this.setState({
-        errorMessage: error.message || t("errors.imageInsertError"),
-      });
-      return placeholderImageElement;
-    }
-  };
-
   private onImageToolbarButtonClick = async () => {
     try {
       const clientX = this.state.width / 2 + this.state.offsetLeft;
@@ -10503,10 +10439,11 @@ class App extends React.Component<AppProps, AppState> {
     centerX: number,
     centerY: number,
     padding = 50,
-  ) => {
+  ): ExcalidrawElement[] => {
+    const res: ExcalidrawElement[] = [];
     // Ensure there are elements to position
     if (!elements || elements.length === 0) {
-      return;
+      return [];
     }
 
     // Normalize input to work with atomic units (groups of elements)
@@ -10585,10 +10522,16 @@ class App extends React.Component<AppProps, AppState> {
 
         // Apply the offset to all elements in this atomic unit
         unitBound.elements.forEach((element) => {
-          this.scene.mutateElement(element, {
-            x: element.x + offsetX,
-            y: element.y + offsetY,
-          });
+          res.push(
+            mutateElement(
+              element,
+              this.scene.getElementsMapIncludingDeleted(),
+              {
+                x: element.x + offsetX,
+                y: element.y + offsetY,
+              },
+            ),
+          );
         });
 
         // Move X for the next unit in the row
@@ -10599,6 +10542,7 @@ class App extends React.Component<AppProps, AppState> {
       // This accounts for the tallest unit in the current row and the inter-row padding
       currentY += rowMaxHeight + padding;
     });
+    return res;
   };
 
   private insertMultipleImages = async (
@@ -10608,29 +10552,55 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     try {
       const initializedImageElements = await Promise.all(
-        imageFiles.map((file) =>
-          this.createImageElement({ imageFile: file, sceneX, sceneY }),
-        ),
+        imageFiles.map(async (file) => {
+          const placeholderImageElement = this.createImagePlaceholder({
+            sceneX,
+            sceneY,
+          });
+          this.scene.insertElement(placeholderImageElement);
+          try {
+            const initializedImageElement = await this.initializeImage(
+              placeholderImageElement,
+              file,
+            );
+            return initializedImageElement;
+          } catch (error: any) {
+            this.store.scheduleAction(CaptureUpdateAction.NEVER);
+            this.scene.mutateElement(placeholderImageElement, {
+              isDeleted: true,
+            });
+            this.setState({
+              errorMessage: error.message || t("errors.imageInsertError"),
+            });
+            return placeholderImageElement;
+          }
+        }),
+      );
+
+      const positionedImageElements = this.positionElementsOnGrid(
+        initializedImageElements,
+        sceneX,
+        sceneY,
       );
 
       const selectedElementIds: Record<ExcalidrawElement["id"], true> = {};
-      initializedImageElements.forEach((element) => {
+      positionedImageElements.forEach((element) => {
         selectedElementIds[element.id] = true;
       });
 
-      this.setState(
-        {
+      this.updateScene({
+        appState: {
           selectedElementIds: makeNextSelectedElementIds(
             selectedElementIds,
             this.state,
           ),
         },
-        () => {
-          this.actionManager.executeAction(actionFinalize);
-        },
-      );
-
-      this.positionElementsOnGrid(initializedImageElements, sceneX, sceneY);
+        elements: positionedImageElements,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+      this.setState({}, () => {
+        this.actionManager.executeAction(actionFinalize);
+      });
     } catch (error: any) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
