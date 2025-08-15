@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@excalidraw/common": "0.18.0",
-    "@excalidraw/math": "0.18.0"
+    "@excalidraw/math": "0.18.0",
+    "es-toolkit": "1.39.7"
   }
 }
