@@ -216,7 +216,7 @@ export const exportToCanvas = async (
   }
 
   const filteredElements = elements.filter(
-    (el) => el.type === "frame" && el.frameRole !== "marker",
+    (el) => !(el.type === "frame" && el.frameRole === "marker"),
   ); //zsviczian
 
   const elementsForRender = prepareElementsForRender({
