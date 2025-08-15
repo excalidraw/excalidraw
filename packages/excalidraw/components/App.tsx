@@ -3131,18 +3131,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      // prefer spreadsheet data over image file (MS Office/Libre Office)
-      if (isSupportedImageFile(file) && !data.spreadsheet) {
-        if (!this.isToolSupported("image")) {
-          this.setState({ errorMessage: t("errors.imageToolNotSupported") });
-          return;
-        }
-
-        this.createImagePlaceholder({ sceneX, sceneY, imageFile: file });
-
-        return;
-      }
-
       if (this.props.onPaste) {
         try {
           if ((await this.props.onPaste(data, event)) === false) {
