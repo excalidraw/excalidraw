@@ -30,6 +30,7 @@ export const languages: Language[] = [
     { code: "es-ES", label: "Español" },
     { code: "eu-ES", label: "Euskara" },
     { code: "fa-IR", label: "فارسی", rtl: true },
+    { code: "fa-AF", label: "فارسی (افغانستان)", rtl: true },
     { code: "fi-FI", label: "Suomi" },
     { code: "fr-FR", label: "Français" },
     { code: "gl-ES", label: "Galego" },
