@@ -3429,45 +3429,11 @@ class App extends React.Component<AppProps, AppState> {
           }
         }),
       );
-      let y = sceneY;
-      let firstImageYOffsetDone = false;
-      const nextSelectedIds: Record<ExcalidrawElement["id"], true> = {};
-      for (const response of responses) {
-        if (response.file) {
-          const initializedImageElement = await this.createImagePlaceholder({
-            sceneX,
-            sceneY: y,
-            imageFile: response.file,
-          });
 
-          if (initializedImageElement) {
-            // vertically center first image in the batch
-            if (!firstImageYOffsetDone) {
-              firstImageYOffsetDone = true;
-              y -= initializedImageElement.height / 2;
-            }
-            // hack to reset the `y` coord because we vertically center during
-            // insertImageElement
-            this.scene.mutateElement(
-              initializedImageElement,
-              { y },
-              { informMutation: false, isDragging: false },
-            );
-
-            y = initializedImageElement.y + initializedImageElement.height + 25;
-
-            nextSelectedIds[initializedImageElement.id] = true;
-          }
-        }
-      }
-
-      this.setState({
-        selectedElementIds: makeNextSelectedElementIds(
-          nextSelectedIds,
-          this.state,
-        ),
-      });
-
+      const imageFiles = responses
+        .filter((response): response is { file: File } => !!response.file)
+        .map((response) => response.file);
+      await this.insertImages(imageFiles, sceneX, sceneY);
       const error = responses.find((response) => !!response.errorMessage);
       if (error && error.errorMessage) {
         this.setState({ errorMessage: error.errorMessage });
