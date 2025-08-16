@@ -3019,6 +3019,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  // TODO: Cover with tests
   private async processClipboardData(
     data: ClipboardData,
     filesData: Awaited<ReturnType<typeof getFilesFromEvent>>,
@@ -3180,7 +3181,6 @@ class App extends React.Component<AppProps, AppState> {
     this.addTextFromPaste(data.text, isPlainPaste);
   }
 
-  // TODO: Cover it with tests
   public pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent) => {
       const isPlainPaste = !!IS_PLAIN_PASTE;
