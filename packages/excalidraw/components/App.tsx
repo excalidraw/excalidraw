@@ -10410,7 +10410,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (filesData.length > 1) {
+    if (filesData.length > 0) {
       const { file, fileHandle } = filesData[0];
       if (file) {
         // Attempt to parse an excalidraw/excalidrawlib file
@@ -10432,6 +10432,7 @@ class App extends React.Component<AppProps, AppState> {
           link: normalizeLink(text),
         });
         if (embeddable) {
+          this.store.scheduleCapture();
           this.setState({ selectedElementIds: { [embeddable.id]: true } });
         }
       }
