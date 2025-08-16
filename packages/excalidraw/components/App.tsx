@@ -3067,7 +3067,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // TODO: Cover with tests
-  private async processClipboardData(
+  private async insertClipboardContent(
     data: ClipboardData,
     filesData: Awaited<ReturnType<typeof getFilesFromEvent>>,
     isPlainPaste: boolean,
@@ -3268,7 +3268,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      await this.processClipboardData(data, filesData, isPlainPaste);
+      await this.insertClipboardContent(data, filesData, isPlainPaste);
       this.setActiveTool({ type: this.defaultSelectionTool }, true);
       event?.preventDefault();
     },
