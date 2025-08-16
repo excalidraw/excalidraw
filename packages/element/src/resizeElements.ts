@@ -45,6 +45,7 @@ import {
 import { wrapText } from "./textWrapping";
 import {
   isArrowElement,
+  isBindingElement,
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
@@ -73,7 +74,9 @@ import type {
   ExcalidrawImageElement,
   ElementsMap,
   ExcalidrawElbowArrowElement,
+  ExcalidrawArrowElement,
 } from "./types";
+import type { ElementUpdate } from "./mutateElement";
 
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (
@@ -219,7 +222,19 @@ const rotateSingleElement = (
   }
   const boundTextElementId = getBoundTextElementId(element);
 
-  scene.mutateElement(element, { angle });
+  let update: ElementUpdate<NonDeletedExcalidrawElement> = {
+    angle,
+  };
+
+  if (isBindingElement(element)) {
+    update = {
+      ...update,
+      startBinding: null,
+      endBinding: null,
+    } as ElementUpdate<ExcalidrawArrowElement>;
+  }
+
+  scene.mutateElement(element, update);
   if (boundTextElementId) {
     const textElement =
       scene.getElement<ExcalidrawTextElementWithContainer>(boundTextElementId);
@@ -819,12 +834,28 @@ export const resizeSingleElement = (
     Number.isFinite(newOrigin.x) &&
     Number.isFinite(newOrigin.y)
   ) {
-    const updates = {
+    let updates: ElementUpdate<ExcalidrawElement> = {
       ...newOrigin,
       width: Math.abs(nextWidth),
       height: Math.abs(nextHeight),
       ...rescaledPoints,
     };
+
+    if (isBindingElement(latestElement)) {
+      if (latestElement.startBinding) {
+        updates = {
+          ...updates,
+          startBinding: null,
+        } as ElementUpdate<ExcalidrawArrowElement>;
+      }
+
+      if (latestElement.endBinding) {
+        updates = {
+          ...updates,
+          endBinding: null,
+        } as ElementUpdate<ExcalidrawArrowElement>;
+      }
+    }
 
     scene.mutateElement(latestElement, updates, {
       informMutation: shouldInformMutation,
@@ -843,10 +874,7 @@ export const resizeSingleElement = (
       shouldMaintainAspectRatio,
     );
 
-    updateBoundElements(latestElement, scene, {
-      // TODO: confirm with MARK if this actually makes sense
-      newSize: { width: nextWidth, height: nextHeight },
-    });
+    updateBoundElements(latestElement, scene);
   }
 };
 
@@ -1385,13 +1413,12 @@ export const resizeMultipleElements = (
       element,
       update: { boundTextFontSize, ...update },
     } of elementsAndUpdates) {
-      const { width, height, angle } = update;
+      const { angle } = update;
 
       scene.mutateElement(element, update);
 
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: elementsToUpdate,
-        newSize: { width, height },
       });
 
       const boundTextElement = getBoundTextElement(element, elementsMap);

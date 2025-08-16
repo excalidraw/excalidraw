@@ -432,12 +432,9 @@ describe("Test Transform", () => {
         boundElements: [{ id: text.id, type: "text" }],
         startBinding: {
           elementId: rectangle.id,
-          focus: 0,
-          gap: 1,
         },
         endBinding: {
           elementId: ellipse.id,
-          focus: -0,
         },
       });
 
@@ -517,12 +514,9 @@ describe("Test Transform", () => {
         boundElements: [{ id: text1.id, type: "text" }],
         startBinding: {
           elementId: text2.id,
-          focus: 0,
-          gap: 1,
         },
         endBinding: {
           elementId: text3.id,
-          focus: -0,
         },
       });
 
@@ -780,8 +774,8 @@ describe("Test Transform", () => {
       const [arrow, rect] = excalidrawElements;
       expect((arrow as ExcalidrawArrowElement).endBinding).toStrictEqual({
         elementId: "rect-1",
-        focus: -0,
-        gap: 25,
+        fixedPoint: [-2.05, 0.5001],
+        mode: "orbit",
       });
       expect(rect.boundElements).toStrictEqual([
         {

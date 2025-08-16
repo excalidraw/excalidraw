@@ -35,8 +35,8 @@ test("unselected bound arrow updates when rotating its target element", async ()
   expect(arrow.endBinding?.elementId).toEqual(rectangle.id);
   expect(arrow.x).toBeCloseTo(-80);
   expect(arrow.y).toBeCloseTo(50);
-  expect(arrow.width).toBeCloseTo(110.7, 1);
-  expect(arrow.height).toBeCloseTo(0);
+  expect(arrow.width).toBeCloseTo(81.75, 1);
+  expect(arrow.height).toBeCloseTo(62.3, 1);
 });
 
 test("unselected bound arrows update when rotating their target elements", async () => {
@@ -72,13 +72,13 @@ test("unselected bound arrows update when rotating their target elements", async
   expect(ellipseArrow.x).toEqual(0);
   expect(ellipseArrow.y).toEqual(0);
   expect(ellipseArrow.points[0]).toEqual([0, 0]);
-  expect(ellipseArrow.points[1][0]).toBeCloseTo(48.98, 1);
-  expect(ellipseArrow.points[1][1]).toBeCloseTo(125.79, 1);
+  expect(ellipseArrow.points[1][0]).toBeCloseTo(16.52, 1);
+  expect(ellipseArrow.points[1][1]).toBeCloseTo(216.57, 1);
 
   expect(textArrow.endBinding?.elementId).toEqual(text.id);
   expect(textArrow.x).toEqual(360);
   expect(textArrow.y).toEqual(300);
   expect(textArrow.points[0]).toEqual([0, 0]);
-  expect(textArrow.points[1][0]).toBeCloseTo(-94, 0);
-  expect(textArrow.points[1][1]).toBeCloseTo(-116.1, 0);
+  expect(textArrow.points[1][0]).toBeCloseTo(-63, 0);
+  expect(textArrow.points[1][1]).toBeCloseTo(-146, 0);
 });

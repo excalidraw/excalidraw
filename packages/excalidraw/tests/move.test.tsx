@@ -1,16 +1,12 @@
 import React from "react";
 import { vi } from "vitest";
-
-import { bindOrUnbindLinearElement } from "@excalidraw/element";
-
 import { KEYS, reseed } from "@excalidraw/common";
-
+import { bindBindingElement } from "@excalidraw/element";
 import "@excalidraw/utils/test-utils";
 
 import type {
-  ExcalidrawLinearElement,
+  ExcalidrawArrowElement,
   NonDeleted,
-  ExcalidrawRectangleElement,
 } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
@@ -83,12 +79,21 @@ describe("move element", () => {
     const rectA = UI.createElement("rectangle", { size: 100 });
     const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
     const arrow = UI.createElement("arrow", { x: 110, y: 50, size: 80 });
+
     act(() => {
       // bind line to two rectangles
-      bindOrUnbindLinearElement(
-        arrow.get() as NonDeleted<ExcalidrawLinearElement>,
-        rectA.get() as ExcalidrawRectangleElement,
-        rectB.get() as ExcalidrawRectangleElement,
+      bindBindingElement(
+        arrow.get() as NonDeleted<ExcalidrawArrowElement>,
+        rectA.get(),
+        "orbit",
+        "start",
+        h.app.scene,
+      );
+      bindBindingElement(
+        arrow.get() as NonDeleted<ExcalidrawArrowElement>,
+        rectB.get(),
+        "orbit",
+        "end",
         h.app.scene,
       );
     });
@@ -105,8 +110,8 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([200, 0]);
-    expect([arrow.x, arrow.y]).toEqual([110, 50]);
-    expect([arrow.width, arrow.height]).toEqual([80, 80]);
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[105, 45]], 0);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[90, 90]], 0);
 
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
@@ -124,8 +129,8 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
-    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[110, 50]]);
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[81, 81.4]]);
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[105, 45]], 0);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[91, 91]], 0);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
