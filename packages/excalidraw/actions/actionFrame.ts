@@ -183,7 +183,8 @@ export const actionWrapSelectionInFrame = register({
       y: y1 - PADDING,
       width: x2 - x1 + PADDING * 2,
       height: y2 - y1 + PADDING * 2,
-    });
+    }, elements); //zsviczian
+
 
     // for a selected partial group, we want to remove it from the remainder of the group
     if (appState.editingGroupId) {

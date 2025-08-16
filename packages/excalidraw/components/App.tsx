@@ -8586,9 +8586,10 @@ startLineEditor = (
       y: gridY,
       opacity: this.state.currentItemOpacity,
       locked: false,
-      ...this.state.currentItemFrameRole //zsviczian
+      //zsviczian
+      ...(type === "frame" && this.state.currentItemFrameRole
         ? { frameRole: this.state.currentItemFrameRole }
-        : {},
+        : {}),
       ...FRAME_STYLE,
       ...(this.state.frameColor
         ? {
@@ -8603,7 +8604,7 @@ startLineEditor = (
     const frame =
       type === TOOL_TYPE.magicframe
         ? newMagicFrameElement(constructorOpts)
-        : newFrameElement(constructorOpts);
+        : newFrameElement(constructorOpts, this.scene.getNonDeletedElements()); //zsviczian
 
     this.scene.insertElement(frame);
 

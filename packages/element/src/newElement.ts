@@ -49,6 +49,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
+  OrderedExcalidrawElement,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -191,15 +192,31 @@ export const newFrameElement = (
     name?: string;
     frameRole?: ExcalidrawFrameElement["frameRole"]; //zsviczian
   } & ElementConstructorOpts,
+  elements?: readonly OrderedExcalidrawElement[], //zsviczian
 ): NonDeleted<ExcalidrawFrameElement> => {
+  //zsviczian
+  const { name, frameRole } = opts;
+  if (!name && frameRole === "marker" && elements) {
+    const markerFrames = elements.filter(
+      (element) => element.type === "frame" && element.frameRole === "marker",
+    ) as ExcalidrawFrameElement[];
+    let max = markerFrames.length + 1;
+    markerFrames.forEach((el) => {
+      const num = parseInt(el.name || "0", 10);
+      if (num >= max) {
+        max = num + 1;
+      }
+    });
+    opts.name = `${max}`.padStart(2, "0");
+  }
   const frameElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawFrameElement>("frame", opts),
       type: "frame",
       name: opts?.name || null,
-      ...opts?.frameRole //zsvciczian
-        ? {frameRole: opts?.frameRole}
-        : {}
+      ...(opts?.frameRole //zsviczian
+        ? { frameRole: opts?.frameRole }
+        : {}),
     },
     {},
   );
