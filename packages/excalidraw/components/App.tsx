@@ -10312,11 +10312,7 @@ class App extends React.Component<AppProps, AppState> {
         });
         this.scene.insertElement(placeholderImageElement);
         try {
-          const initializedImageElement = await this.initializeImage(
-            placeholderImageElement,
-            file,
-          );
-          return initializedImageElement;
+          return await this.initializeImage(placeholderImageElement, file);
         } catch (error: any) {
           this.store.scheduleAction(CaptureUpdateAction.NEVER);
           this.scene.mutateElement(placeholderImageElement, {
