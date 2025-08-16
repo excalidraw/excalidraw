@@ -7861,7 +7861,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const placeholderSize = 100 / this.state.zoom.value;
 
-    const placeholderImageElement = newImageElement({
+    return newImageElement({
       type: "image",
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
@@ -7878,8 +7878,6 @@ class App extends React.Component<AppProps, AppState> {
       width: placeholderSize,
       height: placeholderSize,
     });
-
-    return placeholderImageElement;
   };
 
   private handleLinearElementOnPointerDown = (
