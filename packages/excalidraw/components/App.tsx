@@ -10496,72 +10496,61 @@ class App extends React.Component<AppProps, AppState> {
     sceneX: number,
     sceneY: number,
   ) => {
-    try {
-      const initializedImageElements = await Promise.all(
-        imageFiles.map(async (file) => {
-          const placeholderImageElement = this.createImagePlaceholder({
-            sceneX,
-            sceneY,
+    const initializedImageElements = await Promise.all(
+      imageFiles.map(async (file) => {
+        const placeholderImageElement = this.createImagePlaceholder({
+          sceneX,
+          sceneY,
+        });
+        this.scene.insertElement(placeholderImageElement);
+        try {
+          const initializedImageElement = await this.initializeImage(
+            placeholderImageElement,
+            file,
+          );
+          return initializedImageElement;
+        } catch (error: any) {
+          this.store.scheduleAction(CaptureUpdateAction.NEVER);
+          this.scene.mutateElement(placeholderImageElement, {
+            isDeleted: true,
           });
-          this.scene.insertElement(placeholderImageElement);
-          try {
-            const initializedImageElement = await this.initializeImage(
-              placeholderImageElement,
-              file,
-            );
-            return initializedImageElement;
-          } catch (error: any) {
-            this.store.scheduleAction(CaptureUpdateAction.NEVER);
-            this.scene.mutateElement(placeholderImageElement, {
-              isDeleted: true,
-            });
-            this.setState({
-              errorMessage: error.message || t("errors.imageInsertError"),
-            });
-            return placeholderImageElement;
-          }
-        }),
-      );
+          this.setState({
+            errorMessage: error.message || t("errors.imageInsertError"),
+          });
+          return placeholderImageElement;
+        }
+      }),
+    );
 
-      const selectedElementIds: Record<ExcalidrawElement["id"], true> = {};
-      const initializedImageElementsMap: Map<
-        ExcalidrawElement["id"],
-        ExcalidrawElement
-      > = new Map();
+    const selectedElementIds: Record<ExcalidrawElement["id"], true> = {};
+    const initializedImageElementsMap: Map<
+      ExcalidrawElement["id"],
+      ExcalidrawElement
+    > = new Map();
 
-      initializedImageElements.forEach((element) => {
-        selectedElementIds[element.id] = true;
-        initializedImageElementsMap.set(element.id, element);
-      });
+    initializedImageElements.forEach((element) => {
+      selectedElementIds[element.id] = true;
+      initializedImageElementsMap.set(element.id, element);
+    });
 
-      const nextElements = this.scene
-        .getElementsIncludingDeleted()
-        .map(
-          (element) => initializedImageElementsMap.get(element.id) ?? element,
-        );
+    const nextElements = this.scene
+      .getElementsIncludingDeleted()
+      .map((element) => initializedImageElementsMap.get(element.id) ?? element);
 
-      this.updateScene({
-        appState: {
-          selectedElementIds: makeNextSelectedElementIds(
-            selectedElementIds,
-            this.state,
-          ),
-        },
-        elements: nextElements,
-      });
-      this.positionElementsOnGrid(initializedImageElements, sceneX, sceneY);
-      this.setState({}, () => {
-        // actionFinalize after all state values have been updated
-        this.actionManager.executeAction(actionFinalize);
-      });
-    } catch (error: any) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      this.setState({
-        isLoading: false,
-        errorMessage,
-      });
-    }
+    this.updateScene({
+      appState: {
+        selectedElementIds: makeNextSelectedElementIds(
+          selectedElementIds,
+          this.state,
+        ),
+      },
+      elements: nextElements,
+    });
+    this.positionElementsOnGrid(initializedImageElements, sceneX, sceneY);
+    this.setState({}, () => {
+      // actionFinalize after all state values have been updated
+      this.actionManager.executeAction(actionFinalize);
+    });
   };
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
