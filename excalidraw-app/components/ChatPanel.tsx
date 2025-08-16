@@ -39,6 +39,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const invitedRoomRef = useRef<string | null>(null);
   const collabAPI = useAtomValue(collabAPIAtom);
+  
+  // Phase 2: Simplified AI sync status (pure collaboration mode)
+  const [aiSyncStatus, setAiSyncStatus] = useState<'unknown' | 'synced'>('unknown');
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -49,6 +52,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   useEffect(() => {
     checkServiceHealth();
   }, []);
+
+  // Phase 2: No SCENE.INIT monitoring needed - AI bot maintains state through collaboration
 
   // Manual AI invitation function
   const inviteAI = async () => {
@@ -104,6 +109,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         invitedRoomRef.current = roomId;
         setAiInvited(true);
         console.log('AI bot successfully registered for collaboration room:', roomId);
+        
+        // Phase 2: AI bot maintains its own scene state through collaboration
+        console.log('Phase 2: AI bot registered - no manual sync needed in pure collaboration mode');
+        setAiSyncStatus('synced');
+        
       } else {
         throw new Error(`Failed to register AI bot: ${await resp.text()}`);
       }
@@ -129,6 +139,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       setTimeout(autoInviteIfNeeded, 100);
     }
   }, [isVisible, collabAPI, aiInvited]);
+
+  // Phase 2: No cleanup needed - pure collaboration mode
 
   const checkServiceHealth = async () => {
     try {
@@ -174,6 +186,18 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         }
       };
 
+      // Get current collaboration room info for LLM service
+      let roomId, roomKey;
+      try {
+        const linkData = getCollaborationLinkData(window.location.href);
+        if (linkData) {
+          roomId = linkData.roomId;
+          roomKey = linkData.roomKey;
+        }
+      } catch (err) {
+        console.warn('Could not extract room info for LLM service:', err);
+      }
+
       const response = await fetch('http://localhost:3001/api/chat', {
         method: 'POST',
         headers: {
@@ -182,7 +206,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         body: JSON.stringify({
           message: userMessage.content,
           sessionId: 'default',
-          canvas: canvasContext
+          canvas: canvasContext,
+          roomId,
+          roomKey
         }),
       });
 
@@ -303,12 +329,15 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           {aiInvited && (
             <span style={{
               padding: '4px 8px',
-              backgroundColor: '#28a745',
+              backgroundColor: aiSyncStatus === 'synced' ? '#28a745' : '#6c757d',
               color: 'white',
               borderRadius: '4px',
               fontSize: '12px'
-            }}>
-              ✓ AI Active
+            }}
+            title={
+              aiSyncStatus === 'synced' ? 'AI is collaborating on the canvas' : 'AI sync status unknown'
+            }>
+              {aiSyncStatus === 'synced' ? '✓ AI Active' : '? AI Status'}
             </span>
           )}
           <button
@@ -367,6 +396,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
             ) : (
               <>
                 AI assistant is now collaborating on your canvas!
+                <br />
+                <small>Phase 2: Pure collaboration mode active</small>
                 <br />
                 Try: "Create a blue rectangle" or "Add a text box saying 'Hello'"
               </>
