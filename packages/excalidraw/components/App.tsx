@@ -10326,17 +10326,13 @@ class App extends React.Component<AppProps, AppState> {
       }),
     );
 
-    const selectedElementIds: Record<ExcalidrawElement["id"], true> = {};
-    const initializedImageElementsMap: Map<
-      ExcalidrawElement["id"],
-      ExcalidrawElement
-    > = new Map();
+    const initializedImageElementsMap = new Map(
+      initializedImageElements.map((el) => [el.id, el]),
+    );
 
-    initializedImageElements.forEach((element) => {
-      selectedElementIds[element.id] = true;
-      initializedImageElementsMap.set(element.id, element);
-    });
-
+    const selectedElementIds = Object.fromEntries(
+      initializedImageElements.map((el) => [el.id, true as const]),
+    );
     const nextElements = this.scene
       .getElementsIncludingDeleted()
       .map((element) => initializedImageElementsMap.get(element.id) ?? element);
