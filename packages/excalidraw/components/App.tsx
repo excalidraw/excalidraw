@@ -432,7 +432,7 @@ import type {
   ScrollBars,
 } from "../scene/types";
 
-import type { PastedMixedContent } from "../clipboard";
+import type { ClipboardData, PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
 import type { FileSystemHandle } from "../data/filesystem";
@@ -3066,7 +3066,168 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  // TODO: this is so spaghetti, we should refactor it and cover it with tests
+  private async processClipboardData(
+    data: ClipboardData,
+    filesData: Awaited<ReturnType<typeof getFilesFromEvent>>,
+    isPlainPaste: boolean,
+  ) {
+    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+      {
+        clientX: this.lastViewportPosition.x,
+        clientY: this.lastViewportPosition.y,
+      },
+      this.state,
+    );
+
+    // ------------------- Error -------------------
+    if (data.errorMessage) {
+      this.setState({ errorMessage: data.errorMessage });
+      return;
+    }
+
+    // ------------------- Mixed content with no files -------------------
+    if (filesData.length === 0 && !isPlainPaste && data.mixedContent) {
+      await this.addElementsFromMixedContentPaste(data.mixedContent, {
+        isPlainPaste,
+        sceneX,
+        sceneY,
+      });
+      return;
+    }
+
+    // ------------------- Spreadsheet -------------------
+    if (data.spreadsheet && !isPlainPaste) {
+      this.setState({
+        pasteDialog: {
+          data: data.spreadsheet,
+          shown: true,
+        },
+      });
+      return;
+    }
+
+    // ------------------- Images or SVG code -------------------
+    const imageFiles = filesData
+      .map((data) => data.file)
+      .filter((file): file is File => isSupportedImageFile(file));
+
+    if (imageFiles.length === 0 && data.text && !isPlainPaste) {
+      const trimmedText = data.text.trim();
+      if (trimmedText.startsWith("<svg") && trimmedText.endsWith("</svg>")) {
+        // ignore SVG validation/normalization which will be done during image
+        // initialization
+        imageFiles.push(SVGStringToFile(trimmedText));
+      }
+    }
+
+    if (imageFiles.length > 0) {
+      if (this.isToolSupported("image")) {
+        await this.insertImages(imageFiles, sceneX, sceneY);
+      } else {
+        this.setState({ errorMessage: t("errors.imageToolNotSupported") });
+      }
+      return;
+    }
+
+    // ------------------- Elements -------------------
+    if (data.elements) {
+      const elements = (
+        data.programmaticAPI
+          ? convertToExcalidrawElements(
+              data.elements as ExcalidrawElementSkeleton[],
+            )
+          : data.elements
+      ) as readonly ExcalidrawElement[];
+      // TODO: remove formatting from elements if isPlainPaste
+      this.addElementsFromPasteOrLibrary({
+        elements,
+        files: data.files || null,
+        position: this.isMobileOrTablet() ? "center" : "cursor",
+        retainSeed: isPlainPaste,
+      });
+      return;
+    }
+
+    // ------------------- Only textual stuff remaining -------------------
+    if (!data.text) {
+      return;
+    }
+
+    // ------------------- Successful Mermaid -------------------
+    if (isMaybeMermaidDefinition(data.text)) {
+      const api = await import("@excalidraw/mermaid-to-excalidraw");
+      try {
+        const { elements: skeletonElements, files } =
+          await api.parseMermaidToExcalidraw(data.text);
+
+        const elements = convertToExcalidrawElements(skeletonElements, {
+          regenerateIds: true,
+        });
+
+        this.addElementsFromPasteOrLibrary({
+          elements,
+          files,
+          position: this.isMobileOrTablet() ? "center" : "cursor",
+        });
+
+        return;
+      } catch (err: any) {
+        console.warn(
+          `parsing pasted text as mermaid definition failed: ${err.message}`,
+        );
+      }
+    }
+
+    // ------------------- Pure embeddable URLs -------------------
+    const nonEmptyLines = normalizeEOL(data.text)
+      .split(/\n+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const embbeddableUrls = nonEmptyLines
+      .map((str) => maybeParseEmbedSrc(str))
+      .filter(
+        (string) =>
+          embeddableURLValidator(string, this.props.validateEmbeddable) &&
+          (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(string) ||
+            getEmbedLink(string)?.type === "video"),
+      );
+
+    if (
+      !isPlainPaste &&
+      embbeddableUrls.length > 0 &&
+      embbeddableUrls.length === nonEmptyLines.length
+    ) {
+      const embeddables: NonDeleted<ExcalidrawEmbeddableElement>[] = [];
+      for (const url of embbeddableUrls) {
+        const prevEmbeddable: ExcalidrawEmbeddableElement | undefined =
+          embeddables[embeddables.length - 1];
+        const embeddable = this.insertEmbeddableElement({
+          sceneX: prevEmbeddable
+            ? prevEmbeddable.x + prevEmbeddable.width + 20
+            : sceneX,
+          sceneY,
+          link: normalizeLink(url),
+        });
+        if (embeddable) {
+          embeddables.push(embeddable);
+        }
+      }
+      if (embeddables.length) {
+        this.store.scheduleCapture();
+        this.setState({
+          selectedElementIds: Object.fromEntries(
+            embeddables.map((embeddable) => [embeddable.id, true]),
+          ),
+        });
+      }
+      return;
+    }
+
+    // ------------------- Text -------------------
+    this.addTextFromPaste(data.text, isPlainPaste);
+  }
+
+  // TODO: Cover it with tests
   public pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent) => {
       const isPlainPaste = !!IS_PLAIN_PASTE;
@@ -3091,45 +3252,11 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-        {
-          clientX: this.lastViewportPosition.x,
-          clientY: this.lastViewportPosition.y,
-        },
-        this.state,
-      );
-
-      const filesData = await getFilesFromEvent(event);
-
-      const imageFiles = filesData
-        .map((data) => data.file)
-        .filter((file): file is File => isSupportedImageFile(file));
-
-      if (imageFiles.length > 0 && this.isToolSupported("image")) {
-        return this.insertImages(imageFiles, sceneX, sceneY);
-      }
-
       // must be called in the same frame (thus before any awaits) as the paste
       // event else some browsers (FF...) will clear the clipboardData
       // (something something security)
-      let file = event?.clipboardData?.files[0];
+      const filesData = await getFilesFromEvent(event);
       const data = await parseClipboard(event, isPlainPaste);
-      if (!file && !isPlainPaste) {
-        if (data.mixedContent) {
-          return this.addElementsFromMixedContentPaste(data.mixedContent, {
-            isPlainPaste,
-            sceneX,
-            sceneY,
-          });
-        } else if (data.text) {
-          const string = data.text.trim();
-          if (string.startsWith("<svg") && string.endsWith("</svg>")) {
-            // ignore SVG validation/normalization which will be done during image
-            // initialization
-            file = SVGStringToFile(string);
-          }
-        }
-      }
 
       if (this.props.onPaste) {
         try {
@@ -3141,105 +3268,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (data.errorMessage) {
-        this.setState({ errorMessage: data.errorMessage });
-      } else if (data.spreadsheet && !isPlainPaste) {
-        this.setState({
-          pasteDialog: {
-            data: data.spreadsheet,
-            shown: true,
-          },
-        });
-      } else if (data.elements) {
-        const elements = (
-          data.programmaticAPI
-            ? convertToExcalidrawElements(
-                data.elements as ExcalidrawElementSkeleton[],
-              )
-            : data.elements
-        ) as readonly ExcalidrawElement[];
-        // TODO remove formatting from elements if isPlainPaste
-        this.addElementsFromPasteOrLibrary({
-          elements,
-          files: data.files || null,
-          position: this.isMobileOrTablet() ? "center" : "cursor",
-          retainSeed: isPlainPaste,
-        });
-      } else if (data.text) {
-        if (data.text && isMaybeMermaidDefinition(data.text)) {
-          const api = await import("@excalidraw/mermaid-to-excalidraw");
-
-          try {
-            const { elements: skeletonElements, files } =
-              await api.parseMermaidToExcalidraw(data.text);
-
-            const elements = convertToExcalidrawElements(skeletonElements, {
-              regenerateIds: true,
-            });
-
-            this.addElementsFromPasteOrLibrary({
-              elements,
-              files,
-              position: this.isMobileOrTablet() ? "center" : "cursor",
-            });
-
-            return;
-          } catch (err: any) {
-            console.warn(
-              `parsing pasted text as mermaid definition failed: ${err.message}`,
-            );
-          }
-        }
-
-        const nonEmptyLines = normalizeEOL(data.text)
-          .split(/\n+/)
-          .map((s) => s.trim())
-          .filter(Boolean);
-
-        const embbeddableUrls = nonEmptyLines
-          .map((str) => maybeParseEmbedSrc(str))
-          .filter((string) => {
-            return (
-              embeddableURLValidator(string, this.props.validateEmbeddable) &&
-              (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(string) ||
-                getEmbedLink(string)?.type === "video")
-            );
-          });
-
-        if (
-          !IS_PLAIN_PASTE &&
-          embbeddableUrls.length > 0 &&
-          // if there were non-embeddable text (lines) mixed in with embeddable
-          // urls, ignore and paste as text
-          embbeddableUrls.length === nonEmptyLines.length
-        ) {
-          const embeddables: NonDeleted<ExcalidrawEmbeddableElement>[] = [];
-          for (const url of embbeddableUrls) {
-            const prevEmbeddable: ExcalidrawEmbeddableElement | undefined =
-              embeddables[embeddables.length - 1];
-            const embeddable = this.insertEmbeddableElement({
-              sceneX: prevEmbeddable
-                ? prevEmbeddable.x + prevEmbeddable.width + 20
-                : sceneX,
-              sceneY,
-              link: normalizeLink(url),
-            });
-            if (embeddable) {
-              embeddables.push(embeddable);
-            }
-          }
-          if (embeddables.length) {
-            this.store.scheduleCapture();
-            this.setState({
-              selectedElementIds: Object.fromEntries(
-                embeddables.map((embeddable) => [embeddable.id, true]),
-              ),
-            });
-          }
-          return;
-        }
-        this.addTextFromPaste(data.text, isPlainPaste);
-      }
+      await this.processClipboardData(data, filesData, isPlainPaste);
       this.setActiveTool({ type: this.defaultSelectionTool }, true);
       event?.preventDefault();
     },
