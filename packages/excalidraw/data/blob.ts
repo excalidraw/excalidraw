@@ -395,12 +395,14 @@ export const getFilesFromEvent = async (
   let fileList: FileList | undefined = undefined;
   let items: DataTransferItemList | undefined = undefined;
 
-  if (event instanceof ClipboardEvent) {
-    fileList = event.clipboardData?.files;
-    items = event.clipboardData?.items;
+  if (event.type === "paste") {
+    const clipboardEvent = event as ClipboardEvent;
+    fileList = clipboardEvent.clipboardData?.files;
+    items = clipboardEvent.clipboardData?.items;
   } else {
-    fileList = event.dataTransfer?.files;
-    items = event.dataTransfer?.items;
+    const dragEvent = event as React.DragEvent<HTMLDivElement>;
+    fileList = dragEvent.dataTransfer?.files;
+    items = dragEvent.dataTransfer?.items;
   }
 
   const files: (File | null)[] = Array.from(fileList || []);
