@@ -42,7 +42,7 @@ export function allowDoubleTapEraser() {
   return getHostPlugin().settings.penModeDoubleTapEraser;
 }
 
-// Enable panning with right mouse button if host plugin setting allows
+//mfuria #329. Enable panning with right mouse button if host plugin setting allows
 export function isPanWithRightMouseEnabled(): boolean {
   try {
     return !!getHostPlugin().settings?.panWithRightMouseButton;

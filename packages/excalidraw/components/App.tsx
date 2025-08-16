@@ -465,6 +465,7 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionName, ActionResult } from "../actions/types";
+//mfuria #329. Added import of isPanWithRightMouseEnabled
 import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode, isPanWithRightMouseEnabled } from "../obsidianUtils";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
@@ -2725,7 +2726,7 @@ class App extends React.Component<AppProps, AppState> {
     // this.eraserTrail.terminate(); //zsviczian
     /*
     Object.keys(this).forEach((key) => {
-      //@ts-ignore
+      //@ts-ignore    
       delete this[key];
     });*/
   }
@@ -4056,7 +4057,7 @@ startLineEditor = (
   if (!el || !isLinearElement(el)) {
     return;
   }
-
+  
   // First select the element
   this.setState({
     selectedElementIds: { [el.id]: true }
@@ -4739,8 +4740,8 @@ startLineEditor = (
         return;
       }
 
+      //mfuria #329. open context menu with 'm' if not editing text and container focused
       if (
-        // open context menu with 'm' if not editing text and container focused
         event.key.toLowerCase() === 'm' &&
         !this.state.editingTextElement &&
         // don't trigger when typing in inputs
@@ -6205,7 +6206,7 @@ startLineEditor = (
           let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
 
           const selectedElements = this.scene.getSelectedElements(this.state);
-
+      
           if (selectedElements.length === 1) {
             if (isTextElement(selectedElements[0])) {
               existingTextElement = selectedElements[0];
@@ -7005,7 +7006,7 @@ startLineEditor = (
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
-    // Right-click pan support when enabled via host plugin setting
+    //mfuria #329. Right-click pan support when enabled via host plugin setting
     if (
       event.pointerType === "mouse" &&
       event.button === POINTER_BUTTON.SECONDARY &&
@@ -7570,6 +7571,7 @@ startLineEditor = (
     return true;
   };
 
+  //mfuria #329. start right-click panning
   private startRightClickPanning(
     event: React.PointerEvent<HTMLElement>,
   ): void {
@@ -11257,9 +11259,8 @@ startLineEditor = (
   private handleCanvasContextMenu = (
     event: React.MouseEvent<HTMLElement | HTMLCanvasElement>,
   ) => {
-    // Always prevent native context menu, but if right-click pan is enabled
-    // we suppress opening our custom menu too.
     event.preventDefault();
+    //mfuria #329. if right-click pan is enabled, we suppress opening our custom menu too.
     if (isPanWithRightMouseEnabled()) {
       return;
     }
