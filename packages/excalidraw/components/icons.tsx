@@ -2313,18 +2313,51 @@ export const elementLinkIcon = createIcon(
 //zsviczian
 export const markerFrameIcon = createIcon(
   <g strokeWidth={1.25}>
-   <path d="M5 3a2 2 0 0 0-2 2"/>
-   <path d="M19 3a2 2 0 0 1 2 2"/>
-   <path d="M21 19a2 2 0 0 1-2 2"/>
-   <path d="M5 21a2 2 0 0 1-2-2"/>
-   <path d="M9 3h1"/>
-   <path d="M9 21h1"/>
-   <path d="M14 3h1"/>
-   <path d="M14 21h1"/>
-   <path d="M3 9v1"/>
-   <path d="M21 9v1"/>
-   <path d="M3 14v1"/>
-   <path d="M21 14v1"/>
+    <path d="M5 3a2 2 0 0 0-2 2" />
+    <path d="M19 3a2 2 0 0 1 2 2" />
+    <path d="M21 19a2 2 0 0 1-2 2" />
+    <path d="M5 21a2 2 0 0 1-2-2" />
+    <path d="M9 3h1" />
+    <path d="M9 21h1" />
+    <path d="M14 3h1" />
+    <path d="M14 21h1" />
+    <path d="M3 9v1" />
+    <path d="M21 9v1" />
+    <path d="M3 14v1" />
+    <path d="M21 14v1" />
   </g>,
   tablerIconProps,
+);
+
+//zsviczian
+export const LaTeXIcon = createIcon(
+  <path d="M571.31 251.31l-22.62-22.62c-6.25-6.25-16.38-6.25-22.63 0L480 274.75l-46.06-46.06c-6.25-6.25-16.38-6.25-22.63 0l-22.62 22.62c-6.25 6.25-6.25 16.38 0 22.63L434.75 320l-46.06 46.06c-6.25 6.25-6.25 16.38 0 22.63l22.62 22.62c6.25 6.25 16.38 6.25 22.63 0L480 365.25l46.06 46.06c6.25 6.25 16.38 6.25 22.63 0l22.62-22.62c6.25-6.25 6.25-16.38 0-22.63L525.25 320l46.06-46.06c6.25-6.25 6.25-16.38 0-22.63zM552 0H307.65c-14.54 0-27.26 9.8-30.95 23.87l-84.79 322.8-58.41-106.1A32.008 32.008 0 0 0 105.47 224H24c-13.25 0-24 10.74-24 24v48c0 13.25 10.75 24 24 24h43.62l88.88 163.73C168.99 503.5 186.3 512 204.94 512c17.27 0 44.44-9 54.28-41.48L357.03 96H552c13.25 0 24-10.75 24-24V24c0-13.26-10.75-24-24-24z" />,
+  {
+    width: 576,
+    height: 512,
+    fill: "var(--icon-fill-color)",
+    stroke: "none",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    strokeWidth: 2,
+  },
+);
+
+//zsviczian
+export const InsertAnyFileIcon = createIcon(
+  <g>
+    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+    <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+    <path d="M9 15h6" />
+    <path d="M12 18v-6" />
+  </g>,
+  {
+    width: 24,
+    height: 24,
+    fill: "none",
+    stroke: "var(--icon-fill-color)",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    strokeWidth: 2,
+  },
 );

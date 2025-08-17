@@ -140,6 +140,8 @@ import {
   isSomeElementSelected,
 } from "../scene";
 
+import { t2 } from "../obsidianUtils";
+
 import { register } from "./register";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
@@ -2041,7 +2043,9 @@ export const actionToggleFrameRole = register({
   trackEvent: { category: "element" },
   perform: (elements, appState, value, app) => {
     const selected = getSelectedElements(elements, appState);
-    const frames = selected.filter(el => el.type === "frame") as ExcalidrawFrameElement[];
+    const frames = selected.filter(
+      (el) => el.type === "frame",
+    ) as ExcalidrawFrameElement[];
     const onlyFramesSelected = selected.length > 0 && selected.length === frames.length;
 
     if (onlyFramesSelected) {
@@ -2087,15 +2091,16 @@ export const actionToggleFrameRole = register({
   checked: (appState) => appState.currentItemFrameRole === "marker",
   PanelComponent: ({ elements, appState, updateData, app }) => {
     const selected = getSelectedElements(elements, appState);
-    const frames = selected.filter(el => el.type === "frame") as ExcalidrawFrameElement[];
+    const frames = selected.filter(
+      (el) => el.type === "frame",
+    ) as ExcalidrawFrameElement[];
     const onlyFramesSelected = selected.length > 0 && selected.length === frames.length;
 
     const isMarker = onlyFramesSelected
       ? frames.every((el) => el.frameRole === "marker")
       : appState.currentItemFrameRole === "marker";
 
-    const label = "Toggle Marker Frame. Guide-only frames to define slides/print areas/image references. " +
-      "Hidden in image exports; doesn't contain elements. Hide/show frames via canvas context menu.";
+    const label = t2("COMP_FRAME_HINT");
     return (
       <RadioSelection<"marker" | false>
         type="button"

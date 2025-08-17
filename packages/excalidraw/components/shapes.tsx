@@ -9,7 +9,7 @@ import {
   LineIcon,
   FreedrawIcon,
   TextIcon,
-  ImageIcon,
+  //ImageIcon, //zsviczian
   EraserIcon,
 } from "./icons";
 
@@ -70,13 +70,13 @@ export const SHAPES = [
     numericKey: KEYS["8"],
     fillable: false,
   },
-  {
+  /*{
     icon: ImageIcon,
     value: "image",
     key: null,
     numericKey: KEYS["9"],
     fillable: false,
-  },
+  },*/ //zsviczian
   {
     icon: EraserIcon,
     value: "eraser",

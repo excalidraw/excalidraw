@@ -1,4 +1,4 @@
-import { GlobalPoint } from "@excalidraw/math/types";
+import { type GlobalPoint } from "@excalidraw/math/types";
 import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
 import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
 import { FONT_FAMILY, getVerticalOffset, ZOOM_STEP, MAX_ZOOM, MIN_ZOOM } from "@excalidraw/common";
@@ -249,7 +249,7 @@ export const intersectElementWithLine = (
 //disable double click
 export const disableDoubleClickTextEditing = () => {
   return getHostPlugin().settings.disableDoubleClickTextEditing ?? false;
-}
+};
 
 // zoomStep: number;        // % increment per zoom action (e.g. mouse wheel)
 //  zoomMin: number;         // minimum zoom percentage
@@ -257,3 +257,11 @@ export const disableDoubleClickTextEditing = () => {
 export const getZoomStep = () => getHostPlugin().settings.zoomStep ?? ZOOM_STEP;
 export const getZoomMin = () => getHostPlugin().settings.zoomMin ?? MIN_ZOOM;
 export const getZoomMax = () => getHostPlugin().settings.zoomMax ?? MAX_ZOOM;
+
+export const runAction = (action: string): void => {
+  getHostPlugin()?.runAction(action);
+};
+
+export const t2 = (key: string): string => {
+  return getHostPlugin()?.getLabel(key) ?? key;
+}

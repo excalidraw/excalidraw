@@ -502,13 +502,13 @@ function CommandPaletteInner({
             keywords: ["toolbar"],
             viewMode: false,
             perform: ({ event }) => {
-              if (value === "image") {
+              /*if (value === "image") {
                 app.setActiveTool({
                   type: value,
                 });
-              } else {
-                app.setActiveTool({ type: value });
-              }
+              } else {*/ //zsviczian moved Image action to dropdown menu see: Actions.tsx
+              app.setActiveTool({ type: value });
+              //}
             },
           };
 
