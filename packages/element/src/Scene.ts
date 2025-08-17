@@ -164,9 +164,14 @@ export class Scene {
     return this.frames;
   }
 
-  constructor(elements: ElementsMapOrArray | null = null) {
+  constructor(
+    elements: ElementsMapOrArray | null = null,
+    options?: {
+      skipValidation?: true;
+    },
+  ) {
     if (elements) {
-      this.replaceAllElements(elements);
+      this.replaceAllElements(elements, options);
     }
   }
 
@@ -263,12 +268,19 @@ export class Scene {
     return didChange;
   }
 
-  replaceAllElements(nextElements: ElementsMapOrArray) {
+  replaceAllElements(
+    nextElements: ElementsMapOrArray,
+    options?: {
+      skipValidation?: true;
+    },
+  ) {
     // we do trust the insertion order on the map, though maybe we shouldn't and should prefer order defined by fractional indices
     const _nextElements = toArray(nextElements);
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
 
-    validateIndicesThrottled(_nextElements);
+    if (!options?.skipValidation) {
+      validateIndicesThrottled(_nextElements);
+    }
 
     this.elements = syncInvalidIndices(_nextElements);
     this.elementsMap.clear();
