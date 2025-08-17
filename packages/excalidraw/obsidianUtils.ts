@@ -42,6 +42,15 @@ export function allowDoubleTapEraser() {
   return getHostPlugin().settings.penModeDoubleTapEraser;
 }
 
+//mfuria #329. Enable panning with right mouse button if host plugin setting allows
+export function isPanWithRightMouseEnabled(): boolean {
+  try {
+    return !!getHostPlugin().settings?.panWithRightMouseButton;
+  } catch (e) {
+    return false;
+  }
+}
+
 export function getMaxZoom(): number {
   return getHostPlugin().settings.zoomToFitMaxLevel ?? 1;
 }
@@ -84,11 +93,11 @@ export function getFontMetrics(fontFamily: ExcalidrawTextElement["fontFamily"], 
   // Get the font metadata, fallback to Excalifont if not found
   const metadata = FONT_METADATA[fontFamily] ?? FONT_METADATA[FONT_FAMILY.Excalifont];
   const { unitsPerEm, ascender, descender, lineHeight } = metadata.metrics;
-  
+
   // Calculate baseline offset using the existing utility function
   const lineHeightPx = getLineHeightInPx(fontSize, lineHeight as ExcalidrawTextElement["lineHeight"]);
   const baseline = getVerticalOffset(fontFamily, fontSize, lineHeightPx);
-  
+
   // Get the font string from registered fonts or use font family name as fallback
   let fontString = "";
   const fontFaces = Fonts.registered.get(fontFamily);
@@ -99,7 +108,7 @@ export function getFontMetrics(fontFamily: ExcalidrawTextElement["fontFamily"], 
     const fontFamilyName = Object.entries(FONT_FAMILY).find(([_, value]) => value === fontFamily)?.[0];
     fontString = fontFamilyName || "Excalifont";
   }
-  
+
   return {
     unitsPerEm,
     ascender,
