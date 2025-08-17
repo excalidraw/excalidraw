@@ -465,7 +465,6 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionName, ActionResult } from "../actions/types";
-//mfuria #329. Added import of isPanWithRightMouseEnabled
 import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode, isPanWithRightMouseEnabled } from "../obsidianUtils";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
@@ -4742,6 +4741,7 @@ startLineEditor = (
 
       //mfuria #329. open context menu with 'm' if not editing text and container focused
       if (
+        isPanWithRightMouseEnabled() &&
         event.key.toLowerCase() === 'm' &&
         !this.state.editingTextElement &&
         // don't trigger when typing in inputs
@@ -7008,9 +7008,9 @@ startLineEditor = (
   ) => {
     //mfuria #329. Right-click pan support when enabled via host plugin setting
     if (
+      isPanWithRightMouseEnabled() &&
       event.pointerType === "mouse" &&
       event.button === POINTER_BUTTON.SECONDARY &&
-      isPanWithRightMouseEnabled() &&
       !this.state.editingTextElement
     ) {
       // prevent native context menu
