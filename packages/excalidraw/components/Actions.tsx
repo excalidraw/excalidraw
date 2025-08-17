@@ -63,10 +63,15 @@ import {
   laserPointerToolIcon,
   MagicIcon,
   LassoIcon,
+  ImageIcon,
+  LaTeXIcon,
+  InsertAnyFileIcon, //zsviczian
 } from "./icons";
 
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import type { ActionManager } from "../actions/manager";
+
+import { runAction, t2 } from "../obsidianUtils"; //zsviczian
 
 export const canChangeStrokeColor = (
   appState: UIAppState,
@@ -217,10 +222,8 @@ export const SelectedShapeActions = ({
       {/* //zsviczian: add frame role toggle  */}
       {showToggleFrameRoleAction && (
         <fieldset>
-          <legend>{"Frame Actions"}</legend>
-          <div className="buttonList">
-            {renderAction("toggleFrameRole")}
-          </div>
+          <legend>{t2("COMP_FRAME")}</legend>
+          <div className="buttonList">{renderAction("toggleFrameRole")}</div>
         </fieldset>
       )}
 
@@ -309,6 +312,7 @@ export const ShapesSwitcher = ({
 }) => {
   const { renderMermaid } = useAppProps(); //zsviczian
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
+  const [isImageMenuOpen, setIsImageMenuOpen] = useState(false); //zsviczian
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
@@ -366,18 +370,62 @@ export const ShapesSwitcher = ({
               if (appState.activeTool.type !== value) {
                 trackEvent("toolbar", value, "ui");
               }
-              if (value === "image") {
+              /*if (value === "image") {
                 app.setActiveTool({
                   type: value,
                 });
-              } else {
-                app.setActiveTool({ type: value });
-              }
+              } else {*/ //zsviczian moved Image action to dropdown menu
+              app.setActiveTool({ type: value });
+              //}
             }}
           />
         );
       })}
       <div className="App-toolbar__divider" />
+
+      {/*zsviczian - image dropdown begin*/}
+      <DropdownMenu open={isImageMenuOpen}>
+        <DropdownMenu.Trigger
+          className={clsx("App-toolbar__extra-tools-trigger")}
+          onToggle={() => {
+            if (!isImageMenuOpen) {
+              setIsExtraToolsMenuOpen(false);
+            }
+            setIsImageMenuOpen(!isImageMenuOpen);
+          }}
+          title={t2("COMP_IMG")}
+        >
+          {ImageIcon}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
+          onClickOutside={() => setIsImageMenuOpen(false)}
+          onSelect={() => setIsImageMenuOpen(false)}
+          className="App-toolbar__extra-tools-dropdown"
+        >
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "image" })}
+            icon={ImageIcon}
+            data-testid="toolbar-image-import"
+          >
+            {t2("COMP_IMG_FROM_SYSTEM")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => runAction("anyFile")}
+            icon={InsertAnyFileIcon}
+            data-testid="toolbar-any-file"
+          >
+            {t2("COMP_IMG_ANY_FILE")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => runAction("LaTeX")}
+            icon={LaTeXIcon}
+            data-testid="toolbar-latex"
+          >
+            {t2("COMP_IMG_LaTeX")}
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
+      {/*zsviczian - image dropdown end*/}
 
       <DropdownMenu open={isExtraToolsMenuOpen}>
         <DropdownMenu.Trigger
@@ -391,7 +439,12 @@ export const ShapesSwitcher = ({
               // on top of it
               (laserToolSelected && !app.props.isCollaborating),
           })}
-          onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
+          onToggle={() => { //zsviczian
+            if (!isExtraToolsMenuOpen) {
+              setIsImageMenuOpen(false);
+            }
+            setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen);
+          }}
           title={t("toolBar.extraTools")}
         >
           {frameToolSelected
