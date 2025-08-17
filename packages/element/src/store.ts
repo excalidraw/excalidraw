@@ -552,10 +552,26 @@ export class StoreDelta {
   public static load({
     id,
     elements: { added, removed, updated },
+    appState: { delta: appStateDelta },
   }: DTO<StoreDelta>) {
     const elements = ElementsDelta.create(added, removed, updated);
+    const appState = AppStateDelta.create(appStateDelta);
 
-    return new this(id, elements, AppStateDelta.empty());
+    return new this(id, elements, appState);
+  }
+
+  /**
+   * Squash the passed deltas into the aggregated delta instance.
+   */
+  public static squash(...deltas: StoreDelta[]) {
+    const aggregatedDelta = StoreDelta.empty();
+
+    for (const delta of deltas) {
+      aggregatedDelta.elements.squash(delta.elements);
+      aggregatedDelta.appState.squash(delta.appState);
+    }
+
+    return aggregatedDelta;
   }
 
   /**
@@ -572,9 +588,7 @@ export class StoreDelta {
     delta: StoreDelta,
     elements: SceneElementsMap,
     appState: AppState,
-    options: ApplyToOptions = {
-      excludedProperties: new Set(),
-    },
+    options?: ApplyToOptions,
   ): [SceneElementsMap, AppState, boolean] {
     const [nextElements, elementsContainVisibleChange] = delta.elements.applyTo(
       elements,
@@ -611,6 +625,10 @@ export class StoreDelta {
         id: delta.id,
       },
     );
+  }
+
+  public static empty() {
+    return StoreDelta.create(ElementsDelta.empty(), AppStateDelta.empty());
   }
 
   public isEmpty() {

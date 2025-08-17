@@ -235,6 +235,8 @@ import {
   isSimpleArrow,
   resizeSingleElement,
   getNextSingleWidthAndHeightFromPointer,
+  StoreDelta,
+  type ApplyToOptions,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -261,6 +263,7 @@ import type {
   MagicGenerationData,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
+  SceneElementsMap,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -709,6 +712,7 @@ class App extends React.Component<AppProps, AppState> {
     if (excalidrawAPI) {
       const api: ExcalidrawImperativeAPI = {
         updateScene: this.updateScene,
+        applyDeltas: this.applyDeltas,
         mutateElement: this.mutateElement,
         updateLibrary: this.library.updateLibrary,
         addFiles: this.addFiles,
@@ -2443,7 +2447,10 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-    const scene = restore(initialData, null, null, { repairBindings: true });
+    const scene = restore(initialData, null, null, {
+      repairBindings: true,
+      deleteInvisibleElements: true,
+    });
     scene.appState = {
       ...scene.appState,
       theme: this.props.theme || scene.appState.theme,
@@ -3368,7 +3375,9 @@ class App extends React.Component<AppProps, AppState> {
     retainSeed?: boolean;
     fitToContent?: boolean;
   }) => {
-    const elements = restoreElements(opts.elements, null, undefined);
+    const elements = restoreElements(opts.elements, null, {
+      deleteInvisibleElements: true,
+    });
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;
@@ -4363,6 +4372,27 @@ startLineEditor = (
       }
     },
   );
+
+  public applyDeltas = (
+    deltas: StoreDelta[],
+    options?: ApplyToOptions,
+  ): [SceneElementsMap, AppState, boolean] => {
+    // squash all deltas together, starting with a fresh new delta instance
+    const aggregatedDelta = StoreDelta.squash(...deltas);
+
+    // create new instance of elements map & appState, so we don't accidentaly mutate existing ones
+    const nextAppState = { ...this.state };
+    const nextElements = new Map(
+      this.scene.getElementsMapIncludingDeleted(),
+    ) as SceneElementsMap;
+
+    return StoreDelta.applyTo(
+      aggregatedDelta,
+      nextElements,
+      nextAppState,
+      options,
+    );
+  };
 
   public mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     element: TElement,
@@ -5474,16 +5504,6 @@ startLineEditor = (
         //zsviczian insert end
         updateElement(nextOriginalText, isDeleted, rawText, link); //zsviczian (added rawText, link, text)
 
-        if (isDeleted && !isExistingElement) {
-          // let's just remove the element from the scene, as it's an empty just created text element
-          this.scene.replaceAllElements(
-            this.scene
-              .getElementsIncludingDeleted()
-              .filter((x) => x.id !== element.id),
-          );
-        } else {
-          updateElement(nextOriginalText, isDeleted);
-        }
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -5507,15 +5527,16 @@ startLineEditor = (
             }));
           });
         }
+
         if (isDeleted) {
           fixBindingsAfterDeletion(this.scene.getNonDeletedElements(), [
             element,
           ]);
         }
 
-        // we need to record either way, whether the text element was added or removed
-        // since we need to sync this delta to other clients, otherwise it would end up with inconsistencies
-        this.store.scheduleCapture();
+        if (!isDeleted || isExistingElement) {
+          this.store.scheduleCapture();
+        }
 
         flushSync(() => {
           this.setState({

@@ -315,7 +315,12 @@ describe("Test dragCreate", () => {
       );
       expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
-      expect(h.elements.length).toEqual(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "arrow",
+          isDeleted: true,
+        }),
+      ]);
     });
 
     it("line", async () => {
@@ -344,7 +349,12 @@ describe("Test dragCreate", () => {
       );
       expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
-      expect(h.elements.length).toEqual(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "line",
+          isDeleted: true,
+        }),
+      ]);
     });
   });
 });
