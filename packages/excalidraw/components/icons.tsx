@@ -383,6 +383,54 @@ export const FreedrawIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+// Raster pencil icon - similar to freedraw but with bitmap indicator
+export const RasterPencilIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path
+      clipRule="evenodd"
+      d="m7.643 15.69 7.774-7.773a2.357 2.357 0 1 0-3.334-3.334L4.31 12.357a3.333 3.333 0 0 0-.977 2.357v1.953h1.953c.884 0 1.732-.352 2.357-.977Z"
+    />
+    <path d="m11.25 5.417 3.333 3.333" />
+    {/* Bitmap indicator - small dots */}
+    <circle cx="16" cy="16" r="1" fill="currentColor" />
+    <circle cx="18" cy="16" r="1" fill="currentColor" />
+    <circle cx="16" cy="18" r="1" fill="currentColor" />
+    <circle cx="18" cy="18" r="1" fill="currentColor" />
+  </g>,
+
+  modifiedTablerIconProps,
+);
+
+// Raster eraser icon - similar to eraser but with bitmap indicator  
+export const RasterEraserIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path d="m6.5 15.5 3-3 5-5a2.83 2.83 0 1 1 4 4l-5 5-3 3a2.83 2.83 0 0 1-4-4Z" />
+    <path d="M8.5 17.5 15 11" />
+    {/* Bitmap indicator */}
+    <circle cx="16" cy="16" r="1" fill="currentColor" />
+    <circle cx="18" cy="16" r="1" fill="currentColor" />
+    <circle cx="16" cy="18" r="1" fill="currentColor" />
+    <circle cx="18" cy="18" r="1" fill="currentColor" />
+  </g>,
+
+  modifiedTablerIconProps,
+);
+
+// Raster lasso icon - similar to lasso but with bitmap indicator
+export const RasterLassoIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path d="M4.929 7.913A10 10 0 1 0 15 4.207" />
+    <path d="M5 10a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z" />
+    {/* Bitmap indicator */}
+    <circle cx="16" cy="16" r="1" fill="currentColor" />
+    <circle cx="18" cy="16" r="1" fill="currentColor" />
+    <circle cx="16" cy="18" r="1" fill="currentColor" />
+    <circle cx="18" cy="18" r="1" fill="currentColor" />
+  </g>,
+
+  modifiedTablerIconProps,
+);
+
 // tabler-icons: typography
 export const TextIcon = createIcon(
   <g strokeWidth="1.5">

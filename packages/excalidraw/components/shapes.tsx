@@ -13,6 +13,11 @@ import {
   EraserIcon,
 } from "./icons";
 
+// Temporary icons for raster tools - we'll use variations of existing icons
+const RasterPencilIcon = FreedrawIcon;
+const RasterEraserIcon = EraserIcon;
+const RasterLassoIcon = SelectionIcon;
+
 export const SHAPES = [
   {
     icon: SelectionIcon,
@@ -61,6 +66,13 @@ export const SHAPES = [
     value: "freedraw",
     key: [KEYS.P, KEYS.X],
     numericKey: KEYS["7"],
+    fillable: false,
+  },
+  {
+    icon: RasterPencilIcon,
+    value: "rasterpencil",
+    key: null, // We'll add this to extra tools instead of main toolbar
+    numericKey: null,
     fillable: false,
   },
   {
