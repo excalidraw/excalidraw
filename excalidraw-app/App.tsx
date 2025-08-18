@@ -30,6 +30,7 @@ import {
   resolvablePromise,
   isRunningInIframe,
   isDevEnv,
+  Emitter,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -60,6 +61,7 @@ import {
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
 import type {
+  ExcalidrawElement,
   FileId,
   NonDeletedExcalidrawElement,
   OrderedExcalidrawElement,
@@ -137,6 +139,8 @@ import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
 import "./index.scss";
 
+import { SaveReminder } from "./save-reminder/SaveReminder";
+
 import type { CollabAPI } from "./collab/Collab";
 
 polyfill();
@@ -205,6 +209,7 @@ const shareableLinkConfirmDialog = {
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
   excalidrawAPI: ExcalidrawImperativeAPI;
+  onLoadFromLinkEmitter: Emitter<[elements: readonly ExcalidrawElement[]]>;
 }): Promise<
   { scene: ExcalidrawInitialDataState | null } & (
     | { isExternalScene: true; id: string; key: string }
@@ -241,6 +246,7 @@ const initializeScene = async (opts: {
           jsonBackendMatch[2],
           localDataState,
         );
+        opts.onLoadFromLinkEmitter.trigger(scene.elements);
       }
       scene.scrollToContent = true;
       if (!roomLinkData) {
@@ -373,6 +379,21 @@ const ExcalidrawWrapper = () => {
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
 
+  const onSyncDataEmitter = useRef(new Emitter());
+  const onSyncDataSubscriber = useCallback(
+    (cb: () => void) => onSyncDataEmitter.current.on(cb),
+    [],
+  );
+
+  const onLoadFromLinkEmitter = useRef(
+    new Emitter<[elements: readonly ExcalidrawElement[]]>(),
+  );
+  const onLoadFromLinkSubscriber = useCallback(
+    (cb: (elements: readonly ExcalidrawElement[]) => void) =>
+      onLoadFromLinkEmitter.current.on(cb),
+    [],
+  );
+
   useHandleLibrary({
     excalidrawAPI,
     adapter: LibraryIndexedDBAdapter,
@@ -469,7 +490,11 @@ const ExcalidrawWrapper = () => {
       }
     };
 
-    initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
+    initializeScene({
+      collabAPI,
+      excalidrawAPI,
+      onLoadFromLinkEmitter: onLoadFromLinkEmitter.current,
+    }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
     });
@@ -486,7 +511,11 @@ const ExcalidrawWrapper = () => {
         }
         excalidrawAPI.updateScene({ appState: { isLoading: true } });
 
-        initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
+        initializeScene({
+          collabAPI,
+          excalidrawAPI,
+          onLoadFromLinkEmitter: onLoadFromLinkEmitter.current,
+        }).then((data) => {
           loadImages(data);
           if (data.scene) {
             excalidrawAPI.updateScene({
@@ -512,6 +541,8 @@ const ExcalidrawWrapper = () => {
         !document.hidden &&
         ((collabAPI && !collabAPI.isCollaborating()) || isCollabDisabled)
       ) {
+        onSyncDataEmitter.current.trigger();
+
         // don't sync if local state is newer or identical to browser state
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
           const localDataState = importFromLocalStorage();
@@ -921,6 +952,13 @@ const ExcalidrawWrapper = () => {
         )}
         {excalidrawAPI && !isCollabDisabled && (
           <Collab excalidrawAPI={excalidrawAPI} />
+        )}
+        {excalidrawAPI && !isCollaborating && (
+          <SaveReminder
+            excalidrawAPI={excalidrawAPI}
+            onSyncDataSubscriber={onSyncDataSubscriber}
+            onLoadFromLinkSubscriber={onLoadFromLinkSubscriber}
+          />
         )}
 
         <ShareDialog
