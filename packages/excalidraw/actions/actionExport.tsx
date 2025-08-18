@@ -3,6 +3,8 @@ import {
   DEFAULT_EXPORT_PADDING,
   EXPORT_SCALES,
   THEME,
+  isLatinChar,
+  CODES,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -285,7 +287,10 @@ export const actionLoadScene = register({
       };
     }
   },
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    (event.key === KEYS.O ||
+      (!isLatinChar(event.key) && event.code === CODES.O)),
 });
 
 export const actionExportWithDarkMode = register({

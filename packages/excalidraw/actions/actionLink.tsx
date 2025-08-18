@@ -1,6 +1,6 @@
 import { isEmbeddableElement } from "@excalidraw/element";
 
-import { KEYS, getShortcutKey } from "@excalidraw/common";
+import { KEYS, getShortcutKey, isLatinChar, CODES } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
@@ -33,7 +33,10 @@ export const actionLink = register({
     };
   },
   trackEvent: { category: "hyperlink", action: "click" },
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    (event.key === KEYS.K ||
+      (!isLatinChar(event.key) && event.code === CODES.K)),
   predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
     return selectedElements.length === 1;
