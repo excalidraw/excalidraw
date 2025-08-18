@@ -7835,7 +7835,7 @@ class App extends React.Component<AppProps, AppState> {
     return element;
   };
 
-  private createImagePlaceholder = ({
+  private newImagePlaceholder = ({
     sceneX,
     sceneY,
     addToFrameUnderCursor = true,
@@ -10525,7 +10525,7 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     const initializedImageElements = await Promise.all(
       imageFiles.map(async (file) => {
-        const placeholderImageElement = this.createImagePlaceholder({
+        const placeholderImageElement = this.newImagePlaceholder({
           sceneX,
           sceneY,
         });
