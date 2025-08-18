@@ -120,6 +120,8 @@ export interface CollabAPI {
   getUsername: CollabInstance["getUsername"];
   getActiveRoomLink: CollabInstance["getActiveRoomLink"];
   setCollabError: CollabInstance["setErrorDialog"];
+  /** broadcast current visible viewport bounds to collaborators (and AI bot) */
+  broadcastViewport: (force?: boolean) => void;
 }
 
 interface CollabProps {
@@ -214,7 +216,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.relayVisibleSceneBounds,
     );
     const unsubOnScrollChange = this.excalidrawAPI.onScrollChange(() =>
-      throttledRelayUserViewportBounds(),
+      throttledRelayUserViewportBounds({ force: true }),
     );
     this.onUmmount = () => {
       unsubOnUserFollow();
@@ -234,6 +236,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       getUsername: this.getUsername,
       getActiveRoomLink: this.getActiveRoomLink,
       setCollabError: this.setErrorDialog,
+      broadcastViewport: (force?: boolean) => this.relayVisibleSceneBounds({ force: !!force }),
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
@@ -735,6 +738,15 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     } else {
       this.portal.socketInitialized = true;
     }
+    
+    // Send initial viewport bounds when socket is initialized to support AI bot viewport tracking
+    if (this.portal.socketInitialized && this.portal.socket) {
+      // Use a small delay to ensure the socket connection is fully established
+      setTimeout(() => {
+        this.relayVisibleSceneBounds({ force: true });
+      }, 100);
+    }
+    
     return null;
   };
 
@@ -902,12 +914,13 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   relayVisibleSceneBounds = (props?: { force: boolean }) => {
     const appState = this.excalidrawAPI.getAppState();
 
-    if (this.portal.socket && (appState.followedBy.size > 0 || props?.force)) {
+    // Only send viewport bounds when someone is following us, or explicitly forced
+    if ((appState.followedBy.size > 0 || props?.force) && this.portal.socket && this.portal.roomId) {
       this.portal.broadcastVisibleSceneBounds(
         {
           sceneBounds: getVisibleSceneBounds(appState),
         },
-        `follow@${this.portal.socket.id}`,
+        this.portal.roomId,
       );
     }
   };

@@ -36,8 +36,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const [isConnected, setIsConnected] = useState(false);
   const [aiInvited, setAiInvited] = useState(false);
   const [isInvitingAI, setIsInvitingAI] = useState(false);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const invitedRoomRef = useRef<string | null>(null);
+  const chatPanelRef = useRef<HTMLDivElement>(null);
   const collabAPI = useAtomValue(collabAPIAtom);
   
   // Phase 2: Simplified AI sync status (pure collaboration mode)
@@ -113,6 +115,23 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         // Phase 2: AI bot maintains its own scene state through collaboration
         console.log('Phase 2: AI bot registered - no manual sync needed in pure collaboration mode');
         setAiSyncStatus('synced');
+
+        // Force a one-time full-scene sync and viewport broadcast so the bot has
+        // both the elements and the current viewport cached before first query
+        try {
+          await new Promise((resolve) => setTimeout(resolve, 200));
+          const elements = excalidrawAPI.getSceneElementsIncludingDeleted();
+          if (collabAPI) {
+            await collabAPI.syncElements(elements);
+            console.log('Forced full-scene sync broadcast to AI bot');
+            collabAPI.broadcastViewport(true);
+            console.log('Forced viewport broadcast to AI bot');
+          } else {
+            console.warn('Collab API unavailable; skipped forced sync and viewport broadcast');
+          }
+        } catch (syncErr) {
+          console.warn('Failed to force initial sync/viewport broadcast to AI bot:', syncErr);
+        }
         
       } else {
         throw new Error(`Failed to register AI bot: ${await resp.text()}`);
@@ -178,11 +197,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         selection: {
           selectedElementIds: appState.selectedElementIds,
           count: Object.keys(appState.selectedElementIds).length
-        },
-        viewport: {
-          scrollX: appState.scrollX,
-          scrollY: appState.scrollY,
-          zoom: appState.zoom.value
         }
       };
 
@@ -246,6 +260,44 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     }
   };
 
+  // Clipboard functionality with fallback
+  const copyToClipboard = async (text: string): Promise<boolean> => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (e) {
+      console.warn('Modern clipboard API failed, falling back to execCommand:', e);
+    }
+    
+    // Fallback for older browsers or permission issues
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      textarea.style.top = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      return success;
+    } catch (e) {
+      console.warn('Copy failed:', e);
+      return false;
+    }
+  };
+
+  // Handle copy button click
+  const handleCopy = async (message: ChatMessage) => {
+    const success = await copyToClipboard(message.content);
+    if (success) {
+      setCopiedMessageId(message.id);
+      setTimeout(() => setCopiedMessageId(null), 1500);
+    }
+  };
+
   const clearHistory = async () => {
     try {
       await fetch('http://localhost:3001/api/chat/history/default', {
@@ -274,20 +326,22 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      width: '380px',
-      backgroundColor: 'white',
-      borderLeft: '1px solid #ddd',
-      boxShadow: '-2px 0 8px rgba(0,0,0,0.1)',
-      display: 'flex',
-      flexDirection: 'column',
-      zIndex: 999, // Lower than top UI elements
-      fontFamily: 'system-ui, -apple-system, sans-serif'
-    }}>
+    <div 
+      ref={chatPanelRef}
+      style={{
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        width: '380px',
+        backgroundColor: 'white',
+        borderLeft: '1px solid #ddd',
+        boxShadow: '-2px 0 8px rgba(0,0,0,0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+        zIndex: 999, // Lower than top UI elements
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+      }}>
       {/* Header */}
       <div style={{
         padding: '16px 20px',
@@ -422,12 +476,69 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
               {message.content}
             </div>
             <div style={{
-              fontSize: '11px',
-              color: '#6c757d',
-              marginTop: '4px',
-              textAlign: message.role === 'user' ? 'right' : 'left'
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: '4px'
             }}>
-              {formatTimestamp(message.timestamp)}
+              <div style={{
+                fontSize: '11px',
+                color: '#6c757d',
+                textAlign: message.role === 'user' ? 'right' : 'left'
+              }}>
+                {formatTimestamp(message.timestamp)}
+              </div>
+              {message.role === 'assistant' && (
+                <button
+                  onClick={() => handleCopy(message)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCopy(message);
+                    }
+                  }}
+                  aria-label="Copy reply"
+                  title="Copy reply"
+                  style={{
+                    padding: '4px 8px',
+                    border: '1px solid #ddd',
+                    background: '#fff',
+                    cursor: 'pointer',
+                    fontSize: '11px',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    color: '#6c757d',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f8f9fa';
+                    e.currentTarget.style.borderColor = '#007bff';
+                    e.currentTarget.style.color = '#007bff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#fff';
+                    e.currentTarget.style.borderColor = '#ddd';
+                    e.currentTarget.style.color = '#6c757d';
+                  }}
+                >
+                  {copiedMessageId === message.id ? (
+                    <>
+                      <span>✓</span>
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         ))}
