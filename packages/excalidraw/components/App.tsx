@@ -10144,7 +10144,7 @@ class App extends React.Component<AppProps, AppState> {
     if (erroredFiles.size) {
       this.store.scheduleAction(CaptureUpdateAction.NEVER);
       this.scene.replaceAllElements(
-        elements.map((element) => {
+        this.scene.getElementsIncludingDeleted().map((element) => {
           if (
             isInitializedImageElement(element) &&
             erroredFiles.has(element.fileId)
