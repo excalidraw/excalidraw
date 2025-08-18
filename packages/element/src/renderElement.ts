@@ -602,6 +602,9 @@ const generateElementWithCanvas = (
   }
   return prevElementWithCanvas;
 };
+function isEmojiOnly(text: string) {
+  return [...text].every(ch => /\p{Extended_Pictographic}/u.test(ch));
+}
 
 const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
@@ -659,6 +662,16 @@ const drawElementFromCanvas = (
     // revert afterwards we don't have account for it during drawing
     context.translate(-cx, -cy);
 
+    const isDarkMode = appState.theme === 'dark';
+    let isEmojiImage = false;
+if (element.type === "text" && typeof element.text === "string") {
+  isEmojiImage = isEmojiOnly(element.text);
+}
+if (isDarkMode &&  isEmojiImage) {
+  context.filter = 'invert(1) hue-rotate(180deg) saturate(1.2) brightness(1.05)';
+}
+
+
     context.drawImage(
       elementWithCanvas.canvas!,
       (x1 + appState.scrollX) * window.devicePixelRatio -
@@ -668,6 +681,9 @@ const drawElementFromCanvas = (
       elementWithCanvas.canvas!.width / elementWithCanvas.scale,
       elementWithCanvas.canvas!.height / elementWithCanvas.scale,
     );
+    if (isDarkMode &&  isEmojiImage) {
+  context.filter = 'none';
+}
 
     if (
       import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
