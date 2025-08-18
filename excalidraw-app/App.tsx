@@ -112,7 +112,9 @@ import {
 import { updateStaleImageStatuses } from "./data/FileManager";
 import {
   importFromLocalStorage,
+  importFromIndexedDB,
   importUsernameFromLocalStorage,
+  migrateFromLocalStorageToIndexedDB,
 } from "./data/localStorage";
 
 import { loadFilesFromFirebase } from "./data/firebase";
@@ -218,7 +220,15 @@ const initializeScene = async (opts: {
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
-  const localDataState = importFromLocalStorage();
+  // migrate from localStorage to IndexedDB if needed
+  await migrateFromLocalStorageToIndexedDB();
+
+  // try to load from IndexedDB first, fallback to localStorage
+  let localDataState = await importFromIndexedDB();
+  if (!localDataState.elements.length && !localDataState.appState) {
+    // fallback to localStorage if IndexedDB is empty
+    localDataState = importFromLocalStorage();
+  }
 
   let scene: RestoredDataState & {
     scrollToContent?: boolean;
@@ -504,7 +514,7 @@ const ExcalidrawWrapper = () => {
       TITLE_TIMEOUT,
     );
 
-    const syncData = debounce(() => {
+    const syncData = debounce(async () => {
       if (isTestEnv()) {
         return;
       }
@@ -514,7 +524,12 @@ const ExcalidrawWrapper = () => {
       ) {
         // don't sync if local state is newer or identical to browser state
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
-          const localDataState = importFromLocalStorage();
+          // try to load from IndexedDB first, fallback to localStorage
+          let localDataState = await importFromIndexedDB();
+          if (!localDataState.elements.length && !localDataState.appState) {
+            // fallback to localStorage if IndexedDB is empty
+            localDataState = importFromLocalStorage();
+          }
           const username = importUsernameFromLocalStorage();
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
