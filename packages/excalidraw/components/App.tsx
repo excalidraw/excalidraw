@@ -4523,7 +4523,7 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
       ) {
-        const shape = findShapeByKey(event.key);
+        const shape = findShapeByKey(event.key, this);
         if (shape) {
           if (this.state.activeTool.type !== shape) {
             trackEvent(
