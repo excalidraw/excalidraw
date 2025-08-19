@@ -46,7 +46,7 @@ import {
   hasStrokeWidth,
 } from "../scene";
 
-import { getToolbarTools, SHAPES } from "./shapes";
+import { getToolbarTools } from "./shapes";
 
 import "./Actions.scss";
 
@@ -63,7 +63,6 @@ import {
   laserPointerToolIcon,
   MagicIcon,
   LassoIcon,
-  SelectionIcon,
 } from "./icons";
 
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
