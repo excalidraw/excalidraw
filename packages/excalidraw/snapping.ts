@@ -13,7 +13,7 @@ import {
   getDraggedElementsBounds,
   getElementAbsoluteCoords,
 } from "@excalidraw/element";
-import { isBoundToContainer, isFrameLikeElement } from "@excalidraw/element";
+import { isBoundToContainer } from "@excalidraw/element";
 
 import { getMaximumGroups } from "@excalidraw/element";
 
@@ -317,20 +317,13 @@ const getReferenceElements = (
   selectedElements: NonDeletedExcalidrawElement[],
   appState: AppState,
   elementsMap: ElementsMap,
-) => {
-  const selectedFrames = selectedElements
-    .filter((element) => isFrameLikeElement(element))
-    .map((frame) => frame.id);
-
-  return getVisibleAndNonSelectedElements(
+) =>
+  getVisibleAndNonSelectedElements(
     elements,
     selectedElements,
     appState,
     elementsMap,
-  ).filter(
-    (element) => !(element.frameId && selectedFrames.includes(element.frameId)),
   );
-};
 
 export const getVisibleGaps = (
   elements: readonly NonDeletedExcalidrawElement[],

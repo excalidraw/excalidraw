@@ -49,6 +49,7 @@ export const exportToCanvas = ({
     { elements, appState },
     null,
     null,
+    { deleteInvisibleElements: true },
   );
   const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
@@ -179,6 +180,7 @@ export const exportToSvg = async ({
     { elements, appState },
     null,
     null,
+    { deleteInvisibleElements: true },
   );
 
   const exportAppState = {
