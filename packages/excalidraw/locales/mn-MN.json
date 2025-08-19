@@ -66,7 +66,7 @@
     "veryLarge": "Маш том",
     "solid": "Бүтэн",
     "hachure": "Зураасан",
-    "zigzag": "Ирзгар",
+    "zigzag": "Zigzag",
     "crossHatch": "Хөндлөн зураас",
     "thin": "Нимгэн",
     "bold": "Тод",
@@ -78,7 +78,7 @@
     "artist": "Зураач",
     "cartoonist": "Хүүхэлдэйн киноны зураач",
     "fileTitle": "Файлын нэр",
-    "colorPicker": "Өнгө сонгогч",
+    "colorPicker": "Өнгө сонгох",
     "canvasColors": "Ашигласан өнгө",
     "canvasBackground": "Зургийн дэвсгэр",
     "drawingCanvas": "Зурах талбар",
@@ -86,15 +86,15 @@
     "layers": "Давхарга",
     "actions": "Үйлдэл",
     "language": "Хэл",
-    "liveCollaboration": "Шууд хамтын ажиллагаа...",
+    "liveCollaboration": "Live Collaboration",
     "duplicateSelection": "Хуулбарлах",
-    "untitled": "Нэргүй",
+    "untitled": "Untitled",
     "name": "Нэр",
     "yourName": "Таны нэр",
     "madeWithExcalidraw": "Excalidraw-аар хийсэн",
     "group": "Сонголтыг бүлэглэх",
     "ungroup": "Сонголтыг салгах",
-    "collaborators": "Хамтран ажиллагсад",
+    "collaborators": "Collaborators",
     "toggleGrid": "Тор харуулах/нуух",
     "addToLibrary": "Санд нэмэх",
     "removeFromLibrary": "Сангаас хасах",
@@ -103,8 +103,8 @@
     "loadingScene": "Дүр зураг ачаалж байна…",
     "loadScene": "Файлаас дүр зураг ачаалах",
     "align": "Зэрэгцүүлэх",
-    "alignTop": "Дээд зэрэгцүүлэх",
-    "alignBottom": "Доод зэрэгцүүлэх",
+    "alignTop": "Дээр зэрэгцүүлэх",
+    "alignBottom": "Доор зэрэгцүүлэх",
     "alignLeft": "Зүүн зэрэгцүүлэх",
     "alignRight": "Баруун зэрэгцүүлэх",
     "centerVertically": "Босоо төвлөрүүлэх",
@@ -149,7 +149,7 @@
       "lock": "Түгжих",
       "unlock": "Түгжээ тайлах",
       "lockAll": "Бүгдийг түгжих",
-      "unlockAll": "Бүгдийн түгжээ тайлах"
+      "unlockAll": "Бүгдийн түгжээг тайлах"
     },
     "statusPublished": "Нийтлэгдсэн",
     "sidebarLock": "Хажуугийн самбар нээлттэй байлгах",
@@ -170,7 +170,7 @@
     "copyElementLink": "Объектын холбоос хуулах",
     "linkToElement": "Объект руу холбох",
     "wrapSelectionInFrame": "Сонголтыг хүрээнд оруулах",
-    "tab": "Таб",
+    "tab": "Tab",
     "shapeSwitch": "Дүрс солих"
   },
   "elementLink": {
@@ -179,7 +179,7 @@
     "notFound": "Холбогдсон объект зураг дээр олдсонгүй."
   },
   "library": {
-    "noItems": "Одоогоор юм нэмээгүй байна...",
+    "noItems": "Одоогоор хоосон байна...",
     "hint_emptyLibrary": "Зураг дээрх элементийг сонгож энд нэмнэ үү, эсвэл доорх нийтийн сангаас суулгана уу.",
     "hint_emptyPrivateLibrary": "Зураг дээрх элементийг сонгож энд нэмнэ үү."
   },
@@ -243,7 +243,7 @@
     "decryptFailed": "Өгөгдлийг тайлж чадсангүй.",
     "uploadedSecurly": "Байршуулалт нь төгсгөлөөс төгсгөл хүртэл шифрлэгдсэн тул Excalidraw сервер болон гуравдагч талууд агуулгыг унших боломжгүй.",
     "loadSceneOverridePrompt": "Гадны зураг ачаалах нь таны одоогийн агуулгыг солино. Үргэлжлүүлэх үү?",
-    "collabStopOverridePrompt": "Холболтыг зогсоох нь таны өмнөх локал хадгалсан зургийг дарна. Итгэлтэй байна уу?\n\n(Хэрэв та локал зургаа хадгалахыг хүсвэл браузерын табыг хаана уу.)",
+    "collabStopOverridePrompt": "Холболтыг зогсоох нь таны өмнөх хадгалсан зургийг дарна. Итгэлтэй байна уу?\n\n(Хэрэв та зургаа хадгалахыг хүсвэл браузерын табыг хаана уу.)",
     "errorAddingToLibrary": "Элементийг санд нэмж чадсангүй",
     "errorRemovingFromLibrary": "Элементийг сангаас хасаж чадсангүй",
     "confirmAddLibrary": "Энэ нь {{numShapes}} дүрсийг таны санд нэмнэ. Итгэлтэй байна уу?",
@@ -263,9 +263,9 @@
     "failedToFetchImage": "Зураг татаж авч чадсангүй.",
     "cannotResolveCollabServer": "Хамтын ажиллагааны сервертэй холбогдож чадсангүй. Хуудсыг дахин ачаалж оролдоно уу.",
     "importLibraryError": "Сан ачаалж чадсангүй",
-    "saveLibraryError": "Санг хадгалж чадсангүй. Өөрчлөлтөө алдахгүйн тулд локал файлд хадгална уу.",
-    "collabSaveFailed": "Серверт хадгалж чадсангүй. Асуудал үргэлжилвэл файлаа локал хадгална уу.",
-    "collabSaveFailed_sizeExceeded": "Серверт хадгалж чадсангүй, зураг хэт том байна. Файлаа локал хадгална уу.",
+    "saveLibraryError": "Санг хадгалж чадсангүй. Өөрчлөлтөө алдахгүйн тулд файлд хадгалана уу.",
+    "collabSaveFailed": "Серверт хадгалж чадсангүй. Асуудал үргэлжилвэл файлаа хадгалана уу.",
+    "collabSaveFailed_sizeExceeded": "Серверт хадгалж чадсангүй, зураг хэт том байна. Файлаа хадгалана уу.",
     "imageToolNotSupported": "Зураг идэвхгүй болгосон.",
     "brave_measure_text_error": {
       "line1": "Та Brave хөтөч дээр <bold>Aggressively Block Fingerprinting</bold> тохиргоо идэвхжүүлсэн байна.",
@@ -299,8 +299,8 @@
     "link": "Сонгосон дүрсэнд холбоос нэмэх/шинэчлэх",
     "eraser": "Баллуур",
     "frame": "Хүрээний багаж",
-    "magicframe": "Wireframe-аас код руу",
-    "embeddable": "Вэб суулгац",
+    "magicframe": "Wireframe to code",
+    "embeddable": "Embeddable",
     "laser": "Лазер заагч",
     "hand": "Гар (зөөх багаж)",
     "extraTools": "Нэмэлт багаж",
@@ -318,8 +318,8 @@
     "image": "Зураг",
     "group": "Бүлэг",
     "frame": "Хүрээ",
-    "magicframe": "Wireframe-аас код руу",
-    "embeddable": "Вэб суулгац",
+    "magicframe": "Wireframe to code",
+    "embeddable": "Embeddable",
     "selection": "Сонголт",
     "iframe": "IFrame"
   },
@@ -329,7 +329,7 @@
     "shapes": "Дүрснүүд"
   },
   "hints": {
-    "dismissSearch": "Хайлтаас гарах Escape",
+    "dismissSearch": "Хайлтаас гарах (Esc)",
     "canvasPanning": "Зураг зөөхөд хулганы дунд товч эсвэл зай дарж чирэх, эсвэл гар багаж ашиглах",
     "linearElement": "Олон цэг эхлүүлэхэд дарах, нэг шугамд чирэх",
     "arrowTool": "Олон цэг эхлүүлэхэд дарах, нэг шугамд чирэх. Сумны төрөл солихдоо {{arrowShortcut}} дахин дарна.",
@@ -337,25 +337,25 @@
     "text": "Зөвлөгөө: сонгох багажаар хаана ч хоёр дарж текст нэмж болно",
     "embeddable": "Вэбсайт суулгац үүсгэхэд дарж чирнэ",
     "text_selected": "Текст засахад хоёр дарах эсвэл ENTER дарна",
-    "text_editing": "Засварлаж дуусахад Escape эсвэл CtrlOrCmd+ENTER дарна",
-    "linearElementMulti": "Дуусгахын тулд сүүлийн цэг дээр дарах эсвэл Escape/Enter дарна",
+    "text_editing": "Засварлаж дуусахад Esc эсвэл Ctrl/Cmd+ENTER дарна",
+    "linearElementMulti": "Дуусгахын тулд сүүлийн цэг дээр дарах эсвэл Esc/Enter дарна",
     "lockAngle": "SHIFT дарж өнцөг хязгаарлаж болно",
     "resize": "SHIFT дарж харьцаа хадгалж болно,\nALT дарж төвөөс хэмжээ өөрчлөнө",
     "resizeImage": "SHIFT дарж чөлөөтэй хэмжээ өөрчлөх,\nALT дарж төвөөс хэмжээ өөрчлөнө",
     "rotate": "SHIFT дарж эргүүлэхэд өнцөг хязгаарлаж болно",
-    "lineEditor_info": "CtrlOrCmd дарж хоёр дарах эсвэл CtrlOrCmd + Enter дарж цэг засах",
+    "lineEditor_info": "Ctrl/Cmd дарж хоёр дарах эсвэл Ctrl/Cmd + Enter дарж цэг засах",
     "lineEditor_line_info": "Хоёр дарах эсвэл Enter дарж цэг засах",
-    "lineEditor_pointSelected": "Цэг устгахад Delete дарна,\nCtrlOrCmd+D хуулбарлах, эсвэл чирж зөөнө",
+    "lineEditor_pointSelected": "Цэг устгахад Delete дарна,\nCtrl/Cmd+D хуулбарлах, эсвэл чирж зөөнө",
     "lineEditor_nothingSelected": "Засах цэг сонгоно (SHIFT дарж олон сонгох),\nэсвэл Alt дарж дараад шинэ цэг нэмнэ",
     "publishLibrary": "Өөрийн сангаа нийтлэх",
     "bindTextToElement": "Текст нэмэхэд enter дарна",
-    "createFlowchart": "CtrlOrCmd болон Сум товч дарж урсгалын схем үүсгэнэ",
-    "deepBoxSelect": "CtrlOrCmd дарж гүн сонголт хийх, чирэхээс сэргийлнэ",
+    "createFlowchart": "Ctrl/Cmd болон Сум товч дарж урсгалын схем үүсгэнэ",
+    "deepBoxSelect": "Ctrl/Cmd дарж гүн сонголт хийх, чирэхээс сэргийлнэ",
     "eraserRevert": "Устгахаар тэмдэглэсэн элементүүдийг буцаахад Alt дарна",
     "firefox_clipboard_write": "Энэ боломжийг \"dom.events.asyncClipboard.clipboardItem\" тохиргоог \"true\" болгож идэвхжүүлж болно. Firefox дээр хөтчийн тохиргоо солихдоо \"about:config\" хуудас руу орно.",
-    "disableSnapping": "Наалдуулалт идэвхгүй болгохдоо CtrlOrCmd дарна",
+    "disableSnapping": "Наалдуулалт идэвхгүй болгохдоо Ctrl/Cmd дарна",
     "enterCropEditor": "Зураг тайрахад зураг дээр хоёр дарах эсвэл ENTER дарна",
-    "leaveCropEditor": "Тайралт дуусгахад зургийн гадна дарах эсвэл ENTER/ESCAPE дарна"
+    "leaveCropEditor": "Тайралт дуусгахад зургийн гадна дарах эсвэл ENTER/Esc дарна"
   },
   "canvasError": {
     "cannotShowPreview": "Урьдчилж харах боломжгүй",
@@ -374,11 +374,11 @@
     "or": "Эсвэл"
   },
   "roomDialog": {
-    "desc_intro": "Хүмүүсийг зураг дээрээ хамтран ажиллахад урина.",
-    "desc_privacy": "Санаа зоволтгүй, холболт төгсгөлөөс төгсгөл хүртэл шифрлэгдсэн, бүрэн хувийн. Манай сервер ч таны зурсан зүйлийг харж чадахгүй.",
+    "desc_intro": "Хүмүүсийг зураг дээрээ хамтран ажиллахад урих",
+    "desc_privacy": "Холболт end-to-end нууцлагдсан, хамгаалалтай тул санаа зовох шаардлагагүй. Манай сервер ч таны зурсан зүйлийг харж чадахгүй.",
     "button_startSession": "Холболт эхлүүлэх",
     "button_stopSession": "Холболт зогсоох",
-    "desc_inProgressIntro": "Шууд хамтын ажиллагааны холболт эхэлсэн.",
+    "desc_inProgressIntro": "Шууд хамтын ажиллагааны холболт эхэлсэн",
     "desc_shareLink": "Хамтран ажиллах хүмүүстэйгээ энэ холбоосыг хуваалцана уу:",
     "desc_exitSession": "Холболтыг зогсоох нь таныг өрөөнөөс салгах боловч та дүр зургаа локал үргэлжлүүлэн ажиллах боломжтой. Энэ нь бусад хүмүүст нөлөөлөхгүй бөгөөд тэд өөрсдийн хувилбар дээр хамтран ажиллах боломжтой.",
     "shareTitle": "Excalidraw дээр шууд хамтын ажиллагааны холболтод нэгдэх"
@@ -417,7 +417,7 @@
     "or": "эсвэл",
     "preventBinding": "Сум холбохоос сэргийлэх",
     "tools": "Багаж",
-    "shortcuts": "Товчлолын товчлуур",
+    "shortcuts": "Keyboard Shortcuts/Гарын хослолууд",
     "textFinish": "Засвар дуусгах (текст засварлагч)",
     "textNewLine": "Шинэ мөр нэмэх (текст засварлагч)",
     "title": "Тусламж",
@@ -485,17 +485,17 @@
     "title": {
       "exportToPng": "PNG руу экспортлох",
       "exportToSvg": "SVG руу экспортлох",
-      "copyPngToClipboard": "PNG-г санах ойд хуулах"
+      "copyPngToClipboard": "Copy PNG to clipboard"
     },
     "button": {
       "exportToPng": "PNG",
       "exportToSvg": "SVG",
-      "copyPngToClipboard": "Санах ойд хуулах"
+      "copyPngToClipboard": "Copy to clipboard"
     }
   },
   "encrypted": {
-    "tooltip": "Таны зурагнууд төгсгөлөөс төгсгөл хүртэл шифрлэгдсэн тул Excalidraw-ийн серверүүд хэзээ ч харахгүй.",
-    "link": "Excalidraw дахь төгсгөлөөс төгсгөл хүртэлх шифрлэлтийн тухай блог нийтлэл"
+    "tooltip": "Таны зурагнууд end-to-end нууцлалтай тул Excalidraw-ийн серверүүд хэзээ ч харахгүй.",
+    "link": "Excalidraw дахь end-to-end нууцлалын тухай блог"
   },
   "stats": {
     "angle": "Өнцөг",
@@ -530,33 +530,33 @@
     "elementLinkCopied": "Холбоос санах ойд хуулагдсан"
   },
   "colors": {
-    "transparent": "Тунгалаг",
-    "black": "Хар",
-    "white": "Цагаан",
-    "red": "Улаан",
-    "pink": "Ягаан",
-    "grape": "Усан үзэм",
-    "violet": "Нил ягаан",
-    "gray": "Саарал",
-    "blue": "Цэнхэр",
-    "cyan": "Хөх ногоон",
-    "teal": "Усан ногоон",
-    "green": "Ногоон",
-    "yellow": "Шар",
-    "orange": "Улбар шар",
-    "bronze": "Хүрэл"
+    "transparent": "Transparent",
+    "black": "Black",
+    "white": "White",
+    "red": "Red",
+    "pink": "Pink",
+    "grape": "Grape",
+    "violet": "Violet",
+    "gray": "Gray",
+    "blue": "Blue",
+    "cyan": "Cyan",
+    "teal": "Teal",
+    "green": "Green",
+    "yellow": "Yellow",
+    "orange": "Orange",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Таны бүх өгөгдөл таны хөтөч дээр локал хадгалагддаг.",
+      "center_heading": "Таны бүх өгөгдөл таны хөтөч дээр хадгалагддаг",
       "center_heading_plus": "Та Excalidraw+ руу очих гэж байсан уу?",
       "menuHint": "Экспорт, тохиргоо, хэл, ..."
     },
     "defaults": {
       "menuHint": "Экспорт, тохиргоо, бусад...",
       "center_heading": "Диаграм. Хялбар. Энгийн.",
-      "toolbarHint": "Багаж сонгоод зурж эхлэ!",
-      "helpHint": "Товчлол & тусламж"
+      "toolbarHint": "Багажаа сонгоод, зурж эхлэ!",
+      "helpHint": "Shortcuts & Тусламж"
     }
   },
   "colorPicker": {
