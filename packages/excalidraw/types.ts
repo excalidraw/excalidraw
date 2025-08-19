@@ -731,6 +731,8 @@ export type AppClassProperties = {
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
+
+  defaultSelectionTool: "selection" | "lasso";
 };
 
 export type PointerDownState = Readonly<{
@@ -780,6 +782,10 @@ export type PointerDownState = Readonly<{
     // by default same as PointerDownState.origin. On alt-duplication, reset
     // to current pointer position at time of duplication.
     origin: { x: number; y: number };
+    // Whether to block drag after lasso selection
+    // this is meant to be used to block dragging after lasso selection on PCs
+    // until the next pointer down
+    blockDragging: boolean;
   };
   // We need to have these in the state so that we can unsubscribe them
   eventListeners: {

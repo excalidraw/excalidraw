@@ -13,6 +13,8 @@ import {
   EraserIcon,
 } from "./icons";
 
+import type { AppClassProperties } from "../types";
+
 export const SHAPES = [
   {
     icon: SelectionIcon,
@@ -86,8 +88,23 @@ export const SHAPES = [
   },
 ] as const;
 
-export const findShapeByKey = (key: string) => {
-  const shape = SHAPES.find((shape, index) => {
+export const getToolbarTools = (app: AppClassProperties) => {
+  return app.defaultSelectionTool === "lasso"
+    ? ([
+        {
+          value: "lasso",
+          icon: SelectionIcon,
+          key: KEYS.V,
+          numericKey: KEYS["1"],
+          fillable: true,
+        },
+        ...SHAPES.slice(1),
+      ] as const)
+    : SHAPES;
+};
+
+export const findShapeByKey = (key: string, app: AppClassProperties) => {
+  const shape = getToolbarTools(app).find((shape, index) => {
     return (
       (shape.numericKey != null && key === shape.numericKey.toString()) ||
       (shape.key &&

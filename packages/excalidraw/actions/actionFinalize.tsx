@@ -261,13 +261,13 @@ export const actionFinalize = register({
     if (appState.activeTool.type === "eraser") {
       activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveTool || {
-          type: "selection",
+          type: app.defaultSelectionTool,
         }),
         lastActiveToolBeforeEraser: null,
       });
     } else {
       activeTool = updateActiveTool(appState, {
-        type: "selection",
+        type: app.defaultSelectionTool,
       });
     }
 
