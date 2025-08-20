@@ -10,6 +10,7 @@ import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
 import { useAtomValue } from '../app-jotai';
 import { collabAPIAtom } from '../collab/Collab';
 import { getCollaborationLinkData } from '../data';
+import { exportToCanvas } from '@excalidraw/excalidraw';
 
 interface ChatPanelProps {
   excalidrawAPI: ExcalidrawImperativeAPI;
@@ -212,6 +213,50 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         if (import.meta.env.DEV) console.warn('Could not extract room info for LLM service:', err);
       }
 
+      // Generate snapshots for visual analysis
+      let snapshots: { fullCanvas?: string; selection?: string } = {};
+      try {
+        const appState = excalidrawAPI.getAppState();
+        
+        // Generate canvas snapshot
+        const canvas = await exportToCanvas({
+          elements: elements,
+          appState: {
+            ...appState,
+            exportBackground: true,
+            viewBackgroundColor: appState.viewBackgroundColor,
+          },
+          files: excalidrawAPI.getFiles(),
+          maxWidthOrHeight: 1200,
+        });
+        
+        const canvasDataURL = canvas.toDataURL('image/png', 0.8);
+        snapshots.fullCanvas = canvasDataURL;
+        
+        // Generate selection snapshot if elements are selected
+        if (Object.keys(appState.selectedElementIds).length > 0) {
+          const selectedElements = elements.filter(el => appState.selectedElementIds[el.id]);
+          if (selectedElements.length > 0) {
+            const selectionCanvas = await exportToCanvas({
+              elements: selectedElements,
+              appState: {
+                ...appState,
+                exportBackground: false,
+                viewBackgroundColor: 'transparent',
+              },
+              files: excalidrawAPI.getFiles(),
+              maxWidthOrHeight: 800,
+            });
+            
+            const selectionDataURL = selectionCanvas.toDataURL('image/png', 0.8);
+            snapshots.selection = selectionDataURL;
+          }
+        }
+      } catch (snapshotError) {
+        console.warn('Failed to generate snapshots:', snapshotError);
+        // Continue without snapshots
+      }
+
       const response = await fetch('http://localhost:3001/api/chat', {
         method: 'POST',
         headers: {
@@ -221,6 +266,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           message: userMessage.content,
           sessionId: 'default',
           canvas: canvasContext,
+          snapshots,
           roomId,
           roomKey
         }),
