@@ -27,3 +27,9 @@ dev-dist
 html
 meta*.json
 .claude
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
