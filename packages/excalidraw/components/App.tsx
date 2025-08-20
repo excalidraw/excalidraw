@@ -11161,11 +11161,11 @@ class App extends React.Component<AppProps, AppState> {
       // if not scrolling on canvas/wysiwyg, ignore
       if (
         !(
-          event.target instanceof HTMLCanvasElement ||
+          (event.target instanceof HTMLCanvasElement &&
+            event.target.classList.contains("excalidraw__canvas")) ||
           event.target instanceof HTMLTextAreaElement ||
           event.target instanceof HTMLIFrameElement
-        ) ||
-        this.state.activeEmbeddable?.state === "active"
+        )
       ) {
         // prevent zooming the browser (but allow scrolling DOM)
         if (event[KEYS.CTRL_OR_CMD]) {
