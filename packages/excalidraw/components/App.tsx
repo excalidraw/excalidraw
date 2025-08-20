@@ -2739,12 +2739,6 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(window, EVENT.BLUR, this.onBlur, false),
       addEventListener(
         this.excalidrawContainerRef.current,
-        EVENT.WHEEL,
-        this.handleWheel,
-        { passive: false },
-      ),
-      addEventListener(
-        this.excalidrawContainerRef.current,
         EVENT.DRAG_OVER,
         this.disableEvent,
         false,
@@ -11170,7 +11164,8 @@ class App extends React.Component<AppProps, AppState> {
           event.target instanceof HTMLCanvasElement ||
           event.target instanceof HTMLTextAreaElement ||
           event.target instanceof HTMLIFrameElement
-        )
+        ) ||
+        this.state.activeEmbeddable?.state === "active"
       ) {
         // prevent zooming the browser (but allow scrolling DOM)
         if (event[KEYS.CTRL_OR_CMD]) {
