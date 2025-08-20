@@ -102,6 +102,7 @@ import {
   Emitter,
   isMobile,
   MINIMUM_ARROW_SIZE,
+  DOUBLE_TAP_POSITION_THRESHOLD,
 } from "@excalidraw/common";
 
 import {
@@ -531,6 +532,7 @@ export const useExcalidrawActionManager = () =>
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
+let firstTapPosition: { x: number; y: number } | null = null;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
@@ -2989,6 +2991,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private static resetTapTwice() {
     didTapTwice = false;
+    firstTapPosition = null;
   }
 
   private onTouchStart = (event: TouchEvent) => {
@@ -2999,6 +3002,13 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!didTapTwice) {
       didTapTwice = true;
+
+      if (event.touches.length === 1) {
+        firstTapPosition = {
+          x: event.touches[0].clientX,
+          y: event.touches[0].clientY,
+        };
+      }
       clearTimeout(tappedTwiceTimer);
       tappedTwiceTimer = window.setTimeout(
         App.resetTapTwice,
@@ -3006,15 +3016,29 @@ class App extends React.Component<AppProps, AppState> {
       );
       return;
     }
-    // insert text only if we tapped twice with a single finger
+
+    // insert text only if we tapped twice with a single finger at approximately the same position
     // event.touches.length === 1 will also prevent inserting text when user's zooming
-    if (didTapTwice && event.touches.length === 1) {
+    if (didTapTwice && event.touches.length === 1 && firstTapPosition) {
       const touch = event.touches[0];
-      // @ts-ignore
-      this.handleCanvasDoubleClick({
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-      });
+      const distance = pointDistance(
+        pointFrom(touch.clientX, touch.clientY),
+        pointFrom(firstTapPosition.x, firstTapPosition.y),
+      );
+
+      // only create text if the second tap is within the threshold of the first tap
+      // this prevents accidental text creation during dragging/selection
+      if (distance <= DOUBLE_TAP_POSITION_THRESHOLD) {
+        // end lasso trail and deselect elements just in case
+        this.lassoTrail.endPath();
+        this.deselectElements();
+
+        // @ts-ignore
+        this.handleCanvasDoubleClick({
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+        });
+      }
       didTapTwice = false;
       clearTimeout(tappedTwiceTimer);
     }

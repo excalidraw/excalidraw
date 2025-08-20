@@ -524,3 +524,5 @@ export enum UserIdleState {
  * the start and end points)
  */
 export const LINE_POLYGON_POINT_MERGE_DISTANCE = 20;
+
+export const DOUBLE_TAP_POSITION_THRESHOLD = 35;
