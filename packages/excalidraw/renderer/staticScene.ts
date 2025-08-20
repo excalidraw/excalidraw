@@ -29,20 +29,43 @@ import {
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
 
-import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+import { bootstrapCanvas, fillCircle, getNormalizedCanvasDimensions } from "./helpers";
 
 import type {
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
 } from "../scene/types";
-import type { StaticCanvasAppState, Zoom } from "../types";
+import { GridType, StaticCanvasAppState, Zoom } from "../types";
 
 const GridLineColor = {
   Bold: "#dddddd",
   Regular: "#e5e5e5",
 } as const;
 
+
 const strokeGrid = (
+  context: CanvasRenderingContext2D,
+  /** grid cell pixel size */
+  gridSize: number,
+  /** setting to 1 will disble bold lines */
+  gridStep: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
+  width: number,
+  height: number,
+  gridType?: GridType,
+) => {
+  if (gridType === undefined || gridType === GridType.DEFAULT) {
+    strokeDefaultGrid(context, gridSize, gridStep, scrollX, scrollY, zoom, width, height);
+  } else if (gridType === GridType.DOT) {
+    strokeDotGrid(context, gridSize, scrollX, scrollY, zoom, width, height);
+  } else if (gridType === GridType.IZOMETRIC_DOT) {
+    strokeIzometricDotGrid(context, gridSize, scrollX, scrollY, zoom, width, height);
+  }
+};
+
+const strokeDefaultGrid = (
   context: CanvasRenderingContext2D,
   /** grid cell pixel size */
   gridSize: number,
@@ -110,6 +133,86 @@ const strokeGrid = (
     context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
     context.stroke();
   }
+  context.restore();
+};
+
+
+const strokeIzometricDotGrid = (
+  context: CanvasRenderingContext2D,
+  gridSize: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
+  width: number,
+  height: number,
+) => {
+  const spacing = gridSize; // horizontal spacing in model units
+  const vSpacing = gridSize * Math.sqrt(3) / 2; // vertical spacing in model units
+  
+  // Calculate offsets in screen coordinates using the original Excalidraw approach
+  const offsetX = (scrollX % spacing) - spacing;
+  const offsetY = (scrollY % vSpacing) - vSpacing;
+
+  // Calculate the scaled spacing based on zoom
+  const scaledSpacing = spacing * zoom.value;
+  const scaledVSpacing = vSpacing * zoom.value;
+  
+  // Skip rendering if grid is too small
+  if (scaledSpacing < 10) {
+    return;
+  }
+
+  context.save();
+
+  // Apply pixel alignment for crisp rendering
+  if (zoom.value === 1) {
+    context.translate(offsetX % 1 ? 0 : 0.5, offsetY % 1 ? 0 : 0.5);
+  }
+
+  context.fillStyle = "#C4C4C4";
+
+  // Calculate visible area in screen coordinates
+  const visibleStartX = offsetX;
+  const visibleEndX = offsetX + width + scaledSpacing * 2;
+  const visibleStartY = offsetY;
+  const visibleEndY = offsetY + height + scaledVSpacing * 2;
+
+  // Iterate through rows in screen coordinates
+  for (let y = visibleStartY; y < visibleEndY; y += vSpacing) {
+    let row = Math.abs((scrollY - y) / vSpacing);
+    let offset = (row % 2) * gridSize / 2;
+
+    for (let x = visibleStartX + offset; x < visibleEndX; x += spacing) {
+      fillCircle(context, x, y, 1, false);
+    }
+  }
+  
+  context.restore();
+};
+
+
+const strokeDotGrid = (
+  context: CanvasRenderingContext2D,
+  /** grid cell pixel size */
+  gridSize: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
+  width: number,
+  height: number,
+) => {
+  const offsetX = (scrollX % gridSize) - gridSize;
+  const offsetY = (scrollY % gridSize) - gridSize;
+
+  context.save();
+
+  context.fillStyle = "#C4C4C4"
+  for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+    for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
+      fillCircle(context, x, y, 1, false);
+    }
+  }
+
   context.restore();
 };
 
@@ -254,6 +357,7 @@ const _renderStaticScene = ({
       appState.zoom,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
+      appState.gridType
     );
   }
 

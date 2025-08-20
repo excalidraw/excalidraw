@@ -51,6 +51,7 @@ import {
   mermaidLogoIcon,
   brainIconThin,
   LibraryIcon,
+  gridIcon,
 } from "../icons";
 
 import { SHAPES } from "../shapes";
@@ -473,6 +474,18 @@ function CommandPaletteInner({
             setAppState((prevState) => ({
               openMenu: prevState.openMenu === "canvas" ? null : "canvas",
               openPopup: "canvasBackground",
+            }));
+          },
+        },
+        {
+          label: "Change grid type",
+          keywords: ["grid", "dot", "izometric"],
+          icon: gridIcon,
+          category: DEFAULT_CATEGORIES.editor,
+          viewMode: false,
+          perform: () => {
+            setAppState((prevState) => ({
+              openMenu: prevState.openMenu === "canvas" ? null : "canvas",
             }));
           },
         },
