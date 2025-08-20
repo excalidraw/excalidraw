@@ -42,7 +42,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const chatPanelRef = useRef<HTMLDivElement>(null);
   const collabAPI = useAtomValue(collabAPIAtom);
   
-  // Phase 2: Simplified AI sync status (pure collaboration mode)
+  // Simplified AI sync status
   const [aiSyncStatus, setAiSyncStatus] = useState<'unknown' | 'synced'>('unknown');
 
   // Auto-scroll to bottom when new messages arrive
@@ -55,7 +55,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     checkServiceHealth();
   }, []);
 
-  // Phase 2: No SCENE.INIT monitoring needed - AI bot maintains state through collaboration
+  // AI bot maintains state through collaboration
 
   // Manual AI invitation function
   const inviteAI = async () => {
@@ -72,13 +72,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         if (linkData) {
           roomId = linkData.roomId;
           roomKey = linkData.roomKey;
-          console.log('Using existing collaboration room for AI:', { roomId });
+          if (import.meta.env.DEV) console.log('Using existing collaboration room for AI:', { roomId });
         }
       }
       
       // If no existing collaboration, start a new collaboration session
       if (!roomId || !roomKey) {
-        console.log('Starting new collaboration session for AI chat');
+        if (import.meta.env.DEV) console.log('Starting new collaboration session for AI chat');
         
         // Start collaboration - this will create roomId and roomKey automatically
         const scene = await collabAPI.startCollaboration(null);
@@ -93,7 +93,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         if (linkData) {
           roomId = linkData.roomId;
           roomKey = linkData.roomKey;
-          console.log('Created new collaboration session for AI:', { roomId });
+          if (import.meta.env.DEV) console.log('Created new collaboration session for AI:', { roomId });
         } else {
           throw new Error('Failed to get collaboration link data after starting collaboration');
         }
@@ -110,10 +110,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       if (resp.ok) {
         invitedRoomRef.current = roomId;
         setAiInvited(true);
-        console.log('AI bot successfully registered for collaboration room:', roomId);
+        if (import.meta.env.DEV) console.log('AI bot successfully registered for collaboration room:', roomId);
         
-        // Phase 2: AI bot maintains its own scene state through collaboration
-        console.log('Phase 2: AI bot registered - no manual sync needed in pure collaboration mode');
+        // AI bot maintains its own scene state through collaboration
+        if (import.meta.env.DEV) console.log('AI bot registered - no manual sync needed in pure collaboration mode');
         setAiSyncStatus('synced');
 
         // Force a one-time full-scene sync and viewport broadcast so the bot has
@@ -123,21 +123,21 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           const elements = excalidrawAPI.getSceneElementsIncludingDeleted();
           if (collabAPI) {
             await collabAPI.syncElements(elements);
-            console.log('Forced full-scene sync broadcast to AI bot');
+            if (import.meta.env.DEV) console.log('Forced full-scene sync broadcast to AI bot');
             collabAPI.broadcastViewport(true);
-            console.log('Forced viewport broadcast to AI bot');
+            if (import.meta.env.DEV) console.log('Forced viewport broadcast to AI bot');
           } else {
-            console.warn('Collab API unavailable; skipped forced sync and viewport broadcast');
+            if (import.meta.env.DEV) console.warn('Collab API unavailable; skipped forced sync and viewport broadcast');
           }
         } catch (syncErr) {
-          console.warn('Failed to force initial sync/viewport broadcast to AI bot:', syncErr);
+          if (import.meta.env.DEV) console.warn('Failed to force initial sync/viewport broadcast to AI bot:', syncErr);
         }
         
       } else {
         throw new Error(`Failed to register AI bot: ${await resp.text()}`);
       }
     } catch (err) {
-      console.error('Failed to invite AI to collaboration:', err);
+      if (import.meta.env.DEV) console.error('Failed to invite AI to collaboration:', err);
       setError(`Failed to invite AI: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsInvitingAI(false);
@@ -150,7 +150,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       if (!isVisible || !collabAPI || aiInvited) return;
       
       // Auto-invite: start collaboration + invite AI when chat opens
-      console.log('Chat opened - auto-inviting AI with collaboration');
+      if (import.meta.env.DEV) console.log('Chat opened - auto-inviting AI with collaboration');
       await inviteAI();
     };
     
@@ -159,7 +159,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     }
   }, [isVisible, collabAPI, aiInvited]);
 
-  // Phase 2: No cleanup needed - pure collaboration mode
+  // No cleanup needed - pure collaboration mode
 
   const checkServiceHealth = async () => {
     try {
@@ -168,7 +168,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       setIsConnected(data.status === 'healthy');
     } catch (err) {
       setIsConnected(false);
-      console.error('Failed to check service health:', err);
+      if (import.meta.env.DEV) console.error('Failed to check service health:', err);
     }
   };
 
@@ -209,7 +209,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           roomKey = linkData.roomKey;
         }
       } catch (err) {
-        console.warn('Could not extract room info for LLM service:', err);
+        if (import.meta.env.DEV) console.warn('Could not extract room info for LLM service:', err);
       }
 
       const response = await fetch('http://localhost:3001/api/chat', {
@@ -247,7 +247,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
       setError(errorMessage);
-      console.error('Chat error:', err);
+      if (import.meta.env.DEV) console.error('Chat error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -268,7 +268,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         return true;
       }
     } catch (e) {
-      console.warn('Modern clipboard API failed, falling back to execCommand:', e);
+      if (import.meta.env.DEV) console.warn('Modern clipboard API failed, falling back to execCommand:', e);
     }
     
     // Fallback for older browsers or permission issues
@@ -284,7 +284,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       document.body.removeChild(textarea);
       return success;
     } catch (e) {
-      console.warn('Copy failed:', e);
+      if (import.meta.env.DEV) console.warn('Copy failed:', e);
       return false;
     }
   };
@@ -306,7 +306,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       setMessages([]);
       setError(null);
     } catch (err) {
-      console.error('Failed to clear history:', err);
+      if (import.meta.env.DEV) console.error('Failed to clear history:', err);
     }
   };
 
@@ -451,7 +451,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
               <>
                 AI assistant is now collaborating on your canvas!
                 <br />
-                <small>Phase 2: Pure collaboration mode active</small>
+                <small>Pure collaboration mode active</small>
                 <br />
                 Try: "Create a blue rectangle" or "Add a text box saying 'Hello'"
               </>
