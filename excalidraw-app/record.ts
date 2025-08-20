@@ -170,6 +170,15 @@ export class Record {
   }
 
   private static onMouseMove(event: MouseEvent) {
+    if (
+      event.clientX < 0 ||
+      event.clientX > window.innerWidth ||
+      event.clientY < 0 ||
+      event.clientY > window.innerHeight
+    ) {
+      return;
+    }
+
     const now = event.timeStamp || performance.now();
     const delay = now - Record.timestamp;
     Record.timestamp = now;
