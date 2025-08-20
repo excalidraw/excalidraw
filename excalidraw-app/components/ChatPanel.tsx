@@ -101,7 +101,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
       // Register AI bot with the collaboration room
       const username = 'AI Assistant';
-      const resp = await fetch('http://localhost:3000/api/ai/register', {
+      const resp = await fetch('/api/ai/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomId, roomKey, username })
