@@ -11159,10 +11159,20 @@ class App extends React.Component<AppProps, AppState> {
       event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
     ) => {
       // if not scrolling on canvas/wysiwyg, ignore
+      const path = (event as any).composedPath?.() as EventTarget[] | undefined;
+      const isOnExcalidrawCanvas =
+        path?.some(
+          (n) =>
+            n instanceof HTMLCanvasElement &&
+            n.classList?.contains("excalidraw__canvas"),
+        ) ||
+        (event.target as Element | null)?.closest?.(
+          "canvas.excalidraw__canvas",
+        ) != null;
+
       if (
         !(
-          (event.target instanceof HTMLCanvasElement &&
-            event.target.classList.contains("excalidraw__canvas")) ||
+          isOnExcalidrawCanvas ||
           event.target instanceof HTMLTextAreaElement ||
           event.target instanceof HTMLIFrameElement
         )
