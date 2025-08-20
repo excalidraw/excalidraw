@@ -302,6 +302,7 @@
     "magicframe": "Wireframe to code",
     "embeddable": "Web Embed",
     "laser": "Laser pointer",
+    "persistentLaser": "Persistent Laser",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",

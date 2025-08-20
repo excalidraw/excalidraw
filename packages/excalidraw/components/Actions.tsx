@@ -295,6 +295,7 @@ export const ShapesSwitcher = ({
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
+  const persistentLaserPointer = activeTool.type === "persistentlaser";
   const lassoToolSelected = activeTool.type === "lasso";
 
   const embeddableToolSelected = activeTool.type === "embeddable";
@@ -372,6 +373,7 @@ export const ShapesSwitcher = ({
               // in collab we're already highlighting the laser button
               // outside toolbar, so let's not highlight extra-tools button
               // on top of it
+              persistentLaserPointer ||
               (laserToolSelected && !app.props.isCollaborating),
           })}
           onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
@@ -385,6 +387,8 @@ export const ShapesSwitcher = ({
             ? laserPointerToolIcon
             : lassoToolSelected
             ? LassoIcon
+            : persistentLaserPointer
+            ? laserPointerToolIcon
             : extraToolsIcon}
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
@@ -417,6 +421,15 @@ export const ShapesSwitcher = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "persistentlaser" })}
+            icon={laserPointerToolIcon}
+            data-testid="toolbar-persistentLaserPointer"
+            selected={persistentLaserPointer}
+            shortcut={KEYS.P.toLocaleUpperCase()}
+          >
+            {t("toolBar.persistentLaser")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "lasso" })}

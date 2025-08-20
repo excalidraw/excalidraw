@@ -1,4 +1,4 @@
-import { DEFAULT_LASER_COLOR, easeOut } from "@excalidraw/common";
+import { DEFAULT_LASER_COLOR, easeOut, TOOL_TYPE } from "@excalidraw/common";
 
 import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
 
@@ -33,6 +33,11 @@ export class LaserTrails implements Trail {
       simplify: 0,
       streamline: 0.4,
       sizeMapping: (c) => {
+        // Check if current tool is persistent laser
+        if (this.app.state.activeTool.type === TOOL_TYPE.persistentlaser) {
+          return 1; // No decay - always full opacity
+        }
+        // Original decay logic for regular laser
         const DECAY_TIME = 1000;
         const DECAY_LENGTH = 50;
         const t = Math.max(

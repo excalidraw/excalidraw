@@ -1538,7 +1538,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state.newElement ||
           this.state.selectedElementsAreBeingDragged ||
           this.state.resizingElement ||
-          (this.state.activeTool.type === "laser" &&
+          ((this.state.activeTool.type === "laser" || this.state.activeTool.type === "persistentlaser") &&
             // technically we can just test on this once we make it more safe
             this.state.cursorButton === "down");
 
@@ -4592,7 +4592,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
-        if (this.state.activeTool.type === "laser") {
+        if (this.state.activeTool.type === "laser" || this.state.activeTool.type === "persistentlaser") {
           this.setActiveTool({ type: "selection" });
         } else {
           this.setActiveTool({ type: "laser" });
@@ -6632,7 +6632,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
         this.state.activeTool.type,
       );
-    } else if (this.state.activeTool.type === "laser") {
+    } else if (this.state.activeTool.type === "laser" || this.state.activeTool.type === "persistentlaser") {
       this.laserTrails.startPath(
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
@@ -6675,7 +6675,7 @@ class App extends React.Component<AppProps, AppState> {
       onPointerUp(_event || event.nativeEvent),
     );
 
-    if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
+    if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser" || this.state.activeTool.type === "persistentlaser") {
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.addEventListener(EVENT.POINTER_UP, onPointerUp);
       window.addEventListener(EVENT.KEYDOWN, onKeyDown);
@@ -8155,7 +8155,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (this.state.activeTool.type === "laser") {
+      if (this.state.activeTool.type === "laser" || this.state.activeTool.type === "persistentlaser") {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
 
@@ -9782,7 +9782,7 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
-      if (activeTool.type === "laser") {
+      if (activeTool.type === "laser" || activeTool.type === "persistentlaser") {
         this.laserTrails.endPath();
         return;
       }

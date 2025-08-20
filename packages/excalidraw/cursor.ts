@@ -94,7 +94,7 @@ export const setCursorForShape = (
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
     // Ignore custom type as well and let host decide
-  } else if (appState.activeTool.type === "laser") {
+  } else if (appState.activeTool.type === "laser" || appState.activeTool.type === "persistentlaser") {
     const url =
       appState.theme === THEME.LIGHT
         ? laserPointerCursorDataURL_lightMode

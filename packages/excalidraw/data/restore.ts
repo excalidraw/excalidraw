@@ -103,6 +103,7 @@ export const AllowedExcalidrawActiveTools: Record<
   embeddable: true,
   hand: true,
   laser: false,
+  persistentlaser: false,
   magicframe: false,
 };
 

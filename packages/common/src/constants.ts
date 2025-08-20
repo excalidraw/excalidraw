@@ -470,6 +470,7 @@ export const TOOL_TYPE = {
   hand: "hand",
   frame: "frame",
   magicframe: "magicframe",
+  persistentlaser: "persistentlaser",
   embeddable: "embeddable",
   laser: "laser",
 } as const;

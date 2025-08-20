@@ -154,6 +154,7 @@ export type ToolType =
   | "frame"
   | "magicframe"
   | "embeddable"
+  | "persistentlaser"
   | "laser";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
