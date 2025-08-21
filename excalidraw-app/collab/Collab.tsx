@@ -26,7 +26,7 @@ import { AbortError } from "@excalidraw/excalidraw/errors";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
 
-import throttle from "lodash.throttle";
+import throttle from "es-toolkit/compat/throttle";
 import { PureComponent } from "react";
 
 import type {
