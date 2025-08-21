@@ -936,8 +936,21 @@ export type ScrollConstraints = {
   width: number;
   height: number;
   animateOnNextUpdate?: boolean;
+  /**
+   * a facotr <0-1> that determines how much you can zoom out beyond the scroll
+   * constraints.
+   */
   viewportZoomFactor?: number;
+  /**
+   * If true, the user will not be able to zoom out beyond the scroll
+   * constraints (taking into account the viewportZoomFactor).
+   */
   lockZoom?: boolean;
+  /**
+   * <0-1> - how much can you scroll beyond the constrained area within the
+   * timeout window. Note you will still be snapped back to the constrained area
+   * after the timeout.
+   */
   overscrollAllowance?: number;
 };
 export type PendingExcalidrawElements = ExcalidrawElement[];
