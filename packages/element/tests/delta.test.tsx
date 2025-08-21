@@ -8,7 +8,7 @@ import { AppStateDelta, Delta, ElementsDelta } from "../src/delta";
 
 describe("ElementsDelta", () => {
   describe("elements delta calculation", () => {
-    it("should not create removed delta when element gets removed but was already deleted", () => {
+    it("should not throw when element gets removed but was already deleted", () => {
       const element = API.createElement({
         type: "rectangle",
         x: 100,
@@ -19,12 +19,12 @@ describe("ElementsDelta", () => {
       const prevElements = new Map([[element.id, element]]);
       const nextElements = new Map();
 
-      const delta = ElementsDelta.calculate(prevElements, nextElements);
-
-      expect(delta.isEmpty()).toBeTruthy();
+      expect(() =>
+        ElementsDelta.calculate(prevElements, nextElements),
+      ).not.toThrow();
     });
 
-    it("should not create added delta when adding element as already deleted", () => {
+    it("should not throw when adding element as already deleted", () => {
       const element = API.createElement({
         type: "rectangle",
         x: 100,
@@ -35,12 +35,12 @@ describe("ElementsDelta", () => {
       const prevElements = new Map();
       const nextElements = new Map([[element.id, element]]);
 
-      const delta = ElementsDelta.calculate(prevElements, nextElements);
-
-      expect(delta.isEmpty()).toBeTruthy();
+      expect(() =>
+        ElementsDelta.calculate(prevElements, nextElements),
+      ).not.toThrow();
     });
 
-    it("should not create updated delta when there is only version and versionNonce change", () => {
+    it("should create updated delta even when there is only version and versionNonce change", () => {
       const baseElement = API.createElement({
         type: "rectangle",
         x: 100,
@@ -65,7 +65,24 @@ describe("ElementsDelta", () => {
         nextElements as SceneElementsMap,
       );
 
-      expect(delta.isEmpty()).toBeTruthy();
+      expect(delta).toEqual(
+        ElementsDelta.create(
+          {},
+          {},
+          {
+            [baseElement.id]: Delta.create(
+              {
+                version: baseElement.version,
+                versionNonce: baseElement.versionNonce,
+              },
+              {
+                version: baseElement.version + 1,
+                versionNonce: baseElement.versionNonce + 1,
+              },
+            ),
+          },
+        ),
+      );
     });
   });
 

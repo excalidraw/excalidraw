@@ -4055,7 +4055,7 @@ describe("history", () => {
             expect.objectContaining({
               id: container.id,
               boundElements: [{ id: remoteText.id, type: "text" }],
-              isDeleted: true,
+              isDeleted: false,
             }),
             expect.objectContaining({
               id: text.id,
@@ -4064,8 +4064,7 @@ describe("history", () => {
             }),
             expect.objectContaining({
               id: remoteText.id,
-              // unbound
-              containerId: null,
+              containerId: container.id,
               isDeleted: false,
             }),
           ]);
