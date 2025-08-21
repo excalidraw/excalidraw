@@ -5265,6 +5265,9 @@ eslint-module-utils@^2.12.0:
   dependencies:
     debug "^3.2.7"
 
+"eslint-plugin-eslint@file:packages/eslint":
+  version "0.1.0"
+
 eslint-plugin-flowtype@^8.0.3:
   version "8.0.3"
   resolved "https://registry.yarnpkg.com/eslint-plugin-flowtype/-/eslint-plugin-flowtype-8.0.3.tgz#e1557e37118f24734aa3122e7536a038d34a4912"

@@ -1,5 +1,6 @@
 {
   "extends": ["@excalidraw/eslint-config", "react-app"],
+  "plugins": ["excalidraw"],
   "rules": {
     "import/order": [
       "warn",
@@ -38,6 +39,7 @@
       {
         "allowReferrer": true
       }
-    ]
+    ],
+    "excalidraw/no-binding-direct-mod": "error"
   }
 }
