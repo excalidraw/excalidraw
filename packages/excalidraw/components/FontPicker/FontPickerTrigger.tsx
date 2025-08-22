@@ -34,6 +34,9 @@ export const FontPickerTrigger = ({
           active={isTriggerActive}
           // no-op
           onClick={() => {}}
+          style={{
+            border: "none",
+          }}
         />
       </div>
     </Popover.Trigger>
