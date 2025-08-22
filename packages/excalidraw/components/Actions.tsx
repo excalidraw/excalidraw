@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 
 import {
@@ -20,7 +20,6 @@ import {
   isImageElement,
   isLinearElement,
   isTextElement,
-  getBoundTextElement,
   isArrowElement,
 } from "@excalidraw/element";
 
@@ -51,7 +50,6 @@ import {
 
 import { getFormValue } from "../actions/actionProperties";
 
-import { SHAPES } from "./shapes";
 import { getToolbarTools } from "./shapes";
 
 import "./Actions.scss";
@@ -62,7 +60,6 @@ import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { PropertiesPopover } from "./PropertiesPopover";
-import { RadioSelection } from "./RadioSelection";
 import {
   EmbedIcon,
   extraToolsIcon,
@@ -316,13 +313,6 @@ export const CompactShapeActions = ({
   const targetElements = getTargetElements(elementsMap, appState);
   const [strokePopoverOpen, setStrokePopoverOpen] = useState(false);
   const [otherActionsPopoverOpen, setOtherActionsPopoverOpen] = useState(false);
-  const fontSizePopoverOpen = appState.openPopup === "fontSize";
-  const setFontSizePopoverOpen = useCallback(
-    (open: boolean) => {
-      setAppState({ openPopup: open ? "fontSize" : null });
-    },
-    [setAppState],
-  );
   const { container } = useExcalidrawContainer();
 
   const isEditingTextOrNewElement = Boolean(
