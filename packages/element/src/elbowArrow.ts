@@ -359,6 +359,12 @@ const handleSegmentRelease = (
     null,
   );
 
+  if (!restoredPoints || restoredPoints.length < 2) {
+    throw new Error(
+      "Property 'points' is required in the update returned by normalizeArrowElementUpdate()",
+    );
+  }
+
   const nextPoints: GlobalPoint[] = [];
 
   // First part of the arrow are the old points
@@ -706,7 +712,7 @@ const handleEndpointDrag = (
   endGlobalPoint: GlobalPoint,
   hoveredStartElement: ExcalidrawBindableElement | null,
   hoveredEndElement: ExcalidrawBindableElement | null,
-): ReturnType<typeof normalizeArrowElementUpdate> | null => {
+): ElementUpdate<ExcalidrawElbowArrowElement> => {
   let startIsSpecial = arrow.startIsSpecial ?? null;
   let endIsSpecial = arrow.endIsSpecial ?? null;
   const globalUpdatedPoints = updatedPoints.map((p, i) =>
@@ -745,7 +751,9 @@ const handleEndpointDrag = (
     const thirdPoint = globalUpdatedPoints.at(startIsSpecial ? 3 : 2);
 
     if (!secondPoint || !thirdPoint) {
-      return null;
+      throw new Error(
+        `Second and third points must exist when handling endpoint drag (${startIsSpecial})`,
+      );
     }
 
     const startIsHorizontal = headingIsHorizontal(startHeading);
@@ -814,7 +822,9 @@ const handleEndpointDrag = (
     );
 
     if (!secondToLastPoint || !thirdToLastPoint) {
-      return null;
+      throw new Error(
+        `Second and third to last points must exist when handling endpoint drag (${endIsSpecial})`,
+      );
     }
 
     const endIsHorizontal = headingIsHorizontal(endHeading);
@@ -1140,18 +1150,16 @@ export const updateElbowArrowPoints = (
   // - When segments are fixed, the arrow will keep the exact amount of segments
   // - Fixed segments are "replacements" for exactly one segment in the old arrow
   ////
-  return (
-    handleEndpointDrag(
-      arrow,
-      updatedPoints,
-      fixedSegments,
-      startHeading,
-      endHeading,
-      startGlobalPoint,
-      endGlobalPoint,
-      hoveredStartElement,
-      hoveredEndElement,
-    ) || {}
+  return handleEndpointDrag(
+    arrow,
+    updatedPoints,
+    fixedSegments,
+    startHeading,
+    endHeading,
+    startGlobalPoint,
+    endGlobalPoint,
+    hoveredStartElement,
+    hoveredEndElement,
   );
 };
 
@@ -2085,16 +2093,7 @@ const normalizeArrowElementUpdate = (
   nextFixedSegments: readonly FixedSegment[] | null,
   startIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"],
   endIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"],
-): {
-  points: LocalPoint[];
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  fixedSegments: readonly FixedSegment[] | null;
-  startIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"];
-  endIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"];
-} => {
+): ElementUpdate<ExcalidrawElbowArrowElement> => {
   const offsetX = global[0][0];
   const offsetY = global[0][1];
   let points = global.map((p) =>
