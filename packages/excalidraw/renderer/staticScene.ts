@@ -60,8 +60,8 @@ const strokeGrid = (
     strokeDefaultGrid(context, gridSize, gridStep, scrollX, scrollY, zoom, width, height);
   } else if (gridType === GridType.DOT) {
     strokeDotGrid(context, gridSize, scrollX, scrollY, zoom, width, height);
-  } else if (gridType === GridType.IZOMETRIC_DOT) {
-    strokeIzometricDotGrid(context, gridSize, scrollX, scrollY, zoom, width, height);
+  } else if (gridType === GridType.ISOMETRIC_DOT) {
+    strokeIsometricDotGrid(context, gridSize, scrollX, scrollY, zoom, width, height);
   }
 };
 
@@ -137,7 +137,7 @@ const strokeDefaultGrid = (
 };
 
 
-const strokeIzometricDotGrid = (
+const strokeIsometricDotGrid = (
   context: CanvasRenderingContext2D,
   gridSize: number,
   scrollX: number,
@@ -178,13 +178,15 @@ const strokeIzometricDotGrid = (
   const visibleEndY = offsetY + height + scaledVSpacing * 2;
 
   // Iterate through rows in screen coordinates
-  for (let y = visibleStartY; y < visibleEndY; y += vSpacing) {
-    let row = Math.round(Math.abs((scrollY - y) / vSpacing));
-    for (let x = visibleStartX; x < visibleEndX; x += spacing) {
-      let col = Math.round(Math.abs((scrollX - x) / spacing));
-      if (col % 2 == row % 2)
+  let row = Math.round(Math.abs((scrollY - visibleStartY) / vSpacing));
+  let initialColValue = Math.round(Math.abs((scrollX - visibleStartX) / spacing));
+  let col = initialColValue;
+  for (let y = visibleStartY; y < visibleEndY; y += vSpacing, row++) {
+    for (let x = visibleStartX; x < visibleEndX; x += spacing, col++) {
+      if ((col & 1) === (row & 1))
         fillCircle(context, x, y, 3, false);
     }
+    col = initialColValue;  
   }
   
   context.restore();

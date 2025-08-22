@@ -358,7 +358,7 @@ export const ChangeGridType = () => {
         >
           <option value={GridType.DEFAULT}>Default</option>
           <option value={GridType.DOT}>Dot</option>
-          <option value={GridType.IZOMETRIC_DOT}>Isometric Dot</option>
+          <option value={GridType.ISOMETRIC_DOT}>Isometric Dot</option>
         </select>
       </div>
     </div>
