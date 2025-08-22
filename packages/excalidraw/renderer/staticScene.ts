@@ -146,8 +146,8 @@ const strokeIzometricDotGrid = (
   width: number,
   height: number,
 ) => {
-  const spacing = gridSize; // horizontal spacing in model units
-  const vSpacing = gridSize * Math.sqrt(3) / 2; // vertical spacing in model units
+  const spacing = gridSize * 1.7320508075688772; // horizontal spacing in model units
+  const vSpacing = gridSize; // vertical spacing in model units
   
   // Calculate offsets in screen coordinates using the original Excalidraw approach
   const offsetX = (scrollX % spacing) - spacing;
@@ -179,11 +179,11 @@ const strokeIzometricDotGrid = (
 
   // Iterate through rows in screen coordinates
   for (let y = visibleStartY; y < visibleEndY; y += vSpacing) {
-    let row = Math.abs((scrollY - y) / vSpacing);
-    let offset = (row % 2) * gridSize / 2;
-
-    for (let x = visibleStartX + offset; x < visibleEndX; x += spacing) {
-      fillCircle(context, x, y, 1, false);
+    let row = Math.round(Math.abs((scrollY - y) / vSpacing));
+    for (let x = visibleStartX; x < visibleEndX; x += spacing) {
+      let col = Math.round(Math.abs((scrollX - x) / spacing));
+      if (col % 2 == row % 2)
+        fillCircle(context, x, y, 3, false);
     }
   }
   
