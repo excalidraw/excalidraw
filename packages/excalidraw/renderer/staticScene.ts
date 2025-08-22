@@ -211,7 +211,7 @@ const strokeDotGrid = (
   context.fillStyle = "#C4C4C4"
   for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
     for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
-      fillCircle(context, x, y, 1, false);
+      fillCircle(context, x, y, 3, false);
     }
   }
 
