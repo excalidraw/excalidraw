@@ -2867,12 +2867,12 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(window, EVENT.RESIZE, this.onResize, false),
       addEventListener(window, EVENT.UNLOAD, this.onUnload, false),
       addEventListener(window, EVENT.BLUR, this.onBlur, false),
-      addEventListener(
+      /*addEventListener( //zsviczian (duplicate) https://github.com/excalidraw/excalidraw/pull/9891/files
         this.excalidrawContainerRef.current,
         EVENT.WHEEL,
         this.handleWheel,
         { passive: false },
-      ),
+      ),*/
       addEventListener(
         this.excalidrawContainerRef.current,
         EVENT.DRAG_OVER,
@@ -7045,7 +7045,14 @@ startLineEditor = (
       return;
     }
 
-    this.focusContainer(); //zsviczian
+    //zsviczian - begin
+    const isInsideEmbeddableContainer = !!(
+      event.target as Element | null
+    )?.closest?.(".excalidraw__embeddable-container");
+    if (!isInsideEmbeddableContainer) {
+      this.focusContainer();
+    } //zsviczian - end
+
     const target = event.target as HTMLElement;
     // capture subsequent pointer events to the canvas
     // this makes other elements non-interactive until pointer up
@@ -9903,7 +9910,8 @@ startLineEditor = (
           newElement &&
           !multiElement
         ) {
-          if (this.device.isTouchScreen && newElement.points.length > 1) { //zsviczian
+          //zsviczian https://github.com/excalidraw/excalidraw/pull/9840/files
+          if (this.device.isTouchScreen && newElement.points.length > 1) {
             const FIXED_DELTA_X = Math.min(
               (this.state.width * 0.7) / this.state.zoom.value,
               100,
@@ -11804,9 +11812,21 @@ startLineEditor = (
       event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
     ) => {
       // if not scrolling on canvas/wysiwyg, ignore
+      //zsviczian - begin https://github.com/excalidraw/excalidraw/pull/9891/files
+      const path = (event as any).composedPath?.() as EventTarget[] | undefined;
+      const isOnExcalidrawCanvas =
+        path?.some(
+          (n) =>
+            n instanceof HTMLCanvasElement &&
+            n.classList?.contains("excalidraw__canvas"),
+        ) ||
+        (event.target as Element | null)?.closest?.(
+          "canvas.excalidraw__canvas",
+        ) != null;
+      //zsviczian - end
       if (
         !(
-          event.target instanceof HTMLCanvasElement ||
+          isOnExcalidrawCanvas || //zsviczian
           event.target instanceof HTMLTextAreaElement ||
           event.target instanceof HTMLIFrameElement
         )
