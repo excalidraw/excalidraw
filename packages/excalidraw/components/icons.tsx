@@ -2304,24 +2304,21 @@ export const settingsPlusIcon = createIcon(
 );
 
 export const backgroundIcon = createIcon(
-  <g strokeWidth={1.5}>
+  <g strokeWidth={1}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M4 8l4 -4" />
-    <path d="M14 4l-10 10" />
-    <path d="M4 20l16 -16" />
-    <path d="M20 10l-10 10" />
-    <path d="M20 16l-4 4" />
+    <path d="M6 10l4 -4" />
+    <path d="M6 14l8 -8" />
+    <path d="M6 18l12 -12" />
+    <path d="M10 18l8 -8" />
+    <path d="M14 18l4 -4" />
   </g>,
   tablerIconProps,
 );
 
 export const strokeIcon = createIcon(
-  <g strokeWidth={1.5}>
+  <g strokeWidth={1}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M4 8v8" />
-    <path d="M20 16v-8" />
-    <path d="M8 4h8" />
-    <path d="M8 20h8" />
+    <rect x="6" y="6" width="12" height="12" fill="none" />
   </g>,
   tablerIconProps,
 );
