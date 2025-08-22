@@ -2867,7 +2867,7 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(window, EVENT.RESIZE, this.onResize, false),
       addEventListener(window, EVENT.UNLOAD, this.onUnload, false),
       addEventListener(window, EVENT.BLUR, this.onBlur, false),
-      /*addEventListener( //zsviczian (duplicate) https://github.com/excalidraw/excalidraw/pull/9891/files
+      /*addEventListener( //zsviczian (duplicate)
         this.excalidrawContainerRef.current,
         EVENT.WHEEL,
         this.handleWheel,
@@ -9910,8 +9910,7 @@ startLineEditor = (
           newElement &&
           !multiElement
         ) {
-          //zsviczian https://github.com/excalidraw/excalidraw/pull/9840/files
-          if (this.device.isTouchScreen && newElement.points.length > 1) {
+          if (this.device.isTouchScreen && newElement.points.length > 1) { //zsviczian
             const FIXED_DELTA_X = Math.min(
               (this.state.width * 0.7) / this.state.zoom.value,
               100,
@@ -11812,7 +11811,7 @@ startLineEditor = (
       event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
     ) => {
       // if not scrolling on canvas/wysiwyg, ignore
-      //zsviczian - begin https://github.com/excalidraw/excalidraw/pull/9891/files
+      //zsviczian - begin
       const path = (event as any).composedPath?.() as EventTarget[] | undefined;
       const isOnExcalidrawCanvas =
         path?.some(
