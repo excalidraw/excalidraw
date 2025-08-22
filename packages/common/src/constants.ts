@@ -28,11 +28,9 @@ export const isBrave = () =>
 export const isMobile =
   isIOS ||
   /android|webos|ipod|blackberry|iemobile|opera mini/i.test(
-    navigator.userAgent.toLowerCase(),
+    navigator.userAgent,
   ) ||
-  /android|ios|ipod|blackberry|windows phone/i.test(
-    navigator.platform.toLowerCase(),
-  );
+  /android|ios|ipod|blackberry|windows phone/i.test(navigator.platform);
 
 export const supportsResizeObserver =
   typeof window !== "undefined" && "ResizeObserver" in window;
