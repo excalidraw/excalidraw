@@ -52,6 +52,7 @@ import {
 import { getFormValue } from "../actions/actionProperties";
 
 import { SHAPES } from "./shapes";
+import { getToolbarTools } from "./shapes";
 
 import "./Actions.scss";
 
@@ -159,7 +160,7 @@ export const SelectedShapeActions = ({
     targetElements.length === 1 || isSingleElementBoundContainer;
 
   const showLineEditorAction =
-    !appState.editingLinearElement &&
+    !appState.selectedLinearElement?.isEditing &&
     targetElements.length === 1 &&
     isLinearElement(targetElements[0]) &&
     !isElbowArrow(targetElements[0]);
@@ -339,7 +340,7 @@ export const CompactShapeActions = ({
   const showLinkIcon = targetElements.length === 1;
 
   const showLineEditorAction =
-    !appState.editingLinearElement &&
+    !appState.selectedLinearElement?.isEditing &&
     targetElements.length === 1 &&
     isLinearElement(targetElements[0]) &&
     !isElbowArrow(targetElements[0]);
@@ -673,7 +674,8 @@ export const ShapesSwitcher = ({
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
-  const lassoToolSelected = activeTool.type === "lasso";
+  const lassoToolSelected =
+    activeTool.type === "lasso" && app.defaultSelectionTool !== "lasso";
 
   const embeddableToolSelected = activeTool.type === "embeddable";
 
@@ -681,63 +683,68 @@ export const ShapesSwitcher = ({
 
   return (
     <>
-      {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
-        if (
-          UIOptions.tools?.[
-            value as Extract<typeof value, keyof AppProps["UIOptions"]["tools"]>
-          ] === false
-        ) {
-          return null;
-        }
+      {getToolbarTools(app).map(
+        ({ value, icon, key, numericKey, fillable }, index) => {
+          if (
+            UIOptions.tools?.[
+              value as Extract<
+                typeof value,
+                keyof AppProps["UIOptions"]["tools"]
+              >
+            ] === false
+          ) {
+            return null;
+          }
 
-        const label = t(`toolBar.${value}`);
-        const letter =
-          key && capitalizeString(typeof key === "string" ? key : key[0]);
-        const shortcut = letter
-          ? `${letter} ${t("helpDialog.or")} ${numericKey}`
-          : `${numericKey}`;
+          const label = t(`toolBar.${value}`);
+          const letter =
+            key && capitalizeString(typeof key === "string" ? key : key[0]);
+          const shortcut = letter
+            ? `${letter} ${t("helpDialog.or")} ${numericKey}`
+            : `${numericKey}`;
 
-        return (
-          <ToolButton
-            className={clsx("Shape", { fillable })}
-            key={value}
-            type="radio"
-            icon={icon}
-            checked={activeTool.type === value}
-            name="editor-current-shape"
-            title={`${capitalizeString(label)} — ${shortcut}`}
-            keyBindingLabel={numericKey || letter}
-            aria-label={capitalizeString(label)}
-            aria-keyshortcuts={shortcut}
-            data-testid={`toolbar-${value}`}
-            onPointerDown={({ pointerType }) => {
-              if (!appState.penDetected && pointerType === "pen") {
-                app.togglePenMode(true);
-              }
-
-              if (value === "selection") {
-                if (appState.activeTool.type === "selection") {
-                  app.setActiveTool({ type: "lasso" });
-                } else {
-                  app.setActiveTool({ type: "selection" });
+          return (
+            <ToolButton
+              className={clsx("Shape", { fillable })}
+              key={value}
+              type="radio"
+              icon={icon}
+              checked={activeTool.type === value}
+              name="editor-current-shape"
+              title={`${capitalizeString(label)} — ${shortcut}`}
+              keyBindingLabel={numericKey || letter}
+              aria-label={capitalizeString(label)}
+              aria-keyshortcuts={shortcut}
+              data-testid={`toolbar-${value}`}
+              onPointerDown={({ pointerType }) => {
+                if (!appState.penDetected && pointerType === "pen") {
+                  app.togglePenMode(true);
                 }
-              }
-            }}
-            onChange={({ pointerType }) => {
-              if (appState.activeTool.type !== value) {
-                trackEvent("toolbar", value, "ui");
-              }
-              if (value === "image") {
-                app.setActiveTool({
-                  type: value,
-                });
-              } else {
-                app.setActiveTool({ type: value });
-              }
-            }}
-          />
-        );
-      })}
+
+                if (value === "selection") {
+                  if (appState.activeTool.type === "selection") {
+                    app.setActiveTool({ type: "lasso" });
+                  } else {
+                    app.setActiveTool({ type: "selection" });
+                  }
+                }
+              }}
+              onChange={({ pointerType }) => {
+                if (appState.activeTool.type !== value) {
+                  trackEvent("toolbar", value, "ui");
+                }
+                if (value === "image") {
+                  app.setActiveTool({
+                    type: value,
+                  });
+                } else {
+                  app.setActiveTool({ type: value });
+                }
+              }}
+            />
+          );
+        },
+      )}
       <div className="App-toolbar__divider" />
 
       <DropdownMenu open={isExtraToolsMenuOpen}>
@@ -796,14 +803,16 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.laser")}
           </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "lasso" })}
-            icon={LassoIcon}
-            data-testid="toolbar-lasso"
-            selected={lassoToolSelected}
-          >
-            {t("toolBar.lasso")}
-          </DropdownMenu.Item>
+          {app.defaultSelectionTool !== "lasso" && (
+            <DropdownMenu.Item
+              onSelect={() => app.setActiveTool({ type: "lasso" })}
+              icon={LassoIcon}
+              data-testid="toolbar-lasso"
+              selected={lassoToolSelected}
+            >
+              {t("toolBar.lasso")}
+            </DropdownMenu.Item>
+          )}
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate
           </div>
@@ -882,16 +891,4 @@ export const ExitZenModeAction = ({
   >
     {t("buttons.exitZenMode")}
   </button>
-);
-
-export const FinalizeAction = ({
-  renderAction,
-  className,
-}: {
-  renderAction: ActionManager["renderAction"];
-  className?: string;
-}) => (
-  <div className={`finalize-button ${className}`}>
-    {renderAction("finalize", { size: "small" })}
-  </div>
 );

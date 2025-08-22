@@ -229,6 +229,7 @@ export { defaultLang, useI18n, languages } from "./i18n";
 export {
   restore,
   restoreAppState,
+  restoreElement,
   restoreElements,
   restoreLibraryItems,
 } from "./data/restore";
@@ -281,6 +282,7 @@ export { Sidebar } from "./components/Sidebar/Sidebar";
 export { Button } from "./components/Button";
 export { Footer };
 export { MainMenu };
+export { Ellipsify } from "./components/Ellipsify";
 export { useDevice } from "./components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };

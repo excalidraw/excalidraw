@@ -1198,7 +1198,11 @@ describe("textWysiwyg", () => {
       updateTextEditor(editor, "   ");
       Keyboard.exitTextEditor(editor);
       expect(rectangle.boundElements).toStrictEqual([]);
-      expect(h.elements[1].isDeleted).toBe(true);
+      expect(h.elements[1]).toEqual(
+        expect.objectContaining({
+          isDeleted: true,
+        }),
+      );
     });
 
     it("should restore original container height and clear cache once text is unbind", async () => {
