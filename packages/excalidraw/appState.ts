@@ -13,7 +13,7 @@ import {
   isTestEnv,
 } from "@excalidraw/common";
 
-import { GridType, AppState, NormalizedZoomValue } from "./types";
+import { GridType, type AppState, type NormalizedZoomValue } from "./types";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio

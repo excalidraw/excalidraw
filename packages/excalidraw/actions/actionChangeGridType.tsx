@@ -1,7 +1,7 @@
 import { CaptureUpdateAction } from "@excalidraw/element";
 import { register } from "./register";
 import type { AppState } from "../types";
-import { GridType } from "../types";
+import type { GridType } from "../types";
 
 export const actionChangeGridType = register({
 	name: "changeGridType",

@@ -35,7 +35,7 @@ import type {
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
 } from "../scene/types";
-import { GridType, StaticCanvasAppState, Zoom } from "../types";
+import { GridType, type StaticCanvasAppState, type Zoom } from "../types";
 
 const GridLineColor = {
   Bold: "#dddddd",

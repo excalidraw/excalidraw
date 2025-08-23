@@ -261,7 +261,7 @@ export type ObservedElementsAppState = {
 export enum GridType {
   DEFAULT,
   DOT,
-  ISOMETRIC_DOT
+  ISOMETRIC_DOT,
 };
 
 export interface AppState {
