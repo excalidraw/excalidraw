@@ -66,11 +66,10 @@ import { useStable } from "../../hooks/useStable";
 import { Ellipsify } from "../Ellipsify";
 import { distributeLibraryItemsOnSquareGrid } from "../../data/library";
 
-import type { LibraryItem } from "../../types";
-
+import "./CommandPalette.scss";
 import * as defaultItems from "./defaultCommandPaletteItems";
 
-import "./CommandPalette.scss";
+import type { LibraryItem } from "../../types";
 
 import type { CommandPaletteItem } from "./types";
 import type { AppProps, AppState, UIAppState } from "../../types";
@@ -633,7 +632,7 @@ function CommandPaletteInner({
         //   perform: () => {
         //     app.onMagicframeToolSelect();
         //   },
-        //         },
+        // },
       ];
 
       const baseCommands = [

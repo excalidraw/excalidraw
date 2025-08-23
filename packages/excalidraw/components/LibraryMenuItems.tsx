@@ -5,34 +5,43 @@ import React, {
   useRef,
   useState,
 } from "react";
+
 import { MIME_TYPES, arrayToMap } from "@excalidraw/common";
+
 import { duplicateElements } from "@excalidraw/element";
+
 import { deburr } from "../deburr";
 import { serializeLibraryAsJSON } from "../data/json";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { useScrollPosition } from "../hooks/useScrollPosition";
 import { t } from "../i18n";
+
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
 import {
   LibraryMenuSection,
   LibraryMenuSectionGrid,
 } from "./LibraryMenuSection";
+
 import Spinner from "./Spinner";
 import Stack from "./Stack";
+
 import "./LibraryMenuItems.scss";
+
 import type {
   ExcalidrawProps,
   LibraryItem,
   LibraryItems,
   UIAppState,
 } from "../types";
+
 // using an odd number of items per batch so the rendering creates an irregular
 // pattern which looks more organic
 const ITEMS_RENDERED_PER_BATCH = 17;
 // when render outputs cached we can render many more items per batch to
 // speed it up
 const CACHED_ITEMS_RENDERED_PER_BATCH = 64;
+
 export default function LibraryMenuItems({
   isLoading,
   libraryItems,
@@ -58,12 +67,14 @@ export default function LibraryMenuItems({
 }) {
   const libraryContainerRef = useRef<HTMLDivElement>(null);
   const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
+
   // This effect has to be called only on first render, therefore  `scrollPosition` isn't in the dependency array
   useEffect(() => {
     if (scrollPosition > 0) {
       libraryContainerRef.current?.scrollTo(0, scrollPosition);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const { svgCache } = useLibraryCache();
   const [lastSelectedItem, setLastSelectedItem] = useState<
     LibraryItem["id"] | null
@@ -73,10 +84,12 @@ export default function LibraryMenuItems({
     () => libraryItems.filter((item) => item.status !== "published"),
     [libraryItems],
   );
+
   const publishedItems = useMemo(
     () => libraryItems.filter((item) => item.status === "published"),
     [libraryItems],
   );
+
   const filteredUnpublishedItems = useMemo(() => {
     if (!libraryItemsSearch) {
       return unpublishedItems;
@@ -104,6 +117,7 @@ export default function LibraryMenuItems({
     });
   }, [publishedItems, libraryItemsSearch]);
   const showBtn = !libraryItems.length && !pendingElements.length;
+
   const isLibraryEmpty =
     !pendingElements.length &&
     !unpublishedItems.length &&
@@ -121,10 +135,12 @@ export default function LibraryMenuItems({
             (item) => item.id === lastSelectedItem,
           );
           const rangeEnd = orderedItems.findIndex((item) => item.id === id);
+
           if (rangeStart === -1 || rangeEnd === -1) {
             onSelectItems([...selectedItems, id]);
             return;
           }
+
           const selectedItemsMap = arrayToMap(selectedItems);
           const nextSelectedIds = orderedItems.reduce(
             (acc: LibraryItem["id"][], item, idx) => {
@@ -156,6 +172,7 @@ export default function LibraryMenuItems({
       filteredUnpublishedItems,
     ],
   );
+
   const getInsertedElements = useCallback(
     (id: string) => {
       let targetElements;
@@ -181,6 +198,7 @@ export default function LibraryMenuItems({
     },
     [libraryItems, selectedItems],
   );
+
   const onItemDrag = useCallback(
     (id: LibraryItem["id"], event: React.DragEvent) => {
       event.dataTransfer.setData(
@@ -190,6 +208,7 @@ export default function LibraryMenuItems({
     },
     [getInsertedElements],
   );
+
   const isItemSelected = useCallback(
     (id: LibraryItem["id"] | null) => {
       if (!id) {
@@ -199,9 +218,11 @@ export default function LibraryMenuItems({
     },
     [selectedItems],
   );
+
   const onAddToLibraryClick = useCallback(() => {
     onAddToLibrary(pendingElements);
   }, [pendingElements, onAddToLibrary]);
+
   const onItemClick = useCallback(
     (id: LibraryItem["id"] | null) => {
       if (id) {
@@ -210,10 +231,12 @@ export default function LibraryMenuItems({
     },
     [getInsertedElements, onInsertLibraryItems],
   );
+
   const itemsRenderedPerBatch =
     svgCache.size >= libraryItems.length
       ? CACHED_ITEMS_RENDERED_PER_BATCH
       : ITEMS_RENDERED_PER_BATCH;
+
   return (
     <div
       className="library-menu-items-container"
@@ -307,6 +330,7 @@ export default function LibraryMenuItems({
             </LibraryMenuSectionGrid>
           )}
         </>
+
         <>
           {(filteredPublishedItems.length > 0 ||
             pendingElements.length > 0 ||
@@ -343,6 +367,7 @@ export default function LibraryMenuItems({
             </div>
           ) : null}
         </>
+
         {showBtn && (
           <LibraryMenuControlButtons
             style={{ padding: "16px 0", width: "100%" }}
