@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import fuzzy from "fuzzy";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 
 import {
   DEFAULT_SIDEBAR,
@@ -12,6 +12,10 @@ import {
 } from "@excalidraw/common";
 
 import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionToggleShapeSwitch";
+
+import { exportToSvg } from "@excalidraw/utils/export";
+
+import { COLOR_PALETTE } from "@excalidraw/common";
 
 import type { MarkRequired } from "@excalidraw/common/utility-types";
 
@@ -60,6 +64,9 @@ import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { useStable } from "../../hooks/useStable";
 
 import { Ellipsify } from "../Ellipsify";
+import { distributeLibraryItemsOnSquareGrid } from "../../data/library";
+
+import type { LibraryItem } from "../../types";
 
 import * as defaultItems from "./defaultCommandPaletteItems";
 
@@ -70,6 +77,64 @@ import type { AppProps, AppState, UIAppState } from "../../types";
 import type { ShortcutName } from "../../actions/shortcuts";
 import type { TranslationKeys } from "../../i18n";
 import type { Action } from "../../actions/types";
+
+const LibraryItemIcon = memo(
+  ({ elements }: { elements: LibraryItem["elements"] }) => {
+    const [svgContent, setSvgContent] = useState<string>("");
+
+    useEffect(() => {
+      if (elements && elements.length > 0) {
+        (async () => {
+          try {
+            const svg = await exportToSvg({
+              elements,
+              appState: {
+                exportBackground: false,
+                viewBackgroundColor: COLOR_PALETTE.white,
+              },
+              files: null,
+              renderEmbeddables: false,
+              skipInliningFonts: true,
+            });
+
+            svg.setAttribute("width", "16");
+            svg.setAttribute("height", "16");
+            svg.setAttribute(
+              "viewBox",
+              svg.getAttribute("viewBox") || "0 0 100 100",
+            );
+            svg.style.display = "block";
+            svg.style.maxWidth = "16px";
+            svg.style.maxHeight = "16px";
+
+            setSvgContent(svg.outerHTML);
+          } catch (error) {
+            console.warn("Failed to generate library item icon:", error);
+            setSvgContent("");
+          }
+        })();
+      }
+    }, [elements]);
+
+    if (!svgContent) {
+      return <div style={{ width: 16, height: 16 }}>{LibraryIcon}</div>;
+    }
+
+    return (
+      <div
+        style={{
+          width: 16,
+          height: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+        }}
+        dangerouslySetInnerHTML={{ __html: svgContent }}
+      />
+    );
+  },
+);
 
 const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 
@@ -568,14 +633,71 @@ function CommandPaletteInner({
         //   perform: () => {
         //     app.onMagicframeToolSelect();
         //   },
-        // },
+        //         },
       ];
 
-      const allCommands = [
+      const baseCommands = [
         ...commandsFromActions,
         ...additionalCommands,
         ...(customCommandPaletteItems || []),
-      ].map((command) => {
+      ];
+
+      if (app.library.getLatestLibrary) {
+        app.library
+          .getLatestLibrary()
+          .then((libraryItems) => {
+            const libraryCommandsFromItems: CommandPaletteItem[] = libraryItems
+              .filter(
+                (item) =>
+                  item.elements &&
+                  item.elements.length > 0 &&
+                  item.name &&
+                  item.name.trim().length > 0,
+              )
+              .map((item: LibraryItem) => ({
+                label: item.name!,
+                keywords: ["library", "insert", "element"],
+                category: "Library",
+                icon: () => <LibraryItemIcon elements={item.elements} />,
+                viewMode: false,
+                perform: () => {
+                  const elements = distributeLibraryItemsOnSquareGrid([item]);
+                  if (app.onInsertElements) {
+                    app.onInsertElements(elements);
+                  }
+                },
+              }));
+
+            const allCommandsWithLibrary = [
+              ...baseCommands,
+              ...libraryCommandsFromItems,
+            ].map((command) => {
+              return {
+                ...command,
+                icon: command.icon || boltIcon,
+                order: command.order ?? getCategoryOrder(command.category),
+                haystack: `${deburr(command.label.toLocaleLowerCase())} ${
+                  command.keywords?.join(" ") || ""
+                }`,
+              };
+            });
+
+            setAllCommands(allCommandsWithLibrary);
+            setLastUsed(
+              allCommandsWithLibrary.find(
+                (command) => command.label === lastUsed?.label,
+              ) ?? null,
+            );
+          })
+          .catch((error) => {
+            console.warn(
+              "Failed to load library items for command palette:",
+              error,
+            );
+          });
+      }
+
+      const initialCommands = baseCommands.map((command) => {
         return {
           ...command,
           icon: command.icon || boltIcon,
@@ -586,9 +708,9 @@ function CommandPaletteInner({
         };
       });
 
-      setAllCommands(allCommands);
+      setAllCommands(initialCommands);
       setLastUsed(
-        allCommands.find((command) => command.label === lastUsed?.label) ??
+        initialCommands.find((command) => command.label === lastUsed?.label) ??
           null,
       );
     }

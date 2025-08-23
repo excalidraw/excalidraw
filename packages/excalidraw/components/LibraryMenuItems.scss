@@ -79,6 +79,39 @@
       grid-gap: 1rem;
     }
 
+    &__search {
+      padding: 0 var(--container-padding-x);
+      margin-bottom: 0.75rem;
+      margin-top: 1rem;
+
+      &__input {
+        box-sizing: border-box;
+        width: 80%;
+        margin: 0;
+        font-size: 0.875rem;
+        font-family: inherit;
+        background-color: transparent;
+        color: var(--text-primary-color);
+        outline: none;
+        height: var(--lg-button-size);
+        border: 1px solid var(--default-border-color);
+        letter-spacing: 0.4px;
+        border-radius: var(--border-radius-lg);
+
+        padding: 0.5rem;
+        appearance: none;
+
+        &:focus-visible {
+          box-shadow: none;
+          border-color: var(--color-primary);
+        }
+
+        &::placeholder {
+          color: var(--color-gray-60);
+        }
+      }
+    }
+
     .separator {
       width: 100%;
       display: flex;
