@@ -91,7 +91,8 @@ export const isWritableElement = (
   (target instanceof HTMLInputElement &&
     (target.type === "text" ||
       target.type === "number" ||
-      target.type === "password"));
+      target.type === "password" ||
+      target.type === "search"));
 
 export const getFontFamilyString = ({
   fontFamily,
