@@ -34,7 +34,7 @@
     overflow-y: auto;
     flex-direction: column;
     height: 100%;
-    justify-content: center;
+    justify-content: flex-start;
     margin: 0;
 
     position: relative;
@@ -83,6 +83,7 @@
       padding: 0 var(--container-padding-x);
       margin-bottom: 0.75rem;
       margin-top: 1rem;
+      flex-shrink: 0;
 
       &__input {
         box-sizing: border-box;
