@@ -265,7 +265,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement
   | ExcalidrawFrameElement
-  | ExcalidrawMagicFrameElement;
+  | ExcalidrawMagicFrameElement
+  | ExcalidrawArrowElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
