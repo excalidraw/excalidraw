@@ -65,7 +65,8 @@ import {
   LassoIcon,
   ImageIcon,
   LaTeXIcon,
-  InsertAnyFileIcon, //zsviczian
+  InsertAnyFileIcon,
+  Card, //zsviczian
 } from "./icons";
 
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
@@ -415,6 +416,13 @@ export const ShapesSwitcher = ({
             data-testid="toolbar-any-file"
           >
             {t2("COMP_IMG_ANY_FILE")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => runAction("card")}
+            icon={Card}
+            data-testid="toolbar-card"
+          >
+            {t2("INSERT_CARD")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => runAction("LaTeX")}
