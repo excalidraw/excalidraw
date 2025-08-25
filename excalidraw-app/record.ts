@@ -1,3 +1,5 @@
+import { isDevEnv } from "@excalidraw/common";
+
 declare global {
   interface Window {
     record: typeof Record;
@@ -5,13 +7,18 @@ declare global {
 }
 
 export class Record {
+  private static recording: boolean = false;
   private static events: string = "";
   private static timestamp: number = 0;
 
-  public static start() {
+  public static get isRecording() {
+    return Record.recording;
+  }
+
+  private static header() {
     Record.events += `  await page.setViewportSize({ width: ${window.innerWidth}, height: ${window.innerHeight} });\n`;
-    Record.events += `await page.goto("http://localhost:3000");\n`;
-    Record.events += `await page.waitForLoadState("load");\n`;
+    Record.events += `  await page.goto("http://localhost:3000");\n`;
+    Record.events += `  await page.waitForLoadState("load");\n`;
 
     // Capture LocalStorage, which is essential to re-establish state
     Record.events += "  await page.evaluate(() => {\n";
@@ -26,6 +33,27 @@ export class Record {
     Record.events += "  });\n";
     Record.events += "  await page.reload();\n";
     Record.events += `  await page.waitForLoadState("load");\n`;
+  }
+
+  public static restart() {
+    if (!Record.recording) {
+      Record.start();
+      return;
+    }
+
+    Record.events += `});\n\n`;
+    Record.events += `test("${
+      Date.now() + Math.floor(Math.random() * Date.now()).toString(36)
+    }", async ({ page }) => {\n`;
+
+    Record.header();
+  }
+
+  public static start() {
+    Record.recording = true;
+
+    // Record header
+    this.header();
 
     // Set up the events
     Record.timestamp = performance.now();
@@ -43,11 +71,16 @@ export class Record {
     window.removeEventListener("mouseup", this.onMouseUp);
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("keyup", this.onKeyUp);
+    Record.recording = false;
   }
 
   /// Displays a window as an absolutely positioned DIV with the generated
   /// events within <pre> tags as formatted JSON, so it can be copied easily.
   public static showGeneratedEvents() {
+    if (Record.recording) {
+      Record.stop();
+    }
+
     const div = document.createElement("div");
     div.style.position = "absolute";
     div.style.top = "10px";
@@ -59,8 +92,17 @@ export class Record {
     div.style.zIndex = "10000";
 
     const pre = document.createElement("pre");
-    pre.textContent = this.events;
-    // avoid overlap with the close button and limit height for large event dumps
+
+    let textContent = `import { expect, test } from "@playwright/test";\n\n`;
+    textContent += `test("${
+      Date.now() + Math.floor(Math.random() * Date.now()).toString(36)
+    }", async ({ page }) => {\n`;
+    textContent += Record.events;
+    textContent += `});\n`;
+
+    pre.textContent = textContent;
+    //pre.textContent = Record.events;
+
     pre.style.marginTop = "18px";
     pre.style.maxHeight = "60vh";
     pre.style.overflow = "auto";
@@ -173,31 +215,57 @@ export class Record {
   }
 
   private static onKeyDown(event: KeyboardEvent) {
-    const now = event.timeStamp || performance.now();
-    const delay = now - Record.timestamp;
-    Record.timestamp = now;
+    // Only record if the recording key is not pressed
+    if (event.key !== "F2") {
+      const now = event.timeStamp || performance.now();
+      const delay = now - Record.timestamp;
+      Record.timestamp = now;
 
-    if (delay > 0) {
-      Record.events += `  await page.waitForTimeout(${delay});\n`;
+      if (delay > 0) {
+        Record.events += `  await page.waitForTimeout(${delay});\n`;
+      }
+      Record.events += `  await page.keyboard.down("${event.key}");\n`;
     }
-    Record.events += `  await page.keyboard.down("${event.key}");\n`;
   }
 
   private static onKeyUp(event: KeyboardEvent) {
-    const now = event.timeStamp || performance.now();
-    const delay = now - Record.timestamp;
-    Record.timestamp = now;
+    // Only record if the recording key is not pressed
+    if (event.key !== "F2") {
+      const now = event.timeStamp || performance.now();
+      const delay = now - Record.timestamp;
+      Record.timestamp = now;
 
-    if (delay > 0) {
-      Record.events += `  await page.waitForTimeout(${delay});\n`;
+      if (delay > 0) {
+        Record.events += `  await page.waitForTimeout(${delay});\n`;
+      }
+      Record.events += `  await page.keyboard.up("${event.key}");\n`;
+
+      Record.events += "  await expect(page).toHaveScreenshot({\n";
+      Record.events += "    maxDiffPixels: 100,\n";
+      Record.events += "    maxDiffPixelRatio: 0.01,\n";
+      Record.events += "  });\n";
     }
-    Record.events += `  await page.keyboard.up("${event.key}");\n`;
-
-    Record.events += "  await expect(page).toHaveScreenshot({\n";
-    Record.events += "    maxDiffPixels: 100,\n";
-    Record.events += "    maxDiffPixelRatio: 0.01,\n";
-    Record.events += "  });\n";
   }
 }
 
-window.record = Record;
+if (isDevEnv()) {
+  window.record = Record;
+
+  window.addEventListener("keyup", (event) => {
+    if (event.key === "F2") {
+      if (Record.isRecording) {
+        if (event.ctrlKey) {
+          console.info("Stopping Playwright recording");
+          Record.stop();
+        } else {
+          Record.restart();
+        }
+      } else {
+        console.info("Starting Playwright recording");
+        Record.start();
+      }
+    } else if (event.key === "Enter" && event.ctrlKey) {
+      Record.showGeneratedEvents();
+    }
+  });
+}
