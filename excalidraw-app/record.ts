@@ -4,55 +4,37 @@ declare global {
   }
 }
 
-export type PlaybackEvent = (
-  | {
-      type: "mouse.move";
-      x: number;
-      y: number;
-    }
-  | {
-      type: "mouse.down" | "mouse.up";
-      button: "left" | "right" | "middle";
-    }
-  | {
-      type: "keyboard.down" | "keyboard.up";
-      key: string;
-    }
-  | {
-      type: "header";
-      width: number;
-      height: number;
-      localStorage: { [key: string]: string };
-    }
-) & {
-  delay: number;
-};
-
 export class Record {
-  private static events: PlaybackEvent[] = [];
+  private static events: string = "";
   private static timestamp: number = 0;
 
   public static start() {
+    Record.events += `  await page.setViewportSize({ width: ${window.innerWidth}, height: ${window.innerHeight} });\n`;
+    Record.events += `await page.goto("http://localhost:3000");`;
+    Record.events += `await page.waitForLoadState("load");`;
+
+    // Record.events += "  const mask = [\n";
+    // Record.events += `    page.getByRole("button", { name: "Share" }),\n`;
+    // Record.events += `    page.getByTitle("Library").locator("div"),\n`;
+    // Record.events += "  ];\n";
+
     // capture a snapshot of localStorage (if available) to include in the header
-    const lsSnapshot: { [key: string]: string } = {};
+    Record.events += "  await page.evaluate(() => {\n";
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key != null) {
-          lsSnapshot[key] = localStorage.getItem(key) ?? "";
+          const value = JSON.stringify(localStorage.getItem(key));
+          Record.events += `    localStorage.getItem("${key}");\n`;
+          Record.events += `    localStorage.setItem("${key}", ${value});\n`;
         }
       }
     } catch {}
+    Record.events += "  });\n";
+    Record.events += "  await page.reload();\n";
+    Record.events += `  await page.waitForLoadState("load");\n`;
 
-    Record.events = [
-      {
-        type: "header",
-        width: window.innerWidth,
-        height: window.innerHeight,
-        localStorage: lsSnapshot,
-        delay: 0,
-      },
-    ];
+    // Set up the events
     Record.timestamp = performance.now();
 
     window.addEventListener("mousemove", this.onMouseMove);
@@ -60,17 +42,6 @@ export class Record {
     window.addEventListener("mouseup", this.onMouseUp);
     window.addEventListener("keydown", this.onKeyDown);
     window.addEventListener("keyup", this.onKeyUp);
-
-    try {
-      const canvases = Array.from(
-        document.querySelectorAll("canvas"),
-      ) as HTMLCanvasElement[];
-      for (const c of canvases) {
-        c.addEventListener("mousemove", this.onMouseMove);
-        c.addEventListener("mousedown", this.onMouseDown);
-        c.addEventListener("mouseup", this.onMouseUp);
-      }
-    } catch {}
   }
 
   public static stop() {
@@ -79,18 +50,6 @@ export class Record {
     window.removeEventListener("mouseup", this.onMouseUp);
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("keyup", this.onKeyUp);
-
-    // Remove listeners from any canvases we attached to
-    try {
-      const canvases = Array.from(
-        document.querySelectorAll("canvas"),
-      ) as HTMLCanvasElement[];
-      for (const c of canvases) {
-        c.removeEventListener("mousemove", this.onMouseMove);
-        c.removeEventListener("mousedown", this.onMouseDown);
-        c.removeEventListener("mouseup", this.onMouseUp);
-      }
-    } catch {}
   }
 
   /// Displays a window as an absolutely positioned DIV with the generated
@@ -107,7 +66,7 @@ export class Record {
     div.style.zIndex = "10000";
 
     const pre = document.createElement("pre");
-    pre.textContent = JSON.stringify(this.events, null, 2);
+    pre.textContent = this.events;
     // avoid overlap with the close button and limit height for large event dumps
     pre.style.marginTop = "18px";
     pre.style.maxHeight = "60vh";
@@ -183,12 +142,10 @@ export class Record {
     const delay = now - Record.timestamp;
     Record.timestamp = now;
 
-    Record.events.push({
-      type: "mouse.move",
-      x: event.clientX,
-      y: event.clientY,
-      delay,
-    });
+    if (delay > 0) {
+      Record.events += `  await page.waitForTimeout(${delay});\n`;
+    }
+    Record.events += `  await page.mouse.move(${event.clientX}, ${event.clientY});\n`;
   }
 
   private static onMouseDown(event: MouseEvent) {
@@ -196,12 +153,12 @@ export class Record {
     const delay = now - Record.timestamp;
     Record.timestamp = now;
 
-    Record.events.push({
-      type: "mouse.down",
-      button:
-        event.button === 0 ? "left" : event.button === 1 ? "middle" : "right",
-      delay,
-    });
+    if (delay > 0) {
+      Record.events += `  await page.waitForTimeout(${delay});\n`;
+    }
+    const button =
+      event.button === 0 ? "left" : event.button === 1 ? "middle" : "right";
+    Record.events += `  await page.mouse.down({ button: "${button}" });\n`;
   }
 
   private static onMouseUp(event: MouseEvent) {
@@ -209,12 +166,15 @@ export class Record {
     const delay = now - Record.timestamp;
     Record.timestamp = now;
 
-    Record.events.push({
-      type: "mouse.up",
-      button:
-        event.button === 0 ? "left" : event.button === 1 ? "middle" : "right",
-      delay,
-    });
+    if (delay > 0) {
+      Record.events += `  await page.waitForTimeout(${delay});\n`;
+    }
+    const button =
+      event.button === 0 ? "left" : event.button === 1 ? "middle" : "right";
+    Record.events += `  await page.mouse.down({ button: "${button}" });\n`;
+
+    Record.events +=
+      "  await expect(page).toHaveScreenshot({ maxDiffPixels: 100 });\n";
   }
 
   private static onKeyDown(event: KeyboardEvent) {
@@ -222,11 +182,10 @@ export class Record {
     const delay = now - Record.timestamp;
     Record.timestamp = now;
 
-    Record.events.push({
-      type: "keyboard.down",
-      key: event.key,
-      delay,
-    });
+    if (delay > 0) {
+      Record.events += `  await page.waitForTimeout(${delay});\n`;
+    }
+    Record.events += `  await page.keyboard.down("${event.key}");\n`;
   }
 
   private static onKeyUp(event: KeyboardEvent) {
@@ -234,11 +193,13 @@ export class Record {
     const delay = now - Record.timestamp;
     Record.timestamp = now;
 
-    Record.events.push({
-      type: "keyboard.up",
-      key: event.key,
-      delay,
-    });
+    if (delay > 0) {
+      Record.events += `  await page.waitForTimeout(${delay});\n`;
+    }
+    Record.events += `  await page.keyboard.up("${event.key}");\n`;
+
+    Record.events +=
+      "  await expect(page).toHaveScreenshot({ maxDiffPixels: 100 });\n";
   }
 }
 

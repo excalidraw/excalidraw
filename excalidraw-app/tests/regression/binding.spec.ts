@@ -1,2979 +1,1348 @@
-import { test } from "@playwright/test";
-
-import { playbackEvents } from "./test-utils";
+import { expect, test } from "@playwright/test";
 
 test("bind inside rectangle", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 882 });
   await page.goto("http://localhost:3000");
-  await playbackEvents(page, [
-    {
-      type: "header",
-      width: 1280,
-      height: 881,
-      localStorage: {
-        i18nextLng: "en",
-        "excalidraw-collab": '{"username":"Powerful Lark"}',
-        "excalidraw-debug": '{"enabled":false}',
-        "excalidraw-theme": "dark",
-        "version-files": "1755704371463",
-        "version-dataState": "1755704371463",
-        "excalidraw-state":
-          '{"showWelcomeScreen":true,"theme":"dark","currentChartType":"bar","currentItemBackgroundColor":"transparent","currentItemEndArrowhead":"arrow","currentItemFillStyle":"solid","currentItemFontFamily":5,"currentItemFontSize":20,"currentItemOpacity":100,"currentItemRoughness":0,"currentItemStartArrowhead":null,"currentItemStrokeColor":"#1e1e1e","currentItemRoundness":"round","currentItemArrowType":"round","currentItemStrokeStyle":"solid","currentItemStrokeWidth":2,"currentItemTextAlign":"left","cursorButton":"up","editingGroupId":null,"activeTool":{"type":"selection","customType":null,"locked":false,"fromSelection":false,"lastActiveTool":null},"penMode":false,"penDetected":false,"exportBackground":true,"exportScale":1,"exportEmbedScene":false,"exportWithDarkMode":false,"gridSize":20,"gridStep":5,"gridModeEnabled":false,"defaultSidebarDockedPreference":false,"lastPointerDownWith":"mouse","name":"Untitled-2025-07-28-1603","openMenu":null,"openSidebar":null,"previousSelectedElementIds":{"wvpIyGYBqzOihspy0kz_P":true},"scrolledOutside":false,"scrollX":27.9140625,"scrollY":324.26953125,"selectedElementIds":{},"selectedGroupIds":{},"shouldCacheIgnoreZoom":false,"stats":{"open":false,"panels":3},"viewBackgroundColor":"#ffffff","zenModeEnabled":false,"zoom":{"value":1},"selectedLinearElement":null,"objectsSnapModeEnabled":false,"lockedMultiSelections":{}}',
-        excalidraw:
-          '[{"id":"wvpIyGYBqzOihspy0kz_P","type":"rectangle","x":446.37109375,"y":-41.66796875,"width":180.14453125,"height":182.64453125,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":0,"opacity":100,"groupIds":[],"frameId":null,"index":"a0","roundness":{"type":3},"seed":144460829,"version":64,"versionNonce":440113181,"isDeleted":false,"boundElements":null,"updated":1755704368956,"link":null,"locked":false}]',
-      },
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 498,
-      y: 141,
-      delay: 676.8000000007451,
-    },
-    {
-      type: "mouse.move",
-      x: 498,
-      y: 141,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 494,
-      y: 140,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 494,
-      y: 140,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 481,
-      y: 135,
-      delay: 7.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 481,
-      y: 135,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 456,
-      y: 127,
-      delay: 6.900000002235174,
-    },
-    {
-      type: "mouse.move",
-      x: 456,
-      y: 127,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 436,
-      y: 123,
-      delay: 7.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 436,
-      y: 123,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 435,
-      y: 123,
-      delay: 0.9000000022351742,
-    },
-    {
-      type: "mouse.move",
-      x: 435,
-      y: 123,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 428,
-      y: 122,
-      delay: 27.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 428,
-      y: 122,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 421,
-      y: 120,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 421,
-      y: 120,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 424,
-      y: 118,
-      delay: 74,
-    },
-    {
-      type: "mouse.move",
-      x: 424,
-      y: 118,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 433,
-      y: 115,
-      delay: 9,
-    },
-    {
-      type: "mouse.move",
-      x: 433,
-      y: 115,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 439,
-      y: 114,
-      delay: 5.900000002235174,
-    },
-    {
-      type: "mouse.move",
-      x: 439,
-      y: 114,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 441,
-      y: 111,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 441,
-      y: 111,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 442,
-      y: 109,
-      delay: 9,
-    },
-    {
-      type: "mouse.move",
-      x: 442,
-      y: 109,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 443,
-      y: 109,
-      delay: 2.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 443,
-      y: 109,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 445,
-      y: 108,
-      delay: 10.900000002235174,
-    },
-    {
-      type: "mouse.move",
-      x: 445,
-      y: 108,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 449,
-      y: 108,
-      delay: 8.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 449,
-      y: 108,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 452,
-      y: 105,
-      delay: 6.900000002235174,
-    },
-    {
-      type: "mouse.move",
-      x: 452,
-      y: 105,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 459,
-      y: 104,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 459,
-      y: 104,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 465,
-      y: 102,
-      delay: 7.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 465,
-      y: 102,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 470,
-      y: 101,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 470,
-      y: 101,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 474,
-      y: 99,
-      delay: 7.900000002235174,
-    },
-    {
-      type: "mouse.move",
-      x: 474,
-      y: 99,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 483,
-      y: 91,
-      delay: 7.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 483,
-      y: 91,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 496,
-      y: 87,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 496,
-      y: 87,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 505,
-      y: 83,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 505,
-      y: 83,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 518,
-      y: 78,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 518,
-      y: 78,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 529,
-      y: 70,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 529,
-      y: 70,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 536,
-      y: 67,
-      delay: 6.900000002235174,
-    },
-    {
-      type: "mouse.move",
-      x: 536,
-      y: 67,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 541,
-      y: 65,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 541,
-      y: 65,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 64,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 64,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 64,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 64,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 544,
-      y: 64,
-      delay: 86.09999999776483,
-    },
-    {
-      type: "mouse.move",
-      x: 544,
-      y: 64,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 546,
-      y: 63,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 550,
-      y: 63,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 555,
-      y: 60,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 556,
-      y: 59,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 561,
-      y: 58,
-      delay: 9,
-    },
-    {
-      type: "mouse.move",
-      x: 567,
-      y: 56,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 572,
-      y: 50,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 576,
-      y: 49,
-      delay: 6.900000002235174,
-    },
-    {
-      type: "mouse.move",
-      x: 579,
-      y: 48,
-      delay: 5.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 585,
-      y: 45,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 587,
-      y: 45,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 588,
-      y: 41,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 589,
-      y: 41,
-      delay: 3,
-    },
-    {
-      type: "mouse.move",
-      x: 590,
-      y: 40,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 592,
-      y: 40,
-      delay: 13,
-    },
-    {
-      type: "mouse.move",
-      x: 593,
-      y: 39,
-      delay: 4,
-    },
-    {
-      type: "mouse.move",
-      x: 595,
-      y: 39,
-      delay: 9.900000002235174,
-    },
-    {
-      type: "mouse.move",
-      x: 596,
-      y: 39,
-      delay: 4.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 597,
-      y: 39,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 600,
-      y: 36,
-      delay: 12,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 36,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 602,
-      y: 36,
-      delay: 37,
-    },
-    {
-      type: "mouse.move",
-      x: 602,
-      y: 36,
-      delay: 75.30000000074506,
-    },
-    {
-      type: "mouse.move",
-      x: 605,
-      y: 36,
-      delay: 7.699999999254942,
-    },
-    {
-      type: "mouse.move",
-      x: 607,
-      y: 35,
-      delay: 1.9000000022351742,
-    },
-    {
-      type: "mouse.move",
-      x: 609,
-      y: 35,
-      delay: 11.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 610,
-      y: 35,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 611,
-      y: 34,
-      delay: 11,
-    },
-    {
-      type: "mouse.move",
-      x: 612,
-      y: 34,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 613,
-      y: 33,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 615,
-      y: 33,
-      delay: 9,
-    },
-    {
-      type: "mouse.move",
-      x: 616,
-      y: 33,
-      delay: 9,
-    },
-    {
-      type: "mouse.move",
-      x: 618,
-      y: 32,
-      delay: 13,
-    },
-    {
-      type: "mouse.move",
-      x: 619,
-      y: 32,
-      delay: 3,
-    },
-    {
-      type: "mouse.move",
-      x: 621,
-      y: 31,
-      delay: 9.900000002235174,
-    },
-    {
-      type: "mouse.move",
-      x: 623,
-      y: 31,
-      delay: 13.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 625,
-      y: 31,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 626,
-      y: 31,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 627,
-      y: 30,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 629,
-      y: 30,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 633,
-      y: 29,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 634,
-      y: 28,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 637,
-      y: 28,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 639,
-      y: 28,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 640,
-      y: 28,
-      delay: 4,
-    },
-    {
-      type: "mouse.move",
-      x: 641,
-      y: 28,
-      delay: 5.900000002235174,
-    },
-    {
-      type: "mouse.down",
-      button: "left",
-      delay: 617.0999999977648,
-    },
-    {
-      type: "mouse.up",
-      button: "left",
-      delay: 80,
-    },
-    {
-      type: "mouse.move",
-      x: 641,
-      y: 30,
-      delay: 65.10000000149012,
-    },
-    {
-      type: "mouse.move",
-      x: 640,
-      y: 33,
-      delay: 6.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 638,
-      y: 34,
-      delay: 7.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 637,
-      y: 37,
-      delay: 6.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 636,
-      y: 41,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 634,
-      y: 42,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 632,
-      y: 46,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 627,
-      y: 54,
-      delay: 6.900000002235174,
-    },
-    {
-      type: "mouse.move",
-      x: 622,
-      y: 62,
-      delay: 7.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 616,
-      y: 74,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 616,
-      y: 74,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 614,
-      y: 82,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 614,
-      y: 82,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 611,
-      y: 94,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 611,
-      y: 94,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 607,
-      y: 104,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 607,
-      y: 104,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 605,
-      y: 116,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 605,
-      y: 116,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 603,
-      y: 126,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 603,
-      y: 126,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 600,
-      y: 136,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 600,
-      y: 136,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 600,
-      y: 148,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 600,
-      y: 148,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 599,
-      y: 152,
-      delay: 5.900000002235174,
-    },
-    {
-      type: "mouse.move",
-      x: 599,
-      y: 152,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 598,
-      y: 156,
-      delay: 7.099999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 598,
-      y: 156,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 594,
-      y: 159,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 594,
-      y: 159,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 595,
-      y: 162,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 595,
-      y: 162,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 595,
-      y: 163,
-      delay: 4,
-    },
-    {
-      type: "mouse.move",
-      x: 595,
-      y: 163,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 594,
-      y: 165,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 594,
-      y: 165,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 594,
-      y: 166,
-      delay: 6.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 594,
-      y: 166,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 593,
-      y: 167,
-      delay: 8.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 593,
-      y: 167,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 592,
-      y: 168,
-      delay: 4,
-    },
-    {
-      type: "mouse.move",
-      x: 592,
-      y: 168,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 591,
-      y: 169,
-      delay: 11,
-    },
-    {
-      type: "mouse.move",
-      x: 591,
-      y: 169,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 591,
-      y: 170,
-      delay: 5.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 591,
-      y: 170,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 589,
-      y: 171,
-      delay: 8.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 589,
-      y: 171,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 589,
-      y: 174,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 589,
-      y: 174,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 589,
-      y: 176,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 589,
-      y: 176,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 589,
-      y: 178,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 589,
-      y: 178,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 588,
-      y: 178,
-      delay: 3.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 588,
-      y: 178,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 588,
-      y: 180,
-      delay: 13,
-    },
-    {
-      type: "mouse.move",
-      x: 588,
-      y: 180,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 587,
-      y: 183,
-      delay: 6.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 587,
-      y: 183,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 586,
-      y: 184,
-      delay: 3.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 586,
-      y: 184,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 585,
-      y: 187,
-      delay: 9.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 585,
-      y: 187,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 584,
-      y: 188,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 584,
-      y: 188,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 584,
-      y: 191,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 584,
-      y: 191,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 582,
-      y: 194,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 582,
-      y: 194,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 581,
-      y: 197,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 581,
-      y: 197,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 580,
-      y: 197,
-      delay: 5.400000002235174,
-    },
-    {
-      type: "mouse.move",
-      x: 580,
-      y: 197,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 580,
-      y: 199,
-      delay: 6.599999997764826,
-    },
-    {
-      type: "mouse.move",
-      x: 580,
-      y: 199,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 579,
-      y: 202,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 579,
-      y: 202,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 576,
-      y: 205,
-      delay: 9.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 576,
-      y: 205,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 576,
-      y: 206,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 576,
-      y: 206,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 574,
-      y: 210,
-      delay: 7.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 574,
-      y: 210,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 573,
-      y: 217,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 573,
-      y: 217,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 570,
-      y: 219,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 570,
-      y: 219,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 568,
-      y: 228,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 568,
-      y: 228,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 568,
-      y: 232,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 568,
-      y: 232,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 567,
-      y: 234,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 567,
-      y: 234,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 566,
-      y: 238,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 566,
-      y: 238,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 562,
-      y: 243,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 562,
-      y: 243,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 561,
-      y: 247,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 561,
-      y: 247,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 560,
-      y: 250,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 560,
-      y: 250,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 557,
-      y: 251,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 557,
-      y: 251,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 556,
-      y: 253,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 556,
-      y: 253,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 554,
-      y: 255,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 554,
-      y: 255,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 553,
-      y: 260,
-      delay: 8.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 553,
-      y: 260,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 552,
-      y: 264,
-      delay: 5.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 552,
-      y: 264,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 550,
-      y: 268,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 550,
-      y: 268,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 546,
-      y: 271,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 546,
-      y: 271,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 277,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 277,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 281,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 281,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 282,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 282,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 284,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 284,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 285,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 285,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 286,
-      delay: 10.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 286,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 286,
-      delay: 12.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 286,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 544,
-      y: 287,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 544,
-      y: 287,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 547,
-      y: 288,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 547,
-      y: 288,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 547,
-      y: 289,
-      delay: 76,
-    },
-    {
-      type: "mouse.move",
-      x: 547,
-      y: 289,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 547,
-      y: 290,
-      delay: 29,
-    },
-    {
-      type: "mouse.move",
-      x: 547,
-      y: 290,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 547,
-      y: 291,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 547,
-      y: 291,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 546,
-      y: 291,
-      delay: 5.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 546,
-      y: 291,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 546,
-      y: 292,
-      delay: 4.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 546,
-      y: 292,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 545,
-      y: 293,
-      delay: 9,
-    },
-    {
-      type: "mouse.move",
-      x: 545,
-      y: 293,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 545,
-      y: 294,
-      delay: 4,
-    },
-    {
-      type: "mouse.move",
-      x: 545,
-      y: 294,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 545,
-      y: 295,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 545,
-      y: 295,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 296,
-      delay: 10,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 296,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 297,
-      delay: 72,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 297,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 298,
-      delay: 8.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 298,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 299,
-      delay: 6.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 299,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 300,
-      delay: 19,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 300,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 541,
-      y: 300,
-      delay: 15.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 541,
-      y: 300,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 541,
-      y: 301,
-      delay: 12.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 541,
-      y: 301,
-      delay: 0,
-    },
-    {
-      type: "mouse.down",
-      button: "left",
-      delay: 69,
-    },
-    {
-      type: "mouse.down",
-      button: "left",
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 541,
-      y: 301,
-      delay: 12.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 541,
-      y: 301,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 301,
-      delay: 52.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 301,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 302,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 542,
-      y: 302,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 303,
-      delay: 10,
-    },
-    {
-      type: "mouse.move",
-      x: 543,
-      y: 303,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 544,
-      y: 306,
-      delay: 9,
-    },
-    {
-      type: "mouse.move",
-      x: 544,
-      y: 306,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 545,
-      y: 308,
-      delay: 8.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 545,
-      y: 308,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 546,
-      y: 309,
-      delay: 5.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 546,
-      y: 309,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 547,
-      y: 310,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 547,
-      y: 310,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 548,
-      y: 313,
-      delay: 6.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 548,
-      y: 313,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 551,
-      y: 316,
-      delay: 9.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 551,
-      y: 316,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 552,
-      y: 320,
-      delay: 6.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 552,
-      y: 320,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 556,
-      y: 327,
-      delay: 4.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 556,
-      y: 327,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 563,
-      y: 336,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 563,
-      y: 336,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 564,
-      y: 342,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 564,
-      y: 342,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 569,
-      y: 347,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 569,
-      y: 347,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 572,
-      y: 352,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 572,
-      y: 352,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 572,
-      y: 355,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 572,
-      y: 355,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 572,
-      y: 357,
-      delay: 5.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 572,
-      y: 357,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 573,
-      y: 358,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 573,
-      y: 358,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 574,
-      y: 361,
-      delay: 7.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 574,
-      y: 361,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 577,
-      y: 365,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 577,
-      y: 365,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 578,
-      y: 367,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 578,
-      y: 367,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 579,
-      y: 370,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 579,
-      y: 370,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 580,
-      y: 376,
-      delay: 7.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 580,
-      y: 376,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 583,
-      y: 382,
-      delay: 6.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 583,
-      y: 382,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 585,
-      y: 385,
-      delay: 7.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 585,
-      y: 385,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 586,
-      y: 390,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 586,
-      y: 390,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 589,
-      y: 395,
-      delay: 6.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 589,
-      y: 395,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 592,
-      y: 399,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 592,
-      y: 399,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 593,
-      y: 401,
-      delay: 5.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 593,
-      y: 401,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 594,
-      y: 403,
-      delay: 5.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 594,
-      y: 403,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 597,
-      y: 407,
-      delay: 10.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 597,
-      y: 407,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 597,
-      y: 412,
-      delay: 6.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 597,
-      y: 412,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 600,
-      y: 417,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 600,
-      y: 417,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 419,
-      delay: 8.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 419,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 421,
-      delay: 6.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 421,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 424,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 424,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 602,
-      y: 426,
-      delay: 9,
-    },
-    {
-      type: "mouse.move",
-      x: 602,
-      y: 426,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 602,
-      y: 427,
-      delay: 2,
-    },
-    {
-      type: "mouse.move",
-      x: 602,
-      y: 427,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 603,
-      y: 428,
-      delay: 9,
-    },
-    {
-      type: "mouse.move",
-      x: 603,
-      y: 428,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 429,
-      delay: 6,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 429,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 430,
-      delay: 11,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 430,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 431,
-      delay: 4,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 431,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 433,
-      delay: 10,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 433,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 434,
-      delay: 7.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 434,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 435,
-      delay: 3,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 435,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 436,
-      delay: 5.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 436,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 437,
-      delay: 17.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 437,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 605,
-      y: 437,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 605,
-      y: 437,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 605,
-      y: 438,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 605,
-      y: 438,
-      delay: 0,
-    },
-    {
-      type: "mouse.up",
-      button: "left",
-      delay: 273.8999999985099,
-    },
-    {
-      type: "mouse.up",
-      button: "left",
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 438,
-      delay: 25.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 438,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 437,
-      delay: 6.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 437,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 603,
-      y: 437,
-      delay: 2.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 603,
-      y: 437,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 603,
-      y: 436,
-      delay: 12,
-    },
-    {
-      type: "mouse.move",
-      x: 603,
-      y: 436,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 436,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 436,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 600,
-      y: 436,
-      delay: 5.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 600,
-      y: 436,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 436,
-      delay: 146.10000000149012,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 436,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 437,
-      delay: 7.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 601,
-      y: 437,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 602,
-      y: 437,
-      delay: 1,
-    },
-    {
-      type: "mouse.move",
-      x: 602,
-      y: 437,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 602,
-      y: 438,
-      delay: 46.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 602,
-      y: 438,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 439,
-      delay: 15.199999999254942,
-    },
-    {
-      type: "mouse.move",
-      x: 604,
-      y: 439,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 605,
-      y: 440,
-      delay: 5.699999999254942,
-    },
-    {
-      type: "mouse.move",
-      x: 605,
-      y: 440,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 606,
-      y: 441,
-      delay: 6.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 606,
-      y: 441,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 607,
-      y: 442,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 607,
-      y: 442,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 609,
-      y: 444,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 609,
-      y: 444,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 610,
-      y: 446,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 610,
-      y: 446,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 610,
-      y: 447,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 610,
-      y: 447,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 610,
-      y: 448,
-      delay: 5,
-    },
-    {
-      type: "mouse.move",
-      x: 610,
-      y: 448,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 610,
-      y: 449,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 610,
-      y: 449,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 611,
-      y: 450,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 611,
-      y: 450,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 611,
-      y: 451,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 611,
-      y: 451,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 612,
-      y: 455,
-      delay: 11,
-    },
-    {
-      type: "mouse.move",
-      x: 612,
-      y: 455,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 613,
-      y: 459,
-      delay: 5.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 613,
-      y: 459,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 614,
-      y: 463,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 614,
-      y: 463,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 616,
-      y: 469,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 616,
-      y: 469,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 618,
-      y: 484,
-      delay: 7.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 618,
-      y: 484,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 616,
-      y: 495,
-      delay: 5.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 616,
-      y: 495,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 617,
-      y: 503,
-      delay: 6.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 617,
-      y: 503,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 615,
-      y: 512,
-      delay: 7.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 615,
-      y: 512,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 614,
-      y: 520,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 614,
-      y: 520,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 614,
-      y: 528,
-      delay: 7.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 614,
-      y: 528,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 612,
-      y: 540,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 612,
-      y: 540,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 612,
-      y: 552,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 612,
-      y: 552,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 610,
-      y: 571,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 610,
-      y: 571,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 608,
-      y: 588,
-      delay: 5.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 608,
-      y: 588,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 606,
-      y: 611,
-      delay: 8,
-    },
-    {
-      type: "mouse.move",
-      x: 606,
-      y: 611,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 602,
-      y: 635,
-      delay: 7.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 602,
-      y: 635,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 590,
-      y: 661,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 590,
-      y: 661,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 582,
-      y: 683,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 582,
-      y: 683,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 570,
-      y: 708,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 570,
-      y: 708,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 560,
-      y: 730,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 560,
-      y: 730,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 552,
-      y: 750,
-      delay: 6.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 552,
-      y: 750,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 545,
-      y: 771,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 545,
-      y: 771,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 535,
-      y: 787,
-      delay: 7.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 535,
-      y: 787,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 525,
-      y: 804,
-      delay: 6.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 525,
-      y: 804,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 521,
-      y: 815,
-      delay: 6.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 521,
-      y: 815,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 514,
-      y: 828,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 514,
-      y: 828,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 509,
-      y: 839,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 509,
-      y: 839,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 502,
-      y: 846,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 502,
-      y: 846,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 497,
-      y: 851,
-      delay: 6.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 497,
-      y: 851,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 493,
-      y: 856,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 493,
-      y: 856,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 491,
-      y: 860,
-      delay: 6.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 491,
-      y: 860,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 485,
-      y: 865,
-      delay: 7.899999998509884,
-    },
-    {
-      type: "mouse.move",
-      x: 485,
-      y: 865,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 481,
-      y: 868,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 481,
-      y: 868,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 476,
-      y: 872,
-      delay: 7,
-    },
-    {
-      type: "mouse.move",
-      x: 476,
-      y: 872,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 470,
-      y: 879,
-      delay: 7.100000001490116,
-    },
-    {
-      type: "mouse.move",
-      x: 470,
-      y: 879,
-      delay: 0,
-    },
-    {
-      type: "mouse.move",
-      x: 469,
-      y: 880,
-      delay: 4,
-    },
-    {
-      type: "mouse.move",
-      x: 469,
-      y: 880,
-      delay: 0,
-    },
-  ]);
+  await page.waitForLoadState("load");
+  await page.evaluate(() => {
+    localStorage.getItem("i18nextLng");
+    localStorage.setItem("i18nextLng", "en");
+    localStorage.getItem("excalidraw-debug");
+    localStorage.setItem("excalidraw-debug", '{"enabled":true}');
+    localStorage.getItem("excalidraw-theme");
+    localStorage.setItem("excalidraw-theme", "dark");
+    localStorage.getItem("version-files");
+    localStorage.setItem("version-files", "1756111213393");
+    localStorage.getItem("version-dataState");
+    localStorage.setItem("version-dataState", "1756111213393");
+    localStorage.getItem("excalidraw-state");
+    localStorage.setItem(
+      "excalidraw-state",
+      '{"showWelcomeScreen":true,"theme":"dark","currentChartType":"bar","currentItemBackgroundColor":"#a5d8ff","currentItemEndArrowhead":"arrow","currentItemFillStyle":"solid","currentItemFontFamily":5,"currentItemFontSize":20,"currentItemOpacity":100,"currentItemRoughness":1,"currentItemStartArrowhead":null,"currentItemStrokeColor":"#1e1e1e","currentItemRoundness":"round","currentItemArrowType":"round","currentItemStrokeStyle":"solid","currentItemStrokeWidth":2,"currentItemTextAlign":"left","cursorButton":"up","editingGroupId":null,"activeTool":{"type":"arrow","customType":null,"locked":false,"fromSelection":false,"lastActiveTool":null},"penMode":false,"penDetected":false,"exportBackground":true,"exportScale":1,"exportEmbedScene":false,"exportWithDarkMode":false,"gridSize":20,"gridStep":5,"gridModeEnabled":false,"defaultSidebarDockedPreference":false,"lastPointerDownWith":"mouse","name":"Untitled-2025-07-28-1603","openMenu":null,"openSidebar":null,"previousSelectedElementIds":{"taQ8ZYjvYILhvctYZeOBQ":true},"scrolledOutside":false,"scrollX":175.9296875,"scrollY":138.953125,"selectedElementIds":{},"selectedGroupIds":{},"shouldCacheIgnoreZoom":false,"stats":{"open":true,"panels":3},"viewBackgroundColor":"#ffffff","zenModeEnabled":false,"zoom":{"value":1},"selectedLinearElement":null,"objectsSnapModeEnabled":false,"lockedMultiSelections":{}}',
+    );
+    localStorage.getItem("excalidraw");
+    localStorage.setItem(
+      "excalidraw",
+      '[{"id":"taQ8ZYjvYILhvctYZeOBQ","type":"rectangle","x":326.65625,"y":108.56640625,"width":152.3125,"height":155.8984375,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#a5d8ff","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":[],"frameId":null,"index":"a0","roundness":{"type":3},"seed":931993510,"version":31,"versionNonce":293489658,"isDeleted":false,"boundElements":null,"updated":1756111208666,"link":null,"locked":false},{"id":"yCc7KfoxarVPfeqY0-eks","type":"rectangle","x":538.9140625,"y":408.7890625,"width":152.3125,"height":155.8984375,"angle":0,"strokeColor":"#1e1e1e","backgroundColor":"#a5d8ff","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":1,"opacity":100,"groupIds":[],"frameId":null,"index":"a1","roundness":{"type":3},"seed":958768486,"version":101,"versionNonce":671723750,"isDeleted":false,"boundElements":null,"updated":1756111209235,"link":null,"locked":false}]',
+    );
+  });
+  await page.reload();
+  await page.waitForLoadState("load");
+  await page.waitForTimeout(816.0999999996275);
+  await page.mouse.move(416, 881);
+  await page.waitForTimeout(1);
+  await page.mouse.move(418, 879);
+  await page.waitForTimeout(2);
+  await page.mouse.move(422, 875);
+  await page.waitForTimeout(1);
+  await page.mouse.move(424, 873);
+  await page.waitForTimeout(1);
+  await page.mouse.move(426, 871);
+  await page.waitForTimeout(1);
+  await page.mouse.move(428, 869);
+  await page.waitForTimeout(1);
+  await page.mouse.move(432, 867);
+  await page.waitForTimeout(1);
+  await page.mouse.move(434, 865);
+  await page.waitForTimeout(1);
+  await page.mouse.move(436, 863);
+  await page.waitForTimeout(1);
+  await page.mouse.move(438, 861);
+  await page.waitForTimeout(0.900000000372529);
+  await page.mouse.move(440, 859);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(442, 857);
+  await page.waitForTimeout(1);
+  await page.mouse.move(444, 855);
+  await page.waitForTimeout(1);
+  await page.mouse.move(446, 855);
+  await page.waitForTimeout(1);
+  await page.mouse.move(448, 855);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(450, 851);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(452, 851);
+  await page.waitForTimeout(1);
+  await page.mouse.move(456, 850);
+  await page.waitForTimeout(1);
+  await page.mouse.move(456, 848);
+  await page.waitForTimeout(1);
+  await page.mouse.move(458, 846);
+  await page.waitForTimeout(1);
+  await page.mouse.move(458, 844);
+  await page.waitForTimeout(1);
+  await page.mouse.move(461, 842);
+  await page.waitForTimeout(0.900000000372529);
+  await page.mouse.move(461, 840);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(463, 840);
+  await page.waitForTimeout(1);
+  await page.mouse.move(465, 838);
+  await page.waitForTimeout(1);
+  await page.mouse.move(467, 836);
+  await page.waitForTimeout(2);
+  await page.mouse.move(469, 834);
+  await page.waitForTimeout(1);
+  await page.mouse.move(470, 834);
+  await page.waitForTimeout(1);
+  await page.mouse.move(470, 833);
+  await page.waitForTimeout(1);
+  await page.mouse.move(472, 831);
+  await page.waitForTimeout(1);
+  await page.mouse.move(474, 831);
+  await page.waitForTimeout(2);
+  await page.mouse.move(475, 831);
+  await page.waitForTimeout(1);
+  await page.mouse.move(477, 829);
+  await page.waitForTimeout(2);
+  await page.mouse.move(479, 828);
+  await page.waitForTimeout(1);
+  await page.mouse.move(479, 826);
+  await page.waitForTimeout(2);
+  await page.mouse.move(479, 825);
+  await page.waitForTimeout(2);
+  await page.mouse.move(480, 825);
+  await page.waitForTimeout(2);
+  await page.mouse.move(481, 823);
+  await page.waitForTimeout(2);
+  await page.mouse.move(481, 822);
+  await page.waitForTimeout(5);
+  await page.mouse.move(482, 822);
+  await page.waitForTimeout(4);
+  await page.mouse.move(482, 821);
+  await page.waitForTimeout(3);
+  await page.mouse.move(483, 821);
+  await page.waitForTimeout(1);
+  await page.mouse.move(483, 820);
+  await page.waitForTimeout(1);
+  await page.mouse.move(485, 820);
+  await page.waitForTimeout(2);
+  await page.mouse.move(486, 818);
+  await page.waitForTimeout(1);
+  await page.mouse.move(486, 817);
+  await page.waitForTimeout(1);
+  await page.mouse.move(488, 817);
+  await page.waitForTimeout(1);
+  await page.mouse.move(488, 815);
+  await page.waitForTimeout(1);
+  await page.mouse.move(488, 814);
+  await page.waitForTimeout(1);
+  await page.mouse.move(489, 814);
+  await page.waitForTimeout(1);
+  await page.mouse.move(491, 812);
+  await page.waitForTimeout(1);
+  await page.mouse.move(491, 810);
+  await page.waitForTimeout(1);
+  await page.mouse.move(493, 808);
+  await page.waitForTimeout(1);
+  await page.mouse.move(495, 806);
+  await page.waitForTimeout(1);
+  await page.mouse.move(497, 806);
+  await page.waitForTimeout(1);
+  await page.mouse.move(499, 804);
+  await page.waitForTimeout(0.900000000372529);
+  await page.mouse.move(501, 800);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(501, 798);
+  await page.waitForTimeout(1);
+  await page.mouse.move(503, 796);
+  await page.waitForTimeout(0.900000000372529);
+  await page.mouse.move(505, 794);
+  await page.waitForTimeout(1);
+  await page.mouse.move(507, 790);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(509, 788);
+  await page.waitForTimeout(1);
+  await page.mouse.move(511, 786);
+  await page.waitForTimeout(1);
+  await page.mouse.move(513, 784);
+  await page.waitForTimeout(1);
+  await page.mouse.move(515, 782);
+  await page.waitForTimeout(1);
+  await page.mouse.move(517, 778);
+  await page.waitForTimeout(1);
+  await page.mouse.move(519, 776);
+  await page.waitForTimeout(1);
+  await page.mouse.move(521, 774);
+  await page.waitForTimeout(1);
+  await page.mouse.move(523, 770);
+  await page.waitForTimeout(1);
+  await page.mouse.move(525, 768);
+  await page.waitForTimeout(1);
+  await page.mouse.move(527, 766);
+  await page.waitForTimeout(1);
+  await page.mouse.move(529, 762);
+  await page.waitForTimeout(1);
+  await page.mouse.move(531, 760);
+  await page.waitForTimeout(1);
+  await page.mouse.move(531, 758);
+  await page.waitForTimeout(1);
+  await page.mouse.move(533, 757);
+  await page.waitForTimeout(1);
+  await page.mouse.move(535, 753);
+  await page.waitForTimeout(1);
+  await page.mouse.move(539, 749);
+  await page.waitForTimeout(0.900000000372529);
+  await page.mouse.move(541, 745);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(543, 743);
+  await page.waitForTimeout(1);
+  await page.mouse.move(545, 741);
+  await page.waitForTimeout(1);
+  await page.mouse.move(549, 737);
+  await page.waitForTimeout(0.900000000372529);
+  await page.mouse.move(551, 735);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(553, 731);
+  await page.waitForTimeout(1);
+  await page.mouse.move(555, 729);
+  await page.waitForTimeout(1);
+  await page.mouse.move(559, 725);
+  await page.waitForTimeout(1);
+  await page.mouse.move(561, 721);
+  await page.waitForTimeout(1);
+  await page.mouse.move(563, 717);
+  await page.waitForTimeout(0.900000000372529);
+  await page.mouse.move(567, 715);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(569, 711);
+  await page.waitForTimeout(1);
+  await page.mouse.move(571, 709);
+  await page.waitForTimeout(1);
+  await page.mouse.move(573, 705);
+  await page.waitForTimeout(1);
+  await page.mouse.move(577, 701);
+  await page.waitForTimeout(1);
+  await page.mouse.move(579, 699);
+  await page.waitForTimeout(1);
+  await page.mouse.move(581, 695);
+  await page.waitForTimeout(1);
+  await page.mouse.move(583, 693);
+  await page.waitForTimeout(1);
+  await page.mouse.move(585, 691);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(587, 689);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(589, 687);
+  await page.waitForTimeout(0.900000000372529);
+  await page.mouse.move(591, 685);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(593, 681);
+  await page.waitForTimeout(1.200000001117587);
+  await page.mouse.move(595, 679);
+  await page.waitForTimeout(0.7999999988824129);
+  await page.mouse.move(599, 677);
+  await page.waitForTimeout(1);
+  await page.mouse.move(601, 675);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(603, 671);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(605, 669);
+  await page.waitForTimeout(1);
+  await page.mouse.move(606, 667);
+  await page.waitForTimeout(1);
+  await page.mouse.move(608, 665);
+  await page.waitForTimeout(0.900000000372529);
+  await page.mouse.move(610, 663);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(612, 661);
+  await page.waitForTimeout(1);
+  await page.mouse.move(612, 659);
+  await page.waitForTimeout(3);
+  await page.mouse.move(612, 658);
+  await page.waitForTimeout(1);
+  await page.mouse.move(614, 658);
+  await page.waitForTimeout(1);
+  await page.mouse.move(614, 656);
+  await page.waitForTimeout(2.900000000372529);
+  await page.mouse.move(615, 656);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(615, 655);
+  await page.waitForTimeout(66);
+  await page.mouse.move(616, 655);
+  await page.waitForTimeout(2);
+  await page.mouse.move(616, 654);
+  await page.waitForTimeout(6);
+  await page.mouse.move(616, 653);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(616, 652);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(618, 652);
+  await page.waitForTimeout(1);
+  await page.mouse.move(619, 652);
+  await page.waitForTimeout(1);
+  await page.mouse.move(621, 650);
+  await page.waitForTimeout(2);
+  await page.mouse.move(621, 648);
+  await page.waitForTimeout(2);
+  await page.mouse.move(622, 647);
+  await page.waitForTimeout(2.100000001490116);
+  await page.mouse.move(624, 644);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(625, 644);
+  await page.waitForTimeout(1);
+  await page.mouse.move(625, 642);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(627, 641);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(627, 639);
+  await page.waitForTimeout(1);
+  await page.mouse.move(627, 637);
+  await page.waitForTimeout(1);
+  await page.mouse.move(629, 631);
+  await page.waitForTimeout(1);
+  await page.mouse.move(631, 629);
+  await page.waitForTimeout(2);
+  await page.mouse.move(631, 626);
+  await page.waitForTimeout(2);
+  await page.mouse.move(633, 622);
+  await page.waitForTimeout(2);
+  await page.mouse.move(635, 616);
+  await page.waitForTimeout(1);
+  await page.mouse.move(637, 614);
+  await page.waitForTimeout(1);
+  await page.mouse.move(639, 612);
+  await page.waitForTimeout(1);
+  await page.mouse.move(641, 608);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(641, 606);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(641, 605);
+  await page.waitForTimeout(1);
+  await page.mouse.move(641, 603);
+  await page.waitForTimeout(1);
+  await page.mouse.move(641, 601);
+  await page.waitForTimeout(1);
+  await page.mouse.move(641, 600);
+  await page.waitForTimeout(1);
+  await page.mouse.move(643, 598);
+  await page.waitForTimeout(1);
+  await page.mouse.move(643, 596);
+  await page.waitForTimeout(1);
+  await page.mouse.move(645, 594);
+  await page.waitForTimeout(2);
+  await page.mouse.move(646, 590);
+  await page.waitForTimeout(0.900000000372529);
+  await page.mouse.move(646, 589);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(646, 587);
+  await page.waitForTimeout(1);
+  await page.mouse.move(646, 585);
+  await page.waitForTimeout(1);
+  await page.mouse.move(648, 583);
+  await page.waitForTimeout(1);
+  await page.mouse.move(648, 582);
+  await page.waitForTimeout(1);
+  await page.mouse.move(648, 580);
+  await page.waitForTimeout(1);
+  await page.mouse.move(648, 578);
+  await page.waitForTimeout(1);
+  await page.mouse.move(650, 576);
+  await page.waitForTimeout(1);
+  await page.mouse.move(652, 574);
+  await page.waitForTimeout(1);
+  await page.mouse.move(654, 572);
+  await page.waitForTimeout(1);
+  await page.mouse.move(654, 570);
+  await page.waitForTimeout(1);
+  await page.mouse.move(654, 567);
+  await page.waitForTimeout(1);
+  await page.mouse.move(654, 565);
+  await page.waitForTimeout(1);
+  await page.mouse.move(654, 563);
+  await page.waitForTimeout(1);
+  await page.mouse.move(654, 561);
+  await page.waitForTimeout(1);
+  await page.mouse.move(656, 561);
+  await page.waitForTimeout(1);
+  await page.mouse.move(656, 560);
+  await page.waitForTimeout(1);
+  await page.mouse.move(656, 558);
+  await page.waitForTimeout(1);
+  await page.mouse.move(656, 556);
+  await page.waitForTimeout(1);
+  await page.mouse.move(658, 554);
+  await page.waitForTimeout(1.300000000745058);
+  await page.mouse.move(658, 553);
+  await page.waitForTimeout(0.599999999627471);
+  await page.mouse.move(659, 553);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(659, 551);
+  await page.waitForTimeout(1);
+  await page.mouse.move(661, 551);
+  await page.waitForTimeout(1);
+  await page.mouse.move(661, 549);
+  await page.waitForTimeout(1);
+  await page.mouse.move(663, 547);
+  await page.waitForTimeout(3);
+  await page.mouse.move(663, 546);
+  await page.waitForTimeout(2);
+  await page.mouse.move(664, 546);
+  await page.waitForTimeout(2);
+  await page.mouse.move(664, 545);
+  await page.waitForTimeout(1);
+  await page.mouse.move(664, 543);
+  await page.waitForTimeout(2);
+  await page.mouse.move(664, 542);
+  await page.waitForTimeout(1);
+  await page.mouse.move(665, 542);
+  await page.waitForTimeout(2);
+  await page.mouse.move(665, 541);
+  await page.waitForTimeout(1);
+  await page.mouse.move(665, 539);
+  await page.waitForTimeout(6);
+  await page.mouse.move(665, 538);
+  await page.waitForTimeout(25);
+  await page.mouse.move(665, 537);
+  await page.waitForTimeout(19);
+  await page.mouse.move(666, 536);
+  await page.waitForTimeout(4);
+  await page.mouse.move(666, 535);
+  await page.waitForTimeout(1);
+  await page.mouse.move(667, 535);
+  await page.waitForTimeout(1);
+  await page.mouse.move(667, 534);
+  await page.waitForTimeout(4);
+  await page.mouse.move(669, 532);
+  await page.waitForTimeout(3);
+  await page.mouse.move(670, 531);
+  await page.waitForTimeout(4);
+  await page.mouse.move(670, 530);
+  await page.waitForTimeout(2.100000001490116);
+  await page.mouse.move(670, 529);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(670, 528);
+  await page.waitForTimeout(2);
+  await page.mouse.move(670, 527);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(670, 526);
+  await page.waitForTimeout(3.899999998509884);
+  await page.mouse.move(670, 525);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(670, 524);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(670, 523);
+  await page.waitForTimeout(2);
+  await page.mouse.move(670, 522);
+  await page.waitForTimeout(1);
+  await page.mouse.move(670, 520);
+  await page.waitForTimeout(1);
+  await page.mouse.move(670, 519);
+  await page.waitForTimeout(0.900000000372529);
+  await page.mouse.move(671, 519);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(673, 517);
+  await page.waitForTimeout(2);
+  await page.mouse.move(673, 515);
+  await page.waitForTimeout(2);
+  await page.mouse.move(673, 514);
+  await page.waitForTimeout(2);
+  await page.mouse.move(672, 513);
+  await page.waitForTimeout(1);
+  await page.mouse.move(672, 511);
+  await page.waitForTimeout(2);
+  await page.mouse.move(672, 510);
+  await page.waitForTimeout(1);
+  await page.mouse.move(672, 509);
+  await page.waitForTimeout(1);
+  await page.mouse.move(670, 509);
+  await page.waitForTimeout(2);
+  await page.mouse.move(670, 507);
+  await page.waitForTimeout(2);
+  await page.mouse.move(670, 506);
+  await page.waitForTimeout(1);
+  await page.mouse.move(670, 505);
+  await page.waitForTimeout(1.900000000372529);
+  await page.mouse.move(670, 503);
+  await page.waitForTimeout(1.099999999627471);
+  await page.mouse.move(670, 502);
+  await page.waitForTimeout(1);
+  await page.mouse.move(672, 502);
+  await page.waitForTimeout(1);
+  await page.mouse.move(672, 498);
+  await page.waitForTimeout(2);
+  await page.mouse.move(672, 496);
+  await page.waitForTimeout(3);
+  await page.mouse.move(672, 495);
+  await page.waitForTimeout(2);
+  await page.mouse.move(671, 493);
+  await page.waitForTimeout(2);
+  await page.mouse.move(671, 491);
+  await page.waitForTimeout(4.100000001490116);
+  await page.mouse.move(671, 490);
+  await page.waitForTimeout(2.899999998509884);
+  await page.mouse.move(671, 489);
+  await page.waitForTimeout(4.600000001490116);
+  await page.mouse.move(670, 489);
+  await page.waitForTimeout(0.3999999985098839);
+  await page.mouse.move(670, 488);
+  await page.waitForTimeout(1);
+  await page.mouse.move(670, 486);
+  await page.waitForTimeout(2);
+  await page.mouse.move(670, 485);
+  await page.waitForTimeout(2);
+  await page.mouse.move(670, 484);
+  await page.waitForTimeout(2);
+  await page.mouse.move(670, 483);
+  await page.waitForTimeout(10);
+  await page.mouse.move(669, 483);
+  await page.waitForTimeout(1);
+  await page.mouse.move(669, 481);
+  await page.waitForTimeout(1);
+  await page.mouse.move(667, 481);
+  await page.waitForTimeout(8.100000001490116);
+  await page.mouse.move(666, 481);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(666, 480);
+  await page.waitForTimeout(5);
+  await page.mouse.move(665, 480);
+  await page.waitForTimeout(4);
+  await page.mouse.move(664, 479);
+  await page.waitForTimeout(4);
+  await page.mouse.move(663, 479);
+  await page.waitForTimeout(2);
+  await page.mouse.move(663, 478);
+  await page.waitForTimeout(1);
+  await page.mouse.move(661, 478);
+  await page.waitForTimeout(2);
+  await page.mouse.move(660, 478);
+  await page.waitForTimeout(4);
+  await page.mouse.move(660, 477);
+  await page.waitForTimeout(1);
+  await page.mouse.move(659, 477);
+  await page.waitForTimeout(2);
+  await page.mouse.move(657, 477);
+  await page.waitForTimeout(4);
+  await page.mouse.move(656, 477);
+  await page.waitForTimeout(1);
+  await page.mouse.move(656, 476);
+  await page.waitForTimeout(4);
+  await page.mouse.move(656, 475);
+  await page.waitForTimeout(3);
+  await page.mouse.move(655, 475);
+  await page.waitForTimeout(4);
+  await page.mouse.move(654, 474);
+  await page.waitForTimeout(1);
+  await page.mouse.move(653, 474);
+  await page.waitForTimeout(3);
+  await page.mouse.move(651, 472);
+  await page.waitForTimeout(4);
+  await page.mouse.move(650, 472);
+  await page.waitForTimeout(3);
+  await page.mouse.move(650, 471);
+  await page.waitForTimeout(1);
+  await page.mouse.move(649, 471);
+  await page.waitForTimeout(2);
+  await page.mouse.move(648, 471);
+  await page.waitForTimeout(2);
+  await page.mouse.move(648, 470);
+  await page.waitForTimeout(3);
+  await page.mouse.move(647, 469);
+  await page.waitForTimeout(4);
+  await page.mouse.move(647, 468);
+  await page.waitForTimeout(2);
+  await page.mouse.move(646, 467);
+  await page.waitForTimeout(3);
+  await page.mouse.move(644, 467);
+  await page.waitForTimeout(2);
+  await page.mouse.move(644, 466);
+  await page.waitForTimeout(2);
+  await page.mouse.move(642, 466);
+  await page.waitForTimeout(4);
+  await page.mouse.move(640, 466);
+  await page.waitForTimeout(4);
+  await page.mouse.move(640, 465);
+  await page.waitForTimeout(2);
+  await page.mouse.move(639, 464);
+  await page.waitForTimeout(4);
+  await page.mouse.move(638, 464);
+  await page.waitForTimeout(3);
+  await page.mouse.move(637, 463);
+  await page.waitForTimeout(2);
+  await page.mouse.move(637, 462);
+  await page.waitForTimeout(2);
+  await page.mouse.move(636, 460);
+  await page.waitForTimeout(2);
+  await page.mouse.move(636, 459);
+  await page.waitForTimeout(3);
+  await page.mouse.move(635, 459);
+  await page.waitForTimeout(12);
+  await page.mouse.move(635, 458);
+  await page.waitForTimeout(2);
+  await page.mouse.move(634, 458);
+  await page.waitForTimeout(6);
+  await page.mouse.move(633, 458);
+  await page.waitForTimeout(6);
+  await page.mouse.move(632, 458);
+  await page.waitForTimeout(3);
+  await page.mouse.move(631, 458);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(630, 458);
+  await page.waitForTimeout(7);
+  await page.mouse.move(629, 458);
+  await page.waitForTimeout(5.899999998509884);
+  await page.mouse.move(629, 457);
+  await page.waitForTimeout(3);
+  await page.mouse.move(629, 456);
+  await page.waitForTimeout(9);
+  await page.mouse.move(628, 456);
+  await page.waitForTimeout(1);
+  await page.mouse.move(628, 455);
+  await page.waitForTimeout(4);
+  await page.mouse.move(628, 454);
+  await page.waitForTimeout(3);
+  await page.mouse.move(628, 453);
+  await page.waitForTimeout(3);
+  await page.mouse.move(629, 453);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(629, 452);
+  await page.waitForTimeout(3.899999998509884);
+  await page.mouse.move(629, 451);
+  await page.waitForTimeout(6);
+  await page.mouse.move(629, 450);
+  await page.waitForTimeout(4);
+  await page.mouse.move(629, 449);
+  await page.waitForTimeout(2);
+  await page.mouse.move(629, 448);
+  await page.waitForTimeout(3);
+  await page.mouse.move(629, 447);
+  await page.waitForTimeout(4);
+  await page.mouse.move(629, 446);
+  await page.waitForTimeout(3);
+  await page.mouse.move(629, 445);
+  await page.waitForTimeout(2);
+  await page.mouse.move(629, 444);
+  await page.waitForTimeout(3);
+  await page.mouse.move(629, 443);
+  await page.waitForTimeout(2);
+  await page.mouse.move(629, 442);
+  await page.waitForTimeout(2);
+  await page.mouse.move(629, 440);
+  await page.waitForTimeout(2);
+  await page.mouse.move(630, 440);
+  await page.waitForTimeout(1);
+  await page.mouse.move(630, 439);
+  await page.waitForTimeout(1);
+  await page.mouse.move(632, 439);
+  await page.waitForTimeout(2);
+  await page.mouse.move(632, 438);
+  await page.waitForTimeout(6);
+  await page.mouse.move(633, 438);
+  await page.waitForTimeout(1);
+  await page.mouse.move(633, 436);
+  await page.waitForTimeout(4);
+  await page.mouse.move(634, 436);
+  await page.waitForTimeout(1);
+  await page.mouse.move(634, 435);
+  await page.waitForTimeout(6);
+  await page.mouse.move(634, 434);
+  await page.waitForTimeout(5);
+  await page.mouse.move(634, 433);
+  await page.waitForTimeout(11);
+  await page.mouse.move(634, 432);
+  await page.waitForTimeout(5);
+  await page.mouse.move(635, 432);
+  await page.waitForTimeout(6);
+  await page.mouse.move(635, 431);
+  await page.waitForTimeout(7);
+  await page.mouse.move(636, 431);
+  await page.waitForTimeout(4);
+  await page.mouse.move(637, 431);
+  await page.waitForTimeout(6.800000000745058);
+  await page.mouse.move(638, 430);
+  await page.waitForTimeout(6.199999999254942);
+  await page.mouse.move(638, 429);
+  await page.waitForTimeout(7);
+  await page.mouse.move(639, 429);
+  await page.waitForTimeout(3);
+  await page.mouse.move(639, 428);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(639, 427);
+  await page.waitForTimeout(3.899999998509884);
+  await page.mouse.move(639, 426);
+  await page.waitForTimeout(1);
+  await page.mouse.move(638, 426);
+  await page.waitForTimeout(6);
+  await page.mouse.move(636, 425);
+  await page.waitForTimeout(4);
+  await page.mouse.move(636, 424);
+  await page.waitForTimeout(2);
+  await page.mouse.move(635, 424);
+  await page.waitForTimeout(4.100000001490116);
+  await page.mouse.move(634, 424);
+  await page.waitForTimeout(5);
+  await page.mouse.move(633, 424);
+  await page.waitForTimeout(4.899999998509884);
+  await page.mouse.move(633, 423);
+  await page.waitForTimeout(3);
+  await page.mouse.move(632, 423);
+  await page.waitForTimeout(14);
+  await page.mouse.move(632, 422);
+  await page.waitForTimeout(29);
+  await page.mouse.move(631, 422);
+  await page.waitForTimeout(20);
+  await page.mouse.move(631, 422);
+  await page.waitForTimeout(53);
+  await page.mouse.move(631, 421);
+  await page.waitForTimeout(35);
+  await page.mouse.move(630, 421);
+  await page.waitForTimeout(51.100000001490116);
+  await page.mouse.move(630, 420);
+  await page.waitForTimeout(32);
+  await page.mouse.move(630, 420);
+  await page.waitForTimeout(52.899999998509884);
+  await page.mouse.move(630, 419);
+  await page.waitForTimeout(282);
+  await page.mouse.down({ button: "left" });
+  await page.waitForTimeout(23.100000001490116);
+  await page.mouse.move(630, 419);
+  await page.waitForTimeout(42);
+  await page.mouse.move(631, 419);
+  await page.waitForTimeout(21.899999998509884);
+  await page.mouse.move(631, 420);
+  await page.waitForTimeout(1);
+  await page.mouse.move(632, 420);
+  await page.waitForTimeout(11.100000001490116);
+  await page.mouse.move(633, 420);
+  await page.waitForTimeout(3.899999998509884);
+  await page.mouse.move(633, 421);
+  await page.waitForTimeout(3);
+  await page.mouse.move(634, 421);
+  await page.waitForTimeout(6.100000001490116);
+  await page.mouse.move(635, 421);
+  await page.waitForTimeout(2);
+  await page.mouse.move(635, 422);
+  await page.waitForTimeout(4.899999998509884);
+  await page.mouse.move(636, 422);
+  await page.waitForTimeout(6);
+  await page.mouse.move(637, 422);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(637, 423);
+  await page.waitForTimeout(6);
+  await page.mouse.move(638, 423);
+  await page.waitForTimeout(4.899999998509884);
+  await page.mouse.move(638, 424);
+  await page.waitForTimeout(1);
+  await page.mouse.move(640, 424);
+  await page.waitForTimeout(8.100000001490116);
+  await page.mouse.move(641, 424);
+  await page.waitForTimeout(4.899999998509884);
+  await page.mouse.move(642, 424);
+  await page.waitForTimeout(1);
+  await page.mouse.move(642, 425);
+  await page.waitForTimeout(6.100000001490116);
+  await page.mouse.move(643, 425);
+  await page.waitForTimeout(2.899999998509884);
+  await page.mouse.move(643, 426);
+  await page.waitForTimeout(9);
+  await page.mouse.move(644, 426);
+  await page.waitForTimeout(1);
+  await page.mouse.move(644, 427);
+  await page.waitForTimeout(8.100000001490116);
+  await page.mouse.move(645, 427);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(645, 428);
+  await page.waitForTimeout(6);
+  await page.mouse.move(646, 428);
+  await page.waitForTimeout(2);
+  await page.mouse.move(646, 429);
+  await page.waitForTimeout(1);
+  await page.mouse.move(648, 429);
+  await page.waitForTimeout(3);
+  await page.mouse.move(649, 429);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(650, 430);
+  await page.waitForTimeout(4.899999998509884);
+  await page.mouse.move(651, 431);
+  await page.waitForTimeout(4.100000001490116);
+  await page.mouse.move(652, 431);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(652, 433);
+  await page.waitForTimeout(2);
+  await page.mouse.move(653, 433);
+  await page.waitForTimeout(1);
+  await page.mouse.move(653, 434);
+  await page.waitForTimeout(2);
+  await page.mouse.move(655, 434);
+  await page.waitForTimeout(3);
+  await page.mouse.move(656, 434);
+  await page.waitForTimeout(2);
+  await page.mouse.move(656, 435);
+  await page.waitForTimeout(6);
+  await page.mouse.move(656, 436);
+  await page.waitForTimeout(4);
+  await page.mouse.move(656, 437);
+  await page.waitForTimeout(3);
+  await page.mouse.move(656, 438);
+  await page.waitForTimeout(3);
+  await page.mouse.move(657, 438);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(657, 439);
+  await page.waitForTimeout(3);
+  await page.mouse.move(658, 441);
+  await page.waitForTimeout(3);
+  await page.mouse.move(658, 442);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(658, 443);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(660, 443);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(661, 443);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(663, 445);
+  await page.waitForTimeout(5.899999998509884);
+  await page.mouse.move(664, 446);
+  await page.waitForTimeout(4.100000001490116);
+  await page.mouse.move(664, 447);
+  await page.waitForTimeout(2.899999998509884);
+  await page.mouse.move(665, 448);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(665, 449);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(667, 449);
+  await page.waitForTimeout(2.100000001490116);
+  await page.mouse.move(668, 449);
+  await page.waitForTimeout(2.899999998509884);
+  await page.mouse.move(668, 450);
+  await page.waitForTimeout(1);
+  await page.mouse.move(669, 450);
+  await page.waitForTimeout(1);
+  await page.mouse.move(669, 452);
+  await page.waitForTimeout(2);
+  await page.mouse.move(669, 453);
+  await page.waitForTimeout(4);
+  await page.mouse.move(670, 453);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(670, 454);
+  await page.waitForTimeout(4);
+  await page.mouse.move(670, 456);
+  await page.waitForTimeout(1);
+  await page.mouse.move(670, 457);
+  await page.waitForTimeout(1);
+  await page.mouse.move(672, 457);
+  await page.waitForTimeout(4);
+  await page.mouse.move(672, 458);
+  await page.waitForTimeout(5);
+  await page.mouse.move(673, 459);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(674, 459);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(674, 460);
+  await page.waitForTimeout(2.899999998509884);
+  await page.mouse.move(675, 460);
+  await page.waitForTimeout(1);
+  await page.mouse.move(675, 462);
+  await page.waitForTimeout(3);
+  await page.mouse.move(676, 462);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(676, 463);
+  await page.waitForTimeout(2);
+  await page.mouse.move(677, 463);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(677, 464);
+  await page.waitForTimeout(4);
+  await page.mouse.move(677, 465);
+  await page.waitForTimeout(3);
+  await page.mouse.move(678, 465);
+  await page.waitForTimeout(5);
+  await page.mouse.move(678, 466);
+  await page.waitForTimeout(5);
+  await page.mouse.move(678, 467);
+  await page.waitForTimeout(1);
+  await page.mouse.move(680, 467);
+  await page.waitForTimeout(1);
+  await page.mouse.move(680, 468);
+  await page.waitForTimeout(9.100000001490116);
+  await page.mouse.move(680, 470);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(681, 470);
+  await page.waitForTimeout(2.100000001490116);
+  await page.mouse.move(681, 471);
+  await page.waitForTimeout(2);
+  await page.mouse.move(681, 472);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(682, 474);
+  await page.waitForTimeout(2.100000001490116);
+  await page.mouse.move(682, 475);
+  await page.waitForTimeout(2);
+  await page.mouse.move(683, 475);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(683, 477);
+  await page.waitForTimeout(3);
+  await page.mouse.move(685, 477);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(685, 478);
+  await page.waitForTimeout(2.899999998509884);
+  await page.mouse.move(686, 479);
+  await page.waitForTimeout(3);
+  await page.mouse.move(686, 480);
+  await page.waitForTimeout(4);
+  await page.mouse.move(686, 481);
+  await page.waitForTimeout(5);
+  await page.mouse.move(687, 481);
+  await page.waitForTimeout(4.100000001490116);
+  await page.mouse.move(687, 482);
+  await page.waitForTimeout(2);
+  await page.mouse.move(688, 483);
+  await page.waitForTimeout(4.899999998509884);
+  await page.mouse.move(688, 484);
+  await page.waitForTimeout(2);
+  await page.mouse.move(688, 485);
+  await page.waitForTimeout(5.100000001490116);
+  await page.mouse.move(688, 486);
+  await page.waitForTimeout(2.899999998509884);
+  await page.mouse.move(689, 486);
+  await page.waitForTimeout(1);
+  await page.mouse.move(689, 488);
+  await page.waitForTimeout(2.100000001490116);
+  await page.mouse.move(690, 488);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(690, 489);
+  await page.waitForTimeout(2);
+  await page.mouse.move(691, 489);
+  await page.waitForTimeout(6);
+  await page.mouse.move(691, 490);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(692, 490);
+  await page.waitForTimeout(5.899999998509884);
+  await page.mouse.move(693, 490);
+  await page.waitForTimeout(5);
+  await page.mouse.move(693, 491);
+  await page.waitForTimeout(4);
+  await page.mouse.move(694, 491);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(694, 492);
+  await page.waitForTimeout(9);
+  await page.mouse.move(694, 493);
+  await page.waitForTimeout(5);
+  await page.mouse.move(695, 493);
+  await page.waitForTimeout(2.899999998509884);
+  await page.mouse.move(695, 494);
+  await page.waitForTimeout(12);
+  await page.mouse.move(696, 494);
+  await page.waitForTimeout(3);
+  await page.mouse.move(696, 495);
+  await page.waitForTimeout(2);
+  await page.mouse.move(698, 495);
+  await page.waitForTimeout(6.100000001490116);
+  await page.mouse.move(698, 496);
+  await page.waitForTimeout(3.899999998509884);
+  await page.mouse.move(698, 497);
+  await page.waitForTimeout(8.100000001490116);
+  await page.mouse.move(698, 498);
+  await page.waitForTimeout(11);
+  await page.mouse.move(698, 499);
+  await page.waitForTimeout(3);
+  await page.mouse.move(698, 500);
+  await page.waitForTimeout(2);
+  await page.mouse.move(699, 500);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(699, 502);
+  await page.waitForTimeout(2.100000001490116);
+  await page.mouse.move(700, 502);
+  await page.waitForTimeout(4);
+  await page.mouse.move(701, 502);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(700, 502);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(701, 503);
+  await page.waitForTimeout(4);
+  await page.mouse.move(701, 504);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(702, 504);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(702, 505);
+  await page.waitForTimeout(4);
+  await page.mouse.move(702, 506);
+  await page.waitForTimeout(2.899999998509884);
+  await page.mouse.move(702, 507);
+  await page.waitForTimeout(4);
+  await page.mouse.move(703, 507);
+  await page.waitForTimeout(2.100000001490116);
+  await page.mouse.move(703, 508);
+  await page.waitForTimeout(7);
+  await page.mouse.move(704, 509);
+  await page.waitForTimeout(4);
+  await page.mouse.move(704, 510);
+  await page.waitForTimeout(2);
+  await page.mouse.move(704, 511);
+  await page.waitForTimeout(7);
+  await page.mouse.move(704, 512);
+  await page.waitForTimeout(2);
+  await page.mouse.move(704, 513);
+  await page.waitForTimeout(2);
+  await page.mouse.move(704, 514);
+  await page.waitForTimeout(3.899999998509884);
+  await page.mouse.move(705, 514);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(705, 515);
+  await page.waitForTimeout(8);
+  await page.mouse.move(705, 516);
+  await page.waitForTimeout(38.899999998509884);
+  await page.mouse.move(706, 516);
+  await page.waitForTimeout(2);
+  await page.mouse.move(706, 517);
+  await page.waitForTimeout(6.100000001490116);
+  await page.mouse.move(706, 518);
+  await page.waitForTimeout(7.899999998509884);
+  await page.mouse.move(706, 519);
+  await page.waitForTimeout(2);
+  await page.mouse.move(706, 520);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(707, 520);
+  await page.waitForTimeout(2);
+  await page.mouse.move(707, 521);
+  await page.waitForTimeout(9);
+  await page.mouse.move(707, 522);
+  await page.waitForTimeout(2);
+  await page.mouse.move(707, 523);
+  await page.waitForTimeout(3);
+  await page.mouse.move(707, 524);
+  await page.waitForTimeout(4.899999998509884);
+  await page.mouse.move(707, 525);
+  await page.waitForTimeout(4.100000001490116);
+  await page.mouse.move(707, 526);
+  await page.waitForTimeout(5);
+  await page.mouse.move(707, 527);
+  await page.waitForTimeout(4.899999998509884);
+  await page.mouse.move(708, 527);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(709, 527);
+  await page.waitForTimeout(7);
+  await page.mouse.move(709, 528);
+  await page.waitForTimeout(6.899999998509884);
+  await page.mouse.move(709, 529);
+  await page.waitForTimeout(1);
+  await page.mouse.move(711, 529);
+  await page.waitForTimeout(4.100000001490116);
+  await page.mouse.move(711, 531);
+  await page.waitForTimeout(6);
+  await page.mouse.move(712, 531);
+  await page.waitForTimeout(1);
+  await page.mouse.move(712, 532);
+  await page.waitForTimeout(7);
+  await page.mouse.move(713, 533);
+  await page.waitForTimeout(8.899999998509884);
+  await page.mouse.move(714, 533);
+  await page.waitForTimeout(2);
+  await page.mouse.move(714, 534);
+  await page.waitForTimeout(7.100000001490116);
+  await page.mouse.move(715, 534);
+  await page.waitForTimeout(10);
+  await page.mouse.move(715, 535);
+  await page.waitForTimeout(12.899999998509884);
+  await page.mouse.move(715, 536);
+  await page.waitForTimeout(8.100000001490116);
+  await page.mouse.move(715, 537);
+  await page.waitForTimeout(1);
+  await page.mouse.move(716, 537);
+  await page.waitForTimeout(11);
+  await page.mouse.move(716, 538);
+  await page.waitForTimeout(5);
+  await page.mouse.move(717, 538);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(717, 540);
+  await page.waitForTimeout(3.100000001490116);
+  await page.mouse.move(718, 540);
+  await page.waitForTimeout(5);
+  await page.mouse.move(718, 541);
+  await page.waitForTimeout(9);
+  await page.mouse.move(719, 541);
+  await page.waitForTimeout(10.899999998509884);
+  await page.mouse.move(720, 541);
+  await page.waitForTimeout(9.100000001490116);
+  await page.mouse.move(720, 542);
+  await page.waitForTimeout(3.899999998509884);
+  await page.mouse.move(721, 542);
+  await page.waitForTimeout(285.1000000014901);
+  await page.mouse.down({ button: "left" });
+  await expect(page).toHaveScreenshot({ maxDiffPixels: 100 });
+  await page.waitForTimeout(72);
+  await page.mouse.move(720, 542);
+  await page.waitForTimeout(6);
+  await page.mouse.move(720, 542);
+  await page.waitForTimeout(1);
+  await page.mouse.move(720, 543);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(718, 543);
+  await page.waitForTimeout(4.100000001490116);
+  await page.mouse.move(717, 543);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(717, 544);
+  await page.waitForTimeout(2.100000001490116);
+  await page.mouse.move(716, 544);
+  await page.waitForTimeout(2);
+  await page.mouse.move(716, 545);
+  await page.waitForTimeout(2);
+  await page.mouse.move(715, 545);
+  await page.waitForTimeout(4);
+  await page.mouse.move(714, 546);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(712, 546);
+  await page.waitForTimeout(2);
+  await page.mouse.move(711, 546);
+  await page.waitForTimeout(1);
+  await page.mouse.move(711, 548);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(709, 548);
+  await page.waitForTimeout(1);
+  await page.mouse.move(708, 548);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(708, 549);
+  await page.waitForTimeout(2.100000001490116);
+  await page.mouse.move(706, 551);
+  await page.waitForTimeout(3);
+  await page.mouse.move(705, 551);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(704, 552);
+  await page.waitForTimeout(2.100000001490116);
+  await page.mouse.move(703, 552);
+  await page.waitForTimeout(2);
+  await page.mouse.move(703, 553);
+  await page.waitForTimeout(1);
+  await page.mouse.move(699, 555);
+  await page.waitForTimeout(1);
+  await page.mouse.move(699, 557);
+  await page.waitForTimeout(1);
+  await page.mouse.move(697, 557);
+  await page.waitForTimeout(1);
+  await page.mouse.move(696, 557);
+  await page.waitForTimeout(1);
+  await page.mouse.move(694, 557);
+  await page.waitForTimeout(2);
+  await page.mouse.move(692, 559);
+  await page.waitForTimeout(1);
+  await page.mouse.move(691, 559);
+  await page.waitForTimeout(1.8999999985098839);
+  await page.mouse.move(690, 559);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(688, 559);
+  await page.waitForTimeout(1.199999999254942);
+  await page.mouse.move(686, 560);
+  await page.waitForTimeout(0.8000000007450581);
+  await page.mouse.move(682, 560);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(680, 560);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(680, 562);
+  await page.waitForTimeout(1);
+  await page.mouse.move(679, 564);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(677, 564);
+  await page.waitForTimeout(1);
+  await page.mouse.move(675, 566);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(673, 566);
+  await page.waitForTimeout(1);
+  await page.mouse.move(673, 567);
+  await page.waitForTimeout(1);
+  await page.mouse.move(671, 567);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(669, 569);
+  await page.waitForTimeout(1);
+  await page.mouse.move(669, 571);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(665, 571);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(664, 571);
+  await page.waitForTimeout(1);
+  await page.mouse.move(660, 573);
+  await page.waitForTimeout(1);
+  await page.mouse.move(656, 575);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(654, 577);
+  await page.waitForTimeout(1);
+  await page.mouse.move(652, 579);
+  await page.waitForTimeout(1);
+  await page.mouse.move(650, 579);
+  await page.waitForTimeout(1);
+  await page.mouse.move(648, 581);
+  await page.waitForTimeout(1);
+  await page.mouse.move(646, 583);
+  await page.waitForTimeout(2);
+  await page.mouse.move(642, 585);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(640, 587);
+  await page.waitForTimeout(2.100000001490116);
+  await page.mouse.move(638, 589);
+  await page.waitForTimeout(1);
+  await page.mouse.move(637, 590);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(635, 590);
+  await page.waitForTimeout(1);
+  await page.mouse.move(633, 592);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(631, 596);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(629, 596);
+  await page.waitForTimeout(1);
+  await page.mouse.move(625, 598);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(623, 602);
+  await page.waitForTimeout(1);
+  await page.mouse.move(623, 604);
+  await page.waitForTimeout(1);
+  await page.mouse.move(621, 606);
+  await page.waitForTimeout(1);
+  await page.mouse.move(617, 608);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(613, 612);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(611, 614);
+  await page.waitForTimeout(1);
+  await page.mouse.move(611, 616);
+  await page.waitForTimeout(1);
+  await page.mouse.move(609, 618);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(607, 620);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(605, 622);
+  await page.waitForTimeout(1);
+  await page.mouse.move(601, 626);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(599, 628);
+  await page.waitForTimeout(1);
+  await page.mouse.move(597, 630);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(593, 632);
+  await page.waitForTimeout(1);
+  await page.mouse.move(589, 638);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(587, 638);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(587, 639);
+  await page.waitForTimeout(1);
+  await page.mouse.move(584, 641);
+  await page.waitForTimeout(1);
+  await page.mouse.move(584, 643);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(582, 647);
+  await page.waitForTimeout(1);
+  await page.mouse.move(580, 649);
+  await page.waitForTimeout(1);
+  await page.mouse.move(580, 653);
+  await page.waitForTimeout(1);
+  await page.mouse.move(574, 657);
+  await page.waitForTimeout(1);
+  await page.mouse.move(572, 657);
+  await page.waitForTimeout(1);
+  await page.mouse.move(568, 661);
+  await page.waitForTimeout(1);
+  await page.mouse.move(566, 663);
+  await page.waitForTimeout(1);
+  await page.mouse.move(564, 665);
+  await page.waitForTimeout(1);
+  await page.mouse.move(562, 669);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(562, 671);
+  await page.waitForTimeout(1);
+  await page.mouse.move(558, 675);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(558, 677);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(556, 681);
+  await page.waitForTimeout(1);
+  await page.mouse.move(554, 683);
+  await page.waitForTimeout(1);
+  await page.mouse.move(550, 685);
+  await page.waitForTimeout(1);
+  await page.mouse.move(546, 689);
+  await page.waitForTimeout(1);
+  await page.mouse.move(546, 693);
+  await page.waitForTimeout(1);
+  await page.mouse.move(542, 697);
+  await page.waitForTimeout(1);
+  await page.mouse.move(540, 701);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(538, 703);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(536, 707);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(532, 709);
+  await page.waitForTimeout(1);
+  await page.mouse.move(530, 713);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(528, 719);
+  await page.waitForTimeout(1);
+  await page.mouse.move(524, 723);
+  await page.waitForTimeout(1);
+  await page.mouse.move(520, 725);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(518, 729);
+  await page.waitForTimeout(1);
+  await page.mouse.move(516, 733);
+  await page.waitForTimeout(1);
+  await page.mouse.move(512, 735);
+  await page.waitForTimeout(1);
+  await page.mouse.move(510, 739);
+  await page.waitForTimeout(1);
+  await page.mouse.move(510, 743);
+  await page.waitForTimeout(1);
+  await page.mouse.move(506, 747);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(502, 751);
+  await page.waitForTimeout(1);
+  await page.mouse.move(498, 755);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(496, 759);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(494, 761);
+  await page.waitForTimeout(1);
+  await page.mouse.move(490, 765);
+  await page.waitForTimeout(1);
+  await page.mouse.move(490, 769);
+  await page.waitForTimeout(1);
+  await page.mouse.move(486, 773);
+  await page.waitForTimeout(1);
+  await page.mouse.move(486, 777);
+  await page.waitForTimeout(1);
+  await page.mouse.move(484, 781);
+  await page.waitForTimeout(1);
+  await page.mouse.move(480, 783);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(478, 787);
+  await page.waitForTimeout(1);
+  await page.mouse.move(474, 791);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(472, 795);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(470, 799);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(468, 803);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(464, 807);
+  await page.waitForTimeout(2);
+  await page.mouse.move(460, 813);
+  await page.waitForTimeout(1);
+  await page.mouse.move(456, 819);
+  await page.waitForTimeout(1);
+  await page.mouse.move(454, 823);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(452, 827);
+  await page.waitForTimeout(1);
+  await page.mouse.move(450, 831);
+  await page.waitForTimeout(1);
+  await page.mouse.move(448, 833);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(444, 837);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(442, 839);
+  await page.waitForTimeout(1);
+  await page.mouse.move(438, 843);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(436, 849);
+  await page.waitForTimeout(1);
+  await page.mouse.move(436, 855);
+  await page.waitForTimeout(1);
+  await page.mouse.move(434, 859);
+  await page.waitForTimeout(1);
+  await page.mouse.move(432, 863);
+  await page.waitForTimeout(1.1000000014901161);
+  await page.mouse.move(430, 867);
+  await page.waitForTimeout(1);
+  await page.mouse.move(426, 873);
+  await page.waitForTimeout(1);
+  await page.mouse.move(426, 877);
+  await page.waitForTimeout(0.8999999985098839);
+  await page.mouse.move(424, 881);
 });
