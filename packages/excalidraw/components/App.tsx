@@ -468,7 +468,7 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionName, ActionResult } from "../actions/types";
-import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode, isPanWithRightMouseEnabled } from "../obsidianUtils";
+import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode, isPanWithRightMouseEnabled, shouldDisableZoom } from "../obsidianUtils";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
 
@@ -1318,7 +1318,7 @@ class App extends React.Component<AppProps, AppState> {
                           src?.type !== "document" ? src?.link ?? "" : undefined
                         }
                         // https://stackoverflow.com/q/18470015
-                        scrolling="no"
+                        // scrolling="no" //zsviczian
                         referrerPolicy="no-referrer-when-downgrade"
                         title="Excalidraw Embedded Content"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -5366,6 +5366,13 @@ startLineEditor = (
 
   // fires only on Safari
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
+    //zsviczian - start
+    // If an embeddable is active and the pinch starts over it, let it handle the gesture.
+    if (shouldDisableZoom(this.state)) {
+      gesture.initialScale = null;
+      return;
+    }
+
     event.preventDefault();
 
     // we only want to deselect on touch screens because user may have selected
@@ -5381,6 +5388,11 @@ startLineEditor = (
 
   // fires only on Safari
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
+    //zsviczian
+    if (!gesture.initialScale) {
+      return;
+    }
+
     event.preventDefault();
 
     // onGestureChange only has zoom factor but not the center.
@@ -7660,11 +7672,15 @@ startLineEditor = (
     });
 
     if (gesture.pointers.size === 2) {
-      gesture.lastCenter = getCenter(gesture.pointers);
-      gesture.initialScale = this.state.zoom.value;
-      gesture.initialDistance = getDistance(
-        Array.from(gesture.pointers.values()),
-      );
+      if (shouldDisableZoom(this.state)) { //zsviczian
+        gesture.initialDistance = null;
+      } else {
+        gesture.lastCenter = getCenter(gesture.pointers);
+        gesture.initialScale = this.state.zoom.value;
+        gesture.initialDistance = getDistance(
+          Array.from(gesture.pointers.values()),
+        );
+      }
     }
   }
 

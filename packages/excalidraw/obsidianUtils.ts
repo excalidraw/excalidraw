@@ -1,7 +1,7 @@
 import { type GlobalPoint } from "@excalidraw/math/types";
 import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
 import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
-import { FONT_FAMILY, getVerticalOffset, ZOOM_STEP, MAX_ZOOM, MIN_ZOOM } from "@excalidraw/common";
+import { FONT_FAMILY, getVerticalOffset, ZOOM_STEP, MAX_ZOOM, MIN_ZOOM, viewportCoordsToSceneCoords } from "@excalidraw/common";
 import type { ElementsMap, ExcalidrawElement, ExcalidrawTextElement, NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 import { Fonts } from "./fonts";
 import type { FontMetadata } from "@excalidraw/common";
@@ -9,7 +9,7 @@ import { FONT_METADATA } from "@excalidraw/common";
 import type { AppState } from "./types";
 import { intersectElementWithLineSegment } from "@excalidraw/element/collision";
 import { lineSegment } from "@excalidraw/math";
-import { getLineHeightInPx } from "@excalidraw/element";
+import { getElementAbsoluteCoords, getLineHeightInPx } from "@excalidraw/element";
 
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
 export let hostPlugin: any = null;
@@ -273,4 +273,17 @@ export const runAction = (action: string): void => {
 
 export const t2 = (key: string): string => {
   return getHostPlugin()?.getLabel(key) ?? key;
-}
+};
+
+export const shouldDisableZoom = (appState: AppState): boolean => {
+  if (appState.activeEmbeddable?.state !== "active") {
+    return false;
+  }
+  if (!appState.activeEmbeddable?.element) {
+    return false;
+  }
+  if (appState.activeEmbeddable.element.link?.match(/\.pdf(#[^\]]+)?]]/i)) {
+    return true;
+  }
+  return false;
+};
