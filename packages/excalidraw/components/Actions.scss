@@ -112,7 +112,8 @@
       height: 2rem;
       border: none;
       border-radius: var(--border-radius-lg);
-      background: var(--button-bg, var(--island-bg-color));
+      background: transparent;
+      color: var(--color-on-surface);
       cursor: pointer;
       display: flex;
       align-items: center;
