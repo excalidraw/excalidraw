@@ -879,14 +879,13 @@ export type Device = Readonly<{
   viewport: {
     isMobile: boolean;
     isLandscape: boolean;
-    isTablet: boolean;
   };
   editor: {
     isMobile: boolean;
-    isTablet: boolean;
     canFitSidebar: boolean;
   };
   isTouchScreen: boolean;
+  isTouchMobile: boolean;
 }>;
 
 export type FrameNameBounds = {

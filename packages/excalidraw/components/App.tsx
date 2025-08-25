@@ -473,14 +473,13 @@ const deviceContextInitialValue = {
   viewport: {
     isMobile: false,
     isLandscape: false,
-    isTablet: false,
   },
   editor: {
     isMobile: false,
     canFitSidebar: false,
-    isTablet: false,
   },
   isTouchScreen: false,
+  isTouchMobile: false,
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 DeviceContext.displayName = "DeviceContext";
@@ -2451,11 +2450,21 @@ class App extends React.Component<AppProps, AppState> {
     const nextViewportState = updateObject(prevViewportState, {
       isLandscape: viewportWidth > viewportHeight,
       isMobile: this.isMobileBreakpoint(viewportWidth, viewportHeight),
-      isTablet: this.isTablet(),
     });
 
     if (prevViewportState !== nextViewportState) {
       this.device = { ...this.device, viewport: nextViewportState };
+      return true;
+    }
+    return false;
+  };
+
+  private refreshTouchScreen = () => {
+    const previousIsTouchMobile = this.device.isTouchMobile;
+    const currentIsTouchMobile = this.isMobileOrTablet();
+
+    if (previousIsTouchMobile !== currentIsTouchMobile) {
+      this.device = { ...this.device, isTouchMobile: currentIsTouchMobile };
       return true;
     }
     return false;
@@ -2480,7 +2489,6 @@ class App extends React.Component<AppProps, AppState> {
     const nextEditorState = updateObject(prevEditorState, {
       isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
       canFitSidebar: editorWidth > sidebarBreakpoint,
-      isTablet: this.isTablet(),
     });
 
     if (prevEditorState !== nextEditorState) {
@@ -2567,6 +2575,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.refreshViewportBreakpoints();
       this.refreshEditorBreakpoints();
+      this.refreshTouchScreen();
     }
 
     if (supportsResizeObserver && this.excalidrawContainerRef.current) {
@@ -2626,6 +2635,7 @@ class App extends React.Component<AppProps, AppState> {
       .getElementsIncludingDeleted()
       .forEach((element) => ShapeCache.delete(element));
     this.refreshViewportBreakpoints();
+    this.refreshTouchScreen();
     this.updateDOMRect();
     if (!supportsResizeObserver) {
       this.refreshEditorBreakpoints();
