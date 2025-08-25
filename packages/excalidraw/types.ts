@@ -883,9 +883,9 @@ export type Device = Readonly<{
   editor: {
     isMobile: boolean;
     canFitSidebar: boolean;
+    showCompactSidebar: boolean;
   };
   isTouchScreen: boolean;
-  isTouchMobile: boolean;
 }>;
 
 export type FrameNameBounds = {

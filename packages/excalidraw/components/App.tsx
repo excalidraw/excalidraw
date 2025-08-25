@@ -477,9 +477,9 @@ const deviceContextInitialValue = {
   editor: {
     isMobile: false,
     canFitSidebar: false,
+    showCompactSidebar: false,
   },
   isTouchScreen: false,
-  isTouchMobile: false,
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 DeviceContext.displayName = "DeviceContext";
@@ -2423,12 +2423,6 @@ class App extends React.Component<AppProps, AppState> {
     return isMobile || isTouchMobile;
   };
 
-  private isTablet = (): boolean => {
-    const { clientWidth: viewportWidth } = document.body;
-
-    return this.isMobileOrTablet() && viewportWidth > MQ_MAX_WIDTH_PORTRAIT;
-  };
-
   private isMobileBreakpoint = (width: number, height: number) => {
     return (
       width < MQ_MAX_WIDTH_PORTRAIT ||
@@ -2459,17 +2453,6 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   };
 
-  private refreshTouchScreen = () => {
-    const previousIsTouchMobile = this.device.isTouchMobile;
-    const currentIsTouchMobile = this.isMobileOrTablet();
-
-    if (previousIsTouchMobile !== currentIsTouchMobile) {
-      this.device = { ...this.device, isTouchMobile: currentIsTouchMobile };
-      return true;
-    }
-    return false;
-  };
-
   private refreshEditorBreakpoints = () => {
     const container = this.excalidrawContainerRef.current;
     if (!container) {
@@ -2489,6 +2472,8 @@ class App extends React.Component<AppProps, AppState> {
     const nextEditorState = updateObject(prevEditorState, {
       isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
       canFitSidebar: editorWidth > sidebarBreakpoint,
+      showCompactSidebar:
+        this.isMobileOrTablet() && editorWidth > MQ_MAX_WIDTH_PORTRAIT,
     });
 
     if (prevEditorState !== nextEditorState) {
@@ -2575,7 +2560,6 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.refreshViewportBreakpoints();
       this.refreshEditorBreakpoints();
-      this.refreshTouchScreen();
     }
 
     if (supportsResizeObserver && this.excalidrawContainerRef.current) {
@@ -2635,7 +2619,6 @@ class App extends React.Component<AppProps, AppState> {
       .getElementsIncludingDeleted()
       .forEach((element) => ShapeCache.delete(element));
     this.refreshViewportBreakpoints();
-    this.refreshTouchScreen();
     this.updateDOMRect();
     if (!supportsResizeObserver) {
       this.refreshEditorBreakpoints();
