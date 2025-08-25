@@ -161,6 +161,24 @@ const LayerUI = ({
   const device = useDevice();
   const tunnels = useInitializeTunnels();
 
+  const spacing = device.editor.showCompactSidebar
+    ? {
+        menuTopGap: 4,
+        toolbarColGap: 4,
+        toolbarRowGap: 1,
+        toolbarInnerRowGap: 1,
+        islandPadding: 1,
+        collabMarginLeft: 8,
+      }
+    : {
+        menuTopGap: 6,
+        toolbarColGap: 4,
+        toolbarRowGap: 1,
+        toolbarInnerRowGap: 1,
+        islandPadding: 1,
+        collabMarginLeft: 8,
+      };
+
   const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
@@ -281,10 +299,20 @@ const LayerUI = ({
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
-          <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
+          <Stack.Col
+            gap={spacing.menuTopGap}
+            className={clsx("App-menu_top__left")}
+          >
             {renderCanvasActions()}
-            {shouldRenderSelectedShapeActions &&
-              renderSelectedShapeActions(device.editor.showCompactSidebar)}
+            <div
+              className={clsx("selected-shape-actions-container", {
+                "selected-shape-actions-container--compact":
+                  device.editor.showCompactSidebar,
+              })}
+            >
+              {shouldRenderSelectedShapeActions &&
+                renderSelectedShapeActions(device.editor.showCompactSidebar)}
+            </div>
           </Stack.Col>
           {!appState.viewModeEnabled &&
             appState.openDialog?.name !== "elementLinkSelector" && (
@@ -294,17 +322,19 @@ const LayerUI = ({
                     {renderWelcomeScreen && (
                       <tunnels.WelcomeScreenToolbarHintTunnel.Out />
                     )}
-                    <Stack.Col gap={4} align="start">
+                    <Stack.Col gap={spacing.toolbarColGap} align="start">
                       <Stack.Row
-                        gap={1}
+                        gap={spacing.toolbarRowGap}
                         className={clsx("App-toolbar-container", {
                           "zen-mode": appState.zenModeEnabled,
                         })}
                       >
                         <Island
-                          padding={1}
+                          padding={spacing.islandPadding}
                           className={clsx("App-toolbar", {
                             "zen-mode": appState.zenModeEnabled,
+                            "App-toolbar--compact":
+                              device.editor.showCompactSidebar,
                           })}
                         >
                           <HintViewer
@@ -314,7 +344,7 @@ const LayerUI = ({
                             app={app}
                           />
                           {heading}
-                          <Stack.Row gap={1}>
+                          <Stack.Row gap={spacing.toolbarInnerRowGap}>
                             <PenModeButton
                               zenModeEnabled={appState.zenModeEnabled}
                               checked={appState.penMode}
@@ -348,7 +378,7 @@ const LayerUI = ({
                         {isCollaborating && (
                           <Island
                             style={{
-                              marginLeft: 8,
+                              marginLeft: spacing.collabMarginLeft,
                               alignSelf: "center",
                               height: "fit-content",
                             }}
@@ -376,6 +406,8 @@ const LayerUI = ({
               "layer-ui__wrapper__top-right zen-mode-transition",
               {
                 "transition-right": appState.zenModeEnabled,
+                "layer-ui__wrapper__top-right--compact":
+                  device.editor.showCompactSidebar,
               },
             )}
           >

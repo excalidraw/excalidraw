@@ -10,6 +10,16 @@
       }
     }
 
+    &--compact {
+      .ToolIcon__keybinding {
+        display: none;
+      }
+
+      .App-toolbar__divider {
+        margin: 0;
+      }
+    }
+
     &__divider {
       width: 1px;
       height: 1.5rem;
