@@ -284,7 +284,7 @@ const LayerUI = ({
           <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
             {renderCanvasActions()}
             {shouldRenderSelectedShapeActions &&
-              renderSelectedShapeActions(device.isTouchScreen)}
+              renderSelectedShapeActions(device.editor.isTablet)}
           </Stack.Col>
           {!appState.viewModeEnabled &&
             appState.openDialog?.name !== "elementLinkSelector" && (

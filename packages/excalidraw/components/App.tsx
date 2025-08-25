@@ -473,10 +473,12 @@ const deviceContextInitialValue = {
   viewport: {
     isMobile: false,
     isLandscape: false,
+    isTablet: false,
   },
   editor: {
     isMobile: false,
     canFitSidebar: false,
+    isTablet: false,
   },
   isTouchScreen: false,
 };
@@ -2422,6 +2424,12 @@ class App extends React.Component<AppProps, AppState> {
     return isMobile || isTouchMobile;
   };
 
+  private isTablet = (): boolean => {
+    const { clientWidth: viewportWidth } = document.body;
+
+    return this.isMobileOrTablet() && viewportWidth > MQ_MAX_WIDTH_PORTRAIT;
+  };
+
   private isMobileBreakpoint = (width: number, height: number) => {
     return (
       width < MQ_MAX_WIDTH_PORTRAIT ||
@@ -2443,6 +2451,7 @@ class App extends React.Component<AppProps, AppState> {
     const nextViewportState = updateObject(prevViewportState, {
       isLandscape: viewportWidth > viewportHeight,
       isMobile: this.isMobileBreakpoint(viewportWidth, viewportHeight),
+      isTablet: this.isTablet(),
     });
 
     if (prevViewportState !== nextViewportState) {
@@ -2471,6 +2480,7 @@ class App extends React.Component<AppProps, AppState> {
     const nextEditorState = updateObject(prevEditorState, {
       isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
       canFitSidebar: editorWidth > sidebarBreakpoint,
+      isTablet: this.isTablet(),
     });
 
     if (prevEditorState !== nextEditorState) {
