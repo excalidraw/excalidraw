@@ -10,26 +10,19 @@ export class Record {
 
   public static start() {
     Record.events += `  await page.setViewportSize({ width: ${window.innerWidth}, height: ${window.innerHeight} });\n`;
-    Record.events += `await page.goto("http://localhost:3000");`;
-    Record.events += `await page.waitForLoadState("load");`;
+    Record.events += `await page.goto("http://localhost:3000");\n`;
+    Record.events += `await page.waitForLoadState("load");\n`;
 
-    // Record.events += "  const mask = [\n";
-    // Record.events += `    page.getByRole("button", { name: "Share" }),\n`;
-    // Record.events += `    page.getByTitle("Library").locator("div"),\n`;
-    // Record.events += "  ];\n";
-
-    // capture a snapshot of localStorage (if available) to include in the header
+    // Capture LocalStorage, which is essential to re-establish state
     Record.events += "  await page.evaluate(() => {\n";
-    try {
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key != null) {
-          const value = JSON.stringify(localStorage.getItem(key));
-          Record.events += `    localStorage.getItem("${key}");\n`;
-          Record.events += `    localStorage.setItem("${key}", ${value});\n`;
-        }
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key != null) {
+        const value = JSON.stringify(localStorage.getItem(key));
+        Record.events += `    localStorage.getItem("${key}");\n`;
+        Record.events += `    localStorage.setItem("${key}", ${value});\n`;
       }
-    } catch {}
+    }
     Record.events += "  });\n";
     Record.events += "  await page.reload();\n";
     Record.events += `  await page.waitForLoadState("load");\n`;
@@ -171,10 +164,12 @@ export class Record {
     }
     const button =
       event.button === 0 ? "left" : event.button === 1 ? "middle" : "right";
-    Record.events += `  await page.mouse.down({ button: "${button}" });\n`;
+    Record.events += `  await page.mouse.up({ button: "${button}" });\n`;
 
-    Record.events +=
-      "  await expect(page).toHaveScreenshot({ maxDiffPixels: 100 });\n";
+    Record.events += "  await expect(page).toHaveScreenshot({\n";
+    Record.events += "    maxDiffPixels: 100,\n";
+    Record.events += "    maxDiffPixelRatio: 0.01,\n";
+    Record.events += "  });\n";
   }
 
   private static onKeyDown(event: KeyboardEvent) {
@@ -198,8 +193,10 @@ export class Record {
     }
     Record.events += `  await page.keyboard.up("${event.key}");\n`;
 
-    Record.events +=
-      "  await expect(page).toHaveScreenshot({ maxDiffPixels: 100 });\n";
+    Record.events += "  await expect(page).toHaveScreenshot({\n";
+    Record.events += "    maxDiffPixels: 100,\n";
+    Record.events += "    maxDiffPixelRatio: 0.01,\n";
+    Record.events += "  });\n";
   }
 }
 
