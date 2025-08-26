@@ -10523,17 +10523,23 @@ class App extends React.Component<AppProps, AppState> {
     sceneX: number,
     sceneY: number,
   ) => {
+    const placeholderElements = imageFiles.map(() => {
+      const placeholderImageElement = this.newImagePlaceholder({
+        sceneX,
+        sceneY,
+      });
+      this.scene.insertElement(placeholderImageElement);
+      return placeholderImageElement;
+    });
+
+    this.positionElementsOnGrid(placeholderElements, sceneX, sceneY);
+
     const initializedImageElements = await Promise.all(
-      imageFiles.map(async (file) => {
-        const placeholderImageElement = this.newImagePlaceholder({
-          sceneX,
-          sceneY,
-        });
-        this.scene.insertElement(placeholderImageElement);
+      placeholderElements.map(async (placeholder, i) => {
         try {
-          return await this.initializeImage(placeholderImageElement, file);
+          return await this.initializeImage(placeholder, imageFiles[i]);
         } catch (error: any) {
-          this.scene.mutateElement(placeholderImageElement, {
+          this.scene.mutateElement(placeholder, {
             isDeleted: true,
           });
           this.setState({
