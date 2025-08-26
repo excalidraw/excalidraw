@@ -10414,23 +10414,24 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  // TODO rewrite (vibe-coded)
-  private positionElementsOnGrid = (
-    elements: ExcalidrawElement[] | ExcalidrawElement[][],
+  // TODO rewrite (mostly vibe-coded)
+  private positionElementsOnGrid = <TElement extends ExcalidrawElement>(
+    elements: TElement[] | TElement[][],
     centerX: number,
     centerY: number,
     padding = 50,
-  ) => {
+  ): TElement[] => {
     // Ensure there are elements to position
     if (!elements || elements.length === 0) {
-      return;
+      return [];
     }
 
+    const res: TElement[] = [];
     // Normalize input to work with atomic units (groups of elements)
     // If elements is a flat array, treat each element as its own atomic unit
-    const atomicUnits: ExcalidrawElement[][] = Array.isArray(elements[0])
-      ? (elements as ExcalidrawElement[][])
-      : (elements as ExcalidrawElement[]).map((element) => [element]);
+    const atomicUnits: TElement[][] = Array.isArray(elements[0])
+      ? (elements as TElement[][])
+      : (elements as TElement[]).map((element) => [element]);
 
     // Determine the number of columns for atomic units
     // A common approach for a "grid-like" layout without specific column constraints
@@ -10439,7 +10440,7 @@ class App extends React.Component<AppProps, AppState> {
     const numColumns = Math.max(1, Math.ceil(Math.sqrt(numUnits)));
 
     // Group atomic units into rows based on the calculated number of columns
-    const rows: ExcalidrawElement[][][] = [];
+    const rows: TElement[][][] = [];
     for (let i = 0; i < numUnits; i += numColumns) {
       rows.push(atomicUnits.slice(i, i + numColumns));
     }
@@ -10502,10 +10503,12 @@ class App extends React.Component<AppProps, AppState> {
 
         // Apply the offset to all elements in this atomic unit
         unitBound.elements.forEach((element) => {
-          this.scene.mutateElement(element, {
-            x: element.x + offsetX,
-            y: element.y + offsetY,
-          });
+          res.push(
+            newElementWith(element, {
+              x: element.x + offsetX,
+              y: element.y + offsetY,
+            } as ElementUpdate<TElement>),
+          );
         });
 
         // Move X for the next unit in the row
@@ -10516,6 +10519,7 @@ class App extends React.Component<AppProps, AppState> {
       // This accounts for the tallest unit in the current row and the inter-row padding
       currentY += rowMaxHeight + padding;
     });
+    return res;
   };
 
   private insertImages = async (
@@ -10523,19 +10527,27 @@ class App extends React.Component<AppProps, AppState> {
     sceneX: number,
     sceneY: number,
   ) => {
-    const placeholderElements = imageFiles.map(() => {
-      const placeholderImageElement = this.newImagePlaceholder({
+    // Create, position, and insert placeholders
+    const placeholderElements = imageFiles.map(() =>
+      this.newImagePlaceholder({
         sceneX,
         sceneY,
-      });
-      this.scene.insertElement(placeholderImageElement);
-      return placeholderImageElement;
-    });
+      }),
+    );
 
-    this.positionElementsOnGrid(placeholderElements, sceneX, sceneY);
+    const positionedPlaceholderElements = this.positionElementsOnGrid(
+      placeholderElements,
+      sceneX,
+      sceneY,
+    );
 
+    positionedPlaceholderElements.forEach((element) =>
+      this.scene.insertElement(element),
+    );
+
+    // Create, position, insert and select initialized (replacing placeholders)
     const initializedImageElements = await Promise.all(
-      placeholderElements.map(async (placeholder, i) => {
+      positionedPlaceholderElements.map(async (placeholder, i) => {
         try {
           return await this.initializeImage(placeholder, imageFiles[i]);
         } catch (error: any) {
@@ -10553,13 +10565,16 @@ class App extends React.Component<AppProps, AppState> {
     const imageElements = initializedImageElements.filter(
       (el): el is NonDeleted<InitializedExcalidrawImageElement> => el !== null,
     );
-
-    const initializedImageElementsMap = new Map(
-      imageElements.map((el) => [el.id, el]),
+    const positionedElements = this.positionElementsOnGrid(
+      imageElements,
+      sceneX,
+      sceneY,
     );
-
+    const initializedImageElementsMap = new Map(
+      positionedElements.map((el) => [el.id, el]),
+    );
     const selectedElementIds = Object.fromEntries(
-      imageElements.map((el) => [el.id, true as const]),
+      positionedElements.map((el) => [el.id, true as const]),
     );
     const nextElements = this.scene
       .getElementsIncludingDeleted()
@@ -10573,8 +10588,9 @@ class App extends React.Component<AppProps, AppState> {
         ),
       },
       elements: nextElements,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     });
-    this.positionElementsOnGrid(imageElements, sceneX, sceneY);
+
     this.setState({}, () => {
       // actionFinalize after all state values have been updated
       this.actionManager.executeAction(actionFinalize);
