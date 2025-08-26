@@ -191,12 +191,14 @@ const ColorPickerTrigger = ({
   type,
   compactMode = false,
   mode = "background",
+  onToggle,
 }: {
   color: string | null;
   label: string;
   type: ColorPickerType;
   compactMode?: boolean;
   mode?: "background" | "stroke";
+  onToggle: () => void;
 }) => {
   return (
     <Popover.Trigger
@@ -213,6 +215,7 @@ const ColorPickerTrigger = ({
           ? t("labels.showStroke")
           : t("labels.showBackground")
       }
+      onClick={onToggle}
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
       {compactMode && color && (
@@ -279,7 +282,11 @@ export const ColorPicker = ({
         <Popover.Root
           open={appState.openPopup === type}
           onOpenChange={(open) => {
-            updateData({ openPopup: open ? type : null });
+            if (open) {
+              updateData({ openPopup: type });
+            } else if (appState.openPopup === type) {
+              updateData({ openPopup: null });
+            }
           }}
         >
           {/* serves as an active color indicator as well */}
@@ -289,6 +296,12 @@ export const ColorPicker = ({
             type={type}
             compactMode={compactMode}
             mode={type === "elementStroke" ? "stroke" : "background"}
+            onToggle={() => {
+              // toggle to this type (if already open, close; if another is open, switch)
+              updateData({
+                openPopup: appState.openPopup === type ? null : type,
+              });
+            }}
           />
           {/* popup content */}
           {appState.openPopup === type && (

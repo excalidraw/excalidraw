@@ -380,7 +380,13 @@ export const CompactShapeActions = ({
         <div className="compact-action-item">
           <Popover.Root
             open={strokePopoverOpen}
-            onOpenChange={setStrokePopoverOpen}
+            onOpenChange={(open) => {
+              setStrokePopoverOpen(open);
+              if (open) {
+                setOtherActionsPopoverOpen(false);
+                setAppState({ openPopup: null });
+              }
+            }}
           >
             <Popover.Trigger asChild>
               <button
@@ -435,6 +441,10 @@ export const CompactShapeActions = ({
             open={appState.openPopup === "arrowProperties"}
             onOpenChange={(open) => {
               setAppState({ openPopup: open ? "arrowProperties" : null });
+              if (open) {
+                setStrokePopoverOpen(false);
+                setOtherActionsPopoverOpen(false);
+              }
             }}
           >
             <Popover.Trigger asChild>
@@ -507,6 +517,10 @@ export const CompactShapeActions = ({
               open={appState.openPopup === "textAlign"}
               onOpenChange={(open) => {
                 setAppState({ openPopup: open ? "textAlign" : null });
+                if (open) {
+                  setStrokePopoverOpen(false);
+                  setOtherActionsPopoverOpen(false);
+                }
               }}
             >
               <Popover.Trigger asChild>
@@ -561,7 +575,13 @@ export const CompactShapeActions = ({
         <div className="compact-action-item">
           <Popover.Root
             open={otherActionsPopoverOpen}
-            onOpenChange={setOtherActionsPopoverOpen}
+            onOpenChange={(open) => {
+              setOtherActionsPopoverOpen(open);
+              if (open) {
+                setStrokePopoverOpen(false);
+                setAppState({ openPopup: null });
+              }
+            }}
           >
             <Popover.Trigger asChild>
               <button
