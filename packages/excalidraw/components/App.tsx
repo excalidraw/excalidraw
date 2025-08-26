@@ -10533,24 +10533,27 @@ class App extends React.Component<AppProps, AppState> {
         try {
           return await this.initializeImage(placeholderImageElement, file);
         } catch (error: any) {
-          this.store.scheduleAction(CaptureUpdateAction.NEVER);
           this.scene.mutateElement(placeholderImageElement, {
             isDeleted: true,
           });
           this.setState({
             errorMessage: error.message || t("errors.imageInsertError"),
           });
-          return placeholderImageElement;
+          return null;
         }
       }),
     );
 
+    const imageElements = initializedImageElements.filter(
+      (el): el is NonDeleted<InitializedExcalidrawImageElement> => el !== null,
+    );
+
     const initializedImageElementsMap = new Map(
-      initializedImageElements.map((el) => [el.id, el]),
+      imageElements.map((el) => [el.id, el]),
     );
 
     const selectedElementIds = Object.fromEntries(
-      initializedImageElements.map((el) => [el.id, true as const]),
+      imageElements.map((el) => [el.id, true as const]),
     );
     const nextElements = this.scene
       .getElementsIncludingDeleted()
@@ -10565,7 +10568,7 @@ class App extends React.Component<AppProps, AppState> {
       },
       elements: nextElements,
     });
-    this.positionElementsOnGrid(initializedImageElements, sceneX, sceneY);
+    this.positionElementsOnGrid(imageElements, sceneX, sceneY);
     this.setState({}, () => {
       // actionFinalize after all state values have been updated
       this.actionManager.executeAction(actionFinalize);
