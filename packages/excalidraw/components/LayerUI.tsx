@@ -166,7 +166,7 @@ const LayerUI = ({
         menuTopGap: 4,
         toolbarColGap: 4,
         toolbarRowGap: 1,
-        toolbarInnerRowGap: 1,
+        toolbarInnerRowGap: 0.5,
         islandPadding: 1,
         collabMarginLeft: 8,
       }
