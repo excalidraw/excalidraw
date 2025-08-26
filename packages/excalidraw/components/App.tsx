@@ -10414,7 +10414,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  // TODO rewrite (mostly vibe-coded)
+  // TODO rewrite, and move out of file (mostly vibe-coded)
   private positionElementsOnGrid = <TElement extends ExcalidrawElement>(
     elements: TElement[] | TElement[][],
     centerX: number,
