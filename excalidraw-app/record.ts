@@ -16,12 +16,10 @@ export class Record {
   }
 
   private static header() {
-    Record.events += `  await page.setViewportSize({ width: ${window.innerWidth}, height: ${window.innerHeight} });\n`;
-    Record.events += `  await page.goto("http://localhost:3000");\n`;
-    Record.events += `  await page.waitForLoadState("load");\n`;
+    Record.events += "  await page.addInitScript(() => {\n";
+    Record.events += "    Math.random = () => 0.42;\n\n";
 
     // Capture LocalStorage, which is essential to re-establish state
-    Record.events += "  await page.evaluate(() => {\n";
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key != null) {
@@ -31,7 +29,8 @@ export class Record {
       }
     }
     Record.events += "  });\n";
-    Record.events += "  await page.reload();\n";
+    Record.events += `  await page.setViewportSize({ width: ${window.innerWidth}, height: ${window.innerHeight} });\n`;
+    Record.events += `  await page.goto("http://localhost:3000");\n`;
     Record.events += `  await page.waitForLoadState("load");\n`;
   }
 
