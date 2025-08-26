@@ -393,6 +393,7 @@ export const CompactShapeActions = ({
             </Popover.Trigger>
             {strokePopoverOpen && (
               <PropertiesPopover
+                className={CLASSES.SHAPE_ACTIONS_THEME_SCOPE}
                 container={container}
                 style={{ maxWidth: "13rem" }}
                 onClose={() => setStrokePopoverOpen(false)}
@@ -519,6 +520,7 @@ export const CompactShapeActions = ({
               </Popover.Trigger>
               {appState.openPopup === "textAlign" && (
                 <PropertiesPopover
+                  className={CLASSES.SHAPE_ACTIONS_THEME_SCOPE}
                   container={container}
                   style={{ maxWidth: "13rem" }}
                   onClose={() => setAppState({ openPopup: null })}
@@ -572,6 +574,7 @@ export const CompactShapeActions = ({
             </Popover.Trigger>
             {otherActionsPopoverOpen && (
               <PropertiesPopover
+                className={CLASSES.SHAPE_ACTIONS_THEME_SCOPE}
                 container={container}
                 style={{
                   maxWidth: "12rem",

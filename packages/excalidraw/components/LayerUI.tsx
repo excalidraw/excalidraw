@@ -243,10 +243,7 @@ const LayerUI = ({
       >
         {isTablet ? (
           <Island
-            className={clsx(
-              // CLASSES.SHAPE_ACTIONS_MENU,
-              "compact-shape-actions-island",
-            )}
+            className={clsx("compact-shape-actions-island")}
             padding={0}
             style={{
               // we want to make sure this doesn't overflow so subtracting the
