@@ -99,7 +99,6 @@ import {
   ExportToExcalidrawPlus,
   exportToExcalidrawPlus,
 } from "./components/ExportToExcalidrawPlus";
-import { saveSceneAutomatically } from "./data/supabase";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 
 import {
@@ -111,6 +110,7 @@ import {
 import {
   loadSceneFromSupabaseStorage,
   loadFilesFromSupabase,
+  saveSceneAutomatically,
 } from "./data/supabase";
 
 import { updateStaleImageStatuses } from "./data/FileManager";
@@ -126,7 +126,7 @@ import {
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
-import { SceneBrowserDialog, sceneBrowserDialogStateAtom } from "./components/SceneBrowser";
+import { SceneBrowserDialog, sceneBrowserDialogStateAtom, triggerSceneBrowserRefresh } from "./components/SceneBrowser";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import { useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
@@ -408,6 +408,19 @@ const ExcalidrawWrapper = () => {
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
 
+        // Set the current version based on the loaded scene
+        if (sceneData.metadata?.version !== undefined) {
+          currentSceneVersion.current = sceneData.metadata.version;
+          console.log("Loaded scene version:", sceneData.metadata.version);
+        } else {
+          // Default to version 0 for new scenes
+          currentSceneVersion.current = 0;
+        }
+
+        // Reset auto-save state for the new scene
+        lastSavedSceneHash.current = "";
+        lastAutoSaveTime.current = 0;
+
         // Load any associated images
         if (sceneData.files) {
           Object.values(sceneData.files).forEach((file: any) => {
@@ -667,6 +680,57 @@ const ExcalidrawWrapper = () => {
     };
   }, [excalidrawAPI]);
 
+  // Automatic scene saving with cooldown
+  const autoSaveScene = useCallback(async (
+    elements: readonly OrderedExcalidrawElement[],
+    appState: AppState,
+    files: BinaryFiles,
+  ) => {
+    if (!excalidrawAPI) return;
+
+    // Create a simple hash of the current scene state to detect changes
+    const currentSceneHash = JSON.stringify({
+      elements: elements.filter(el => !el.isDeleted).map(el => ({ id: el.id, type: el.type, versionNonce: el.versionNonce })),
+      appState: { name: appState.name, viewBackgroundColor: appState.viewBackgroundColor }
+    });
+
+    // Also trigger auto-save when the scene name changes (indicates new scene creation)
+    const isFirstSave = lastSavedSceneHash.current === "";
+    const sceneNameChanged = !isFirstSave && 
+      lastSavedSceneHash.current && 
+      !lastSavedSceneHash.current.includes(`"name":"${appState.name}"`);
+
+    // Check if there are actual changes, if scene name changed, or if this is the first save
+    if (currentSceneHash === lastSavedSceneHash.current && !sceneNameChanged && !isFirstSave) {
+      return; // No changes, don't save
+    }
+
+    const now = Date.now();
+    if (now - lastAutoSaveTime.current < AUTO_SAVE_COOLDOWN_MS) {
+      return; // Still in cooldown period
+    }
+
+    try {
+      const sceneName = excalidrawAPI.getName() || "Untitled";
+      await saveSceneAutomatically(
+        elements.filter(el => !el.isDeleted),
+        appState,
+        files,
+        sceneName,
+        currentSceneVersion.current,
+      );
+      lastAutoSaveTime.current = now;
+      lastSavedSceneHash.current = currentSceneHash;
+      console.log("Scene auto-saved successfully", {
+        reason: isFirstSave ? "first save" : sceneNameChanged ? "scene name changed" : "content changed",
+        sceneName: excalidrawAPI.getName() || "Untitled",
+        version: currentSceneVersion.current,
+      });
+    } catch (error) {
+      console.error("Failed to auto-save scene:", error);
+    }
+  }, [excalidrawAPI]);
+
   const onChange = (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
@@ -709,7 +773,7 @@ const ExcalidrawWrapper = () => {
     }
 
     // Trigger automatic scene saving
-    debouncedAutoSaveScene(elements, appState, files);
+    autoSaveScene(elements, appState, files);
 
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
@@ -726,60 +790,11 @@ const ExcalidrawWrapper = () => {
     null,
   );
 
-  // Debounced automatic scene saving
-  const debouncedAutoSave = useRef<NodeJS.Timeout | null>(null);
+  // Track current scene version for branching
+  const currentSceneVersion = useRef<number>(0);
   const lastAutoSaveTime = useRef<number>(0);
-  const AUTO_SAVE_DEBOUNCE_MS = 10000; // 10 seconds
-
-  const autoSaveScene = useCallback(async (
-    elements: readonly OrderedExcalidrawElement[],
-    appState: AppState,
-    files: BinaryFiles,
-  ) => {
-    if (!excalidrawAPI) return;
-
-    const now = Date.now();
-    if (now - lastAutoSaveTime.current < AUTO_SAVE_DEBOUNCE_MS) {
-      return;
-    }
-
-    try {
-      const sceneName = excalidrawAPI.getName() || "Untitled";
-      await saveSceneAutomatically(
-        elements.filter(el => !el.isDeleted),
-        appState,
-        files,
-        sceneName,
-      );
-      lastAutoSaveTime.current = now;
-      console.log("Scene auto-saved successfully");
-    } catch (error) {
-      console.error("Failed to auto-save scene:", error);
-    }
-  }, [excalidrawAPI]);
-
-  const debouncedAutoSaveScene = useCallback((
-    elements: readonly OrderedExcalidrawElement[],
-    appState: AppState,
-    files: BinaryFiles,
-  ) => {
-    if (debouncedAutoSave.current) {
-      clearTimeout(debouncedAutoSave.current);
-    }
-
-    debouncedAutoSave.current = setTimeout(() => {
-      autoSaveScene(elements, appState, files);
-    }, AUTO_SAVE_DEBOUNCE_MS);
-  }, [autoSaveScene]);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (debouncedAutoSave.current) {
-        clearTimeout(debouncedAutoSave.current);
-      }
-    };
-  }, []);
+  const lastSavedSceneHash = useRef<string>("");
+  const AUTO_SAVE_COOLDOWN_MS = 10000; // 10 seconds cooldown
 
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
@@ -937,6 +952,18 @@ const ExcalidrawWrapper = () => {
                             appState: { openDialog: null },
                           });
                         }}
+                        onVersionCreated={(newVersion) => {
+                          // Update the current version
+                          currentSceneVersion.current = newVersion;
+                          console.log("Switched to new version:", newVersion);
+                          
+                          // Reset auto-save state to trigger a fresh save
+                          lastSavedSceneHash.current = "";
+                          lastAutoSaveTime.current = 0;
+                          
+                          // Trigger scene browser refresh
+                          triggerSceneBrowserRefresh();
+                        }}
                       />
                     );
                   }
@@ -1052,6 +1079,11 @@ const ExcalidrawWrapper = () => {
         <SceneBrowserDialog
           onSceneLoad={handleSceneLoad}
           onError={(error) => setErrorMessage(error.message)}
+          onRefresh={() => {
+            // Reset auto-save state to trigger a fresh save
+            lastSavedSceneHash.current = "";
+            lastAutoSaveTime.current = 0;
+          }}
         />
 
         {errorMessage && (

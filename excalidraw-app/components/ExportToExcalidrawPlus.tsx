@@ -62,11 +62,15 @@ export const exportToExcalidrawPlus = async (
     version: 2,
   });
 
-  // Save metadata to database
-  await saveSceneMetadata(id, encryptionKey, {
+  // Save metadata to database and get the new version number
+  const newVersion = await saveSceneMetadata(id, encryptionKey, {
     name,
     description: `Exported diagram: ${name}`,
+    isAutomatic: false, // Explicitly mark as manual export
   });
+
+  // Update the current version in the app (this will be handled by the calling component)
+  console.log("Created new manual version:", newVersion);
 
   const filesMap = new Map<FileId, BinaryFileData>();
   for (const element of elements) {
@@ -92,6 +96,9 @@ export const exportToExcalidrawPlus = async (
   const url = `http://localhost:3000#json=${id},${encryptionKey}`;
 
   window.open(url, "_blank");
+
+  // Return the new version number
+  return newVersion;
 };
 
 export const ExportToExcalidrawPlus: React.FC<{
@@ -101,7 +108,8 @@ export const ExportToExcalidrawPlus: React.FC<{
   name: string;
   onError: (error: Error) => void;
   onSuccess: () => void;
-}> = ({ elements, appState, files, name, onError, onSuccess }) => {
+  onVersionCreated?: (version: number) => void;
+}> = ({ elements, appState, files, name, onError, onSuccess, onVersionCreated }) => {
   const { t } = useI18n();
   return (
     <Card color="primary">
@@ -127,7 +135,10 @@ export const ExportToExcalidrawPlus: React.FC<{
         onClick={async () => {
           try {
             trackEvent("export", "eplus", `ui (${getFrame()})`);
-            await exportToExcalidrawPlus(elements, appState, files, name);
+            const newVersion = await exportToExcalidrawPlus(elements, appState, files, name);
+            if (newVersion !== undefined) {
+              onVersionCreated?.(newVersion);
+            }
             onSuccess();
           } catch (error: any) {
             console.error(error);

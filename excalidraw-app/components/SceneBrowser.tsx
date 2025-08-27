@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { listExportedScenes, loadSceneById, deleteSceneById } from "../data/supabase";
+import { listExportedScenes, loadSceneById, deleteSceneByName } from "../data/supabase";
 import { Card } from "@excalidraw/excalidraw/components/Card";
 import { ToolButton } from "@excalidraw/excalidraw/components/ToolButton";
 import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
@@ -9,6 +9,23 @@ import { t } from "@excalidraw/excalidraw/i18n";
 import { atom, useAtom } from "../app-jotai";
 import { LoadIcon, LinkIcon, TrashIcon } from "@excalidraw/excalidraw/components/icons";
 import "./SceneBrowser.scss";
+
+// Global event emitter for scene updates
+const sceneUpdateEmitter = {
+  listeners: new Set<() => void>(),
+  emit() {
+    this.listeners.forEach(listener => listener());
+  },
+  subscribe(listener: () => void) {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+};
+
+// Export the emitter so other components can trigger updates
+export const triggerSceneBrowserRefresh = () => {
+  sceneUpdateEmitter.emit();
+};
 
 interface ExportedSceneVersion {
   id: string;
@@ -26,6 +43,12 @@ interface GroupedScene {
   name: string;
   description: string;
   versions: ExportedSceneVersion[];
+  branches: {
+    version: number;
+    versions: ExportedSceneVersion[];
+    latestVersion: ExportedSceneVersion;
+    isManualBranch: boolean;
+  }[];
   latestVersion: ExportedSceneVersion;
 }
 
@@ -35,7 +58,8 @@ export const sceneBrowserDialogStateAtom = atom<{ isOpen: boolean }>({ isOpen: f
 export const SceneBrowserDialog: React.FC<{
   onSceneLoad: (sceneData: any) => void;
   onError?: (error: Error) => void;
-}> = ({ onSceneLoad, onError }) => {
+  onRefresh?: () => void;
+}> = ({ onSceneLoad, onError, onRefresh }) => {
   const [dialogState, setDialogState] = useAtom(sceneBrowserDialogStateAtom);
   const [scenes, setScenes] = useState<GroupedScene[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,6 +90,15 @@ export const SceneBrowserDialog: React.FC<{
   useEffect(() => {
     if (dialogState.isOpen) {
       loadScenes();
+      
+      // Subscribe to scene update events
+      const unsubscribe = sceneUpdateEmitter.subscribe(() => {
+        loadScenes();
+      });
+      
+      return () => {
+        unsubscribe();
+      };
     }
   }, [dialogState.isOpen, loadScenes]);
 
@@ -92,21 +125,23 @@ export const SceneBrowserDialog: React.FC<{
     setDialogState({ isOpen: false });
   };
 
-  const handleDeleteScene = async (sceneId: string) => {
-    if (!confirm("Are you sure you want to delete this scene? This action cannot be undone.")) {
+  const handleRefresh = () => {
+    loadScenes();
+    onRefresh?.();
+  };
+
+  const handleDeleteScene = async (sceneName: string) => {
+    if (!confirm(`Are you sure you want to delete the entire scene "${sceneName}" and all its versions? This action cannot be undone.`)) {
       return;
     }
 
     try {
-      setDeletingScene(sceneId);
-      await deleteSceneById(sceneId);
+      setDeletingScene(sceneName);
+      await deleteSceneByName(sceneName);
       
-      // Remove the scene from the local state
+      // Remove the entire scene from the local state
       setScenes(prevScenes => 
-        prevScenes.map(scene => ({
-          ...scene,
-          versions: scene.versions.filter(version => version.id !== sceneId),
-        })).filter(scene => scene.versions.length > 0)
+        prevScenes.filter(scene => scene.name !== sceneName)
       );
       
       trackEvent("scene", "delete", `browser`);
@@ -165,19 +200,23 @@ export const SceneBrowserDialog: React.FC<{
               <div className="SceneBrowser__meta">
                 <h4 className="SceneBrowser__name">{scene.name}</h4>
                 <div className="SceneBrowser__sub">
-                  {scene.versions.length > 1 ? (
+                  {scene.branches.length > 1 ? (
                     <div className="SceneBrowser__version-selector">
-                      <label htmlFor={`version-${scene.name}`}>Version:</label>
+                      <label htmlFor={`version-${scene.name}`}>Branch:</label>
                       <select
                         id={`version-${scene.name}`}
                         className="dropdown-select"
                         value={selectedVersions[scene.name] || scene.latestVersion.id}
                         onChange={(e) => handleVersionChange(scene.name, e.target.value)}
                       >
-                        {scene.versions.map((version) => (
-                          <option key={version.id} value={version.id}>
-                            {version.isAutomatic ? "Latest" : `v${version.version}`} {version.isLatest ? "(Latest)" : ""} - {formatDate(version.createdAt)}
-                          </option>
+                        {scene.branches.map((branch) => (
+                          <optgroup key={branch.version} label={branch.isManualBranch ? `Manual v${branch.version}` : `Automatic v${branch.version}`}>
+                            {branch.versions.map((version) => (
+                              <option key={version.id} value={version.id}>
+                                {version.isLatest ? "Latest" : formatDate(version.createdAt)}
+                              </option>
+                            ))}
+                          </optgroup>
                         ))}
                       </select>
                     </div>
@@ -216,19 +255,17 @@ export const SceneBrowserDialog: React.FC<{
                 >
                   Copy URL
                 </ToolButton>
-                {scene.versions.length > 1 && (
-                  <ToolButton
-                    type="button"
-                    size="small"
-                    title="Delete Version"
-                    aria-label="Delete scene version"
-                    icon={TrashIcon}
-                    onClick={() => handleDeleteScene(selectedVersions[scene.name])}
-                    disabled={deletingScene === selectedVersions[scene.name]}
-                  >
-                    {deletingScene === selectedVersions[scene.name] ? "Deleting..." : "Delete Version"}
-                  </ToolButton>
-                )}
+                <ToolButton
+                  type="button"
+                  size="small"
+                  title="Delete Scene"
+                  aria-label="Delete entire scene and all versions"
+                  icon={TrashIcon}
+                  onClick={() => handleDeleteScene(scene.name)}
+                  disabled={deletingScene === scene.name}
+                >
+                  {deletingScene === scene.name ? "Deleting..." : "Delete Scene"}
+                </ToolButton>
               </div>
             </div>
           ))}
@@ -240,7 +277,22 @@ export const SceneBrowserDialog: React.FC<{
   return (
     <Dialog
       onCloseRequest={handleClose}
-      title="Scene Browser"
+      title={
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+          <span>Scene Browser</span>
+          <ToolButton
+            type="button"
+            size="small"
+            title="Refresh Scenes"
+            aria-label="Refresh scenes"
+            icon="⟳"
+            onClick={handleRefresh}
+            disabled={loading}
+          >
+            Refresh
+          </ToolButton>
+        </div>
+      }
       size="wide"
     >
       {renderContent()}

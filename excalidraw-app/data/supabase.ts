@@ -369,7 +369,9 @@ export const saveSceneToSupabaseStorage = async (
 
   try {
     const fileName = `files/shareLinks/${sceneId}`;
-    const { error } = await supabase.storage
+    
+    // Try to upload, if it fails due to existing file, remove and retry
+    let { error } = await supabase.storage
       .from("diagram-files")
       .upload(fileName, sceneData, {
         cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
@@ -383,7 +385,35 @@ export const saveSceneToSupabaseStorage = async (
           : undefined,
       });
 
-    if (error) {
+    if (error && error.message?.includes("already exists")) {
+      // File already exists, remove it first
+      const { error: removeError } = await supabase.storage
+        .from("diagram-files")
+        .remove([fileName]);
+
+      if (removeError) {
+        console.warn("Failed to remove existing file:", removeError);
+      }
+
+      // Try upload again
+      const { error: retryError } = await supabase.storage
+        .from("diagram-files")
+        .upload(fileName, sceneData, {
+          cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
+          contentType: MIME_TYPES.binary,
+          metadata: metadata
+            ? {
+                name: metadata.name || "",
+                version: metadata.version?.toString() || "2",
+                created: Date.now().toString(),
+              }
+            : undefined,
+        });
+
+      if (retryError) {
+        throw retryError;
+      }
+    } else if (error) {
       throw error;
     }
 
@@ -394,61 +424,103 @@ export const saveSceneToSupabaseStorage = async (
   }
 };
 
-// Function to save scene metadata to database with versioning support
+// Function to save scene metadata to database with branching versioning support
 export const saveSceneMetadata = async (
   sceneId: string,
   encryptionKey: string,
-  metadata: { name?: string; description?: string; isAutomatic?: boolean },
+  metadata: { name?: string; description?: string; isAutomatic?: boolean; currentVersion?: number },
 ) => {
   const supabase = _getSupabase();
 
   try {
     const sceneName = metadata.name || `Scene ${sceneId}`;
     
-    // Check if a scene with this name already exists
-    const { data: existingScenes, error: checkError } = await (supabase as any)
-      .from("scene_metadata")
-      .select("version")
-      .eq("name", sceneName)
-      .order("version", { ascending: false });
-
-    if (checkError) {
-      throw checkError;
-    }
-
-    // Determine the next version number
-    const nextVersion = existingScenes && existingScenes.length > 0 
-      ? Math.max(...existingScenes.map((s: any) => s.version)) + 1 
-      : 1;
-
-    // Mark all existing versions of this scene as not latest
-    if (existingScenes && existingScenes.length > 0) {
-      const { error: updateError } = await (supabase as any)
+    if (metadata.isAutomatic) {
+      // For automatic saves, update the "Latest" version of the current branch
+      const currentVersion = metadata.currentVersion || 0;
+      
+      // Check if there's already a "Latest" version for this branch
+      const { data: existingLatest, error: checkError } = await (supabase as any)
         .from("scene_metadata")
-        .update({ is_latest: false })
-        .eq("name", sceneName);
+        .select("scene_id")
+        .eq("name", sceneName)
+        .eq("version", currentVersion)
+        .eq("is_latest", true)
+        .single();
 
-      if (updateError) {
-        throw updateError;
+      if (existingLatest && !checkError) {
+        // Update existing "Latest" version for this branch
+        const { error: updateError } = await (supabase as any)
+          .from("scene_metadata")
+          .update({
+            scene_id: sceneId,
+            encryption_key: encryptionKey,
+            description: metadata.description || "",
+            created_at: new Date().toISOString(),
+          })
+          .eq("scene_id", existingLatest.scene_id);
+
+        if (updateError) {
+          throw updateError;
+        }
+      } else {
+        // Create new "Latest" version for this branch
+        const { error } = await (supabase as any)
+          .from("scene_metadata")
+          .insert({
+            scene_id: sceneId,
+            encryption_key: encryptionKey,
+            name: sceneName,
+            description: metadata.description || "",
+            version: currentVersion,
+            is_latest: true,
+            is_automatic: true,
+            created_at: new Date().toISOString(),
+          });
+
+        if (error) {
+          throw error;
+        }
       }
-    }
+    } else {
+      // For manual exports, create a new version branch
+      // Check if a scene with this name already exists (excluding automatic versions)
+      const { data: existingScenes, error: checkError } = await (supabase as any)
+        .from("scene_metadata")
+        .select("version")
+        .eq("name", sceneName)
+        .eq("is_automatic", false)
+        .order("version", { ascending: false });
 
-    // Insert the new version
-    const { error } = await (supabase as any)
-      .from("scene_metadata")
-      .insert({
-        scene_id: sceneId,
-        encryption_key: encryptionKey,
-        name: sceneName,
-        description: metadata.description || "",
-        version: nextVersion,
-        is_latest: true,
-        is_automatic: metadata.isAutomatic || false,
-        created_at: new Date().toISOString(),
-      });
+      if (checkError) {
+        throw checkError;
+      }
 
-    if (error) {
-      throw error;
+      // Determine the next version number (only counting manual exports)
+      const nextVersion = existingScenes && existingScenes.length > 0 
+        ? Math.max(...existingScenes.map((s: any) => s.version)) + 1 
+        : 1;
+
+      // Insert the new manual version branch
+      const { error } = await (supabase as any)
+        .from("scene_metadata")
+        .insert({
+          scene_id: sceneId,
+          encryption_key: encryptionKey,
+          name: sceneName,
+          description: metadata.description || "",
+          version: nextVersion,
+          is_latest: false, // Manual exports create new branches, not latest
+          is_automatic: false,
+          created_at: new Date().toISOString(),
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      // Return the version number for manual exports
+      return nextVersion;
     }
   } catch (error: any) {
     console.error("Error saving scene metadata:", error);
@@ -456,16 +528,17 @@ export const saveSceneMetadata = async (
   }
 };
 
-// Function to save scene automatically (creates "latest" version)
+// Function to save scene automatically (creates or replaces "latest" version for current branch)
 export const saveSceneAutomatically = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: Partial<AppState>,
   files: BinaryFiles,
   name: string,
+  currentVersion: number = 0,
 ) => {
-  const id = `${nanoid(12)}`;
-
+  const sceneId = `${nanoid(12)}`;
   const encryptionKey = (await generateEncryptionKey())!;
+
   const encryptedData = await encryptData(
     encryptionKey,
     serializeAsJSON(elements, appState, files, "database"),
@@ -481,23 +554,24 @@ export const saveSceneAutomatically = async (
     encryptedData.iv.length,
   );
 
-  // Save to Supabase storage
-  await saveSceneToSupabaseStorage(sceneData, id, {
+  // Save to Supabase storage (overwrite if exists)
+  await saveSceneToSupabaseStorage(sceneData, sceneId, {
     name,
     version: 2,
   });
 
-  // Save metadata to database with automatic flag
-  await saveSceneMetadata(id, encryptionKey, {
+  // Save metadata to database with automatic flag and current version
+  await saveSceneMetadata(sceneId, encryptionKey, {
     name,
     description: `Latest automatic save: ${name}`,
     isAutomatic: true,
+    currentVersion,
   });
 
-  return id;
+  return sceneId;
 };
 
-// Function to list all exported scenes with metadata, grouped by name with versioning
+// Function to list all exported scenes with metadata, grouped by name with branching versioning
 export const listExportedScenes = async () => {
   const supabase = _getSupabase();
 
@@ -512,14 +586,19 @@ export const listExportedScenes = async () => {
       throw error;
     }
 
-    // Group scenes by name
-    const groupedScenes = new Map<string, any[]>();
+    // Group scenes by name and version (branch)
+    const groupedScenes = new Map<string, Map<number, any[]>>();
     
     data?.forEach((item: any) => {
       if (!groupedScenes.has(item.name)) {
-        groupedScenes.set(item.name, []);
+        groupedScenes.set(item.name, new Map());
       }
-      groupedScenes.get(item.name)!.push({
+      const versionMap = groupedScenes.get(item.name)!;
+      
+      if (!versionMap.has(item.version)) {
+        versionMap.set(item.version, []);
+      }
+      versionMap.get(item.version)!.push({
         id: item.scene_id,
         name: item.name,
         description: item.description,
@@ -532,13 +611,24 @@ export const listExportedScenes = async () => {
       });
     });
 
-    // Convert to array format for backward compatibility
-    return Array.from(groupedScenes.values()).map(versions => ({
-      name: versions[0].name,
-      description: versions[0].description,
-      versions: versions,
-      latestVersion: versions.find((v: any) => v.isLatest) || versions[0],
-    }));
+    // Convert to array format with branches
+    return Array.from(groupedScenes.entries()).map(([name, versionMap]) => {
+      const allVersions = Array.from(versionMap.values()).flat();
+      const branches = Array.from(versionMap.entries()).map(([version, versions]) => ({
+        version,
+        versions,
+        latestVersion: versions.find((v: any) => v.isLatest) || versions[0],
+        isManualBranch: version > 0, // v0 is automatic, v1+ are manual branches
+      }));
+
+      return {
+        name,
+        description: allVersions[0]?.description || "",
+        versions: allVersions,
+        branches,
+        latestVersion: allVersions.find((v: any) => v.isLatest) || allVersions[0],
+      };
+    });
   } catch (error: any) {
     console.error("Error listing exported scenes:", error);
     return [];
@@ -623,15 +713,6 @@ export const deleteSceneById = async (sceneId: string) => {
       throw deleteMetadataError;
     }
 
-    // Delete from diagrams table
-    const { error: deleteDiagramsError } = await (supabase as any)
-      .from("diagrams")
-      .delete()
-      .eq("room_id", sceneId);
-
-    if (deleteDiagramsError) {
-      throw deleteDiagramsError;
-    }
 
     // Delete the file from storage
     const { error: deleteStorageError } = await supabase.storage
@@ -640,6 +721,55 @@ export const deleteSceneById = async (sceneId: string) => {
 
     if (deleteStorageError) {
       console.warn("Failed to delete scene file from storage:", deleteStorageError);
+      // Don't throw here as the metadata and versions are already deleted
+    }
+
+    return true;
+  } catch (error: any) {
+    console.error("Error deleting scene:", error);
+    throw error;
+  }
+};
+
+// Function to delete all versions of a scene by name
+export const deleteSceneByName = async (sceneName: string) => {
+  const supabase = _getSupabase();
+
+  try {
+    // Get all versions of the scene
+    const { data: allVersions, error: fetchError } = await (supabase as any)
+      .from("scene_metadata")
+      .select("scene_id")
+      .eq("name", sceneName);
+
+    if (fetchError) {
+      throw fetchError;
+    }
+
+    if (!allVersions || allVersions.length === 0) {
+      throw new Error("Scene not found");
+    }
+
+    const sceneIds = allVersions.map((version: any) => version.scene_id);
+
+    // Delete all versions from scene_metadata table
+    const { error: deleteMetadataError } = await (supabase as any)
+      .from("scene_metadata")
+      .delete()
+      .in("scene_id", sceneIds);
+
+    if (deleteMetadataError) {
+      throw deleteMetadataError;
+    }
+
+    // Delete all files from storage
+    const filePaths = sceneIds.map((id: string) => `files/shareLinks/${id}`);
+    const { error: deleteStorageError } = await supabase.storage
+      .from("diagram-files")
+      .remove(filePaths);
+
+    if (deleteStorageError) {
+      console.warn("Failed to delete some scene files from storage:", deleteStorageError);
       // Don't throw here as the metadata and versions are already deleted
     }
 
