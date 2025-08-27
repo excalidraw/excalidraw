@@ -28,7 +28,7 @@ export enum WS_SUBTYPES {
   USER_VISIBLE_SCENE_BOUNDS = "USER_VISIBLE_SCENE_BOUNDS",
 }
 
-export const FIREBASE_STORAGE_PREFIXES = {
+export const STORAGE_PREFIXES = {
   shareLinkFiles: `/files/shareLinks`,
   collabFiles: `/files/rooms`,
 };

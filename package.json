@@ -90,5 +90,8 @@
   },
   "resolutions": {
     "strip-ansi": "6.0.1"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.56.0"
   }
 }

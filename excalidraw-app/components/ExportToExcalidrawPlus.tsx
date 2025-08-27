@@ -1,12 +1,11 @@
 import React from "react";
-import { uploadBytes, ref } from "firebase/storage";
 import { nanoid } from "nanoid";
 
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { Card } from "@excalidraw/excalidraw/components/Card";
 import { ExcalidrawLogo } from "@excalidraw/excalidraw/components/ExcalidrawLogo";
 import { ToolButton } from "@excalidraw/excalidraw/components/ToolButton";
-import { MIME_TYPES, getFrame } from "@excalidraw/common";
+import { getFrame } from "@excalidraw/common";
 import {
   encryptData,
   generateEncryptionKey,
@@ -27,7 +26,10 @@ import type {
 
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";
-import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
+import {
+  saveFilesToSupabase,
+  saveSceneToSupabaseStorage,
+} from "../data/supabase";
 
 export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -35,8 +37,6 @@ export const exportToExcalidrawPlus = async (
   files: BinaryFiles,
   name: string,
 ) => {
-  const storage = await loadFirebaseStorage();
-
   const id = `${nanoid(12)}`;
 
   const encryptionKey = (await generateEncryptionKey())!;
@@ -45,19 +45,20 @@ export const exportToExcalidrawPlus = async (
     serializeAsJSON(elements, appState, files, "database"),
   );
 
-  const blob = new Blob(
-    [encryptedData.iv, new Uint8Array(encryptedData.encryptedBuffer)],
-    {
-      type: MIME_TYPES.binary,
-    },
+  // Combine IV and encrypted data into a single Uint8Array
+  const sceneData = new Uint8Array(
+    encryptedData.iv.length + encryptedData.encryptedBuffer.byteLength,
+  );
+  sceneData.set(encryptedData.iv);
+  sceneData.set(
+    new Uint8Array(encryptedData.encryptedBuffer),
+    encryptedData.iv.length,
   );
 
-  const storageRef = ref(storage, `/migrations/scenes/${id}`);
-  await uploadBytes(storageRef, blob, {
-    customMetadata: {
-      data: JSON.stringify({ version: 2, name }),
-      created: Date.now().toString(),
-    },
+  // Save to Supabase storage
+  await saveSceneToSupabaseStorage(sceneData, id, {
+    name,
+    version: 2,
   });
 
   const filesMap = new Map<FileId, BinaryFileData>();
@@ -74,17 +75,16 @@ export const exportToExcalidrawPlus = async (
       maxBytes: FILE_UPLOAD_MAX_BYTES,
     });
 
-    await saveFilesToFirebase({
-      prefix: `/migrations/files/scenes/${id}`,
+    await saveFilesToSupabase({
+      prefix: `files/shareLinks/${id}`,
       files: filesToUpload,
     });
   }
 
-  window.open(
-    `${
-      import.meta.env.VITE_APP_PLUS_APP
-    }/import?excalidraw=${id},${encryptionKey}`,
-  );
+  // Generate local URL that can load from Supabase storage
+  const url = `http://localhost:3000#json=${id},${encryptionKey}`;
+
+  window.open(url, "_blank");
 };
 
 export const ExportToExcalidrawPlus: React.FC<{

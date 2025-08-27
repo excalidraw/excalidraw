@@ -82,7 +82,7 @@ import {
   appJotaiStore,
 } from "./app-jotai";
 import {
-  FIREBASE_STORAGE_PREFIXES,
+  STORAGE_PREFIXES,
   isExcalidrawPlusSignedUser,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
@@ -107,6 +107,10 @@ import {
   isCollaborationLink,
   loadScene,
 } from "./data";
+import {
+  loadSceneFromSupabaseStorage,
+  loadFilesFromSupabase,
+} from "./data/supabase";
 
 import { updateStaleImageStatuses } from "./data/FileManager";
 import {
@@ -114,7 +118,6 @@ import {
   importUsernameFromLocalStorage,
 } from "./data/localStorage";
 
-import { loadFilesFromFirebase } from "./data/firebase";
 import {
   LibraryIndexedDBAdapter,
   LibraryLocalStorageMigrationAdapter,
@@ -235,11 +238,30 @@ const initializeScene = async (opts: {
       (await openConfirmModal(shareableLinkConfirmDialog))
     ) {
       if (jsonBackendMatch) {
-        scene = await loadScene(
-          jsonBackendMatch[1],
-          jsonBackendMatch[2],
-          localDataState,
-        );
+        try {
+          // Try to load from Supabase storage first
+          const supabaseData = await loadSceneFromSupabaseStorage(
+            jsonBackendMatch[1],
+            jsonBackendMatch[2],
+          );
+          scene = restore(
+            supabaseData,
+            localDataState?.appState,
+            localDataState?.elements,
+            {
+              repairBindings: true,
+              refreshDimensions: false,
+              deleteInvisibleElements: true,
+            },
+          );
+        } catch (error) {
+          // Fall back to original backend
+          scene = await loadScene(
+            jsonBackendMatch[1],
+            jsonBackendMatch[2],
+            localDataState,
+          );
+        }
       }
       scene.scrollToContent = true;
       if (!roomLinkData) {
@@ -434,8 +456,8 @@ const ExcalidrawWrapper = () => {
           }, [] as FileId[]) || [];
 
         if (data.isExternalScene) {
-          loadFilesFromFirebase(
-            `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
+          loadFilesFromSupabase(
+            `${STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
             data.key,
             fileIds,
           ).then(({ loadedFiles, erroredFiles }) => {
