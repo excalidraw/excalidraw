@@ -520,14 +520,14 @@ export const deleteSceneById = async (sceneId: string) => {
       throw deleteMetadataError;
     }
 
-    // Delete from scene_versions table
-    const { error: deleteVersionsError } = await (supabase as any)
-      .from("scene_versions")
+    // Delete from diagrams table
+    const { error: deleteDiagramsError } = await (supabase as any)
+      .from("diagrams")
       .delete()
       .eq("room_id", sceneId);
 
-    if (deleteVersionsError) {
-      throw deleteVersionsError;
+    if (deleteDiagramsError) {
+      throw deleteDiagramsError;
     }
 
     // Delete the file from storage
