@@ -63,4 +63,15 @@
     font-size: 0.6rem;
     font-family: "Cascadia";
   }
+
+  .sign-out-button {
+    --button-bg: var(--color-primary);
+    --button-color: var(--color-surface-lowest);
+    --button-border: var(--color-primary);
+    --button-hover-bg: var(--color-primary-darker);
+    --button-hover-border: var(--color-primary-darker);
+
+    min-width: 120px;
+    width: auto;
+  }
 }

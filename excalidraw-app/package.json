@@ -28,6 +28,7 @@
   "dependencies": {
     "@excalidraw/random-username": "1.0.0",
     "@sentry/browser": "9.0.1",
+    "@supabase/supabase-js": "2.56.0",
     "callsites": "4.2.0",
     "firebase": "11.3.1",
     "i18next-browser-languagedetector": "6.1.4",

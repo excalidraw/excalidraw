@@ -1,4 +1,3 @@
-import { createClient } from "@supabase/supabase-js";
 import { reconcileElements } from "@excalidraw/excalidraw";
 import { MIME_TYPES } from "@excalidraw/common";
 import { decompressData } from "@excalidraw/excalidraw/data/encode";
@@ -37,27 +36,36 @@ import type { SyncableExcalidrawElement } from ".";
 import type Portal from "../collab/Portal";
 import type { Socket } from "socket.io-client";
 
-// Supabase configuration
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-// Initialize Supabase client
-let supabaseClient: ReturnType<typeof createClient> | null = null;
-
-const _initializeSupabase = () => {
-  if (!supabaseClient) {
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      throw new Error(
-        "Supabase URL and anonymous key are required. Please check your environment variables.",
-      );
-    }
-    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-  return supabaseClient;
-};
+// Import Supabase client from AuthContext to ensure shared session
+import { supabase } from "../components/AuthContext";
 
 const _getSupabase = () => {
-  return _initializeSupabase();
+  return supabase;
+};
+
+// Helper function to get current user ID
+const _getCurrentUserId = async (): Promise<string | null> => {
+  try {
+    const supabase = _getSupabase();
+    if (!supabase) {
+      console.warn("Supabase not configured");
+      return null;
+    }
+
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error) {
+      console.error("Error getting current user:", error);
+      return null;
+    }
+    if (!user) {
+      console.warn("No authenticated user found");
+      return null;
+    }
+    return user.id;
+  } catch (error) {
+    console.error("Unexpected error getting current user:", error);
+    return null;
+  }
 };
 
 type SupabaseStoredScene = {
@@ -141,6 +149,13 @@ export const saveFilesToSupabase = async ({
   const erroredFiles: FileId[] = [];
   const savedFiles: FileId[] = [];
 
+  if (!supabase) {
+    console.warn("Supabase not configured - cannot save files");
+    return { savedFiles: [], erroredFiles: files.map(f => f.id) };
+  }
+
+  // Note: This function uses Supabase Storage, not the diagram_files table
+  // The diagram_files table is for metadata, but storage uses Supabase Storage buckets
   await Promise.all(
     files.map(async ({ id, buffer }) => {
       try {
@@ -199,72 +214,25 @@ export const saveToSupabase = async (
   }
 
   const supabase = _getSupabase();
+  const userId = await _getCurrentUserId();
+
+  if (!userId) {
+    console.warn("User must be authenticated to save collaborative scenes");
+    return null;
+  }
 
   try {
-    // Check if scene already exists
-    const { data: existingScene } = await supabase
-      .from("diagrams")
-      .select("*")
-      .eq("room_id", roomId)
-      .single();
+    // Note: diagrams table may not exist in current schema
+    // This function is for collaborative editing which requires additional tables
+    console.warn("Collaborative editing with Supabase is not available - diagrams table missing");
 
-    if (existingScene) {
-      // Decrypt existing scene for reconciliation
-      const prevStoredScene = existingScene as SupabaseStoredScene;
-      const prevStoredElements = getSyncableElements(
-        restoreElements(await decryptElements(prevStoredScene, roomKey), null),
-      );
-
-      const reconciledElements = getSyncableElements(
-        reconcileElements(
-          elements,
-          prevStoredElements as OrderedExcalidrawElement[] as RemoteExcalidrawElement[],
-          appState,
-        ),
-      );
-
-      const sceneData = await createSupabaseSceneDocument(
-        roomId,
-        reconciledElements,
-        roomKey,
-      );
-
-      // Update existing scene
-      const { error } = await (supabase as any)
-        .from("diagrams")
-        .update(sceneData)
-        .eq("room_id", roomId);
-
-      if (error) {
-        throw error;
-      }
-
-      const storedElements = reconciledElements;
-      SupabaseSceneVersionCache.set(socket, storedElements);
-
-      return storedElements;
-    }
-    // Create new scene
-    const sceneData = await createSupabaseSceneDocument(
-      roomId,
-      elements,
-      roomKey,
-    );
-
-    const { error } = await (supabase as any)
-      .from("diagrams")
-      .insert(sceneData);
-
-    if (error) {
-      throw error;
-    }
-
-    SupabaseSceneVersionCache.set(socket, elements);
-
-    return elements;
+    // For now, return null to indicate collaborative save is not available
+    // The scene will still be saved locally via localStorage
+    return null;
   } catch (error: any) {
     console.error("Error saving to Supabase:", error);
-    throw error;
+    // Don't throw error - let the local save continue
+    return null;
   }
 };
 
@@ -274,33 +242,19 @@ export const loadFromSupabase = async (
   socket: Socket | null,
 ): Promise<readonly SyncableExcalidrawElement[] | null> => {
   const supabase = _getSupabase();
+  const userId = await _getCurrentUserId();
+
+  if (!userId) {
+    console.warn("User must be authenticated to load collaborative scenes");
+    return null;
+  }
 
   try {
-    const { data: storedScene, error } = await supabase
-      .from("diagrams")
-      .select("*")
-      .eq("room_id", roomId)
-      .single();
+    // Note: diagrams table may not exist in current schema
+    console.warn("Collaborative loading from Supabase is not available - diagrams table missing");
 
-    if (error || !storedScene) {
-      return null;
-    }
-
-    const elements = getSyncableElements(
-      restoreElements(
-        await decryptElements(storedScene as SupabaseStoredScene, roomKey),
-        null,
-        {
-          deleteInvisibleElements: true,
-        },
-      ),
-    );
-
-    if (socket) {
-      SupabaseSceneVersionCache.set(socket, elements);
-    }
-
-    return elements;
+    // Return null to indicate collaborative load is not available
+    return null;
   } catch (error: any) {
     console.error("Error loading from Supabase:", error);
     return null;
@@ -316,6 +270,11 @@ export const loadFilesFromSupabase = async (
 
   const loadedFiles: BinaryFileData[] = [];
   const erroredFiles = new Map<FileId, true>();
+
+  if (!supabase) {
+    console.warn("Supabase not configured - cannot load files");
+    return { loadedFiles: [], erroredFiles: new Map(filesIds.map(id => [id, true as const])) };
+  }
 
   await Promise.all(
     [...new Set(filesIds)].map(async (id) => {
@@ -367,9 +326,19 @@ export const saveSceneToSupabaseStorage = async (
 ) => {
   const supabase = _getSupabase();
 
+  if (!supabase) {
+    throw new Error("Supabase not configured");
+  }
+
   try {
     const fileName = `files/shareLinks/${sceneId}`;
-    
+
+    console.log('Attempting to save scene to Supabase storage:', {
+      fileName,
+      bucket: 'diagram-files',
+      dataSize: sceneData.length
+    });
+
     // Try to upload, if it fails due to existing file, remove and retry
     let { error } = await supabase.storage
       .from("diagram-files")
@@ -385,38 +354,51 @@ export const saveSceneToSupabaseStorage = async (
           : undefined,
       });
 
-    if (error && error.message?.includes("already exists")) {
-      // File already exists, remove it first
-      const { error: removeError } = await supabase.storage
-        .from("diagram-files")
-        .remove([fileName]);
+    if (error) {
+      console.error('Supabase storage upload error:', error);
 
-      if (removeError) {
-        console.warn("Failed to remove existing file:", removeError);
+      // Check if it's a permission error
+      if (error.message?.includes('violates row-level security')) {
+        throw new Error('Storage permission denied. Please check Supabase Storage bucket policies.');
       }
 
-      // Try upload again
-      const { error: retryError } = await supabase.storage
-        .from("diagram-files")
-        .upload(fileName, sceneData, {
-          cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
-          contentType: MIME_TYPES.binary,
-          metadata: metadata
-            ? {
-                name: metadata.name || "",
-                version: metadata.version?.toString() || "2",
-                created: Date.now().toString(),
-              }
-            : undefined,
-        });
+      // If file already exists, try to remove it and retry
+      if (error.message?.includes("already exists")) {
+        console.log('File already exists, attempting to remove and retry...');
 
-      if (retryError) {
-        throw retryError;
+        const { error: removeError } = await supabase.storage
+          .from("diagram-files")
+          .remove([fileName]);
+
+        if (removeError) {
+          console.warn("Failed to remove existing file:", removeError);
+        }
+
+        // Try upload again
+        const { error: retryError } = await supabase.storage
+          .from("diagram-files")
+          .upload(fileName, sceneData, {
+            cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
+            contentType: MIME_TYPES.binary,
+            metadata: metadata
+              ? {
+                  name: metadata.name || "",
+                  version: metadata.version?.toString() || "2",
+                  created: Date.now().toString(),
+                }
+              : undefined,
+          });
+
+        if (retryError) {
+          console.error('Retry upload failed:', retryError);
+          throw retryError;
+        }
+      } else {
+        throw error;
       }
-    } else if (error) {
-      throw error;
     }
 
+    console.log('Scene saved successfully to Supabase storage:', fileName);
     return fileName;
   } catch (error: any) {
     console.error("Error saving scene to Supabase storage:", error);
@@ -429,43 +411,95 @@ export const saveSceneMetadata = async (
   sceneId: string,
   encryptionKey: string,
   metadata: { name?: string; description?: string; isAutomatic?: boolean; currentVersion?: number },
+  userId?: string,
 ) => {
   const supabase = _getSupabase();
+  if (!supabase) {
+    throw new Error("Supabase not configured");
+  }
+
+  const currentUserId = userId || await _getCurrentUserId();
+
+  if (!currentUserId) {
+    throw new Error("User must be authenticated to save scene metadata");
+  }
 
   try {
     const sceneName = metadata.name || `Scene ${sceneId}`;
-    
+
     if (metadata.isAutomatic) {
       // For automatic saves, update the "Latest" version of the current branch
       const currentVersion = metadata.currentVersion || 0;
-      
-      // Check if there's already a "Latest" version for this branch
-      const { data: existingLatest, error: checkError } = await (supabase as any)
-        .from("scene_metadata")
-        .select("scene_id")
-        .eq("name", sceneName)
-        .eq("version", currentVersion)
-        .eq("is_latest", true)
-        .single();
 
-      if (existingLatest && !checkError) {
+      // Check if there's already a "Latest" version for this branch
+      let existingLatest: any = null;
+      let hasExistingRecord = false;
+      
+      try {
+        const { data, error } = await supabase!
+          .from("scene_metadata")
+          .select("scene_id")
+          .eq("name", sceneName)
+          .eq("version", currentVersion)
+          .eq("is_latest", true)
+          .eq("user_id", currentUserId)
+          .single();
+
+        if (error) {
+          // Handle PGRST116 error (multiple rows found) - this indicates duplicate data
+          if (error.message?.includes('Results contain 2 rows')) {
+            console.warn('PGRST116 error detected - duplicate records found. Please run fix-pgrst116-duplicates.sql to clean up the database.');
+            throw new Error('Database contains duplicate records. Please run the database cleanup script (fix-pgrst116-duplicates.sql) to resolve this issue.');
+          } else if (error.message?.includes('violates row-level security')) {
+            throw new Error('Access denied. Please check your Supabase RLS policies.');
+          } else if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+            throw new Error('Database table missing. Please run the database migrations from supabase-diagnostics.sql');
+          } else if (error.message?.includes('column') && error.message?.includes('does not exist')) {
+            throw new Error('Database column missing. Please run the database migrations from supabase-diagnostics.sql');
+          } else {
+            throw error;
+          }
+        } else {
+          existingLatest = data;
+          hasExistingRecord = true;
+        }
+      } catch (error: any) {
+        // If it's a "no rows found" error, that's normal - just continue
+        if (error.message?.includes('Results contain 0 rows')) {
+          console.log('No existing latest version found, will create new one');
+        } else {
+          // Re-throw other errors
+          throw error;
+        }
+      }
+
+      // Log whether we found an existing record or not
+      if (hasExistingRecord) {
+        console.log('Found existing latest version, will update it');
+      }
+
+      if (hasExistingRecord) {
         // Update existing "Latest" version for this branch
-        const { error: updateError } = await (supabase as any)
+        console.log('Updating existing latest version');
+        const { error: updateError } = await (supabase!
           .from("scene_metadata")
           .update({
             scene_id: sceneId,
             encryption_key: encryptionKey,
             description: metadata.description || "",
             created_at: new Date().toISOString(),
-          })
-          .eq("scene_id", existingLatest.scene_id);
+          } as any)
+          .eq("scene_id", (existingLatest as any).scene_id)
+          .eq("user_id", currentUserId) as any);
 
         if (updateError) {
-          throw updateError;
+          console.error('Error updating existing scene metadata:', updateError);
+          throw updateError as Error;
         }
       } else {
         // Create new "Latest" version for this branch
-        const { error } = await (supabase as any)
+        console.log('Creating new latest version');
+        const { error } = await supabase!
           .from("scene_metadata")
           .insert({
             scene_id: sceneId,
@@ -475,21 +509,31 @@ export const saveSceneMetadata = async (
             version: currentVersion,
             is_latest: true,
             is_automatic: true,
+            user_id: currentUserId,
             created_at: new Date().toISOString(),
-          });
+          } as any);
 
         if (error) {
+          console.error('Error creating new scene metadata:', error);
+          if (error.message?.includes('violates row-level security')) {
+            throw new Error('Access denied. Please check your Supabase RLS policies.');
+          } else if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+            throw new Error('Database table missing. Please run the database migrations from supabase-diagnostics.sql');
+          } else if (error.message?.includes('column') && error.message?.includes('does not exist')) {
+            throw new Error('Database column missing. Please run the database migrations from supabase-diagnostics.sql');
+          }
           throw error;
         }
       }
     } else {
       // For manual exports, create a new version branch
       // Check if a scene with this name already exists (excluding automatic versions)
-      const { data: existingScenes, error: checkError } = await (supabase as any)
+      const { data: existingScenes, error: checkError } = await supabase
         .from("scene_metadata")
         .select("version")
         .eq("name", sceneName)
         .eq("is_automatic", false)
+        .eq("user_id", currentUserId)
         .order("version", { ascending: false });
 
       if (checkError) {
@@ -497,12 +541,12 @@ export const saveSceneMetadata = async (
       }
 
       // Determine the next version number (only counting manual exports)
-      const nextVersion = existingScenes && existingScenes.length > 0 
-        ? Math.max(...existingScenes.map((s: any) => s.version)) + 1 
+      const nextVersion = existingScenes && existingScenes.length > 0
+        ? Math.max(...existingScenes.map((s: any) => s.version)) + 1
         : 1;
 
       // Insert the new manual version branch
-      const { error } = await (supabase as any)
+      const { error } = await supabase!
         .from("scene_metadata")
         .insert({
           scene_id: sceneId,
@@ -512,8 +556,9 @@ export const saveSceneMetadata = async (
           version: nextVersion,
           is_latest: false, // Manual exports create new branches, not latest
           is_automatic: false,
+          user_id: currentUserId,
           created_at: new Date().toISOString(),
-        });
+        } as any);
 
       if (error) {
         throw error;
@@ -535,7 +580,12 @@ export const saveSceneAutomatically = async (
   files: BinaryFiles,
   name: string,
   currentVersion: number = 0,
+  userId?: string,
 ) => {
+  if (!userId) {
+    throw new Error("User must be authenticated to save scenes");
+  }
+
   const sceneId = `${nanoid(12)}`;
   const encryptionKey = (await generateEncryptionKey())!;
 
@@ -566,7 +616,7 @@ export const saveSceneAutomatically = async (
     description: `Latest automatic save: ${name}`,
     isAutomatic: true,
     currentVersion,
-  });
+  }, userId);
 
   return sceneId;
 };
@@ -574,11 +624,23 @@ export const saveSceneAutomatically = async (
 // Function to list all exported scenes with metadata, grouped by name with branching versioning
 export const listExportedScenes = async () => {
   const supabase = _getSupabase();
+  if (!supabase) {
+    console.warn("Supabase not configured - cannot list scenes");
+    return [];
+  }
+
+  const userId = await _getCurrentUserId();
+
+  if (!userId) {
+    console.error("User must be authenticated to list scenes");
+    return [];
+  }
 
   try {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase!
       .from("scene_metadata")
       .select("*")
+      .eq("user_id", userId)
       .order("name", { ascending: true })
       .order("version", { ascending: false });
 
@@ -588,26 +650,26 @@ export const listExportedScenes = async () => {
 
     // Group scenes by name and version (branch)
     const groupedScenes = new Map<string, Map<number, any[]>>();
-    
-    data?.forEach((item: any) => {
+
+        data?.forEach((item: any) => {
       if (!groupedScenes.has(item.name)) {
         groupedScenes.set(item.name, new Map());
       }
       const versionMap = groupedScenes.get(item.name)!;
-      
+
       if (!versionMap.has(item.version)) {
         versionMap.set(item.version, []);
       }
       versionMap.get(item.version)!.push({
-        id: item.scene_id,
-        name: item.name,
-        description: item.description,
-        createdAt: item.created_at,
-        encryptionKey: item.encryption_key,
-        version: item.version,
-        isLatest: item.is_latest,
-        isAutomatic: item.is_automatic || false,
-        url: constructExcalidrawUrl(item.scene_id, item.encryption_key),
+        id: item.scene_id as string,
+        name: item.name as string,
+        description: item.description as string,
+        createdAt: item.created_at as string,
+        encryptionKey: item.encryption_key as string,
+        version: item.version as number,
+        isLatest: item.is_latest as boolean,
+        isAutomatic: (item.is_automatic as boolean) || false,
+        url: constructExcalidrawUrl(item.scene_id as string, item.encryption_key as string),
       });
     });
 
@@ -638,12 +700,22 @@ export const listExportedScenes = async () => {
 // Function to load scene by ID (with metadata lookup)
 export const loadSceneById = async (sceneId: string) => {
   const supabase = _getSupabase();
+  if (!supabase) {
+    throw new Error("Supabase not configured");
+  }
+
+  const userId = await _getCurrentUserId();
+
+  if (!userId) {
+    throw new Error("User must be authenticated to load scenes");
+  }
 
   try {
-    const { data: metadata, error } = await (supabase as any)
+    const { data: metadata, error } = await supabase!
       .from("scene_metadata")
       .select("*")
       .eq("scene_id", sceneId)
+      .eq("user_id", userId)
       .single();
 
     if (error || !metadata) {
@@ -651,19 +723,19 @@ export const loadSceneById = async (sceneId: string) => {
     }
 
     const sceneData = await loadSceneFromSupabaseStorage(
-      metadata.scene_id,
-      metadata.encryption_key,
+      (metadata as any).scene_id,
+      (metadata as any).encryption_key,
     );
 
     return {
       ...sceneData,
       metadata: {
-        name: metadata.name,
-        description: metadata.description,
-        createdAt: metadata.created_at,
-        version: metadata.version,
-        isLatest: metadata.is_latest,
-        isAutomatic: metadata.is_automatic || false,
+        name: (metadata as any).name,
+        description: (metadata as any).description,
+        createdAt: (metadata as any).created_at,
+        version: (metadata as any).version,
+        isLatest: (metadata as any).is_latest,
+        isAutomatic: ((metadata as any).is_automatic as boolean) || false,
       },
     };
   } catch (error: any) {
@@ -675,6 +747,11 @@ export const loadSceneById = async (sceneId: string) => {
 // Function to generate scene URL from Supabase storage
 export const getSupabaseSceneUrl = (sceneId: string) => {
   const supabase = _getSupabase();
+  if (!supabase) {
+    console.warn("Supabase not configured - cannot generate scene URL");
+    return "";
+  }
+
   const { data } = supabase.storage
     .from("diagram-files")
     .getPublicUrl(`files/shareLinks/${sceneId}`);
@@ -690,13 +767,23 @@ export const constructExcalidrawUrl = (sceneId: string, encryptionKey: string) =
 // Function to delete a scene by ID
 export const deleteSceneById = async (sceneId: string) => {
   const supabase = _getSupabase();
+  if (!supabase) {
+    throw new Error("Supabase not configured");
+  }
+
+  const userId = await _getCurrentUserId();
+
+  if (!userId) {
+    throw new Error("User must be authenticated to delete scenes");
+  }
 
   try {
     // First, get the metadata to find the encryption key
-    const { data: metadata, error: metadataError } = await (supabase as any)
+    const { data: metadata, error: metadataError } = await supabase!
       .from("scene_metadata")
       .select("*")
       .eq("scene_id", sceneId)
+      .eq("user_id", userId)
       .single();
 
     if (metadataError || !metadata) {
@@ -704,15 +791,15 @@ export const deleteSceneById = async (sceneId: string) => {
     }
 
     // Delete from scene_metadata table
-    const { error: deleteMetadataError } = await (supabase as any)
+    const { error: deleteMetadataError } = await supabase!
       .from("scene_metadata")
       .delete()
-      .eq("scene_id", sceneId);
+      .eq("scene_id", sceneId)
+      .eq("user_id", userId);
 
     if (deleteMetadataError) {
       throw deleteMetadataError;
     }
-
 
     // Delete the file from storage
     const { error: deleteStorageError } = await supabase.storage
@@ -734,13 +821,23 @@ export const deleteSceneById = async (sceneId: string) => {
 // Function to delete all versions of a scene by name
 export const deleteSceneByName = async (sceneName: string) => {
   const supabase = _getSupabase();
+  if (!supabase) {
+    throw new Error("Supabase not configured");
+  }
+
+  const userId = await _getCurrentUserId();
+
+  if (!userId) {
+    throw new Error("User must be authenticated to delete scenes");
+  }
 
   try {
     // Get all versions of the scene
-    const { data: allVersions, error: fetchError } = await (supabase as any)
+    const { data: allVersions, error: fetchError } = await supabase!
       .from("scene_metadata")
       .select("scene_id")
-      .eq("name", sceneName);
+      .eq("name", sceneName)
+      .eq("user_id", userId);
 
     if (fetchError) {
       throw fetchError;
@@ -753,10 +850,11 @@ export const deleteSceneByName = async (sceneName: string) => {
     const sceneIds = allVersions.map((version: any) => version.scene_id);
 
     // Delete all versions from scene_metadata table
-    const { error: deleteMetadataError } = await (supabase as any)
+    const { error: deleteMetadataError } = await supabase!
       .from("scene_metadata")
       .delete()
-      .in("scene_id", sceneIds);
+      .in("scene_id", sceneIds)
+      .eq("user_id", userId);
 
     if (deleteMetadataError) {
       throw deleteMetadataError;
@@ -786,6 +884,10 @@ export const loadSceneFromSupabaseStorage = async (
   decryptionKey: string,
 ): Promise<ImportedDataState> => {
   const supabase = _getSupabase();
+
+  if (!supabase) {
+    throw new Error("Supabase not configured");
+  }
 
   try {
     const { data, error } = await supabase.storage

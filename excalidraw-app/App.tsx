@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Excalidraw,
   LiveCollaborationTrigger,
@@ -5,6 +6,7 @@ import {
   CaptureUpdateAction,
   reconcileElements,
 } from "@excalidraw/excalidraw";
+import LoginPage from "./components/LoginPage";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 import {
@@ -46,6 +48,7 @@ import {
   share,
   youtubeIcon,
 } from "@excalidraw/excalidraw/components/icons";
+import { Button } from "@excalidraw/excalidraw/components/Button";
 import { isElementLink } from "@excalidraw/element";
 import { restore, restoreAppState } from "@excalidraw/excalidraw/data/restore";
 import { newElementWith } from "@excalidraw/element";
@@ -100,6 +103,9 @@ import {
   exportToExcalidrawPlus,
 } from "./components/ExportToExcalidrawPlus";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
+import { AuthProvider, useAuth, supabase } from "./components/AuthContext";
+
+
 
 import {
   exportToBackend,
@@ -358,7 +364,103 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
-const ExcalidrawWrapper = () => {
+const AuthWrapper = () => {
+  const { user, loading, signOut } = useAuth();
+  const [forceLoginRedirect, setForceLoginRedirect] = useState(false);
+
+  // Debug effect to track authentication state changes
+  React.useEffect(() => {
+    if (!user && !loading) {
+      // Authentication state changed - user is null, showing login page
+    } else if (user) {
+      // Authentication state changed - user is authenticated, showing main app
+      // Reset force redirect when user logs back in
+      setForceLoginRedirect(false);
+    }
+  }, [user, loading]);
+
+  const handleSignOut = async () => {
+    // Clear any cached scene data
+    try {
+      localStorage.removeItem('excalidraw');
+      localStorage.removeItem('excalidraw-activeDrawing');
+      // Clear any other excalidraw-related local storage
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('excalidraw')) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch (error) {
+      console.warn("Error clearing local storage:", error);
+    }
+
+    const { error } = await signOut();
+    if (error) {
+      console.error("Error signing out:", error);
+      // Still redirect to login even if sign out had an error
+    }
+
+    // Force immediate redirect to login page
+    setForceLoginRedirect(true);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login page if:
+  // 1. User is not authenticated (!user)
+  // 2. Force redirect is active (immediately after sign out)
+  if (!user || forceLoginRedirect) {
+    return (
+      <LoginPage
+        onBack={() => {
+          // For now, just show a message since this is a single-page app
+          alert('Login is required to use the application');
+        }}
+      />
+    );
+  }
+
+  // Show main app if authenticated
+  return (
+    <>
+      <ExcalidrawWrapper
+        isAuthenticated={!!user}
+        user={user}
+        onOpenAuthModal={() => {
+          // This shouldn't happen since we're authenticated, but just in case
+          alert('You are already logged in');
+        }}
+        onSignOut={handleSignOut}
+        onOpenProfile={() => {
+          // Profile functionality removed - just show sign out button
+        }}
+      />
+    </>
+  );
+};
+
+const ExcalidrawWrapper = ({
+  isAuthenticated,
+  user,
+  onOpenAuthModal,
+  onSignOut,
+  onOpenProfile
+}: {
+  isAuthenticated: boolean;
+  user: any;
+  onOpenAuthModal: () => void;
+  onSignOut: () => void;
+  onOpenProfile?: () => void;
+}) => {
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
 
@@ -411,7 +513,6 @@ const ExcalidrawWrapper = () => {
         // Set the current version based on the loaded scene
         if (sceneData.metadata?.version !== undefined) {
           currentSceneVersion.current = sceneData.metadata.version;
-          console.log("Loaded scene version:", sceneData.metadata.version);
         } else {
           // Default to version 0 for new scenes
           currentSceneVersion.current = 0;
@@ -686,7 +787,7 @@ const ExcalidrawWrapper = () => {
     appState: AppState,
     files: BinaryFiles,
   ) => {
-    if (!excalidrawAPI) return;
+    if (!excalidrawAPI || !isAuthenticated) return;
 
     // Create a simple hash of the current scene state to detect changes
     const currentSceneHash = JSON.stringify({
@@ -696,8 +797,8 @@ const ExcalidrawWrapper = () => {
 
     // Also trigger auto-save when the scene name changes (indicates new scene creation)
     const isFirstSave = lastSavedSceneHash.current === "";
-    const sceneNameChanged = !isFirstSave && 
-      lastSavedSceneHash.current && 
+    const sceneNameChanged = !isFirstSave &&
+      lastSavedSceneHash.current &&
       !lastSavedSceneHash.current.includes(`"name":"${appState.name}"`);
 
     // Check if there are actual changes, if scene name changed, or if this is the first save
@@ -718,18 +819,21 @@ const ExcalidrawWrapper = () => {
         files,
         sceneName,
         currentSceneVersion.current,
+        user?.id,
       );
       lastAutoSaveTime.current = now;
       lastSavedSceneHash.current = currentSceneHash;
-      console.log("Scene auto-saved successfully", {
-        reason: isFirstSave ? "first save" : sceneNameChanged ? "scene name changed" : "content changed",
-        sceneName: excalidrawAPI.getName() || "Untitled",
-        version: currentSceneVersion.current,
-      });
     } catch (error) {
       console.error("Failed to auto-save scene:", error);
+
+      // If it's a storage permission error, show a user-friendly message
+      if (error instanceof Error && error.message.includes('Storage permission denied')) {
+        console.warn('Auto-save disabled due to storage permissions. Please check Supabase Storage bucket policies.');
+        // You might want to disable auto-save completely until permissions are fixed
+        // lastAutoSaveTime.current = Date.now() + (AUTO_SAVE_COOLDOWN_MS * 10); // Disable for a while
+      }
     }
-  }, [excalidrawAPI]);
+  }, [excalidrawAPI, isAuthenticated, user]);
 
   const onChange = (
     elements: readonly OrderedExcalidrawElement[],
@@ -772,8 +876,10 @@ const ExcalidrawWrapper = () => {
       });
     }
 
-    // Trigger automatic scene saving
-    autoSaveScene(elements, appState, files);
+    // Trigger automatic scene saving (only if not disabled)
+    if (!DISABLE_AUTOSAVE) {
+      autoSaveScene(elements, appState, files);
+    }
 
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
@@ -794,7 +900,10 @@ const ExcalidrawWrapper = () => {
   const currentSceneVersion = useRef<number>(0);
   const lastAutoSaveTime = useRef<number>(0);
   const lastSavedSceneHash = useRef<string>("");
-  const AUTO_SAVE_COOLDOWN_MS = 10000; // 10 seconds cooldown 
+  const AUTO_SAVE_COOLDOWN_MS = 10000; // 10 seconds cooldown
+
+  // Temporary flag to disable autosave - set to true to disable
+  const DISABLE_AUTOSAVE = false; 
 
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
@@ -955,12 +1064,11 @@ const ExcalidrawWrapper = () => {
                         onVersionCreated={(newVersion) => {
                           // Update the current version
                           currentSceneVersion.current = newVersion;
-                          console.log("Switched to new version:", newVersion);
-                          
+
                           // Reset auto-save state to trigger a fresh save
                           lastSavedSceneHash.current = "";
                           lastAutoSaveTime.current = 0;
-                          
+
                           // Trigger scene browser refresh
                           triggerSceneBrowserRefresh();
                         }}
@@ -990,6 +1098,17 @@ const ExcalidrawWrapper = () => {
                   setShareDialogState({ isOpen: true, type: "share" })
                 }
               />
+              {/* Sign Out Button */}
+              {isAuthenticated && (
+                <Button
+                  onSelect={onSignOut}
+                  className="collab-button sign-out-button"
+                  style={{ marginLeft: "1rem" }}
+                  title="Sign Out"
+                >
+                  Sign Out
+                </Button>
+              )}
             </div>
           );
         }}
@@ -1279,6 +1398,21 @@ const ExcalidrawWrapper = () => {
                 }
               },
             },
+            {
+              label: supabase ? (isAuthenticated ? "Sign Out" : "Sign In") : "Authentication Not Configured",
+              category: DEFAULT_CATEGORIES.app,
+              predicate: true,
+              icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>,
+              keywords: ["auth", "login", "logout", "account", "profile"],
+              perform: () => {
+                if (supabase) {
+                  // Call the auth modal opener function passed as prop
+                  onOpenAuthModal();
+                }
+              },
+            },
           ]}
         />
         {isVisualDebuggerEnabled() && excalidrawAPI && (
@@ -1302,9 +1436,11 @@ const ExcalidrawApp = () => {
 
   return (
     <TopErrorBoundary>
-      <Provider store={appJotaiStore}>
-        <ExcalidrawWrapper />
-      </Provider>
+      <AuthProvider>
+        <Provider store={appJotaiStore}>
+          <AuthWrapper />
+        </Provider>
+      </AuthProvider>
     </TopErrorBoundary>
   );
 };
