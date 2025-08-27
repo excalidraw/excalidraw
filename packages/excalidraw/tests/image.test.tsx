@@ -4,10 +4,11 @@ import type { FileId } from "@excalidraw/element/types";
 
 import * as blobModule from "../data/blob";
 import { Excalidraw } from "../index";
+import { createPasteEvent } from "../clipboard";
 
 import { API } from "./helpers/api";
 import { mockMultipleHTMLImageElements } from "./helpers/mocks";
-import { render, waitFor } from "./test-utils";
+import { GlobalTestState, render, waitFor } from "./test-utils";
 import {
   DEER_IMAGE_DIMENSIONS,
   SMILEY_IMAGE_DIMENSIONS,
@@ -36,6 +37,10 @@ describe("image insertion", () => {
       Promise.resolve(randomId() as FileId),
     );
     resizeFileSpy.mockImplementation((file: File) => Promise.resolve(file));
+
+    Object.assign(document, {
+      elementFromPoint: () => GlobalTestState.canvas,
+    });
   });
 
   it("should eventually initialize all dropped images", async () => {
@@ -68,6 +73,48 @@ describe("image insertion", () => {
           }),
         ]),
       );
+      expect(h.elements).toHaveLength(2);
+      // Not placed on top of each other
+      const dimensionsSet = new Set(h.elements.map((el) => `${el.x}-${el.y}`));
+      expect(dimensionsSet.size).toEqual(h.elements.length);
+    });
+  });
+
+  it("should eventually initialize all pasted images", async () => {
+    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
+
+    h.state.height = 1000;
+
+    mockMultipleHTMLImageElements([
+      [DEER_IMAGE_DIMENSIONS.width, DEER_IMAGE_DIMENSIONS.height],
+      [SMILEY_IMAGE_DIMENSIONS.width, SMILEY_IMAGE_DIMENSIONS.height],
+    ]);
+
+    document.dispatchEvent(
+      createPasteEvent({
+        files: await Promise.all([
+          API.loadFile("./fixtures/smiley.png"),
+          API.loadFile("./fixtures/deer.png"),
+        ]),
+      }),
+    );
+
+    await waitFor(() => {
+      expect(h.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            ...initializedImageProperties,
+            ...DEER_IMAGE_DIMENSIONS,
+          }),
+          expect.objectContaining({
+            ...initializedImageProperties,
+            ...SMILEY_IMAGE_DIMENSIONS,
+          }),
+        ]),
+      );
+      expect(h.elements).toHaveLength(2);
+      const dimensionsSet = new Set(h.elements.map((el) => `${el.x}-${el.y}`));
+      expect(dimensionsSet.size).toEqual(h.elements.length);
     });
   });
 });
