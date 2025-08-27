@@ -4886,8 +4886,8 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 6,
   "verticalAlign": "top",
   "width": 80,
-  "x": 205,
-  "y": 205,
+  "x": "241.29526",
+  "y": "247.59241",
 }
 `;
 
