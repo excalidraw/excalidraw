@@ -34,43 +34,30 @@ describe("image insertion", () => {
 
     const generateIdSpy = vi.spyOn(blobModule, "generateIdFromFile");
     const resizeFileSpy = vi.spyOn(blobModule, "resizeImageFile");
-    const fileOpenSpy = vi.spyOn(filesystemModule, "fileOpen");
 
     generateIdSpy.mockImplementation(() =>
       Promise.resolve(randomId() as FileId),
     );
     resizeFileSpy.mockImplementation((file: File) => Promise.resolve(file));
-    fileOpenSpy.mockImplementation(
-      async () =>
-        await Promise.all([
-          API.loadFile("./fixtures/deer.png"),
-          API.loadFile("./fixtures/smiley.png"),
-        ]),
-    );
 
     Object.assign(document, {
       elementFromPoint: () => GlobalTestState.canvas,
     });
   });
 
-  it("should eventually initialize all dropped images", async () => {
-    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  const setup = async () => {
+    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
 
-    // it's necessary to specify the height in order to calculate natural dimensions of the image
     h.state.height = 1000;
 
     mockMultipleHTMLImageElements([
       [DEER_IMAGE_DIMENSIONS.width, DEER_IMAGE_DIMENSIONS.height],
       [SMILEY_IMAGE_DIMENSIONS.width, SMILEY_IMAGE_DIMENSIONS.height],
     ]);
+  };
 
-    const files = await Promise.all([
-      API.loadFile("./fixtures/deer.png"),
-      API.loadFile("./fixtures/smiley.png"),
-    ]);
-    await API.drop(files);
-
-    await waitFor(() => {
+  const assert = () =>
+    waitFor(() => {
       expect(h.elements).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -88,74 +75,47 @@ describe("image insertion", () => {
       const dimensionsSet = new Set(h.elements.map((el) => `${el.x}-${el.y}`));
       expect(dimensionsSet.size).toEqual(h.elements.length);
     });
+
+  it("should eventually initialize all dropped images", async () => {
+    await setup();
+
+    const files = await Promise.all([
+      API.loadFile("./fixtures/deer.png"),
+      API.loadFile("./fixtures/smiley.png"),
+    ]);
+    await API.drop(files);
+
+    await assert();
   });
 
   it("should eventually initialize all pasted images", async () => {
-    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
-
-    h.state.height = 1000;
-
-    mockMultipleHTMLImageElements([
-      [DEER_IMAGE_DIMENSIONS.width, DEER_IMAGE_DIMENSIONS.height],
-      [SMILEY_IMAGE_DIMENSIONS.width, SMILEY_IMAGE_DIMENSIONS.height],
-    ]);
+    await setup();
 
     document.dispatchEvent(
       createPasteEvent({
         files: await Promise.all([
-          API.loadFile("./fixtures/smiley.png"),
           API.loadFile("./fixtures/deer.png"),
+          API.loadFile("./fixtures/smiley.png"),
         ]),
       }),
     );
 
-    await waitFor(() => {
-      expect(h.elements).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            ...initializedImageProperties,
-            ...DEER_IMAGE_DIMENSIONS,
-          }),
-          expect.objectContaining({
-            ...initializedImageProperties,
-            ...SMILEY_IMAGE_DIMENSIONS,
-          }),
-        ]),
-      );
-      expect(h.elements).toHaveLength(2);
-      const dimensionsSet = new Set(h.elements.map((el) => `${el.x}-${el.y}`));
-      expect(dimensionsSet.size).toEqual(h.elements.length);
-    });
+    await assert();
   });
 
   it("should eventually initialize all images added through image tool", async () => {
-    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
+    await setup();
 
-    h.state.height = 1000;
-
-    mockMultipleHTMLImageElements([
-      [DEER_IMAGE_DIMENSIONS.width, DEER_IMAGE_DIMENSIONS.height],
-      [SMILEY_IMAGE_DIMENSIONS.width, SMILEY_IMAGE_DIMENSIONS.height],
-    ]);
-
+    const fileOpenSpy = vi.spyOn(filesystemModule, "fileOpen");
+    fileOpenSpy.mockImplementation(
+      async () =>
+        await Promise.all([
+          API.loadFile("./fixtures/deer.png"),
+          API.loadFile("./fixtures/smiley.png"),
+        ]),
+    );
     UI.clickTool("image");
 
-    await waitFor(() => {
-      expect(h.elements).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            ...initializedImageProperties,
-            ...DEER_IMAGE_DIMENSIONS,
-          }),
-          expect.objectContaining({
-            ...initializedImageProperties,
-            ...SMILEY_IMAGE_DIMENSIONS,
-          }),
-        ]),
-      );
-      expect(h.elements).toHaveLength(2);
-      const dimensionsSet = new Set(h.elements.map((el) => `${el.x}-${el.y}`));
-      expect(dimensionsSet.size).toEqual(h.elements.length);
-    });
+    await assert();
   });
 });
