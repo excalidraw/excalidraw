@@ -50,6 +50,7 @@
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
+    "build:vercel": "node ./scripts/build-vercel.js",
     "build:app:docker": "yarn --cwd ./excalidraw-app build:app:docker",
     "build:app": "yarn --cwd ./excalidraw-app build:app",
     "build:common": "yarn --cwd ./packages/common build:esm",
