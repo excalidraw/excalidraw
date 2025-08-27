@@ -139,6 +139,7 @@ import ChatPanel from "./components/ChatPanel";
 import "./index.scss";
 
 import type { CollabAPI } from "./collab/Collab";
+import { usePDFHandlers } from "./hooks/usePDFHandlers.js";
 
 polyfill();
 
@@ -741,6 +742,8 @@ const ExcalidrawWrapper = () => {
     [setShareDialogState],
   );
 
+  // PDF handlers - all PDF functionality extracted to separate modules
+  const { importPdfFile } = usePDFHandlers(excalidrawAPI);
   // browsers generally prevent infinite self-embedding, there are
   // cases where it still happens, and while we disallow self-embedding
   // by not whitelisting our own origin, this serves as an additional guard
@@ -925,8 +928,8 @@ const ExcalidrawWrapper = () => {
         <AppFooter onChange={() => excalidrawAPI?.refresh()} />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
         {excalidrawAPI && (
-          <ChatPanel 
-            excalidrawAPI={excalidrawAPI} 
+          <ChatPanel
+            excalidrawAPI={excalidrawAPI}
             isVisible={isChatVisible}
             onToggle={() => setIsChatVisible(!isChatVisible)}
           />
@@ -974,6 +977,21 @@ const ExcalidrawWrapper = () => {
 
         <CommandPalette
           customCommandPaletteItems={[
+            {
+              label: "Import PDF",
+              category: DEFAULT_CATEGORIES.app,
+              keywords: [
+                "pdf",
+                "import",
+                "document",
+                "file",
+                "upload",
+              ],
+              icon: <span style={{ fontSize: '14px' }}>📄</span>,
+              perform: () => {
+                importPdfFile();
+              },
+            },
             {
               label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
