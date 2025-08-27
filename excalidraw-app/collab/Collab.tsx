@@ -76,6 +76,7 @@ import {
   loadFromSupabase,
   saveFilesToSupabase,
   saveToSupabase,
+  SupabaseSceneVersionCache,
 } from "../data/supabase";
 import {
   importUsernameFromLocalStorage,
@@ -546,6 +547,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       });
 
       this.saveCollabRoomToSupabase(getSyncableElements(elements));
+      
+      // Initialize the Supabase scene version cache for the current scene
+      if (this.portal.socket) {
+        SupabaseSceneVersionCache.set(this.portal.socket, getSyncableElements(elements));
+      }
     }
 
     // fallback in case you're not alone in the room but still don't receive
@@ -782,6 +788,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       elements,
       captureUpdate: CaptureUpdateAction.NEVER,
     });
+
+    // Update the Supabase scene version cache to prevent unnecessary saves
+    if (this.portal.socket) {
+      SupabaseSceneVersionCache.set(this.portal.socket, elements as unknown as readonly SyncableExcalidrawElement[]);
+    }
 
     this.loadImageFiles();
   };

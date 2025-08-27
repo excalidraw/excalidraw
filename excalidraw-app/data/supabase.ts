@@ -110,7 +110,7 @@ const decryptElements = async (
   return JSON.parse(decodedData);
 };
 
-class SupabaseSceneVersionCache {
+export class SupabaseSceneVersionCache {
   private static cache = new WeakMap<Socket, number>();
   static get = (socket: Socket) => {
     return SupabaseSceneVersionCache.cache.get(socket);
@@ -228,6 +228,10 @@ export const saveToSupabase = async (
 
     // For now, return null to indicate collaborative save is not available
     // The scene will still be saved locally via localStorage
+    // But we should still update the cache to prevent repeated save attempts
+    if (socket) {
+      SupabaseSceneVersionCache.set(socket, elements);
+    }
     return null;
   } catch (error: any) {
     console.error("Error saving to Supabase:", error);
@@ -318,6 +322,32 @@ export const loadFilesFromSupabase = async (
   return { loadedFiles, erroredFiles };
 };
 
+// Map to track ongoing save operations by sceneId to prevent race conditions
+const saveOperations = new Map<string, Promise<any>>();
+
+// Map to track ongoing metadata save operations by a composite key to prevent race conditions
+const metadataSaveOperations = new Map<string, Promise<any>>();
+
+// Cleanup function to remove completed operations and prevent memory leaks
+const cleanupSaveOperation = (sceneId: string, operation: Promise<any>) => {
+  operation.finally(() => {
+    // Only remove if this is still the current operation for this sceneId
+    if (saveOperations.get(sceneId) === operation) {
+      saveOperations.delete(sceneId);
+    }
+  });
+};
+
+// Cleanup function for metadata operations
+const cleanupMetadataOperation = (operationKey: string, operation: Promise<any>) => {
+  operation.finally(() => {
+    // Only remove if this is still the current operation for this key
+    if (metadataSaveOperations.get(operationKey) === operation) {
+      metadataSaveOperations.delete(operationKey);
+    }
+  });
+};
+
 // Function to save encrypted scene data to Supabase storage (equivalent to Firebase export)
 export const saveSceneToSupabaseStorage = async (
   sceneData: Uint8Array,
@@ -330,80 +360,104 @@ export const saveSceneToSupabaseStorage = async (
     throw new Error("Supabase not configured");
   }
 
-  try {
-    const fileName = `files/shareLinks/${sceneId}`;
+  // Check if a save operation is already in progress for this sceneId
+  const existingOperation = saveOperations.get(sceneId);
+  if (existingOperation) {
+    console.log(`Save operation already in progress for ${sceneId}, waiting...`);
+    return await existingOperation;
+  }
 
-    console.log('Attempting to save scene to Supabase storage:', {
-      fileName,
-      bucket: 'diagram-files',
-      dataSize: sceneData.length
-    });
+  // Create a new save operation
+  const saveOperation = (async () => {
+    try {
+      const fileName = `files/shareLinks/${sceneId}`;
 
-    // Try to upload, if it fails due to existing file, remove and retry
-    let { error } = await supabase.storage
-      .from("diagram-files")
-      .upload(fileName, sceneData, {
-        cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
-        contentType: MIME_TYPES.binary,
-        metadata: metadata
-          ? {
-              name: metadata.name || "",
-              version: metadata.version?.toString() || "2",
-              created: Date.now().toString(),
-            }
-          : undefined,
+      console.log('Attempting to save scene to Supabase storage:', {
+        fileName,
+        bucket: 'diagram-files',
+        dataSize: sceneData.length
       });
 
-    if (error) {
-      console.error('Supabase storage upload error:', error);
+      // Try to upload with upsert behavior - use a unique filename to avoid conflicts
+      const timestamp = Date.now();
+      const randomSuffix = Math.random().toString(36).substring(2, 8);
+      const uniqueFileName = `files/shareLinks/${sceneId}_${timestamp}_${randomSuffix}`;
 
-      // Check if it's a permission error
-      if (error.message?.includes('violates row-level security')) {
-        throw new Error('Storage permission denied. Please check Supabase Storage bucket policies.');
-      }
+      console.log('Attempting to save scene to Supabase storage:', {
+        originalFileName: fileName,
+        uniqueFileName,
+        bucket: 'diagram-files',
+        dataSize: sceneData.length
+      });
 
-      // If file already exists, try to remove it and retry
-      if (error.message?.includes("already exists")) {
-        console.log('File already exists, attempting to remove and retry...');
-
-        const { error: removeError } = await supabase.storage
+      // First, try to remove any existing files with the same sceneId prefix to clean up old versions
+      try {
+        const { data: existingFiles } = await supabase.storage
           .from("diagram-files")
-          .remove([fileName]);
-
-        if (removeError) {
-          console.warn("Failed to remove existing file:", removeError);
-        }
-
-        // Try upload again
-        const { error: retryError } = await supabase.storage
-          .from("diagram-files")
-          .upload(fileName, sceneData, {
-            cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
-            contentType: MIME_TYPES.binary,
-            metadata: metadata
-              ? {
-                  name: metadata.name || "",
-                  version: metadata.version?.toString() || "2",
-                  created: Date.now().toString(),
-                }
-              : undefined,
+          .list('files/shareLinks', {
+            search: sceneId
           });
 
-        if (retryError) {
-          console.error('Retry upload failed:', retryError);
-          throw retryError;
-        }
-      } else {
-        throw error;
-      }
-    }
+        if (existingFiles && existingFiles.length > 0) {
+          const filesToRemove = existingFiles
+            .filter(file => file.name.startsWith(sceneId))
+            .map(file => `files/shareLinks/${file.name}`);
 
-    console.log('Scene saved successfully to Supabase storage:', fileName);
-    return fileName;
-  } catch (error: any) {
-    console.error("Error saving scene to Supabase storage:", error);
-    throw error;
-  }
+          if (filesToRemove.length > 0) {
+            console.log(`Cleaning up ${filesToRemove.length} old versions for ${sceneId}`);
+            await supabase.storage
+              .from("diagram-files")
+              .remove(filesToRemove);
+          }
+        }
+      } catch (cleanupError) {
+        console.warn("Failed to cleanup old files:", cleanupError);
+        // Don't throw here, continue with upload
+      }
+
+      // Now upload with the unique filename
+      const { error } = await supabase.storage
+        .from("diagram-files")
+        .upload(uniqueFileName, sceneData, {
+          cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
+          contentType: MIME_TYPES.binary,
+          metadata: metadata
+            ? {
+                name: metadata.name || "",
+                version: metadata.version?.toString() || "2",
+                created: Date.now().toString(),
+                sceneId: sceneId, // Store original sceneId for reference
+              }
+            : undefined,
+        });
+
+      if (error) {
+        console.error('Supabase storage upload error:', error);
+
+        // Check if it's a permission error
+        if (error.message?.includes('violates row-level security')) {
+          throw new Error('Storage permission denied. Please check Supabase Storage bucket policies.');
+        } else if (error.message?.includes('You do not have permission')) {
+          throw new Error('Storage permission denied. Please check your Supabase Storage bucket policies and ensure the user has proper access.');
+        } else {
+          throw error;
+        }
+      }
+
+      console.log('Scene saved successfully to Supabase storage:', uniqueFileName);
+      return uniqueFileName;
+    } catch (error: any) {
+      console.error("Error saving scene to Supabase storage:", error);
+      throw error;
+    }
+  })();
+
+  // Store the operation in the map and set up cleanup
+  saveOperations.set(sceneId, saveOperation);
+  cleanupSaveOperation(sceneId, saveOperation);
+
+  // Return the result
+  return await saveOperation;
 };
 
 // Function to save scene metadata to database with branching versioning support
@@ -424,12 +478,24 @@ export const saveSceneMetadata = async (
     throw new Error("User must be authenticated to save scene metadata");
   }
 
-  try {
-    const sceneName = metadata.name || `Scene ${sceneId}`;
+  const sceneName = metadata.name || `Scene ${sceneId}`;
+  const currentVersion = metadata.currentVersion || 0;
 
-    if (metadata.isAutomatic) {
-      // For automatic saves, update the "Latest" version of the current branch
-      const currentVersion = metadata.currentVersion || 0;
+  // Create a composite key for this metadata operation to prevent race conditions
+  const operationKey = `${currentUserId}:${sceneName}:${currentVersion}:${metadata.isAutomatic ? 'auto' : 'manual'}`;
+
+  // Check if a metadata save operation is already in progress for this key
+  const existingOperation = metadataSaveOperations.get(operationKey);
+  if (existingOperation) {
+    console.log(`Metadata save operation already in progress for ${operationKey}, waiting...`);
+    return await existingOperation;
+  }
+
+  // Create a new metadata save operation
+  const metadataOperation = (async () => {
+    try {
+      if (metadata.isAutomatic) {
+        // For automatic saves, update the "Latest" version of the current branch
 
       // Check if there's already a "Latest" version for this branch
       let existingLatest: any = null;
@@ -443,7 +509,7 @@ export const saveSceneMetadata = async (
           .eq("version", currentVersion)
           .eq("is_latest", true)
           .eq("user_id", currentUserId)
-          .single();
+          .maybeSingle();
 
         if (error) {
           // Handle PGRST116 error (multiple rows found) - this indicates duplicate data
@@ -459,18 +525,15 @@ export const saveSceneMetadata = async (
           } else {
             throw error;
           }
-        } else {
+        } else if (data) {
           existingLatest = data;
           hasExistingRecord = true;
+        } else {
+          console.log('No existing latest version found, will create new one');
         }
       } catch (error: any) {
-        // If it's a "no rows found" error, that's normal - just continue
-        if (error.message?.includes('Results contain 0 rows')) {
-          console.log('No existing latest version found, will create new one');
-        } else {
-          // Re-throw other errors
-          throw error;
-        }
+        // Re-throw unexpected errors
+        throw error;
       }
 
       // Log whether we found an existing record or not
@@ -481,16 +544,16 @@ export const saveSceneMetadata = async (
       if (hasExistingRecord) {
         // Update existing "Latest" version for this branch
         console.log('Updating existing latest version');
-        const { error: updateError } = await (supabase!
+        const { error: updateError } = await supabase!
           .from("scene_metadata")
           .update({
             scene_id: sceneId,
             encryption_key: encryptionKey,
             description: metadata.description || "",
             created_at: new Date().toISOString(),
-          } as any)
+          })
           .eq("scene_id", (existingLatest as any).scene_id)
-          .eq("user_id", currentUserId) as any);
+          .eq("user_id", currentUserId);
 
         if (updateError) {
           console.error('Error updating existing scene metadata:', updateError);
@@ -521,6 +584,8 @@ export const saveSceneMetadata = async (
             throw new Error('Database table missing. Please run the database migrations from supabase-diagnostics.sql');
           } else if (error.message?.includes('column') && error.message?.includes('does not exist')) {
             throw new Error('Database column missing. Please run the database migrations from supabase-diagnostics.sql');
+          } else if (error.message?.includes('duplicate key value violates unique constraint')) {
+            throw new Error('A scene with this name already exists. Please try a different name or version.');
           }
           throw error;
         }
@@ -561,16 +626,27 @@ export const saveSceneMetadata = async (
         } as any);
 
       if (error) {
+        if (error.message?.includes('duplicate key value violates unique constraint')) {
+          throw new Error('A scene with this name already exists. Please try a different name or version.');
+        }
         throw error;
       }
 
       // Return the version number for manual exports
       return nextVersion;
     }
-  } catch (error: any) {
-    console.error("Error saving scene metadata:", error);
-    throw error;
-  }
+    } catch (error: any) {
+      console.error("Error saving scene metadata:", error);
+      throw error;
+    }
+  })();
+
+  // Store the operation in the map and set up cleanup
+  metadataSaveOperations.set(operationKey, metadataOperation);
+  cleanupMetadataOperation(operationKey, metadataOperation);
+
+  // Return the result
+  return await metadataOperation;
 };
 
 // Function to save scene automatically (creates or replaces "latest" version for current branch)
@@ -586,7 +662,9 @@ export const saveSceneAutomatically = async (
     throw new Error("User must be authenticated to save scenes");
   }
 
-  const sceneId = `${nanoid(12)}`;
+  // Use a consistent scene ID based on the scene name and user ID to avoid creating multiple files
+  // This ensures auto-saves update the same file instead of creating new ones
+  const sceneId = `${userId}_${name.replace(/[^a-zA-Z0-9]/g, '_')}_auto`;
   const encryptionKey = (await generateEncryptionKey())!;
 
   const encryptedData = await encryptData(
@@ -716,9 +794,13 @@ export const loadSceneById = async (sceneId: string) => {
       .select("*")
       .eq("scene_id", sceneId)
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
-    if (error || !metadata) {
+    if (error) {
+      throw new Error(`Error loading scene: ${error.message}`);
+    }
+    
+    if (!metadata) {
       throw new Error("Scene not found");
     }
 
@@ -745,18 +827,45 @@ export const loadSceneById = async (sceneId: string) => {
 };
 
 // Function to generate scene URL from Supabase storage
-export const getSupabaseSceneUrl = (sceneId: string) => {
+export const getSupabaseSceneUrl = async (sceneId: string): Promise<string> => {
   const supabase = _getSupabase();
   if (!supabase) {
     console.warn("Supabase not configured - cannot generate scene URL");
     return "";
   }
 
-  const { data } = supabase.storage
-    .from("diagram-files")
-    .getPublicUrl(`files/shareLinks/${sceneId}`);
+  try {
+    // List files that start with the sceneId to find the latest version
+    const { data: files, error: listError } = await supabase.storage
+      .from("diagram-files")
+      .list('files/shareLinks', {
+        search: sceneId
+      });
 
-  return data.publicUrl;
+    if (listError || !files || files.length === 0) {
+      console.warn(`No files found for scene ${sceneId}`);
+      return "";
+    }
+
+    // Find the most recent file (by name, since we include timestamp)
+    const latestFile = files
+      .filter(file => file.name.startsWith(sceneId))
+      .sort((a, b) => b.name.localeCompare(a.name))[0];
+
+    if (!latestFile) {
+      console.warn(`No valid files found for scene ${sceneId}`);
+      return "";
+    }
+
+    const { data } = supabase.storage
+      .from("diagram-files")
+      .getPublicUrl(`files/shareLinks/${latestFile.name}`);
+
+    return data.publicUrl;
+  } catch (error) {
+    console.warn(`Error generating scene URL for ${sceneId}:`, error);
+    return "";
+  }
 };
 
 // Function to construct Excalidraw URL from scene ID and encryption key
@@ -784,9 +893,13 @@ export const deleteSceneById = async (sceneId: string) => {
       .select("*")
       .eq("scene_id", sceneId)
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
-    if (metadataError || !metadata) {
+    if (metadataError) {
+      throw new Error(`Error loading scene metadata: ${metadataError.message}`);
+    }
+    
+    if (!metadata) {
       throw new Error("Scene not found");
     }
 
@@ -801,13 +914,33 @@ export const deleteSceneById = async (sceneId: string) => {
       throw deleteMetadataError;
     }
 
-    // Delete the file from storage
-    const { error: deleteStorageError } = await supabase.storage
-      .from("diagram-files")
-      .remove([`files/shareLinks/${sceneId}`]);
+    // Delete all files from storage that start with the sceneId
+    try {
+      const { data: existingFiles } = await supabase.storage
+        .from("diagram-files")
+        .list('files/shareLinks', {
+          search: sceneId
+        });
 
-    if (deleteStorageError) {
-      console.warn("Failed to delete scene file from storage:", deleteStorageError);
+      if (existingFiles && existingFiles.length > 0) {
+        const filesToRemove = existingFiles
+          .filter(file => file.name.startsWith(sceneId))
+          .map(file => `files/shareLinks/${file.name}`);
+
+        if (filesToRemove.length > 0) {
+          console.log(`Deleting ${filesToRemove.length} files for scene ${sceneId}`);
+          const { error: deleteStorageError } = await supabase.storage
+            .from("diagram-files")
+            .remove(filesToRemove);
+
+          if (deleteStorageError) {
+            console.warn("Failed to delete scene files from storage:", deleteStorageError);
+            // Don't throw here as the metadata and versions are already deleted
+          }
+        }
+      }
+    } catch (storageError) {
+      console.warn("Error accessing storage during cleanup:", storageError);
       // Don't throw here as the metadata and versions are already deleted
     }
 
@@ -860,14 +993,38 @@ export const deleteSceneByName = async (sceneName: string) => {
       throw deleteMetadataError;
     }
 
-    // Delete all files from storage
-    const filePaths = sceneIds.map((id: string) => `files/shareLinks/${id}`);
-    const { error: deleteStorageError } = await supabase.storage
-      .from("diagram-files")
-      .remove(filePaths);
+    // Delete all files from storage that start with any of the sceneIds
+    try {
+      const allFilesToRemove: string[] = [];
 
-    if (deleteStorageError) {
-      console.warn("Failed to delete some scene files from storage:", deleteStorageError);
+      for (const sceneId of sceneIds) {
+        const { data: existingFiles } = await supabase.storage
+          .from("diagram-files")
+          .list('files/shareLinks', {
+            search: sceneId
+          });
+
+        if (existingFiles && existingFiles.length > 0) {
+          const filesForScene = existingFiles
+            .filter(file => file.name.startsWith(sceneId))
+            .map(file => `files/shareLinks/${file.name}`);
+          allFilesToRemove.push(...filesForScene);
+        }
+      }
+
+      if (allFilesToRemove.length > 0) {
+        console.log(`Deleting ${allFilesToRemove.length} files for scene ${sceneName}`);
+        const { error: deleteStorageError } = await supabase.storage
+          .from("diagram-files")
+          .remove(allFilesToRemove);
+
+        if (deleteStorageError) {
+          console.warn("Failed to delete some scene files from storage:", deleteStorageError);
+          // Don't throw here as the metadata and versions are already deleted
+        }
+      }
+    } catch (storageError) {
+      console.warn("Error accessing storage during cleanup:", storageError);
       // Don't throw here as the metadata and versions are already deleted
     }
 
@@ -890,12 +1047,38 @@ export const loadSceneFromSupabaseStorage = async (
   }
 
   try {
+    // List files that start with the sceneId to find the latest version
+    const { data: files, error: listError } = await supabase.storage
+      .from("diagram-files")
+      .list('files/shareLinks', {
+        search: sceneId
+      });
+
+    if (listError) {
+      throw new Error(`Failed to list files for scene ${sceneId}: ${listError.message}`);
+    }
+
+    if (!files || files.length === 0) {
+      throw new Error(`No files found for scene ${sceneId}`);
+    }
+
+    // Find the most recent file (by name, since we include timestamp)
+    const latestFile = files
+      .filter(file => file.name.startsWith(sceneId))
+      .sort((a, b) => b.name.localeCompare(a.name))[0];
+
+    if (!latestFile) {
+      throw new Error(`No valid files found for scene ${sceneId}`);
+    }
+
+    console.log(`Loading scene ${sceneId} from file: ${latestFile.name}`);
+
     const { data, error } = await supabase.storage
       .from("diagram-files")
-      .download(`files/shareLinks/${sceneId}`);
+      .download(`files/shareLinks/${latestFile.name}`);
 
     if (error || !data) {
-      throw new Error("Failed to load scene from Supabase storage");
+      throw new Error(`Failed to load scene from Supabase storage: ${latestFile.name}`);
     }
 
     const buffer = await data.arrayBuffer();

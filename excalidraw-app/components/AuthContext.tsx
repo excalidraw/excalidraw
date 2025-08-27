@@ -113,14 +113,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching profile:', error);
         return;
       }
 
-      setProfile(data as Profile);
+      if (data) {
+        setProfile(data as Profile);
+      }
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
@@ -208,15 +210,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .update(updates as any)
         .eq('id', user.id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         return { profile: null, error };
       }
 
-      const profileData = data as Profile;
-      setProfile(profileData);
-      return { profile: profileData, error: null };
+      if (data) {
+        setProfile(data as Profile);
+        return { profile: data as Profile, error: null };
+      } else {
+        return { profile: null, error: 'Profile not found' };
+      }
     } catch (error) {
       return { profile: null, error };
     }

@@ -781,6 +781,11 @@ const ExcalidrawWrapper = ({
     };
   }, [excalidrawAPI]);
 
+  // Track permission errors to temporarily disable auto-save
+  const permissionErrorCount = useRef(0);
+  const maxPermissionErrors = 3; // Disable auto-save after 3 permission errors
+  const autoSaveDisabledUntil = useRef(0);
+
   // Automatic scene saving with cooldown
   const autoSaveScene = useCallback(async (
     elements: readonly OrderedExcalidrawElement[],
@@ -788,6 +793,13 @@ const ExcalidrawWrapper = ({
     files: BinaryFiles,
   ) => {
     if (!excalidrawAPI || !isAuthenticated) return;
+
+    // Check if auto-save is temporarily disabled due to permission errors
+    const now = Date.now();
+    if (now < autoSaveDisabledUntil.current) {
+      console.log(`Auto-save disabled until ${new Date(autoSaveDisabledUntil.current).toLocaleTimeString()}`);
+      return;
+    }
 
     // Create a simple hash of the current scene state to detect changes
     const currentSceneHash = JSON.stringify({
@@ -806,7 +818,6 @@ const ExcalidrawWrapper = ({
       return; // No changes, don't save
     }
 
-    const now = Date.now();
     if (now - lastAutoSaveTime.current < AUTO_SAVE_COOLDOWN_MS) {
       return; // Still in cooldown period
     }
@@ -823,17 +834,72 @@ const ExcalidrawWrapper = ({
       );
       lastAutoSaveTime.current = now;
       lastSavedSceneHash.current = currentSceneHash;
+      // Reset permission error count on successful save
+      permissionErrorCount.current = 0;
     } catch (error) {
       console.error("Failed to auto-save scene:", error);
 
-      // If it's a storage permission error, show a user-friendly message
+      // If it's a storage permission error, show a user-friendly message and temporarily disable auto-save
       if (error instanceof Error && error.message.includes('Storage permission denied')) {
-        console.warn('Auto-save disabled due to storage permissions. Please check Supabase Storage bucket policies.');
-        // You might want to disable auto-save completely until permissions are fixed
-        // lastAutoSaveTime.current = Date.now() + (AUTO_SAVE_COOLDOWN_MS * 10); // Disable for a while
+        permissionErrorCount.current++;
+        const message = `Auto-save failed due to storage permissions (${permissionErrorCount.current}/${maxPermissionErrors}). Please check your Supabase Storage bucket policies.`;
+        console.warn(message);
+
+        // Show user-friendly notification (you might want to use a toast library here)
+        if (window.alert) {
+          window.alert(message);
+        }
+
+        if (permissionErrorCount.current >= maxPermissionErrors) {
+          // Disable auto-save for 5 minutes after 3 permission errors
+          autoSaveDisabledUntil.current = now + (5 * 60 * 1000);
+          const disableMessage = `Auto-save disabled for 5 minutes due to repeated permission errors. Please check your Supabase Storage bucket policies and refresh the page to re-enable auto-save.`;
+          console.warn(disableMessage);
+
+          if (window.alert) {
+            window.alert(disableMessage);
+          }
+        }
+      } else if (error instanceof Error && error.message.includes('duplicate key value violates unique constraint')) {
+        // Handle database constraint errors by resetting the error count
+        permissionErrorCount.current = 0;
+        console.warn('Database constraint error - this may resolve automatically on the next save attempt.');
       }
     }
   }, [excalidrawAPI, isAuthenticated, user]);
+
+  // Debounced auto-save to prevent excessive save attempts during rapid changes
+  const debouncedAutoSave = useCallback(
+    (() => {
+      let timeoutId: NodeJS.Timeout | null = null;
+      const debounceFn = (elements: readonly OrderedExcalidrawElement[], appState: AppState, files: BinaryFiles) => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+          autoSaveScene(elements, appState, files);
+        }, 3000); // Wait 3 seconds after the last change before auto-saving
+      };
+
+      // Add cleanup method to the function
+      debounceFn.cleanup = () => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+      };
+
+      return debounceFn as typeof debounceFn & { cleanup: () => void };
+    })(),
+    [autoSaveScene]
+  );
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      debouncedAutoSave.cleanup();
+    };
+  }, [debouncedAutoSave]);
 
   const onChange = (
     elements: readonly OrderedExcalidrawElement[],
@@ -878,7 +944,7 @@ const ExcalidrawWrapper = ({
 
     // Trigger automatic scene saving (only if not disabled)
     if (!DISABLE_AUTOSAVE) {
-      autoSaveScene(elements, appState, files);
+      debouncedAutoSave(elements, appState, files);
     }
 
     // Render the debug scene if the debug canvas is available
