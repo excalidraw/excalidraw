@@ -27,7 +27,15 @@ try {
     cwd: path.resolve(__dirname, '../excalidraw-app')
   });
 
+  // Verify the build output exists
+  const buildPath = path.resolve(__dirname, '../excalidraw-app/build');
+  const fs = require('fs');
+  if (!fs.existsSync(buildPath)) {
+    throw new Error(`Build output not found at ${buildPath}`);
+  }
+  
   console.log('✅ Vercel build completed successfully!');
+  console.log(`📁 Build output: ${buildPath}`);
 } catch (error) {
   console.error('❌ Build failed:', error.message);
   process.exit(1);
