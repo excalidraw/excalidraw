@@ -494,6 +494,59 @@ export const constructExcalidrawUrl = (sceneId: string, encryptionKey: string) =
   return `http://localhost:3000#json=${sceneId},${encryptionKey}`;
 };
 
+// Function to delete a scene by ID
+export const deleteSceneById = async (sceneId: string) => {
+  const supabase = _getSupabase();
+
+  try {
+    // First, get the metadata to find the encryption key
+    const { data: metadata, error: metadataError } = await (supabase as any)
+      .from("scene_metadata")
+      .select("*")
+      .eq("scene_id", sceneId)
+      .single();
+
+    if (metadataError || !metadata) {
+      throw new Error("Scene not found");
+    }
+
+    // Delete from scene_metadata table
+    const { error: deleteMetadataError } = await (supabase as any)
+      .from("scene_metadata")
+      .delete()
+      .eq("scene_id", sceneId);
+
+    if (deleteMetadataError) {
+      throw deleteMetadataError;
+    }
+
+    // Delete from scene_versions table
+    const { error: deleteVersionsError } = await (supabase as any)
+      .from("scene_versions")
+      .delete()
+      .eq("room_id", sceneId);
+
+    if (deleteVersionsError) {
+      throw deleteVersionsError;
+    }
+
+    // Delete the file from storage
+    const { error: deleteStorageError } = await supabase.storage
+      .from("diagram-files")
+      .remove([`files/shareLinks/${sceneId}`]);
+
+    if (deleteStorageError) {
+      console.warn("Failed to delete scene file from storage:", deleteStorageError);
+      // Don't throw here as the metadata and versions are already deleted
+    }
+
+    return true;
+  } catch (error: any) {
+    console.error("Error deleting scene:", error);
+    throw error;
+  }
+};
+
 // Function to load encrypted scene data from Supabase storage
 export const loadSceneFromSupabaseStorage = async (
   sceneId: string,

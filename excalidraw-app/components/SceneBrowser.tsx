@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { listExportedScenes, loadSceneById } from "../data/supabase";
+import { listExportedScenes, loadSceneById, deleteSceneById } from "../data/supabase";
 import { Card } from "@excalidraw/excalidraw/components/Card";
 import { ToolButton } from "@excalidraw/excalidraw/components/ToolButton";
 import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
@@ -7,7 +7,7 @@ import { getFrame } from "@excalidraw/common";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { atom, useAtom } from "../app-jotai";
-import { LoadIcon, LinkIcon } from "@excalidraw/excalidraw/components/icons";
+import { LoadIcon, LinkIcon, TrashIcon } from "@excalidraw/excalidraw/components/icons";
 import "./SceneBrowser.scss";
 
 interface ExportedScene {
@@ -30,6 +30,7 @@ export const SceneBrowserDialog: React.FC<{
   const [scenes, setScenes] = useState<ExportedScene[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingScene, setLoadingScene] = useState<string | null>(null);
+  const [deletingScene, setDeletingScene] = useState<string | null>(null);
 
   const loadScenes = useCallback(async () => {
     try {
@@ -68,6 +69,27 @@ export const SceneBrowserDialog: React.FC<{
 
   const handleClose = () => {
     setDialogState({ isOpen: false });
+  };
+
+  const handleDeleteScene = async (sceneId: string) => {
+    if (!confirm("Are you sure you want to delete this scene? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      setDeletingScene(sceneId);
+      await deleteSceneById(sceneId);
+      
+      // Remove the scene from the local state
+      setScenes(prevScenes => prevScenes.filter(scene => scene.id !== sceneId));
+      
+      trackEvent("scene", "delete", `browser`);
+    } catch (error: any) {
+      console.error("Error deleting scene:", error);
+      onError?.(new Error("Failed to delete scene"));
+    } finally {
+      setDeletingScene(null);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -137,6 +159,17 @@ export const SceneBrowserDialog: React.FC<{
                   }}
                 >
                   Copy URL
+                </ToolButton>
+                <ToolButton
+                  type="button"
+                  size="small"
+                  title="Delete Scene"
+                  aria-label="Delete scene"
+                  icon={TrashIcon}
+                  onClick={() => handleDeleteScene(scene.id)}
+                  disabled={deletingScene === scene.id}
+                >
+                  {deletingScene === scene.id ? "Deleting..." : "Delete"}
                 </ToolButton>
               </div>
             </div>
