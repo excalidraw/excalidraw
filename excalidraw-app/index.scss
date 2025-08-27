@@ -82,6 +82,9 @@
   }
 }
 
+@import "./components/SceneBrowser.scss";
+@import "./components/SceneHeader.scss";
+
 .plus-button {
   display: flex;
   justify-content: center;

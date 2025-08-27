@@ -7,6 +7,8 @@ import { getFrame } from "@excalidraw/common";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { atom, useAtom } from "../app-jotai";
+import { LoadIcon, LinkIcon } from "@excalidraw/excalidraw/components/icons";
+import "./SceneBrowser.scss";
 
 interface ExportedScene {
   id: string;
@@ -22,7 +24,8 @@ export const sceneBrowserDialogStateAtom = atom<{ isOpen: boolean }>({ isOpen: f
 
 export const SceneBrowserDialog: React.FC<{
   onSceneLoad: (sceneData: any) => void;
-}> = ({ onSceneLoad }) => {
+  onError?: (error: Error) => void;
+}> = ({ onSceneLoad, onError }) => {
   const [dialogState, setDialogState] = useAtom(sceneBrowserDialogStateAtom);
   const [scenes, setScenes] = useState<ExportedScene[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +42,7 @@ export const SceneBrowserDialog: React.FC<{
       setScenes(exportedScenes);
     } catch (error: any) {
       console.error("Error loading scenes:", error);
-      onError(new Error("Failed to load scenes"));
+      onError?.(new Error("Failed to load scenes"));
     } finally {
       setLoading(false);
     }
@@ -92,40 +95,30 @@ export const SceneBrowserDialog: React.FC<{
           <div className="Card-details">
             You haven't exported any scenes yet. Go to File → Export → Export to Excalidraw to create your first exported scene.
           </div>
-          <ToolButton
-            className="Card-button"
-            type="button"
-            title="Refresh"
-            onClick={loadScenes}
-          >
-            Refresh
-          </ToolButton>
         </Card>
       );
     }
 
     return (
-      <div style={{ maxHeight: "70vh", overflowY: "auto" }}>
-        <h3 style={{ marginBottom: "1rem", color: "#333" }}>Your Exported Scenes</h3>
-        {scenes.map((scene) => (
-          <Card key={scene.id} color="primary" style={{ marginBottom: "0.5rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <div style={{ flex: 1 }}>
-                <h4 style={{ margin: "0 0 0.5rem 0", color: "#333" }}>{scene.name}</h4>
-                <div style={{ fontSize: "0.875rem", color: "#666", marginBottom: "0.25rem" }}>
-                  Created: {formatDate(scene.createdAt)}
-                </div>
+      <div className="SceneBrowser">
+        <h3 className="SceneBrowser__heading">Your Exported Scenes</h3>
+        <div className="SceneBrowser__content">
+          {scenes.map((scene) => (
+            <div key={scene.id} className="SceneBrowser__item">
+              <div className="SceneBrowser__meta">
+                <h4 className="SceneBrowser__name">{scene.name}</h4>
+                <div className="SceneBrowser__sub">Created: {formatDate(scene.createdAt)}</div>
                 {scene.description && (
-                  <div style={{ fontSize: "0.875rem", color: "#666" }}>
-                    {scene.description}
-                  </div>
+                  <div className="SceneBrowser__sub">{scene.description}</div>
                 )}
               </div>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
+              <div className="SceneBrowser__actions">
                 <ToolButton
                   type="button"
                   size="small"
                   title="Load Scene"
+                  aria-label="Load scene"
+                  icon={LoadIcon}
                   onClick={() => handleLoadScene(scene.id)}
                   disabled={loadingScene === scene.id}
                 >
@@ -135,25 +128,17 @@ export const SceneBrowserDialog: React.FC<{
                   type="button"
                   size="small"
                   title="Copy URL"
+                  aria-label="Copy scene URL"
+                  icon={LinkIcon}
                   onClick={() => {
                     navigator.clipboard.writeText(scene.url);
-                    // You might want to show a toast notification here
                   }}
                 >
                   Copy URL
                 </ToolButton>
               </div>
             </div>
-          </Card>
-        ))}
-        <div style={{ textAlign: "center", marginTop: "1rem" }}>
-          <ToolButton
-            type="button"
-            onClick={loadScenes}
-            disabled={loading}
-          >
-            {loading ? "Refreshing..." : "Refresh List"}
-          </ToolButton>
+          ))}
         </div>
       </div>
     );
@@ -163,7 +148,7 @@ export const SceneBrowserDialog: React.FC<{
     <Dialog
       onCloseRequest={handleClose}
       title="Scene Browser"
-      size="large"
+      size="wide"
     >
       {renderContent()}
     </Dialog>

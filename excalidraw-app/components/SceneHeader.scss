@@ -1,0 +1,120 @@
+.excalidraw {
+  .SceneHeader {
+    position: absolute;
+    top: 16px; /* aligned with hamburger menu */
+    left: 65px; /* positioned next to hamburger button with proper spacing */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10; /* above canvas and other UI elements */
+    pointer-events: auto;
+    background: var(--color-surface-lowest);
+    border: 1px solid var(--dialog-border-color);
+    border-radius: var(--border-radius-md);
+    padding: 4px;
+    box-shadow: var(--shadow-island);
+  }
+
+  .SceneHeader__browse-scenes {
+    background: var(--color-surface-lowest);
+    border: 1px solid var(--dialog-border-color);
+    border-radius: var(--border-radius-md);
+    padding: 4px;
+    cursor: pointer;
+    transition: background-color 0.1s ease, border-color 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      color: var(--color-on-surface);
+      stroke: var(--color-on-surface);
+    }
+
+    &:hover {
+      background: var(--color-surface-low);
+      border-color: var(--color-primary);
+
+      svg {
+        color: var(--color-primary);
+        stroke: var(--color-primary);
+      }
+    }
+
+    &:active {
+      background: var(--color-surface-primary-container);
+      border-color: var(--color-brand-active);
+    }
+  }
+
+  .SceneHeader__name {
+    background: transparent;
+    border: none;
+    color: var(--color-on-surface);
+    font-size: 0.95rem;
+    padding: 2px 6px;
+    border-radius: var(--border-radius-md);
+    cursor: text;
+    transition: background-color 0.1s ease;
+
+    &:hover {
+      background: var(--color-surface-low);
+    }
+  }
+
+  .SceneHeader__name-input {
+    background: var(--color-surface-lowest);
+    border: 1px solid var(--dialog-border-color);
+    color: var(--color-on-surface);
+    font-size: 0.95rem;
+    padding: 2px 6px;
+    border-radius: var(--border-radius-md);
+    min-width: 180px;
+    transition: border-color 0.1s ease, box-shadow 0.1s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(105, 101, 219, 0.2);
+    }
+
+    &:hover {
+      border-color: var(--color-primary);
+    }
+  }
+
+  .InlineSceneBrowser__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .InlineSceneBrowser__title {
+    font-weight: 600;
+    color: var(--color-on-surface);
+  }
+
+  .InlineSceneBrowser__close {
+    background: transparent;
+    border: none;
+    color: var(--color-on-surface);
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  // Dark mode specific adjustments
+  &.theme--dark {
+    .SceneHeader__name-input {
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(168, 165, 255, 0.3);
+      }
+    }
+  }
+}
+
+

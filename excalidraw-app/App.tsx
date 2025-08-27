@@ -137,6 +137,7 @@ import DebugCanvas, {
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import SceneHeader from "./components/SceneHeader";
 
 import "./index.scss";
 
@@ -909,6 +910,14 @@ const ExcalidrawWrapper = () => {
           }
         }}
       >
+        {excalidrawAPI && (
+          <SceneHeader
+            getName={() => excalidrawAPI.getName()}
+            setName={(name) =>
+              excalidrawAPI.updateScene({ appState: { name } })
+            }
+          />
+        )}
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
           isCollaborating={isCollaborating}
@@ -977,7 +986,10 @@ const ExcalidrawWrapper = () => {
             }
           }}
         />
-        <SceneBrowserDialog onSceneLoad={handleSceneLoad} />
+        <SceneBrowserDialog
+          onSceneLoad={handleSceneLoad}
+          onError={(error) => setErrorMessage(error.message)}
+        />
 
         {errorMessage && (
           <ErrorDialog onClose={() => setErrorMessage("")}>

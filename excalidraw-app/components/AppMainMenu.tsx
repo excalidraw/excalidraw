@@ -8,6 +8,7 @@ import React from "react";
 
 import { isDevEnv } from "@excalidraw/common";
 
+import { LibraryIcon } from "@excalidraw/excalidraw/components/icons";
 import type { Theme } from "@excalidraw/element/types";
 
 import { LanguageList } from "../app-language/LanguageList";
@@ -33,7 +34,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Export />
       <MainMenu.Item
         onSelect={() => setSceneBrowserDialogState({ isOpen: true })}
-        icon="📄"
+        icon={LibraryIcon}
       >
         Browse Scenes
       </MainMenu.Item>

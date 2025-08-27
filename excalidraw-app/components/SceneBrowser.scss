@@ -1,0 +1,74 @@
+.excalidraw {
+  .SceneBrowser {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  .InlineSceneBrowser {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .SceneBrowser__heading {
+    margin: 0 0 1rem 0;
+    color: var(--color-on-surface);
+    font-weight: 600;
+  }
+
+  .SceneBrowser__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .SceneBrowser__item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface-lowest);
+    border: 1px solid var(--dialog-border-color);
+    border-radius: var(--border-radius-lg);
+  }
+
+  .SceneBrowser__meta {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .SceneBrowser__name {
+    margin: 0 0 0.25rem 0;
+    color: var(--color-on-surface);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .SceneBrowser__sub {
+    font-size: 0.875rem;
+    color: var(--color-muted-darker);
+  }
+
+  .SceneBrowser__actions {
+    display: inline-flex;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+  }
+
+  // Improve contrast for buttons in dark mode
+  .SceneBrowser__actions .ToolIcon {
+    --icon-fill-color: var(--color-on-surface);
+
+    &:hover {
+      --icon-fill-color: var(--color-primary);
+      background-color: var(--color-surface-primary-container);
+    }
+
+    &:active {
+      --icon-fill-color: var(--color-on-primary-container);
+      background-color: var(--color-brand-active);
+    }
+  }
+}
+
+
