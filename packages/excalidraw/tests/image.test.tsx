@@ -3,11 +3,13 @@ import { randomId, reseed } from "@excalidraw/common";
 import type { FileId } from "@excalidraw/element/types";
 
 import * as blobModule from "../data/blob";
+import * as filesystemModule from "../data/filesystem";
 import { Excalidraw } from "../index";
 import { createPasteEvent } from "../clipboard";
 
 import { API } from "./helpers/api";
 import { mockMultipleHTMLImageElements } from "./helpers/mocks";
+import { UI } from "./helpers/ui";
 import { GlobalTestState, render, waitFor } from "./test-utils";
 import {
   DEER_IMAGE_DIMENSIONS,
@@ -32,11 +34,19 @@ describe("image insertion", () => {
 
     const generateIdSpy = vi.spyOn(blobModule, "generateIdFromFile");
     const resizeFileSpy = vi.spyOn(blobModule, "resizeImageFile");
+    const fileOpenSpy = vi.spyOn(filesystemModule, "fileOpen");
 
     generateIdSpy.mockImplementation(() =>
       Promise.resolve(randomId() as FileId),
     );
     resizeFileSpy.mockImplementation((file: File) => Promise.resolve(file));
+    fileOpenSpy.mockImplementation(
+      async () =>
+        await Promise.all([
+          API.loadFile("./fixtures/deer.png"),
+          API.loadFile("./fixtures/smiley.png"),
+        ]),
+    );
 
     Object.assign(document, {
       elementFromPoint: () => GlobalTestState.canvas,
@@ -98,6 +108,37 @@ describe("image insertion", () => {
         ]),
       }),
     );
+
+    await waitFor(() => {
+      expect(h.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            ...initializedImageProperties,
+            ...DEER_IMAGE_DIMENSIONS,
+          }),
+          expect.objectContaining({
+            ...initializedImageProperties,
+            ...SMILEY_IMAGE_DIMENSIONS,
+          }),
+        ]),
+      );
+      expect(h.elements).toHaveLength(2);
+      const dimensionsSet = new Set(h.elements.map((el) => `${el.x}-${el.y}`));
+      expect(dimensionsSet.size).toEqual(h.elements.length);
+    });
+  });
+
+  it("should eventually initialize all images added through image tool", async () => {
+    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
+
+    h.state.height = 1000;
+
+    mockMultipleHTMLImageElements([
+      [DEER_IMAGE_DIMENSIONS.width, DEER_IMAGE_DIMENSIONS.height],
+      [SMILEY_IMAGE_DIMENSIONS.width, SMILEY_IMAGE_DIMENSIONS.height],
+    ]);
+
+    UI.clickTool("image");
 
     await waitFor(() => {
       expect(h.elements).toEqual(
