@@ -10440,7 +10440,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // Create, position, insert and select initialized (replacing placeholders)
     const initializedImageElements = await Promise.all(
-      positionedPlaceholderElements.map(async (placeholder, i) => {
+      placeholderElements.map(async (placeholder, i) => {
         try {
           return await this.initializeImage(placeholder, imageFiles[i]);
         } catch (error: any) {

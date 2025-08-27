@@ -1,27 +1,27 @@
 import { getCommonBounds } from "@excalidraw/utils";
 
-import { newElementWith, type ElementUpdate } from "./mutateElement";
+import { newElementWith } from "./mutateElement";
 
 import type { ExcalidrawElement } from "./types";
 
 // TODO rewrite (mostly vibe-coded)
-export const positionElementsOnGrid = <TElement extends ExcalidrawElement>(
-  elements: TElement[] | TElement[][],
+export const positionElementsOnGrid = (
+  elements: ExcalidrawElement[] | ExcalidrawElement[][],
   centerX: number,
   centerY: number,
   padding = 50,
-): TElement[] => {
+): ExcalidrawElement[] => {
   // Ensure there are elements to position
   if (!elements || elements.length === 0) {
     return [];
   }
 
-  const res: TElement[] = [];
+  const res: ExcalidrawElement[] = [];
   // Normalize input to work with atomic units (groups of elements)
   // If elements is a flat array, treat each element as its own atomic unit
-  const atomicUnits: TElement[][] = Array.isArray(elements[0])
-    ? (elements as TElement[][])
-    : (elements as TElement[]).map((element) => [element]);
+  const atomicUnits: ExcalidrawElement[][] = Array.isArray(elements[0])
+    ? (elements as ExcalidrawElement[][])
+    : (elements as ExcalidrawElement[]).map((element) => [element]);
 
   // Determine the number of columns for atomic units
   // A common approach for a "grid-like" layout without specific column constraints
@@ -30,7 +30,7 @@ export const positionElementsOnGrid = <TElement extends ExcalidrawElement>(
   const numColumns = Math.max(1, Math.ceil(Math.sqrt(numUnits)));
 
   // Group atomic units into rows based on the calculated number of columns
-  const rows: TElement[][][] = [];
+  const rows: ExcalidrawElement[][][] = [];
   for (let i = 0; i < numUnits; i += numColumns) {
     rows.push(atomicUnits.slice(i, i + numColumns));
   }
@@ -97,7 +97,7 @@ export const positionElementsOnGrid = <TElement extends ExcalidrawElement>(
           newElementWith(element, {
             x: element.x + offsetX,
             y: element.y + offsetY,
-          } as ElementUpdate<TElement>),
+          }),
         );
       });
 
