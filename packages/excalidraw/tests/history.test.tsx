@@ -58,6 +58,10 @@ import { createPasteEvent } from "../clipboard";
 
 import * as blobModule from "../data/blob";
 
+import {
+  DEER_IMAGE_DIMENSIONS,
+  SMILEY_IMAGE_DIMENSIONS,
+} from "./fixtures/constants.js";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { mockHTMLImageElement } from "./helpers/mocks";
@@ -618,14 +622,9 @@ describe("history", () => {
       // it's necessary to specify the height in order to calculate natural dimensions of the image
       h.state.height = 1000;
 
-      const deerImageDimensions = {
-        width: 318,
-        height: 335,
-      };
-
       mockHTMLImageElement(
-        deerImageDimensions.width,
-        deerImageDimensions.height,
+        DEER_IMAGE_DIMENSIONS.width,
+        DEER_IMAGE_DIMENSIONS.height,
       );
 
       await API.drop(await API.loadFile("./fixtures/deer.png"));
@@ -639,7 +638,7 @@ describe("history", () => {
             fileId: expect.any(String),
             x: expect.toBeNonNaNNumber(),
             y: expect.toBeNonNaNNumber(),
-            ...deerImageDimensions,
+            ...DEER_IMAGE_DIMENSIONS,
           }),
         ]);
 
@@ -652,7 +651,7 @@ describe("history", () => {
             fileId: expect.any(String),
             x: expect.toBeNonNaNNumber(),
             y: expect.toBeNonNaNNumber(),
-            ...deerImageDimensions,
+            ...DEER_IMAGE_DIMENSIONS,
           }),
         );
       });
@@ -667,7 +666,7 @@ describe("history", () => {
           x: expect.toBeNonNaNNumber(),
           y: expect.toBeNonNaNNumber(),
           isDeleted: true,
-          ...deerImageDimensions,
+          ...DEER_IMAGE_DIMENSIONS,
         }),
       ]);
 
@@ -681,7 +680,7 @@ describe("history", () => {
           x: expect.toBeNonNaNNumber(),
           y: expect.toBeNonNaNNumber(),
           isDeleted: false,
-          ...deerImageDimensions,
+          ...DEER_IMAGE_DIMENSIONS,
         }),
       ]);
     });
@@ -738,14 +737,9 @@ describe("history", () => {
       // it's necessary to specify the height in order to calculate natural dimensions of the image
       h.state.height = 1000;
 
-      const smileyImageDimensions = {
-        width: 56,
-        height: 77,
-      };
-
       mockHTMLImageElement(
-        smileyImageDimensions.width,
-        smileyImageDimensions.height,
+        SMILEY_IMAGE_DIMENSIONS.width,
+        SMILEY_IMAGE_DIMENSIONS.height,
       );
 
       document.dispatchEvent(
@@ -763,7 +757,7 @@ describe("history", () => {
             fileId: expect.any(String),
             x: expect.toBeNonNaNNumber(),
             y: expect.toBeNonNaNNumber(),
-            ...smileyImageDimensions,
+            ...SMILEY_IMAGE_DIMENSIONS,
           }),
         ]);
         // need to check that delta actually contains initialized image element (with fileId & natural dimensions)
@@ -775,7 +769,7 @@ describe("history", () => {
             fileId: expect.any(String),
             x: expect.toBeNonNaNNumber(),
             y: expect.toBeNonNaNNumber(),
-            ...smileyImageDimensions,
+            ...SMILEY_IMAGE_DIMENSIONS,
           }),
         );
       });
@@ -790,7 +784,7 @@ describe("history", () => {
           x: expect.toBeNonNaNNumber(),
           y: expect.toBeNonNaNNumber(),
           isDeleted: true,
-          ...smileyImageDimensions,
+          ...SMILEY_IMAGE_DIMENSIONS,
         }),
       ]);
 
@@ -804,7 +798,7 @@ describe("history", () => {
           x: expect.toBeNonNaNNumber(),
           y: expect.toBeNonNaNNumber(),
           isDeleted: false,
-          ...smileyImageDimensions,
+          ...SMILEY_IMAGE_DIMENSIONS,
         }),
       ]);
     });
