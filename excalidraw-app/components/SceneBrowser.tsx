@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { listExportedScenes, loadSceneById } from "../data/supabase";
 import { Card } from "@excalidraw/excalidraw/components/Card";
 import { ToolButton } from "@excalidraw/excalidraw/components/ToolButton";
@@ -31,11 +31,7 @@ export const SceneBrowserDialog: React.FC<{
   const [loading, setLoading] = useState(true);
   const [loadingScene, setLoadingScene] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadScenes();
-  }, []);
-
-  const loadScenes = async () => {
+  const loadScenes = useCallback(async () => {
     try {
       setLoading(true);
       const exportedScenes = await listExportedScenes();
@@ -46,7 +42,13 @@ export const SceneBrowserDialog: React.FC<{
     } finally {
       setLoading(false);
     }
-  };
+  }, [onError]);
+
+  useEffect(() => {
+    if (dialogState.isOpen) {
+      loadScenes();
+    }
+  }, [dialogState.isOpen, loadScenes]);
 
   const handleLoadScene = async (sceneId: string) => {
     try {
