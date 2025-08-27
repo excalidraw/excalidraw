@@ -794,7 +794,7 @@ const ExcalidrawWrapper = () => {
   const currentSceneVersion = useRef<number>(0);
   const lastAutoSaveTime = useRef<number>(0);
   const lastSavedSceneHash = useRef<string>("");
-  const AUTO_SAVE_COOLDOWN_MS = 10000; // 10 seconds cooldown
+  const AUTO_SAVE_COOLDOWN_MS = 10000; // 10 seconds cooldown 
 
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
