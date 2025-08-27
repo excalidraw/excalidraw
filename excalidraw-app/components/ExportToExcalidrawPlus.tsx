@@ -13,6 +13,7 @@ import {
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import { isInitializedImageElement } from "@excalidraw/element";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
+import { useAuth, supabase } from "./AuthContext";
 
 import type {
   FileId,
@@ -56,21 +57,30 @@ export const exportToExcalidrawPlus = async (
     encryptedData.iv.length,
   );
 
+  // Check authentication before attempting to save
+  if (!supabase) {
+    throw new Error("Supabase not configured");
+  }
+
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error) {
+    throw new Error("Authentication error: " + error.message);
+  }
+  if (!user) {
+    throw new Error("User must be authenticated to export to Excalidraw+");
+  }
+
   // Save to Supabase storage
   await saveSceneToSupabaseStorage(sceneData, id, {
     name,
     version: 2,
   });
 
-  // Save metadata to database and get the new version number
-  const newVersion = await saveSceneMetadata(id, encryptionKey, {
+  // Save metadata to database
+  await saveSceneMetadata(id, encryptionKey, {
     name,
     description: `Exported diagram: ${name}`,
-    isAutomatic: false, // Explicitly mark as manual export
   });
-
-  // Update the current version in the app (this will be handled by the calling component)
-  console.log("Created new manual version:", newVersion);
 
   const filesMap = new Map<FileId, BinaryFileData>();
   for (const element of elements) {
@@ -97,8 +107,8 @@ export const exportToExcalidrawPlus = async (
 
   window.open(url, "_blank");
 
-  // Return the new version number
-  return newVersion;
+  // Return the scene ID
+  return { sceneId: id };
 };
 
 export const ExportToExcalidrawPlus: React.FC<{
@@ -108,9 +118,70 @@ export const ExportToExcalidrawPlus: React.FC<{
   name: string;
   onError: (error: Error) => void;
   onSuccess: () => void;
-  onVersionCreated?: (version: number) => void;
-}> = ({ elements, appState, files, name, onError, onSuccess, onVersionCreated }) => {
+  onVersionCreated?: (sceneId: string) => void;
+  onOpenAuthModal?: () => void;
+}> = ({ elements, appState, files, name, onError, onSuccess, onVersionCreated, onOpenAuthModal }) => {
   const { t } = useI18n();
+  const { user, loading } = useAuth();
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <Card color="primary">
+        <div className="Card-icon">
+          <ExcalidrawLogo
+            style={{
+              [`--color-logo-icon` as any]: "#fff",
+              width: "2.8rem",
+              height: "2.8rem",
+            }}
+          />
+        </div>
+        <h2>Excalidraw+</h2>
+        <div className="Card-details">
+          Checking authentication...
+        </div>
+      </Card>
+    );
+  }
+
+  // Show login prompt if user is not authenticated
+  if (!user) {
+    return (
+      <Card color="primary">
+        <div className="Card-icon">
+          <ExcalidrawLogo
+            style={{
+              [`--color-logo-icon` as any]: "#fff",
+              width: "2.8rem",
+              height: "2.8rem",
+            }}
+          />
+        </div>
+        <h2>Excalidraw+</h2>
+        <div className="Card-details">
+          Please sign in to export your diagrams to Excalidraw+ cloud storage.
+        </div>
+        <ToolButton
+          className="Card-button"
+          type="button"
+          title="Sign In"
+          aria-label="Sign In"
+          showAriaLabel={true}
+          onClick={() => {
+            if (onOpenAuthModal) {
+              onOpenAuthModal();
+            } else {
+              // Fallback to error message
+              onError(new Error("Please sign in to export to Excalidraw+"));
+            }
+          }}
+        />
+      </Card>
+    );
+  }
+
+  // User is authenticated, show normal export option
   return (
     <Card color="primary">
       <div className="Card-icon">
@@ -135,9 +206,9 @@ export const ExportToExcalidrawPlus: React.FC<{
         onClick={async () => {
           try {
             trackEvent("export", "eplus", `ui (${getFrame()})`);
-            const newVersion = await exportToExcalidrawPlus(elements, appState, files, name);
-            if (newVersion !== undefined) {
-              onVersionCreated?.(newVersion);
+            const result = await exportToExcalidrawPlus(elements, appState, files, name);
+            if (result && typeof result === 'object' && 'sceneId' in result) {
+              onVersionCreated?.(result.sceneId);
             }
             onSuccess();
           } catch (error: any) {

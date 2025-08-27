@@ -30,6 +30,13 @@
     background: var(--color-surface-lowest);
     border: 1px solid var(--dialog-border-color);
     border-radius: var(--border-radius-lg);
+    transition: all 0.2s ease;
+
+    &--current {
+      border-color: var(--color-primary);
+      background: rgba(var(--color-primary-rgb), 0.05);
+      box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.1);
+    }
   }
 
   .SceneBrowser__meta {
@@ -42,6 +49,13 @@
     color: var(--color-on-surface);
     font-size: 1rem;
     font-weight: 600;
+  }
+
+  .SceneBrowser__current-indicator {
+    color: var(--color-primary);
+    font-weight: 500;
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
   }
 
   .SceneBrowser__sub {

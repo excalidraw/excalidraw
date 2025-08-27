@@ -27,33 +27,20 @@ export const triggerSceneBrowserRefresh = () => {
   sceneUpdateEmitter.emit();
 };
 
-interface ExportedSceneVersion {
+interface ExportedScene {
   id: string;
   name: string;
   description: string;
   createdAt: string;
   encryptionKey: string;
   url: string;
-  version: number;
-  isLatest: boolean;
-  isAutomatic: boolean;
-}
-
-interface GroupedScene {
-  name: string;
-  description: string;
-  versions: ExportedSceneVersion[];
-  branches: {
-    version: number;
-    versions: ExportedSceneVersion[];
-    latestVersion: ExportedSceneVersion;
-    isManualBranch: boolean;
-  }[];
-  latestVersion: ExportedSceneVersion;
 }
 
 // State atom for scene browser dialog
 export const sceneBrowserDialogStateAtom = atom<{ isOpen: boolean }>({ isOpen: false });
+
+// State atom for current scene in scene browser (the scene that was just exported)
+export const currentSceneInBrowserAtom = atom<{ sceneName: string; sceneId: string } | null>(null);
 
 export const SceneBrowserDialog: React.FC<{
   onSceneLoad: (sceneData: any) => void;
@@ -61,24 +48,17 @@ export const SceneBrowserDialog: React.FC<{
   onRefresh?: () => void;
 }> = ({ onSceneLoad, onError, onRefresh }) => {
   const [dialogState, setDialogState] = useAtom(sceneBrowserDialogStateAtom);
-  const [scenes, setScenes] = useState<GroupedScene[]>([]);
+  const [currentScene, setCurrentScene] = useAtom(currentSceneInBrowserAtom);
+  const [scenes, setScenes] = useState<ExportedScene[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingScene, setLoadingScene] = useState<string | null>(null);
   const [deletingScene, setDeletingScene] = useState<string | null>(null);
-  const [selectedVersions, setSelectedVersions] = useState<Record<string, string>>({});
 
   const loadScenes = useCallback(async () => {
     try {
       setLoading(true);
       const exportedScenes = await listExportedScenes();
       setScenes(exportedScenes);
-      
-      // Initialize selected versions to latest versions
-      const initialVersions: Record<string, string> = {};
-      exportedScenes.forEach(scene => {
-        initialVersions[scene.name] = scene.latestVersion.id;
-      });
-      setSelectedVersions(initialVersions);
     } catch (error: any) {
       console.error("Error loading scenes:", error);
       onError?.(new Error("Failed to load scenes"));
@@ -102,16 +82,17 @@ export const SceneBrowserDialog: React.FC<{
     }
   }, [dialogState.isOpen, loadScenes]);
 
-  const handleLoadScene = async (sceneName: string) => {
-    const selectedSceneId = selectedVersions[sceneName];
-    if (!selectedSceneId) return;
-
+  const handleLoadScene = async (sceneId: string, sceneName: string) => {
     try {
-      setLoadingScene(selectedSceneId);
+      setLoadingScene(sceneId);
       trackEvent("scene", "load", `browser`);
 
-      const sceneData = await loadSceneById(selectedSceneId);
+      const sceneData = await loadSceneById(sceneId);
       onSceneLoad(sceneData);
+
+      // Update the current scene to reflect the newly loaded scene
+      setCurrentScene({ sceneName, sceneId });
+
       setDialogState({ isOpen: false });
     } catch (error: any) {
       console.error("Error loading scene:", error);
@@ -123,6 +104,8 @@ export const SceneBrowserDialog: React.FC<{
 
   const handleClose = () => {
     setDialogState({ isOpen: false });
+    // Clear the current scene when closing the browser
+    setCurrentScene(null);
   };
 
   const handleRefresh = () => {
@@ -131,7 +114,7 @@ export const SceneBrowserDialog: React.FC<{
   };
 
   const handleDeleteScene = async (sceneName: string) => {
-    if (!confirm(`Are you sure you want to delete the entire scene "${sceneName}" and all its versions? This action cannot be undone.`)) {
+    if (!confirm(`Are you sure you want to delete the scene "${sceneName}"? This action cannot be undone.`)) {
       return;
     }
 
@@ -153,12 +136,7 @@ export const SceneBrowserDialog: React.FC<{
     }
   };
 
-  const handleVersionChange = (sceneName: string, sceneId: string) => {
-    setSelectedVersions(prev => ({
-      ...prev,
-      [sceneName]: sceneId,
-    }));
-  };
+
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
@@ -195,80 +173,64 @@ export const SceneBrowserDialog: React.FC<{
       <div className="SceneBrowser">
         <h3 className="SceneBrowser__heading">Your Exported Scenes</h3>
         <div className="SceneBrowser__content">
-          {scenes.map((scene) => (
-            <div key={scene.name} className="SceneBrowser__item">
-              <div className="SceneBrowser__meta">
-                <h4 className="SceneBrowser__name">{scene.name}</h4>
-                <div className="SceneBrowser__sub">
-                  {scene.branches.length > 1 ? (
-                    <div className="SceneBrowser__version-selector">
-                      <label htmlFor={`version-${scene.name}`}>Branch:</label>
-                      <select
-                        id={`version-${scene.name}`}
-                        className="dropdown-select"
-                        value={selectedVersions[scene.name] || scene.latestVersion.id}
-                        onChange={(e) => handleVersionChange(scene.name, e.target.value)}
-                      >
-                        {scene.branches.map((branch) => (
-                          <optgroup key={branch.version} label={branch.isManualBranch ? `Manual v${branch.version}` : `Automatic v${branch.version}`}>
-                            {branch.versions.map((version) => (
-                              <option key={version.id} value={version.id}>
-                                {version.isLatest ? "Latest" : formatDate(version.createdAt)}
-                              </option>
-                            ))}
-                          </optgroup>
-                        ))}
-                      </select>
-                    </div>
-                  ) : (
-                    <div className="SceneBrowser__sub">Created: {formatDate(scene.latestVersion.createdAt)}</div>
+          {scenes.map((scene) => {
+            const isCurrentScene = currentScene?.sceneName === scene.name;
+            return (
+              <div
+                key={scene.id}
+                className={`SceneBrowser__item ${isCurrentScene ? 'SceneBrowser__item--current' : ''}`}
+              >
+                <div className="SceneBrowser__meta">
+                  <h4 className="SceneBrowser__name">
+                    {scene.name}
+                    {isCurrentScene && <span className="SceneBrowser__current-indicator"> (Current)</span>}
+                  </h4>
+                  <div className="SceneBrowser__sub">
+                    Created: {formatDate(scene.createdAt)}
+                  </div>
+                  {scene.description && (
+                    <div className="SceneBrowser__sub">{scene.description}</div>
                   )}
                 </div>
-                {scene.description && (
-                  <div className="SceneBrowser__sub">{scene.description}</div>
-                )}
+                <div className="SceneBrowser__actions">
+                  <ToolButton
+                    type="button"
+                    size="small"
+                    title="Load Scene"
+                    aria-label="Load scene"
+                    icon={LoadIcon}
+                    onClick={() => handleLoadScene(scene.id, scene.name)}
+                    disabled={loadingScene === scene.id}
+                  >
+                    {loadingScene === scene.id ? "Loading..." : "Load"}
+                  </ToolButton>
+                  <ToolButton
+                    type="button"
+                    size="small"
+                    title="Copy URL"
+                    aria-label="Copy scene URL"
+                    icon={LinkIcon}
+                    onClick={() => {
+                      navigator.clipboard.writeText(scene.url);
+                    }}
+                  >
+                    Copy URL
+                  </ToolButton>
+                  <ToolButton
+                    type="button"
+                    size="small"
+                    title="Delete Scene"
+                    aria-label="Delete scene"
+                    icon={TrashIcon}
+                    onClick={() => handleDeleteScene(scene.name)}
+                    disabled={deletingScene === scene.name}
+                  >
+                    {deletingScene === scene.name ? "Deleting..." : "Delete"}
+                  </ToolButton>
+                </div>
               </div>
-              <div className="SceneBrowser__actions">
-                <ToolButton
-                  type="button"
-                  size="small"
-                  title="Load Scene"
-                  aria-label="Load scene"
-                  icon={LoadIcon}
-                  onClick={() => handleLoadScene(scene.name)}
-                  disabled={loadingScene === selectedVersions[scene.name]}
-                >
-                  {loadingScene === selectedVersions[scene.name] ? "Loading..." : "Load"}
-                </ToolButton>
-                <ToolButton
-                  type="button"
-                  size="small"
-                  title="Copy URL"
-                  aria-label="Copy scene URL"
-                  icon={LinkIcon}
-                  onClick={() => {
-                    const selectedVersion = scene.versions.find(v => v.id === selectedVersions[scene.name]);
-                    if (selectedVersion) {
-                      navigator.clipboard.writeText(selectedVersion.url);
-                    }
-                  }}
-                >
-                  Copy URL
-                </ToolButton>
-                <ToolButton
-                  type="button"
-                  size="small"
-                  title="Delete Scene"
-                  aria-label="Delete entire scene and all versions"
-                  icon={TrashIcon}
-                  onClick={() => handleDeleteScene(scene.name)}
-                  disabled={deletingScene === scene.name}
-                >
-                  {deletingScene === scene.name ? "Deleting..." : "Delete Scene"}
-                </ToolButton>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     );

@@ -1,7 +1,7 @@
 import React from "react";
 import {
   Excalidraw,
-  LiveCollaborationTrigger,
+
   TTDDialogTrigger,
   CaptureUpdateAction,
   reconcileElements,
@@ -29,7 +29,7 @@ import {
   isTestEnv,
   preventUnload,
   resolvablePromise,
-  isRunningInIframe,
+
   isDevEnv,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
@@ -116,7 +116,7 @@ import {
 import {
   loadSceneFromSupabaseStorage,
   loadFilesFromSupabase,
-  saveSceneAutomatically,
+
 } from "./data/supabase";
 
 import { updateStaleImageStatuses } from "./data/FileManager";
@@ -132,8 +132,9 @@ import {
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
-import { SceneBrowserDialog, sceneBrowserDialogStateAtom, triggerSceneBrowserRefresh } from "./components/SceneBrowser";
-import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
+import { SceneBrowserDialog, sceneBrowserDialogStateAtom, triggerSceneBrowserRefresh, currentSceneInBrowserAtom } from "./components/SceneBrowser";
+// Collaborative features disabled
+// import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import { useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
 import { useAppLangCode } from "./app-language/language-state";
@@ -318,40 +319,8 @@ const initializeScene = async (opts: {
     }
   }
 
-  if (roomLinkData && opts.collabAPI) {
-    const { excalidrawAPI } = opts;
-
-    const scene = await opts.collabAPI.startCollaboration(roomLinkData);
-
-    return {
-      // when collaborating, the state may have already been updated at this
-      // point (we may have received updates from other clients), so reconcile
-      // elements and appState with existing state
-      scene: {
-        ...scene,
-        appState: {
-          ...restoreAppState(
-            {
-              ...scene?.appState,
-              theme: localDataState?.appState?.theme || scene?.appState?.theme,
-            },
-            excalidrawAPI.getAppState(),
-          ),
-          // necessary if we're invoking from a hashchange handler which doesn't
-          // go through App.initializeScene() that resets this flag
-          isLoading: false,
-        },
-        elements: reconcileElements(
-          scene?.elements || [],
-          excalidrawAPI.getSceneElementsIncludingDeleted() as RemoteExcalidrawElement[],
-          excalidrawAPI.getAppState(),
-        ),
-      },
-      isExternalScene: true,
-      id: roomLinkData.roomId,
-      key: roomLinkData.roomKey,
-    };
-  } else if (scene) {
+  // Collaborative features disabled - room collaboration not supported
+  if (scene) {
     return isExternalScene && jsonBackendMatch
       ? {
           scene,
@@ -462,7 +431,8 @@ const ExcalidrawWrapper = ({
   onOpenProfile?: () => void;
 }) => {
   const [errorMessage, setErrorMessage] = useState("");
-  const isCollabDisabled = isRunningInIframe();
+  // Collaborative features disabled
+  const isCollabDisabled = true;
 
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
 
@@ -510,17 +480,7 @@ const ExcalidrawWrapper = ({
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
 
-        // Set the current version based on the loaded scene
-        if (sceneData.metadata?.version !== undefined) {
-          currentSceneVersion.current = sceneData.metadata.version;
-        } else {
-          // Default to version 0 for new scenes
-          currentSceneVersion.current = 0;
-        }
 
-        // Reset auto-save state for the new scene
-        lastSavedSceneHash.current = "";
-        lastAutoSaveTime.current = 0;
 
         // Load any associated images
         if (sceneData.files) {
@@ -533,9 +493,12 @@ const ExcalidrawWrapper = ({
     [excalidrawAPI],
   );
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
-    return isCollaborationLink(window.location.href);
+    // Collaborative features disabled
+    return false;
   });
-  const collabError = useAtomValue(collabErrorIndicatorAtom);
+  // Collaborative features disabled
+  // const collabError = useAtomValue(collabErrorIndicatorAtom);
+  const collabError = { message: null };
 
   useHandleLibrary({
     excalidrawAPI,
@@ -573,15 +536,36 @@ const ExcalidrawWrapper = ({
       if (!data.scene) {
         return;
       }
-      if (collabAPI?.isCollaborating()) {
-        if (data.scene.elements) {
-          collabAPI
-            .fetchImageFilesFromFirebase({
-              elements: data.scene.elements,
-              forceFetchFiles: true,
-            })
+      // Collaborative features disabled - only load from local storage or Supabase
+      const fileIds =
+        data.scene.elements?.reduce((acc, element) => {
+          if (isInitializedImageElement(element)) {
+            return acc.concat(element.fileId);
+          }
+          return acc;
+        }, [] as FileId[]) || [];
+
+      if (data.isExternalScene) {
+        loadFilesFromSupabase(
+          `${STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
+          data.key,
+          fileIds,
+        ).then(({ loadedFiles, erroredFiles }) => {
+          excalidrawAPI.addFiles(loadedFiles);
+          updateStaleImageStatuses({
+            excalidrawAPI,
+            erroredFiles,
+            elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+          });
+        });
+      } else if (isInitialLoad) {
+        if (fileIds.length) {
+          LocalData.fileStorage
+            .getFiles(fileIds)
             .then(({ loadedFiles, erroredFiles }) => {
-              excalidrawAPI.addFiles(loadedFiles);
+              if (loadedFiles.length) {
+                excalidrawAPI.addFiles(loadedFiles);
+              }
               updateStaleImageStatuses({
                 excalidrawAPI,
                 erroredFiles,
@@ -589,47 +573,9 @@ const ExcalidrawWrapper = ({
               });
             });
         }
-      } else {
-        const fileIds =
-          data.scene.elements?.reduce((acc, element) => {
-            if (isInitializedImageElement(element)) {
-              return acc.concat(element.fileId);
-            }
-            return acc;
-          }, [] as FileId[]) || [];
-
-        if (data.isExternalScene) {
-          loadFilesFromSupabase(
-            `${STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
-            data.key,
-            fileIds,
-          ).then(({ loadedFiles, erroredFiles }) => {
-            excalidrawAPI.addFiles(loadedFiles);
-            updateStaleImageStatuses({
-              excalidrawAPI,
-              erroredFiles,
-              elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
-            });
-          });
-        } else if (isInitialLoad) {
-          if (fileIds.length) {
-            LocalData.fileStorage
-              .getFiles(fileIds)
-              .then(({ loadedFiles, erroredFiles }) => {
-                if (loadedFiles.length) {
-                  excalidrawAPI.addFiles(loadedFiles);
-                }
-                updateStaleImageStatuses({
-                  excalidrawAPI,
-                  erroredFiles,
-                  elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
-                });
-              });
-          }
-          // on fresh load, clear unused files from IDB (from previous
-          // session)
-          LocalData.fileStorage.clearObsoleteFiles({ currentFileIds: fileIds });
-        }
+        // on fresh load, clear unused files from IDB (from previous
+        // session)
+        LocalData.fileStorage.clearObsoleteFiles({ currentFileIds: fileIds });
       }
     };
 
@@ -642,12 +588,13 @@ const ExcalidrawWrapper = ({
       event.preventDefault();
       const libraryUrlTokens = parseLibraryTokensFromUrl();
       if (!libraryUrlTokens) {
-        if (
-          collabAPI?.isCollaborating() &&
-          !isCollaborationLink(window.location.href)
-        ) {
-          collabAPI.stopCollaboration(false);
-        }
+        // Collaborative features disabled
+        // if (
+        //   collabAPI?.isCollaborating() &&
+        //   !isCollaborationLink(window.location.href)
+        // ) {
+        //   collabAPI.stopCollaboration(false);
+        // }
         excalidrawAPI.updateScene({ appState: { isLoading: true } });
 
         initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
@@ -667,10 +614,8 @@ const ExcalidrawWrapper = ({
       if (isTestEnv()) {
         return;
       }
-      if (
-        !document.hidden &&
-        ((collabAPI && !collabAPI.isCollaborating()) || isCollabDisabled)
-      ) {
+      // Collaborative features disabled - always sync since no collaboration
+      if (!document.hidden) {
         // don't sync if local state is newer or identical to browser state
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
           const localDataState = importFromLocalStorage();
@@ -687,7 +632,8 @@ const ExcalidrawWrapper = ({
               });
             }
           });
-          collabAPI?.setUsername(username || "");
+          // Collaborative features disabled
+          // collabAPI?.setUsername(username || "");
         }
 
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_FILES)) {
@@ -781,134 +727,21 @@ const ExcalidrawWrapper = ({
     };
   }, [excalidrawAPI]);
 
-  // Track permission errors to temporarily disable auto-save
-  const permissionErrorCount = useRef(0);
-  const maxPermissionErrors = 3; // Disable auto-save after 3 permission errors
-  const autoSaveDisabledUntil = useRef(0);
 
-  // Automatic scene saving with cooldown
-  const autoSaveScene = useCallback(async (
-    elements: readonly OrderedExcalidrawElement[],
-    appState: AppState,
-    files: BinaryFiles,
-  ) => {
-    if (!excalidrawAPI || !isAuthenticated) return;
 
-    // Check if auto-save is temporarily disabled due to permission errors
-    const now = Date.now();
-    if (now < autoSaveDisabledUntil.current) {
-      console.log(`Auto-save disabled until ${new Date(autoSaveDisabledUntil.current).toLocaleTimeString()}`);
-      return;
-    }
 
-    // Create a simple hash of the current scene state to detect changes
-    const currentSceneHash = JSON.stringify({
-      elements: elements.filter(el => !el.isDeleted).map(el => ({ id: el.id, type: el.type, versionNonce: el.versionNonce })),
-      appState: { name: appState.name, viewBackgroundColor: appState.viewBackgroundColor }
-    });
 
-    // Also trigger auto-save when the scene name changes (indicates new scene creation)
-    const isFirstSave = lastSavedSceneHash.current === "";
-    const sceneNameChanged = !isFirstSave &&
-      lastSavedSceneHash.current &&
-      !lastSavedSceneHash.current.includes(`"name":"${appState.name}"`);
 
-    // Check if there are actual changes, if scene name changed, or if this is the first save
-    if (currentSceneHash === lastSavedSceneHash.current && !sceneNameChanged && !isFirstSave) {
-      return; // No changes, don't save
-    }
-
-    if (now - lastAutoSaveTime.current < AUTO_SAVE_COOLDOWN_MS) {
-      return; // Still in cooldown period
-    }
-
-    try {
-      const sceneName = excalidrawAPI.getName() || "Untitled";
-      await saveSceneAutomatically(
-        elements.filter(el => !el.isDeleted),
-        appState,
-        files,
-        sceneName,
-        currentSceneVersion.current,
-        user?.id,
-      );
-      lastAutoSaveTime.current = now;
-      lastSavedSceneHash.current = currentSceneHash;
-      // Reset permission error count on successful save
-      permissionErrorCount.current = 0;
-    } catch (error) {
-      console.error("Failed to auto-save scene:", error);
-
-      // If it's a storage permission error, show a user-friendly message and temporarily disable auto-save
-      if (error instanceof Error && error.message.includes('Storage permission denied')) {
-        permissionErrorCount.current++;
-        const message = `Auto-save failed due to storage permissions (${permissionErrorCount.current}/${maxPermissionErrors}). Please check your Supabase Storage bucket policies.`;
-        console.warn(message);
-
-        // Show user-friendly notification (you might want to use a toast library here)
-        if (window.alert) {
-          window.alert(message);
-        }
-
-        if (permissionErrorCount.current >= maxPermissionErrors) {
-          // Disable auto-save for 5 minutes after 3 permission errors
-          autoSaveDisabledUntil.current = now + (5 * 60 * 1000);
-          const disableMessage = `Auto-save disabled for 5 minutes due to repeated permission errors. Please check your Supabase Storage bucket policies and refresh the page to re-enable auto-save.`;
-          console.warn(disableMessage);
-
-          if (window.alert) {
-            window.alert(disableMessage);
-          }
-        }
-      } else if (error instanceof Error && error.message.includes('duplicate key value violates unique constraint')) {
-        // Handle database constraint errors by resetting the error count
-        permissionErrorCount.current = 0;
-        console.warn('Database constraint error - this may resolve automatically on the next save attempt.');
-      }
-    }
-  }, [excalidrawAPI, isAuthenticated, user]);
-
-  // Debounced auto-save to prevent excessive save attempts during rapid changes
-  const debouncedAutoSave = useCallback(
-    (() => {
-      let timeoutId: NodeJS.Timeout | null = null;
-      const debounceFn = (elements: readonly OrderedExcalidrawElement[], appState: AppState, files: BinaryFiles) => {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-        timeoutId = setTimeout(() => {
-          autoSaveScene(elements, appState, files);
-        }, 3000); // Wait 3 seconds after the last change before auto-saving
-      };
-
-      // Add cleanup method to the function
-      debounceFn.cleanup = () => {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-          timeoutId = null;
-        }
-      };
-
-      return debounceFn as typeof debounceFn & { cleanup: () => void };
-    })(),
-    [autoSaveScene]
-  );
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      debouncedAutoSave.cleanup();
-    };
-  }, [debouncedAutoSave]);
 
   const onChange = (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => {
-    if (collabAPI?.isCollaborating()) {
-      collabAPI.syncElements(elements);
-    }
+    // Collaborative features disabled
+    // if (collabAPI?.isCollaborating()) {
+    //   collabAPI.syncElements(elements);
+    // }
 
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
@@ -942,10 +775,7 @@ const ExcalidrawWrapper = ({
       });
     }
 
-    // Trigger automatic scene saving (only if not disabled)
-    if (!DISABLE_AUTOSAVE) {
-      debouncedAutoSave(elements, appState, files);
-    }
+
 
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
@@ -962,14 +792,7 @@ const ExcalidrawWrapper = ({
     null,
   );
 
-  // Track current scene version for branching
-  const currentSceneVersion = useRef<number>(0);
-  const lastAutoSaveTime = useRef<number>(0);
-  const lastSavedSceneHash = useRef<string>("");
-  const AUTO_SAVE_COOLDOWN_MS = 10000; // 10 seconds cooldown
-
-  // Temporary flag to disable autosave - set to true to disable
-  const DISABLE_AUTOSAVE = false; 
+ 
 
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
@@ -1127,16 +950,27 @@ const ExcalidrawWrapper = ({
                             appState: { openDialog: null },
                           });
                         }}
-                        onVersionCreated={(newVersion) => {
-                          // Update the current version
-                          currentSceneVersion.current = newVersion;
-
-                          // Reset auto-save state to trigger a fresh save
-                          lastSavedSceneHash.current = "";
-                          lastAutoSaveTime.current = 0;
+                        onVersionCreated={(sceneId) => {
+                          // Set the newly exported scene as current in the scene browser
+                          appJotaiStore.set(currentSceneInBrowserAtom, {
+                            sceneName: excalidrawAPI.getName(),
+                            sceneId: sceneId,
+                          });
 
                           // Trigger scene browser refresh
                           triggerSceneBrowserRefresh();
+                        }}
+                        onOpenAuthModal={() => {
+                          // Show authentication error message
+                          excalidrawAPI?.updateScene({
+                            appState: {
+                              errorMessage: "Please sign in to export to Excalidraw+. You will be redirected to the login page.",
+                            },
+                          });
+                          // Redirect to login page after a short delay
+                          setTimeout(() => {
+                            window.location.reload();
+                          }, 2000);
                         }}
                       />
                     );
@@ -1152,31 +986,25 @@ const ExcalidrawWrapper = ({
         autoFocus={true}
         theme={editorTheme}
         renderTopRightUI={(isMobile) => {
-          if (isMobile || !collabAPI || isCollabDisabled) {
-            return null;
+          // Collaborative features disabled
+          if (isMobile || true) { // Always disable collaborative UI
+            return (
+              <div className="top-right-ui">
+                {/* Sign Out Button */}
+                {isAuthenticated && (
+                  <Button
+                    onSelect={onSignOut}
+                    className="collab-button sign-out-button"
+                    style={{ marginLeft: "1rem" }}
+                    title="Sign Out"
+                  >
+                    Sign Out
+                  </Button>
+                )}
+              </div>
+            );
           }
-          return (
-            <div className="top-right-ui">
-              {collabError.message && <CollabError collabError={collabError} />}
-              <LiveCollaborationTrigger
-                isCollaborating={isCollaborating}
-                onSelect={() =>
-                  setShareDialogState({ isOpen: true, type: "share" })
-                }
-              />
-              {/* Sign Out Button */}
-              {isAuthenticated && (
-                <Button
-                  onSelect={onSignOut}
-                  className="collab-button sign-out-button"
-                  style={{ marginLeft: "1rem" }}
-                  title="Sign Out"
-                >
-                  Sign Out
-                </Button>
-              )}
-            </div>
-          );
+          return null;
         }}
         onLinkOpen={(element, event) => {
           if (element.link && isElementLink(element.link)) {
@@ -1229,11 +1057,12 @@ const ExcalidrawWrapper = ({
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
 
         <TTDDialogTrigger />
-        {isCollaborating && isOffline && (
+        {/* Collaborative features disabled */}
+        {/* {isCollaborating && isOffline && (
           <div className="collab-offline-warning">
             {t("alerts.collabOfflineWarning")}
           </div>
-        )}
+        )} */}
         {latestShareableLink && (
           <ShareableLinkDialog
             link={latestShareableLink}
@@ -1241,9 +1070,10 @@ const ExcalidrawWrapper = ({
             setErrorMessage={setErrorMessage}
           />
         )}
-        {excalidrawAPI && !isCollabDisabled && (
+        {/* Collaborative features disabled */}
+        {/* {excalidrawAPI && !isCollabDisabled && (
           <Collab excalidrawAPI={excalidrawAPI} />
-        )}
+        )} */}
 
         <ShareDialog
           collabAPI={collabAPI}
@@ -1265,9 +1095,7 @@ const ExcalidrawWrapper = ({
           onSceneLoad={handleSceneLoad}
           onError={(error) => setErrorMessage(error.message)}
           onRefresh={() => {
-            // Reset auto-save state to trigger a fresh save
-            lastSavedSceneHash.current = "";
-            lastAutoSaveTime.current = 0;
+            // Scene browser refreshed
           }}
         />
 
@@ -1279,47 +1107,48 @@ const ExcalidrawWrapper = ({
 
         <CommandPalette
           customCommandPaletteItems={[
-            {
-              label: t("labels.liveCollaboration"),
-              category: DEFAULT_CATEGORIES.app,
-              keywords: [
-                "team",
-                "multiplayer",
-                "share",
-                "public",
-                "session",
-                "invite",
-              ],
-              icon: usersIcon,
-              perform: () => {
-                setShareDialogState({
-                  isOpen: true,
-                  type: "collaborationOnly",
-                });
-              },
-            },
-            {
-              label: t("roomDialog.button_stopSession"),
-              category: DEFAULT_CATEGORIES.app,
-              predicate: () => !!collabAPI?.isCollaborating(),
-              keywords: [
-                "stop",
-                "session",
-                "end",
-                "leave",
-                "close",
-                "exit",
-                "collaboration",
-              ],
-              perform: () => {
-                if (collabAPI) {
-                  collabAPI.stopCollaboration();
-                  if (!collabAPI.isCollaborating()) {
-                    setShareDialogState({ isOpen: false });
-                  }
-                }
-              },
-            },
+            // Collaborative features disabled
+            // {
+            //   label: t("labels.liveCollaboration"),
+            //   category: DEFAULT_CATEGORIES.app,
+            //   keywords: [
+            //     "team",
+            //     "multiplayer",
+            //     "share",
+            //     "public",
+            //     "session",
+            //     "invite",
+            //   ],
+            //   icon: usersIcon,
+            //   perform: () => {
+            //     setShareDialogState({
+            //       isOpen: true,
+            //       type: "collaborationOnly",
+            //     });
+            //   },
+            // },
+            // {
+            //   label: t("roomDialog.button_stopSession"),
+            //   category: DEFAULT_CATEGORIES.app,
+            //   predicate: () => !!collabAPI?.isCollaborating(),
+            //   keywords: [
+            //     "stop",
+            //     "session",
+            //     "end",
+            //     "leave",
+            //     "close",
+            //     "exit",
+            //     "collaboration",
+            //   ],
+            //   perform: () => {
+            //     if (collabAPI) {
+            //       collabAPI.stopCollaboration();
+            //       if (!collabAPI.isCollaborating()) {
+            //         setShareDialogState({ isOpen: false });
+            //       }
+            //     }
+            //   },
+            // },
             {
               label: t("labels.share"),
               category: DEFAULT_CATEGORIES.app,
