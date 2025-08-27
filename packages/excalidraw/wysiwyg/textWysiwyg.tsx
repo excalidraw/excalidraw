@@ -8,12 +8,10 @@ import {
   getFontFamilyString,
   isTestEnv,
 } from "@excalidraw/common";
-
 import {
   originalContainerCache,
   updateOriginalContainerCache,
 } from "@excalidraw/element";
-
 import { LinearElementEditor } from "@excalidraw/element";
 import { bumpVersion } from "@excalidraw/element";
 import {
@@ -35,16 +33,13 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "@excalidraw/element";
-
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
-
 import { actionSaveToActiveFile } from "../actions";
-
 import { parseClipboard } from "../clipboard";
 import {
   actionDecreaseFontSize,
@@ -55,7 +50,6 @@ import {
   actionZoomIn,
   actionZoomOut,
 } from "../actions/actionCanvas";
-
 import type App from "../components/App";
 import type { AppState } from "../types";
 
@@ -132,7 +126,6 @@ export const textWysiwyg = ({
   const updateWysiwygStyle = () => {
     const appState = app.state;
     const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
-
     if (!updatedTextElement) {
       return;
     }
@@ -145,16 +138,12 @@ export const textWysiwyg = ({
         updatedTextElement,
         app.scene.getNonDeletedElementsMap(),
       );
-
       let width = updatedTextElement.width;
-
       // set to element height by default since that's
       // what is going to be used for unbounded text
       let height = updatedTextElement.height;
-
       let maxWidth = updatedTextElement.width;
       let maxHeight = updatedTextElement.height;
-
       if (container && updatedTextElement.containerId) {
         if (isArrowElement(container)) {
           const boundTextCoords =
@@ -170,7 +159,6 @@ export const textWysiwyg = ({
           updatedTextElement,
           editable,
         );
-
         let originalContainerData;
         if (propertiesUpdated) {
           originalContainerData = updateOriginalContainerCache(
@@ -186,20 +174,17 @@ export const textWysiwyg = ({
             );
           }
         }
-
         maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
         );
-
         // autogrow container height if text exceeds
         if (!isArrowElement(container) && height > maxHeight) {
           const targetContainerHeight = computeContainerDimensionForBoundText(
             height,
             container.type,
           );
-
           app.scene.mutateElement(container, { height: targetContainerHeight });
           return;
         } else if (
@@ -227,7 +212,6 @@ export const textWysiwyg = ({
       const initialSelectionStart = editable.selectionStart;
       const initialSelectionEnd = editable.selectionEnd;
       const initialLength = editable.value.length;
-
       // restore cursor position after value updated so it doesn't
       // go to the end of text when container auto expanded
       if (
@@ -240,19 +224,15 @@ export const textWysiwyg = ({
         editable.selectionStart = editable.value.length - diff;
         editable.selectionEnd = editable.value.length - diff;
       }
-
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         width = Math.min(width, maxWidth);
       } else {
         width += 0.5;
       }
-
       // add 5% buffer otherwise it causes wysiwyg to jump
       height *= 1.05;
-
       const font = getFontString(updatedTextElement);
-
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
@@ -285,13 +265,11 @@ export const textWysiwyg = ({
       if (isTestEnv()) {
         editable.style.fontFamily = getFontFamilyString(updatedTextElement);
       }
-
       app.scene.mutateElement(updatedTextElement, { x: coordX, y: coordY });
     }
   };
 
   const editable = document.createElement("textarea");
-
   editable.dir = "auto";
   editable.tabIndex = 0;
   editable.dataset.type = "wysiwyg";
@@ -301,7 +279,6 @@ export const textWysiwyg = ({
 
   let whiteSpace = "pre";
   let wordBreak = "normal";
-
   if (isBoundToContainer(element) || !element.autoResize) {
     whiteSpace = "pre-wrap";
     wordBreak = "break-word";
@@ -326,6 +303,7 @@ export const textWysiwyg = ({
     overflowWrap: "break-word",
     boxSizing: "content-box",
   });
+
   editable.value = element.originalText;
   updateWysiwygStyle();
 
@@ -343,7 +321,6 @@ export const textWysiwyg = ({
         element,
         app.scene.getNonDeletedElementsMap(),
       );
-
       const font = getFontString({
         fontSize: app.state.currentItemFontSize,
         fontFamily: app.state.currentItemFontFamily,
@@ -362,7 +339,6 @@ export const textWysiwyg = ({
         editable.style.width = `${width}px`;
       }
     };
-
     editable.oninput = () => {
       const normalized = normalizeText(editable.value);
       if (editable.value !== normalized) {
@@ -377,365 +353,15 @@ export const textWysiwyg = ({
     };
   }
 
+  // Helper function to get the leading whitespace from a line
+  const getLeadingWhitespace = (line: string): string => {
+    const match = line.match(/^[\s\t]*/);
+    return match ? match[0] : "";
+  };
+
   editable.onkeydown = (event) => {
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomIn);
       updateWysiwygStyle();
-    } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
-      event.preventDefault();
-      app.actionManager.executeAction(actionZoomOut);
-      updateWysiwygStyle();
-    } else if (!event.shiftKey && actionResetZoom.keyTest(event)) {
-      event.preventDefault();
-      app.actionManager.executeAction(actionResetZoom);
-      updateWysiwygStyle();
-    } else if (actionDecreaseFontSize.keyTest(event)) {
-      app.actionManager.executeAction(actionDecreaseFontSize);
-    } else if (actionIncreaseFontSize.keyTest(event)) {
-      app.actionManager.executeAction(actionIncreaseFontSize);
-    } else if (event.key === KEYS.ESCAPE) {
-      event.preventDefault();
-      submittedViaKeyboard = true;
-      handleSubmit();
-    } else if (actionSaveToActiveFile.keyTest(event)) {
-      event.preventDefault();
-      handleSubmit();
-      app.actionManager.executeAction(actionSaveToActiveFile);
-    } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
-      event.preventDefault();
-      if (event.isComposing || event.keyCode === 229) {
-        return;
-      }
-      submittedViaKeyboard = true;
-      handleSubmit();
-    } else if (
-      event.key === KEYS.TAB ||
-      (event[KEYS.CTRL_OR_CMD] &&
-        (event.code === CODES.BRACKET_LEFT ||
-          event.code === CODES.BRACKET_RIGHT))
-    ) {
-      event.preventDefault();
-      if (event.isComposing) {
-        return;
-      } else if (event.shiftKey || event.code === CODES.BRACKET_LEFT) {
-        outdent();
-      } else {
-        indent();
-      }
-      // We must send an input event to resize the element
-      editable.dispatchEvent(new Event("input"));
-    }
-  };
-
-  const TAB_SIZE = 4;
-  const TAB = " ".repeat(TAB_SIZE);
-  const RE_LEADING_TAB = new RegExp(`^ {1,${TAB_SIZE}}`);
-  const indent = () => {
-    const { selectionStart, selectionEnd } = editable;
-    const linesStartIndices = getSelectedLinesStartIndices();
-
-    let value = editable.value;
-    linesStartIndices.forEach((startIndex: number) => {
-      const startValue = value.slice(0, startIndex);
-      const endValue = value.slice(startIndex);
-
-      value = `${startValue}${TAB}${endValue}`;
-    });
-
-    editable.value = value;
-
-    editable.selectionStart = selectionStart + TAB_SIZE;
-    editable.selectionEnd = selectionEnd + TAB_SIZE * linesStartIndices.length;
-  };
-
-  const outdent = () => {
-    const { selectionStart, selectionEnd } = editable;
-    const linesStartIndices = getSelectedLinesStartIndices();
-    const removedTabs: number[] = [];
-
-    let value = editable.value;
-    linesStartIndices.forEach((startIndex) => {
-      const tabMatch = value
-        .slice(startIndex, startIndex + TAB_SIZE)
-        .match(RE_LEADING_TAB);
-
-      if (tabMatch) {
-        const startValue = value.slice(0, startIndex);
-        const endValue = value.slice(startIndex + tabMatch[0].length);
-
-        // Delete a tab from the line
-        value = `${startValue}${endValue}`;
-        removedTabs.push(startIndex);
-      }
-    });
-
-    editable.value = value;
-
-    if (removedTabs.length) {
-      if (selectionStart > removedTabs[removedTabs.length - 1]) {
-        editable.selectionStart = Math.max(
-          selectionStart - TAB_SIZE,
-          removedTabs[removedTabs.length - 1],
-        );
-      } else {
-        // If the cursor is before the first tab removed, ex:
-        // Line| #1
-        //     Line #2
-        // Lin|e #3
-        // we should reset the selectionStart to his initial value.
-        editable.selectionStart = selectionStart;
-      }
-      editable.selectionEnd = Math.max(
-        editable.selectionStart,
-        selectionEnd - TAB_SIZE * removedTabs.length,
-      );
-    }
-  };
-
-  /**
-   * @returns indices of start positions of selected lines, in reverse order
-   */
-  const getSelectedLinesStartIndices = () => {
-    let { selectionStart, selectionEnd, value } = editable;
-
-    // chars before selectionStart on the same line
-    const startOffset = value.slice(0, selectionStart).match(/[^\n]*$/)![0]
-      .length;
-    // put caret at the start of the line
-    selectionStart = selectionStart - startOffset;
-
-    const selected = value.slice(selectionStart, selectionEnd);
-
-    return selected
-      .split("\n")
-      .reduce(
-        (startIndices, line, idx, lines) =>
-          startIndices.concat(
-            idx
-              ? // curr line index is prev line's start + prev line's length + \n
-                startIndices[idx - 1] + lines[idx - 1].length + 1
-              : // first selected line
-                selectionStart,
-          ),
-        [] as number[],
-      )
-      .reverse();
-  };
-
-  const stopEvent = (event: Event) => {
-    if (event.target instanceof HTMLCanvasElement) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  };
-
-  // using a state variable instead of passing it to the handleSubmit callback
-  // so that we don't need to create separate a callback for event handlers
-  let submittedViaKeyboard = false;
-  const handleSubmit = () => {
-    // prevent double submit
-    if (isDestroyed) {
-      return;
-    }
-    isDestroyed = true;
-    // cleanup must be run before onSubmit otherwise when app blurs the wysiwyg
-    // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
-    // wysiwyg on update
-    cleanup();
-    const updateElement = app.scene.getElement(
-      element.id,
-    ) as ExcalidrawTextElement;
-    if (!updateElement) {
-      return;
-    }
-    const container = getContainerElement(
-      updateElement,
-      app.scene.getNonDeletedElementsMap(),
-    );
-
-    if (container) {
-      if (editable.value.trim()) {
-        const boundTextElementId = getBoundTextElementId(container);
-        if (!boundTextElementId || boundTextElementId !== element.id) {
-          app.scene.mutateElement(container, {
-            boundElements: (container.boundElements || []).concat({
-              type: "text",
-              id: element.id,
-            }),
-          });
-        } else if (isArrowElement(container)) {
-          // updating an arrow label may change bounds, prevent stale cache:
-          bumpVersion(container);
-        }
-      } else {
-        app.scene.mutateElement(container, {
-          boundElements: container.boundElements?.filter(
-            (ele) =>
-              !isTextElement(
-                ele as ExcalidrawTextElement | ExcalidrawLinearElement,
-              ),
-          ),
-        });
-      }
-
-      redrawTextBoundingBox(updateElement, container, app.scene);
-    }
-
-    onSubmit({
-      viaKeyboard: submittedViaKeyboard,
-      nextOriginalText: editable.value,
-    });
-  };
-
-  const cleanup = () => {
-    // remove events to ensure they don't late-fire
-    editable.onblur = null;
-    editable.oninput = null;
-    editable.onkeydown = null;
-
-    if (observer) {
-      observer.disconnect();
-    }
-
-    window.removeEventListener("resize", updateWysiwygStyle);
-    window.removeEventListener("wheel", stopEvent, true);
-    window.removeEventListener("pointerdown", onPointerDown);
-    window.removeEventListener("pointerup", bindBlurEvent);
-    window.removeEventListener("blur", handleSubmit);
-    window.removeEventListener("beforeunload", handleSubmit);
-    unbindUpdate();
-    unbindOnScroll();
-
-    editable.remove();
-  };
-
-  const bindBlurEvent = (event?: MouseEvent) => {
-    window.removeEventListener("pointerup", bindBlurEvent);
-    // Deferred so that the pointerdown that initiates the wysiwyg doesn't
-    // trigger the blur on ensuing pointerup.
-    // Also to handle cases such as picking a color which would trigger a blur
-    // in that same tick.
-    const target = event?.target;
-
-    const isPropertiesTrigger =
-      target instanceof HTMLElement &&
-      target.classList.contains("properties-trigger");
-
-    setTimeout(() => {
-      editable.onblur = handleSubmit;
-
-      // case: clicking on the same property → no change → no update → no focus
-      if (!isPropertiesTrigger) {
-        editable.focus();
-      }
-    });
-  };
-
-  const temporarilyDisableSubmit = () => {
-    editable.onblur = null;
-    window.addEventListener("pointerup", bindBlurEvent);
-    // handle edge-case where pointerup doesn't fire e.g. due to user
-    // alt-tabbing away
-    window.addEventListener("blur", handleSubmit);
-  };
-
-  // prevent blur when changing properties from the menu
-  const onPointerDown = (event: MouseEvent) => {
-    const target = event?.target;
-
-    // panning canvas
-    if (event.button === POINTER_BUTTON.WHEEL) {
-      // trying to pan by clicking inside text area itself -> handle here
-      if (target instanceof HTMLTextAreaElement) {
-        event.preventDefault();
-        app.handleCanvasPanUsingWheelOrSpaceDrag(event);
-      }
-      temporarilyDisableSubmit();
-      return;
-    }
-
-    const isPropertiesTrigger =
-      target instanceof HTMLElement &&
-      target.classList.contains("properties-trigger");
-
-    if (
-      ((event.target instanceof HTMLElement ||
-        event.target instanceof SVGElement) &&
-        event.target.closest(
-          `.${CLASSES.SHAPE_ACTIONS_MENU}, .${CLASSES.ZOOM_ACTIONS}`,
-        ) &&
-        !isWritableElement(event.target)) ||
-      isPropertiesTrigger
-    ) {
-      temporarilyDisableSubmit();
-    } else if (
-      event.target instanceof HTMLCanvasElement &&
-      // Vitest simply ignores stopPropagation, capture-mode, or rAF
-      // so without introducing crazier hacks, nothing we can do
-      !isTestEnv()
-    ) {
-      // On mobile, blur event doesn't seem to always fire correctly,
-      // so we want to also submit on pointerdown outside the wysiwyg.
-      // Done in the next frame to prevent pointerdown from creating a new text
-      // immediately (if tools locked) so that users on mobile have chance
-      // to submit first (to hide virtual keyboard).
-      // Note: revisit if we want to differ this behavior on Desktop
-      requestAnimationFrame(() => {
-        handleSubmit();
-      });
-    }
-  };
-
-  // handle updates of textElement properties of editing element
-  const unbindUpdate = app.scene.onUpdate(() => {
-    updateWysiwygStyle();
-    const isPopupOpened = !!document.activeElement?.closest(
-      ".properties-content",
-    );
-    if (!isPopupOpened) {
-      editable.focus();
-    }
-  });
-
-  const unbindOnScroll = app.onScrollChangeEmitter.on(() => {
-    updateWysiwygStyle();
-  });
-
-  // ---------------------------------------------------------------------------
-
-  let isDestroyed = false;
-
-  if (autoSelect) {
-    // select on init (focusing is done separately inside the bindBlurEvent()
-    // because we need it to happen *after* the blur event from `pointerdown`)
-    editable.select();
-  }
-  bindBlurEvent();
-
-  // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
-  // is preferred so we catch changes from host, where window may not resize.
-  let observer: ResizeObserver | null = null;
-  if (canvas && "ResizeObserver" in window) {
-    observer = new window.ResizeObserver(() => {
-      updateWysiwygStyle();
-    });
-    observer.observe(canvas);
-  } else {
-    window.addEventListener("resize", updateWysiwygStyle);
-  }
-
-  editable.onpointerdown = (event) => event.stopPropagation();
-
-  // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
-  // triggered the wysiwyg
-  requestAnimationFrame(() => {
-    window.addEventListener("pointerdown", onPointerDown, { capture: true });
-  });
-  window.addEventListener("beforeunload", handleSubmit);
-  excalidrawContainer
-    ?.querySelector(".excalidraw-textEditorContainer")!
-    .appendChild(editable);
-
-  return handleSubmit;
-};
+    } else if (!
