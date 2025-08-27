@@ -49,6 +49,54 @@
     color: var(--color-muted-darker);
   }
 
+  .SceneBrowser__version-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+    
+    label {
+      font-size: 0.875rem;
+      color: var(--color-on-surface);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    
+    .dropdown-select {
+      height: 1.75rem;
+      padding: 0 0.5rem;
+      color: var(--color-on-surface);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
+      font-size: 0.875rem;
+      font-family: inherit;
+      outline: none;
+      appearance: none;
+      background-image: var(--dropdown-icon);
+      background-repeat: no-repeat;
+      background-position: right 0.5rem top 50%, 0 0;
+      background-size: 0.65em auto, 100%;
+      min-width: 200px;
+      
+      &:focus {
+        box-shadow: 0 0 0 2px var(--focus-highlight-color);
+        border-color: var(--color-primary);
+      }
+      
+      &:hover {
+        background-color: var(--color-surface-hover);
+        border-color: var(--color-border-hover);
+      }
+      
+      option {
+        background-color: var(--color-surface);
+        color: var(--color-on-surface);
+        padding: 0.25rem 0.5rem;
+      }
+    }
+  }
+
   .SceneBrowser__actions {
     display: inline-flex;
     gap: 0.5rem;

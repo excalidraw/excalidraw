@@ -389,7 +389,7 @@ export const saveSceneToSupabaseStorage = async (
   }
 };
 
-// Function to save scene metadata to database
+// Function to save scene metadata to database with versioning support
 export const saveSceneMetadata = async (
   sceneId: string,
   encryptionKey: string,
@@ -398,13 +398,46 @@ export const saveSceneMetadata = async (
   const supabase = _getSupabase();
 
   try {
+    const sceneName = metadata.name || `Scene ${sceneId}`;
+    
+    // Check if a scene with this name already exists
+    const { data: existingScenes, error: checkError } = await (supabase as any)
+      .from("scene_metadata")
+      .select("version")
+      .eq("name", sceneName)
+      .order("version", { ascending: false });
+
+    if (checkError) {
+      throw checkError;
+    }
+
+    // Determine the next version number
+    const nextVersion = existingScenes && existingScenes.length > 0 
+      ? Math.max(...existingScenes.map((s: any) => s.version)) + 1 
+      : 1;
+
+    // Mark all existing versions of this scene as not latest
+    if (existingScenes && existingScenes.length > 0) {
+      const { error: updateError } = await (supabase as any)
+        .from("scene_metadata")
+        .update({ is_latest: false })
+        .eq("name", sceneName);
+
+      if (updateError) {
+        throw updateError;
+      }
+    }
+
+    // Insert the new version
     const { error } = await (supabase as any)
       .from("scene_metadata")
       .insert({
         scene_id: sceneId,
         encryption_key: encryptionKey,
-        name: metadata.name || `Scene ${sceneId}`,
+        name: sceneName,
         description: metadata.description || "",
+        version: nextVersion,
+        is_latest: true,
         created_at: new Date().toISOString(),
       });
 
@@ -417,7 +450,7 @@ export const saveSceneMetadata = async (
   }
 };
 
-// Function to list all exported scenes with metadata
+// Function to list all exported scenes with metadata, grouped by name with versioning
 export const listExportedScenes = async () => {
   const supabase = _getSupabase();
 
@@ -425,20 +458,39 @@ export const listExportedScenes = async () => {
     const { data, error } = await (supabase as any)
       .from("scene_metadata")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("name", { ascending: true })
+      .order("version", { ascending: false });
 
     if (error) {
       throw error;
     }
 
-    return data?.map((item: any) => ({
-      id: item.scene_id,
-      name: item.name,
-      description: item.description,
-      createdAt: item.created_at,
-      encryptionKey: item.encryption_key,
-      url: constructExcalidrawUrl(item.scene_id, item.encryption_key),
-    })) || [];
+    // Group scenes by name
+    const groupedScenes = new Map<string, any[]>();
+    
+    data?.forEach((item: any) => {
+      if (!groupedScenes.has(item.name)) {
+        groupedScenes.set(item.name, []);
+      }
+      groupedScenes.get(item.name)!.push({
+        id: item.scene_id,
+        name: item.name,
+        description: item.description,
+        createdAt: item.created_at,
+        encryptionKey: item.encryption_key,
+        version: item.version,
+        isLatest: item.is_latest,
+        url: constructExcalidrawUrl(item.scene_id, item.encryption_key),
+      });
+    });
+
+    // Convert to array format for backward compatibility
+    return Array.from(groupedScenes.values()).map(versions => ({
+      name: versions[0].name,
+      description: versions[0].description,
+      versions: versions,
+      latestVersion: versions.find((v: any) => v.isLatest) || versions[0],
+    }));
   } catch (error: any) {
     console.error("Error listing exported scenes:", error);
     return [];
@@ -471,6 +523,8 @@ export const loadSceneById = async (sceneId: string) => {
         name: metadata.name,
         description: metadata.description,
         createdAt: metadata.created_at,
+        version: metadata.version,
+        isLatest: metadata.is_latest,
       },
     };
   } catch (error: any) {
@@ -566,12 +620,9 @@ export const loadSceneFromSupabaseStorage = async (
     const buffer = await data.arrayBuffer();
     const uint8Array = new Uint8Array(buffer);
 
-    // Extract IV (first 12 bytes for AES-GCM) and encrypted data
-    const iv = uint8Array.slice(0, 12);
-    const encryptedData = uint8Array.slice(12);
-
+    // Try new format first (compression format)
     try {
-      const { data: decodedBuffer } = await decompressData(encryptedData, {
+      const { data: decodedBuffer } = await decompressData(uint8Array, {
         decryptionKey,
       });
       const sceneData: ImportedDataState = JSON.parse(
@@ -584,10 +635,15 @@ export const loadSceneFromSupabaseStorage = async (
       };
     } catch (error: any) {
       console.warn(
-        "Error when decoding scene data using the new format:",
+        "Error when decoding scene data using the new format, trying legacy format:",
         error,
       );
-      // Try legacy format (direct decryption without decompression)
+      
+      // Try legacy format (direct decryption without compression)
+      // Extract IV (first 12 bytes for AES-GCM) and encrypted data
+      const iv = uint8Array.slice(0, 12);
+      const encryptedData = uint8Array.slice(12);
+      
       const decrypted = await decryptData(iv, encryptedData, decryptionKey);
       const decodedData = new TextDecoder("utf-8").decode(
         new Uint8Array(decrypted),

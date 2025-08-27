@@ -10,13 +10,22 @@ import { atom, useAtom } from "../app-jotai";
 import { LoadIcon, LinkIcon, TrashIcon } from "@excalidraw/excalidraw/components/icons";
 import "./SceneBrowser.scss";
 
-interface ExportedScene {
+interface ExportedSceneVersion {
   id: string;
   name: string;
   description: string;
   createdAt: string;
   encryptionKey: string;
   url: string;
+  version: number;
+  isLatest: boolean;
+}
+
+interface GroupedScene {
+  name: string;
+  description: string;
+  versions: ExportedSceneVersion[];
+  latestVersion: ExportedSceneVersion;
 }
 
 // State atom for scene browser dialog
@@ -27,16 +36,24 @@ export const SceneBrowserDialog: React.FC<{
   onError?: (error: Error) => void;
 }> = ({ onSceneLoad, onError }) => {
   const [dialogState, setDialogState] = useAtom(sceneBrowserDialogStateAtom);
-  const [scenes, setScenes] = useState<ExportedScene[]>([]);
+  const [scenes, setScenes] = useState<GroupedScene[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingScene, setLoadingScene] = useState<string | null>(null);
   const [deletingScene, setDeletingScene] = useState<string | null>(null);
+  const [selectedVersions, setSelectedVersions] = useState<Record<string, string>>({});
 
   const loadScenes = useCallback(async () => {
     try {
       setLoading(true);
       const exportedScenes = await listExportedScenes();
       setScenes(exportedScenes);
+      
+      // Initialize selected versions to latest versions
+      const initialVersions: Record<string, string> = {};
+      exportedScenes.forEach(scene => {
+        initialVersions[scene.name] = scene.latestVersion.id;
+      });
+      setSelectedVersions(initialVersions);
     } catch (error: any) {
       console.error("Error loading scenes:", error);
       onError?.(new Error("Failed to load scenes"));
@@ -51,12 +68,15 @@ export const SceneBrowserDialog: React.FC<{
     }
   }, [dialogState.isOpen, loadScenes]);
 
-  const handleLoadScene = async (sceneId: string) => {
+  const handleLoadScene = async (sceneName: string) => {
+    const selectedSceneId = selectedVersions[sceneName];
+    if (!selectedSceneId) return;
+
     try {
-      setLoadingScene(sceneId);
+      setLoadingScene(selectedSceneId);
       trackEvent("scene", "load", `browser`);
 
-      const sceneData = await loadSceneById(sceneId);
+      const sceneData = await loadSceneById(selectedSceneId);
       onSceneLoad(sceneData);
       setDialogState({ isOpen: false });
     } catch (error: any) {
@@ -81,7 +101,12 @@ export const SceneBrowserDialog: React.FC<{
       await deleteSceneById(sceneId);
       
       // Remove the scene from the local state
-      setScenes(prevScenes => prevScenes.filter(scene => scene.id !== sceneId));
+      setScenes(prevScenes => 
+        prevScenes.map(scene => ({
+          ...scene,
+          versions: scene.versions.filter(version => version.id !== sceneId),
+        })).filter(scene => scene.versions.length > 0)
+      );
       
       trackEvent("scene", "delete", `browser`);
     } catch (error: any) {
@@ -90,6 +115,13 @@ export const SceneBrowserDialog: React.FC<{
     } finally {
       setDeletingScene(null);
     }
+  };
+
+  const handleVersionChange = (sceneName: string, sceneId: string) => {
+    setSelectedVersions(prev => ({
+      ...prev,
+      [sceneName]: sceneId,
+    }));
   };
 
   const formatDate = (dateString: string) => {
@@ -128,10 +160,30 @@ export const SceneBrowserDialog: React.FC<{
         <h3 className="SceneBrowser__heading">Your Exported Scenes</h3>
         <div className="SceneBrowser__content">
           {scenes.map((scene) => (
-            <div key={scene.id} className="SceneBrowser__item">
+            <div key={scene.name} className="SceneBrowser__item">
               <div className="SceneBrowser__meta">
                 <h4 className="SceneBrowser__name">{scene.name}</h4>
-                <div className="SceneBrowser__sub">Created: {formatDate(scene.createdAt)}</div>
+                <div className="SceneBrowser__sub">
+                  {scene.versions.length > 1 ? (
+                    <div className="SceneBrowser__version-selector">
+                      <label htmlFor={`version-${scene.name}`}>Version:</label>
+                      <select
+                        id={`version-${scene.name}`}
+                        className="dropdown-select"
+                        value={selectedVersions[scene.name] || scene.latestVersion.id}
+                        onChange={(e) => handleVersionChange(scene.name, e.target.value)}
+                      >
+                        {scene.versions.map((version) => (
+                          <option key={version.id} value={version.id}>
+                            v{version.version} {version.isLatest ? "(Latest)" : ""} - {formatDate(version.createdAt)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="SceneBrowser__sub">Created: {formatDate(scene.latestVersion.createdAt)}</div>
+                  )}
+                </div>
                 {scene.description && (
                   <div className="SceneBrowser__sub">{scene.description}</div>
                 )}
@@ -143,10 +195,10 @@ export const SceneBrowserDialog: React.FC<{
                   title="Load Scene"
                   aria-label="Load scene"
                   icon={LoadIcon}
-                  onClick={() => handleLoadScene(scene.id)}
-                  disabled={loadingScene === scene.id}
+                  onClick={() => handleLoadScene(scene.name)}
+                  disabled={loadingScene === selectedVersions[scene.name]}
                 >
-                  {loadingScene === scene.id ? "Loading..." : "Load"}
+                  {loadingScene === selectedVersions[scene.name] ? "Loading..." : "Load"}
                 </ToolButton>
                 <ToolButton
                   type="button"
@@ -155,22 +207,27 @@ export const SceneBrowserDialog: React.FC<{
                   aria-label="Copy scene URL"
                   icon={LinkIcon}
                   onClick={() => {
-                    navigator.clipboard.writeText(scene.url);
+                    const selectedVersion = scene.versions.find(v => v.id === selectedVersions[scene.name]);
+                    if (selectedVersion) {
+                      navigator.clipboard.writeText(selectedVersion.url);
+                    }
                   }}
                 >
                   Copy URL
                 </ToolButton>
-                <ToolButton
-                  type="button"
-                  size="small"
-                  title="Delete Scene"
-                  aria-label="Delete scene"
-                  icon={TrashIcon}
-                  onClick={() => handleDeleteScene(scene.id)}
-                  disabled={deletingScene === scene.id}
-                >
-                  {deletingScene === scene.id ? "Deleting..." : "Delete"}
-                </ToolButton>
+                {scene.versions.length > 1 && (
+                  <ToolButton
+                    type="button"
+                    size="small"
+                    title="Delete Version"
+                    aria-label="Delete scene version"
+                    icon={TrashIcon}
+                    onClick={() => handleDeleteScene(selectedVersions[scene.name])}
+                    disabled={deletingScene === selectedVersions[scene.name]}
+                  >
+                    {deletingScene === selectedVersions[scene.name] ? "Deleting..." : "Delete Version"}
+                  </ToolButton>
+                )}
               </div>
             </div>
           ))}
