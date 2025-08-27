@@ -12,6 +12,8 @@ import type { Theme } from "@excalidraw/element/types";
 
 import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
+import { useAtom } from "../app-jotai";
+import { sceneBrowserDialogStateAtom } from "./SceneBrowser";
 
 import { saveDebugState } from "./DebugCanvas";
 
@@ -23,11 +25,18 @@ export const AppMainMenu: React.FC<{
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
 }> = React.memo((props) => {
+  const [, setSceneBrowserDialogState] = useAtom(sceneBrowserDialogStateAtom);
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />
+      <MainMenu.Item
+        onSelect={() => setSceneBrowserDialogState({ isOpen: true })}
+        icon="📄"
+      >
+        Browse Scenes
+      </MainMenu.Item>
       <MainMenu.DefaultItems.SaveAsImage />
       {props.isCollabEnabled && (
         <MainMenu.DefaultItems.LiveCollaborationTrigger

@@ -125,6 +125,7 @@ import {
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
+import { SceneBrowserDialog, sceneBrowserDialogStateAtom } from "./components/SceneBrowser";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import { useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
@@ -388,7 +389,29 @@ const ExcalidrawWrapper = () => {
     useCallbackRefState<ExcalidrawImperativeAPI>();
 
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
+  const [, setSceneBrowserDialogState] = useAtom(sceneBrowserDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
+
+  const handleSceneLoad = useCallback(
+    (sceneData: any) => {
+      if (excalidrawAPI && sceneData) {
+        // Update the scene with the loaded data
+        excalidrawAPI.updateScene({
+          elements: sceneData.elements || [],
+          appState: sceneData.appState || {},
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        });
+
+        // Load any associated images
+        if (sceneData.files) {
+          Object.values(sceneData.files).forEach((file: any) => {
+            excalidrawAPI.addFiles([file]);
+          });
+        }
+      }
+    },
+    [excalidrawAPI],
+  );
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
     return isCollaborationLink(window.location.href);
   });
@@ -954,6 +977,7 @@ const ExcalidrawWrapper = () => {
             }
           }}
         />
+        <SceneBrowserDialog onSceneLoad={handleSceneLoad} />
 
         {errorMessage && (
           <ErrorDialog onClose={() => setErrorMessage("")}>

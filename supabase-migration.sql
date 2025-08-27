@@ -23,9 +23,21 @@ CREATE TABLE IF NOT EXISTS diagram_files (
   UNIQUE(diagram_id, file_id)
 );
 
+-- Create scene_metadata table for exported scenes
+CREATE TABLE IF NOT EXISTS scene_metadata (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  scene_id TEXT NOT NULL UNIQUE,
+  encryption_key TEXT NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Enable RLS (Row Level Security)
 ALTER TABLE diagrams ENABLE ROW LEVEL SECURITY;
 ALTER TABLE diagram_files ENABLE ROW LEVEL SECURITY;
+ALTER TABLE scene_metadata ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for public access (you may want to restrict these based on your needs)
 -- For diagrams
@@ -33,6 +45,9 @@ CREATE POLICY "Allow all operations on diagrams" ON diagrams FOR ALL USING (true
 
 -- For diagram_files
 CREATE POLICY "Allow all operations on diagram_files" ON diagram_files FOR ALL USING (true);
+
+-- For scene_metadata
+CREATE POLICY "Allow all operations on scene_metadata" ON scene_metadata FOR ALL USING (true);
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_diagrams_room_id ON diagrams(room_id);

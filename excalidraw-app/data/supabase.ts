@@ -389,6 +389,96 @@ export const saveSceneToSupabaseStorage = async (
   }
 };
 
+// Function to save scene metadata to database
+export const saveSceneMetadata = async (
+  sceneId: string,
+  encryptionKey: string,
+  metadata: { name?: string; description?: string },
+) => {
+  const supabase = _getSupabase();
+
+  try {
+    const { error } = await (supabase as any)
+      .from("scene_metadata")
+      .insert({
+        scene_id: sceneId,
+        encryption_key: encryptionKey,
+        name: metadata.name || `Scene ${sceneId}`,
+        description: metadata.description || "",
+        created_at: new Date().toISOString(),
+      });
+
+    if (error) {
+      throw error;
+    }
+  } catch (error: any) {
+    console.error("Error saving scene metadata:", error);
+    throw error;
+  }
+};
+
+// Function to list all exported scenes with metadata
+export const listExportedScenes = async () => {
+  const supabase = _getSupabase();
+
+  try {
+    const { data, error } = await (supabase as any)
+      .from("scene_metadata")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    return data?.map((item: any) => ({
+      id: item.scene_id,
+      name: item.name,
+      description: item.description,
+      createdAt: item.created_at,
+      encryptionKey: item.encryption_key,
+      url: constructExcalidrawUrl(item.scene_id, item.encryption_key),
+    })) || [];
+  } catch (error: any) {
+    console.error("Error listing exported scenes:", error);
+    return [];
+  }
+};
+
+// Function to load scene by ID (with metadata lookup)
+export const loadSceneById = async (sceneId: string) => {
+  const supabase = _getSupabase();
+
+  try {
+    const { data: metadata, error } = await (supabase as any)
+      .from("scene_metadata")
+      .select("*")
+      .eq("scene_id", sceneId)
+      .single();
+
+    if (error || !metadata) {
+      throw new Error("Scene not found");
+    }
+
+    const sceneData = await loadSceneFromSupabaseStorage(
+      metadata.scene_id,
+      metadata.encryption_key,
+    );
+
+    return {
+      ...sceneData,
+      metadata: {
+        name: metadata.name,
+        description: metadata.description,
+        createdAt: metadata.created_at,
+      },
+    };
+  } catch (error: any) {
+    console.error("Error loading scene by ID:", error);
+    throw error;
+  }
+};
+
 // Function to generate scene URL from Supabase storage
 export const getSupabaseSceneUrl = (sceneId: string) => {
   const supabase = _getSupabase();

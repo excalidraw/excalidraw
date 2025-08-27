@@ -100,6 +100,21 @@ For better security, you can use the service role key instead of the anonymous k
 
 ## Loading Exported Scenes
 
+### Method 1: Scene Browser (New!)
+The easiest way to manage your exported scenes:
+
+1. **Open the main menu** (☰ button in top-left)
+2. **Click "Browse Scenes"** - this opens the Scene Browser
+3. **Select any scene** from the list to load it instantly
+4. **Copy URLs** or refresh the list as needed
+
+The Scene Browser shows:
+- Scene name and creation date
+- Description (if provided)
+- Direct loading buttons
+- URL copying functionality
+
+### Method 2: Direct URL Loading
 When you export a scene, it generates a URL like: `http://localhost:3000#json=S3RreFQexcdt,encryptionKey`
 
 To load the scene:
@@ -111,7 +126,8 @@ To load the scene:
 
 - **Database (`diagrams` table)**: Used for collaborative sessions and real-time editing
 - **Storage (`files/shareLinks/`)**: Used for exported shareable scenes
-- **Both are persistent** and accessible via URLs
+- **Database (`scene_metadata` table)**: Stores scene names, descriptions, and encryption keys
+- **All data is persistent** and accessible via URLs or the Scene Browser
 
 ## Next Steps
 

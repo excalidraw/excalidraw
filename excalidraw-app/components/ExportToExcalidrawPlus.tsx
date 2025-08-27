@@ -29,6 +29,7 @@ import { encodeFilesForUpload } from "../data/FileManager";
 import {
   saveFilesToSupabase,
   saveSceneToSupabaseStorage,
+  saveSceneMetadata,
 } from "../data/supabase";
 
 export const exportToExcalidrawPlus = async (
@@ -59,6 +60,12 @@ export const exportToExcalidrawPlus = async (
   await saveSceneToSupabaseStorage(sceneData, id, {
     name,
     version: 2,
+  });
+
+  // Save metadata to database
+  await saveSceneMetadata(id, encryptionKey, {
+    name,
+    description: `Exported diagram: ${name}`,
   });
 
   const filesMap = new Map<FileId, BinaryFileData>();
