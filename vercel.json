@@ -1,6 +1,5 @@
 {
   "public": true,
-  "framework": null,
   "headers": [
     {
       "source": "/(.*)",
