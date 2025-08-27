@@ -67,5 +67,5 @@
   ],
   "outputDirectory": "excalidraw-app/build",
   "installCommand": "yarn install",
-  "buildCommand": "SKIP_TYPESCRIPT=true yarn build:packages && SKIP_TYPESCRIPT=true yarn --cwd ./excalidraw-app build:app"
+  "buildCommand": "SKIP_TYPESCRIPT=true yarn build:vercel"
 }
