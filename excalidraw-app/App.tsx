@@ -399,7 +399,11 @@ const ExcalidrawWrapper = () => {
         // Update the scene with the loaded data
         excalidrawAPI.updateScene({
           elements: sceneData.elements || [],
-          appState: sceneData.appState || {},
+          appState: {
+            ...sceneData.appState || {},
+            // Update the scene name from metadata if available
+            name: sceneData.metadata?.name || sceneData.appState?.name || "Untitled",
+          },
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
 
