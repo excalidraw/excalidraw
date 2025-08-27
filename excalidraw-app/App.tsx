@@ -155,6 +155,19 @@ polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
 
+// Helper function to detect if current URL is a read-only shared scene
+const isReadOnlySharedScene = (): boolean => {
+  const hash = window.location.hash;
+
+  // Check for json backend URLs (like #json=Oe95Ogvq0t2U9eYzBiJuI,a8BGoMO_ftW_C_dKLxnzNQ)
+  const jsonBackendMatch = hash.match(/^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/);
+
+  // Check for external URL embeds (like #url=...)
+  const externalUrlMatch = hash.match(/^#url=(.*)$/);
+
+  return !!(jsonBackendMatch || externalUrlMatch);
+};
+
 declare global {
   interface BeforeInstallPromptEventChoiceResult {
     outcome: "accepted" | "dismissed";
@@ -384,10 +397,13 @@ const AuthWrapper = () => {
     );
   }
 
+  // Allow access to read-only shared scenes without authentication
+  const isReadOnlyScene = isReadOnlySharedScene();
+
   // Show login page if:
-  // 1. User is not authenticated (!user)
+  // 1. User is not authenticated (!user) AND it's not a read-only shared scene
   // 2. Force redirect is active (immediately after sign out)
-  if (!user || forceLoginRedirect) {
+  if ((!user && !isReadOnlyScene) || forceLoginRedirect) {
     return (
       <LoginPage
         onBack={() => {
@@ -398,12 +414,13 @@ const AuthWrapper = () => {
     );
   }
 
-  // Show main app if authenticated
+  // Show main app if authenticated or if it's a read-only shared scene
   return (
     <>
       <ExcalidrawWrapper
         isAuthenticated={!!user}
         user={user}
+        isReadOnlyScene={isReadOnlyScene}
         onOpenAuthModal={() => {
           // This shouldn't happen since we're authenticated, but just in case
           alert('You are already logged in');
@@ -420,12 +437,14 @@ const AuthWrapper = () => {
 const ExcalidrawWrapper = ({
   isAuthenticated,
   user,
+  isReadOnlyScene,
   onOpenAuthModal,
   onSignOut,
   onOpenProfile
 }: {
   isAuthenticated: boolean;
   user: any;
+  isReadOnlyScene: boolean;
   onOpenAuthModal: () => void;
   onSignOut: () => void;
   onOpenProfile?: () => void;
@@ -985,13 +1004,14 @@ const ExcalidrawWrapper = ({
         handleKeyboardGlobally={true}
         autoFocus={true}
         theme={editorTheme}
+        viewModeEnabled={isReadOnlyScene}
         renderTopRightUI={(isMobile) => {
           // Collaborative features disabled
           if (isMobile || true) { // Always disable collaborative UI
             return (
               <div className="top-right-ui">
-                {/* Sign Out Button */}
-                {isAuthenticated && (
+                {/* Sign Out Button - only show if authenticated and not a read-only scene */}
+                {isAuthenticated && !isReadOnlyScene && (
                   <Button
                     onSelect={onSignOut}
                     className="collab-button sign-out-button"
