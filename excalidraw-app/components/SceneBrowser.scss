@@ -118,12 +118,11 @@
     align-items: center;
     gap: 0.375rem;
     
-    // Theme-aware styling
-    background: var(--color-surface);
-    color: var(--color-on-surface);
+    background: var(--color-surface-secondary);
+    color: var(--color-on-surface-secondary) !important;
     
     &:hover {
-      background: var(--color-surface-hover);
+      background: var(--color-surface-secondary-hover);
       border-color: var(--color-border-hover);
       transform: translateY(-1px);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -153,7 +152,7 @@
     --text-color: var(--color-on-surface) !important;
     
     // Override any default button text colors
-    color: var(--color-on-surface) !important;
+    color: var(--color-on-surface-secondary) !important;
     
     // Target all possible text elements with maximum specificity
     span, div, button, & > *, & > span, & > div {

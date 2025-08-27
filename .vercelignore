@@ -1,0 +1,14 @@
+# Exclude examples from Vercel deployment
+examples/
+dev-docs/
+firebase-project/
+migrations/
+
+# Exclude development files
+*.log
+.DS_Store
+node_modules/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
