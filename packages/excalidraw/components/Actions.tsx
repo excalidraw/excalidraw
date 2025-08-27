@@ -356,11 +356,12 @@ export const CompactShapeActions = ({
   return (
     <div className="compact-shape-actions">
       {/* Stroke Color */}
-      {canChangeStrokeColor(appState, targetElements) && (
-        <div className={clsx("compact-action-item")}>
-          {renderAction("changeStrokeColor", { compactMode: true })}
-        </div>
-      )}
+      {canChangeStrokeColor(appState, targetElements) &&
+        !appState.editingTextElement && (
+          <div className={clsx("compact-action-item")}>
+            {renderAction("changeStrokeColor", { compactMode: true })}
+          </div>
+        )}
 
       {/* Background Color */}
       {canChangeBackgroundColor(appState, targetElements) && (
@@ -505,56 +506,60 @@ export const CompactShapeActions = ({
 
       {/* Text Properties */}
       {(appState.activeTool.type === "text" ||
-        targetElements.some(isTextElement)) && (
-        <>
-          <div className="compact-action-item">
-            {renderAction("changeFontFamily", {
-              compactMode: true,
-            })}
-          </div>
-          <div className="compact-action-item">
-            <Popover.Root
-              open={appState.openPopup === "textAlign"}
-              onOpenChange={(open) => {
-                setAppState({ openPopup: open ? "textAlign" : null });
-                if (open) {
-                  setStrokePopoverOpen(false);
-                  setOtherActionsPopoverOpen(false);
-                }
-              }}
-            >
-              <Popover.Trigger asChild>
-                <button
-                  type="button"
-                  className="compact-action-button"
-                  title={t("labels.textAlign")}
-                >
-                  {TextSizeIcon}
-                </button>
-              </Popover.Trigger>
-              {appState.openPopup === "textAlign" && (
-                <PropertiesPopover
-                  className={CLASSES.SHAPE_ACTIONS_THEME_SCOPE}
-                  container={container}
-                  style={{ maxWidth: "13rem" }}
-                  onClose={() => setAppState({ openPopup: null })}
-                >
-                  <div className="selected-shape-actions">
-                    {(appState.activeTool.type === "text" ||
-                      suppportsHorizontalAlign(targetElements, elementsMap)) &&
-                      renderAction("changeTextAlign")}
-                    {shouldAllowVerticalAlign(targetElements, elementsMap) &&
-                      renderAction("changeVerticalAlign")}
-                    {(appState.activeTool.type === "text" ||
-                      targetElements.some(isTextElement)) &&
-                      renderAction("changeFontSize")}
-                  </div>
-                </PropertiesPopover>
-              )}
-            </Popover.Root>
-          </div>
-        </>
-      )}
+        targetElements.some(isTextElement)) &&
+        !appState.editingTextElement && (
+          <>
+            <div className="compact-action-item">
+              {renderAction("changeFontFamily", {
+                compactMode: true,
+              })}
+            </div>
+            <div className="compact-action-item">
+              <Popover.Root
+                open={appState.openPopup === "textAlign"}
+                onOpenChange={(open) => {
+                  setAppState({ openPopup: open ? "textAlign" : null });
+                  if (open) {
+                    setStrokePopoverOpen(false);
+                    setOtherActionsPopoverOpen(false);
+                  }
+                }}
+              >
+                <Popover.Trigger asChild>
+                  <button
+                    type="button"
+                    className="compact-action-button"
+                    title={t("labels.textAlign")}
+                  >
+                    {TextSizeIcon}
+                  </button>
+                </Popover.Trigger>
+                {appState.openPopup === "textAlign" && (
+                  <PropertiesPopover
+                    className={CLASSES.SHAPE_ACTIONS_THEME_SCOPE}
+                    container={container}
+                    style={{ maxWidth: "13rem" }}
+                    onClose={() => setAppState({ openPopup: null })}
+                  >
+                    <div className="selected-shape-actions">
+                      {(appState.activeTool.type === "text" ||
+                        suppportsHorizontalAlign(
+                          targetElements,
+                          elementsMap,
+                        )) &&
+                        renderAction("changeTextAlign")}
+                      {shouldAllowVerticalAlign(targetElements, elementsMap) &&
+                        renderAction("changeVerticalAlign")}
+                      {(appState.activeTool.type === "text" ||
+                        targetElements.some(isTextElement)) &&
+                        renderAction("changeFontSize")}
+                    </div>
+                  </PropertiesPopover>
+                )}
+              </Popover.Root>
+            </div>
+          </>
+        )}
 
       {/* Dedicated Copy Button */}
       {!isEditingTextOrNewElement && targetElements.length > 0 && (
