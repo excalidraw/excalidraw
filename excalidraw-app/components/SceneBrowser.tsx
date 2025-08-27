@@ -19,6 +19,7 @@ interface ExportedSceneVersion {
   url: string;
   version: number;
   isLatest: boolean;
+  isAutomatic: boolean;
 }
 
 interface GroupedScene {
@@ -175,7 +176,7 @@ export const SceneBrowserDialog: React.FC<{
                       >
                         {scene.versions.map((version) => (
                           <option key={version.id} value={version.id}>
-                            v{version.version} {version.isLatest ? "(Latest)" : ""} - {formatDate(version.createdAt)}
+                            {version.isAutomatic ? "Latest" : `v${version.version}`} {version.isLatest ? "(Latest)" : ""} - {formatDate(version.createdAt)}
                           </option>
                         ))}
                       </select>

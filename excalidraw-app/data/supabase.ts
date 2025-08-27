@@ -5,9 +5,12 @@ import { decompressData } from "@excalidraw/excalidraw/data/encode";
 import {
   encryptData,
   decryptData,
+  generateEncryptionKey,
 } from "@excalidraw/excalidraw/data/encryption";
 import { restoreElements } from "@excalidraw/excalidraw/data/restore";
 import { getSceneVersion } from "@excalidraw/element";
+import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
+import { nanoid } from "nanoid";
 
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 
@@ -16,12 +19,14 @@ import type {
   ExcalidrawElement,
   FileId,
   OrderedExcalidrawElement,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
   BinaryFileMetadata,
   DataURL,
+  BinaryFiles,
 } from "@excalidraw/excalidraw/types";
 
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
@@ -393,7 +398,7 @@ export const saveSceneToSupabaseStorage = async (
 export const saveSceneMetadata = async (
   sceneId: string,
   encryptionKey: string,
-  metadata: { name?: string; description?: string },
+  metadata: { name?: string; description?: string; isAutomatic?: boolean },
 ) => {
   const supabase = _getSupabase();
 
@@ -438,6 +443,7 @@ export const saveSceneMetadata = async (
         description: metadata.description || "",
         version: nextVersion,
         is_latest: true,
+        is_automatic: metadata.isAutomatic || false,
         created_at: new Date().toISOString(),
       });
 
@@ -448,6 +454,47 @@ export const saveSceneMetadata = async (
     console.error("Error saving scene metadata:", error);
     throw error;
   }
+};
+
+// Function to save scene automatically (creates "latest" version)
+export const saveSceneAutomatically = async (
+  elements: readonly NonDeletedExcalidrawElement[],
+  appState: Partial<AppState>,
+  files: BinaryFiles,
+  name: string,
+) => {
+  const id = `${nanoid(12)}`;
+
+  const encryptionKey = (await generateEncryptionKey())!;
+  const encryptedData = await encryptData(
+    encryptionKey,
+    serializeAsJSON(elements, appState, files, "database"),
+  );
+
+  // Combine IV and encrypted data into a single Uint8Array
+  const sceneData = new Uint8Array(
+    encryptedData.iv.length + encryptedData.encryptedBuffer.byteLength,
+  );
+  sceneData.set(encryptedData.iv);
+  sceneData.set(
+    new Uint8Array(encryptedData.encryptedBuffer),
+    encryptedData.iv.length,
+  );
+
+  // Save to Supabase storage
+  await saveSceneToSupabaseStorage(sceneData, id, {
+    name,
+    version: 2,
+  });
+
+  // Save metadata to database with automatic flag
+  await saveSceneMetadata(id, encryptionKey, {
+    name,
+    description: `Latest automatic save: ${name}`,
+    isAutomatic: true,
+  });
+
+  return id;
 };
 
 // Function to list all exported scenes with metadata, grouped by name with versioning
@@ -480,6 +527,7 @@ export const listExportedScenes = async () => {
         encryptionKey: item.encryption_key,
         version: item.version,
         isLatest: item.is_latest,
+        isAutomatic: item.is_automatic || false,
         url: constructExcalidrawUrl(item.scene_id, item.encryption_key),
       });
     });
@@ -525,6 +573,7 @@ export const loadSceneById = async (sceneId: string) => {
         createdAt: metadata.created_at,
         version: metadata.version,
         isLatest: metadata.is_latest,
+        isAutomatic: metadata.is_automatic || false,
       },
     };
   } catch (error: any) {

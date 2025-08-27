@@ -99,6 +99,7 @@ import {
   ExportToExcalidrawPlus,
   exportToExcalidrawPlus,
 } from "./components/ExportToExcalidrawPlus";
+import { saveSceneAutomatically } from "./data/supabase";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 
 import {
@@ -707,6 +708,9 @@ const ExcalidrawWrapper = () => {
       });
     }
 
+    // Trigger automatic scene saving
+    debouncedAutoSaveScene(elements, appState, files);
+
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
       debugRenderer(
@@ -721,6 +725,61 @@ const ExcalidrawWrapper = () => {
   const [latestShareableLink, setLatestShareableLink] = useState<string | null>(
     null,
   );
+
+  // Debounced automatic scene saving
+  const debouncedAutoSave = useRef<NodeJS.Timeout | null>(null);
+  const lastAutoSaveTime = useRef<number>(0);
+  const AUTO_SAVE_DEBOUNCE_MS = 10000; // 10 seconds
+
+  const autoSaveScene = useCallback(async (
+    elements: readonly OrderedExcalidrawElement[],
+    appState: AppState,
+    files: BinaryFiles,
+  ) => {
+    if (!excalidrawAPI) return;
+
+    const now = Date.now();
+    if (now - lastAutoSaveTime.current < AUTO_SAVE_DEBOUNCE_MS) {
+      return;
+    }
+
+    try {
+      const sceneName = excalidrawAPI.getName() || "Untitled";
+      await saveSceneAutomatically(
+        elements.filter(el => !el.isDeleted),
+        appState,
+        files,
+        sceneName,
+      );
+      lastAutoSaveTime.current = now;
+      console.log("Scene auto-saved successfully");
+    } catch (error) {
+      console.error("Failed to auto-save scene:", error);
+    }
+  }, [excalidrawAPI]);
+
+  const debouncedAutoSaveScene = useCallback((
+    elements: readonly OrderedExcalidrawElement[],
+    appState: AppState,
+    files: BinaryFiles,
+  ) => {
+    if (debouncedAutoSave.current) {
+      clearTimeout(debouncedAutoSave.current);
+    }
+
+    debouncedAutoSave.current = setTimeout(() => {
+      autoSaveScene(elements, appState, files);
+    }, AUTO_SAVE_DEBOUNCE_MS);
+  }, [autoSaveScene]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debouncedAutoSave.current) {
+        clearTimeout(debouncedAutoSave.current);
+      }
+    };
+  }, []);
 
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
