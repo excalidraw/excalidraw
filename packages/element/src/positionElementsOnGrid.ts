@@ -1,5 +1,4 @@
-import { getCommonBounds } from "@excalidraw/utils";
-
+import { getCommonBounds } from "./bounds";
 import { newElementWith } from "./mutateElement";
 
 import type { ExcalidrawElement } from "./types";
