@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as Popover from "@radix-ui/react-popover";
 
 import {
@@ -353,6 +353,14 @@ export const CompactShapeActions = ({
 
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
+  // Close local popovers any time a global popup (appState.openPopup) opens/switches
+  useEffect(() => {
+    if (appState.openPopup) {
+      setStrokePopoverOpen(false);
+      setOtherActionsPopoverOpen(false);
+    }
+  }, [appState.openPopup]);
+
   return (
     <div className="compact-shape-actions">
       {/* Stroke Color */}
@@ -394,6 +402,17 @@ export const CompactShapeActions = ({
                 type="button"
                 className="compact-action-button"
                 title={t("labels.stroke")}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  setStrokePopoverOpen((open) => {
+                    const next = !open;
+                    if (next) {
+                      setOtherActionsPopoverOpen(false);
+                      setAppState({ openPopup: null });
+                    }
+                    return next;
+                  });
+                }}
               >
                 {resizeIcon}
               </button>
@@ -453,6 +472,16 @@ export const CompactShapeActions = ({
                 type="button"
                 className="compact-action-button"
                 title={t("labels.arrowtypes")}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  if (appState.openPopup === "arrowProperties") {
+                    setAppState({ openPopup: null });
+                  } else {
+                    setStrokePopoverOpen(false);
+                    setOtherActionsPopoverOpen(false);
+                    setAppState({ openPopup: "arrowProperties" });
+                  }
+                }}
               >
                 {(() => {
                   // Show an icon based on the current arrow type
@@ -488,7 +517,11 @@ export const CompactShapeActions = ({
               <PropertiesPopover
                 container={container}
                 style={{ maxWidth: "13rem" }}
-                onClose={() => setAppState({ openPopup: null })}
+                onClose={() => {
+                  if (appState.openPopup === "arrowProperties") {
+                    setAppState({ openPopup: null });
+                  }
+                }}
               >
                 {renderAction("changeArrowProperties")}
               </PropertiesPopover>
@@ -530,6 +563,16 @@ export const CompactShapeActions = ({
                     type="button"
                     className="compact-action-button"
                     title={t("labels.textAlign")}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      if (appState.openPopup === "textAlign") {
+                        setAppState({ openPopup: null });
+                      } else {
+                        setStrokePopoverOpen(false);
+                        setOtherActionsPopoverOpen(false);
+                        setAppState({ openPopup: "textAlign" });
+                      }
+                    }}
                   >
                     {TextSizeIcon}
                   </button>
@@ -539,7 +582,11 @@ export const CompactShapeActions = ({
                     className={CLASSES.SHAPE_ACTIONS_THEME_SCOPE}
                     container={container}
                     style={{ maxWidth: "13rem" }}
-                    onClose={() => setAppState({ openPopup: null })}
+                    onClose={() => {
+                      if (appState.openPopup === "textAlign") {
+                        setAppState({ openPopup: null });
+                      }
+                    }}
                   >
                     <div className="selected-shape-actions">
                       {(appState.activeTool.type === "text" ||
@@ -593,6 +640,17 @@ export const CompactShapeActions = ({
                 type="button"
                 className="compact-action-button"
                 title={t("labels.actions")}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  setOtherActionsPopoverOpen((open) => {
+                    const next = !open;
+                    if (next) {
+                      setStrokePopoverOpen(false);
+                      setAppState({ openPopup: null });
+                    }
+                    return next;
+                  });
+                }}
               >
                 {settingsPlusIcon}
               </button>

@@ -1172,19 +1172,19 @@ export const actionChangeFontFamily = register({
                 openPopup: "fontFamily",
               });
             } else {
-              // close, use the cache and clear it afterwards
+              // close immediately to avoid racing with other popovers opening
               const data = {
-                openPopup: null,
                 currentHoveredFontFamily: null,
                 cachedElements: new Map(cachedElementsRef.current),
                 resetAll: true,
               } as ChangeFontFamilyData;
 
               if (isUnmounted.current) {
-                // in case the component was unmounted by the parent, trigger the update directly
                 updateData({ ...batchedData, ...data });
               } else {
-                setBatchedData(data);
+                // apply immediately instead of batching
+                updateData({ ...batchedData, ...data });
+                setBatchedData({});
               }
 
               cachedElementsRef.current.clear();

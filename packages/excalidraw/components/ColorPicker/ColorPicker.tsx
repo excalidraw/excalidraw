@@ -1,6 +1,6 @@
 import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
 import {
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
@@ -78,6 +78,7 @@ const ColorPickerPopupContent = ({
   elements,
   palette = COLOR_PALETTE,
   updateData,
+  getOpenPopup,
 }: Pick<
   ColorPickerProps,
   | "type"
@@ -87,7 +88,9 @@ const ColorPickerPopupContent = ({
   | "elements"
   | "palette"
   | "updateData"
->) => {
+> & {
+  getOpenPopup: () => AppState["openPopup"];
+}) => {
   const { container } = useExcalidrawContainer();
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
@@ -132,7 +135,10 @@ const ColorPickerPopupContent = ({
         }
       }}
       onClose={() => {
-        updateData({ openPopup: null });
+        // only clear if we're still the active popup (avoid racing with switch)
+        if (getOpenPopup() === type) {
+          updateData({ openPopup: null });
+        }
         setActiveColorPickerSection(null);
       }}
     >
@@ -169,6 +175,7 @@ const ColorPickerPopupContent = ({
             if (eyeDropperState) {
               setEyeDropperState(null);
             } else {
+              // close explicitly on Escape
               updateData({ openPopup: null });
             }
           }}
@@ -215,7 +222,12 @@ const ColorPickerTrigger = ({
           ? t("labels.showStroke")
           : t("labels.showBackground")
       }
-      onClick={onToggle}
+      data-openpopup={type}
+      onPointerDown={(e) => {
+        // use pointerdown so we run before outside-close logic
+        e.preventDefault();
+        onToggle();
+      }}
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
       {compactMode && color && (
@@ -261,6 +273,10 @@ export const ColorPicker = ({
   appState,
   compactMode = false,
 }: ColorPickerProps) => {
+  const openRef = useRef(appState.openPopup);
+  useEffect(() => {
+    openRef.current = appState.openPopup;
+  }, [appState.openPopup]);
   return (
     <div>
       <div
@@ -284,8 +300,6 @@ export const ColorPicker = ({
           onOpenChange={(open) => {
             if (open) {
               updateData({ openPopup: type });
-            } else if (appState.openPopup === type) {
-              updateData({ openPopup: null });
             }
           }}
         >
@@ -297,10 +311,18 @@ export const ColorPicker = ({
             compactMode={compactMode}
             mode={type === "elementStroke" ? "stroke" : "background"}
             onToggle={() => {
-              // toggle to this type (if already open, close; if another is open, switch)
-              updateData({
-                openPopup: appState.openPopup === type ? null : type,
-              });
+              // atomic switch: if another popup is open, close it first, then open this one next tick
+              if (appState.openPopup === type) {
+                // toggle off
+                updateData({ openPopup: null });
+              } else if (appState.openPopup) {
+                // switching
+                updateData({ openPopup: null });
+                setTimeout(() => updateData({ openPopup: type }), 0);
+              } else {
+                // open this one
+                updateData({ openPopup: type });
+              }
             }}
           />
           {/* popup content */}
@@ -313,6 +335,7 @@ export const ColorPicker = ({
               elements={elements}
               palette={palette}
               updateData={updateData}
+              getOpenPopup={() => openRef.current}
             />
           )}
         </Popover.Root>

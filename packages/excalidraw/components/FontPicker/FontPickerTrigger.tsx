@@ -11,10 +11,12 @@ import { isDefaultFont } from "./FontPicker";
 
 interface FontPickerTriggerProps {
   selectedFontFamily: FontFamilyValues | null;
+  onTrigger?: (event: React.SyntheticEvent) => void;
 }
 
 export const FontPickerTrigger = ({
   selectedFontFamily,
+  onTrigger,
 }: FontPickerTriggerProps) => {
   const isTriggerActive = useMemo(
     () => Boolean(selectedFontFamily && !isDefaultFont(selectedFontFamily)),
@@ -24,7 +26,7 @@ export const FontPickerTrigger = ({
   return (
     <Popover.Trigger asChild>
       {/* Empty div as trigger so it's stretched 100% due to different button sizes */}
-      <div>
+      <div data-openpopup="fontFamily">
         <ButtonIcon
           standalone
           icon={TextIcon}
@@ -32,8 +34,12 @@ export const FontPickerTrigger = ({
           className="properties-trigger"
           testId={"font-family-show-fonts"}
           active={isTriggerActive}
-          // no-op
-          onClick={() => {}}
+          onClick={(e) => {
+            if (onTrigger) {
+              e.preventDefault();
+              onTrigger(e);
+            }
+          }}
           style={{
             border: "none",
           }}
