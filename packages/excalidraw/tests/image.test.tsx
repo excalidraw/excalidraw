@@ -15,15 +15,9 @@ import {
   DEER_IMAGE_DIMENSIONS,
   SMILEY_IMAGE_DIMENSIONS,
 } from "./fixtures/constants";
+import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants";
 
 const { h } = window;
-
-const initializedImageProperties = {
-  type: "image",
-  fileId: expect.any(String),
-  x: expect.toBeNonNaNNumber(),
-  y: expect.toBeNonNaNNumber(),
-};
 
 describe("image insertion", () => {
   beforeEach(() => {
@@ -60,11 +54,11 @@ describe("image insertion", () => {
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({
-          ...initializedImageProperties,
+          ...INITIALIZED_IMAGE_PROPS,
           ...DEER_IMAGE_DIMENSIONS,
         }),
         expect.objectContaining({
-          ...initializedImageProperties,
+          ...INITIALIZED_IMAGE_PROPS,
           ...SMILEY_IMAGE_DIMENSIONS,
         }),
       ]);

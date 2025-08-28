@@ -20,6 +20,7 @@ import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
   reseed,
+  randomId,
 } from "@excalidraw/common";
 
 import "@excalidraw/utils/test-utils";
@@ -64,7 +65,8 @@ import {
 } from "./fixtures/constants";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { mockHTMLImageElement } from "./helpers/mocks";
+import { mockMultipleHTMLImageElements } from "./helpers/mocks";
+import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants";
 import {
   GlobalTestState,
   act,
@@ -127,7 +129,9 @@ describe("history", () => {
     const generateIdSpy = vi.spyOn(blobModule, "generateIdFromFile");
     const resizeFileSpy = vi.spyOn(blobModule, "resizeImageFile");
 
-    generateIdSpy.mockImplementation(() => Promise.resolve("fileId" as FileId));
+    generateIdSpy.mockImplementation(() =>
+      Promise.resolve(randomId() as FileId),
+    );
     resizeFileSpy.mockImplementation((file: File) => Promise.resolve(file));
 
     Object.assign(document, {
@@ -616,75 +620,6 @@ describe("history", () => {
       ]);
     });
 
-    it("should create new history entry on image drag&drop", async () => {
-      await render(<Excalidraw handleKeyboardGlobally={true} />);
-
-      // it's necessary to specify the height in order to calculate natural dimensions of the image
-      h.state.height = 1000;
-
-      mockHTMLImageElement(
-        DEER_IMAGE_DIMENSIONS.width,
-        DEER_IMAGE_DIMENSIONS.height,
-      );
-
-      await API.drop(await API.loadFile("./fixtures/deer.png"));
-
-      await waitFor(() => {
-        expect(API.getUndoStack().length).toBe(1);
-        expect(API.getRedoStack().length).toBe(0);
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            type: "image",
-            fileId: expect.any(String),
-            x: expect.toBeNonNaNNumber(),
-            y: expect.toBeNonNaNNumber(),
-            ...DEER_IMAGE_DIMENSIONS,
-          }),
-        ]);
-
-        // need to check that delta actually contains initialized image element (with fileId & natural dimensions)
-        expect(
-          Object.values(h.history.undoStack[0].elements.removed)[0].deleted,
-        ).toEqual(
-          expect.objectContaining({
-            type: "image",
-            fileId: expect.any(String),
-            x: expect.toBeNonNaNNumber(),
-            y: expect.toBeNonNaNNumber(),
-            ...DEER_IMAGE_DIMENSIONS,
-          }),
-        );
-      });
-
-      Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(0);
-      expect(API.getRedoStack().length).toBe(1);
-      expect(h.elements).toEqual([
-        expect.objectContaining({
-          type: "image",
-          fileId: expect.any(String),
-          x: expect.toBeNonNaNNumber(),
-          y: expect.toBeNonNaNNumber(),
-          isDeleted: true,
-          ...DEER_IMAGE_DIMENSIONS,
-        }),
-      ]);
-
-      Keyboard.redo();
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(0);
-      expect(h.elements).toEqual([
-        expect.objectContaining({
-          type: "image",
-          fileId: expect.any(String),
-          x: expect.toBeNonNaNNumber(),
-          y: expect.toBeNonNaNNumber(),
-          isDeleted: false,
-          ...DEER_IMAGE_DIMENSIONS,
-        }),
-      ]);
-    });
-
     it("should create new history entry on embeddable link drag&drop", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
 
@@ -729,49 +664,43 @@ describe("history", () => {
       ]);
     });
 
-    it("should create new history entry on image paste", async () => {
-      await render(
-        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
-      );
+    it("should create new history entry on image drag&drop", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
 
       // it's necessary to specify the height in order to calculate natural dimensions of the image
       h.state.height = 1000;
 
-      mockHTMLImageElement(
-        SMILEY_IMAGE_DIMENSIONS.width,
-        SMILEY_IMAGE_DIMENSIONS.height,
-      );
+      mockMultipleHTMLImageElements([
+        [DEER_IMAGE_DIMENSIONS.width, DEER_IMAGE_DIMENSIONS.height],
+        [SMILEY_IMAGE_DIMENSIONS.width, SMILEY_IMAGE_DIMENSIONS.height],
+      ]);
 
-      document.dispatchEvent(
-        createPasteEvent({
-          files: [await API.loadFile("./fixtures/smiley_embedded_v2.png")],
-        }),
+      await API.drop(
+        await Promise.all([
+          API.loadFile("./fixtures/deer.png"),
+          API.loadFile("./fixtures/smiley.png"),
+        ]),
       );
 
       await waitFor(() => {
         expect(API.getUndoStack().length).toBe(1);
         expect(API.getRedoStack().length).toBe(0);
-        expect(h.elements).toEqual([
+
+        // need to check that delta actually contains initialized image elements (with fileId & natural dimensions)
+        expect(
+          Object.values(h.history.undoStack[0].elements.removed).map(
+            (val) => val.deleted,
+          ),
+        ).toEqual([
           expect.objectContaining({
-            type: "image",
-            fileId: expect.any(String),
-            x: expect.toBeNonNaNNumber(),
-            y: expect.toBeNonNaNNumber(),
+            ...INITIALIZED_IMAGE_PROPS,
+            ...DEER_IMAGE_DIMENSIONS,
+          }),
+          expect.objectContaining({
+            ...INITIALIZED_IMAGE_PROPS,
             ...SMILEY_IMAGE_DIMENSIONS,
           }),
         ]);
-        // need to check that delta actually contains initialized image element (with fileId & natural dimensions)
-        expect(
-          Object.values(h.history.undoStack[0].elements.removed)[0].deleted,
-        ).toEqual(
-          expect.objectContaining({
-            type: "image",
-            fileId: expect.any(String),
-            x: expect.toBeNonNaNNumber(),
-            y: expect.toBeNonNaNNumber(),
-            ...SMILEY_IMAGE_DIMENSIONS,
-          }),
-        );
       });
 
       Keyboard.undo();
@@ -779,10 +708,12 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(1);
       expect(h.elements).toEqual([
         expect.objectContaining({
-          type: "image",
-          fileId: expect.any(String),
-          x: expect.toBeNonNaNNumber(),
-          y: expect.toBeNonNaNNumber(),
+          ...INITIALIZED_IMAGE_PROPS,
+          isDeleted: true,
+          ...DEER_IMAGE_DIMENSIONS,
+        }),
+        expect.objectContaining({
+          ...INITIALIZED_IMAGE_PROPS,
           isDeleted: true,
           ...SMILEY_IMAGE_DIMENSIONS,
         }),
@@ -793,10 +724,88 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(0);
       expect(h.elements).toEqual([
         expect.objectContaining({
-          type: "image",
-          fileId: expect.any(String),
-          x: expect.toBeNonNaNNumber(),
-          y: expect.toBeNonNaNNumber(),
+          ...INITIALIZED_IMAGE_PROPS,
+          isDeleted: false,
+          ...DEER_IMAGE_DIMENSIONS,
+        }),
+        expect.objectContaining({
+          ...INITIALIZED_IMAGE_PROPS,
+          isDeleted: false,
+          ...SMILEY_IMAGE_DIMENSIONS,
+        }),
+      ]);
+    });
+
+    it("should create new history entry on image paste", async () => {
+      await render(
+        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
+      );
+
+      // it's necessary to specify the height in order to calculate natural dimensions of the image
+      h.state.height = 1000;
+
+      mockMultipleHTMLImageElements([
+        [DEER_IMAGE_DIMENSIONS.width, DEER_IMAGE_DIMENSIONS.height],
+        [SMILEY_IMAGE_DIMENSIONS.width, SMILEY_IMAGE_DIMENSIONS.height],
+      ]);
+
+      document.dispatchEvent(
+        createPasteEvent({
+          files: await Promise.all([
+            API.loadFile("./fixtures/deer.png"),
+            API.loadFile("./fixtures/smiley.png"),
+          ]),
+        }),
+      );
+
+      await waitFor(() => {
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(0);
+
+        // need to check that delta actually contains initialized image elements (with fileId & natural dimensions)
+        expect(
+          Object.values(h.history.undoStack[0].elements.removed).map(
+            (val) => val.deleted,
+          ),
+        ).toEqual([
+          expect.objectContaining({
+            ...INITIALIZED_IMAGE_PROPS,
+            ...DEER_IMAGE_DIMENSIONS,
+          }),
+          expect.objectContaining({
+            ...INITIALIZED_IMAGE_PROPS,
+            ...SMILEY_IMAGE_DIMENSIONS,
+          }),
+        ]);
+      });
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          ...INITIALIZED_IMAGE_PROPS,
+          isDeleted: true,
+          ...DEER_IMAGE_DIMENSIONS,
+        }),
+        expect.objectContaining({
+          ...INITIALIZED_IMAGE_PROPS,
+          isDeleted: true,
+          ...SMILEY_IMAGE_DIMENSIONS,
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          ...INITIALIZED_IMAGE_PROPS,
+          isDeleted: false,
+          ...DEER_IMAGE_DIMENSIONS,
+        }),
+        expect.objectContaining({
+          ...INITIALIZED_IMAGE_PROPS,
           isDeleted: false,
           ...SMILEY_IMAGE_DIMENSIONS,
         }),
