@@ -65,7 +65,6 @@ import {
 } from "./fixtures/constants";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { mockMultipleHTMLImageElements } from "./helpers/mocks";
 import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants";
 import {
   GlobalTestState,
@@ -77,6 +76,7 @@ import {
   checkpointHistory,
   unmountComponent,
 } from "./test-utils";
+import { setupImageTest } from "./image.test";
 
 import type { AppState } from "../types";
 
@@ -664,24 +664,7 @@ describe("history", () => {
       ]);
     });
 
-    it("should create new history entry on image drag&drop", async () => {
-      await render(<Excalidraw handleKeyboardGlobally={true} />);
-
-      // it's necessary to specify the height in order to calculate natural dimensions of the image
-      h.state.height = 1000;
-
-      mockMultipleHTMLImageElements([
-        [DEER_IMAGE_DIMENSIONS.width, DEER_IMAGE_DIMENSIONS.height],
-        [SMILEY_IMAGE_DIMENSIONS.width, SMILEY_IMAGE_DIMENSIONS.height],
-      ]);
-
-      await API.drop(
-        await Promise.all([
-          API.loadFile("./fixtures/deer.png"),
-          API.loadFile("./fixtures/smiley.png"),
-        ]),
-      );
-
+    const assertImageTest = async () => {
       await waitFor(() => {
         expect(API.getUndoStack().length).toBe(1);
         expect(API.getRedoStack().length).toBe(0);
@@ -734,20 +717,23 @@ describe("history", () => {
           ...SMILEY_IMAGE_DIMENSIONS,
         }),
       ]);
+    };
+
+    it("should create new history entry on image drag&drop", async () => {
+      await setupImageTest();
+
+      await API.drop(
+        await Promise.all([
+          API.loadFile("./fixtures/deer.png"),
+          API.loadFile("./fixtures/smiley.png"),
+        ]),
+      );
+
+      await assertImageTest();
     });
 
     it("should create new history entry on image paste", async () => {
-      await render(
-        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
-      );
-
-      // it's necessary to specify the height in order to calculate natural dimensions of the image
-      h.state.height = 1000;
-
-      mockMultipleHTMLImageElements([
-        [DEER_IMAGE_DIMENSIONS.width, DEER_IMAGE_DIMENSIONS.height],
-        [SMILEY_IMAGE_DIMENSIONS.width, SMILEY_IMAGE_DIMENSIONS.height],
-      ]);
+      await setupImageTest();
 
       document.dispatchEvent(
         createPasteEvent({
@@ -758,58 +744,7 @@ describe("history", () => {
         }),
       );
 
-      await waitFor(() => {
-        expect(API.getUndoStack().length).toBe(1);
-        expect(API.getRedoStack().length).toBe(0);
-
-        // need to check that delta actually contains initialized image elements (with fileId & natural dimensions)
-        expect(
-          Object.values(h.history.undoStack[0].elements.removed).map(
-            (val) => val.deleted,
-          ),
-        ).toEqual([
-          expect.objectContaining({
-            ...INITIALIZED_IMAGE_PROPS,
-            ...DEER_IMAGE_DIMENSIONS,
-          }),
-          expect.objectContaining({
-            ...INITIALIZED_IMAGE_PROPS,
-            ...SMILEY_IMAGE_DIMENSIONS,
-          }),
-        ]);
-      });
-
-      Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(0);
-      expect(API.getRedoStack().length).toBe(1);
-      expect(h.elements).toEqual([
-        expect.objectContaining({
-          ...INITIALIZED_IMAGE_PROPS,
-          isDeleted: true,
-          ...DEER_IMAGE_DIMENSIONS,
-        }),
-        expect.objectContaining({
-          ...INITIALIZED_IMAGE_PROPS,
-          isDeleted: true,
-          ...SMILEY_IMAGE_DIMENSIONS,
-        }),
-      ]);
-
-      Keyboard.redo();
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(0);
-      expect(h.elements).toEqual([
-        expect.objectContaining({
-          ...INITIALIZED_IMAGE_PROPS,
-          isDeleted: false,
-          ...DEER_IMAGE_DIMENSIONS,
-        }),
-        expect.objectContaining({
-          ...INITIALIZED_IMAGE_PROPS,
-          isDeleted: false,
-          ...SMILEY_IMAGE_DIMENSIONS,
-        }),
-      ]);
+      await assertImageTest();
     });
 
     it("should create new history entry on embeddable link paste", async () => {
