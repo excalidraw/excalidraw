@@ -56,25 +56,23 @@ describe("image insertion", () => {
     ]);
   };
 
-  const assert = () =>
-    waitFor(() => {
-      expect(h.elements).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            ...initializedImageProperties,
-            ...DEER_IMAGE_DIMENSIONS,
-          }),
-          expect.objectContaining({
-            ...initializedImageProperties,
-            ...SMILEY_IMAGE_DIMENSIONS,
-          }),
-        ]),
-      );
-      expect(h.elements).toHaveLength(2);
-      // Not placed on top of each other
-      const dimensionsSet = new Set(h.elements.map((el) => `${el.x}-${el.y}`));
-      expect(dimensionsSet.size).toEqual(h.elements.length);
+  const assert = async () => {
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          ...initializedImageProperties,
+          ...DEER_IMAGE_DIMENSIONS,
+        }),
+        expect.objectContaining({
+          ...initializedImageProperties,
+          ...SMILEY_IMAGE_DIMENSIONS,
+        }),
+      ]);
     });
+    // Not placed on top of each other
+    const dimensionsSet = new Set(h.elements.map((el) => `${el.x}-${el.y}`));
+    expect(dimensionsSet.size).toEqual(h.elements.length);
+  };
 
   it("should eventually initialize all dropped images", async () => {
     await setup();

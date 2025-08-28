@@ -61,7 +61,7 @@ import * as blobModule from "../data/blob";
 import {
   DEER_IMAGE_DIMENSIONS,
   SMILEY_IMAGE_DIMENSIONS,
-} from "./fixtures/constants.js";
+} from "./fixtures/constants";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { mockHTMLImageElement } from "./helpers/mocks";
