@@ -76,7 +76,7 @@ import {
   checkpointHistory,
   unmountComponent,
 } from "./test-utils";
-import { setupImageTest } from "./image.test";
+import { setupImageTest as _setupImageTest } from "./image.test";
 
 import type { AppState } from "../types";
 
@@ -663,6 +663,9 @@ describe("history", () => {
         }),
       ]);
     });
+
+    const setupImageTest = () =>
+      _setupImageTest([DEER_IMAGE_DIMENSIONS, SMILEY_IMAGE_DIMENSIONS]);
 
     const assertImageTest = async () => {
       await waitFor(() => {

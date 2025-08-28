@@ -19,15 +19,14 @@ import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants";
 
 const { h } = window;
 
-export const setupImageTest = async () => {
+export const setupImageTest = async (
+  sizes: { width: number; height: number }[],
+) => {
   await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
 
   h.state.height = 1000;
 
-  mockMultipleHTMLImageElements([
-    [DEER_IMAGE_DIMENSIONS.width, DEER_IMAGE_DIMENSIONS.height],
-    [SMILEY_IMAGE_DIMENSIONS.width, SMILEY_IMAGE_DIMENSIONS.height],
-  ]);
+  mockMultipleHTMLImageElements(sizes.map((size) => [size.width, size.height]));
 };
 
 describe("image insertion", () => {
@@ -50,6 +49,9 @@ describe("image insertion", () => {
     });
   });
 
+  const setup = () =>
+    setupImageTest([DEER_IMAGE_DIMENSIONS, SMILEY_IMAGE_DIMENSIONS]);
+
   const assert = async () => {
     await waitFor(() => {
       expect(h.elements).toEqual([
@@ -69,7 +71,7 @@ describe("image insertion", () => {
   };
 
   it("should eventually initialize all dropped images", async () => {
-    await setupImageTest();
+    await setup();
 
     const files = await Promise.all([
       API.loadFile("./fixtures/deer.png"),
@@ -81,7 +83,7 @@ describe("image insertion", () => {
   });
 
   it("should eventually initialize all pasted images", async () => {
-    await setupImageTest();
+    await setup();
 
     document.dispatchEvent(
       createPasteEvent({
@@ -96,7 +98,7 @@ describe("image insertion", () => {
   });
 
   it("should eventually initialize all images added through image tool", async () => {
-    await setupImageTest();
+    await setup();
 
     const fileOpenSpy = vi.spyOn(filesystemModule, "fileOpen");
     fileOpenSpy.mockImplementation(
