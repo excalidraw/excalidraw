@@ -102,16 +102,19 @@ export const FontPicker = React.memo(
           </div>
         )}
         {!compactMode && <ButtonSeparator />}
-        <Popover.Root open={isOpened} onOpenChange={onPopupChange}>
+        <Popover.Root open={isOpened} onOpenChange={() => {}}>
           <FontPickerTrigger
             selectedFontFamily={selectedFontFamily}
-            onTrigger={() => {
+            onTrigger={(e) => {
+              // suppress default to avoid double toggle
+              if (e && e.preventDefault) {
+                e.preventDefault();
+              }
+
               if (isOpened) {
                 onPopupChange(false);
               } else {
-                // switch from any open popup: close then open next tick
-                onPopupChange(false);
-                setTimeout(() => onPopupChange(true), 0);
+                onPopupChange(true);
               }
             }}
           />

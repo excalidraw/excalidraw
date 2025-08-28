@@ -285,6 +285,7 @@ export const FontPickerList = React.memo(
         onClose={onClose}
         onPointerLeave={onLeave}
         onKeyDown={onKeyDown}
+        preventAutoFocusOnTouch={true}
       >
         <QuickSearch
           ref={inputRef}

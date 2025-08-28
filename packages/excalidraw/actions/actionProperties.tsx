@@ -1168,25 +1168,23 @@ export const actionChangeFontFamily = register({
                 }
               }
 
-              setBatchedData({
-                openPopup: "fontFamily",
-              });
+              updateData({ ...batchedData, openPopup: "fontFamily" });
+              setBatchedData({});
             } else {
-              // close immediately to avoid racing with other popovers opening
+              // close: clear openPopup if we're still the active popup
               const data = {
+                openPopup:
+                  appState.openPopup === "fontFamily"
+                    ? null
+                    : appState.openPopup,
                 currentHoveredFontFamily: null,
                 cachedElements: new Map(cachedElementsRef.current),
                 resetAll: true,
               } as ChangeFontFamilyData;
 
-              if (isUnmounted.current) {
-                updateData({ ...batchedData, ...data });
-              } else {
-                // apply immediately instead of batching
-                updateData({ ...batchedData, ...data });
-                setBatchedData({});
-              }
-
+              // apply immediately to avoid racing with other popovers opening
+              updateData({ ...batchedData, ...data });
+              setBatchedData({});
               cachedElementsRef.current.clear();
             }
           }}

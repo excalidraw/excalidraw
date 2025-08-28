@@ -26,7 +26,17 @@ export const FontPickerTrigger = ({
   return (
     <Popover.Trigger asChild>
       {/* Empty div as trigger so it's stretched 100% due to different button sizes */}
-      <div data-openpopup="fontFamily">
+      <div
+        data-openpopup="fontFamily"
+        onPointerDown={(e) => {
+          e.preventDefault();
+          onTrigger?.(e);
+        }}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
         <ButtonIcon
           standalone
           icon={TextIcon}
@@ -35,10 +45,8 @@ export const FontPickerTrigger = ({
           testId={"font-family-show-fonts"}
           active={isTriggerActive}
           onClick={(e) => {
-            if (onTrigger) {
-              e.preventDefault();
-              onTrigger(e);
-            }
+            e.preventDefault();
+            e.stopPropagation();
           }}
           style={{
             border: "none",

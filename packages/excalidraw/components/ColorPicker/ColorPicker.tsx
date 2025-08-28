@@ -226,7 +226,13 @@ const ColorPickerTrigger = ({
       onPointerDown={(e) => {
         // use pointerdown so we run before outside-close logic
         e.preventDefault();
+        e.stopPropagation();
         onToggle();
+      }}
+      onClick={(e) => {
+        // suppress Radix default toggle to avoid double-toggle flicker
+        e.preventDefault();
+        e.stopPropagation();
       }}
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
@@ -313,7 +319,7 @@ export const ColorPicker = ({
             onToggle={() => {
               // atomic switch: if another popup is open, close it first, then open this one next tick
               if (appState.openPopup === type) {
-                // toggle off
+                // toggle off on same trigger
                 updateData({ openPopup: null });
               } else if (appState.openPopup) {
                 // switching

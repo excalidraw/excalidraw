@@ -413,6 +413,10 @@ export const CompactShapeActions = ({
                     return next;
                   });
                 }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
               >
                 {resizeIcon}
               </button>
@@ -460,8 +464,8 @@ export const CompactShapeActions = ({
           <Popover.Root
             open={appState.openPopup === "arrowProperties"}
             onOpenChange={(open) => {
-              setAppState({ openPopup: open ? "arrowProperties" : null });
               if (open) {
+                setAppState({ openPopup: "arrowProperties" });
                 setStrokePopoverOpen(false);
                 setOtherActionsPopoverOpen(false);
               }
@@ -481,6 +485,10 @@ export const CompactShapeActions = ({
                     setOtherActionsPopoverOpen(false);
                     setAppState({ openPopup: "arrowProperties" });
                   }
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                 }}
               >
                 {(() => {
@@ -518,9 +526,11 @@ export const CompactShapeActions = ({
                 container={container}
                 style={{ maxWidth: "13rem" }}
                 onClose={() => {
-                  if (appState.openPopup === "arrowProperties") {
-                    setAppState({ openPopup: null });
-                  }
+                  setAppState((prev: AppState) =>
+                    prev.openPopup === "arrowProperties"
+                      ? { openPopup: null }
+                      : null,
+                  );
                 }}
               >
                 {renderAction("changeArrowProperties")}
@@ -551,8 +561,8 @@ export const CompactShapeActions = ({
               <Popover.Root
                 open={appState.openPopup === "textAlign"}
                 onOpenChange={(open) => {
-                  setAppState({ openPopup: open ? "textAlign" : null });
                   if (open) {
+                    setAppState({ openPopup: "textAlign" });
                     setStrokePopoverOpen(false);
                     setOtherActionsPopoverOpen(false);
                   }
@@ -573,6 +583,10 @@ export const CompactShapeActions = ({
                         setAppState({ openPopup: "textAlign" });
                       }
                     }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
                   >
                     {TextSizeIcon}
                   </button>
@@ -583,9 +597,11 @@ export const CompactShapeActions = ({
                     container={container}
                     style={{ maxWidth: "13rem" }}
                     onClose={() => {
-                      if (appState.openPopup === "textAlign") {
-                        setAppState({ openPopup: null });
-                      }
+                      setAppState((prev: AppState) =>
+                        prev.openPopup === "textAlign"
+                          ? { openPopup: null }
+                          : null,
+                      );
                     }}
                   >
                     <div className="selected-shape-actions">
@@ -650,6 +666,10 @@ export const CompactShapeActions = ({
                     }
                     return next;
                   });
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                 }}
               >
                 {settingsPlusIcon}
