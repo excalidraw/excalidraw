@@ -74,7 +74,7 @@ import {
   roundArrowIcon,
   elbowArrowIcon,
   TextSizeIcon,
-  resizeIcon,
+  adjustmentsIcon,
   settingsPlusIcon,
 } from "./icons";
 
@@ -427,7 +427,7 @@ export const CompactShapeActions = ({
                   e.stopPropagation();
                 }}
               >
-                {resizeIcon}
+                {adjustmentsIcon}
               </button>
             </Popover.Trigger>
             {strokePopoverOpen && (
