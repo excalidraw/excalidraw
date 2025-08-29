@@ -1,26 +1,26 @@
 import { getCommonBounds } from "./bounds";
-import { newElementWith } from "./mutateElement";
+import { type ElementUpdate, newElementWith } from "./mutateElement";
 
 import type { ExcalidrawElement } from "./types";
 
 // TODO rewrite (mostly vibe-coded)
-export const positionElementsOnGrid = (
-  elements: ExcalidrawElement[] | ExcalidrawElement[][],
+export const positionElementsOnGrid = <TElement extends ExcalidrawElement>(
+  elements: TElement[] | TElement[][],
   centerX: number,
   centerY: number,
   padding = 50,
-): ExcalidrawElement[] => {
+): TElement[] => {
   // Ensure there are elements to position
   if (!elements || elements.length === 0) {
     return [];
   }
 
-  const res: ExcalidrawElement[] = [];
+  const res: TElement[] = [];
   // Normalize input to work with atomic units (groups of elements)
   // If elements is a flat array, treat each element as its own atomic unit
-  const atomicUnits: ExcalidrawElement[][] = Array.isArray(elements[0])
-    ? (elements as ExcalidrawElement[][])
-    : (elements as ExcalidrawElement[]).map((element) => [element]);
+  const atomicUnits: TElement[][] = Array.isArray(elements[0])
+    ? (elements as TElement[][])
+    : (elements as TElement[]).map((element) => [element]);
 
   // Determine the number of columns for atomic units
   // A common approach for a "grid-like" layout without specific column constraints
@@ -29,7 +29,7 @@ export const positionElementsOnGrid = (
   const numColumns = Math.max(1, Math.ceil(Math.sqrt(numUnits)));
 
   // Group atomic units into rows based on the calculated number of columns
-  const rows: ExcalidrawElement[][][] = [];
+  const rows: TElement[][][] = [];
   for (let i = 0; i < numUnits; i += numColumns) {
     rows.push(atomicUnits.slice(i, i + numColumns));
   }
@@ -96,7 +96,7 @@ export const positionElementsOnGrid = (
           newElementWith(element, {
             x: element.x + offsetX,
             y: element.y + offsetY,
-          }),
+          } as ElementUpdate<TElement>),
         );
       });
 
