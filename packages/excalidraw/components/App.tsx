@@ -10439,44 +10439,42 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     // Create, position, insert and select initialized (replacing placeholders)
-    const initializedImageElements = await Promise.all(
+    const imageElements = await Promise.all(
       positionedPlaceholderElements.map(async (placeholder, i) => {
         try {
           return await this.initializeImage(placeholder, imageFiles[i]);
         } catch (error: any) {
-          this.scene.mutateElement(placeholder, {
-            isDeleted: true,
-          });
           this.setState({
             errorMessage: error.message || t("errors.imageInsertError"),
           });
-          return null;
+          return newElementWith(placeholder, { isDeleted: true });
         }
       }),
     );
 
-    const imageElements = initializedImageElements.filter(
-      (el): el is NonDeleted<InitializedExcalidrawImageElement> => el !== null,
-    );
-    const positionedElements = positionElementsOnGrid(
-      imageElements,
+    const positionedImageElements = positionElementsOnGrid(
+      imageElements.filter((el) => !el.isDeleted),
       sceneX,
       sceneY,
     );
-    const initializedImageElementsMap = new Map(
-      positionedElements.map((el) => [el.id, el]),
+    const selectedImageElements = Object.fromEntries(
+      positionedImageElements.map((el) => [el.id, true as const]),
     );
-    const selectedElementIds = Object.fromEntries(
-      positionedElements.map((el) => [el.id, true as const]),
-    );
+
+    const allImageElements = [
+      ...positionedImageElements,
+      ...imageElements.filter((el) => el.isDeleted),
+    ];
+    const imageElementsMap = new Map(allImageElements.map((el) => [el.id, el]));
+
     const nextElements = this.scene
       .getElementsIncludingDeleted()
-      .map((element) => initializedImageElementsMap.get(element.id) ?? element);
+      .map((element) => imageElementsMap.get(element.id) ?? element);
 
     this.updateScene({
       appState: {
         selectedElementIds: makeNextSelectedElementIds(
-          selectedElementIds,
+          selectedImageElements,
           this.state,
         ),
       },
