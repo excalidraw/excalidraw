@@ -1222,6 +1222,7 @@ const getElbowArrowData = (
         elementsMap,
         elements,
         options?.zoom,
+        (arrow as any).id,
       ) || null;
     hoveredEndElement =
       getHoveredElement(
@@ -1229,6 +1230,7 @@ const getElbowArrowData = (
         elementsMap,
         elements,
         options?.zoom,
+        (arrow as any).id,
       ) || null;
   } else {
     hoveredStartElement = arrow.startBinding
@@ -2264,6 +2266,7 @@ const getHoveredElement = (
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly NonDeletedExcalidrawElement[],
   zoom?: AppState["zoom"],
+  excludeElementId?: string,
 ) => {
   return getHoveredElementForBinding(
     tupleToCoors(origPoint),
@@ -2272,6 +2275,7 @@ const getHoveredElement = (
     zoom,
     true,
     true,
+    excludeElementId,
   );
 };
 

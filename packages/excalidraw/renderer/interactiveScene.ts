@@ -234,6 +234,35 @@ const renderBindingHighlightForBindableElement = (
       );
       break;
     }
+    case "arrow": {
+      // Draw highlight along the arrow path
+      context.strokeStyle = "rgba(0, 123, 255, 0.4)"; // Blue highlight for arrows
+      context.lineWidth = padding;
+      context.lineCap = "round";
+      context.lineJoin = "round";
+      
+      const points = element.points;
+      if (points.length >= 2) {
+        context.beginPath();
+        const [startX, startY] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          element,
+          0,
+          elementsMap,
+        );
+        context.moveTo(startX, startY);
+        
+        for (let i = 1; i < points.length; i++) {
+          const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            element,
+            i,
+            elementsMap,
+          );
+          context.lineTo(x, y);
+        }
+        context.stroke();
+      }
+      break;
+    }
   }
 };
 

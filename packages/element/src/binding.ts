@@ -407,6 +407,7 @@ export const maybeSuggestBindingsForLinearElementAtCoords = (
           zoom,
           isElbowArrow(linearElement),
           isElbowArrow(linearElement),
+          linearElement.id,
         );
 
         if (
@@ -451,6 +452,7 @@ export const maybeBindLinearElement = (
     appState.zoom,
     isElbowArrow(linearElement),
     isElbowArrow(linearElement),
+    linearElement.id,
   );
 
   if (hoveredElement !== null) {
@@ -581,7 +583,9 @@ export const getHoveredElementForBinding = (
   zoom?: AppState["zoom"],
   fullShape?: boolean,
   considerAllElements?: boolean,
+  excludeElementId?: string,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
+
   if (considerAllElements) {
     let cullRest = false;
     const candidateElements = getAllElementsAtPositionForBinding(
@@ -602,6 +606,11 @@ export const getHoveredElementForBinding = (
             !isFrameLikeElement(element),
         ),
     ).filter((element) => {
+      // Exclude the current element being dragged
+      if (excludeElementId && element.id === excludeElementId) {
+        return false;
+      }
+      
       if (cullRest) {
         return false;
       }
@@ -640,18 +649,24 @@ export const getHoveredElementForBinding = (
 
   const hoveredElement = getElementAtPositionForBinding(
     elements,
-    (element) =>
-      isBindableElement(element, false) &&
-      bindingBorderTest(
-        element,
+    (element) => {
+      const isBindable = isBindableElement(element, false);
+      const isNotExcluded = element.id !== excludeElementId;
+      const passesBindingTest = isBindable ? bindingBorderTest(
+        element as ExcalidrawBindableElement,
         pointerCoords,
         elementsMap,
         zoom,
         // disable fullshape snapping for frame elements so we
         // can bind to frame children
-        (fullShape || !isBindingFallthroughEnabled(element)) &&
-          !isFrameLikeElement(element),
-      ),
+        (fullShape || !isBindingFallthroughEnabled(element as ExcalidrawBindableElement)) &&
+          !isFrameLikeElement(element as ExcalidrawBindableElement),
+      ) : false;
+      
+
+      
+      return isBindable && isNotExcluded && passesBindingTest;
+    },
   );
 
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
@@ -722,6 +737,18 @@ const calculateFocusAndGap = (
     elementsMap,
   );
 
+  // Special handling for arrow-to-arrow binding
+  if (isArrowElement(hoveredElement)) {
+    return calculateArrowToArrowFocusAndGap(
+      linearElement,
+      hoveredElement,
+      startOrEnd,
+      elementsMap,
+      edgePoint,
+      adjacentPoint,
+    );
+  }
+
   return {
     focus: determineFocusDistance(
       hoveredElement,
@@ -731,6 +758,212 @@ const calculateFocusAndGap = (
     ),
     gap: Math.max(1, distanceToElement(hoveredElement, elementsMap, edgePoint)),
   };
+};
+
+const calculateArrowToArrowFocusAndGap = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  targetArrow: ExcalidrawArrowElement,
+  startOrEnd: "start" | "end",
+  elementsMap: NonDeletedSceneElementsMap,
+  edgePoint: GlobalPoint,
+  adjacentPoint: GlobalPoint,
+): { focus: number; gap: number } => {
+  // Find the closest point on the target arrow's path
+  const closestPoint = findClosestPointOnArrow(targetArrow, edgePoint, elementsMap);
+  
+  // Calculate the distance from the edge point to the closest point on the target arrow
+  const distance = pointDistance(edgePoint, closestPoint);
+  
+  // For arrow-to-arrow binding, we use a simple focus calculation
+  // based on the position along the target arrow's path
+  const focus = calculateArrowFocus(targetArrow, closestPoint, elementsMap);
+  
+  return {
+    focus,
+    gap: Math.max(1, distance),
+  };
+};
+
+const findClosestPointOnArrow = (
+  arrow: ExcalidrawArrowElement,
+  point: GlobalPoint,
+  elementsMap: NonDeletedSceneElementsMap,
+): GlobalPoint => {
+  let closestPoint = pointFrom<GlobalPoint>(0, 0);
+  let minDistance = Infinity;
+  
+  // Check each segment of the arrow
+  for (let i = 0; i < arrow.points.length - 1; i++) {
+    const start = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      i,
+      elementsMap,
+    );
+    const end = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      i + 1,
+      elementsMap,
+    );
+    
+    const segmentClosestPoint = findClosestPointOnLineSegment(start, end, point);
+    const distance = pointDistance(point, segmentClosestPoint);
+    
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestPoint = segmentClosestPoint;
+    }
+  }
+  
+  return closestPoint;
+};
+
+const findClosestPointOnLineSegment = (
+  start: GlobalPoint,
+  end: GlobalPoint,
+  point: GlobalPoint,
+): GlobalPoint => {
+  const A = point[0] - start[0];
+  const B = point[1] - start[1];
+  const C = end[0] - start[0];
+  const D = end[1] - start[1];
+  
+  const dot = A * C + B * D;
+  const lenSq = C * C + D * D;
+  
+  if (lenSq === 0) {
+    return start;
+  }
+  
+  let param = dot / lenSq;
+  param = Math.max(0, Math.min(1, param));
+  
+  return pointFrom<GlobalPoint>(
+    start[0] + param * C,
+    start[1] + param * D,
+  );
+};
+
+const calculateArrowFocus = (
+  arrow: ExcalidrawArrowElement,
+  point: GlobalPoint,
+  elementsMap: NonDeletedSceneElementsMap,
+): number => {
+  // Calculate the position along the arrow's path (0 to 1)
+  let totalLength = 0;
+  let currentLength = 0;
+  
+  // Calculate total length of the arrow
+  for (let i = 0; i < arrow.points.length - 1; i++) {
+    const start = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      i,
+      elementsMap,
+    );
+    const end = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      i + 1,
+      elementsMap,
+    );
+    totalLength += pointDistance(start, end);
+  }
+  
+  // Find which segment contains the point
+  for (let i = 0; i < arrow.points.length - 1; i++) {
+    const start = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      i,
+      elementsMap,
+    );
+    const end = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      i + 1,
+      elementsMap,
+    );
+    
+    const segmentLength = pointDistance(start, end);
+    const segmentClosestPoint = findClosestPointOnLineSegment(start, end, point);
+    const distanceFromStart = pointDistance(start, segmentClosestPoint);
+    
+    if (distanceFromStart <= segmentLength) {
+      // Point is on this segment
+      const segmentProgress = distanceFromStart / segmentLength;
+      return (currentLength + segmentProgress * segmentLength) / totalLength;
+    }
+    
+    currentLength += segmentLength;
+  }
+  
+  return 0.5; // Default to middle if not found
+};
+
+const determineArrowFocusPoint = (
+  arrow: ExcalidrawArrowElement,
+  elementsMap: ElementsMap,
+  focus: number,
+  adjacentPoint: GlobalPoint,
+): GlobalPoint => {
+  // Convert focus (0-1) to a position along the arrow's path
+  const totalLength = calculateArrowTotalLength(arrow, elementsMap);
+  const targetDistance = focus * totalLength;
+  
+  let currentDistance = 0;
+  
+  // Find the segment that contains the target distance
+  for (let i = 0; i < arrow.points.length - 1; i++) {
+    const start = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      i,
+      elementsMap,
+    );
+    const end = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      i + 1,
+      elementsMap,
+    );
+    
+    const segmentLength = pointDistance(start, end);
+    
+    if (currentDistance + segmentLength >= targetDistance) {
+      // Target point is on this segment
+      const segmentProgress = (targetDistance - currentDistance) / segmentLength;
+      return pointFrom<GlobalPoint>(
+        start[0] + segmentProgress * (end[0] - start[0]),
+        start[1] + segmentProgress * (end[1] - start[1]),
+      );
+    }
+    
+    currentDistance += segmentLength;
+  }
+  
+  // If we get here, return the end point
+  return LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    arrow.points.length - 1,
+    elementsMap,
+  );
+};
+
+const calculateArrowTotalLength = (
+  arrow: ExcalidrawArrowElement,
+  elementsMap: ElementsMap,
+): number => {
+  let totalLength = 0;
+  
+  for (let i = 0; i < arrow.points.length - 1; i++) {
+    const start = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      i,
+      elementsMap,
+    );
+    const end = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      i + 1,
+      elementsMap,
+    );
+    totalLength += pointDistance(start, end);
+  }
+  
+  return totalLength;
 };
 
 // Supports translating, rotating and scaling `changedElement` with bound
@@ -1437,6 +1670,7 @@ const getEligibleElementForBindingElement = (
     zoom,
     isElbowArrow(linearElement),
     isElbowArrow(linearElement),
+    linearElement.id,
   );
 };
 
@@ -1576,6 +1810,14 @@ export const bindingBorderTest = (
   fullShape?: boolean,
 ): boolean => {
   const p = pointFrom<GlobalPoint>(x, y);
+  
+  // Special handling for arrows
+  if (isArrowElement(element)) {
+    const threshold = maxBindingGap(element, element.width, element.height, zoom);
+    const distance = distanceToElement(element, elementsMap, p);
+    return distance <= threshold;
+  }
+  
   const threshold = maxBindingGap(element, element.width, element.height, zoom);
   const shouldTestInside =
     // disable fullshape snapping for frame elements so we
@@ -1616,6 +1858,15 @@ export const maxBindingGap = (
   zoom?: AppState["zoom"],
 ): number => {
   const zoomValue = zoom?.value && zoom.value < 1 ? zoom.value : 1;
+
+  // Special handling for arrows
+  if (isArrowElement(element)) {
+    // For arrows, use a much larger binding gap to account for linear elements
+    return Math.max(
+      50, // Increased minimum gap for arrows
+      BINDING_HIGHLIGHT_THICKNESS / zoomValue + FIXED_BINDING_DISTANCE * 3, // 3x larger gap
+    );
+  }
 
   // Aligns diamonds with rectangles
   const shapeRatio = element.type === "diamond" ? 1 / Math.sqrt(2) : 1;
@@ -1778,6 +2029,11 @@ const determineFocusPoint = (
 
   if (focus === 0) {
     return center;
+  }
+
+  // Special handling for arrow-to-arrow binding
+  if (isArrowElement(element)) {
+    return determineArrowFocusPoint(element, elementsMap, focus, adjacentPoint);
   }
 
   const candidates = (
