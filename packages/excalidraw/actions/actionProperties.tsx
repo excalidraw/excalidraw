@@ -137,6 +137,11 @@ import {
   isSomeElementSelected,
 } from "../scene";
 
+import {
+  withCaretPositionPreservation,
+  restoreCaretPosition,
+} from "../hooks/useTextEditorFocus";
+
 import { register } from "./register";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
@@ -701,7 +706,7 @@ export const actionChangeFontSize = register({
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, () => value, value);
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
       <legend>{t("labels.fontSize")}</legend>
       <div className="buttonList">
@@ -760,7 +765,14 @@ export const actionChangeFontSize = register({
                 ? null
                 : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
           )}
-          onChange={(value) => updateData(value)}
+          onChange={(value) => {
+            withCaretPositionPreservation(
+              () => updateData(value),
+              !!data?.compactMode,
+              !!appState.editingTextElement,
+              data?.onPreventClose,
+            );
+          }}
         />
       </div>
     </fieldset>
@@ -1105,14 +1117,19 @@ export const actionChangeFontFamily = register({
           hoveredFontFamily={appState.currentHoveredFontFamily}
           compactMode={data?.compactMode}
           onSelect={(fontFamily) => {
-            setBatchedData({
-              openPopup: null,
-              currentHoveredFontFamily: null,
-              currentItemFontFamily: fontFamily,
-            });
-
-            // defensive clear so immediate close won't abuse the cached elements
-            cachedElementsRef.current.clear();
+            withCaretPositionPreservation(
+              () => {
+                setBatchedData({
+                  openPopup: null,
+                  currentHoveredFontFamily: null,
+                  currentItemFontFamily: fontFamily,
+                });
+                // defensive clear so immediate close won't abuse the cached elements
+                cachedElementsRef.current.clear();
+              },
+              !!data?.compactMode,
+              !!appState.editingTextElement,
+            );
           }}
           onHover={(fontFamily) => {
             setBatchedData({
@@ -1172,7 +1189,7 @@ export const actionChangeFontFamily = register({
               setBatchedData({});
             } else {
               // close: clear openPopup if we're still the active popup
-              const data = {
+              const fontFamilyData = {
                 openPopup:
                   appState.openPopup === "fontFamily"
                     ? null
@@ -1183,9 +1200,14 @@ export const actionChangeFontFamily = register({
               } as ChangeFontFamilyData;
 
               // apply immediately to avoid racing with other popovers opening
-              updateData({ ...batchedData, ...data });
+              updateData({ ...batchedData, ...fontFamilyData });
               setBatchedData({});
               cachedElementsRef.current.clear();
+
+              // Refocus text editor when font picker closes if we were editing text
+              if (data?.compactMode && appState.editingTextElement) {
+                restoreCaretPosition(null); // Just refocus without saved position
+              }
             }
           }}
         />
@@ -1228,8 +1250,9 @@ export const actionChangeTextAlign = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => {
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
     const elementsMap = app.scene.getNonDeletedElementsMap();
+
     return (
       <fieldset>
         <legend>{t("labels.textAlign")}</legend>
@@ -1278,7 +1301,14 @@ export const actionChangeTextAlign = register({
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemTextAlign,
             )}
-            onChange={(value) => updateData(value)}
+            onChange={(value) => {
+              withCaretPositionPreservation(
+                () => updateData(value),
+                !!data?.compactMode,
+                !!appState.editingTextElement,
+                data?.onPreventClose,
+              );
+            }}
           />
         </div>
       </fieldset>
@@ -1320,7 +1350,7 @@ export const actionChangeVerticalAlign = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => {
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
     return (
       <fieldset>
         <div className="buttonList">
@@ -1370,7 +1400,14 @@ export const actionChangeVerticalAlign = register({
                 ) !== null,
               (hasSelection) => (hasSelection ? null : VERTICAL_ALIGN.MIDDLE),
             )}
-            onChange={(value) => updateData(value)}
+            onChange={(value) => {
+              withCaretPositionPreservation(
+                () => updateData(value),
+                !!data?.compactMode,
+                !!appState.editingTextElement,
+                data?.onPreventClose,
+              );
+            }}
           />
         </div>
       </fieldset>

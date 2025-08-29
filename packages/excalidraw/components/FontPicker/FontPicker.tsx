@@ -102,21 +102,11 @@ export const FontPicker = React.memo(
           </div>
         )}
         {!compactMode && <ButtonSeparator />}
-        <Popover.Root open={isOpened} onOpenChange={() => {}}>
+        <Popover.Root open={isOpened} onOpenChange={onPopupChange}>
           <FontPickerTrigger
             selectedFontFamily={selectedFontFamily}
-            onTrigger={(e) => {
-              // suppress default to avoid double toggle
-              if (e && e.preventDefault) {
-                e.preventDefault();
-              }
-
-              if (isOpened) {
-                onPopupChange(false);
-              } else {
-                onPopupChange(true);
-              }
-            }}
+            onToggle={() => {}} // No longer needed, Radix handles it
+            isOpened={isOpened}
           />
           {isOpened && (
             <FontPickerList

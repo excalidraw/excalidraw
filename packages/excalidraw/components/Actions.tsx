@@ -50,6 +50,8 @@ import {
 
 import { getFormValue } from "../actions/actionProperties";
 
+import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
+
 import { getToolbarTools } from "./shapes";
 
 import "./Actions.scss";
@@ -84,6 +86,12 @@ import type {
   AppState,
 } from "../types";
 import type { ActionManager } from "../actions/manager";
+
+// Common CSS class combinations
+const PROPERTIES_CLASSES = clsx([
+  CLASSES.SHAPE_ACTIONS_THEME_SCOPE,
+  "properties-content",
+]);
 
 export const canChangeStrokeColor = (
   appState: UIAppState,
@@ -313,6 +321,8 @@ export const CompactShapeActions = ({
   const targetElements = getTargetElements(elementsMap, appState);
   const [strokePopoverOpen, setStrokePopoverOpen] = useState(false);
   const [otherActionsPopoverOpen, setOtherActionsPopoverOpen] = useState(false);
+  const [preventTextAlignClose, setPreventTextAlignClose] = useState(false);
+  const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus();
   const { container } = useExcalidrawContainer();
 
   const isEditingTextOrNewElement = Boolean(
@@ -364,12 +374,11 @@ export const CompactShapeActions = ({
   return (
     <div className="compact-shape-actions">
       {/* Stroke Color */}
-      {canChangeStrokeColor(appState, targetElements) &&
-        !appState.editingTextElement && (
-          <div className={clsx("compact-action-item")}>
-            {renderAction("changeStrokeColor", { compactMode: true })}
-          </div>
-        )}
+      {canChangeStrokeColor(appState, targetElements) && (
+        <div className={clsx("compact-action-item")}>
+          {renderAction("changeStrokeColor", { compactMode: true })}
+        </div>
+      )}
 
       {/* Background Color */}
       {canChangeBackgroundColor(appState, targetElements) && (
@@ -400,7 +409,7 @@ export const CompactShapeActions = ({
             <Popover.Trigger asChild>
               <button
                 type="button"
-                className="compact-action-button"
+                className="compact-action-button properties-trigger"
                 title={t("labels.stroke")}
                 onPointerDown={(e) => {
                   e.preventDefault();
@@ -423,7 +432,7 @@ export const CompactShapeActions = ({
             </Popover.Trigger>
             {strokePopoverOpen && (
               <PropertiesPopover
-                className={CLASSES.SHAPE_ACTIONS_THEME_SCOPE}
+                className={PROPERTIES_CLASSES}
                 container={container}
                 style={{ maxWidth: "13rem" }}
                 onClose={() => setStrokePopoverOpen(false)}
@@ -474,7 +483,7 @@ export const CompactShapeActions = ({
             <Popover.Trigger asChild>
               <button
                 type="button"
-                className="compact-action-button"
+                className="compact-action-button properties-trigger"
                 title={t("labels.arrowtypes")}
                 onPointerDown={(e) => {
                   e.preventDefault();
@@ -524,6 +533,7 @@ export const CompactShapeActions = ({
             {appState.openPopup === "arrowProperties" && (
               <PropertiesPopover
                 container={container}
+                className="properties-content"
                 style={{ maxWidth: "13rem" }}
                 onClose={() => {
                   setAppState((prev: AppState) =>
@@ -549,80 +559,99 @@ export const CompactShapeActions = ({
 
       {/* Text Properties */}
       {(appState.activeTool.type === "text" ||
-        targetElements.some(isTextElement)) &&
-        !appState.editingTextElement && (
-          <>
-            <div className="compact-action-item">
-              {renderAction("changeFontFamily", {
-                compactMode: true,
-              })}
-            </div>
-            <div className="compact-action-item">
-              <Popover.Root
-                open={appState.openPopup === "textAlign"}
-                onOpenChange={(open) => {
-                  if (open) {
-                    setAppState({ openPopup: "textAlign" });
-                    setStrokePopoverOpen(false);
-                    setOtherActionsPopoverOpen(false);
+        targetElements.some(isTextElement)) && (
+        <>
+          <div className="compact-action-item">
+            {renderAction("changeFontFamily", {
+              compactMode: true,
+              onPreventClose: () => setPreventTextAlignClose(true),
+            })}
+          </div>
+          <div className="compact-action-item">
+            <Popover.Root
+              open={appState.openPopup === "textAlign"}
+              onOpenChange={(open) => {
+                if (!open) {
+                  // If we're preventing close due to selection, ignore this close event
+                  if (preventTextAlignClose) {
+                    setPreventTextAlignClose(false);
+                    return;
                   }
-                }}
-              >
-                <Popover.Trigger asChild>
-                  <button
-                    type="button"
-                    className="compact-action-button"
-                    title={t("labels.textAlign")}
-                    onPointerDown={(e) => {
+
+                  setAppState({ openPopup: null });
+
+                  // Refocus text editor if it was being edited and restore caret position
+                  if (appState.editingTextElement) {
+                    restoreCaretPosition();
+                  }
+                } else {
+                  // Save current caret position before opening popover
+                  if (appState.editingTextElement) {
+                    saveCaretPosition();
+                  }
+
+                  setAppState({ openPopup: "textAlign" });
+                  setStrokePopoverOpen(false);
+                  setOtherActionsPopoverOpen(false);
+                }
+              }}
+            >
+              <Popover.Trigger asChild>
+                <button
+                  type="button"
+                  className="compact-action-button properties-trigger"
+                  title={t("labels.textAlign")}
+                  onPointerDown={(e) => {
+                    // Prevent default behavior that might dismiss keyboard on mobile
+                    if (appState.editingTextElement) {
                       e.preventDefault();
-                      if (appState.openPopup === "textAlign") {
-                        setAppState({ openPopup: null });
-                      } else {
-                        setStrokePopoverOpen(false);
-                        setOtherActionsPopoverOpen(false);
-                        setAppState({ openPopup: "textAlign" });
-                      }
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                  >
-                    {TextSizeIcon}
-                  </button>
-                </Popover.Trigger>
-                {appState.openPopup === "textAlign" && (
-                  <PropertiesPopover
-                    className={CLASSES.SHAPE_ACTIONS_THEME_SCOPE}
-                    container={container}
-                    style={{ maxWidth: "13rem" }}
-                    onClose={() => {
-                      setAppState((prev: AppState) =>
-                        prev.openPopup === "textAlign"
-                          ? { openPopup: null }
-                          : null,
-                      );
-                    }}
-                  >
-                    <div className="selected-shape-actions">
-                      {(appState.activeTool.type === "text" ||
-                        suppportsHorizontalAlign(
-                          targetElements,
-                          elementsMap,
-                        )) &&
-                        renderAction("changeTextAlign")}
-                      {shouldAllowVerticalAlign(targetElements, elementsMap) &&
-                        renderAction("changeVerticalAlign")}
-                      {(appState.activeTool.type === "text" ||
-                        targetElements.some(isTextElement)) &&
-                        renderAction("changeFontSize")}
-                    </div>
-                  </PropertiesPopover>
-                )}
-              </Popover.Root>
-            </div>
-          </>
-        )}
+                    }
+                  }}
+                  onClick={() => {}}
+                >
+                  {TextSizeIcon}
+                </button>
+              </Popover.Trigger>
+              {appState.openPopup === "textAlign" && (
+                <PropertiesPopover
+                  className={PROPERTIES_CLASSES}
+                  container={container}
+                  style={{ maxWidth: "13rem" }}
+                  // Improve focus handling for text editing scenarios
+                  preventAutoFocusOnTouch={!!appState.editingTextElement}
+                  onClose={() => {
+                    setAppState({ openPopup: null });
+                    // Refocus text editor when popover closes with caret restoration
+                    if (appState.editingTextElement) {
+                      restoreCaretPosition();
+                    }
+                  }}
+                >
+                  <div className="selected-shape-actions">
+                    {(appState.activeTool.type === "text" ||
+                      suppportsHorizontalAlign(targetElements, elementsMap)) &&
+                      renderAction("changeTextAlign", {
+                        compactMode: true,
+                        onPreventClose: () => setPreventTextAlignClose(true),
+                      })}
+                    {shouldAllowVerticalAlign(targetElements, elementsMap) &&
+                      renderAction("changeVerticalAlign", {
+                        compactMode: true,
+                        onPreventClose: () => setPreventTextAlignClose(true),
+                      })}
+                    {(appState.activeTool.type === "text" ||
+                      targetElements.some(isTextElement)) &&
+                      renderAction("changeFontSize", {
+                        compactMode: true,
+                        onPreventClose: () => setPreventTextAlignClose(true),
+                      })}
+                  </div>
+                </PropertiesPopover>
+              )}
+            </Popover.Root>
+          </div>
+        </>
+      )}
 
       {/* Dedicated Copy Button */}
       {!isEditingTextOrNewElement && targetElements.length > 0 && (
@@ -654,7 +683,7 @@ export const CompactShapeActions = ({
             <Popover.Trigger asChild>
               <button
                 type="button"
-                className="compact-action-button"
+                className="compact-action-button properties-trigger"
                 title={t("labels.actions")}
                 onPointerDown={(e) => {
                   e.preventDefault();
@@ -677,7 +706,7 @@ export const CompactShapeActions = ({
             </Popover.Trigger>
             {otherActionsPopoverOpen && (
               <PropertiesPopover
-                className={CLASSES.SHAPE_ACTIONS_THEME_SCOPE}
+                className={PROPERTIES_CLASSES}
                 container={container}
                 style={{
                   maxWidth: "12rem",

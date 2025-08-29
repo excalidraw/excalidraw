@@ -19,6 +19,11 @@ import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
 import { backgroundIcon, slashIcon, strokeIcon } from "../icons";
+import {
+  saveCaretPosition,
+  restoreCaretPosition,
+  temporarilyDisableTextEditorBlur,
+} from "../../hooks/useTextEditorFocus";
 
 import { ColorInput } from "./ColorInput";
 import { Picker } from "./Picker";
@@ -79,6 +84,7 @@ const ColorPickerPopupContent = ({
   palette = COLOR_PALETTE,
   updateData,
   getOpenPopup,
+  appState,
 }: Pick<
   ColorPickerProps,
   | "type"
@@ -88,6 +94,7 @@ const ColorPickerPopupContent = ({
   | "elements"
   | "palette"
   | "updateData"
+  | "appState"
 > & {
   getOpenPopup: () => AppState["openPopup"];
 }) => {
@@ -121,6 +128,8 @@ const ColorPickerPopupContent = ({
     <PropertiesPopover
       container={container}
       style={{ maxWidth: "13rem" }}
+      // Improve focus handling for text editing scenarios
+      preventAutoFocusOnTouch={!!appState.editingTextElement}
       onFocusOutside={(event) => {
         // refocus due to eye dropper
         focusPickerContent();
@@ -140,6 +149,18 @@ const ColorPickerPopupContent = ({
           updateData({ openPopup: null });
         }
         setActiveColorPickerSection(null);
+
+        // Refocus text editor when popover closes if we were editing text
+        if (appState.editingTextElement) {
+          setTimeout(() => {
+            const textEditor = document.querySelector(
+              ".excalidraw-wysiwyg",
+            ) as HTMLTextAreaElement;
+            if (textEditor) {
+              textEditor.focus();
+            }
+          }, 0);
+        }
       }}
     >
       {palette ? (
@@ -148,7 +169,17 @@ const ColorPickerPopupContent = ({
           palette={palette}
           color={color}
           onChange={(changedColor) => {
+            // Save caret position before color change if editing text
+            const savedSelection = appState.editingTextElement
+              ? saveCaretPosition()
+              : null;
+
             onChange(changedColor);
+
+            // Restore caret position after color change if editing text
+            if (appState.editingTextElement && savedSelection) {
+              restoreCaretPosition(savedSelection);
+            }
           }}
           onEyeDropperToggle={(force) => {
             setEyeDropperState((state) => {
@@ -199,6 +230,7 @@ const ColorPickerTrigger = ({
   compactMode = false,
   mode = "background",
   onToggle,
+  editingTextElement,
 }: {
   color: string | null;
   label: string;
@@ -206,7 +238,21 @@ const ColorPickerTrigger = ({
   compactMode?: boolean;
   mode?: "background" | "stroke";
   onToggle: () => void;
+  editingTextElement?: boolean;
 }) => {
+  const handlePointerDown = (e: React.PointerEvent) => {
+    // use pointerdown so we run before outside-close logic
+    e.preventDefault();
+    e.stopPropagation();
+
+    // If editing text, temporarily disable the wysiwyg blur event
+    if (editingTextElement) {
+      temporarilyDisableTextEditorBlur();
+    }
+
+    onToggle();
+  };
+
   return (
     <Popover.Trigger
       type="button"
@@ -223,12 +269,7 @@ const ColorPickerTrigger = ({
           : t("labels.showBackground")
       }
       data-openpopup={type}
-      onPointerDown={(e) => {
-        // use pointerdown so we run before outside-close logic
-        e.preventDefault();
-        e.stopPropagation();
-        onToggle();
-      }}
+      onPointerDown={handlePointerDown}
       onClick={(e) => {
         // suppress Radix default toggle to avoid double-toggle flicker
         e.preventDefault();
@@ -316,6 +357,7 @@ export const ColorPicker = ({
             type={type}
             compactMode={compactMode}
             mode={type === "elementStroke" ? "stroke" : "background"}
+            editingTextElement={!!appState.editingTextElement}
             onToggle={() => {
               // atomic switch: if another popup is open, close it first, then open this one next tick
               if (appState.openPopup === type) {
@@ -342,6 +384,7 @@ export const ColorPicker = ({
               palette={palette}
               updateData={updateData}
               getOpenPopup={() => openRef.current}
+              appState={appState}
             />
           )}
         </Popover.Root>
