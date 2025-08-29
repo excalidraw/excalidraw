@@ -215,11 +215,12 @@ export const textWysiwyg = ({
           );
           app.scene.mutateElement(container, { height: targetContainerHeight });
         } else {
-          const { y } = computeBoundTextPosition(
+          const { x, y } = computeBoundTextPosition(
             container,
             updatedTextElement as ExcalidrawTextElementWithContainer,
             elementsMap,
           );
+          coordX = x;
           coordY = y;
         }
       }

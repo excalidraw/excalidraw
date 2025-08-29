@@ -35,6 +35,7 @@ import {
   getContainerElement,
   handleBindTextResize,
   getBoundTextMaxWidth,
+  computeBoundTextPosition,
 } from "./textElement";
 import {
   getMinTextElementWidth,
@@ -225,7 +226,16 @@ const rotateSingleElement = (
       scene.getElement<ExcalidrawTextElementWithContainer>(boundTextElementId);
 
     if (textElement && !isArrowElement(element)) {
-      scene.mutateElement(textElement, { angle });
+      const { x, y } = computeBoundTextPosition(
+        element,
+        textElement,
+        scene.getNonDeletedElementsMap(),
+      );
+      scene.mutateElement(textElement, {
+        angle,
+        x,
+        y,
+      });
     }
   }
 };
@@ -416,9 +426,15 @@ const rotateMultipleElements = (
 
       const boundText = getBoundTextElement(element, elementsMap);
       if (boundText && !isArrowElement(element)) {
+        const { x, y } = computeBoundTextPosition(
+          element,
+          boundText,
+          elementsMap,
+        );
+
         scene.mutateElement(boundText, {
-          x: boundText.x + (rotatedCX - cx),
-          y: boundText.y + (rotatedCY - cy),
+          x,
+          y,
           angle: normalizeRadians((centerAngle + origAngle) as Radians),
         });
       }

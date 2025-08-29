@@ -1,13 +1,14 @@
 import { getLineHeight } from "@excalidraw/common";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import { FONT_FAMILY } from "@excalidraw/common";
+import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "@excalidraw/common";
 
 import {
   computeContainerDimensionForBoundText,
   getContainerCoords,
   getBoundTextMaxWidth,
   getBoundTextMaxHeight,
+  computeBoundTextPosition,
 } from "../src/textElement";
 import { detectLineHeight, getLineHeightInPx } from "../src/textMeasurements";
 
@@ -205,5 +206,174 @@ describe("Test getDefaultLineHeight", () => {
 
   it("should return correct line height", () => {
     expect(getLineHeight(FONT_FAMILY.Cascadia)).toBe(1.2);
+  });
+});
+
+describe("Test computeBoundTextPosition", () => {
+  const createMockElementsMap = () => new Map();
+
+  // Helper function to create rectangle test case with 90-degree rotation
+  const createRotatedRectangleTestCase = (
+    textAlign: string,
+    verticalAlign: string,
+  ) => {
+    const container = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 100,
+      angle: (Math.PI / 2) as any, // 90 degrees
+    });
+
+    const boundTextElement = API.createElement({
+      type: "text",
+      width: 80,
+      height: 40,
+      text: "hello darkness my old friend",
+      textAlign: textAlign as any,
+      verticalAlign: verticalAlign as any,
+      containerId: container.id,
+    }) as ExcalidrawTextElementWithContainer;
+
+    const elementsMap = createMockElementsMap();
+
+    return { container, boundTextElement, elementsMap };
+  };
+
+  describe("90-degree rotation with all alignment combinations", () => {
+    // Test all 9 combinations of horizontal (left, center, right) and vertical (top, middle, bottom) alignment
+
+    it("should position text with LEFT + TOP alignment at 90-degree rotation", () => {
+      const { container, boundTextElement, elementsMap } =
+        createRotatedRectangleTestCase(TEXT_ALIGN.LEFT, VERTICAL_ALIGN.TOP);
+
+      const result = computeBoundTextPosition(
+        container,
+        boundTextElement,
+        elementsMap,
+      );
+
+      expect(result.x).toBeCloseTo(185, 1);
+      expect(result.y).toBeCloseTo(75, 1);
+    });
+
+    it("should position text with LEFT + MIDDLE alignment at 90-degree rotation", () => {
+      const { container, boundTextElement, elementsMap } =
+        createRotatedRectangleTestCase(TEXT_ALIGN.LEFT, VERTICAL_ALIGN.MIDDLE);
+
+      const result = computeBoundTextPosition(
+        container,
+        boundTextElement,
+        elementsMap,
+      );
+
+      expect(result.x).toBeCloseTo(160, 1);
+      expect(result.y).toBeCloseTo(75, 1);
+    });
+
+    it("should position text with LEFT + BOTTOM alignment at 90-degree rotation", () => {
+      const { container, boundTextElement, elementsMap } =
+        createRotatedRectangleTestCase(TEXT_ALIGN.LEFT, VERTICAL_ALIGN.BOTTOM);
+
+      const result = computeBoundTextPosition(
+        container,
+        boundTextElement,
+        elementsMap,
+      );
+
+      expect(result.x).toBeCloseTo(135, 1);
+      expect(result.y).toBeCloseTo(75, 1);
+    });
+
+    it("should position text with CENTER + TOP alignment at 90-degree rotation", () => {
+      const { container, boundTextElement, elementsMap } =
+        createRotatedRectangleTestCase(TEXT_ALIGN.CENTER, VERTICAL_ALIGN.TOP);
+
+      const result = computeBoundTextPosition(
+        container,
+        boundTextElement,
+        elementsMap,
+      );
+
+      expect(result.x).toBeCloseTo(185, 1);
+      expect(result.y).toBeCloseTo(130, 1);
+    });
+
+    it("should position text with CENTER + MIDDLE alignment at 90-degree rotation", () => {
+      const { container, boundTextElement, elementsMap } =
+        createRotatedRectangleTestCase(
+          TEXT_ALIGN.CENTER,
+          VERTICAL_ALIGN.MIDDLE,
+        );
+
+      const result = computeBoundTextPosition(
+        container,
+        boundTextElement,
+        elementsMap,
+      );
+
+      expect(result.x).toBeCloseTo(160, 1);
+      expect(result.y).toBeCloseTo(130, 1);
+    });
+
+    it("should position text with CENTER + BOTTOM alignment at 90-degree rotation", () => {
+      const { container, boundTextElement, elementsMap } =
+        createRotatedRectangleTestCase(
+          TEXT_ALIGN.CENTER,
+          VERTICAL_ALIGN.BOTTOM,
+        );
+
+      const result = computeBoundTextPosition(
+        container,
+        boundTextElement,
+        elementsMap,
+      );
+
+      expect(result.x).toBeCloseTo(135, 1);
+      expect(result.y).toBeCloseTo(130, 1);
+    });
+
+    it("should position text with RIGHT + TOP alignment at 90-degree rotation", () => {
+      const { container, boundTextElement, elementsMap } =
+        createRotatedRectangleTestCase(TEXT_ALIGN.RIGHT, VERTICAL_ALIGN.TOP);
+
+      const result = computeBoundTextPosition(
+        container,
+        boundTextElement,
+        elementsMap,
+      );
+
+      expect(result.x).toBeCloseTo(185, 1);
+      expect(result.y).toBeCloseTo(185, 1);
+    });
+
+    it("should position text with RIGHT + MIDDLE alignment at 90-degree rotation", () => {
+      const { container, boundTextElement, elementsMap } =
+        createRotatedRectangleTestCase(TEXT_ALIGN.RIGHT, VERTICAL_ALIGN.MIDDLE);
+
+      const result = computeBoundTextPosition(
+        container,
+        boundTextElement,
+        elementsMap,
+      );
+
+      expect(result.x).toBeCloseTo(160, 1);
+      expect(result.y).toBeCloseTo(185, 1);
+    });
+
+    it("should position text with RIGHT + BOTTOM alignment at 90-degree rotation", () => {
+      const { container, boundTextElement, elementsMap } =
+        createRotatedRectangleTestCase(TEXT_ALIGN.RIGHT, VERTICAL_ALIGN.BOTTOM);
+
+      const result = computeBoundTextPosition(
+        container,
+        boundTextElement,
+        elementsMap,
+      );
+
+      expect(result.x).toBeCloseTo(135, 1);
+      expect(result.y).toBeCloseTo(185, 1);
+    });
   });
 });
