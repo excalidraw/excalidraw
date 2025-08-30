@@ -10456,17 +10456,7 @@ class App extends React.Component<AppProps, AppState> {
       .getElementsIncludingDeleted()
       .map((el) => succeededMap.get(el.id) ?? failedMap.get(el.id) ?? el);
 
-    if (failed.length > 0) {
-      // First, update the snapshot with the failed images without capturing
-      this.store.scheduleMicroAction({
-        appState: undefined,
-        elements: nextElements.filter((el) => !succeededMap.has(el.id)),
-        action: CaptureUpdateAction.NEVER,
-      });
-    }
-
     if (succeeded.length > 0) {
-      // Then, update the scene, capturing the update (the failed images won't be captured this way)
       this.updateScene({
         appState: {
           selectedElementIds: makeNextSelectedElementIds(
@@ -10474,8 +10464,15 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           ),
         },
-        elements: nextElements,
+        elements: nextElements.filter((el) => !failedMap.has(el.id)),
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+    }
+
+    if (failed.length > 0) {
+      this.updateScene({
+        elements: nextElements,
+        captureUpdate: CaptureUpdateAction.NEVER,
       });
     }
 
