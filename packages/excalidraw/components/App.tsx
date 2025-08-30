@@ -10447,17 +10447,26 @@ class App extends React.Component<AppProps, AppState> {
       sceneX,
       sceneY,
     );
-    const succeededMap = new Map(succeeded.map((el) => [el.id, el]));
+    const succeededMap = arrayToMap(succeeded);
 
     const failed = initialized.filter((el) => el.isDeleted);
-    const failedSet = new Set(failed.map((el) => el.id));
+    const failedMap = arrayToMap(failed);
 
     const nextElements = this.scene
       .getElementsIncludingDeleted()
-      .filter((el) => !failedSet.has(el.id))
-      .map((element) => succeededMap.get(element.id) ?? element);
+      .map((el) => succeededMap.get(el.id) ?? failedMap.get(el.id) ?? el);
+
+    if (failed.length > 0) {
+      // First, update the snapshot with the failed images without capturing
+      this.store.scheduleMicroAction({
+        appState: undefined,
+        elements: nextElements.filter((el) => !succeededMap.has(el.id)),
+        action: CaptureUpdateAction.NEVER,
+      });
+    }
 
     if (succeeded.length > 0) {
+      // Then, update the scene, capturing the update (the failed images won't be captured this way)
       this.updateScene({
         appState: {
           selectedElementIds: makeNextSelectedElementIds(
@@ -10467,13 +10476,6 @@ class App extends React.Component<AppProps, AppState> {
         },
         elements: nextElements,
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-      });
-    }
-
-    if (failed.length > 0) {
-      this.updateScene({
-        elements: [...nextElements, ...failed],
-        captureUpdate: CaptureUpdateAction.NEVER,
       });
     }
 
