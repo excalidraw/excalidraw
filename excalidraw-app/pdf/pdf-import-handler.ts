@@ -1,14 +1,22 @@
 import { useCallback } from "react";
 import { fileOpen } from "browser-fs-access";
 import { MIME_TYPES } from "@excalidraw/common";
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+
+/**
+ * PDF import handler return type
+ */
+interface PDFImportHandlers {
+  importPdfFile: () => Promise<void>;
+}
 
 /**
  * PDF import handler for file dialog import functionality.
  * Creates a simulated drop event to trigger the global PDF drop handler
  * for consistent processing behavior.
  */
-export const usePDFImportHandler = (excalidrawAPI) => {
-  const importPdfFile = useCallback(async () => {
+export const usePDFImportHandler = (excalidrawAPI: ExcalidrawImperativeAPI | null): PDFImportHandlers => {
+  const importPdfFile = useCallback(async (): Promise<void> => {
     try {
       const file = await fileOpen({
         description: "PDF files",
@@ -37,7 +45,7 @@ export const usePDFImportHandler = (excalidrawAPI) => {
         document.dispatchEvent(fakeDropEvent);
       }
     } catch (error) {
-      if (error.name !== "AbortError") {
+      if (error instanceof Error && error.name !== "AbortError") {
         console.error("PDF import error:", error);
         excalidrawAPI?.setToast({
           message: `Failed to import PDF: ${error.message}`,

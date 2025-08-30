@@ -110,7 +110,7 @@ export const isControlsVisible = (
  * @returns Whether element is a PDF image
  */
 export const isPDFImageElement = (element: ExcalidrawElement): boolean => {
-  return (
+  return Boolean(
     element?.type === 'image' &&
     element?.customData?.pdf &&
     typeof element.customData.pdf.page === 'number' &&

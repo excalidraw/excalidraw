@@ -87,15 +87,21 @@ export const usePDFSelection = (excalidrawAPI: any): PDFSelectionState => {
 
 /**
  * Hook to handle PDF page navigation
- * Provides functions to navigate between PDF pages
+ * Provides functions to navigate between PDF pages using IndexedDB thumbnails
  */
 export const usePDFNavigation = (excalidrawAPI: any, selectedElement: ExcalidrawElement | null) => {
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [navigationError, setNavigationError] = useState<string | null>(null);
+
   const navigateToPage = async (page: number) => {
-    if (!excalidrawAPI || !selectedElement || !isPDFImageElement(selectedElement)) {
+    if (!excalidrawAPI || !selectedElement || !isPDFImageElement(selectedElement) || isNavigating) {
       return;
     }
 
     try {
+      setIsNavigating(true);
+      setNavigationError(null);
+      
       // Get current PDF info
       const pdfData = selectedElement.customData?.pdf;
       if (!pdfData) return;
@@ -104,51 +110,70 @@ export const usePDFNavigation = (excalidrawAPI: any, selectedElement: Excalidraw
       const targetPage = Math.max(1, Math.min(page, pdfData.pageCount));
       if (targetPage === pdfData.page) return; // Already on this page
 
-      // Update element's customData to reflect new page
-      const updatedElement = {
-        ...selectedElement,
-        customData: {
-          ...selectedElement.customData,
-          pdf: {
-            ...pdfData,
-            page: targetPage
-          }
-        }
-      };
-
-      // Update the element in Excalidraw
-      // Note: This would require implementing the PDF page change logic
-      // For now, we'll prepare the structure for the integration
-      console.log('Navigate to page:', targetPage, 'for element:', selectedElement.id);
+      // Import navigation handler dynamically to avoid build issues
+      const { navigatePDFPage } = await import('../../pdf/pdf-navigation-handler.js');
       
-      // TODO: Implement actual PDF page switching logic
-      // This would involve:
-      // 1. Loading the new page thumbnail from storage
-      // 2. Updating the element's fileId to point to the new thumbnail
-      // 3. Triggering a re-render of the element
+      // Use the navigation handler to switch pages
+      await navigatePDFPage(excalidrawAPI, selectedElement, targetPage);
       
     } catch (error) {
       console.error('Error navigating PDF page:', error);
+      setNavigationError(error instanceof Error ? error.message : 'Navigation failed');
+    } finally {
+      setIsNavigating(false);
     }
   };
 
-  const goToPrevPage = () => {
-    if (selectedElement?.customData?.pdf) {
-      const currentPage = selectedElement.customData.pdf.page;
-      navigateToPage(currentPage - 1);
+  const goToPrevPage = async () => {
+    if (!excalidrawAPI || !selectedElement || isNavigating) return;
+    
+    try {
+      setIsNavigating(true);
+      setNavigationError(null);
+      
+      const { goToPrevPage: prevPageHandler } = await import('../../pdf/pdf-navigation-handler.js');
+      await prevPageHandler(excalidrawAPI, selectedElement);
+      
+    } catch (error) {
+      console.error('Error navigating to previous page:', error);
+      setNavigationError(error instanceof Error ? error.message : 'Navigation failed');
+    } finally {
+      setIsNavigating(false);
     }
   };
 
-  const goToNextPage = () => {
-    if (selectedElement?.customData?.pdf) {
-      const currentPage = selectedElement.customData.pdf.page;
-      navigateToPage(currentPage + 1);
+  const goToNextPage = async () => {
+    if (!excalidrawAPI || !selectedElement || isNavigating) return;
+    
+    try {
+      setIsNavigating(true);
+      setNavigationError(null);
+      
+      const { goToNextPage: nextPageHandler } = await import('../../pdf/pdf-navigation-handler.js');
+      await nextPageHandler(excalidrawAPI, selectedElement);
+      
+    } catch (error) {
+      console.error('Error navigating to next page:', error);
+      setNavigationError(error instanceof Error ? error.message : 'Navigation failed');
+    } finally {
+      setIsNavigating(false);
     }
   };
+
+  // Check if navigation is possible
+  const canNavigatePrev = selectedElement?.customData?.pdf && 
+    selectedElement.customData.pdf.page > 1;
+  
+  const canNavigateNext = selectedElement?.customData?.pdf && 
+    selectedElement.customData.pdf.page < selectedElement.customData.pdf.pageCount;
 
   return {
     navigateToPage,
     goToPrevPage,
-    goToNextPage
+    goToNextPage,
+    isNavigating,
+    navigationError,
+    canNavigatePrev,
+    canNavigateNext
   };
 };

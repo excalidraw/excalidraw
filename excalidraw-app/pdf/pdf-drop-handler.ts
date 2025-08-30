@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { viewportCoordsToSceneCoords } from "@excalidraw/excalidraw";
+import type { ExcalidrawImperativeAPI, DataURL } from "@excalidraw/excalidraw/types";
 import { newImageElement } from "@excalidraw/element";
 import { generateIdFromFile } from "@excalidraw/excalidraw/data/blob";
 import { processPDFFile } from "./pdf-processor.js";
 import { storePDFFile, getPDFFile } from "./pdf-storage.js";
+import type { PDFPageResult } from './types/pdf.types.js';
 
 /**
  * Global PDF drop handler that intercepts PDF files at document level
@@ -11,9 +13,9 @@ import { storePDFFile, getPDFFile } from "./pdf-storage.js";
  * This prevents the "Couldn't load invalid file" error while maintaining
  * full PDF processing functionality.
  */
-export const usePDFDropHandler = (excalidrawAPI) => {
+export const usePDFDropHandler = (excalidrawAPI: ExcalidrawImperativeAPI | null): void => {
   useEffect(() => {
-    const handleGlobalDrop = async (e) => {
+    const handleGlobalDrop = async (e: DragEvent): Promise<void> => {
       if (!e.dataTransfer?.files || !excalidrawAPI) return;
 
       const files = Array.from(e.dataTransfer.files);
@@ -50,8 +52,8 @@ export const usePDFDropHandler = (excalidrawAPI) => {
 
             // Convert blob to data URL
             const reader = new FileReader();
-            const dataURL = await new Promise((resolve, reject) => {
-              reader.onload = () => resolve(reader.result);
+            const dataURL = await new Promise<string>((resolve, reject) => {
+              reader.onload = () => resolve(reader.result as string);
               reader.onerror = reject;
               reader.readAsDataURL(firstPage.blob);
             });
@@ -67,7 +69,7 @@ export const usePDFDropHandler = (excalidrawAPI) => {
             if (!existingFiles[thumbnailFileId]) {
               excalidrawAPI.addFiles([{
                 id: thumbnailFileId,
-                dataURL: dataURL,
+                dataURL: dataURL as DataURL,
                 mimeType: "image/jpeg",
                 created: Date.now(),
                 lastRetrieved: Date.now(),
@@ -107,16 +109,16 @@ export const usePDFDropHandler = (excalidrawAPI) => {
                 if (originalFile && window.extractPDFDocumentPages) {
                   const arrayBuffer = await originalFile.arrayBuffer();
                   const pdfData = new Uint8Array(arrayBuffer);
-                  const pages = await window.extractPDFDocumentPages(pdfData, 1.0);
+                  const pages = await window.extractPDFDocumentPages!(pdfData, 1.0);
                   const pageResult = pages[1]; // Page 2 (0-based index)
 
                   if (pageResult) {
-                    // Convert page result to blob like in pdf-processor.js
+                    // Convert page result to blob like in pdf-processor.ts
                     const pageBlob = new Blob([pageResult.Bytes], { type: 'image/jpeg' });
 
                     const reader = new FileReader();
-                    const pageDataURL = await new Promise((resolve, reject) => {
-                      reader.onload = () => resolve(reader.result);
+                    const pageDataURL = await new Promise<string>((resolve, reject) => {
+                      reader.onload = () => resolve(reader.result as string);
                       reader.onerror = reject;
                       reader.readAsDataURL(pageBlob);
                     });
@@ -127,7 +129,7 @@ export const usePDFDropHandler = (excalidrawAPI) => {
                     if (!excalidrawAPI.getFiles()[pageFileId]) {
                       excalidrawAPI.addFiles([{
                         id: pageFileId,
-                        dataURL: pageDataURL,
+                        dataURL: pageDataURL as DataURL,
                         mimeType: "image/jpeg",
                         created: Date.now(),
                         lastRetrieved: Date.now(),

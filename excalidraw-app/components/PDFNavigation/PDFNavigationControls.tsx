@@ -22,8 +22,15 @@ export const PDFNavigationControls: React.FC<PDFNavigationControlsProps> = ({
   // Track PDF element selection
   const pdfSelection = usePDFSelection(excalidrawAPI);
   
-  // Navigation handlers
-  const { goToPrevPage, goToNextPage } = usePDFNavigation(excalidrawAPI, pdfSelection.selectedElement);
+  // Navigation handlers with state
+  const { 
+    goToPrevPage, 
+    goToNextPage, 
+    isNavigating, 
+    navigationError,
+    canNavigatePrev,
+    canNavigateNext 
+  } = usePDFNavigation(excalidrawAPI, pdfSelection.selectedElement);
   
   // Don't render if no PDF is selected
   if (!pdfSelection.isVisible || !pdfSelection.selectedElement) {
@@ -41,8 +48,6 @@ export const PDFNavigationControls: React.FC<PDFNavigationControlsProps> = ({
   }
 
   const { currentPage, totalPages } = pdfSelection;
-  const hasPrevPage = currentPage > 1;
-  const hasNextPage = currentPage < totalPages;
 
   return (
     <div 
@@ -60,8 +65,8 @@ export const PDFNavigationControls: React.FC<PDFNavigationControlsProps> = ({
       <button
         className={`${styles.controlButton} ${styles.prevButton}`}
         onClick={goToPrevPage}
-        disabled={!hasPrevPage}
-        title={`Go to page ${currentPage - 1}`}
+        disabled={!canNavigatePrev || isNavigating}
+        title={canNavigatePrev ? `Go to page ${currentPage - 1}` : 'First page'}
         aria-label={`Previous page (${currentPage - 1})`}
         data-testid="pdf-prev-button"
       />
@@ -69,18 +74,18 @@ export const PDFNavigationControls: React.FC<PDFNavigationControlsProps> = ({
       {/* Page Info */}
       <span 
         className={styles.pageInfo}
-        title={`Page ${currentPage} of ${totalPages}`}
+        title={`Page ${currentPage} of ${totalPages}${isNavigating ? ' - Loading...' : ''}`}
         data-testid="pdf-page-info"
       >
-        {currentPage}/{totalPages}
+        {isNavigating ? '...' : `${currentPage}/${totalPages}`}
       </span>
       
       {/* Next Page Button */}
       <button
         className={`${styles.controlButton} ${styles.nextButton}`}
         onClick={goToNextPage}
-        disabled={!hasNextPage}
-        title={`Go to page ${currentPage + 1}`}
+        disabled={!canNavigateNext || isNavigating}
+        title={canNavigateNext ? `Go to page ${currentPage + 1}` : 'Last page'}
         aria-label={`Next page (${currentPage + 1})`}
         data-testid="pdf-next-button"
       />
