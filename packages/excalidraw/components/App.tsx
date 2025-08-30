@@ -10457,30 +10457,43 @@ class App extends React.Component<AppProps, AppState> {
       sceneX,
       sceneY,
     );
-    const selectedImageElements = Object.fromEntries(
-      positionedImageElements.map((el) => [el.id, true as const]),
+    const positionedImageElementsMap = new Map(
+      positionedImageElements.map((el) => [el.id, el]),
     );
 
-    const allImageElements = [
-      ...positionedImageElements,
-      ...imageElements.filter((el) => el.isDeleted),
-    ];
-    const imageElementsMap = new Map(allImageElements.map((el) => [el.id, el]));
+    const deletedImageElements = imageElements.filter((el) => el.isDeleted);
+    const deletedImageElementsSet = new Set(
+      deletedImageElements.map((el) => el.id),
+    );
 
     const nextElements = this.scene
       .getElementsIncludingDeleted()
-      .map((element) => imageElementsMap.get(element.id) ?? element);
+      .filter((el) => !deletedImageElementsSet.has(el.id))
+      .map((element) => positionedImageElementsMap.get(element.id) ?? element);
 
-    this.updateScene({
-      appState: {
-        selectedElementIds: makeNextSelectedElementIds(
-          selectedImageElements,
-          this.state,
-        ),
-      },
-      elements: nextElements,
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-    });
+    if (positionedImageElements.length > 0) {
+      const selectedElements = Object.fromEntries(
+        positionedImageElements.map((el) => [el.id, true as const]),
+      );
+      this.updateScene({
+        appState: {
+          selectedElementIds: makeNextSelectedElementIds(
+            selectedElements,
+            this.state,
+          ),
+        },
+        elements: nextElements,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+    }
+
+    if (deletedImageElements.length > 0) {
+      const failedImageElements = imageElements.filter((el) => el.isDeleted);
+      this.updateScene({
+        elements: [...nextElements, ...failedImageElements],
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+    }
 
     this.setState({}, () => {
       // actionFinalize after all state values have been updated
