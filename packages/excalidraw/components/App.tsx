@@ -10421,26 +10421,16 @@ class App extends React.Component<AppProps, AppState> {
     sceneY: number,
   ) => {
     // Create, position, and insert placeholders
-    const placeholderElements = imageFiles.map(() =>
-      this.newImagePlaceholder({
-        sceneX,
-        sceneY,
-      }),
-    );
-
-    const positionedPlaceholderElements = positionElementsOnGrid(
-      placeholderElements,
+    const placeholders = positionElementsOnGrid(
+      imageFiles.map(() => this.newImagePlaceholder({ sceneX, sceneY })),
       sceneX,
       sceneY,
     );
-
-    positionedPlaceholderElements.forEach((element) =>
-      this.scene.insertElement(element),
-    );
+    placeholders.forEach((el) => this.scene.insertElement(el));
 
     // Create, position, insert and select initialized (replacing placeholders)
-    const imageElements = await Promise.all(
-      positionedPlaceholderElements.map(async (placeholder, i) => {
+    const initialized = await Promise.all(
+      placeholders.map(async (placeholder, i) => {
         try {
           return await this.initializeImage(placeholder, imageFiles[i]);
         } catch (error: any) {
@@ -10452,33 +10442,26 @@ class App extends React.Component<AppProps, AppState> {
       }),
     );
 
-    const positionedImageElements = positionElementsOnGrid(
-      imageElements.filter((el) => !el.isDeleted),
+    const succeeded = positionElementsOnGrid(
+      initialized.filter((el) => !el.isDeleted),
       sceneX,
       sceneY,
     );
-    const positionedImageElementsMap = new Map(
-      positionedImageElements.map((el) => [el.id, el]),
-    );
+    const succeededMap = new Map(succeeded.map((el) => [el.id, el]));
 
-    const deletedImageElements = imageElements.filter((el) => el.isDeleted);
-    const deletedImageElementsSet = new Set(
-      deletedImageElements.map((el) => el.id),
-    );
+    const failed = initialized.filter((el) => el.isDeleted);
+    const failedSet = new Set(failed.map((el) => el.id));
 
     const nextElements = this.scene
       .getElementsIncludingDeleted()
-      .filter((el) => !deletedImageElementsSet.has(el.id))
-      .map((element) => positionedImageElementsMap.get(element.id) ?? element);
+      .filter((el) => !failedSet.has(el.id))
+      .map((element) => succeededMap.get(element.id) ?? element);
 
-    if (positionedImageElements.length > 0) {
-      const selectedElements = Object.fromEntries(
-        positionedImageElements.map((el) => [el.id, true as const]),
-      );
+    if (succeeded.length > 0) {
       this.updateScene({
         appState: {
           selectedElementIds: makeNextSelectedElementIds(
-            selectedElements,
+            Object.fromEntries(succeeded.map((el) => [el.id, true])),
             this.state,
           ),
         },
@@ -10487,10 +10470,9 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    if (deletedImageElements.length > 0) {
-      const failedImageElements = imageElements.filter((el) => el.isDeleted);
+    if (failed.length > 0) {
       this.updateScene({
-        elements: [...nextElements, ...failedImageElements],
+        elements: [...nextElements, ...failed],
         captureUpdate: CaptureUpdateAction.NEVER,
       });
     }
