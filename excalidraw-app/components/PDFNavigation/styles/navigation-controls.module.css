@@ -1,0 +1,170 @@
+/* PDF Navigation Controls Styles */
+
+.navigationControls {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 16px;
+  padding: 6px 12px;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  user-select: none;
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  
+  /* Smooth transitions for position changes */
+  transition: opacity 0.2s ease-in-out;
+}
+
+.navigationControls:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.controlButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 4px 6px;
+  margin: 0 2px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  transition: all 0.15s ease;
+}
+
+.controlButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.controlButton:active {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0.95);
+}
+
+.controlButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.controlButton:disabled:hover {
+  background: none;
+  transform: none;
+}
+
+.pageInfo {
+  margin: 0 8px;
+  font-size: 11px;
+  opacity: 0.9;
+  white-space: nowrap;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Arrow icons using CSS */
+.prevButton::before {
+  content: "‹";
+  font-size: 16px;
+  line-height: 1;
+}
+
+.nextButton::before {
+  content: "›";
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Responsive scaling for different zoom levels */
+@media (max-width: 768px) {
+  .navigationControls {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+  
+  .controlButton {
+    padding: 3px 5px;
+    font-size: 13px;
+  }
+  
+  .pageInfo {
+    font-size: 10px;
+    margin: 0 6px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .navigationControls {
+    background: black;
+    border: 2px solid white;
+  }
+  
+  .controlButton:hover {
+    background: white;
+    color: black;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .navigationControls {
+    transition: none;
+  }
+  
+  .controlButton {
+    transition: none;
+  }
+  
+  .controlButton:active {
+    transform: none;
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: light) {
+  .navigationControls {
+    background: rgba(255, 255, 255, 0.8);
+    color: #1a1a1a;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4px);
+  }
+  
+  .navigationControls:hover {
+    background: rgba(255, 255, 255, 0.9);
+  }
+  
+  .controlButton {
+    color: #1a1a1a;
+  }
+  
+  .controlButton:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+  
+  .controlButton:active {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Focus styles for accessibility */
+.controlButton:focus {
+  outline: 2px solid #007acc;
+  outline-offset: 1px;
+}
+
+@media (prefers-color-scheme: light) {
+  .controlButton:focus {
+    outline-color: #0066cc;
+  }
+}

@@ -140,6 +140,7 @@ import "./index.scss";
 
 import type { CollabAPI } from "./collab/Collab";
 import { usePDFHandlers } from "./hooks/usePDFHandlers.js";
+import { PDFNavigationControls } from "./components/PDFNavigation";
 
 polyfill();
 
@@ -934,6 +935,7 @@ const ExcalidrawWrapper = () => {
             onToggle={() => setIsChatVisible(!isChatVisible)}
           />
         )}
+        {excalidrawAPI && <PDFNavigationControls excalidrawAPI={excalidrawAPI} />}
 
         <TTDDialogTrigger />
         {isCollaborating && isOffline && (
