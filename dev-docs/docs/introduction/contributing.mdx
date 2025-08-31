@@ -15,7 +15,7 @@ In case you want to pick up something from the roadmap, comment on that issue an
 1. Run `yarn` to install dependencies
 1. Create a branch for your PR with `git checkout -b your-branch-name`
 
-> To keep `master` branch pointing to remote repository and make pull requests from branches on your fork. To do this, run:
+> To keep `master` branch pointing to remote repository and make pull requests from branches on your fork, run:
 >
 > ```bash
 > git remote add upstream https://github.com/excalidraw/excalidraw.git
@@ -52,15 +52,6 @@ Make sure the title starts with a semantic prefix:
 - **chore**: Other changes that don't modify src or test files
 - **revert**: Reverts a previous commit
 
-### Changelog
-
-Add a brief description of your pull request to the changelog located here: [changelog](https://github.com/excalidraw/excalidraw/blob/master/CHANGELOG.md)
-
-Notes:
-
-- Make sure to prepend to the section corresponding with the semantic prefix you selected in the title
-- Link to your pull request - this will require updating the CHANGELOG _after_ creating the pull request
-
 ### Testing
 
 Once you submit your pull request it will automatically be tested. Be sure to check the results of the test and fix any issues that arise.
@@ -69,6 +60,10 @@ It's also a good idea to consider if your change should include additional tests
 
 Finally - always manually test your changes using the convenient staging environment deployed for each pull request. As much as local development attempts to replicate production, there can still be subtle differences in behavior. For larger features consider testing your change in multiple browsers as well.
 
+:::note
+Some checks, such as the `lint` and `test`, require approval from the maintainers to run. 
+They will appear as `Expected — Waiting for status to be reported` in the PR checks when they are waiting for approval.
+:::
 
 ## Translating
 

@@ -1,0 +1,50 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Test <App/> > should show error modal when using brave and measureText API is not working 1`] = `
+<div
+  data-testid="brave-measure-text-error"
+>
+  <p>
+    Looks like you are using Brave browser with the 
+    <span
+      style="font-weight: 600;"
+    >
+      Aggressively Block Fingerprinting
+    </span>
+     setting enabled.
+  </p>
+  <p>
+    This could result in breaking the 
+    <span
+      style="font-weight: 600;"
+    >
+      Text Elements
+    </span>
+     in your drawings.
+  </p>
+  <p>
+    We strongly recommend disabling this setting. You can follow 
+    <a
+      href="http://docs.excalidraw.com/docs/@excalidraw/excalidraw/faq#turning-off-aggresive-block-fingerprinting-in-brave-browser"
+    >
+      these steps
+    </a>
+     on how to do so.
+  </p>
+  <p>
+    If disabling this setting doesn't fix the display of text elements, please open an 
+    <a
+      href="https://github.com/excalidraw/excalidraw/issues/new"
+    >
+      issue
+    </a>
+     on our GitHub, or write us on 
+    <a
+      href="https://discord.gg/UexuTaE"
+    >
+      Discord
+      .
+    </a>
+  </p>
+</div>
+`;

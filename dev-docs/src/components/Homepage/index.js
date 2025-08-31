@@ -1,5 +1,6 @@
-import React from "react";
 import clsx from "clsx";
+import React from "react";
+
 import styles from "./styles.module.css";
 
 const FeatureList = [
@@ -15,7 +16,7 @@ const FeatureList = [
     Svg: require("@site/static/img/undraw_blank_canvas.svg").default,
     description: (
       <>
-        Want to build your own app powered by Excalidraw by don't know where to
+        Want to build your own app powered by Excalidraw but don't know where to
         start?
       </>
     ),

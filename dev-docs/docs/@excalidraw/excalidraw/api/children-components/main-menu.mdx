@@ -38,6 +38,7 @@ To render an item, its recommended to use `MainMenu.Item`.
 | Prop | Type | Required | Default | Description |
 | --- | --- | :-: | :-: | --- |
 | `onSelect` | `function` | Yes | - | Triggered when selected (via mouse). Calling `event.preventDefault()` will stop menu from closing. |
+| `selected` | `boolean` | No | `false` | Whether item is active |
 | `children` | `React.ReactNode` | Yes | - | The content of the menu item |
 | `icon` | `JSX.Element` | No | - | The icon used in the menu item |
 | `shortcut` | `string` | No | - | The shortcut to be shown for the menu item |
@@ -70,6 +71,7 @@ function App() {
 | Prop | Type | Required | Default | Description |
 | --- | --- | :-: | :-: | --- |
 | `onSelect` | `function` | No | - | Triggered when selected (via mouse). Calling `event.preventDefault()` will stop menu from closing. |
+| `selected` | `boolean` | No | `false` | Whether item is active |
 | `href` | `string` | Yes | - | The `href` attribute to be added to the `anchor` element. |
 | `children` | `React.ReactNode` | Yes | - | The content of the menu item |
 | `icon` | `JSX.Element` | No | - | The icon used in the menu item |
@@ -131,7 +133,7 @@ function App() {
 }
 ```
 
-Here is a [complete list](https://github.com/excalidraw/excalidraw/blob/master/src/components/mainMenu/DefaultItems.tsx) of the default items.
+Here is a [complete list](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/components/main-menu/DefaultItems.tsx) of the default items.
 
 ### MainMenu.Group
 

@@ -4,8 +4,16 @@
 !.eslintrc.json
 !.npmrc
 !.prettierrc
+!excalidraw-app/
 !package.json
 !public/
-!src/
+!packages/
+!scripts/
 !tsconfig.json
 !yarn.lock
+
+# keep (sub)sub directories at the end to exclude from explicit included
+# e.g. ./packages/excalidraw/{dist,node_modules}
+**/build
+**/dist
+**/node_modules

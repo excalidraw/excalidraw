@@ -1,0 +1,190 @@
+@import "open-color/open-color.scss";
+
+@mixin isMobile() {
+  @at-root .excalidraw--mobile#{&} {
+    @content;
+  }
+}
+
+@mixin toolbarButtonColorStates {
+  &.fillable {
+    .ToolIcon_type_radio,
+    .ToolIcon_type_checkbox {
+      &:checked + .ToolIcon__icon {
+        --icon-fill-color: var(--color-on-primary-container);
+
+        svg {
+          fill: var(--icon-fill-color);
+        }
+      }
+    }
+  }
+
+  .ToolIcon_type_radio,
+  .ToolIcon_type_checkbox {
+    &:checked + .ToolIcon__icon {
+      background: var(--color-surface-primary-container);
+      --keybinding-color: var(--color-on-primary-container);
+
+      svg {
+        color: var(--color-on-primary-container);
+      }
+    }
+  }
+
+  .ToolIcon__keybinding {
+    bottom: 4px;
+    right: 4px;
+  }
+
+  .ToolIcon__icon {
+    &:hover {
+      background: var(--button-hover-bg);
+    }
+
+    &:active {
+      background: var(--button-hover-bg);
+      border: 1px solid var(--button-active-border);
+
+      svg {
+        color: var(--color-on-primary-container);
+      }
+    }
+
+    &[aria-disabled="true"] {
+      background: initial;
+      border: none;
+
+      svg {
+        color: var(--color-disabled);
+      }
+    }
+  }
+}
+
+@mixin outlineButtonStyles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.625rem;
+  width: var(--button-width, var(--default-button-size));
+  height: var(--button-height, var(--default-button-size));
+  box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--button-border, var(--default-border-color));
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  background-color: var(--button-bg, var(--island-bg-color));
+  color: var(--button-color, var(--color-on-surface));
+  font-family: var(--ui-font);
+
+  svg {
+    width: var(--button-width, var(--lg-icon-size));
+    height: var(--button-height, var(--lg-icon-size));
+  }
+
+  &:hover {
+    background-color: var(--button-hover-bg, var(--island-bg-color));
+    border-color: var(
+      --button-hover-border,
+      var(--button-border, var(--default-border-color))
+    );
+    color: var(
+      --button-hover-color,
+      var(--button-color, var(--text-primary-color, inherit))
+    );
+  }
+
+  &:active {
+    background-color: var(--button-active-bg, var(--island-bg-color));
+    border-color: var(--button-active-border, var(--color-primary-darkest));
+  }
+
+  &.active {
+    background-color: var(
+      --button-selected-bg,
+      var(--color-surface-primary-container)
+    );
+    border-color: var(
+      --button-selected-border,
+      var(--color-surface-primary-container)
+    );
+
+    &:hover {
+      background-color: var(
+        --button-selected-hover-bg,
+        var(--color-surface-primary-container)
+      );
+    }
+
+    svg {
+      color: var(--button-color, var(--color-on-primary-container));
+    }
+  }
+}
+
+@mixin outlineButtonIconStyles {
+  @include outlineButtonStyles;
+  padding: 0;
+
+  svg {
+    width: var(--default-icon-size);
+    height: var(--default-icon-size);
+  }
+}
+
+@mixin avatarStyles {
+  width: var(--avatar-size, 1.5rem);
+  height: var(--avatar-size, 1.5rem);
+  position: relative;
+  border-radius: 100%;
+  outline-offset: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-gray-90);
+  flex: 0 0 auto;
+
+  &:active {
+    transform: scale(0.94);
+  }
+
+  &-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    bottom: -3px;
+    left: -3px;
+    border-radius: 100%;
+  }
+
+  &.is-followed::before {
+    border-color: var(--color-primary-hover);
+    box-shadow: 0 0 0 1px var(--color-primary-hover);
+  }
+  &.is-current-user {
+    cursor: auto;
+  }
+}
+
+@mixin filledButtonOnCanvas {
+  border: none;
+  box-shadow: 0 0 0 1px var(--color-surface-lowest);
+  background-color: var(--color-surface-low);
+
+  &:active {
+    box-shadow: 0 0 0 1px var(--color-brand-active);
+  }
+}

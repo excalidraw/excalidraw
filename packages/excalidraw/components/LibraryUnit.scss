@@ -1,0 +1,185 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .library-unit {
+    align-items: center;
+    border: 1px solid transparent;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    width: 55px;
+    height: 55px;
+    box-sizing: border-box;
+    border-radius: var(--border-radius-lg);
+
+    svg {
+      // to prevent clicks on links and such
+      pointer-events: none;
+    }
+
+    &--hover {
+      border-color: var(--color-primary);
+    }
+
+    &--selected {
+      border-color: var(--color-primary);
+      border-width: 1px;
+    }
+
+    &--skeleton {
+      opacity: 0.5;
+      background: linear-gradient(
+        -45deg,
+        var(--color-gray-10),
+        var(--color-gray-20),
+        var(--color-gray-10)
+      );
+      background-size: 200% 200%;
+      animation: library-unit__skeleton-opacity-animation 0.2s linear;
+    }
+  }
+
+  &.theme--dark .library-unit--skeleton {
+    background-image: linear-gradient(
+      -45deg,
+      var(--color-gray-100),
+      var(--color-gray-80),
+      var(--color-gray-100)
+    );
+  }
+
+  .library-unit__dragger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+  }
+
+  .library-unit__dragger > svg {
+    filter: var(--theme-filter);
+    flex-grow: 1;
+    max-height: 100%;
+    max-width: 100%;
+  }
+
+  .library-unit__checkbox-container,
+  .library-unit__checkbox-container:hover,
+  .library-unit__checkbox-container:active {
+    align-items: center;
+    background: none;
+    border: none;
+    color: var(--icon-fill-color);
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0.5rem;
+    position: absolute;
+    left: 2rem;
+    bottom: 2rem;
+    cursor: pointer;
+
+    input {
+      cursor: pointer;
+    }
+  }
+
+  .library-unit__checkbox {
+    position: absolute;
+    top: 0.125rem;
+    right: 0.125rem;
+    margin: 0;
+
+    .Checkbox-box {
+      margin: 0;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 4px;
+      background-color: var(--color-primary-light);
+      border: 1px solid var(--color-primary);
+      box-shadow: none !important;
+      padding: 2px;
+    }
+
+    &.Checkbox:hover {
+      .Checkbox-box {
+        background-color: var(--color-primary-light);
+      }
+    }
+
+    &.is-checked {
+      .Checkbox-box {
+        background-color: var(--color-primary) !important;
+
+        svg {
+          color: var(--color-primary-light);
+        }
+      }
+    }
+  }
+
+  .library-unit__removeFromLibrary > svg {
+    height: 16px;
+    width: 16px;
+  }
+
+  .library-unit__adder {
+    transform: scale(1);
+    animation: library-unit__adder-animation 1s ease-in infinite;
+
+    position: absolute;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: var(--color-primary);
+    border-radius: var(--border-radius-md);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    pointer-events: none;
+
+    svg {
+      color: var(--color-primary-light);
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  .library-unit:active .library-unit__adder {
+    animation: none;
+    transform: scale(0.8);
+  }
+
+  .library-unit__active {
+    cursor: pointer;
+  }
+
+  @keyframes library-unit__adder-animation {
+    0% {
+      transform: scale(0.85);
+    }
+
+    50% {
+      transform: scale(1);
+    }
+
+    100% {
+      transform: scale(0.85);
+    }
+  }
+
+  @keyframes library-unit__skeleton-opacity-animation {
+    0% {
+      opacity: 0;
+    }
+
+    75% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 0.5;
+    }
+  }
+}

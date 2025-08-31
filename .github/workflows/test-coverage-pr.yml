@@ -1,0 +1,26 @@
+name: Test Coverage PR
+on:
+  pull_request:
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Install Node"
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18.x"
+      - name: "Install Deps"
+        run: yarn install
+      - name: "Test Coverage"
+        run: yarn test:coverage
+      - name: "Report Coverage"
+        if: always() # Also generate the report if tests are failing
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

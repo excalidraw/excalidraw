@@ -1,6 +1,11 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
+// Set the env variable to false so the excalidraw npm package doesn't throw
+// process undefined as docusaurus doesn't expose env variables by default
+
+process.env.IS_PREACT = "false";
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Excalidraw developer docs",
@@ -10,7 +15,7 @@ const config = {
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
+  favicon: "img/favicon.png",
   organizationName: "Excalidraw", // Usually your GitHub org/user name.
   projectName: "excalidraw", // Usually your repo name.
 
@@ -36,10 +41,7 @@ const config = {
           showLastUpdateTime: true,
         },
         theme: {
-          customCss: [
-            require.resolve("./src/css/custom.scss"),
-            require.resolve("../src/packages/excalidraw/example/App.scss"),
-          ],
+          customCss: [require.resolve("./src/css/custom.scss")],
         },
       }),
     ],
@@ -64,7 +66,7 @@ const config = {
             label: "Docs",
           },
           {
-            to: "https://blog.excalidraw.com",
+            to: "https://plus.excalidraw.com/blog",
             label: "Blog",
             position: "left",
           },
@@ -109,7 +111,7 @@ const config = {
             items: [
               {
                 label: "Blog",
-                to: "https://blog.excalidraw.com",
+                to: "https://plus.excalidraw.com/blog",
               },
               {
                 label: "GitHub",
@@ -123,7 +125,7 @@ const config = {
       prism: {
         theme: require("prism-react-renderer/themes/dracula"),
       },
-      image: "img/og-image.png",
+      image: "img/og-image-2.png",
       docs: {
         sidebar: {
           hideable: true,
@@ -139,7 +141,38 @@ const config = {
       },
     }),
   themes: ["@docusaurus/theme-live-codeblock"],
-  plugins: ["docusaurus-plugin-sass"],
+  plugins: [
+    "docusaurus-plugin-sass",
+    [
+      "docusaurus2-dotenv",
+      {
+        systemvars: true,
+      },
+    ],
+    function () {
+      return {
+        name: "disable-fully-specified-error",
+        configureWebpack() {
+          return {
+            module: {
+              rules: [
+                {
+                  test: /\.m?js$/,
+                  resolve: {
+                    fullySpecified: false,
+                  },
+                },
+              ],
+            },
+            optimization: {
+              // disable terser minification
+              minimize: false,
+            },
+          };
+        },
+      };
+    },
+  ],
 };
 
 module.exports = config;

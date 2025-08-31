@@ -1,0 +1,160 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  --avatar-size: 1.75rem;
+  --avatarList-gap: 0.625rem;
+  --userList-padding: var(--space-factor);
+
+  .UserList__wrapper {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    align-items: center;
+    pointer-events: none !important;
+  }
+
+  .UserList {
+    pointer-events: none;
+    padding: var(--userList-padding);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--avatarList-gap);
+
+    box-sizing: border-box;
+
+    --max-size: calc(
+      var(--avatar-size) * var(--max-avatars, 2) + var(--avatarList-gap) *
+        (var(--max-avatars, 2) - 1) + var(--userList-padding) * 2
+    );
+
+    // max width & height set to fix the max-avatars
+    max-height: var(--max-size);
+    max-width: var(--max-size);
+
+    // Tweak in 30px increments to fit more/fewer avatars in a row/column ^^
+  }
+
+  .UserList > * {
+    pointer-events: var(--ui-pointerEvents);
+  }
+
+  .UserList_mobile {
+    padding: 0;
+    justify-content: normal;
+    margin: 0.5rem 0;
+    max-width: none;
+    max-height: none;
+  }
+
+  .UserList__more {
+    @include avatarStyles;
+    background-color: var(--color-gray-20);
+    border: 0 !important;
+    font-size: 0.625rem;
+    font-weight: 400;
+    flex-shrink: 0;
+    color: var(--color-gray-100);
+    font-weight: bold;
+  }
+
+  .UserList__collaborator-name {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .UserList__collaborator--avatar-only {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    .UserList__collaborator-status-icon {
+      --size: 14px;
+      position: absolute;
+      display: flex;
+      flex: 0 0 auto;
+      bottom: -0.25rem;
+      right: -0.25rem;
+      width: var(--size);
+      height: var(--size);
+      svg {
+        flex: 0 0 auto;
+        width: var(--size);
+        height: var(--size);
+      }
+    }
+  }
+
+  .UserList__collaborator-status-icons {
+    margin-left: auto;
+    flex: 0 0 auto;
+    min-width: 2.25rem;
+    gap: 0.25rem;
+    justify-content: flex-end;
+    display: flex;
+  }
+
+  .UserList__collaborator.is-muted
+    .UserList__collaborator-status-icon-microphone-muted {
+    color: var(--color-danger);
+    filter: drop-shadow(0px 0px 0px rgba(0, 0, 0, 0.5));
+  }
+
+  .UserList__collaborator-status-icon-speaking-indicator {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+    width: 1rem;
+    padding: 0 3px;
+    box-sizing: border-box;
+
+    div {
+      width: 0.125rem;
+      height: 0.4rem;
+      // keep this in sync with constants.ts
+      background-color: #a2f1a6;
+    }
+
+    div:nth-of-type(1) {
+      animation: speaking-indicator-anim 1s -0.45s ease-in-out infinite;
+    }
+
+    div:nth-of-type(2) {
+      animation: speaking-indicator-anim 1s -0.9s ease-in-out infinite;
+    }
+
+    div:nth-of-type(3) {
+      animation: speaking-indicator-anim 1s -0.15s ease-in-out infinite;
+    }
+  }
+
+  @keyframes speaking-indicator-anim {
+    0%,
+    100% {
+      transform: scaleY(1);
+    }
+
+    50% {
+      transform: scaleY(2);
+    }
+  }
+
+  --userlist-hint-bg-color: var(--color-gray-10);
+  --userlist-hint-heading-color: var(--color-gray-80);
+  --userlist-hint-text-color: var(--color-gray-60);
+  --userlist-collaborators-border-color: var(--color-gray-20);
+
+  &.theme--dark {
+    --userlist-hint-bg-color: var(--color-gray-90);
+    --userlist-hint-heading-color: var(--color-gray-30);
+    --userlist-hint-text-color: var(--color-gray-40);
+    --userlist-collaborators-border-color: var(--color-gray-80);
+  }
+
+  .UserList__collaborators {
+    top: auto;
+    max-height: 50vh;
+  }
+}

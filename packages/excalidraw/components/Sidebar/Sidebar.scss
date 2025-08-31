@@ -1,0 +1,176 @@
+@import "open-color/open-color";
+@import "../../css/variables.module.scss";
+
+.excalidraw {
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 5;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    background-color: var(--sidebar-bg-color);
+    box-shadow: var(--sidebar-shadow);
+
+    pointer-events: var(--ui-pointerEvents);
+
+    :root[dir="rtl"] & {
+      left: 0;
+      right: auto;
+    }
+
+    &--docked {
+      box-shadow: none;
+    }
+
+    overflow: hidden;
+    border-radius: 0;
+    width: calc(var(--right-sidebar-width) - var(--space-factor) * 2);
+
+    border-left: 1px solid var(--sidebar-border-color);
+
+    :root[dir="rtl"] & {
+      border-right: 1px solid var(--sidebar-border-color);
+      border-left: 0;
+    }
+  }
+
+  // ---------------------------- sidebar header ------------------------------
+
+  .sidebar__header {
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 1rem 0.75rem;
+    position: relative;
+
+    &::after {
+      content: "";
+      width: calc(100% - 1.5rem);
+      height: 1px;
+      background: var(--sidebar-border-color);
+      position: absolute;
+      bottom: -1px;
+    }
+  }
+
+  .sidebar__header__buttons {
+    gap: 0;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+
+    button {
+      @include outlineButtonStyles;
+      --button-bg: transparent;
+      border: 0 !important;
+
+      width: var(--lg-button-size);
+      height: var(--lg-button-size);
+      padding: 0;
+
+      svg {
+        width: var(--lg-icon-size);
+        height: var(--lg-icon-size);
+      }
+
+      &:hover {
+        background: var(--button-hover-bg, var(--island-bg-color));
+      }
+    }
+
+    .sidebar__dock.selected {
+      svg {
+        stroke: var(--color-primary);
+        fill: var(--color-primary);
+      }
+    }
+  }
+
+  // ---------------------------- sidebar tabs ------------------------------
+
+  .sidebar-tabs-root {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    padding: 1rem 0;
+
+    [role="tabpanel"] {
+      flex: 1;
+      outline: none;
+
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      outline: none;
+    }
+
+    [role="tabpanel"][data-state="inactive"] {
+      display: none !important;
+    }
+
+    [role="tablist"] {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    }
+  }
+
+  .sidebar-tabs-root > .sidebar__header {
+    padding-top: 0;
+    padding-bottom: 1rem;
+  }
+
+  .sidebar-tab-trigger {
+    --button-width: auto;
+    --button-bg: transparent;
+    --button-hover-bg: transparent;
+    --button-active-bg: var(--color-primary);
+    --button-hover-color: var(--color-primary);
+    --button-hover-border: var(--color-primary);
+
+    &[data-state="active"] {
+      --button-bg: var(--color-primary);
+      --button-hover-bg: var(--color-primary-darker);
+      --button-hover-color: var(--color-icon-white);
+      --button-border: var(--color-primary);
+      color: var(--color-icon-white);
+    }
+  }
+
+  // ---------------------------- default sidebar ------------------------------
+
+  .default-sidebar {
+    display: flex;
+    flex-direction: column;
+
+    .sidebar-triggers {
+      $padding: 2px;
+      $border: 1px;
+      display: flex;
+      gap: 0;
+      padding: $padding;
+      // offset by padding + border to vertically center the list with sibling
+      // buttons (both from top and bototm, due to flex layout)
+      margin-top: -#{$padding + $border};
+      margin-bottom: -#{$padding + $border};
+      border: $border solid var(--sidebar-border-color);
+      background: var(--default-bg-color);
+      border-radius: 0.625rem;
+
+      .sidebar-tab-trigger {
+        height: var(--lg-button-size);
+        width: var(--lg-button-size);
+
+        border: none;
+      }
+    }
+  }
+}

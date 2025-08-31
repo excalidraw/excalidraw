@@ -1,0 +1,123 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  --ExcTextField--color: var(--color-on-surface);
+  --ExcTextField--label-color: var(--color-on-surface);
+  --ExcTextField--background: var(--color-surface-low);
+  --ExcTextField--readonly--background: var(--color-surface-high);
+  --ExcTextField--readonly--color: var(--color-on-surface);
+  --ExcTextField--border: var(--color-gray-20);
+  --ExcTextField--readonly--border: var(--color-border-outline-variant);
+  --ExcTextField--border-hover: var(--color-brand-hover);
+  --ExcTextField--border-active: var(--color-brand-active);
+  --ExcTextField--placeholder: var(--color-border-outline-variant);
+
+  .ExcTextField {
+    position: relative;
+
+    svg {
+      position: absolute;
+      top: 50%; // 50% is not exactly in the center of the input
+      transform: translateY(-50%);
+      left: 0.75rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--color-gray-40);
+      z-index: 1;
+    }
+
+    &--fullWidth {
+      width: 100%;
+      flex-grow: 1;
+    }
+
+    &__label {
+      font-family: "Assistant";
+      font-style: normal;
+      font-weight: 600;
+      font-size: 0.875rem;
+      line-height: 150%;
+
+      color: var(--ExcTextField--label-color);
+
+      margin-bottom: 0.25rem;
+      user-select: none;
+    }
+
+    &__input {
+      box-sizing: border-box;
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      height: 3rem;
+
+      background: var(--ExcTextField--background);
+      border: 1px solid var(--ExcTextField--border);
+      border-radius: 0.5rem;
+
+      padding: 0 0.75rem;
+
+      &:not(&--readonly) {
+        &:hover {
+          border-color: var(--ExcTextField--border-hover);
+        }
+
+        &:active,
+        &:focus-within {
+          border-color: var(--ExcTextField--border-active);
+        }
+      }
+
+      & input {
+        display: flex;
+        align-items: center;
+
+        border: none;
+        outline: none;
+        padding: 0;
+        margin: 0;
+
+        height: 1.5rem;
+
+        color: var(--ExcTextField--color);
+
+        font-family: "Assistant";
+        font-style: normal;
+        font-weight: 400;
+        font-size: 1rem;
+        line-height: 150%;
+        text-overflow: ellipsis;
+
+        background: transparent;
+
+        width: 100%;
+
+        &:not(:focus) {
+          &:hover {
+            background-color: initial;
+          }
+        }
+
+        &:focus {
+          outline: initial;
+          box-shadow: initial;
+        }
+      }
+
+      &--readonly {
+        background: var(--ExcTextField--readonly--background);
+        border-color: var(--ExcTextField--readonly--border);
+
+        & input {
+          color: var(--ExcTextField--readonly--color);
+        }
+      }
+    }
+
+    &--hasIcon .ExcTextField__input {
+      padding-left: 2.5rem;
+    }
+  }
+}

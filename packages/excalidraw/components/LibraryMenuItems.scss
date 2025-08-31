@@ -1,0 +1,99 @@
+@import "open-color/open-color";
+
+.excalidraw {
+  --container-padding-y: 1.5rem;
+  --container-padding-x: 0.75rem;
+
+  .library-menu-items__no-items {
+    text-align: center;
+    color: var(--color-gray-70);
+    line-height: 1.5;
+    font-size: 0.875rem;
+    width: 100%;
+
+    &__label {
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 1.125rem;
+      margin-bottom: 0.75rem;
+    }
+  }
+
+  &.theme--dark {
+    .library-menu-items__no-items {
+      color: var(--color-gray-40);
+    }
+  }
+
+  .library-menu-items-container {
+    width: 100%;
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    overflow-y: auto;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    margin: 0;
+
+    position: relative;
+
+    & > div {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+
+    &__row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    &__items {
+      row-gap: 0.5rem;
+      padding: var(--container-padding-y) 0;
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      margin-bottom: 1rem;
+    }
+
+    &__header {
+      color: var(--color-primary);
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      width: 100%;
+      padding-right: 4rem; // due to dropdown button
+      box-sizing: border-box;
+
+      &--excal {
+        margin-top: 2rem;
+      }
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-gap: 1rem;
+    }
+
+    .separator {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin: 0.6em 0.2em;
+      color: var(--text-primary-color);
+    }
+  }
+
+  .library-menu-items-private-library-container {
+    // so that when you toggle between pending item and no items, there's
+    // no layout shift (this is hardcoded and works only with ENG locale)
+    min-height: 3.75rem;
+    width: 100%;
+  }
+}

@@ -1,0 +1,109 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .picker {
+    padding: 0.5rem;
+    background: var(--popup-bg-color);
+    border: 0 solid transparentize($oc-white, 0.75);
+    box-shadow: var(--shadow-island);
+    border-radius: 4px;
+    position: absolute;
+    :root[dir="rtl"] & {
+      padding: 0.4rem;
+    }
+  }
+
+  .picker-container button,
+  .picker button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:focus-visible {
+      outline: transparent;
+      background-color: var(--button-gray-2);
+      & svg {
+        opacity: 1;
+      }
+    }
+
+    &:hover {
+      background-color: var(--button-gray-2);
+    }
+
+    &:active {
+      background-color: var(--button-gray-3);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    svg {
+      margin: 0;
+      width: 36px;
+      height: 18px;
+      pointer-events: none;
+    }
+  }
+
+  .picker button {
+    padding: 0.25rem 0.28rem 0.35rem 0.25rem;
+  }
+
+  .picker-content {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    grid-gap: 0.5rem;
+    border-radius: 4px;
+  }
+
+  .picker-collapsible {
+    font-size: 0.75rem;
+    padding: 0.5rem 0;
+  }
+
+  .picker-keybinding {
+    position: absolute;
+    bottom: 2px;
+    font-size: 0.7em;
+    color: var(--keybinding-color);
+
+    :root[dir="ltr"] & {
+      right: 2px;
+    }
+
+    :root[dir="rtl"] & {
+      left: 2px;
+    }
+    @include isMobile {
+      display: none;
+    }
+  }
+
+  .picker-type-canvasBackground .picker-keybinding {
+    color: #aaa;
+  }
+
+  .picker-type-elementBackground .picker-keybinding {
+    color: $oc-white;
+  }
+
+  .picker-swatch[aria-label="transparent"] .picker-keybinding {
+    color: #aaa;
+  }
+
+  .picker-type-elementStroke .picker-keybinding {
+    color: #d4d4d4;
+  }
+
+  &.theme--dark {
+    .picker-type-elementBackground .picker-keybinding {
+      color: $oc-black;
+    }
+    .picker-swatch[aria-label="transparent"] .picker-keybinding {
+      color: $oc-black;
+    }
+  }
+}
