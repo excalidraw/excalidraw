@@ -287,7 +287,15 @@ export default function ExampleApp({
     const file = await fileOpen({ description: "Excalidraw or library file" });
     const contents = await loadSceneOrLibraryFromBlob(file, null, null);
     if (contents.type === MIME_TYPES.excalidraw) {
-      excalidrawAPI?.updateScene(contents.data as any);
+      const sceneData = contents.data as any;
+      
+      // Add files first if they exist
+      if (sceneData.files) {
+        excalidrawAPI?.addFiles(sceneData.files);
+      }
+      
+      // Then update the scene
+      excalidrawAPI?.updateScene(sceneData);
     } else if (contents.type === MIME_TYPES.excalidrawlib) {
       excalidrawAPI?.updateLibrary({
         libraryItems: (contents.data as ImportedLibraryData).libraryItems!,
