@@ -10441,40 +10441,29 @@ class App extends React.Component<AppProps, AppState> {
         }
       }),
     );
+    const initializedMap = arrayToMap(initialized);
 
-    const succeeded = positionElementsOnGrid(
+    const positioned = positionElementsOnGrid(
       initialized.filter((el) => !el.isDeleted),
       sceneX,
       sceneY,
     );
-    const succeededMap = arrayToMap(succeeded);
-
-    const failed = initialized.filter((el) => el.isDeleted);
-    const failedMap = arrayToMap(failed);
+    const positionedMap = arrayToMap(positioned);
 
     const nextElements = this.scene
       .getElementsIncludingDeleted()
-      .map((el) => succeededMap.get(el.id) ?? failedMap.get(el.id) ?? el);
+      .map((el) => positionedMap.get(el.id) ?? initializedMap.get(el.id) ?? el);
 
-    if (succeeded.length > 0) {
-      this.updateScene({
-        appState: {
-          selectedElementIds: makeNextSelectedElementIds(
-            Object.fromEntries(succeeded.map((el) => [el.id, true])),
-            this.state,
-          ),
-        },
-        elements: nextElements.filter((el) => !failedMap.has(el.id)),
-        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-      });
-    }
-
-    if (failed.length > 0) {
-      this.updateScene({
-        elements: nextElements,
-        captureUpdate: CaptureUpdateAction.NEVER,
-      });
-    }
+    this.updateScene({
+      appState: {
+        selectedElementIds: makeNextSelectedElementIds(
+          Object.fromEntries(positioned.map((el) => [el.id, true])),
+          this.state,
+        ),
+      },
+      elements: nextElements,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
 
     this.setState({}, () => {
       // actionFinalize after all state values have been updated
