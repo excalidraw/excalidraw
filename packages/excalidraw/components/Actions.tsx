@@ -451,10 +451,10 @@ export const ShapesSwitcher = ({
               <DropdownMenu.Item
                 onSelect={() => app.onMagicframeToolSelect()}
                 icon={MagicIcon}
+                badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
                 data-testid="toolbar-magicframe"
               >
                 {t("toolBar.magicframe")}
-                <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
               </DropdownMenu.Item>
             </>
           )}

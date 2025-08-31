@@ -8,8 +8,6 @@ import {
   useHandleDropdownMenuItemClick,
 } from "./common";
 
-import type { JSX } from "react";
-
 const DropdownMenuSubItem = ({
   icon,
   onSelect,
@@ -18,7 +16,7 @@ const DropdownMenuSubItem = ({
   className,
   ...rest
 }: {
-  icon?: JSX.Element;
+  icon?: React.ReactNode;
   onSelect: (event: Event) => void;
   children: React.ReactNode;
   shortcut?: string;
@@ -30,8 +28,7 @@ const DropdownMenuSubItem = ({
     <DropdownMenuPrimitive.Item className="radix-menu-item">
       <Button
         {...rest}
-        onClick={handleClick}
-        onSelect={() => {}}
+        onSelect={handleClick}
         type="button"
         className={getDropdownMenuItemClassName(className)}
         title={rest.title ?? rest["aria-label"]}

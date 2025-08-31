@@ -3,6 +3,8 @@ import React, { useEffect, useRef } from "react";
 
 import { EVENT, KEYS } from "@excalidraw/common";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useStable } from "../../hooks/useStable";
 import { useDevice } from "../App";
@@ -10,8 +12,6 @@ import { Island } from "../Island";
 import Stack from "../Stack";
 
 import { DropdownMenuContentPropsContext } from "./common";
-
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 
 const MenuContent = ({
   children,
@@ -89,7 +89,7 @@ const MenuContent = ({
         ) : (
           <Island
             className="dropdown-menu-container"
-            padding={1}
+            padding={2}
             style={{ zIndex: 2 }}
           >
             {children}

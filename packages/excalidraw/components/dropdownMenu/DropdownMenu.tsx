@@ -1,5 +1,7 @@
 import React from "react";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import DropdownMenuContent from "./DropdownMenuContent";
 import DropdownMenuGroup from "./DropdownMenuGroup";
 import DropdownMenuItem from "./DropdownMenuItem";
@@ -13,8 +15,6 @@ import {
 } from "./dropdownMenuUtils";
 
 import "./DropdownMenu.scss";
-
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 
 const DropdownMenu = ({
   children,

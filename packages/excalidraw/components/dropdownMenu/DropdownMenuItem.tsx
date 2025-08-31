@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 
 import { THEME } from "@excalidraw/common";
 
@@ -22,53 +22,41 @@ import type { JSX } from "react";
 const DropdownMenuItem = ({
   icon,
   value,
+  badge,
   order,
   children,
   shortcut,
   className,
-  hovered,
   selected,
-  textStyle,
   onSelect,
   onClick,
   ...rest
 }: {
   icon?: JSX.Element;
+  badge?: React.ReactNode;
   value?: string | number | undefined;
   order?: number;
   onSelect?: (event: Event) => void;
   children: React.ReactNode;
   shortcut?: string;
-  hovered?: boolean;
+
   selected?: boolean;
-  textStyle?: React.CSSProperties;
+
   className?: string;
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">) => {
   const handleClick = useHandleDropdownMenuItemClick(onClick, onSelect);
   const ref = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (hovered) {
-      if (order === 0) {
-        // scroll into the first item differently, so it's visible what is above (i.e. group title)
-        ref.current?.scrollIntoView({ block: "end" });
-      } else {
-        ref.current?.scrollIntoView({ block: "nearest" });
-      }
-    }
-  }, [hovered, order]);
 
   return (
     <DropdownMenuPrimitive.Item className="radix-menu-item">
       <Button
         {...rest}
         ref={ref}
-        // onClick={handleClick}
         onSelect={handleClick}
-        className={getDropdownMenuItemClassName(className, selected, hovered)}
+        className={getDropdownMenuItemClassName(className)}
         title={rest.title ?? rest["aria-label"]}
       >
-        <MenuItemContent textStyle={textStyle} icon={icon} shortcut={shortcut}>
+        <MenuItemContent icon={icon} shortcut={shortcut} badge={badge}>
           {children}
         </MenuItemContent>
       </Button>

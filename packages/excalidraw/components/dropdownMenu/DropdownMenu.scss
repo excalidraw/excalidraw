@@ -7,6 +7,7 @@
 
   .dropdown-menu {
     max-width: 16rem;
+    margin-top: 0.25rem;
 
     &__submenu-trigger {
       &[aria-expanded="true"] {
@@ -60,6 +61,7 @@
 
     .dropdown-menu-item-base {
       display: flex;
+      padding: 0 0.625rem;
       column-gap: 0.625rem;
       font-size: 0.875rem;
       color: var(--color-on-surface);
@@ -125,7 +127,7 @@
       border: 1px solid transparent;
       align-items: center;
       cursor: pointer;
-      border-radius: var(--border-radius-sm);
+      border-radius: var(--border-radius-md);
       flex: 1 0 auto;
 
       @media screen and (min-width: 1921px) {

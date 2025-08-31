@@ -1,7 +1,8 @@
 import clsx from "clsx";
 
-import { useDevice } from "../App";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
+import { useDevice } from "../App";
 
 const MenuTrigger = ({
   className = "",
