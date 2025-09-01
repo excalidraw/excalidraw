@@ -12534,10 +12534,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": null,
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -12759,6 +12756,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
+    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -12793,7 +12791,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "boundElements": null,
   "crop": null,
   "customData": undefined,
-  "fileId": "fileId",
+  "fileId": "id2",
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
@@ -12816,16 +12814,53 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "strokeWidth": 2,
   "type": "image",
   "updated": 1,
-  "version": 5,
+  "version": 7,
   "width": 318,
-  "x": -159,
+  "x": -212,
   "y": "-167.50000",
 }
 `;
 
-exports[`history > singleplayer undo/redo > should create new history entry on image drag&drop > [end of test] number of elements 1`] = `1`;
+exports[`history > singleplayer undo/redo > should create new history entry on image drag&drop > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "crop": null,
+  "customData": undefined,
+  "fileId": "id3",
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 77,
+  "id": "id1",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "scale": [
+    1,
+    1,
+  ],
+  "status": "pending",
+  "strokeColor": "transparent",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "image",
+  "updated": 1,
+  "version": 7,
+  "width": 56,
+  "x": 156,
+  "y": "-167.50000",
+}
+`;
 
-exports[`history > singleplayer undo/redo > should create new history entry on image drag&drop > [end of test] number of renders 1`] = `7`;
+exports[`history > singleplayer undo/redo > should create new history entry on image drag&drop > [end of test] number of elements 1`] = `2`;
+
+exports[`history > singleplayer undo/redo > should create new history entry on image drag&drop > [end of test] number of renders 1`] = `8`;
 
 exports[`history > singleplayer undo/redo > should create new history entry on image drag&drop > [end of test] redo stack 1`] = `[]`;
 
@@ -12837,6 +12872,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
         "deleted": {
           "selectedElementIds": {
             "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -12854,7 +12890,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
             "boundElements": null,
             "crop": null,
             "customData": undefined,
-            "fileId": "fileId",
+            "fileId": "id2",
             "fillStyle": "solid",
             "frameId": null,
             "groupIds": [],
@@ -12875,20 +12911,58 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "image",
-            "version": 5,
+            "version": 7,
             "width": 318,
-            "x": -159,
+            "x": -212,
             "y": "-167.50000",
           },
           "inserted": {
             "isDeleted": true,
-            "version": 4,
+            "version": 6,
+          },
+        },
+        "id1": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "crop": null,
+            "customData": undefined,
+            "fileId": "id3",
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 77,
+            "index": "a1",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "scale": [
+              1,
+              1,
+            ],
+            "status": "pending",
+            "strokeColor": "transparent",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "image",
+            "version": 7,
+            "width": 56,
+            "x": 156,
+            "y": "-167.50000",
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 6,
           },
         },
       },
       "updated": {},
     },
-    "id": "id4",
+    "id": "id7",
   },
 ]
 `;
@@ -12964,10 +13038,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": null,
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -12981,6 +13052,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
+    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -13015,11 +13087,11 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "boundElements": null,
   "crop": null,
   "customData": undefined,
-  "fileId": "fileId",
+  "fileId": "id2",
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 77,
+  "height": 335,
   "id": "id0",
   "index": "a0",
   "isDeleted": false,
@@ -13038,16 +13110,53 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "strokeWidth": 2,
   "type": "image",
   "updated": 1,
-  "version": 5,
-  "width": 56,
-  "x": -28,
-  "y": "-38.50000",
+  "version": 7,
+  "width": 318,
+  "x": -212,
+  "y": "-167.50000",
 }
 `;
 
-exports[`history > singleplayer undo/redo > should create new history entry on image paste > [end of test] number of elements 1`] = `1`;
+exports[`history > singleplayer undo/redo > should create new history entry on image paste > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "crop": null,
+  "customData": undefined,
+  "fileId": "id3",
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 77,
+  "id": "id1",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "scale": [
+    1,
+    1,
+  ],
+  "status": "pending",
+  "strokeColor": "transparent",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "image",
+  "updated": 1,
+  "version": 7,
+  "width": 56,
+  "x": 156,
+  "y": "-167.50000",
+}
+`;
 
-exports[`history > singleplayer undo/redo > should create new history entry on image paste > [end of test] number of renders 1`] = `7`;
+exports[`history > singleplayer undo/redo > should create new history entry on image paste > [end of test] number of elements 1`] = `2`;
+
+exports[`history > singleplayer undo/redo > should create new history entry on image paste > [end of test] number of renders 1`] = `8`;
 
 exports[`history > singleplayer undo/redo > should create new history entry on image paste > [end of test] redo stack 1`] = `[]`;
 
@@ -13059,6 +13168,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
         "deleted": {
           "selectedElementIds": {
             "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -13076,11 +13186,11 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
             "boundElements": null,
             "crop": null,
             "customData": undefined,
-            "fileId": "fileId",
+            "fileId": "id2",
             "fillStyle": "solid",
             "frameId": null,
             "groupIds": [],
-            "height": 77,
+            "height": 335,
             "index": "a0",
             "isDeleted": false,
             "link": null,
@@ -13097,20 +13207,58 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "image",
-            "version": 5,
-            "width": 56,
-            "x": -28,
-            "y": "-38.50000",
+            "version": 7,
+            "width": 318,
+            "x": -212,
+            "y": "-167.50000",
           },
           "inserted": {
             "isDeleted": true,
-            "version": 4,
+            "version": 6,
+          },
+        },
+        "id1": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "crop": null,
+            "customData": undefined,
+            "fileId": "id3",
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 77,
+            "index": "a1",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "scale": [
+              1,
+              1,
+            ],
+            "status": "pending",
+            "strokeColor": "transparent",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "image",
+            "version": 7,
+            "width": 56,
+            "x": 156,
+            "y": "-167.50000",
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 6,
           },
         },
       },
       "updated": {},
     },
-    "id": "id4",
+    "id": "id7",
   },
 ]
 `;
