@@ -28,11 +28,9 @@ export const isBrave = () =>
 export const isMobile =
   isIOS ||
   /android|webos|ipod|blackberry|iemobile|opera mini/i.test(
-    navigator.userAgent.toLowerCase(),
+    navigator.userAgent,
   ) ||
-  /android|ios|ipod|blackberry|windows phone/i.test(
-    navigator.platform.toLowerCase(),
-  );
+  /android|ios|ipod|blackberry|windows phone/i.test(navigator.platform);
 
 export const supportsResizeObserver =
   typeof window !== "undefined" && "ResizeObserver" in window;
@@ -525,3 +523,5 @@ export enum UserIdleState {
  * the start and end points)
  */
 export const LINE_POLYGON_POINT_MERGE_DISTANCE = 20;
+
+export const DOUBLE_TAP_POSITION_THRESHOLD = 35;
