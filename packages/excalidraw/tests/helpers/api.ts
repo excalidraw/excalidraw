@@ -478,33 +478,43 @@ export class API {
     });
   };
 
-  static drop = async (blob: Blob) => {
+  static drop = async (_blobs: Blob[] | Blob) => {
+    const blobs = Array.isArray(_blobs) ? _blobs : [_blobs];
     const fileDropEvent = createEvent.drop(GlobalTestState.interactiveCanvas);
-    const text = await new Promise<string>((resolve, reject) => {
-      try {
-        const reader = new FileReader();
-        reader.onload = () => {
-          resolve(reader.result as string);
-        };
-        reader.readAsText(blob);
-      } catch (error: any) {
-        reject(error);
-      }
-    });
+    const texts = await Promise.all(
+      blobs.map(
+        (blob) =>
+          new Promise<string>((resolve, reject) => {
+            try {
+              const reader = new FileReader();
+              reader.onload = () => {
+                resolve(reader.result as string);
+              };
+              reader.readAsText(blob);
+            } catch (error: any) {
+              reject(error);
+            }
+          }),
+      ),
+    );
 
-    const files = [blob] as File[] & { item: (index: number) => File };
+    const files = blobs as File[] & { item: (index: number) => File };
     files.item = (index: number) => files[index];
 
     Object.defineProperty(fileDropEvent, "dataTransfer", {
       value: {
         files,
         getData: (type: string) => {
-          if (type === blob.type || type === "text") {
-            return text;
+          const idx = blobs.findIndex((b) => b.type === type);
+          if (idx >= 0) {
+            return texts[idx];
+          }
+          if (type === "text") {
+            return texts.join("\n");
           }
           return "";
         },
-        types: [blob.type],
+        types: Array.from(new Set(blobs.map((b) => b.type))),
       },
     });
     Object.defineProperty(fileDropEvent, "clientX", {
@@ -513,7 +523,7 @@ export class API {
     Object.defineProperty(fileDropEvent, "clientY", {
       value: 0,
     });
-    
+
     await fireEvent(GlobalTestState.interactiveCanvas, fileDropEvent);
   };
 

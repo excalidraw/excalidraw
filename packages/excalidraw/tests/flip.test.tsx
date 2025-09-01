@@ -25,6 +25,7 @@ import { Excalidraw } from "../index";
 // Importing to spy on it and mock the implementation (mocking does not work with simple vi.mock for some reason)
 import * as blobModule from "../data/blob";
 
+import { SMILEY_IMAGE_DIMENSIONS } from "./fixtures/constants";
 import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import {
@@ -744,11 +745,6 @@ describe("freedraw", () => {
 //image
 //TODO: currently there is no test for pixel colors at flipped positions.
 describe("image", () => {
-  const smileyImageDimensions = {
-    width: 56,
-    height: 77,
-  };
-
   beforeEach(() => {
     // it's necessary to specify the height in order to calculate natural dimensions of the image
     h.state.height = 1000;
@@ -756,8 +752,8 @@ describe("image", () => {
 
   beforeAll(() => {
     mockHTMLImageElement(
-      smileyImageDimensions.width,
-      smileyImageDimensions.height,
+      SMILEY_IMAGE_DIMENSIONS.width,
+      SMILEY_IMAGE_DIMENSIONS.height,
     );
   });
 
