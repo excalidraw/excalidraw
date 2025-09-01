@@ -10420,11 +10420,13 @@ class App extends React.Component<AppProps, AppState> {
     sceneX: number,
     sceneY: number,
   ) => {
+    const gridPadding = 50 / this.state.zoom.value;
     // Create, position, and insert placeholders
     const placeholders = positionElementsOnGrid(
       imageFiles.map(() => this.newImagePlaceholder({ sceneX, sceneY })),
       sceneX,
       sceneY,
+      gridPadding,
     );
     placeholders.forEach((el) => this.scene.insertElement(el));
 
@@ -10447,6 +10449,7 @@ class App extends React.Component<AppProps, AppState> {
       initialized.filter((el) => !el.isDeleted),
       sceneX,
       sceneY,
+      gridPadding,
     );
     const positionedMap = arrayToMap(positioned);
 
