@@ -18,6 +18,8 @@ import { CanvasError, ImageSceneDataError } from "../errors";
 import { calculateScrollCenter } from "../scene";
 import { decodeSvgBase64Payload } from "../scene/export";
 
+import { isClipboardEvent } from "../clipboard";
+
 import { base64ToString, stringToBase64, toByteString } from "./encode";
 import { nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
@@ -395,10 +397,9 @@ export const getFilesFromEvent = async (
   let fileList: FileList | undefined = undefined;
   let items: DataTransferItemList | undefined = undefined;
 
-  if (event.type === "paste") {
-    const clipboardEvent = event as ClipboardEvent;
-    fileList = clipboardEvent.clipboardData?.files;
-    items = clipboardEvent.clipboardData?.items;
+  if (isClipboardEvent(event)) {
+    fileList = event.clipboardData?.files;
+    items = event.clipboardData?.items;
   } else {
     const dragEvent = event as React.DragEvent<HTMLDivElement>;
     fileList = dragEvent.dataTransfer?.files;
