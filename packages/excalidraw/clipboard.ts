@@ -220,7 +220,7 @@ function parseHTMLTree(el: ChildNode) {
       }
     } else if (node instanceof HTMLImageElement) {
       const url = node.getAttribute("src");
-      if (url && url.startsWith("http")) {
+      if (url && (url.startsWith("http") || url.startsWith("data:"))) {
         result.push({ type: "imageUrl", value: url });
       }
     } else {
