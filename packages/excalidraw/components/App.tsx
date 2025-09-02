@@ -865,6 +865,44 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private handleSkipBindMode() {
+    if (
+      this.state.selectedLinearElement?.pointerDownState &&
+      !this.state.selectedLinearElement.pointerDownState.arrowStartIsInside
+    ) {
+      invariant(
+        this.lastPointerMoveCoords,
+        "Missing last pointer move coords when changing bind skip mode for arrow start",
+      );
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      const hoveredElement = getHoveredElementForBinding(
+        pointFrom<GlobalPoint>(
+          this.lastPointerMoveCoords.x,
+          this.lastPointerMoveCoords.y,
+        ),
+        this.scene.getNonDeletedElements(),
+        elementsMap,
+      );
+      const element = LinearElementEditor.getElement(
+        this.state.selectedLinearElement.elementId,
+        elementsMap,
+      );
+
+      if (
+        element?.startBinding &&
+        hoveredElement?.id === element.startBinding.elementId
+      ) {
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            pointerDownState: {
+              ...this.state.selectedLinearElement.pointerDownState,
+              arrowStartIsInside: true,
+            },
+          },
+        });
+      }
+    }
+
     if (this.state.bindMode === "orbit") {
       if (this.bindModeHandler) {
         clearTimeout(this.bindModeHandler);
