@@ -270,11 +270,6 @@ const ColorPickerTrigger = ({
       }
       data-openpopup={type}
       onPointerDown={handlePointerDown}
-      onClick={(e) => {
-        // suppress Radix default toggle to avoid double-toggle flicker
-        e.preventDefault();
-        e.stopPropagation();
-      }}
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
       {compactMode && color && (
