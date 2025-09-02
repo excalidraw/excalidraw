@@ -457,17 +457,7 @@ export class LinearElementEditor {
 
       deltaX = target[0] - draggingPoint[0];
       deltaY = target[1] - draggingPoint[1];
-    } else if (
-      // shouldAllowDraggingPoint(
-      //   element,
-      //   scenePointerX,
-      //   scenePointerY,
-      //   selectedPointsIndices,
-      //   elementsMap,
-      //   app,
-      // )
-      true
-    ) {
+    } else {
       const newDraggingPointPosition = LinearElementEditor.createPointAt(
         element,
         elementsMap,

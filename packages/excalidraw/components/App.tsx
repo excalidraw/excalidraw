@@ -6208,7 +6208,7 @@ class App extends React.Component<AppProps, AppState> {
       // Hovering with a selected tool or creating new linear element via click
       // and point
       const { newElement } = this.state;
-      if (isBindingElement(newElement, false)) {
+      if (isBindingElement(newElement, false) && isBindingEnabled(this.state)) {
         this.setState({
           suggestedBinding: maybeSuggestBindingsForBindingElementAtCoords(
             newElement,
@@ -6217,8 +6217,6 @@ class App extends React.Component<AppProps, AppState> {
             pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
           ),
         });
-      } else {
-        this.maybeSuggestBindingAtCursor(scenePointer);
       }
     }
 
@@ -8280,11 +8278,13 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.origin.y,
       );
       const elementsMap = this.scene.getNonDeletedElementsMap();
-      const boundElement = getHoveredElementForBinding(
-        point,
-        this.scene.getNonDeletedElements(),
-        elementsMap,
-      );
+      const boundElement = isBindingEnabled(this.state)
+        ? getHoveredElementForBinding(
+            point,
+            this.scene.getNonDeletedElements(),
+            elementsMap,
+          )
+        : null;
 
       this.scene.mutateElement(element, {
         points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(0, 0)],
@@ -10701,20 +10701,6 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.isBindingEnabled !== shouldEnableBinding) {
       this.setState({ isBindingEnabled: shouldEnableBinding });
     }
-  };
-
-  private maybeSuggestBindingAtCursor = (pointerCoords: {
-    x: number;
-    y: number;
-  }): void => {
-    const hoveredBindableElement = getHoveredElementForBinding(
-      pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
-      this.scene.getNonDeletedElements(),
-      this.scene.getNonDeletedElementsMap(),
-    );
-    this.setState({
-      suggestedBinding: hoveredBindableElement ?? null,
-    });
   };
 
   private clearSelection(hitElement: ExcalidrawElement | null): void {
