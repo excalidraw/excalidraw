@@ -5,17 +5,21 @@ export class BinaryHeap<T> {
 
   sinkDown(idx: number) {
     const node = this.content[idx];
+    const nodeScore = this.scoreFunction(node);
+
     while (idx > 0) {
       const parentN = ((idx + 1) >> 1) - 1;
       const parent = this.content[parentN];
-      if (this.scoreFunction(node) < this.scoreFunction(parent)) {
-        this.content[parentN] = node;
+
+      if (nodeScore < this.scoreFunction(parent)) {
         this.content[idx] = parent;
-        idx = parentN; // TODO: Optimize
+        idx = parentN;
       } else {
         break;
       }
     }
+
+    this.content[idx] = node;
   }
 
   bubbleUp(idx: number) {
