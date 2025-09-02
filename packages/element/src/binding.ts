@@ -253,6 +253,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
   let start: BindingStrategy = { mode: undefined };
   let end: BindingStrategy = { mode: undefined };
 
+  const isMultiPoint = arrow.points.length > 2;
   const point = LinearElementEditor.getPointGlobalCoordinates(
     arrow,
     draggingPoints.get(startDragged ? startIdx : endIdx)!.point,
@@ -287,11 +288,13 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
       );
 
       return {
-        start: {
-          mode: "inside",
-          element: hit,
-          focusPoint: origin ?? center,
-        },
+        start: isMultiPoint
+          ? { mode: undefined }
+          : {
+              mode: "inside",
+              element: hit,
+              focusPoint: origin ?? center,
+            },
         end: { mode: "inside", element: hit, focusPoint: point },
       };
     }
@@ -335,7 +338,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
       }
 
       return {
-        start: other,
+        start: isMultiPoint ? { mode: undefined } : other,
         end: current,
       };
     }
@@ -362,8 +365,6 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
   }
 
   invariant(false, "New arrow creation should not reach here");
-
-  return { start, end };
 };
 
 const bindingStrategyForSimpleArrowEndpointDragging = (
@@ -371,14 +372,13 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
   oppositeBinding: FixedPointBinding | null,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  globalBindMode?: AppState["bindMode"],
-  opts?: {
-    appState?: AppState;
-  },
+  globalBindMode: AppState["bindMode"],
+  arrow: NonDeleted<ExcalidrawArrowElement>,
 ): { current: BindingStrategy; other: BindingStrategy } => {
   let current: BindingStrategy = { mode: undefined };
   let other: BindingStrategy = { mode: undefined };
 
+  const isMultiPoint = arrow.points.length > 2;
   const hit = getHoveredElementForBinding(point, elements, elementsMap);
 
   // If the global bind mode is in free binding mode, just bind
@@ -416,14 +416,14 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
         current = { element: hit, mode: "orbit", focusPoint: point };
         other = { mode: null };
 
-        return { current, other };
+        return { current, other: isMultiPoint ? { mode: undefined } : other };
       }
       // The opposite binding is inside the same element
       // eslint-disable-next-line no-else-return
       else {
         current = { element: hit, mode: "inside", focusPoint: point };
 
-        return { current, other };
+        return { current, other: isMultiPoint ? { mode: undefined } : other };
       }
     }
     // The opposite binding is on a different element
@@ -435,7 +435,7 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
         focusPoint: snapToCenter(hit, elementsMap, point),
       };
 
-      return { current, other };
+      return { current, other: isMultiPoint ? { mode: undefined } : other };
     }
   }
   // The opposite binding is on a different element or no binding
@@ -449,7 +449,7 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
 
   // Must return as only one endpoint is dragged, therefore
   // the end binding strategy might accidentally gets overriden
-  return { current, other };
+  return { current, other: isMultiPoint ? { mode: undefined } : other };
 };
 
 export const getBindingStrategyForDraggingBindingElementEndpoints = (
@@ -540,7 +540,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
       elementsMap,
       elements,
       globalBindMode,
-      { appState },
+      arrow,
     );
 
     return { start: current, end: other };
@@ -561,7 +561,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
       elementsMap,
       elements,
       globalBindMode,
-      { appState },
+      arrow,
     );
 
     return { start: other, end: current };

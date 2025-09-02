@@ -2217,11 +2217,19 @@ const pointDraggingUpdates = (
       ) || nextArrow.points[0]
     : nextArrow.points[0];
 
+  const endChanged =
+    pointDistance(
+      endLocalPoint,
+      nextArrow.points[nextArrow.points.length - 1],
+    ) !== 0;
+  const startChanged =
+    pointDistance(startLocalPoint, nextArrow.points[0]) !== 0;
+
   const indicesSet = new Set(selectedPointsIndices);
-  if (startBindable) {
+  if (startBindable && startChanged) {
     indicesSet.add(0);
   }
-  if (endBindable) {
+  if (endBindable && endChanged) {
     indicesSet.add(element.points.length - 1);
   }
   const indices = Array.from(indicesSet);
