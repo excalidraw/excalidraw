@@ -49,7 +49,6 @@ import {
   getFixedBindingDistance,
   isBindingEnabled,
   maybeSuggestBindingsForBindingElementAtCoords,
-  unbindBindingElement,
   updateBoundPoint,
 } from "./binding";
 import {
@@ -2235,11 +2234,11 @@ const pointDraggingUpdates = (
   const indices = Array.from(indicesSet);
 
   return {
-    updates:
-      Object.hasOwn(updates, "startBinding") ||
-      Object.hasOwn(updates, "endBinding")
-        ? updates
-        : undefined,
+    updates: updates.startBinding
+      ? {
+          startBinding: updates.startBinding,
+        }
+      : undefined,
     positions: new Map(
       indices.map((idx) => {
         return [
@@ -2281,9 +2280,6 @@ const shouldAllowDraggingPoint = (
     const inside = isPointInElement(scenePointer, boundElement, elementsMap);
     allowDrag =
       allowDrag && (dist > getFixedBindingDistance(boundElement) || inside);
-    if (allowDrag) {
-      unbindBindingElement(element, "start", app.scene);
-    }
   }
   if (
     selectedPointsIndices.includes(element.points.length - 1) &&
@@ -2296,9 +2292,6 @@ const shouldAllowDraggingPoint = (
     const inside = isPointInElement(scenePointer, boundElement, elementsMap);
     allowDrag =
       allowDrag && (dist > getFixedBindingDistance(boundElement) || inside);
-    if (allowDrag) {
-      unbindBindingElement(element, "end", app.scene);
-    }
   }
 
   return allowDrag;
