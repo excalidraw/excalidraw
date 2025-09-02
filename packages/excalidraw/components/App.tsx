@@ -1006,7 +1006,10 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
       }
-    } else if (!this.bindModeHandler && !this.state.newElement) {
+    } else if (
+      !this.bindModeHandler &&
+      (!this.state.newElement || !arrow.startBinding)
+    ) {
       // We are hovering a bindable element
       this.bindModeHandler = setTimeout(effector, BIND_MODE_TIMEOUT);
     }
