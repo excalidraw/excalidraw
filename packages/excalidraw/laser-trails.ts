@@ -15,6 +15,7 @@ export class LaserTrails implements Trail {
   private collabTrails = new Map<SocketId, AnimatedTrail>();
 
   private container?: SVGSVGElement;
+  private pathEndedAt: number | undefined = undefined;
 
   constructor(
     private animationFrameHandler: AnimationFrameHandler,
@@ -29,27 +30,32 @@ export class LaserTrails implements Trail {
   }
 
   private getTrailOptions() {
+    const size = 1.2;
+    const DECAY_DELAY = 0;
+    const DECAY_TIME = 1500;
+
     return {
       simplify: 0,
       streamline: 0.4,
-      sizeMapping: (c) => {
-        const DECAY_TIME = 1000;
-        const DECAY_LENGTH = 50;
-        const t = Math.max(
+      size,
+      sizeMapping: () => {
+        if (this.pathEndedAt === undefined) {
+          return size;
+        }
+        const timeElapsedSincePathEnded = performance.now() - this.pathEndedAt;
+        const delayApplied = Math.max(
           0,
-          1 - (performance.now() - c.pressure) / DECAY_TIME,
+          timeElapsedSincePathEnded - DECAY_DELAY,
         );
-        const l =
-          (DECAY_LENGTH -
-            Math.min(DECAY_LENGTH, c.totalLength - c.currentIndex)) /
-          DECAY_LENGTH;
-
-        return Math.min(easeOut(l), easeOut(t));
+        return (
+          size * easeOut(Math.max(0, DECAY_TIME - delayApplied) / DECAY_TIME)
+        );
       },
     } as Partial<LaserPointerOptions>;
   }
 
   startPath(x: number, y: number): void {
+    this.pathEndedAt = undefined;
     this.localTrail.startPath(x, y);
   }
 
@@ -58,6 +64,7 @@ export class LaserTrails implements Trail {
   }
 
   endPath(): void {
+    this.pathEndedAt = performance.now();
     this.localTrail.endPath();
   }
 
