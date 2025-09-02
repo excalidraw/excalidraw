@@ -898,7 +898,7 @@ class App extends React.Component<AppProps, AppState> {
     arrow: ExcalidrawArrowElement,
     hoveredElement: NonDeletedExcalidrawElement | null,
   ) {
-    if (isElbowArrow(arrow)) {
+    if (arrow.isDeleted || isElbowArrow(arrow)) {
       return;
     }
 
@@ -913,7 +913,7 @@ class App extends React.Component<AppProps, AppState> {
       if (!this.state.multiElement) {
         invariant(
           this.state.selectedLinearElement?.selectedPointsIndices?.length,
-          "There has to be at least one selected point to trigger bind mode change at arrow drag creation",
+          "There has to be at least one selected point to trigger bind mode change at arrow point drag",
         );
 
         const startDragged =
@@ -8708,6 +8708,10 @@ class App extends React.Component<AppProps, AppState> {
             elementsMap,
           );
 
+          if (element?.isDeleted) {
+            return;
+          }
+
           if (isBindingElement(element)) {
             const hoveredElement = getHoveredElementForBinding(
               pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
@@ -9195,7 +9199,7 @@ class App extends React.Component<AppProps, AppState> {
               newElement,
             });
           }
-        } else if (isLinearElement(newElement)) {
+        } else if (isLinearElement(newElement) && !newElement.isDeleted) {
           pointerDownState.drag.hasOccurred = true;
           const points = newElement.points;
 
