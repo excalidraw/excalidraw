@@ -25,9 +25,7 @@ import {
 
 import {
   deconstructLinearOrFreeDrawElement,
-  distanceToElement,
   isPathALoop,
-  isPointInElement,
   moveArrowAboveBindable,
   type Store,
 } from "@excalidraw/element";
@@ -46,7 +44,6 @@ import type {
 import {
   calculateFixedPointForNonElbowArrowBinding,
   getBindingStrategyForDraggingBindingElementEndpoints,
-  getFixedBindingDistance,
   isBindingEnabled,
   maybeSuggestBindingsForBindingElementAtCoords,
   updateBoundPoint,
@@ -60,12 +57,7 @@ import {
 import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
-import {
-  isArrowElement,
-  isBindingElement,
-  isElbowArrow,
-  isSimpleArrow,
-} from "./typeChecks";
+import { isArrowElement, isBindingElement, isElbowArrow } from "./typeChecks";
 
 import { ShapeCache, toggleLinePolygonState } from "./shape";
 
@@ -466,14 +458,15 @@ export class LinearElementEditor {
       deltaX = target[0] - draggingPoint[0];
       deltaY = target[1] - draggingPoint[1];
     } else if (
-      shouldAllowDraggingPoint(
-        element,
-        scenePointerX,
-        scenePointerY,
-        selectedPointsIndices,
-        elementsMap,
-        app,
-      )
+      // shouldAllowDraggingPoint(
+      //   element,
+      //   scenePointerX,
+      //   scenePointerY,
+      //   selectedPointsIndices,
+      //   elementsMap,
+      //   app,
+      // )
+      true
     ) {
       const newDraggingPointPosition = LinearElementEditor.createPointAt(
         element,
@@ -2254,48 +2247,48 @@ const pointDraggingUpdates = (
   };
 };
 
-const shouldAllowDraggingPoint = (
-  element: ExcalidrawLinearElement,
-  scenePointerX: number,
-  scenePointerY: number,
-  selectedPointsIndices: readonly number[],
-  elementsMap: Readonly<NonDeletedSceneElementsMap>,
-  app: AppClassProperties,
-) => {
-  if (!isSimpleArrow(element)) {
-    return true;
-  }
+// const shouldAllowDraggingPoint = (
+//   element: ExcalidrawLinearElement,
+//   scenePointerX: number,
+//   scenePointerY: number,
+//   selectedPointsIndices: readonly number[],
+//   elementsMap: Readonly<NonDeletedSceneElementsMap>,
+//   app: AppClassProperties,
+// ) => {
+//   if (!isSimpleArrow(element)) {
+//     return true;
+//   }
 
-  const scenePointer = pointFrom<GlobalPoint>(scenePointerX, scenePointerY);
+//   const scenePointer = pointFrom<GlobalPoint>(scenePointerX, scenePointerY);
 
-  // Do not allow dragging the bound arrow closer to the shape than
-  // the dragging threshold
-  let allowDrag = true;
+//   // Do not allow dragging the bound arrow closer to the shape than
+//   // the dragging threshold
+//   let allowDrag = true;
 
-  if (selectedPointsIndices.includes(0) && element.startBinding) {
-    const boundElement = elementsMap.get(
-      element.startBinding.elementId,
-    )! as ExcalidrawBindableElement;
-    const dist = distanceToElement(boundElement, elementsMap, scenePointer);
-    const inside = isPointInElement(scenePointer, boundElement, elementsMap);
-    allowDrag =
-      allowDrag && (dist > getFixedBindingDistance(boundElement) || inside);
-  }
-  if (
-    selectedPointsIndices.includes(element.points.length - 1) &&
-    element.endBinding
-  ) {
-    const boundElement = elementsMap.get(
-      element.endBinding.elementId,
-    )! as ExcalidrawBindableElement;
-    const dist = distanceToElement(boundElement, elementsMap, scenePointer);
-    const inside = isPointInElement(scenePointer, boundElement, elementsMap);
-    allowDrag =
-      allowDrag && (dist > getFixedBindingDistance(boundElement) || inside);
-  }
+//   if (selectedPointsIndices.includes(0) && element.startBinding) {
+//     const boundElement = elementsMap.get(
+//       element.startBinding.elementId,
+//     )! as ExcalidrawBindableElement;
+//     const dist = distanceToElement(boundElement, elementsMap, scenePointer);
+//     const inside = isPointInElement(scenePointer, boundElement, elementsMap);
+//     allowDrag =
+//       allowDrag && (dist > getFixedBindingDistance(boundElement) || inside);
+//   }
+//   if (
+//     selectedPointsIndices.includes(element.points.length - 1) &&
+//     element.endBinding
+//   ) {
+//     const boundElement = elementsMap.get(
+//       element.endBinding.elementId,
+//     )! as ExcalidrawBindableElement;
+//     const dist = distanceToElement(boundElement, elementsMap, scenePointer);
+//     const inside = isPointInElement(scenePointer, boundElement, elementsMap);
+//     allowDrag =
+//       allowDrag && (dist > getFixedBindingDistance(boundElement) || inside);
+//   }
 
-  return allowDrag;
-};
+//   return allowDrag;
+// };
 
 const determineCustomLinearAngle = (
   pivotPoint: LocalPoint,
