@@ -284,6 +284,7 @@ export const actionDeleteSelected = register({
           type: app.defaultSelectionTool,
         }),
         multiElement: null,
+        newElement: null,
         activeEmbeddable: null,
         selectedLinearElement: null,
       },
