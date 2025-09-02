@@ -46,6 +46,7 @@ import type {
 import {
   calculateFixedPointForNonElbowArrowBinding,
   getBindingStrategyForDraggingBindingElementEndpoints,
+  getFixedBindingDistance,
   isBindingEnabled,
   maybeSuggestBindingsForBindingElementAtCoords,
   unbindBindingElement,
@@ -2159,8 +2160,18 @@ const pointDraggingUpdates = (
         ),
       offsetEndLocalPoint,
     ],
-    startBinding: updates.startBinding ?? element.startBinding,
-    endBinding: updates.endBinding ?? element.endBinding,
+    startBinding:
+      updates.startBinding === undefined
+        ? element.startBinding
+        : updates.startBinding === null
+        ? null
+        : updates.startBinding,
+    endBinding:
+      updates.endBinding === undefined
+        ? element.endBinding
+        : updates.endBinding === null
+        ? null
+        : updates.endBinding,
   };
 
   // We need to use a custom intersector to ensure that if there is a big "jump"
@@ -2224,7 +2235,11 @@ const pointDraggingUpdates = (
   const indices = Array.from(indicesSet);
 
   return {
-    updates: start.mode || end.mode ? updates : undefined,
+    updates:
+      Object.hasOwn(updates, "startBinding") ||
+      Object.hasOwn(updates, "endBinding")
+        ? updates
+        : undefined,
     positions: new Map(
       indices.map((idx) => {
         return [
@@ -2259,10 +2274,13 @@ const shouldAllowDraggingPoint = (
   let allowDrag = true;
 
   if (selectedPointsIndices.includes(0) && element.startBinding) {
-    const boundElement = elementsMap.get(element.startBinding.elementId)!;
+    const boundElement = elementsMap.get(
+      element.startBinding.elementId,
+    )! as ExcalidrawBindableElement;
     const dist = distanceToElement(boundElement, elementsMap, scenePointer);
     const inside = isPointInElement(scenePointer, boundElement, elementsMap);
-    allowDrag = allowDrag && (dist > DRAGGING_THRESHOLD || inside);
+    allowDrag =
+      allowDrag && (dist > getFixedBindingDistance(boundElement) || inside);
     if (allowDrag) {
       unbindBindingElement(element, "start", app.scene);
     }
@@ -2271,10 +2289,13 @@ const shouldAllowDraggingPoint = (
     selectedPointsIndices.includes(element.points.length - 1) &&
     element.endBinding
   ) {
-    const boundElement = elementsMap.get(element.endBinding.elementId)!;
+    const boundElement = elementsMap.get(
+      element.endBinding.elementId,
+    )! as ExcalidrawBindableElement;
     const dist = distanceToElement(boundElement, elementsMap, scenePointer);
     const inside = isPointInElement(scenePointer, boundElement, elementsMap);
-    allowDrag = allowDrag && (dist > DRAGGING_THRESHOLD || inside);
+    allowDrag =
+      allowDrag && (dist > getFixedBindingDistance(boundElement) || inside);
     if (allowDrag) {
       unbindBindingElement(element, "end", app.scene);
     }
