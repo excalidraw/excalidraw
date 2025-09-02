@@ -126,7 +126,7 @@ export class EraserTrail extends AnimatedTrail {
 
           this.elementsToErase.delete(element.id);
         }
-      } else if (!restoreToErase && !this.elementsToErase.has(element.id)) {
+      } else if (!restoreToErase && !this.elementsToErase.has(element.id) && this.isEraserTarget(element.type)) {
         const intersects = eraserTest(
           pathSegment,
           element,
@@ -166,6 +166,25 @@ export class EraserTrail extends AnimatedTrail {
     }
 
     return Array.from(this.elementsToErase);
+  }
+
+  private isEraserTarget(type: ExcalidrawElement["type"]) {
+    switch (type) {
+      case "freedraw":
+        return this.app.state.eraserTargets.freedraw
+      case "rectangle":
+      case "diamond":
+      case "ellipse":
+      case "arrow":
+      case "line":
+        return this.app.state.eraserTargets.shape
+      case "text":
+        return this.app.state.eraserTargets.text
+      case "image":
+        return this.app.state.eraserTargets.image
+      default:
+        return false
+    }
   }
 
   endPath(): void {

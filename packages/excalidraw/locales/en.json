@@ -77,6 +77,7 @@
     "architect": "Architect",
     "artist": "Artist",
     "cartoonist": "Cartoonist",
+    "eraserTargets": "Eraser targets",
     "fileTitle": "File name",
     "colorPicker": "Color picker",
     "canvasColors": "Used on canvas",

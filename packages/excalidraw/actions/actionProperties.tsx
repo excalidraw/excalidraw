@@ -126,6 +126,10 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  FreedrawIcon,
+  RectangleIcon,
+  TextIcon,
+  ImageIcon
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -140,6 +144,7 @@ import {
 import { register } from "./register";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
+import { ButtonIcon } from "../components/ButtonIcon";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -1808,4 +1813,60 @@ export const actionChangeArrowType = register({
       </fieldset>
     );
   },
+});
+
+export const actionChangeEraserTargets = register({
+  name: "changeEraserTargets",
+  label: "labels.eraserTargets",
+  trackEvent: false,
+  perform: (elements, appState, value: AppState["eraserTargets"]) => {
+    return {
+      appState: {
+        eraserTargets: {
+          ...appState.eraserTargets,
+          ...value,
+        }
+      },
+      captureUpdate: CaptureUpdateAction.NEVER
+    }
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.eraserTargets")}</legend>
+      <div className="buttonList">
+        <ButtonIcon
+          title={t("element.freedraw")}
+          icon={FreedrawIcon}
+          active={appState.eraserTargets.freedraw}
+          onClick={ () => { updateData({
+            freedraw: !appState.eraserTargets.freedraw
+          }) }}
+        />
+        <ButtonIcon
+          title={t("headings.shapes")}
+          icon={RectangleIcon}
+          active={appState.eraserTargets.shape}
+          onClick={ () => { updateData({
+            shape: !appState.eraserTargets.shape
+          }) }}
+        />
+        <ButtonIcon
+          title={t("element.text")}
+          icon={TextIcon}
+          active={appState.eraserTargets.text}
+          onClick={ () => { updateData({
+            text: !appState.eraserTargets.text
+          }) }}
+        />
+        <ButtonIcon
+          title={t("element.image")}
+          icon={ImageIcon}
+          active={appState.eraserTargets.image}
+          onClick={() => { updateData({
+            image: !appState.eraserTargets.image
+          }) }}
+        />
+      </div>
+    </fieldset>
+  ),
 });
