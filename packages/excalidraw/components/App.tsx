@@ -2475,7 +2475,7 @@ class App extends React.Component<AppProps, AppState> {
       isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
       canFitSidebar: editorWidth > sidebarBreakpoint,
       showCompactSidebar:
-        this.isMobileOrTablet() && editorWidth > MQ_MAX_WIDTH_PORTRAIT,
+        this.isMobileOrTablet() && editorWidth >= MQ_MAX_WIDTH_PORTRAIT,
     });
 
     if (prevEditorState !== nextEditorState) {
