@@ -662,6 +662,7 @@ export type UIOptions = Partial<{
   tools: {
     image: boolean;
   };
+  libraryEnabled?: boolean;
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
 }>;
