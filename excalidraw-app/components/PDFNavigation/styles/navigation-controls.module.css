@@ -13,7 +13,7 @@
   font-size: 12px;
   font-weight: 500;
   user-select: none;
-  pointer-events: auto;
+  pointer-events: none;
   backdrop-filter: blur(4px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -42,6 +42,7 @@
   justify-content: center;
   min-width: 20px;
   transition: all 0.15s ease;
+  pointer-events: auto;
 }
 
 .controlButton:hover {
