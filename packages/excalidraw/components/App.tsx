@@ -982,9 +982,10 @@ class App extends React.Component<AppProps, AppState> {
 
         // Once the start is set to inside binding, it remains so
         const arrowStartIsInside =
-          this.state.selectedLinearElement.pointerDownState
+          !this.state.newElement &&
+          (this.state.selectedLinearElement.pointerDownState
             .arrowStartIsInside ||
-          arrow.startBinding?.elementId === hoveredElement.id;
+            arrow.startBinding?.elementId === hoveredElement.id);
 
         // Change the global binding mode
         flushSync(() => {
