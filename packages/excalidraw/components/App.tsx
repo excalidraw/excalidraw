@@ -6284,6 +6284,18 @@ class App extends React.Component<AppProps, AppState> {
             },
             { informMutation: false, isDragging: false },
           );
+          if (this.state.selectedLinearElement?.pointerDownState) {
+            this.setState({
+              selectedLinearElement: {
+                ...this.state.selectedLinearElement,
+                selectedPointsIndices: [multiElement.points.length - 1],
+                pointerDownState: {
+                  ...this.state.selectedLinearElement.pointerDownState,
+                  lastClickedPoint: multiElement.points.length - 1,
+                },
+              },
+            });
+          }
         } else {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
           // in this branch, we're inside the commit zone, and no uncommitted
@@ -8374,12 +8386,13 @@ class App extends React.Component<AppProps, AppState> {
                 ),
               },
             };
-            nextSelectedElementIds = makeNextSelectedElementIds(
-              { [element.id]: true },
-              prevState,
-            );
           }
         }
+
+        nextSelectedElementIds = makeNextSelectedElementIds(
+          { [element.id]: true },
+          prevState,
+        );
 
         return {
           ...prevState,
@@ -8758,6 +8771,14 @@ class App extends React.Component<AppProps, AppState> {
             );
 
             this.handleDelayedBindModeChange(element, hoveredElement);
+          }
+
+          if (
+            event.altKey &&
+            !this.state.selectedLinearElement?.pointerDownState
+              ?.arrowStartIsInside
+          ) {
+            this.handleSkipBindMode();
           }
 
           const newState = LinearElementEditor.handlePointDragging(
