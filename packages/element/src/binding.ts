@@ -295,7 +295,9 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
               element: hit,
               focusPoint: origin ?? center,
             },
-        end: { mode: "inside", element: hit, focusPoint: point },
+        end: isMultiPoint
+          ? { mode: "orbit", element: hit, focusPoint: point }
+          : { mode: "inside", element: hit, focusPoint: point },
       };
     }
 
