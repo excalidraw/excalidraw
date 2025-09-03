@@ -359,9 +359,7 @@ export const ColorPicker = ({
                 // toggle off on same trigger
                 updateData({ openPopup: null });
               } else if (appState.openPopup) {
-                // switching
-                updateData({ openPopup: null });
-                setTimeout(() => updateData({ openPopup: type }), 0);
+                updateData({ openPopup: type });
               } else {
                 // open this one
                 updateData({ openPopup: type });

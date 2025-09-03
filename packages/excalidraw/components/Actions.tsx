@@ -25,6 +25,8 @@ import {
 
 import { hasStrokeColor, toolIsArrow } from "@excalidraw/element";
 
+import { flushSync } from "react-dom";
+
 import type {
   ExcalidrawElement,
   ExcalidrawElementType,
@@ -321,6 +323,7 @@ export const CompactShapeActions = ({
   const targetElements = getTargetElements(elementsMap, appState);
   const [strokePopoverOpen, setStrokePopoverOpen] = useState(false);
   const [otherActionsPopoverOpen, setOtherActionsPopoverOpen] = useState(false);
+  const [textPopoverOpen, setTextPopoverOpen] = useState(false);
   const [preventTextAlignClose, setPreventTextAlignClose] = useState(false);
   const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus();
   const { container } = useExcalidrawContainer();
@@ -363,11 +366,11 @@ export const CompactShapeActions = ({
 
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
-  // Close local popovers any time a global popup (appState.openPopup) opens/switches
   useEffect(() => {
-    if (appState.openPopup) {
+    if (appState.openPopup === "fontFamily") {
       setStrokePopoverOpen(false);
       setOtherActionsPopoverOpen(false);
+      setTextPopoverOpen(false);
     }
   }, [appState.openPopup]);
 
@@ -402,7 +405,15 @@ export const CompactShapeActions = ({
               setStrokePopoverOpen(open);
               if (open) {
                 setOtherActionsPopoverOpen(false);
-                setAppState({ openPopup: null });
+                setTextPopoverOpen(false);
+                // Only close specific global popups that conflict with local popovers
+                // Don't interfere with normal global popup switching
+                if (
+                  appState.openPopup === "fontFamily" ||
+                  appState.openPopup === "arrowProperties"
+                ) {
+                  setAppState({ openPopup: null });
+                }
               }
             }}
           >
@@ -417,7 +428,14 @@ export const CompactShapeActions = ({
                     const next = !open;
                     if (next) {
                       setOtherActionsPopoverOpen(false);
-                      setAppState({ openPopup: null });
+                      setTextPopoverOpen(false);
+                      // Only close specific global popups that conflict with local popovers
+                      if (
+                        appState.openPopup === "fontFamily" ||
+                        appState.openPopup === "arrowProperties"
+                      ) {
+                        setAppState({ openPopup: null });
+                      }
                     }
                     return next;
                   });
@@ -477,6 +495,7 @@ export const CompactShapeActions = ({
                 setAppState({ openPopup: "arrowProperties" });
                 setStrokePopoverOpen(false);
                 setOtherActionsPopoverOpen(false);
+                setTextPopoverOpen(false);
               }
             }}
           >
@@ -492,6 +511,7 @@ export const CompactShapeActions = ({
                   } else {
                     setStrokePopoverOpen(false);
                     setOtherActionsPopoverOpen(false);
+                    setTextPopoverOpen(false);
                     setAppState({ openPopup: "arrowProperties" });
                   }
                 }}
@@ -564,35 +584,38 @@ export const CompactShapeActions = ({
           <div className="compact-action-item">
             {renderAction("changeFontFamily", {
               compactMode: true,
-              onPreventClose: () => setPreventTextAlignClose(true),
             })}
           </div>
           <div className="compact-action-item">
             <Popover.Root
-              open={appState.openPopup === "textAlign"}
+              open={textPopoverOpen}
               onOpenChange={(open) => {
-                if (!open) {
+                setTextPopoverOpen(open);
+                if (open) {
+                  // Save current caret position before opening popover
+                  if (appState.editingTextElement) {
+                    saveCaretPosition();
+                  }
+                  setStrokePopoverOpen(false);
+                  setOtherActionsPopoverOpen(false);
+                  // Only close specific global popups that conflict with local popovers
+                  // Don't interfere with normal global popup switching
+                  if (
+                    appState.openPopup === "fontFamily" ||
+                    appState.openPopup === "arrowProperties"
+                  ) {
+                    setAppState({ openPopup: null });
+                  }
+                } else {
                   // If we're preventing close due to selection, ignore this close event
                   if (preventTextAlignClose) {
                     setPreventTextAlignClose(false);
                     return;
                   }
-
-                  setAppState({ openPopup: null });
-
                   // Refocus text editor if it was being edited and restore caret position
                   if (appState.editingTextElement) {
                     restoreCaretPosition();
                   }
-                } else {
-                  // Save current caret position before opening popover
-                  if (appState.editingTextElement) {
-                    saveCaretPosition();
-                  }
-
-                  setAppState({ openPopup: "textAlign" });
-                  setStrokePopoverOpen(false);
-                  setOtherActionsPopoverOpen(false);
                 }
               }}
             >
@@ -606,13 +629,45 @@ export const CompactShapeActions = ({
                     if (appState.editingTextElement) {
                       e.preventDefault();
                     }
+
+                    // Handle switching from any global popup (font family, elementStroke, etc.)
+                    if (appState.openPopup) {
+                      // First close the global popup
+                      flushSync(() => {
+                        setAppState({ openPopup: null });
+                      });
+                      // Then open text popover in next tick
+                      if (appState.editingTextElement) {
+                        saveCaretPosition();
+                      }
+                      setTextPopoverOpen(false);
+                      setStrokePopoverOpen(false);
+                      setOtherActionsPopoverOpen(false);
+                    } else {
+                      // Normal toggle behavior
+                      setTextPopoverOpen((open) => {
+                        const next = !open;
+                        if (next) {
+                          // Save current caret position before opening popover
+                          if (appState.editingTextElement) {
+                            saveCaretPosition();
+                          }
+                          setStrokePopoverOpen(false);
+                          setOtherActionsPopoverOpen(false);
+                        }
+                        return next;
+                      });
+                    }
                   }}
-                  onClick={() => {}}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
                 >
                   {TextSizeIcon}
                 </button>
               </Popover.Trigger>
-              {appState.openPopup === "textAlign" && (
+              {textPopoverOpen && (
                 <PropertiesPopover
                   className={PROPERTIES_CLASSES}
                   container={container}
@@ -620,7 +675,7 @@ export const CompactShapeActions = ({
                   // Improve focus handling for text editing scenarios
                   preventAutoFocusOnTouch={!!appState.editingTextElement}
                   onClose={() => {
-                    setAppState({ openPopup: null });
+                    setTextPopoverOpen(false);
                     // Refocus text editor when popover closes with caret restoration
                     if (appState.editingTextElement) {
                       restoreCaretPosition();
@@ -676,7 +731,7 @@ export const CompactShapeActions = ({
               setOtherActionsPopoverOpen(open);
               if (open) {
                 setStrokePopoverOpen(false);
-                setAppState({ openPopup: null });
+                setTextPopoverOpen(false);
               }
             }}
           >
@@ -687,14 +742,28 @@ export const CompactShapeActions = ({
                 title={t("labels.actions")}
                 onPointerDown={(e) => {
                   e.preventDefault();
-                  setOtherActionsPopoverOpen((open) => {
-                    const next = !open;
-                    if (next) {
+
+                  // Handle switching from any global popup (font family, elementStroke, etc.)
+                  if (appState.openPopup) {
+                    // First close the global popup
+                    setAppState({ openPopup: null });
+                    // Then open other actions popover in next tick
+                    setTimeout(() => {
+                      setOtherActionsPopoverOpen(true);
                       setStrokePopoverOpen(false);
-                      setAppState({ openPopup: null });
-                    }
-                    return next;
-                  });
+                      setTextPopoverOpen(false);
+                    }, 0);
+                  } else {
+                    // Normal toggle behavior
+                    setOtherActionsPopoverOpen((open) => {
+                      const next = !open;
+                      if (next) {
+                        setStrokePopoverOpen(false);
+                        setTextPopoverOpen(false);
+                      }
+                      return next;
+                    });
+                  }
                 }}
                 onClick={(e) => {
                   e.preventDefault();
