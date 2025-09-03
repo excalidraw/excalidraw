@@ -237,17 +237,17 @@ export const actionWrapTextInContainer = register({
       if (isTextElement(textElement)) {
         const container = newElement({
           type: "rectangle",
-          backgroundColor: appState.currentItemBackgroundColor,
+          backgroundColor: textElement.backgroundColor, 
           boundElements: [
             ...(textElement.boundElements || []),
             { id: textElement.id, type: "text" },
           ],
           angle: textElement.angle,
-          fillStyle: appState.currentItemFillStyle,
-          strokeColor: appState.currentItemStrokeColor,
-          roughness: appState.currentItemRoughness,
-          strokeWidth: appState.currentItemStrokeWidth,
-          strokeStyle: appState.currentItemStrokeStyle,
+          fillStyle: textElement.fillStyle, 
+          strokeColor: textElement.strokeColor, 
+          roughness: textElement.roughness, 
+          strokeWidth: textElement.strokeWidth, 
+          strokeStyle: textElement.strokeStyle, 
           roundness:
             appState.currentItemRoundness === "round"
               ? {
@@ -256,7 +256,7 @@ export const actionWrapTextInContainer = register({
                     : ROUNDNESS.PROPORTIONAL_RADIUS,
                 }
               : null,
-          opacity: 100,
+          opacity: textElement.opacity ?? 100, 
           locked: false,
           x: textElement.x - BOUND_TEXT_PADDING,
           y: textElement.y - BOUND_TEXT_PADDING,
