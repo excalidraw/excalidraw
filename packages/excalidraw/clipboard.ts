@@ -5,6 +5,7 @@ import {
   arrayToMap,
   isMemberOf,
   isPromiseLike,
+  EVENT,
 } from "@excalidraw/common";
 
 import { mutateElement } from "@excalidraw/element";
@@ -92,7 +93,7 @@ export const createPasteEvent = ({
     console.warn("createPasteEvent: no types or files provided");
   }
 
-  const event = new ClipboardEvent("paste", {
+  const event = new ClipboardEvent(EVENT.PASTE, {
     clipboardData: new DataTransfer(),
   });
 
@@ -518,4 +519,15 @@ const copyTextViaExecCommand = (text: string | null) => {
   textarea.remove();
 
   return success;
+};
+
+export const isClipboardEvent = (
+  event: React.SyntheticEvent | Event,
+): event is ClipboardEvent => {
+  /** not using instanceof ClipboardEvent due to tests (jsdom) */
+  return (
+    event.type === EVENT.PASTE ||
+    event.type === EVENT.COPY ||
+    event.type === EVENT.CUT
+  );
 };
