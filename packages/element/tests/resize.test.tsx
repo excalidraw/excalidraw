@@ -510,12 +510,12 @@ describe("arrow element", () => {
       h.state,
     )[0] as ExcalidrawElbowArrowElement;
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.06);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
 
     UI.resize(rectangle, "se", [-200, -150]);
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.06);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
   });
 
@@ -538,11 +538,11 @@ describe("arrow element", () => {
       h.state,
     )[0] as ExcalidrawElbowArrowElement;
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.06);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
 
     UI.resize([rectangle, arrow], "nw", [300, 350]);
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.05);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.06);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.25);
   });
 });
@@ -1350,8 +1350,8 @@ describe("multiple selection", () => {
 
     expect(boundArrow.x).toBeCloseTo(380 * scaleX);
     expect(boundArrow.y).toBeCloseTo(240 * scaleY);
-    expect(boundArrow.points[1][0]).toBeCloseTo(64.1246);
-    expect(boundArrow.points[1][1]).toBeCloseTo(-85.4995);
+    expect(boundArrow.points[1][0]).toBeCloseTo(66.3157);
+    expect(boundArrow.points[1][1]).toBeCloseTo(-88.421);
 
     expect(arrowLabelPos.x + arrowLabel.width / 2).toBeCloseTo(
       boundArrow.x + boundArrow.points[1][0] / 2,

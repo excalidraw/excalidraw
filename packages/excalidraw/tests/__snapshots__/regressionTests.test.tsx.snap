@@ -6242,7 +6242,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
 
 exports[`regression tests > draw every type of shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `31`;
+exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `35`;
 
 exports[`regression tests > draw every type of shape > [end of test] redo stack 1`] = `[]`;
 
@@ -6446,7 +6446,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "height": 10,
             "index": "a3",
             "isDeleted": false,
-            "lastCommittedPoint": null,
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -6525,7 +6524,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "height": 10,
             "index": "a4",
             "isDeleted": false,
-            "lastCommittedPoint": null,
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -6604,10 +6602,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "height": 10,
             "index": "a5",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              50,
-              10,
-            ],
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -6631,14 +6625,14 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 5,
+            "version": 4,
             "width": 50,
             "x": 310,
             "y": -10,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 4,
+            "version": 3,
           },
         },
       },
@@ -6660,10 +6654,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
         "id15": {
           "deleted": {
             "height": 20,
-            "lastCommittedPoint": [
-              80,
-              20,
-            ],
             "points": [
               [
                 0,
@@ -6678,15 +6668,11 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 20,
               ],
             ],
-            "version": 7,
+            "version": 5,
             "width": 80,
           },
           "inserted": {
             "height": 10,
-            "lastCommittedPoint": [
-              50,
-              10,
-            ],
             "points": [
               [
                 0,
@@ -6697,7 +6683,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 10,
               ],
             ],
-            "version": 5,
+            "version": 4,
             "width": 50,
           },
         },
@@ -6712,7 +6698,10 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           "selectedElementIds": {
             "id20": true,
           },
-          "selectedLinearElement": null,
+          "selectedLinearElement": {
+            "elementId": "id20",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {
@@ -6742,10 +6731,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "height": 10,
             "index": "a6",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              50,
-              10,
-            ],
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -6768,14 +6753,14 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "line",
-            "version": 5,
+            "version": 4,
             "width": 50,
             "x": 430,
             "y": -10,
           },
           "inserted": {
             "isDeleted": true,
-            "version": 4,
+            "version": 3,
           },
         },
       },
@@ -6797,10 +6782,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
         "id20": {
           "deleted": {
             "height": 20,
-            "lastCommittedPoint": [
-              80,
-              20,
-            ],
             "points": [
               [
                 0,
@@ -6815,15 +6796,11 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 20,
               ],
             ],
-            "version": 7,
+            "version": 5,
             "width": 80,
           },
           "inserted": {
             "height": 10,
-            "lastCommittedPoint": [
-              50,
-              10,
-            ],
             "points": [
               [
                 0,
@@ -6834,34 +6811,13 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
                 10,
               ],
             ],
-            "version": 5,
+            "version": 4,
             "width": 50,
           },
         },
       },
     },
     "id": "id24",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {
-          "selectedLinearElement": {
-            "elementId": "id20",
-            "isEditing": false,
-          },
-        },
-        "inserted": {
-          "selectedLinearElement": null,
-        },
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {},
-    },
-    "id": "id26",
   },
   {
     "appState": AppStateDelta {
@@ -6881,7 +6837,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       "removed": {},
       "updated": {},
     },
-    "id": "id28",
+    "id": "id26",
   },
   {
     "appState": AppStateDelta {
@@ -6900,7 +6856,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
     "elements": {
       "added": {},
       "removed": {
-        "id29": {
+        "id27": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -6912,10 +6868,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "height": 10,
             "index": "a7",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              50,
-              10,
-            ],
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -6958,7 +6910,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       },
       "updated": {},
     },
-    "id": "id31",
+    "id": "id29",
   },
 ]
 `;
@@ -8680,12 +8632,8 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
     "elbowed": false,
     "elementId": "id0",
     "hoverPointIndex": -1,
-    "isDragging": false,
-    "isEditing": false,
-    "lastUncommittedPoint": null,
-    "pointerDownState": {
+    "initialState": {
       "arrowStartIsInside": false,
-      "lastClickedIsEndPoint": false,
       "lastClickedPoint": -1,
       "origin": null,
       "prevSelectedPointsIndices": null,
@@ -8695,6 +8643,11 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
         "value": null,
       },
     },
+    "isDragging": false,
+    "isEditing": false,
+    "lastCommittedPoint": null,
+    "lastUncommittedPoint": null,
+    "pointerDownState": undefined,
     "pointerOffset": {
       "x": 0,
       "y": 0,
@@ -8728,7 +8681,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
 
 exports[`regression tests > key 5 selects arrow tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 5 selects arrow tool > [end of test] number of renders 1`] = `6`;
+exports[`regression tests > key 5 selects arrow tool > [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests > key 5 selects arrow tool > [end of test] redo stack 1`] = `[]`;
 
@@ -8770,7 +8723,6 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] undo stack 
             "height": 30,
             "index": "a0",
             "isDeleted": false,
-            "lastCommittedPoint": null,
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -8908,12 +8860,8 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
     "elbowed": false,
     "elementId": "id0",
     "hoverPointIndex": -1,
-    "isDragging": false,
-    "isEditing": false,
-    "lastUncommittedPoint": null,
-    "pointerDownState": {
+    "initialState": {
       "arrowStartIsInside": false,
-      "lastClickedIsEndPoint": false,
       "lastClickedPoint": -1,
       "origin": null,
       "prevSelectedPointsIndices": null,
@@ -8923,6 +8871,11 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
         "value": null,
       },
     },
+    "isDragging": false,
+    "isEditing": false,
+    "lastCommittedPoint": null,
+    "lastUncommittedPoint": null,
+    "pointerDownState": undefined,
     "pointerOffset": {
       "x": 0,
       "y": 0,
@@ -8956,7 +8909,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
 
 exports[`regression tests > key 6 selects line tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 6 selects line tool > [end of test] number of renders 1`] = `6`;
+exports[`regression tests > key 6 selects line tool > [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests > key 6 selects line tool > [end of test] redo stack 1`] = `[]`;
 
@@ -8997,7 +8950,6 @@ exports[`regression tests > key 6 selects line tool > [end of test] undo stack 1
             "height": 30,
             "index": "a0",
             "isDeleted": false,
-            "lastCommittedPoint": null,
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -9182,10 +9134,6 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] undo sta
             "height": 30,
             "index": "a0",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              30,
-              30,
-            ],
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -9329,12 +9277,8 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
     "elbowed": false,
     "elementId": "id0",
     "hoverPointIndex": -1,
-    "isDragging": false,
-    "isEditing": false,
-    "lastUncommittedPoint": null,
-    "pointerDownState": {
+    "initialState": {
       "arrowStartIsInside": false,
-      "lastClickedIsEndPoint": false,
       "lastClickedPoint": -1,
       "origin": null,
       "prevSelectedPointsIndices": null,
@@ -9344,6 +9288,11 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
         "value": null,
       },
     },
+    "isDragging": false,
+    "isEditing": false,
+    "lastCommittedPoint": null,
+    "lastUncommittedPoint": null,
+    "pointerDownState": undefined,
     "pointerOffset": {
       "x": 0,
       "y": 0,
@@ -9377,7 +9326,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
 
 exports[`regression tests > key a selects arrow tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key a selects arrow tool > [end of test] number of renders 1`] = `6`;
+exports[`regression tests > key a selects arrow tool > [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests > key a selects arrow tool > [end of test] redo stack 1`] = `[]`;
 
@@ -9419,7 +9368,6 @@ exports[`regression tests > key a selects arrow tool > [end of test] undo stack 
             "height": 30,
             "index": "a0",
             "isDeleted": false,
-            "lastCommittedPoint": null,
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -9736,12 +9684,8 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
     "elbowed": false,
     "elementId": "id0",
     "hoverPointIndex": -1,
-    "isDragging": false,
-    "isEditing": false,
-    "lastUncommittedPoint": null,
-    "pointerDownState": {
+    "initialState": {
       "arrowStartIsInside": false,
-      "lastClickedIsEndPoint": false,
       "lastClickedPoint": -1,
       "origin": null,
       "prevSelectedPointsIndices": null,
@@ -9751,6 +9695,11 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
         "value": null,
       },
     },
+    "isDragging": false,
+    "isEditing": false,
+    "lastCommittedPoint": null,
+    "lastUncommittedPoint": null,
+    "pointerDownState": undefined,
     "pointerOffset": {
       "x": 0,
       "y": 0,
@@ -9784,7 +9733,7 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
 
 exports[`regression tests > key l selects line tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key l selects line tool > [end of test] number of renders 1`] = `6`;
+exports[`regression tests > key l selects line tool > [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests > key l selects line tool > [end of test] redo stack 1`] = `[]`;
 
@@ -9825,7 +9774,6 @@ exports[`regression tests > key l selects line tool > [end of test] undo stack 1
             "height": 30,
             "index": "a0",
             "isDeleted": false,
-            "lastCommittedPoint": null,
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -10189,10 +10137,6 @@ exports[`regression tests > key p selects freedraw tool > [end of test] undo sta
             "height": 30,
             "index": "a0",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              30,
-              30,
-            ],
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -14530,7 +14474,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
 
 exports[`regression tests > undo/redo drawing an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `18`;
+exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests > undo/redo drawing an element > [end of test] redo stack 1`] = `
 [
@@ -14548,10 +14492,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
         "id6": {
           "deleted": {
             "height": 10,
-            "lastCommittedPoint": [
-              60,
-              10,
-            ],
             "points": [
               [
                 0,
@@ -14562,15 +14502,11 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
                 10,
               ],
             ],
-            "version": 8,
+            "version": 6,
             "width": 60,
           },
           "inserted": {
             "height": 20,
-            "lastCommittedPoint": [
-              100,
-              20,
-            ],
             "points": [
               [
                 0,
@@ -14585,7 +14521,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
                 20,
               ],
             ],
-            "version": 7,
+            "version": 5,
             "width": 100,
           },
         },
@@ -14618,7 +14554,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
         "id6": {
           "deleted": {
             "isDeleted": true,
-            "version": 9,
+            "version": 7,
           },
           "inserted": {
             "angle": 0,
@@ -14634,10 +14570,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
             "height": 10,
             "index": "a2",
             "isDeleted": false,
-            "lastCommittedPoint": [
-              60,
-              10,
-            ],
             "link": null,
             "locked": false,
             "opacity": 100,
@@ -14661,7 +14593,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 8,
+            "version": 6,
             "width": 60,
             "x": 130,
             "y": 10,

@@ -114,7 +114,7 @@ describe("binding with linear elements", () => {
     mouse.up(200, 100);
 
     UI.clickTool("arrow");
-    mouse.down(5, 0);
+    mouse.down(-5, 0);
     mouse.up(300, 50);
 
     elementStats = stats?.querySelector("#elementStats");

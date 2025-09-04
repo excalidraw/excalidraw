@@ -151,6 +151,10 @@ export const actionFinalize = register<FormData>({
               ...linearElementEditor,
               selectedPointsIndices: null,
               isEditing: false,
+              initialState: {
+                ...linearElementEditor.initialState,
+                lastClickedPoint: -1,
+              },
             },
             selectionElement: null,
             suggestedBinding: null,
@@ -186,11 +190,13 @@ export const actionFinalize = register<FormData>({
     if (element) {
       // pen and mouse have hover
       if (
+        appState.selectedLinearElement &&
         appState.multiElement &&
         element.type !== "freedraw" &&
         appState.lastPointerDownWith !== "touch"
       ) {
-        const { points, lastCommittedPoint } = element;
+        const { points } = element;
+        const { lastCommittedPoint } = appState.selectedLinearElement;
         if (
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
@@ -278,8 +284,9 @@ export const actionFinalize = register<FormData>({
           isEditing: appState.newElement
             ? false
             : selectedLinearElement.isEditing,
-          pointerDownState: {
-            ...selectedLinearElement.pointerDownState,
+          initialState: {
+            ...selectedLinearElement.initialState,
+            lastClickedPoint: -1,
             origin: null,
           },
         }

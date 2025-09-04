@@ -131,6 +131,11 @@ describe("elbow arrow segment move", () => {
 });
 
 describe("elbow arrow routing", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
   it("can properly generate orthogonal arrow points", () => {
     const scene = new Scene();
     const arrow = API.createElement({
@@ -194,9 +199,9 @@ describe("elbow arrow routing", () => {
 
     expect(arrow.points).toEqual([
       [0, 0],
-      [45, 0],
-      [45, 200],
-      [90, 200],
+      [44, 0],
+      [44, 200],
+      [88, 200],
     ]);
   });
 });
@@ -235,9 +240,9 @@ describe("elbow arrow ui", () => {
     expect(h.state.currentItemArrowType).toBe(ARROW_TYPE.elbow);
 
     mouse.reset();
-    mouse.moveTo(-43, -99);
+    mouse.moveTo(-53, -99);
     mouse.click();
-    mouse.moveTo(43, 99);
+    mouse.moveTo(53, 99);
     mouse.click();
 
     const arrow = h.scene.getSelectedElements(
@@ -248,9 +253,9 @@ describe("elbow arrow ui", () => {
     expect(arrow.elbowed).toBe(true);
     expect(arrow.points).toEqual([
       [0, 0],
-      [45, 0],
-      [45, 200],
-      [90, 200],
+      [44, 0],
+      [44, 200],
+      [88, 200],
     ]);
   });
 
@@ -272,9 +277,9 @@ describe("elbow arrow ui", () => {
     UI.clickOnTestId("elbow-arrow");
 
     mouse.reset();
-    mouse.moveTo(-43, -99);
+    mouse.moveTo(-53, -99);
     mouse.click();
-    mouse.moveTo(43, 99);
+    mouse.moveTo(53, 99);
     mouse.click();
 
     const arrow = h.scene.getSelectedElements(
@@ -290,9 +295,11 @@ describe("elbow arrow ui", () => {
 
     expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
       [0, 0],
-      [35, 0],
-      [35, 165],
-      [103, 165],
+      [36, 0],
+      [36, 90],
+      [28, 90],
+      [28, 164],
+      [101, 164],
     ]);
   });
 
@@ -314,9 +321,9 @@ describe("elbow arrow ui", () => {
     UI.clickOnTestId("elbow-arrow");
 
     mouse.reset();
-    mouse.moveTo(-43, -99);
+    mouse.moveTo(-53, -99);
     mouse.click();
-    mouse.moveTo(43, 99);
+    mouse.moveTo(53, 99);
     mouse.click();
 
     const arrow = h.scene.getSelectedElements(
@@ -346,9 +353,9 @@ describe("elbow arrow ui", () => {
     expect(duplicatedArrow.elbowed).toBe(true);
     expect(duplicatedArrow.points).toEqual([
       [0, 0],
-      [45, 0],
-      [45, 200],
-      [90, 200],
+      [44, 0],
+      [44, 200],
+      [88, 200],
     ]);
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);
@@ -372,9 +379,9 @@ describe("elbow arrow ui", () => {
     UI.clickOnTestId("elbow-arrow");
 
     mouse.reset();
-    mouse.moveTo(-43, -99);
+    mouse.moveTo(-53, -99);
     mouse.click();
-    mouse.moveTo(43, 99);
+    mouse.moveTo(53, 99);
     mouse.click();
 
     const arrow = h.scene.getSelectedElements(
@@ -401,8 +408,8 @@ describe("elbow arrow ui", () => {
     expect(duplicatedArrow.points).toEqual([
       [0, 0],
       [0, 100],
-      [90, 100],
-      [90, 200],
+      [88, 100],
+      [88, 200],
     ]);
   });
 });

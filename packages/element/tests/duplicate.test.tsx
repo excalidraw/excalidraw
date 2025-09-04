@@ -814,7 +814,7 @@ describe("duplication z-order", () => {
     const arrow = UI.createElement("arrow", {
       x: -100,
       y: 50,
-      width: 95,
+      width: 115,
       height: 0,
     });
 

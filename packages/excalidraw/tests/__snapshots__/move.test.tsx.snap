@@ -95,3 +95,141 @@ exports[`move element > rectangle 5`] = `
   "y": 40,
 }
 `;
+
+exports[`move element > rectangles with binding arrow 5`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id6",
+      "type": "arrow",
+    },
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": 1278240551,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 4,
+  "versionNonce": 640725609,
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`move element > rectangles with binding arrow 6`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id6",
+      "type": "arrow",
+    },
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 300,
+  "id": "id3",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": 1116226695,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 7,
+  "versionNonce": 1051383431,
+  "width": 300,
+  "x": 201,
+  "y": 2,
+}
+`;
+
+exports[`move element > rectangles with binding arrow 7`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "elbowed": false,
+  "endArrowhead": "arrow",
+  "endBinding": {
+    "elementId": "id3",
+    "fixedPoint": [
+      "-0.03333",
+      "0.43333",
+    ],
+    "mode": "orbit",
+  },
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": "90.03375",
+  "id": "id6",
+  "index": "a2",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "moveMidPointsWithElement": false,
+  "opacity": 100,
+  "points": [
+    [
+      0,
+      0,
+    ],
+    [
+      89,
+      "90.03375",
+    ],
+  ],
+  "roughness": 1,
+  "roundness": {
+    "type": 2,
+  },
+  "seed": 23633383,
+  "startArrowhead": null,
+  "startBinding": {
+    "elementId": "id0",
+    "fixedPoint": [
+      "1.10000",
+      "0.50010",
+    ],
+    "mode": "orbit",
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "arrow",
+  "updated": 1,
+  "version": 9,
+  "versionNonce": 1996028265,
+  "width": 89,
+  "x": 106,
+  "y": "46.01049",
+}
+`;

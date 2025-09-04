@@ -866,8 +866,8 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleSkipBindMode() {
     if (
-      this.state.selectedLinearElement?.pointerDownState &&
-      !this.state.selectedLinearElement.pointerDownState.arrowStartIsInside
+      this.state.selectedLinearElement?.initialState &&
+      !this.state.selectedLinearElement.initialState.arrowStartIsInside
     ) {
       invariant(
         this.lastPointerMoveCoords,
@@ -894,8 +894,8 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           selectedLinearElement: {
             ...this.state.selectedLinearElement,
-            pointerDownState: {
-              ...this.state.selectedLinearElement.pointerDownState,
+            initialState: {
+              ...this.state.selectedLinearElement.initialState,
               arrowStartIsInside: true,
             },
           },
@@ -983,8 +983,7 @@ class App extends React.Component<AppProps, AppState> {
         // Once the start is set to inside binding, it remains so
         const arrowStartIsInside =
           !this.state.newElement &&
-          (this.state.selectedLinearElement.pointerDownState
-            .arrowStartIsInside ||
+          (this.state.selectedLinearElement.initialState.arrowStartIsInside ||
             arrow.startBinding?.elementId === hoveredElement.id);
 
         // Change the global binding mode
@@ -998,8 +997,8 @@ class App extends React.Component<AppProps, AppState> {
             bindMode: "inside",
             selectedLinearElement: {
               ...this.state.selectedLinearElement,
-              pointerDownState: {
-                ...this.state.selectedLinearElement.pointerDownState,
+              initialState: {
+                ...this.state.selectedLinearElement.initialState,
                 arrowStartIsInside,
               },
             },
@@ -5841,8 +5840,8 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({
             selectedLinearElement: {
               ...this.state.selectedLinearElement,
-              pointerDownState: {
-                ...this.state.selectedLinearElement.pointerDownState,
+              initialState: {
+                ...this.state.selectedLinearElement.initialState,
                 segmentMidpoint: {
                   index: nextIndex,
                   value: hitCoords,
@@ -6260,9 +6259,16 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (this.state.multiElement) {
-      const { multiElement } = this.state;
-      const { x: rx, y: ry, points, lastCommittedPoint } = multiElement;
+      const { multiElement, selectedLinearElement } = this.state;
+      const { x: rx, y: ry, points } = multiElement;
       const lastPoint = points[points.length - 1];
+
+      invariant(
+        selectedLinearElement,
+        "There must be a selected linear element instace",
+      );
+
+      const { lastCommittedPoint } = selectedLinearElement;
 
       setCursorForShape(this.interactiveCanvas, this.state);
 
@@ -6285,13 +6291,18 @@ class App extends React.Component<AppProps, AppState> {
             },
             { informMutation: false, isDragging: false },
           );
-          if (this.state.selectedLinearElement?.pointerDownState) {
+          invariant(
+            this.state.selectedLinearElement?.initialState,
+            "initialState must be set",
+          );
+          if (this.state.selectedLinearElement.initialState) {
             this.setState({
               selectedLinearElement: {
                 ...this.state.selectedLinearElement,
+                lastCommittedPoint: points[points.length - 1],
                 selectedPointsIndices: [multiElement.points.length - 1],
-                pointerDownState: {
-                  ...this.state.selectedLinearElement.pointerDownState,
+                initialState: {
+                  ...this.state.selectedLinearElement.initialState,
                   lastClickedPoint: multiElement.points.length - 1,
                 },
               },
@@ -6318,6 +6329,30 @@ class App extends React.Component<AppProps, AppState> {
           },
           { informMutation: false, isDragging: false },
         );
+        this.setState({
+          selectedLinearElement: {
+            ...selectedLinearElement,
+            selectedPointsIndices:
+              selectedLinearElement.selectedPointsIndices?.includes(
+                multiElement.points.length,
+              )
+                ? [
+                    ...selectedLinearElement.selectedPointsIndices.filter(
+                      (idx) =>
+                        idx !== multiElement.points.length &&
+                        idx !== multiElement.points.length - 1,
+                    ),
+                    multiElement.points.length - 1,
+                  ]
+                : selectedLinearElement.selectedPointsIndices,
+            lastCommittedPoint:
+              multiElement.points[multiElement.points.length - 1],
+            initialState: {
+              ...selectedLinearElement.initialState,
+              lastClickedPoint: multiElement.points.length - 1,
+            },
+          },
+        });
       } else {
         if (isPathALoop(points, this.state.zoom.value)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
@@ -8171,16 +8206,30 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): void => {
     if (this.state.multiElement) {
-      const { multiElement } = this.state;
+      const { multiElement, selectedLinearElement } = this.state;
+
+      invariant(
+        selectedLinearElement,
+        "selectedLinearElement is expected to be set",
+      );
 
       // finalize if completing a loop
       if (
         multiElement.type === "line" &&
         isPathALoop(multiElement.points, this.state.zoom.value)
       ) {
-        this.scene.mutateElement(multiElement, {
-          lastCommittedPoint:
-            multiElement.points[multiElement.points.length - 1],
+        flushSync(() => {
+          this.setState({
+            selectedLinearElement: {
+              ...selectedLinearElement,
+              lastCommittedPoint:
+                multiElement.points[multiElement.points.length - 1],
+              initialState: {
+                ...selectedLinearElement.initialState,
+                lastClickedPoint: -1, // Disable dragging
+              },
+            },
+          });
         });
         this.actionManager.executeAction(actionFinalize);
         return;
@@ -8189,10 +8238,6 @@ class App extends React.Component<AppProps, AppState> {
       // Elbow arrows cannot be created by putting down points
       // only the start and end points can be defined
       if (isElbowArrow(multiElement) && multiElement.points.length > 1) {
-        this.scene.mutateElement(multiElement, {
-          lastCommittedPoint:
-            multiElement.points[multiElement.points.length - 1],
-        });
         this.actionManager.executeAction(actionFinalize, "ui", {
           event: event.nativeEvent,
           sceneCoords: {
@@ -8203,7 +8248,9 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const { x: rx, y: ry, lastCommittedPoint } = multiElement;
+      const { x: rx, y: ry } = multiElement;
+      const { lastCommittedPoint } = selectedLinearElement;
+
       const hoveredElementForBinding = getHoveredElementForBinding(
         pointFrom<GlobalPoint>(
           this.lastPointerMoveCoords?.x ??
@@ -8247,11 +8294,7 @@ class App extends React.Component<AppProps, AppState> {
           prevState,
         ),
       }));
-      // clicking outside commit zone → update reference for last committed
-      // point
-      this.scene.mutateElement(multiElement, {
-        lastCommittedPoint: multiElement.points[multiElement.points.length - 1],
-      });
+
       setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
     } else {
       const [gridX, gridY] = getGridPoint(
@@ -8373,27 +8416,24 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
 
-          if (isBindingElement(element)) {
-            const endIdx = element.points.length - 1;
-            linearElementEditor = {
-              ...linearElementEditor,
-              selectedPointsIndices: [endIdx],
-              pointerDownState: {
-                ...linearElementEditor.pointerDownState,
-                lastClickedPoint: endIdx,
-                origin: pointFrom<GlobalPoint>(
-                  pointerDownState.origin.x,
-                  pointerDownState.origin.y,
-                ),
-              },
-            };
-          }
+          const endIdx = element.points.length - 1;
+          linearElementEditor = {
+            ...linearElementEditor,
+            selectedPointsIndices: [endIdx],
+            initialState: {
+              ...linearElementEditor.initialState,
+              lastClickedPoint: endIdx,
+              origin: pointFrom<GlobalPoint>(
+                pointerDownState.origin.x,
+                pointerDownState.origin.y,
+              ),
+            },
+          };
         }
 
-        nextSelectedElementIds = makeNextSelectedElementIds(
-          { [element.id]: true },
-          prevState,
-        );
+        nextSelectedElementIds = !this.state.activeTool.locked
+          ? makeNextSelectedElementIds({ [element.id]: true }, prevState)
+          : prevState.selectedElementIds;
 
         return {
           ...prevState,
@@ -8607,7 +8647,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         this.state.selectedLinearElement &&
         this.state.selectedLinearElement.elbowed &&
-        this.state.selectedLinearElement.pointerDownState.segmentMidpoint.index
+        this.state.selectedLinearElement.initialState.segmentMidpoint.index
       ) {
         const [gridX, gridY] = getGridPoint(
           pointerCoords.x,
@@ -8616,8 +8656,7 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         let index =
-          this.state.selectedLinearElement.pointerDownState.segmentMidpoint
-            .index;
+          this.state.selectedLinearElement.initialState.segmentMidpoint.index;
         if (index < 0) {
           const nextCoords = LinearElementEditor.getSegmentMidpointHitCoords(
             {
@@ -8650,7 +8689,7 @@ class App extends React.Component<AppProps, AppState> {
           selectedLinearElement: {
             ...this.state.selectedLinearElement,
             segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
-            pointerDownState: ret.pointerDownState,
+            initialState: ret.initialState,
           },
         });
         return;
@@ -8740,7 +8779,7 @@ class App extends React.Component<AppProps, AppState> {
               this.setState({
                 selectedLinearElement: {
                   ...this.state.selectedLinearElement,
-                  pointerDownState: ret.pointerDownState,
+                  initialState: ret.pointerDownState,
                   selectedPointsIndices: ret.selectedPointsIndices,
                   segmentMidPointHoveredCoords: null,
                 },
@@ -8750,11 +8789,11 @@ class App extends React.Component<AppProps, AppState> {
 
           return;
         } else if (
-          linearElementEditor.pointerDownState.segmentMidpoint.value !== null &&
-          !linearElementEditor.pointerDownState.segmentMidpoint.added
+          linearElementEditor.initialState.segmentMidpoint.value !== null &&
+          !linearElementEditor.initialState.segmentMidpoint.added
         ) {
           return;
-        } else if (linearElementEditor.pointerDownState.lastClickedPoint > -1) {
+        } else if (linearElementEditor.initialState.lastClickedPoint > -1) {
           const element = LinearElementEditor.getElement(
             linearElementEditor.elementId,
             elementsMap,
@@ -8776,10 +8815,14 @@ class App extends React.Component<AppProps, AppState> {
 
           if (
             event.altKey &&
-            !this.state.selectedLinearElement?.pointerDownState
-              ?.arrowStartIsInside
+            !this.state.selectedLinearElement?.initialState?.arrowStartIsInside
           ) {
             this.handleSkipBindMode();
+          }
+
+          // Ignore drag requests if the arrow modification already happened
+          if (linearElementEditor.initialState.lastClickedPoint === -1) {
+            return;
           }
 
           const newState = LinearElementEditor.handlePointDragging(
@@ -8789,6 +8832,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerCoords.y,
             linearElementEditor,
           );
+
           if (newState) {
             pointerDownState.lastCoords.x = pointerCoords.x;
             pointerDownState.lastCoords.y = pointerCoords.y;
@@ -9277,13 +9321,12 @@ class App extends React.Component<AppProps, AppState> {
             linearElementEditor = {
               ...linearElementEditor,
               selectedPointsIndices: [1],
-              pointerDownState: {
-                ...linearElementEditor.pointerDownState,
+              initialState: {
+                ...linearElementEditor.initialState,
                 lastClickedPoint: 1,
               },
             };
           }
-
           this.setState({
             newElement,
             ...LinearElementEditor.handlePointDragging(
@@ -9612,6 +9655,23 @@ class App extends React.Component<AppProps, AppState> {
             sceneCoords,
           });
         }
+
+        if (
+          this.state.newElement &&
+          this.state.multiElement &&
+          isLinearElement(this.state.newElement) &&
+          this.state.selectedLinearElement
+        ) {
+          const { multiElement } = this.state;
+
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              lastCommittedPoint:
+                multiElement.points[multiElement.points.length - 1],
+            },
+          });
+        }
       }
 
       this.missingPointerEventCleanupEmitter.clear();
@@ -9663,7 +9723,6 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.mutateElement(newElement, {
           points: [...points, pointFrom<LocalPoint>(dx, dy)],
           pressures,
-          lastCommittedPoint: pointFrom<LocalPoint>(dx, dy),
         });
 
         this.actionManager.executeAction(actionFinalize);

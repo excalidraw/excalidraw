@@ -278,7 +278,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
 
   // With new arrows it represents the continuous dragging of the end point
   if (endDragged) {
-    const origin = appState?.selectedLinearElement?.pointerDownState.origin;
+    const origin = appState?.selectedLinearElement?.initialState.origin;
 
     // Inside -> inside binding
     if (hit && arrow.startBinding?.elementId === hit.id) {
@@ -309,7 +309,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
       invariant(otherElement, "Other element must be in the elements map");
 
       const otherIsInsideBinding =
-        !!appState.selectedLinearElement?.pointerDownState.arrowStartIsInside;
+        !!appState.selectedLinearElement?.initialState.arrowStartIsInside;
 
       const other: BindingStrategy = {
         mode: otherIsInsideBinding ? "inside" : "orbit",

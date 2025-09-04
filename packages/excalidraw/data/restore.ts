@@ -292,7 +292,6 @@ export const restoreElement = (
     case "freedraw": {
       return restoreElementWithProperties(element, {
         points: element.points,
-        lastCommittedPoint: null,
         simulatePressure: element.simulatePressure,
         pressures: element.pressures,
       });
@@ -328,7 +327,6 @@ export const restoreElement = (
             : element.type,
         startBinding: repairBinding(element, element.startBinding),
         endBinding: repairBinding(element, element.endBinding),
-        lastCommittedPoint: null,
         startArrowhead,
         endArrowhead,
         points,
@@ -361,7 +359,6 @@ export const restoreElement = (
         type: element.type,
         startBinding: repairBinding(element, element.startBinding),
         endBinding: repairBinding(element, element.endBinding),
-        lastCommittedPoint: null,
         startArrowhead,
         endArrowhead,
         points,

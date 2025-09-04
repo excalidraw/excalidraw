@@ -257,8 +257,8 @@ describe("binding for simple arrows", () => {
       const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
       expect(arrow.x).toBe(10);
       expect(arrow.y).toBe(10);
-      expect(arrow.width).toBeCloseTo(86.4669660940663);
-      expect(arrow.height).toBeCloseTo(86.46696609406821);
+      expect(arrow.width).toBeCloseTo(85.75985931287957);
+      expect(arrow.height).toBeCloseTo(85.75985931288186);
 
       // Should bind to the rectangle since endpoint is inside
       expect(arrow.startBinding).toBe(null);
@@ -280,8 +280,8 @@ describe("binding for simple arrows", () => {
       // Check if the arrow moved
       expect(arrow.x).toBe(10);
       expect(arrow.y).toBe(10);
-      expect(arrow.width).toBeCloseTo(235);
-      expect(arrow.height).toBeCloseTo(117.5);
+      expect(arrow.width).toBeCloseTo(234);
+      expect(arrow.height).toBeCloseTo(117);
 
       // Restore bindable
       mouse.reset();
@@ -309,49 +309,9 @@ describe("binding for simple arrows", () => {
       expect(arrow.width).toBeCloseTo(86, 0);
       expect(arrow.height).toBeCloseTo(86, 0);
     });
-
-    it("should happen even if the arrow is not pointing at the element", () => {
-      // Create a rectangle positioned so the extended arrow segment will miss it
-      const rect = API.createElement({
-        type: "rectangle",
-        x: 100,
-        y: 100,
-        width: 100,
-        height: 100,
-      });
-
-      API.setElements([rect]);
-
-      // Draw an arrow that doesn't point at the rectangle (extended segment will miss)
-      UI.clickTool("arrow");
-      mouse.reset();
-      mouse.downAt(125, 93); // Start point
-      mouse.moveTo(175, 93); // End point - arrow direction is horizontal, misses rectangle
-      mouse.up();
-
-      const arrow = API.getSelectedElement() as ExcalidrawLinearElement;
-
-      // Should create a fixed point binding since the extended line segment
-      // from the last arrow segment misses the rectangle
-      expect(arrow.startBinding?.elementId).toBe(rect.id);
-      expect(arrow.startBinding).toHaveProperty("fixedPoint");
-      expect(
-        (arrow.startBinding as FixedPointBinding).fixedPoint[0],
-      ).toBeGreaterThanOrEqual(0);
-      expect(
-        (arrow.startBinding as FixedPointBinding).fixedPoint[0],
-      ).toBeLessThanOrEqual(1);
-      expect(
-        (arrow.startBinding as FixedPointBinding).fixedPoint[1],
-      ).toBeLessThanOrEqual(0.5);
-      expect(
-        (arrow.startBinding as FixedPointBinding).fixedPoint[1],
-      ).toBeLessThanOrEqual(1);
-      expect(arrow.endBinding).toBe(null);
-    });
   });
 
-  describe("", () => {
+  describe("additional binding behavior", () => {
     beforeEach(async () => {
       mouse.reset();
 
@@ -411,8 +371,8 @@ describe("binding for simple arrows", () => {
 
       const arrow = UI.createElement("arrow", {
         x: 0,
-        y: 0,
-        size: 50,
+        y: 5,
+        size: 70,
       });
 
       expect(arrow.endBinding?.elementId).toBe(rectangle.id);
@@ -435,9 +395,9 @@ describe("binding for simple arrows", () => {
         height: 500,
       });
       const arrow = UI.createElement("arrow", {
-        x: 210,
+        x: 190,
         y: 250,
-        width: 180,
+        width: 220,
         height: 1,
       });
       expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
@@ -475,11 +435,11 @@ describe("binding for simple arrows", () => {
 
       UI.clickTool("arrow");
       mouse.reset();
-      mouse.clickAt(210, 250);
+      mouse.clickAt(190, 250);
       mouse.moveTo(300, 200);
       mouse.clickAt(300, 200);
-      mouse.moveTo(390, 251);
-      mouse.clickAt(390, 251);
+      mouse.moveTo(410, 251);
+      mouse.clickAt(410, 251);
 
       const arrow = API.getSelectedElement() as ExcalidrawArrowElement;
 
@@ -517,9 +477,9 @@ describe("binding for simple arrows", () => {
         height: 500,
       });
       const arrow = UI.createElement("arrow", {
-        x: 210,
+        x: 190,
         y: 250,
-        width: 177,
+        width: 217,
         height: 1,
       });
       expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
@@ -668,7 +628,7 @@ describe("binding for simple arrows", () => {
       const arrow = UI.createElement("arrow", {
         x: 0,
         y: 0,
-        size: 50,
+        size: 65,
       });
 
       expect(arrow.endBinding?.elementId).toBe(text.id);
@@ -693,7 +653,7 @@ describe("binding for simple arrows", () => {
     it("should unbind on text element deletion by submitting empty text", async () => {
       const text = API.createElement({
         type: "text",
-        text: "ola",
+        text: "¡olá!",
         x: 60,
         y: 0,
         width: 100,
@@ -705,7 +665,7 @@ describe("binding for simple arrows", () => {
       const arrow = UI.createElement("arrow", {
         x: 0,
         y: 0,
-        size: 50,
+        size: 65,
       });
 
       expect(arrow.endBinding?.elementId).toBe(text.id);

@@ -126,7 +126,7 @@ export class LinearElementEditor {
   /** indices */
   public readonly selectedPointsIndices: readonly number[] | null;
 
-  public readonly pointerDownState: Readonly<{
+  public readonly initialState: Readonly<{
     prevSelectedPointsIndices: readonly number[] | null;
     /** index */
     lastClickedPoint: number;
@@ -142,12 +142,18 @@ export class LinearElementEditor {
   /** whether you're dragging a point */
   public readonly isDragging: boolean;
   public readonly lastUncommittedPoint: LocalPoint | null;
+  public readonly lastCommittedPoint: LocalPoint | null;
   public readonly pointerOffset: Readonly<{ x: number; y: number }>;
   public readonly hoverPointIndex: number;
   public readonly segmentMidPointHoveredCoords: GlobalPoint | null;
   public readonly elbowed: boolean;
   public readonly customLineAngle: number | null;
   public readonly isEditing: boolean;
+
+  // @deprecated renamed to initialState because the data is used during linear
+  // element click creation as well (with multiple pointer down events)
+  // @ts-ignore
+  public readonly pointerDownState: never;
 
   constructor(
     element: NonDeleted<ExcalidrawLinearElement>,
@@ -167,9 +173,10 @@ export class LinearElementEditor {
     }
     this.selectedPointsIndices = null;
     this.lastUncommittedPoint = null;
+    this.lastCommittedPoint = null;
     this.isDragging = false;
     this.pointerOffset = { x: 0, y: 0 };
-    this.pointerDownState = {
+    this.initialState = {
       prevSelectedPointsIndices: null,
       lastClickedPoint: -1,
       origin: null,
@@ -396,12 +403,14 @@ export class LinearElementEditor {
   ): Pick<AppState, "suggestedBinding" | "selectedLinearElement"> | null {
     const elementsMap = app.scene.getNonDeletedElementsMap();
     const elements = app.scene.getNonDeletedElements();
-    const { elbowed, elementId, pointerDownState, selectedPointsIndices } =
+    const { elbowed, elementId, initialState, selectedPointsIndices } =
       linearElementEditor;
-    const { lastClickedPoint } = pointerDownState;
+    const { lastClickedPoint } = initialState;
     const element = LinearElementEditor.getElement(elementId, elementsMap);
 
     invariant(element, "Element being dragged must exist in the scene");
+
+    invariant(element.points.length > 1, "Element must have at least 2 points");
 
     invariant(
       selectedPointsIndices,
@@ -409,11 +418,15 @@ export class LinearElementEditor {
     );
 
     invariant(
-      lastClickedPoint > -1 && selectedPointsIndices.includes(lastClickedPoint),
-      "There must be a valid lastClickedPoint in order to drag it",
+      lastClickedPoint > -1 &&
+        selectedPointsIndices.includes(lastClickedPoint) &&
+        element.points[lastClickedPoint],
+      `There must be a valid lastClickedPoint in order to drag it. selectedPointsIndices(${JSON.stringify(
+        selectedPointsIndices,
+      )}) points(0..${
+        element.points.length - 1
+      }) lastClickedPoint(${lastClickedPoint})`,
     );
-
-    invariant(element.points.length > 1, "Element must have at least 2 points");
 
     invariant(
       !elbowed ||
@@ -551,8 +564,8 @@ export class LinearElementEditor {
     const newLinearElementEditor = {
       ...linearElementEditor,
       selectedPointsIndices: newSelectedPointsIndices,
-      pointerDownState: {
-        ...linearElementEditor.pointerDownState,
+      initialState: {
+        ...linearElementEditor.initialState,
         lastClickedPoint: newLastClickedPoint,
       },
       segmentMidPointHoveredCoords: newSelectedMidPointHoveredCoords,
@@ -575,8 +588,12 @@ export class LinearElementEditor {
   ): LinearElementEditor {
     const elementsMap = scene.getNonDeletedElementsMap();
 
-    const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
-      editingLinearElement;
+    const {
+      elementId,
+      selectedPointsIndices,
+      isDragging,
+      initialState: pointerDownState,
+    } = editingLinearElement;
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
       return editingLinearElement;
@@ -647,8 +664,8 @@ export class LinearElementEditor {
       isDragging: false,
       pointerOffset: { x: 0, y: 0 },
       customLineAngle: null,
-      pointerDownState: {
-        ...editingLinearElement.pointerDownState,
+      initialState: {
+        ...editingLinearElement.initialState,
         origin: null,
         arrowStartIsInside: false,
       },
@@ -948,7 +965,7 @@ export class LinearElementEditor {
       store.scheduleCapture();
       ret.linearElementEditor = {
         ...linearElementEditor,
-        pointerDownState: {
+        initialState: {
           prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
           lastClickedPoint: -1,
           origin: pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
@@ -1009,7 +1026,7 @@ export class LinearElementEditor {
         : null;
     ret.linearElementEditor = {
       ...linearElementEditor,
-      pointerDownState: {
+      initialState: {
         prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
         lastClickedPoint: clickedPointIndex,
         origin: pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
@@ -1082,19 +1099,16 @@ export class LinearElementEditor {
     let newPoint: LocalPoint;
 
     if (shouldRotateWithDiscreteAngle(event) && points.length >= 2) {
-      const lastCommittedPoint = points[points.length - 2];
+      const anchor = points[points.length - 2];
       const [width, height] = LinearElementEditor._getShiftLockedDelta(
         element,
         elementsMap,
-        lastCommittedPoint,
+        anchor,
         pointFrom(scenePointerX, scenePointerY),
         event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
       );
 
-      newPoint = pointFrom(
-        width + lastCommittedPoint[0],
-        height + lastCommittedPoint[1],
-      );
+      newPoint = pointFrom(width + anchor[0], height + anchor[1]);
     } else {
       newPoint = LinearElementEditor.createPointAt(
         element,
@@ -1530,18 +1544,18 @@ export class LinearElementEditor {
       return false;
     }
 
-    const { segmentMidpoint } = linearElementEditor.pointerDownState;
+    const { segmentMidpoint } = linearElementEditor.initialState;
 
     if (
       segmentMidpoint.added ||
       segmentMidpoint.value === null ||
       segmentMidpoint.index === null ||
-      linearElementEditor.pointerDownState.origin === null
+      linearElementEditor.initialState.origin === null
     ) {
       return false;
     }
 
-    const origin = linearElementEditor.pointerDownState.origin!;
+    const origin = linearElementEditor.initialState.origin!;
     const dist = pointDistance(
       origin,
       pointFrom(pointerCoords.x, pointerCoords.y),
@@ -1570,12 +1584,12 @@ export class LinearElementEditor {
     if (!element) {
       return;
     }
-    const { segmentMidpoint } = linearElementEditor.pointerDownState;
+    const { segmentMidpoint } = linearElementEditor.initialState;
     const ret: {
-      pointerDownState: LinearElementEditor["pointerDownState"];
+      pointerDownState: LinearElementEditor["initialState"];
       selectedPointsIndices: LinearElementEditor["selectedPointsIndices"];
     } = {
-      pointerDownState: linearElementEditor.pointerDownState,
+      pointerDownState: linearElementEditor.initialState,
       selectedPointsIndices: linearElementEditor.selectedPointsIndices,
     };
 
@@ -1595,9 +1609,9 @@ export class LinearElementEditor {
     scene.mutateElement(element, { points });
 
     ret.pointerDownState = {
-      ...linearElementEditor.pointerDownState,
+      ...linearElementEditor.initialState,
       segmentMidpoint: {
-        ...linearElementEditor.pointerDownState.segmentMidpoint,
+        ...linearElementEditor.initialState.segmentMidpoint,
         added: true,
       },
       lastClickedPoint: segmentMidpoint.index!,
@@ -1915,7 +1929,7 @@ export class LinearElementEditor {
     scene: Scene,
   ): Pick<
     LinearElementEditor,
-    "segmentMidPointHoveredCoords" | "pointerDownState"
+    "segmentMidPointHoveredCoords" | "initialState"
   > {
     const elementsMap = scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(
@@ -1978,8 +1992,8 @@ export class LinearElementEditor {
       return {
         ...linearElement,
         segmentMidPointHoveredCoords: point,
-        pointerDownState: {
-          ...linearElement.pointerDownState,
+        initialState: {
+          ...linearElement.initialState,
           segmentMidpoint: {
             added: false,
             index: element.fixedSegments![offset].index,

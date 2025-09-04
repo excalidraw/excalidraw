@@ -321,7 +321,6 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
     type: "line" | "arrow";
     points: readonly LocalPoint[];
-    lastCommittedPoint: LocalPoint | null;
     startBinding: FixedPointBinding | null;
     endBinding: FixedPointBinding | null;
     startArrowhead: Arrowhead | null;
@@ -378,7 +377,6 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     points: readonly LocalPoint[];
     pressures: readonly number[];
     simulatePressure: boolean;
-    lastCommittedPoint: LocalPoint | null;
   }>;
 
 export type FileId = string & { _brand: "FileId" };
