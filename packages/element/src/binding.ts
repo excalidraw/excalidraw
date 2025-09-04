@@ -32,6 +32,7 @@ import {
   getElementBounds,
 } from "./bounds";
 import {
+  getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
   hitElementItself,
   intersectElementWithLineSegment,
@@ -299,6 +300,54 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
           ? { mode: "orbit", element: hit, focusPoint: point }
           : { mode: "inside", element: hit, focusPoint: point },
       };
+    }
+
+    // Check and handle nested shapes
+    if (arrow.startBinding) {
+      const otherElement = elementsMap.get(
+        arrow.startBinding.elementId,
+      ) as ExcalidrawBindableElement;
+      invariant(otherElement, "Other element must be in the elements map");
+      const startFocusElements = getAllHoveredElementAtPoint(
+        getGlobalFixedPointForBindableElement(
+          arrow.startBinding.fixedPoint,
+          otherElement,
+          elementsMap,
+        ),
+        elements,
+        elementsMap,
+      );
+      const startHoverElements = getAllHoveredElementAtPoint(
+        LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          arrow,
+          0,
+          elementsMap,
+        ),
+        elements,
+        elementsMap,
+      );
+
+      if (
+        hit &&
+        otherElement.id !== hit.id &&
+        (startHoverElements.find((el) => el.id === hit.id) ||
+          startFocusElements.find((el) => el.id === hit.id))
+      ) {
+        return {
+          start: isMultiPoint
+            ? { mode: undefined }
+            : {
+                mode: "orbit",
+                element: otherElement,
+                focusPoint: snapToCenter(
+                  otherElement,
+                  elementsMap,
+                  origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y),
+                ),
+              },
+          end: { mode: "inside", element: hit, focusPoint: point },
+        };
+      }
     }
 
     // Inside -> outside binding

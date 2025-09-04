@@ -238,12 +238,12 @@ const bindingBorderTest = (
     : intersections.length > 0 && distance <= t;
 };
 
-export const getHoveredElementForBinding = (
+export const getAllHoveredElementAtPoint = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
   toleranceFn?: (element: ExcalidrawBindableElement) => number,
-): NonDeleted<ExcalidrawBindableElement> | null => {
+): NonDeleted<ExcalidrawBindableElement>[] => {
   const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index
@@ -263,6 +263,22 @@ export const getHoveredElementForBinding = (
       candidateElements.push(element);
     }
   }
+
+  return candidateElements;
+};
+
+export const getHoveredElementForBinding = (
+  point: Readonly<GlobalPoint>,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elementsMap: NonDeletedSceneElementsMap,
+  toleranceFn?: (element: ExcalidrawBindableElement) => number,
+): NonDeleted<ExcalidrawBindableElement> | null => {
+  const candidateElements = getAllHoveredElementAtPoint(
+    point,
+    elements,
+    elementsMap,
+    toleranceFn,
+  );
 
   if (!candidateElements || candidateElements.length === 0) {
     return null;
