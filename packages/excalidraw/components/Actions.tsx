@@ -400,17 +400,16 @@ export const CompactShapeActions = ({
                 type="button"
                 className="compact-action-button properties-trigger"
                 title={t("labels.stroke")}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  if (appState.openPopup === "compactStrokeStyles") {
-                    setAppState({ openPopup: null });
-                  } else {
-                    setAppState({ openPopup: "compactStrokeStyles" });
-                  }
-                }}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
+
+                  setAppState({
+                    openPopup:
+                      appState.openPopup === "compactStrokeStyles"
+                        ? null
+                        : "compactStrokeStyles",
+                  });
                 }}
               >
                 {adjustmentsIcon}
@@ -471,17 +470,16 @@ export const CompactShapeActions = ({
                 type="button"
                 className="compact-action-button properties-trigger"
                 title={t("labels.arrowtypes")}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  if (appState.openPopup === "compactArrowProperties") {
-                    setAppState({ openPopup: null });
-                  } else {
-                    setAppState({ openPopup: "compactArrowProperties" });
-                  }
-                }}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
+
+                  setAppState({
+                    openPopup:
+                      appState.openPopup === "compactArrowProperties"
+                        ? null
+                        : "compactArrowProperties",
+                  });
                 }}
               >
                 {(() => {
@@ -510,7 +508,7 @@ export const CompactShapeActions = ({
                   if (arrowType === "round") {
                     return roundArrowIcon;
                   }
-                  return sharpArrowIcon; // default
+                  return sharpArrowIcon;
                 })()}
               </button>
             </Popover.Trigger>
@@ -549,14 +547,12 @@ export const CompactShapeActions = ({
               open={appState.openPopup === "compactTextProperties"}
               onOpenChange={(open) => {
                 if (open) {
-                  // Save current caret position before opening popover
                   if (appState.editingTextElement) {
                     saveCaretPosition();
                   }
                   setAppState({ openPopup: "compactTextProperties" });
                 } else {
                   setAppState({ openPopup: null });
-                  // Refocus text editor if it was being edited and restore caret position
                   if (appState.editingTextElement) {
                     restoreCaretPosition();
                   }
@@ -568,25 +564,18 @@ export const CompactShapeActions = ({
                   type="button"
                   className="compact-action-button properties-trigger"
                   title={t("labels.textAlign")}
-                  onPointerDown={(e) => {
-                    // Prevent default behavior that might dismiss keyboard on mobile
-                    if (appState.editingTextElement) {
-                      e.preventDefault();
-                    }
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
 
                     if (appState.openPopup === "compactTextProperties") {
                       setAppState({ openPopup: null });
                     } else {
-                      // Save current caret position before opening popover
                       if (appState.editingTextElement) {
                         saveCaretPosition();
                       }
                       setAppState({ openPopup: "compactTextProperties" });
                     }
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
                   }}
                 >
                   {TextSizeIcon}
@@ -661,18 +650,15 @@ export const CompactShapeActions = ({
                 type="button"
                 className="compact-action-button properties-trigger"
                 title={t("labels.actions")}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-
-                  if (appState.openPopup === "compactOtherProperties") {
-                    setAppState({ openPopup: null });
-                  } else {
-                    setAppState({ openPopup: "compactOtherProperties" });
-                  }
-                }}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
+                  setAppState({
+                    openPopup:
+                      appState.openPopup === "compactOtherProperties"
+                        ? null
+                        : "compactOtherProperties",
+                  });
                 }}
               >
                 {DotsHorizontalIcon}
