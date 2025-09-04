@@ -118,7 +118,9 @@ describe("multi point mode in linear elements", () => {
       key: KEYS.ENTER,
     });
 
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`11`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+      `11`,
+    );
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(h.elements.length).toEqual(1);
 
@@ -161,7 +163,9 @@ describe("multi point mode in linear elements", () => {
     fireEvent.keyDown(document, {
       key: KEYS.ENTER,
     });
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`11`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+      `11`,
+    );
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(h.elements.length).toEqual(1);
 
