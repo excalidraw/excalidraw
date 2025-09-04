@@ -367,11 +367,7 @@ export class LinearElementEditor {
       );
     }
 
-    const newLinearElementEditor = {
-      ...linearElementEditor,
-      customLineAngle,
-    };
-
+    // PERF: Avoid state updates if not absolutely necessary
     if (
       app.state.selectedLinearElement?.customLineAngle === customLineAngle &&
       (!suggestedBinding ||
@@ -379,6 +375,11 @@ export class LinearElementEditor {
     ) {
       return null;
     }
+
+    const newLinearElementEditor = {
+      ...linearElementEditor,
+      customLineAngle,
+    };
 
     return {
       selectedLinearElement: newLinearElementEditor,
