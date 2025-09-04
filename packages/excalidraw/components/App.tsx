@@ -478,7 +478,6 @@ const deviceContextInitialValue = {
   editor: {
     isMobile: false,
     canFitSidebar: false,
-    showCompactSidebar: false,
   },
   isTouchScreen: false,
 };
@@ -2474,8 +2473,14 @@ class App extends React.Component<AppProps, AppState> {
     const nextEditorState = updateObject(prevEditorState, {
       isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
       canFitSidebar: editorWidth > sidebarBreakpoint,
-      showCompactSidebar:
-        this.isMobileOrTablet() && editorWidth >= MQ_MAX_WIDTH_PORTRAIT,
+    });
+
+    // also check if we need to update the app state
+    this.setState({
+      propertiesSidebarMode:
+        this.isMobileOrTablet() && editorWidth >= MQ_MAX_WIDTH_PORTRAIT
+          ? "compact"
+          : "complete",
     });
 
     if (prevEditorState !== nextEditorState) {

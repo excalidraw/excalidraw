@@ -446,6 +446,9 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+
+  /** properties sidebar mode - determines whether to show compact or complete sidebar */
+  propertiesSidebarMode: "compact" | "complete";
 }
 
 export type SearchMatch = {
@@ -884,7 +887,6 @@ export type Device = Readonly<{
   editor: {
     isMobile: boolean;
     canFitSidebar: boolean;
-    showCompactSidebar: boolean;
   };
   isTouchScreen: boolean;
 }>;

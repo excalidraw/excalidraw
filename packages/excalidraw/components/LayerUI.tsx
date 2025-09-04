@@ -161,23 +161,24 @@ const LayerUI = ({
   const device = useDevice();
   const tunnels = useInitializeTunnels();
 
-  const spacing = device.editor.showCompactSidebar
-    ? {
-        menuTopGap: 4,
-        toolbarColGap: 4,
-        toolbarRowGap: 1,
-        toolbarInnerRowGap: 0.5,
-        islandPadding: 1,
-        collabMarginLeft: 8,
-      }
-    : {
-        menuTopGap: 6,
-        toolbarColGap: 4,
-        toolbarRowGap: 1,
-        toolbarInnerRowGap: 1,
-        islandPadding: 1,
-        collabMarginLeft: 8,
-      };
+  const spacing =
+    appState.propertiesSidebarMode === "compact"
+      ? {
+          menuTopGap: 4,
+          toolbarColGap: 4,
+          toolbarRowGap: 1,
+          toolbarInnerRowGap: 0.5,
+          islandPadding: 1,
+          collabMarginLeft: 8,
+        }
+      : {
+          menuTopGap: 6,
+          toolbarColGap: 4,
+          toolbarRowGap: 1,
+          toolbarInnerRowGap: 1,
+          islandPadding: 1,
+          collabMarginLeft: 8,
+        };
 
   const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
@@ -231,8 +232,8 @@ const LayerUI = ({
     </div>
   );
 
-  const renderSelectedShapeActions = (isTablet: boolean) => {
-    // Use compact layout for tablets (when device is mobile but not too small)
+  const renderSelectedShapeActions = () => {
+    const isCompactMode = appState.propertiesSidebarMode === "compact";
 
     return (
       <Section
@@ -241,7 +242,7 @@ const LayerUI = ({
           "transition-left": appState.zenModeEnabled,
         })}
       >
-        {isTablet ? (
+        {isCompactMode ? (
           <Island
             className={clsx("compact-shape-actions-island")}
             padding={0}
@@ -304,11 +305,10 @@ const LayerUI = ({
             <div
               className={clsx("selected-shape-actions-container", {
                 "selected-shape-actions-container--compact":
-                  device.editor.showCompactSidebar,
+                  appState.propertiesSidebarMode === "compact",
               })}
             >
-              {shouldRenderSelectedShapeActions &&
-                renderSelectedShapeActions(device.editor.showCompactSidebar)}
+              {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
             </div>
           </Stack.Col>
           {!appState.viewModeEnabled &&
@@ -331,7 +331,7 @@ const LayerUI = ({
                           className={clsx("App-toolbar", {
                             "zen-mode": appState.zenModeEnabled,
                             "App-toolbar--compact":
-                              device.editor.showCompactSidebar,
+                              appState.propertiesSidebarMode === "compact",
                           })}
                         >
                           <HintViewer
@@ -404,7 +404,7 @@ const LayerUI = ({
               {
                 "transition-right": appState.zenModeEnabled,
                 "layer-ui__wrapper__top-right--compact":
-                  device.editor.showCompactSidebar,
+                  appState.propertiesSidebarMode === "compact",
               },
             )}
           >
@@ -479,7 +479,7 @@ const LayerUI = ({
         }}
         tab={DEFAULT_SIDEBAR.defaultTab}
       >
-        {!device.editor.showCompactSidebar && t("toolBar.library")}
+        {appState.propertiesSidebarMode === "complete" && t("toolBar.library")}
       </DefaultSidebar.Trigger>
       <DefaultOverwriteConfirmDialog />
       {appState.openDialog?.name === "ttd" && <TTDDialog __fallback />}

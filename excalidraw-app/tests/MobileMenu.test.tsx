@@ -33,7 +33,6 @@ describe("Test MobileMenu", () => {
         "editor": {
           "canFitSidebar": false,
           "isMobile": true,
-          "showCompactSidebar": false,
         },
         "isTouchScreen": false,
         "viewport": {
