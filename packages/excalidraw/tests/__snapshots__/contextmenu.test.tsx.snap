@@ -3128,7 +3128,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "offsetTop": 10,
   "openDialog": null,
   "openMenu": null,
-  "openPopup": "elementBackground",
+  "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
   "pasteDialog": {

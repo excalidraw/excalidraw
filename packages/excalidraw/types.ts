@@ -352,9 +352,10 @@ export interface AppState {
     | "elementBackground"
     | "elementStroke"
     | "fontFamily"
-    | "fontSize"
-    | "textAlign"
-    | "arrowProperties"
+    | "compactTextProperties"
+    | "compactStrokeStyles"
+    | "compactOtherProperties"
+    | "compactArrowProperties"
     | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:

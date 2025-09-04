@@ -6,22 +6,21 @@ import type { FontFamilyValues } from "@excalidraw/element/types";
 import { t } from "../../i18n";
 import { ButtonIcon } from "../ButtonIcon";
 import { TextIcon } from "../icons";
-import { useExcalidrawAppState } from "../App";
+
+import { useExcalidrawSetAppState } from "../App";
 
 import { isDefaultFont } from "./FontPicker";
 
 interface FontPickerTriggerProps {
   selectedFontFamily: FontFamilyValues | null;
-  onToggle: () => void;
   isOpened?: boolean;
 }
 
 export const FontPickerTrigger = ({
   selectedFontFamily,
-  onToggle,
   isOpened = false,
 }: FontPickerTriggerProps) => {
-  const appState = useExcalidrawAppState();
+  const setAppState = useExcalidrawSetAppState();
   const isTriggerActive = useMemo(
     () => Boolean(selectedFontFamily && !isDefaultFont(selectedFontFamily)),
     [selectedFontFamily],
@@ -29,16 +28,7 @@ export const FontPickerTrigger = ({
 
   return (
     <Popover.Trigger asChild>
-      <div
-        data-openpopup="fontFamily"
-        className="properties-trigger"
-        onPointerDown={(e) => {
-          // Prevent default behavior that might dismiss keyboard on mobile when editing text
-          if (appState.editingTextElement) {
-            e.preventDefault();
-          }
-        }}
-      >
+      <div data-openpopup="fontFamily" className="properties-trigger">
         <ButtonIcon
           standalone
           icon={TextIcon}
@@ -46,7 +36,12 @@ export const FontPickerTrigger = ({
           className="properties-trigger"
           testId={"font-family-show-fonts"}
           active={isTriggerActive || isOpened}
-          onClick={() => {}} // Let Radix handle the toggle
+          onClick={() => {
+            setAppState((appState) => ({
+              openPopup:
+                appState.openPopup === "fontFamily" ? null : appState.openPopup,
+            }));
+          }}
           style={{
             border: "none",
           }}

@@ -105,7 +105,6 @@ export const FontPicker = React.memo(
         <Popover.Root open={isOpened} onOpenChange={onPopupChange}>
           <FontPickerTrigger
             selectedFontFamily={selectedFontFamily}
-            onToggle={() => {}} // No longer needed, Radix handles it
             isOpened={isOpened}
           />
           {isOpened && (

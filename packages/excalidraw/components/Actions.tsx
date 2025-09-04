@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 
 import {
@@ -24,8 +24,6 @@ import {
 } from "@excalidraw/element";
 
 import { hasStrokeColor, toolIsArrow } from "@excalidraw/element";
-
-import { flushSync } from "react-dom";
 
 import type {
   ExcalidrawElement,
@@ -321,10 +319,6 @@ export const CompactShapeActions = ({
   setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
-  const [strokePopoverOpen, setStrokePopoverOpen] = useState(false);
-  const [otherActionsPopoverOpen, setOtherActionsPopoverOpen] = useState(false);
-  const [textPopoverOpen, setTextPopoverOpen] = useState(false);
-  const [preventTextAlignClose, setPreventTextAlignClose] = useState(false);
   const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus();
   const { container } = useExcalidrawContainer();
 
@@ -366,14 +360,6 @@ export const CompactShapeActions = ({
 
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
-  useEffect(() => {
-    if (appState.openPopup === "fontFamily") {
-      setStrokePopoverOpen(false);
-      setOtherActionsPopoverOpen(false);
-      setTextPopoverOpen(false);
-    }
-  }, [appState.openPopup]);
-
   return (
     <div className="compact-shape-actions">
       {/* Stroke Color */}
@@ -400,20 +386,12 @@ export const CompactShapeActions = ({
         targetElements.some((element) => canChangeRoundness(element.type))) && (
         <div className="compact-action-item">
           <Popover.Root
-            open={strokePopoverOpen}
+            open={appState.openPopup === "compactStrokeStyles"}
             onOpenChange={(open) => {
-              setStrokePopoverOpen(open);
               if (open) {
-                setOtherActionsPopoverOpen(false);
-                setTextPopoverOpen(false);
-                // Only close specific global popups that conflict with local popovers
-                // Don't interfere with normal global popup switching
-                if (
-                  appState.openPopup === "fontFamily" ||
-                  appState.openPopup === "arrowProperties"
-                ) {
-                  setAppState({ openPopup: null });
-                }
+                setAppState({ openPopup: "compactStrokeStyles" });
+              } else {
+                setAppState({ openPopup: null });
               }
             }}
           >
@@ -424,21 +402,11 @@ export const CompactShapeActions = ({
                 title={t("labels.stroke")}
                 onPointerDown={(e) => {
                   e.preventDefault();
-                  setStrokePopoverOpen((open) => {
-                    const next = !open;
-                    if (next) {
-                      setOtherActionsPopoverOpen(false);
-                      setTextPopoverOpen(false);
-                      // Only close specific global popups that conflict with local popovers
-                      if (
-                        appState.openPopup === "fontFamily" ||
-                        appState.openPopup === "arrowProperties"
-                      ) {
-                        setAppState({ openPopup: null });
-                      }
-                    }
-                    return next;
-                  });
+                  if (appState.openPopup === "compactStrokeStyles") {
+                    setAppState({ openPopup: null });
+                  } else {
+                    setAppState({ openPopup: "compactStrokeStyles" });
+                  }
                 }}
                 onClick={(e) => {
                   e.preventDefault();
@@ -448,12 +416,12 @@ export const CompactShapeActions = ({
                 {adjustmentsIcon}
               </button>
             </Popover.Trigger>
-            {strokePopoverOpen && (
+            {appState.openPopup === "compactStrokeStyles" && (
               <PropertiesPopover
                 className={PROPERTIES_CLASSES}
                 container={container}
                 style={{ maxWidth: "13rem" }}
-                onClose={() => setStrokePopoverOpen(false)}
+                onClose={() => {}}
               >
                 <div className="selected-shape-actions">
                   {showFillIcons && renderAction("changeFillStyle")}
@@ -489,13 +457,12 @@ export const CompactShapeActions = ({
         targetElements.some((element) => toolIsArrow(element.type))) && (
         <div className="compact-action-item">
           <Popover.Root
-            open={appState.openPopup === "arrowProperties"}
+            open={appState.openPopup === "compactArrowProperties"}
             onOpenChange={(open) => {
               if (open) {
-                setAppState({ openPopup: "arrowProperties" });
-                setStrokePopoverOpen(false);
-                setOtherActionsPopoverOpen(false);
-                setTextPopoverOpen(false);
+                setAppState({ openPopup: "compactArrowProperties" });
+              } else {
+                setAppState({ openPopup: null });
               }
             }}
           >
@@ -506,13 +473,10 @@ export const CompactShapeActions = ({
                 title={t("labels.arrowtypes")}
                 onPointerDown={(e) => {
                   e.preventDefault();
-                  if (appState.openPopup === "arrowProperties") {
+                  if (appState.openPopup === "compactArrowProperties") {
                     setAppState({ openPopup: null });
                   } else {
-                    setStrokePopoverOpen(false);
-                    setOtherActionsPopoverOpen(false);
-                    setTextPopoverOpen(false);
-                    setAppState({ openPopup: "arrowProperties" });
+                    setAppState({ openPopup: "compactArrowProperties" });
                   }
                 }}
                 onClick={(e) => {
@@ -550,18 +514,12 @@ export const CompactShapeActions = ({
                 })()}
               </button>
             </Popover.Trigger>
-            {appState.openPopup === "arrowProperties" && (
+            {appState.openPopup === "compactArrowProperties" && (
               <PropertiesPopover
                 container={container}
                 className="properties-content"
                 style={{ maxWidth: "13rem" }}
-                onClose={() => {
-                  setAppState((prev: AppState) =>
-                    prev.openPopup === "arrowProperties"
-                      ? { openPopup: null }
-                      : null,
-                  );
-                }}
+                onClose={() => {}}
               >
                 {renderAction("changeArrowProperties")}
               </PropertiesPopover>
@@ -588,30 +546,16 @@ export const CompactShapeActions = ({
           </div>
           <div className="compact-action-item">
             <Popover.Root
-              open={textPopoverOpen}
+              open={appState.openPopup === "compactTextProperties"}
               onOpenChange={(open) => {
-                setTextPopoverOpen(open);
                 if (open) {
                   // Save current caret position before opening popover
                   if (appState.editingTextElement) {
                     saveCaretPosition();
                   }
-                  setStrokePopoverOpen(false);
-                  setOtherActionsPopoverOpen(false);
-                  // Only close specific global popups that conflict with local popovers
-                  // Don't interfere with normal global popup switching
-                  if (
-                    appState.openPopup === "fontFamily" ||
-                    appState.openPopup === "arrowProperties"
-                  ) {
-                    setAppState({ openPopup: null });
-                  }
+                  setAppState({ openPopup: "compactTextProperties" });
                 } else {
-                  // If we're preventing close due to selection, ignore this close event
-                  if (preventTextAlignClose) {
-                    setPreventTextAlignClose(false);
-                    return;
-                  }
+                  setAppState({ openPopup: null });
                   // Refocus text editor if it was being edited and restore caret position
                   if (appState.editingTextElement) {
                     restoreCaretPosition();
@@ -630,33 +574,14 @@ export const CompactShapeActions = ({
                       e.preventDefault();
                     }
 
-                    // Handle switching from any global popup (font family, elementStroke, etc.)
-                    if (appState.openPopup) {
-                      // First close the global popup
-                      flushSync(() => {
-                        setAppState({ openPopup: null });
-                      });
-                      // Then open text popover in next tick
+                    if (appState.openPopup === "compactTextProperties") {
+                      setAppState({ openPopup: null });
+                    } else {
+                      // Save current caret position before opening popover
                       if (appState.editingTextElement) {
                         saveCaretPosition();
                       }
-                      setTextPopoverOpen(false);
-                      setStrokePopoverOpen(false);
-                      setOtherActionsPopoverOpen(false);
-                    } else {
-                      // Normal toggle behavior
-                      setTextPopoverOpen((open) => {
-                        const next = !open;
-                        if (next) {
-                          // Save current caret position before opening popover
-                          if (appState.editingTextElement) {
-                            saveCaretPosition();
-                          }
-                          setStrokePopoverOpen(false);
-                          setOtherActionsPopoverOpen(false);
-                        }
-                        return next;
-                      });
+                      setAppState({ openPopup: "compactTextProperties" });
                     }
                   }}
                   onClick={(e) => {
@@ -667,7 +592,7 @@ export const CompactShapeActions = ({
                   {TextSizeIcon}
                 </button>
               </Popover.Trigger>
-              {textPopoverOpen && (
+              {appState.openPopup === "compactTextProperties" && (
                 <PropertiesPopover
                   className={PROPERTIES_CLASSES}
                   container={container}
@@ -675,7 +600,6 @@ export const CompactShapeActions = ({
                   // Improve focus handling for text editing scenarios
                   preventAutoFocusOnTouch={!!appState.editingTextElement}
                   onClose={() => {
-                    setTextPopoverOpen(false);
                     // Refocus text editor when popover closes with caret restoration
                     if (appState.editingTextElement) {
                       restoreCaretPosition();
@@ -687,18 +611,15 @@ export const CompactShapeActions = ({
                       suppportsHorizontalAlign(targetElements, elementsMap)) &&
                       renderAction("changeTextAlign", {
                         compactMode: true,
-                        onPreventClose: () => setPreventTextAlignClose(true),
                       })}
                     {shouldAllowVerticalAlign(targetElements, elementsMap) &&
                       renderAction("changeVerticalAlign", {
                         compactMode: true,
-                        onPreventClose: () => setPreventTextAlignClose(true),
                       })}
                     {(appState.activeTool.type === "text" ||
                       targetElements.some(isTextElement)) &&
                       renderAction("changeFontSize", {
                         compactMode: true,
-                        onPreventClose: () => setPreventTextAlignClose(true),
                       })}
                   </div>
                 </PropertiesPopover>
@@ -726,12 +647,12 @@ export const CompactShapeActions = ({
       {!isEditingTextOrNewElement && targetElements.length > 0 && (
         <div className="compact-action-item">
           <Popover.Root
-            open={otherActionsPopoverOpen}
+            open={appState.openPopup === "compactOtherProperties"}
             onOpenChange={(open) => {
-              setOtherActionsPopoverOpen(open);
               if (open) {
-                setStrokePopoverOpen(false);
-                setTextPopoverOpen(false);
+                setAppState({ openPopup: "compactOtherProperties" });
+              } else {
+                setAppState({ openPopup: null });
               }
             }}
           >
@@ -743,26 +664,10 @@ export const CompactShapeActions = ({
                 onPointerDown={(e) => {
                   e.preventDefault();
 
-                  // Handle switching from any global popup (font family, elementStroke, etc.)
-                  if (appState.openPopup) {
-                    // First close the global popup
+                  if (appState.openPopup === "compactOtherProperties") {
                     setAppState({ openPopup: null });
-                    // Then open other actions popover in next tick
-                    setTimeout(() => {
-                      setOtherActionsPopoverOpen(true);
-                      setStrokePopoverOpen(false);
-                      setTextPopoverOpen(false);
-                    }, 0);
                   } else {
-                    // Normal toggle behavior
-                    setOtherActionsPopoverOpen((open) => {
-                      const next = !open;
-                      if (next) {
-                        setStrokePopoverOpen(false);
-                        setTextPopoverOpen(false);
-                      }
-                      return next;
-                    });
+                    setAppState({ openPopup: "compactOtherProperties" });
                   }
                 }}
                 onClick={(e) => {
@@ -773,7 +678,7 @@ export const CompactShapeActions = ({
                 {DotsHorizontalIcon}
               </button>
             </Popover.Trigger>
-            {otherActionsPopoverOpen && (
+            {appState.openPopup === "compactOtherProperties" && (
               <PropertiesPopover
                 className={PROPERTIES_CLASSES}
                 container={container}
@@ -783,7 +688,7 @@ export const CompactShapeActions = ({
                   justifyContent: "center",
                   alignItems: "center",
                 }}
-                onClose={() => setOtherActionsPopoverOpen(false)}
+                onClose={() => {}}
               >
                 <div className="selected-shape-actions">
                   <fieldset>

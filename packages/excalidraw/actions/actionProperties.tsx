@@ -1185,23 +1185,20 @@ export const actionChangeFontFamily = register({
                 }
               }
 
-              updateData({ ...batchedData, openPopup: "fontFamily" });
-              setBatchedData({});
+              setBatchedData({
+                ...batchedData,
+                openPopup: "fontFamily",
+              });
             } else {
-              // close: clear openPopup if we're still the active popup
               const fontFamilyData = {
-                openPopup:
-                  appState.openPopup === "fontFamily"
-                    ? null
-                    : appState.openPopup,
                 currentHoveredFontFamily: null,
                 cachedElements: new Map(cachedElementsRef.current),
                 resetAll: true,
               } as ChangeFontFamilyData;
 
-              // apply immediately to avoid racing with other popovers opening
-              updateData({ ...batchedData, ...fontFamilyData });
-              setBatchedData({});
+              setBatchedData({
+                ...fontFamilyData,
+              });
               cachedElementsRef.current.clear();
 
               // Refocus text editor when font picker closes if we were editing text

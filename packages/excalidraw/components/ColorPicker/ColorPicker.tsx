@@ -240,7 +240,7 @@ const ColorPickerTrigger = ({
   onToggle: () => void;
   editingTextElement?: boolean;
 }) => {
-  const handlePointerDown = (e: React.PointerEvent) => {
+  const handleClick = (e: React.MouseEvent) => {
     // use pointerdown so we run before outside-close logic
     e.preventDefault();
     e.stopPropagation();
@@ -269,7 +269,7 @@ const ColorPickerTrigger = ({
           : t("labels.showBackground")
       }
       data-openpopup={type}
-      onPointerDown={handlePointerDown}
+      onClick={handleClick}
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
       {compactMode && color && (
