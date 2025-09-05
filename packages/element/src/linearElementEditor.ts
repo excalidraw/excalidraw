@@ -117,6 +117,7 @@ type PointMoveOtherUpdates = {
   startBinding?: FixedPointBinding | null;
   endBinding?: FixedPointBinding | null;
   moveMidPointsWithElement?: boolean | null;
+  suggestedBinding?: AppState["suggestedBinding"] | null;
 };
 
 export class LinearElementEditor {
@@ -484,6 +485,7 @@ export class LinearElementEditor {
     }
 
     // Apply the point movement if needed
+    let suggestedBinding: AppState["suggestedBinding"] = null;
     if (deltaX || deltaY) {
       const { positions, updates } = pointDraggingUpdates(
         selectedPointsIndices,
@@ -496,6 +498,13 @@ export class LinearElementEditor {
       );
 
       LinearElementEditor.movePoints(element, app.scene, positions, updates);
+
+      // Set the suggested binding from the updates if available
+      if (isBindingElement(element, false)) {
+        if (isBindingEnabled(app.state) && (startIsSelected || endIsSelected)) {
+          suggestedBinding = updates?.suggestedBinding ?? null;
+        }
+      }
 
       // Move the arrow over the bindable object in terms of z-index
       if (isBindingElement(element) && startIsSelected !== endIsSelected) {
@@ -522,7 +531,6 @@ export class LinearElementEditor {
     }
 
     // Suggest bindings for first and last point if selected
-    let suggestedBinding: AppState["suggestedBinding"] = null;
     if (isBindingElement(element, false)) {
       if (isBindingEnabled(app.state) && (startIsSelected || endIsSelected)) {
         suggestedBinding = maybeSuggestBindingsForBindingElementAtCoords(
@@ -2086,7 +2094,9 @@ const pointDraggingUpdates = (
   );
 
   // Generate the next bindings for the arrow
-  const updates: PointMoveOtherUpdates = {};
+  const updates: PointMoveOtherUpdates = {
+    suggestedBinding: null,
+  };
   if (start.mode === null) {
     updates.startBinding = null;
   } else if (start.mode) {
@@ -2101,6 +2111,10 @@ const pointDraggingUpdates = (
         start.focusPoint,
       ),
     };
+
+    if (startIsDragged) {
+      updates.suggestedBinding = start.element;
+    }
   }
   if (end.mode === null) {
     updates.endBinding = null;
@@ -2116,6 +2130,10 @@ const pointDraggingUpdates = (
         end.focusPoint,
       ),
     };
+
+    if (endIsDragged) {
+      updates.suggestedBinding = end.element;
+    }
   }
 
   // Simulate the updated arrow for the bind point calculation
