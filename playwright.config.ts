@@ -44,7 +44,7 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         launchOptions: {
-          args: ["--disable-font-subpixel-positioning"],
+          args: ["--disable-font-subpixel-positioning", "--disable-gpu"],
         },
       },
     },

@@ -21,6 +21,7 @@ import {
   assertNever,
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
+  isTestEnv,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -182,7 +183,7 @@ export const generateRoughOptions = (
   continuousPath = false,
 ): Options => {
   const options: Options = {
-    seed: element.seed,
+    seed: isTestEnv() ? 1 : element.seed,
     strokeLineDash:
       element.strokeStyle === "dashed"
         ? getDashArrayDashed(element.strokeWidth)
