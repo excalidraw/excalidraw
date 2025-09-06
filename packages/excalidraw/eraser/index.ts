@@ -182,11 +182,31 @@ const eraserTest = (
   elementsMap: ElementsMap,
 ): boolean => {
   const lastPoint = pathSegment[1];
+  const boundBoxDiagonal = Math.hypot(element.width, element.height);
+  const threshold = 1;
   if (
     shouldTestInside(element) &&
     isPointInElement(lastPoint, element, elementsMap)
   ) {
     return true;
+  }
+
+  // for freedraw-points, lines and arrows of shared endpoints
+  if (boundBoxDiagonal < threshold) {
+    const tolerance =
+      element.type === "freedraw"
+        ? element.strokeWidth * 2.125
+        : element.strokeWidth / 2;
+    const [cx, cy] = [
+      element.x + element.width / 2,
+      element.y + element.height / 2,
+    ];
+    const distance = Math.hypot(lastPoint[0] - cx, lastPoint[1] - cy);
+    const hitRadius = Math.max(element.width, element.height) / 2 + tolerance;
+
+    if (distance <= hitRadius) {
+      return true;
+    }
   }
 
   const boundTextElement = getBoundTextElement(element, elementsMap);
