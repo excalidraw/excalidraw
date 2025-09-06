@@ -56,9 +56,13 @@ describe("library", () => {
 
   it("import library via drag&drop", async () => {
     expect(await h.app.library.getLatestLibrary()).toEqual([]);
-    await API.drop(
-      await API.loadFile("./fixtures/fixture_library.excalidrawlib"),
-    );
+    await API.drop([
+      {
+        kind: "file",
+        type: MIME_TYPES.excalidrawlib,
+        file: await API.loadFile("./fixtures/fixture_library.excalidrawlib"),
+      },
+    ]);
     await waitFor(async () => {
       expect(await h.app.library.getLatestLibrary()).toEqual([
         {
@@ -75,11 +79,13 @@ describe("library", () => {
   it("drop library item onto canvas", async () => {
     expect(h.elements).toEqual([]);
     const libraryItems = parseLibraryJSON(await libraryJSONPromise);
-    await API.drop(
-      new Blob([serializeLibraryAsJSON(libraryItems)], {
+    await API.drop([
+      {
+        kind: "string",
+        value: serializeLibraryAsJSON(libraryItems),
         type: MIME_TYPES.excalidrawlib,
-      }),
-    );
+      },
+    ]);
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ [ORIG_ID]: "A" })]);
     });
@@ -111,23 +117,20 @@ describe("library", () => {
       },
     });
 
-    await API.drop(
-      new Blob(
-        [
-          serializeLibraryAsJSON([
-            {
-              id: "item1",
-              status: "published",
-              elements: [rectangle, text, arrow],
-              created: 1,
-            },
-          ]),
-        ],
-        {
-          type: MIME_TYPES.excalidrawlib,
-        },
-      ),
-    );
+    await API.drop([
+      {
+        kind: "string",
+        value: serializeLibraryAsJSON([
+          {
+            id: "item1",
+            status: "published",
+            elements: [rectangle, text, arrow],
+            created: 1,
+          },
+        ]),
+        type: MIME_TYPES.excalidrawlib,
+      },
+    ]);
 
     await waitFor(() => {
       expect(h.elements).toEqual(
@@ -170,11 +173,13 @@ describe("library", () => {
       created: 1,
     };
 
-    await API.drop(
-      new Blob([serializeLibraryAsJSON([item1, item1])], {
+    await API.drop([
+      {
+        kind: "string",
+        value: serializeLibraryAsJSON([item1, item1]),
         type: MIME_TYPES.excalidrawlib,
-      }),
-    );
+      },
+    ]);
 
     await waitFor(() => {
       expect(h.elements).toEqual([
@@ -193,11 +198,13 @@ describe("library", () => {
     UI.clickTool("rectangle");
     expect(h.elements).toEqual([]);
     const libraryItems = parseLibraryJSON(await libraryJSONPromise);
-    await API.drop(
-      new Blob([serializeLibraryAsJSON(libraryItems)], {
+    await API.drop([
+      {
+        kind: "string",
+        value: serializeLibraryAsJSON(libraryItems),
         type: MIME_TYPES.excalidrawlib,
-      }),
-    );
+      },
+    ]);
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ [ORIG_ID]: "A" })]);
     });
