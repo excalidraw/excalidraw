@@ -5,6 +5,7 @@ import { newImageElement } from "@excalidraw/element";
 import { generateIdFromFile } from "@excalidraw/excalidraw/data/blob";
 import { processPDFFile } from "./pdf-processor.js";
 import { storePDFFile, getPDFFile } from "./pdf-storage.js";
+import { hashFile, createChunks, buildIngestPayload } from "./rag-utils.js";
 import type { PDFPageResult } from './types/pdf.types.js';
 
 /**
@@ -144,6 +145,14 @@ export const usePDFDropHandler = (excalidrawAPI: ExcalidrawImperativeAPI | null)
 
             excalidrawAPI.setToast({ message: `PDF imported (${result.pageCount} pages)`, duration: 3000 });
 
+            // RAG ingestion (non-blocking)
+            try {
+              await ingestPDFForRAG(pdfFile, originalFileId, excalidrawAPI);
+            } catch (ragError) {
+              console.warn('RAG ingestion failed (non-blocking):', ragError);
+              // Don't show error toast for RAG failures to keep UX smooth
+            }
+
           } catch (error) {
             console.error('PDF processing failed:', error);
             excalidrawAPI.setToast({
@@ -163,3 +172,128 @@ export const usePDFDropHandler = (excalidrawAPI: ExcalidrawImperativeAPI | null)
     };
   }, [excalidrawAPI]);
 };
+
+/**
+ * Ingest PDF for RAG system (non-blocking background process)
+ */
+async function ingestPDFForRAG(
+  pdfFile: File, 
+  originalFileId: string, 
+  excalidrawAPI: ExcalidrawImperativeAPI
+): Promise<void> {
+  // Check if RAG indexing is enabled (privacy setting)
+  const ragIndexingEnabled = localStorage.getItem('excalidraw-rag-indexing') !== 'false';
+  if (!ragIndexingEnabled) {
+    console.log('PDF RAG indexing disabled by user preference');
+    return;
+  }
+
+  // Resolve LLM service URL safely in browser environment
+  const envUrl = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_LLM_SERVICE_URL)
+    ? import.meta.env.VITE_LLM_SERVICE_URL
+    : undefined;
+  const globalUrl = window.__EXCALIDRAW_LLM_SERVICE_URL;
+  const storedUrl = (localStorage.getItem('excalidraw-llm-url') || undefined) as string | undefined;
+  const defaultUrl = `${window.location.protocol}//${window.location.hostname}:3001`;
+  const LLM_SERVICE_URL = globalUrl || envUrl || storedUrl || defaultUrl;
+  
+  try {
+    // Show indexing start toast
+    excalidrawAPI.setToast({ 
+      message: 'Indexing PDF for semantic search...', 
+      duration: 2000 
+    });
+
+    // Generate stable source hash
+    const sourceHash = await hashFile(pdfFile);
+    
+    // Extract text from PDF
+    const arrayBuffer = await pdfFile.arrayBuffer();
+    const pdfData = new Uint8Array(arrayBuffer);
+    
+    if (!window.extractPDFText) {
+      throw new Error('PDF text extraction not available');
+    }
+    
+    const pagesText = await window.extractPDFText(pdfData);
+    
+    // Skip if no text extracted
+    if (pagesText.length === 0 || pagesText.every(p => !p.text.trim())) {
+      console.log('No text content found in PDF, skipping RAG indexing');
+      return;
+    }
+    
+    // Create chunks
+    const chunks = createChunks(pagesText, 1000, 0.15);
+    
+    if (chunks.length === 0) {
+      console.log('No chunks created from PDF text, skipping RAG indexing');
+      return;
+    }
+    
+    // Build ingestion payload
+    const payload = buildIngestPayload(pdfFile.name, sourceHash, chunks);
+    
+    // Ingest document
+    const ingestResponse = await fetch(`${LLM_SERVICE_URL}/api/rag/ingest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    
+    if (!ingestResponse.ok) {
+      throw new Error(`Ingestion failed: ${ingestResponse.status} ${ingestResponse.statusText}`);
+    }
+    
+    const ingestResult = await ingestResponse.json();
+    const documentId = ingestResult?.document?.id;
+    
+    if (!documentId) {
+      throw new Error('No document ID returned from ingestion');
+    }
+    
+    // Update element with RAG metadata
+    const elements = excalidrawAPI.getSceneElements();
+    const pdfElement = elements.find(el => 
+      el.type === 'image' && 
+      el.customData?.pdf?.originalFileId === originalFileId
+    );
+    
+    if (pdfElement) {
+      const updatedElement = {
+        ...pdfElement,
+        customData: {
+          ...pdfElement.customData,
+          pdf: {
+            ...pdfElement.customData?.pdf,
+            documentId,
+            sourceHash,
+            indexingStatus: 'ingesting'
+          }
+        }
+      };
+      
+      excalidrawAPI.updateScene({
+        elements: elements.map(el => el.id === pdfElement.id ? updatedElement : el)
+      });
+    }
+    
+    // Trigger embedding generation (fire-and-forget)
+    fetch(`${LLM_SERVICE_URL}/api/rag/embed-missing`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ documentId })
+    }).catch(error => {
+      console.warn('Embedding generation failed:', error);
+    });
+    
+    console.log(`PDF "${pdfFile.name}" indexed for RAG: ${chunks.length} chunks, document ID: ${documentId}`);
+    
+  } catch (error) {
+    console.warn('PDF RAG ingestion failed:', error);
+    excalidrawAPI.setToast({ 
+      message: 'PDF indexing failed (non-blocking)', 
+      duration: 2500 
+    });
+  }
+}

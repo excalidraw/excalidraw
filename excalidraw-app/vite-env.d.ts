@@ -1,3 +1,13 @@
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_LLM_SERVICE_URL?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
 /// <reference types="vite-plugin-pwa/vanillajs" />
 /// <reference types="vite-plugin-pwa/info" />
 /// <reference types="vite-plugin-svgr/client" />

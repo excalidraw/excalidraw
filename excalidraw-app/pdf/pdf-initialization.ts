@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { initializePDFJS } from "./pdf-processor.js";
+// Import PDF utils to ensure global functions are available early
+import "./pdf-utils";
 
 /**
  * PDF.js initialization hook.

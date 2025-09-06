@@ -99,6 +99,7 @@ declare global {
   interface Window {
     pdfjsLib?: any;
     extractPDFDocumentPages?: (pdfData: Uint8Array, outputScale: number) => Promise<PDFPageResult[]>;
+    extractPDFText?: (pdfData: Uint8Array) => Promise<Array<{page: number, text: string}>>;
   }
 }
 
