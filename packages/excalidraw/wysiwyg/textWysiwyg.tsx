@@ -7,6 +7,7 @@ import {
   getFontString,
   getFontFamilyString,
   isTestEnv,
+  MIME_TYPES,
 } from "@excalidraw/common";
 
 import {
@@ -45,7 +46,7 @@ import type {
 
 import { actionSaveToActiveFile } from "../actions";
 
-import { parseClipboard } from "../clipboard";
+import { parseDataTransferEvent } from "../clipboard";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -332,12 +333,14 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.onpaste = async (event) => {
-      const clipboardData = await parseClipboard(event, true);
-      if (!clipboardData.text) {
+      const textItem = (await parseDataTransferEvent(event)).findByType(
+        MIME_TYPES.text,
+      );
+      if (!textItem) {
         return;
       }
-      const data = normalizeText(clipboardData.text);
-      if (!data) {
+      const text = normalizeText(textItem.value);
+      if (!text) {
         return;
       }
       const container = getContainerElement(
@@ -355,7 +358,7 @@ export const textWysiwyg = ({
           app.scene.getNonDeletedElementsMap(),
         );
         const wrappedText = wrapText(
-          `${editable.value}${data}`,
+          `${editable.value}${text}`,
           font,
           getBoundTextMaxWidth(container, boundTextElement),
         );

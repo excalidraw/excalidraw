@@ -259,13 +259,17 @@ export const IMAGE_MIME_TYPES = {
   jfif: "image/jfif",
 } as const;
 
-export const MIME_TYPES = {
+export const STRING_MIME_TYPES = {
   text: "text/plain",
   html: "text/html",
   json: "application/json",
   // excalidraw data
   excalidraw: "application/vnd.excalidraw+json",
   excalidrawlib: "application/vnd.excalidrawlib+json",
+} as const;
+
+export const MIME_TYPES = {
+  ...STRING_MIME_TYPES,
   // image-encoded excalidraw data
   "excalidraw.svg": "image/svg+xml",
   "excalidraw.png": "image/png",

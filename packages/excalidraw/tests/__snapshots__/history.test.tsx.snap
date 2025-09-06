@@ -12291,7 +12291,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "editingGroupId": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
-  "errorMessage": "Couldn't load invalid file",
+  "errorMessage": null,
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
