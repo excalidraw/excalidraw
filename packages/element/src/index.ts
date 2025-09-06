@@ -97,6 +97,7 @@ export * from "./image";
 export * from "./linearElementEditor";
 export * from "./mutateElement";
 export * from "./newElement";
+export * from "./positionElementsOnGrid";
 export * from "./renderElement";
 export * from "./resizeElements";
 export * from "./resizeTest";
