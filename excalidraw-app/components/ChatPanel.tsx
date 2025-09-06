@@ -23,6 +23,7 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
+  durationMs?: number;
 }
 
 const ChatPanel: React.FC<ChatPanelProps> = ({ 
@@ -189,6 +190,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     setError(null);
 
     try {
+      const startTs = (typeof performance !== 'undefined' ? performance.now() : Date.now());
       // Get canvas context for AI
       const elements = excalidrawAPI.getSceneElements();
       const appState = excalidrawAPI.getAppState();
@@ -279,11 +281,14 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       const data = await response.json();
 
       if (data.success) {
+        const endTs = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+        const durationMs = Math.max(0, Math.round(endTs - startTs));
         const assistantMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
           content: data.content,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          durationMs
         };
 
         setMessages(prev => [...prev, assistantMessage]);
@@ -365,6 +370,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     } catch {
       return '';
     }
+  };
+
+  const formatDuration = (ms?: number): string => {
+    if (ms == null) return '';
+    const s = (ms / 1000).toFixed(1);
+    return `${s}s`;
   };
 
   if (!isVisible) {
@@ -533,6 +544,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 textAlign: message.role === 'user' ? 'right' : 'left'
               }}>
                 {formatTimestamp(message.timestamp)}
+                {message.role === 'assistant' && message.durationMs != null && (
+                  <span style={{ marginLeft: 6 }}>· {formatDuration(message.durationMs)}</span>
+                )}
               </div>
               {message.role === 'assistant' && (
                 <button
