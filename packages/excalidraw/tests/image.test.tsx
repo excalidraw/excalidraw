@@ -77,7 +77,7 @@ describe("image insertion", () => {
       API.loadFile("./fixtures/deer.png"),
       API.loadFile("./fixtures/smiley.png"),
     ]);
-    await API.drop(files);
+    await API.drop(files.map((file) => ({ kind: "file", file })));
 
     await assert();
   });

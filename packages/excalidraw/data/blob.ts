@@ -18,8 +18,6 @@ import { CanvasError, ImageSceneDataError } from "../errors";
 import { calculateScrollCenter } from "../scene";
 import { decodeSvgBase64Payload } from "../scene/export";
 
-import { isClipboardEvent } from "../clipboard";
-
 import { base64ToString, stringToBase64, toByteString } from "./encode";
 import { nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
@@ -98,6 +96,8 @@ export const getMimeType = (blob: Blob | string): string => {
     return MIME_TYPES.jpg;
   } else if (/\.svg$/.test(name)) {
     return MIME_TYPES.svg;
+  } else if (/\.excalidrawlib$/.test(name)) {
+    return MIME_TYPES.excalidrawlib;
   }
   return "";
 };
@@ -389,42 +389,6 @@ export const ImageURLToFile = async (
   }
 
   throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
-};
-
-export const getFilesFromEvent = async (
-  event: React.DragEvent<HTMLDivElement> | ClipboardEvent,
-) => {
-  let fileList: FileList | undefined = undefined;
-  let items: DataTransferItemList | undefined = undefined;
-
-  if (isClipboardEvent(event)) {
-    fileList = event.clipboardData?.files;
-    items = event.clipboardData?.items;
-  } else {
-    const dragEvent = event as React.DragEvent<HTMLDivElement>;
-    fileList = dragEvent.dataTransfer?.files;
-    items = dragEvent.dataTransfer?.items;
-  }
-
-  const files: (File | null)[] = Array.from(fileList || []);
-
-  return await Promise.all(
-    files.map(async (file, idx) => {
-      const dataTransferItem = items?.[idx];
-      const fileHandle = dataTransferItem
-        ? getFileHandle(dataTransferItem)
-        : null;
-      return file
-        ? {
-            file: await normalizeFile(file),
-            fileHandle: await fileHandle,
-          }
-        : {
-            file: null,
-            fileHandle: null,
-          };
-    }),
-  );
 };
 
 export const getFileHandle = async (

@@ -35,20 +35,23 @@ describe("appState", () => {
       expect(h.state.viewBackgroundColor).toBe("#F00");
     });
 
-    await API.drop(
-      new Blob(
-        [
-          JSON.stringify({
-            type: EXPORT_DATA_TYPES.excalidraw,
-            appState: {
-              viewBackgroundColor: "#000",
-            },
-            elements: [API.createElement({ type: "rectangle", id: "A" })],
-          }),
-        ],
-        { type: MIME_TYPES.json },
-      ),
-    );
+    await API.drop([
+      {
+        kind: "file",
+        file: new Blob(
+          [
+            JSON.stringify({
+              type: EXPORT_DATA_TYPES.excalidraw,
+              appState: {
+                viewBackgroundColor: "#000",
+              },
+              elements: [API.createElement({ type: "rectangle", id: "A" })],
+            }),
+          ],
+          { type: MIME_TYPES.json },
+        ),
+      },
+    ]);
 
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
