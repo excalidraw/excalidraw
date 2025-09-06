@@ -246,7 +246,11 @@ async function ingestPDFForRAG(
     }
     
     const ingestResult = await ingestResponse.json();
-    const documentId = ingestResult?.document?.id;
+    // Support both legacy { document: { id } } and new { document_id }
+    const documentId: string | undefined =
+      (ingestResult && ingestResult.document && ingestResult.document.id)
+        ? ingestResult.document.id
+        : ingestResult?.document_id;
     
     if (!documentId) {
       throw new Error('No document ID returned from ingestion');
