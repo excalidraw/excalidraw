@@ -305,15 +305,16 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
 
     // Check and handle nested shapes
     if (hit && arrow.startBinding) {
-      const otherElement = elementsMap.get(
-        arrow.startBinding.elementId,
-      ) as ExcalidrawBindableElement;
-
-      invariant(otherElement, "Other element must be in the elements map");
-
+      const startBinding = arrow.startBinding;
       const allHits = getAllHoveredElementAtPoint(point, elements, elementsMap);
 
-      if (allHits.find((el) => el.id === otherElement.id)) {
+      if (allHits.find((el) => el.id === startBinding.elementId)) {
+        const otherElement = elementsMap.get(
+          arrow.startBinding.elementId,
+        ) as ExcalidrawBindableElement;
+
+        invariant(otherElement, "Other element must be in the elements map");
+
         const otherIsTransparent = isTransparent(otherElement.backgroundColor);
 
         return {
@@ -414,6 +415,20 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
 
   const isMultiPoint = arrow.points.length > 2;
   const hit = getHoveredElementForBinding(point, elements, elementsMap);
+  const isNested = oppositeBinding
+    ? getAllHoveredElementAtPoint(point, elements, elementsMap).some(
+        (el) => el.id === oppositeBinding.elementId,
+      )
+    : false;
+  const oppositeElement =
+    isNested && oppositeBinding
+      ? (elementsMap.get(
+          oppositeBinding.elementId,
+        ) as ExcalidrawBindableElement)
+      : null;
+  const otherIsTransparent = oppositeElement
+    ? isTransparent(oppositeElement.backgroundColor)
+    : false;
 
   // If the global bind mode is in free binding mode, just bind
   // where the pointer is and keep the other end intact
@@ -424,7 +439,10 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
   ) {
     current = hit
       ? {
-          element: hit,
+          element:
+            !isNested || !oppositeElement || otherIsTransparent
+              ? hit
+              : oppositeElement,
           focusPoint: point,
           mode: "inside",
         }
@@ -440,10 +458,8 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
   }
 
   // The dragged point is inside the hovered bindable element
-
-  // The opposite binding is on the same element
-  // eslint-disable-next-line no-lonely-if
   if (oppositeBinding) {
+    // The opposite binding is on the same element
     if (oppositeBinding.elementId === hit.id) {
       // The opposite binding is on the binding gap of the same element
       if (oppositeBinding.mode === "orbit") {
@@ -460,14 +476,23 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
         return { current, other: isMultiPoint ? { mode: undefined } : other };
       }
     }
-    // The opposite binding is on a different element
+    // The opposite binding is on a different element (or nested)
     // eslint-disable-next-line no-else-return
     else {
-      current = {
-        element: hit,
-        mode: "orbit",
-        focusPoint: snapToCenter(hit, elementsMap, point),
-      };
+      // Handle the nested element case
+      if (isNested && oppositeElement && !otherIsTransparent) {
+        current = {
+          element: oppositeElement,
+          mode: "inside",
+          focusPoint: point,
+        };
+      } else {
+        current = {
+          element: hit,
+          mode: "orbit",
+          focusPoint: snapToCenter(hit, elementsMap, point),
+        };
+      }
 
       return { current, other: isMultiPoint ? { mode: undefined } : other };
     }
