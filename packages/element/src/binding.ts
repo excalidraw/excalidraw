@@ -35,7 +35,6 @@ import {
 import {
   getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
-  hitElementItself,
   intersectElementWithLineSegment,
   isPointInElement,
 } from "./collision";
@@ -642,68 +641,6 @@ export const bindOrUnbindBindingElements = (
       appState,
     );
   });
-};
-
-export const maybeSuggestBindingsForBindingElementAtCoords = (
-  linearElement: NonDeleted<ExcalidrawArrowElement>,
-  startOrEndOrBoth: "start" | "end" | "both",
-  scene: Scene,
-  pointerCoords: GlobalPoint,
-): AppState["suggestedBinding"] => {
-  const startCoords =
-    startOrEndOrBoth === "start"
-      ? pointerCoords
-      : LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          linearElement,
-          0,
-          scene.getNonDeletedElementsMap(),
-        );
-  const endCoords =
-    startOrEndOrBoth === "end"
-      ? pointerCoords
-      : LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          linearElement,
-          -1,
-          scene.getNonDeletedElementsMap(),
-        );
-  const startHovered = getHoveredElementForBinding(
-    startCoords,
-    scene.getNonDeletedElements(),
-    scene.getNonDeletedElementsMap(),
-  );
-  const endHovered = getHoveredElementForBinding(
-    endCoords,
-    scene.getNonDeletedElements(),
-    scene.getNonDeletedElementsMap(),
-  );
-
-  let suggestedBinding: AppState["suggestedBinding"] = null;
-
-  if (startHovered != null && startHovered.id === endHovered?.id) {
-    const hitStart = hitElementItself({
-      element: startHovered,
-      elementsMap: scene.getNonDeletedElementsMap(),
-      point: pointFrom<GlobalPoint>(startCoords[0], startCoords[1]),
-      threshold: 0,
-      overrideShouldTestInside: true,
-    });
-    const hitEnd = hitElementItself({
-      element: endHovered,
-      elementsMap: scene.getNonDeletedElementsMap(),
-      point: pointFrom<GlobalPoint>(endCoords[0], endCoords[1]),
-      threshold: 0,
-      overrideShouldTestInside: true,
-    });
-    if (hitStart && hitEnd) {
-      suggestedBinding = startHovered;
-    }
-  } else if (startOrEndOrBoth === "start" && startHovered != null) {
-    suggestedBinding = startHovered;
-  } else if (startOrEndOrBoth === "end" && endHovered != null) {
-    suggestedBinding = endHovered;
-  }
-
-  return suggestedBinding;
 };
 
 export const bindBindingElement = (

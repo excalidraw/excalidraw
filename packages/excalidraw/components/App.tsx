@@ -110,7 +110,6 @@ import {
 import {
   getObservedAppState,
   getCommonBounds,
-  maybeSuggestBindingsForBindingElementAtCoords,
   getElementAbsoluteCoords,
   bindOrUnbindBindingElements,
   fixBindingsAfterDeletion,
@@ -6246,15 +6245,17 @@ class App extends React.Component<AppProps, AppState> {
       // Hovering with a selected tool or creating new linear element via click
       // and point
       const { newElement } = this.state;
-      if (isBindingElement(newElement, false) && isBindingEnabled(this.state)) {
-        this.setState({
-          suggestedBinding: maybeSuggestBindingsForBindingElementAtCoords(
-            newElement,
-            "end",
-            this.scene,
-            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-          ),
-        });
+      if (!newElement && isBindingEnabled(this.state)) {
+        const hoveredElement = getHoveredElementForBinding(
+          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+          this.scene.getNonDeletedElements(),
+          this.scene.getNonDeletedElementsMap(),
+        );
+        if (hoveredElement) {
+          this.setState({
+            suggestedBinding: hoveredElement,
+          });
+        }
       }
     }
 

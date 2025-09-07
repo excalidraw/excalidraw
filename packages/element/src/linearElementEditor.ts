@@ -45,7 +45,6 @@ import {
   calculateFixedPointForNonElbowArrowBinding,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isBindingEnabled,
-  maybeSuggestBindingsForBindingElementAtCoords,
   updateBoundPoint,
 } from "./binding";
 import {
@@ -335,6 +334,7 @@ export class LinearElementEditor {
     }
 
     // Apply the point movement if needed
+    let suggestedBinding: AppState["suggestedBinding"] = null;
     if (deltaX || deltaY) {
       const { positions, updates } = pointDraggingUpdates(
         [idx],
@@ -347,6 +347,12 @@ export class LinearElementEditor {
       );
 
       LinearElementEditor.movePoints(element, app.scene, positions, updates);
+      // Set the suggested binding from the updates if available
+      if (isBindingElement(element, false)) {
+        if (isBindingEnabled(app.state)) {
+          suggestedBinding = updates?.suggestedBinding ?? null;
+        }
+      }
 
       // Move the arrow over the bindable object in terms of z-index
       if (isBindingElement(element)) {
@@ -362,17 +368,6 @@ export class LinearElementEditor {
           app.scene,
         );
       }
-    }
-
-    // Suggest bindings for first and last point if selected
-    let suggestedBinding: AppState["suggestedBinding"] = null;
-    if (isBindingElement(element, false)) {
-      suggestedBinding = maybeSuggestBindingsForBindingElementAtCoords(
-        element,
-        "end",
-        app.scene,
-        pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-      );
     }
 
     // PERF: Avoid state updates if not absolutely necessary
@@ -528,22 +523,6 @@ export class LinearElementEditor {
     const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
       handleBindTextResize(element, app.scene, false);
-    }
-
-    // Suggest bindings for first and last point if selected
-    if (isBindingElement(element, false)) {
-      if (isBindingEnabled(app.state) && (startIsSelected || endIsSelected)) {
-        suggestedBinding = maybeSuggestBindingsForBindingElementAtCoords(
-          element,
-          startIsSelected && endIsSelected
-            ? "both"
-            : startIsSelected
-            ? "start"
-            : "end",
-          app.scene,
-          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-        );
-      }
     }
 
     // Update selected points for elbow arrows because elbow arrows add and
@@ -2115,7 +2094,10 @@ const pointDraggingUpdates = (
     if (startIsDragged) {
       updates.suggestedBinding = start.element;
     }
+  } else if (startIsDragged) {
+    updates.suggestedBinding = app.state.suggestedBinding;
   }
+
   if (end.mode === null) {
     updates.endBinding = null;
   } else if (end.mode) {
@@ -2134,6 +2116,8 @@ const pointDraggingUpdates = (
     if (endIsDragged) {
       updates.suggestedBinding = end.element;
     }
+  } else if (endIsDragged) {
+    updates.suggestedBinding = app.state.suggestedBinding;
   }
 
   // Simulate the updated arrow for the bind point calculation
@@ -2258,11 +2242,13 @@ const pointDraggingUpdates = (
   const indices = Array.from(indicesSet);
 
   return {
-    updates: updates.startBinding
-      ? {
-          startBinding: updates.startBinding,
-        }
-      : undefined,
+    updates:
+      updates.startBinding || updates.suggestedBinding
+        ? {
+            startBinding: updates.startBinding,
+            suggestedBinding: updates.suggestedBinding,
+          }
+        : undefined,
     positions: new Map(
       indices.map((idx) => {
         return [
