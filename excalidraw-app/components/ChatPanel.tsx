@@ -26,6 +26,29 @@ interface ChatMessage {
   durationMs?: number;
 }
 
+// Simple hash function for content deduplication
+const generateSimpleHash = async (data: string): Promise<string> => {
+  if (typeof crypto !== 'undefined' && crypto.subtle) {
+    try {
+      const encoder = new TextEncoder();
+      const buffer = await crypto.subtle.digest('SHA-1', encoder.encode(data));
+      const hashArray = Array.from(new Uint8Array(buffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch {
+      // Fallback to simple hash if crypto API fails
+    }
+  }
+  
+  // Simple rolling hash fallback
+  let hash = 0;
+  for (let i = 0; i < data.length; i++) {
+    const char = data.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash).toString(16);
+};
+
 const ChatPanel: React.FC<ChatPanelProps> = ({ 
   excalidrawAPI, 
   isVisible = true, 
@@ -216,9 +239,54 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       }
 
       // Generate snapshots for visual analysis
-      let snapshots: { fullCanvas?: string; selection?: string } = {};
+      let snapshots: { fullCanvas?: string; selection?: string; thumbnail?: string; thumbnailHash?: string } = {};
       try {
         const appState = excalidrawAPI.getAppState();
+        
+        // Generate thumbnail for preattach (if enabled and elements exist)
+        const env: any = (typeof import.meta !== 'undefined' && (import.meta as any).env) || {};
+        const thumbnailEnabled = String(
+          env.VITE_LLM_INCLUDE_THUMBNAIL_SNAPSHOT ?? (window as any)?.__LLM_INCLUDE_THUMBNAIL_SNAPSHOT ?? 'false'
+        ).toLowerCase() === 'true';
+        const maxThumbnailDim = Number(env.VITE_LLM_THUMBNAIL_MAX_DIM ?? 512);
+        const thumbnailQuality = Number(env.VITE_LLM_THUMBNAIL_JPEG_QUALITY ?? 0.5);
+        const maxThumbnailBytes = Number(env.VITE_LLM_THUMBNAIL_MAX_BYTES ?? 300000);
+        
+        if (thumbnailEnabled && isVisible && elements.length > 0) {
+          try {
+            const thumbnailCanvas = await exportToCanvas({
+              elements: elements,
+              appState: {
+                ...appState,
+                exportBackground: true,
+                viewBackgroundColor: appState.viewBackgroundColor,
+              },
+              files: excalidrawAPI.getFiles(),
+              maxWidthOrHeight: maxThumbnailDim,
+            });
+            
+            const thumbnailDataURL = thumbnailCanvas.toDataURL('image/jpeg', thumbnailQuality);
+            
+            // Check size limit
+            const thumbnailSizeBytes = Math.round((thumbnailDataURL.length - 'data:image/jpeg;base64,'.length) * 0.75);
+            
+            if (thumbnailSizeBytes <= maxThumbnailBytes) {
+              snapshots.thumbnail = thumbnailDataURL;
+              
+              // Generate simple hash for deduplication
+              const base64Data = thumbnailDataURL.split(',')[1];
+              snapshots.thumbnailHash = await generateSimpleHash(base64Data);
+              
+              if (import.meta.env.DEV) {
+                console.log(`Generated thumbnail: ${(thumbnailSizeBytes/1000).toFixed(1)}KB, hash: ${snapshots.thumbnailHash}`);
+              }
+            } else if (import.meta.env.DEV) {
+              console.warn(`Thumbnail too large: ${(thumbnailSizeBytes/1000).toFixed(1)}KB > ${(maxThumbnailBytes/1000).toFixed(1)}KB limit`);
+            }
+          } catch (thumbnailError) {
+            if (import.meta.env.DEV) console.warn('Failed to generate thumbnail:', thumbnailError);
+          }
+        }
         
         // Generate canvas snapshot
         const canvas = await exportToCanvas({
