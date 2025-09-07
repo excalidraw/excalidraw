@@ -568,21 +568,24 @@ describe("history", () => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]),
       );
 
-      await API.drop(
-        new Blob(
-          [
-            JSON.stringify({
-              type: EXPORT_DATA_TYPES.excalidraw,
-              appState: {
-                ...getDefaultAppState(),
-                viewBackgroundColor: "#000",
-              },
-              elements: [API.createElement({ type: "rectangle", id: "B" })],
-            }),
-          ],
-          { type: MIME_TYPES.json },
-        ),
-      );
+      await API.drop([
+        {
+          kind: "file",
+          file: new Blob(
+            [
+              JSON.stringify({
+                type: EXPORT_DATA_TYPES.excalidraw,
+                appState: {
+                  ...getDefaultAppState(),
+                  viewBackgroundColor: "#000",
+                },
+                elements: [API.createElement({ type: "rectangle", id: "B" })],
+              }),
+            ],
+            { type: MIME_TYPES.json },
+          ),
+        },
+      ]);
 
       await waitFor(() => expect(API.getUndoStack().length).toBe(1));
       expect(h.state.viewBackgroundColor).toBe("#000");
@@ -624,11 +627,13 @@ describe("history", () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
 
       const link = "https://www.youtube.com/watch?v=gkGMXY0wekg";
-      await API.drop(
-        new Blob([link], {
+      await API.drop([
+        {
+          kind: "string",
+          value: link,
           type: MIME_TYPES.text,
-        }),
-      );
+        },
+      ]);
 
       await waitFor(() => {
         expect(API.getUndoStack().length).toBe(1);
@@ -726,10 +731,15 @@ describe("history", () => {
       await setupImageTest();
 
       await API.drop(
-        await Promise.all([
-          API.loadFile("./fixtures/deer.png"),
-          API.loadFile("./fixtures/smiley.png"),
-        ]),
+        (
+          await Promise.all([
+            API.loadFile("./fixtures/deer.png"),
+            API.loadFile("./fixtures/smiley.png"),
+          ])
+        ).map((file) => ({
+          kind: "file",
+          file,
+        })),
       );
 
       await assertImageTest();
