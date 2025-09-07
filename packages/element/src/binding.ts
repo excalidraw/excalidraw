@@ -428,7 +428,7 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
           focusPoint: point,
           mode: "inside",
         }
-      : { mode: undefined };
+      : { mode: null };
 
     return { current, other };
   }
