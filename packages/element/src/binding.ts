@@ -1,10 +1,4 @@
-import {
-  KEYS,
-  arrayToMap,
-  invariant,
-  isAlwaysInsideBinding,
-  isTransparent,
-} from "@excalidraw/common";
+import { KEYS, arrayToMap, invariant, isTransparent } from "@excalidraw/common";
 
 import {
   lineSegment,
@@ -53,6 +47,7 @@ import {
   isBindableElement,
   isBoundToContainer,
   isElbowArrow,
+  isImageElement,
   isRectanguloidElement,
   isTextElement,
 } from "./typeChecks";
@@ -106,6 +101,9 @@ export const FIXED_BINDING_DISTANCE = 5;
 export const getFixedBindingDistance = (
   element: ExcalidrawBindableElement,
 ): number => FIXED_BINDING_DISTANCE + element.strokeWidth / 2;
+
+export const isAlwaysInsideBinding = (element: ExcalidrawBindableElement) =>
+  isImageElement(element);
 
 export const shouldEnableBindingForPointerEvent = (
   event: React.PointerEvent<HTMLElement>,

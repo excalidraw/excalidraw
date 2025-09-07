@@ -1,11 +1,6 @@
 import { average } from "@excalidraw/math";
-import { isImageElement } from "@excalidraw/element";
 
-import type {
-  ExcalidrawBindableElement,
-  FontFamilyValues,
-  FontString,
-} from "@excalidraw/element/types";
+import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
 
 import type {
   ActiveTool,
@@ -566,9 +561,6 @@ export const isTransparent = (color: string) => {
     color === COLOR_PALETTE.transparent
   );
 };
-
-export const isAlwaysInsideBinding = (element: ExcalidrawBindableElement) =>
-  isImageElement(element);
 
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined]
