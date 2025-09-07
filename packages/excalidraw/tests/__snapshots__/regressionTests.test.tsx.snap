@@ -2216,7 +2216,16 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
           },
         },
       },
-      "updated": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "version": 5,
+          },
+          "inserted": {
+            "version": 3,
+          },
+        },
+      },
     },
     "id": "id6",
   },
@@ -10892,7 +10901,32 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
           },
         },
       },
-      "updated": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "version": 6,
+          },
+          "inserted": {
+            "version": 4,
+          },
+        },
+        "id3": {
+          "deleted": {
+            "version": 6,
+          },
+          "inserted": {
+            "version": 4,
+          },
+        },
+        "id6": {
+          "deleted": {
+            "version": 6,
+          },
+          "inserted": {
+            "version": 4,
+          },
+        },
+      },
     },
     "id": "id21",
   },

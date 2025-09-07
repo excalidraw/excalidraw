@@ -298,7 +298,9 @@ export const actionDeleteSelected = register({
       elements: nextElements,
       appState: {
         ...nextAppState,
-        activeTool: updateActiveTool(appState, { type: "selection" }),
+        activeTool: updateActiveTool(appState, {
+          type: app.defaultSelectionTool,
+        }),
         multiElement: null,
         activeEmbeddable: null,
         selectedLinearElement: null,
