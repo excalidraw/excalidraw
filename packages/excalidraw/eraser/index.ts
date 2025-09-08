@@ -1,8 +1,15 @@
 import { arrayToMap, easeOut, THEME } from "@excalidraw/common";
+
 import {
   computeBoundTextPosition,
+  distanceToElement,
+  doBoundsIntersect,
   getBoundTextElement,
+  getElementBounds,
   intersectElementWithLineSegment,
+  isArrowElement,
+  isFreeDrawElement,
+  isLineElement,
   isPointInElement,
 } from "@excalidraw/element";
 import { lineSegment, pointFrom } from "@excalidraw/math";
@@ -12,6 +19,8 @@ import { getElementsInGroup } from "@excalidraw/element";
 import { shouldTestInside } from "@excalidraw/element";
 import { hasBoundTextElement, isBoundToContainer } from "@excalidraw/element";
 import { getBoundTextElementId } from "@excalidraw/element";
+
+import type { Bounds } from "@excalidraw/element";
 
 import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
@@ -182,8 +191,21 @@ const eraserTest = (
   elementsMap: ElementsMap,
 ): boolean => {
   const lastPoint = pathSegment[1];
-  const boundBoxDiagonal = Math.hypot(element.width, element.height);
   const threshold = 1;
+
+  const bounds = [
+    lastPoint[0] - threshold,
+    lastPoint[1] - threshold,
+    lastPoint[0] + threshold,
+    lastPoint[1] + threshold,
+  ] as Bounds;
+
+  const elementBounds = getElementBounds(element, elementsMap);
+
+  if (!doBoundsIntersect(bounds, elementBounds)) {
+    return false;
+  }
+
   if (
     shouldTestInside(element) &&
     isPointInElement(lastPoint, element, elementsMap)
@@ -191,22 +213,17 @@ const eraserTest = (
     return true;
   }
 
-  // for freedraw-points, lines and arrows of shared endpoints
-  if (boundBoxDiagonal < threshold) {
+  // for freedraw-points, lines and arrows
+  if (
+    isFreeDrawElement(element) ||
+    isArrowElement(element) ||
+    (isLineElement(element) && !element.polygon)
+  ) {
     const tolerance =
       element.type === "freedraw"
         ? element.strokeWidth * 2.125
         : element.strokeWidth / 2;
-    const [cx, cy] = [
-      element.x + element.width / 2,
-      element.y + element.height / 2,
-    ];
-    const distance = Math.hypot(lastPoint[0] - cx, lastPoint[1] - cy);
-    const hitRadius = Math.max(element.width, element.height) / 2 + tolerance;
-
-    if (distance <= hitRadius) {
-      return true;
-    }
+    return distanceToElement(element, elementsMap, lastPoint) <= tolerance;
   }
 
   const boundTextElement = getBoundTextElement(element, elementsMap);
