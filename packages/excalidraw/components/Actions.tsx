@@ -595,13 +595,13 @@ export const CompactShapeActions = ({
                 >
                   <div className="selected-shape-actions">
                     {(appState.activeTool.type === "text" ||
+                      targetElements.some(isTextElement)) &&
+                      renderAction("changeFontSize")}
+                    {(appState.activeTool.type === "text" ||
                       suppportsHorizontalAlign(targetElements, elementsMap)) &&
                       renderAction("changeTextAlign")}
                     {shouldAllowVerticalAlign(targetElements, elementsMap) &&
                       renderAction("changeVerticalAlign")}
-                    {(appState.activeTool.type === "text" ||
-                      targetElements.some(isTextElement)) &&
-                      renderAction("changeFontSize")}
                   </div>
                 </PropertiesPopover>
               )}
