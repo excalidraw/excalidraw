@@ -234,6 +234,11 @@ export type InteractiveCanvasAppState = Readonly<
     // Search matches
     searchMatches: AppState["searchMatches"];
     activeLockedId: AppState["activeLockedId"];
+    // Non-used but needed in binding highlight arrow overdraw
+    hoveredElementIds: AppState["hoveredElementIds"];
+    frameRendering: AppState["frameRendering"];
+    shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
+    exportScale: AppState["exportScale"];
   }
 >;
 

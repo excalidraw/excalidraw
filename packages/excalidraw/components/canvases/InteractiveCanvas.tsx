@@ -215,6 +215,10 @@ const getRelevantAppStateProps = (
   croppingElementId: appState.croppingElementId,
   searchMatches: appState.searchMatches,
   activeLockedId: appState.activeLockedId,
+  hoveredElementIds: appState.hoveredElementIds,
+  frameRendering: appState.frameRendering,
+  shouldCacheIgnoreZoom: appState.shouldCacheIgnoreZoom,
+  exportScale: appState.exportScale,
 });
 
 const areEqual = (

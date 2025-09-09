@@ -917,12 +917,11 @@ class App extends React.Component<AppProps, AppState> {
         });
       });
 
-      if (this.lastPointerMoveCoords) {
-        invariant(
-          this.state.selectedLinearElement,
-          "Selected element is missing",
-        );
-
+      if (
+        this.lastPointerMoveCoords &&
+        this.state.selectedLinearElement?.selectedPointsIndices &&
+        this.state.selectedLinearElement?.selectedPointsIndices.length
+      ) {
         const { x, y } = this.lastPointerMoveCoords;
         const event =
           this.lastPointerMoveEvent ?? this.lastPointerDownEvent?.nativeEvent;

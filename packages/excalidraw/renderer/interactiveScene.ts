@@ -1,3 +1,4 @@
+import rough from "roughjs/bin/rough";
 import {
   pointFrom,
   pointsEqual,
@@ -16,7 +17,11 @@ import {
   throttleRAF,
 } from "@excalidraw/common";
 
-import { LinearElementEditor } from "@excalidraw/element";
+import {
+  LinearElementEditor,
+  renderElement,
+  ShapeCache,
+} from "@excalidraw/element";
 import {
   getOmitSidesForDevice,
   getTransformHandles,
@@ -50,6 +55,7 @@ import type {
 
 import type {
   ElementsMap,
+  ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawImageElement,
@@ -57,6 +63,7 @@ import type {
   ExcalidrawTextElement,
   GroupId,
   NonDeleted,
+  NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
 import { renderSnaps } from "../renderer/renderSnaps";
@@ -66,6 +73,7 @@ import {
   SCROLLBAR_COLOR,
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
+
 import { type InteractiveCanvasAppState } from "../types";
 
 import { getClientColor, renderRemoteCursors } from "../clients";
@@ -176,6 +184,126 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
     !isPhantomPoint,
     !isOverlappingPoint || isSelected,
   );
+};
+
+const renderBindingHighlightForBindableElement = (
+  context: CanvasRenderingContext2D,
+  element: ExcalidrawBindableElement,
+  elementsMap: RenderableElementsMap,
+  allElementsMap: NonDeletedSceneElementsMap,
+  appState: InteractiveCanvasAppState,
+) => {
+  switch (element.type) {
+    case "magicframe":
+    case "frame":
+      {
+        const {
+          options: { stroke: highlightStroke },
+        } = ShapeCache.generateBindableElementHighlight(element, appState);
+
+        context.save();
+        context.translate(
+          element.x + appState.scrollX,
+          element.y + appState.scrollY,
+        );
+
+        context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
+        context.strokeStyle = highlightStroke;
+
+        if (FRAME_STYLE.radius && context.roundRect) {
+          context.beginPath();
+          context.roundRect(
+            0,
+            0,
+            element.width,
+            element.height,
+            FRAME_STYLE.radius / appState.zoom.value,
+          );
+          context.stroke();
+          context.closePath();
+        } else {
+          context.strokeRect(0, 0, element.width, element.height);
+        }
+
+        context.restore();
+      }
+      break;
+    case "image":
+    case "text":
+      {
+        const {
+          options: { stroke: highlightStroke },
+        } = ShapeCache.generateBindableElementHighlight(element, appState);
+
+        context.save();
+        context.translate(
+          element.x + appState.scrollX,
+          element.y + appState.scrollY,
+        );
+
+        context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
+        context.strokeStyle = highlightStroke;
+
+        context.strokeRect(0, 0, element.width, element.height);
+        context.restore();
+      }
+      break;
+    default:
+      const cx =
+        (element.x + element.width / 2 + appState.scrollX) *
+        window.devicePixelRatio;
+      const cy =
+        (element.y + element.height / 2 + appState.scrollY) *
+        window.devicePixelRatio;
+      context.save();
+
+      context.translate(cx, cy);
+      context.rotate(element.angle);
+      context.translate(-cx, -cy);
+      context.translate(
+        appState.scrollX + element.x,
+        appState.scrollY + element.y,
+      );
+
+      const drawable = ShapeCache.generateBindableElementHighlight(
+        element,
+        appState,
+      );
+      drawable.options.fill = "transparent";
+      rough.canvas(context.canvas).draw(drawable);
+
+      context.restore();
+
+      // Overdraw the arrow if exists (if there is a suggestedBinding it's an arrow)
+      if (appState.selectedLinearElement) {
+        const arrow = LinearElementEditor.getElement(
+          appState.selectedLinearElement.elementId,
+          allElementsMap,
+        );
+
+        invariant(arrow, "arrow not found during highlight element binding");
+
+        renderElement(
+          arrow,
+          elementsMap,
+          allElementsMap,
+          rough.canvas(context.canvas),
+          context,
+          {
+            canvasBackgroundColor: "transparent",
+            imageCache: new Map(),
+            renderGrid: false,
+            isExporting: false,
+            embedsValidationStatus: new Map(),
+            elementsPendingErasure: new Set(),
+            pendingFlowchartNodes: null,
+          },
+          appState,
+        );
+      }
+
+      break;
+  }
 };
 
 type ElementSelectionBorder = {
@@ -705,6 +833,16 @@ const _renderInteractiveScene = ({
         renderConfig.selectionColor,
       );
     }
+  }
+
+  if (appState.isBindingEnabled && appState.suggestedBinding) {
+    renderBindingHighlightForBindableElement(
+      context,
+      appState.suggestedBinding,
+      elementsMap,
+      allElementsMap,
+      appState,
+    );
   }
 
   if (appState.frameToHighlight) {
