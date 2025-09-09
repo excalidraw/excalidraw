@@ -328,7 +328,9 @@ export const actionChangeStrokeColor = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <>
-      {!data?.compactMode && <h3 aria-hidden="true">{t("labels.stroke")}</h3>}
+      {appState.propertiesSidebarMode === "complete" && (
+        <h3 aria-hidden="true">{t("labels.stroke")}</h3>
+      )}
       <ColorPicker
         topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
         palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
@@ -346,7 +348,7 @@ export const actionChangeStrokeColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
-        compactMode={data?.compactMode}
+        compactMode={appState.propertiesSidebarMode === "compact"}
       />
     </>
   ),
@@ -406,7 +408,7 @@ export const actionChangeBackgroundColor = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <>
-      {!data?.compactMode && (
+      {appState.propertiesSidebarMode === "complete" && (
         <h3 aria-hidden="true">{t("labels.background")}</h3>
       )}
       <ColorPicker
@@ -426,7 +428,7 @@ export const actionChangeBackgroundColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
-        compactMode={data?.compactMode}
+        compactMode={appState.propertiesSidebarMode === "compact"}
       />
     </>
   ),
@@ -529,7 +531,9 @@ export const actionChangeStrokeWidth = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      {!data?.compactMode && <legend>{t("labels.strokeWidth")}</legend>}
+      {appState.propertiesSidebarMode === "complete" && (
+        <legend>{t("labels.strokeWidth")}</legend>
+      )}
       <div className="buttonList">
         <RadioSelection
           group="stroke-width"
@@ -586,7 +590,9 @@ export const actionChangeSloppiness = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      {!data?.compactMode && <legend>{t("labels.sloppiness")}</legend>}
+      {appState.propertiesSidebarMode === "complete" && (
+        <legend>{t("labels.sloppiness")}</legend>
+      )}
       <div className="buttonList">
         <RadioSelection
           group="sloppiness"
@@ -639,7 +645,9 @@ export const actionChangeStrokeStyle = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      {!data?.compactMode && <legend>{t("labels.strokeStyle")}</legend>}
+      {appState.propertiesSidebarMode === "complete" && (
+        <legend>{t("labels.strokeStyle")}</legend>
+      )}
       <div className="buttonList">
         <RadioSelection
           group="strokeStyle"
@@ -768,7 +776,7 @@ export const actionChangeFontSize = register({
           onChange={(value) => {
             withCaretPositionPreservation(
               () => updateData(value),
-              !!data?.compactMode,
+              appState.propertiesSidebarMode === "compact",
               !!appState.editingTextElement,
               data?.onPreventClose,
             );
@@ -1110,12 +1118,14 @@ export const actionChangeFontFamily = register({
 
     return (
       <fieldset>
-        {!data?.compactMode && <legend>{t("labels.fontFamily")}</legend>}
+        {appState.propertiesSidebarMode === "complete" && (
+          <legend>{t("labels.fontFamily")}</legend>
+        )}
         <FontPicker
           isOpened={appState.openPopup === "fontFamily"}
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
-          compactMode={data?.compactMode}
+          compactMode={appState.propertiesSidebarMode === "compact"}
           onSelect={(fontFamily) => {
             withCaretPositionPreservation(
               () => {
@@ -1127,7 +1137,7 @@ export const actionChangeFontFamily = register({
                 // defensive clear so immediate close won't abuse the cached elements
                 cachedElementsRef.current.clear();
               },
-              !!data?.compactMode,
+              appState.propertiesSidebarMode === "compact",
               !!appState.editingTextElement,
             );
           }}
@@ -1202,7 +1212,10 @@ export const actionChangeFontFamily = register({
               cachedElementsRef.current.clear();
 
               // Refocus text editor when font picker closes if we were editing text
-              if (data?.compactMode && appState.editingTextElement) {
+              if (
+                appState.propertiesSidebarMode === "compact" &&
+                appState.editingTextElement
+              ) {
                 restoreCaretPosition(null); // Just refocus without saved position
               }
             }
@@ -1301,7 +1314,7 @@ export const actionChangeTextAlign = register({
             onChange={(value) => {
               withCaretPositionPreservation(
                 () => updateData(value),
-                !!data?.compactMode,
+                appState.propertiesSidebarMode === "compact",
                 !!appState.editingTextElement,
                 data?.onPreventClose,
               );
@@ -1400,7 +1413,7 @@ export const actionChangeVerticalAlign = register({
             onChange={(value) => {
               withCaretPositionPreservation(
                 () => updateData(value),
-                !!data?.compactMode,
+                appState.propertiesSidebarMode === "compact",
                 !!appState.editingTextElement,
                 data?.onPreventClose,
               );

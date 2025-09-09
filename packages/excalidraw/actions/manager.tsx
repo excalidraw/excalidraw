@@ -180,7 +180,6 @@ export class ActionManager {
           app={this.app}
           data={data}
           renderAction={this.renderAction}
-          compactMode={Boolean(data?.compactMode)}
         />
       );
     }

@@ -365,14 +365,14 @@ export const CompactShapeActions = ({
       {/* Stroke Color */}
       {canChangeStrokeColor(appState, targetElements) && (
         <div className={clsx("compact-action-item")}>
-          {renderAction("changeStrokeColor", { compactMode: true })}
+          {renderAction("changeStrokeColor")}
         </div>
       )}
 
       {/* Background Color */}
       {canChangeBackgroundColor(appState, targetElements) && (
         <div className="compact-action-item">
-          {renderAction("changeBackgroundColor", { compactMode: true })}
+          {renderAction("changeBackgroundColor")}
         </div>
       )}
 
@@ -529,7 +529,7 @@ export const CompactShapeActions = ({
       {/* Linear Editor */}
       {showLineEditorAction && (
         <div className="compact-action-item">
-          {renderAction("toggleLinearEditor", { compactMode: true })}
+          {renderAction("toggleLinearEditor")}
         </div>
       )}
 
@@ -538,9 +538,7 @@ export const CompactShapeActions = ({
         targetElements.some(isTextElement)) && (
         <>
           <div className="compact-action-item">
-            {renderAction("changeFontFamily", {
-              compactMode: true,
-            })}
+            {renderAction("changeFontFamily")}
           </div>
           <div className="compact-action-item">
             <Popover.Root
@@ -598,18 +596,12 @@ export const CompactShapeActions = ({
                   <div className="selected-shape-actions">
                     {(appState.activeTool.type === "text" ||
                       suppportsHorizontalAlign(targetElements, elementsMap)) &&
-                      renderAction("changeTextAlign", {
-                        compactMode: true,
-                      })}
+                      renderAction("changeTextAlign")}
                     {shouldAllowVerticalAlign(targetElements, elementsMap) &&
-                      renderAction("changeVerticalAlign", {
-                        compactMode: true,
-                      })}
+                      renderAction("changeVerticalAlign")}
                     {(appState.activeTool.type === "text" ||
                       targetElements.some(isTextElement)) &&
-                      renderAction("changeFontSize", {
-                        compactMode: true,
-                      })}
+                      renderAction("changeFontSize")}
                   </div>
                 </PropertiesPopover>
               )}
@@ -621,14 +613,14 @@ export const CompactShapeActions = ({
       {/* Dedicated Copy Button */}
       {!isEditingTextOrNewElement && targetElements.length > 0 && (
         <div className="compact-action-item">
-          {renderAction("duplicateSelection", { compactMode: true })}
+          {renderAction("duplicateSelection")}
         </div>
       )}
 
       {/* Dedicated Delete Button */}
       {!isEditingTextOrNewElement && targetElements.length > 0 && (
         <div className="compact-action-item">
-          {renderAction("deleteSelectedElements", { compactMode: true })}
+          {renderAction("deleteSelectedElements")}
         </div>
       )}
 
