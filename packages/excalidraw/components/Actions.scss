@@ -107,6 +107,8 @@
     align-items: center;
     min-height: 2.5rem;
 
+    --default-button-size: 2rem;
+
     .compact-action-button {
       width: 2rem;
       height: 2rem;
@@ -123,6 +125,7 @@
       svg {
         width: 1rem;
         height: 1rem;
+        flex: 0 0 auto;
       }
 
       &:hover {
