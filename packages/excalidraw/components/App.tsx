@@ -985,10 +985,13 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       if (!this.state.multiElement) {
-        invariant(
-          this.state.selectedLinearElement?.selectedPointsIndices?.length,
-          "There has to be at least one selected point to trigger bind mode change at arrow point drag",
-        );
+        if (
+          !this.state.selectedLinearElement ||
+          !this.state.selectedLinearElement.selectedPointsIndices ||
+          !this.state.selectedLinearElement.selectedPointsIndices.length
+        ) {
+          return;
+        }
 
         const startDragged =
           this.state.selectedLinearElement.selectedPointsIndices.includes(0);
@@ -6298,15 +6301,10 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    if (this.state.multiElement) {
+    if (this.state.multiElement && this.state.selectedLinearElement) {
       const { multiElement, selectedLinearElement } = this.state;
       const { x: rx, y: ry, points } = multiElement;
       const lastPoint = points[points.length - 1];
-
-      invariant(
-        selectedLinearElement,
-        "There must be a selected linear element instace",
-      );
 
       const { lastCommittedPoint } = selectedLinearElement;
 
