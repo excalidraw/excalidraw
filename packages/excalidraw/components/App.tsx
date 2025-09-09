@@ -908,9 +908,46 @@ class App extends React.Component<AppProps, AppState> {
         this.bindModeHandler = null;
       }
 
-      this.setState({
-        bindMode: "skip",
+      // PERF: It's okay since it's a single trigger from a key handler
+      // or single call from pointer move handler because the bindMode check
+      // will not pass the second time
+      flushSync(() => {
+        this.setState({
+          bindMode: "skip",
+        });
       });
+
+      if (this.lastPointerMoveCoords) {
+        invariant(
+          this.state.selectedLinearElement,
+          "Selected element is missing",
+        );
+
+        const { x, y } = this.lastPointerMoveCoords;
+        const event =
+          this.lastPointerMoveEvent ?? this.lastPointerDownEvent?.nativeEvent;
+        invariant(event, "Last event must exist");
+        const deltaX = x - this.state.selectedLinearElement.pointerOffset.x;
+        const deltaY = y - this.state.selectedLinearElement.pointerOffset.y;
+        const newState = this.state.multiElement
+          ? LinearElementEditor.handlePointerMove(
+              event,
+              this,
+              deltaX,
+              deltaY,
+              this.state.selectedLinearElement,
+            )
+          : LinearElementEditor.handlePointDragging(
+              event,
+              this,
+              deltaX,
+              deltaY,
+              this.state.selectedLinearElement,
+            );
+        if (newState) {
+          this.setState(newState);
+        }
+      }
     }
   }
 
@@ -1024,7 +1061,9 @@ class App extends React.Component<AppProps, AppState> {
               deltaY,
               this.state.selectedLinearElement,
             );
-        this.setState(newState);
+        if (newState) {
+          this.setState(newState);
+        }
       }
     };
 
