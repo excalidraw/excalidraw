@@ -30,6 +30,7 @@ import {
   createFile,
   getFileHandle,
   isSupportedImageFileType,
+  normalizeFile,
 } from "./data/blob";
 
 import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
@@ -472,7 +473,12 @@ export const parseDataTransferEvent = async (
             const file = item.getAsFile();
             if (file) {
               const fileHandle = await getFileHandle(item);
-              return { type: file.type, kind: "file", file, fileHandle };
+              return {
+                type: file.type,
+                kind: "file",
+                file: await normalizeFile(file),
+                fileHandle,
+              };
             }
           } else if (item.kind === "string") {
             const { type } = item;
