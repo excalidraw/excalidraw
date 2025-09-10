@@ -111,7 +111,7 @@ export const usePDFNavigation = (excalidrawAPI: any, selectedElement: Excalidraw
       if (targetPage === pdfData.page) return; // Already on this page
 
       // Import navigation handler dynamically to avoid build issues
-      const { navigatePDFPage } = await import('../../pdf/pdf-navigation-handler.js');
+      const { navigatePDFPage } = await import('../../pdf/pdf-navigation-handler');
       
       // Use the navigation handler to switch pages
       await navigatePDFPage(excalidrawAPI, selectedElement, targetPage);
@@ -131,7 +131,7 @@ export const usePDFNavigation = (excalidrawAPI: any, selectedElement: Excalidraw
       setIsNavigating(true);
       setNavigationError(null);
       
-      const { goToPrevPage: prevPageHandler } = await import('../../pdf/pdf-navigation-handler.js');
+      const { goToPrevPage: prevPageHandler } = await import('../../pdf/pdf-navigation-handler');
       await prevPageHandler(excalidrawAPI, selectedElement);
       
     } catch (error) {
@@ -149,7 +149,7 @@ export const usePDFNavigation = (excalidrawAPI: any, selectedElement: Excalidraw
       setIsNavigating(true);
       setNavigationError(null);
       
-      const { goToNextPage: nextPageHandler } = await import('../../pdf/pdf-navigation-handler.js');
+      const { goToNextPage: nextPageHandler } = await import('../../pdf/pdf-navigation-handler');
       await nextPageHandler(excalidrawAPI, selectedElement);
       
     } catch (error) {

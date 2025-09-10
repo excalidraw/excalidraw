@@ -22,11 +22,10 @@ export const generateFileIdFromBlob = async (
   originalFileId: string, 
   pageNumber: number
 ): Promise<string> => {
-  // Create a deterministic ID based on original PDF and page number
-  // This ensures the same page always gets the same file ID
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).substr(2, 9);
-  return `pdf-page-${originalFileId.substr(-8)}-p${pageNumber}-${timestamp}-${random}`;
+  // Deterministic ID based on original PDF ID and page number to avoid file bloat
+  // Same page for the same PDF will always resolve to the same fileId
+  const suffix = originalFileId.slice(-8);
+  return `pdf-page-${suffix}-p${pageNumber}`;
 };
 
 /**

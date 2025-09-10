@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { viewportCoordsToSceneCoords } from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI, DataURL } from "@excalidraw/excalidraw/types";
 import { newImageElement } from "@excalidraw/element";
+import { generateNKeysBetween } from "fractional-indexing";
 import { generateIdFromFile } from "@excalidraw/excalidraw/data/blob";
 import { processPDFFile } from "./pdf-processor.js";
 import { storePDFFile, getPDFFile } from "./pdf-storage.js";
@@ -98,10 +99,17 @@ export const usePDFDropHandler = (excalidrawAPI: ExcalidrawImperativeAPI | null)
               }
             });
 
-            // Add element to scene
-            excalidrawAPI.updateScene({
-              elements: [...excalidrawAPI.getSceneElements(), element],
-            });
+            // Ensure the new element has a valid fractional index before adding
+            try {
+              const current = excalidrawAPI.getSceneElements();
+              const lastIndex = current.length > 0 ? (current[current.length - 1] as any).index ?? null : null;
+              const [nextIndex] = generateNKeysBetween(lastIndex, null, 1);
+              (element as any).index = nextIndex;
+              excalidrawAPI.updateScene({ elements: [...current, element] });
+            } catch {
+              // Fallback: append without manual index (engine will attempt to repair)
+              excalidrawAPI.updateScene({ elements: [...excalidrawAPI.getSceneElements(), element] });
+            }
 
             // Prefetch next page for faster navigation
             if (result.pageCount > 1) {
@@ -153,6 +161,13 @@ export const usePDFDropHandler = (excalidrawAPI: ExcalidrawImperativeAPI | null)
               // Don't show error toast for RAG failures to keep UX smooth
             }
 
+            // Check existing document status after drop (non-blocking)
+            try {
+              await checkExistingDocumentStatus(originalFileId, excalidrawAPI);
+            } catch (statusError) {
+              console.warn('Document status check failed (non-blocking):', statusError);
+            }
+
           } catch (error) {
             console.error('PDF processing failed:', error);
             excalidrawAPI.setToast({
@@ -192,7 +207,7 @@ async function ingestPDFForRAG(
   const envUrl = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_LLM_SERVICE_URL)
     ? import.meta.env.VITE_LLM_SERVICE_URL
     : undefined;
-  const globalUrl = window.__EXCALIDRAW_LLM_SERVICE_URL;
+  const globalUrl = (window as any).__EXCALIDRAW_LLM_SERVICE_URL;
   const storedUrl = (localStorage.getItem('excalidraw-llm-url') || undefined) as string | undefined;
   const defaultUrl = `${window.location.protocol}//${window.location.hostname}:3001`;
   const LLM_SERVICE_URL = globalUrl || envUrl || storedUrl || defaultUrl;
@@ -264,7 +279,12 @@ async function ingestPDFForRAG(
     );
     
     if (pdfElement) {
-      const updatedElement = {
+      const bump = (el: any) => ({
+        ...el,
+        version: (el.version ?? 0) + 1,
+        versionNonce: typeof el.versionNonce === 'number' ? el.versionNonce + 1 : Math.floor(Math.random() * 2 ** 31),
+      });
+      const updatedElement = bump({
         ...pdfElement,
         customData: {
           ...pdfElement.customData,
@@ -275,21 +295,135 @@ async function ingestPDFForRAG(
             indexingStatus: 'ingesting'
           }
         }
-      };
+      });
       
       excalidrawAPI.updateScene({
         elements: elements.map(el => el.id === pdfElement.id ? updatedElement : el)
       });
     }
     
-    // Trigger embedding generation (fire-and-forget)
-    fetch(`${LLM_SERVICE_URL}/api/rag/embed-missing`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ documentId })
-    }).catch(error => {
-      console.warn('Embedding generation failed:', error);
-    });
+    // Start embedding job and track progress
+    try {
+      const embedResponse = await fetch(`${LLM_SERVICE_URL}/api/rag/embed-missing`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documentId })
+      });
+      
+      if (embedResponse.ok) {
+        const { jobId, total, batchSize } = await embedResponse.json();
+        
+        // Handle no-op case when no chunks need embedding
+        if (jobId === null || total === 0) {
+          console.log(`No embedding needed for document ${documentId} (already complete)`);
+          
+          // Explicitly update element status from 'ingesting' to 'embedded'
+          const currentElements = excalidrawAPI.getSceneElements();
+          const noOpPdfElement = currentElements.find(el => 
+            el.type === 'image' && 
+            el.customData?.pdf?.originalFileId === originalFileId
+          );
+          
+          if (noOpPdfElement) {
+            const bump = (el: any) => ({
+              ...el,
+              version: (el.version ?? 0) + 1,
+              versionNonce: typeof el.versionNonce === 'number' ? el.versionNonce + 1 : Math.floor(Math.random() * 2 ** 31),
+            });
+            const noOpUpdatedElement = bump({
+              ...noOpPdfElement,
+              customData: {
+                ...noOpPdfElement.customData,
+                pdf: {
+                  ...noOpPdfElement.customData?.pdf,
+                  indexingStatus: 'embedded' as const
+                }
+              }
+            });
+            
+            excalidrawAPI.updateScene({
+              elements: currentElements.map(el => el.id === noOpPdfElement.id ? noOpUpdatedElement : el)
+            });
+          }
+          
+          excalidrawAPI.setToast({
+            message: 'PDF already indexed for search',
+            duration: 2000
+          });
+          return;
+        }
+        
+        // Update element with job tracking info
+        const currentElements = excalidrawAPI.getSceneElements();
+        const currentPdfElement = currentElements.find(el => 
+          el.type === 'image' && 
+          el.customData?.pdf?.originalFileId === originalFileId
+        );
+        
+        if (currentPdfElement && jobId) {
+          const bump = (el: any) => ({
+            ...el,
+            version: (el.version ?? 0) + 1,
+            versionNonce: typeof el.versionNonce === 'number' ? el.versionNonce + 1 : Math.floor(Math.random() * 2 ** 31),
+          });
+          const jobUpdatedElement = bump({
+            ...currentPdfElement,
+            customData: {
+              ...currentPdfElement.customData,
+              pdf: {
+                ...currentPdfElement.customData?.pdf,
+                indexingJobId: jobId,
+                indexingStatus: 'running' as const
+              }
+            }
+          });
+          
+          excalidrawAPI.updateScene({
+            elements: currentElements.map(el => el.id === currentPdfElement.id ? jobUpdatedElement : el)
+          });
+          
+          // Start progress tracking (SSE preferred, polling fallback)
+          startEmbeddingProgressTracking(jobId, originalFileId, excalidrawAPI, LLM_SERVICE_URL);
+          
+          // Show progress toast with cancellation info
+          excalidrawAPI.setToast({
+            message: `PDF indexing started (${total} chunks) - Check console for progress`,
+            duration: 4000
+          });
+          
+          console.log(`Started embedding job ${jobId} for document ${documentId} (${total} chunks)`);
+          console.log(`To cancel: cancelEmbeddingJob_${jobId}()`);
+        }
+      } else {
+        throw new Error(`Embedding job failed: ${embedResponse.status}`);
+      }
+    } catch (error) {
+      console.warn('Embedding job start failed:', error);
+      
+      // Update status to failed
+      const currentElements = excalidrawAPI.getSceneElements();
+      const failedPdfElement = currentElements.find(el => 
+        el.type === 'image' && 
+        el.customData?.pdf?.originalFileId === originalFileId
+      );
+      
+      if (failedPdfElement) {
+        const failedUpdatedElement = {
+          ...failedPdfElement,
+          customData: {
+            ...failedPdfElement.customData,
+            pdf: {
+              ...failedPdfElement.customData?.pdf,
+              indexingStatus: 'failed' as const
+            }
+          }
+        };
+        
+        excalidrawAPI.updateScene({
+          elements: currentElements.map(el => el.id === failedPdfElement.id ? failedUpdatedElement : el)
+        });
+      }
+    }
     
     console.log(`PDF "${pdfFile.name}" indexed for RAG: ${chunks.length} chunks, document ID: ${documentId}`);
     
@@ -298,6 +432,481 @@ async function ingestPDFForRAG(
     excalidrawAPI.setToast({ 
       message: 'PDF indexing failed (non-blocking)', 
       duration: 2500 
+    });
+  }
+}
+
+/**
+ * Start embedding progress tracking using SSE if available, fallback to polling
+ */
+function startEmbeddingProgressTracking(
+  jobId: string,
+  originalFileId: string,
+  excalidrawAPI: ExcalidrawImperativeAPI,
+  llmServiceUrl: string
+): void {
+  // Try SSE first, fallback to polling if it fails
+  const useSSE = typeof EventSource !== 'undefined';
+  
+  if (useSSE) {
+    startEmbeddingSSETracking(jobId, originalFileId, excalidrawAPI, llmServiceUrl);
+  } else {
+    console.log(`EventSource not available, using polling for job ${jobId}`);
+    startEmbeddingJobPolling(jobId, originalFileId, excalidrawAPI, llmServiceUrl);
+  }
+}
+
+/**
+ * Track embedding job progress via Server-Sent Events
+ */
+function startEmbeddingSSETracking(
+  jobId: string,
+  originalFileId: string,
+  excalidrawAPI: ExcalidrawImperativeAPI,
+  llmServiceUrl: string
+): void {
+  let cancelled = false;
+  
+  // Create cancellation function
+  const cancelFunction = async () => {
+    if (cancelled) return;
+    cancelled = true;
+    
+    try {
+      const cancelResponse = await fetch(`${llmServiceUrl}/api/rag/embed-jobs/${jobId}`, {
+        method: 'DELETE'
+      });
+      
+      if (cancelResponse.ok) {
+        console.log(`Embedding job ${jobId} cancelled successfully`);
+        updatePdfElementStatus(originalFileId, 'failed', excalidrawAPI);
+        excalidrawAPI.setToast({
+          message: 'PDF indexing cancelled',
+          duration: 2000
+        });
+      } else {
+        console.warn(`Failed to cancel job ${jobId}:`, cancelResponse.status);
+      }
+    } catch (error) {
+      console.warn(`Error cancelling job ${jobId}:`, error);
+    }
+  };
+  
+  // Store cancel function globally for manual access
+  if (typeof window !== 'undefined') {
+    (window as any)[`cancelEmbeddingJob_${jobId}`] = cancelFunction;
+  }
+  
+  // Create EventSource for SSE
+  const eventSource = new EventSource(`${llmServiceUrl}/api/rag/embed-events/${jobId}`);
+  
+  eventSource.onopen = () => {
+    console.log(`SSE connected for job ${jobId}`);
+  };
+  
+  eventSource.addEventListener('status', (event) => {
+    if (cancelled) return;
+    
+    try {
+      const data = JSON.parse(event.data);
+      const { status, embedded, failed, total, progress } = data;
+      
+      // Show progress updates
+      console.log(`Embedding progress: ${progress}% (${embedded + failed}/${total}) - Cancel: cancelEmbeddingJob_${jobId}()`);
+      
+      // Handle completion
+      if (status === 'done') {
+        console.log(`Embedding job ${jobId} completed: ${embedded}/${total} chunks embedded`);
+        updatePdfElementStatus(originalFileId, 'embedded', excalidrawAPI);
+        excalidrawAPI.setToast({
+          message: `PDF indexing complete (${embedded}/${total} chunks)`,
+          duration: 3000
+        });
+        cleanup();
+        
+      } else if (status === 'error' || status === 'cancelled') {
+        console.warn(`Embedding job ${jobId} ${status}:`, data.lastError);
+        updatePdfElementStatus(originalFileId, 'failed', excalidrawAPI);
+        
+        // Show error toast (unless we cancelled it ourselves)
+        if (!cancelled) {
+          // Create user-friendly error message
+          let errorMessage = `PDF indexing ${status}`;
+          if (data.lastError) {
+            // Check for provider-specific errors and show appropriate message
+            if (data.lastError.includes('region') || data.lastError.includes('not available')) {
+              errorMessage = '⚠️ Embeddings not available in your region. Please configure a different provider.';
+            } else if (data.lastError.includes('unauthorized') || data.lastError.includes('API key')) {
+              errorMessage = '🔑 Invalid API key. Please check your embeddings provider configuration.';
+            } else if (data.lastError.includes('provider') || data.lastError.includes('configuration')) {
+              errorMessage = '⚙️ Embeddings provider error. Please check your configuration.';
+            } else {
+              errorMessage = `PDF indexing ${status}: ${data.lastError}`;
+            }
+          }
+          
+          excalidrawAPI.setToast({
+            message: errorMessage,
+            duration: 6000 // Longer duration for error messages
+          });
+        }
+        cleanup();
+      }
+    } catch (error) {
+      console.warn('Error parsing SSE status event:', error);
+    }
+  });
+  
+  eventSource.addEventListener('done', (event) => {
+    if (cancelled) return;
+    
+    try {
+      const data = JSON.parse(event.data);
+      console.log(`SSE: Job ${jobId} finished with status: ${data.status}`);
+    } catch (error) {
+      console.warn('Error parsing SSE done event:', error);
+    }
+    cleanup();
+  });
+  
+  eventSource.addEventListener('error', (event) => {
+    console.warn(`SSE error for job ${jobId}:`, event);
+    
+    // If SSE fails, fallback to polling
+    console.log(`SSE failed for job ${jobId}, falling back to polling`);
+    cleanup();
+    
+    if (!cancelled) {
+      startEmbeddingJobPolling(jobId, originalFileId, excalidrawAPI, llmServiceUrl);
+    }
+  });
+  
+  eventSource.onerror = (error) => {
+    console.warn(`SSE connection error for job ${jobId}:`, error);
+    
+    // Fallback to polling on connection errors
+    console.log(`SSE connection failed for job ${jobId}, falling back to polling`);
+    cleanup();
+    
+    if (!cancelled) {
+      startEmbeddingJobPolling(jobId, originalFileId, excalidrawAPI, llmServiceUrl);
+    }
+  };
+  
+  const cleanup = () => {
+    eventSource.close();
+    if (typeof window !== 'undefined') {
+      delete (window as any)[`cancelEmbeddingJob_${jobId}`];
+    }
+  };
+}
+
+/**
+ * Poll embedding job status and update PDF element UI state (fallback method)
+ */
+function startEmbeddingJobPolling(
+  jobId: string,
+  originalFileId: string,
+  excalidrawAPI: ExcalidrawImperativeAPI,
+  llmServiceUrl: string
+): void {
+  let pollCount = 0;
+  const maxPolls = 150; // 5 minutes max (150 * 2s)
+  let cancelled = false;
+  
+  // Create cancellation function and store it globally for manual cancellation
+  const cancelFunction = async () => {
+    if (cancelled) return;
+    cancelled = true;
+    
+    try {
+      const cancelResponse = await fetch(`${llmServiceUrl}/api/rag/embed-jobs/${jobId}`, {
+        method: 'DELETE'
+      });
+      
+      if (cancelResponse.ok) {
+        console.log(`Embedding job ${jobId} cancelled successfully`);
+        updatePdfElementStatus(originalFileId, 'failed', excalidrawAPI);
+        excalidrawAPI.setToast({
+          message: 'PDF indexing cancelled',
+          duration: 2000
+        });
+      } else {
+        console.warn(`Failed to cancel job ${jobId}:`, cancelResponse.status);
+      }
+    } catch (error) {
+      console.warn(`Error cancelling job ${jobId}:`, error);
+    }
+  };
+  
+  // Store cancel function globally for debugging/manual access
+  if (typeof window !== 'undefined') {
+    (window as any)[`cancelEmbeddingJob_${jobId}`] = cancelFunction;
+  }
+  
+  const poll = async () => {
+    if (cancelled) return;
+    try {
+      pollCount++;
+      
+      const response = await fetch(`${llmServiceUrl}/api/rag/embed-status/${jobId}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.log(`Job ${jobId} not found or expired`);
+          updatePdfElementStatus(originalFileId, 'failed', excalidrawAPI);
+          return;
+        }
+        throw new Error(`Status check failed: ${response.status}`);
+      }
+      
+      const { job } = await response.json();
+      const { status, embedded, total, failed, lastError } = job;
+      
+      // Calculate progress percentage
+      const progress = total > 0 ? Math.round(((embedded + failed) / total) * 100) : 0;
+      
+      if (status === 'done') {
+        console.log(`Embedding job ${jobId} completed: ${embedded}/${total} chunks embedded`);
+        updatePdfElementStatus(originalFileId, 'embedded', excalidrawAPI);
+        
+        // Show success toast
+        excalidrawAPI.setToast({
+          message: `PDF indexing complete (${embedded}/${total} chunks)`,
+          duration: 3000
+        });
+        
+        // Cleanup cancel function
+        if (typeof window !== 'undefined') {
+          delete (window as any)[`cancelEmbeddingJob_${jobId}`];
+        }
+        
+      } else if (status === 'error' || status === 'cancelled') {
+        console.warn(`Embedding job ${jobId} ${status}:`, lastError);
+        updatePdfElementStatus(originalFileId, 'failed', excalidrawAPI);
+        
+        // Show error toast (unless we cancelled it ourselves)
+        if (!cancelled) {
+          // Create user-friendly error message
+          let errorMessage = `PDF indexing ${status}`;
+          if (lastError) {
+            if (lastError.includes('region') || lastError.includes('not available')) {
+              errorMessage = '⚠️ Embeddings not available in your region. Please configure a different provider.';
+            } else if (lastError.includes('unauthorized') || lastError.includes('API key')) {
+              errorMessage = '🔑 Invalid API key. Please check your embeddings provider configuration.';
+            } else if (lastError.includes('provider') || lastError.includes('configuration')) {
+              errorMessage = '⚙️ Embeddings provider error. Please check your configuration.';
+            } else {
+              errorMessage = `PDF indexing ${status}: ${lastError}`;
+            }
+          }
+          
+          excalidrawAPI.setToast({
+            message: errorMessage,
+            duration: 6000 // Longer duration for error messages
+          });
+        }
+        
+        // Cleanup cancel function
+        if (typeof window !== 'undefined') {
+          delete (window as any)[`cancelEmbeddingJob_${jobId}`];
+        }
+        
+      } else if (status === 'running') {
+        // Still running, schedule next poll
+        if (pollCount < maxPolls) {
+          setTimeout(poll, 2000); // Poll every 2 seconds
+          
+          // Show progress in console with cancellation instructions
+          if (pollCount % 5 === 0) { // Every 10 seconds
+            console.log(`Embedding progress: ${progress}% (${embedded + failed}/${total}) - Cancel: cancelEmbeddingJob_${jobId}()`);
+          }
+        } else {
+          console.warn(`Embedding job ${jobId} polling timeout after ${maxPolls} attempts`);
+          updatePdfElementStatus(originalFileId, 'failed', excalidrawAPI);
+          
+          // Cleanup cancel function on timeout
+          if (typeof window !== 'undefined') {
+            delete (window as any)[`cancelEmbeddingJob_${jobId}`];
+          }
+        }
+      }
+      
+    } catch (error) {
+      console.warn(`Embedding job polling error:`, error);
+      
+      // Retry a few times before giving up
+      if (pollCount < 5) {
+        setTimeout(poll, 3000); // Retry with longer delay
+      } else {
+        updatePdfElementStatus(originalFileId, 'failed', excalidrawAPI);
+        
+        // Cleanup cancel function on final error
+        if (typeof window !== 'undefined') {
+          delete (window as any)[`cancelEmbeddingJob_${jobId}`];
+        }
+      }
+    }
+  };
+  
+  // Start polling after initial delay
+  setTimeout(poll, 1000);
+}
+
+/**
+ * Check existing document embedding status and offer resume options
+ */
+async function checkExistingDocumentStatus(
+  originalFileId: string,
+  excalidrawAPI: ExcalidrawImperativeAPI
+): Promise<void> {
+  // Find PDF element to get document ID
+  const elements = excalidrawAPI.getSceneElements();
+  const pdfElement = elements.find(el => 
+    el.type === 'image' && 
+    el.customData?.pdf?.originalFileId === originalFileId
+  );
+  
+  if (!pdfElement?.customData?.pdf?.documentId) {
+    return; // No document ID available
+  }
+  
+  const documentId = pdfElement.customData.pdf.documentId;
+  
+  // Resolve LLM service URL
+  const envUrl = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_LLM_SERVICE_URL)
+    ? import.meta.env.VITE_LLM_SERVICE_URL
+    : undefined;
+  const globalUrl = (window as any).__EXCALIDRAW_LLM_SERVICE_URL;
+  const storedUrl = (localStorage.getItem('excalidraw-llm-url') || undefined) as string | undefined;
+  const defaultUrl = `${window.location.protocol}//${window.location.hostname}:3001`;
+  const LLM_SERVICE_URL = globalUrl || envUrl || storedUrl || defaultUrl;
+  
+  try {
+    // Check document status
+    const statusResponse = await fetch(`${LLM_SERVICE_URL}/api/rag/doc/${documentId}/status`);
+    
+    if (!statusResponse.ok) {
+      if (statusResponse.status === 404) {
+        console.log(`Document ${documentId} not found in RAG system`);
+        return;
+      }
+      throw new Error(`Status check failed: ${statusResponse.status}`);
+    }
+    
+    const status = await statusResponse.json();
+    const { chunks, embedded, embeddingPending, progress, isComplete, title } = status;
+    
+    console.log(`Document "${title}" status: ${embedded}/${chunks} chunks embedded (${progress}%)`);
+    
+    // Update element status based on completion
+    if (isComplete) {
+      updatePdfElementStatus(originalFileId, 'embedded', excalidrawAPI);
+      console.log(`✅ Document "${title}" is fully embedded and ready for search`);
+    } else if (embedded > 0) {
+      // Partially embedded - offer resume option
+      updatePdfElementStatus(originalFileId, 'failed', excalidrawAPI); // Use 'failed' to show incomplete state
+      
+      console.log(`⚠️ Document "${title}" is partially embedded (${embedded}/${chunks})`);
+      console.log(`🔄 To resume embedding: resumeDocumentEmbedding_${documentId}()`);
+      
+      // Create resume function
+      const resumeFunction = async () => {
+        try {
+          const embedResponse = await fetch(`${LLM_SERVICE_URL}/api/rag/embed-missing`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ documentId })
+          });
+          
+          if (embedResponse.ok) {
+            const { jobId, total } = await embedResponse.json();
+            
+            if (jobId === null || total === 0) {
+              console.log('✅ No additional embedding needed - document is complete');
+              updatePdfElementStatus(originalFileId, 'embedded', excalidrawAPI);
+              return;
+            }
+            
+            console.log(`🚀 Resumed embedding for "${title}" - Job: ${jobId} (${total} remaining chunks)`);
+            
+            // Update element to show running status
+            updatePdfElementStatus(originalFileId, 'running', excalidrawAPI);
+            
+            // Start progress tracking
+            startEmbeddingProgressTracking(jobId, originalFileId, excalidrawAPI, LLM_SERVICE_URL);
+            
+            excalidrawAPI.setToast({
+              message: `Resumed PDF indexing (${total} chunks remaining)`,
+              duration: 3000
+            });
+          } else {
+            throw new Error(`Resume failed: ${embedResponse.status}`);
+          }
+        } catch (error) {
+          console.error('Failed to resume embedding:', error);
+          excalidrawAPI.setToast({
+            message: 'Failed to resume PDF indexing',
+            duration: 3000
+          });
+        }
+      };
+      
+      // Store resume function globally
+      if (typeof window !== 'undefined') {
+        (window as any)[`resumeDocumentEmbedding_${documentId}`] = resumeFunction;
+      }
+      
+    } else {
+      // No embeddings yet - document exists but not embedded
+      updatePdfElementStatus(originalFileId, 'failed', excalidrawAPI);
+      console.log(`📄 Document "${title}" exists but has no embeddings (${chunks} chunks pending)`);
+    }
+    
+  } catch (error) {
+    console.warn('Document status check failed:', error);
+  }
+}
+
+/**
+ * Update PDF element indexing status in the scene
+ */
+function updatePdfElementStatus(
+  originalFileId: string,
+  status: 'running' | 'embedded' | 'failed',
+  excalidrawAPI: ExcalidrawImperativeAPI
+): void {
+  const elements = excalidrawAPI.getSceneElements();
+  const pdfElement = elements.find(el => 
+    el.type === 'image' && 
+    el.customData?.pdf?.originalFileId === originalFileId
+  );
+  
+  if (pdfElement) {
+    const prevPdf = (pdfElement as any).customData?.pdf || {};
+    // For terminal states, drop indexingJobId from metadata
+    const nextPdf = (() => {
+      if (status === 'running') {
+        return { ...prevPdf, indexingStatus: status } as const;
+      }
+      const { indexingJobId, ...rest } = prevPdf as any; // omit jobId on done/failed
+      return { ...rest, indexingStatus: status } as const;
+    })();
+    const bump = (el: any) => ({
+      ...el,
+      version: (el.version ?? 0) + 1,
+      versionNonce: typeof el.versionNonce === 'number' ? el.versionNonce + 1 : Math.floor(Math.random() * 2 ** 31),
+    });
+    const updatedElement = bump({
+      ...pdfElement,
+      customData: {
+        ...pdfElement.customData,
+        pdf: nextPdf
+      }
+    });
+    
+    excalidrawAPI.updateScene({
+      elements: elements.map(el => el.id === pdfElement.id ? updatedElement : el)
     });
   }
 }

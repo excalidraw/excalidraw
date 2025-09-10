@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 /**
  * Simple Chat Panel Component
  * 
@@ -6,6 +7,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
+import type { RAGFocusDetail } from '../types/rag.types';
 import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
 import { useAtomValue } from '../app-jotai';
 import { collabAPIAtom } from '../collab/Collab';
@@ -18,12 +20,23 @@ interface ChatPanelProps {
   onToggle: () => void;
 }
 
+interface ChatCitation {
+  index: number;
+  documentId: string;
+  chunkId: string;
+  page?: number;
+  chunk_index?: number;
+  source?: string;
+  snippet?: string;
+}
+
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
   durationMs?: number;
+  citations?: ChatCitation[];
 }
 
 // Simple hash function for content deduplication
@@ -69,6 +82,14 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   
   // Simplified AI sync status
   const [aiSyncStatus, setAiSyncStatus] = useState<'unknown' | 'synced'>('unknown');
+
+  // Resolve LLM service base URL from env or window at runtime (typed via vite/client)
+  const LLM_BASE_URL: string = (
+    import.meta.env?.VITE_LLM_SERVICE_URL ??
+    (window as any)?.__EXCALIDRAW_LLM_SERVICE_URL ??
+    (window as any)?.__LLM_SERVICE_URL ??
+    'http://localhost:3001'
+  );
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -147,7 +168,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           await new Promise((resolve) => setTimeout(resolve, 200));
           const elements = excalidrawAPI.getSceneElementsIncludingDeleted();
           if (collabAPI) {
-            await collabAPI.syncElements(elements);
+            await collabAPI.syncElements(elements as any);
             if (import.meta.env.DEV) console.log('Forced full-scene sync broadcast to AI bot');
             collabAPI.broadcastViewport(true);
             if (import.meta.env.DEV) console.log('Forced viewport broadcast to AI bot');
@@ -188,7 +209,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
   const checkServiceHealth = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/health');
+      const response = await fetch(`${LLM_BASE_URL}/api/health`);
       const data = await response.json();
       setIsConnected(data.status === 'healthy');
     } catch (err) {
@@ -244,13 +265,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         const appState = excalidrawAPI.getAppState();
         
         // Generate thumbnail for preattach (if enabled and elements exist)
-        const env: any = (typeof import.meta !== 'undefined' && (import.meta as any).env) || {};
         const thumbnailEnabled = String(
-          env.VITE_LLM_INCLUDE_THUMBNAIL_SNAPSHOT ?? (window as any)?.__LLM_INCLUDE_THUMBNAIL_SNAPSHOT ?? 'false'
+          import.meta.env.VITE_LLM_INCLUDE_THUMBNAIL_SNAPSHOT ?? (window as any)?.__LLM_INCLUDE_THUMBNAIL_SNAPSHOT ?? 'false'
         ).toLowerCase() === 'true';
-        const maxThumbnailDim = Number(env.VITE_LLM_THUMBNAIL_MAX_DIM ?? 512);
-        const thumbnailQuality = Number(env.VITE_LLM_THUMBNAIL_JPEG_QUALITY ?? 0.5);
-        const maxThumbnailBytes = Number(env.VITE_LLM_THUMBNAIL_MAX_BYTES ?? 300000);
+        const maxThumbnailDim = Number(import.meta.env.VITE_LLM_THUMBNAIL_MAX_DIM ?? 512);
+        const thumbnailQuality = Number(import.meta.env.VITE_LLM_THUMBNAIL_JPEG_QUALITY ?? 0.5);
+        const maxThumbnailBytes = Number(import.meta.env.VITE_LLM_THUMBNAIL_MAX_BYTES ?? 300000);
         
         if (thumbnailEnabled && isVisible && elements.length > 0) {
           try {
@@ -327,7 +347,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         // Continue without snapshots
       }
 
-      const response = await fetch('http://localhost:3001/api/chat', {
+      const response = await fetch(`${LLM_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -356,7 +376,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           role: 'assistant',
           content: data.content,
           timestamp: new Date().toISOString(),
-          durationMs
+          durationMs,
+          citations: data.citations || undefined
         };
 
         setMessages(prev => [...prev, assistantMessage]);
@@ -417,9 +438,140 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     }
   };
 
+  // Handle citation chip click: focus PDF on canvas and optionally switch page
+  const handleCitationClick = async (citation: ChatCitation) => {
+    const detail: RAGFocusDetail = {
+      documentId: citation.documentId,
+      chunkId: citation.chunkId,
+      page: citation.page,
+      chunk_index: citation.chunk_index
+    };
+
+    try {
+      const { documentId, page } = detail;
+      if (import.meta.env.DEV) console.log('RAG citation focus requested:', detail);
+
+      // Get current scene elements
+      const elements = excalidrawAPI.getSceneElements();
+
+      // Find all PDF elements with matching documentId and prefer the topmost (last in array)
+      const matches = elements.filter((el: any) => el.type === 'image' && el.customData?.pdf?.documentId === documentId);
+      const pdfElement = matches.length > 0 ? matches[matches.length - 1] : null;
+
+      if (!pdfElement) {
+        excalidrawAPI.setToast({ message: 'Document not found on canvas', closable: true, duration: 3000 });
+        if (import.meta.env.DEV) console.warn('PDF document not found on canvas:', documentId, 'matches=', matches.length);
+        return;
+      }
+
+      // Center viewport on the element and select it
+      const elementCenter = { x: pdfElement.x + pdfElement.width / 2, y: pdfElement.y + pdfElement.height / 2 };
+      const appState = excalidrawAPI.getAppState();
+      const containerWidth = (appState as any)?.width || window.innerWidth;
+      const containerHeight = (appState as any)?.height || window.innerHeight;
+      const newAppState = {
+        ...appState,
+        scrollX: -elementCenter.x + (containerWidth / 2) / (appState.zoom?.value || 1),
+        scrollY: -elementCenter.y + (containerHeight / 2) / (appState.zoom?.value || 1),
+        selectedElementIds: { [pdfElement.id]: true } as const
+      };
+      excalidrawAPI.updateScene({ appState: newAppState });
+
+      // Switch to target page if specified and different
+      if (page && pdfElement.customData?.pdf?.page !== page) {
+        const { navigatePDFPage } = await import('../pdf/pdf-navigation-handler');
+        await navigatePDFPage(excalidrawAPI, pdfElement, page);
+      }
+
+      if (import.meta.env.DEV) console.log('RAG citation focus completed successfully');
+    } catch (error) {
+      const message = error instanceof Error && /Thumbnail not found/i.test(error.message)
+        ? 'Thumbnails missing for this PDF. Reopen/import the PDF to reindex.'
+        : 'Failed to focus citation';
+      excalidrawAPI.setToast({ message, closable: true, duration: 3000 });
+      if (import.meta.env.DEV) console.error('Error focusing RAG citation:', error);
+    }
+  };
+
+  // Render assistant content and make inline markers like 〖R:2〗 or 〖R:2, R:5〗 clickable.
+  // Each number maps to message.citations[index-1]. If mapping is missing, show plain text.
+  const renderContentWithInlineRefs = (message: ChatMessage): React.ReactNode => {
+    const text = message.content || '';
+    const citations = message.citations || [];
+
+    // Only enhance assistant messages
+    if (message.role !== 'assistant' || !text) return text;
+
+    const parts: React.ReactNode[] = [];
+    const regex = /〖([^〗]+)〗/g; // match full-width brackets content
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    let keyCounter = 0;
+
+    while ((match = regex.exec(text)) !== null) {
+      const before = text.slice(lastIndex, match.index);
+      if (before) parts.push(<span key={`t-${keyCounter++}`}>{before}</span>);
+
+      const inside = match[1];
+      // Extract all numbers inside, tolerate formats like "R:2, R:5" or "2,5"
+      const numbers = (inside.match(/\b\d+\b/g) || []).map(n => parseInt(n, 10)).filter(n => Number.isFinite(n));
+
+      if (numbers.length === 0 || citations.length === 0) {
+        // If no valid mapping, keep original marker text
+        parts.push(<span key={`m-${keyCounter++}`}>{match[0]}</span>);
+      } else {
+        parts.push(
+          <span key={`refs-${keyCounter++}`} style={{ display: 'inline-flex', gap: '4px', verticalAlign: 'baseline' }}>
+            {numbers.map((num, i) => {
+              const c = citations[num - 1];
+              if (!c) {
+                return <span key={`r-${num}-${i}`}>〖R:{num}〗</span>;
+              }
+              return (
+                <button
+                  key={`rbtn-${num}-${i}`}
+                  onClick={() => handleCitationClick(c)}
+                  title={`${c.snippet || ''}${c.page ? ` (Page ${c.page})` : ''}`}
+                  style={{
+                    padding: '0 6px',
+                    fontSize: '10px',
+                    fontFamily: 'Monaco, "Lucida Console", monospace',
+                    backgroundColor: '#fff',
+                    border: '1px solid #dadce0',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    color: '#1a73e8',
+                    lineHeight: 1.4
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#e8f0fe';
+                    e.currentTarget.style.borderColor = '#1a73e8';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#fff';
+                    e.currentTarget.style.borderColor = '#dadce0';
+                  }}
+                >
+                  R:{num}
+                </button>
+              );
+            })}
+          </span>
+        );
+      }
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    const tail = text.slice(lastIndex);
+    if (tail) parts.push(<span key={`t-${keyCounter++}`}>{tail}</span>);
+
+    return parts;
+  };
+
   const clearHistory = async () => {
     try {
-      await fetch('http://localhost:3001/api/chat/history/default', {
+      await fetch(`${LLM_BASE_URL}/api/chat/history/default`, {
         method: 'DELETE'
       });
       setMessages([]);
@@ -598,8 +750,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
               lineHeight: 1.4,
               wordWrap: 'break-word'
             }}>
-              {message.content}
+              {renderContentWithInlineRefs(message)}
             </div>
+            
+            {/* References block removed: inline 〖R:n〗 markers are now clickable instead */}
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
