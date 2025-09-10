@@ -26,6 +26,7 @@ import {
   setMany,
   get,
 } from "idb-keyval";
+import { t } from "@excalidraw/excalidraw/i18n";
 
 import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
@@ -91,7 +92,14 @@ const saveDataStateToLocalStorage = (
   } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
+    if (isQuotaExceededError(error)) {
+      appState.toast = { message: t("toast.localStorageQuotaExceeded") };
+    }
   }
+};
+
+const isQuotaExceededError = (error: any) => {
+  return error instanceof DOMException && error.name === "QuotaExceededError";
 };
 
 type SavingLockTypes = "collaboration";
