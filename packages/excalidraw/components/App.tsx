@@ -667,9 +667,7 @@ class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
-    this.defaultSelectionTool = this.isMobileOrTablet()
-      ? ("lasso" as const)
-      : ("selection" as const);
+    this.defaultSelectionTool = "selection" as const;
     const {
       excalidrawAPI,
       viewModeEnabled = false,
