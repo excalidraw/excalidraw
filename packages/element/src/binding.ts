@@ -47,7 +47,6 @@ import {
   isBindableElement,
   isBoundToContainer,
   isElbowArrow,
-  isImageElement,
   isRectanguloidElement,
   isTextElement,
 } from "./typeChecks";
@@ -101,9 +100,6 @@ export const FIXED_BINDING_DISTANCE = 5;
 export const getFixedBindingDistance = (
   element: ExcalidrawBindableElement,
 ): number => FIXED_BINDING_DISTANCE + element.strokeWidth / 2;
-
-export const isAlwaysInsideBinding = (element: ExcalidrawBindableElement) =>
-  isImageElement(element);
 
 export const shouldEnableBindingForPointerEvent = (
   event: React.PointerEvent<HTMLElement>,
@@ -379,9 +375,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
     if (!arrow.startBinding) {
       if (hit) {
         const isInsideBinding =
-          globalBindMode === "inside" ||
-          globalBindMode === "skip" ||
-          isAlwaysInsideBinding(hit);
+          globalBindMode === "inside" || globalBindMode === "skip";
 
         end = {
           mode: isInsideBinding ? "inside" : "orbit",
@@ -429,11 +423,7 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
 
   // If the global bind mode is in free binding mode, just bind
   // where the pointer is and keep the other end intact
-  if (
-    globalBindMode === "inside" ||
-    globalBindMode === "skip" ||
-    (hit && isAlwaysInsideBinding(hit))
-  ) {
+  if (globalBindMode === "inside" || globalBindMode === "skip") {
     current = hit
       ? {
           element:
