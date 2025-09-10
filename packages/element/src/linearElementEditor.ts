@@ -335,39 +335,37 @@ export class LinearElementEditor {
 
     // Apply the point movement if needed
     let suggestedBinding: AppState["suggestedBinding"] = null;
-    if (deltaX || deltaY) {
-      const { positions, updates } = pointDraggingUpdates(
-        [idx],
-        deltaX,
-        deltaY,
-        elementsMap,
+    const { positions, updates } = pointDraggingUpdates(
+      [idx],
+      deltaX,
+      deltaY,
+      elementsMap,
+      element,
+      elements,
+      app,
+    );
+
+    LinearElementEditor.movePoints(element, app.scene, positions, updates);
+    // Set the suggested binding from the updates if available
+    if (isBindingElement(element, false)) {
+      if (isBindingEnabled(app.state)) {
+        suggestedBinding = updates?.suggestedBinding ?? null;
+      }
+    }
+
+    // Move the arrow over the bindable object in terms of z-index
+    if (isBindingElement(element)) {
+      moveArrowAboveBindable(
+        LinearElementEditor.getPointGlobalCoordinates(
+          element,
+          element.points[element.points.length - 1],
+          elementsMap,
+        ),
         element,
         elements,
-        app,
+        elementsMap,
+        app.scene,
       );
-
-      LinearElementEditor.movePoints(element, app.scene, positions, updates);
-      // Set the suggested binding from the updates if available
-      if (isBindingElement(element, false)) {
-        if (isBindingEnabled(app.state)) {
-          suggestedBinding = updates?.suggestedBinding ?? null;
-        }
-      }
-
-      // Move the arrow over the bindable object in terms of z-index
-      if (isBindingElement(element)) {
-        moveArrowAboveBindable(
-          LinearElementEditor.getPointGlobalCoordinates(
-            element,
-            element.points[element.points.length - 1],
-            elementsMap,
-          ),
-          element,
-          elements,
-          elementsMap,
-          app.scene,
-        );
-      }
     }
 
     // PERF: Avoid state updates if not absolutely necessary
@@ -481,42 +479,40 @@ export class LinearElementEditor {
 
     // Apply the point movement if needed
     let suggestedBinding: AppState["suggestedBinding"] = null;
-    if (deltaX || deltaY) {
-      const { positions, updates } = pointDraggingUpdates(
-        selectedPointsIndices,
-        deltaX,
-        deltaY,
-        elementsMap,
+    const { positions, updates } = pointDraggingUpdates(
+      selectedPointsIndices,
+      deltaX,
+      deltaY,
+      elementsMap,
+      element,
+      elements,
+      app,
+    );
+
+    LinearElementEditor.movePoints(element, app.scene, positions, updates);
+
+    // Set the suggested binding from the updates if available
+    if (isBindingElement(element, false)) {
+      if (isBindingEnabled(app.state) && (startIsSelected || endIsSelected)) {
+        suggestedBinding = updates?.suggestedBinding ?? null;
+      }
+    }
+
+    // Move the arrow over the bindable object in terms of z-index
+    if (isBindingElement(element) && startIsSelected !== endIsSelected) {
+      moveArrowAboveBindable(
+        LinearElementEditor.getPointGlobalCoordinates(
+          element,
+          startIsSelected
+            ? element.points[0]
+            : element.points[element.points.length - 1],
+          elementsMap,
+        ),
         element,
         elements,
-        app,
+        elementsMap,
+        app.scene,
       );
-
-      LinearElementEditor.movePoints(element, app.scene, positions, updates);
-
-      // Set the suggested binding from the updates if available
-      if (isBindingElement(element, false)) {
-        if (isBindingEnabled(app.state) && (startIsSelected || endIsSelected)) {
-          suggestedBinding = updates?.suggestedBinding ?? null;
-        }
-      }
-
-      // Move the arrow over the bindable object in terms of z-index
-      if (isBindingElement(element) && startIsSelected !== endIsSelected) {
-        moveArrowAboveBindable(
-          LinearElementEditor.getPointGlobalCoordinates(
-            element,
-            startIsSelected
-              ? element.points[0]
-              : element.points[element.points.length - 1],
-            elementsMap,
-          ),
-          element,
-          elements,
-          elementsMap,
-          app.scene,
-        );
-      }
     }
 
     // Attached text might need to update if arrow dimensions change
