@@ -21,7 +21,6 @@ import {
   assertNever,
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
-  THEME,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -33,7 +32,6 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 import type {
   AppState,
   EmbedsValidationStatus,
-  InteractiveCanvasAppState,
 } from "@excalidraw/excalidraw/types";
 import type {
   ElementShape,
@@ -72,7 +70,6 @@ import type {
   ExcalidrawFreeDrawElement,
   ElementsMap,
   ExcalidrawLineElement,
-  ExcalidrawBindableElement,
 } from "./types";
 
 import type { Drawable, Options } from "roughjs/bin/core";
@@ -106,31 +103,6 @@ export class ShapeCache {
 
   public static destroy = () => {
     ShapeCache.cache = new WeakMap();
-  };
-
-  public static generateBindableElementHighlight = <
-    T extends ExcalidrawBindableElement,
-  >(
-    element: T,
-    appState: Pick<InteractiveCanvasAppState, "theme">,
-  ) => {
-    let shape =
-      (ShapeCache.get(element) as Drawable | null) ||
-      (ShapeCache.rg.rectangle(0, 0, element.width, element.height, {
-        roughness: 0,
-        strokeWidth: 2,
-      }) as Drawable);
-
-    // Clone the shape from the cache
-    shape = {
-      ...shape,
-      options: {
-        ...shape.options,
-        stroke: appState.theme === THEME.DARK ? "#035da1" : "#6abdfc",
-      },
-    };
-
-    return shape;
   };
 
   /**

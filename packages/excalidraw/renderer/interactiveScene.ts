@@ -17,11 +17,7 @@ import {
   throttleRAF,
 } from "@excalidraw/common";
 
-import {
-  LinearElementEditor,
-  renderElement,
-  ShapeCache,
-} from "@excalidraw/element";
+import { LinearElementEditor, renderElement } from "@excalidraw/element";
 import {
   getOmitSidesForDevice,
   getTransformHandles,
@@ -196,83 +192,71 @@ const renderBindingHighlightForBindableElement = (
   switch (element.type) {
     case "magicframe":
     case "frame":
-      {
-        const {
-          options: { stroke: highlightStroke },
-        } = ShapeCache.generateBindableElementHighlight(element, appState);
+      context.save();
+      context.translate(
+        element.x + appState.scrollX,
+        element.y + appState.scrollY,
+      );
 
-        context.save();
-        context.translate(
-          element.x + appState.scrollX,
-          element.y + appState.scrollY,
+      context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
+      context.strokeStyle =
+        appState.theme === THEME.DARK ? "#035da1" : "#6abdfc";
+
+      if (FRAME_STYLE.radius && context.roundRect) {
+        context.beginPath();
+        context.roundRect(
+          0,
+          0,
+          element.width,
+          element.height,
+          FRAME_STYLE.radius / appState.zoom.value,
         );
-
-        context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle = highlightStroke;
-
-        if (FRAME_STYLE.radius && context.roundRect) {
-          context.beginPath();
-          context.roundRect(
-            0,
-            0,
-            element.width,
-            element.height,
-            FRAME_STYLE.radius / appState.zoom.value,
-          );
-          context.stroke();
-          context.closePath();
-        } else {
-          context.strokeRect(0, 0, element.width, element.height);
-        }
-
-        context.restore();
+        context.stroke();
+        context.closePath();
+      } else {
+        context.strokeRect(0, 0, element.width, element.height);
       }
+
+      context.restore();
       break;
     case "image":
     case "text":
-      {
-        const {
-          options: { stroke: highlightStroke },
-        } = ShapeCache.generateBindableElementHighlight(element, appState);
+      context.save();
+      context.translate(
+        element.x + appState.scrollX,
+        element.y + appState.scrollY,
+      );
 
-        context.save();
-        context.translate(
-          element.x + appState.scrollX,
-          element.y + appState.scrollY,
-        );
+      context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
+      context.strokeStyle =
+        appState.theme === THEME.DARK ? "#035da1" : "#6abdfc";
 
-        context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle = highlightStroke;
-
-        context.strokeRect(0, 0, element.width, element.height);
-        context.restore();
-      }
+      context.strokeRect(0, 0, element.width, element.height);
+      context.restore();
       break;
     default:
-      const cx =
-        (element.x + element.width / 2 + appState.scrollX) *
-        window.devicePixelRatio;
-      const cy =
-        (element.y + element.height / 2 + appState.scrollY) *
-        window.devicePixelRatio;
-      context.save();
-
-      context.translate(cx, cy);
-      context.rotate(element.angle);
-      context.translate(-cx, -cy);
-      context.translate(
-        appState.scrollX + element.x,
-        appState.scrollY + element.y,
-      );
-
-      const drawable = ShapeCache.generateBindableElementHighlight(
-        element,
+      renderElement(
+        {
+          ...element,
+          strokeColor: appState.theme === THEME.DARK ? "#035da1" : "#6abdfc",
+          fillStyle: "solid",
+          backgroundColor: "transparent",
+        },
+        elementsMap,
+        allElementsMap,
+        rough.canvas(context.canvas),
+        context,
+        {
+          canvasBackgroundColor: "transparent",
+          imageCache: new Map(),
+          renderGrid: false,
+          isExporting: false,
+          embedsValidationStatus: new Map(),
+          elementsPendingErasure: new Set(),
+          pendingFlowchartNodes: null,
+        },
         appState,
       );
-      drawable.options.fill = "transparent";
-      rough.canvas(context.canvas).draw(drawable);
-
-      context.restore();
 
       // Overdraw the arrow if exists (if there is a suggestedBinding it's an arrow)
       if (appState.selectedLinearElement) {
