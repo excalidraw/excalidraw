@@ -83,7 +83,7 @@ export const actionChangeViewBackgroundColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
-        compactMode={appState.propertiesSidebarMode === "compact"}
+        compactMode={appState.stylesPanelMode === "compact"}
       />
     );
   },

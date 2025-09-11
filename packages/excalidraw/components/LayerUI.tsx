@@ -163,7 +163,7 @@ const LayerUI = ({
   const tunnels = useInitializeTunnels();
 
   const spacing =
-    appState.propertiesSidebarMode === "compact"
+    appState.stylesPanelMode === "compact"
       ? {
           menuTopGap: 4,
           toolbarColGap: 4,
@@ -234,7 +234,7 @@ const LayerUI = ({
   );
 
   const renderSelectedShapeActions = () => {
-    const isCompactMode = appState.propertiesSidebarMode === "compact";
+    const isCompactMode = appState.stylesPanelMode === "compact";
 
     return (
       <Section
@@ -306,7 +306,7 @@ const LayerUI = ({
             <div
               className={clsx("selected-shape-actions-container", {
                 "selected-shape-actions-container--compact":
-                  appState.propertiesSidebarMode === "compact",
+                  appState.stylesPanelMode === "compact",
               })}
             >
               {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
@@ -332,7 +332,7 @@ const LayerUI = ({
                           className={clsx("App-toolbar", {
                             "zen-mode": appState.zenModeEnabled,
                             "App-toolbar--compact":
-                              appState.propertiesSidebarMode === "compact",
+                              appState.stylesPanelMode === "compact",
                           })}
                         >
                           <HintViewer
@@ -405,7 +405,7 @@ const LayerUI = ({
               {
                 "transition-right": appState.zenModeEnabled,
                 "layer-ui__wrapper__top-right--compact":
-                  appState.propertiesSidebarMode === "compact",
+                  appState.stylesPanelMode === "compact",
               },
             )}
           >
@@ -480,7 +480,7 @@ const LayerUI = ({
         }}
         tab={DEFAULT_SIDEBAR.defaultTab}
       >
-        {appState.propertiesSidebarMode === "complete" &&
+        {appState.stylesPanelMode === "full" &&
           appState.width >= MQ_MIN_WIDTH_DESKTOP &&
           t("toolBar.library")}
       </DefaultSidebar.Trigger>

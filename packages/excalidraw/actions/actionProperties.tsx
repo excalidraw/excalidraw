@@ -328,7 +328,7 @@ export const actionChangeStrokeColor = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <>
-      {appState.propertiesSidebarMode === "complete" && (
+      {appState.stylesPanelMode === "full" && (
         <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       )}
       <ColorPicker
@@ -348,7 +348,7 @@ export const actionChangeStrokeColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
-        compactMode={appState.propertiesSidebarMode === "compact"}
+        compactMode={appState.stylesPanelMode === "compact"}
       />
     </>
   ),
@@ -408,7 +408,7 @@ export const actionChangeBackgroundColor = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <>
-      {appState.propertiesSidebarMode === "complete" && (
+      {appState.stylesPanelMode === "full" && (
         <h3 aria-hidden="true">{t("labels.background")}</h3>
       )}
       <ColorPicker
@@ -428,7 +428,7 @@ export const actionChangeBackgroundColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
-        compactMode={appState.propertiesSidebarMode === "compact"}
+        compactMode={appState.stylesPanelMode === "compact"}
       />
     </>
   ),
@@ -531,7 +531,7 @@ export const actionChangeStrokeWidth = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      {appState.propertiesSidebarMode === "complete" && (
+      {appState.stylesPanelMode === "full" && (
         <legend>{t("labels.strokeWidth")}</legend>
       )}
       <div className="buttonList">
@@ -590,7 +590,7 @@ export const actionChangeSloppiness = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      {appState.propertiesSidebarMode === "complete" && (
+      {appState.stylesPanelMode === "full" && (
         <legend>{t("labels.sloppiness")}</legend>
       )}
       <div className="buttonList">
@@ -645,7 +645,7 @@ export const actionChangeStrokeStyle = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      {appState.propertiesSidebarMode === "complete" && (
+      {appState.stylesPanelMode === "full" && (
         <legend>{t("labels.strokeStyle")}</legend>
       )}
       <div className="buttonList">
@@ -776,7 +776,7 @@ export const actionChangeFontSize = register({
           onChange={(value) => {
             withCaretPositionPreservation(
               () => updateData(value),
-              appState.propertiesSidebarMode === "compact",
+              appState.stylesPanelMode === "compact",
               !!appState.editingTextElement,
               data?.onPreventClose,
             );
@@ -1118,14 +1118,14 @@ export const actionChangeFontFamily = register({
 
     return (
       <fieldset>
-        {appState.propertiesSidebarMode === "complete" && (
+        {appState.stylesPanelMode === "full" && (
           <legend>{t("labels.fontFamily")}</legend>
         )}
         <FontPicker
           isOpened={appState.openPopup === "fontFamily"}
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
-          compactMode={appState.propertiesSidebarMode === "compact"}
+          compactMode={appState.stylesPanelMode === "compact"}
           onSelect={(fontFamily) => {
             withCaretPositionPreservation(
               () => {
@@ -1137,7 +1137,7 @@ export const actionChangeFontFamily = register({
                 // defensive clear so immediate close won't abuse the cached elements
                 cachedElementsRef.current.clear();
               },
-              appState.propertiesSidebarMode === "compact",
+              appState.stylesPanelMode === "compact",
               !!appState.editingTextElement,
             );
           }}
@@ -1213,7 +1213,7 @@ export const actionChangeFontFamily = register({
 
               // Refocus text editor when font picker closes if we were editing text
               if (
-                appState.propertiesSidebarMode === "compact" &&
+                appState.stylesPanelMode === "compact" &&
                 appState.editingTextElement
               ) {
                 restoreCaretPosition(null); // Just refocus without saved position
@@ -1314,7 +1314,7 @@ export const actionChangeTextAlign = register({
             onChange={(value) => {
               withCaretPositionPreservation(
                 () => updateData(value),
-                appState.propertiesSidebarMode === "compact",
+                appState.stylesPanelMode === "compact",
                 !!appState.editingTextElement,
                 data?.onPreventClose,
               );
@@ -1413,7 +1413,7 @@ export const actionChangeVerticalAlign = register({
             onChange={(value) => {
               withCaretPositionPreservation(
                 () => updateData(value),
-                appState.propertiesSidebarMode === "compact",
+                appState.stylesPanelMode === "compact",
                 !!appState.editingTextElement,
                 data?.onPreventClose,
               );

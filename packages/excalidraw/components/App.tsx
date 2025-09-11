@@ -2476,13 +2476,13 @@ class App extends React.Component<AppProps, AppState> {
 
     // also check if we need to update the app state
     this.setState({
-      propertiesSidebarMode:
+      stylesPanelMode:
         // NOTE: we could also remove the isMobileOrTablet check here and
         // always switch to compact mode when the editor is narrow (e.g. < MQ_MIN_WIDTH_DESKTOP)
         // but not too narrow (> MQ_MAX_WIDTH_MOBILE)
         this.isTabletBreakpoint(editorWidth, editorHeight) && isMobileOrTablet()
           ? "compact"
-          : "complete",
+          : "full",
     });
 
     if (prevEditorState !== nextEditorState) {
