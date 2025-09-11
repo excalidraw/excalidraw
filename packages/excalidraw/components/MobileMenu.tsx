@@ -11,6 +11,7 @@ import { calculateScrollCenter } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
+import { MobileToolBar } from "./MobileToolBar";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HandButton } from "./HandButton";
 import { HintViewer } from "./HintViewer";
@@ -78,60 +79,16 @@ export const MobileMenu = ({
   } = useTunnels();
   const renderToolbar = () => {
     return (
-      <FixedSideContainer side="top" className="App-top-bar">
-        {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
-        <Section heading="shapes">
-          {(heading: React.ReactNode) => (
-            <Stack.Col gap={4} align="center">
-              <Stack.Row gap={1} className="App-toolbar-container">
-                <Island padding={1} className="App-toolbar App-toolbar--mobile">
-                  {heading}
-                  <Stack.Row gap={1}>
-                    <ShapesSwitcher
-                      appState={appState}
-                      activeTool={appState.activeTool}
-                      UIOptions={UIOptions}
-                      app={app}
-                    />
-                  </Stack.Row>
-                </Island>
-                {renderTopRightUI && renderTopRightUI(true, appState)}
-                <div className="mobile-misc-tools-container">
-                  {!appState.viewModeEnabled &&
-                    appState.openDialog?.name !== "elementLinkSelector" && (
-                      <DefaultSidebarTriggerTunnel.Out />
-                    )}
-                  <PenModeButton
-                    checked={appState.penMode}
-                    onChange={() => onPenModeToggle(null)}
-                    title={t("toolBar.penMode")}
-                    isMobile
-                    penDetected={appState.penDetected}
-                  />
-                  <LockButton
-                    checked={appState.activeTool.locked}
-                    onChange={onLockToggle}
-                    title={t("toolBar.lock")}
-                    isMobile
-                  />
-                  <HandButton
-                    checked={isHandToolActive(appState)}
-                    onChange={() => onHandToolToggle()}
-                    title={t("toolBar.hand")}
-                    isMobile
-                  />
-                </div>
-              </Stack.Row>
-            </Stack.Col>
-          )}
-        </Section>
-        <HintViewer
+      <div>
+        {/* {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />} */}
+        <MobileToolBar
           appState={appState}
-          isMobile={true}
-          device={device}
           app={app}
+          actionManager={actionManager}
+          onHandToolToggle={onHandToolToggle}
+          UIOptions={UIOptions}
         />
-      </FixedSideContainer>
+      </div>
     );
   };
 
@@ -166,9 +123,14 @@ export const MobileMenu = ({
   return (
     <>
       {renderSidebars()}
-      {!appState.viewModeEnabled &&
-        appState.openDialog?.name !== "elementLinkSelector" &&
-        renderToolbar()}
+      <FixedSideContainer side="top" className="App-top-bar">
+        <HintViewer
+          appState={appState}
+          isMobile={true}
+          device={device}
+          app={app}
+        />
+      </FixedSideContainer>
       <div
         className="App-bottom-bar"
         style={{
@@ -192,7 +154,9 @@ export const MobileMenu = ({
             </Section>
           ) : null}
           <footer className="App-toolbar">
-            {renderAppToolbar()}
+            {!appState.viewModeEnabled &&
+              appState.openDialog?.name !== "elementLinkSelector" &&
+              renderToolbar()}
             {appState.scrolledOutside &&
               !appState.openMenu &&
               !appState.openSidebar && (

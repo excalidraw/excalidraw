@@ -6,6 +6,13 @@
     top: 100%;
     margin-top: 0.5rem;
 
+    &--placement-top {
+      top: auto;
+      bottom: 100%;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
     &--mobile {
       left: 0;
       width: 100%;

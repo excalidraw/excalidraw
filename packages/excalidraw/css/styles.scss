@@ -249,13 +249,13 @@ body.excalidraw-cursor-resize * {
     display: flex;
     align-items: flex-end;
     pointer-events: none;
+    display: flex;
+    justify-content: center;
 
     > .Island {
-      width: 100%;
-      max-width: 100%;
-      min-width: 100%;
       box-sizing: border-box;
       max-height: 100%;
+      padding: 4px;
       display: flex;
       flex-direction: column;
       pointer-events: var(--ui-pointerEvents);
@@ -264,6 +264,8 @@ body.excalidraw-cursor-resize * {
 
   .App-toolbar {
     width: 100%;
+    display: flex;
+    justify-content: center;
 
     .eraser {
       &.ToolIcon:hover {
