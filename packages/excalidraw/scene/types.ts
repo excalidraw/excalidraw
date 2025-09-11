@@ -141,6 +141,11 @@ export type ScrollBars = {
   } | null;
 };
 
+export type ConstrainedScrollValues = Pick<
+  AppState,
+  "scrollX" | "scrollY" | "zoom"
+> | null;
+
 export type ElementShape = Drawable | Drawable[] | null;
 
 export type ElementShapes = {
