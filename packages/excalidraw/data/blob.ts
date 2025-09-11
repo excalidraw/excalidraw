@@ -96,6 +96,8 @@ export const getMimeType = (blob: Blob | string): string => {
     return MIME_TYPES.jpg;
   } else if (/\.svg$/.test(name)) {
     return MIME_TYPES.svg;
+  } else if (/\.excalidrawlib$/.test(name)) {
+    return MIME_TYPES.excalidrawlib;
   }
   return "";
 };
@@ -389,23 +391,18 @@ export const ImageURLToFile = async (
   throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
 };
 
-export const getFileFromEvent = async (
-  event: React.DragEvent<HTMLDivElement>,
-) => {
-  const file = event.dataTransfer.files.item(0);
-  const fileHandle = await getFileHandle(event);
-
-  return { file: file ? await normalizeFile(file) : null, fileHandle };
-};
-
 export const getFileHandle = async (
-  event: React.DragEvent<HTMLDivElement>,
+  event: DragEvent | React.DragEvent | DataTransferItem,
 ): Promise<FileSystemHandle | null> => {
   if (nativeFileSystemSupported) {
     try {
-      const item = event.dataTransfer.items[0];
+      const dataTransferItem =
+        event instanceof DataTransferItem
+          ? event
+          : (event as DragEvent).dataTransfer?.items?.[0];
+
       const handle: FileSystemHandle | null =
-        (await (item as any).getAsFileSystemHandle()) || null;
+        (await (dataTransferItem as any).getAsFileSystemHandle()) || null;
 
       return handle;
     } catch (error: any) {

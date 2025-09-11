@@ -20,6 +20,7 @@ import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
   reseed,
+  randomId,
 } from "@excalidraw/common";
 
 import "@excalidraw/utils/test-utils";
@@ -58,9 +59,13 @@ import { createPasteEvent } from "../clipboard";
 
 import * as blobModule from "../data/blob";
 
+import {
+  DEER_IMAGE_DIMENSIONS,
+  SMILEY_IMAGE_DIMENSIONS,
+} from "./fixtures/constants";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { mockHTMLImageElement } from "./helpers/mocks";
+import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants";
 import {
   GlobalTestState,
   act,
@@ -71,6 +76,7 @@ import {
   checkpointHistory,
   unmountComponent,
 } from "./test-utils";
+import { setupImageTest as _setupImageTest } from "./image.test";
 
 import type { AppState } from "../types";
 
@@ -123,7 +129,9 @@ describe("history", () => {
     const generateIdSpy = vi.spyOn(blobModule, "generateIdFromFile");
     const resizeFileSpy = vi.spyOn(blobModule, "resizeImageFile");
 
-    generateIdSpy.mockImplementation(() => Promise.resolve("fileId" as FileId));
+    generateIdSpy.mockImplementation(() =>
+      Promise.resolve(randomId() as FileId),
+    );
     resizeFileSpy.mockImplementation((file: File) => Promise.resolve(file));
 
     Object.assign(document, {
@@ -560,21 +568,24 @@ describe("history", () => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]),
       );
 
-      await API.drop(
-        new Blob(
-          [
-            JSON.stringify({
-              type: EXPORT_DATA_TYPES.excalidraw,
-              appState: {
-                ...getDefaultAppState(),
-                viewBackgroundColor: "#000",
-              },
-              elements: [API.createElement({ type: "rectangle", id: "B" })],
-            }),
-          ],
-          { type: MIME_TYPES.json },
-        ),
-      );
+      await API.drop([
+        {
+          kind: "file",
+          file: new Blob(
+            [
+              JSON.stringify({
+                type: EXPORT_DATA_TYPES.excalidraw,
+                appState: {
+                  ...getDefaultAppState(),
+                  viewBackgroundColor: "#000",
+                },
+                elements: [API.createElement({ type: "rectangle", id: "B" })],
+              }),
+            ],
+            { type: MIME_TYPES.json },
+          ),
+        },
+      ]);
 
       await waitFor(() => expect(API.getUndoStack().length).toBe(1));
       expect(h.state.viewBackgroundColor).toBe("#000");
@@ -612,89 +623,17 @@ describe("history", () => {
       ]);
     });
 
-    it("should create new history entry on image drag&drop", async () => {
-      await render(<Excalidraw handleKeyboardGlobally={true} />);
-
-      // it's necessary to specify the height in order to calculate natural dimensions of the image
-      h.state.height = 1000;
-
-      const deerImageDimensions = {
-        width: 318,
-        height: 335,
-      };
-
-      mockHTMLImageElement(
-        deerImageDimensions.width,
-        deerImageDimensions.height,
-      );
-
-      await API.drop(await API.loadFile("./fixtures/deer.png"));
-
-      await waitFor(() => {
-        expect(API.getUndoStack().length).toBe(1);
-        expect(API.getRedoStack().length).toBe(0);
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            type: "image",
-            fileId: expect.any(String),
-            x: expect.toBeNonNaNNumber(),
-            y: expect.toBeNonNaNNumber(),
-            ...deerImageDimensions,
-          }),
-        ]);
-
-        // need to check that delta actually contains initialized image element (with fileId & natural dimensions)
-        expect(
-          Object.values(h.history.undoStack[0].elements.removed)[0].deleted,
-        ).toEqual(
-          expect.objectContaining({
-            type: "image",
-            fileId: expect.any(String),
-            x: expect.toBeNonNaNNumber(),
-            y: expect.toBeNonNaNNumber(),
-            ...deerImageDimensions,
-          }),
-        );
-      });
-
-      Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(0);
-      expect(API.getRedoStack().length).toBe(1);
-      expect(h.elements).toEqual([
-        expect.objectContaining({
-          type: "image",
-          fileId: expect.any(String),
-          x: expect.toBeNonNaNNumber(),
-          y: expect.toBeNonNaNNumber(),
-          isDeleted: true,
-          ...deerImageDimensions,
-        }),
-      ]);
-
-      Keyboard.redo();
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(0);
-      expect(h.elements).toEqual([
-        expect.objectContaining({
-          type: "image",
-          fileId: expect.any(String),
-          x: expect.toBeNonNaNNumber(),
-          y: expect.toBeNonNaNNumber(),
-          isDeleted: false,
-          ...deerImageDimensions,
-        }),
-      ]);
-    });
-
     it("should create new history entry on embeddable link drag&drop", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
 
       const link = "https://www.youtube.com/watch?v=gkGMXY0wekg";
-      await API.drop(
-        new Blob([link], {
+      await API.drop([
+        {
+          kind: "string",
+          value: link,
           type: MIME_TYPES.text,
-        }),
-      );
+        },
+      ]);
 
       await waitFor(() => {
         expect(API.getUndoStack().length).toBe(1);
@@ -730,54 +669,29 @@ describe("history", () => {
       ]);
     });
 
-    it("should create new history entry on image paste", async () => {
-      await render(
-        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
-      );
+    const setupImageTest = () =>
+      _setupImageTest([DEER_IMAGE_DIMENSIONS, SMILEY_IMAGE_DIMENSIONS]);
 
-      // it's necessary to specify the height in order to calculate natural dimensions of the image
-      h.state.height = 1000;
-
-      const smileyImageDimensions = {
-        width: 56,
-        height: 77,
-      };
-
-      mockHTMLImageElement(
-        smileyImageDimensions.width,
-        smileyImageDimensions.height,
-      );
-
-      document.dispatchEvent(
-        createPasteEvent({
-          files: [await API.loadFile("./fixtures/smiley_embedded_v2.png")],
-        }),
-      );
-
+    const assertImageTest = async () => {
       await waitFor(() => {
         expect(API.getUndoStack().length).toBe(1);
         expect(API.getRedoStack().length).toBe(0);
-        expect(h.elements).toEqual([
+
+        // need to check that delta actually contains initialized image elements (with fileId & natural dimensions)
+        expect(
+          Object.values(h.history.undoStack[0].elements.removed).map(
+            (val) => val.deleted,
+          ),
+        ).toEqual([
           expect.objectContaining({
-            type: "image",
-            fileId: expect.any(String),
-            x: expect.toBeNonNaNNumber(),
-            y: expect.toBeNonNaNNumber(),
-            ...smileyImageDimensions,
+            ...INITIALIZED_IMAGE_PROPS,
+            ...DEER_IMAGE_DIMENSIONS,
+          }),
+          expect.objectContaining({
+            ...INITIALIZED_IMAGE_PROPS,
+            ...SMILEY_IMAGE_DIMENSIONS,
           }),
         ]);
-        // need to check that delta actually contains initialized image element (with fileId & natural dimensions)
-        expect(
-          Object.values(h.history.undoStack[0].elements.removed)[0].deleted,
-        ).toEqual(
-          expect.objectContaining({
-            type: "image",
-            fileId: expect.any(String),
-            x: expect.toBeNonNaNNumber(),
-            y: expect.toBeNonNaNNumber(),
-            ...smileyImageDimensions,
-          }),
-        );
       });
 
       Keyboard.undo();
@@ -785,12 +699,14 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(1);
       expect(h.elements).toEqual([
         expect.objectContaining({
-          type: "image",
-          fileId: expect.any(String),
-          x: expect.toBeNonNaNNumber(),
-          y: expect.toBeNonNaNNumber(),
+          ...INITIALIZED_IMAGE_PROPS,
           isDeleted: true,
-          ...smileyImageDimensions,
+          ...DEER_IMAGE_DIMENSIONS,
+        }),
+        expect.objectContaining({
+          ...INITIALIZED_IMAGE_PROPS,
+          isDeleted: true,
+          ...SMILEY_IMAGE_DIMENSIONS,
         }),
       ]);
 
@@ -799,14 +715,49 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(0);
       expect(h.elements).toEqual([
         expect.objectContaining({
-          type: "image",
-          fileId: expect.any(String),
-          x: expect.toBeNonNaNNumber(),
-          y: expect.toBeNonNaNNumber(),
+          ...INITIALIZED_IMAGE_PROPS,
           isDeleted: false,
-          ...smileyImageDimensions,
+          ...DEER_IMAGE_DIMENSIONS,
+        }),
+        expect.objectContaining({
+          ...INITIALIZED_IMAGE_PROPS,
+          isDeleted: false,
+          ...SMILEY_IMAGE_DIMENSIONS,
         }),
       ]);
+    };
+
+    it("should create new history entry on image drag&drop", async () => {
+      await setupImageTest();
+
+      await API.drop(
+        (
+          await Promise.all([
+            API.loadFile("./fixtures/deer.png"),
+            API.loadFile("./fixtures/smiley.png"),
+          ])
+        ).map((file) => ({
+          kind: "file",
+          file,
+        })),
+      );
+
+      await assertImageTest();
+    });
+
+    it("should create new history entry on image paste", async () => {
+      await setupImageTest();
+
+      document.dispatchEvent(
+        createPasteEvent({
+          files: await Promise.all([
+            API.loadFile("./fixtures/deer.png"),
+            API.loadFile("./fixtures/smiley.png"),
+          ]),
+        }),
+      );
+
+      await assertImageTest();
     });
 
     it("should create new history entry on embeddable link paste", async () => {
