@@ -1,5 +1,6 @@
 import { KEYS, arrayToMap, invariant, isTransparent } from "@excalidraw/common";
 
+import { isElementInsideBBox } from "@excalidraw/utils";
 import {
   lineSegment,
   pointFrom,
@@ -21,11 +22,7 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 
-import {
-  doBoundsIntersect,
-  getCenterForBounds,
-  getElementBounds,
-} from "./bounds";
+import { getCenterForBounds, getElementBounds } from "./bounds";
 import {
   getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
@@ -763,13 +760,6 @@ export const updateBoundElements = (
         : elementsMap.get(element.endBinding.elementId)
       : null;
 
-    let startBounds: Bounds | null = null;
-    let endBounds: Bounds | null = null;
-    if (startBindingElement && endBindingElement) {
-      startBounds = getElementBounds(startBindingElement, elementsMap);
-      endBounds = getElementBounds(endBindingElement, elementsMap);
-    }
-
     // `linearElement` is being moved/scaled already, just update the binding
     if (simultaneouslyUpdatedElementIds.has(element.id)) {
       return;
@@ -784,11 +774,10 @@ export const updateBoundElements = (
           isBindableElement(bindableElement) &&
           (bindingProp === "startBinding" || bindingProp === "endBinding") &&
           (changedElement.id === element[bindingProp]?.elementId ||
-            (changedElement.id ===
+            changedElement.id ===
               element[
                 bindingProp === "startBinding" ? "endBinding" : "startBinding"
-              ]?.elementId &&
-              !doBoundsIntersect(startBounds, endBounds)))
+              ]?.elementId)
         ) {
           const point = updateBoundPoint(
             element,
@@ -1252,39 +1241,50 @@ export const updateBoundPoint = (
   const pointIndex =
     startOrEnd === "startBinding" ? 0 : arrow.points.length - 1;
 
+  const otherBinding =
+    startOrEnd === "startBinding" ? arrow.endBinding : arrow.startBinding;
+  const otherBindableElement =
+    otherBinding &&
+    (elementsMap.get(otherBinding.elementId)! as ExcalidrawBindableElement);
+  const bounds = getElementBounds(bindableElement, elementsMap);
+  const isNested =
+    otherBindableElement && isElementInsideBBox(otherBindableElement, bounds);
+
   const maybeOutlineGlobal =
     binding.mode === "orbit" && bindableElement
-      ? bindPointToSnapToElementOutline(
-          {
-            ...arrow,
-            x: pointIndex === 0 ? global[0] : arrow.x,
-            y: pointIndex === 0 ? global[1] : arrow.y,
-            points:
-              pointIndex === 0
-                ? [
-                    pointFrom<LocalPoint>(0, 0),
-                    ...arrow.points
-                      .slice(1)
-                      .map((p) =>
-                        pointFrom<LocalPoint>(
-                          p[0] - (global[0] - arrow.x),
-                          p[1] - (global[1] - arrow.y),
+      ? isNested
+        ? global
+        : bindPointToSnapToElementOutline(
+            {
+              ...arrow,
+              x: pointIndex === 0 ? global[0] : arrow.x,
+              y: pointIndex === 0 ? global[1] : arrow.y,
+              points:
+                pointIndex === 0
+                  ? [
+                      pointFrom<LocalPoint>(0, 0),
+                      ...arrow.points
+                        .slice(1)
+                        .map((p) =>
+                          pointFrom<LocalPoint>(
+                            p[0] - (global[0] - arrow.x),
+                            p[1] - (global[1] - arrow.y),
+                          ),
                         ),
+                    ]
+                  : [
+                      ...arrow.points.slice(0, -1),
+                      pointFrom<LocalPoint>(
+                        global[0] - arrow.x,
+                        global[1] - arrow.y,
                       ),
-                  ]
-                : [
-                    ...arrow.points.slice(0, -1),
-                    pointFrom<LocalPoint>(
-                      global[0] - arrow.x,
-                      global[1] - arrow.y,
-                    ),
-                  ],
-          },
-          bindableElement,
-          pointIndex === 0 ? "start" : "end",
-          elementsMap,
-          customIntersector,
-        )
+                    ],
+            },
+            bindableElement,
+            pointIndex === 0 ? "start" : "end",
+            elementsMap,
+            customIntersector,
+          )
       : global;
 
   return LinearElementEditor.pointFromAbsoluteCoords(
