@@ -213,7 +213,7 @@ const eraserTest = (
     return true;
   }
 
-  // for freedraw and linear elements account for stroke width and handling of dots #9762
+  // for freedraw and linear elements account for stroke width to handle dot-like elements #9762
   if (
     isFreeDrawElement(element) ||
     isArrowElement(element) ||
