@@ -347,14 +347,18 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
       };
 
       // We are hovering another element with the end point
+      const isNested =
+        hit &&
+        isElementInsideBBox(otherElement, getElementBounds(hit, elementsMap));
       let current: BindingStrategy;
       if (hit) {
         const isInsideBinding =
           globalBindMode === "inside" || globalBindMode === "skip";
         current = {
-          mode: isInsideBinding ? "inside" : "orbit",
+          mode: isInsideBinding && !isNested ? "inside" : "orbit",
           element: hit,
-          focusPoint: isInsideBinding
+          focusPoint:
+            isInsideBinding || isNested
             ? point
             : snapToCenter(hit, elementsMap, point),
         };
@@ -403,20 +407,22 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
 
   const isMultiPoint = arrow.points.length > 2;
   const hit = getHoveredElementForBinding(point, elements, elementsMap);
-  const isNested = oppositeBinding
+  const isOverlapping = oppositeBinding
     ? getAllHoveredElementAtPoint(point, elements, elementsMap).some(
         (el) => el.id === oppositeBinding.elementId,
       )
     : false;
-  const oppositeElement =
-    isNested && oppositeBinding
-      ? (elementsMap.get(
-          oppositeBinding.elementId,
-        ) as ExcalidrawBindableElement)
+  const oppositeElement = oppositeBinding
+    ? (elementsMap.get(oppositeBinding.elementId) as ExcalidrawBindableElement)
       : null;
-  const otherIsTransparent = oppositeElement
+  const otherIsTransparent =
+    isOverlapping && oppositeElement
     ? isTransparent(oppositeElement.backgroundColor)
     : false;
+  const isNested =
+    hit &&
+    oppositeElement &&
+    isElementInsideBBox(oppositeElement, getElementBounds(hit, elementsMap));
 
   // If the global bind mode is in free binding mode, just bind
   // where the pointer is and keep the other end intact
@@ -424,7 +430,7 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
     current = hit
       ? {
           element:
-            !isNested || !oppositeElement || otherIsTransparent
+            !isOverlapping || !oppositeElement || otherIsTransparent
               ? hit
               : oppositeElement,
           focusPoint: point,
@@ -464,7 +470,7 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
     // eslint-disable-next-line no-else-return
     else {
       // Handle the nested element case
-      if (isNested && oppositeElement && !otherIsTransparent) {
+      if (isOverlapping && oppositeElement && !otherIsTransparent) {
         current = {
           element: oppositeElement,
           mode: "inside",
@@ -474,7 +480,7 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
         current = {
           element: hit,
           mode: "orbit",
-          focusPoint: snapToCenter(hit, elementsMap, point),
+          focusPoint: isNested ? point : snapToCenter(hit, elementsMap, point),
         };
       }
 
