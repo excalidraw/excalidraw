@@ -967,6 +967,9 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  private previousHoveredBindableElement: NonDeletedExcalidrawElement | null =
+    null;
+
   private handleDelayedBindModeChange(
     arrow: ExcalidrawArrowElement,
     hoveredElement: NonDeletedExcalidrawElement | null,
@@ -1069,7 +1072,11 @@ class App extends React.Component<AppProps, AppState> {
       }
     };
 
-    if (!hoveredElement) {
+    if (
+      !hoveredElement ||
+      (this.previousHoveredBindableElement &&
+        hoveredElement.id !== this.previousHoveredBindableElement.id)
+    ) {
       // Clear the timeout if we're not hovering a bindable
       if (this.bindModeHandler) {
         clearTimeout(this.bindModeHandler);
@@ -1084,6 +1091,8 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
       }
+
+      this.previousHoveredBindableElement = null;
     } else if (
       !this.bindModeHandler &&
       (!this.state.newElement || !arrow.startBinding)
@@ -1091,6 +1100,8 @@ class App extends React.Component<AppProps, AppState> {
       // We are hovering a bindable element
       this.bindModeHandler = setTimeout(effector, BIND_MODE_TIMEOUT);
     }
+
+    this.previousHoveredBindableElement = hoveredElement;
   }
 
   private cacheEmbeddableRef(

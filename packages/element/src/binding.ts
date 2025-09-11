@@ -309,8 +309,6 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
 
         invariant(otherElement, "Other element must be in the elements map");
 
-        const otherIsTransparent = isTransparent(otherElement.backgroundColor);
-
         return {
           start: isMultiPoint
             ? { mode: undefined }
@@ -320,8 +318,8 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
                 focusPoint: origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y),
               },
           end: {
-            mode: "inside",
-            element: otherIsTransparent ? hit : otherElement,
+            mode: "orbit",
+            element: hit,
             focusPoint: point,
           },
         };
