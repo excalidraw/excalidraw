@@ -101,9 +101,10 @@ import {
   DOUBLE_TAP_POSITION_THRESHOLD,
   isMobileOrTablet,
   MQ_MAX_WIDTH_MOBILE,
-  MQ_MIN_WIDTH_TABLET,
   MQ_MAX_HEIGHT_LANDSCAPE,
   MQ_MAX_WIDTH_LANDSCAPE,
+  MQ_MIN_TABLET,
+  MQ_MAX_TABLET,
 } from "@excalidraw/common";
 
 import {
@@ -2422,6 +2423,13 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
+  private isTabletBreakpoint = (editorWidth: number, editorHeight: number) => {
+    const minSide = Math.min(editorWidth, editorHeight);
+    const maxSide = Math.max(editorWidth, editorHeight);
+
+    return minSide >= MQ_MIN_TABLET && maxSide <= MQ_MAX_TABLET;
+  };
+
   private refreshViewportBreakpoints = () => {
     const container = this.excalidrawContainerRef.current;
     if (!container) {
@@ -2472,7 +2480,7 @@ class App extends React.Component<AppProps, AppState> {
         // NOTE: we could also remove the isMobileOrTablet check here and
         // always switch to compact mode when the editor is narrow (e.g. < MQ_MIN_WIDTH_DESKTOP)
         // but not too narrow (> MQ_MAX_WIDTH_MOBILE)
-        isMobileOrTablet() && editorWidth >= MQ_MIN_WIDTH_TABLET
+        this.isTabletBreakpoint(editorWidth, editorHeight) && isMobileOrTablet()
           ? "compact"
           : "complete",
     });
