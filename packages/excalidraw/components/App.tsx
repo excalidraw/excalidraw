@@ -41,9 +41,6 @@ import {
   LINE_CONFIRM_THRESHOLD,
   MAX_ALLOWED_FILE_BYTES,
   MIME_TYPES,
-  MQ_MAX_HEIGHT_LANDSCAPE,
-  MQ_MAX_WIDTH_LANDSCAPE,
-  MQ_MAX_WIDTH_PORTRAIT,
   MQ_RIGHT_SIDEBAR_MIN_WIDTH,
   POINTER_BUTTON,
   ROUNDNESS,
@@ -100,9 +97,13 @@ import {
   randomInteger,
   CLASSES,
   Emitter,
-  isMobile,
   MINIMUM_ARROW_SIZE,
   DOUBLE_TAP_POSITION_THRESHOLD,
+  isMobileOrTablet,
+  MQ_MAX_WIDTH_MOBILE,
+  MQ_MIN_WIDTH_TABLET,
+  MQ_MAX_HEIGHT_LANDSCAPE,
+  MQ_MAX_WIDTH_LANDSCAPE,
 } from "@excalidraw/common";
 
 import {
@@ -661,7 +662,7 @@ class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
-    this.defaultSelectionTool = this.isMobileOrTablet()
+    this.defaultSelectionTool = isMobileOrTablet()
       ? ("lasso" as const)
       : ("selection" as const);
     const {
@@ -2414,19 +2415,9 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private isMobileOrTablet = (): boolean => {
-    const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    const hasCoarsePointer =
-      "matchMedia" in window &&
-      window?.matchMedia("(pointer: coarse)")?.matches;
-    const isTouchMobile = hasTouch && hasCoarsePointer;
-
-    return isMobile || isTouchMobile;
-  };
-
   private isMobileBreakpoint = (width: number, height: number) => {
     return (
-      width < MQ_MAX_WIDTH_PORTRAIT ||
+      width <= MQ_MAX_WIDTH_MOBILE ||
       (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
     );
   };
@@ -2478,7 +2469,10 @@ class App extends React.Component<AppProps, AppState> {
     // also check if we need to update the app state
     this.setState({
       propertiesSidebarMode:
-        this.isMobileOrTablet() && editorWidth >= MQ_MAX_WIDTH_PORTRAIT
+        // NOTE: we could also remove the isMobileOrTablet check here and
+        // always switch to compact mode when the editor is narrow (e.g. < MQ_MIN_WIDTH_DESKTOP)
+        // but not too narrow (> MQ_MAX_WIDTH_MOBILE)
+        isMobileOrTablet() && editorWidth >= MQ_MIN_WIDTH_TABLET
           ? "compact"
           : "complete",
     });
@@ -3172,7 +3166,7 @@ class App extends React.Component<AppProps, AppState> {
         this.addElementsFromPasteOrLibrary({
           elements,
           files: data.files || null,
-          position: this.isMobileOrTablet() ? "center" : "cursor",
+          position: isMobileOrTablet() ? "center" : "cursor",
           retainSeed: isPlainPaste,
         });
       } else if (data.text) {
@@ -3190,7 +3184,7 @@ class App extends React.Component<AppProps, AppState> {
             this.addElementsFromPasteOrLibrary({
               elements,
               files,
-              position: this.isMobileOrTablet() ? "center" : "cursor",
+              position: isMobileOrTablet() ? "center" : "cursor",
             });
 
             return;
@@ -6675,8 +6669,6 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.hit.element &&
         this.isASelectedElement(pointerDownState.hit.element);
 
-      const isMobileOrTablet = this.isMobileOrTablet();
-
       if (
         !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
         !pointerDownState.resize.handleType &&
@@ -6690,12 +6682,12 @@ class App extends React.Component<AppProps, AppState> {
 
         // block dragging after lasso selection on PCs until the next pointer down
         // (on mobile or tablet, we want to allow user to drag immediately)
-        pointerDownState.drag.blockDragging = !isMobileOrTablet;
+        pointerDownState.drag.blockDragging = !isMobileOrTablet();
       }
 
       // only for mobile or tablet, if we hit an element, select it immediately like normal selection
       if (
-        isMobileOrTablet &&
+        isMobileOrTablet() &&
         pointerDownState.hit.element &&
         !hitSelectedElement
       ) {
@@ -8505,7 +8497,7 @@ class App extends React.Component<AppProps, AppState> {
         if (
           this.state.activeTool.type === "lasso" &&
           this.lassoTrail.hasCurrentTrail &&
-          !(this.isMobileOrTablet() && pointerDownState.hit.element) &&
+          !(isMobileOrTablet() && pointerDownState.hit.element) &&
           !this.state.activeTool.fromSelection
         ) {
           return;

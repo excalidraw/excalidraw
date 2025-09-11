@@ -4,6 +4,7 @@ import React from "react";
 import {
   CLASSES,
   DEFAULT_SIDEBAR,
+  MQ_MIN_WIDTH_DESKTOP,
   TOOL_TYPE,
   arrayToMap,
   capitalizeString,
@@ -479,7 +480,9 @@ const LayerUI = ({
         }}
         tab={DEFAULT_SIDEBAR.defaultTab}
       >
-        {appState.propertiesSidebarMode === "complete" && t("toolBar.library")}
+        {appState.propertiesSidebarMode === "complete" &&
+          appState.width >= MQ_MIN_WIDTH_DESKTOP &&
+          t("toolBar.library")}
       </DefaultSidebar.Trigger>
       <DefaultOverwriteConfirmDialog />
       {appState.openDialog?.name === "ttd" && <TTDDialog __fallback />}

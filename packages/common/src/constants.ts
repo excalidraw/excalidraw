@@ -344,9 +344,21 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
 // breakpoints
 // -----------------------------------------------------------------------------
 // md screen
-export const MQ_MAX_WIDTH_PORTRAIT = 730;
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
 export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
+
+// mobile: up to 699px
+export const MQ_MAX_WIDTH_MOBILE = 699;
+
+// tablets: 700px to 1199px
+export const MQ_MIN_WIDTH_TABLET = 700;
+export const MQ_MAX_WIDTH_TABLET = 1199;
+
+// desktop and large tablets
+export const MQ_MIN_WIDTH_DESKTOP = 1200;
+
+// optional: large desktop/ultrawide
+export const MQ_MIN_WIDTH_DESKTOP_LARGE = 1920;
 // sidebar
 export const MQ_RIGHT_SIDEBAR_MIN_WIDTH = 1229;
 // -----------------------------------------------------------------------------
