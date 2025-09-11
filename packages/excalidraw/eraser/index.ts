@@ -191,18 +191,18 @@ const eraserTest = (
   elementsMap: ElementsMap,
 ): boolean => {
   const lastPoint = pathSegment[1];
-  const threshold = 1;
+  const threshold = isFreeDrawElement(element) ? 15 : element.strokeWidth / 2;
 
-  const bounds = [
-    lastPoint[0] - threshold,
-    lastPoint[1] - threshold,
-    lastPoint[0] + threshold,
-    lastPoint[1] + threshold,
+  const segmentBounds = [
+    Math.min(pathSegment[0][0], pathSegment[1][0]) - threshold,
+    Math.min(pathSegment[0][1], pathSegment[1][1]) - threshold,
+    Math.max(pathSegment[0][0], pathSegment[1][0]) + threshold,
+    Math.max(pathSegment[0][1], pathSegment[1][1]) + threshold,
   ] as Bounds;
 
   const elementBounds = getElementBounds(element, elementsMap);
 
-  if (!doBoundsIntersect(bounds, elementBounds)) {
+  if (!doBoundsIntersect(segmentBounds, elementBounds)) {
     return false;
   }
 
@@ -213,16 +213,16 @@ const eraserTest = (
     return true;
   }
 
-  // for freedraw-points, lines and arrows
+  // for freedraw and linear elements account for stroke width and handling of dots #9762
   if (
     isFreeDrawElement(element) ||
     isArrowElement(element) ||
     (isLineElement(element) && !element.polygon)
   ) {
-    const tolerance =
-      element.type === "freedraw"
-        ? element.strokeWidth * 2.125
-        : element.strokeWidth / 2;
+    const tolerance = isFreeDrawElement(element)
+      ? element.strokeWidth * 2.125
+      : element.strokeWidth / 2;
+
     return distanceToElement(element, elementsMap, lastPoint) <= tolerance;
   }
 
