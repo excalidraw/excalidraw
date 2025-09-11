@@ -22,7 +22,11 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 
-import { getCenterForBounds, getElementBounds } from "./bounds";
+import {
+  doBoundsIntersect,
+  getCenterForBounds,
+  getElementBounds,
+} from "./bounds";
 import {
   getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
@@ -359,8 +363,8 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
           element: hit,
           focusPoint:
             isInsideBinding || isNested
-            ? point
-            : snapToCenter(hit, elementsMap, point),
+              ? point
+              : snapToCenter(hit, elementsMap, point),
         };
       } else {
         current = { mode: null };
@@ -414,11 +418,11 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
     : false;
   const oppositeElement = oppositeBinding
     ? (elementsMap.get(oppositeBinding.elementId) as ExcalidrawBindableElement)
-      : null;
+    : null;
   const otherIsTransparent =
     isOverlapping && oppositeElement
-    ? isTransparent(oppositeElement.backgroundColor)
-    : false;
+      ? isTransparent(oppositeElement.backgroundColor)
+      : false;
   const isNested =
     hit &&
     oppositeElement &&
@@ -1223,6 +1227,11 @@ const snapToMid = (
   return p;
 };
 
+const compareElementArea = (
+  a: ExcalidrawBindableElement,
+  b: ExcalidrawBindableElement,
+) => b.width ** 2 + b.height ** 2 - (a.width ** 2 + a.height ** 2);
+
 export const updateBoundPoint = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   startOrEnd: "startBinding" | "endBinding",
@@ -1253,8 +1262,15 @@ export const updateBoundPoint = (
     otherBinding &&
     (elementsMap.get(otherBinding.elementId)! as ExcalidrawBindableElement);
   const bounds = getElementBounds(bindableElement, elementsMap);
-  const isNested =
-    otherBindableElement && isElementInsideBBox(otherBindableElement, bounds);
+  const otherBounds =
+    otherBindableElement && getElementBounds(otherBindableElement, elementsMap);
+  const isLargerThanOther =
+    otherBindableElement &&
+    compareElementArea(bindableElement, otherBindableElement) < 0;
+  const isIntersecting = otherBounds && doBoundsIntersect(bounds, otherBounds);
+  // const isNested =
+  //   otherBindableElement && isElementInsideBBox(otherBindableElement, bounds);
+  const isNested = isIntersecting && isLargerThanOther;
 
   const maybeOutlineGlobal =
     binding.mode === "orbit" && bindableElement
