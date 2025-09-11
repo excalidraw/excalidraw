@@ -2,8 +2,12 @@ import React from "react";
 
 import { composeEventHandlers } from "@excalidraw/common";
 
+import * as Portal from "@radix-ui/react-portal";
+
 import { useTunnels } from "../../context/tunnels";
 import { useUIAppState } from "../../context/ui-appState";
+import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
+
 import { t } from "../../i18n";
 import { useDevice, useExcalidrawSetAppState } from "../App";
 import { UserList } from "../UserList";
@@ -36,6 +40,17 @@ const MainMenu = Object.assign(
 
       return (
         <MainMenuTunnel.In>
+          {appState.openMenu === "canvas" && device.editor.isMobile && (
+            <Portal.Root
+              style={{
+                backgroundColor: "rgba(18, 18, 18, 0.2)",
+                position: "fixed",
+                inset: "0px",
+                // zIndex: "var(--zIndex-layerUI)",
+              }}
+              onClick={() => setAppState({ openMenu: null })}
+            />
+          )}
           <DropdownMenu open={appState.openMenu === "canvas"}>
             <DropdownMenu.Trigger
               onToggle={() => {
@@ -44,15 +59,27 @@ const MainMenu = Object.assign(
                 });
               }}
               data-testid="main-menu-trigger"
+              aria-label="Main menu"
               className="main-menu-trigger"
             >
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
+              sideOffset={device.editor.isMobile ? 20 : undefined}
+              className="main-menu-content"
               onClickOutside={onClickOutside}
               onSelect={composeEventHandlers(onSelect, () => {
                 setAppState({ openMenu: null });
               })}
+              collisionPadding={
+                // accounting for
+                // - editor footer on desktop
+                // - toolbar on mobile
+                // we probably don't want the menu to overlay these elements
+                !device.editor.isMobile
+                  ? { bottom: 90, top: 10 }
+                  : { top: 90, bottom: 10 }
+              }
             >
               {children}
               {device.editor.isMobile && appState.collaborators.size > 0 && (
@@ -78,6 +105,7 @@ const MainMenu = Object.assign(
     ItemCustom: DropdownMenu.ItemCustom,
     Group: DropdownMenu.Group,
     Separator: DropdownMenu.Separator,
+    Sub: DropdownMenuSub,
     DefaultItems,
   },
 );

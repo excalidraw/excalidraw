@@ -615,6 +615,52 @@ export default function ExampleApp({
   const renderMenu = () => {
     return (
       <MainMenu>
+        <MainMenu.Sub>
+          <MainMenu.Sub.Trigger
+            title="Custom trigger"
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5"
+                />
+              </svg>
+            }
+          >
+            Submenu trigger
+          </MainMenu.Sub.Trigger>
+          <MainMenu.Sub.Content>
+            <MainMenu.Sub.Item
+              icon={
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"
+                  />
+                </svg>
+              }
+              onSelect={() => window.alert("You clicked on sub item")}
+            >
+              Sub item
+            </MainMenu.Sub.Item>
+          </MainMenu.Sub.Content>
+        </MainMenu.Sub>
         <MainMenu.DefaultItems.SaveAsImage />
         <MainMenu.DefaultItems.Export />
         <MainMenu.Separator />
@@ -622,10 +668,57 @@ export default function ExampleApp({
           isCollaborating={isCollaborating}
           onSelect={() => window.alert("You clicked on collab button")}
         />
+        <MainMenu.Sub>
+          <MainMenu.Sub.Trigger>Trigger</MainMenu.Sub.Trigger>
+          <MainMenu.Sub.Content>
+            <MainMenu.Sub.Item
+              onSelect={() => window.alert("You clicked on sub item")}
+            >
+              Sub item
+            </MainMenu.Sub.Item>
+          </MainMenu.Sub.Content>
+        </MainMenu.Sub>
         <MainMenu.Group title="Excalidraw links">
           <MainMenu.DefaultItems.Socials />
         </MainMenu.Group>
-        <MainMenu.Separator />
+        {/* <MainMenu.Separator /> */}
+        <MainMenu.Sub>
+          <MainMenu.Sub.Trigger className="custom-classname">
+            Another submenu trigger
+          </MainMenu.Sub.Trigger>
+          <MainMenu.Sub.Content className="custom-classname-for-content">
+            <MainMenu.Sub.Item
+              title="Sub item"
+              onSelect={() => window.alert("You clicked on sub item")}
+            >
+              Sub item
+            </MainMenu.Sub.Item>
+          </MainMenu.Sub.Content>
+        </MainMenu.Sub>
+        <MainMenu.Sub>
+          <MainMenu.Sub.Trigger>Trigger me</MainMenu.Sub.Trigger>
+          <MainMenu.Sub.Content>
+            <MainMenu.Sub>
+              <MainMenu.Sub.Trigger>Trigger me inside</MainMenu.Sub.Trigger>
+              <MainMenu.Sub.Content>
+                <MainMenu.Sub.Item
+                  onSelect={() => {
+                    alert("wow, nested submenus!");
+                  }}
+                >
+                  Item wow
+                </MainMenu.Sub.Item>
+              </MainMenu.Sub.Content>
+            </MainMenu.Sub>
+            <MainMenu.Sub.Item
+              onSelect={() => {
+                alert("wow, nested submenus! very cool");
+              }}
+            >
+              Another one
+            </MainMenu.Sub.Item>
+          </MainMenu.Sub.Content>
+        </MainMenu.Sub>
         <MainMenu.ItemCustom>
           <button
             style={{ height: "2rem" }}

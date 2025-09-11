@@ -1,20 +1,45 @@
-@import "../../css/variables.module.scss";
+@import "../../css/variables.module";
 
 .excalidraw {
+  [data-dropdown-menu-trigger] + [data-radix-popper-content-wrapper] {
+    z-index: 2 !important;
+  }
+
   .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    margin-top: 0.5rem;
+    max-width: 16rem;
+    margin-top: 0.25rem;
+
+    &__submenu-trigger {
+      &[aria-expanded="true"] {
+        .dropdown-menu-item {
+          background-color: var(--button-hover-bg);
+        }
+      }
+    }
+
+    &__submenu-trigger-icon {
+      margin-left: auto;
+      opacity: 0.5;
+    }
+
+    .radix-menu-item {
+      &:focus-visible {
+        outline: none;
+      }
+    }
+
+    .dropdown-submenu {
+      margin-left: -0.75rem;
+      min-width: 16rem;
+      max-width: 20rem;
+    }
 
     &--mobile {
-      left: 0;
-      width: 100%;
-      row-gap: 0.75rem;
-
       .dropdown-menu-container {
+        grid-template-columns: minmax(0, 1fr);
         padding: 8px 8px;
         box-sizing: border-box;
-        // background-color: var(--island-bg-color);
+        background-color: var(--island-bg-color);
         box-shadow: var(--shadow-island);
         border-radius: var(--border-radius-lg);
         position: relative;
@@ -30,13 +55,14 @@
 
     .dropdown-menu-container {
       background-color: var(--island-bg-color);
-      max-height: calc(100vh - 150px);
+      max-height: var(--radix-popper-available-height);
       overflow-y: auto;
       --gap: 2;
     }
 
     .dropdown-menu-item-base {
       display: flex;
+      padding: 0 0.625rem;
       column-gap: 0.625rem;
       font-size: 0.875rem;
       color: var(--color-on-surface);
@@ -44,6 +70,7 @@
       box-sizing: border-box;
       font-weight: 400;
       font-family: inherit;
+      justify-content: flex-start;
     }
 
     &.manual-hover {

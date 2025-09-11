@@ -39,6 +39,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
+      <MainMenu.DefaultItems.Preferences />
       <MainMenu.Separator />
       <MainMenu.ItemLink
         icon={ExcalLogo}

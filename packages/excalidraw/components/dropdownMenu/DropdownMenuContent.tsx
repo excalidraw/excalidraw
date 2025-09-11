@@ -3,6 +3,8 @@ import React, { useEffect, useRef } from "react";
 
 import { EVENT, KEYS } from "@excalidraw/common";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useStable } from "../../hooks/useStable";
 import { useDevice } from "../App";
@@ -17,6 +19,9 @@ const MenuContent = ({
   className = "",
   onSelect,
   style,
+  sideOffset = 4,
+  align = "start",
+  collisionPadding,
 }: {
   children?: React.ReactNode;
   onClickOutside?: () => void;
@@ -26,6 +31,11 @@ const MenuContent = ({
    */
   onSelect?: (event: Event) => void;
   style?: React.CSSProperties;
+  sideOffset?: number;
+  align?: "start" | "center" | "end";
+  collisionPadding?:
+    | number
+    | Partial<Record<"top" | "right" | "bottom" | "left", number>>;
 }) => {
   const device = useDevice();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -62,11 +72,15 @@ const MenuContent = ({
 
   return (
     <DropdownMenuContentPropsContext.Provider value={{ onSelect }}>
-      <div
+      <DropdownMenuPrimitive.Content
         ref={menuRef}
         className={classNames}
         style={style}
         data-testid="dropdown-menu"
+        side="bottom"
+        sideOffset={sideOffset}
+        align={align}
+        collisionPadding={collisionPadding}
       >
         {/* the zIndex ensures this menu has higher stacking order,
     see https://github.com/excalidraw/excalidraw/pull/1445 */}
@@ -81,7 +95,7 @@ const MenuContent = ({
             {children}
           </Island>
         )}
-      </div>
+      </DropdownMenuPrimitive.Content>
     </DropdownMenuContentPropsContext.Provider>
   );
 };

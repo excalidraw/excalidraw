@@ -30,6 +30,18 @@
     align-items: center;
   }
 
+  #canvas-bg-color-picker-container {
+    .color-picker__top-picks {
+      gap: 0.5rem;
+    }
+
+    .color-picker-container {
+      @include isMobile {
+        max-width: none;
+      }
+    }
+  }
+
   .color-picker__button {
     --radius: 4px;
     --size: 1.375rem;

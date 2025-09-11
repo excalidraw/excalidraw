@@ -1,5 +1,5 @@
-import { act, queryByTestId } from "@testing-library/react";
-import React from "react";
+import { queryByTestId } from "@testing-library/react";
+import { act } from "@testing-library/react";
 import { vi } from "vitest";
 
 import { MIME_TYPES, ORIG_ID } from "@excalidraw/common";
@@ -13,9 +13,11 @@ import { serializeLibraryAsJSON } from "../data/json";
 import { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { Excalidraw } from "../index";
 
+import { fireEvent, render, togglePopover, waitFor } from "./test-utils";
+
 import { API } from "./helpers/api";
 import { UI } from "./helpers/ui";
-import { fireEvent, getCloneByOrigId, render, waitFor } from "./test-utils";
+import { getCloneByOrigId } from "./test-utils";
 
 import type { LibraryItem, LibraryItems } from "../types";
 
@@ -222,12 +224,13 @@ describe("library menu", () => {
     const libraryButton = container.querySelector(".sidebar-trigger");
 
     fireEvent.click(libraryButton!);
-    fireEvent.click(
-      queryByTestId(
-        container.querySelector(".layer-ui__library")!,
-        "dropdown-menu-button",
-      )!,
-    );
+    togglePopover("Library menu");
+    // fireEvent.click(
+    //   queryByTestId(
+    //     container.querySelector(".layer-ui__library")!,
+    //     "dropdown-menu-button",
+    //   )!,
+    // );
     fireEvent.click(queryByTestId(container, "lib-dropdown--load")!);
 
     const libraryItems = parseLibraryJSON(await libraryJSONPromise);

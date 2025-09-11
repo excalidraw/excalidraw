@@ -11,7 +11,7 @@ interface ButtonProps
     HTMLButtonElement
   > {
   type?: "button" | "submit" | "reset";
-  onSelect: () => any;
+  onSelect: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => any;
   /** whether button is in active state */
   selected?: boolean;
   children: React.ReactNode;
@@ -34,7 +34,7 @@ export const Button = ({
   return (
     <button
       onClick={composeEventHandlers(rest.onClick, (event) => {
-        onSelect();
+        onSelect(event);
       })}
       type={type}
       className={clsx("excalidraw-button", className, { selected })}

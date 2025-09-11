@@ -1,5 +1,7 @@
 import React from "react";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import DropdownMenuContent from "./DropdownMenuContent";
 import DropdownMenuGroup from "./DropdownMenuGroup";
 import DropdownMenuItem from "./DropdownMenuItem";
@@ -23,11 +25,12 @@ const DropdownMenu = ({
 }) => {
   const MenuTriggerComp = getMenuTriggerComponent(children);
   const MenuContentComp = getMenuContentComponent(children);
+
   return (
-    <>
+    <DropdownMenuPrimitive.Root open={open} modal={false}>
       {MenuTriggerComp}
-      {open && MenuContentComp}
-    </>
+      {MenuContentComp}
+    </DropdownMenuPrimitive.Root>
   );
 };
 

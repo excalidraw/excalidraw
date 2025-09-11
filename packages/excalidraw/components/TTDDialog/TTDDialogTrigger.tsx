@@ -26,9 +26,9 @@ export const TTDDialogTrigger = ({
           setAppState({ openDialog: { name: "ttd", tab: "text-to-diagram" } });
         }}
         icon={icon ?? brainIcon}
+        badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
       >
         {children ?? t("labels.textToDiagram")}
-        <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
       </DropdownMenu.Item>
     </TTDDialogTriggerTunnel.In>
   );

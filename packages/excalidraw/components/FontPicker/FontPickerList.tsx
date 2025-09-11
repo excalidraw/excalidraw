@@ -25,10 +25,6 @@ import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
 import { ScrollableList } from "../ScrollableList";
 import DropdownMenuGroup from "../dropdownMenu/DropdownMenuGroup";
-import DropdownMenuItem, {
-  DropDownMenuItemBadgeType,
-  DropDownMenuItemBadge,
-} from "../dropdownMenu/DropdownMenuItem";
 import {
   FontFamilyCodeIcon,
   FontFamilyHeadingIcon,
@@ -36,7 +32,14 @@ import {
   FreedrawIcon,
 } from "../icons";
 
+import { Ellipsify } from "../Ellipsify";
+
 import { fontPickerKeyHandler } from "./keyboardNavHandlers";
+
+import {
+  FontPickerListItem,
+  FontPickerListItemBadgeType,
+} from "./FontPickerListItem";
 
 import type { JSX } from "react";
 
@@ -46,7 +49,7 @@ export interface FontDescriptor {
   text: string;
   deprecated?: true;
   badge?: {
-    type: ValueOf<typeof DropDownMenuItemBadgeType>;
+    type: ValueOf<typeof FontPickerListItemBadgeType>;
     placeholder: string;
   };
 }
@@ -112,7 +115,7 @@ export const FontPickerList = React.memo(
               Object.assign(fontDescriptor, {
                 deprecated: metadata.deprecated,
                 badge: {
-                  type: DropDownMenuItemBadgeType.RED,
+                  type: FontPickerListItemBadgeType.RED,
                   placeholder: t("fontList.badge.old"),
                 },
               });
@@ -227,7 +230,7 @@ export const FontPickerList = React.memo(
     );
 
     const renderFont = (font: FontDescriptor, index: number) => (
-      <DropdownMenuItem
+      <FontPickerListItem
         key={font.value}
         icon={font.icon}
         value={font.value}
@@ -239,8 +242,8 @@ export const FontPickerList = React.memo(
         selected={font.value === selectedFontFamily}
         // allow to tab between search and selected font
         tabIndex={font.value === selectedFontFamily ? 0 : -1}
-        onClick={(e) => {
-          onSelect(Number(e.currentTarget.value));
+        onSelect={() => {
+          onSelect(font.value);
         }}
         onMouseMove={() => {
           if (hoveredFont?.value !== font.value) {
@@ -248,13 +251,13 @@ export const FontPickerList = React.memo(
           }
         }}
       >
-        {font.text}
+        <Ellipsify>{font.text}</Ellipsify>
         {font.badge && (
-          <DropDownMenuItemBadge type={font.badge.type}>
+          <FontPickerListItem.Badge type={font.badge.type}>
             {font.badge.placeholder}
-          </DropDownMenuItemBadge>
+          </FontPickerListItem.Badge>
         )}
-      </DropdownMenuItem>
+      </FontPickerListItem>
     );
 
     const groups = [];

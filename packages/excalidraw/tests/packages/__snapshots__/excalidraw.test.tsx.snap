@@ -2,26 +2,46 @@
 
 exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu items if passed from host 1`] = `
 <div
-  class="dropdown-menu"
+  aria-labelledby="radix-:r65:"
+  aria-orientation="vertical"
+  class="dropdown-menu main-menu-content"
+  data-align="start"
+  data-orientation="vertical"
+  data-radix-menu-content=""
+  data-side="bottom"
+  data-state="open"
   data-testid="dropdown-menu"
+  dir="ltr"
+  id="radix-:r66:"
+  role="menu"
+  style="outline: none; --radix-dropdown-menu-content-transform-origin: var(--radix-popper-transform-origin); --radix-dropdown-menu-content-available-width: var(--radix-popper-available-width); --radix-dropdown-menu-content-available-height: var(--radix-popper-available-height); --radix-dropdown-menu-trigger-width: var(--radix-popper-anchor-width); --radix-dropdown-menu-trigger-height: var(--radix-popper-anchor-height); animation: none;"
+  tabindex="-1"
 >
   <div
     class="Island dropdown-menu-container"
-    style="--padding: 2; z-index: 2;"
+    style="--padding: 1; z-index: 2;"
   >
-    <button
-      class="dropdown-menu-item dropdown-menu-item-base"
-      type="button"
+    <div
+      class="radix-menu-item"
+      data-orientation="vertical"
+      data-radix-collection-item=""
+      role="menuitem"
+      tabindex="-1"
     >
-      <div
-        class="dropdown-menu-item__icon"
-      />
-      <div
-        class="dropdown-menu-item__text"
+      <button
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
+        type="button"
       >
-        Click me
-      </div>
-    </button>
+        <div
+          class="dropdown-menu-item__icon"
+        />
+        <div
+          class="dropdown-menu-item__text"
+        >
+          Click me
+        </div>
+      </button>
+    </div>
     <a
       class="dropdown-menu-item dropdown-menu-item-base"
       href="https://plus.excalidraw.com/blog"
@@ -46,301 +66,361 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
         custom menu item
       </button>
     </div>
-    <button
-      aria-label="Help"
-      class="dropdown-menu-item dropdown-menu-item-base"
-      data-testid="help-menu-item"
-      title="Help"
-      type="button"
+    <div
+      class="radix-menu-item"
+      data-orientation="vertical"
+      data-radix-collection-item=""
+      role="menuitem"
+      tabindex="-1"
     >
-      <div
-        class="dropdown-menu-item__icon"
+      <button
+        aria-label="Help"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
+        data-testid="help-menu-item"
+        title="Help"
+        type="button"
       >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
+        <div
+          class="dropdown-menu-item__icon"
         >
-          <g
-            stroke-width="1.5"
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="none"
+            focusable="false"
+            role="img"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
           >
-            <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
-            />
-            <circle
-              cx="12"
-              cy="12"
-              r="9"
-            />
-            <line
-              x1="12"
-              x2="12"
-              y1="17"
-              y2="17.01"
-            />
-            <path
-              d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"
-            />
-          </g>
-        </svg>
-      </div>
-      <div
-        class="dropdown-menu-item__text"
-      >
-        Help
-      </div>
-      <div
-        class="dropdown-menu-item__shortcut"
-      >
-        ?
-      </div>
-    </button>
+            <g
+              stroke-width="1.5"
+            >
+              <path
+                d="M0 0h24v24H0z"
+                fill="none"
+                stroke="none"
+              />
+              <circle
+                cx="12"
+                cy="12"
+                r="9"
+              />
+              <line
+                x1="12"
+                x2="12"
+                y1="17"
+                y2="17.01"
+              />
+              <path
+                d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"
+              />
+            </g>
+          </svg>
+        </div>
+        <div
+          class="dropdown-menu-item__text"
+        >
+          Help
+        </div>
+        <div
+          class="dropdown-menu-item__shortcut"
+        >
+          ?
+        </div>
+      </button>
+    </div>
   </div>
 </div>
 `;
 
 exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should render menu with default items when "UIOPtions" is "undefined" 1`] = `
 <div
-  class="dropdown-menu"
+  aria-labelledby="radix-:rq:"
+  aria-orientation="vertical"
+  class="dropdown-menu main-menu-content"
+  data-align="start"
+  data-orientation="vertical"
+  data-radix-menu-content=""
+  data-side="bottom"
+  data-state="open"
   data-testid="dropdown-menu"
+  dir="ltr"
+  id="radix-:rr:"
+  role="menu"
+  style="outline: none; --radix-dropdown-menu-content-transform-origin: var(--radix-popper-transform-origin); --radix-dropdown-menu-content-available-width: var(--radix-popper-available-width); --radix-dropdown-menu-content-available-height: var(--radix-popper-available-height); --radix-dropdown-menu-trigger-width: var(--radix-popper-anchor-width); --radix-dropdown-menu-trigger-height: var(--radix-popper-anchor-height); animation: none;"
+  tabindex="-1"
 >
   <div
     class="Island dropdown-menu-container"
-    style="--padding: 2; z-index: 2;"
+    style="--padding: 1; z-index: 2;"
   >
-    <button
-      aria-label="Open"
-      class="dropdown-menu-item dropdown-menu-item-base"
-      data-testid="load-button"
-      title="Open"
-      type="button"
+    <div
+      class="radix-menu-item"
+      data-orientation="vertical"
+      data-radix-collection-item=""
+      role="menuitem"
+      tabindex="-1"
     >
-      <div
-        class="dropdown-menu-item__icon"
+      <button
+        aria-label="Open"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
+        data-testid="load-button"
+        title="Open"
+        type="button"
       >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          viewBox="0 0 20 20"
+        <div
+          class="dropdown-menu-item__icon"
         >
-          <path
-            d="m9.257 6.351.183.183H15.819c.34 0 .727.182 1.051.506.323.323.505.708.505 1.05v5.819c0 .316-.183.7-.52 1.035-.337.338-.723.522-1.037.522H4.182c-.352 0-.74-.181-1.058-.5-.318-.318-.499-.705-.499-1.057V5.182c0-.351.181-.736.5-1.054.32-.321.71-.503 1.057-.503H6.53l2.726 2.726Z"
-            stroke-width="1.25"
-          />
-        </svg>
-      </div>
-      <div
-        class="dropdown-menu-item__text"
-      >
-        Open
-      </div>
-      <div
-        class="dropdown-menu-item__shortcut"
-      >
-        Ctrl+O
-      </div>
-    </button>
-    <button
-      aria-label="Save to..."
-      class="dropdown-menu-item dropdown-menu-item-base"
-      data-testid="json-export-button"
-      title="Save to..."
-      type="button"
-    >
-      <div
-        class="dropdown-menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          viewBox="0 0 20 20"
-        >
-          <path
-            d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 9.167 10 13.333l4.167-4.166M10 3.333v10"
-            stroke-width="1.25"
-          />
-        </svg>
-      </div>
-      <div
-        class="dropdown-menu-item__text"
-      >
-        Save to...
-      </div>
-    </button>
-    <button
-      aria-label="Export image..."
-      class="dropdown-menu-item dropdown-menu-item-base"
-      data-testid="image-export-button"
-      title="Export image..."
-      type="button"
-    >
-      <div
-        class="dropdown-menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <g
-            stroke-width="1.25"
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="none"
+            focusable="false"
+            role="img"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            viewBox="0 0 20 20"
           >
             <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
+              d="m9.257 6.351.183.183H15.819c.34 0 .727.182 1.051.506.323.323.505.708.505 1.05v5.819c0 .316-.183.7-.52 1.035-.337.338-.723.522-1.037.522H4.182c-.352 0-.74-.181-1.058-.5-.318-.318-.499-.705-.499-1.057V5.182c0-.351.181-.736.5-1.054.32-.321.71-.503 1.057-.503H6.53l2.726 2.726Z"
+              stroke-width="1.25"
             />
-            <path
-              d="M15 8h.01"
-            />
-            <path
-              d="M12 20h-5a3 3 0 0 1 -3 -3v-10a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v5"
-            />
-            <path
-              d="M4 15l4 -4c.928 -.893 2.072 -.893 3 0l4 4"
-            />
-            <path
-              d="M14 14l1 -1c.617 -.593 1.328 -.793 2.009 -.598"
-            />
-            <path
-              d="M19 16v6"
-            />
-            <path
-              d="M22 19l-3 3l-3 -3"
-            />
-          </g>
-        </svg>
-      </div>
-      <div
-        class="dropdown-menu-item__text"
-      >
-        Export image...
-      </div>
-      <div
-        class="dropdown-menu-item__shortcut"
-      >
-        Ctrl+Shift+E
-      </div>
-    </button>
-    <button
-      aria-label="Help"
-      class="dropdown-menu-item dropdown-menu-item-base"
-      data-testid="help-menu-item"
-      title="Help"
-      type="button"
-    >
-      <div
-        class="dropdown-menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
+          </svg>
+        </div>
+        <div
+          class="dropdown-menu-item__text"
         >
-          <g
-            stroke-width="1.5"
+          Open
+        </div>
+        <div
+          class="dropdown-menu-item__shortcut"
+        >
+          Ctrl+O
+        </div>
+      </button>
+    </div>
+    <div
+      class="radix-menu-item"
+      data-orientation="vertical"
+      data-radix-collection-item=""
+      role="menuitem"
+      tabindex="-1"
+    >
+      <button
+        aria-label="Save to..."
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
+        data-testid="json-export-button"
+        title="Save to..."
+        type="button"
+      >
+        <div
+          class="dropdown-menu-item__icon"
+        >
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="none"
+            focusable="false"
+            role="img"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            viewBox="0 0 20 20"
           >
             <path
-              d="M0 0h24v24H0z"
-              fill="none"
-              stroke="none"
+              d="M3.333 14.167v1.666c0 .92.747 1.667 1.667 1.667h10c.92 0 1.667-.746 1.667-1.667v-1.666M5.833 9.167 10 13.333l4.167-4.166M10 3.333v10"
+              stroke-width="1.25"
             />
-            <circle
-              cx="12"
-              cy="12"
-              r="9"
-            />
-            <line
-              x1="12"
-              x2="12"
-              y1="17"
-              y2="17.01"
-            />
-            <path
-              d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"
-            />
-          </g>
-        </svg>
-      </div>
-      <div
-        class="dropdown-menu-item__text"
-      >
-        Help
-      </div>
-      <div
-        class="dropdown-menu-item__shortcut"
-      >
-        ?
-      </div>
-    </button>
-    <button
-      aria-label="Reset the canvas"
-      class="dropdown-menu-item dropdown-menu-item-base"
-      data-testid="clear-canvas-button"
-      title="Reset the canvas"
-      type="button"
-    >
-      <div
-        class="dropdown-menu-item__icon"
-      >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          viewBox="0 0 20 20"
+          </svg>
+        </div>
+        <div
+          class="dropdown-menu-item__text"
         >
-          <path
-            d="M3.333 5.833h13.334M8.333 9.167v5M11.667 9.167v5M4.167 5.833l.833 10c0 .92.746 1.667 1.667 1.667h6.666c.92 0 1.667-.746 1.667-1.667l.833-10M7.5 5.833v-2.5c0-.46.373-.833.833-.833h3.334c.46 0 .833.373.833.833v2.5"
-            stroke-width="1.25"
-          />
-        </svg>
-      </div>
-      <div
-        class="dropdown-menu-item__text"
+          Save to...
+        </div>
+      </button>
+    </div>
+    <div
+      class="radix-menu-item"
+      data-orientation="vertical"
+      data-radix-collection-item=""
+      role="menuitem"
+      tabindex="-1"
+    >
+      <button
+        aria-label="Export image..."
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
+        data-testid="image-export-button"
+        title="Export image..."
+        type="button"
       >
-        Reset the canvas
-      </div>
-    </button>
+        <div
+          class="dropdown-menu-item__icon"
+        >
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="none"
+            focusable="false"
+            role="img"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <g
+              stroke-width="1.25"
+            >
+              <path
+                d="M0 0h24v24H0z"
+                fill="none"
+                stroke="none"
+              />
+              <path
+                d="M15 8h.01"
+              />
+              <path
+                d="M12 20h-5a3 3 0 0 1 -3 -3v-10a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v5"
+              />
+              <path
+                d="M4 15l4 -4c.928 -.893 2.072 -.893 3 0l4 4"
+              />
+              <path
+                d="M14 14l1 -1c.617 -.593 1.328 -.793 2.009 -.598"
+              />
+              <path
+                d="M19 16v6"
+              />
+              <path
+                d="M22 19l-3 3l-3 -3"
+              />
+            </g>
+          </svg>
+        </div>
+        <div
+          class="dropdown-menu-item__text"
+        >
+          Export image...
+        </div>
+        <div
+          class="dropdown-menu-item__shortcut"
+        >
+          Ctrl+Shift+E
+        </div>
+      </button>
+    </div>
+    <div
+      class="radix-menu-item"
+      data-orientation="vertical"
+      data-radix-collection-item=""
+      role="menuitem"
+      tabindex="-1"
+    >
+      <button
+        aria-label="Help"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
+        data-testid="help-menu-item"
+        title="Help"
+        type="button"
+      >
+        <div
+          class="dropdown-menu-item__icon"
+        >
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="none"
+            focusable="false"
+            role="img"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <g
+              stroke-width="1.5"
+            >
+              <path
+                d="M0 0h24v24H0z"
+                fill="none"
+                stroke="none"
+              />
+              <circle
+                cx="12"
+                cy="12"
+                r="9"
+              />
+              <line
+                x1="12"
+                x2="12"
+                y1="17"
+                y2="17.01"
+              />
+              <path
+                d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"
+              />
+            </g>
+          </svg>
+        </div>
+        <div
+          class="dropdown-menu-item__text"
+        >
+          Help
+        </div>
+        <div
+          class="dropdown-menu-item__shortcut"
+        >
+          ?
+        </div>
+      </button>
+    </div>
+    <div
+      class="radix-menu-item"
+      data-orientation="vertical"
+      data-radix-collection-item=""
+      role="menuitem"
+      tabindex="-1"
+    >
+      <button
+        aria-label="Reset the canvas"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
+        data-testid="clear-canvas-button"
+        title="Reset the canvas"
+        type="button"
+      >
+        <div
+          class="dropdown-menu-item__icon"
+        >
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="none"
+            focusable="false"
+            role="img"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            viewBox="0 0 20 20"
+          >
+            <path
+              d="M3.333 5.833h13.334M8.333 9.167v5M11.667 9.167v5M4.167 5.833l.833 10c0 .92.746 1.667 1.667 1.667h6.666c.92 0 1.667-.746 1.667-1.667l.833-10M7.5 5.833v-2.5c0-.46.373-.833.833-.833h3.334c.46 0 .833.373.833.833v2.5"
+              stroke-width="1.25"
+            />
+          </svg>
+        </div>
+        <div
+          class="dropdown-menu-item__text"
+        >
+          Reset the canvas
+        </div>
+      </button>
+    </div>
     <div
       style="height: 1px; margin: .5rem 0px;"
     />
@@ -473,45 +553,53 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
     <div
       style="height: 1px; margin: .5rem 0px;"
     />
-    <button
-      aria-label="Dark mode"
-      class="dropdown-menu-item dropdown-menu-item-base"
-      data-testid="toggle-dark-mode"
-      title="Dark mode"
-      type="button"
+    <div
+      class="radix-menu-item"
+      data-orientation="vertical"
+      data-radix-collection-item=""
+      role="menuitem"
+      tabindex="-1"
     >
-      <div
-        class="dropdown-menu-item__icon"
+      <button
+        aria-label="Dark mode"
+        class="excalidraw-button dropdown-menu-item dropdown-menu-item-base"
+        data-testid="toggle-dark-mode"
+        title="Dark mode"
+        type="button"
       >
-        <svg
-          aria-hidden="true"
-          class=""
-          fill="none"
-          focusable="false"
-          role="img"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          viewBox="0 0 20 20"
+        <div
+          class="dropdown-menu-item__icon"
         >
-          <path
-            clip-rule="evenodd"
-            d="M10 2.5h.328a6.25 6.25 0 0 0 6.6 10.372A7.5 7.5 0 1 1 10 2.493V2.5Z"
+          <svg
+            aria-hidden="true"
+            class=""
+            fill="none"
+            focusable="false"
+            role="img"
             stroke="currentColor"
-          />
-        </svg>
-      </div>
-      <div
-        class="dropdown-menu-item__text"
-      >
-        Dark mode
-      </div>
-      <div
-        class="dropdown-menu-item__shortcut"
-      >
-        Shift+Alt+D
-      </div>
-    </button>
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            viewBox="0 0 20 20"
+          >
+            <path
+              clip-rule="evenodd"
+              d="M10 2.5h.328a6.25 6.25 0 0 0 6.6 10.372A7.5 7.5 0 1 1 10 2.493V2.5Z"
+              stroke="currentColor"
+            />
+          </svg>
+        </div>
+        <div
+          class="dropdown-menu-item__text"
+        >
+          Dark mode
+        </div>
+        <div
+          class="dropdown-menu-item__shortcut"
+        >
+          Shift+Alt+D
+        </div>
+      </button>
+    </div>
     <div
       style="margin-top: 0.5rem;"
     >
@@ -522,6 +610,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         Canvas background
       </div>
       <div
+        id="canvas-bg-color-picker-container"
         style="padding: 0px 0.625rem;"
       >
         <div>
@@ -593,7 +682,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
               style="width: 1px; height: 100%; margin: 0px auto;"
             />
             <button
-              aria-controls="radix-:r0:"
+              aria-controls="radix-:r12:"
               aria-expanded="false"
               aria-haspopup="dialog"
               aria-label="Canvas background"
