@@ -235,7 +235,6 @@ body.excalidraw-cursor-resize * {
     z-index: var(--zIndex-layerUI);
     display: flex;
     flex-direction: column;
-    align-items: center;
   }
 
   .App-bottom-bar {
@@ -280,14 +279,7 @@ body.excalidraw-cursor-resize * {
 
   .App-toolbar-content {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px;
-
-    .dropdown-menu--mobile {
-      bottom: 55px;
-      top: auto;
-    }
+    flex-direction: column;
   }
 
   .App-mobile-menu {

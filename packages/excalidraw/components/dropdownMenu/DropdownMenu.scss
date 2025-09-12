@@ -18,6 +18,18 @@
       width: 100%;
       row-gap: 0.75rem;
 
+      // When main menu is in the top toolbar, position relative to trigger
+      &.main-menu-dropdown {
+        position: fixed;
+        left: 1rem;
+        top: 3.5rem;
+        min-width: 280px;
+        max-width: calc(100vw - 2rem);
+        margin-top: 0;
+        margin-bottom: 0;
+        z-index: var(--zIndex-layerUI);
+      }
+
       .dropdown-menu-container {
         padding: 8px 8px;
         box-sizing: border-box;

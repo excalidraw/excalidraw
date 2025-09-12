@@ -107,29 +107,24 @@ export const MobileMenu = ({
     return (
       <div className="App-toolbar-content">
         <MainMenuTunnel.Out />
-        {actionManager.renderAction("toggleEditMenu")}
-        {actionManager.renderAction(
-          appState.multiElement ? "finalize" : "duplicateSelection",
-        )}
-        {actionManager.renderAction("deleteSelectedElements")}
-        <div>
-          {actionManager.renderAction("undo")}
-          {actionManager.renderAction("redo")}
-        </div>
+        {renderTopRightUI?.(true, appState)}
       </div>
     );
   };
 
   return (
     <>
-      {renderSidebars()}
+      {/* {renderSidebars()} */}
+
       <FixedSideContainer side="top" className="App-top-bar">
+        {renderAppToolbar()}
         <HintViewer
           appState={appState}
           isMobile={true}
           device={device}
           app={app}
         />
+        {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
       </FixedSideContainer>
       <div
         className="App-bottom-bar"
