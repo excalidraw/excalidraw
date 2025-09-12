@@ -1,6 +1,9 @@
 import { KEYS, updateActiveTool } from "@excalidraw/common";
 
-import { getNonDeletedElements } from "@excalidraw/element";
+import {
+  bindOrUnbindLinearElement,
+  getNonDeletedElements,
+} from "@excalidraw/element";
 import { fixBindingsAfterDeletion } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
@@ -92,14 +95,14 @@ const deleteSelectedElements = (
         el.boundElements.forEach((candidate) => {
           const bound = app.scene.getNonDeletedElementsMap().get(candidate.id);
           if (bound && isElbowArrow(bound)) {
-            app.scene.mutateElement(bound, {
-              startBinding:
-                el.id === bound.startBinding?.elementId
-                  ? null
-                  : bound.startBinding,
-              endBinding:
-                el.id === bound.endBinding?.elementId ? null : bound.endBinding,
-            });
+            if (el.id === bound.startBinding?.elementId) {
+              bindOrUnbindLinearElement(
+                bound,
+                el.id === bound.startBinding?.elementId ? null : "keep",
+                el.id === bound.endBinding?.elementId ? null : "keep",
+                app.scene,
+              );
+            }
           }
         });
       }
