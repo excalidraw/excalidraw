@@ -1,6 +1,5 @@
 import { KEYS, arrayToMap, invariant, isTransparent } from "@excalidraw/common";
 
-import { isElementInsideBBox } from "@excalidraw/utils";
 import {
   lineSegment,
   pointFrom,
@@ -31,6 +30,7 @@ import {
   getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
   intersectElementWithLineSegment,
+  isBindableElementInsideOtherBindable,
   isPointInElement,
 } from "./collision";
 import { distanceToElement } from "./distance";
@@ -351,7 +351,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
       // We are hovering another element with the end point
       const isNested =
         hit &&
-        isElementInsideBBox(otherElement, getElementBounds(hit, elementsMap));
+        isBindableElementInsideOtherBindable(otherElement, hit, elementsMap);
       let current: BindingStrategy;
       if (hit) {
         const isInsideBinding =
@@ -424,7 +424,7 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
   const isNested =
     hit &&
     oppositeElement &&
-    isElementInsideBBox(oppositeElement, getElementBounds(hit, elementsMap));
+    isBindableElementInsideOtherBindable(oppositeElement, hit, elementsMap);
 
   // If the global bind mode is in free binding mode, just bind
   // where the pointer is and keep the other end intact
@@ -1267,7 +1267,7 @@ export const updateBoundPoint = (
     compareElementArea(bindableElement, otherBindableElement) < 0;
   const isIntersecting = otherBounds && doBoundsIntersect(bounds, otherBounds);
   // const isNested =
-  //   otherBindableElement && isElementInsideBBox(otherBindableElement, bounds);
+  //   otherBindableElement && isBindableElementInsideOtherBindable(otherBindableElement, bindableElement);
   const isNested = isIntersecting && isLargerThanOther;
 
   const maybeOutlineGlobal =
