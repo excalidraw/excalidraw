@@ -7,6 +7,7 @@ import {
   lineSegment,
   pointFrom,
   pointRotateRads,
+  type Radians,
 } from "@excalidraw/math";
 
 import {
@@ -39,7 +40,7 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "@excalidraw/excalidraw/scene/types";
 
-import { elementCenterPoint, getElementAbsoluteCoords } from "./bounds";
+import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
@@ -1054,7 +1055,17 @@ export function getFreedrawOutlineAsSegments(
   elementsMap: ElementsMap,
 ) {
   const spline = getFreedrawOutline(element);
-  const center = elementCenterPoint(element, elementsMap);
+  const bounds = getElementBounds(
+    {
+      ...element,
+      angle: 0 as Radians,
+    },
+    elementsMap,
+  );
+  const center = pointFrom<GlobalPoint>(
+    (bounds[0] + bounds[2]) / 2,
+    (bounds[1] + bounds[3]) / 2,
+  );
 
   invariant(spline.length >= 2, "Freepath outline must have at least 2 points");
 

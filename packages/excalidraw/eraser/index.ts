@@ -204,7 +204,13 @@ const eraserTest = (
     Math.max(pathSegment[0][0], pathSegment[1][0]) + threshold,
     Math.max(pathSegment[0][1], pathSegment[1][1]) + threshold,
   ] as Bounds;
-  const elementBounds = getElementBounds(element, elementsMap);
+  const origElementBounds = getElementBounds(element, elementsMap);
+  const elementBounds: Bounds = [
+    origElementBounds[0] - threshold,
+    origElementBounds[1] - threshold,
+    origElementBounds[2] + threshold,
+    origElementBounds[3] + threshold,
+  ];
 
   if (!doBoundsIntersect(segmentBounds, elementBounds)) {
     return false;
