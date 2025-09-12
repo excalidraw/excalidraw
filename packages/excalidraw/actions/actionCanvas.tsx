@@ -69,7 +69,7 @@ export const actionChangeViewBackgroundColor = register({
         : CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, appProps }) => {
+  PanelComponent: ({ elements, appState, updateData, appProps, data }) => {
     // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
       <ColorPicker
@@ -83,6 +83,7 @@ export const actionChangeViewBackgroundColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
+        compactMode={appState.stylesPanelMode === "compact"}
       />
     );
   },

@@ -1,5 +1,7 @@
 import clsx from "clsx";
 
+import { isMobileOrTablet, MQ_MIN_WIDTH_DESKTOP } from "@excalidraw/common";
+
 import { t } from "../../i18n";
 import { Button } from "../Button";
 import { share } from "../icons";
@@ -17,7 +19,8 @@ const LiveCollaborationTrigger = ({
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   const appState = useUIAppState();
 
-  const showIconOnly = appState.width < 830;
+  const showIconOnly =
+    isMobileOrTablet() || appState.width < MQ_MIN_WIDTH_DESKTOP;
 
   return (
     <Button

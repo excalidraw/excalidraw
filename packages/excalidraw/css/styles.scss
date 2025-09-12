@@ -317,7 +317,7 @@ body.excalidraw-cursor-resize * {
 
   .App-menu_top {
     grid-template-columns: 1fr 2fr 1fr;
-    grid-gap: 2rem;
+    grid-gap: 1rem;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
@@ -334,6 +334,14 @@ body.excalidraw-cursor-resize * {
 
   .App-menu_top > *:first-child {
     justify-self: flex-start;
+  }
+
+  .selected-shape-actions-container {
+    width: fit-content;
+
+    &--compact {
+      min-width: 48px;
+    }
   }
 
   .App-menu_top > *:last-child {
