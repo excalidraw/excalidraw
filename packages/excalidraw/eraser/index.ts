@@ -6,13 +6,14 @@ import {
   doBoundsIntersect,
   getBoundTextElement,
   getElementBounds,
+  getFreedrawOutlineAsSegments,
   intersectElementWithLineSegment,
   isArrowElement,
   isFreeDrawElement,
   isLineElement,
   isPointInElement,
 } from "@excalidraw/element";
-import { lineSegment, pointFrom } from "@excalidraw/math";
+import { lineSegment, lineSegmentsDistance, pointFrom } from "@excalidraw/math";
 
 import { getElementsInGroup } from "@excalidraw/element";
 
@@ -105,6 +106,7 @@ export class EraserTrail extends AnimatedTrail {
           pathSegment,
           element,
           candidateElementsMap,
+          this.app.state.zoom.value,
         );
 
         if (intersects) {
@@ -140,6 +142,7 @@ export class EraserTrail extends AnimatedTrail {
           pathSegment,
           element,
           candidateElementsMap,
+          this.app.state.zoom.value,
         );
 
         if (intersects) {
@@ -189,23 +192,27 @@ const eraserTest = (
   pathSegment: LineSegment<GlobalPoint>,
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
+  zoom: number,
 ): boolean => {
   const lastPoint = pathSegment[1];
-  const threshold = isFreeDrawElement(element) ? 15 : element.strokeWidth / 2;
 
+  // PERF: Do a quick bounds intersection test first because it's cheap
+  const threshold = isFreeDrawElement(element) ? 15 : element.strokeWidth / 2;
   const segmentBounds = [
     Math.min(pathSegment[0][0], pathSegment[1][0]) - threshold,
     Math.min(pathSegment[0][1], pathSegment[1][1]) - threshold,
     Math.max(pathSegment[0][0], pathSegment[1][0]) + threshold,
     Math.max(pathSegment[0][1], pathSegment[1][1]) + threshold,
   ] as Bounds;
-
   const elementBounds = getElementBounds(element, elementsMap);
 
   if (!doBoundsIntersect(segmentBounds, elementBounds)) {
     return false;
   }
 
+  // There are shapes where the inner area should trigger erasing
+  // even though the eraser path segment doesn't intersect with or
+  // get close to the shape's stroke
   if (
     shouldTestInside(element) &&
     isPointInElement(lastPoint, element, elementsMap)
@@ -213,15 +220,29 @@ const eraserTest = (
     return true;
   }
 
-  // for freedraw and linear elements account for stroke width to handle dot-like elements #9762
-  if (
-    isFreeDrawElement(element) ||
+  // Freedraw elements are tested for erasure by measuring the distance
+  // of the eraser path and the freedraw shape outline lines to a tolerance
+  // which offers a good visual precision at various zoom levels
+  if (isFreeDrawElement(element)) {
+    const strokeSegments = getFreedrawOutlineAsSegments(element, elementsMap);
+    const tolerance = Math.max(2.25, 5 / zoom); // NOTE: Visually fine-tuned approximation
+
+    for (const seg of strokeSegments) {
+      //      debugDrawLine(seg, { color: "red", permanent: true });
+      if (lineSegmentsDistance(seg, pathSegment) <= tolerance) {
+        return true;
+      }
+    }
+
+    return false;
+  } else if (
     isArrowElement(element) ||
     (isLineElement(element) && !element.polygon)
   ) {
-    const tolerance = isFreeDrawElement(element)
-      ? element.strokeWidth * 2.125
-      : element.strokeWidth / 2;
+    const tolerance = Math.max(
+      element.strokeWidth,
+      (element.strokeWidth * 2) / zoom,
+    );
 
     return distanceToElement(element, elementsMap, lastPoint) <= tolerance;
   }
