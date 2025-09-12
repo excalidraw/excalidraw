@@ -126,6 +126,7 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  CustomRoundIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -140,6 +141,7 @@ import {
 import { register } from "./register";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
+import { customAlphabet } from "nanoid";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -559,6 +561,7 @@ export const actionChangeStrokeWidth = register({
   ),
 });
 
+// 
 export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   label: "labels.sloppiness",
@@ -1431,13 +1434,21 @@ export const actionChangeRoundness = register({
                 text: t("labels.round"),
                 icon: EdgeRoundIcon,
               },
+              {
+                value: "custom",
+                text: t("labels.round"),
+                icon: CustomRoundIcon,
+              },
             ]}
+
             value={getFormValue(
               elements,
               app,
               (element) =>
                 hasLegacyRoundness
                   ? null
+                  : element.roundness?.type === ROUNDNESS.CUSTOMIZED
+                  ? "custom"
                   : element.roundness
                   ? "round"
                   : "sharp",
@@ -1446,7 +1457,13 @@ export const actionChangeRoundness = register({
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemRoundness,
             )}
-            onChange={(value) => updateData(value)}
+            onChange={
+              (value) => {
+                updateData(value)
+                console.log(value)
+              }
+
+            }
           />
           {renderAction("togglePolygon")}
         </div>
@@ -1454,6 +1471,65 @@ export const actionChangeRoundness = register({
     );
   },
 });
+
+// Test - Copas dari actionChangeRoundness
+export const actionCustomizeRoundness = register({
+  name: "customizeRoundness",
+  label: "Customize edge roundness",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isElbowArrow(el)) {
+          return el;
+        }
+
+        return newElementWith(el, {
+          roundness:{
+              type: ROUNDNESS.CUSTOMIZED,
+              // topLeft: value.topLeft,
+              // topRight: value.topRight,
+              // bottomLeft: value.bottomLeft,
+              // bottomRight: value.bottomRight,
+
+            }
+          ,
+        });
+      }),
+      appState: {
+        ...appState,
+        currentItemRoundness: value,
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app, renderAction }) => {
+    const targetElements = getTargetElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+
+    const hasLegacyRoundness = targetElements.some(
+      (el) => el.roundness?.type === ROUNDNESS.LEGACY,
+    );
+
+    return (
+      <fieldset>
+        <legend>{t("labels")}</legend>
+        <div className="corner-inputs">
+          <input 
+            type="number"
+            placeholder="TL"
+
+          >
+          </input>
+        </div>
+      </fieldset>
+    );
+  },
+});
+
+// =======================================================================================================
 
 const getArrowheadOptions = (flip: boolean) => {
   return [

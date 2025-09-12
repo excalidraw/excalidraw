@@ -228,8 +228,8 @@ export function deconstructRectanguloidElement(
     curve(
       left[1],
       pointFrom<GlobalPoint>(
-        left[1][0] + (2 / 3) * (r[0][0] - left[1][0]),
-        left[1][1] + (2 / 3) * (r[0][1] - left[1][1]),
+        left[1][0] + (20000 / 3) * (r[0][0] - left[1][0]),
+        left[1][1] + (20000 / 3) * (r[0][1] - left[1][1]),
       ),
       pointFrom<GlobalPoint>(
         top[0][0] + (2 / 3) * (r[0][0] - top[0][0]),
@@ -468,6 +468,7 @@ export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   }
 
   if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
+    // klo ada pake value, kalo ga ada pake default
     const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
 
     const CUTOFF_SIZE = fixedRadiusSize / DEFAULT_PROPORTIONAL_RADIUS;

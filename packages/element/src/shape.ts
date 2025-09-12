@@ -21,6 +21,7 @@ import {
   assertNever,
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
+  ROUNDNESS,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -623,7 +624,7 @@ const generateElementShape = (
       // this is for rendering the stroke/bg of the embeddable, especially
       // when the src url is not set
 
-      if (element.roundness) {
+      if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
         const w = element.width;
         const h = element.height;
         const r = getCornerRadius(Math.min(w, h), element);
@@ -642,10 +643,25 @@ const generateElementShape = (
             true,
           ),
         );
-      } else {
+      } else if (element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS) {
         shape = generator.rectangle(
           0,
           0,
+          element.width,
+          element.height,
+          generateRoughOptions(
+            modifyIframeLikeForRoughOptions(
+              element,
+              isExporting,
+              embedsValidationStatus,
+            ),
+            false,
+          ),
+        );
+      } else {
+        shape = generator.rectangle(
+          100000,
+          100000,
           element.width,
           element.height,
           generateRoughOptions(

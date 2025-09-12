@@ -103,6 +103,8 @@ export type ActionName =
   | "goToCollaborator"
   | "addToLibrary"
   | "changeRoundness"
+  // nambahin ini
+  | "customizeRoundness"
   | "alignTop"
   | "alignBottom"
   | "alignLeft"

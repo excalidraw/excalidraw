@@ -39,6 +39,15 @@ export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "diamond" ||
   type === "image";
 
+// 
+export const canCustomizeRoundness = (type: ElementOrToolType) =>
+  type === "rectangle" ||
+  type === "iframe" ||
+  type === "embeddable" ||
+  type === "line" ||
+  type === "diamond" ||
+  type === "image";
+
 export const toolIsArrow = (type: ElementOrToolType) => type === "arrow";
 
 export const canHaveArrowheads = (type: ElementOrToolType) => type === "arrow";

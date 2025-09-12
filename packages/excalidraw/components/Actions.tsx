@@ -39,6 +39,7 @@ import { useTunnels } from "../context/tunnels";
 import { t } from "../i18n";
 import {
   canChangeRoundness,
+  canCustomizeRoundness,
   canHaveArrowheads,
   getTargetElements,
   hasBackground,
@@ -184,6 +185,13 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => canChangeRoundness(element.type))) && (
         <>{renderAction("changeRoundness")}</>
       )}
+
+      {/* Tambahin yang custom roundness */}
+
+      {(canCustomizeRoundness(appState.activeTool.type)) || 
+        targetElements.some((element)=> canCustomizeRoundness(element.type) && (
+          <>{renderAction("customizeRoundness")}</>
+        ))}
 
       {(toolIsArrow(appState.activeTool.type) ||
         targetElements.some((element) => toolIsArrow(element.type))) && (
