@@ -16,7 +16,6 @@ import {
   DEFAULT_SIDEBAR,
   debounce,
 } from "@excalidraw/common";
-import { clearElementsForLocalStorage } from "@excalidraw/element";
 import {
   createStore,
   entries,
@@ -81,7 +80,7 @@ const saveDataStateToLocalStorage = (
 
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(clearElementsForLocalStorage(elements)),
+      JSON.stringify(elements),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
