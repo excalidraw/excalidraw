@@ -665,7 +665,10 @@ export const isBindableElementInsideOtherBindable = (
   elementsMap: ElementsMap,
 ): boolean => {
   // Get corner points of the inner element based on its type
-  const getCornerPoints = (element: ExcalidrawElement): GlobalPoint[] => {
+  const getCornerPoints = (
+    element: ExcalidrawElement,
+    offset: number,
+  ): GlobalPoint[] => {
     const { x, y, width, height, angle } = element;
     const center = elementCenterPoint(element, elementsMap);
 
@@ -674,10 +677,10 @@ export const isBindableElementInsideOtherBindable = (
       const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
         getDiamondPoints(element);
       const corners: GlobalPoint[] = [
-        pointFrom(x + topX, y + topY), // top
-        pointFrom(x + rightX, y + rightY), // right
-        pointFrom(x + bottomX, y + bottomY), // bottom
-        pointFrom(x + leftX, y + leftY), // left
+        pointFrom(x + topX, y + topY - offset), // top
+        pointFrom(x + rightX + offset, y + rightY), // right
+        pointFrom(x + bottomX, y + bottomY + offset), // bottom
+        pointFrom(x + leftX - offset, y + leftY), // left
       ];
       return corners.map((corner) => pointRotateRads(corner, center, angle));
     }
@@ -688,24 +691,25 @@ export const isBindableElementInsideOtherBindable = (
       const rx = width / 2;
       const ry = height / 2;
       const corners: GlobalPoint[] = [
-        pointFrom(cx, cy - ry), // top
-        pointFrom(cx + rx, cy), // right
-        pointFrom(cx, cy + ry), // bottom
-        pointFrom(cx - rx, cy), // left
+        pointFrom(cx, cy - ry - offset), // top
+        pointFrom(cx + rx + offset, cy), // right
+        pointFrom(cx, cy + ry + offset), // bottom
+        pointFrom(cx - rx - offset, cy), // left
       ];
       return corners.map((corner) => pointRotateRads(corner, center, angle));
     }
     // Rectangle and other rectangular shapes (image, text, etc.)
     const corners: GlobalPoint[] = [
-      pointFrom(x, y), // top-left
-      pointFrom(x + width, y), // top-right
-      pointFrom(x + width, y + height), // bottom-right
-      pointFrom(x, y + height), // bottom-left
+      pointFrom(x - offset, y - offset), // top-left
+      pointFrom(x + width + offset, y - offset), // top-right
+      pointFrom(x + width + offset, y + height + offset), // bottom-right
+      pointFrom(x - offset, y + height + offset), // bottom-left
     ];
     return corners.map((corner) => pointRotateRads(corner, center, angle));
   };
 
-  const innerCorners = getCornerPoints(innerElement);
+  const offset = Math.max(innerElement.width, innerElement.height) / 20; // 5% offset
+  const innerCorners = getCornerPoints(innerElement, offset);
 
   // Check if all corner points of the inner element are inside the outer element
   return innerCorners.every((corner) =>
