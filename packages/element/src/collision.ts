@@ -708,7 +708,7 @@ export const isBindableElementInsideOtherBindable = (
     return corners.map((corner) => pointRotateRads(corner, center, angle));
   };
 
-  const offset = Math.max(innerElement.width, innerElement.height) / 20; // 5% offset
+  const offset = (-1 * Math.max(innerElement.width, innerElement.height)) / 20; // 5% offset
   const innerCorners = getCornerPoints(innerElement, offset);
 
   // Check if all corner points of the inner element are inside the outer element
