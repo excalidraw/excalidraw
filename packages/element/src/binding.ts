@@ -1096,21 +1096,28 @@ export const snapToCenter = (
   elementsMap: ElementsMap,
   p: GlobalPoint,
 ): GlobalPoint => {
-  const percent = 0.8;
+  const percent = 0.5;
 
-  const isPointDeepInside = isPointInElement(
-    p,
-    {
-      ...element,
-      x: element.x + (element.width * (1 - percent)) / 2,
-      y: element.y + (element.height * (1 - percent)) / 2,
-      width: element.width * percent,
-      height: element.height * percent,
-    },
-    elementsMap,
-  );
+  const center = elementCenterPoint(element, elementsMap);
 
-  return isPointDeepInside ? elementCenterPoint(element, elementsMap) : p;
+  return pointDistance(center, p) <
+    (Math.min(element.width, element.height) / 2) * percent
+    ? center
+    : p;
+
+  // const isPointDeepInside = isPointInElement(
+  //   p,
+  //   {
+  //     ...element,
+  //     x: element.x + (element.width * (1 - percent)) / 2,
+  //     y: element.y + (element.height * (1 - percent)) / 2,
+  //     width: element.width * percent,
+  //     height: element.height * percent,
+  //   },
+  //   elementsMap,
+  // );
+
+  // return isPointDeepInside ? elementCenterPoint(element, elementsMap) : p;
 };
 
 const snapToMid = (
