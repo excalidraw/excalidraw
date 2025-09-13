@@ -30,11 +30,10 @@ const ChartPreviewBtn = (props: {
   );
 
   useLayoutEffect(() => {
-    const spreadsheet = normalizeSpreadsheet(props.spreadsheet);
-    if (!spreadsheet) {
+    if (!props.spreadsheet) {
       return;
     }
-    const elements = renderSpreadsheet(props.chartType, spreadsheet, 0, 0);
+    const elements = renderSpreadsheet(props.chartType, props.spreadsheet, 0, 0);
     setChartElements(elements);
     let svg: SVGSVGElement;
     const previewNode = previewRef.current!;
@@ -78,23 +77,6 @@ const ChartPreviewBtn = (props: {
       <div ref={previewRef} />
     </button>
   );
-};
-
-// Normalize possible legacy `Spreadsheet` that exposes `values` to the
-// multi-series shape expected by rendering code. This keeps the dialog
-// resilient while the rest of the codebase migrates.
-const normalizeSpreadsheet = (s: Spreadsheet | null): Spreadsheet | null => {
-  if (!s) return null;
-  if (s.series && Array.isArray(s.series)) return s;
-  // legacy: s.values -> single series
-  const values = (s as any).values as number[] | undefined;
-  if (!values) return s;
-  return {
-    title: s.title ?? null,
-    labels: s.labels ?? null,
-    series: [{ name: null, values }],
-    values,
-  };
 };
 
 export const PasteChartDialog = ({

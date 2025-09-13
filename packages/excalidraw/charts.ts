@@ -34,10 +34,6 @@ export interface Spreadsheet {
   // Support multiple series: each series has an optional name and an array of
   // numeric values (one value per label/row).
   series: { name: string | null; values: number[] }[];
-  // Backwards-compatible single-series values array. When parsing multi-series
-  // spreadsheets this will be set to the first series so existing code that
-  // expects `values` continues to work until renderers are updated.
-  values?: number[];
 }
 
 export const NOT_SPREADSHEET = "NOT_SPREADSHEET";
@@ -87,7 +83,6 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
         series: [
           { name: hasHeader ? cells[0][0] : null, values: rows.map((r) => tryParseNumber(r[0])!) },
         ],
-        values: rows.map((r) => tryParseNumber(r[0])!),
       },
     };
   }
@@ -130,7 +125,6 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
         title: hasHeader ? cells[0][firstNumericIndex] : null,
         labels,
         series,
-        values: series[0].values,
       },
     };
   }
@@ -167,7 +161,6 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
       title: null,
       labels: null,
       series,
-      values: series[0].values,
     },
   };
 };
@@ -243,7 +236,7 @@ const commonProps = {
 
 const getChartDimensions = (spreadsheet: Spreadsheet) => {
   // number of categories (labels) is either labels.length or values.length
-  const categories = (spreadsheet.labels ?? spreadsheet.values ?? spreadsheet.series[0].values).length
+  const categories = (spreadsheet.labels ?? spreadsheet.series[0].values).length;
   // For grouped bars we keep BAR_WIDTH per series and use half BAR_GAP between series
   // within a category and BAR_GAP between categories as before.
   const numSeries = spreadsheet.series.length;
@@ -260,8 +253,7 @@ const chartXLabels = (
   groupId: string,
   backgroundColor: string,
 ): ChartElements => {
-  const categories = spreadsheet.labels 
-    ?? (spreadsheet.values ?? spreadsheet.series[0].values).map((_, i) => String(i + 1));
+  const categories = spreadsheet.labels ?? spreadsheet.series[0].values.map((_: number, i: number) => String(i + 1));
 
   const numSeries = spreadsheet.series.length;
   const categoryBlockWidth = numSeries * BAR_WIDTH + (numSeries - 1) * BAR_GAP;
@@ -423,7 +415,7 @@ const chartTypeBar = (
 ): ChartElements => {
   const groupId = randomId();
   const numSeries = spreadsheet.series.length;
-  const categories = (spreadsheet.labels ?? spreadsheet.values ?? spreadsheet.series[0].values).length;
+  const categories = (spreadsheet.labels ?? spreadsheet.series[0].values).length;
 
   // global max across all series
   const max = Math.max(
@@ -469,7 +461,7 @@ const chartTypeLine = (
 ): ChartElements => {
   const groupId = randomId();
   const numSeries = spreadsheet.series.length;
-  const categories = (spreadsheet.labels ?? spreadsheet.values ?? spreadsheet.series[0].values).length;
+  const categories = (spreadsheet.labels ?? spreadsheet.series[0].values).length;
 
   // global max across all series
   const max = Math.max(
