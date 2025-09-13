@@ -254,7 +254,7 @@ const getChartDimensions = (spreadsheet: Spreadsheet) => {
   // For grouped bars we keep BAR_WIDTH per series and use half BAR_GAP between series
   // within a category and BAR_GAP between categories as before.
   const numSeries = spreadsheet.series.length;
-  const categoryBlockWidth = numSeries * BAR_WIDTH + (numSeries - 1) * BAR_GAP;
+  const categoryBlockWidth = numSeries * (BAR_WIDTH + BAR_GAP);
   const chartWidth = categoryBlockWidth * categories + BAR_GAP;
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
   return { chartWidth, chartHeight };
@@ -270,7 +270,7 @@ const chartXLabels = (
   const categories = spreadsheet.labels ?? spreadsheet.series[0].values.map((_: number, i: number) => String(i + 1));
 
   const numSeries = spreadsheet.series.length;
-  const categoryBlockWidth = numSeries * BAR_WIDTH + (numSeries - 1) * BAR_GAP;
+  const categoryBlockWidth = numSeries * (BAR_WIDTH + BAR_GAP);
 
   return (
     categories.map((label, index) => {
@@ -436,7 +436,7 @@ const chartTypeBar = (
     ...spreadsheet.series.reduce((acc, s) => acc.concat(s.values), [] as number[]),
   );
 
-  const categoryBlockWidth = numSeries * BAR_WIDTH + (numSeries - 1) * BAR_GAP;
+  const categoryBlockWidth = numSeries * (BAR_WIDTH + BAR_GAP);
 
   const bars: NonDeletedExcalidrawElement[] = [];
   for (let cat = 0; cat < categories; cat++) {
