@@ -7,13 +7,20 @@ import {
   getBoundTextElement,
   getElementBounds,
   getFreedrawOutlineAsSegments,
+  getFreedrawOutlinePoints,
   intersectElementWithLineSegment,
   isArrowElement,
   isFreeDrawElement,
   isLineElement,
   isPointInElement,
 } from "@excalidraw/element";
-import { lineSegment, lineSegmentsDistance, pointFrom } from "@excalidraw/math";
+import {
+  lineSegment,
+  lineSegmentsDistance,
+  pointFrom,
+  polygon,
+  polygonIncludesPoint,
+} from "@excalidraw/math";
 
 import { getElementsInGroup } from "@excalidraw/element";
 
@@ -230,14 +237,31 @@ const eraserTest = (
   // of the eraser path and the freedraw shape outline lines to a tolerance
   // which offers a good visual precision at various zoom levels
   if (isFreeDrawElement(element)) {
-    const strokeSegments = getFreedrawOutlineAsSegments(element, elementsMap);
+    const outlinePoints = getFreedrawOutlinePoints(element);
+    const strokeSegments = getFreedrawOutlineAsSegments(
+      element,
+      outlinePoints,
+      elementsMap,
+    );
     const tolerance = Math.max(2.25, 5 / zoom); // NOTE: Visually fine-tuned approximation
 
     for (const seg of strokeSegments) {
-      //      debugDrawLine(seg, { color: "red", permanent: true });
       if (lineSegmentsDistance(seg, pathSegment) <= tolerance) {
         return true;
       }
+    }
+
+    const poly = polygon(
+      ...(outlinePoints.map(([x, y]) =>
+        pointFrom<GlobalPoint>(element.x + x, element.y + y),
+      ) as GlobalPoint[]),
+    );
+
+    if (
+      polygonIncludesPoint(pathSegment[0], poly) ||
+      polygonIncludesPoint(pathSegment[1], poly)
+    ) {
+      return true;
     }
 
     return false;

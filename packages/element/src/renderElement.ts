@@ -1047,14 +1047,14 @@ export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
 }
 
 export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
-  return getSvgPathFromStroke(getFreedrawOutline(element));
+  return getSvgPathFromStroke(getFreedrawOutlinePoints(element));
 }
 
 export function getFreedrawOutlineAsSegments(
   element: ExcalidrawFreeDrawElement,
+  points: [number, number][],
   elementsMap: ElementsMap,
 ) {
-  const spline = getFreedrawOutline(element);
   const bounds = getElementBounds(
     {
       ...element,
@@ -1067,9 +1067,9 @@ export function getFreedrawOutlineAsSegments(
     (bounds[1] + bounds[3]) / 2,
   );
 
-  invariant(spline.length >= 2, "Freepath outline must have at least 2 points");
+  invariant(points.length >= 2, "Freepath outline must have at least 2 points");
 
-  return spline.slice(2).reduce(
+  return points.slice(2).reduce(
     (acc, curr) => {
       acc.push(
         lineSegment<GlobalPoint>(
@@ -1087,16 +1087,16 @@ export function getFreedrawOutlineAsSegments(
       lineSegment<GlobalPoint>(
         pointRotateRads(
           pointFrom<GlobalPoint>(
-            spline[0][0] + element.x,
-            spline[0][1] + element.y,
+            points[0][0] + element.x,
+            points[0][1] + element.y,
           ),
           center,
           element.angle,
         ),
         pointRotateRads(
           pointFrom<GlobalPoint>(
-            spline[1][0] + element.x,
-            spline[1][1] + element.y,
+            points[1][0] + element.x,
+            points[1][1] + element.y,
           ),
           center,
           element.angle,
@@ -1106,7 +1106,7 @@ export function getFreedrawOutlineAsSegments(
   );
 }
 
-function getFreedrawOutline(element: ExcalidrawFreeDrawElement) {
+export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement) {
   // If input points are empty (should they ever be?) return a dot
   const inputPoints = element.simulatePressure
     ? element.points
