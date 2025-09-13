@@ -31,7 +31,13 @@ const GRID_OPACITY = 50;
 export interface Spreadsheet {
   title: string | null;
   labels: string[] | null;
-  values: number[];
+  // Support multiple series: each series has an optional name and an array of
+  // numeric values (one value per label/row).
+  series: { name: string | null; values: number[] }[];
+  // Backwards-compatible single-series values array. When parsing multi-series
+  // spreadsheets this will be set to the first series so existing code that
+  // expects `values` continues to work until renderers are updated.
+  values?: number[];
 }
 
 export const NOT_SPREADSHEET = "NOT_SPREADSHEET";
@@ -61,21 +67,15 @@ const isNumericColumn = (lines: string[][], columnIndex: number) =>
 export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const numCols = cells[0].length;
 
-  if (numCols > 2) {
-    return { type: NOT_SPREADSHEET, reason: "More than 2 columns" };
-  }
-
   if (numCols === 1) {
     if (!isNumericColumn(cells, 0)) {
       return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
     }
 
     const hasHeader = tryParseNumber(cells[0][0]) === null;
-    const values = (hasHeader ? cells.slice(1) : cells).map((line) =>
-      tryParseNumber(line[0]),
-    );
+    const rows = hasHeader ? cells.slice(1) : cells;
 
-    if (values.length < 2) {
+    if (rows.length < 2) {
       return { type: NOT_SPREADSHEET, reason: "Less than two rows" };
     }
 
@@ -84,38 +84,93 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
       spreadsheet: {
         title: hasHeader ? cells[0][0] : null,
         labels: null,
-        values: values as number[],
+        series: [
+          { name: hasHeader ? cells[0][0] : null, values: rows.map((r) => tryParseNumber(r[0])!) },
+        ],
+        values: rows.map((r) => tryParseNumber(r[0])!),
       },
     };
   }
 
-  const labelColumnNumeric = isNumericColumn(cells, 0);
-  const valueColumnNumeric = isNumericColumn(cells, 1);
+  // For multi-column input, detect numeric columns
+  const numericCols = new Array<boolean>(numCols).fill(false).map((_, i) =>
+    isNumericColumn(cells, i),
+  );
 
-  if (!labelColumnNumeric && !valueColumnNumeric) {
+  // If first column is non-numeric and there's at least one numeric column,
+  // treat the first column as labels and the rest as series.
+  if (!numericCols[0] && numericCols.some(Boolean)) {
+    const firstNumericIndex = numericCols.findIndex(Boolean);
+    const hasHeader = tryParseNumber(cells[0][firstNumericIndex]) === null;
+    const rows = hasHeader ? cells.slice(1) : cells;
+
+    if (rows.length < 2) {
+      return { type: NOT_SPREADSHEET, reason: "Less than 2 rows" };
+    }
+
+    // labels come from the first column
+    const labels = rows.map((row) => row[0]);
+
+    const series: { name: string | null; values: number[] }[] = [];
+    for (let col = 1; col < numCols; col++) {
+      if (!numericCols[col]) {
+        return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
+      }
+      const name = hasHeader ? cells[0][col] : null;
+      const values = rows.map((row) => tryParseNumber(row[col]));
+      if (values.some((v) => v === null)) {
+        return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
+      }
+      series.push({ name, values: values as number[] });
+    }
+
+    return {
+      type: VALID_SPREADSHEET,
+      spreadsheet: {
+        title: hasHeader ? cells[0][firstNumericIndex] : null,
+        labels,
+        series,
+        values: series[0].values,
+      },
+    };
+  }
+
+  // Otherwise expect all columns to be numeric (multiple series, no labels)
+  if (!numericCols.some(Boolean)) {
     return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
   }
 
-  const [labelColumnIndex, valueColumnIndex] = valueColumnNumeric
-    ? [0, 1]
-    : [1, 0];
-  const hasHeader = tryParseNumber(cells[0][valueColumnIndex]) === null;
+  const firstNumericIndex = numericCols.findIndex(Boolean);
+  const hasHeader = tryParseNumber(cells[0][firstNumericIndex]) === null;
   const rows = hasHeader ? cells.slice(1) : cells;
 
   if (rows.length < 2) {
     return { type: NOT_SPREADSHEET, reason: "Less than 2 rows" };
   }
 
+  const series: { name: string | null; values: number[] }[] = [];
+  for (let col = 0; col < numCols; col++) {
+    if (!numericCols[col]) {
+      return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
+    }
+    const name = hasHeader ? cells[0][col] : null;
+    const values = rows.map((row) => tryParseNumber(row[col]));
+    if (values.some((v) => v === null)) {
+      return { type: NOT_SPREADSHEET, reason: "Value is not numeric" };
+    }
+    series.push({ name, values: values as number[] });
+  }
+
   return {
     type: VALID_SPREADSHEET,
     spreadsheet: {
-      title: hasHeader ? cells[0][valueColumnIndex] : null,
-      labels: rows.map((row) => row[labelColumnIndex]),
-      values: rows.map((row) => tryParseNumber(row[valueColumnIndex])!),
+      title: null,
+      labels: null,
+      series,
+      values: series[0].values,
     },
   };
 };
-
 const transposeCells = (cells: string[][]) => {
   const nextCells: string[][] = [];
   for (let col = 0; col < cells[0].length; col++) {
@@ -189,8 +244,8 @@ const commonProps = {
 } as const;
 
 const getChartDimensions = (spreadsheet: Spreadsheet) => {
-  const chartWidth =
-    (BAR_WIDTH + BAR_GAP) * spreadsheet.values.length + BAR_GAP;
+  const values = spreadsheet.values ?? spreadsheet.series[0].values;
+  const chartWidth = (BAR_WIDTH + BAR_GAP) * values.length + BAR_GAP;
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
   return { chartWidth, chartHeight };
 };
@@ -244,7 +299,7 @@ const chartYLabels = (
     ...commonProps,
     x: x - BAR_GAP,
     y: y - BAR_HEIGHT - minYLabel.height / 2,
-    text: Math.max(...spreadsheet.values).toLocaleString(),
+    text: Math.max(...(spreadsheet.values ?? spreadsheet.series[0].values)).toLocaleString(),
     textAlign: "right",
   });
 
@@ -351,11 +406,11 @@ const chartTypeBar = (
   x: number,
   y: number,
 ): ChartElements => {
-  const max = Math.max(...spreadsheet.values);
+  const values = spreadsheet.values ?? spreadsheet.series[0].values;
+  const max = Math.max(...values);
   const groupId = randomId();
   const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
-
-  const bars = spreadsheet.values.map((value, index) => {
+  const bars = values.map((value, index) => {
     const barHeight = (value / max) * BAR_HEIGHT;
     return newElement({
       backgroundColor,
@@ -387,13 +442,14 @@ const chartTypeLine = (
   x: number,
   y: number,
 ): ChartElements => {
-  const max = Math.max(...spreadsheet.values);
+  const values = spreadsheet.values ?? spreadsheet.series[0].values;
+  const max = Math.max(...values);
   const groupId = randomId();
   const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
 
   let index = 0;
   const points = [];
-  for (const value of spreadsheet.values) {
+  for (const value of values) {
     const cx = index * (BAR_WIDTH + BAR_GAP);
     const cy = -(value / max) * BAR_HEIGHT;
     points.push([cx, cy]);
@@ -418,7 +474,7 @@ const chartTypeLine = (
     points: points as any,
   });
 
-  const dots = spreadsheet.values.map((value, index) => {
+  const dots = values.map((value, index) => {
     const cx = index * (BAR_WIDTH + BAR_GAP) + BAR_GAP / 2;
     const cy = -(value / max) * BAR_HEIGHT + BAR_GAP / 2;
     return newElement({
@@ -435,7 +491,7 @@ const chartTypeLine = (
     });
   });
 
-  const lines = spreadsheet.values.map((value, index) => {
+  const lines = values.map((value, index) => {
     const cx = index * (BAR_WIDTH + BAR_GAP) + BAR_GAP / 2;
     const cy = (value / max) * BAR_HEIGHT + BAR_GAP / 2 + BAR_GAP;
     return newLinearElement({
