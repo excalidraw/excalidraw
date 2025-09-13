@@ -242,7 +242,10 @@ const renderBindingHighlightForBindableElement = (
         element.y + appState.scrollY,
       );
 
-      context.lineWidth = 2 * element.strokeWidth;
+      context.lineWidth = Math.max(
+        2 / appState.zoom.value,
+        element.strokeWidth * 0.5,
+      );
       context.strokeStyle =
         appState.theme === THEME.DARK ? "#035da1" : "#6abdfc";
 
