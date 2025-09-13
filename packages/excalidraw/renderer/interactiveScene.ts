@@ -14,6 +14,7 @@ import {
   invariant,
   THEME,
   throttleRAF,
+  viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
 import {
@@ -337,6 +338,14 @@ const renderBindingHighlightForBindableElement = (
       break;
   }
 
+  // FIXME
+  const { x, y } = window.h.app.lastViewportPosition;
+
+  const { x: cursorX, y: cursorY } = viewportCoordsToSceneCoords(
+    { clientX: x, clientY: y },
+    appState,
+  );
+
   // Draw center snap area
   context.save();
   context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
@@ -344,9 +353,20 @@ const renderBindingHighlightForBindableElement = (
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
   context.lineDashOffset = 0;
-  context.fillStyle = "rgba(0, 0, 0, 0.01)";
 
   const radius = 0.5 * (Math.min(element.width, element.height) / 2);
+  const centerX = element.x + element.width / 2;
+  const centerY = element.y + element.height / 2;
+
+  const distanceFromCenter = Math.sqrt(
+    Math.pow(cursorX - centerX, 2) + Math.pow(cursorY - centerY, 2),
+  );
+
+  const isInsideEllipse = distanceFromCenter <= radius;
+  context.fillStyle = isInsideEllipse
+    ? "rgba(0, 0, 0, 0.05)"
+    : "rgba(0, 0, 0, 0.01)";
+
   context.beginPath();
   context.ellipse(
     element.width / 2,
