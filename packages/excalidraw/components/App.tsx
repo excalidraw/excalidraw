@@ -6324,6 +6324,10 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({
             suggestedBinding: hoveredElement,
           });
+        } else if (this.state.suggestedBinding) {
+          this.setState({
+            suggestedBinding: null,
+          });
         }
       }
     }
