@@ -262,6 +262,10 @@ export const getAllHoveredElementAtPoint = (
       bindingBorderTest(element, point, elementsMap, toleranceFn?.(element))
     ) {
       candidateElements.push(element);
+
+      if (!isTransparent(element.backgroundColor)) {
+        break;
+      }
     }
   }
 
