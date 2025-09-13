@@ -20,7 +20,12 @@ import type {
   RenderableElementsMap,
   RenderInteractiveSceneCallback,
 } from "../../scene/types";
-import type { AppState, Device, InteractiveCanvasAppState } from "../../types";
+import type {
+  AppClassProperties,
+  AppState,
+  Device,
+  InteractiveCanvasAppState,
+} from "../../types";
 import type { DOMAttributes } from "react";
 
 type InteractiveCanvasProps = {
@@ -36,6 +41,7 @@ type InteractiveCanvasProps = {
   appState: InteractiveCanvasAppState;
   renderScrollbars: boolean;
   device: Device;
+  app: AppClassProperties;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
@@ -145,6 +151,8 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           remotePointerUserStates,
           selectionColor,
           renderScrollbars: props.renderScrollbars,
+          // NOTE not memoized on so we don't rerender on cursor move
+          lastViewportPosition: props.app.lastViewportPosition,
         },
         device: props.device,
         callback: props.renderInteractiveSceneCallback,
