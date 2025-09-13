@@ -185,30 +185,28 @@ const transposeCells = (cells: string[][]) => {
 
 export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
   // Copy/paste from excel, spreadsheets, tsv, csv.
-  // For now we only accept 2 columns with an optional header
+  // Accept any number of columns. Try common delimiters (tab, comma, semicolon)
+  // and pick the one that yields a consistent column count across rows.
 
-  // Check for tab separated values
-  let lines = text
-    .trim()
-    .split("\n")
-    .map((line) => line.trim().split("\t"));
-
-  // Check for comma separated files
-  if (lines.length && lines[0].length !== 2) {
-    lines = text
-      .trim()
-      .split("\n")
-      .map((line) => line.trim().split(","));
-  }
-
-  if (lines.length === 0) {
+  const rawLines = text.trim().split("\n").map((l) => l.trim());
+  if (rawLines.length === 0 || (rawLines.length === 1 && rawLines[0] === "")) {
     return { type: NOT_SPREADSHEET, reason: "No values" };
   }
 
-  const numColsFirstLine = lines[0].length;
-  const isSpreadsheet = lines.every((line) => line.length === numColsFirstLine);
+  const delimiters = ["\t", ",", ";"];
+  let lines: string[][] | null = null;
 
-  if (!isSpreadsheet) {
+  for (const delim of delimiters) {
+    const candidate = rawLines.map((line) => line.split(delim));
+    const numColsFirstLine = candidate[0].length;
+    const isSpreadsheet = candidate.every((line) => line.length === numColsFirstLine);
+    if (isSpreadsheet && numColsFirstLine > 0) {
+      lines = candidate;
+      break;
+    }
+  }
+
+  if (!lines) {
     return {
       type: NOT_SPREADSHEET,
       reason: "All rows don't have same number of columns",
@@ -244,8 +242,13 @@ const commonProps = {
 } as const;
 
 const getChartDimensions = (spreadsheet: Spreadsheet) => {
-  const values = spreadsheet.values ?? spreadsheet.series[0].values;
-  const chartWidth = (BAR_WIDTH + BAR_GAP) * values.length + BAR_GAP;
+  // number of categories (labels) is either labels.length or values.length
+  const categories = (spreadsheet.labels ?? spreadsheet.values ?? spreadsheet.series[0].values).length
+  // For grouped bars we keep BAR_WIDTH per series and use half BAR_GAP between series
+  // within a category and BAR_GAP between categories as before.
+  const numSeries = spreadsheet.series.length;
+  const categoryBlockWidth = numSeries * BAR_WIDTH + (numSeries - 1) * BAR_GAP;
+  const chartWidth = categoryBlockWidth * categories + BAR_GAP;
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
   return { chartWidth, chartHeight };
 };
@@ -257,16 +260,25 @@ const chartXLabels = (
   groupId: string,
   backgroundColor: string,
 ): ChartElements => {
+  const categories = spreadsheet.labels 
+    ?? (spreadsheet.values ?? spreadsheet.series[0].values).map((_, i) => String(i + 1));
+
+  const numSeries = spreadsheet.series.length;
+  const categoryBlockWidth = numSeries * BAR_WIDTH + (numSeries - 1) * BAR_GAP;
+
   return (
-    spreadsheet.labels?.map((label, index) => {
+    categories.map((label, index) => {
+      // center the label under the category block
+      const categoryX = x + index * categoryBlockWidth + BAR_GAP;
+      const labelX = categoryX + categoryBlockWidth / 2;
       return newTextElement({
         groupIds: [groupId],
         backgroundColor,
         ...commonProps,
         text: label.length > 8 ? `${label.slice(0, 5)}...` : label,
-        x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
+        x: labelX,
         y: y + BAR_GAP / 2,
-        width: BAR_WIDTH,
+        width: categoryBlockWidth,
         angle: 5.87 as Radians,
         fontSize: 16,
         textAlign: "center",
@@ -293,13 +305,16 @@ const chartYLabels = (
     textAlign: "right",
   });
 
+  const maxVal = Math.max(
+    ...spreadsheet.series.reduce((acc, s) => acc.concat(s.values), [] as number[]),
+  );
   const maxYLabel = newTextElement({
     groupIds: [groupId],
     backgroundColor,
     ...commonProps,
     x: x - BAR_GAP,
     y: y - BAR_HEIGHT - minYLabel.height / 2,
-    text: Math.max(...(spreadsheet.values ?? spreadsheet.series[0].values)).toLocaleString(),
+    text: maxVal.toLocaleString(),
     textAlign: "right",
   });
 
@@ -406,34 +421,44 @@ const chartTypeBar = (
   x: number,
   y: number,
 ): ChartElements => {
-  const values = spreadsheet.values ?? spreadsheet.series[0].values;
-  const max = Math.max(...values);
   const groupId = randomId();
-  const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
-  const bars = values.map((value, index) => {
-    const barHeight = (value / max) * BAR_HEIGHT;
-    return newElement({
-      backgroundColor,
-      groupIds: [groupId],
-      ...commonProps,
-      type: "rectangle",
-      x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP,
-      y: y - barHeight - BAR_GAP,
-      width: BAR_WIDTH,
-      height: barHeight,
-    });
-  });
+  const numSeries = spreadsheet.series.length;
+  const categories = (spreadsheet.labels ?? spreadsheet.values ?? spreadsheet.series[0].values).length;
+
+  // global max across all series
+  const max = Math.max(
+    ...spreadsheet.series.reduce((acc, s) => acc.concat(s.values), [] as number[]),
+  );
+
+  const categoryBlockWidth = numSeries * BAR_WIDTH + (numSeries - 1) * BAR_GAP;
+
+  const bars: NonDeletedExcalidrawElement[] = [];
+  for (let cat = 0; cat < categories; cat++) {
+    const categoryX = x + cat * categoryBlockWidth + BAR_GAP;
+    for (let s = 0; s < numSeries; s++) {
+      const series = spreadsheet.series[s];
+      const value = series.values[cat];
+      const barHeight = (value / max) * BAR_HEIGHT;
+      const seriesColor = bgColors[s % bgColors.length];
+      const barX = categoryX + s * (BAR_WIDTH + BAR_GAP);
+      bars.push(
+        newElement({
+          backgroundColor: seriesColor,
+          groupIds: [groupId],
+          ...commonProps,
+          type: "rectangle",
+          x: barX,
+          y: y - barHeight - BAR_GAP,
+          width: BAR_WIDTH,
+          height: barHeight,
+        }),
+      );
+    }
+  }
 
   return [
     ...bars,
-    ...chartBaseElements(
-      spreadsheet,
-      x,
-      y,
-      groupId,
-      backgroundColor,
-      isDevEnv(),
-    ),
+    ...chartBaseElements(spreadsheet, x, y, groupId, bgColors[0], isDevEnv()),
   ];
 };
 
@@ -442,84 +467,99 @@ const chartTypeLine = (
   x: number,
   y: number,
 ): ChartElements => {
-  const values = spreadsheet.values ?? spreadsheet.series[0].values;
-  const max = Math.max(...values);
   const groupId = randomId();
-  const backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+  const numSeries = spreadsheet.series.length;
+  const categories = (spreadsheet.labels ?? spreadsheet.values ?? spreadsheet.series[0].values).length;
 
-  let index = 0;
-  const points = [];
-  for (const value of values) {
-    const cx = index * (BAR_WIDTH + BAR_GAP);
-    const cy = -(value / max) * BAR_HEIGHT;
-    points.push([cx, cy]);
-    index++;
-  }
+  // global max across all series
+  const max = Math.max(
+    ...spreadsheet.series.reduce((acc, s) => acc.concat(s.values), [] as number[]),
+  );
 
-  const maxX = Math.max(...points.map((element) => element[0]));
-  const maxY = Math.max(...points.map((element) => element[1]));
-  const minX = Math.min(...points.map((element) => element[0]));
-  const minY = Math.min(...points.map((element) => element[1]));
+  const categoryBlockWidth = numSeries * BAR_WIDTH + (numSeries - 1) * BAR_GAP;
 
-  const line = newLinearElement({
-    backgroundColor,
-    groupIds: [groupId],
-    ...commonProps,
-    type: "line",
-    x: x + BAR_GAP + BAR_WIDTH / 2,
-    y: y - BAR_GAP,
-    height: maxY - minY,
-    width: maxX - minX,
-    strokeWidth: 2,
-    points: points as any,
-  });
+  const elements: NonDeletedExcalidrawElement[] = [];
 
-  const dots = values.map((value, index) => {
-    const cx = index * (BAR_WIDTH + BAR_GAP) + BAR_GAP / 2;
-    const cy = -(value / max) * BAR_HEIGHT + BAR_GAP / 2;
-    return newElement({
-      backgroundColor,
-      groupIds: [groupId],
-      ...commonProps,
-      fillStyle: "solid",
-      strokeWidth: 2,
-      type: "ellipse",
-      x: x + cx + BAR_WIDTH / 2,
-      y: y + cy - BAR_GAP * 2,
-      width: BAR_GAP,
-      height: BAR_GAP,
-    });
-  });
+  for (let s = 0; s < numSeries; s++) {
+    const series = spreadsheet.series[s];
+    const seriesColor = bgColors[s % bgColors.length];
 
-  const lines = values.map((value, index) => {
-    const cx = index * (BAR_WIDTH + BAR_GAP) + BAR_GAP / 2;
-    const cy = (value / max) * BAR_HEIGHT + BAR_GAP / 2 + BAR_GAP;
-    return newLinearElement({
-      backgroundColor,
+    let index = 0;
+    const points: [number, number][] = [];
+    for (let cat = 0; cat < categories; cat++) {
+      const value = series.values[cat];
+      const cx = cat * categoryBlockWidth + s * (BAR_WIDTH + BAR_GAP);
+      const cy = -(value / max) * BAR_HEIGHT;
+      points.push([cx, cy]);
+      index++;
+    }
+
+    const maxX = Math.max(...points.map((element) => element[0]));
+    const maxY = Math.max(...points.map((element) => element[1]));
+    const minX = Math.min(...points.map((element) => element[0]));
+    const minY = Math.min(...points.map((element) => element[1]));
+
+    const line = newLinearElement({
+      backgroundColor: seriesColor,
       groupIds: [groupId],
       ...commonProps,
       type: "line",
-      x: x + cx + BAR_WIDTH / 2 + BAR_GAP / 2,
-      y: y - cy,
-      height: cy,
-      strokeStyle: "dotted",
-      opacity: GRID_OPACITY,
-      points: [pointFrom(0, 0), pointFrom(0, cy)],
+      x: x + BAR_GAP + BAR_WIDTH / 2,
+      y: y - BAR_GAP,
+      height: maxY - minY,
+      width: maxX - minX,
+      strokeWidth: 2,
+      points: points as any,
     });
-  });
+
+    elements.push(line);
+
+    // dotted vertical grid lines per point
+    for (let i = 0; i < points.length; i++) {
+      const cx = points[i][0] + BAR_GAP / 2 + BAR_WIDTH / 2;
+      const value = series.values[i];
+      const cy = (value / max) * BAR_HEIGHT + BAR_GAP / 2 + BAR_GAP;
+      elements.push(
+        newLinearElement({
+          backgroundColor: seriesColor,
+          groupIds: [groupId],
+          ...commonProps,
+          type: "line",
+          x: x + cx + BAR_GAP / 2,
+          y: y - cy,
+          height: cy,
+          strokeStyle: "dotted",
+          opacity: GRID_OPACITY,
+          points: [pointFrom(0, 0), pointFrom(0, cy)],
+        }),
+      );
+    }
+
+    // dots
+    for (let i = 0; i < points.length; i++) {
+      const cx = points[i][0] + BAR_GAP / 2 + BAR_WIDTH / 2;
+      const value = series.values[i];
+      const cy = -(value / max) * BAR_HEIGHT + BAR_GAP / 2;
+      elements.push(
+        newElement({
+          backgroundColor: seriesColor,
+          groupIds: [groupId],
+          ...commonProps,
+          fillStyle: "solid",
+          strokeWidth: 2,
+          type: "ellipse",
+          x: x + cx + BAR_WIDTH / 2,
+          y: y + cy - BAR_GAP * 2,
+          width: BAR_GAP,
+          height: BAR_GAP,
+        }),
+      );
+    }
+  }
 
   return [
-    ...chartBaseElements(
-      spreadsheet,
-      x,
-      y,
-      groupId,
-      backgroundColor,
-      isDevEnv(),
-    ),
-    line,
-    ...lines,
-    ...dots,
+    ...chartBaseElements(spreadsheet, x, y, groupId, bgColors[0], isDevEnv()),
+    ...elements,
   ];
 };
 

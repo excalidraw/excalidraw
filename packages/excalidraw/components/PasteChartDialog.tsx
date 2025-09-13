@@ -30,16 +30,11 @@ const ChartPreviewBtn = (props: {
   );
 
   useLayoutEffect(() => {
-    if (!props.spreadsheet) {
+    const spreadsheet = normalizeSpreadsheet(props.spreadsheet);
+    if (!spreadsheet) {
       return;
     }
-
-    const elements = renderSpreadsheet(
-      props.chartType,
-      props.spreadsheet,
-      0,
-      0,
-    );
+    const elements = renderSpreadsheet(props.chartType, spreadsheet, 0, 0);
     setChartElements(elements);
     let svg: SVGSVGElement;
     const previewNode = previewRef.current!;
@@ -85,6 +80,23 @@ const ChartPreviewBtn = (props: {
   );
 };
 
+// Normalize possible legacy `Spreadsheet` that exposes `values` to the
+// multi-series shape expected by rendering code. This keeps the dialog
+// resilient while the rest of the codebase migrates.
+const normalizeSpreadsheet = (s: Spreadsheet | null): Spreadsheet | null => {
+  if (!s) return null;
+  if (s.series && Array.isArray(s.series)) return s;
+  // legacy: s.values -> single series
+  const values = (s as any).values as number[] | undefined;
+  if (!values) return s;
+  return {
+    title: s.title ?? null,
+    labels: s.labels ?? null,
+    series: [{ name: null, values }],
+    values,
+  };
+};
+
 export const PasteChartDialog = ({
   setAppState,
   appState,
@@ -124,13 +136,13 @@ export const PasteChartDialog = ({
       <div className={"container"}>
         <ChartPreviewBtn
           chartType="bar"
-          spreadsheet={appState.pasteDialog.data}
+            spreadsheet={appState.pasteDialog.data}
           selected={appState.currentChartType === "bar"}
           onClick={handleChartClick}
         />
         <ChartPreviewBtn
           chartType="line"
-          spreadsheet={appState.pasteDialog.data}
+            spreadsheet={appState.pasteDialog.data}
           selected={appState.currentChartType === "line"}
           onClick={handleChartClick}
         />
