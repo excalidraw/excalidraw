@@ -119,10 +119,17 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
       series.push({ name, values: values as number[] });
     }
 
+    const combinedTitle = hasHeader
+      ? series
+          .map((s) => s.name ?? "")
+          .filter((n) => n.trim().length > 0)
+          .join(", ") || null
+      : null;
+
     return {
       type: VALID_SPREADSHEET,
       spreadsheet: {
-        title: hasHeader ? cells[0][firstNumericIndex] : null,
+        title: combinedTitle,
         labels,
         series,
       },
@@ -155,10 +162,17 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
     series.push({ name, values: values as number[] });
   }
 
+  const combinedTitle = hasHeader
+    ? series
+        .map((s) => s.name ?? "")
+        .filter((n) => n.trim().length > 0)
+        .join(", ") || null
+    : null;
+
   return {
     type: VALID_SPREADSHEET,
     spreadsheet: {
-      title: null,
+      title: combinedTitle,
       labels: null,
       series,
     },
