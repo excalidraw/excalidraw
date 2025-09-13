@@ -1,4 +1,3 @@
-import rough from "roughjs/bin/rough";
 import {
   pointFrom,
   pointsEqual,
@@ -17,7 +16,12 @@ import {
   throttleRAF,
 } from "@excalidraw/common";
 
-import { LinearElementEditor, renderElement } from "@excalidraw/element";
+import {
+  deconstructDiamondElement,
+  deconstructRectanguloidElement,
+  elementCenterPoint,
+  LinearElementEditor,
+} from "@excalidraw/element";
 import {
   getOmitSidesForDevice,
   getTransformHandles,
@@ -219,9 +223,17 @@ const renderBindingHighlightForBindableElement = (
 
       context.restore();
       break;
-    case "image":
-    case "text":
+    default:
       context.save();
+
+      const center = elementCenterPoint(element, allElementsMap);
+      const cx = center[0] + appState.scrollX;
+      const cy = center[1] + appState.scrollY;
+
+      context.translate(cx, cy);
+      context.rotate(element.angle as Radians);
+      context.translate(-cx, -cy);
+
       context.translate(
         element.x + appState.scrollX,
         element.y + appState.scrollY,
@@ -231,63 +243,124 @@ const renderBindingHighlightForBindableElement = (
       context.strokeStyle =
         appState.theme === THEME.DARK ? "#035da1" : "#6abdfc";
 
-      context.strokeRect(0, 0, element.width, element.height);
-      context.restore();
-      break;
-    default:
-      renderElement(
-        {
-          ...element,
-          strokeColor: appState.theme === THEME.DARK ? "#035da1" : "#6abdfc",
-          fillStyle: "solid",
-          backgroundColor: "transparent",
-        },
-        elementsMap,
-        allElementsMap,
-        rough.canvas(context.canvas),
-        context,
-        {
-          canvasBackgroundColor: "transparent",
-          imageCache: new Map(),
-          renderGrid: false,
-          isExporting: false,
-          embedsValidationStatus: new Map(),
-          elementsPendingErasure: new Set(),
-          pendingFlowchartNodes: null,
-        },
-        appState,
-      );
-
-      // Overdraw the arrow if exists (if there is a suggestedBinding it's an arrow)
-      if (appState.selectedLinearElement) {
-        const arrow = LinearElementEditor.getElement(
-          appState.selectedLinearElement.elementId,
-          allElementsMap,
-        );
-
-        invariant(arrow, "arrow not found during highlight element binding");
-
-        renderElement(
-          arrow,
-          elementsMap,
-          allElementsMap,
-          rough.canvas(context.canvas),
-          context,
+      switch (element.type) {
+        case "ellipse":
+          context.beginPath();
+          context.ellipse(
+            element.width / 2,
+            element.height / 2,
+            element.width / 2,
+            element.height / 2,
+            0,
+            0,
+            2 * Math.PI,
+          );
+          context.closePath();
+          context.stroke();
+          break;
+        case "diamond":
           {
-            canvasBackgroundColor: "transparent",
-            imageCache: new Map(),
-            renderGrid: false,
-            isExporting: false,
-            embedsValidationStatus: new Map(),
-            elementsPendingErasure: new Set(),
-            pendingFlowchartNodes: null,
-          },
-          appState,
-        );
+            const [segments, curves] = deconstructDiamondElement(element);
+
+            // Draw each line segment individually
+            segments.forEach((segment) => {
+              context.beginPath();
+              context.moveTo(
+                segment[0][0] - element.x,
+                segment[0][1] - element.y,
+              );
+              context.lineTo(
+                segment[1][0] - element.x,
+                segment[1][1] - element.y,
+              );
+              context.stroke();
+            });
+
+            // Draw each curve individually (for rounded corners)
+            curves.forEach((curve) => {
+              const [start, control1, control2, end] = curve;
+              context.beginPath();
+              context.moveTo(start[0] - element.x, start[1] - element.y);
+              context.bezierCurveTo(
+                control1[0] - element.x,
+                control1[1] - element.y,
+                control2[0] - element.x,
+                control2[1] - element.y,
+                end[0] - element.x,
+                end[1] - element.y,
+              );
+              context.stroke();
+            });
+          }
+
+          break;
+        default:
+          {
+            const [segments, curves] = deconstructRectanguloidElement(element);
+
+            // Draw each line segment individually
+            segments.forEach((segment) => {
+              context.beginPath();
+              context.moveTo(
+                segment[0][0] - element.x,
+                segment[0][1] - element.y,
+              );
+              context.lineTo(
+                segment[1][0] - element.x,
+                segment[1][1] - element.y,
+              );
+              context.stroke();
+            });
+
+            // Draw each curve individually (for rounded corners)
+            curves.forEach((curve) => {
+              const [start, control1, control2, end] = curve;
+              context.beginPath();
+              context.moveTo(start[0] - element.x, start[1] - element.y);
+              context.bezierCurveTo(
+                control1[0] - element.x,
+                control1[1] - element.y,
+                control2[0] - element.x,
+                control2[1] - element.y,
+                end[0] - element.x,
+                end[1] - element.y,
+              );
+              context.stroke();
+            });
+          }
+
+          break;
       }
+
+      context.restore();
 
       break;
   }
+
+  // Draw center snap area
+  context.save();
+  context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
+  context.strokeStyle = "rgba(0, 0, 0, 0.1)";
+  context.lineWidth = 1 / appState.zoom.value;
+  context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
+  context.lineDashOffset = 0;
+  context.fillStyle = "rgba(0, 0, 0, 0.01)";
+
+  const radius = 0.5 * (Math.min(element.width, element.height) / 2);
+  context.beginPath();
+  context.ellipse(
+    element.width / 2,
+    element.height / 2,
+    radius,
+    radius,
+    0,
+    0,
+    2 * Math.PI,
+  );
+  context.stroke();
+  context.fill();
+
+  context.restore();
 };
 
 type ElementSelectionBorder = {

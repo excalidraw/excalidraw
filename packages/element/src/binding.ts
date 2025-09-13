@@ -31,7 +31,6 @@ import {
   getHoveredElementForBinding,
   intersectElementWithLineSegment,
   isBindableElementInsideOtherBindable,
-  isPointInElement,
 } from "./collision";
 import { distanceToElement } from "./distance";
 import {
