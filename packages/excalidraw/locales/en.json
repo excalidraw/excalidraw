@@ -332,6 +332,7 @@
     "dismissSearch": "Escape to dismiss search",
     "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging, or use the hand tool",
     "linearElement": "Click to start multiple points, drag for single line",
+    "arrowBindModifiers": "Hold Alt to bind inside, or CtrlOrCmd to disable binding",
     "arrowTool": "Click to start multiple points, drag for single line. Press {{arrowShortcut}} again to change arrow type.",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
