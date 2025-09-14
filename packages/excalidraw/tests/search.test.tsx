@@ -23,11 +23,11 @@ const { h } = window;
 
 const querySearchInput = async () => {
   const input =
-    h.app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
+    h.app.excalidrawContainerValue.container?.querySelector(
       `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
-    )!;
+    ) as HTMLInputElement | null;
   await waitFor(() => expect(input).not.toBeNull());
-  return input;
+  return input!;
 };
 
 describe("search", () => {
@@ -58,9 +58,9 @@ describe("search", () => {
     });
 
     const searchInput =
-      h.app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
+      h.app.excalidrawContainerValue.container?.querySelector(
         `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
-      );
+      ) as HTMLInputElement | null;
 
     act(() => {
       searchInput?.blur();

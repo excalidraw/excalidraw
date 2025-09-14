@@ -22,6 +22,7 @@ import {
 import {
   hasBoundTextElement,
   isArrowElement,
+  isLineElement,
   isTextBindableContainer,
   isTextElement,
   isUsingAdaptiveRadius,
@@ -157,7 +158,8 @@ export const actionBindText = register({
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
       textAlign: TEXT_ALIGN.CENTER,
       autoResize: true,
-      angle: (isArrowElement(container) ? 0 : container?.angle ?? 0) as Radians,
+      backgroundColor: (isArrowElement(container) || isLineElement(container)) ? "#ffffff" : textElement.backgroundColor,
+      angle: (isArrowElement(container) || isLineElement(container) ? 0 : container?.angle ?? 0) as Radians,
     });
     app.scene.mutateElement(container, {
       boundElements: (container.boundElements || []).concat({

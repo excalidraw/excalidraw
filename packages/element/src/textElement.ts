@@ -27,6 +27,7 @@ import { wrapText } from "./textWrapping";
 import {
   isBoundToContainer,
   isArrowElement,
+  isLineElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -37,6 +38,7 @@ import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawElementType,
+  ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -54,8 +56,8 @@ export const redrawTextBoundingBox = (
 
   if (!isProdEnv()) {
     invariant(
-      !container || !isArrowElement(container) || textElement.angle === 0,
-      "text element angle must be 0 if bound to arrow container",
+      !container || (!isArrowElement(container) && !isLineElement(container)) || textElement.angle === 0,
+      "text element angle must be 0 if bound to arrow or line container",
     );
   }
 
@@ -66,7 +68,7 @@ export const redrawTextBoundingBox = (
     width: textElement.width,
     height: textElement.height,
     angle: (container
-      ? isArrowElement(container)
+      ? isArrowElement(container) || isLineElement(container)
         ? 0
         : container.angle
       : textElement.angle) as Radians,
@@ -224,9 +226,9 @@ export const computeBoundTextPosition = (
   boundTextElement: ExcalidrawTextElementWithContainer,
   elementsMap: ElementsMap,
 ) => {
-  if (isArrowElement(container)) {
+  if (isArrowElement(container) || isLineElement(container)) {
     return LinearElementEditor.getBoundTextElementPosition(
-      container,
+      container as ExcalidrawLinearElement,
       boundTextElement,
       elementsMap,
     );
@@ -346,6 +348,10 @@ export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
     offsetX += container.width / 4;
     offsetY += container.height / 4;
   }
+  // For images, frames, and magic frames, use standard padding
+  if (container.type === "image" || container.type === "frame" || container.type === "magicframe") {
+    // Use standard padding - no additional offset needed
+  }
   return {
     x: container.x + offsetX,
     y: container.y + offsetY,
@@ -370,9 +376,9 @@ export const getBoundTextElementPosition = (
   boundTextElement: ExcalidrawTextElementWithContainer,
   elementsMap: ElementsMap,
 ) => {
-  if (isArrowElement(container)) {
+  if (isArrowElement(container) || isLineElement(container)) {
     return LinearElementEditor.getBoundTextElementPosition(
-      container,
+      container as ExcalidrawLinearElement,
       boundTextElement,
       elementsMap,
     );
@@ -416,6 +422,9 @@ const VALID_CONTAINER_TYPES = new Set([
   "rectangle",
   "ellipse",
   "diamond",
+  "image",
+  "frame",
+  "magicframe",
   "arrow",
 ]);
 
@@ -438,6 +447,9 @@ export const computeContainerDimensionForBoundText = (
   }
   if (containerType === "diamond") {
     return 2 * (dimension + padding);
+  }
+  if (containerType === "image" || containerType === "frame" || containerType === "magicframe") {
+    return dimension + padding;
   }
   return dimension + padding;
 };
