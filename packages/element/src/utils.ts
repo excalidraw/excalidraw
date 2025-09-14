@@ -459,7 +459,11 @@ export const isPathALoop = (
   return false;
 };
 
-export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
+export const getCornerRadius = (
+  x: number, 
+  element: ExcalidrawElement
+  
+  ) => {
   if (
     element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS ||
     element.roundness?.type === ROUNDNESS.LEGACY
@@ -468,8 +472,25 @@ export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   }
 
   if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
-    // klo ada pake value, kalo ga ada pake default
     const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
+
+    const CUTOFF_SIZE = fixedRadiusSize / DEFAULT_PROPORTIONAL_RADIUS;
+
+    if (x <= CUTOFF_SIZE) {
+      return x * DEFAULT_PROPORTIONAL_RADIUS;
+    }
+
+    return fixedRadiusSize;
+  }
+
+  if (element.roundness?.type === ROUNDNESS.CUSTOMIZED){
+
+    // Todo: ganti kode ,baru copas dari adaptive
+    
+    // const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
+
+    // Test, semakin besar, semakin jadi round
+    const fixedRadiusSize = 100;
 
     const CUTOFF_SIZE = fixedRadiusSize / DEFAULT_PROPORTIONAL_RADIUS;
 

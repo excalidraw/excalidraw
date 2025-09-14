@@ -672,14 +672,29 @@ const generateElementShape = (
         const w = element.width;
         const h = element.height;
         const r = getCornerRadius(Math.min(w, h), element);
+
+        console.log(element.id, w, h, r)
+
+        const tl = customInput?.topLeft ?? 0;
+        const tr = customInput?.topRight ?? 0;
+        const bl = customInput?.bottomLeft ?? 0;
+        const br = customInput?.bottomRight ?? 0;
+
+        // Dummy
+        
+
         shape = generator.path(
 
           //Todo: Nanti modify untuk bisa menyesuaikan dengan input manualnya
-          `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
-            h - r
-          } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
-            h - r
-          } L 0 ${r} Q 0 0, ${r} 0`,
+          `M ${r} 0`+                     // Pindahin kursor ke posisi awal
+           `L ${w - r} 0` +                 // Garis atas
+           `Q ${w} 0, ${w} ${r}` +          // Kurva kanan atas
+           `L ${w} ${h - r}` +              // Garis kanan
+           `Q ${w} ${h}, ${w - r} ${h}` +   // Kurva kanan bawah
+           `L ${r} ${h}` +                 // Garis bawah
+           `Q 0 ${h}, 0 ${h - r}` +         // Kurva kiri bawah
+           `L 0 ${r}` +                     // Garis kiri
+           `Q 0 0, ${r} 0`,              // Kurva kanan atas
           generateRoughOptions(
             modifyIframeLikeForRoughOptions(
               element,
