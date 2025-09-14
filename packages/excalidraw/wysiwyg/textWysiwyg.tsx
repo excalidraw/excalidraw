@@ -7,6 +7,7 @@ import {
   getFontString,
   getFontFamilyString,
   isTestEnv,
+  MIME_TYPES,
 } from "@excalidraw/common";
 
 import {
@@ -45,7 +46,7 @@ import type {
 
 import { actionSaveToActiveFile } from "../actions";
 
-import { parseClipboard } from "../clipboard";
+import { parseDataTransferEvent } from "../clipboard";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -332,12 +333,14 @@ export const textWysiwyg = ({
 
   if (onChange) {
     editable.onpaste = async (event) => {
-      const clipboardData = await parseClipboard(event, true);
-      if (!clipboardData.text) {
+      const textItem = (await parseDataTransferEvent(event)).findByType(
+        MIME_TYPES.text,
+      );
+      if (!textItem) {
         return;
       }
-      const data = normalizeText(clipboardData.text);
-      if (!data) {
+      const text = normalizeText(textItem.value);
+      if (!text) {
         return;
       }
       const container = getContainerElement(
@@ -355,7 +358,7 @@ export const textWysiwyg = ({
           app.scene.getNonDeletedElementsMap(),
         );
         const wrappedText = wrapText(
-          `${editable.value}${data}`,
+          `${editable.value}${text}`,
           font,
           getBoundTextMaxWidth(container, boundTextElement),
         );
@@ -539,6 +542,7 @@ export const textWysiwyg = ({
     if (isDestroyed) {
       return;
     }
+
     isDestroyed = true;
     // cleanup must be run before onSubmit otherwise when app blurs the wysiwyg
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
@@ -622,14 +626,24 @@ export const textWysiwyg = ({
     const isPropertiesTrigger =
       target instanceof HTMLElement &&
       target.classList.contains("properties-trigger");
+    const isPropertiesContent =
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      !!(target as Element).closest(".properties-content");
+    const inShapeActionsMenu =
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      (!!(target as Element).closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
+        !!(target as Element).closest(".compact-shape-actions-island"));
 
     setTimeout(() => {
-      editable.onblur = handleSubmit;
-
-      // case: clicking on the same property → no change → no update → no focus
-      if (!isPropertiesTrigger) {
-        editable.focus();
+      // If we interacted within shape actions menu or its popovers/triggers,
+      // keep submit disabled and don't steal focus back to textarea.
+      if (inShapeActionsMenu || isPropertiesTrigger || isPropertiesContent) {
+        return;
       }
+
+      // Otherwise, re-enable submit on blur and refocus the editor.
+      editable.onblur = handleSubmit;
+      editable.focus();
     });
   };
 
@@ -652,6 +666,7 @@ export const textWysiwyg = ({
         event.preventDefault();
         app.handleCanvasPanUsingWheelOrSpaceDrag(event);
       }
+
       temporarilyDisableSubmit();
       return;
     }
@@ -659,15 +674,20 @@ export const textWysiwyg = ({
     const isPropertiesTrigger =
       target instanceof HTMLElement &&
       target.classList.contains("properties-trigger");
+    const isPropertiesContent =
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      !!(target as Element).closest(".properties-content");
 
     if (
       ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-        event.target.closest(
+        (event.target.closest(
           `.${CLASSES.SHAPE_ACTIONS_MENU}, .${CLASSES.ZOOM_ACTIONS}`,
-        ) &&
+        ) ||
+          event.target.closest(".compact-shape-actions-island")) &&
         !isWritableElement(event.target)) ||
-      isPropertiesTrigger
+      isPropertiesTrigger ||
+      isPropertiesContent
     ) {
       temporarilyDisableSubmit();
     } else if (

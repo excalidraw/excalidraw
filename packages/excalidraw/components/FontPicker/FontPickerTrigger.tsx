@@ -1,5 +1,4 @@
 import * as Popover from "@radix-ui/react-popover";
-import { useMemo } from "react";
 
 import type { FontFamilyValues } from "@excalidraw/element/types";
 
@@ -7,33 +6,38 @@ import { t } from "../../i18n";
 import { ButtonIcon } from "../ButtonIcon";
 import { TextIcon } from "../icons";
 
-import { isDefaultFont } from "./FontPicker";
+import { useExcalidrawSetAppState } from "../App";
 
 interface FontPickerTriggerProps {
   selectedFontFamily: FontFamilyValues | null;
+  isOpened?: boolean;
 }
 
 export const FontPickerTrigger = ({
   selectedFontFamily,
+  isOpened = false,
 }: FontPickerTriggerProps) => {
-  const isTriggerActive = useMemo(
-    () => Boolean(selectedFontFamily && !isDefaultFont(selectedFontFamily)),
-    [selectedFontFamily],
-  );
+  const setAppState = useExcalidrawSetAppState();
 
   return (
     <Popover.Trigger asChild>
-      {/* Empty div as trigger so it's stretched 100% due to different button sizes */}
-      <div>
+      <div data-openpopup="fontFamily" className="properties-trigger">
         <ButtonIcon
           standalone
           icon={TextIcon}
           title={t("labels.showFonts")}
           className="properties-trigger"
           testId={"font-family-show-fonts"}
-          active={isTriggerActive}
-          // no-op
-          onClick={() => {}}
+          active={isOpened}
+          onClick={() => {
+            setAppState((appState) => ({
+              openPopup:
+                appState.openPopup === "fontFamily" ? null : appState.openPopup,
+            }));
+          }}
+          style={{
+            border: "none",
+          }}
         />
       </div>
     </Popover.Trigger>
