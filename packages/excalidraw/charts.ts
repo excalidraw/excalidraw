@@ -427,44 +427,41 @@ const chartTypeBar = (
   x: number,
   y: number,
 ): ChartElements => {
-  const groupId = randomId();
-  const numSeries = spreadsheet.series.length;
-  const categories = (spreadsheet.labels ?? spreadsheet.series[0].values).length;
-
-  // global max across all series
   const max = Math.max(
     ...spreadsheet.series.reduce((acc, s) => acc.concat(s.values), [] as number[]),
   );
+  const groupId = randomId();
+  const categoryBlockWidth = spreadsheet.series.length * (BAR_WIDTH + BAR_GAP);
 
-  const categoryBlockWidth = numSeries * (BAR_WIDTH + BAR_GAP);
-
-  const bars: NonDeletedExcalidrawElement[] = [];
-  for (let cat = 0; cat < categories; cat++) {
-    const categoryX = x + cat * categoryBlockWidth + BAR_GAP;
-    for (let s = 0; s < numSeries; s++) {
-      const series = spreadsheet.series[s];
-      const value = series.values[cat];
+  const bars = spreadsheet.series.flatMap((series, s) => {
+    const seriesColor = bgColors[s % bgColors.length];
+    const barX = s * (BAR_WIDTH + BAR_GAP);
+    return series.values.map((value, cat) => {
+      const categoryX = x + cat * categoryBlockWidth + BAR_GAP;
       const barHeight = (value / max) * BAR_HEIGHT;
-      const seriesColor = bgColors[s % bgColors.length];
-      const barX = categoryX + s * (BAR_WIDTH + BAR_GAP);
-      bars.push(
-        newElement({
+      return newElement({
           backgroundColor: seriesColor,
           groupIds: [groupId],
           ...commonProps,
           type: "rectangle",
-          x: barX,
+          x: barX + categoryX,
           y: y - barHeight - BAR_GAP,
           width: BAR_WIDTH,
           height: barHeight,
-        }),
-      );
-    }
-  }
+        });
+    });
+  });
 
   return [
     ...bars,
-    ...chartBaseElements(spreadsheet, x, y, groupId, bgColors[0], isDevEnv()),
+    ...chartBaseElements(
+      spreadsheet,
+      x,
+      y,
+      groupId,
+      bgColors[0],
+      isDevEnv(),
+    ),
   ];
 };
 
