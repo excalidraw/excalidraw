@@ -31,8 +31,6 @@ const GRID_OPACITY = 50;
 export interface Spreadsheet {
   title: string | null;
   labels: string[] | null;
-  // Support multiple series: each series has an optional name and an array of
-  // numeric values (one value per label/row).
   series: { name: string | null; values: number[] }[];
 }
 
@@ -46,7 +44,7 @@ type ParseSpreadsheetResult =
 /**
  * @private exported for testing
  */
-export const tryParseNumber = (s: string): number | null => {
+export const tryParseNumber = (s: string): number | null => {``
   const match = /^([-+]?)[$€£¥₩]?([-+]?)([\d.,]+)[%]?$/.exec(s);
   if (!match) {
     return null;
