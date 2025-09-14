@@ -615,6 +615,14 @@ const generateElementShape = (
     canvasBackgroundColor: string;
     embedsValidationStatus: EmbedsValidationStatus | null;
   },
+
+  //Todo: Bisa jadi class tersendiri
+  customInput? : {
+    topLeft? : null | number
+    topRight? : null | number
+    bottomRight? : null | number
+    bottomLeft? : null | number
+  }
 ): Drawable | Drawable[] | null => {
   switch (element.type) {
     case "rectangle":
@@ -623,7 +631,7 @@ const generateElementShape = (
       let shape: ElementShapes[typeof element.type];
       // this is for rendering the stroke/bg of the embeddable, especially
       // when the src url is not set
-
+      console.log(element.roundness?.type)
       if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
         const w = element.width;
         const h = element.height;
@@ -658,19 +666,27 @@ const generateElementShape = (
             false,
           ),
         );
-      } else {
-        shape = generator.rectangle(
-          100000,
-          100000,
-          element.width,
-          element.height,
+      } 
+      // Kalau pilihan custom
+      else {
+        const w = element.width;
+        const h = element.height;
+        const r = getCornerRadius(Math.min(w, h), element);
+        shape = generator.path(
+
+          //Todo: Nanti modify untuk bisa menyesuaikan dengan input manualnya
+          `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
+            h - r
+          } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
+            h - r
+          } L 0 ${r} Q 0 0, ${r} 0`,
           generateRoughOptions(
             modifyIframeLikeForRoughOptions(
               element,
               isExporting,
               embedsValidationStatus,
             ),
-            false,
+            true,
           ),
         );
       }
