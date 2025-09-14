@@ -265,16 +265,16 @@ const chartXLabels = (
   backgroundColor: string,
   stacked = false,
 ): ChartElements => {
-  const categories = spreadsheet.labels ?? spreadsheet.series[0].values.map((_: number, i: number) => String(i + 1));
+  const labels = spreadsheet.labels ?? spreadsheet.series[0].values.map((_: number, i: number) => String(i + 1));
 
   const numSeries = stacked ? 1 : spreadsheet.series.length;
   const categoryBlockWidth = numSeries * (BAR_WIDTH + BAR_GAP);
 
   return (
-    categories.map((label, index) => {
+    labels.map((label, index) => {
       // center the label under the category block
       const categoryX = x + index * categoryBlockWidth + BAR_GAP;
-      const labelX = categoryX + categoryBlockWidth / 2;
+      const labelX = categoryX + (categoryBlockWidth - BAR_GAP) / 2;
       return newTextElement({
         groupIds: [groupId],
         backgroundColor,
