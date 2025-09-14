@@ -473,28 +473,20 @@ const chartTypeLine = (
   x: number,
   y: number,
 ): ChartElements => {
-  const groupId = randomId();
-  const numSeries = spreadsheet.series.length;
-  const categories = (spreadsheet.labels ?? spreadsheet.series[0].values).length;
-
-  // global max across all series
   const max = Math.max(
     ...spreadsheet.series.reduce((acc, s) => acc.concat(s.values), [] as number[]),
   );
-
-  const categoryBlockWidth = numSeries * BAR_WIDTH + (numSeries - 1) * BAR_GAP;
+  const groupId = randomId();
 
   const elements: NonDeletedExcalidrawElement[] = [];
 
-  for (let s = 0; s < numSeries; s++) {
-    const series = spreadsheet.series[s];
+  for (let s = 0; s < spreadsheet.series.length; s++) {
     const seriesColor = bgColors[s % bgColors.length];
 
     let index = 0;
-    const points: [number, number][] = [];
-    for (let cat = 0; cat < categories; cat++) {
-      const value = series.values[cat];
-      const cx = cat * categoryBlockWidth + s * (BAR_WIDTH + BAR_GAP);
+    const points = [];
+    for (const value of spreadsheet.series[s].values) {
+      const cx = index * (BAR_WIDTH + BAR_GAP);
       const cy = -(value / max) * BAR_HEIGHT;
       points.push([cx, cy]);
       index++;
@@ -520,51 +512,54 @@ const chartTypeLine = (
 
     elements.push(line);
 
-    // dotted vertical grid lines per point
-    for (let i = 0; i < points.length; i++) {
-      const cx = points[i][0] + BAR_GAP / 2 + BAR_WIDTH / 2;
-      const value = series.values[i];
-      const cy = (value / max) * BAR_HEIGHT + BAR_GAP / 2 + BAR_GAP;
-      elements.push(
-        newLinearElement({
+    const dots = points.map(([px, py]) => {
+      const cx = px + BAR_GAP / 2;
+      const cy = py + BAR_GAP / 2;
+      return newElement({
+        backgroundColor: seriesColor,
+        groupIds: [groupId],
+        ...commonProps,
+        fillStyle: "solid",
+        strokeWidth: 2,
+        type: "ellipse",
+        x: x + cx + BAR_WIDTH / 2,
+        y: y + cy - BAR_GAP * 2,
+        width: BAR_GAP,
+        height: BAR_GAP,
+      });
+    });
+
+    elements.push(...dots);
+
+    const lines = points.map(([px, py]) => {
+      const cx = px + BAR_GAP / 2;
+      const cy = -py + BAR_GAP / 2 + BAR_GAP;
+      return newLinearElement({
           backgroundColor: seriesColor,
           groupIds: [groupId],
           ...commonProps,
           type: "line",
-          x: x + cx + BAR_GAP / 2,
+          x: x + cx + BAR_WIDTH / 2 + BAR_GAP / 2,
           y: y - cy,
           height: cy,
           strokeStyle: "dotted",
           opacity: GRID_OPACITY,
           points: [pointFrom(0, 0), pointFrom(0, cy)],
-        }),
-      );
-    }
+        });
+    });
 
-    // dots
-    for (let i = 0; i < points.length; i++) {
-      const cx = points[i][0] + BAR_GAP / 2 + BAR_WIDTH / 2;
-      const value = series.values[i];
-      const cy = -(value / max) * BAR_HEIGHT + BAR_GAP / 2;
-      elements.push(
-        newElement({
-          backgroundColor: seriesColor,
-          groupIds: [groupId],
-          ...commonProps,
-          fillStyle: "solid",
-          strokeWidth: 2,
-          type: "ellipse",
-          x: x + cx + BAR_WIDTH / 2,
-          y: y + cy - BAR_GAP * 2,
-          width: BAR_GAP,
-          height: BAR_GAP,
-        }),
-      );
-    }
+    elements.push(...lines);
   }
 
   return [
-    ...chartBaseElements(spreadsheet, x, y, groupId, bgColors[0], isDevEnv()),
+    ...chartBaseElements(
+      spreadsheet,
+      x,
+      y,
+      groupId,
+      bgColors[0],
+      isDevEnv(),
+    ),
     ...elements,
   ];
 };
