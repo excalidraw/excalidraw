@@ -397,9 +397,11 @@ export class LinearElementEditor {
   ): Pick<AppState, "suggestedBinding" | "selectedLinearElement"> | null {
     const elementsMap = app.scene.getNonDeletedElementsMap();
     const elements = app.scene.getNonDeletedElements();
-    const { elbowed, elementId, initialState, selectedPointsIndices } =
-      linearElementEditor;
-    const { lastClickedPoint } = initialState;
+    const { elbowed, elementId, initialState } = linearElementEditor;
+    const selectedPointsIndices = Array.from(
+      linearElementEditor.selectedPointsIndices ?? [],
+    );
+    let { lastClickedPoint } = initialState;
     const element = LinearElementEditor.getElement(elementId, elementsMap);
 
     invariant(element, "Element being dragged must exist in the scene");
@@ -411,6 +413,18 @@ export class LinearElementEditor {
       "There must be selected points in order to drag them",
     );
 
+    if (elbowed) {
+      selectedPointsIndices.some((pointIdx, idx) => {
+        if (pointIdx > 0 && pointIdx !== element.points.length - 1) {
+          selectedPointsIndices[idx] = element.points.length - 1;
+          lastClickedPoint = element.points.length - 1;
+          return true;
+        }
+
+        return false;
+      });
+    }
+
     invariant(
       lastClickedPoint > -1 &&
         selectedPointsIndices.includes(lastClickedPoint) &&
@@ -420,16 +434,6 @@ export class LinearElementEditor {
       )}) points(0..${
         element.points.length - 1
       }) lastClickedPoint(${lastClickedPoint})`,
-    );
-
-    invariant(
-      !elbowed ||
-        selectedPointsIndices?.filter(
-          (idx) => idx !== 0 && idx !== element.points.length - 1,
-        ).length === 0,
-      `Only start and end points can be selected for elbow arrows: ${JSON.stringify(
-        selectedPointsIndices,
-      )} end point ${element.points.length - 1}`,
     );
 
     // point that's being dragged (out of all selected points)
