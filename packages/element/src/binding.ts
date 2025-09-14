@@ -1270,7 +1270,10 @@ export const updateBoundPoint = (
     otherBindableElement && getElementBounds(otherBindableElement, elementsMap);
   const isLargerThanOther =
     otherBindableElement &&
-    compareElementArea(bindableElement, otherBindableElement) < 0;
+    compareElementArea(bindableElement, otherBindableElement) <
+      // if both shapes the same size, pretend the other is larger
+      (startOrEnd === "endBinding" ? 1 : 0);
+
   const isIntersecting = otherBounds && doBoundsIntersect(bounds, otherBounds);
   // const isNested =
   //   otherBindableElement && isBindableElementInsideOtherBindable(otherBindableElement, bindableElement);
