@@ -1,4 +1,5 @@
 import {
+  clamp,
   pointDistance,
   pointFrom,
   pointsEqual,
@@ -244,10 +245,9 @@ const renderBindingHighlightForBindableElement = (
         element.y + appState.scrollY - offset,
       );
 
-      context.lineWidth = Math.max(
-        2 / appState.zoom.value,
-        element.strokeWidth * 0.5,
-      );
+      context.lineWidth =
+        clamp(2.5, element.strokeWidth * 1.75, 4) /
+        Math.max(0.25, appState.zoom.value);
       context.strokeStyle =
         appState.theme === THEME.DARK ? "#035da1" : "#6abdfc";
 
