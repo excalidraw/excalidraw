@@ -23,7 +23,7 @@ import {
   reduceToCommonValue,
 } from "@excalidraw/common";
 
-import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
+import { canBecomePolygon, getNonDeletedElements, isUsingCustiomizedRadius } from "@excalidraw/element";
 
 import {
   bindLinearElement,
@@ -1397,7 +1397,10 @@ export const actionChangeRoundness = register({
                     ? ROUNDNESS.ADAPTIVE_RADIUS
                     : ROUNDNESS.PROPORTIONAL_RADIUS,
                 }
-              : null,
+              : value === "custom" ? 
+              {
+                type: ROUNDNESS.CUSTOMIZED
+              } : null
         });
       }),
       appState: {
@@ -1436,7 +1439,7 @@ export const actionChangeRoundness = register({
               },
               {
                 value: "custom",
-                text: t("labels.round"),
+                text: t("labels.custom"),
                 icon: CustomRoundIcon,
               },
             ]}
@@ -1460,7 +1463,8 @@ export const actionChangeRoundness = register({
             onChange={
               (value) => {
                 updateData(value)
-                console.log(value)
+                console.log(1) 
+                // return;
               }
 
             }
@@ -1484,14 +1488,10 @@ export const actionCustomizeRoundness = register({
           return el;
         }
 
+        //Todo: Kode untuk perform aksi gambarnya
         return newElementWith(el, {
           roundness:{
               type: ROUNDNESS.CUSTOMIZED,
-              // topLeft: value.topLeft,
-              // topRight: value.topRight,
-              // bottomLeft: value.bottomLeft,
-              // bottomRight: value.bottomRight,
-
             }
           ,
         });
@@ -1514,15 +1514,18 @@ export const actionCustomizeRoundness = register({
     );
 
     return (
+    // Todo: Bikin fieldsetnya, dan masing - masing valuenya (setiap onChange di input ,harus bisa regenerate)
       <fieldset>
-        <legend>{t("labels")}</legend>
+        <legend>{t("labels.custom")}</legend>
         <div className="corner-inputs">
           <input 
             type="number"
-            placeholder="TL"
-
-          >
-          </input>
+            placeholder={t("labels.topLeft")}
+            onChange={(e)=>{
+              console.log(e)
+            }}
+         
+          />
         </div>
       </fieldset>
     );

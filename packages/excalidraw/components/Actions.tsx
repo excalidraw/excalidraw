@@ -186,12 +186,11 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeRoundness")}</>
       )}
 
-      {/* Tambahin yang custom roundness */}
-
-      {(canCustomizeRoundness(appState.activeTool.type)) || 
-        targetElements.some((element)=> canCustomizeRoundness(element.type) && (
-          <>{renderAction("customizeRoundness")}</>
-        ))}
+      {/* Tambahin yang roudness customization */}
+      {(canCustomizeRoundness(appState.activeTool.type) ||
+        targetElements.some((element) => canCustomizeRoundness(element.type))) && (
+        <>{renderAction("customizeRoundness")}</>
+      )}
 
       {(toolIsArrow(appState.activeTool.type) ||
         targetElements.some((element) => toolIsArrow(element.type))) && (

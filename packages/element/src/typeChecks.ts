@@ -317,6 +317,9 @@ export const isUsingAdaptiveRadius = (type: string) =>
 export const isUsingProportionalRadius = (type: string) =>
   type === "line" || type === "arrow" || type === "diamond";
 
+// Satu dulu aja
+export const isUsingCustiomizedRadius = (type:string) => type === "rectangle"; 
+
 export const canApplyRoundnessTypeToElement = (
   roundnessType: RoundnessType,
   element: ExcalidrawElement,
@@ -333,6 +336,11 @@ export const canApplyRoundnessTypeToElement = (
   if (
     roundnessType === ROUNDNESS.PROPORTIONAL_RADIUS &&
     isUsingProportionalRadius(element.type)
+  ) {
+    return true;
+  }
+  if (
+    roundnessType === ROUNDNESS.CUSTOMIZED && isUsingCustiomizedRadius(element.type) 
   ) {
     return true;
   }
