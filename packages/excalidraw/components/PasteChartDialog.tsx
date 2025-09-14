@@ -33,7 +33,13 @@ const ChartPreviewBtn = (props: {
     if (!props.spreadsheet) {
       return;
     }
-    const elements = renderSpreadsheet(props.chartType, props.spreadsheet, 0, 0);
+
+    const elements = renderSpreadsheet(
+      props.chartType,
+      props.spreadsheet,
+      0,
+      0,
+    );
     setChartElements(elements);
     let svg: SVGSVGElement;
     const previewNode = previewRef.current!;
@@ -118,13 +124,13 @@ export const PasteChartDialog = ({
       <div className={"container"}>
         <ChartPreviewBtn
           chartType="bar"
-            spreadsheet={appState.pasteDialog.data}
+          spreadsheet={appState.pasteDialog.data}
           selected={appState.currentChartType === "bar"}
           onClick={handleChartClick}
         />
         <ChartPreviewBtn
           chartType="line"
-            spreadsheet={appState.pasteDialog.data}
+          spreadsheet={appState.pasteDialog.data}
           selected={appState.currentChartType === "line"}
           onClick={handleChartClick}
         />
