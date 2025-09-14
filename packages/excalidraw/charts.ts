@@ -248,14 +248,11 @@ const commonProps = {
   locked: false,
 } as const;
 
-const getChartDimensions = (spreadsheet: Spreadsheet) => {
-  // number of categories (labels) is either labels.length or values.length
-  const categories = (spreadsheet.labels ?? spreadsheet.series[0].values).length;
-  // For grouped bars we keep BAR_WIDTH per series and use half BAR_GAP between series
-  // within a category and BAR_GAP between categories as before.
-  const numSeries = spreadsheet.series.length;
+const getChartDimensions = (spreadsheet: Spreadsheet, stacked = false) => {
+  const numCategories = (spreadsheet.labels ?? spreadsheet.series[0].values).length;
+  const numSeries = stacked ? 1 : spreadsheet.series.length;
   const categoryBlockWidth = numSeries * (BAR_WIDTH + BAR_GAP);
-  const chartWidth = categoryBlockWidth * categories + BAR_GAP;
+  const chartWidth = categoryBlockWidth * numCategories + BAR_GAP;
   const chartHeight = BAR_HEIGHT + BAR_GAP * 2;
   return { chartWidth, chartHeight };
 };
@@ -266,10 +263,11 @@ const chartXLabels = (
   y: number,
   groupId: string,
   backgroundColor: string,
+  stacked = false,
 ): ChartElements => {
   const categories = spreadsheet.labels ?? spreadsheet.series[0].values.map((_: number, i: number) => String(i + 1));
 
-  const numSeries = spreadsheet.series.length;
+  const numSeries = stacked ? 1 : spreadsheet.series.length;
   const categoryBlockWidth = numSeries * (BAR_WIDTH + BAR_GAP);
 
   return (
@@ -333,8 +331,9 @@ const chartLines = (
   y: number,
   groupId: string,
   backgroundColor: string,
+  stacked = false,
 ): ChartElements => {
-  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet);
+  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet, stacked);
   const xLine = newLinearElement({
     backgroundColor,
     groupIds: [groupId],
@@ -381,8 +380,9 @@ const chartBaseElements = (
   groupId: string,
   backgroundColor: string,
   debug?: boolean,
+  stacked = false,
 ): ChartElements => {
-  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet);
+  const { chartWidth, chartHeight } = getChartDimensions(spreadsheet, stacked);
 
   const title = spreadsheet.title
     ? newTextElement({
@@ -416,9 +416,9 @@ const chartBaseElements = (
   return [
     ...(debugRect ? [debugRect] : []),
     ...(title ? [title] : []),
-    ...chartXLabels(spreadsheet, x, y, groupId, backgroundColor),
+    ...chartXLabels(spreadsheet, x, y, groupId, backgroundColor, stacked),
     ...chartYLabels(spreadsheet, x, y, groupId, backgroundColor),
-    ...chartLines(spreadsheet, x, y, groupId, backgroundColor),
+    ...chartLines(spreadsheet, x, y, groupId, backgroundColor, stacked),
   ];
 };
 
@@ -461,6 +461,7 @@ const chartTypeBar = (
       groupId,
       bgColors[0],
       isDevEnv(),
+      false,
     ),
   ];
 };
@@ -556,6 +557,7 @@ const chartTypeLine = (
       groupId,
       bgColors[0],
       isDevEnv(),
+      true,
     ),
     ...elements,
   ];
