@@ -196,6 +196,8 @@ const renderBindingHighlightForBindableElement = (
   appState: InteractiveCanvasAppState,
   renderConfig: InteractiveCanvasRenderConfig,
 ) => {
+  const offset = element.strokeWidth / 2;
+
   switch (element.type) {
     case "magicframe":
     case "frame":
@@ -238,8 +240,8 @@ const renderBindingHighlightForBindableElement = (
       context.translate(-cx, -cy);
 
       context.translate(
-        element.x + appState.scrollX,
-        element.y + appState.scrollY,
+        element.x + appState.scrollX - offset,
+        element.y + appState.scrollY - offset,
       );
 
       context.lineWidth = Math.max(
@@ -253,10 +255,10 @@ const renderBindingHighlightForBindableElement = (
         case "ellipse":
           context.beginPath();
           context.ellipse(
-            element.width / 2,
-            element.height / 2,
-            element.width / 2,
-            element.height / 2,
+            (element.width + offset * 2) / 2,
+            (element.height + offset * 2) / 2,
+            (element.width + offset * 2) / 2,
+            (element.height + offset * 2) / 2,
             0,
             0,
             2 * Math.PI,
@@ -266,18 +268,21 @@ const renderBindingHighlightForBindableElement = (
           break;
         case "diamond":
           {
-            const [segments, curves] = deconstructDiamondElement(element);
+            const [segments, curves] = deconstructDiamondElement(
+              element,
+              offset,
+            );
 
             // Draw each line segment individually
             segments.forEach((segment) => {
               context.beginPath();
               context.moveTo(
-                segment[0][0] - element.x,
-                segment[0][1] - element.y,
+                segment[0][0] - element.x + offset,
+                segment[0][1] - element.y + offset,
               );
               context.lineTo(
-                segment[1][0] - element.x,
-                segment[1][1] - element.y,
+                segment[1][0] - element.x + offset,
+                segment[1][1] - element.y + offset,
               );
               context.stroke();
             });
@@ -286,14 +291,17 @@ const renderBindingHighlightForBindableElement = (
             curves.forEach((curve) => {
               const [start, control1, control2, end] = curve;
               context.beginPath();
-              context.moveTo(start[0] - element.x, start[1] - element.y);
+              context.moveTo(
+                start[0] - element.x + offset,
+                start[1] - element.y + offset,
+              );
               context.bezierCurveTo(
-                control1[0] - element.x,
-                control1[1] - element.y,
-                control2[0] - element.x,
-                control2[1] - element.y,
-                end[0] - element.x,
-                end[1] - element.y,
+                control1[0] - element.x + offset,
+                control1[1] - element.y + offset,
+                control2[0] - element.x + offset,
+                control2[1] - element.y + offset,
+                end[0] - element.x + offset,
+                end[1] - element.y + offset,
               );
               context.stroke();
             });
@@ -302,18 +310,21 @@ const renderBindingHighlightForBindableElement = (
           break;
         default:
           {
-            const [segments, curves] = deconstructRectanguloidElement(element);
+            const [segments, curves] = deconstructRectanguloidElement(
+              element,
+              offset,
+            );
 
             // Draw each line segment individually
             segments.forEach((segment) => {
               context.beginPath();
               context.moveTo(
-                segment[0][0] - element.x,
-                segment[0][1] - element.y,
+                segment[0][0] - element.x + offset,
+                segment[0][1] - element.y + offset,
               );
               context.lineTo(
-                segment[1][0] - element.x,
-                segment[1][1] - element.y,
+                segment[1][0] - element.x + offset,
+                segment[1][1] - element.y + offset,
               );
               context.stroke();
             });
@@ -322,14 +333,17 @@ const renderBindingHighlightForBindableElement = (
             curves.forEach((curve) => {
               const [start, control1, control2, end] = curve;
               context.beginPath();
-              context.moveTo(start[0] - element.x, start[1] - element.y);
+              context.moveTo(
+                start[0] - element.x + offset,
+                start[1] - element.y + offset,
+              );
               context.bezierCurveTo(
-                control1[0] - element.x,
-                control1[1] - element.y,
-                control2[0] - element.x,
-                control2[1] - element.y,
-                end[0] - element.x,
-                end[1] - element.y,
+                control1[0] - element.x + offset,
+                control1[1] - element.y + offset,
+                control2[0] - element.x + offset,
+                control2[1] - element.y + offset,
+                end[0] - element.x + offset,
+                end[1] - element.y + offset,
               );
               context.stroke();
             });
