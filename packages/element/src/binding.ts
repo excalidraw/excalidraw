@@ -1273,10 +1273,18 @@ export const updateBoundPoint = (
     compareElementArea(bindableElement, otherBindableElement) <
       // if both shapes the same size, pretend the other is larger
       (startOrEnd === "endBinding" ? 1 : 0);
-
-  const isIntersecting = otherBounds && doBoundsIntersect(bounds, otherBounds);
-  // const isNested =
-  //   otherBindableElement && isBindableElementInsideOtherBindable(otherBindableElement, bindableElement);
+  const boundsPadding = 30; // Effectively the "minimum arrow size" in this case
+  const isIntersecting =
+    otherBounds &&
+    doBoundsIntersect(
+      [
+        bounds[0] - boundsPadding,
+        bounds[1] - boundsPadding,
+        bounds[2] + boundsPadding,
+        bounds[3] + boundsPadding,
+      ],
+      otherBounds,
+    );
   const isNested = isIntersecting && isLargerThanOther;
 
   const maybeOutlineGlobal =
