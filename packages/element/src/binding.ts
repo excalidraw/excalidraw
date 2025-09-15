@@ -312,7 +312,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
           start: isMultiPoint
             ? { mode: undefined }
             : {
-                mode: "inside",
+                mode: otherElement.id !== hit.id ? "orbit" : "inside",
                 element: otherElement,
                 focusPoint: origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y),
               },
