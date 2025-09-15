@@ -19,7 +19,7 @@ import {
   lineSegmentsDistance,
   pointFrom,
   polygon,
-  polygonIncludesPoint,
+  polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
 import { getElementsInGroup } from "@excalidraw/element";
@@ -260,7 +260,7 @@ const eraserTest = (
     // PERF: Check only one point of the eraser segment. If the eraser segment
     // start is inside the closed freedraw shape, the other point is either also
     // inside or the eraser segment will intersect the shape outline anyway
-    if (polygonIncludesPoint(pathSegment[0], poly)) {
+    if (polygonIncludesPointNonZero(pathSegment[0], poly)) {
       return true;
     }
 
