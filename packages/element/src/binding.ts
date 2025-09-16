@@ -1237,12 +1237,54 @@ export const updateBoundPoint = (
     compareElementArea(bindableElement, otherBindableElement) <
       // if both shapes the same size, pretend the other is larger
       (startOrEnd === "endBinding" ? 1 : 0);
+  const isOverlapping = otherBounds && doBoundsIntersect(bounds, otherBounds);
 
-  // TODO: 1. Focus point -> focus point segment (fallback to arrow endpoint if not bound)
-  // 2. Check the intersection points for both elements
-  // 3. Measure distance between intersection points
-  const isIntersecting = otherBounds && doBoundsIntersect(bounds, otherBounds);
-  const isNested = isIntersecting && isLargerThanOther;
+  // GOAL: If the arrow becomes too short, we want to jump the arrow endpoints
+  // to the exact focus points on the elements.
+  // INTUITION: We're not interested in the exacts length of the arrow (which
+  // will change if we change where we route it), we want to know the length of
+  // the part which lies outside of both shapes and consider that as a trigger
+  // to change where we point the arrow. Avoids jumping the arrow in and out
+  // at every frame.
+  let arrowTooShort = false;
+  if (
+    !isOverlapping &&
+    arrow.startBinding &&
+    arrow.endBinding &&
+    otherBindableElement
+  ) {
+    const startFocusPoint = getGlobalFixedPointForBindableElement(
+      arrow.startBinding.fixedPoint,
+      startOrEnd === "startBinding" ? bindableElement : otherBindableElement,
+      elementsMap,
+    );
+    const endFocusPoint = getGlobalFixedPointForBindableElement(
+      arrow.endBinding.fixedPoint,
+      startOrEnd === "endBinding" ? bindableElement : otherBindableElement,
+      elementsMap,
+    );
+    const segment = lineSegment(startFocusPoint, endFocusPoint);
+    const startIntersection = intersectElementWithLineSegment(
+      startOrEnd === "endBinding" ? bindableElement : otherBindableElement,
+      elementsMap,
+      segment,
+      0,
+      true,
+    );
+    const endIntersection = intersectElementWithLineSegment(
+      startOrEnd === "startBinding" ? bindableElement : otherBindableElement,
+      elementsMap,
+      segment,
+      0,
+      true,
+    );
+    if (startIntersection.length > 0 && endIntersection.length > 0) {
+      const len = pointDistance(startIntersection[0], endIntersection[0]);
+      arrowTooShort = len < 40;
+    }
+  }
+
+  const isNested = (arrowTooShort || isOverlapping) && isLargerThanOther;
 
   const maybeOutlineGlobal =
     binding.mode === "orbit" && bindableElement
