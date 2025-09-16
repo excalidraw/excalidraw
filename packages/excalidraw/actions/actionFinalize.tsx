@@ -134,6 +134,8 @@ export const actionFinalize = register<FormData>({
           });
         }
 
+        const activeToolLocked = appState.activeTool?.locked;
+        console.log("finalize - activeToolLocked:", activeToolLocked);
         return {
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
@@ -147,15 +149,17 @@ export const actionFinalize = register<FormData>({
           appState: {
             ...appState,
             cursorButton: "up",
-            selectedLinearElement: {
-              ...linearElementEditor,
-              selectedPointsIndices: null,
-              isEditing: false,
-              initialState: {
-                ...linearElementEditor.initialState,
-                lastClickedPoint: -1,
-              },
-            },
+            selectedLinearElement: activeToolLocked
+              ? null
+              : {
+                  ...linearElementEditor,
+                  selectedPointsIndices: null,
+                  isEditing: false,
+                  initialState: {
+                    ...linearElementEditor.initialState,
+                    lastClickedPoint: -1,
+                  },
+                },
             selectionElement: null,
             suggestedBinding: null,
             newElement: null,

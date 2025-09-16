@@ -3194,14 +3194,14 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ editingTextElement: null });
     }
 
-    if (
-      this.state.selectedLinearElement &&
-      !this.state.selectedElementIds[this.state.selectedLinearElement.elementId]
-    ) {
-      // To make sure `selectedLinearElement` is in sync with `selectedElementIds`, however this shouldn't be needed once
-      // we have a single API to update `selectedElementIds`
-      this.setState({ selectedLinearElement: null });
-    }
+    // if (
+    //   this.state.selectedLinearElement &&
+    //   !this.state.selectedElementIds[this.state.selectedLinearElement.elementId]
+    // ) {
+    //   // To make sure `selectedLinearElement` is in sync with `selectedElementIds`, however this shouldn't be needed once
+    //   // we have a single API to update `selectedElementIds`
+    //   this.setState({ selectedLinearElement: null });
+    // }
 
     this.store.commit(elementsMap, this.state);
 
