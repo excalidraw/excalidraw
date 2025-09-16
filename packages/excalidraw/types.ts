@@ -747,6 +747,8 @@ export type AppClassProperties = {
   updateEditorAtom: App["updateEditorAtom"];
 
   defaultSelectionTool: "selection" | "lasso";
+
+  bindModeHandler: App["bindModeHandler"];
 };
 
 export type PointerDownState = Readonly<{

@@ -135,7 +135,7 @@ export const actionFinalize = register<FormData>({
         }
 
         const activeToolLocked = appState.activeTool?.locked;
-        console.log("finalize - activeToolLocked:", activeToolLocked);
+
         return {
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
