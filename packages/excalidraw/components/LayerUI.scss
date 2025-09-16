@@ -24,6 +24,10 @@
       gap: 0.75rem;
       pointer-events: none !important;
 
+      &--compact {
+        gap: 0.5rem;
+      }
+
       & > * {
         pointer-events: var(--ui-pointerEvents);
       }
