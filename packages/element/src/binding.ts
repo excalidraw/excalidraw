@@ -340,11 +340,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
         element: otherElement,
         focusPoint: otherIsInsideBinding
           ? origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y)
-          : snapToCenter(
-              otherElement,
-              elementsMap,
-              origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y),
-            ),
+          : origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y),
       };
 
       // We are hovering another element with the end point
@@ -358,10 +354,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
         current = {
           mode: isInsideBinding && !isNested ? "inside" : "orbit",
           element: hit,
-          focusPoint:
-            isInsideBinding || isNested
-              ? point
-              : snapToCenter(hit, elementsMap, point),
+          focusPoint: isInsideBinding || isNested ? point : point,
         };
       } else {
         current = { mode: null };
@@ -481,7 +474,7 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
         current = {
           element: hit,
           mode: "orbit",
-          focusPoint: isNested ? point : snapToCenter(hit, elementsMap, point),
+          focusPoint: isNested ? point : point,
         };
       }
 
@@ -1088,35 +1081,6 @@ export const avoidRectangularCorner = (
   }
 
   return p;
-};
-
-export const snapToCenter = (
-  element: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-  p: GlobalPoint,
-): GlobalPoint => {
-  const percent = 0.5;
-
-  const center = elementCenterPoint(element, elementsMap);
-
-  return pointDistance(center, p) <
-    (Math.min(element.width, element.height) / 2) * percent
-    ? center
-    : p;
-
-  // const isPointDeepInside = isPointInElement(
-  //   p,
-  //   {
-  //     ...element,
-  //     x: element.x + (element.width * (1 - percent)) / 2,
-  //     y: element.y + (element.height * (1 - percent)) / 2,
-  //     width: element.width * percent,
-  //     height: element.height * percent,
-  //   },
-  //   elementsMap,
-  // );
-
-  // return isPointDeepInside ? elementCenterPoint(element, elementsMap) : p;
 };
 
 const snapToMid = (

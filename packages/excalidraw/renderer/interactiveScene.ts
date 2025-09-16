@@ -1,6 +1,5 @@
 import {
   clamp,
-  pointDistance,
   pointFrom,
   pointsEqual,
   type GlobalPoint,
@@ -16,7 +15,6 @@ import {
   invariant,
   THEME,
   throttleRAF,
-  viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
 import {
@@ -356,47 +354,6 @@ const renderBindingHighlightForBindableElement = (
 
       break;
   }
-
-  const { x: cursorX, y: cursorY } = viewportCoordsToSceneCoords(
-    {
-      clientX: renderConfig.lastViewportPosition.x,
-      clientY: renderConfig.lastViewportPosition.y,
-    },
-    appState,
-  );
-
-  // Draw center snap area
-  context.save();
-  context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
-  context.strokeStyle = "rgba(0, 0, 0, 0.2)";
-  context.lineWidth = 1 / appState.zoom.value;
-  context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
-  context.lineDashOffset = 0;
-
-  const radius = 0.5 * (Math.min(element.width, element.height) / 2);
-  const centerX = element.x + element.width / 2;
-  const centerY = element.y + element.height / 2;
-
-  const isInsideEllipse =
-    pointDistance(pointFrom(cursorX, cursorY), pointFrom(centerX, centerY)) <=
-    radius;
-
-  context.fillStyle = isInsideEllipse ? "rgba(0, 0, 0, 0.04)" : "transparent";
-
-  context.beginPath();
-  context.ellipse(
-    element.width / 2,
-    element.height / 2,
-    radius,
-    radius,
-    0,
-    0,
-    2 * Math.PI,
-  );
-  context.stroke();
-  context.fill();
-
-  context.restore();
 };
 
 type ElementSelectionBorder = {
