@@ -1030,9 +1030,8 @@ class App extends React.Component<AppProps, AppState> {
 
         // Once the start is set to inside binding, it remains so
         const arrowStartIsInside =
-          !this.state.newElement &&
-          (this.state.selectedLinearElement.initialState.arrowStartIsInside ||
-            arrow.startBinding?.elementId === hoveredElement.id);
+          this.state.selectedLinearElement.initialState.arrowStartIsInside ||
+          arrow.startBinding?.elementId === hoveredElement.id;
 
         // Change the global binding mode
         flushSync(() => {
@@ -1100,10 +1099,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.previousHoveredBindableElement = null;
-    } else if (
-      !this.bindModeHandler &&
-      (!this.state.newElement || !arrow.startBinding)
-    ) {
+    } else if (!this.bindModeHandler) {
       // We are hovering a bindable element
       this.bindModeHandler = setTimeout(effector, BIND_MODE_TIMEOUT);
     }
