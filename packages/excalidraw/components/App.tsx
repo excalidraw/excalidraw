@@ -100,7 +100,7 @@ import {
   MINIMUM_ARROW_SIZE,
   DOUBLE_TAP_POSITION_THRESHOLD,
   isMobileOrTablet,
-  MQ_MAX_WIDTH_MOBILE,
+  MQ_MAX_MOBILE,
   MQ_MIN_TABLET,
   MQ_MAX_TABLET,
 } from "@excalidraw/common";
@@ -2422,7 +2422,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private isMobileBreakpoint = (width: number, height: number) => {
     const minSide = Math.min(width, height);
-    return minSide <= MQ_MAX_WIDTH_MOBILE;
+    return minSide <= MQ_MAX_MOBILE;
   };
 
   private isTabletBreakpoint = (editorWidth: number, editorHeight: number) => {
