@@ -1894,6 +1894,28 @@ export const laserPointerToolIcon = createIcon(
   20,
 );
 
+export const annotationToolIcon = createIcon(
+  <g
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.25"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    {/* Marker/pen body */}
+    <path d="M3 17l6-6 4 4-6 6H3v-4z" />
+    {/* Marker tip */}
+    <path d="M9 11l4 4" />
+    {/* Cap */}
+    <circle cx="15" cy="7" r="2" />
+    {/* Glowing effect dots */}
+    <circle cx="6" cy="18" r="0.5" fill="currentColor" opacity="0.6" />
+    <circle cx="8" cy="16" r="0.3" fill="currentColor" opacity="0.4" />
+    <circle cx="10" cy="14" r="0.3" fill="currentColor" opacity="0.4" />
+  </g>,
+  20,
+);
+
 export const MagicIcon = createIcon(
   <g stroke="currentColor" fill="none">
     <path stroke="none" d="M0 0h24v24H0z" />
