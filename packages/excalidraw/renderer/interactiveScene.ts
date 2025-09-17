@@ -10,6 +10,7 @@ import oc from "open-color";
 
 import {
   arrayToMap,
+  BIND_MODE_TIMEOUT,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   invariant,
@@ -85,6 +86,8 @@ import {
   getNormalizedCanvasDimensions,
   strokeRectWithRotation,
 } from "./helpers";
+
+import { AnimationController } from "./animation";
 
 import type {
   InteractiveCanvasRenderConfig,
@@ -190,17 +193,21 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
 const renderBindingHighlightForBindableElement = (
   context: CanvasRenderingContext2D,
   element: ExcalidrawBindableElement,
-  elementsMap: RenderableElementsMap,
   allElementsMap: NonDeletedSceneElementsMap,
   appState: InteractiveCanvasAppState,
-  renderConfig: InteractiveCanvasRenderConfig,
+  deltaTime: number,
+  state?: { runtime: number },
 ) => {
+  const remainingTime = BIND_MODE_TIMEOUT - (state?.runtime ?? 0);
+  const opacity = clamp((1 / BIND_MODE_TIMEOUT) * remainingTime, 0.0001, 1);
   const offset = element.strokeWidth / 2;
 
   switch (element.type) {
     case "magicframe":
     case "frame":
       context.save();
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
       context.translate(
         element.x + appState.scrollX,
         element.y + appState.scrollY,
@@ -208,7 +215,9 @@ const renderBindingHighlightForBindableElement = (
 
       context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
       context.strokeStyle =
-        appState.theme === THEME.DARK ? "#035da1" : "#6abdfc";
+        appState.theme === THEME.DARK
+          ? `rgba(3, 93, 161, ${opacity})`
+          : `rgba(106, 189, 252, ${opacity})`;
 
       if (FRAME_STYLE.radius && context.roundRect) {
         context.beginPath();
@@ -234,6 +243,7 @@ const renderBindingHighlightForBindableElement = (
       const cx = center[0] + appState.scrollX;
       const cy = center[1] + appState.scrollY;
 
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
       context.translate(cx, cy);
       context.rotate(element.angle as Radians);
       context.translate(-cx, -cy);
@@ -247,7 +257,9 @@ const renderBindingHighlightForBindableElement = (
         clamp(2.5, element.strokeWidth * 1.75, 4) /
         Math.max(0.25, appState.zoom.value);
       context.strokeStyle =
-        appState.theme === THEME.DARK ? "#035da1" : "#6abdfc";
+        appState.theme === THEME.DARK
+          ? `rgba(3, 93, 161, ${0.5 + opacity / 2})`
+          : `rgba(106, 189, 252, ${0.5 + opacity / 2})`;
 
       switch (element.type) {
         case "ellipse":
@@ -354,6 +366,47 @@ const renderBindingHighlightForBindableElement = (
 
       break;
   }
+
+  // Draw center snap area
+  if ((state?.runtime ?? 0) < BIND_MODE_TIMEOUT) {
+    context.save();
+    context.translate(
+      element.x + appState.scrollX,
+      element.y + appState.scrollY,
+    );
+    context.strokeStyle = "rgba(0, 0, 0, 0.2)";
+    context.lineWidth = 1 / appState.zoom.value;
+    context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
+    context.lineDashOffset = 0;
+
+    const radius =
+      0.5 * (Math.min(element.width, element.height) / 2) * opacity;
+
+    context.fillStyle = "rgba(0, 0, 0, 0.04)";
+
+    context.beginPath();
+    context.ellipse(
+      element.width / 2,
+      element.height / 2,
+      radius,
+      radius,
+      0,
+      0,
+      2 * Math.PI,
+    );
+    context.stroke();
+    context.fill();
+
+    context.restore();
+  }
+
+  if ((state?.runtime ?? 0) > BIND_MODE_TIMEOUT) {
+    return null;
+  }
+
+  return {
+    runtime: (state?.runtime ?? 0) + deltaTime,
+  };
 };
 
 type ElementSelectionBorder = {
@@ -886,14 +939,25 @@ const _renderInteractiveScene = ({
   }
 
   if (appState.isBindingEnabled && appState.suggestedBinding) {
-    renderBindingHighlightForBindableElement(
-      context,
-      appState.suggestedBinding,
-      elementsMap,
-      allElementsMap,
-      appState,
-      renderConfig,
+    AnimationController.start<{ runtime: number }>(
+      "bindingHighlight",
+      ({ deltaTime, state }) => {
+        if (!appState.suggestedBinding) {
+          return null; // Stop the animation
+        }
+
+        return renderBindingHighlightForBindableElement(
+          context,
+          appState.suggestedBinding,
+          allElementsMap,
+          appState,
+          deltaTime,
+          state,
+        );
+      },
     );
+  } else {
+    AnimationController.cancel("bindingHighlight");
   }
 
   if (appState.frameToHighlight) {

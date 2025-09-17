@@ -1,14 +1,12 @@
 import React, { useEffect, useRef } from "react";
 
 import {
-  BIND_MODE_TIMEOUT,
   CURSOR_TYPE,
   isShallowEqual,
   sceneCoordsToViewportCoords,
 } from "@excalidraw/common";
 
 import type {
-  ExcalidrawBindableElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
@@ -80,54 +78,6 @@ type InteractiveCanvasProps = {
 
 const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   const isComponentMounted = useRef(false);
-
-  // START - Binding highlight timeout animation
-  const currentSuggestedBinding = useRef<ExcalidrawBindableElement | null>(
-    null,
-  );
-  const animationInterval = useRef<NodeJS.Timeout | null>(null);
-  const [animationFrameCount, triggerAnnimationRerender] = React.useState(0);
-
-  if (props.app.state.suggestedBinding === null && animationInterval.current) {
-    clearInterval(animationInterval.current);
-    animationInterval.current = null;
-    triggerAnnimationRerender(0);
-  }
-
-  if (currentSuggestedBinding.current !== props.appState.suggestedBinding) {
-    if (animationInterval.current !== null) {
-      currentSuggestedBinding.current = props.appState.suggestedBinding;
-      clearInterval(animationInterval.current);
-      animationInterval.current = null;
-      triggerAnnimationRerender(0);
-    }
-  }
-
-  if (
-    animationFrameCount > BIND_MODE_TIMEOUT / 10 &&
-    animationInterval.current
-  ) {
-    clearInterval(animationInterval.current);
-    animationInterval.current = null;
-    triggerAnnimationRerender(0);
-  } else if (
-    props.app.state.bindMode === "orbit" &&
-    props.app.bindModeHandler // Timeout is running
-  ) {
-    if (animationInterval.current === null) {
-      animationInterval.current = setInterval(() => {
-        triggerAnnimationRerender((count) => count + 1);
-      }, 1000 / 60 /* 60 FPS animation */);
-    }
-  } else {
-    // eslint-disable-next-line no-lonely-if
-    if (animationInterval.current) {
-      clearInterval(animationInterval.current);
-      animationInterval.current = null;
-      triggerAnnimationRerender(0);
-    }
-  }
-  // END - Binding highlight timeout animation
 
   useEffect(() => {
     if (!isComponentMounted.current) {
