@@ -7796,20 +7796,31 @@ class App extends React.Component<AppProps, AppState> {
         if (
           (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
-          !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+          !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
+          (!this.state.selectedLinearElement?.isEditing ||
+            (hitElement &&
+              hitElement?.id !== this.state.selectedLinearElement?.elementId))
         ) {
           this.clearSelection(hitElement);
         }
 
         if (this.state.selectedLinearElement?.isEditing) {
-          this.setState({
-            selectedElementIds: makeNextSelectedElementIds(
-              {
-                [this.state.selectedLinearElement.elementId]: true,
-              },
-              this.state,
-            ),
-          });
+          this.setState((prevState) => ({
+            selectedLinearElement: prevState.selectedLinearElement
+              ? {
+                  ...prevState.selectedLinearElement,
+                  isEditing: isBindingElement(hitElement),
+                }
+              : null,
+            selectedElementIds: prevState.selectedLinearElement
+              ? makeNextSelectedElementIds(
+                  {
+                    [prevState.selectedLinearElement.elementId]: true,
+                  },
+                  this.state,
+                )
+              : makeNextSelectedElementIds({}, prevState),
+          }));
           // If we click on something
         } else if (hitElement != null) {
           // == deep selection ==
@@ -10904,6 +10915,7 @@ class App extends React.Component<AppProps, AppState> {
       selectedElementIds: makeNextSelectedElementIds({}, this.state),
       activeEmbeddable: null,
       previousSelectedElementIds: this.state.selectedElementIds,
+      selectedLinearElement: null,
     });
   }
 
