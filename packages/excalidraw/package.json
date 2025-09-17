@@ -1,6 +1,6 @@
 {
-  "name": "@excalidraw/excalidraw",
-  "version": "0.18.0",
+  "name": "@dwelle/excalidraw",
+  "version": "0.5.0",
   "type": "module",
   "types": "./dist/types/excalidraw/index.d.ts",
   "main": "./dist/prod/index.js",
@@ -40,13 +40,7 @@
   },
   "description": "Excalidraw as a React component",
   "license": "MIT",
-  "keywords": [
-    "excalidraw",
-    "excalidraw-embed",
-    "react",
-    "npm",
-    "npm excalidraw"
-  ],
+  "keywords": [],
   "browserslist": {
     "production": [
       ">0.2%",

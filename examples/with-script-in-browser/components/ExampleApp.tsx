@@ -867,48 +867,8 @@ export default function ExampleApp({
           <div className="export export-blob">
             <img src={blobUrl} alt="" />
           </div>
-          <button
-            onClick={async () => {
-              if (!excalidrawAPI) {
-                return;
-              }
-              const canvas = await exportToCanvas({
-                elements: excalidrawAPI.getSceneElements(),
-                appState: {
-                  ...initialData.appState,
-                  exportWithDarkMode,
-                },
-                files: excalidrawAPI.getFiles(),
-              });
-              const ctx = canvas.getContext("2d")!;
-              ctx.font = "30px Excalifont";
-              ctx.strokeText("My custom text", 50, 60);
-              setCanvasUrl(canvas.toDataURL());
-            }}
-          >
-            Export to Canvas
-          </button>
-          <button
-            onClick={async () => {
-              if (!excalidrawAPI) {
-                return;
-              }
-              const canvas = await exportToCanvas({
-                elements: excalidrawAPI.getSceneElements(),
-                appState: {
-                  ...initialData.appState,
-                  exportWithDarkMode,
-                },
-                files: excalidrawAPI.getFiles(),
-              });
-              const ctx = canvas.getContext("2d")!;
-              ctx.font = "30px Excalifont";
-              ctx.strokeText("My custom text", 50, 60);
-              setCanvasUrl(canvas.toDataURL());
-            }}
-          >
-            Export to Canvas
-          </button>
+          <button>Export to Canvas</button>
+          <button>Export to Canvas</button>
           <button
             type="button"
             onClick={() => {

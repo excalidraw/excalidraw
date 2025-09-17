@@ -680,6 +680,28 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  .mobile-misc-tools-container-left {
+    position: fixed;
+    top: 5rem;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--sidebar-border-color);
+    border-top-right-radius: var(--border-radius-lg);
+    border-bottom-right-radius: var(--border-radius-lg);
+    border-left: 0;
+
+    background-color: var(--island-bg-color);
+
+    .ToolIcon__icon {
+      border-radius: 0;
+    }
+
+    .library-button {
+      border: 0;
+    }
+  }
+
   .App-toolbar--mobile {
     overflow: visible;
     max-width: 98vw;

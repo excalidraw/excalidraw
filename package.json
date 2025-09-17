@@ -49,6 +49,7 @@
   "homepage": ".",
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
+    "setup": "yarn && cd src/packages/excalidraw && yarn",
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "yarn --cwd ./excalidraw-app build:app:docker",
     "build:app": "yarn --cwd ./excalidraw-app build:app",
@@ -86,7 +87,10 @@
     "release:latest": "node scripts/release.js --tag=latest",
     "rm:build": "rimraf --glob excalidraw-app/build excalidraw-app/dist excalidraw-app/dev-dist packages/*/dist packages/*/build examples/*/build examples/*/dist",
     "rm:node_modules": "rimraf --glob node_modules excalidraw-app/node_modules packages/*/node_modules",
-    "clean-install": "yarn rm:node_modules && yarn install"
+    "clean-install": "yarn rm:node_modules && yarn install",
+    "autorelease-fork": "node scripts/autorelease-fork.js",
+    "pull": "git pull upstream master --rebase",
+    "publish": "yarn --frozen-lockfile && cd src/packages/excalidraw && yarn --frozen-lockfile && npm run build:umd && yarn publish"
   },
   "resolutions": {
     "strip-ansi": "6.0.1"

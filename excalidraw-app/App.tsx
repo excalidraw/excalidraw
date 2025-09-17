@@ -7,6 +7,9 @@ import {
   useEditorInterface,
   ExcalidrawAPIProvider,
   useExcalidrawAPI,
+  Sidebar,
+  Footer,
+  Button,
 } from "@excalidraw/excalidraw";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
@@ -843,6 +846,75 @@ const ExcalidrawWrapper = () => {
   //   // console.log("onExport");
   // };
 
+  const [activeToolType, setActiveToolType] = useState<string | null>(null);
+  const prevActiveTool = useRef<{
+    type: string;
+    locked?: boolean;
+    prevLockState?: boolean;
+  }>({ type: "selection", locked: false, prevLockState: false });
+
+  const toggleCommentTool = useCallback(() => {
+    const nextType =
+      excalidrawAPI?.getAppState().activeTool?.customType === "comment"
+        ? "selection"
+        : "comment";
+    excalidrawAPI?.setActiveTool(
+      nextType === "comment"
+        ? {
+            type: "custom",
+            customType: "comment",
+            locked: true,
+          }
+        : { type: "selection" },
+    );
+  }, [excalidrawAPI]);
+
+  useEffect(() => {
+    if (excalidrawAPI) {
+      const unsubOnChange = excalidrawAPI.onChange((_, appState) => {
+        const type = appState.activeTool.customType || appState.activeTool.type;
+        if (
+          prevActiveTool.current?.type === "comment" &&
+          type !== "comment" &&
+          !prevActiveTool.current?.prevLockState
+        ) {
+          excalidrawAPI.setActiveTool({
+            ...appState.activeTool,
+            locked: false,
+          });
+        }
+        setActiveToolType(type);
+        prevActiveTool.current = {
+          type,
+          locked: appState.activeTool.locked,
+          prevLockState:
+            prevActiveTool.current?.type !== "comment"
+              ? prevActiveTool.current?.locked
+              : prevActiveTool.current?.prevLockState,
+        };
+      });
+
+      // on C keypress
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (
+          event.code === "KeyC" &&
+          !event.ctrlKey &&
+          !event.metaKey &&
+          !event.altKey
+        ) {
+          toggleCommentTool();
+        }
+      };
+
+      window.addEventListener("keydown", onKeyDown);
+
+      return () => {
+        window.removeEventListener("keydown", onKeyDown);
+        unsubOnChange();
+      };
+    }
+  }, [excalidrawAPI, toggleCommentTool]);
+
   // browsers generally prevent infinite self-embedding, there are
   // cases where it still happens, and while we disallow self-embedding
   // by not whitelisting our own origin, this serves as an additional guard
@@ -1017,8 +1089,26 @@ const ExcalidrawWrapper = () => {
         </OverwriteConfirmDialog>
         <AppFooter onChange={() => excalidrawAPI?.refresh()} />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
-
         <TTDDialogTrigger />
+        <Sidebar name="custom">test</Sidebar>
+        <Footer>
+          <div
+            style={{
+              display: "flex",
+              gap: ".5rem",
+              alignItems: "center",
+              marginRight: "auto",
+            }}
+          >
+            <Sidebar.Trigger name="custom">sidebar</Sidebar.Trigger>
+            <Button
+              onSelect={toggleCommentTool}
+              className={clsx({ active: activeToolType === "comment" })}
+            >
+              💬
+            </Button>
+          </div>
+        </Footer>
         {isCollaborating && isOffline && (
           <div className="alertalert--warning">
             {t("alerts.collabOfflineWarning")}

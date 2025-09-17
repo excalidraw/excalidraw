@@ -525,7 +525,7 @@ const editorLifecycleEventBehavior = {
 
 export const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
-  id: string | null;
+  id?: string | null;
 }>({ container: null, id: null });
 ExcalidrawContainerContext.displayName = "ExcalidrawContainerContext";
 
@@ -2111,6 +2111,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.viewModeEnabled ||
             this.state.openDialog?.name === "elementLinkSelector",
           "excalidraw--mobile": this.editorInterface.formFactor === "phone",
+          "excalidraw--zen-mode": this.state.zenModeEnabled,
         })}
         style={{
           ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
@@ -2959,6 +2960,14 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.resetStore();
+
+    if (initialData?.scrollX != null) {
+      scene.appState.scrollX = initialData.scrollX;
+    }
+    if (initialData?.scrollY != null) {
+      scene.appState.scrollY = initialData.scrollY;
+    }
+
     this.resetHistory();
     this.syncActionResult({
       elements: restoredElements,
@@ -3195,6 +3204,30 @@ class App extends React.Component<AppProps, AppState> {
     this.editorLifecycleEvents.clear();
     ShapeCache.destroy();
     SnapCache.destroy();
+    clearRenderCache();
+
+    this.onChangeEmitter.destroy();
+
+    this.scene = new Scene();
+    this.history = new History();
+    this.actionManager = new ActionManager(
+      this.syncActionResult,
+      () => this.state,
+      () => this.scene.getElementsIncludingDeleted(),
+      this,
+    );
+    this.library = new Library(this);
+    // @ts-ignore
+    this.canvas = null;
+    this.interactiveCanvas = null;
+    // @ts-ignore
+    this.rc = null;
+
+    // @ts-ignore
+    this.excalidrawContainerRef.current = undefined;
+    this.nearestScrollableContainer = undefined;
+    this.excalidrawContainerValue = { container: null, id: "unmounted" };
+
     clearTimeout(touchTimeout);
     isSomeElementSelected.clearCache();
     selectGroupsForSelectedElements.clearCache();
@@ -3483,6 +3516,15 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ theme: this.props.theme });
     }
 
+    if (
+      !this.props.UIOptions.canvasActions &&
+      this.state.openMenu === "canvas"
+    ) {
+      this.setState({
+        openMenu: null,
+      });
+    }
+
     this.excalidrawContainerRef.current?.classList.toggle(
       "theme--dark",
       this.state.theme === THEME.DARK,
@@ -3515,7 +3557,7 @@ class App extends React.Component<AppProps, AppState> {
     // init, which would trigger onChange with empty elements, which would then
     // override whatever is in localStorage currently.
     if (!this.state.isLoading) {
-      this.props.onChange?.(elements, this.state, this.files);
+      this.props.onChange?.(elements, this.state, this.files, this.props.id);
       this.onChangeEmitter.trigger(elements, this.state, this.files);
     }
   }

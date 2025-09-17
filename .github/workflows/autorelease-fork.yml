@@ -1,11 +1,11 @@
-name: Auto release excalidraw next
+name: Auto release excalidraw latest
 on:
   push:
     branches:
-      - release
+      - master
 
 jobs:
-  Auto-release-excalidraw-next:
+  Auto-release-excalidraw-latest:
     runs-on: ubuntu-latest
 
     steps:
