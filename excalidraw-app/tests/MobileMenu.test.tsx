@@ -36,7 +36,7 @@ describe("Test MobileMenu", () => {
         },
         "isTouchScreen": false,
         "viewport": {
-          "isLandscape": false,
+          "isLandscape": true,
           "isMobile": true,
         },
       }
