@@ -1,13 +1,8 @@
-import {
-  IMAGE_INVERT_FILTER_HUE_ROTATE_AMOUNT,
-  IMAGE_INVERT_FILTER_INVERT_AMOUNT,
-  IMAGE_INVERT_FILTER_SATURATE_AMOUNT,
-} from "./renderElement";
-
 export function applyFiltersToImage(
   image: CanvasImageSource,
   imageWidth: number,
   imageHeight: number,
+  filter: string,
 ): CanvasImageSource {
   const cached = cache.get(image);
   if (cached) {
@@ -21,9 +16,7 @@ export function applyFiltersToImage(
   const ctx = canvas.getContext("2d")!;
   ctx.drawImage(image, 0, 0, imageWidth, imageHeight);
 
-  invert(ctx, IMAGE_INVERT_FILTER_INVERT_AMOUNT);
-  hueRotate(ctx, IMAGE_INVERT_FILTER_HUE_ROTATE_AMOUNT);
-  saturate(ctx, IMAGE_INVERT_FILTER_SATURATE_AMOUNT);
+  applyFilter(ctx, filter);
 
   cache.set(image, canvas);
   return canvas;
@@ -231,4 +224,50 @@ function normalizeAngle(angle: string): number {
   }
 
   return normalized;
+}
+
+/**
+ * Taken from @davidenke's context-filter-polyfill
+ * @see {@link https://github.com/davidenke/context-filter-polyfill/blob/e1a04c24b8f31a0608f5d05155d29544a6d6429a/src/utils/filter.utils.ts#L5}
+ */
+function parseFilterString(
+  filterString: string,
+): [filterName: string, filterValue: string][] {
+  // filters are separated by whitespace
+  const match = filterString.match(/([-a-z]+)(?:\(([\w\d\s.%-]*)\))?/gim);
+
+  if (!match) {
+    return [];
+  }
+
+  return (
+    match
+      // filters may have options within appended brackets
+      ?.map(
+        (filter) =>
+          filter.match(/([-a-z]+)(?:\((.*)\))?/i)?.slice(1, 3) as [
+            string,
+            string,
+          ],
+      )
+  );
+}
+
+function applyFilter(ctx: CanvasRenderingContext2D, filterString: string) {
+  const filters = parseFilterString(filterString);
+  for (const [filterName, filterValue] of filters) {
+    switch (filterName) {
+      case "invert":
+        invert(ctx, filterValue);
+        break;
+      case "hue-rotate":
+        hueRotate(ctx, filterValue);
+        break;
+      case "saturate":
+        saturate(ctx, filterValue);
+        break;
+      default:
+        break;
+    }
+  }
 }

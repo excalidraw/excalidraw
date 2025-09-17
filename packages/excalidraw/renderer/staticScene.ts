@@ -1,4 +1,10 @@
-import { FRAME_STYLE, THEME, throttleRAF } from "@excalidraw/common";
+import {
+  FRAME_STYLE,
+  isCanvasFilterSupported,
+  THEME,
+  THEME_FILTER,
+  throttleRAF,
+} from "@excalidraw/common";
 import { applyFiltersToImage, isElementLink } from "@excalidraw/element";
 import { createPlaceholderEmbeddableLabel } from "@excalidraw/element";
 import { getBoundTextElement } from "@excalidraw/element";
@@ -459,11 +465,16 @@ const _renderStaticScene = ({
     }
   });
 
-  if (isExporting && appState.theme === THEME.DARK) {
+  if (
+    isExporting &&
+    appState.theme === THEME.DARK &&
+    !isCanvasFilterSupported()
+  ) {
     const invertedCanvas = applyFiltersToImage(
       canvas,
       normalizedWidth,
       normalizedHeight,
+      THEME_FILTER,
     );
     context.drawImage(invertedCanvas, 0, 0, normalizedWidth, normalizedHeight);
   }
