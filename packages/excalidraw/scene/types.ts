@@ -89,6 +89,10 @@ export type StaticSceneRenderConfig = {
   renderConfig: StaticCanvasRenderConfig;
 };
 
+export type InteractiveSceneRenderAnimationState = {
+  bindingHighlight: { runtime: number } | undefined;
+};
+
 export type InteractiveSceneRenderConfig = {
   canvas: HTMLCanvasElement | null;
   elementsMap: RenderableElementsMap;
@@ -100,6 +104,8 @@ export type InteractiveSceneRenderConfig = {
   renderConfig: InteractiveCanvasRenderConfig;
   device: Device;
   callback: (data: RenderInteractiveSceneCallback) => void;
+  animationState?: InteractiveSceneRenderAnimationState;
+  deltaTime: number;
 };
 
 export type NewElementSceneRenderConfig = {

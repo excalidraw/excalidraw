@@ -87,8 +87,6 @@ import {
   strokeRectWithRotation,
 } from "./helpers";
 
-import { AnimationController } from "./animation";
-
 import type {
   InteractiveCanvasRenderConfig,
   InteractiveSceneRenderConfig,
@@ -198,7 +196,8 @@ const renderBindingHighlightForBindableElement = (
   deltaTime: number,
   state?: { runtime: number },
 ) => {
-  const remainingTime = BIND_MODE_TIMEOUT - (state?.runtime ?? 0);
+  const remainingTime =
+    BIND_MODE_TIMEOUT - (state?.runtime ?? BIND_MODE_TIMEOUT);
   const opacity = clamp((1 / BIND_MODE_TIMEOUT) * remainingTime, 0.0001, 1);
   const offset = element.strokeWidth / 2;
 
@@ -206,7 +205,6 @@ const renderBindingHighlightForBindableElement = (
     case "magicframe":
     case "frame":
       context.save();
-      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
       context.translate(
         element.x + appState.scrollX,
@@ -243,7 +241,6 @@ const renderBindingHighlightForBindableElement = (
       const cx = center[0] + appState.scrollX;
       const cy = center[1] + appState.scrollY;
 
-      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
       context.translate(cx, cy);
       context.rotate(element.angle as Radians);
       context.translate(-cx, -cy);
@@ -401,7 +398,7 @@ const renderBindingHighlightForBindableElement = (
   }
 
   if ((state?.runtime ?? 0) > BIND_MODE_TIMEOUT) {
-    return null;
+    return;
   }
 
   return {
@@ -860,7 +857,14 @@ const _renderInteractiveScene = ({
   appState,
   renderConfig,
   device,
-}: InteractiveSceneRenderConfig) => {
+  animationState,
+  deltaTime,
+}: InteractiveSceneRenderConfig): {
+  scrollBars?: ReturnType<typeof getScrollBars>;
+  atLeastOneVisibleElement: boolean;
+  elementsMap: RenderableElementsMap;
+  animationState?: typeof animationState;
+} => {
   if (canvas === null) {
     return { atLeastOneVisibleElement: false, elementsMap };
   }
@@ -869,6 +873,7 @@ const _renderInteractiveScene = ({
     canvas,
     scale,
   );
+  let nextAnimationState = animationState;
 
   const context = bootstrapCanvas({
     canvas,
@@ -939,25 +944,22 @@ const _renderInteractiveScene = ({
   }
 
   if (appState.isBindingEnabled && appState.suggestedBinding) {
-    AnimationController.start<{ runtime: number }>(
-      "bindingHighlight",
-      ({ deltaTime, state }) => {
-        if (!appState.suggestedBinding) {
-          return null; // Stop the animation
-        }
-
-        return renderBindingHighlightForBindableElement(
-          context,
-          appState.suggestedBinding,
-          allElementsMap,
-          appState,
-          deltaTime,
-          state,
-        );
-      },
-    );
+    nextAnimationState = {
+      ...animationState,
+      bindingHighlight: renderBindingHighlightForBindableElement(
+        context,
+        appState.suggestedBinding,
+        allElementsMap,
+        appState,
+        deltaTime,
+        animationState?.bindingHighlight,
+      ),
+    };
   } else {
-    AnimationController.cancel("bindingHighlight");
+    nextAnimationState = {
+      ...animationState,
+      bindingHighlight: undefined,
+    };
   }
 
   if (appState.frameToHighlight) {
@@ -1329,6 +1331,7 @@ const _renderInteractiveScene = ({
     scrollBars,
     atLeastOneVisibleElement: visibleElements.length > 0,
     elementsMap,
+    animationState: nextAnimationState,
   };
 };
 
