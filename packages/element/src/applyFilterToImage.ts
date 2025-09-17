@@ -8,34 +8,34 @@ export function applyFiltersToImage(
   image: CanvasImageSource,
   imageWidth: number,
   imageHeight: number,
-) {
+): CanvasImageSource {
   const cached = cache.get(image);
   if (cached) {
     return cached;
   }
 
-  const offscreen = new OffscreenCanvas(imageWidth, imageHeight);
-  const offscreenCtx = offscreen.getContext("2d")!;
-  offscreenCtx.drawImage(image, 0, 0, imageWidth, imageHeight);
+  const canvas = document.createElement("canvas");
+  canvas.width = imageWidth;
+  canvas.height = imageHeight;
 
-  invert(offscreenCtx, IMAGE_INVERT_FILTER_INVERT_AMOUNT);
-  hueRotate(offscreenCtx, IMAGE_INVERT_FILTER_HUE_ROTATE_AMOUNT);
-  saturate(offscreenCtx, IMAGE_INVERT_FILTER_SATURATE_AMOUNT);
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(image, 0, 0, imageWidth, imageHeight);
 
-  cache.set(image, offscreen);
-  return offscreen;
+  invert(ctx, IMAGE_INVERT_FILTER_INVERT_AMOUNT);
+  hueRotate(ctx, IMAGE_INVERT_FILTER_HUE_ROTATE_AMOUNT);
+  saturate(ctx, IMAGE_INVERT_FILTER_SATURATE_AMOUNT);
+
+  cache.set(image, canvas);
+  return canvas;
 }
 
-const cache = new WeakMap<CanvasImageSource, OffscreenCanvas>();
+const cache = new WeakMap<CanvasImageSource, CanvasImageSource>();
 
 /**
  * Taken from @davidenke's context-filter-polyfill
  * @see {@link https://github.com/davidenke/context-filter-polyfill/blob/e1a04c24b8f31a0608f5d05155d29544a6d6429a/src/filters/invert.filter.ts}
  */
-function invert(
-  context: OffscreenCanvasRenderingContext2D,
-  stringAmount = "0",
-): void {
+function invert(context: CanvasRenderingContext2D, stringAmount = "0"): void {
   let amount = normalizeNumberPercentage(stringAmount);
 
   // do not manipulate without proper amount
@@ -66,10 +66,7 @@ function invert(
  * Taken from @davidenke's context-filter-polyfill
  * @see {@link https://github.com/davidenke/context-filter-polyfill/blob/e1a04c24b8f31a0608f5d05155d29544a6d6429a/src/filters/hue-rotate.filter.ts}
  */
-function hueRotate(
-  context: OffscreenCanvasRenderingContext2D,
-  rotation = "0deg",
-): void {
+function hueRotate(context: CanvasRenderingContext2D, rotation = "0deg"): void {
   const amount = normalizeAngle(rotation);
 
   // do not manipulate without proper amount
@@ -158,18 +155,13 @@ function hueRotate(
 
   // set back image data to context
   context.putImageData(imageData, 0, 0);
-
-  // return the context itself
 }
 
 /**
  * Taken from @davidenke's context-filter-polyfill
  * @see {@link https://github.com/davidenke/context-filter-polyfill/blob/e1a04c24b8f31a0608f5d05155d29544a6d6429a/src/filters/saturate.filter.ts}
  */
-function saturate(
-  context: OffscreenCanvasRenderingContext2D,
-  saturation = "1",
-): void {
+function saturate(context: CanvasRenderingContext2D, saturation = "1"): void {
   let amount = normalizeNumberPercentage(saturation);
 
   // do not manipulate without proper amount
@@ -185,9 +177,9 @@ function saturate(
   const { height, width } = context.canvas;
   const imageData = context.getImageData(0, 0, width, height);
   const { data } = imageData;
-  const lumR = (1 - amount) * 0.3086;
-  const lumG = (1 - amount) * 0.6094;
-  const lumB = (1 - amount) * 0.082;
+  const lumR = (1 - amount) * 0.213;
+  const lumG = (1 - amount) * 0.715;
+  const lumB = (1 - amount) * 0.072;
   // tslint:disable-next-line no-bitwise
   const shiftW = width << 2;
 
