@@ -345,7 +345,11 @@ export class LinearElementEditor {
       app,
     );
 
-    LinearElementEditor.movePoints(element, app.scene, positions, updates);
+    LinearElementEditor.movePoints(element, app.scene, positions, {
+      startBinding: updates?.startBinding,
+      endBinding: updates?.endBinding,
+      moveMidPointsWithElement: updates?.moveMidPointsWithElement,
+    });
     // Set the suggested binding from the updates if available
     if (isBindingElement(element, false)) {
       if (isBindingEnabled(app.state)) {
@@ -493,7 +497,11 @@ export class LinearElementEditor {
       app,
     );
 
-    LinearElementEditor.movePoints(element, app.scene, positions, updates);
+    LinearElementEditor.movePoints(element, app.scene, positions, {
+      startBinding: updates?.startBinding,
+      endBinding: updates?.endBinding,
+      moveMidPointsWithElement: updates?.moveMidPointsWithElement,
+    });
 
     // Set the suggested binding from the updates if available
     if (isBindingElement(element, false)) {
