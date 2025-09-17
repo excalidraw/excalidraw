@@ -7809,7 +7809,10 @@ class App extends React.Component<AppProps, AppState> {
             selectedLinearElement: prevState.selectedLinearElement
               ? {
                   ...prevState.selectedLinearElement,
-                  isEditing: isBindingElement(hitElement),
+                  isEditing:
+                    !!hitElement &&
+                    hitElement.id ===
+                      this.state.selectedLinearElement?.elementId,
                 }
               : null,
             selectedElementIds: prevState.selectedLinearElement

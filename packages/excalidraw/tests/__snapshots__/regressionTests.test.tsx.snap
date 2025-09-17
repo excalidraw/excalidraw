@@ -6235,7 +6235,34 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
-  "selectedLinearElement": null,
+  "selectedLinearElement": {
+    "customLineAngle": null,
+    "elbowed": false,
+    "elementId": "id20",
+    "hoverPointIndex": -1,
+    "initialState": {
+      "arrowStartIsInside": false,
+      "lastClickedPoint": -1,
+      "origin": null,
+      "prevSelectedPointsIndices": null,
+      "segmentMidpoint": {
+        "added": false,
+        "index": null,
+        "value": null,
+      },
+    },
+    "isDragging": false,
+    "isEditing": false,
+    "lastCommittedPoint": null,
+    "lastUncommittedPoint": null,
+    "pointerDownState": undefined,
+    "pointerOffset": {
+      "x": 0,
+      "y": 0,
+    },
+    "segmentMidPointHoveredCoords": null,
+    "selectedPointsIndices": null,
+  },
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
@@ -6863,15 +6890,8 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
   {
     "appState": AppStateDelta {
       "delta": Delta {
-        "deleted": {
-          "selectedLinearElement": null,
-        },
-        "inserted": {
-          "selectedLinearElement": {
-            "elementId": "id20",
-            "isEditing": false,
-          },
-        },
+        "deleted": {},
+        "inserted": {},
       },
     },
     "elements": {

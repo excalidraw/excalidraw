@@ -217,7 +217,7 @@ describe("Test Linear Elements", () => {
 
     // drag line from midpoint
     drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`9`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`8`);
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(line.points.length).toEqual(3);
     expect(line.points).toMatchInlineSnapshot(`
@@ -329,7 +329,7 @@ describe("Test Linear Elements", () => {
     expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
     mouse.doubleClick();
-    expect(h.state.selectedLinearElement).toBe(null);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
     await getTextEditor();
   });
 
@@ -357,6 +357,7 @@ describe("Test Linear Elements", () => {
       const originalY = line.y;
       enterLineEditingMode(line);
 
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
       expect(line.points.length).toEqual(2);
 
       mouse.clickAt(midpoint[0], midpoint[1]);
