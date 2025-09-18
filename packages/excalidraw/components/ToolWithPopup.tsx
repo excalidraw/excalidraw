@@ -132,7 +132,7 @@ type ToolWithPopupProps = {
   "data-testid": string;
   onToolChange: (type: string) => void;
   getDisplayedOption: () => ToolOption;
-  isActive: (type: string) => boolean;
+  isActive: boolean;
   fillable?: boolean;
 };
 
@@ -154,7 +154,6 @@ export const ToolWithPopup = ({
   const [triggerRef, setTriggerRef] = useState<HTMLElement | null>(null);
 
   const displayedOption = getDisplayedOption();
-  const isToolActive = options.some((option) => isActive(option.type));
 
   return (
     <div style={{ position: "relative" }}>
@@ -163,7 +162,7 @@ export const ToolWithPopup = ({
           className={clsx(className, { fillable })}
           type="radio"
           icon={displayedOption.icon}
-          checked={isToolActive}
+          checked={isActive}
           name="editor-current-shape"
           title={title}
           aria-label={title}

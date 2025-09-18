@@ -200,7 +200,9 @@ export const MobileToolBar = ({
             (tool) => tool.type === app.defaultSelectionTool,
           ) || SELECTION_TOOLS[0]
         }
-        isActive={(type: string) => type === "lasso" || type === "selection"}
+        isActive={
+          activeTool.type === "selection" || activeTool.type === "lasso"
+        }
       />
 
       {/* Free Draw */}
@@ -257,9 +259,7 @@ export const MobileToolBar = ({
           SHAPE_TOOLS.find((tool) => tool.type === lastActiveGenericShape) ||
           SHAPE_TOOLS[0]
         }
-        isActive={(type: string) =>
-          ["rectangle", "diamond", "ellipse"].includes(type)
-        }
+        isActive={["rectangle", "diamond", "ellipse"].includes(activeTool.type)}
       />
 
       {/* Arrow/Line */}
@@ -288,7 +288,7 @@ export const MobileToolBar = ({
             (tool) => tool.type === lastActiveLinearElement,
           ) || LINEAR_ELEMENT_TOOLS[0]
         }
-        isActive={(type: string) => ["arrow", "line"].includes(type)}
+        isActive={["arrow", "line"].includes(activeTool.type)}
       />
 
       {/* Image */}
