@@ -242,6 +242,8 @@ import {
   calculateFixedPointForNonElbowArrowBinding,
   bindOrUnbindBindingElement,
   mutateElement,
+  getElementBounds,
+  doBoundsIntersect,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -1078,6 +1080,31 @@ class App extends React.Component<AppProps, AppState> {
       }
     };
 
+    let isOverlapping = false;
+    if (this.state.selectedLinearElement?.selectedPointsIndices) {
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      const startDragged =
+        this.state.selectedLinearElement.selectedPointsIndices.includes(0);
+      const endDragged =
+        this.state.selectedLinearElement.selectedPointsIndices.includes(
+          arrow.points.length - 1,
+        );
+      const startElement = startDragged
+        ? hoveredElement
+        : arrow.startBinding && elementsMap.get(arrow.startBinding.elementId);
+      const endElement = endDragged
+        ? hoveredElement
+        : arrow.endBinding && elementsMap.get(arrow.endBinding.elementId);
+      const startBounds =
+        startElement && getElementBounds(startElement, elementsMap);
+      const endBounds = endElement && getElementBounds(endElement, elementsMap);
+      isOverlapping = !!(
+        startBounds &&
+        endBounds &&
+        doBoundsIntersect(startBounds, endBounds)
+      );
+    }
+
     if (
       !hoveredElement ||
       (this.previousHoveredBindableElement &&
@@ -1099,7 +1126,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.previousHoveredBindableElement = null;
-    } else if (!this.bindModeHandler) {
+    } else if (
+      !this.bindModeHandler &&
+      (!this.state.newElement || !arrow.startBinding || isOverlapping)
+    ) {
       // We are hovering a bindable element
       this.bindModeHandler = setTimeout(effector, BIND_MODE_TIMEOUT);
     }
