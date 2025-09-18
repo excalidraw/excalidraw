@@ -76,7 +76,10 @@ import {
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
 
-import { type InteractiveCanvasAppState } from "../types";
+import {
+  type AppClassProperties,
+  type InteractiveCanvasAppState,
+} from "../types";
 
 import { getClientColor, renderRemoteCursors } from "../clients";
 
@@ -189,6 +192,7 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
 };
 
 const renderBindingHighlightForBindableElement = (
+  app: AppClassProperties,
   context: CanvasRenderingContext2D,
   element: ExcalidrawBindableElement,
   allElementsMap: NonDeletedSceneElementsMap,
@@ -196,8 +200,12 @@ const renderBindingHighlightForBindableElement = (
   deltaTime: number,
   state?: { runtime: number },
 ) => {
+  const countdownInProgress =
+    app.state.bindMode === "orbit" && app.bindModeHandler !== null;
+
   const remainingTime =
-    BIND_MODE_TIMEOUT - (state?.runtime ?? BIND_MODE_TIMEOUT);
+    BIND_MODE_TIMEOUT -
+    (state?.runtime ?? (countdownInProgress ? 0 : BIND_MODE_TIMEOUT));
   const opacity = clamp((1 / BIND_MODE_TIMEOUT) * remainingTime, 0.0001, 1);
   const offset = element.strokeWidth / 2;
 
@@ -364,42 +372,47 @@ const renderBindingHighlightForBindableElement = (
       break;
   }
 
-  // Draw center snap area
-  if ((state?.runtime ?? 0) < BIND_MODE_TIMEOUT) {
-    context.save();
-    context.translate(
-      element.x + appState.scrollX,
-      element.y + appState.scrollY,
-    );
-    context.strokeStyle = "rgba(0, 0, 0, 0.2)";
-    context.lineWidth = 1 / appState.zoom.value;
-    context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
-    context.lineDashOffset = 0;
-
-    const radius =
-      0.5 * (Math.min(element.width, element.height) / 2) * opacity;
-
-    context.fillStyle = "rgba(0, 0, 0, 0.04)";
-
-    context.beginPath();
-    context.ellipse(
-      element.width / 2,
-      element.height / 2,
-      radius,
-      radius,
-      0,
-      0,
-      2 * Math.PI,
-    );
-    context.stroke();
-    context.fill();
-
-    context.restore();
-  }
-
-  if ((state?.runtime ?? 0) > BIND_MODE_TIMEOUT) {
+  // Middle indicator is not rendered after it expired
+  if (!countdownInProgress || (state?.runtime ?? 0) > BIND_MODE_TIMEOUT) {
     return;
   }
+
+  // Draw center snap area
+  context.save();
+  context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
+  context.strokeStyle = "rgba(0, 0, 0, 0.2)";
+  context.lineWidth = 1 / appState.zoom.value;
+  context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
+  context.lineDashOffset = 0;
+
+  const radius = 0.5 * (Math.min(element.width, element.height) / 2) * opacity;
+
+  context.fillStyle = "rgba(0, 0, 0, 0.04)";
+
+  context.beginPath();
+  context.ellipse(
+    element.width / 2,
+    element.height / 2,
+    radius,
+    radius,
+    0,
+    0,
+    2 * Math.PI,
+  );
+  context.stroke();
+  context.fill();
+
+  // Draw countdown
+  context.font = `${radius / 2}px sans-serif`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(
+    `${Math.round(remainingTime)}`,
+    element.width / 2,
+    element.height / 2,
+  );
+
+  context.restore();
 
   return {
     runtime: (state?.runtime ?? 0) + deltaTime,
@@ -848,6 +861,7 @@ const renderTextBox = (
 };
 
 const _renderInteractiveScene = ({
+  app,
   canvas,
   elementsMap,
   visibleElements,
@@ -947,6 +961,7 @@ const _renderInteractiveScene = ({
     nextAnimationState = {
       ...animationState,
       bindingHighlight: renderBindingHighlightForBindableElement(
+        app,
         context,
         appState.suggestedBinding,
         allElementsMap,

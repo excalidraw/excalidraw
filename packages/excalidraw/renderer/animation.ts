@@ -1,24 +1,44 @@
+import { isRenderThrottlingEnabled } from "../reactUtils";
+
 export type Animation<R extends object> = (params: {
   deltaTime: number;
   state?: R;
 }) => R | null | undefined;
 
 export class AnimationController {
+  private static isRunning = false;
   private static animations = new Map<
     string,
     {
       animation: Animation<any>;
       lastTime: number;
-      state?: any;
+      state: any;
     }
   >();
 
   static start<R extends object>(key: string, animation: Animation<R>) {
-    AnimationController.animations.set(key, {
-      animation,
-      lastTime: 0,
+    const initialState = animation({
+      deltaTime: 0,
+      state: undefined,
     });
-    requestAnimationFrame(AnimationController.tick);
+
+    if (initialState) {
+      AnimationController.animations.set(key, {
+        animation,
+        lastTime: 0,
+        state: initialState,
+      });
+
+      if (!AnimationController.isRunning) {
+        AnimationController.isRunning = true;
+
+        if (isRenderThrottlingEnabled()) {
+          requestAnimationFrame(AnimationController.tick);
+        } else {
+          setTimeout(AnimationController.tick, 0);
+        }
+      }
+    }
   }
 
   private static tick() {
@@ -35,13 +55,27 @@ export class AnimationController {
 
         if (!state) {
           AnimationController.animations.delete(key);
+
+          if (AnimationController.animations.size === 0) {
+            AnimationController.isRunning = false;
+            return;
+          }
         } else {
           animation.lastTime = now;
           animation.state = state;
         }
       }
-      requestAnimationFrame(AnimationController.tick);
+
+      if (isRenderThrottlingEnabled()) {
+        requestAnimationFrame(AnimationController.tick);
+      } else {
+        setTimeout(AnimationController.tick, 0);
+      }
     }
+  }
+
+  static running(key: string) {
+    return AnimationController.animations.has(key);
   }
 
   static cancel(key: string) {

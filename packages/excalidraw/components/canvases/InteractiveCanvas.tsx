@@ -8,18 +8,17 @@ import {
 import { AnimationController } from "@excalidraw/excalidraw/renderer/animation";
 
 import type {
-  ExcalidrawBindableElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
 import { t } from "../../i18n";
-import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
 import type {
   InteractiveCanvasRenderConfig,
   InteractiveSceneRenderAnimationState,
+  InteractiveSceneRenderConfig,
   RenderableElementsMap,
   RenderInteractiveSceneCallback,
 } from "../../scene/types";
@@ -79,9 +78,11 @@ type InteractiveCanvasProps = {
   >;
 };
 
+export const INTERACTIVE_SCENE_ANIMATION_KEY = "animateInteractiveScene";
+
 const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   const isComponentMounted = useRef(false);
-  const lastSuggestedBinding = useRef<ExcalidrawBindableElement | null>(null);
+  const rendererParams = useRef(null as InteractiveSceneRenderConfig | null);
 
   useEffect(() => {
     if (!isComponentMounted.current) {
@@ -138,90 +139,62 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         )) ||
       "#6965db";
 
-    renderInteractiveScene(
-      {
-        canvas: props.canvas,
-        elementsMap: props.elementsMap,
-        visibleElements: props.visibleElements,
-        selectedElements: props.selectedElements,
-        allElementsMap: props.allElementsMap,
-        scale: window.devicePixelRatio,
-        appState: props.appState,
-        renderConfig: {
-          remotePointerViewportCoords,
-          remotePointerButton,
-          remoteSelectedElementIds,
-          remotePointerUsernames,
-          remotePointerUserStates,
-          selectionColor,
-          renderScrollbars: props.renderScrollbars,
-          // NOTE not memoized on so we don't rerender on cursor move
-          lastViewportPosition: props.app.lastViewportPosition,
-        },
-        device: props.device,
-        callback: props.renderInteractiveSceneCallback,
-        deltaTime: 0,
+    rendererParams.current = {
+      app: props.app,
+      canvas: props.canvas,
+      elementsMap: props.elementsMap,
+      visibleElements: props.visibleElements,
+      selectedElements: props.selectedElements,
+      allElementsMap: props.allElementsMap,
+      scale: window.devicePixelRatio,
+      appState: props.appState,
+      renderConfig: {
+        remotePointerViewportCoords,
+        remotePointerButton,
+        remoteSelectedElementIds,
+        remotePointerUsernames,
+        remotePointerUserStates,
+        selectionColor,
+        renderScrollbars: props.renderScrollbars,
+        // NOTE not memoized on so we don't rerender on cursor move
+        lastViewportPosition: props.app.lastViewportPosition,
       },
-      isRenderThrottlingEnabled(),
-    );
+      device: props.device,
+      callback: props.renderInteractiveSceneCallback,
+      animationState: {
+        bindingHighlight: undefined,
+      },
+      deltaTime: 0,
+    };
 
-    if (lastSuggestedBinding.current !== props.appState.suggestedBinding) {
-      lastSuggestedBinding.current = props.appState.suggestedBinding;
-      if (props.appState.suggestedBinding) {
-        AnimationController.cancel("bindingHighlight");
-        AnimationController.start<InteractiveSceneRenderAnimationState>(
-          "bindingHighlight",
-          ({ deltaTime, state }) => {
-            if (
-              lastSuggestedBinding.current !== props.appState.suggestedBinding
-            ) {
-              return null;
-            }
+    if (!AnimationController.running(INTERACTIVE_SCENE_ANIMATION_KEY)) {
+      AnimationController.start<InteractiveSceneRenderAnimationState>(
+        INTERACTIVE_SCENE_ANIMATION_KEY,
+        ({ deltaTime, state }) => {
+          const nextAnimationState = renderInteractiveScene(
+            {
+              ...rendererParams.current!,
+              deltaTime,
+              animationState: state,
+            },
+            false,
+          ).animationState;
 
-            const nextAnimationState = renderInteractiveScene(
-              {
-                canvas: props.canvas,
-                elementsMap: props.elementsMap,
-                visibleElements: props.visibleElements,
-                selectedElements: props.selectedElements,
-                allElementsMap: props.allElementsMap,
-                scale: window.devicePixelRatio,
-                appState: props.appState,
-                renderConfig: {
-                  remotePointerViewportCoords,
-                  remotePointerButton,
-                  remoteSelectedElementIds,
-                  remotePointerUsernames,
-                  remotePointerUserStates,
-                  selectionColor,
-                  renderScrollbars: props.renderScrollbars,
-                  // NOTE not memoized on so we don't rerender on cursor move
-                  lastViewportPosition: props.app.lastViewportPosition,
-                },
-                device: props.device,
-                callback: props.renderInteractiveSceneCallback,
-                animationState: state,
-                deltaTime,
-              },
-              false,
-            ).animationState;
-
-            if (nextAnimationState) {
-              for (const key in nextAnimationState) {
-                if (
-                  nextAnimationState[
-                    key as keyof InteractiveSceneRenderAnimationState
-                  ] !== undefined
-                ) {
-                  return nextAnimationState;
-                }
+          if (nextAnimationState) {
+            for (const key in nextAnimationState) {
+              if (
+                nextAnimationState[
+                  key as keyof InteractiveSceneRenderAnimationState
+                ] !== undefined
+              ) {
+                return nextAnimationState;
               }
-
-              return undefined;
             }
-          },
-        );
-      }
+          }
+
+          return undefined;
+        },
+      );
     }
   });
 

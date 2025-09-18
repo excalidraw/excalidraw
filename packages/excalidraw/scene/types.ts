@@ -94,6 +94,7 @@ export type InteractiveSceneRenderAnimationState = {
 };
 
 export type InteractiveSceneRenderConfig = {
+  app: AppClassProperties;
   canvas: HTMLCanvasElement | null;
   elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
