@@ -21,6 +21,8 @@ import {
   getLineHeight,
   isTransparent,
   reduceToCommonValue,
+  DEFAULT_ADAPTIVE_RADIUS,
+  DEFAULT_PROPORTIONAL_RADIUS,
 } from "@excalidraw/common";
 
 import { canBecomePolygon, getNonDeletedElements, isUsingCustiomizedRadius } from "@excalidraw/element";
@@ -132,6 +134,7 @@ import {
 import { Fonts } from "../fonts";
 import { getLanguage, t } from "../i18n";
 import {
+  canCustomizeRoundness,
   canHaveArrowheads,
   getSelectedElements,
   getTargetElements,
@@ -1399,8 +1402,15 @@ export const actionChangeRoundness = register({
                 }
               : value === "custom" ? 
               {
-                type: ROUNDNESS.CUSTOMIZED
-              } : null
+                type: ROUNDNESS.CUSTOMIZED,
+                corners : {
+                  topLeft: el.roundness?.corners?.topLeft?? DEFAULT_ADAPTIVE_RADIUS,
+                  topRight: el.roundness?.corners?.topRight?? DEFAULT_ADAPTIVE_RADIUS,
+                  bottomLeft: el.roundness?.corners?.bottomLeft?? DEFAULT_ADAPTIVE_RADIUS,
+                  bottomRight: el.roundness?.corners?.bottomRight?? DEFAULT_ADAPTIVE_RADIUS,
+                }
+              } : null,
+
         });
       }),
       appState: {
@@ -1420,31 +1430,8 @@ export const actionChangeRoundness = register({
       (el) => el.roundness?.type === ROUNDNESS.LEGACY,
     );
 
-    return (
-      <fieldset>
-        <legend>{t("labels.edges")}</legend>
-        <div className="buttonList">
-          <RadioSelection
-            group="edges"
-            options={[
-              {
-                value: "sharp",
-                text: t("labels.sharp"),
-                icon: EdgeSharpIcon,
-              },
-              {
-                value: "round",
-                text: t("labels.round"),
-                icon: EdgeRoundIcon,
-              },
-              {
-                value: "custom",
-                text: t("labels.custom"),
-                icon: CustomRoundIcon,
-              },
-            ]}
-
-            value={getFormValue(
+    const getCurrentEdgeType = () => {
+      return getFormValue(
               elements,
               app,
               (element) =>
@@ -1459,16 +1446,50 @@ export const actionChangeRoundness = register({
                 !isArrowElement(element) && element.hasOwnProperty("roundness"),
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemRoundness,
-            )}
+            );
+    }
+
+    return (
+      <fieldset>
+        <legend>{t("labels.edges")}</legend>
+        <div className="buttonList">
+          <RadioSelection
+            group="edges"
+            options={[
+              {
+                value: "sharp",
+                text: t("labels.sharp"),
+                icon: EdgeSharpIcon,
+              },
+              // {
+              //   value: "round",
+              //   text: t("labels.round"),
+              //   icon: EdgeRoundIcon,
+              // },
+              {
+                value: "custom",
+                text: t("labels.custom"),
+                icon: CustomRoundIcon,
+              },
+            ]}
+
+            value={getCurrentEdgeType()}
             onChange={
               (value) => {
                 updateData(value)
-                console.log(1) 
-                // return;
+
               }
 
             }
+
           />
+
+          {((canCustomizeRoundness(appState.activeTool.type) ||
+          targetElements.some((element) => canCustomizeRoundness(element.type))) 
+          && getCurrentEdgeType() === "custom" )
+            && (
+            <>{renderAction("customizeRoundness")}</>
+          )}
           {renderAction("togglePolygon")}
         </div>
       </fieldset>
@@ -1492,6 +1513,12 @@ export const actionCustomizeRoundness = register({
         return newElementWith(el, {
           roundness:{
               type: ROUNDNESS.CUSTOMIZED,
+              corners: {
+                topLeft:10,
+                topRight:10,
+                bottomLeft:10,
+                bottomRight:10,
+              }
             }
           ,
         });
@@ -1509,25 +1536,110 @@ export const actionCustomizeRoundness = register({
       appState,
     );
 
-    const hasLegacyRoundness = targetElements.some(
-      (el) => el.roundness?.type === ROUNDNESS.LEGACY,
-    );
+    const getCurrentCornerValue = (corner : 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight') => {
+        return getFormValue(
+        elements,
+        app,
+        (element) => {
+          if (element.roundness?.type === ROUNDNESS.CUSTOMIZED && element.roundness.corners) {
+            return element.roundness.corners[corner] ?? 0;
+          }
+
+          let uniformValue = 0;
+          
+          if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
+            uniformValue = DEFAULT_ADAPTIVE_RADIUS;
+          } else if (element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS) {
+            uniformValue = DEFAULT_PROPORTIONAL_RADIUS;
+          }
+
+          return uniformValue;
+        },
+        (element) => !isArrowElement(element) && element.hasOwnProperty("roundness"),
+        (hasSelection) => hasSelection ? null : 0
+      );
+    }
+
+      const updateCornersValue = (corner: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight', newValue: number) => {
+    const currentCorners = {
+      topLeft: getCurrentCornerValue('topLeft') ?? 0,
+      topRight: getCurrentCornerValue('topRight') ?? 0,
+      bottomLeft: getCurrentCornerValue('bottomLeft') ?? 0,
+      bottomRight: getCurrentCornerValue('bottomRight') ?? 0,
+    };
+    
+    currentCorners[corner] = newValue;
+
+    updateData({
+      roundness: {
+        type: ROUNDNESS.CUSTOMIZED,
+        corners: currentCorners
+      }
+    });
+
+    console.log(getCurrentCornerValue(corner));
+  };
 
     return (
     // Todo: Bikin fieldsetnya, dan masing - masing valuenya (setiap onChange di input ,harus bisa regenerate)
       <fieldset>
-        <legend>{t("labels.custom")}</legend>
-        <div className="corner-inputs">
-          <input 
-            type="number"
-            placeholder={t("labels.topLeft")}
-            onChange={(e)=>{
-              console.log(e)
-            }}
-         
-          />
-        </div>
-      </fieldset>
+      <legend>{t("labels.custom")}</legend>
+      <div className="corner-inputs" style={{ 
+        display: 'grid', 
+        gridTemplateColumns: '1fr 1fr', 
+        gap: '8px',
+        padding: '8px 0',
+        width: '100%'
+      }}>
+        <input 
+          type="number"
+          placeholder={t("labels.topLeft")}
+          // value={ParsegetCurrentCornerValue('topLeft')}
+          onChange={(e) => {
+            const val = parseInt(e.target.value) | 0;
+            updateCornersValue('topLeft', val)
+          }}
+          style={{ padding: '4px 8px', width: '100%', boxSizing: 'border-box' }}
+        />
+        <input 
+          type="number"
+          placeholder={t("labels.topRight")}
+          // value={getCurrentCornerValue('topRight') ?? 0}
+          onChange={(e) => {
+            const val = parseInt(e.target.value) | 0;
+            updateCornersValue('topRight', val)
+            
+            
+
+          }}
+          style={{ padding: '4px 8px', width: '100%', boxSizing: 'border-box' }}
+        />
+        <input 
+          type="number"
+          placeholder={ t("labels.bottomLeft")}
+          // value={getCurrentCornerValue('bottomLeft') ?? 0}
+          onChange={(e) => {
+            const val = parseInt(e.target.value) | 0;
+            updateCornersValue('bottomLeft', val)
+            
+            
+          }}
+          style={{ padding: '4px 8px', width: '100%', boxSizing: 'border-box' }}
+          // min={}
+        />
+        <input 
+          type="number"
+          placeholder={t("labels.bottomRight")}
+          // value={getCurrentCornerValue('bottomRight') ?? 0}
+          onChange={(e) => {
+            const val = parseInt(e.target.value) | 0;
+            updateCornersValue('bottomRight', val)
+            
+          }}
+          style={{ padding: '4px 8px', width: '100%', boxSizing: 'border-box' }}
+        />
+      </div>
+    </fieldset>
     );
   },
 });

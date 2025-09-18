@@ -22,6 +22,7 @@ import {
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
   ROUNDNESS,
+  DEFAULT_ADAPTIVE_RADIUS,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -75,6 +76,7 @@ import type {
 
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+import { t } from "@excalidraw/excalidraw/i18n";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -631,27 +633,28 @@ const generateElementShape = (
       let shape: ElementShapes[typeof element.type];
       // this is for rendering the stroke/bg of the embeddable, especially
       // when the src url is not set
-      console.log(element.roundness?.type)
-      if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
-        const w = element.width;
-        const h = element.height;
-        const r = getCornerRadius(Math.min(w, h), element);
-        shape = generator.path(
-          `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
-            h - r
-          } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
-            h - r
-          } L 0 ${r} Q 0 0, ${r} 0`,
-          generateRoughOptions(
-            modifyIframeLikeForRoughOptions(
-              element,
-              isExporting,
-              embedsValidationStatus,
-            ),
-            true,
-          ),
-        );
-      } else if (element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS) {
+      // console.log(element.roundness?.type)
+      // if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
+      //   const w = element.width;
+      //   const h = element.height;
+      //   const r = getCornerRadius(Math.min(w, h), element);
+      //   shape = generator.path(
+      //     `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
+      //       h - r
+      //     } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
+      //       h - r
+      //     } L 0 ${r} Q 0 0, ${r} 0`,
+      //     generateRoughOptions(
+      //       modifyIframeLikeForRoughOptions(
+      //         element,
+      //         isExporting,
+      //         embedsValidationStatus,
+      //       ),
+      //       true,
+      //     ),
+      //   );
+      // }
+      if (element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS) {
         shape = generator.rectangle(
           0,
           0,
@@ -673,12 +676,12 @@ const generateElementShape = (
         const h = element.height;
         const r = getCornerRadius(Math.min(w, h), element);
 
-        console.log(element.id, w, h, r)
+        // console.log(element.id, w, h, r)
 
-        const tl = customInput?.topLeft ?? 0;
-        const tr = customInput?.topRight ?? 0;
-        const bl = customInput?.bottomLeft ?? 0;
-        const br = customInput?.bottomRight ?? 0;
+        const tl = customInput?.topLeft ?? DEFAULT_ADAPTIVE_RADIUS;
+        const tr = customInput?.topRight ?? DEFAULT_ADAPTIVE_RADIUS;
+        const bl = customInput?.bottomLeft ?? DEFAULT_ADAPTIVE_RADIUS;
+        const br = customInput?.bottomRight ?? DEFAULT_ADAPTIVE_RADIUS;
 
         // Dummy
         
@@ -686,15 +689,15 @@ const generateElementShape = (
         shape = generator.path(
 
           //Todo: Nanti modify untuk bisa menyesuaikan dengan input manualnya
-          `M ${r} 0`+                     // Pindahin kursor ke posisi awal
-           `L ${w - r} 0` +                 // Garis atas
-           `Q ${w} 0, ${w} ${r}` +          // Kurva kanan atas
-           `L ${w} ${h - r}` +              // Garis kanan
-           `Q ${w} ${h}, ${w - r} ${h}` +   // Kurva kanan bawah
-           `L ${r} ${h}` +                 // Garis bawah
-           `Q 0 ${h}, 0 ${h - r}` +         // Kurva kiri bawah
-           `L 0 ${r}` +                     // Garis kiri
-           `Q 0 0, ${r} 0`,              // Kurva kanan atas
+          `M ${tl} 0`+                     // Pindahin kursor ke posisi awal
+           `L ${w - tr} 0` +                 // Garis atas
+           `Q ${w} 0, ${w} ${tr}` +          // Kurva kanan atas
+           `L ${w} ${h - br}` +              // Garis kanan
+           `Q ${w} ${h}, ${w - br} ${h}` +   // Kurva kanan bawah
+           `L ${bl} ${h}` +                 // Garis bawah
+           `Q 0 ${h}, 0 ${h - bl}` +         // Kurva kiri bawah
+           `L 0 ${tl}` +                     // Garis kiri
+           `Q 0 0, ${tl} 0`,              // Kurva kanan atas
           generateRoughOptions(
             modifyIframeLikeForRoughOptions(
               element,
