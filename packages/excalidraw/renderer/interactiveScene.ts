@@ -263,8 +263,8 @@ const renderBindingHighlightForBindableElement = (
         Math.max(0.25, appState.zoom.value);
       context.strokeStyle =
         appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, ${0.5 + opacity / 2})`
-          : `rgba(106, 189, 252, ${0.5 + opacity / 2})`;
+          ? `rgba(3, 93, 161, ${opacity / 2})`
+          : `rgba(106, 189, 252, ${opacity / 2})`;
 
       switch (element.type) {
         case "ellipse":
@@ -377,17 +377,16 @@ const renderBindingHighlightForBindableElement = (
     return;
   }
 
+  const radius = 0.5 * (Math.min(element.width, element.height) / 2);
+
   // Draw center snap area
   context.save();
   context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
+
   context.strokeStyle = "rgba(0, 0, 0, 0.2)";
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
   context.lineDashOffset = 0;
-
-  const radius = 0.5 * (Math.min(element.width, element.height) / 2) * opacity;
-
-  context.fillStyle = "rgba(0, 0, 0, 0.04)";
 
   context.beginPath();
   context.ellipse(
@@ -400,6 +399,20 @@ const renderBindingHighlightForBindableElement = (
     2 * Math.PI,
   );
   context.stroke();
+
+  // context.strokeStyle = "transparent";
+  context.fillStyle = "rgba(0, 0, 0, 0.04)";
+  context.beginPath();
+  context.ellipse(
+    element.width / 2,
+    element.height / 2,
+    radius * (1 - opacity),
+    radius * (1 - opacity),
+    0,
+    0,
+    2 * Math.PI,
+  );
+
   context.fill();
 
   // Draw countdown
