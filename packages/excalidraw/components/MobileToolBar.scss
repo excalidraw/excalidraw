@@ -8,22 +8,18 @@
     align-items: center;
     padding: 4px;
     gap: 4px;
-    max-width: 400px;
     border-radius: var(--space-factor);
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
     justify-content: space-between;
 
-    @media screen and (min-width: 350px) {
-      gap: 8px;
-      padding: 4px 6px;
+    @media screen and (min-width: 340px) {
+      gap: 6px;
     }
 
-    // add a media query to increase the gaps on larger mobile devices
-    @media screen and (min-width: 400px) {
-      gap: 12px;
-      padding: 4px 8px;
+    @media screen and (min-width: 380px) {
+      gap: 8px;
     }
   }
 
@@ -32,8 +28,8 @@
   }
 
   .mobile-toolbar .ToolIcon {
-    min-width: 32px;
-    min-height: 32px;
+    min-width: 2rem;
+    min-height: 2rem;
     border-radius: 4px;
     display: flex;
     align-items: center;
@@ -41,19 +37,19 @@
     flex-shrink: 0;
 
     .ToolIcon__icon {
-      width: 32px;
-      height: 32px;
+      width: 2rem;
+      height: 2rem;
     }
 
     svg {
-      width: 16px;
-      height: 16px;
+      width: 1rem;
+      height: 1rem;
     }
   }
 
-  /* Reuse existing dropdown styles */
   .mobile-toolbar .App-toolbar__extra-tools-dropdown {
     min-width: 160px;
+    z-index: var(--zIndex-layerUI);
   }
 
   .mobile-toolbar-separator {
