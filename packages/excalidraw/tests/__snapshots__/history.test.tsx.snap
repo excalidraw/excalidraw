@@ -6101,7 +6101,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "offsetTop": 0,
   "openDialog": null,
   "openMenu": null,
-  "openPopup": "elementBackground",
+  "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
   "pasteDialog": {
@@ -11961,7 +11961,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "offsetTop": 0,
   "openDialog": null,
   "openMenu": null,
-  "openPopup": "elementStroke",
+  "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
   "pasteDialog": {
@@ -15533,7 +15533,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "offsetTop": 0,
   "openDialog": null,
   "openMenu": null,
-  "openPopup": "elementBackground",
+  "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
   "pasteDialog": {

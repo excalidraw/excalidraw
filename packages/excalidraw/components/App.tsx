@@ -2488,6 +2488,8 @@ class App extends React.Component<AppProps, AppState> {
         // but not too narrow (> MQ_MAX_WIDTH_MOBILE)
         this.isTabletBreakpoint(editorWidth, editorHeight) && isMobileOrTablet()
           ? "compact"
+          : this.isMobileBreakpoint(editorWidth, editorHeight)
+          ? "mobile"
           : "full",
     });
 
@@ -6487,6 +6489,10 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.snapLines) {
       this.setAppState({ snapLines: [] });
+    }
+
+    if (this.state.openPopup) {
+      this.setState({ openPopup: null });
     }
 
     this.updateGestureOnPointerDown(event);

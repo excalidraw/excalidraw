@@ -78,6 +78,8 @@ import {
   DotsHorizontalIcon,
 } from "./icons";
 
+import { Island } from "./Island";
+
 import type {
   AppClassProperties,
   AppProps,
@@ -86,7 +88,6 @@ import type {
   AppState,
 } from "../types";
 import type { ActionManager } from "../actions/manager";
-import { Island } from "./Island";
 
 // Common CSS class combinations
 const PROPERTIES_CLASSES = clsx([

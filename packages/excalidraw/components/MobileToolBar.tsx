@@ -3,6 +3,14 @@ import clsx from "clsx";
 
 import { KEYS, capitalizeString } from "@excalidraw/common";
 
+import { trackEvent } from "../analytics";
+
+import { t } from "../i18n";
+
+import { isHandToolActive } from "../appState";
+
+import { useTunnels } from "../context/tunnels";
+
 import { HandButton } from "./HandButton";
 import { ToolButton } from "./ToolButton";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
@@ -28,15 +36,10 @@ import {
   MagicIcon,
 } from "./icons";
 
-import { trackEvent } from "../analytics";
-import { t } from "../i18n";
-import { isHandToolActive } from "../appState";
-import { useTunnels } from "../context/tunnels";
-
-import type { AppClassProperties, UIAppState } from "../types";
-
 import "./ToolIcon.scss";
 import "./MobileToolBar.scss";
+
+import type { AppClassProperties, UIAppState } from "../types";
 
 const SHAPE_TOOLS = [
   {

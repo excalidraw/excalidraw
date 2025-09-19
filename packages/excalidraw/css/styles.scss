@@ -239,16 +239,18 @@ body.excalidraw-cursor-resize * {
 
   .App-bottom-bar {
     position: absolute;
-    top: 0;
+    // account for margins
+    width: calc(100% - 28px);
+    max-width: 400px;
     bottom: 0;
-    left: 0;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
     --bar-padding: calc(4 * var(--space-factor));
     z-index: 4;
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
+
     pointer-events: none;
-    display: flex;
     justify-content: center;
 
     > .Island {
@@ -262,7 +264,6 @@ body.excalidraw-cursor-resize * {
   }
 
   .App-toolbar {
-    width: 100%;
     display: flex;
     justify-content: center;
 

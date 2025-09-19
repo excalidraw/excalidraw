@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 
+import { capitalizeString, CLASSES } from "@excalidraw/common";
+
+import { trackEvent } from "../analytics";
+
 import { ToolButton } from "./ToolButton";
 
 import type { AppClassProperties } from "../types";
-import { capitalizeString, CLASSES } from "@excalidraw/common";
-import { trackEvent } from "../analytics";
 
 type ToolOption = {
   type: string;
