@@ -383,10 +383,12 @@ const renderBindingHighlightForBindableElement = (
   context.save();
   context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
 
+  const PROGRESS_RATIO = (1 / BIND_MODE_TIMEOUT) * remainingTime;
+
   context.strokeStyle = "rgba(0, 0, 0, 0.2)";
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
-  context.lineDashOffset = 0;
+  context.lineDashOffset = (-PROGRESS_RATIO * 10) / appState.zoom.value;
 
   context.beginPath();
   context.ellipse(
@@ -414,16 +416,6 @@ const renderBindingHighlightForBindableElement = (
   );
 
   context.fill();
-
-  // Draw countdown
-  context.font = `${radius / 2}px sans-serif`;
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.fillText(
-    `${Math.round(remainingTime)}`,
-    element.width / 2,
-    element.height / 2,
-  );
 
   context.restore();
 
