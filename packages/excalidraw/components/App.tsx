@@ -7252,6 +7252,7 @@ class App extends React.Component<AppProps, AppState> {
         selectedElements.length === 1 &&
         !this.state.selectedLinearElement?.isEditing &&
         !isElbowArrow(selectedElements[0]) &&
+        !this.device.isTouchScreen &&
         !(
           this.state.selectedLinearElement &&
           this.state.selectedLinearElement.hoverPointIndex !== -1
