@@ -608,6 +608,7 @@
   "quickSearch": {
     "placeholder": "Quick search"
   },
+  "searchIcons": "Search icons",
   "fontList": {
     "badge": {
       "old": "old"
