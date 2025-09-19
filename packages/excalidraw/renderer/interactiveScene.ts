@@ -1,4 +1,5 @@
 import {
+  clamp,
   pointFrom,
   pointsEqual,
   type GlobalPoint,
@@ -9,6 +10,7 @@ import oc from "open-color";
 
 import {
   arrayToMap,
+  BIND_MODE_TIMEOUT,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   invariant,
@@ -16,8 +18,12 @@ import {
   throttleRAF,
 } from "@excalidraw/common";
 
-import { FIXED_BINDING_DISTANCE, maxBindingGap } from "@excalidraw/element";
-import { LinearElementEditor } from "@excalidraw/element";
+import {
+  deconstructDiamondElement,
+  deconstructRectanguloidElement,
+  elementCenterPoint,
+  LinearElementEditor,
+} from "@excalidraw/element";
 import {
   getOmitSidesForDevice,
   getTransformHandles,
@@ -45,11 +51,6 @@ import {
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
-  SuggestedBinding,
-  SuggestedPointBinding,
-} from "@excalidraw/element";
-
-import type {
   TransformHandles,
   TransformHandleType,
 } from "@excalidraw/element";
@@ -64,6 +65,7 @@ import type {
   ExcalidrawTextElement,
   GroupId,
   NonDeleted,
+  NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
 import { renderSnaps } from "../renderer/renderSnaps";
@@ -73,17 +75,18 @@ import {
   SCROLLBAR_COLOR,
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
-import { type InteractiveCanvasAppState } from "../types";
+
+import {
+  type AppClassProperties,
+  type InteractiveCanvasAppState,
+} from "../types";
 
 import { getClientColor, renderRemoteCursors } from "../clients";
 
 import {
   bootstrapCanvas,
-  drawHighlightForDiamondWithRotation,
-  drawHighlightForRectWithRotation,
   fillCircle,
   getNormalizedCanvasDimensions,
-  strokeEllipseWithRotation,
   strokeRectWithRotation,
 } from "./helpers";
 
@@ -189,82 +192,236 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
 };
 
 const renderBindingHighlightForBindableElement = (
+  app: AppClassProperties,
   context: CanvasRenderingContext2D,
   element: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-  zoom: InteractiveCanvasAppState["zoom"],
+  allElementsMap: NonDeletedSceneElementsMap,
+  appState: InteractiveCanvasAppState,
+  deltaTime: number,
+  state?: { runtime: number },
 ) => {
-  const padding = maxBindingGap(element, element.width, element.height, zoom);
+  const countdownInProgress =
+    app.state.bindMode === "orbit" && app.bindModeHandler !== null;
 
-  context.fillStyle = "rgba(0,0,0,.05)";
+  const remainingTime =
+    BIND_MODE_TIMEOUT -
+    (state?.runtime ?? (countdownInProgress ? 0 : BIND_MODE_TIMEOUT));
+  const opacity = clamp((1 / BIND_MODE_TIMEOUT) * remainingTime, 0.0001, 1);
+  const offset = element.strokeWidth / 2;
 
   switch (element.type) {
-    case "rectangle":
-    case "text":
-    case "image":
-    case "iframe":
-    case "embeddable":
-    case "frame":
     case "magicframe":
-      drawHighlightForRectWithRotation(context, element, elementsMap, padding);
-      break;
-    case "diamond":
-      drawHighlightForDiamondWithRotation(
-        context,
-        padding,
-        element,
-        elementsMap,
-      );
-      break;
-    case "ellipse": {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-      const width = x2 - x1;
-      const height = y2 - y1;
+    case "frame":
+      context.save();
 
-      context.strokeStyle = "rgba(0,0,0,.05)";
-      context.lineWidth = padding - FIXED_BINDING_DISTANCE;
-
-      strokeEllipseWithRotation(
-        context,
-        width + padding + FIXED_BINDING_DISTANCE,
-        height + padding + FIXED_BINDING_DISTANCE,
-        x1 + width / 2,
-        y1 + height / 2,
-        element.angle,
+      context.translate(
+        element.x + appState.scrollX,
+        element.y + appState.scrollY,
       );
+
+      context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
+      context.strokeStyle =
+        appState.theme === THEME.DARK
+          ? `rgba(3, 93, 161, ${opacity})`
+          : `rgba(106, 189, 252, ${opacity})`;
+
+      if (FRAME_STYLE.radius && context.roundRect) {
+        context.beginPath();
+        context.roundRect(
+          0,
+          0,
+          element.width,
+          element.height,
+          FRAME_STYLE.radius / appState.zoom.value,
+        );
+        context.stroke();
+        context.closePath();
+      } else {
+        context.strokeRect(0, 0, element.width, element.height);
+      }
+
+      context.restore();
       break;
-    }
+    default:
+      context.save();
+
+      const center = elementCenterPoint(element, allElementsMap);
+      const cx = center[0] + appState.scrollX;
+      const cy = center[1] + appState.scrollY;
+
+      context.translate(cx, cy);
+      context.rotate(element.angle as Radians);
+      context.translate(-cx, -cy);
+
+      context.translate(
+        element.x + appState.scrollX - offset,
+        element.y + appState.scrollY - offset,
+      );
+
+      context.lineWidth =
+        clamp(2.5, element.strokeWidth * 1.75, 4) /
+        Math.max(0.25, appState.zoom.value);
+      context.strokeStyle =
+        appState.theme === THEME.DARK
+          ? `rgba(3, 93, 161, ${opacity / 2})`
+          : `rgba(106, 189, 252, ${opacity / 2})`;
+
+      switch (element.type) {
+        case "ellipse":
+          context.beginPath();
+          context.ellipse(
+            (element.width + offset * 2) / 2,
+            (element.height + offset * 2) / 2,
+            (element.width + offset * 2) / 2,
+            (element.height + offset * 2) / 2,
+            0,
+            0,
+            2 * Math.PI,
+          );
+          context.closePath();
+          context.stroke();
+          break;
+        case "diamond":
+          {
+            const [segments, curves] = deconstructDiamondElement(
+              element,
+              offset,
+            );
+
+            // Draw each line segment individually
+            segments.forEach((segment) => {
+              context.beginPath();
+              context.moveTo(
+                segment[0][0] - element.x + offset,
+                segment[0][1] - element.y + offset,
+              );
+              context.lineTo(
+                segment[1][0] - element.x + offset,
+                segment[1][1] - element.y + offset,
+              );
+              context.stroke();
+            });
+
+            // Draw each curve individually (for rounded corners)
+            curves.forEach((curve) => {
+              const [start, control1, control2, end] = curve;
+              context.beginPath();
+              context.moveTo(
+                start[0] - element.x + offset,
+                start[1] - element.y + offset,
+              );
+              context.bezierCurveTo(
+                control1[0] - element.x + offset,
+                control1[1] - element.y + offset,
+                control2[0] - element.x + offset,
+                control2[1] - element.y + offset,
+                end[0] - element.x + offset,
+                end[1] - element.y + offset,
+              );
+              context.stroke();
+            });
+          }
+
+          break;
+        default:
+          {
+            const [segments, curves] = deconstructRectanguloidElement(
+              element,
+              offset,
+            );
+
+            // Draw each line segment individually
+            segments.forEach((segment) => {
+              context.beginPath();
+              context.moveTo(
+                segment[0][0] - element.x + offset,
+                segment[0][1] - element.y + offset,
+              );
+              context.lineTo(
+                segment[1][0] - element.x + offset,
+                segment[1][1] - element.y + offset,
+              );
+              context.stroke();
+            });
+
+            // Draw each curve individually (for rounded corners)
+            curves.forEach((curve) => {
+              const [start, control1, control2, end] = curve;
+              context.beginPath();
+              context.moveTo(
+                start[0] - element.x + offset,
+                start[1] - element.y + offset,
+              );
+              context.bezierCurveTo(
+                control1[0] - element.x + offset,
+                control1[1] - element.y + offset,
+                control2[0] - element.x + offset,
+                control2[1] - element.y + offset,
+                end[0] - element.x + offset,
+                end[1] - element.y + offset,
+              );
+              context.stroke();
+            });
+          }
+
+          break;
+      }
+
+      context.restore();
+
+      break;
   }
-};
 
-const renderBindingHighlightForSuggestedPointBinding = (
-  context: CanvasRenderingContext2D,
-  suggestedBinding: SuggestedPointBinding,
-  elementsMap: ElementsMap,
-  zoom: InteractiveCanvasAppState["zoom"],
-) => {
-  const [element, startOrEnd, bindableElement] = suggestedBinding;
+  // Middle indicator is not rendered after it expired
+  if (!countdownInProgress || (state?.runtime ?? 0) > BIND_MODE_TIMEOUT) {
+    return;
+  }
 
-  const threshold = maxBindingGap(
-    bindableElement,
-    bindableElement.width,
-    bindableElement.height,
-    zoom,
+  const radius = 0.5 * (Math.min(element.width, element.height) / 2);
+
+  // Draw center snap area
+  context.save();
+  context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
+
+  const PROGRESS_RATIO = (1 / BIND_MODE_TIMEOUT) * remainingTime;
+
+  context.strokeStyle = "rgba(0, 0, 0, 0.2)";
+  context.lineWidth = 1 / appState.zoom.value;
+  context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
+  context.lineDashOffset = (-PROGRESS_RATIO * 10) / appState.zoom.value;
+
+  context.beginPath();
+  context.ellipse(
+    element.width / 2,
+    element.height / 2,
+    radius,
+    radius,
+    0,
+    0,
+    2 * Math.PI,
+  );
+  context.stroke();
+
+  // context.strokeStyle = "transparent";
+  context.fillStyle = "rgba(0, 0, 0, 0.04)";
+  context.beginPath();
+  context.ellipse(
+    element.width / 2,
+    element.height / 2,
+    radius * (1 - opacity),
+    radius * (1 - opacity),
+    0,
+    0,
+    2 * Math.PI,
   );
 
-  context.strokeStyle = "rgba(0,0,0,0)";
-  context.fillStyle = "rgba(0,0,0,.05)";
+  context.fill();
 
-  const pointIndices =
-    startOrEnd === "both" ? [0, -1] : startOrEnd === "start" ? [0] : [-1];
-  pointIndices.forEach((index) => {
-    const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      element,
-      index,
-      elementsMap,
-    );
-    fillCircle(context, x, y, threshold, true);
-  });
+  context.restore();
+
+  return {
+    runtime: (state?.runtime ?? 0) + deltaTime,
+  };
 };
 
 type ElementSelectionBorder = {
@@ -333,23 +490,6 @@ const renderSelectionBorder = (
       angle,
     );
   }
-  context.restore();
-};
-
-const renderBindingHighlight = (
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  suggestedBinding: SuggestedBinding,
-  elementsMap: ElementsMap,
-) => {
-  const renderHighlight = Array.isArray(suggestedBinding)
-    ? renderBindingHighlightForSuggestedPointBinding
-    : renderBindingHighlightForBindableElement;
-
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-  renderHighlight(context, suggestedBinding as any, elementsMap, appState.zoom);
-
   context.restore();
 };
 
@@ -726,6 +866,7 @@ const renderTextBox = (
 };
 
 const _renderInteractiveScene = ({
+  app,
   canvas,
   elementsMap,
   visibleElements,
@@ -735,7 +876,14 @@ const _renderInteractiveScene = ({
   appState,
   renderConfig,
   device,
-}: InteractiveSceneRenderConfig) => {
+  animationState,
+  deltaTime,
+}: InteractiveSceneRenderConfig): {
+  scrollBars?: ReturnType<typeof getScrollBars>;
+  atLeastOneVisibleElement: boolean;
+  elementsMap: RenderableElementsMap;
+  animationState?: typeof animationState;
+} => {
   if (canvas === null) {
     return { atLeastOneVisibleElement: false, elementsMap };
   }
@@ -744,6 +892,7 @@ const _renderInteractiveScene = ({
     canvas,
     scale,
   );
+  let nextAnimationState = animationState;
 
   const context = bootstrapCanvas({
     canvas,
@@ -813,17 +962,24 @@ const _renderInteractiveScene = ({
     }
   }
 
-  if (appState.isBindingEnabled) {
-    appState.suggestedBindings
-      .filter((binding) => binding != null)
-      .forEach((suggestedBinding) => {
-        renderBindingHighlight(
-          context,
-          appState,
-          suggestedBinding!,
-          elementsMap,
-        );
-      });
+  if (appState.isBindingEnabled && appState.suggestedBinding) {
+    nextAnimationState = {
+      ...animationState,
+      bindingHighlight: renderBindingHighlightForBindableElement(
+        app,
+        context,
+        appState.suggestedBinding,
+        allElementsMap,
+        appState,
+        deltaTime,
+        animationState?.bindingHighlight,
+      ),
+    };
+  } else {
+    nextAnimationState = {
+      ...animationState,
+      bindingHighlight: undefined,
+    };
   }
 
   if (appState.frameToHighlight) {
@@ -891,7 +1047,11 @@ const _renderInteractiveScene = ({
   }
 
   // Paint selected elements
-  if (!appState.multiElement && !appState.selectedLinearElement?.isEditing) {
+  if (
+    !appState.multiElement &&
+    !appState.newElement &&
+    !appState.selectedLinearElement?.isEditing
+  ) {
     const showBoundingBox = shouldShowBoundingBox(selectedElements, appState);
 
     const isSingleLinearElementSelected =
@@ -1191,6 +1351,7 @@ const _renderInteractiveScene = ({
     scrollBars,
     atLeastOneVisibleElement: visibleElements.length > 0,
     elementsMap,
+    animationState: nextAnimationState,
   };
 };
 

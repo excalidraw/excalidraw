@@ -66,6 +66,7 @@ export type InteractiveCanvasRenderConfig = {
   remotePointerUsernames: Map<SocketId, string>;
   remotePointerButton: Map<SocketId, string | undefined>;
   selectionColor: string;
+  lastViewportPosition: { x: number; y: number };
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   renderScrollbars?: boolean;
@@ -88,7 +89,12 @@ export type StaticSceneRenderConfig = {
   renderConfig: StaticCanvasRenderConfig;
 };
 
+export type InteractiveSceneRenderAnimationState = {
+  bindingHighlight: { runtime: number } | undefined;
+};
+
 export type InteractiveSceneRenderConfig = {
+  app: AppClassProperties;
   canvas: HTMLCanvasElement | null;
   elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
@@ -99,6 +105,8 @@ export type InteractiveSceneRenderConfig = {
   renderConfig: InteractiveCanvasRenderConfig;
   device: Device;
   callback: (data: RenderInteractiveSceneCallback) => void;
+  animationState?: InteractiveSceneRenderAnimationState;
+  deltaTime: number;
 };
 
 export type NewElementSceneRenderConfig = {

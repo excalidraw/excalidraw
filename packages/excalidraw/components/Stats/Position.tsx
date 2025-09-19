@@ -34,6 +34,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
   property,
   scene,
   originalAppState,
+  app,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const origElement = originalElements[0];
@@ -131,6 +132,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       newTopLeftY,
       origElement,
       scene,
+      app.state,
       originalElementsMap,
     );
     return;
@@ -162,6 +164,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
     newTopLeftY,
     origElement,
     scene,
+    app.state,
     originalElementsMap,
   );
 };
