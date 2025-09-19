@@ -43,6 +43,10 @@
   --lg-icon-size: 1rem;
   --editor-container-padding: 1rem;
 
+  @include isMobile {
+    --editor-container-padding: 0.75rem;
+  }
+
   @media screen and (min-device-width: 1921px) {
     --lg-button-size: 2.5rem;
     --lg-icon-size: 1.25rem;

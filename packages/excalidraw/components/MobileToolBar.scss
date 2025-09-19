@@ -1,0 +1,74 @@
+@import "open-color/open-color.scss";
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .mobile-toolbar {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    padding: 4px;
+    gap: 4px;
+    border-radius: var(--space-factor);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    justify-content: space-between;
+
+    @media screen and (min-width: 340px) {
+      gap: 6px;
+    }
+
+    @media screen and (min-width: 380px) {
+      gap: 8px;
+    }
+  }
+
+  .mobile-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-toolbar .ToolIcon {
+    min-width: 2rem;
+    min-height: 2rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    .ToolIcon__icon {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  .mobile-toolbar .App-toolbar__extra-tools-dropdown {
+    min-width: 160px;
+    z-index: var(--zIndex-layerUI);
+  }
+
+  .mobile-toolbar-separator {
+    width: 1px;
+    height: 24px;
+    background: var(--default-border-color);
+    margin: 0 2px;
+    flex-shrink: 0;
+  }
+
+  .mobile-toolbar-undo {
+    display: flex;
+    align-items: center;
+  }
+
+  .mobile-toolbar-undo .ToolIcon {
+    min-width: 32px;
+    min-height: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}

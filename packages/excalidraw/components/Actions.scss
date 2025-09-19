@@ -110,8 +110,8 @@
     --default-button-size: 2rem;
 
     .compact-action-button {
-      width: 2rem;
-      height: 2rem;
+      width: 1.625rem;
+      height: 1.625rem;
       border: none;
       border-radius: var(--border-radius-lg);
       background: transparent;
@@ -167,6 +167,11 @@
       }
     }
   }
+
+  .ToolIcon__icon {
+    width: 1.625rem;
+    height: 1.625rem;
+  }
 }
 
 .compact-shape-actions-island {
@@ -197,6 +202,17 @@
       gap: 0.25rem;
     }
   }
+}
+
+.mobile-shape-actions {
+  z-index: 999;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  background: transparent;
+  border-radius: var(--border-radius-lg);
+  box-shadow: none;
 }
 
 .shape-actions-theme-scope {

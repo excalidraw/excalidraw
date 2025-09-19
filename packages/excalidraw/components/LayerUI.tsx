@@ -582,13 +582,10 @@ const LayerUI = ({
           renderJSONExportDialog={renderJSONExportDialog}
           renderImageExportDialog={renderImageExportDialog}
           setAppState={setAppState}
-          onLockToggle={onLockToggle}
           onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
           renderTopRightUI={renderTopRightUI}
-          renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
-          device={device}
           renderWelcomeScreen={renderWelcomeScreen}
           UIOptions={UIOptions}
         />

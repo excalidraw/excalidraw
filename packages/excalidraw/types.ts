@@ -448,7 +448,7 @@ export interface AppState {
   lockedMultiSelections: { [groupId: string]: true };
 
   /** properties sidebar mode - determines whether to show compact or complete sidebar */
-  stylesPanelMode: "compact" | "full";
+  stylesPanelMode: "compact" | "full" | "mobile";
 }
 
 export type SearchMatch = {
