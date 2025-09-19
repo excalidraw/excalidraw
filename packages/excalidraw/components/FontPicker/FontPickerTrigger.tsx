@@ -11,11 +11,13 @@ import { useExcalidrawSetAppState } from "../App";
 interface FontPickerTriggerProps {
   selectedFontFamily: FontFamilyValues | null;
   isOpened?: boolean;
+  compactMode?: boolean;
 }
 
 export const FontPickerTrigger = ({
   selectedFontFamily,
   isOpened = false,
+  compactMode = false,
 }: FontPickerTriggerProps) => {
   const setAppState = useExcalidrawSetAppState();
 
@@ -37,6 +39,8 @@ export const FontPickerTrigger = ({
           }}
           style={{
             border: "none",
+            width: compactMode ? "1.625rem" : undefined,
+            height: compactMode ? "1.625rem" : undefined,
           }}
         />
       </div>

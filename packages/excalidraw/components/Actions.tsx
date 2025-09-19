@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 
 import {
@@ -86,6 +86,7 @@ import type {
   AppState,
 } from "../types";
 import type { ActionManager } from "../actions/manager";
+import { Island } from "./Island";
 
 // Common CSS class combinations
 const PROPERTIES_CLASSES = clsx([
@@ -305,6 +306,467 @@ export const SelectedShapeActions = ({
   );
 };
 
+const CombinedShapeProperties = ({
+  appState,
+  renderAction,
+  setAppState,
+  targetElements,
+  container,
+}: {
+  targetElements: ExcalidrawElement[];
+  appState: UIAppState;
+  renderAction: ActionManager["renderAction"];
+  setAppState: React.Component<any, AppState>["setState"];
+  container: HTMLDivElement | null;
+}) => {
+  const showFillIcons =
+    (hasBackground(appState.activeTool.type) &&
+      !isTransparent(appState.currentItemBackgroundColor)) ||
+    targetElements.some(
+      (element) =>
+        hasBackground(element.type) && !isTransparent(element.backgroundColor),
+    );
+
+  const showShowCombinedProperties =
+    showFillIcons ||
+    hasStrokeWidth(appState.activeTool.type) ||
+    targetElements.some((element) => hasStrokeWidth(element.type)) ||
+    hasStrokeStyle(appState.activeTool.type) ||
+    targetElements.some((element) => hasStrokeStyle(element.type)) ||
+    canChangeRoundness(appState.activeTool.type) ||
+    targetElements.some((element) => canChangeRoundness(element.type));
+
+  if (!showShowCombinedProperties) {
+    return null;
+  }
+
+  return (
+    <div className="compact-action-item">
+      <Popover.Root
+        open={appState.openPopup === "compactStrokeStyles"}
+        onOpenChange={(open) => {
+          if (open) {
+            setAppState({ openPopup: "compactStrokeStyles" });
+          } else {
+            setAppState({ openPopup: null });
+          }
+        }}
+      >
+        <Popover.Trigger asChild>
+          <button
+            type="button"
+            className="compact-action-button properties-trigger"
+            title={t("labels.stroke")}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              setAppState({
+                openPopup:
+                  appState.openPopup === "compactStrokeStyles"
+                    ? null
+                    : "compactStrokeStyles",
+              });
+            }}
+          >
+            {adjustmentsIcon}
+          </button>
+        </Popover.Trigger>
+        {appState.openPopup === "compactStrokeStyles" && (
+          <PropertiesPopover
+            className={PROPERTIES_CLASSES}
+            container={container}
+            style={{ maxWidth: "13rem" }}
+            onClose={() => {}}
+          >
+            <div className="selected-shape-actions">
+              {showFillIcons && renderAction("changeFillStyle")}
+              {(hasStrokeWidth(appState.activeTool.type) ||
+                targetElements.some((element) =>
+                  hasStrokeWidth(element.type),
+                )) &&
+                renderAction("changeStrokeWidth")}
+              {(hasStrokeStyle(appState.activeTool.type) ||
+                targetElements.some((element) =>
+                  hasStrokeStyle(element.type),
+                )) && (
+                <>
+                  {renderAction("changeStrokeStyle")}
+                  {renderAction("changeSloppiness")}
+                </>
+              )}
+              {(canChangeRoundness(appState.activeTool.type) ||
+                targetElements.some((element) =>
+                  canChangeRoundness(element.type),
+                )) &&
+                renderAction("changeRoundness")}
+              {renderAction("changeOpacity")}
+            </div>
+          </PropertiesPopover>
+        )}
+      </Popover.Root>
+    </div>
+  );
+};
+
+const CombinedArrowProperties = ({
+  appState,
+  renderAction,
+  setAppState,
+  targetElements,
+  container,
+  app,
+}: {
+  targetElements: ExcalidrawElement[];
+  appState: UIAppState;
+  renderAction: ActionManager["renderAction"];
+  setAppState: React.Component<any, AppState>["setState"];
+  container: HTMLDivElement | null;
+  app: AppClassProperties;
+}) => {
+  const showShowArrowProperties =
+    toolIsArrow(appState.activeTool.type) ||
+    targetElements.some((element) => toolIsArrow(element.type));
+
+  if (!showShowArrowProperties) {
+    return null;
+  }
+
+  return (
+    <div className="compact-action-item">
+      <Popover.Root
+        open={appState.openPopup === "compactArrowProperties"}
+        onOpenChange={(open) => {
+          if (open) {
+            setAppState({ openPopup: "compactArrowProperties" });
+          } else {
+            setAppState({ openPopup: null });
+          }
+        }}
+      >
+        <Popover.Trigger asChild>
+          <button
+            type="button"
+            className="compact-action-button properties-trigger"
+            title={t("labels.arrowtypes")}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              setAppState({
+                openPopup:
+                  appState.openPopup === "compactArrowProperties"
+                    ? null
+                    : "compactArrowProperties",
+              });
+            }}
+          >
+            {(() => {
+              // Show an icon based on the current arrow type
+              const arrowType = getFormValue(
+                targetElements,
+                app,
+                (element) => {
+                  if (isArrowElement(element)) {
+                    return element.elbowed
+                      ? "elbow"
+                      : element.roundness
+                      ? "round"
+                      : "sharp";
+                  }
+                  return null;
+                },
+                (element) => isArrowElement(element),
+                (hasSelection) =>
+                  hasSelection ? null : appState.currentItemArrowType,
+              );
+
+              if (arrowType === "elbow") {
+                return elbowArrowIcon;
+              }
+              if (arrowType === "round") {
+                return roundArrowIcon;
+              }
+              return sharpArrowIcon;
+            })()}
+          </button>
+        </Popover.Trigger>
+        {appState.openPopup === "compactArrowProperties" && (
+          <PropertiesPopover
+            container={container}
+            className="properties-content"
+            style={{ maxWidth: "13rem" }}
+            onClose={() => {}}
+          >
+            {renderAction("changeArrowProperties")}
+          </PropertiesPopover>
+        )}
+      </Popover.Root>
+    </div>
+  );
+};
+
+const CombinedTextProperties = ({
+  appState,
+  renderAction,
+  setAppState,
+  targetElements,
+  container,
+  elementsMap,
+}: {
+  appState: UIAppState;
+  renderAction: ActionManager["renderAction"];
+  setAppState: React.Component<any, AppState>["setState"];
+  targetElements: ExcalidrawElement[];
+  container: HTMLDivElement | null;
+  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
+}) => {
+  const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus();
+
+  return (
+    <div className="compact-action-item">
+      <Popover.Root
+        open={appState.openPopup === "compactTextProperties"}
+        onOpenChange={(open) => {
+          if (open) {
+            if (appState.editingTextElement) {
+              saveCaretPosition();
+            }
+            setAppState({ openPopup: "compactTextProperties" });
+          } else {
+            setAppState({ openPopup: null });
+            if (appState.editingTextElement) {
+              restoreCaretPosition();
+            }
+          }
+        }}
+      >
+        <Popover.Trigger asChild>
+          <button
+            type="button"
+            className="compact-action-button properties-trigger"
+            title={t("labels.textAlign")}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              if (appState.openPopup === "compactTextProperties") {
+                setAppState({ openPopup: null });
+              } else {
+                if (appState.editingTextElement) {
+                  saveCaretPosition();
+                }
+                setAppState({ openPopup: "compactTextProperties" });
+              }
+            }}
+          >
+            {TextSizeIcon}
+          </button>
+        </Popover.Trigger>
+        {appState.openPopup === "compactTextProperties" && (
+          <PropertiesPopover
+            className={PROPERTIES_CLASSES}
+            container={container}
+            style={{ maxWidth: "13rem" }}
+            // Improve focus handling for text editing scenarios
+            preventAutoFocusOnTouch={!!appState.editingTextElement}
+            onClose={() => {
+              // Refocus text editor when popover closes with caret restoration
+              if (appState.editingTextElement) {
+                restoreCaretPosition();
+              }
+            }}
+          >
+            <div className="selected-shape-actions">
+              {(appState.activeTool.type === "text" ||
+                targetElements.some(isTextElement)) &&
+                renderAction("changeFontSize")}
+              {(appState.activeTool.type === "text" ||
+                suppportsHorizontalAlign(targetElements, elementsMap)) &&
+                renderAction("changeTextAlign")}
+              {shouldAllowVerticalAlign(targetElements, elementsMap) &&
+                renderAction("changeVerticalAlign")}
+            </div>
+          </PropertiesPopover>
+        )}
+      </Popover.Root>
+    </div>
+  );
+};
+
+const CombinedExtraActions = ({
+  appState,
+  renderAction,
+  targetElements,
+  setAppState,
+  container,
+  app,
+}: {
+  appState: UIAppState;
+  targetElements: ExcalidrawElement[];
+  renderAction: ActionManager["renderAction"];
+  setAppState: React.Component<any, AppState>["setState"];
+  container: HTMLDivElement | null;
+  app: AppClassProperties;
+}) => {
+  const isEditingTextOrNewElement = Boolean(
+    appState.editingTextElement || appState.newElement,
+  );
+  const showCropEditorAction =
+    !appState.croppingElementId &&
+    targetElements.length === 1 &&
+    isImageElement(targetElements[0]);
+  const showLinkIcon = targetElements.length === 1;
+  const showAlignActions = alignActionsPredicate(appState, app);
+  let isSingleElementBoundContainer = false;
+  if (
+    targetElements.length === 2 &&
+    (hasBoundTextElement(targetElements[0]) ||
+      hasBoundTextElement(targetElements[1]))
+  ) {
+    isSingleElementBoundContainer = true;
+  }
+
+  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
+
+  if (isEditingTextOrNewElement || targetElements.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="compact-action-item">
+      <Popover.Root
+        open={appState.openPopup === "compactOtherProperties"}
+        onOpenChange={(open) => {
+          if (open) {
+            setAppState({ openPopup: "compactOtherProperties" });
+          } else {
+            setAppState({ openPopup: null });
+          }
+        }}
+      >
+        <Popover.Trigger asChild>
+          <button
+            type="button"
+            className="compact-action-button properties-trigger"
+            title={t("labels.actions")}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setAppState({
+                openPopup:
+                  appState.openPopup === "compactOtherProperties"
+                    ? null
+                    : "compactOtherProperties",
+              });
+            }}
+          >
+            {DotsHorizontalIcon}
+          </button>
+        </Popover.Trigger>
+        {appState.openPopup === "compactOtherProperties" && (
+          <PropertiesPopover
+            className={PROPERTIES_CLASSES}
+            container={container}
+            style={{
+              maxWidth: "12rem",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            onClose={() => {}}
+          >
+            <div className="selected-shape-actions">
+              <fieldset>
+                <legend>{t("labels.layers")}</legend>
+                <div className="buttonList">
+                  {renderAction("sendToBack")}
+                  {renderAction("sendBackward")}
+                  {renderAction("bringForward")}
+                  {renderAction("bringToFront")}
+                </div>
+              </fieldset>
+
+              {showAlignActions && !isSingleElementBoundContainer && (
+                <fieldset>
+                  <legend>{t("labels.align")}</legend>
+                  <div className="buttonList">
+                    {isRTL ? (
+                      <>
+                        {renderAction("alignRight")}
+                        {renderAction("alignHorizontallyCentered")}
+                        {renderAction("alignLeft")}
+                      </>
+                    ) : (
+                      <>
+                        {renderAction("alignLeft")}
+                        {renderAction("alignHorizontallyCentered")}
+                        {renderAction("alignRight")}
+                      </>
+                    )}
+                    {targetElements.length > 2 &&
+                      renderAction("distributeHorizontally")}
+                    {/* breaks the row ˇˇ */}
+                    <div style={{ flexBasis: "100%", height: 0 }} />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: ".5rem",
+                        marginTop: "-0.5rem",
+                      }}
+                    >
+                      {renderAction("alignTop")}
+                      {renderAction("alignVerticallyCentered")}
+                      {renderAction("alignBottom")}
+                      {targetElements.length > 2 &&
+                        renderAction("distributeVertically")}
+                    </div>
+                  </div>
+                </fieldset>
+              )}
+              <fieldset>
+                <legend>{t("labels.actions")}</legend>
+                <div className="buttonList">
+                  {renderAction("group")}
+                  {renderAction("ungroup")}
+                  {showLinkIcon && renderAction("hyperlink")}
+                  {showCropEditorAction && renderAction("cropEditor")}
+                </div>
+              </fieldset>
+            </div>
+          </PropertiesPopover>
+        )}
+      </Popover.Root>
+    </div>
+  );
+};
+
+const LinearEditorAction = ({
+  appState,
+  renderAction,
+  targetElements,
+}: {
+  appState: UIAppState;
+  targetElements: ExcalidrawElement[];
+  renderAction: ActionManager["renderAction"];
+}) => {
+  const showLineEditorAction =
+    !appState.selectedLinearElement?.isEditing &&
+    targetElements.length === 1 &&
+    isLinearElement(targetElements[0]) &&
+    !isElbowArrow(targetElements[0]);
+
+  if (!showLineEditorAction) {
+    return null;
+  }
+
+  return (
+    <div className="compact-action-item">
+      {renderAction("toggleLinearEditor")}
+    </div>
+  );
+};
+
 export const CompactShapeActions = ({
   appState,
   elementsMap,
@@ -319,22 +781,11 @@ export const CompactShapeActions = ({
   setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
-  const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus();
   const { container } = useExcalidrawContainer();
 
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
   );
-
-  const showFillIcons =
-    (hasBackground(appState.activeTool.type) &&
-      !isTransparent(appState.currentItemBackgroundColor)) ||
-    targetElements.some(
-      (element) =>
-        hasBackground(element.type) && !isTransparent(element.backgroundColor),
-    );
-
-  const showLinkIcon = targetElements.length === 1;
 
   const showLineEditorAction =
     !appState.selectedLinearElement?.isEditing &&
@@ -342,29 +793,16 @@ export const CompactShapeActions = ({
     isLinearElement(targetElements[0]) &&
     !isElbowArrow(targetElements[0]);
 
-  const showCropEditorAction =
-    !appState.croppingElementId &&
-    targetElements.length === 1 &&
-    isImageElement(targetElements[0]);
-
-  const showAlignActions = alignActionsPredicate(appState, app);
-
-  let isSingleElementBoundContainer = false;
-  if (
-    targetElements.length === 2 &&
-    (hasBoundTextElement(targetElements[0]) ||
-      hasBoundTextElement(targetElements[1]))
-  ) {
-    isSingleElementBoundContainer = true;
-  }
-
-  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
-
   return (
     <div className="compact-shape-actions">
       {/* Stroke Color */}
       {canChangeStrokeColor(appState, targetElements) && (
-        <div className={clsx("compact-action-item")}>
+        <div
+          className={clsx("compact-action-item")}
+          style={{
+            marginRight: 4,
+          }}
+        >
           {renderAction("changeStrokeColor")}
         </div>
       )}
@@ -376,156 +814,22 @@ export const CompactShapeActions = ({
         </div>
       )}
 
-      {/* Combined Properties (Fill, Stroke, Opacity) */}
-      {(showFillIcons ||
-        hasStrokeWidth(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeWidth(element.type)) ||
-        hasStrokeStyle(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeStyle(element.type)) ||
-        canChangeRoundness(appState.activeTool.type) ||
-        targetElements.some((element) => canChangeRoundness(element.type))) && (
-        <div className="compact-action-item">
-          <Popover.Root
-            open={appState.openPopup === "compactStrokeStyles"}
-            onOpenChange={(open) => {
-              if (open) {
-                setAppState({ openPopup: "compactStrokeStyles" });
-              } else {
-                setAppState({ openPopup: null });
-              }
-            }}
-          >
-            <Popover.Trigger asChild>
-              <button
-                type="button"
-                className="compact-action-button properties-trigger"
-                title={t("labels.stroke")}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
+      <CombinedShapeProperties
+        appState={appState}
+        renderAction={renderAction}
+        setAppState={setAppState}
+        targetElements={targetElements}
+        container={container}
+      />
 
-                  setAppState({
-                    openPopup:
-                      appState.openPopup === "compactStrokeStyles"
-                        ? null
-                        : "compactStrokeStyles",
-                  });
-                }}
-              >
-                {adjustmentsIcon}
-              </button>
-            </Popover.Trigger>
-            {appState.openPopup === "compactStrokeStyles" && (
-              <PropertiesPopover
-                className={PROPERTIES_CLASSES}
-                container={container}
-                style={{ maxWidth: "13rem" }}
-                onClose={() => {}}
-              >
-                <div className="selected-shape-actions">
-                  {showFillIcons && renderAction("changeFillStyle")}
-                  {(hasStrokeWidth(appState.activeTool.type) ||
-                    targetElements.some((element) =>
-                      hasStrokeWidth(element.type),
-                    )) &&
-                    renderAction("changeStrokeWidth")}
-                  {(hasStrokeStyle(appState.activeTool.type) ||
-                    targetElements.some((element) =>
-                      hasStrokeStyle(element.type),
-                    )) && (
-                    <>
-                      {renderAction("changeStrokeStyle")}
-                      {renderAction("changeSloppiness")}
-                    </>
-                  )}
-                  {(canChangeRoundness(appState.activeTool.type) ||
-                    targetElements.some((element) =>
-                      canChangeRoundness(element.type),
-                    )) &&
-                    renderAction("changeRoundness")}
-                  {renderAction("changeOpacity")}
-                </div>
-              </PropertiesPopover>
-            )}
-          </Popover.Root>
-        </div>
-      )}
-
-      {/* Combined Arrow Properties */}
-      {(toolIsArrow(appState.activeTool.type) ||
-        targetElements.some((element) => toolIsArrow(element.type))) && (
-        <div className="compact-action-item">
-          <Popover.Root
-            open={appState.openPopup === "compactArrowProperties"}
-            onOpenChange={(open) => {
-              if (open) {
-                setAppState({ openPopup: "compactArrowProperties" });
-              } else {
-                setAppState({ openPopup: null });
-              }
-            }}
-          >
-            <Popover.Trigger asChild>
-              <button
-                type="button"
-                className="compact-action-button properties-trigger"
-                title={t("labels.arrowtypes")}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-
-                  setAppState({
-                    openPopup:
-                      appState.openPopup === "compactArrowProperties"
-                        ? null
-                        : "compactArrowProperties",
-                  });
-                }}
-              >
-                {(() => {
-                  // Show an icon based on the current arrow type
-                  const arrowType = getFormValue(
-                    targetElements,
-                    app,
-                    (element) => {
-                      if (isArrowElement(element)) {
-                        return element.elbowed
-                          ? "elbow"
-                          : element.roundness
-                          ? "round"
-                          : "sharp";
-                      }
-                      return null;
-                    },
-                    (element) => isArrowElement(element),
-                    (hasSelection) =>
-                      hasSelection ? null : appState.currentItemArrowType,
-                  );
-
-                  if (arrowType === "elbow") {
-                    return elbowArrowIcon;
-                  }
-                  if (arrowType === "round") {
-                    return roundArrowIcon;
-                  }
-                  return sharpArrowIcon;
-                })()}
-              </button>
-            </Popover.Trigger>
-            {appState.openPopup === "compactArrowProperties" && (
-              <PropertiesPopover
-                container={container}
-                className="properties-content"
-                style={{ maxWidth: "13rem" }}
-                onClose={() => {}}
-              >
-                {renderAction("changeArrowProperties")}
-              </PropertiesPopover>
-            )}
-          </Popover.Root>
-        </div>
-      )}
-
+      <CombinedArrowProperties
+        appState={appState}
+        renderAction={renderAction}
+        setAppState={setAppState}
+        targetElements={targetElements}
+        container={container}
+        app={app}
+      />
       {/* Linear Editor */}
       {showLineEditorAction && (
         <div className="compact-action-item">
@@ -540,73 +844,14 @@ export const CompactShapeActions = ({
           <div className="compact-action-item">
             {renderAction("changeFontFamily")}
           </div>
-          <div className="compact-action-item">
-            <Popover.Root
-              open={appState.openPopup === "compactTextProperties"}
-              onOpenChange={(open) => {
-                if (open) {
-                  if (appState.editingTextElement) {
-                    saveCaretPosition();
-                  }
-                  setAppState({ openPopup: "compactTextProperties" });
-                } else {
-                  setAppState({ openPopup: null });
-                  if (appState.editingTextElement) {
-                    restoreCaretPosition();
-                  }
-                }
-              }}
-            >
-              <Popover.Trigger asChild>
-                <button
-                  type="button"
-                  className="compact-action-button properties-trigger"
-                  title={t("labels.textAlign")}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    if (appState.openPopup === "compactTextProperties") {
-                      setAppState({ openPopup: null });
-                    } else {
-                      if (appState.editingTextElement) {
-                        saveCaretPosition();
-                      }
-                      setAppState({ openPopup: "compactTextProperties" });
-                    }
-                  }}
-                >
-                  {TextSizeIcon}
-                </button>
-              </Popover.Trigger>
-              {appState.openPopup === "compactTextProperties" && (
-                <PropertiesPopover
-                  className={PROPERTIES_CLASSES}
-                  container={container}
-                  style={{ maxWidth: "13rem" }}
-                  // Improve focus handling for text editing scenarios
-                  preventAutoFocusOnTouch={!!appState.editingTextElement}
-                  onClose={() => {
-                    // Refocus text editor when popover closes with caret restoration
-                    if (appState.editingTextElement) {
-                      restoreCaretPosition();
-                    }
-                  }}
-                >
-                  <div className="selected-shape-actions">
-                    {(appState.activeTool.type === "text" ||
-                      targetElements.some(isTextElement)) &&
-                      renderAction("changeFontSize")}
-                    {(appState.activeTool.type === "text" ||
-                      suppportsHorizontalAlign(targetElements, elementsMap)) &&
-                      renderAction("changeTextAlign")}
-                    {shouldAllowVerticalAlign(targetElements, elementsMap) &&
-                      renderAction("changeVerticalAlign")}
-                  </div>
-                </PropertiesPopover>
-              )}
-            </Popover.Root>
-          </div>
+          <CombinedTextProperties
+            appState={appState}
+            renderAction={renderAction}
+            setAppState={setAppState}
+            targetElements={targetElements}
+            container={container}
+            elementsMap={elementsMap}
+          />
         </>
       )}
 
@@ -624,115 +869,147 @@ export const CompactShapeActions = ({
         </div>
       )}
 
-      {/* Combined Other Actions */}
-      {!isEditingTextOrNewElement && targetElements.length > 0 && (
-        <div className="compact-action-item">
-          <Popover.Root
-            open={appState.openPopup === "compactOtherProperties"}
-            onOpenChange={(open) => {
-              if (open) {
-                setAppState({ openPopup: "compactOtherProperties" });
-              } else {
-                setAppState({ openPopup: null });
-              }
-            }}
-          >
-            <Popover.Trigger asChild>
-              <button
-                type="button"
-                className="compact-action-button properties-trigger"
-                title={t("labels.actions")}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setAppState({
-                    openPopup:
-                      appState.openPopup === "compactOtherProperties"
-                        ? null
-                        : "compactOtherProperties",
-                  });
-                }}
-              >
-                {DotsHorizontalIcon}
-              </button>
-            </Popover.Trigger>
-            {appState.openPopup === "compactOtherProperties" && (
-              <PropertiesPopover
-                className={PROPERTIES_CLASSES}
-                container={container}
-                style={{
-                  maxWidth: "12rem",
-                  // center the popover content
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                onClose={() => {}}
-              >
-                <div className="selected-shape-actions">
-                  <fieldset>
-                    <legend>{t("labels.layers")}</legend>
-                    <div className="buttonList">
-                      {renderAction("sendToBack")}
-                      {renderAction("sendBackward")}
-                      {renderAction("bringForward")}
-                      {renderAction("bringToFront")}
-                    </div>
-                  </fieldset>
-
-                  {showAlignActions && !isSingleElementBoundContainer && (
-                    <fieldset>
-                      <legend>{t("labels.align")}</legend>
-                      <div className="buttonList">
-                        {isRTL ? (
-                          <>
-                            {renderAction("alignRight")}
-                            {renderAction("alignHorizontallyCentered")}
-                            {renderAction("alignLeft")}
-                          </>
-                        ) : (
-                          <>
-                            {renderAction("alignLeft")}
-                            {renderAction("alignHorizontallyCentered")}
-                            {renderAction("alignRight")}
-                          </>
-                        )}
-                        {targetElements.length > 2 &&
-                          renderAction("distributeHorizontally")}
-                        {/* breaks the row ˇˇ */}
-                        <div style={{ flexBasis: "100%", height: 0 }} />
-                        <div
-                          style={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            gap: ".5rem",
-                            marginTop: "-0.5rem",
-                          }}
-                        >
-                          {renderAction("alignTop")}
-                          {renderAction("alignVerticallyCentered")}
-                          {renderAction("alignBottom")}
-                          {targetElements.length > 2 &&
-                            renderAction("distributeVertically")}
-                        </div>
-                      </div>
-                    </fieldset>
-                  )}
-                  <fieldset>
-                    <legend>{t("labels.actions")}</legend>
-                    <div className="buttonList">
-                      {renderAction("group")}
-                      {renderAction("ungroup")}
-                      {showLinkIcon && renderAction("hyperlink")}
-                      {showCropEditorAction && renderAction("cropEditor")}
-                    </div>
-                  </fieldset>
-                </div>
-              </PropertiesPopover>
-            )}
-          </Popover.Root>
-        </div>
-      )}
+      <CombinedExtraActions
+        appState={appState}
+        renderAction={renderAction}
+        targetElements={targetElements}
+        setAppState={setAppState}
+        container={container}
+        app={app}
+      />
     </div>
+  );
+};
+
+export const MobileShapeActions = ({
+  appState,
+  elementsMap,
+  renderAction,
+  app,
+  setAppState,
+}: {
+  appState: UIAppState;
+  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
+  renderAction: ActionManager["renderAction"];
+  app: AppClassProperties;
+  setAppState: React.Component<any, AppState>["setState"];
+}) => {
+  const targetElements = getTargetElements(elementsMap, appState);
+  const { container } = useExcalidrawContainer();
+  const mobileActionsRef = useRef<HTMLDivElement>(null);
+
+  const width = mobileActionsRef.current?.getBoundingClientRect()?.width ?? 0;
+
+  const WIDTH = 26;
+  const GAP = 8;
+
+  // max 6 actions + undo
+  const MIN_WIDTH = 7 * WIDTH + 6 * GAP;
+
+  const ADDITIONAL_WIDTH = WIDTH + GAP;
+
+  const showDelete = width >= MIN_WIDTH;
+  const showDuplicate = width >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
+  const showRedo = width >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
+
+  return (
+    <Island
+      className="compact-shape-actions mobile-shape-actions"
+      style={{
+        flexDirection: "row",
+        boxShadow: "none",
+        backgroundColor: "transparent",
+        padding: 0,
+        margin: "0 0.25rem",
+        zIndex: 2,
+        height: WIDTH * 1.75,
+        alignItems: "center",
+        gap: GAP,
+      }}
+      ref={mobileActionsRef}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: GAP,
+          flex: 1,
+        }}
+      >
+        {canChangeStrokeColor(appState, targetElements) && (
+          <div className={clsx("compact-action-item")}>
+            {renderAction("changeStrokeColor")}
+          </div>
+        )}
+        {canChangeBackgroundColor(appState, targetElements) && (
+          <div className="compact-action-item">
+            {renderAction("changeBackgroundColor")}
+          </div>
+        )}
+        <CombinedShapeProperties
+          appState={appState}
+          renderAction={renderAction}
+          setAppState={setAppState}
+          targetElements={targetElements}
+          container={container}
+        />
+        {/* Combined Arrow Properties */}
+        <CombinedArrowProperties
+          appState={appState}
+          renderAction={renderAction}
+          setAppState={setAppState}
+          targetElements={targetElements}
+          container={container}
+          app={app}
+        />
+        {/* Linear Editor */}
+        <LinearEditorAction
+          appState={appState}
+          renderAction={renderAction}
+          targetElements={targetElements}
+        />
+        {/* Text Properties */}
+        {(appState.activeTool.type === "text" ||
+          targetElements.some(isTextElement)) && (
+          <>
+            <div className="compact-action-item">
+              {renderAction("changeFontFamily")}
+            </div>
+            <CombinedTextProperties
+              appState={appState}
+              renderAction={renderAction}
+              setAppState={setAppState}
+              targetElements={targetElements}
+              container={container}
+              elementsMap={elementsMap}
+            />
+          </>
+        )}
+
+        {showDuplicate && renderAction("duplicateSelection")}
+        {showDelete && renderAction("deleteSelectedElements")}
+
+        {/* Combined Other Actions */}
+        <CombinedExtraActions
+          appState={appState}
+          renderAction={renderAction}
+          targetElements={targetElements}
+          setAppState={setAppState}
+          container={container}
+          app={app}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: GAP,
+        }}
+      >
+        {renderAction("undo")}
+        {showRedo && renderAction("redo")}
+      </div>
+    </Island>
   );
 };
 
