@@ -617,14 +617,15 @@ const generateElementShape = (
     canvasBackgroundColor: string;
     embedsValidationStatus: EmbedsValidationStatus | null;
   },
-
+  
+  from? : string,
   //Todo: Bisa jadi class tersendiri
   customInput? : {
     topLeft? : null | number
     topRight? : null | number
     bottomRight? : null | number
     bottomLeft? : null | number
-  }
+  },
 ): Drawable | Drawable[] | null => {
   switch (element.type) {
     case "rectangle":
@@ -684,7 +685,7 @@ const generateElementShape = (
         const br = customInput?.bottomRight ?? DEFAULT_ADAPTIVE_RADIUS;
 
         // Dummy
-        
+        console.log(from, tl, tr, bl ,br)
 
         shape = generator.path(
 

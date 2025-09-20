@@ -160,6 +160,8 @@ export const changeProperty = (
     }),
   );
 
+  console.log(callback);
+
   return elements.map((element) => {
     if (
       selectedElementIds.get(element.id) ||
@@ -1394,11 +1396,9 @@ export const actionChangeRoundness = register({
 
         return newElementWith(el, {
           roundness:
-            value === "round"
+            value === "sharp"
               ? {
-                  type: isUsingAdaptiveRadius(el.type)
-                    ? ROUNDNESS.ADAPTIVE_RADIUS
-                    : ROUNDNESS.PROPORTIONAL_RADIUS,
+                  type: ROUNDNESS.PROPORTIONAL_RADIUS
                 }
               : value === "custom" ? 
               {
@@ -1503,22 +1503,43 @@ export const actionCustomizeRoundness = register({
   label: "Customize edge roundness",
   trackEvent: false,
   perform: (elements, appState, value) => {
+
+    
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isElbowArrow(el)) {
           return el;
         }
+        // console.log(" value : "+value)
+        const { roundness } = value;
+        const { type, corners } = roundness;
+        console.log(type, corners)
+
+        const defaultValue = type === ROUNDNESS.PROPORTIONAL_RADIUS ? DEFAULT_PROPORTIONAL_RADIUS : DEFAULT_ADAPTIVE_RADIUS;
+        
+        let customCorners = {
+          topLeft:  defaultValue,
+          topRight: defaultValue,
+          bottomLeft: defaultValue,
+          bottomRight: defaultValue,
+        }
+
+        if (el.roundness?.type === ROUNDNESS.CUSTOMIZED && el.roundness.corners) {
+          customCorners = {
+            topLeft:  corners.topLeft ?? defaultValue,
+            topRight: corners.topRight ?? defaultValue,
+            bottomLeft: corners.bottomLeft ?? defaultValue,
+            bottomRight: corners.bottomRight ?? defaultValue,
+          }
+        }
+
+        // console.log(customCorners)
 
         //Todo: Kode untuk perform aksi gambarnya
         return newElementWith(el, {
           roundness:{
               type: ROUNDNESS.CUSTOMIZED,
-              corners: {
-                topLeft:10,
-                topRight:10,
-                bottomLeft:10,
-                bottomRight:10,
-              }
+              corners: customCorners,
             }
           ,
         });
@@ -1561,23 +1582,25 @@ export const actionCustomizeRoundness = register({
     }
 
       const updateCornersValue = (corner: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight', newValue: number) => {
-    const currentCorners = {
-      topLeft: getCurrentCornerValue('topLeft') ?? 0,
-      topRight: getCurrentCornerValue('topRight') ?? 0,
-      bottomLeft: getCurrentCornerValue('bottomLeft') ?? 0,
-      bottomRight: getCurrentCornerValue('bottomRight') ?? 0,
-    };
+      const currentCorners = {
+        topLeft: getCurrentCornerValue('topLeft') ?? 0,
+        topRight: getCurrentCornerValue('topRight') ?? 0,
+        bottomLeft: getCurrentCornerValue('bottomLeft') ?? 0,
+        bottomRight: getCurrentCornerValue('bottomRight') ?? 0,
+      };
     
     currentCorners[corner] = newValue;
 
     updateData({
       roundness: {
         type: ROUNDNESS.CUSTOMIZED,
-        corners: currentCorners
+        corners: currentCorners,
       }
     });
 
-    console.log(getCurrentCornerValue(corner));
+      // updateData("TEST");
+
+    console.log(currentCorners);
   };
 
     return (
