@@ -24,7 +24,9 @@ export class LaserTrails implements Trail {
 
     this.localTrail = new AnimatedTrail(animationFrameHandler, app, {
       ...this.getTrailOptions(),
-      fill: () => DEFAULT_LASER_COLOR,
+      fill: () => this.app.state.activeTool.type === "annotation" 
+        ? "#ff3b30" // iPad-style red for annotation
+        : DEFAULT_LASER_COLOR, // Default laser color
     });
   }
 
@@ -33,8 +35,15 @@ export class LaserTrails implements Trail {
       simplify: 0,
       streamline: 0.4,
       sizeMapping: (c) => {
-        const DECAY_TIME = 1000;
-        const DECAY_LENGTH = 50;
+        // For annotation tool, make trails persistent (never decay)
+        // For laser tool, use original fading behavior
+        const DECAY_TIME = this.app.state.activeTool.type === "annotation" 
+          ? Infinity 
+          : 1000;
+        // For annotation, use a longer decay length to ensure full trail visibility
+        const DECAY_LENGTH = this.app.state.activeTool.type === "annotation" 
+          ? 1000  // Much longer trail for annotations
+          : 50;   // Normal short trail for laser
         const t = Math.max(
           0,
           1 - (performance.now() - c.pressure) / DECAY_TIME,
@@ -59,6 +68,14 @@ export class LaserTrails implements Trail {
 
   endPath(): void {
     this.localTrail.endPath();
+  }
+
+  clearTrails() {
+    this.localTrail.clearTrails();
+    // Also clear collaborative trails
+    for (const trail of this.collabTrails.values()) {
+      trail.clearTrails();
+    }
   }
 
   start(container: SVGSVGElement) {
