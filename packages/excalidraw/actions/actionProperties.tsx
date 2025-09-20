@@ -566,7 +566,7 @@ export const actionChangeStrokeWidth = register({
   ),
 });
 
-// 
+//
 export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   label: "labels.sloppiness",
@@ -1400,7 +1400,7 @@ export const actionChangeRoundness = register({
               ? {
                   type: ROUNDNESS.PROPORTIONAL_RADIUS
                 }
-              : value === "custom" ? 
+              : value === "custom" ?
               {
                 type: ROUNDNESS.CUSTOMIZED,
                 corners : {
@@ -1485,7 +1485,7 @@ export const actionChangeRoundness = register({
           />
 
           {((canCustomizeRoundness(appState.activeTool.type) ||
-          targetElements.some((element) => canCustomizeRoundness(element.type))) 
+          targetElements.some((element) => canCustomizeRoundness(element.type)))
           && getCurrentEdgeType() === "custom" )
             && (
             <>{renderAction("customizeRoundness")}</>
@@ -1504,19 +1504,20 @@ export const actionCustomizeRoundness = register({
   trackEvent: false,
   perform: (elements, appState, value) => {
 
-    
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isElbowArrow(el)) {
           return el;
-        }
+        }    
+        
         // console.log(" value : "+value)
         const { roundness } = value;
         const { type, corners } = roundness;
+
         console.log(type, corners)
 
         const defaultValue = type === ROUNDNESS.PROPORTIONAL_RADIUS ? DEFAULT_PROPORTIONAL_RADIUS : DEFAULT_ADAPTIVE_RADIUS;
-        
+
         let customCorners = {
           topLeft:  defaultValue,
           topRight: defaultValue,
@@ -1567,7 +1568,7 @@ export const actionCustomizeRoundness = register({
           }
 
           let uniformValue = 0;
-          
+
           if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
             uniformValue = DEFAULT_ADAPTIVE_RADIUS;
           } else if (element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS) {
@@ -1581,21 +1582,24 @@ export const actionCustomizeRoundness = register({
       );
     }
 
-      const updateCornersValue = (corner: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight', newValue: number) => {
-      const currentCorners = {
-        topLeft: getCurrentCornerValue('topLeft') ?? 0,
-        topRight: getCurrentCornerValue('topRight') ?? 0,
-        bottomLeft: getCurrentCornerValue('bottomLeft') ?? 0,
-        bottomRight: getCurrentCornerValue('bottomRight') ?? 0,
-      };
     
-    currentCorners[corner] = newValue;
 
-    updateData({
-      roundness: {
-        type: ROUNDNESS.CUSTOMIZED,
-        corners: currentCorners,
-      }
+    const updateCornersValue = (corner: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight', newValue: number) => {
+
+        const currentCorners = {
+          topLeft: getCurrentCornerValue('topLeft') ?? 0,
+          topRight: getCurrentCornerValue('topRight') ?? 0,
+          bottomLeft: getCurrentCornerValue('bottomLeft') ?? 0,
+          bottomRight: getCurrentCornerValue('bottomRight') ?? 0,
+        };
+
+      currentCorners[corner] = newValue;
+
+      updateData({
+        roundness: {
+          type: ROUNDNESS.CUSTOMIZED,
+          corners: currentCorners,
+        }
     });
 
       // updateData("TEST");
@@ -1607,59 +1611,62 @@ export const actionCustomizeRoundness = register({
     // Todo: Bikin fieldsetnya, dan masing - masing valuenya (setiap onChange di input ,harus bisa regenerate)
       <fieldset>
       <legend>{t("labels.custom")}</legend>
-      <div className="corner-inputs" style={{ 
-        display: 'grid', 
-        gridTemplateColumns: '1fr 1fr', 
+      <div className="corner-inputs" style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
         gap: '8px',
         padding: '8px 0',
         width: '100%'
       }}>
-        <input 
+        <input
           type="number"
           placeholder={t("labels.topLeft")}
-          // value={ParsegetCurrentCornerValue('topLeft')}
+          value={getCurrentCornerValue('topLeft') ?? ''}
           onChange={(e) => {
             const val = parseInt(e.target.value) | 0;
             updateCornersValue('topLeft', val)
           }}
           style={{ padding: '4px 8px', width: '100%', boxSizing: 'border-box' }}
+          min={0}
         />
-        <input 
+        <input
           type="number"
           placeholder={t("labels.topRight")}
-          // value={getCurrentCornerValue('topRight') ?? 0}
+          value={getCurrentCornerValue('topRight') ?? ''}
           onChange={(e) => {
             const val = parseInt(e.target.value) | 0;
             updateCornersValue('topRight', val)
-            
-            
+
+
 
           }}
           style={{ padding: '4px 8px', width: '100%', boxSizing: 'border-box' }}
+          min={0}
         />
-        <input 
+        <input
           type="number"
           placeholder={ t("labels.bottomLeft")}
-          // value={getCurrentCornerValue('bottomLeft') ?? 0}
+          value={getCurrentCornerValue('bottomLeft') ?? ''}
           onChange={(e) => {
             const val = parseInt(e.target.value) | 0;
             updateCornersValue('bottomLeft', val)
-            
-            
+
+
           }}
           style={{ padding: '4px 8px', width: '100%', boxSizing: 'border-box' }}
-          // min={}
+          min={0}
         />
-        <input 
+        <input
           type="number"
           placeholder={t("labels.bottomRight")}
-          // value={getCurrentCornerValue('bottomRight') ?? 0}
+          value={getCurrentCornerValue('bottomRight') ?? ''}
           onChange={(e) => {
             const val = parseInt(e.target.value) | 0;
             updateCornersValue('bottomRight', val)
-            
+
           }}
           style={{ padding: '4px 8px', width: '100%', boxSizing: 'border-box' }}
+          min={0}
         />
       </div>
     </fieldset>
