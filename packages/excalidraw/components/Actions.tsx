@@ -10,6 +10,7 @@ import {
 } from "@excalidraw/common";
 
 import {
+  getContainerElement,
   hasContainerBehavior,
   isFlowchartNodeElement,
   shouldAllowVerticalAlign,
@@ -149,6 +150,13 @@ export const SelectedShapeActions = ({
   ) {
     isSingleElementBoundContainer = true;
   }
+
+  const textContainer = targetElements.length === 1 && isTextElement(targetElements[0])
+    ? getContainerElement(targetElements[0], elementsMap)
+    : null;
+
+  const isStickyNoteContainer = textContainer && isFlowchartNodeElement(textContainer);
+
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
   );
@@ -233,7 +241,7 @@ export const SelectedShapeActions = ({
             renderAction("changeTextAlign")}
         </>
       )}
-
+      
       {shouldAllowVerticalAlign(targetElements, elementsMap) &&
         renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(appState.activeTool.type) ||
@@ -241,6 +249,8 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeArrowhead")}</>
       )}
 
+      {isStickyNoteContainer && <>{renderAction("changeContainerBehavior")}</>}
+      
       {renderAction("changeOpacity")}
 
       <fieldset>
@@ -333,6 +343,12 @@ export const CompactShapeActions = ({
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
   );
+
+  const textContainer = targetElements.length === 1 && isTextElement(targetElements[0])
+    ? getContainerElement(targetElements[0], elementsMap)
+    : null;
+
+  const isStickyNoteContainer = textContainer && isFlowchartNodeElement(textContainer);
 
   const showFillIcons =
     (hasBackground(appState.activeTool.type) &&
@@ -616,6 +632,7 @@ export const CompactShapeActions = ({
                       renderAction("changeTextAlign")}
                     {shouldAllowVerticalAlign(targetElements, elementsMap) &&
                       renderAction("changeVerticalAlign")}
+                    {isStickyNoteContainer && <>{renderAction("changeContainerBehavior")}</>}
                   </div>
                 </PropertiesPopover>
               )}
