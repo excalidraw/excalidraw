@@ -4,6 +4,7 @@ import React from "react";
 import {
   CLASSES,
   DEFAULT_SIDEBAR,
+  MQ_MIN_WIDTH_DESKTOP,
   TOOL_TYPE,
   arrayToMap,
   capitalizeString,
@@ -28,7 +29,11 @@ import { useAtom, useAtomValue } from "../editor-jotai";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 
-import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
+import {
+  SelectedShapeActions,
+  ShapesSwitcher,
+  CompactShapeActions,
+} from "./Actions";
 import { LoadingMessage } from "./LoadingMessage";
 import { LockButton } from "./LockButton";
 import { MobileMenu } from "./MobileMenu";
@@ -157,6 +162,25 @@ const LayerUI = ({
   const device = useDevice();
   const tunnels = useInitializeTunnels();
 
+  const spacing =
+    appState.stylesPanelMode === "compact"
+      ? {
+          menuTopGap: 4,
+          toolbarColGap: 4,
+          toolbarRowGap: 1,
+          toolbarInnerRowGap: 0.5,
+          islandPadding: 1,
+          collabMarginLeft: 8,
+        }
+      : {
+          menuTopGap: 6,
+          toolbarColGap: 4,
+          toolbarRowGap: 1,
+          toolbarInnerRowGap: 1,
+          islandPadding: 1,
+          collabMarginLeft: 8,
+        };
+
   const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
@@ -209,31 +233,55 @@ const LayerUI = ({
     </div>
   );
 
-  const renderSelectedShapeActions = () => (
-    <Section
-      heading="selectedShapeActions"
-      className={clsx("selected-shape-actions zen-mode-transition", {
-        "transition-left": appState.zenModeEnabled,
-      })}
-    >
-      <Island
-        className={CLASSES.SHAPE_ACTIONS_MENU}
-        padding={2}
-        style={{
-          // we want to make sure this doesn't overflow so subtracting the
-          // approximate height of hamburgerMenu + footer
-          maxHeight: `${appState.height - 166}px`,
-        }}
+  const renderSelectedShapeActions = () => {
+    const isCompactMode = appState.stylesPanelMode === "compact";
+
+    return (
+      <Section
+        heading="selectedShapeActions"
+        className={clsx("selected-shape-actions zen-mode-transition", {
+          "transition-left": appState.zenModeEnabled,
+        })}
       >
-        <SelectedShapeActions
-          appState={appState}
-          elementsMap={app.scene.getNonDeletedElementsMap()}
-          renderAction={actionManager.renderAction}
-          app={app}
-        />
-      </Island>
-    </Section>
-  );
+        {isCompactMode ? (
+          <Island
+            className={clsx("compact-shape-actions-island")}
+            padding={0}
+            style={{
+              // we want to make sure this doesn't overflow so subtracting the
+              // approximate height of hamburgerMenu + footer
+              maxHeight: `${appState.height - 166}px`,
+            }}
+          >
+            <CompactShapeActions
+              appState={appState}
+              elementsMap={app.scene.getNonDeletedElementsMap()}
+              renderAction={actionManager.renderAction}
+              app={app}
+              setAppState={setAppState}
+            />
+          </Island>
+        ) : (
+          <Island
+            className={CLASSES.SHAPE_ACTIONS_MENU}
+            padding={2}
+            style={{
+              // we want to make sure this doesn't overflow so subtracting the
+              // approximate height of hamburgerMenu + footer
+              maxHeight: `${appState.height - 166}px`,
+            }}
+          >
+            <SelectedShapeActions
+              appState={appState}
+              elementsMap={app.scene.getNonDeletedElementsMap()}
+              renderAction={actionManager.renderAction}
+              app={app}
+            />
+          </Island>
+        )}
+      </Section>
+    );
+  };
 
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
@@ -253,9 +301,19 @@ const LayerUI = ({
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
-          <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
+          <Stack.Col
+            gap={spacing.menuTopGap}
+            className={clsx("App-menu_top__left")}
+          >
             {renderCanvasActions()}
-            {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
+            <div
+              className={clsx("selected-shape-actions-container", {
+                "selected-shape-actions-container--compact":
+                  appState.stylesPanelMode === "compact",
+              })}
+            >
+              {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
+            </div>
           </Stack.Col>
           {!appState.viewModeEnabled &&
             appState.openDialog?.name !== "elementLinkSelector" && (
@@ -265,17 +323,19 @@ const LayerUI = ({
                     {renderWelcomeScreen && (
                       <tunnels.WelcomeScreenToolbarHintTunnel.Out />
                     )}
-                    <Stack.Col gap={4} align="start">
+                    <Stack.Col gap={spacing.toolbarColGap} align="start">
                       <Stack.Row
-                        gap={1}
+                        gap={spacing.toolbarRowGap}
                         className={clsx("App-toolbar-container", {
                           "zen-mode": appState.zenModeEnabled,
                         })}
                       >
                         <Island
-                          padding={1}
+                          padding={spacing.islandPadding}
                           className={clsx("App-toolbar", {
                             "zen-mode": appState.zenModeEnabled,
+                            "App-toolbar--compact":
+                              appState.stylesPanelMode === "compact",
                           })}
                         >
                           <HintViewer
@@ -292,7 +352,7 @@ const LayerUI = ({
                             app={app}
                           />
                           {heading}
-                          <Stack.Row gap={1}>
+                          <Stack.Row gap={spacing.toolbarInnerRowGap}>
                             <PenModeButton
                               zenModeEnabled={appState.zenModeEnabled}
                               checked={appState.penMode}
@@ -326,7 +386,7 @@ const LayerUI = ({
                         {isCollaborating && (
                           <Island
                             style={{
-                              marginLeft: 8,
+                              marginLeft: spacing.collabMarginLeft,
                               alignSelf: "center",
                               height: "fit-content",
                             }}
@@ -354,6 +414,8 @@ const LayerUI = ({
               "layer-ui__wrapper__top-right zen-mode-transition",
               {
                 "transition-right": appState.zenModeEnabled,
+                "layer-ui__wrapper__top-right--compact":
+                  appState.stylesPanelMode === "compact",
               },
             )}
           >
@@ -433,7 +495,9 @@ const LayerUI = ({
         }}
         tab={DEFAULT_SIDEBAR.defaultTab}
       >
-        {/*t("toolBar.library") //zsviczian */}
+        {/*appState.stylesPanelMode === "full" &&
+          appState.width >= MQ_MIN_WIDTH_DESKTOP &&
+          t("toolBar.library") //zsviczian */}
       </DefaultSidebar.Trigger>
       <DefaultOverwriteConfirmDialog />
       {appState.openDialog?.name === "ttd" && <TTDDialog __fallback />}

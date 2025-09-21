@@ -1,17 +1,34 @@
 import { arrayToMap, easeOut, THEME } from "@excalidraw/common";
+
 import {
   computeBoundTextPosition,
+  distanceToElement,
+  doBoundsIntersect,
   getBoundTextElement,
+  getElementBounds,
+  getFreedrawOutlineAsSegments,
+  getFreedrawOutlinePoints,
   intersectElementWithLineSegment,
+  isArrowElement,
+  isFreeDrawElement,
+  isLineElement,
   isPointInElement,
 } from "@excalidraw/element";
-import { lineSegment, pointFrom } from "@excalidraw/math";
+import {
+  lineSegment,
+  lineSegmentsDistance,
+  pointFrom,
+  polygon,
+  polygonIncludesPointNonZero,
+} from "@excalidraw/math";
 
 import { getElementsInGroup } from "@excalidraw/element";
 
 import { shouldTestInside } from "@excalidraw/element";
 import { hasBoundTextElement, isBoundToContainer } from "@excalidraw/element";
 import { getBoundTextElementId } from "@excalidraw/element";
+
+import type { Bounds } from "@excalidraw/element";
 
 import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
@@ -96,6 +113,7 @@ export class EraserTrail extends AnimatedTrail {
           pathSegment,
           element,
           candidateElementsMap,
+          this.app.state.zoom.value,
         );
 
         if (intersects) {
@@ -131,6 +149,7 @@ export class EraserTrail extends AnimatedTrail {
           pathSegment,
           element,
           candidateElementsMap,
+          this.app.state.zoom.value,
         );
 
         if (intersects) {
@@ -180,13 +199,82 @@ const eraserTest = (
   pathSegment: LineSegment<GlobalPoint>,
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
+  zoom: number,
 ): boolean => {
   const lastPoint = pathSegment[1];
+
+  // PERF: Do a quick bounds intersection test first because it's cheap
+  const threshold = isFreeDrawElement(element) ? 15 : element.strokeWidth / 2;
+  const segmentBounds = [
+    Math.min(pathSegment[0][0], pathSegment[1][0]) - threshold,
+    Math.min(pathSegment[0][1], pathSegment[1][1]) - threshold,
+    Math.max(pathSegment[0][0], pathSegment[1][0]) + threshold,
+    Math.max(pathSegment[0][1], pathSegment[1][1]) + threshold,
+  ] as Bounds;
+  const origElementBounds = getElementBounds(element, elementsMap);
+  const elementBounds: Bounds = [
+    origElementBounds[0] - threshold,
+    origElementBounds[1] - threshold,
+    origElementBounds[2] + threshold,
+    origElementBounds[3] + threshold,
+  ];
+
+  if (!doBoundsIntersect(segmentBounds, elementBounds)) {
+    return false;
+  }
+
+  // There are shapes where the inner area should trigger erasing
+  // even though the eraser path segment doesn't intersect with or
+  // get close to the shape's stroke
   if (
     shouldTestInside(element) &&
     isPointInElement(lastPoint, element, elementsMap)
   ) {
     return true;
+  }
+
+  // Freedraw elements are tested for erasure by measuring the distance
+  // of the eraser path and the freedraw shape outline lines to a tolerance
+  // which offers a good visual precision at various zoom levels
+  if (isFreeDrawElement(element)) {
+    const outlinePoints = getFreedrawOutlinePoints(element);
+    const strokeSegments = getFreedrawOutlineAsSegments(
+      element,
+      outlinePoints,
+      elementsMap,
+    );
+    const tolerance = Math.max(2.25, 5 / zoom); // NOTE: Visually fine-tuned approximation
+
+    for (const seg of strokeSegments) {
+      if (lineSegmentsDistance(seg, pathSegment) <= tolerance) {
+        return true;
+      }
+    }
+
+    const poly = polygon(
+      ...(outlinePoints.map(([x, y]) =>
+        pointFrom<GlobalPoint>(element.x + x, element.y + y),
+      ) as GlobalPoint[]),
+    );
+
+    // PERF: Check only one point of the eraser segment. If the eraser segment
+    // start is inside the closed freedraw shape, the other point is either also
+    // inside or the eraser segment will intersect the shape outline anyway
+    if (polygonIncludesPointNonZero(pathSegment[0], poly)) {
+      return true;
+    }
+
+    return false;
+  } else if (
+    isArrowElement(element) ||
+    (isLineElement(element) && !element.polygon)
+  ) {
+    const tolerance = Math.max(
+      element.strokeWidth,
+      (element.strokeWidth * 2) / zoom,
+    );
+
+    return distanceToElement(element, elementsMap, lastPoint) <= tolerance;
   }
 
   const boundTextElement = getBoundTextElement(element, elementsMap);
