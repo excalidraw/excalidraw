@@ -18,7 +18,11 @@ import {
   normalizeLink,
   getLineHeight,
 } from "@excalidraw/common";
-import { getNonDeletedElements, isValidPolygon } from "@excalidraw/element";
+import {
+  getNonDeletedElements,
+  isFlowchartType,
+  isValidPolygon,
+} from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
 import {
   updateElbowArrowPoints,
@@ -155,29 +159,41 @@ const repairBinding = <T extends ExcalidrawLinearElement>(
     : PointBinding | FixedPointBinding | null;
 };
 
-const restoreElementWithProperties = <
-  T extends Required<Omit<ExcalidrawElement, "customData">> & {
+type _ElementForRestoreBase = Required<
+  Omit<ExcalidrawElement, "customData" | "containerBehavior">
+> &
+  Pick<ExcalidrawElement, "containerBehavior"> & {
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
     /** @deprecated */
     strokeSharpness?: StrokeRoundness;
-  },
+  };
+
+const restoreElementWithProperties = <
+  T extends _ElementForRestoreBase &
+    Omit<
+      any,
+      | keyof ExcalidrawElement
+      | "boundElementIds"
+      | "strokeSharpness"
+      | "customData"
+      | "containerBehavior"
+    >,
   K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
   element: T,
   extra: Pick<
     T,
-    // This extra Pick<T, keyof K> ensure no excess properties are passed.
-    // @ts-ignore TS complains here but type checks the call sites fine.
+    // @ts-ignore
     keyof K
   > &
     Partial<Pick<ExcalidrawElement, "type" | "x" | "y" | "customData">>,
 ): T => {
+  const nextType = (extra.type || element.type) as ExcalidrawElementType;
+
   const base: Pick<T, keyof ExcalidrawElement> = {
-    type: extra.type || element.type,
-    // all elements must have version > 0 so getSceneVersion() will pick up
-    // newly added elements
+    type: nextType,
     version: element.version || 1,
     versionNonce: element.versionNonce ?? 0,
     index: element.index ?? null,
@@ -206,7 +222,7 @@ const restoreElementWithProperties = <
       ? {
           // for old elements that would now use adaptive radius algo,
           // use legacy algo instead
-          type: isUsingAdaptiveRadius(element.type)
+          type: isUsingAdaptiveRadius(nextType)
             ? ROUNDNESS.LEGACY
             : ROUNDNESS.PROPORTIONAL_RADIUS,
         }
@@ -217,26 +233,29 @@ const restoreElementWithProperties = <
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
+    ...(isFlowchartType(nextType)
+      ? {
+          containerBehavior:
+            element.containerBehavior ??
+            DEFAULT_ELEMENT_PROPS.containerBehavior,
+        }
+      : {}),
   };
 
   if ("customData" in element || "customData" in extra) {
-    base.customData =
+    (base as any).customData =
       "customData" in extra ? extra.customData : element.customData;
   }
 
   const ret = {
-    // spread the original element properties to not lose unknown ones
-    // for forward-compatibility
     ...element,
-    // normalized properties
     ...base,
     ...getNormalizedDimensions(base),
     ...extra,
   } as unknown as T;
 
-  // strip legacy props (migrated in previous steps)
-  delete ret.strokeSharpness;
-  delete ret.boundElementIds;
+  delete (ret as any).strokeSharpness;
+  delete (ret as any).boundElementIds;
 
   return ret;
 };

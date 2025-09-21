@@ -21,11 +21,11 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 import { newElementWith } from "./mutateElement";
-import { getBoundTextMaxWidth } from "./textElement";
+import { getBoundTextMaxWidth, getBoundTextMaxHeight } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 
-import { isLineElement } from "./typeChecks";
+import { isFlowchartType, isLineElement } from "./typeChecks";
 
 import type {
   ExcalidrawElement,
@@ -48,6 +48,8 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
+  ExcalidrawFlowchartNodeElement,
+  ContainerBehavior,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -158,9 +160,23 @@ const _newElementBase = <T extends ExcalidrawElement>(
 export const newElement = (
   opts: {
     type: ExcalidrawGenericElement["type"];
+    containerBehavior?: ContainerBehavior;
   } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawGenericElement> =>
-  _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
+): NonDeleted<ExcalidrawGenericElement> => {
+  if (isFlowchartType(opts.type)) {
+    return {
+      ..._newElementBase<ExcalidrawFlowchartNodeElement>(
+        opts.type as ExcalidrawFlowchartNodeElement["type"],
+        opts,
+      ),
+      containerBehavior: opts.containerBehavior ?? "growing",
+    } as NonDeleted<ExcalidrawFlowchartNodeElement>;
+  }
+  return _newElementBase<ExcalidrawGenericElement>(
+    opts.type,
+    opts,
+  ) as NonDeleted<ExcalidrawGenericElement>;
+};
 
 export const newEmbeddableElement = (
   opts: {
@@ -417,6 +433,103 @@ const adjustXYWithRotation = (
   return [x, y];
 };
 
+// Sticky note font sizing constants
+export const STICKY_NOTE_FONT_STEP = 2;
+export const STICKY_NOTE_MIN_FONT_SIZE = 8;
+export const STICKY_NOTE_MAX_FONT_SIZE = 72;
+
+export interface StickyNoteFontComputationResult {
+  fontSize: number;
+  width: number;
+  height: number;
+  wrappedText: string;
+}
+
+/**
+ * Computes the appropriate font size (snapped to step) so that the text fits
+ * inside the sticky note container without resizing the container.
+ * It first tries to shrink if overflowing, otherwise opportunistically enlarges
+ * (still snapped) while it fits. Width is constrained by wrap at container width.
+ */
+export const computeStickyNoteFontSize = (
+  text: string,
+  element: ExcalidrawTextElement,
+  container: ExcalidrawTextContainer,
+  /**
+   * Upper cap to which the font size is allowed to grow back during this
+   * editing session (snapped). If not provided defaults to global max.
+   */
+  maxGrowFontSize?: number,
+): StickyNoteFontComputationResult => {
+  const step = STICKY_NOTE_FONT_STEP;
+  const maxH = getBoundTextMaxHeight(container, element as any);
+  const maxW = getBoundTextMaxWidth(container, element);
+
+  const snap = (size: number) =>
+    Math.max(
+      STICKY_NOTE_MIN_FONT_SIZE,
+      Math.min(
+        STICKY_NOTE_MAX_FONT_SIZE,
+        Math.max(step, Math.floor(size / step) * step),
+      ),
+    );
+
+  let size = snap(element.fontSize);
+  const growthCap = snap(
+    maxGrowFontSize != null ? maxGrowFontSize : STICKY_NOTE_MAX_FONT_SIZE,
+  );
+
+  const lineHeight = element.lineHeight;
+  const fontFamily = element.fontFamily;
+
+  const measure = (fontSize: number) => {
+    const font = getFontString({ fontFamily, fontSize });
+    const wrappedText = wrapText(text, font, maxW);
+    const metrics = measureText(wrappedText, font, lineHeight);
+    return {
+      wrappedText,
+      width: Math.min(metrics.width, maxW),
+      height: metrics.height,
+    };
+  };
+
+  let { wrappedText, width, height } = measure(size);
+
+  if (height > maxH) {
+    // shrink until fits or min
+    while (size > STICKY_NOTE_MIN_FONT_SIZE) {
+      const next = snap(size - step);
+      if (next === size) {
+        break;
+      }
+      size = next;
+      ({ wrappedText, width, height } = measure(size));
+      if (height <= maxH) {
+        break;
+      }
+    }
+  } else {
+    // grow back only up to growthCap (initial session font size)
+    while (size < growthCap) {
+      const next = snap(Math.min(size + step, growthCap));
+      if (next === size) {
+        break;
+      }
+      const m = measure(next);
+      if (m.height <= maxH) {
+        size = next;
+        wrappedText = m.wrappedText;
+        width = m.width;
+        height = m.height;
+      } else {
+        break;
+      }
+    }
+  }
+
+  return { fontSize: size, width, height, wrappedText };
+};
+
 export const refreshTextDimensions = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawTextContainer | null,
@@ -435,6 +548,8 @@ export const refreshTextDimensions = (
         : textElement.width,
     );
   }
+  // NOTE: sticky note font auto-sizing is handled during editing (WYSIWYG)
+  // so we keep refresh logic unchanged to avoid side-effects elsewhere.
   const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
   return { text, ...dimensions };
 };

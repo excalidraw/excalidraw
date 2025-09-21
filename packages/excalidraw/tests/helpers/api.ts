@@ -217,6 +217,10 @@ export class API {
       : never;
     elbowed?: boolean;
     fixedSegments?: FixedSegment[] | null;
+    containerBehavior?: T extends "rectangle" | "diamond" | "ellipse"
+      ? ExcalidrawGenericElement["containerBehavior"]
+      : never;
+  } = {
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
@@ -282,6 +286,7 @@ export class API {
         element = newElement({
           type: type as "rectangle" | "diamond" | "ellipse",
           ...base,
+          containerBehavior: rest.containerBehavior ?? "growing",
         });
         break;
       case "embeddable":

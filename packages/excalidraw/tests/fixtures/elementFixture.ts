@@ -34,25 +34,29 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
 
 export const rectangleFixture: ExcalidrawElement = {
   ...elementBase,
+  containerBehavior: "growing",
   type: "rectangle",
-};
+} as unknown as ExcalidrawElement;
 export const embeddableFixture: ExcalidrawElement = {
   ...elementBase,
   type: "embeddable",
 };
 export const ellipseFixture: ExcalidrawElement = {
   ...elementBase,
+  containerBehavior: "growing",
   type: "ellipse",
-};
+} as unknown as ExcalidrawElement;
 export const diamondFixture: ExcalidrawElement = {
   ...elementBase,
+  containerBehavior: "growing",
   type: "diamond",
-};
+} as unknown as ExcalidrawElement;
 export const rectangleWithLinkFixture: ExcalidrawElement = {
   ...elementBase,
+  containerBehavior: "growing",
   type: "rectangle",
   link: "excalidraw.com",
-};
+} as unknown as ExcalidrawElement;
 
 export const textFixture: ExcalidrawElement = {
   ...elementBase,

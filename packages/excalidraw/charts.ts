@@ -334,6 +334,7 @@ const chartBaseElements = (
         strokeColor: COLOR_PALETTE.black,
         fillStyle: "solid",
         opacity: 6,
+        containerBehavior: "growing",
       })
     : null;
 
@@ -366,6 +367,7 @@ const chartTypeBar = (
       y: y - barHeight - BAR_GAP,
       width: BAR_WIDTH,
       height: barHeight,
+      containerBehavior: "growing",
     });
   });
 
@@ -432,6 +434,7 @@ const chartTypeLine = (
       y: y + cy - BAR_GAP * 2,
       width: BAR_GAP,
       height: BAR_GAP,
+      containerBehavior: "growing",
     });
   });
 

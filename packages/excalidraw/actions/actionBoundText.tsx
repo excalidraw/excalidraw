@@ -270,6 +270,7 @@ export const actionWrapTextInContainer = register({
           ),
           groupIds: textElement.groupIds,
           frameId: textElement.frameId,
+          containerBehavior: appState.currentItemContainerBehavior,
         });
 
         // update bindings

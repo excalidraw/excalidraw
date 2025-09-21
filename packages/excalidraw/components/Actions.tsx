@@ -10,6 +10,8 @@ import {
 } from "@excalidraw/common";
 
 import {
+  hasContainerBehavior,
+  isFlowchartNodeElement,
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
 } from "@excalidraw/element";
@@ -209,6 +211,12 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => canChangeRoundness(element.type))) && (
         <>{renderAction("changeRoundness")}</>
       )}
+
+      {hasContainerBehavior(appState.activeTool.type) ||
+        (targetElements.some(
+          (element) =>
+            isFlowchartNodeElement(element) && hasBoundTextElement(element),
+        ) && <>{renderAction("changeContainerBehavior")}</>)}
 
       {(toolIsArrow(appState.activeTool.type) ||
         targetElements.some((element) => toolIsArrow(element.type))) && (
@@ -443,6 +451,12 @@ export const CompactShapeActions = ({
                       canChangeRoundness(element.type),
                     )) &&
                     renderAction("changeRoundness")}
+                  {hasContainerBehavior(appState.activeTool.type) ||
+                    (targetElements.some(
+                      (element) =>
+                        isFlowchartNodeElement(element) &&
+                        hasBoundTextElement(element),
+                    ) && <>{renderAction("changeContainerBehavior")}</>)}
                   {renderAction("changeOpacity")}
                 </div>
               </PropertiesPopover>

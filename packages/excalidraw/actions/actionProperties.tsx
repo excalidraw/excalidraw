@@ -23,7 +23,11 @@ import {
   reduceToCommonValue,
 } from "@excalidraw/common";
 
-import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
+import {
+  canBecomePolygon,
+  getNonDeletedElements,
+  isFlowchartNodeElement,
+} from "@excalidraw/element";
 
 import {
   bindLinearElement,
@@ -126,6 +130,8 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  stickyNoteIcon,
+  growingContainerIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -1503,6 +1509,65 @@ export const actionChangeRoundness = register({
       </fieldset>
     );
   },
+});
+
+export const actionChangeContainerBehavior = register({
+  name: "changeContainerBehavior",
+  label: "labels.container",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        newElementWith(el, {
+          containerBehavior: value,
+        }),
+      ),
+      appState: { ...appState, currentItemContainerBehavior: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => (
+    <fieldset>
+      {appState.stylesPanelMode === "full" && (
+        <legend>{t("labels.container")}</legend>
+      )}
+      <div className="buttonList">
+        <RadioSelection
+          group="container"
+          options={[
+            {
+              value: "growing",
+              text: t("labels.container_growing"),
+              icon: growingContainerIcon,
+            },
+            {
+              value: "stickyNote",
+              text: t("labels.container_sticky"),
+              icon: stickyNoteIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            app,
+            (element) => element.containerBehavior ?? "growing",
+            (element) =>
+              isFlowchartNodeElement(element) &&
+              Boolean(
+                getBoundTextElement(
+                  element,
+                  app.scene.getNonDeletedElementsMap(),
+                ),
+              ),
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemContainerBehavior ?? "growing",
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </div>
+    </fieldset>
+  ),
 });
 
 const getArrowheadOptions = (flip: boolean) => {

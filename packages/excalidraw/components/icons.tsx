@@ -2338,3 +2338,38 @@ export const strokeIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+export const stickyNoteIcon = createIcon(
+  <g
+    stroke="currentColor"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth={2}
+  >
+    <path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z" />
+    <path d="M15 3v4a2 2 0 0 0 2 2h4" />
+  </g>,
+  tablerIconProps,
+);
+
+export const growingContainerIcon = createIcon(
+  <g
+    stroke="currentColor"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth={2}
+  >
+    <path d="M14 21h1" />
+    <path d="M21 14v1" />
+    <path d="M21 19a2 2 0 0 1-2 2" />
+    <path d="M21 9v1" />
+    <path d="M3 14v1" />
+    <path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2" />
+    <path d="M3 9v1" />
+    <path d="M5 21a2 2 0 0 1-2-2" />
+    <path d="M9 21h1" />
+  </g>,
+  tablerIconProps,
+);
