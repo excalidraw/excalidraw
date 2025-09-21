@@ -455,10 +455,6 @@ export const computeStickyNoteFontSize = (
   text: string,
   element: ExcalidrawTextElement,
   container: ExcalidrawTextContainer,
-  /**
-   * Upper cap to which the font size is allowed to grow back during this
-   * editing session (snapped). If not provided defaults to global max.
-   */
   maxGrowFontSize?: number,
 ): StickyNoteFontComputationResult => {
   const step = STICKY_NOTE_FONT_STEP;
@@ -468,10 +464,7 @@ export const computeStickyNoteFontSize = (
   const snap = (size: number) =>
     Math.max(
       STICKY_NOTE_MIN_FONT_SIZE,
-      Math.min(
-        STICKY_NOTE_MAX_FONT_SIZE,
-        Math.max(step, Math.floor(size / step) * step),
-      ),
+      Math.max(step, Math.floor(size / step) * step),
     );
 
   let size = snap(element.fontSize);
@@ -548,8 +541,6 @@ export const refreshTextDimensions = (
         : textElement.width,
     );
   }
-  // NOTE: sticky note font auto-sizing is handled during editing (WYSIWYG)
-  // so we keep refresh logic unchanged to avoid side-effects elsewhere.
   const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
   return { text, ...dimensions };
 };

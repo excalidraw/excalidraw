@@ -185,7 +185,8 @@ const restoreElementWithProperties = <
   element: T,
   extra: Pick<
     T,
-    // @ts-ignore
+    // This extra Pick<T, keyof K> ensure no excess properties are passed.
+    // @ts-ignore TS complains here but type checks the call sites fine.
     keyof K
   > &
     Partial<Pick<ExcalidrawElement, "type" | "x" | "y" | "customData">>,
@@ -195,6 +196,8 @@ const restoreElementWithProperties = <
   const base: Pick<T, keyof ExcalidrawElement> = {
     type: nextType,
     version: element.version || 1,
+    // all elements must have version > 0 so getSceneVersion() will pick up
+    // newly added elements
     versionNonce: element.versionNonce ?? 0,
     index: element.index ?? null,
     isDeleted: element.isDeleted ?? false,
@@ -248,12 +251,16 @@ const restoreElementWithProperties = <
   }
 
   const ret = {
+    // spread the original element properties to not lose unknown ones
+    // for forward-compatibility
     ...element,
+    // normalized properties
     ...base,
     ...getNormalizedDimensions(base),
     ...extra,
   } as unknown as T;
 
+  // strip legacy props (migrated in previous steps)
   delete (ret as any).strokeSharpness;
   delete (ret as any).boundElementIds;
 

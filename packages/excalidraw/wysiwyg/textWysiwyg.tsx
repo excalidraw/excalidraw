@@ -131,7 +131,6 @@ export const textWysiwyg = ({
     return false;
   };
 
-  // Sticky note: remember initial font size for this edit session
   let stickyNoteInitialFontSize: number | null = null;
 
   const updateWysiwygStyle = () => {
