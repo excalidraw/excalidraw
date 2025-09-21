@@ -102,9 +102,7 @@ import {
   BIND_MODE_TIMEOUT,
   invariant,
   isMobileOrTablet,
-  MQ_MAX_WIDTH_MOBILE,
-  MQ_MAX_HEIGHT_LANDSCAPE,
-  MQ_MAX_WIDTH_LANDSCAPE,
+  MQ_MAX_MOBILE,
   MQ_MIN_TABLET,
   MQ_MAX_TABLET,
 } from "@excalidraw/common";
@@ -2719,10 +2717,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
-    return (
-      width <= MQ_MAX_WIDTH_MOBILE ||
-      (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
-    );
+    const minSide = Math.min(width, height);
+    return minSide <= MQ_MAX_MOBILE;
   };
 
   private isTabletBreakpoint = (editorWidth: number, editorHeight: number) => {
@@ -2738,14 +2734,14 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const { clientWidth: viewportWidth, clientHeight: viewportHeight } =
-      document.body;
+    const { width: editorWidth, height: editorHeight } =
+      container.getBoundingClientRect();
 
     const prevViewportState = this.device.viewport;
 
     const nextViewportState = updateObject(prevViewportState, {
-      isLandscape: viewportWidth > viewportHeight,
-      isMobile: this.isMobileBreakpoint(viewportWidth, viewportHeight),
+      isLandscape: editorWidth > editorHeight,
+      isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
     });
 
     if (prevViewportState !== nextViewportState) {
@@ -7648,6 +7644,16 @@ class App extends React.Component<AppProps, AppState> {
         selectedElements.length === 1 &&
         !this.state.selectedLinearElement?.isEditing &&
         !isElbowArrow(selectedElements[0]) &&
+        !(
+          isLineElement(selectedElements[0]) &&
+          LinearElementEditor.getPointIndexUnderCursor(
+            selectedElements[0],
+            elementsMap,
+            this.state.zoom,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ) !== -1
+        ) &&
         !(
           this.state.selectedLinearElement &&
           this.state.selectedLinearElement.hoverPointIndex !== -1
