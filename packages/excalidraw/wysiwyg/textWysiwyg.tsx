@@ -546,6 +546,7 @@ export const textWysiwyg = ({
     if (isDestroyed) {
       return;
     }
+
     isDestroyed = true;
     // cleanup must be run before onSubmit otherwise when app blurs the wysiwyg
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
@@ -629,14 +630,24 @@ export const textWysiwyg = ({
     const isPropertiesTrigger =
       target instanceof HTMLElement &&
       target.classList.contains("properties-trigger");
+    const isPropertiesContent =
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      !!(target as Element).closest(".properties-content");
+    const inShapeActionsMenu =
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      (!!(target as Element).closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
+        !!(target as Element).closest(".compact-shape-actions-island"));
 
     setTimeout(() => {
-      editable.onblur = handleSubmit;
-
-      // case: clicking on the same property → no change → no update → no focus
-      if (!isPropertiesTrigger) {
-        editable.focus();
+      // If we interacted within shape actions menu or its popovers/triggers,
+      // keep submit disabled and don't steal focus back to textarea.
+      if (inShapeActionsMenu || isPropertiesTrigger || isPropertiesContent) {
+        return;
       }
+
+      // Otherwise, re-enable submit on blur and refocus the editor.
+      editable.onblur = handleSubmit;
+      editable.focus();
     });
   };
 
@@ -665,6 +676,7 @@ export const textWysiwyg = ({
         event.preventDefault();
         app.handleCanvasPanUsingWheelOrSpaceDrag(event);
       }
+
       temporarilyDisableSubmit();
       return;
     }
@@ -672,6 +684,9 @@ export const textWysiwyg = ({
     const isPropertiesTrigger =
       target instanceof HTMLElement &&
       target.classList.contains("properties-trigger");
+    const isPropertiesContent =
+      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      !!(target as Element).closest(".properties-content");
 
     if (
       ((event.target instanceof HTMLElement ||
@@ -679,9 +694,11 @@ export const textWysiwyg = ({
         (isShapeActionsPanel || //zsviczian
           event.target.closest(
             `.${CLASSES.SHAPE_ACTIONS_MENU}, .${CLASSES.ZOOM_ACTIONS}`,
-          )) &&
+          ) ||
+          event.target.closest(".compact-shape-actions-island")) &&
         !isWritableElement(event.target)) ||
-      isPropertiesTrigger
+      isPropertiesTrigger ||
+      isPropertiesContent
     ) {
       temporarilyDisableSubmit();
     } else if (

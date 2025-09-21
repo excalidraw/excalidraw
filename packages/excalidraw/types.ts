@@ -365,6 +365,10 @@ export interface AppState {
     | "elementBackground"
     | "elementStroke"
     | "fontFamily"
+    | "compactTextProperties"
+    | "compactStrokeStyles"
+    | "compactOtherProperties"
+    | "compactArrowProperties"
     | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:
@@ -479,6 +483,9 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+
+  /** properties sidebar mode - determines whether to show compact or complete sidebar */
+  stylesPanelMode: "compact" | "full";
 }
 
 export type SearchMatch = {
