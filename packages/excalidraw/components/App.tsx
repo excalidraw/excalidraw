@@ -1099,6 +1099,7 @@ class App extends React.Component<AppProps, AppState> {
       isOverlapping = !!(
         startBounds &&
         endBounds &&
+        startElement.id !== endElement.id &&
         doBoundsIntersect(startBounds, endBounds)
       );
     }
@@ -8517,48 +8518,55 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
           { newArrow: true },
         );
-
-        this.handleDelayedBindModeChange(element, boundElement);
       }
 
-      this.setState((prevState) => {
-        let linearElementEditor = null;
-        let nextSelectedElementIds = prevState.selectedElementIds;
-        if (isLinearElement(element)) {
-          linearElementEditor = new LinearElementEditor(
-            element,
-            this.scene.getNonDeletedElementsMap(),
-          );
+      // NOTE: We need the flushSync here for the
+      // delayed bind mode change to see the right state
+      // (specifically the `newElement`)
+      flushSync(() => {
+        this.setState((prevState) => {
+          let linearElementEditor = null;
+          let nextSelectedElementIds = prevState.selectedElementIds;
+          if (isLinearElement(element)) {
+            linearElementEditor = new LinearElementEditor(
+              element,
+              this.scene.getNonDeletedElementsMap(),
+            );
 
-          const endIdx = element.points.length - 1;
-          linearElementEditor = {
-            ...linearElementEditor,
-            selectedPointsIndices: [endIdx],
-            initialState: {
-              ...linearElementEditor.initialState,
-              lastClickedPoint: endIdx,
-              origin: pointFrom<GlobalPoint>(
-                pointerDownState.origin.x,
-                pointerDownState.origin.y,
-              ),
-            },
+            const endIdx = element.points.length - 1;
+            linearElementEditor = {
+              ...linearElementEditor,
+              selectedPointsIndices: [endIdx],
+              initialState: {
+                ...linearElementEditor.initialState,
+                lastClickedPoint: endIdx,
+                origin: pointFrom<GlobalPoint>(
+                  pointerDownState.origin.x,
+                  pointerDownState.origin.y,
+                ),
+              },
+            };
+          }
+
+          nextSelectedElementIds = !this.state.activeTool.locked
+            ? makeNextSelectedElementIds({ [element.id]: true }, prevState)
+            : prevState.selectedElementIds;
+
+          return {
+            ...prevState,
+            bindMode: "orbit",
+            newElement: element,
+            startBoundElement: boundElement,
+            suggestedBinding: boundElement || null,
+            selectedElementIds: nextSelectedElementIds,
+            selectedLinearElement: linearElementEditor,
           };
-        }
-
-        nextSelectedElementIds = !this.state.activeTool.locked
-          ? makeNextSelectedElementIds({ [element.id]: true }, prevState)
-          : prevState.selectedElementIds;
-
-        return {
-          ...prevState,
-          bindMode: "orbit",
-          newElement: element,
-          startBoundElement: boundElement,
-          suggestedBinding: boundElement || null,
-          selectedElementIds: nextSelectedElementIds,
-          selectedLinearElement: linearElementEditor,
-        };
+        });
       });
+
+      if (isBindingElement(element)) {
+        this.handleDelayedBindModeChange(element, boundElement);
+      }
     }
   };
 
