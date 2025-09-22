@@ -53,7 +53,7 @@ export const ToolTypePopup = ({
       const panelWidth = panelRect?.width ?? 0;
       const panelHeight = panelRect?.height ?? 0;
       setPanelPosition({
-        x: triggerRect.left - panelWidth / 2,
+        x: triggerRect.left - panelWidth / 2 + 4,
         y: panelHeight + 8,
       });
     };
@@ -93,15 +93,17 @@ export const ToolTypePopup = ({
       tabIndex={-1}
       style={{
         position: "fixed",
-        top: `${-10}px`,
+        top: `${-16}px`,
         left: `${panelPosition.x}px`,
-        zIndex: 9999,
+        zIndex: "var(--zIndex-popup)",
       }}
       className={CLASSES.CONVERT_ELEMENT_TYPE_POPUP}
     >
       {options.map(({ type, icon, title }) => (
         <ToolButton
-          className={className}
+          className={clsx(className, {
+            active: currentType === type,
+          })}
           key={type}
           type="radio"
           icon={icon}
