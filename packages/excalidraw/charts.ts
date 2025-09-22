@@ -9,6 +9,7 @@ import {
   VERTICAL_ALIGN,
   randomId,
   isDevEnv,
+  BOUND_TEXT_PADDING,
 } from "@excalidraw/common";
 
 import {
@@ -334,7 +335,10 @@ const chartBaseElements = (
         strokeColor: COLOR_PALETTE.black,
         fillStyle: "solid",
         opacity: 6,
-        containerBehavior: "growing",
+        containerBehavior: {
+          textFlow: "growing",
+          margin: BOUND_TEXT_PADDING,
+        },
       })
     : null;
 
@@ -367,7 +371,10 @@ const chartTypeBar = (
       y: y - barHeight - BAR_GAP,
       width: BAR_WIDTH,
       height: barHeight,
-      containerBehavior: "growing",
+      containerBehavior: {
+        textFlow: "growing",
+        margin: BOUND_TEXT_PADDING,
+      },
     });
   });
 
@@ -434,7 +441,10 @@ const chartTypeLine = (
       y: y + cy - BAR_GAP * 2,
       width: BAR_GAP,
       height: BAR_GAP,
-      containerBehavior: "growing",
+      containerBehavior: {
+        textFlow: "growing",
+        margin: BOUND_TEXT_PADDING,
+      },
     });
   });
 

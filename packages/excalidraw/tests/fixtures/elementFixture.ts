@@ -1,4 +1,4 @@
-import { DEFAULT_FONT_FAMILY } from "@excalidraw/common";
+import { BOUND_TEXT_PADDING, DEFAULT_FONT_FAMILY } from "@excalidraw/common";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -34,7 +34,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
 
 export const rectangleFixture: ExcalidrawElement = {
   ...elementBase,
-  containerBehavior: "growing",
+  containerBehavior: { textFlow: "growing", margin: BOUND_TEXT_PADDING },
   type: "rectangle",
 } as unknown as ExcalidrawElement;
 export const embeddableFixture: ExcalidrawElement = {
@@ -43,17 +43,17 @@ export const embeddableFixture: ExcalidrawElement = {
 };
 export const ellipseFixture: ExcalidrawElement = {
   ...elementBase,
-  containerBehavior: "growing",
+  containerBehavior: { textFlow: "growing", margin: BOUND_TEXT_PADDING },
   type: "ellipse",
 } as unknown as ExcalidrawElement;
 export const diamondFixture: ExcalidrawElement = {
   ...elementBase,
-  containerBehavior: "growing",
+  containerBehavior: { textFlow: "growing", margin: BOUND_TEXT_PADDING },
   type: "diamond",
 } as unknown as ExcalidrawElement;
 export const rectangleWithLinkFixture: ExcalidrawElement = {
   ...elementBase,
-  containerBehavior: "growing",
+  containerBehavior: { textFlow: "growing", margin: BOUND_TEXT_PADDING },
   type: "rectangle",
   link: "excalidraw.com",
 } as unknown as ExcalidrawElement;

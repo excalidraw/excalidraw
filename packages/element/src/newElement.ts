@@ -10,6 +10,7 @@ import {
   getFontString,
   getUpdatedTimestamp,
   getLineHeight,
+  BOUND_TEXT_PADDING,
 } from "@excalidraw/common";
 
 import type { Radians } from "@excalidraw/math";
@@ -169,7 +170,10 @@ export const newElement = (
         opts.type as ExcalidrawFlowchartNodeElement["type"],
         opts,
       ),
-      containerBehavior: opts.containerBehavior ?? "growing",
+      containerBehavior: {
+        textFlow: opts.containerBehavior?.textFlow ?? "growing",
+        margin: opts.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+      },
     } as NonDeleted<ExcalidrawFlowchartNodeElement>;
   }
   return _newElementBase<ExcalidrawGenericElement>(

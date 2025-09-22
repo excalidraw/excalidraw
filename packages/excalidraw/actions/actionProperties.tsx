@@ -21,6 +21,7 @@ import {
   getLineHeight,
   isTransparent,
   reduceToCommonValue,
+  BOUND_TEXT_PADDING,
 } from "@excalidraw/common";
 
 import {
@@ -1559,14 +1560,24 @@ export const actionChangeContainerBehavior = register({
     const nextElements = elements.map((el) =>
       containerIdsToUpdate.has(el.id)
         ? newElementWith(el, {
-            containerBehavior: value,
+            containerBehavior: {
+              textFlow: value,
+              margin: el.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+            },
           })
         : el,
     );
 
     return {
       elements: nextElements,
-      appState: { ...appState, currentItemContainerBehavior: value },
+      appState: {
+        ...appState,
+        currentItemContainerBehavior: {
+          textFlow: value,
+          margin:
+            appState.currentItemContainerBehavior?.margin ?? BOUND_TEXT_PADDING,
+        },
+      },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
@@ -1611,7 +1622,7 @@ export const actionChangeContainerBehavior = register({
     const value =
       reduceToCommonValue(
         targetContainers,
-        (el) => el.containerBehavior ?? "growing",
+        (el) => el.containerBehavior?.textFlow ?? "growing",
       ) ??
       // mixed selection -> show null so nothing appears selected
       null;
@@ -1631,8 +1642,8 @@ export const actionChangeContainerBehavior = register({
                 icon: growingContainerIcon,
               },
               {
-                value: "stickyNote",
-                text: t("labels.container_sticky"),
+                value: "fixed",
+                text: t("labels.container_fixed"),
                 icon: stickyNoteIcon,
               },
             ]}
@@ -1640,7 +1651,7 @@ export const actionChangeContainerBehavior = register({
               value ??
               (targetContainers.length
                 ? null
-                : appState.currentItemContainerBehavior ?? "growing")
+                : appState.currentItemContainerBehavior?.textFlow ?? "growing")
             }
             onChange={(val) => updateData(val)}
           />

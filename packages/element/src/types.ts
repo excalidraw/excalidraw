@@ -27,7 +27,10 @@ export type StrokeRoundness = "round" | "sharp";
 export type RoundnessType = ValueOf<typeof ROUNDNESS>;
 export type StrokeStyle = "solid" | "dashed" | "dotted";
 export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
-export type ContainerBehavior = "growing" | "stickyNote";
+export type ContainerBehavior = {
+  textFlow: "growing" | "fixed";
+  margin?: number;
+};
 
 type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
 export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];
@@ -88,7 +91,7 @@ export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
 };
 
 type _ExcalidrawStickyNoteContainer = _ExcalidrawElementBase & {
-  containerBehavior: "stickyNote";
+  containerBehavior: ContainerBehavior;
 };
 
 export type ExcalidrawRectangleElement = _ExcalidrawStickyNoteContainer & {

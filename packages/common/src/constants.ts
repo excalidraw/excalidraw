@@ -458,7 +458,10 @@ export const DEFAULT_ELEMENT_PROPS: {
   roughness: ROUGHNESS.artist,
   opacity: 100,
   locked: false,
-  containerBehavior: "growing",
+  containerBehavior: {
+    textFlow: "growing",
+    margin: BOUND_TEXT_PADDING,
+  },
 };
 
 export const LIBRARY_SIDEBAR_TAB = "library";

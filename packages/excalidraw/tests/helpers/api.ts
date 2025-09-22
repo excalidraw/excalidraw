@@ -4,7 +4,7 @@ import util from "util";
 
 import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
-import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
+import { BOUND_TEXT_PADDING, DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
 
 import {
   newArrowElement,
@@ -286,7 +286,10 @@ export class API {
         element = newElement({
           type: type as "rectangle" | "diamond" | "ellipse",
           ...base,
-          containerBehavior: rest.containerBehavior ?? "growing",
+          containerBehavior: {
+            textFlow: rest.containerBehavior?.textFlow ?? "growing",
+            margin: rest.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+          },  
         });
         break;
       case "embeddable":

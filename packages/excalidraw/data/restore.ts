@@ -17,6 +17,7 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
+  BOUND_TEXT_PADDING,
 } from "@excalidraw/common";
 import {
   getNonDeletedElements,
@@ -238,9 +239,10 @@ const restoreElementWithProperties = <
     locked: element.locked ?? false,
     ...(isFlowchartType(nextType)
       ? {
-          containerBehavior:
-            element.containerBehavior ??
-            DEFAULT_ELEMENT_PROPS.containerBehavior,
+          containerBehavior: {
+            textFlow: element.containerBehavior?.textFlow ?? "growing",
+            margin: element.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+          },
         }
       : {}),
   };

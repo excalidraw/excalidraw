@@ -160,7 +160,7 @@ export const textWysiwyg = ({
       let maxHeight = updatedTextElement.height;
 
       if (container && updatedTextElement.containerId) {
-        if ((container as any).containerBehavior === "stickyNote") {
+        if ((container as any).containerBehavior?.textFlow === "fixed") {
           if (stickyNoteInitialFontSize == null) {
             stickyNoteInitialFontSize = updatedTextElement.fontSize;
           }
@@ -244,7 +244,7 @@ export const textWysiwyg = ({
           );
 
           // autogrow / autoshrink only for non-sticky behaviors
-          if ((container as any).containerBehavior !== "stickyNote") {
+          if ((container as any).containerBehavior?.textFlow !== "fixed") {
             // autogrow container height if text exceeds
             if (!isArrowElement(container) && height > maxHeight) {
               const targetContainerHeight =
