@@ -115,7 +115,9 @@ export const actionDuplicateSelection = register({
       )}`}
       aria-label={t("labels.duplicateSelection")}
       onClick={() => updateData(null)}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      disabled={
+        !isSomeElementSelected(getNonDeletedElements(elements), appState)
+      }
     />
   ),
 });

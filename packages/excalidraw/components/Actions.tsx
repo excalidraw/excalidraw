@@ -919,10 +919,9 @@ export const MobileShapeActions = ({
       style={{
         flexDirection: "row",
         boxShadow: "none",
-        backgroundColor: "transparent",
         padding: 0,
-        margin: "0 0.25rem",
         zIndex: 2,
+        backgroundColor: "transparent",
         height: WIDTH * 1.75,
         alignItems: "center",
         gap: GAP,
@@ -987,9 +986,6 @@ export const MobileShapeActions = ({
           </>
         )}
 
-        {showDuplicate && renderAction("duplicateSelection")}
-        {showDelete && renderAction("deleteSelectedElements")}
-
         {/* Combined Other Actions */}
         <CombinedExtraActions
           appState={appState}
@@ -1007,8 +1003,20 @@ export const MobileShapeActions = ({
           gap: GAP,
         }}
       >
-        {renderAction("undo")}
-        {showRedo && renderAction("redo")}
+        <div className="compact-action-item">{renderAction("undo")}</div>
+        {showRedo && (
+          <div className="compact-action-item">{renderAction("redo")}</div>
+        )}
+        {showDuplicate && (
+          <div className="compact-action-item">
+            {renderAction("duplicateSelection")}
+          </div>
+        )}
+        {showDelete && (
+          <div className="compact-action-item">
+            {renderAction("deleteSelectedElements")}
+          </div>
+        )}
       </div>
     </Island>
   );

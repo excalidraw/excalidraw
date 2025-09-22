@@ -323,7 +323,9 @@ export const actionDeleteSelected = register({
       title={t("labels.delete")}
       aria-label={t("labels.delete")}
       onClick={() => updateData(null)}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      disabled={
+        !isSomeElementSelected(getNonDeletedElements(elements), appState)
+      }
     />
   ),
 });
