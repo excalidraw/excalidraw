@@ -106,6 +106,7 @@
     justify-content: center;
     align-items: center;
     min-height: 2.5rem;
+    pointer-events: auto;
 
     --default-button-size: 2rem;
 
@@ -114,7 +115,6 @@
       height: 1.625rem;
       border: none;
       border-radius: var(--border-radius-lg);
-      background: transparent;
       color: var(--color-on-surface);
       cursor: pointer;
       display: flex;
@@ -122,21 +122,17 @@
       justify-content: center;
       transition: all 0.2s ease;
 
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+
       svg {
         width: 1rem;
         height: 1rem;
         flex: 0 0 auto;
       }
 
-      &:hover {
-        background: var(--button-hover-bg, var(--island-bg-color));
-        border-color: var(
-          --button-hover-border,
-          var(--button-border, var(--default-border-color))
-        );
-      }
-
-      &:active {
+      &.active {
         background: var(--button-active-bg, var(--island-bg-color));
         border-color: var(--button-active-border, var(--color-primary-darkest));
       }
@@ -168,9 +164,15 @@
     }
   }
 
-  .ToolIcon__icon {
-    width: 1.625rem;
-    height: 1.625rem;
+  .ToolIcon {
+    .ToolIcon__icon {
+      width: 1.625rem;
+      height: 1.625rem;
+
+      &:hover {
+        background-color: transparent;
+      }
+    }
   }
 }
 

@@ -39,6 +39,15 @@
     .ToolIcon__icon {
       width: 2rem;
       height: 2rem;
+
+      &:hover {
+        background-color: transparent;
+      }
+    }
+
+    &.active {
+      background: var(--button-active-bg, var(--island-bg-color));
+      border-color: var(--button-active-border, var(--color-primary-darkest));
     }
 
     svg {

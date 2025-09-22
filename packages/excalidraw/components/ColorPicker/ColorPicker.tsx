@@ -18,7 +18,7 @@ import { useExcalidrawContainer } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
-import { backgroundIcon, slashIcon, strokeIcon } from "../icons";
+import { slashIcon, strokeIcon } from "../icons";
 import {
   saveCaretPosition,
   restoreCaretPosition,
@@ -213,6 +213,10 @@ const ColorPickerPopupContent = ({
           type={type}
           elements={elements}
           updateData={updateData}
+          showTitle={
+            appState.stylesPanelMode === "compact" ||
+            appState.stylesPanelMode === "mobile"
+          }
         >
           {colorInputJSX}
         </Picker>
@@ -272,31 +276,18 @@ const ColorPickerTrigger = ({
       onClick={handleClick}
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
-      {compactMode && color && (
+      {compactMode && color && mode === "stroke" && (
         <div className="color-picker__button-background">
-          {mode === "background" ? (
-            <span
-              style={{
-                color:
-                  color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
-                    ? "#fff"
-                    : "#111",
-              }}
-            >
-              {backgroundIcon}
-            </span>
-          ) : (
-            <span
-              style={{
-                color:
-                  color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
-                    ? "#fff"
-                    : "#111",
-              }}
-            >
-              {strokeIcon}
-            </span>
-          )}
+          <span
+            style={{
+              color:
+                color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
+                  ? "#fff"
+                  : "#111",
+            }}
+          >
+            {strokeIcon}
+          </span>
         </div>
       )}
     </Popover.Trigger>

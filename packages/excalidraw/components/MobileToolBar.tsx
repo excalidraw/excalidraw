@@ -190,7 +190,6 @@ export const MobileToolBar = ({
         options={SELECTION_TOOLS}
         activeTool={activeTool}
         defaultOption={app.defaultSelectionTool}
-        className="Selection"
         namePrefix="selectionType"
         title={capitalizeString(t("toolBar.selection"))}
         data-testid="toolbar-selection"
@@ -210,7 +209,9 @@ export const MobileToolBar = ({
 
       {/* Free Draw */}
       <ToolButton
-        className={clsx("Shape", { fillable: false })}
+        className={clsx({
+          active: activeTool.type === "freedraw",
+        })}
         type="radio"
         icon={FreedrawIcon}
         checked={activeTool.type === "freedraw"}
@@ -223,7 +224,9 @@ export const MobileToolBar = ({
 
       {/* Eraser */}
       <ToolButton
-        className={clsx("Shape", { fillable: false })}
+        className={clsx({
+          active: activeTool.type === "eraser",
+        })}
         type="radio"
         icon={EraserIcon}
         checked={activeTool.type === "eraser"}
@@ -296,7 +299,9 @@ export const MobileToolBar = ({
 
       {/* Image */}
       <ToolButton
-        className={clsx("Shape", { fillable: false })}
+        className={clsx({
+          active: activeTool.type === "image",
+        })}
         type="radio"
         icon={ImageIcon}
         checked={activeTool.type === "image"}
@@ -310,7 +315,9 @@ export const MobileToolBar = ({
       {/* Text Tool */}
       {showTextToolOutside && (
         <ToolButton
-          className={clsx("Shape", { fillable: false })}
+          className={clsx({
+            active: activeTool.type === "text",
+          })}
           type="radio"
           icon={TextIcon}
           checked={activeTool.type === "text"}
@@ -325,7 +332,7 @@ export const MobileToolBar = ({
       {/* Frame Tool */}
       {showFrameToolOutside && (
         <ToolButton
-          className={clsx("Shape", { fillable: false })}
+          className={clsx({ active: frameToolSelected })}
           type="radio"
           icon={frameToolIcon}
           checked={frameToolSelected}

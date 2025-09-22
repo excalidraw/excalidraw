@@ -328,7 +328,7 @@ const CombinedShapeProperties = ({
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     );
 
-  const showShowCombinedProperties =
+  const shouldShowCombinedProperties =
     showFillIcons ||
     hasStrokeWidth(appState.activeTool.type) ||
     targetElements.some((element) => hasStrokeWidth(element.type)) ||
@@ -337,14 +337,16 @@ const CombinedShapeProperties = ({
     canChangeRoundness(appState.activeTool.type) ||
     targetElements.some((element) => canChangeRoundness(element.type));
 
-  if (!showShowCombinedProperties) {
+  const isOpen = appState.openPopup === "compactStrokeStyles";
+
+  if (!shouldShowCombinedProperties) {
     return null;
   }
 
   return (
     <div className="compact-action-item">
       <Popover.Root
-        open={appState.openPopup === "compactStrokeStyles"}
+        open={isOpen}
         onOpenChange={(open) => {
           if (open) {
             setAppState({ openPopup: "compactStrokeStyles" });
@@ -356,24 +358,23 @@ const CombinedShapeProperties = ({
         <Popover.Trigger asChild>
           <button
             type="button"
-            className="compact-action-button properties-trigger"
+            className={clsx("compact-action-button properties-trigger", {
+              active: isOpen,
+            })}
             title={t("labels.stroke")}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
 
               setAppState({
-                openPopup:
-                  appState.openPopup === "compactStrokeStyles"
-                    ? null
-                    : "compactStrokeStyles",
+                openPopup: isOpen ? null : "compactStrokeStyles",
               });
             }}
           >
             {adjustmentsIcon}
           </button>
         </Popover.Trigger>
-        {appState.openPopup === "compactStrokeStyles" && (
+        {isOpen && (
           <PropertiesPopover
             className={PROPERTIES_CLASSES}
             container={container}
@@ -428,6 +429,7 @@ const CombinedArrowProperties = ({
   const showShowArrowProperties =
     toolIsArrow(appState.activeTool.type) ||
     targetElements.some((element) => toolIsArrow(element.type));
+  const isOpen = appState.openPopup === "compactArrowProperties";
 
   if (!showShowArrowProperties) {
     return null;
@@ -436,7 +438,7 @@ const CombinedArrowProperties = ({
   return (
     <div className="compact-action-item">
       <Popover.Root
-        open={appState.openPopup === "compactArrowProperties"}
+        open={isOpen}
         onOpenChange={(open) => {
           if (open) {
             setAppState({ openPopup: "compactArrowProperties" });
@@ -448,17 +450,16 @@ const CombinedArrowProperties = ({
         <Popover.Trigger asChild>
           <button
             type="button"
-            className="compact-action-button properties-trigger"
+            className={clsx("compact-action-button properties-trigger", {
+              active: isOpen,
+            })}
             title={t("labels.arrowtypes")}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
 
               setAppState({
-                openPopup:
-                  appState.openPopup === "compactArrowProperties"
-                    ? null
-                    : "compactArrowProperties",
+                openPopup: isOpen ? null : "compactArrowProperties",
               });
             }}
           >
@@ -492,7 +493,7 @@ const CombinedArrowProperties = ({
             })()}
           </button>
         </Popover.Trigger>
-        {appState.openPopup === "compactArrowProperties" && (
+        {isOpen && (
           <PropertiesPopover
             container={container}
             className="properties-content"
@@ -523,11 +524,12 @@ const CombinedTextProperties = ({
   elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
 }) => {
   const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus();
+  const isOpen = appState.openPopup === "compactTextProperties";
 
   return (
     <div className="compact-action-item">
       <Popover.Root
-        open={appState.openPopup === "compactTextProperties"}
+        open={isOpen}
         onOpenChange={(open) => {
           if (open) {
             if (appState.editingTextElement) {
@@ -545,13 +547,15 @@ const CombinedTextProperties = ({
         <Popover.Trigger asChild>
           <button
             type="button"
-            className="compact-action-button properties-trigger"
+            className={clsx("compact-action-button properties-trigger", {
+              active: isOpen,
+            })}
             title={t("labels.textAlign")}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
 
-              if (appState.openPopup === "compactTextProperties") {
+              if (isOpen) {
                 setAppState({ openPopup: null });
               } else {
                 if (appState.editingTextElement) {
@@ -629,6 +633,7 @@ const CombinedExtraActions = ({
   }
 
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
+  const isOpen = appState.openPopup === "compactOtherProperties";
 
   if (isEditingTextOrNewElement || targetElements.length === 0) {
     return null;
@@ -637,7 +642,7 @@ const CombinedExtraActions = ({
   return (
     <div className="compact-action-item">
       <Popover.Root
-        open={appState.openPopup === "compactOtherProperties"}
+        open={isOpen}
         onOpenChange={(open) => {
           if (open) {
             setAppState({ openPopup: "compactOtherProperties" });
@@ -649,23 +654,22 @@ const CombinedExtraActions = ({
         <Popover.Trigger asChild>
           <button
             type="button"
-            className="compact-action-button properties-trigger"
+            className={clsx("compact-action-button properties-trigger", {
+              active: isOpen,
+            })}
             title={t("labels.actions")}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               setAppState({
-                openPopup:
-                  appState.openPopup === "compactOtherProperties"
-                    ? null
-                    : "compactOtherProperties",
+                openPopup: isOpen ? null : "compactOtherProperties",
               });
             }}
           >
             {DotsHorizontalIcon}
           </button>
         </Popover.Trigger>
-        {appState.openPopup === "compactOtherProperties" && (
+        {isOpen && (
           <PropertiesPopover
             className={PROPERTIES_CLASSES}
             container={container}
@@ -798,12 +802,7 @@ export const CompactShapeActions = ({
     <div className="compact-shape-actions">
       {/* Stroke Color */}
       {canChangeStrokeColor(appState, targetElements) && (
-        <div
-          className={clsx("compact-action-item")}
-          style={{
-            marginRight: 4,
-          }}
-        >
+        <div className={clsx("compact-action-item")}>
           {renderAction("changeStrokeColor")}
         </div>
       )}
@@ -925,6 +924,7 @@ export const MobileShapeActions = ({
         height: WIDTH * 1.75,
         alignItems: "center",
         gap: GAP,
+        pointerEvents: "none",
       }}
       ref={mobileActionsRef}
     >

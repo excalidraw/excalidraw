@@ -246,7 +246,7 @@ body.excalidraw-cursor-resize * {
     left: 50%;
     transform: translateX(-50%);
     --bar-padding: calc(4 * var(--space-factor));
-    z-index: 4;
+    z-index: 3;
     display: flex;
     flex-direction: column;
 

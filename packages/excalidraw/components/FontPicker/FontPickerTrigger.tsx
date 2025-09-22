@@ -21,6 +21,16 @@ export const FontPickerTrigger = ({
 }: FontPickerTriggerProps) => {
   const setAppState = useExcalidrawSetAppState();
 
+  const compactStyle = compactMode
+    ? {
+        background: "rgba(255, 255, 255, 0.1)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        width: "1.625rem",
+        height: "1.625rem",
+      }
+    : {};
+
   return (
     <Popover.Trigger asChild>
       <div data-openpopup="fontFamily" className="properties-trigger">
@@ -39,8 +49,7 @@ export const FontPickerTrigger = ({
           }}
           style={{
             border: "none",
-            width: compactMode ? "1.625rem" : undefined,
-            height: compactMode ? "1.625rem" : undefined,
+            ...compactStyle,
           }}
         />
       </div>

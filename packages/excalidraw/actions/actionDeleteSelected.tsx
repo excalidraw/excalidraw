@@ -1,4 +1,8 @@
-import { KEYS, updateActiveTool } from "@excalidraw/common";
+import {
+  KEYS,
+  MOBILE_ACTION_BUTTON_BG,
+  updateActiveTool,
+} from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
 import { fixBindingsAfterDeletion } from "@excalidraw/element";
@@ -326,6 +330,11 @@ export const actionDeleteSelected = register({
       disabled={
         !isSomeElementSelected(getNonDeletedElements(elements), appState)
       }
+      style={{
+        ...(appState.stylesPanelMode === "mobile"
+          ? MOBILE_ACTION_BUTTON_BG
+          : {}),
+      }}
     />
   ),
 });

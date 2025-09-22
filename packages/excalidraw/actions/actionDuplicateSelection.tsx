@@ -1,6 +1,7 @@
 import {
   DEFAULT_GRID_SIZE,
   KEYS,
+  MOBILE_ACTION_BUTTON_BG,
   arrayToMap,
   getShortcutKey,
 } from "@excalidraw/common";
@@ -118,6 +119,11 @@ export const actionDuplicateSelection = register({
       disabled={
         !isSomeElementSelected(getNonDeletedElements(elements), appState)
       }
+      style={{
+        ...(appState.stylesPanelMode === "mobile"
+          ? MOBILE_ACTION_BUTTON_BG
+          : {}),
+      }}
     />
   ),
 });

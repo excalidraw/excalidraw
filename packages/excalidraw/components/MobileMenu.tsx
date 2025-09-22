@@ -93,16 +93,7 @@ export const MobileMenu = ({
           justifyContent: "space-between",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 16,
-          }}
-        >
-          <MainMenuTunnel.Out />
-        </div>
+        <MainMenuTunnel.Out />
         {topRightUI ? topRightUI : <DefaultSidebarTriggerTunnel.Out />}
       </div>
     );
