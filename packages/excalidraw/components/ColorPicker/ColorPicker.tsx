@@ -264,6 +264,7 @@ const ColorPickerTrigger = ({
         "is-transparent": !color || color === "transparent",
         "has-outline":
           !color || !isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD),
+        "compact-sizing": compactMode,
       })}
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}

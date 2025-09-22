@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
 
 import { KEYS, capitalizeString } from "@excalidraw/common";
@@ -101,6 +101,8 @@ export const MobileToolBar = ({
     "arrow" | "line"
   >("arrow");
 
+  const toolbarRef = useRef<HTMLDivElement>(null);
+
   // keep lastActiveGenericShape in sync with active tool if user switches via other UI
   useEffect(() => {
     if (
@@ -141,8 +143,19 @@ export const MobileToolBar = ({
     }
   };
 
-  const showTextToolOutside = appState.width >= 400;
-  const showFrameToolOutside = appState.width >= 440;
+  const toolbarWidth =
+    toolbarRef.current?.getBoundingClientRect()?.width ?? 0 - 8;
+  const WIDTH = 36;
+  const GAP = 4;
+
+  // hand, selection, freedraw, eraser, rectangle, arrow, others
+  const MIN_TOOLS = 7;
+  const MIN_WIDTH = MIN_TOOLS * WIDTH + (MIN_TOOLS - 1) * GAP;
+  const ADDITIONAL_WIDTH = WIDTH + GAP;
+
+  const showImageToolOutside = toolbarWidth >= MIN_WIDTH + 1 * ADDITIONAL_WIDTH;
+  const showTextToolOutside = toolbarWidth >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
+  const showFrameToolOutside = toolbarWidth >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
 
   const extraTools = [
     "text",
@@ -175,7 +188,7 @@ export const MobileToolBar = ({
     : extraToolsIcon;
 
   return (
-    <div className="mobile-toolbar">
+    <div className="mobile-toolbar" ref={toolbarRef}>
       {/* Hand Tool */}
       <HandButton
         checked={isHandToolActive(appState)}
@@ -243,7 +256,6 @@ export const MobileToolBar = ({
         options={SHAPE_TOOLS}
         activeTool={activeTool}
         defaultOption={lastActiveGenericShape}
-        className="Shape"
         namePrefix="shapeType"
         title={capitalizeString(
           t(
@@ -274,7 +286,6 @@ export const MobileToolBar = ({
         options={LINEAR_ELEMENT_TOOLS}
         activeTool={activeTool}
         defaultOption={lastActiveLinearElement}
-        className="LinearElement"
         namePrefix="linearElementType"
         title={capitalizeString(
           t(
@@ -298,19 +309,21 @@ export const MobileToolBar = ({
       />
 
       {/* Image */}
-      <ToolButton
-        className={clsx({
-          active: activeTool.type === "image",
-        })}
-        type="radio"
-        icon={ImageIcon}
-        checked={activeTool.type === "image"}
-        name="editor-current-shape"
-        title={`${capitalizeString(t("toolBar.image"))}`}
-        aria-label={capitalizeString(t("toolBar.image"))}
-        data-testid="toolbar-image"
-        onChange={() => handleToolChange("image")}
-      />
+      {showImageToolOutside && (
+        <ToolButton
+          className={clsx({
+            active: activeTool.type === "image",
+          })}
+          type="radio"
+          icon={ImageIcon}
+          checked={activeTool.type === "image"}
+          name="editor-current-shape"
+          title={`${capitalizeString(t("toolBar.image"))}`}
+          aria-label={capitalizeString(t("toolBar.image"))}
+          data-testid="toolbar-image"
+          onChange={() => handleToolChange("image")}
+        />
+      )}
 
       {/* Text Tool */}
       {showTextToolOutside && (
@@ -347,13 +360,33 @@ export const MobileToolBar = ({
       {/* Other Shapes */}
       <DropdownMenu open={isOtherShapesMenuOpen} placement="top">
         <DropdownMenu.Trigger
-          className={clsx("App-toolbar__extra-tools-trigger", {
-            "App-toolbar__extra-tools-trigger--selected": extraToolSelected,
-          })}
+          className={clsx(
+            "App-toolbar__extra-tools-trigger App-toolbar__extra-tools-trigger--mobile",
+            {
+              "App-toolbar__extra-tools-trigger--selected": extraToolSelected,
+            },
+          )}
           onToggle={() => setIsOtherShapesMenuOpen(!isOtherShapesMenuOpen)}
           title={t("toolBar.extraTools")}
+          style={{
+            width: WIDTH,
+            height: WIDTH,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-          {extraIcon}
+          <div
+            style={{
+              width: WIDTH,
+              height: WIDTH,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {extraIcon}
+          </div>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => setIsOtherShapesMenuOpen(false)}

@@ -26,8 +26,8 @@ export const FontPickerTrigger = ({
         background: "rgba(255, 255, 255, 0.1)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        width: "1.625rem",
-        height: "1.625rem",
+        width: "2.25rem",
+        height: "2.25rem",
       }
     : {};
 

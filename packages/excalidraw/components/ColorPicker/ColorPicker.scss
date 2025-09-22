@@ -163,6 +163,11 @@
       width: 1.625rem;
       height: 1.625rem;
     }
+
+    &.compact-sizing {
+      width: var(--mobile-action-button-size);
+      height: var(--mobile-action-button-size);
+    }
   }
 
   .color-picker__button__hotkey-label {

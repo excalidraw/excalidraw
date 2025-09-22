@@ -183,6 +183,8 @@
   border: none;
   box-shadow: 0 0 0 1px var(--color-surface-lowest);
   background-color: var(--color-surface-low);
+  width: var(--moobile-action-button-size, 2.25rem);
+  height: var(--moobile-action-button-size, 2.25rem);
 
   &:active {
     box-shadow: 0 0 0 1px var(--color-brand-active);

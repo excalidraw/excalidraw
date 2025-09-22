@@ -111,8 +111,8 @@
     --default-button-size: 2rem;
 
     .compact-action-button {
-      width: 1.625rem;
-      height: 1.625rem;
+      width: var(--mobile-action-button-size);
+      height: var(--mobile-action-button-size);
       border: none;
       border-radius: var(--border-radius-lg);
       color: var(--color-on-surface);
@@ -166,8 +166,8 @@
 
   .ToolIcon {
     .ToolIcon__icon {
-      width: 1.625rem;
-      height: 1.625rem;
+      width: 2.5rem;
+      height: 2.5rem;
 
       &:hover {
         background-color: transparent;

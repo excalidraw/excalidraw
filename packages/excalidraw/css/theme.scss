@@ -42,6 +42,7 @@
   --lg-button-size: 2.25rem;
   --lg-icon-size: 1rem;
   --editor-container-padding: 1rem;
+  --mobile-action-button-size: 2.25rem;
 
   @include isMobile {
     --editor-container-padding: 0.75rem;

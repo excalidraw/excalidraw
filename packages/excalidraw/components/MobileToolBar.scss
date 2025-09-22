@@ -13,14 +13,7 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
     justify-content: space-between;
-
-    @media screen and (min-width: 340px) {
-      gap: 6px;
-    }
-
-    @media screen and (min-width: 380px) {
-      gap: 8px;
-    }
+    position: relative;
   }
 
   .mobile-toolbar::-webkit-scrollbar {
@@ -37,8 +30,8 @@
     flex-shrink: 0;
 
     .ToolIcon__icon {
-      width: 2rem;
-      height: 2rem;
+      width: var(--mobile-action-button-size);
+      height: var(--mobile-action-button-size);
 
       &:hover {
         background-color: transparent;

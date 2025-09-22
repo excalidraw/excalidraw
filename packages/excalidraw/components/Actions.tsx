@@ -900,11 +900,11 @@ export const MobileShapeActions = ({
 
   const width = mobileActionsRef.current?.getBoundingClientRect()?.width ?? 0;
 
-  const WIDTH = 26;
-  const GAP = 8;
+  const WIDTH = 36;
+  const GAP = 6;
 
-  // max 6 actions + undo
-  const MIN_WIDTH = 7 * WIDTH + 6 * GAP;
+  // max 7 actions + undo
+  const MIN_WIDTH = 8 * WIDTH + 7 * GAP;
 
   const ADDITIONAL_WIDTH = WIDTH + GAP;
 
@@ -921,7 +921,8 @@ export const MobileShapeActions = ({
         padding: 0,
         zIndex: 2,
         backgroundColor: "transparent",
-        height: WIDTH * 1.75,
+        height: WIDTH * 1.25,
+        marginBottom: 2,
         alignItems: "center",
         gap: GAP,
         pointerEvents: "none",
