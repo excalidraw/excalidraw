@@ -223,7 +223,7 @@ export const MobileToolBar = ({
 
       {/* Eraser */}
       <ToolButton
-        className={clsx("Shape", { fillable: true })}
+        className={clsx("Shape", { fillable: false })}
         type="radio"
         icon={EraserIcon}
         checked={activeTool.type === "eraser"}
