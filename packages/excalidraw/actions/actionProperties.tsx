@@ -1529,10 +1529,7 @@ export const actionChangeContainerBehavior = register({
 
     // collect directly selected eligible containers
     for (const el of selected) {
-      if (
-        isFlowchartNodeElement(el) &&
-        getBoundTextElement(el, elementsMap)
-      ) {
+      if (isFlowchartNodeElement(el) && getBoundTextElement(el, elementsMap)) {
         containerIdsToUpdate.add(el.id);
       }
     }
@@ -1603,8 +1600,7 @@ export const actionChangeContainerBehavior = register({
       // case 2: any eligible containers directly selected
       targetContainers = selected.filter(
         (el) =>
-          isFlowchartNodeElement(el) &&
-          getBoundTextElement(el, elementsMap),
+          isFlowchartNodeElement(el) && getBoundTextElement(el, elementsMap),
       );
     }
 
