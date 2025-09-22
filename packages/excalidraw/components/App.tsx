@@ -3985,7 +3985,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (appState) {
-        this.setState(appState);
+        this.setState({
+          ...appState,
+          // keep existing stylesPanelMode as it needs to be preserved
+          // or set at startup
+          stylesPanelMode: this.state.stylesPanelMode,
+        } as Pick<AppState, K> | null);
       }
 
       if (elements) {
