@@ -42,6 +42,7 @@ import {
   isBoundToContainer,
   isFreeDrawElement,
   isLinearElement,
+  isLineElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -324,9 +325,28 @@ export const getElementLineSegments = (
     const points = curves
       .map((curve) => pointsOnBezierCurves(curve, 10))
       .flat();
-    let i = 0;
     const segments: LineSegment<GlobalPoint>[] = [];
+
+    let i = 0;
+
     while (i < points.length - 1) {
+      const p1 = pointFrom(points[i + 1][0], points[i][1]);
+      const p2 = pointFrom(points[i][0], points[i + 1][1]);
+      const alignsWithStart = pointDistance(p1, points[0] as GlobalPoint) < 1;
+      const alignsWithEnd =
+        pointDistance(p2, points[points.length - 1] as GlobalPoint) < 1;
+
+      // Avoid closing the polycurve for non-polygon lines and arrows
+      if (
+        ((isLineElement(element) && !element.polygon) ||
+          isArrowElement(element)) &&
+        alignsWithStart &&
+        alignsWithEnd
+      ) {
+        i++;
+        continue;
+      }
+
       segments.push(
         lineSegment(
           pointFrom(points[i][0], points[i][1]),
