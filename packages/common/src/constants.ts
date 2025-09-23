@@ -266,7 +266,10 @@ export const STRING_MIME_TYPES = {
   json: "application/json",
   // excalidraw data
   excalidraw: "application/vnd.excalidraw+json",
+  // LEGACY: fully-qualified library JSON data
   excalidrawlib: "application/vnd.excalidrawlib+json",
+  // list of excalidraw library item ids
+  excalidrawlibIds: "application/vnd.excalidrawlib.ids+json",
 } as const;
 
 export const MIME_TYPES = {

@@ -433,6 +433,8 @@ import { findShapeByKey } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
 
+import type { ExcalidrawLibraryIds } from "../data/types";
+
 import type {
   RenderInteractiveSceneCallback,
   ScrollBars,
@@ -10545,16 +10547,44 @@ class App extends React.Component<AppProps, AppState> {
     if (imageFiles.length > 0 && this.isToolSupported("image")) {
       return this.insertImages(imageFiles, sceneX, sceneY);
     }
-
-    const libraryJSON = dataTransferList.getData(MIME_TYPES.excalidrawlib);
-    if (libraryJSON && typeof libraryJSON === "string") {
+    const excalidrawLibrary_ids = dataTransferList.getData(
+      MIME_TYPES.excalidrawlibIds,
+    );
+    const excalidrawLibrary_data = dataTransferList.getData(
+      MIME_TYPES.excalidrawlib,
+    );
+    if (excalidrawLibrary_ids || excalidrawLibrary_data) {
       try {
-        const libraryItems = parseLibraryJSON(libraryJSON);
-        this.addElementsFromPasteOrLibrary({
-          elements: distributeLibraryItemsOnSquareGrid(libraryItems),
-          position: event,
-          files: null,
-        });
+        let libraryItems: LibraryItems | null = null;
+        if (excalidrawLibrary_ids) {
+          const { itemIds } = JSON.parse(
+            excalidrawLibrary_ids,
+          ) as ExcalidrawLibraryIds;
+          const allLibraryItems = await this.library.getLatestLibrary();
+          libraryItems = allLibraryItems.filter((item) =>
+            itemIds.includes(item.id),
+          );
+          // legacy library dataTransfer format
+        } else if (excalidrawLibrary_data) {
+          libraryItems = parseLibraryJSON(excalidrawLibrary_data);
+        }
+        if (libraryItems?.length) {
+          libraryItems = libraryItems.map((item) => ({
+            ...item,
+            // #6465
+            elements: duplicateElements({
+              type: "everything",
+              elements: item.elements,
+              randomizeSeed: true,
+            }).duplicatedElements,
+          }));
+
+          this.addElementsFromPasteOrLibrary({
+            elements: distributeLibraryItemsOnSquareGrid(libraryItems),
+            position: event,
+            files: null,
+          });
+        }
       } catch (error: any) {
         this.setState({ errorMessage: error.message });
       }

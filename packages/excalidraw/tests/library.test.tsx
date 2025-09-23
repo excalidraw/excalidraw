@@ -15,7 +15,7 @@ import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
 import { UI } from "./helpers/ui";
-import { fireEvent, getCloneByOrigId, render, waitFor } from "./test-utils";
+import { fireEvent, render, waitFor } from "./test-utils";
 
 import type { LibraryItem, LibraryItems } from "../types";
 
@@ -46,52 +46,8 @@ vi.mock("../data/filesystem.ts", async (importOriginal) => {
   };
 });
 
-describe("library", () => {
+describe("library items inserting", () => {
   beforeEach(async () => {
-    await render(<Excalidraw />);
-    await act(() => {
-      return h.app.library.resetLibrary();
-    });
-  });
-
-  it("import library via drag&drop", async () => {
-    expect(await h.app.library.getLatestLibrary()).toEqual([]);
-    await API.drop([
-      {
-        kind: "file",
-        type: MIME_TYPES.excalidrawlib,
-        file: await API.loadFile("./fixtures/fixture_library.excalidrawlib"),
-      },
-    ]);
-    await waitFor(async () => {
-      expect(await h.app.library.getLatestLibrary()).toEqual([
-        {
-          status: "unpublished",
-          elements: [expect.objectContaining({ id: "A" })],
-          id: "id0",
-          created: expect.any(Number),
-        },
-      ]);
-    });
-  });
-
-  // NOTE: mocked to test logic, not actual drag&drop via UI
-  it("drop library item onto canvas", async () => {
-    expect(h.elements).toEqual([]);
-    const libraryItems = parseLibraryJSON(await libraryJSONPromise);
-    await API.drop([
-      {
-        kind: "string",
-        value: serializeLibraryAsJSON(libraryItems),
-        type: MIME_TYPES.excalidrawlib,
-      },
-    ]);
-    await waitFor(() => {
-      expect(h.elements).toEqual([expect.objectContaining({ [ORIG_ID]: "A" })]);
-    });
-  });
-
-  it("should regenerate ids but retain bindings on library insert", async () => {
     const rectangle = API.createElement({
       id: "rectangle1",
       type: "rectangle",
@@ -117,43 +73,114 @@ describe("library", () => {
       },
     });
 
+    const libraryItems: LibraryItems = [
+      {
+        id: "libraryItem_id0",
+        status: "unpublished",
+        elements: [rectangle, text, arrow],
+        created: 0,
+        name: "test",
+      },
+    ];
+
+    await render(<Excalidraw initialData={{ libraryItems }} />);
+  });
+
+  afterEach(async () => {
+    await act(() => {
+      return h.app.library.resetLibrary();
+    });
+  });
+
+  it("should regenerate ids but retain bindings on library insert", async () => {
+    const libraryItems = await h.app.library.getLatestLibrary();
+
+    expect(libraryItems.length).toBe(1);
+
     await API.drop([
       {
         kind: "string",
-        value: serializeLibraryAsJSON([
-          {
-            id: "item1",
-            status: "published",
-            elements: [rectangle, text, arrow],
-            created: 1,
-          },
-        ]),
-        type: MIME_TYPES.excalidrawlib,
+        value: JSON.stringify({
+          itemIds: [libraryItems[0].id],
+        }),
+        type: MIME_TYPES.excalidrawlibIds,
       },
     ]);
 
     await waitFor(() => {
+      const rectangle = h.elements.find((e) => e.type === "rectangle")!;
+      const text = h.elements.find((e) => e.type === "text")!;
+      const arrow = h.elements.find((e) => e.type === "arrow")!;
       expect(h.elements).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            [ORIG_ID]: "rectangle1",
+            type: "rectangle",
+            id: expect.not.stringMatching("rectangle1"),
             boundElements: expect.arrayContaining([
-              { type: "text", id: getCloneByOrigId("text1").id },
-              { type: "arrow", id: getCloneByOrigId("arrow1").id },
+              { type: "text", id: text.id },
+              { type: "arrow", id: arrow.id },
             ]),
           }),
           expect.objectContaining({
-            [ORIG_ID]: "text1",
-            containerId: getCloneByOrigId("rectangle1").id,
+            type: "text",
+            id: expect.not.stringMatching("text1"),
+            containerId: rectangle.id,
           }),
           expect.objectContaining({
-            [ORIG_ID]: "arrow1",
+            type: "arrow",
+            id: expect.not.stringMatching("arrow1"),
             endBinding: expect.objectContaining({
-              elementId: getCloneByOrigId("rectangle1").id,
+              elementId: rectangle.id,
             }),
           }),
         ]),
       );
+    });
+  });
+});
+
+describe("library", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+    await act(() => {
+      return h.app.library.resetLibrary();
+    });
+  });
+
+  it("import library via drag&drop", async () => {
+    expect(await h.app.library.getLatestLibrary()).toEqual([]);
+    await API.drop([
+      {
+        kind: "file",
+        type: MIME_TYPES.excalidrawlib,
+        file: await API.loadFile("./fixtures/fixture_library.excalidrawlib"),
+      },
+    ]);
+    await waitFor(async () => {
+      expect(await h.app.library.getLatestLibrary()).toEqual([
+        {
+          status: "unpublished",
+          elements: [expect.objectContaining({ id: "A" })],
+          id: expect.any(String),
+          created: expect.any(Number),
+        },
+      ]);
+    });
+  });
+
+  // NOTE: mocked to test logic, not actual drag&drop via UI
+  it("drop library item onto canvas", async () => {
+    expect(h.elements).toEqual([]);
+    const libraryItems = parseLibraryJSON(await libraryJSONPromise);
+    await API.drop([
+      {
+        kind: "string",
+        value: serializeLibraryAsJSON(libraryItems),
+        type: MIME_TYPES.excalidrawlib,
+      },
+    ]);
+    await waitFor(() => {
+      expect(h.elements).toEqual([expect.objectContaining({ [ORIG_ID]: "A" })]);
     });
   });
 
