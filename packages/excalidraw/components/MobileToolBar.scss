@@ -38,7 +38,10 @@
     }
 
     &.active {
-      background: var(--button-active-bg, var(--island-bg-color));
+      background: var(
+        --color-surface-primary-container,
+        var(--island-bg-color)
+      );
       border-color: var(--button-active-border, var(--color-primary-darkest));
     }
 

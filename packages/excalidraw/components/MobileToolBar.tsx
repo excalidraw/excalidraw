@@ -14,7 +14,7 @@ import { useTunnels } from "../context/tunnels";
 import { HandButton } from "./HandButton";
 import { ToolButton } from "./ToolButton";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import { ToolWithPopup } from "./ToolWithPopup";
+import { ToolPopover } from "./ToolPopover";
 
 import {
   SelectionIcon,
@@ -198,7 +198,7 @@ export const MobileToolBar = ({
       />
 
       {/* Selection Tool */}
-      <ToolWithPopup
+      <ToolPopover
         app={app}
         options={SELECTION_TOOLS}
         activeTool={activeTool}
@@ -210,7 +210,7 @@ export const MobileToolBar = ({
           app.setActiveTool({ type: type as any });
           app.defaultSelectionTool = type as any;
         }}
-        getDisplayedOption={() =>
+        displayedOption={
           SELECTION_TOOLS.find(
             (tool) => tool.type === app.defaultSelectionTool,
           ) || SELECTION_TOOLS[0]
@@ -251,7 +251,7 @@ export const MobileToolBar = ({
       />
 
       {/* Rectangle */}
-      <ToolWithPopup
+      <ToolPopover
         app={app}
         options={SHAPE_TOOLS}
         activeTool={activeTool}
@@ -273,7 +273,7 @@ export const MobileToolBar = ({
           setLastActiveGenericShape(type as any);
           app.setActiveTool({ type: type as any });
         }}
-        getDisplayedOption={() =>
+        displayedOption={
           SHAPE_TOOLS.find((tool) => tool.type === lastActiveGenericShape) ||
           SHAPE_TOOLS[0]
         }
@@ -281,7 +281,7 @@ export const MobileToolBar = ({
       />
 
       {/* Arrow/Line */}
-      <ToolWithPopup
+      <ToolPopover
         app={app}
         options={LINEAR_ELEMENT_TOOLS}
         activeTool={activeTool}
@@ -300,7 +300,7 @@ export const MobileToolBar = ({
           setLastActiveLinearElement(type as any);
           app.setActiveTool({ type: type as any });
         }}
-        getDisplayedOption={() =>
+        displayedOption={
           LINEAR_ELEMENT_TOOLS.find(
             (tool) => tool.type === lastActiveLinearElement,
           ) || LINEAR_ELEMENT_TOOLS[0]

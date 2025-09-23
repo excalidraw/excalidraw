@@ -133,8 +133,10 @@
       }
 
       &.active {
-        background: var(--button-active-bg, var(--island-bg-color));
-        border-color: var(--button-active-border, var(--color-primary-darkest));
+        background: var(
+          --color-surface-primary-container,
+          var(--island-bg-color)
+        );
       }
     }
 
@@ -179,31 +181,6 @@
 .compact-shape-actions-island {
   width: fit-content;
   overflow-x: hidden;
-}
-
-.compact-popover-content {
-  .popover-section {
-    margin-bottom: 1rem;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    .popover-section-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--color-text-secondary);
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .buttonList {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.25rem;
-    }
-  }
 }
 
 .mobile-shape-actions {
