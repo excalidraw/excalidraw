@@ -175,12 +175,19 @@ export default function LibraryMenuItems({
 
   const onItemDrag = useCallback(
     (id: LibraryItem["id"], event: React.DragEvent) => {
+      let ids: string[];
+      if (selectedItems.includes(id)) {
+        ids = selectedItems;
+      } else {
+        ids = [id];
+      }
+      const serialized = JSON.stringify({ ids });
       event.dataTransfer.setData(
         MIME_TYPES.excalidrawlib,
-        serializeLibraryAsJSON(getInsertedElements(id)),
+        serialized,
       );
     },
-    [getInsertedElements],
+    [selectedItems],
   );
 
   const isItemSelected = useCallback(

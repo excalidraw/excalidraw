@@ -10534,17 +10534,40 @@ class App extends React.Component<AppProps, AppState> {
 
     const libraryJSON = dataTransferList.getData(MIME_TYPES.excalidrawlib);
     if (libraryJSON && typeof libraryJSON === "string") {
-      try {
-        const libraryItems = parseLibraryJSON(libraryJSON);
-        this.addElementsFromPasteOrLibrary({
-          elements: distributeLibraryItemsOnSquareGrid(libraryItems),
-          position: event,
-          files: null,
-        });
-      } catch (error: any) {
-        this.setState({ errorMessage: error.message });
-      }
-      return;
+        try {
+          // Try to parse as lightweight ID-only format first
+          let parsed;
+          try {
+            parsed = JSON.parse(libraryJSON);
+          } catch (e) {
+            parsed = null;
+          }
+          if (parsed && Array.isArray(parsed.ids)) {
+            // Resolve IDs to full items from the library
+            const allItems = this.library.getItems();
+            const resolvedItems = parsed.ids
+              .map((id: string) => allItems.find((item: any) => item.id === id))
+              .filter(Boolean);
+            if (resolvedItems.length > 0) {
+              this.addElementsFromPasteOrLibrary({
+                elements: distributeLibraryItemsOnSquareGrid(resolvedItems),
+                position: event,
+                files: null,
+              });
+              return;
+            }
+          }
+          // Fallback: try to parse as full library JSON
+          const libraryItems = parseLibraryJSON(libraryJSON);
+          this.addElementsFromPasteOrLibrary({
+            elements: distributeLibraryItemsOnSquareGrid(libraryItems),
+            position: event,
+            files: null,
+          });
+        } catch (error: any) {
+          this.setState({ errorMessage: error.message });
+        }
+        return;
     }
 
     if (fileItems.length > 0) {

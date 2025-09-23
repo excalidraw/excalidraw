@@ -192,6 +192,13 @@ const createLibraryUpdate = (
 class Library {
   /** latest libraryItems */
   private currLibraryItems: LibraryItems = [];
+
+  /**
+   * Returns a readonly copy of the current library items.
+   */
+  public getItems(): LibraryItems {
+    return [...this.currLibraryItems];
+  }
   /** snapshot of library items since last onLibraryChange call */
   private prevLibraryItems = cloneLibraryItems(this.currLibraryItems);
 
