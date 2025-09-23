@@ -917,9 +917,9 @@ export const MobileShapeActions = ({
 
   const ADDITIONAL_WIDTH = WIDTH + GAP;
 
-  const showDeleteOutside = width >= MIN_WIDTH;
-  const showDuplicateOutside = width >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
-  const showRedoOutside = width >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
+  const showRedoOutside = width >= MIN_WIDTH + 1 * ADDITIONAL_WIDTH;
+  const showDeleteOutside = width >= 2 * MIN_WIDTH;
+  const showDuplicateOutside = width >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
 
   return (
     <Island
