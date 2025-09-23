@@ -26,6 +26,8 @@ import Stack from "./Stack";
 
 import "./LibraryMenuItems.scss";
 
+import type { ExcalidrawLibraryIds } from "../data/types";
+
 import type {
   ExcalidrawProps,
   LibraryItem,
@@ -174,11 +176,14 @@ export default function LibraryMenuItems({
 
   const onItemDrag = useCallback(
     (id: LibraryItem["id"], event: React.DragEvent) => {
-  const ids = selectedItems.includes(id) ? selectedItems : [id];
-      const serialized = JSON.stringify({ ids });
+      // we want to serialize just the ids so the operation is fast and there's
+      // no race condition if people drop the library items on canvas too fast
+      const data: ExcalidrawLibraryIds = {
+        itemIds: selectedItems.includes(id) ? selectedItems : [id],
+      };
       event.dataTransfer.setData(
-        MIME_TYPES.excalidrawlib,
-        serialized,
+        MIME_TYPES.excalidrawlibIds,
+        JSON.stringify(data),
       );
     },
     [selectedItems],

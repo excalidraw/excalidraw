@@ -433,6 +433,8 @@ import { findShapeByKey } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
 
+import type { ExcalidrawLibraryIds } from "../data/types";
+
 import type {
   RenderInteractiveSceneCallback,
   ScrollBars,
@@ -469,7 +471,6 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
-  LibraryItem,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -10532,40 +10533,38 @@ class App extends React.Component<AppProps, AppState> {
     if (imageFiles.length > 0 && this.isToolSupported("image")) {
       return this.insertImages(imageFiles, sceneX, sceneY);
     }
-
-    const libraryJSON = dataTransferList.getData(MIME_TYPES.excalidrawlib);
-    if (libraryJSON && typeof libraryJSON === "string") {
-        try {
-          let distributedItems = null;
-          // Try to parse as lightweight ID-only format first
-          let parsed: { ids: string[] } | null;
-          try {
-            parsed = JSON.parse(libraryJSON) as { ids: string[] };
-          } catch (e) {
-            parsed = null;
-          }
-          if (parsed && Array.isArray(parsed.ids)) {
-            // Resolve IDs to full items from the latest library
-            const allItems = await this.library.getLatestLibrary();
-            const resolvedItems = allItems.filter((item) => parsed!.ids.includes(item.id));
-            if (resolvedItems.length > 0) {
-              distributedItems = distributeLibraryItemsOnSquareGrid(resolvedItems);
-            }
-          }
-          if (!distributedItems) {
-            // Fallback: try to parse as full library JSON
-            const libraryItems = parseLibraryJSON(libraryJSON);
-            distributedItems = distributeLibraryItemsOnSquareGrid(libraryItems);
-          }
+    const excalidrawLibrary_ids = dataTransferList.getData(
+      MIME_TYPES.excalidrawlibIds,
+    );
+    const excalidrawLibrary_data = dataTransferList.getData(
+      MIME_TYPES.excalidrawlib,
+    );
+    if (excalidrawLibrary_ids || excalidrawLibrary_data) {
+      try {
+        let libraryItems: LibraryItems | null = null;
+        if (excalidrawLibrary_ids) {
+          const { itemIds } = JSON.parse(
+            excalidrawLibrary_ids,
+          ) as ExcalidrawLibraryIds;
+          const allLibraryItems = await this.library.getLatestLibrary();
+          libraryItems = allLibraryItems.filter((item) =>
+            itemIds.includes(item.id),
+          );
+          // legacy library dataTransfer format
+        } else if (excalidrawLibrary_data) {
+          libraryItems = parseLibraryJSON(excalidrawLibrary_data);
+        }
+        if (libraryItems?.length) {
           this.addElementsFromPasteOrLibrary({
-            elements: distributedItems,
+            elements: distributeLibraryItemsOnSquareGrid(libraryItems),
             position: event,
             files: null,
           });
-        } catch (error: any) {
-          this.setState({ errorMessage: error.message });
         }
-        return;
+      } catch (error: any) {
+        this.setState({ errorMessage: error.message });
+      }
+      return;
     }
 
     if (fileItems.length > 0) {
