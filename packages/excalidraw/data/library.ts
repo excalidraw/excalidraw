@@ -193,7 +193,6 @@ class Library {
   /** latest libraryItems */
   private currLibraryItems: LibraryItems = [];
 
-
   /** snapshot of library items since last onLibraryChange call */
   private prevLibraryItems = cloneLibraryItems(this.currLibraryItems);
 
