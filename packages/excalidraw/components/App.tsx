@@ -10537,16 +10537,16 @@ class App extends React.Component<AppProps, AppState> {
     if (libraryJSON && typeof libraryJSON === "string") {
         try {
           // Try to parse as lightweight ID-only format first
-          let parsed;
+          let parsed: { ids: string[] } | null;
           try {
-            parsed = JSON.parse(libraryJSON);
+            parsed = JSON.parse(libraryJSON) as { ids: string[] };
           } catch (e) {
             parsed = null;
           }
           if (parsed && Array.isArray(parsed.ids)) {
               // Resolve IDs to full items from the latest library
               const allItems = await this.library.getLatestLibrary();
-              const resolvedItems = allItems.filter((item) => parsed.ids.includes(item.id));
+              const resolvedItems = allItems.filter((item) => parsed!.ids.includes(item.id));
             if (resolvedItems.length > 0) {
               const distributedItems = distributeLibraryItemsOnSquareGrid(resolvedItems);
               this.addElementsFromPasteOrLibrary({
