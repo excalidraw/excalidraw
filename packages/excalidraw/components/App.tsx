@@ -10555,6 +10555,16 @@ class App extends React.Component<AppProps, AppState> {
           libraryItems = parseLibraryJSON(excalidrawLibrary_data);
         }
         if (libraryItems?.length) {
+          libraryItems = libraryItems.map((item) => ({
+            ...item,
+            // #6465
+            elements: duplicateElements({
+              type: "everything",
+              elements: item.elements,
+              randomizeSeed: true,
+            }).duplicatedElements,
+          }));
+
           this.addElementsFromPasteOrLibrary({
             elements: distributeLibraryItemsOnSquareGrid(libraryItems),
             position: event,
