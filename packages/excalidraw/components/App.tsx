@@ -10544,14 +10544,13 @@ class App extends React.Component<AppProps, AppState> {
             parsed = null;
           }
           if (parsed && Array.isArray(parsed.ids)) {
-            // Resolve IDs to full items from the library
-            const allItems = this.library.getItems();
-            const resolvedItems = parsed.ids
-              .map((id: string) => allItems.find((item: LibraryItem) => item.id === id))
-              .filter(Boolean);
+              // Resolve IDs to full items from the latest library
+              const allItems = await this.library.getLatestLibrary();
+              const resolvedItems = allItems.filter((item) => parsed.ids.includes(item.id));
             if (resolvedItems.length > 0) {
+              const distributedItems = distributeLibraryItemsOnSquareGrid(resolvedItems);
               this.addElementsFromPasteOrLibrary({
-                elements: distributeLibraryItemsOnSquareGrid(resolvedItems),
+                elements: distributedItems,
                 position: event,
                 files: null,
               });
