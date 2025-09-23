@@ -606,6 +606,9 @@ const CombinedExtraActions = ({
   setAppState,
   container,
   app,
+  showRedo,
+  showDuplicate,
+  showDelete,
 }: {
   appState: UIAppState;
   targetElements: ExcalidrawElement[];
@@ -613,6 +616,9 @@ const CombinedExtraActions = ({
   setAppState: React.Component<any, AppState>["setState"];
   container: HTMLDivElement | null;
   app: AppClassProperties;
+  showRedo?: boolean;
+  showDuplicate?: boolean;
+  showDelete?: boolean;
 }) => {
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
@@ -734,6 +740,9 @@ const CombinedExtraActions = ({
                 <div className="buttonList">
                   {renderAction("group")}
                   {renderAction("ungroup")}
+                  {showRedo && renderAction("redo")}
+                  {showDuplicate && renderAction("duplicateSelection")}
+                  {showDelete && renderAction("deleteSelectedElements")}
                   {showLinkIcon && renderAction("hyperlink")}
                   {showCropEditorAction && renderAction("cropEditor")}
                 </div>
@@ -908,9 +917,9 @@ export const MobileShapeActions = ({
 
   const ADDITIONAL_WIDTH = WIDTH + GAP;
 
-  const showDelete = width >= MIN_WIDTH;
-  const showDuplicate = width >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
-  const showRedo = width >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
+  const showDeleteOutside = width >= MIN_WIDTH;
+  const showDuplicateOutside = width >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
+  const showRedoOutside = width >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
 
   return (
     <Island
@@ -995,6 +1004,9 @@ export const MobileShapeActions = ({
           setAppState={setAppState}
           container={container}
           app={app}
+          showRedo={!showRedoOutside}
+          showDuplicate={!showDuplicateOutside}
+          showDelete={!showDeleteOutside}
         />
       </div>
       <div
@@ -1005,15 +1017,15 @@ export const MobileShapeActions = ({
         }}
       >
         <div className="compact-action-item">{renderAction("undo")}</div>
-        {showRedo && (
+        {showRedoOutside && (
           <div className="compact-action-item">{renderAction("redo")}</div>
         )}
-        {showDuplicate && (
+        {showDuplicateOutside && (
           <div className="compact-action-item">
             {renderAction("duplicateSelection")}
           </div>
         )}
-        {showDelete && (
+        {showDeleteOutside && (
           <div className="compact-action-item">
             {renderAction("deleteSelectedElements")}
           </div>
