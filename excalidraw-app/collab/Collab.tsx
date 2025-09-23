@@ -531,7 +531,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     }
 
     if (existingRoomLinkData) {
-      // Local elements not needed in this case
+      // when joining existing room, don't merge it with current scene data
       this.excalidrawAPI.resetScene();
     } else {
       const elements = this.excalidrawAPI.getSceneElements().map((element) => {
