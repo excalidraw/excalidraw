@@ -10536,6 +10536,7 @@ class App extends React.Component<AppProps, AppState> {
     const libraryJSON = dataTransferList.getData(MIME_TYPES.excalidrawlib);
     if (libraryJSON && typeof libraryJSON === "string") {
         try {
+          let distributedItems = null;
           // Try to parse as lightweight ID-only format first
           let parsed: { ids: string[] } | null;
           try {
@@ -10544,23 +10545,20 @@ class App extends React.Component<AppProps, AppState> {
             parsed = null;
           }
           if (parsed && Array.isArray(parsed.ids)) {
-              // Resolve IDs to full items from the latest library
-              const allItems = await this.library.getLatestLibrary();
-              const resolvedItems = allItems.filter((item) => parsed!.ids.includes(item.id));
+            // Resolve IDs to full items from the latest library
+            const allItems = await this.library.getLatestLibrary();
+            const resolvedItems = allItems.filter((item) => parsed!.ids.includes(item.id));
             if (resolvedItems.length > 0) {
-              const distributedItems = distributeLibraryItemsOnSquareGrid(resolvedItems);
-              this.addElementsFromPasteOrLibrary({
-                elements: distributedItems,
-                position: event,
-                files: null,
-              });
-              return;
+              distributedItems = distributeLibraryItemsOnSquareGrid(resolvedItems);
             }
           }
-          // Fallback: try to parse as full library JSON
-          const libraryItems = parseLibraryJSON(libraryJSON);
+          if (!distributedItems) {
+            // Fallback: try to parse as full library JSON
+            const libraryItems = parseLibraryJSON(libraryJSON);
+            distributedItems = distributeLibraryItemsOnSquareGrid(libraryItems);
+          }
           this.addElementsFromPasteOrLibrary({
-            elements: distributeLibraryItemsOnSquareGrid(libraryItems),
+            elements: distributedItems,
             position: event,
             files: null,
           });
