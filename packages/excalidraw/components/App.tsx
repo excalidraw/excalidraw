@@ -469,6 +469,7 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
+  LibraryItem,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -10546,7 +10547,7 @@ class App extends React.Component<AppProps, AppState> {
             // Resolve IDs to full items from the library
             const allItems = this.library.getItems();
             const resolvedItems = parsed.ids
-              .map((id: string) => allItems.find((item: any) => item.id === id))
+              .map((id: string) => allItems.find((item: LibraryItem) => item.id === id))
               .filter(Boolean);
             if (resolvedItems.length > 0) {
               this.addElementsFromPasteOrLibrary({
