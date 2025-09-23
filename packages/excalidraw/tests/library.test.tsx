@@ -15,7 +15,7 @@ import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
 import { UI } from "./helpers/ui";
-import { fireEvent, getCloneByOrigId, render, waitFor } from "./test-utils";
+import { fireEvent, render, waitFor } from "./test-utils";
 
 import type { LibraryItem, LibraryItems } from "../types";
 
