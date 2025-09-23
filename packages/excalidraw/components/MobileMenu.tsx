@@ -60,16 +60,6 @@ export const MobileMenu = ({
     MainMenuTunnel,
     DefaultSidebarTriggerTunnel,
   } = useTunnels();
-  const renderToolbar = () => {
-    return (
-      <MobileToolBar
-        appState={appState}
-        app={app}
-        onHandToolToggle={onHandToolToggle}
-      />
-    );
-  };
-
   const renderAppTopBar = () => {
     if (
       appState.viewModeEnabled ||
@@ -99,13 +89,25 @@ export const MobileMenu = ({
     );
   };
 
+  const renderToolbar = () => {
+    return (
+      <MobileToolBar
+        appState={appState}
+        app={app}
+        onHandToolToggle={onHandToolToggle}
+      />
+    );
+  };
+
   return (
     <>
       {renderSidebars()}
-      <FixedSideContainer side="top" className="App-top-bar">
-        {renderAppTopBar()}
+      {/* welcome screen, bottom bar, and top bar all have the same z-index */}
+      {/* ordered in this reverse order so that top bar is on top */}
+      <div className="App-welcome-screen">
         {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
-      </FixedSideContainer>
+      </div>
+
       <div
         className="App-bottom-bar"
         style={{
@@ -141,6 +143,10 @@ export const MobileMenu = ({
             )}
         </Island>
       </div>
+
+      <FixedSideContainer side="top" className="App-top-bar">
+        {renderAppTopBar()}
+      </FixedSideContainer>
     </>
   );
 };

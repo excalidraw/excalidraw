@@ -237,6 +237,10 @@ body.excalidraw-cursor-resize * {
     flex-direction: column;
   }
 
+  .App-welcome-screen {
+    z-index: var(--zIndex-layerUI);
+  }
+
   .App-bottom-bar {
     position: absolute;
     // account for margins
@@ -246,7 +250,7 @@ body.excalidraw-cursor-resize * {
     left: 50%;
     transform: translateX(-50%);
     --bar-padding: calc(4 * var(--space-factor));
-    z-index: 3;
+    z-index: var(--zIndex-layerUI);
     display: flex;
     flex-direction: column;
 
