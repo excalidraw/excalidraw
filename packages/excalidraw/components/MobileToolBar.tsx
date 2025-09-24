@@ -363,7 +363,8 @@ export const MobileToolBar = ({
           className={clsx(
             "App-toolbar__extra-tools-trigger App-toolbar__extra-tools-trigger--mobile",
             {
-              "App-toolbar__extra-tools-trigger--selected": extraToolSelected,
+              "App-toolbar__extra-tools-trigger--selected":
+                extraToolSelected || isOtherShapesMenuOpen,
             },
           )}
           onToggle={() => setIsOtherShapesMenuOpen(!isOtherShapesMenuOpen)}
@@ -376,17 +377,7 @@ export const MobileToolBar = ({
             justifyContent: "center",
           }}
         >
-          <div
-            style={{
-              width: WIDTH,
-              height: WIDTH,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {extraIcon}
-          </div>
+          {extraIcon}
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => setIsOtherShapesMenuOpen(false)}
