@@ -5,17 +5,18 @@ export class BinaryHeap<T> {
 
   sinkDown(idx: number) {
     const node = this.content[idx];
+    const nodeScore = this.scoreFunction(node);
     while (idx > 0) {
       const parentN = ((idx + 1) >> 1) - 1;
       const parent = this.content[parentN];
-      if (this.scoreFunction(node) < this.scoreFunction(parent)) {
-        this.content[parentN] = node;
+      if (nodeScore < this.scoreFunction(parent)) {
         this.content[idx] = parent;
         idx = parentN; // TODO: Optimize
       } else {
         break;
       }
     }
+    this.content[idx] = node;
   }
 
   bubbleUp(idx: number) {
@@ -24,35 +25,39 @@ export class BinaryHeap<T> {
     const score = this.scoreFunction(node);
 
     while (true) {
-      const child2N = (idx + 1) << 1;
-      const child1N = child2N - 1;
-      let swap = null;
-      let child1Score = 0;
+      const child1N = ((idx + 1) << 1) - 1;
+      const child2N = child1N + 1;
+      let smallestIdx = idx;
+      let smallestScore = score;
 
+      // Check left child
       if (child1N < length) {
-        const child1 = this.content[child1N];
-        child1Score = this.scoreFunction(child1);
-        if (child1Score < score) {
-          swap = child1N;
+        const child1Score = this.scoreFunction(this.content[child1N]);
+        if (child1Score < smallestScore) {
+          smallestIdx = child1N;
+          smallestScore = child1Score;
         }
       }
 
+      // Check right child
       if (child2N < length) {
-        const child2 = this.content[child2N];
-        const child2Score = this.scoreFunction(child2);
-        if (child2Score < (swap === null ? score : child1Score)) {
-          swap = child2N;
+        const child2Score = this.scoreFunction(this.content[child2N]);
+        if (child2Score < smallestScore) {
+          smallestIdx = child2N;
         }
       }
 
-      if (swap !== null) {
-        this.content[idx] = this.content[swap];
-        this.content[swap] = node;
-        idx = swap; // TODO: Optimize
-      } else {
+      if (smallestIdx === idx) {
         break;
       }
+
+      // Move the smaller child up, continue finding position for node
+      this.content[idx] = this.content[smallestIdx];
+      idx = smallestIdx;
     }
+
+    // Place node in its final position
+    this.content[idx] = node;
   }
 
   push(node: T) {
