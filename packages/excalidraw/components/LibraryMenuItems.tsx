@@ -10,7 +10,6 @@ import { MIME_TYPES, arrayToMap } from "@excalidraw/common";
 
 import { duplicateElements } from "@excalidraw/element";
 
-import { serializeLibraryAsJSON } from "../data/json";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { useScrollPosition } from "../hooks/useScrollPosition";
 import { t } from "../i18n";
@@ -26,6 +25,8 @@ import Spinner from "./Spinner";
 import Stack from "./Stack";
 
 import "./LibraryMenuItems.scss";
+
+import type { ExcalidrawLibraryIds } from "../data/types";
 
 import type {
   ExcalidrawProps,
@@ -175,12 +176,17 @@ export default function LibraryMenuItems({
 
   const onItemDrag = useCallback(
     (id: LibraryItem["id"], event: React.DragEvent) => {
+      // we want to serialize just the ids so the operation is fast and there's
+      // no race condition if people drop the library items on canvas too fast
+      const data: ExcalidrawLibraryIds = {
+        itemIds: selectedItems.includes(id) ? selectedItems : [id],
+      };
       event.dataTransfer.setData(
-        MIME_TYPES.excalidrawlib,
-        serializeLibraryAsJSON(getInsertedElements(id)),
+        MIME_TYPES.excalidrawlibIds,
+        JSON.stringify(data),
       );
     },
-    [getInsertedElements],
+    [selectedItems],
   );
 
   const isItemSelected = useCallback(
