@@ -36,7 +36,17 @@ interface ChatMessage {
   content: string;
   timestamp: string;
   durationMs?: number;
+  planningDurationMs?: number;
+  executionDurationMs?: number;
   citations?: ChatCitation[];
+  executionInfo?: {
+    tools?: string[];
+    useRAG?: boolean;
+    needsSnapshot?: boolean;
+    planningDurationMs?: number;
+    executionDurationMs?: number;
+    totalDurationMs?: number;
+  };
 }
 
 // Simple hash function for content deduplication
@@ -75,6 +85,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const [aiInvited, setAiInvited] = useState(false);
   const [isInvitingAI, setIsInvitingAI] = useState(false);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [loadingPhase, setLoadingPhase] = useState<'idle' | 'planning' | 'executing'>('idle');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const invitedRoomRef = useRef<string | null>(null);
   const chatPanelRef = useRef<HTMLDivElement>(null);
@@ -232,10 +243,77 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     setInputMessage('');
     setIsLoading(true);
     setError(null);
+    setLoadingPhase('planning');
+
+    let planPayload: any = null;
+    let planUseRAGValue: boolean | undefined;
+    let planNeedsSnapshotValue: boolean | undefined;
+    let planDurationMs: number | undefined;
+    let executionDurationMs: number | undefined;
+    let executionStartTs: number | undefined;
+    const hasPerformanceNow = typeof performance !== 'undefined' && typeof performance.now === 'function';
+    const getNow = () => hasPerformanceNow ? performance.now() : Date.now();
+    const startTs = getNow();
+    let plannedToolsForExecution: string[] = [];
 
     try {
-      const startTs = (typeof performance !== 'undefined' ? performance.now() : Date.now());
-      // Get canvas context for AI
+      const planResponse = await fetch(`${LLM_BASE_URL}/api/chat/plan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userMessage.content,
+          sessionId: 'default'
+        })
+      });
+
+      let planData: any = null;
+      try {
+        planData = await planResponse.json();
+      } catch {
+        planData = null;
+      }
+
+      if (!planResponse.ok || !planData?.success || !planData?.plan) {
+        const planErrorMessage = planData?.error || `Planning failed with status ${planResponse.status}`;
+        throw new Error(planErrorMessage);
+      }
+
+      planPayload = planData.plan;
+      const planEndTs = getNow();
+      if (typeof planData.durationMs === 'number' && Number.isFinite(planData.durationMs)) {
+        planDurationMs = Math.max(0, Math.round(planData.durationMs));
+      } else {
+        planDurationMs = Math.max(0, Math.round(planEndTs - startTs));
+      }
+
+      const resolvedUseRAG = typeof planData.useRAG === 'boolean' ? planData.useRAG : planPayload?.useRAG;
+      const resolvedNeedsSnapshot = typeof planData.needsSnapshot === 'boolean' ? planData.needsSnapshot : planPayload?.needsSnapshot;
+      planUseRAGValue = typeof resolvedUseRAG === 'boolean' ? resolvedUseRAG : undefined;
+      planNeedsSnapshotValue = typeof resolvedNeedsSnapshot === 'boolean' ? resolvedNeedsSnapshot : undefined;
+
+      const allowlistNames = Array.isArray(planData.allowlist)
+        ? planData.allowlist.filter((name: unknown): name is string => typeof name === 'string')
+        : [];
+      const fallbackToolNames = Array.isArray(planData.toolNames)
+        ? planData.toolNames.filter((name: unknown): name is string => typeof name === 'string')
+        : Array.isArray(planPayload?.tools)
+          ? planPayload.tools
+              .map((tool: any) => (tool && typeof tool.name === 'string') ? tool.name : null)
+              .filter((name: string | null): name is string => !!name)
+          : [];
+      const toolListForDisplay = allowlistNames.length > 0 ? allowlistNames : fallbackToolNames;
+      plannedToolsForExecution = toolListForDisplay;
+      setLoadingPhase('executing');
+
+      if (import.meta.env.DEV) {
+        console.log('Planning result', { plan: planPayload, allowlist: toolListForDisplay });
+      }
+
+      executionStartTs = getNow();
+
+      // Get canvas context for AI (after planning completes)
       const elements = excalidrawAPI.getSceneElements();
       const appState = excalidrawAPI.getAppState();
       
@@ -262,7 +340,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       // Generate snapshots for visual analysis
       let snapshots: { fullCanvas?: string; selection?: string; thumbnail?: string; thumbnailHash?: string } = {};
       try {
-        const appState = excalidrawAPI.getAppState();
+        const refreshedAppState = excalidrawAPI.getAppState();
         
         // Generate thumbnail for preattach (if enabled and elements exist)
         const thumbnailEnabled = String(
@@ -277,9 +355,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
             const thumbnailCanvas = await exportToCanvas({
               elements: elements,
               appState: {
-                ...appState,
+                ...refreshedAppState,
                 exportBackground: true,
-                viewBackgroundColor: appState.viewBackgroundColor,
+                viewBackgroundColor: refreshedAppState.viewBackgroundColor,
               },
               files: excalidrawAPI.getFiles(),
               maxWidthOrHeight: maxThumbnailDim,
@@ -312,9 +390,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         const canvas = await exportToCanvas({
           elements: elements,
           appState: {
-            ...appState,
+            ...refreshedAppState,
             exportBackground: true,
-            viewBackgroundColor: appState.viewBackgroundColor,
+            viewBackgroundColor: refreshedAppState.viewBackgroundColor,
           },
           files: excalidrawAPI.getFiles(),
           maxWidthOrHeight: 1200,
@@ -324,13 +402,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         snapshots.fullCanvas = canvasDataURL;
         
         // Generate selection snapshot if elements are selected
-        if (Object.keys(appState.selectedElementIds).length > 0) {
-          const selectedElements = elements.filter(el => appState.selectedElementIds[el.id]);
+        if (Object.keys(refreshedAppState.selectedElementIds).length > 0) {
+          const selectedElements = elements.filter(el => refreshedAppState.selectedElementIds[el.id]);
           if (selectedElements.length > 0) {
             const selectionCanvas = await exportToCanvas({
               elements: selectedElements,
               appState: {
-                ...appState,
+                ...refreshedAppState,
                 exportBackground: false,
                 viewBackgroundColor: 'transparent',
               },
@@ -347,19 +425,22 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         // Continue without snapshots
       }
 
-      const response = await fetch(`${LLM_BASE_URL}/api/chat`, {
+      const requestBody: Record<string, unknown> = {
+        message: userMessage.content,
+        sessionId: 'default',
+        plan: planPayload,
+        canvas: canvasContext,
+        snapshots,
+        roomId,
+        roomKey
+      };
+
+      const response = await fetch(`${LLM_BASE_URL}/api/chat/exec`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          message: userMessage.content,
-          sessionId: 'default',
-          canvas: canvasContext,
-          snapshots,
-          roomId,
-          roomKey
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -369,14 +450,31 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       const data = await response.json();
 
       if (data.success) {
-        const endTs = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+        const endTs = getNow();
+        if (typeof executionStartTs === 'number') {
+          executionDurationMs = Math.max(0, Math.round(endTs - executionStartTs));
+        }
         const durationMs = Math.max(0, Math.round(endTs - startTs));
+        if (typeof executionDurationMs !== 'number' && typeof planDurationMs === 'number') {
+          executionDurationMs = Math.max(0, durationMs - planDurationMs);
+        }
+        const executionInfo = {
+          tools: plannedToolsForExecution.length > 0 ? plannedToolsForExecution : undefined,
+          useRAG: planUseRAGValue,
+          needsSnapshot: planNeedsSnapshotValue,
+          planningDurationMs: planDurationMs,
+          executionDurationMs,
+          totalDurationMs: durationMs
+        };
         const assistantMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
           content: data.content,
           timestamp: new Date().toISOString(),
           durationMs,
+          planningDurationMs: planDurationMs,
+          executionDurationMs,
+          executionInfo,
           citations: data.citations || undefined
         };
 
@@ -390,6 +488,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       if (import.meta.env.DEV) console.error('Chat error:', err);
     } finally {
       setIsLoading(false);
+      setLoadingPhase('idle');
     }
   };
 
@@ -429,9 +528,20 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     }
   };
 
+  const buildCopyText = (message: ChatMessage): string => {
+    let text = message.content;
+    if (message.role === 'assistant') {
+      const metaLines = getExecutionInfoLines(message.executionInfo);
+      if (metaLines.length > 0) {
+        text += `\n\n[Execution]\n${metaLines.join('\n')}`;
+      }
+    }
+    return text;
+  };
+
   // Handle copy button click
   const handleCopy = async (message: ChatMessage) => {
-    const success = await copyToClipboard(message.content);
+    const success = await copyToClipboard(buildCopyText(message));
     if (success) {
       setCopiedMessageId(message.id);
       setTimeout(() => setCopiedMessageId(null), 1500);
@@ -598,6 +708,30 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     return `${s}s`;
   };
 
+  const getExecutionInfoLines = (info?: ChatMessage['executionInfo']): string[] => {
+    if (!info) return [];
+    const lines: string[] = [];
+    if (info.tools && info.tools.length > 0) {
+      lines.push(`tools: [${info.tools.join(', ')}]`);
+    }
+    if (typeof info.useRAG === 'boolean') {
+      lines.push(`useRAG: ${info.useRAG}`);
+    }
+    if (typeof info.needsSnapshot === 'boolean') {
+      lines.push(`needsSnapshot: ${info.needsSnapshot}`);
+    }
+    if (typeof info.planningDurationMs === 'number') {
+      lines.push(`planning: ${formatDuration(info.planningDurationMs)}`);
+    }
+    if (typeof info.executionDurationMs === 'number') {
+      lines.push(`execution: ${formatDuration(info.executionDurationMs)}`);
+    }
+    if (typeof info.totalDurationMs === 'number') {
+      lines.push(`total: ${formatDuration(info.totalDurationMs)}`);
+    }
+    return lines;
+  };
+
   if (!isVisible) {
     return null; // Button is now handled in renderTopRightUI
   }
@@ -736,109 +870,172 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           </div>
         )}
 
-        {messages.map((message) => (
-          <div key={message.id} style={{
-            alignSelf: message.role === 'user' ? 'flex-end' : 'flex-start',
-            maxWidth: '80%'
-          }}>
-            <div style={{
-              padding: '8px 12px',
-              borderRadius: '12px',
-              backgroundColor: message.role === 'user' ? '#007bff' : '#f8f9fa',
-              color: message.role === 'user' ? 'white' : '#333',
-              fontSize: '14px',
-              lineHeight: 1.4,
-              wordWrap: 'break-word'
-            }}>
-              {renderContentWithInlineRefs(message)}
-            </div>
-            
-            {/* References block removed: inline 〖R:n〗 markers are now clickable instead */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginTop: '4px'
-            }}>
-              <div style={{
-                fontSize: '11px',
-                color: '#6c757d',
-                textAlign: message.role === 'user' ? 'right' : 'left'
-              }}>
-                {formatTimestamp(message.timestamp)}
-                {message.role === 'assistant' && message.durationMs != null && (
-                  <span style={{ marginLeft: 6 }}>· {formatDuration(message.durationMs)}</span>
-                )}
+        {messages.map((message) => {
+          return (
+            <div
+              key={message.id}
+              style={{
+                alignSelf: message.role === 'user' ? 'flex-end' : 'flex-start',
+                maxWidth: '80%'
+              }}
+            >
+              <div
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '12px',
+                  backgroundColor: message.role === 'user' ? '#007bff' : '#f8f9fa',
+                  color: message.role === 'user' ? 'white' : '#333',
+                  fontSize: '14px',
+                  lineHeight: 1.4,
+                  wordWrap: 'break-word'
+                }}
+              >
+                {renderContentWithInlineRefs(message)}
               </div>
-              {message.role === 'assistant' && (
-                <button
-                  onClick={() => handleCopy(message)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleCopy(message);
-                    }
-                  }}
-                  aria-label="Copy reply"
-                  title="Copy reply"
+
+              {/* References block removed: inline 〖R:n〗 markers are now clickable instead */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '4px'
+                }}
+              >
+                <div
                   style={{
-                    padding: '4px 8px',
-                    border: '1px solid #ddd',
-                    background: '#fff',
-                    cursor: 'pointer',
                     fontSize: '11px',
-                    borderRadius: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
                     color: '#6c757d',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#f8f9fa';
-                    e.currentTarget.style.borderColor = '#007bff';
-                    e.currentTarget.style.color = '#007bff';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#fff';
-                    e.currentTarget.style.borderColor = '#ddd';
-                    e.currentTarget.style.color = '#6c757d';
+                    textAlign: message.role === 'user' ? 'right' : 'left'
                   }}
                 >
-                  {copiedMessageId === message.id ? (
-                    <>
-                      <span>✓</span>
-                      <span>Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                      </svg>
-                      <span>Copy</span>
-                    </>
-                  )}
-                </button>
-              )}
+                  {formatTimestamp(message.timestamp)}
+                  {message.role === 'assistant' && (() => {
+                    const timingParts: string[] = [];
+                    if (typeof message.planningDurationMs === 'number') {
+                      timingParts.push(`planning ${formatDuration(message.planningDurationMs)}`);
+                    }
+                    if (typeof message.executionDurationMs === 'number') {
+                      timingParts.push(`execution ${formatDuration(message.executionDurationMs)}`);
+                    }
+                    if (timingParts.length === 0 && typeof message.durationMs === 'number') {
+                      timingParts.push(`total ${formatDuration(message.durationMs)}`);
+                    }
+                    if (timingParts.length === 0) {
+                      return null;
+                    }
+                    return <span style={{ marginLeft: 6 }}>· {timingParts.join(' · ')}</span>;
+                  })()}
+                </div>
+                {message.role === 'assistant' && (
+                  <button
+                    onClick={() => handleCopy(message)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleCopy(message);
+                      }
+                    }}
+                    aria-label="Copy reply"
+                    title="Copy reply"
+                    style={{
+                      padding: '4px 8px',
+                      border: '1px solid #ddd',
+                      background: '#fff',
+                      cursor: 'pointer',
+                      fontSize: '11px',
+                      borderRadius: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      color: '#6c757d',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#f8f9fa';
+                      e.currentTarget.style.borderColor = '#007bff';
+                      e.currentTarget.style.color = '#007bff';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#fff';
+                      e.currentTarget.style.borderColor = '#ddd';
+                      e.currentTarget.style.color = '#6c757d';
+                    }}
+                  >
+                    {copiedMessageId === message.id ? (
+                      <>
+                        <span>✓</span>
+                        <span>Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {isLoading && (
           <div style={{
             alignSelf: 'flex-start',
             maxWidth: '80%'
           }}>
-            <div style={{
-              padding: '8px 12px',
-              borderRadius: '12px',
-              backgroundColor: '#f8f9fa',
-              color: '#6c757d',
-              fontSize: '14px',
-              fontStyle: 'italic'
-            }}>
-              AI is thinking...
+            <div
+              role="status"
+              aria-live="polite"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '10px 14px',
+                borderRadius: '12px',
+                backgroundColor: '#f8f9fa',
+                color: '#6c757d',
+                fontSize: '14px'
+              }}
+            >
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '28px',
+                  height: '28px'
+                }}
+                aria-label={loadingPhase === 'planning' ? 'Planning request' : 'Executing request'}
+              >
+                <svg width="18" height="18" viewBox="0 0 50 50" role="img">
+                  <circle
+                    cx="25"
+                    cy="25"
+                    r="18"
+                    fill="none"
+                    stroke="#007bff"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    strokeDasharray="31.4 31.4"
+                  >
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      repeatCount="indefinite"
+                      dur="1s"
+                      values="0 25 25;360 25 25"
+                    />
+                  </circle>
+                </svg>
+              </div>
+              <span>
+                {loadingPhase === 'planning' ? 'Planning...' : 'Executing...'}
+              </span>
             </div>
           </div>
         )}
