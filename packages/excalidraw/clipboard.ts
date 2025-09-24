@@ -470,14 +470,13 @@ export const parseDataTransferEvent = async (
       Array.from(items || []).map(
         async (item): Promise<ParsedDataTransferItem | null> => {
           if (item.kind === "file") {
-            let file = item.getAsFile();
+            const file = item.getAsFile();
             if (file) {
-              file = await normalizeFile(file);
               const fileHandle = await getFileHandle(item);
               return {
                 type: file.type,
                 kind: "file",
-                file,
+                file: await normalizeFile(file),
                 fileHandle,
               };
             }
