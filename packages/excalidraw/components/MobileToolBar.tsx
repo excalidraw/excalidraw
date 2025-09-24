@@ -39,7 +39,7 @@ import {
 import "./ToolIcon.scss";
 import "./MobileToolBar.scss";
 
-import type { AppClassProperties, UIAppState } from "../types";
+import type { AppClassProperties, ToolType, UIAppState } from "../types";
 
 const SHAPE_TOOLS = [
   {
@@ -139,7 +139,7 @@ export const MobileToolBar = ({
         app.setActiveTool({ type: "selection" });
       }
     } else {
-      app.setActiveTool({ type: toolType as any });
+      app.setActiveTool({ type: toolType as ToolType });
     }
   };
 
@@ -207,8 +207,10 @@ export const MobileToolBar = ({
         title={capitalizeString(t("toolBar.selection"))}
         data-testid="toolbar-selection"
         onToolChange={(type: string) => {
-          app.setActiveTool({ type: type as any });
-          app.defaultSelectionTool = type as any;
+          if (type === "selection" || type === "lasso") {
+            app.setActiveTool({ type: type });
+            app.defaultSelectionTool = type;
+          }
         }}
         displayedOption={
           SELECTION_TOOLS.find(
@@ -270,8 +272,14 @@ export const MobileToolBar = ({
         )}
         data-testid="toolbar-rectangle"
         onToolChange={(type: string) => {
-          setLastActiveGenericShape(type as any);
-          app.setActiveTool({ type: type as any });
+          if (
+            type === "rectangle" ||
+            type === "diamond" ||
+            type === "ellipse"
+          ) {
+            setLastActiveGenericShape(type);
+            app.setActiveTool({ type });
+          }
         }}
         displayedOption={
           SHAPE_TOOLS.find((tool) => tool.type === lastActiveGenericShape) ||
@@ -297,8 +305,10 @@ export const MobileToolBar = ({
         data-testid="toolbar-arrow"
         fillable={true}
         onToolChange={(type: string) => {
-          setLastActiveLinearElement(type as any);
-          app.setActiveTool({ type: type as any });
+          if (type === "arrow" || type === "line") {
+            setLastActiveLinearElement(type);
+            app.setActiveTool({ type });
+          }
         }}
         displayedOption={
           LINEAR_ELEMENT_TOOLS.find(
