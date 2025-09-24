@@ -59,6 +59,7 @@ import "./Actions.scss";
 import { useDevice, useExcalidrawContainer } from "./App";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
+import { ToolPopover } from "./ToolPopover";
 import { Tooltip } from "./Tooltip";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { PropertiesPopover } from "./PropertiesPopover";
@@ -76,6 +77,7 @@ import {
   TextSizeIcon,
   adjustmentsIcon,
   DotsHorizontalIcon,
+  SelectionIcon,
 } from "./icons";
 
 import { Island } from "./Island";
@@ -1038,10 +1040,23 @@ export const ShapesSwitcher = ({
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
 
+  const SELECTION_TOOLS = [
+    {
+      type: "selection",
+      icon: SelectionIcon,
+      title: capitalizeString(t("toolBar.selection")),
+    },
+    {
+      type: "lasso",
+      icon: LassoIcon,
+      title: capitalizeString(t("toolBar.lasso")),
+    },
+  ] as const;
+
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const lassoToolSelected =
-    activeTool.type === "lasso" && app.defaultSelectionTool !== "lasso";
+    activeTool.type === "lasso" && app.state.preferredSelectionTool !== "lasso";
 
   const embeddableToolSelected = activeTool.type === "embeddable";
 
@@ -1068,6 +1083,39 @@ export const ShapesSwitcher = ({
           const shortcut = letter
             ? `${letter} ${t("helpDialog.or")} ${numericKey}`
             : `${numericKey}`;
+          // when in compact styles panel mode (tablet)
+          // use a ToolPopover for selection/lasso toggle as well
+          if (
+            (value === "selection" || value === "lasso") &&
+            appState.stylesPanelMode === "compact"
+          ) {
+            return (
+              <ToolPopover
+                key={"selection-popover"}
+                app={app}
+                options={SELECTION_TOOLS}
+                activeTool={activeTool as any}
+                defaultOption={app.state.preferredSelectionTool}
+                namePrefix="selectionType"
+                title={capitalizeString(t("toolBar.selection"))}
+                data-testid="toolbar-selection"
+                onToolChange={(type: string) => {
+                  if (type === "selection" || type === "lasso") {
+                    app.setActiveTool({ type });
+                    app.state.preferredSelectionTool = type as any;
+                  }
+                }}
+                displayedOption={
+                  SELECTION_TOOLS.find(
+                    (tool) => tool.type === app.state.preferredSelectionTool,
+                  ) || SELECTION_TOOLS[0]
+                }
+                isActive={
+                  activeTool.type === "selection" || activeTool.type === "lasso"
+                }
+              />
+            );
+          }
 
           return (
             <ToolButton
@@ -1169,7 +1217,7 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.laser")}
           </DropdownMenu.Item>
-          {app.defaultSelectionTool !== "lasso" && (
+          {appState.stylesPanelMode === "full" && (
             <DropdownMenu.Item
               onSelect={() => app.setActiveTool({ type: "lasso" })}
               icon={LassoIcon}

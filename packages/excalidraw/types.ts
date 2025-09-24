@@ -316,6 +316,7 @@ export interface AppState {
     // indicates if the current tool is temporarily switched on from the selection tool
     fromSelection: boolean;
   } & ActiveTool;
+  preferredSelectionTool: "selection" | "lasso";
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
@@ -364,7 +365,6 @@ export interface AppState {
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" }
     | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
-
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -739,8 +739,6 @@ export type AppClassProperties = {
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
   onPointerDownEmitter: App["onPointerDownEmitter"];
-
-  defaultSelectionTool: "selection" | "lasso";
 };
 
 export type PointerDownState = Readonly<{

@@ -11,6 +11,7 @@ import {
   THEME,
   DEFAULT_GRID_STEP,
   isTestEnv,
+  isMobileOrTablet,
 } from "@excalidraw/common";
 
 import type { AppState, NormalizedZoomValue } from "./types";
@@ -55,6 +56,7 @@ export const getDefaultAppState = (): Omit<
       fromSelection: false,
       lastActiveTool: null,
     },
+    preferredSelectionTool: isMobileOrTablet() ? "lasso" : "selection",
     penMode: false,
     penDetected: false,
     errorMessage: null,
@@ -176,6 +178,7 @@ const APP_STATE_STORAGE_CONF = (<
   editingTextElement: { browser: false, export: false, server: false },
   editingGroupId: { browser: true, export: false, server: false },
   activeTool: { browser: true, export: false, server: false },
+  preferredSelectionTool: { browser: true, export: false, server: false },
   penMode: { browser: true, export: false, server: false },
   penDetected: { browser: true, export: false, server: false },
   errorMessage: { browser: false, export: false, server: false },
