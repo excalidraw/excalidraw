@@ -103,6 +103,8 @@ import {
   MQ_MAX_MOBILE,
   MQ_MIN_TABLET,
   MQ_MAX_TABLET,
+  MQ_MAX_HEIGHT_LANDSCAPE,
+  MQ_MAX_WIDTH_LANDSCAPE,
 } from "@excalidraw/common";
 
 import {
@@ -2423,8 +2425,10 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
-    const minSide = Math.min(width, height);
-    return minSide <= MQ_MAX_MOBILE;
+    return (
+      width <= MQ_MAX_MOBILE ||
+      (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
+    );
   };
 
   private isTabletBreakpoint = (editorWidth: number, editorHeight: number) => {
