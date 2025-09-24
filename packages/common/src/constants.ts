@@ -539,7 +539,5 @@ export const DOUBLE_TAP_POSITION_THRESHOLD = 35;
 
 // glass background for mobile action buttons
 export const MOBILE_ACTION_BUTTON_BG = {
-  background: "rgba(255, 255, 255, 0.1)",
-  backdropFilter: "blur(20px)",
-  WebkitBackdropFilter: "blur(20px)",
+  background: "var(--island-bg-color)",
 } as const;

@@ -122,9 +122,7 @@
       justify-content: center;
       transition: all 0.2s ease;
 
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: var(--island-bg-color);
 
       svg {
         width: 1rem;
@@ -168,8 +166,10 @@
 
   .ToolIcon {
     .ToolIcon__icon {
-      width: 2.5rem;
-      height: 2.5rem;
+      width: var(--mobile-action-button-size);
+      height: var(--mobile-action-button-size);
+
+      background-color: var(--island-bg-color);
 
       &:hover {
         background-color: transparent;
