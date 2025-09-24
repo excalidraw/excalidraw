@@ -1336,3 +1336,7 @@ export const isMobileOrTablet = (): boolean => {
   }
   return false;
 };
+
+export function isCanvasFilterSupported() {
+  return "filter" in (CanvasRenderingContext2D.prototype || {});
+}
