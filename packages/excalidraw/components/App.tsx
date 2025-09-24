@@ -10461,7 +10461,10 @@ class App extends React.Component<AppProps, AppState> {
     const initialized = await Promise.all(
       placeholders.map(async (placeholder, i) => {
         try {
-          return await this.initializeImage(placeholder, imageFiles[i]);
+          return await this.initializeImage(
+            placeholder,
+            await normalizeFile(imageFiles[i]),
+          );
         } catch (error: any) {
           this.setState({
             errorMessage: error.message || t("errors.imageInsertError"),
