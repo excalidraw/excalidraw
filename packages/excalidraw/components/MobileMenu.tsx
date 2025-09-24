@@ -36,6 +36,10 @@ type MobileMenuProps = {
     isMobile: boolean,
     appState: UIAppState,
   ) => JSX.Element | null;
+  renderTopLeftUI?: (
+    isMobile: boolean,
+    appState: UIAppState,
+  ) => JSX.Element | null;
   renderSidebars: () => JSX.Element | null;
   renderWelcomeScreen: boolean;
   UIOptions: AppProps["UIOptions"];
@@ -48,7 +52,7 @@ export const MobileMenu = ({
   actionManager,
   setAppState,
   onHandToolToggle,
-
+  renderTopLeftUI,
   renderTopRightUI,
   renderSidebars,
   renderWelcomeScreen,
@@ -61,18 +65,19 @@ export const MobileMenu = ({
     DefaultSidebarTriggerTunnel,
   } = useTunnels();
   const renderAppTopBar = () => {
+    const topRightUI = renderTopRightUI?.(true, appState) ?? (
+      <DefaultSidebarTriggerTunnel.Out />
+    );
+    const topLeftUI = renderTopLeftUI?.(true, appState) ?? (
+      <MainMenuTunnel.Out />
+    );
+
     if (
       appState.viewModeEnabled ||
       appState.openDialog?.name === "elementLinkSelector"
     ) {
-      return (
-        <div className="App-toolbar-content">
-          <MainMenuTunnel.Out />
-        </div>
-      );
+      return <div className="App-toolbar-content">{topLeftUI}</div>;
     }
-
-    const topRightUI = renderTopRightUI?.(true, appState);
 
     return (
       <div
@@ -83,8 +88,8 @@ export const MobileMenu = ({
           justifyContent: "space-between",
         }}
       >
-        <MainMenuTunnel.Out />
-        {topRightUI ? topRightUI : <DefaultSidebarTriggerTunnel.Out />}
+        {topLeftUI}
+        {topRightUI}
       </div>
     );
   };

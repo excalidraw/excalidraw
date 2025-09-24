@@ -91,6 +91,7 @@ interface LayerUIProps {
   onPenModeToggle: AppClassProperties["togglePenMode"];
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
+  renderTopLeftUI?: ExcalidrawProps["renderTopLeftUI"];
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   UIOptions: AppProps["UIOptions"];
@@ -149,6 +150,7 @@ const LayerUI = ({
   onHandToolToggle,
   onPenModeToggle,
   showExitZenModeBtn,
+  renderTopLeftUI,
   renderTopRightUI,
   renderCustomStats,
   UIOptions,
@@ -584,6 +586,7 @@ const LayerUI = ({
           setAppState={setAppState}
           onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
+          renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
           renderSidebars={renderSidebars}
           renderWelcomeScreen={renderWelcomeScreen}
