@@ -21,20 +21,9 @@ export function curve<Point extends GlobalPoint | LocalPoint>(
   return [a, b, c, d] as Curve<Point>;
 }
 
-function gradient(
-  f: (t: number, s: number) => number,
-  t0: number,
-  s0: number,
-  delta: number = 1e-6,
-): number[] {
-  return [
-    (f(t0 + delta, s0) - f(t0 - delta, s0)) / (2 * delta),
-    (f(t0, s0 + delta) - f(t0, s0 - delta)) / (2 * delta),
-  ];
-}
-
-function solve(
-  f: (t: number, s: number) => [number, number],
+function solveWithAnalyticalJacobian<Point extends GlobalPoint | LocalPoint>(
+  curve: Curve<Point>,
+  lineSegment: LineSegment<Point>,
   t0: number,
   s0: number,
   tolerance: number = 1e-3,
@@ -48,33 +37,75 @@ function solve(
       return null;
     }
 
-    const y0 = f(t0, s0);
-    const jacobian = [
-      gradient((t, s) => f(t, s)[0], t0, s0),
-      gradient((t, s) => f(t, s)[1], t0, s0),
-    ];
-    const b = [[-y0[0]], [-y0[1]]];
-    const det =
-      jacobian[0][0] * jacobian[1][1] - jacobian[0][1] * jacobian[1][0];
+    // Compute bezier point at parameter t0
+    const bt = 1 - t0;
+    const bt2 = bt * bt;
+    const bt3 = bt2 * bt;
+    const t0_2 = t0 * t0;
+    const t0_3 = t0_2 * t0;
 
-    if (det === 0) {
+    const bezierX =
+      bt3 * curve[0][0] +
+      3 * bt2 * t0 * curve[1][0] +
+      3 * bt * t0_2 * curve[2][0] +
+      t0_3 * curve[3][0];
+    const bezierY =
+      bt3 * curve[0][1] +
+      3 * bt2 * t0 * curve[1][1] +
+      3 * bt * t0_2 * curve[2][1] +
+      t0_3 * curve[3][1];
+
+    // Compute line point at parameter s0
+    const lineX =
+      lineSegment[0][0] + s0 * (lineSegment[1][0] - lineSegment[0][0]);
+    const lineY =
+      lineSegment[0][1] + s0 * (lineSegment[1][1] - lineSegment[0][1]);
+
+    // Function values
+    const fx = bezierX - lineX;
+    const fy = bezierY - lineY;
+
+    error = Math.abs(fx) + Math.abs(fy);
+
+    if (error < tolerance) {
+      break;
+    }
+
+    // Analytical derivatives
+    const dfx_dt =
+      -3 * bt2 * curve[0][0] +
+      3 * bt2 * curve[1][0] -
+      6 * bt * t0 * curve[1][0] -
+      3 * t0_2 * curve[2][0] +
+      6 * bt * t0 * curve[2][0] +
+      3 * t0_2 * curve[3][0];
+
+    const dfy_dt =
+      -3 * bt2 * curve[0][1] +
+      3 * bt2 * curve[1][1] -
+      6 * bt * t0 * curve[1][1] -
+      3 * t0_2 * curve[2][1] +
+      6 * bt * t0 * curve[2][1] +
+      3 * t0_2 * curve[3][1];
+
+    // Line derivatives
+    const dfx_ds = -(lineSegment[1][0] - lineSegment[0][0]);
+    const dfy_ds = -(lineSegment[1][1] - lineSegment[0][1]);
+
+    // Jacobian determinant
+    const det = dfx_dt * dfy_ds - dfx_ds * dfy_dt;
+
+    if (Math.abs(det) < 1e-12) {
       return null;
     }
 
-    const iJ = [
-      [jacobian[1][1] / det, -jacobian[0][1] / det],
-      [-jacobian[1][0] / det, jacobian[0][0] / det],
-    ];
-    const h = [
-      [iJ[0][0] * b[0][0] + iJ[0][1] * b[1][0]],
-      [iJ[1][0] * b[0][0] + iJ[1][1] * b[1][0]],
-    ];
+    // Newton step
+    const invDet = 1 / det;
+    const dt = invDet * (dfy_ds * -fx - dfx_ds * -fy);
+    const ds = invDet * (-dfy_dt * -fx + dfx_dt * -fy);
 
-    t0 = t0 + h[0][0];
-    s0 = s0 + h[1][0];
-
-    const [tErr, sErr] = f(t0, s0);
-    error = Math.max(Math.abs(tErr), Math.abs(sErr));
+    t0 += dt;
+    s0 += ds;
     iter += 1;
   }
 
@@ -96,63 +127,49 @@ export const bezierEquation = <Point extends GlobalPoint | LocalPoint>(
       t ** 3 * c[3][1],
   );
 
+const initial_guesses: [number, number][] = [
+  [0.5, 0],
+  [0.2, 0],
+  [0.8, 0],
+];
+
+const calculate = <Point extends GlobalPoint | LocalPoint>(
+  [t0, s0]: [number, number],
+  l: LineSegment<Point>,
+  c: Curve<Point>,
+) => {
+  const solution = solveWithAnalyticalJacobian(c, l, t0, s0, 1e-2, 3);
+
+  if (!solution) {
+    return null;
+  }
+
+  const [t, s] = solution;
+
+  if (t < 0 || t > 1 || s < 0 || s > 1) {
+    return null;
+  }
+
+  return bezierEquation(c, t);
+};
+
 /**
  * Computes the intersection between a cubic spline and a line segment.
  */
 export function curveIntersectLineSegment<
   Point extends GlobalPoint | LocalPoint,
 >(c: Curve<Point>, l: LineSegment<Point>): Point[] {
-  const line = (s: number) =>
-    pointFrom<Point>(
-      l[0][0] + s * (l[1][0] - l[0][0]),
-      l[0][1] + s * (l[1][1] - l[0][1]),
-    );
-
-  const initial_guesses: [number, number][] = [
-    [0.5, 0],
-    [0.2, 0],
-    [0.8, 0],
-  ];
-
-  const calculate = ([t0, s0]: [number, number]) => {
-    const solution = solve(
-      (t: number, s: number) => {
-        const bezier_point = bezierEquation(c, t);
-        const line_point = line(s);
-
-        return [
-          bezier_point[0] - line_point[0],
-          bezier_point[1] - line_point[1],
-        ];
-      },
-      t0,
-      s0,
-    );
-
-    if (!solution) {
-      return null;
-    }
-
-    const [t, s] = solution;
-
-    if (t < 0 || t > 1 || s < 0 || s > 1) {
-      return null;
-    }
-
-    return bezierEquation(c, t);
-  };
-
-  let solution = calculate(initial_guesses[0]);
+  let solution = calculate(initial_guesses[0], l, c);
   if (solution) {
     return [solution];
   }
 
-  solution = calculate(initial_guesses[1]);
+  solution = calculate(initial_guesses[1], l, c);
   if (solution) {
     return [solution];
   }
 
-  solution = calculate(initial_guesses[2]);
+  solution = calculate(initial_guesses[2], l, c);
   if (solution) {
     return [solution];
   }
