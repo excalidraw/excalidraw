@@ -2,10 +2,10 @@ import { arrayToMap, easeOut, THEME } from "@excalidraw/common";
 
 import {
   computeBoundTextPosition,
-  distanceToElement,
   doBoundsIntersect,
   getBoundTextElement,
   getElementBounds,
+  getElementLineSegments,
   getFreedrawOutlineAsSegments,
   getFreedrawOutlinePoints,
   intersectElementWithLineSegment,
@@ -265,19 +265,28 @@ const eraserTest = (
     }
 
     return false;
-  } else if (
-    isArrowElement(element) ||
-    (isLineElement(element) && !element.polygon)
-  ) {
+  }
+
+  const boundTextElement = getBoundTextElement(element, elementsMap);
+
+  if (isArrowElement(element) || (isLineElement(element) && !element.polygon)) {
     const tolerance = Math.max(
       element.strokeWidth,
       (element.strokeWidth * 2) / zoom,
     );
 
-    return distanceToElement(element, elementsMap, lastPoint) <= tolerance;
-  }
+    // If the eraser movement is so fast that a large distance is covered
+    // between the last two points, the distanceToElement miss, so we test
+    // agaist each segment of the linear element
+    const segments = getElementLineSegments(element, elementsMap);
+    for (const seg of segments) {
+      if (lineSegmentsDistance(seg, pathSegment) <= tolerance) {
+        return true;
+      }
+    }
 
-  const boundTextElement = getBoundTextElement(element, elementsMap);
+    return false;
+  }
 
   return (
     intersectElementWithLineSegment(element, elementsMap, pathSegment, 0, true)
