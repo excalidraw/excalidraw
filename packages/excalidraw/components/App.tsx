@@ -10233,6 +10233,10 @@ class App extends React.Component<AppProps, AppState> {
         multiple: true,
       });
 
+      for (let i = 0; i < imageFiles.length; i++) {
+        imageFiles[i] = await normalizeFile(imageFiles[i]);
+      }
+
       this.insertImages(imageFiles, x, y);
     } catch (error: any) {
       if (error.name !== "AbortError") {
@@ -10449,6 +10453,7 @@ class App extends React.Component<AppProps, AppState> {
     const initialized = await Promise.all(
       placeholders.map(async (placeholder, i) => {
         try {
+          //imageFiles[i] = await normalizeFile(imageFiles[i]);
           return await this.initializeImage(placeholder, imageFiles[i]);
         } catch (error: any) {
           this.setState({
