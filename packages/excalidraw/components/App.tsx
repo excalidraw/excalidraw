@@ -10453,7 +10453,6 @@ class App extends React.Component<AppProps, AppState> {
     const initialized = await Promise.all(
       placeholders.map(async (placeholder, i) => {
         try {
-          //imageFiles[i] = await normalizeFile(imageFiles[i]);
           return await this.initializeImage(placeholder, imageFiles[i]);
         } catch (error: any) {
           this.setState({
