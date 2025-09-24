@@ -122,6 +122,11 @@
       color: var(--button-color, var(--color-on-primary-container));
     }
   }
+
+  @include isMobile() {
+    width: var(--mobile-action-button-size, var(--default-button-size));
+    height: var(--mobile-action-button-size, var(--default-button-size));
+  }
 }
 
 @mixin outlineButtonIconStyles {
@@ -183,8 +188,8 @@
   border: none;
   box-shadow: 0 0 0 1px var(--color-surface-lowest);
   background-color: var(--color-surface-low);
-  width: var(--moobile-action-button-size, 2.25rem);
-  height: var(--moobile-action-button-size, 2.25rem);
+  width: var(--mobile-action-button-size, 2rem);
+  height: var(--mobile-action-button-size, 2rem);
 
   &:active {
     box-shadow: 0 0 0 1px var(--color-brand-active);

@@ -192,6 +192,9 @@
   background: transparent;
   border-radius: var(--border-radius-lg);
   box-shadow: none;
+  overflow: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .shape-actions-theme-scope {

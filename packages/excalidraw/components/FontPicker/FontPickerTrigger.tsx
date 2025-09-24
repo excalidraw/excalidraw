@@ -1,5 +1,7 @@
 import * as Popover from "@radix-ui/react-popover";
 
+import { MOBILE_ACTION_BUTTON_BG } from "@excalidraw/common";
+
 import type { FontFamilyValues } from "@excalidraw/element/types";
 
 import { t } from "../../i18n";
@@ -23,11 +25,9 @@ export const FontPickerTrigger = ({
 
   const compactStyle = compactMode
     ? {
-        background: "rgba(255, 255, 255, 0.1)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        width: "2.25rem",
-        height: "2.25rem",
+        ...MOBILE_ACTION_BUTTON_BG,
+        width: "2rem",
+        height: "2rem",
       }
     : {};
 

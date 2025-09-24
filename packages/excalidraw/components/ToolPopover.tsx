@@ -50,6 +50,7 @@ export const ToolPopover = ({
 }: ToolPopoverProps) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const currentType = activeTool.type;
+  const SIDE_OFFSET = 32 / 2 + 10;
 
   // if currentType is not in options, close popup
   if (!options.some((o) => o.type === currentType) && isPopupOpen) {
@@ -87,7 +88,10 @@ export const ToolPopover = ({
         />
       </Popover.Trigger>
 
-      <Popover.Content className="tool-popover-content" sideOffset={28}>
+      <Popover.Content
+        className="tool-popover-content"
+        sideOffset={SIDE_OFFSET}
+      >
         {options.map(({ type, icon, title }) => (
           <ToolButton
             className={clsx(className, {

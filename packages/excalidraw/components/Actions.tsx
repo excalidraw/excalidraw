@@ -328,14 +328,7 @@ const CombinedShapeProperties = ({
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     );
 
-  const shouldShowCombinedProperties =
-    showFillIcons ||
-    hasStrokeWidth(appState.activeTool.type) ||
-    targetElements.some((element) => hasStrokeWidth(element.type)) ||
-    hasStrokeStyle(appState.activeTool.type) ||
-    targetElements.some((element) => hasStrokeStyle(element.type)) ||
-    canChangeRoundness(appState.activeTool.type) ||
-    targetElements.some((element) => canChangeRoundness(element.type));
+  const shouldShowCombinedProperties = targetElements.length > 0;
 
   const isOpen = appState.openPopup === "compactStrokeStyles";
 
@@ -606,7 +599,6 @@ const CombinedExtraActions = ({
   setAppState,
   container,
   app,
-  showRedo,
   showDuplicate,
   showDelete,
 }: {
@@ -616,7 +608,6 @@ const CombinedExtraActions = ({
   setAppState: React.Component<any, AppState>["setState"];
   container: HTMLDivElement | null;
   app: AppClassProperties;
-  showRedo?: boolean;
   showDuplicate?: boolean;
   showDelete?: boolean;
 }) => {
@@ -740,11 +731,10 @@ const CombinedExtraActions = ({
                 <div className="buttonList">
                   {renderAction("group")}
                   {renderAction("ungroup")}
-                  {showRedo && renderAction("redo")}
-                  {showDuplicate && renderAction("duplicateSelection")}
-                  {showDelete && renderAction("deleteSelectedElements")}
                   {showLinkIcon && renderAction("hyperlink")}
                   {showCropEditorAction && renderAction("cropEditor")}
+                  {showDuplicate && renderAction("duplicateSelection")}
+                  {showDelete && renderAction("deleteSelectedElements")}
                 </div>
               </fieldset>
             </div>
@@ -907,19 +897,22 @@ export const MobileShapeActions = ({
   const { container } = useExcalidrawContainer();
   const mobileActionsRef = useRef<HTMLDivElement>(null);
 
-  const width = mobileActionsRef.current?.getBoundingClientRect()?.width ?? 0;
+  const ACTIONS_WIDTH =
+    mobileActionsRef.current?.getBoundingClientRect()?.width ?? 0;
 
-  const WIDTH = 36;
+  // 7 actions + 2 for undo/redo
+  const MIN_ACTIONS = 9;
+
   const GAP = 6;
+  const WIDTH = 32;
 
-  // max 7 actions + undo
-  const MIN_WIDTH = 8 * WIDTH + 7 * GAP;
+  const MIN_WIDTH = MIN_ACTIONS * WIDTH + (MIN_ACTIONS - 1) * GAP;
 
   const ADDITIONAL_WIDTH = WIDTH + GAP;
 
-  const showRedoOutside = width >= MIN_WIDTH + 1 * ADDITIONAL_WIDTH;
-  const showDeleteOutside = width >= 2 * MIN_WIDTH;
-  const showDuplicateOutside = width >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
+  const showDeleteOutside = ACTIONS_WIDTH >= MIN_WIDTH + ADDITIONAL_WIDTH;
+  const showDuplicateOutside =
+    ACTIONS_WIDTH >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
 
   return (
     <Island
@@ -930,8 +923,8 @@ export const MobileShapeActions = ({
         padding: 0,
         zIndex: 2,
         backgroundColor: "transparent",
-        height: WIDTH * 1.25,
-        marginBottom: 2,
+        height: WIDTH * 1.35,
+        marginBottom: 4,
         alignItems: "center",
         gap: GAP,
         pointerEvents: "none",
@@ -1004,7 +997,6 @@ export const MobileShapeActions = ({
           setAppState={setAppState}
           container={container}
           app={app}
-          showRedo={!showRedoOutside}
           showDuplicate={!showDuplicateOutside}
           showDelete={!showDeleteOutside}
         />
@@ -1017,9 +1009,7 @@ export const MobileShapeActions = ({
         }}
       >
         <div className="compact-action-item">{renderAction("undo")}</div>
-        {showRedoOutside && (
-          <div className="compact-action-item">{renderAction("redo")}</div>
-        )}
+        <div className="compact-action-item">{renderAction("redo")}</div>
         {showDuplicateOutside && (
           <div className="compact-action-item">
             {renderAction("duplicateSelection")}

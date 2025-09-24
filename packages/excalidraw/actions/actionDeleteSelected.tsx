@@ -331,7 +331,8 @@ export const actionDeleteSelected = register({
         !isSomeElementSelected(getNonDeletedElements(elements), appState)
       }
       style={{
-        ...(appState.stylesPanelMode === "mobile"
+        ...(appState.stylesPanelMode === "mobile" &&
+        appState.openPopup !== "compactOtherProperties"
           ? MOBILE_ACTION_BUTTON_BG
           : {}),
       }}
