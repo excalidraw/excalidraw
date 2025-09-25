@@ -122,7 +122,7 @@
       justify-content: center;
       transition: all 0.2s ease;
 
-      background: var(--island-bg-color);
+      background: var(--mobile-action-button-bg);
 
       svg {
         width: 1rem;
@@ -133,7 +133,7 @@
       &.active {
         background: var(
           --color-surface-primary-container,
-          var(--island-bg-color)
+          var(--mobile-action-button-bg)
         );
       }
     }
@@ -169,7 +169,7 @@
       width: var(--mobile-action-button-size);
       height: var(--mobile-action-button-size);
 
-      background-color: var(--island-bg-color);
+      background: var(--mobile-action-button-bg);
 
       &:hover {
         background-color: transparent;

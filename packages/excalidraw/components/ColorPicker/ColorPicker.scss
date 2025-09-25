@@ -168,6 +168,10 @@
       width: var(--mobile-action-button-size);
       height: var(--mobile-action-button-size);
     }
+
+    &.mobile-border {
+      border: 1px solid var(--mobile-color-border);
+    }
   }
 
   .color-picker__button__hotkey-label {

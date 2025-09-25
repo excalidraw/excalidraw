@@ -231,7 +231,7 @@ const ColorPickerTrigger = ({
   label,
   color,
   type,
-  compactMode = false,
+  stylesPanelMode,
   mode = "background",
   onToggle,
   editingTextElement,
@@ -239,7 +239,7 @@ const ColorPickerTrigger = ({
   color: string | null;
   label: string;
   type: ColorPickerType;
-  compactMode?: boolean;
+  stylesPanelMode?: AppState["stylesPanelMode"];
   mode?: "background" | "stroke";
   onToggle: () => void;
   editingTextElement?: boolean;
@@ -264,7 +264,9 @@ const ColorPickerTrigger = ({
         "is-transparent": !color || color === "transparent",
         "has-outline":
           !color || !isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD),
-        "compact-sizing": compactMode,
+        "compact-sizing":
+          stylesPanelMode === "compact" || stylesPanelMode === "mobile",
+        "mobile-border": stylesPanelMode === "mobile",
       })}
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}
@@ -277,20 +279,22 @@ const ColorPickerTrigger = ({
       onClick={handleClick}
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
-      {compactMode && color && mode === "stroke" && (
-        <div className="color-picker__button-background">
-          <span
-            style={{
-              color:
-                color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
-                  ? "#fff"
-                  : "#111",
-            }}
-          >
-            {strokeIcon}
-          </span>
-        </div>
-      )}
+      {(stylesPanelMode === "compact" || stylesPanelMode === "mobile") &&
+        color &&
+        mode === "stroke" && (
+          <div className="color-picker__button-background">
+            <span
+              style={{
+                color:
+                  color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
+                    ? "#fff"
+                    : "#111",
+              }}
+            >
+              {strokeIcon}
+            </span>
+          </div>
+        )}
     </Popover.Trigger>
   );
 };
@@ -305,12 +309,15 @@ export const ColorPicker = ({
   topPicks,
   updateData,
   appState,
-  compactMode = false,
 }: ColorPickerProps) => {
   const openRef = useRef(appState.openPopup);
   useEffect(() => {
     openRef.current = appState.openPopup;
   }, [appState.openPopup]);
+  const compactMode =
+    appState.stylesPanelMode === "compact" ||
+    appState.stylesPanelMode === "mobile";
+
   return (
     <div>
       <div
@@ -342,7 +349,7 @@ export const ColorPicker = ({
             color={color}
             label={label}
             type={type}
-            compactMode={compactMode}
+            stylesPanelMode={appState.stylesPanelMode}
             mode={type === "elementStroke" ? "stroke" : "background"}
             editingTextElement={!!appState.editingTextElement}
             onToggle={() => {
