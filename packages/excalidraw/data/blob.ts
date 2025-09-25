@@ -437,7 +437,7 @@ const getActualMimeTypeFromImage = (buffer: ArrayBuffer) => {
     webp: /^82 73 70 70 \d+ \d+ \d+ \d+ 87 69 66 80 86 80 56/,
   };
 
-  if (leadingBytes === bytes.png) {
+  if (leadingBytes.startsWith(bytes.png)) {
     mimeType = MIME_TYPES.png;
   } else if (leadingBytes.startsWith(bytes.jpg)) {
     mimeType = MIME_TYPES.jpg;
