@@ -451,7 +451,7 @@ const getActualMimeTypeFromImage = async (file: Blob | File) => {
 
 export const createFile = (
   blob: File | Blob | ArrayBuffer,
-  mimeType: ValueOf<typeof MIME_TYPES>,
+  mimeType: string,
   name: string | undefined,
 ) => {
   return new File([blob], name || "", {
