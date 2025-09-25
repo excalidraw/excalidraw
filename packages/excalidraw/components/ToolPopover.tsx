@@ -30,7 +30,6 @@ type ToolPopoverProps = {
   "data-testid": string;
   onToolChange: (type: string) => void;
   displayedOption: ToolOption;
-  isActive: boolean;
   fillable?: boolean;
 };
 
@@ -44,12 +43,12 @@ export const ToolPopover = ({
   title,
   "data-testid": dataTestId,
   onToolChange,
-  isActive,
   displayedOption,
   fillable = false,
 }: ToolPopoverProps) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const currentType = activeTool.type;
+  const isActive = displayedOption.type === currentType;
   const SIDE_OFFSET = 32 / 2 + 10;
 
   // if currentType is not in options, close popup

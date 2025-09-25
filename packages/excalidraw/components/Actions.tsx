@@ -1034,12 +1034,12 @@ export const MobileShapeActions = ({
 
 export const ShapesSwitcher = ({
   activeTool,
-  appState,
+  setAppState,
   app,
   UIOptions,
 }: {
   activeTool: UIAppState["activeTool"];
-  appState: UIAppState;
+  setAppState: React.Component<any, AppState>["setState"];
   app: AppClassProperties;
   UIOptions: AppProps["UIOptions"];
 }) => {
@@ -1061,7 +1061,9 @@ export const ShapesSwitcher = ({
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const lassoToolSelected =
-    activeTool.type === "lasso" && app.state.preferredSelectionTool !== "lasso";
+    app.state.stylesPanelMode === "full" &&
+    activeTool.type === "lasso" &&
+    app.state.preferredSelectionTool !== "lasso";
 
   const embeddableToolSelected = activeTool.type === "embeddable";
 
@@ -1092,14 +1094,14 @@ export const ShapesSwitcher = ({
           // use a ToolPopover for selection/lasso toggle as well
           if (
             (value === "selection" || value === "lasso") &&
-            appState.stylesPanelMode === "compact"
+            app.state.stylesPanelMode === "compact"
           ) {
             return (
               <ToolPopover
                 key={"selection-popover"}
                 app={app}
                 options={SELECTION_TOOLS}
-                activeTool={activeTool as any}
+                activeTool={activeTool}
                 defaultOption={app.state.preferredSelectionTool}
                 namePrefix="selectionType"
                 title={capitalizeString(t("toolBar.selection"))}
@@ -1107,7 +1109,9 @@ export const ShapesSwitcher = ({
                 onToolChange={(type: string) => {
                   if (type === "selection" || type === "lasso") {
                     app.setActiveTool({ type });
-                    app.state.preferredSelectionTool = type as any;
+                    setAppState({
+                      preferredSelectionTool: type,
+                    });
                   }
                 }}
                 displayedOption={
@@ -1115,9 +1119,7 @@ export const ShapesSwitcher = ({
                     (tool) => tool.type === app.state.preferredSelectionTool,
                   ) || SELECTION_TOOLS[0]
                 }
-                isActive={
-                  activeTool.type === "selection" || activeTool.type === "lasso"
-                }
+                fillable={activeTool.type === "selection"}
               />
             );
           }
@@ -1136,12 +1138,12 @@ export const ShapesSwitcher = ({
               aria-keyshortcuts={shortcut}
               data-testid={`toolbar-${value}`}
               onPointerDown={({ pointerType }) => {
-                if (!appState.penDetected && pointerType === "pen") {
+                if (!app.state.penDetected && pointerType === "pen") {
                   app.togglePenMode(true);
                 }
 
                 if (value === "selection") {
-                  if (appState.activeTool.type === "selection") {
+                  if (app.state.activeTool.type === "selection") {
                     app.setActiveTool({ type: "lasso" });
                   } else {
                     app.setActiveTool({ type: "selection" });
@@ -1149,7 +1151,7 @@ export const ShapesSwitcher = ({
                 }
               }}
               onChange={({ pointerType }) => {
-                if (appState.activeTool.type !== value) {
+                if (app.state.activeTool.type !== value) {
                   trackEvent("toolbar", value, "ui");
                 }
                 if (value === "image") {
@@ -1222,7 +1224,7 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.laser")}
           </DropdownMenu.Item>
-          {appState.stylesPanelMode === "full" && (
+          {app.state.stylesPanelMode === "full" && (
             <DropdownMenu.Item
               onSelect={() => app.setActiveTool({ type: "lasso" })}
               icon={LassoIcon}

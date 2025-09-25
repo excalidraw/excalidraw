@@ -2375,12 +2375,13 @@ class App extends React.Component<AppProps, AppState> {
         activeTool.type === "selection"
           ? {
               ...activeTool,
-              type: this.state.preferredSelectionTool,
+              type: scene.appState.preferredSelectionTool,
             }
           : scene.appState.activeTool,
       isLoading: false,
       toast: this.state.toast,
     };
+
     if (initialData?.scrollToContent) {
       scene.appState = {
         ...scene.appState,

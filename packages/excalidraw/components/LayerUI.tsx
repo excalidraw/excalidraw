@@ -368,7 +368,7 @@ const LayerUI = ({
                             />
 
                             <ShapesSwitcher
-                              appState={appState}
+                              setAppState={setAppState}
                               activeTool={appState.activeTool}
                               UIOptions={UIOptions}
                               app={app}

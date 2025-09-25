@@ -82,17 +82,17 @@ const LINEAR_ELEMENT_TOOLS = [
 ] as const;
 
 type MobileToolBarProps = {
-  appState: UIAppState;
   app: AppClassProperties;
   onHandToolToggle: () => void;
+  setAppState: React.Component<any, UIAppState>["setState"];
 };
 
 export const MobileToolBar = ({
-  appState,
   app,
   onHandToolToggle,
+  setAppState,
 }: MobileToolBarProps) => {
-  const activeTool = appState.activeTool;
+  const activeTool = app.state.activeTool;
   const [isOtherShapesMenuOpen, setIsOtherShapesMenuOpen] = useState(false);
   const [lastActiveGenericShape, setLastActiveGenericShape] = useState<
     "rectangle" | "diamond" | "ellipse"
@@ -128,12 +128,12 @@ export const MobileToolBar = ({
   const { TTDDialogTriggerTunnel } = useTunnels();
 
   const handleToolChange = (toolType: string, pointerType?: string) => {
-    if (appState.activeTool.type !== toolType) {
+    if (app.state.activeTool.type !== toolType) {
       trackEvent("toolbar", toolType, "ui");
     }
 
     if (toolType === "selection") {
-      if (appState.activeTool.type === "selection") {
+      if (app.state.activeTool.type === "selection") {
         // Toggle selection tool behavior if needed
       } else {
         app.setActiveTool({ type: "selection" });
@@ -172,17 +172,17 @@ export const MobileToolBar = ({
     }
     return true;
   });
-  const extraToolSelected = extraTools.includes(appState.activeTool.type);
+  const extraToolSelected = extraTools.includes(activeTool.type);
   const extraIcon = extraToolSelected
-    ? appState.activeTool.type === "frame"
+    ? activeTool.type === "frame"
       ? frameToolIcon
-      : appState.activeTool.type === "embeddable"
+      : activeTool.type === "embeddable"
       ? EmbedIcon
-      : appState.activeTool.type === "laser"
+      : activeTool.type === "laser"
       ? laserPointerToolIcon
-      : appState.activeTool.type === "text"
+      : activeTool.type === "text"
       ? TextIcon
-      : appState.activeTool.type === "magicframe"
+      : activeTool.type === "magicframe"
       ? MagicIcon
       : extraToolsIcon
     : extraToolsIcon;
@@ -191,7 +191,7 @@ export const MobileToolBar = ({
     <div className="mobile-toolbar" ref={toolbarRef}>
       {/* Hand Tool */}
       <HandButton
-        checked={isHandToolActive(appState)}
+        checked={isHandToolActive(app.state)}
         onChange={onHandToolToggle}
         title={t("toolBar.hand")}
         isMobile
@@ -209,16 +209,15 @@ export const MobileToolBar = ({
         onToolChange={(type: string) => {
           if (type === "selection" || type === "lasso") {
             app.setActiveTool({ type });
-            app.state.preferredSelectionTool = type;
+            setAppState({
+              preferredSelectionTool: type,
+            });
           }
         }}
         displayedOption={
           SELECTION_TOOLS.find(
             (tool) => tool.type === app.state.preferredSelectionTool,
           ) || SELECTION_TOOLS[0]
-        }
-        isActive={
-          activeTool.type === "selection" || activeTool.type === "lasso"
         }
       />
 
@@ -285,7 +284,6 @@ export const MobileToolBar = ({
           SHAPE_TOOLS.find((tool) => tool.type === lastActiveGenericShape) ||
           SHAPE_TOOLS[0]
         }
-        isActive={["rectangle", "diamond", "ellipse"].includes(activeTool.type)}
       />
 
       {/* Arrow/Line */}
@@ -315,7 +313,6 @@ export const MobileToolBar = ({
             (tool) => tool.type === lastActiveLinearElement,
           ) || LINEAR_ELEMENT_TOOLS[0]
         }
-        isActive={["arrow", "line"].includes(activeTool.type)}
       />
 
       {/* Image */}
