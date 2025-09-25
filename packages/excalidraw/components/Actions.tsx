@@ -330,8 +330,13 @@ const CombinedShapeProperties = ({
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     );
 
-  const shouldShowCombinedProperties = targetElements.length > 0;
-
+  const shouldShowCombinedProperties =
+    targetElements.length > 0 ||
+    (appState.activeTool.type !== "selection" &&
+      appState.activeTool.type !== "eraser" &&
+      appState.activeTool.type !== "hand" &&
+      appState.activeTool.type !== "laser" &&
+      appState.activeTool.type !== "lasso");
   const isOpen = appState.openPopup === "compactStrokeStyles";
 
   if (!shouldShowCombinedProperties) {
