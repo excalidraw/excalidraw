@@ -15,7 +15,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 
-import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
+import { isImageFileHandle, loadFromBlob } from "./blob";
 import { fileOpen, fileSave } from "./filesystem";
 
 import type { AppState, BinaryFiles, LibraryItems } from "../types";
