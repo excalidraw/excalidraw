@@ -108,12 +108,7 @@ export const loadFromJSON = async (
     // gets resolved. Else, iOS users cannot open `.excalidraw` files.
     // extensions: ["json", "excalidraw", "png", "svg"],
   });
-  return loadFromBlob(
-    await normalizeFile(file),
-    localAppState,
-    localElements,
-    file.handle,
-  );
+  return loadFromBlob(file, localAppState, localElements, file.handle);
 };
 
 export const isValidExcalidrawData = (data?: {
