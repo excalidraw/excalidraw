@@ -646,10 +646,35 @@ const generateElementShape = (
         const h = element.height;
         const r = getCornerRadius(Math.min(w, h), element);
 
-        const tl = element.roundness?.corners?.topLeft ?? DEFAULT_ADAPTIVE_RADIUS;
-        const tr = element.roundness?.corners?.topRight ?? DEFAULT_ADAPTIVE_RADIUS;
-        const bl = element.roundness?.corners?.bottomLeft ?? DEFAULT_ADAPTIVE_RADIUS;
-        const br = element.roundness?.corners?.bottomRight ?? DEFAULT_ADAPTIVE_RADIUS;
+        let tl = element.roundness?.corners?.topLeft ?? DEFAULT_ADAPTIVE_RADIUS;
+        let tr = element.roundness?.corners?.topRight ?? DEFAULT_ADAPTIVE_RADIUS;
+        let bl = element.roundness?.corners?.bottomLeft ?? DEFAULT_ADAPTIVE_RADIUS;
+        let br = element.roundness?.corners?.bottomRight ?? DEFAULT_ADAPTIVE_RADIUS;
+
+        const halfMinimumLength = Math.min(element.width, element.height)/2
+        
+        // console.log(w, h)
+        // console.log("Half Min: " + halfMinimumLength)
+        
+        tl = Math.min(tl, halfMinimumLength);
+        tr = Math.min(tr, halfMinimumLength);
+        bl = Math.min(bl, halfMinimumLength);
+        br = Math.min(br, halfMinimumLength);
+
+
+
+        if (element.roundness && element.roundness.corners) {
+          element.roundness.corners.topLeft = tl;
+          element.roundness.corners.topRight = tr;
+          element.roundness.corners.bottomLeft = bl;
+          element.roundness.corners.bottomRight = br;
+
+          // console.log(element.roundness.corners.topLeft + " " + element.roundness.corners.topRight + " " + element.roundness.corners.bottomLeft + " " + element.roundness.corners.bottomRight)
+        }
+
+        
+        // Dummy
+        // console.log(tl, tr, bl ,br)
 
         shape = generator.path(
 
