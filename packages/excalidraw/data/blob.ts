@@ -416,37 +416,37 @@ export const getFileHandle = async (
 /**
  * attempts to detect if a buffer is a valid image by checking its leading bytes
  */
-const getActualMimeTypeFromImage = (buffer: ArrayBuffer) => {
+const getActualMimeTypeFromImage = async (file: Blob | File) => {
   let mimeType: ValueOf<
     Pick<typeof MIME_TYPES, "png" | "jpg" | "gif" | "webp">
   > | null = null;
 
-  const leadingBytes = `${[...new Uint8Array(buffer).slice(0, 15)].join(" ")} `;
+  const leadingBytes = [
+    ...new Uint8Array(await blobToArrayBuffer(file.slice(0, 15))),
+  ].join(" ");
 
   // uint8 leading bytes
   const bytes = {
     // https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header
-    png: "137 80 78 71 13 10 26 10 ",
+    png: /^137 80 78 71 13 10 26 10\b/,
     // https://en.wikipedia.org/wiki/JPEG#Syntax_and_structure
     // jpg is a bit wonky. Checking the first three bytes should be enough,
     // but may yield false positives. (https://stackoverflow.com/a/23360709/927631)
-    jpg: "255 216 255 ",
+    jpg: /^255 216 255\b/,
     // https://en.wikipedia.org/wiki/GIF#Example_GIF_file
-    gif: "71 73 70 56 57 97 ",
+    gif: /^71 73 70 56 57 97\b/,
     // 4 bytes for RIFF + 4 bytes for chunk size + WEBP identifier
-    webp: /^82 73 70 70 \d+ \d+ \d+ \d+ 87 69 66 80 86 80 56/,
+    webp: /^82 73 70 70 \d+ \d+ \d+ \d+ 87 69 66 80 86 80 56\b/,
   };
 
-  if (leadingBytes.startsWith(bytes.png)) {
-    mimeType = MIME_TYPES.png;
-  } else if (leadingBytes.startsWith(bytes.jpg)) {
-    mimeType = MIME_TYPES.jpg;
-  } else if (leadingBytes.startsWith(bytes.gif)) {
-    mimeType = MIME_TYPES.gif;
-  } else if (bytes.webp.test(leadingBytes)) {
-    mimeType = MIME_TYPES.webp;
+  for (const type of Object.keys(bytes) as (keyof typeof bytes)[]) {
+    if (leadingBytes.match(bytes[type])) {
+      mimeType = MIME_TYPES[type];
+      break;
+    }
   }
-  return mimeType;
+
+  return mimeType || file.type || null;
 };
 
 export const createFile = (
@@ -478,7 +478,7 @@ export const normalizeFile = async (file: File) => {
     // when the file is an image, make sure the extension corresponds to the
     // actual mimeType (this is an edge case, but happens - especially
     // with AI generated images)
-    const mimeType = getActualMimeTypeFromImage(await blobToArrayBuffer(file));
+    const mimeType = await getActualMimeTypeFromImage(file);
     if (mimeType && mimeType !== file.type) {
       file = createFile(file, mimeType, file.name);
     }
