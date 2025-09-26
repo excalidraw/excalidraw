@@ -72,6 +72,7 @@ import {
 } from "../data/FileManager";
 import { LocalData } from "../data/LocalData";
 import {
+  deleteRoomFromFirebase,
   isSavedToFirebase,
   loadFilesFromFirebase,
   loadFromFirebase,
@@ -83,6 +84,7 @@ import {
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
 import { resetBrowserStateVersions } from "../data/tabSync";
+import { roomManager } from "../data/roomManager";
 
 import { collabErrorIndicatorAtom } from "./CollabError";
 import Portal from "./Portal";
@@ -114,6 +116,7 @@ export interface CollabAPI {
   onPointerUpdate: CollabInstance["onPointerUpdate"];
   startCollaboration: CollabInstance["startCollaboration"];
   stopCollaboration: CollabInstance["stopCollaboration"];
+  deleteRoom: CollabInstance["deleteRoom"];
   syncElements: CollabInstance["syncElements"];
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
   setUsername: CollabInstance["setUsername"];
@@ -227,6 +230,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       isCollaborating: this.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
       startCollaboration: this.startCollaboration,
+      deleteRoom: this.deleteRoom,
       syncElements: this.syncElements,
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
       stopCollaboration: this.stopCollaboration,
@@ -550,6 +554,25 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       });
 
       this.saveCollabRoomToFirebase(getSyncableElements(elements));
+
+      // Save room data to local room manager for new rooms
+      try {
+        await roomManager.addRoom(
+          roomId,
+          roomKey,
+          getCollaborationLink({ roomId, roomKey }),
+          "", // User can edit this later
+        );
+      } catch (error) {
+        console.warn("Failed to save room to local storage:", error);
+      }
+    } else {
+      // Update access time for existing rooms
+      try {
+        await roomManager.updateRoomAccess(existingRoomLinkData.roomId);
+      } catch (error) {
+        console.warn("Failed to update room access time:", error);
+      }
     }
 
     // fallback in case you're not alone in the room but still don't receive
@@ -655,6 +678,18 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               userState,
               username,
             });
+            break;
+          }
+
+          case WS_SUBTYPES.DELETE: {
+            const { roomId } = decryptedData.payload;
+            if (this.portal.roomId === roomId) {
+              this.destroySocketClient({ isUnload: true });
+              this.setIsCollaborating(false);
+              this.setActiveRoomLink(null);
+              this.setErrorDialog(t("alerts.collabRoomDeleted"));
+              window.history.pushState({}, APP_NAME, window.location.origin);
+            }
             break;
           }
 
@@ -875,6 +910,42 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.excalidrawAPI.updateScene({
       collaborators,
     });
+  };
+
+  deleteRoom = async (): Promise<void> => {
+    if (!this.portal.socket || !this.portal.roomId) {
+      return;
+    }
+
+    const { roomId, roomKey } = this.portal;
+    if (!roomId || !roomKey) {
+      return;
+    }
+
+    const link = this.getActiveRoomLink();
+    if (!link) {
+      return;
+    }
+
+    // check if the room belongs to the current user
+    const isOwner = await roomManager.isRoomOwnedByUser(link);
+
+    if (!isOwner) {
+      return;
+    }
+
+    try {
+      this.portal.broadcastRoomDeletion();
+      await deleteRoomFromFirebase(roomId, roomKey);
+      await roomManager.deleteRoom(roomId);
+      this.stopCollaboration(false);
+      this.setActiveRoomLink(null);
+      window.history.pushState({}, APP_NAME, window.location.origin);
+    } catch (error) {
+      console.error("Failed to delete room:", error);
+      this.setErrorDialog(t("errors.roomDeletionFailed"));
+      throw error;
+    }
   };
 
   public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
