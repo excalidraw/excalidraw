@@ -154,7 +154,8 @@ export type ToolType =
   | "frame"
   | "magicframe"
   | "embeddable"
-  | "laser";
+  | "laser"
+  | "annotation";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
@@ -449,6 +450,9 @@ export interface AppState {
 
   /** properties sidebar mode - determines whether to show compact or complete sidebar */
   stylesPanelMode: "compact" | "full";
+
+  /** controls whether laser trails persist until manually cleared or fade automatically */
+  laserTrailsPersistent: boolean;
 }
 
 export type SearchMatch = {
