@@ -92,6 +92,7 @@
     "strip-ansi": "6.0.1"
   },
   "dependencies": {
-    "esbuild": "0.25.8"
+    "esbuild": "0.25.8",
+    "pdfjs-dist": "3.11.174"
   }
 }
