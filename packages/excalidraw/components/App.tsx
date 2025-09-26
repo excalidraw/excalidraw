@@ -240,6 +240,7 @@ import {
   StoreDelta,
   type ApplyToOptions,
   positionElementsOnGrid,
+  isFlowchartType,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -8124,6 +8125,9 @@ class App extends React.Component<AppProps, AppState> {
       roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      ...(isFlowchartType(elementType) && {
+        containerBehavior: this.state.currentItemContainerBehavior,
+      }),
     } as const;
 
     let element;
