@@ -38,6 +38,8 @@ If you want to only import `Excalidraw` component you can do :point_down:
 
 ```jsx showLineNumbers
 import dynamic from "next/dynamic";
+import "@excalidraw/excalidraw/index.css";
+
 const Excalidraw = dynamic(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
   {
@@ -128,11 +130,10 @@ If you are using `pages router` then importing the wrapper dynamically would wor
   </TabItem>
 </Tabs>
 
+{/* Link  should be updated to point to the latest! */}
+Here is a [source code](https://github.com/excalidraw/excalidraw/tree/master/examples/with-nextjs) for the example with app and pages router. You you can try it out [here](https://excalidraw-package-example-with-nextjs.vercel.app/).
 
-Here is a [source code](https://github.com/excalidraw/excalidraw/tree/master/examples/excalidraw/with-nextjs) for the example with app and pages router. You you can try it out [here](https://excalidraw-package-example-with-nextjs-gh6smrdnq-excalidraw.vercel.app/).
-
-
-The `types` are available at `@excalidraw/excalidraw/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
+The `types` are available at `@excalidraw/excalidraw/types`, check [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/master/examples/with-script-in-browser) example for details.
 
 ### Preact
 
@@ -157,27 +158,9 @@ Since Vite removes env variables by default, you can update the vite config to e
 
 ## Browser
 
-To use it in a browser directly:
+To use it Excalidraw in a browser directly, use the following setup :point_down:
 
-For development use :point_down:
-
-```js
-<script
-  type="text/javascript"
-  src="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.development.js"
-></script>
-```
-
-For production use :point_down:
-
-```js
-<script
-  type="text/javascript"
-  src="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.production.min.js"
-></script>
-```
-
-You will need to make sure `react`, `react-dom` is available as shown in the below example. For prod please use the production versions of `react`, `react-dom`.
+> **Note**: We rely on import maps to de-duplicate `react`, `react-dom` and `react/jsx-runtime` versions.
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
@@ -191,13 +174,23 @@ import TabItem from "@theme/TabItem";
   <head>
     <title>Excalidraw in browser</title>
     <meta charset="UTF-8" />
-    <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
-
-    <script
-      type="text/javascript"
-      src="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.development.js"
-    ></script>
+    <link
+      rel="stylesheet"
+      href="https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.css"
+    />
+    <link rel="stylesheet" href="./index.css" />
+    <script>
+    	window.EXCALIDRAW_ASSET_PATH = "https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/prod/";
+		</script>
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@19.0.0",
+          "react/jsx-runtime": "https://esm.sh/react@19.0.0/jsx-runtime",
+          "react-dom": "https://esm.sh/react-dom@19.0.0"
+          }
+      }
+    </script>
   </head>
 
   <body>
@@ -214,6 +207,14 @@ import TabItem from "@theme/TabItem";
 <TabItem value="js" label="Javascript">
 
 ```js showLineNumbers
+// See https://www.npmjs.com/package/@excalidraw/excalidraw documentation.
+import * as ExcalidrawLib from 'https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.js?external=react,react-dom';
+import React from "https://esm.sh/react@19.0.0";
+import ReactDOM from "https://esm.sh/react-dom@19.0.0"
+
+window.ExcalidrawLib = ExcalidrawLib;
+console.log("Excalidraw library", ExcalidrawLib);
+
 const App = () => {
   return React.createElement(
     React.Fragment,
@@ -236,4 +237,4 @@ root.render(React.createElement(App));
 </TabItem>
 </Tabs>
 
-You can try it out [here](https://codesandbox.io/p/sandbox/excalidraw-in-browser-tlqom?file=%2Findex.html%3A1%2C10).
+You can try it out [here](https://jsfiddle.net/vfn6dm14/3/).

@@ -1,17 +1,20 @@
-import type { Action, ActionResult } from "./types";
-import { UndoIcon, RedoIcon } from "../components/icons";
+import { isWindows, KEYS, matchKey, arrayToMap } from "@excalidraw/common";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import { orderByFractionalIndex } from "@excalidraw/element";
+
+import type { SceneElementsMap } from "@excalidraw/element/types";
+
 import { ToolButton } from "../components/ToolButton";
-import { t } from "../i18n";
-import type { History } from "../history";
+import { UndoIcon, RedoIcon } from "../components/icons";
 import { HistoryChangedEvent } from "../history";
-import type { AppClassProperties, AppState } from "../types";
-import { KEYS, matchKey } from "../keys";
-import { arrayToMap } from "../utils";
-import { isWindows } from "../constants";
-import type { SceneElementsMap } from "../element/types";
-import type { Store } from "../store";
-import { StoreAction } from "../store";
 import { useEmitter } from "../hooks/useEmitter";
+import { t } from "../i18n";
+
+import type { History } from "../history";
+import type { AppClassProperties, AppState } from "../types";
+import type { Action, ActionResult } from "./types";
 
 const executeHistoryAction = (
   app: AppClassProperties,
@@ -30,25 +33,29 @@ const executeHistoryAction = (
     const result = updater();
 
     if (!result) {
-      return { storeAction: StoreAction.NONE };
+      return { captureUpdate: CaptureUpdateAction.EVENTUALLY };
     }
 
     const [nextElementsMap, nextAppState] = result;
-    const nextElements = Array.from(nextElementsMap.values());
+
+    // order by fractional indices in case the map was accidently modified in the meantime
+    const nextElements = orderByFractionalIndex(
+      Array.from(nextElementsMap.values()),
+    );
 
     return {
       appState: nextAppState,
       elements: nextElements,
-      storeAction: StoreAction.UPDATE,
+      captureUpdate: CaptureUpdateAction.NEVER,
     };
   }
 
-  return { storeAction: StoreAction.NONE };
+  return { captureUpdate: CaptureUpdateAction.EVENTUALLY };
 };
 
-type ActionCreator = (history: History, store: Store) => Action;
+type ActionCreator = (history: History) => Action;
 
-export const createUndoAction: ActionCreator = (history, store) => ({
+export const createUndoAction: ActionCreator = (history) => ({
   name: "undo",
   label: "buttons.undo",
   icon: UndoIcon,
@@ -56,11 +63,7 @@ export const createUndoAction: ActionCreator = (history, store) => ({
   viewMode: false,
   perform: (elements, appState, value, app) =>
     executeHistoryAction(app, appState, () =>
-      history.undo(
-        arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
-        appState,
-        store.snapshot,
-      ),
+      history.undo(arrayToMap(elements) as SceneElementsMap, appState),
     ),
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && matchKey(event, KEYS.Z) && !event.shiftKey,
@@ -87,19 +90,15 @@ export const createUndoAction: ActionCreator = (history, store) => ({
   },
 });
 
-export const createRedoAction: ActionCreator = (history, store) => ({
+export const createRedoAction: ActionCreator = (history) => ({
   name: "redo",
   label: "buttons.redo",
   icon: RedoIcon,
   trackEvent: { category: "history" },
   viewMode: false,
-  perform: (elements, appState, _, app) =>
+  perform: (elements, appState, __, app) =>
     executeHistoryAction(app, appState, () =>
-      history.redo(
-        arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
-        appState,
-        store.snapshot,
-      ),
+      history.redo(arrayToMap(elements) as SceneElementsMap, appState),
     ),
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] && event.shiftKey && matchKey(event, KEYS.Z)) ||

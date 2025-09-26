@@ -1,18 +1,28 @@
-import type { ExcalidrawElement } from "../../element/types";
-import DragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, isPropertyEditable } from "./utils";
-import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
-import { resizeSingleElement } from "../../element/resizeElements";
-import type Scene from "../../scene/Scene";
-import type { AppState } from "../../types";
-import { isImageElement } from "../../element/typeChecks";
+import { clamp, round } from "@excalidraw/math";
+
+import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
 import {
   MINIMAL_CROP_SIZE,
   getUncroppedWidthAndHeight,
-} from "../../element/cropElement";
-import { mutateElement } from "../../element/mutateElement";
-import { clamp, round } from "../../../math";
+} from "@excalidraw/element";
+import { resizeSingleElement } from "@excalidraw/element";
+import { isImageElement } from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element";
+import { getElementsInResizingFrame } from "@excalidraw/element";
+import { replaceAllElementsInFrame } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Scene } from "@excalidraw/element";
+
+import DragInput from "./DragInput";
+import { getStepSizedValue, isPropertyEditable } from "./utils";
+
+import type {
+  DragFinishedCallbackType,
+  DragInputCallbackType,
+} from "./DragInput";
+import type { AppState } from "../../types";
 
 interface DimensionDragInputProps {
   property: "width" | "height";
@@ -39,6 +49,8 @@ const handleDimensionChange: DragInputCallbackType<
   originalAppState,
   instantChange,
   scene,
+  app,
+  setAppState,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const origElement = originalElements[0];
@@ -109,7 +121,7 @@ const handleDimensionChange: DragInputCallbackType<
           };
         }
 
-        mutateElement(element, {
+        scene.mutateElement(element, {
           crop: nextCrop,
           width: nextCrop.width / (crop.naturalWidth / uncroppedWidth),
           height: nextCrop.height / (crop.naturalHeight / uncroppedHeight),
@@ -140,7 +152,7 @@ const handleDimensionChange: DragInputCallbackType<
         height: nextCropHeight,
       };
 
-      mutateElement(element, {
+      scene.mutateElement(element, {
         crop: nextCrop,
         width: nextCrop.width / (crop.naturalWidth / uncroppedWidth),
         height: nextCrop.height / (crop.naturalHeight / uncroppedHeight),
@@ -149,6 +161,7 @@ const handleDimensionChange: DragInputCallbackType<
       return;
     }
 
+    // User types in a value to stats then presses Enter
     if (nextValue !== undefined) {
       const nextWidth = Math.max(
         property === "width"
@@ -172,60 +185,131 @@ const handleDimensionChange: DragInputCallbackType<
         nextHeight,
         latestElement,
         origElement,
-        elementsMap,
         originalElementsMap,
+        scene,
         property === "width" ? "e" : "s",
         {
           shouldMaintainAspectRatio: keepAspectRatio,
         },
       );
 
+      // Handle frame membership update for resized frames
+      if (isFrameLikeElement(latestElement)) {
+        const nextElementsInFrame = getElementsInResizingFrame(
+          scene.getElementsIncludingDeleted(),
+          latestElement,
+          originalAppState,
+          scene.getNonDeletedElementsMap(),
+        );
+
+        const updatedElements = replaceAllElementsInFrame(
+          scene.getElementsIncludingDeleted(),
+          nextElementsInFrame,
+          latestElement,
+          app,
+        );
+
+        scene.replaceAllElements(updatedElements);
+      }
+
       return;
     }
-    const changeInWidth = property === "width" ? accumulatedChange : 0;
-    const changeInHeight = property === "height" ? accumulatedChange : 0;
 
-    let nextWidth = Math.max(0, origElement.width + changeInWidth);
-    if (property === "width") {
-      if (shouldChangeByStepSize) {
-        nextWidth = getStepSizedValue(nextWidth, STEP_SIZE);
-      } else {
-        nextWidth = Math.round(nextWidth);
-      }
-    }
+    // Stats slider is dragged
+    {
+      const changeInWidth = property === "width" ? accumulatedChange : 0;
+      const changeInHeight = property === "height" ? accumulatedChange : 0;
 
-    let nextHeight = Math.max(0, origElement.height + changeInHeight);
-    if (property === "height") {
-      if (shouldChangeByStepSize) {
-        nextHeight = getStepSizedValue(nextHeight, STEP_SIZE);
-      } else {
-        nextHeight = Math.round(nextHeight);
-      }
-    }
-
-    if (keepAspectRatio) {
+      let nextWidth = Math.max(0, origElement.width + changeInWidth);
       if (property === "width") {
-        nextHeight = Math.round((nextWidth / aspectRatio) * 100) / 100;
-      } else {
-        nextWidth = Math.round(nextHeight * aspectRatio * 100) / 100;
+        if (shouldChangeByStepSize) {
+          nextWidth = getStepSizedValue(nextWidth, STEP_SIZE);
+        } else {
+          nextWidth = Math.round(nextWidth);
+        }
+      }
+
+      let nextHeight = Math.max(0, origElement.height + changeInHeight);
+      if (property === "height") {
+        if (shouldChangeByStepSize) {
+          nextHeight = getStepSizedValue(nextHeight, STEP_SIZE);
+        } else {
+          nextHeight = Math.round(nextHeight);
+        }
+      }
+
+      if (keepAspectRatio) {
+        if (property === "width") {
+          nextHeight = Math.round((nextWidth / aspectRatio) * 100) / 100;
+        } else {
+          nextWidth = Math.round(nextHeight * aspectRatio * 100) / 100;
+        }
+      }
+
+      nextHeight = Math.max(MIN_WIDTH_OR_HEIGHT, nextHeight);
+      nextWidth = Math.max(MIN_WIDTH_OR_HEIGHT, nextWidth);
+
+      resizeSingleElement(
+        nextWidth,
+        nextHeight,
+        latestElement,
+        origElement,
+        originalElementsMap,
+        scene,
+        property === "width" ? "e" : "s",
+        {
+          shouldMaintainAspectRatio: keepAspectRatio,
+        },
+      );
+
+      // Handle highlighting frame element candidates
+      if (isFrameLikeElement(latestElement)) {
+        const nextElementsInFrame = getElementsInResizingFrame(
+          scene.getElementsIncludingDeleted(),
+          latestElement,
+          originalAppState,
+          scene.getNonDeletedElementsMap(),
+        );
+
+        setAppState({
+          elementsToHighlight: nextElementsInFrame,
+        });
       }
     }
+  }
+};
 
-    nextHeight = Math.max(MIN_WIDTH_OR_HEIGHT, nextHeight);
-    nextWidth = Math.max(MIN_WIDTH_OR_HEIGHT, nextWidth);
+const handleDragFinished: DragFinishedCallbackType = ({
+  setAppState,
+  app,
+  originalElements,
+  originalAppState,
+}) => {
+  const elementsMap = app.scene.getNonDeletedElementsMap();
+  const origElement = originalElements?.[0];
+  const latestElement = origElement && elementsMap.get(origElement.id);
 
-    resizeSingleElement(
-      nextWidth,
-      nextHeight,
+  // Handle frame membership update for resized frames
+  if (latestElement && isFrameLikeElement(latestElement)) {
+    const nextElementsInFrame = getElementsInResizingFrame(
+      app.scene.getElementsIncludingDeleted(),
       latestElement,
-      origElement,
-      elementsMap,
-      originalElementsMap,
-      property === "width" ? "e" : "s",
-      {
-        shouldMaintainAspectRatio: keepAspectRatio,
-      },
+      originalAppState,
+      app.scene.getNonDeletedElementsMap(),
     );
+
+    const updatedElements = replaceAllElementsInFrame(
+      app.scene.getElementsIncludingDeleted(),
+      nextElementsInFrame,
+      latestElement,
+      app,
+    );
+
+    app.scene.replaceAllElements(updatedElements);
+
+    setAppState({
+      elementsToHighlight: null,
+    });
   }
 };
 
@@ -265,6 +349,7 @@ const DimensionDragInput = ({
       scene={scene}
       appState={appState}
       property={property}
+      dragFinishedCallback={handleDragFinished}
     />
   );
 };

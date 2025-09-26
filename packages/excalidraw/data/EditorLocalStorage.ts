@@ -1,4 +1,5 @@
-import type { EDITOR_LS_KEYS } from "../constants";
+import type { EDITOR_LS_KEYS } from "@excalidraw/common";
+
 import type { JSONValue } from "../types";
 
 export class EditorLocalStorage {

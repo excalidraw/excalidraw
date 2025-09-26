@@ -1,5 +1,16 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { vi } from "vitest";
+
+import { KEYS, reseed } from "@excalidraw/common";
+
+import { setDateTimeForTests } from "@excalidraw/common";
+
+import { copiedStyles } from "../actions/actionStyles";
+import { Excalidraw } from "../index";
+import * as StaticScene from "../renderer/staticScene";
+
+import { API } from "./helpers/api";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
 import {
   render,
   fireEvent,
@@ -11,17 +22,11 @@ import {
   queryAllByText,
   waitFor,
   togglePopover,
+  unmountComponent,
+  checkpointHistory,
 } from "./test-utils";
-import { Excalidraw } from "../index";
-import * as StaticScene from "../renderer/staticScene";
-import { reseed } from "../random";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { KEYS } from "../keys";
+
 import type { ShortcutName } from "../actions/shortcuts";
-import { copiedStyles } from "../actions/actionStyles";
-import { API } from "./helpers/api";
-import { setDateTimeForTests } from "../utils";
-import { vi } from "vitest";
 import type { ActionName } from "../actions/types";
 
 const checkpoint = (name: string) => {
@@ -29,17 +34,17 @@ const checkpoint = (name: string) => {
     `[${name}] number of renders`,
   );
   expect(h.state).toMatchSnapshot(`[${name}] appState`);
-  expect(h.history).toMatchSnapshot(`[${name}] history`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
   h.elements.forEach((element, i) =>
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
   );
+
+  checkpointHistory(h.history, name);
 };
 
 const mouse = new Pointer("mouse");
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 beforeEach(() => {
@@ -105,8 +110,8 @@ describe("contextMenu element", () => {
 
   it("shows context menu for element", () => {
     UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
@@ -120,6 +125,7 @@ describe("contextMenu element", () => {
       "cut",
       "copy",
       "paste",
+      "wrapSelectionInFrame",
       "copyStyles",
       "pasteStyles",
       "deleteSelectedElements",
@@ -213,6 +219,7 @@ describe("contextMenu element", () => {
       "cut",
       "copy",
       "paste",
+      "wrapSelectionInFrame",
       "copyStyles",
       "pasteStyles",
       "deleteSelectedElements",
@@ -269,6 +276,7 @@ describe("contextMenu element", () => {
       "cut",
       "copy",
       "paste",
+      "wrapSelectionInFrame",
       "copyStyles",
       "pasteStyles",
       "deleteSelectedElements",
@@ -296,8 +304,8 @@ describe("contextMenu element", () => {
 
   it("selecting 'Copy styles' in context menu copies styles", () => {
     UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
@@ -335,7 +343,7 @@ describe("contextMenu element", () => {
     // Roughness
     fireEvent.click(screen.getByTitle("Cartoonist"));
     // Opacity
-    fireEvent.change(screen.getByLabelText("Opacity"), {
+    fireEvent.change(screen.getByTestId("opacity"), {
       target: { value: "60" },
     });
 
@@ -381,8 +389,8 @@ describe("contextMenu element", () => {
 
   it("selecting 'Delete' in context menu deletes element", () => {
     UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
@@ -397,8 +405,8 @@ describe("contextMenu element", () => {
 
   it("selecting 'Add to library' in context menu adds element to library", async () => {
     UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
@@ -416,8 +424,8 @@ describe("contextMenu element", () => {
 
   it("selecting 'Duplicate' in context menu duplicates element", () => {
     UI.clickTool("rectangle");
-    mouse.down(10, 10);
-    mouse.up(20, 20);
+    mouse.down(0, 0);
+    mouse.up(10, 10);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,

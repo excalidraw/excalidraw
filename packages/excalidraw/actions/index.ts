@@ -18,6 +18,7 @@ export {
   actionChangeFontFamily,
   actionChangeTextAlign,
   actionChangeVerticalAlign,
+  actionChangeArrowProperties,
 } from "./actionProperties";
 
 export {
@@ -29,6 +30,8 @@ export {
   actionZoomToFit,
   actionToggleTheme,
 } from "./actionCanvas";
+
+export { actionSetEmbeddableAsActiveTool } from "./actionEmbeddable";
 
 export { actionFinalize } from "./actionFinalize";
 

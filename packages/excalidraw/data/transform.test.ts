@@ -1,8 +1,11 @@
+import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
-import type { ExcalidrawElementSkeleton } from "./transform";
+
+import type { ExcalidrawArrowElement } from "@excalidraw/element/types";
+
 import { convertToExcalidrawElements } from "./transform";
-import type { ExcalidrawArrowElement } from "../element/types";
-import { pointFrom } from "../../math";
+
+import type { ExcalidrawElementSkeleton } from "./transform";
 
 const opts = { regenerateIds: false };
 
@@ -424,7 +427,7 @@ describe("Test Transform", () => {
       const [arrow, text, rectangle, ellipse] = excalidrawElements;
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255,
+        x: 255.5,
         y: 239,
         boundElements: [{ id: text.id, type: "text" }],
         startBinding: {
@@ -434,7 +437,7 @@ describe("Test Transform", () => {
         },
         endBinding: {
           elementId: ellipse.id,
-          focus: 0,
+          focus: -0,
         },
       });
 
@@ -509,7 +512,7 @@ describe("Test Transform", () => {
 
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255,
+        x: 255.5,
         y: 239,
         boundElements: [{ id: text1.id, type: "text" }],
         startBinding: {
@@ -519,7 +522,7 @@ describe("Test Transform", () => {
         },
         endBinding: {
           elementId: text3.id,
-          focus: 0,
+          focus: -0,
         },
       });
 
@@ -727,7 +730,7 @@ describe("Test Transform", () => {
       const [, , arrow, text] = excalidrawElements;
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255,
+        x: 255.5,
         y: 239,
         boundElements: [
           {
@@ -777,9 +780,8 @@ describe("Test Transform", () => {
       const [arrow, rect] = excalidrawElements;
       expect((arrow as ExcalidrawArrowElement).endBinding).toStrictEqual({
         elementId: "rect-1",
-        fixedPoint: null,
-        focus: 0,
-        gap: 14,
+        focus: -0,
+        gap: 25,
       });
       expect(rect.boundElements).toStrictEqual([
         {

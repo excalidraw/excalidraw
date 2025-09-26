@@ -1,17 +1,75 @@
 import clsx from "clsx";
 import React from "react";
-import type { ActionManager } from "../actions/manager";
+
 import {
   CLASSES,
   DEFAULT_SIDEBAR,
-  LIBRARY_SIDEBAR_WIDTH,
+  MQ_MIN_WIDTH_DESKTOP,
   TOOL_TYPE,
-} from "../constants";
-import { showSelectedShapeActions } from "../element";
-import type { NonDeletedExcalidrawElement } from "../element/types";
-import type { Language } from "../i18n";
+  arrayToMap,
+  capitalizeString,
+  isShallowEqual,
+} from "@excalidraw/common";
+
+import { mutateElement } from "@excalidraw/element";
+
+import { showSelectedShapeActions } from "@excalidraw/element";
+
+import { ShapeCache } from "@excalidraw/element";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
+import { actionToggleStats } from "../actions";
+import { trackEvent } from "../analytics";
+import { isHandToolActive } from "../appState";
+import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
+import { UIAppStateContext } from "../context/ui-appState";
+import { useAtom, useAtomValue } from "../editor-jotai";
+
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
+
+import {
+  SelectedShapeActions,
+  ShapesSwitcher,
+  CompactShapeActions,
+} from "./Actions";
+import { LoadingMessage } from "./LoadingMessage";
+import { LockButton } from "./LockButton";
+import { MobileMenu } from "./MobileMenu";
+import { PasteChartDialog } from "./PasteChartDialog";
+import { Section } from "./Section";
+import Stack from "./Stack";
+import { UserList } from "./UserList";
+import { PenModeButton } from "./PenModeButton";
+import Footer from "./footer/Footer";
+import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
+import MainMenu from "./main-menu/MainMenu";
+import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
+import { useDevice } from "./App";
+import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
+import { LibraryIcon } from "./icons";
+import { DefaultSidebar } from "./DefaultSidebar";
+import { TTDDialog } from "./TTDDialog/TTDDialog";
+import { Stats } from "./Stats";
+import ElementLinkDialog from "./ElementLinkDialog";
+import { ErrorDialog } from "./ErrorDialog";
+import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
+import { FixedSideContainer } from "./FixedSideContainer";
+import { HandButton } from "./HandButton";
+import { HelpDialog } from "./HelpDialog";
+import { HintViewer } from "./HintViewer";
+import { ImageExportDialog } from "./ImageExportDialog";
+import { Island } from "./Island";
+import { JSONExportDialog } from "./JSONExportDialog";
+import { LaserPointerButton } from "./LaserPointerButton";
+
+import "./LayerUI.scss";
+import "./Toolbar.scss";
+
+import type { ActionManager } from "../actions/manager";
+
+import type { Language } from "../i18n";
 import type {
   AppProps,
   AppState,
@@ -20,50 +78,6 @@ import type {
   UIAppState,
   AppClassProperties,
 } from "../types";
-import { capitalizeString, isShallowEqual } from "../utils";
-import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
-import { ErrorDialog } from "./ErrorDialog";
-import { ImageExportDialog } from "./ImageExportDialog";
-import { FixedSideContainer } from "./FixedSideContainer";
-import { HintViewer } from "./HintViewer";
-import { Island } from "./Island";
-import { LoadingMessage } from "./LoadingMessage";
-import { LockButton } from "./LockButton";
-import { MobileMenu } from "./MobileMenu";
-import { PasteChartDialog } from "./PasteChartDialog";
-import { Section } from "./Section";
-import { HelpDialog } from "./HelpDialog";
-import Stack from "./Stack";
-import { UserList } from "./UserList";
-import { JSONExportDialog } from "./JSONExportDialog";
-import { PenModeButton } from "./PenModeButton";
-import { trackEvent } from "../analytics";
-import { useDevice } from "./App";
-import Footer from "./footer/Footer";
-import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
-import { jotaiScope } from "../jotai";
-import { Provider, useAtom, useAtomValue } from "jotai";
-import MainMenu from "./main-menu/MainMenu";
-import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
-import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
-import { HandButton } from "./HandButton";
-import { isHandToolActive } from "../appState";
-import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
-import { LibraryIcon } from "./icons";
-import { UIAppStateContext } from "../context/ui-appState";
-import { DefaultSidebar } from "./DefaultSidebar";
-import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
-import { mutateElement } from "../element/mutateElement";
-import { ShapeCache } from "../scene/ShapeCache";
-import Scene from "../scene/Scene";
-import { LaserPointerButton } from "./LaserPointerButton";
-import { TTDDialog } from "./TTDDialog/TTDDialog";
-import { Stats } from "./Stats";
-import { actionToggleStats } from "../actions";
-import ElementLinkDialog from "./ElementLinkDialog";
-
-import "./LayerUI.scss";
-import "./Toolbar.scss";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -148,10 +162,28 @@ const LayerUI = ({
   const device = useDevice();
   const tunnels = useInitializeTunnels();
 
-  const [eyeDropperState, setEyeDropperState] = useAtom(
-    activeEyeDropperAtom,
-    jotaiScope,
-  );
+  const spacing =
+    appState.stylesPanelMode === "compact"
+      ? {
+          menuTopGap: 4,
+          toolbarColGap: 4,
+          toolbarRowGap: 1,
+          toolbarInnerRowGap: 0.5,
+          islandPadding: 1,
+          collabMarginLeft: 8,
+        }
+      : {
+          menuTopGap: 6,
+          toolbarColGap: 4,
+          toolbarRowGap: 1,
+          toolbarInnerRowGap: 1,
+          islandPadding: 1,
+          collabMarginLeft: 8,
+        };
+
+  const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
+
+  const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -201,30 +233,55 @@ const LayerUI = ({
     </div>
   );
 
-  const renderSelectedShapeActions = () => (
-    <Section
-      heading="selectedShapeActions"
-      className={clsx("selected-shape-actions zen-mode-transition", {
-        "transition-left": appState.zenModeEnabled,
-      })}
-    >
-      <Island
-        className={CLASSES.SHAPE_ACTIONS_MENU}
-        padding={2}
-        style={{
-          // we want to make sure this doesn't overflow so subtracting the
-          // approximate height of hamburgerMenu + footer
-          maxHeight: `${appState.height - 166}px`,
-        }}
+  const renderSelectedShapeActions = () => {
+    const isCompactMode = appState.stylesPanelMode === "compact";
+
+    return (
+      <Section
+        heading="selectedShapeActions"
+        className={clsx("selected-shape-actions zen-mode-transition", {
+          "transition-left": appState.zenModeEnabled,
+        })}
       >
-        <SelectedShapeActions
-          appState={appState}
-          elementsMap={app.scene.getNonDeletedElementsMap()}
-          renderAction={actionManager.renderAction}
-        />
-      </Island>
-    </Section>
-  );
+        {isCompactMode ? (
+          <Island
+            className={clsx("compact-shape-actions-island")}
+            padding={0}
+            style={{
+              // we want to make sure this doesn't overflow so subtracting the
+              // approximate height of hamburgerMenu + footer
+              maxHeight: `${appState.height - 166}px`,
+            }}
+          >
+            <CompactShapeActions
+              appState={appState}
+              elementsMap={app.scene.getNonDeletedElementsMap()}
+              renderAction={actionManager.renderAction}
+              app={app}
+              setAppState={setAppState}
+            />
+          </Island>
+        ) : (
+          <Island
+            className={CLASSES.SHAPE_ACTIONS_MENU}
+            padding={2}
+            style={{
+              // we want to make sure this doesn't overflow so subtracting the
+              // approximate height of hamburgerMenu + footer
+              maxHeight: `${appState.height - 166}px`,
+            }}
+          >
+            <SelectedShapeActions
+              appState={appState}
+              elementsMap={app.scene.getNonDeletedElementsMap()}
+              renderAction={actionManager.renderAction}
+              app={app}
+            />
+          </Island>
+        )}
+      </Section>
+    );
+  };
 
   const renderFixedSideContainer = () => {
     const shouldRenderSelectedShapeActions = showSelectedShapeActions(
@@ -241,9 +298,19 @@ const LayerUI = ({
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
-          <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
+          <Stack.Col
+            gap={spacing.menuTopGap}
+            className={clsx("App-menu_top__left")}
+          >
             {renderCanvasActions()}
-            {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
+            <div
+              className={clsx("selected-shape-actions-container", {
+                "selected-shape-actions-container--compact":
+                  appState.stylesPanelMode === "compact",
+              })}
+            >
+              {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
+            </div>
           </Stack.Col>
           {!appState.viewModeEnabled &&
             appState.openDialog?.name !== "elementLinkSelector" && (
@@ -253,17 +320,19 @@ const LayerUI = ({
                     {renderWelcomeScreen && (
                       <tunnels.WelcomeScreenToolbarHintTunnel.Out />
                     )}
-                    <Stack.Col gap={4} align="start">
+                    <Stack.Col gap={spacing.toolbarColGap} align="start">
                       <Stack.Row
-                        gap={1}
+                        gap={spacing.toolbarRowGap}
                         className={clsx("App-toolbar-container", {
                           "zen-mode": appState.zenModeEnabled,
                         })}
                       >
                         <Island
-                          padding={1}
+                          padding={spacing.islandPadding}
                           className={clsx("App-toolbar", {
                             "zen-mode": appState.zenModeEnabled,
+                            "App-toolbar--compact":
+                              appState.stylesPanelMode === "compact",
                           })}
                         >
                           <HintViewer
@@ -273,7 +342,7 @@ const LayerUI = ({
                             app={app}
                           />
                           {heading}
-                          <Stack.Row gap={1}>
+                          <Stack.Row gap={spacing.toolbarInnerRowGap}>
                             <PenModeButton
                               zenModeEnabled={appState.zenModeEnabled}
                               checked={appState.penMode}
@@ -307,7 +376,7 @@ const LayerUI = ({
                         {isCollaborating && (
                           <Island
                             style={{
-                              marginLeft: 8,
+                              marginLeft: spacing.collabMarginLeft,
                               alignSelf: "center",
                               height: "fit-content",
                             }}
@@ -335,6 +404,8 @@ const LayerUI = ({
               "layer-ui__wrapper__top-right zen-mode-transition",
               {
                 "transition-right": appState.zenModeEnabled,
+                "layer-ui__wrapper__top-right--compact":
+                  appState.stylesPanelMode === "compact",
               },
             )}
           >
@@ -382,7 +453,7 @@ const LayerUI = ({
     );
   };
 
-  const isSidebarDocked = useAtomValue(isSidebarDockedAtom, jotaiScope);
+  const isSidebarDocked = useAtomValue(isSidebarDockedAtom);
 
   const layerUIJSX = (
     <>
@@ -409,7 +480,9 @@ const LayerUI = ({
         }}
         tab={DEFAULT_SIDEBAR.defaultTab}
       >
-        {t("toolBar.library")}
+        {appState.stylesPanelMode === "full" &&
+          appState.width >= MQ_MIN_WIDTH_DESKTOP &&
+          t("toolBar.library")}
       </DefaultSidebar.Trigger>
       <DefaultOverwriteConfirmDialog />
       {appState.openDialog?.name === "ttd" && <TTDDialog __fallback />}
@@ -437,22 +510,18 @@ const LayerUI = ({
 
             if (selectedElements.length) {
               for (const element of selectedElements) {
-                mutateElement(
-                  element,
-                  {
-                    [altKey && eyeDropperState.swapPreviewOnAlt
-                      ? colorPickerType === "elementBackground"
-                        ? "strokeColor"
-                        : "backgroundColor"
-                      : colorPickerType === "elementBackground"
-                      ? "backgroundColor"
-                      : "strokeColor"]: color,
-                  },
-                  false,
-                );
+                mutateElement(element, arrayToMap(elements), {
+                  [altKey && eyeDropperState.swapPreviewOnAlt
+                    ? colorPickerType === "elementBackground"
+                      ? "strokeColor"
+                      : "backgroundColor"
+                    : colorPickerType === "elementBackground"
+                    ? "backgroundColor"
+                    : "strokeColor"]: color,
+                });
                 ShapeCache.delete(element);
               }
-              Scene.getScene(selectedElements[0])?.triggerUpdate();
+              app.scene.triggerUpdate();
             } else if (colorPickerType === "elementBackground") {
               setAppState({
                 currentItemBackgroundColor: color,
@@ -485,7 +554,7 @@ const LayerUI = ({
               openDialog: null,
             });
           }}
-          elementsMap={app.scene.getNonDeletedElementsMap()}
+          scene={app.scene}
           appState={appState}
           generateLinkForSelection={generateLinkForSelection}
         />
@@ -532,7 +601,7 @@ const LayerUI = ({
               appState.openSidebar &&
               isSidebarDocked &&
               device.editor.canFitSidebar
-                ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
+                ? { width: `calc(100% - var(--right-sidebar-width))` }
                 : {}
             }
           >
@@ -566,11 +635,11 @@ const LayerUI = ({
 
   return (
     <UIAppStateContext.Provider value={appState}>
-      <Provider scope={tunnels.jotaiScope}>
+      <TunnelsJotaiProvider>
         <TunnelsContext.Provider value={tunnels}>
           {layerUIJSX}
         </TunnelsContext.Provider>
-      </Provider>
+      </TunnelsJotaiProvider>
     </UIAppStateContext.Provider>
   );
 };

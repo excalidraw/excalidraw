@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Triangle (outline)",
     "arrowhead_diamond": "Diamond",
     "arrowhead_diamond_outline": "Diamond (outline)",
+    "arrowhead_crowfoot_many": "Crow's foot (many)",
+    "arrowhead_crowfoot_one": "Crow's foot (one)",
+    "arrowhead_crowfoot_one_or_many": "Crow's foot (one or many)",
+    "more_options": "More options",
     "arrowtypes": "Arrow type",
     "arrowtype_sharp": "Sharp arrow",
     "arrowtype_round": "Curved arrow",
@@ -137,6 +141,10 @@
       "edit": "Edit line",
       "editArrow": "Edit arrow"
     },
+    "polygon": {
+      "breakPolygon": "Break polygon",
+      "convertToPolygon": "Convert to polygon"
+    },
     "elementLock": {
       "lock": "Lock",
       "unlock": "Unlock",
@@ -160,7 +168,10 @@
     "imageCropping": "Image cropping",
     "unCroppedDimension": "Uncropped dimension",
     "copyElementLink": "Copy link to object",
-    "linkToElement": "Link to object"
+    "linkToElement": "Link to object",
+    "wrapSelectionInFrame": "Wrap selection in frame",
+    "tab": "Tab",
+    "shapeSwitch": "Switch shape"
   },
   "elementLink": {
     "title": "Link to object",
@@ -177,7 +188,9 @@
     "noMatch": "No matches found...",
     "singleResult": "result",
     "multipleResults": "results",
-    "placeholder": "Find text on canvas..."
+    "placeholder": "Find text on canvas...",
+    "frames": "Frames",
+    "texts": "Texts"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -271,6 +284,7 @@
   },
   "toolBar": {
     "selection": "Selection",
+    "lasso": "Lasso selection",
     "image": "Insert image",
     "rectangle": "Rectangle",
     "diamond": "Diamond",
@@ -290,7 +304,8 @@
     "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
-    "mermaidToExcalidraw": "Mermaid to Excalidraw"
+    "mermaidToExcalidraw": "Mermaid to Excalidraw",
+    "convertElementType": "Toggle shape type"
   },
   "element": {
     "rectangle": "Rectangle",
@@ -329,9 +344,9 @@
     "resizeImage": "You can resize freely by holding SHIFT,\nhold ALT to resize from the center",
     "rotate": "You can constrain angles by holding SHIFT while rotating",
     "lineEditor_info": "Hold CtrlOrCmd and Double-click or press CtrlOrCmd + Enter to edit points",
+    "lineEditor_line_info": "Double-click or press Enter to edit points",
     "lineEditor_pointSelected": "Press Delete to remove point(s),\nCtrlOrCmd+D to duplicate, or drag to move",
     "lineEditor_nothingSelected": "Select a point to edit (hold SHIFT to select multiple),\nor hold Alt and click to add new points",
-    "placeImage": "Click to place the image, or click and drag to set its size manually",
     "publishLibrary": "Publish your own library",
     "bindTextToElement": "Press enter to add text",
     "createFlowchart": "Hold CtrlOrCmd and Arrow key to create a flowchart",
@@ -545,6 +560,7 @@
     }
   },
   "colorPicker": {
+    "color": "Color",
     "mostUsedCustomColors": "Most used custom colors",
     "colors": "Colors",
     "shades": "Shades",

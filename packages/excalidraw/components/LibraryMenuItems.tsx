@@ -5,29 +5,35 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { serializeLibraryAsJSON } from "../data/json";
+
+import { MIME_TYPES, arrayToMap } from "@excalidraw/common";
+
+import { duplicateElements } from "@excalidraw/element";
+
+import { useLibraryCache } from "../hooks/useLibraryItemSvg";
+import { useScrollPosition } from "../hooks/useScrollPosition";
 import { t } from "../i18n";
-import type {
-  ExcalidrawProps,
-  LibraryItem,
-  LibraryItems,
-  UIAppState,
-} from "../types";
-import { arrayToMap } from "../utils";
-import Stack from "./Stack";
-import { MIME_TYPES } from "../constants";
-import Spinner from "./Spinner";
-import { duplicateElements } from "../element/newElement";
+
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
 import {
   LibraryMenuSection,
   LibraryMenuSectionGrid,
 } from "./LibraryMenuSection";
-import { useScrollPosition } from "../hooks/useScrollPosition";
-import { useLibraryCache } from "../hooks/useLibraryItemSvg";
+
+import Spinner from "./Spinner";
+import Stack from "./Stack";
 
 import "./LibraryMenuItems.scss";
+
+import type { ExcalidrawLibraryIds } from "../data/types";
+
+import type {
+  ExcalidrawProps,
+  LibraryItem,
+  LibraryItems,
+  UIAppState,
+} from "../types";
 
 // using an odd number of items per batch so the rendering creates an irregular
 // pattern which looks more organic
@@ -157,7 +163,11 @@ export default function LibraryMenuItems({
           ...item,
           // duplicate each library item before inserting on canvas to confine
           // ids and bindings to each library item. See #6465
-          elements: duplicateElements(item.elements, { randomizeSeed: true }),
+          elements: duplicateElements({
+            type: "everything",
+            elements: item.elements,
+            randomizeSeed: true,
+          }).duplicatedElements,
         };
       });
     },
@@ -166,12 +176,17 @@ export default function LibraryMenuItems({
 
   const onItemDrag = useCallback(
     (id: LibraryItem["id"], event: React.DragEvent) => {
+      // we want to serialize just the ids so the operation is fast and there's
+      // no race condition if people drop the library items on canvas too fast
+      const data: ExcalidrawLibraryIds = {
+        itemIds: selectedItems.includes(id) ? selectedItems : [id],
+      };
       event.dataTransfer.setData(
-        MIME_TYPES.excalidrawlib,
-        serializeLibraryAsJSON(getInsertedElements(id)),
+        MIME_TYPES.excalidrawlibIds,
+        JSON.stringify(data),
       );
     },
-    [getInsertedElements],
+    [selectedItems],
   );
 
   const isItemSelected = useCallback(

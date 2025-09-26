@@ -1,21 +1,45 @@
+import clsx from "clsx";
+import fuzzy from "fuzzy";
 import { useEffect, useRef, useState } from "react";
+
+import {
+  DEFAULT_SIDEBAR,
+  EVENT,
+  KEYS,
+  capitalizeString,
+  getShortcutKey,
+  isWritableElement,
+} from "@excalidraw/common";
+
+import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionToggleShapeSwitch";
+
+import type { MarkRequired } from "@excalidraw/common/utility-types";
+
+import {
+  actionClearCanvas,
+  actionLink,
+  actionToggleSearchMenu,
+} from "../../actions";
+import {
+  actionCopyElementLink,
+  actionLinkToElement,
+} from "../../actions/actionElementLink";
+import { getShortcutFromShortcutName } from "../../actions/shortcuts";
+import { trackEvent } from "../../analytics";
+import { useUIAppState } from "../../context/ui-appState";
+import { deburr } from "../../deburr";
+import { atom, useAtom, editorJotaiStore } from "../../editor-jotai";
+import { t } from "../../i18n";
 import {
   useApp,
   useAppProps,
   useExcalidrawActionManager,
   useExcalidrawSetAppState,
 } from "../App";
-import { KEYS } from "../../keys";
 import { Dialog } from "../Dialog";
+import { InlineIcon } from "../InlineIcon";
 import { TextField } from "../TextField";
-import clsx from "clsx";
 import { getSelectedElements } from "../../scene";
-import type { Action } from "../../actions/types";
-import type { TranslationKeys } from "../../i18n";
-import { t } from "../../i18n";
-import type { ShortcutName } from "../../actions/shortcuts";
-import { getShortcutFromShortcutName } from "../../actions/shortcuts";
-import { DEFAULT_SIDEBAR, EVENT } from "../../constants";
 import {
   LockedIcon,
   UnlockedIcon,
@@ -28,38 +52,24 @@ import {
   brainIconThin,
   LibraryIcon,
 } from "../icons";
-import fuzzy from "fuzzy";
-import { useUIAppState } from "../../context/ui-appState";
-import type { AppProps, AppState, UIAppState } from "../../types";
-import {
-  capitalizeString,
-  getShortcutKey,
-  isWritableElement,
-} from "../../utils";
-import { atom, useAtom } from "jotai";
-import { deburr } from "../../deburr";
-import type { MarkRequired } from "../../utility-types";
-import { InlineIcon } from "../InlineIcon";
-import { SHAPES } from "../../shapes";
+
+import { SHAPES } from "../shapes";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
 import { useStableCallback } from "../../hooks/useStableCallback";
-import {
-  actionClearCanvas,
-  actionLink,
-  actionToggleSearchMenu,
-} from "../../actions";
-import { jotaiStore } from "../../jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
-import type { CommandPaletteItem } from "./types";
-import * as defaultItems from "./defaultCommandPaletteItems";
-import { trackEvent } from "../../analytics";
 import { useStable } from "../../hooks/useStable";
 
+import { Ellipsify } from "../Ellipsify";
+
+import * as defaultItems from "./defaultCommandPaletteItems";
+
 import "./CommandPalette.scss";
-import {
-  actionCopyElementLink,
-  actionLinkToElement,
-} from "../../actions/actionElementLink";
+
+import type { CommandPaletteItem } from "./types";
+import type { AppProps, AppState, UIAppState } from "../../types";
+import type { ShortcutName } from "../../actions/shortcuts";
+import type { TranslationKeys } from "../../i18n";
+import type { Action } from "../../actions/types";
 
 const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 
@@ -263,6 +273,7 @@ function CommandPaletteInner({
         actionManager.actions.cut,
         actionManager.actions.copy,
         actionManager.actions.deleteSelectedElements,
+        actionManager.actions.wrapSelectionInFrame,
         actionManager.actions.copyStyles,
         actionManager.actions.pasteStyles,
         actionManager.actions.bringToFront,
@@ -284,6 +295,7 @@ function CommandPaletteInner({
         actionManager.actions.decreaseFontSize,
         actionManager.actions.toggleLinearEditor,
         actionManager.actions.cropEditor,
+        actionManager.actions.togglePolygon,
         actionLink,
         actionCopyElementLink,
         actionLinkToElement,
@@ -308,6 +320,7 @@ function CommandPaletteInner({
       const toolCommands: CommandPaletteItem[] = [
         actionManager.actions.toggleHandTool,
         actionManager.actions.setFrameAsActiveTool,
+        actionManager.actions.toggleLassoTool,
       ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.tools));
 
       const editorCommands: CommandPaletteItem[] = [
@@ -348,7 +361,7 @@ function CommandPaletteInner({
           keywords: ["delete", "destroy"],
           viewMode: false,
           perform: () => {
-            jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
+            editorJotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
           },
         },
         {
@@ -400,6 +413,14 @@ function CommandPaletteInner({
           viewMode: true,
           perform: () => {
             actionManager.executeAction(actionToggleSearchMenu);
+          },
+        },
+        {
+          label: t("labels.shapeSwitch"),
+          category: DEFAULT_CATEGORIES.elements,
+          icon: boltIcon,
+          perform: () => {
+            actionManager.executeAction(actionToggleShapeSwitch);
           },
         },
         {
@@ -484,7 +505,6 @@ function CommandPaletteInner({
               if (value === "image") {
                 app.setActiveTool({
                   type: value,
-                  insertOnCanvasDirectly: event.type === EVENT.KEYDOWN,
                 });
               } else {
                 app.setActiveTool({ type: value });
@@ -946,7 +966,7 @@ const CommandItem = ({
             }
           />
         )}
-        {command.label}
+        <Ellipsify>{command.label}</Ellipsify>
       </div>
       {showShortcut && command.shortcut && (
         <CommandShortcutHint shortcut={command.shortcut} />

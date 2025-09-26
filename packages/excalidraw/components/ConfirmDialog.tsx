@@ -1,14 +1,16 @@
 import { flushSync } from "react-dom";
-import { t } from "../i18n";
-import type { DialogProps } from "./Dialog";
-import { Dialog } from "./Dialog";
 
-import "./ConfirmDialog.scss";
+import { useSetAtom } from "../editor-jotai";
+import { t } from "../i18n";
+
+import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
-import { useSetAtom } from "jotai";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
-import { jotaiScope } from "../jotai";
+
+import "./ConfirmDialog.scss";
+
+import type { DialogProps } from "./Dialog";
 
 interface Props extends Omit<DialogProps, "onCloseRequest"> {
   onConfirm: () => void;
@@ -27,7 +29,7 @@ const ConfirmDialog = (props: Props) => {
     ...rest
   } = props;
   const setAppState = useExcalidrawSetAppState();
-  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom, jotaiScope);
+  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
   const { container } = useExcalidrawContainer();
 
   return (

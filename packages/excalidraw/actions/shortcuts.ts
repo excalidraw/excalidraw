@@ -1,7 +1,9 @@
-import { isDarwin } from "../constants";
+import { isDarwin, getShortcutKey } from "@excalidraw/common";
+
+import type { SubtypeOf } from "@excalidraw/common/utility-types";
+
 import { t } from "../i18n";
-import type { SubtypeOf } from "../utility-types";
-import { getShortcutKey } from "../utils";
+
 import type { ActionName } from "./types";
 
 export type ShortcutName =
@@ -47,6 +49,7 @@ export type ShortcutName =
       | "saveFileToDisk"
       | "saveToActiveFile"
       | "toggleShortcuts"
+      | "wrapSelectionInFrame"
     >
   | "saveScene"
   | "imageExport"
@@ -112,6 +115,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   saveToActiveFile: [getShortcutKey("CtrlOrCmd+S")],
   toggleShortcuts: [getShortcutKey("?")],
   searchMenu: [getShortcutKey("CtrlOrCmd+F")],
+  wrapSelectionInFrame: [],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName, idx = 0) => {

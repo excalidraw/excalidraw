@@ -1,29 +1,31 @@
-import type { ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { exportToCanvas, exportToSvg } from "@excalidraw/utils/export";
 import OpenColor from "open-color";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Dialog } from "./Dialog";
-import { t } from "../i18n";
-import Trans from "./Trans";
-
-import type { LibraryItems, LibraryItem, UIAppState } from "../types";
-import { exportToCanvas, exportToSvg } from "../../utils/export";
 import {
   EDITOR_LS_KEYS,
   EXPORT_DATA_TYPES,
-  EXPORT_SOURCE,
   MIME_TYPES,
   VERSIONS,
-} from "../constants";
-import type { ExportedLibraryData } from "../data/types";
-import { canvasToBlob, resizeImageFile } from "../data/blob";
-import { chunk } from "../utils";
-import DialogActionButton from "./DialogActionButton";
-import { CloseIcon } from "./icons";
-import { ToolButton } from "./ToolButton";
+  chunk,
+  getExportSource,
+} from "@excalidraw/common";
+
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
+import { canvasToBlob, resizeImageFile } from "../data/blob";
+import { t } from "../i18n";
+
+import { Dialog } from "./Dialog";
+import DialogActionButton from "./DialogActionButton";
+import { ToolButton } from "./ToolButton";
+import Trans from "./Trans";
+import { CloseIcon } from "./icons";
 
 import "./PublishLibrary.scss";
+
+import type { ReactNode } from "react";
+import type { ExportedLibraryData } from "../data/types";
+import type { LibraryItems, LibraryItem, UIAppState } from "../types";
 
 interface PublishLibraryDataParams {
   authorName: string;
@@ -279,7 +281,7 @@ const PublishLibrary = ({
     const libContent: ExportedLibraryData = {
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
       version: VERSIONS.excalidrawLibrary,
-      source: EXPORT_SOURCE,
+      source: getExportSource(),
       libraryItems: clonedLibItems,
     };
     const content = JSON.stringify(libContent, null, 2);
@@ -387,7 +389,7 @@ const PublishLibrary = ({
                 <a
                   href="https://libraries.excalidraw.com"
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener"
                 >
                   {el}
                 </a>

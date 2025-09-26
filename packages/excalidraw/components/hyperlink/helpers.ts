@@ -1,19 +1,24 @@
-import type { GlobalPoint, Radians } from "../../../math";
-import { pointFrom, pointRotateRads } from "../../../math";
-import { MIME_TYPES } from "../../constants";
-import type { Bounds } from "../../element/bounds";
-import { getElementAbsoluteCoords } from "../../element/bounds";
-import { hitElementBoundingBox } from "../../element/collision";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
+
+import { MIME_TYPES } from "@excalidraw/common";
+import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { hitElementBoundingBox } from "@excalidraw/element";
+
+import type { GlobalPoint, Radians } from "@excalidraw/math";
+
+import type { Bounds } from "@excalidraw/element";
 import type {
   ElementsMap,
   NonDeletedExcalidrawElement,
-} from "../../element/types";
-import { DEFAULT_LINK_SIZE } from "../../renderer/renderElement";
+} from "@excalidraw/element/types";
+
 import type { AppState, UIAppState } from "../../types";
+
+export const DEFAULT_LINK_SIZE = 12;
 
 export const EXTERNAL_LINK_IMG = document.createElement("img");
 EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1971c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`,
+  `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1971c2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`,
 )}`;
 
 export const ELEMENT_LINK_IMG = document.createElement("img");
@@ -27,13 +32,14 @@ export const getLinkHandleFromCoords = (
   appState: Pick<UIAppState, "zoom">,
 ): Bounds => {
   const size = DEFAULT_LINK_SIZE;
-  const linkWidth = size / appState.zoom.value;
-  const linkHeight = size / appState.zoom.value;
-  const linkMarginY = size / appState.zoom.value;
+  const zoom = appState.zoom.value > 1 ? appState.zoom.value : 1;
+  const linkWidth = size / zoom;
+  const linkHeight = size / zoom;
+  const linkMarginY = size / zoom;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
-  const centeringOffset = (size - 8) / (2 * appState.zoom.value);
-  const dashedLineMargin = 4 / appState.zoom.value;
+  const centeringOffset = (size - 8) / (2 * zoom);
+  const dashedLineMargin = 4 / zoom;
 
   // Same as `ne` resize handle
   const x = x2 + dashedLineMargin - centeringOffset;
@@ -86,7 +92,7 @@ export const isPointHittingLink = (
   if (
     !isMobile &&
     appState.viewModeEnabled &&
-    hitElementBoundingBox(x, y, element, elementsMap)
+    hitElementBoundingBox(pointFrom(x, y), element, elementsMap)
   ) {
     return true;
   }

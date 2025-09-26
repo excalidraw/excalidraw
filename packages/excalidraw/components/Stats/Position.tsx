@@ -1,16 +1,20 @@
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
-import StatsDragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, moveElement } from "./utils";
-import type Scene from "../../scene/Scene";
-import type { AppState } from "../../types";
-import { clamp, pointFrom, pointRotateRads, round } from "../../../math";
-import { isImageElement } from "../../element/typeChecks";
+import { clamp, pointFrom, pointRotateRads, round } from "@excalidraw/math";
+
 import {
   getFlipAdjustedCropPosition,
   getUncroppedWidthAndHeight,
-} from "../../element/cropElement";
-import { mutateElement } from "../../element/mutateElement";
+} from "@excalidraw/element";
+import { isImageElement } from "@excalidraw/element";
+
+import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Scene } from "@excalidraw/element";
+
+import StatsDragInput from "./DragInput";
+import { getStepSizedValue, moveElement, STEP_SIZE } from "./utils";
+
+import type { DragInputCallbackType } from "./DragInput";
+import type { AppState } from "../../types";
 
 interface PositionProps {
   property: "x" | "y";
@@ -19,8 +23,6 @@ interface PositionProps {
   scene: Scene;
   appState: AppState;
 }
-
-const STEP_SIZE = 10;
 
 const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
   accumulatedChange,
@@ -34,7 +36,6 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
   originalAppState,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const elements = scene.getNonDeletedElements();
   const origElement = originalElements[0];
   const [cx, cy] = [
     origElement.x + origElement.width / 2,
@@ -97,7 +98,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
         };
       }
 
-      mutateElement(element, {
+      scene.mutateElement(element, {
         crop: nextCrop,
       });
 
@@ -115,7 +116,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       y: clamp(crop.y + changeInY, 0, crop.naturalHeight - crop.height),
     };
 
-    mutateElement(element, {
+    scene.mutateElement(element, {
       crop: nextCrop,
     });
 
@@ -129,8 +130,6 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       newTopLeftX,
       newTopLeftY,
       origElement,
-      elementsMap,
-      elements,
       scene,
       originalElementsMap,
     );
@@ -162,8 +161,6 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
     newTopLeftX,
     newTopLeftY,
     origElement,
-    elementsMap,
-    elements,
     scene,
     originalElementsMap,
   );

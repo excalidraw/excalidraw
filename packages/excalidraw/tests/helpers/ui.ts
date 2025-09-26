@@ -1,3 +1,30 @@
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
+
+import {
+  elementCenterPoint,
+  getCommonBounds,
+  getElementPointsCoords,
+} from "@excalidraw/element";
+import { cropElement } from "@excalidraw/element";
+import {
+  getTransformHandles,
+  getTransformHandlesFromCoords,
+  OMIT_SIDES_FOR_FRAME,
+  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  type TransformHandle,
+  type TransformHandleDirection,
+} from "@excalidraw/element";
+import {
+  isLinearElement,
+  isFreeDrawElement,
+  isTextElement,
+  isFrameLikeElement,
+} from "@excalidraw/element";
+import { KEYS, arrayToMap } from "@excalidraw/common";
+
+import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
+
+import type { TransformHandleType } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -9,33 +36,15 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   ExcalidrawImageElement,
-} from "../../element/types";
-import type { TransformHandleType } from "../../element/transformHandles";
-import {
-  getTransformHandles,
-  getTransformHandlesFromCoords,
-  OMIT_SIDES_FOR_FRAME,
-  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-  type TransformHandle,
-  type TransformHandleDirection,
-} from "../../element/transformHandles";
-import { KEYS } from "../../keys";
-import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
-import { mutateElement } from "../../element/mutateElement";
-import { API } from "./api";
-import {
-  isLinearElement,
-  isFreeDrawElement,
-  isTextElement,
-  isFrameLikeElement,
-} from "../../element/typeChecks";
-import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
-import { getTextEditor } from "../queries/dom";
-import { arrayToMap } from "../../utils";
+  ElementsMap,
+} from "@excalidraw/element/types";
+
 import { createTestHook } from "../../components/App";
-import type { GlobalPoint, LocalPoint, Radians } from "../../../math";
-import { pointFrom, pointRotateRads } from "../../../math";
-import { cropElement } from "../../element/cropElement";
+import { getTextEditor, TEXT_EDITOR_SELECTOR } from "../queries/dom";
+import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
+
+import { API } from "./api";
+
 import type { ToolType } from "../../types";
 
 // so that window.h is available when App.tsx is not imported as well.
@@ -142,8 +151,9 @@ export class Keyboard {
 
 const getElementPointForSelection = (
   element: ExcalidrawElement,
+  elementsMap: ElementsMap,
 ): GlobalPoint => {
-  const { x, y, width, height, angle } = element;
+  const { x, y, width, angle } = element;
   const target = pointFrom<GlobalPoint>(
     x +
       (isLinearElement(element) || isFreeDrawElement(element) ? 0 : width / 2),
@@ -158,7 +168,7 @@ const getElementPointForSelection = (
       (bounds[1] + bounds[3]) / 2,
     );
   } else {
-    center = pointFrom(x + width / 2, y + height / 2);
+    center = elementCenterPoint(element, elementsMap);
   }
 
   if (isTextElement(element)) {
@@ -172,10 +182,17 @@ export class Pointer {
   public clientX = 0;
   public clientY = 0;
 
+  static activePointers: Pointer[] = [];
+  static resetAll() {
+    Pointer.activePointers.forEach((pointer) => pointer.reset());
+  }
+
   constructor(
     private readonly pointerType: "mouse" | "touch" | "pen",
     private readonly pointerId = 1,
-  ) {}
+  ) {
+    Pointer.activePointers.push(this);
+  }
 
   reset() {
     this.clientX = 0;
@@ -288,7 +305,12 @@ export class Pointer {
       elements = Array.isArray(elements) ? elements : [elements];
       elements.forEach((element) => {
         this.reset();
-        this.click(...getElementPointForSelection(element));
+        this.click(
+          ...getElementPointForSelection(
+            element,
+            h.app.scene.getElementsMapIncludingDeleted(),
+          ),
+        );
       });
     });
 
@@ -297,13 +319,23 @@ export class Pointer {
 
   clickOn(element: ExcalidrawElement) {
     this.reset();
-    this.click(...getElementPointForSelection(element));
+    this.click(
+      ...getElementPointForSelection(
+        element,
+        h.app.scene.getElementsMapIncludingDeleted(),
+      ),
+    );
     this.reset();
   }
 
   doubleClickOn(element: ExcalidrawElement) {
     this.reset();
-    this.doubleClick(...getElementPointForSelection(element));
+    this.doubleClick(
+      ...getElementPointForSelection(
+        element,
+        h.app.scene.getElementsMapIncludingDeleted(),
+      ),
+    );
     this.reset();
   }
 }
@@ -394,7 +426,10 @@ const proxy = <T extends ExcalidrawElement>(
 };
 
 /** Tools that can be used to draw shapes */
-type DrawingToolName = Exclude<ToolType, "lock" | "selection" | "eraser">;
+type DrawingToolName = Exclude<
+  ToolType,
+  "lock" | "selection" | "eraser" | "lasso"
+>;
 
 type Element<T extends DrawingToolName> = T extends "line" | "freedraw"
   ? ExcalidrawLinearElement
@@ -508,7 +543,7 @@ export class UI {
 
     if (angle !== 0) {
       act(() => {
-        mutateElement(origElement, { angle });
+        h.app.scene.mutateElement(origElement, { angle });
       });
     }
 
@@ -518,16 +553,15 @@ export class UI {
   static async editText<
     T extends ExcalidrawTextElement | ExcalidrawTextContainer,
   >(element: T, text: string) {
-    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
     const openedEditor =
-      document.querySelector<HTMLTextAreaElement>(textEditorSelector);
+      document.querySelector<HTMLTextAreaElement>(TEXT_EDITOR_SELECTOR);
 
     if (!openedEditor) {
       mouse.select(element);
       Keyboard.keyPress(KEYS.ENTER);
     }
 
-    const editor = await getTextEditor(textEditorSelector);
+    const editor = await getTextEditor();
     if (!editor) {
       throw new Error("Can't find wysiwyg text editor in the dom");
     }
@@ -584,6 +618,7 @@ export class UI {
 
     const mutations = cropElement(
       element,
+      h.scene.getNonDeletedElementsMap(),
       handle,
       naturalWidth,
       naturalHeight,

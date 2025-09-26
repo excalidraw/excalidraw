@@ -88,14 +88,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "ellipse-1",
-    "fixedPoint": null,
-    "focus": -0.008153707962747813,
-    "gap": 1,
+    "focus": -0.007519379844961235,
+    "gap": 11.562288374879595,
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 33.519031369643244,
+  "height": 35,
   "id": Any<String>,
   "index": "a2",
   "isDeleted": false,
@@ -105,12 +104,12 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "opacity": 100,
   "points": [
     [
-      0.5,
-      0.5,
+      0,
+      0,
     ],
     [
-      382.47606040672997,
-      34.019031369643244,
+      394,
+      34,
     ],
   ],
   "roughness": 1,
@@ -119,8 +118,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id49",
-    "fixedPoint": null,
-    "focus": -0.08139534883720931,
+    "focus": -0.0813953488372095,
     "gap": 1,
   },
   "strokeColor": "#1864ab",
@@ -128,11 +126,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 7,
+  "version": 4,
   "versionNonce": Any<Number>,
-  "width": 381.97606040672997,
-  "x": 247,
-  "y": 420,
+  "width": 395,
+  "x": 247.5,
+  "y": 420.5,
 }
 `;
 
@@ -146,9 +144,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "ellipse-1",
-    "fixedPoint": null,
     "focus": 0.10666666666666667,
-    "gap": 3.834326468444573,
+    "gap": 3.8343264684446097,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -163,11 +160,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      389.5,
+      399,
       0,
     ],
   ],
@@ -177,19 +174,18 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "startArrowhead": null,
   "startBinding": {
     "elementId": "diamond-1",
-    "fixedPoint": null,
     "focus": 0,
-    "gap": 1,
+    "gap": 4.535423522449215,
   },
   "strokeColor": "#e67700",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 6,
+  "version": 4,
   "versionNonce": Any<Number>,
-  "width": 390,
-  "x": 237,
+  "width": 400,
+  "x": 227.5,
   "y": 450,
 }
 `;
@@ -319,7 +315,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "verticalAlign": "top",
   "width": 100,
   "x": 560,
-  "y": 236.95454545454544,
+  "y": 226.5,
 }
 `;
 
@@ -338,14 +334,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "text-2",
-    "fixedPoint": null,
-    "focus": 1.625925925925924,
-    "gap": 14,
+    "focus": 0,
+    "gap": 16,
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 18.278619528619487,
+  "height": 0,
   "id": Any<String>,
   "index": "a2",
   "isDeleted": false,
@@ -355,12 +350,12 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "opacity": 100,
   "points": [
     [
-      0.5,
-      -0.5,
+      0,
+      0,
     ],
     [
-      357.2037037037038,
-      -17.778619528619487,
+      99,
+      0,
     ],
   ],
   "roughness": 1,
@@ -369,7 +364,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "startArrowhead": null,
   "startBinding": {
     "elementId": "text-1",
-    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -378,11 +372,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 6,
+  "version": 4,
   "versionNonce": Any<Number>,
-  "width": 357.7037037037038,
-  "x": 171,
-  "y": 249.45454545454544,
+  "width": 100,
+  "x": 255.5,
+  "y": 239,
 }
 `;
 
@@ -442,8 +436,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id42",
-    "fixedPoint": null,
-    "focus": 0,
+    "focus": -0,
     "gap": 1,
   },
   "fillStyle": "solid",
@@ -459,11 +452,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -473,7 +466,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id41",
-    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -482,10 +474,10 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 6,
+  "version": 4,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 255,
+  "x": 255.5,
   "y": 239,
 }
 `;
@@ -620,8 +612,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id46",
-    "fixedPoint": null,
-    "focus": 0,
+    "focus": -0,
     "gap": 1,
   },
   "fillStyle": "solid",
@@ -637,11 +628,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -651,7 +642,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id45",
-    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -660,10 +650,10 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 6,
+  "version": 4,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 255,
+  "x": 255.5,
   "y": 239,
 }
 `;
@@ -855,11 +845,11 @@ exports[`Test Transform > should transform linear elements 1`] = `
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -876,7 +866,7 @@ exports[`Test Transform > should transform linear elements 1`] = `
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100,
+  "x": 100.5,
   "y": 20,
 }
 `;
@@ -903,11 +893,11 @@ exports[`Test Transform > should transform linear elements 2`] = `
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -924,7 +914,7 @@ exports[`Test Transform > should transform linear elements 2`] = `
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 450,
+  "x": 450.5,
   "y": 20,
 }
 `;
@@ -958,6 +948,7 @@ exports[`Test Transform > should transform linear elements 3`] = `
       0,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
@@ -1005,6 +996,7 @@ exports[`Test Transform > should transform linear elements 4`] = `
       0,
     ],
   ],
+  "polygon": false,
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
@@ -1484,8 +1476,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "Alice",
-    "fixedPoint": null,
-    "focus": 0,
+    "focus": -0,
     "gap": 5.299874999999986,
   },
   "fillStyle": "solid",
@@ -1501,11 +1492,11 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      270.98528125,
+      271.985,
       0,
     ],
   ],
@@ -1517,7 +1508,6 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "startArrowhead": null,
   "startBinding": {
     "elementId": "Bob",
-    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -1526,10 +1516,10 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 7,
+  "version": 4,
   "versionNonce": Any<Number>,
-  "width": 270.48528125,
-  "x": 112.76171875,
+  "width": 272.985,
+  "x": 111.762,
   "y": 57,
 }
 `;
@@ -1549,9 +1539,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "B",
-    "fixedPoint": null,
     "focus": 0,
-    "gap": 1,
+    "gap": 32,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -1578,7 +1567,6 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "startArrowhead": null,
   "startBinding": {
     "elementId": "Bob",
-    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -1587,11 +1575,11 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 6,
+  "version": 4,
   "versionNonce": Any<Number>,
   "width": 0,
-  "x": 83.015625,
-  "y": 81.5,
+  "x": 77.017,
+  "y": 79,
 }
 `;
 
@@ -1803,7 +1791,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 120,
-  "x": 187.7545,
+  "x": 187.75450000000004,
   "y": 44.5,
 }
 `;
@@ -1876,11 +1864,11 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -1897,7 +1885,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100,
+  "x": 100.5,
   "y": 100,
 }
 `;
@@ -1929,11 +1917,11 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -1950,7 +1938,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100,
+  "x": 100.5,
   "y": 200,
 }
 `;
@@ -1982,11 +1970,11 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -2003,7 +1991,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100,
+  "x": 100.5,
   "y": 300,
 }
 `;
@@ -2035,11 +2023,11 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -2056,7 +2044,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100,
+  "x": 100.5,
   "y": 400,
 }
 `;

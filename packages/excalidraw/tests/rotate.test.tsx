@@ -1,12 +1,14 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { render } from "./test-utils";
-import { reseed } from "../random";
-import { UI } from "./helpers/ui";
-import { Excalidraw } from "../index";
 import { expect } from "vitest";
 
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+import { reseed } from "@excalidraw/common";
+
+import { Excalidraw } from "../index";
+
+import { UI } from "./helpers/ui";
+import { render, unmountComponent } from "./test-utils";
+
+unmountComponent();
 
 beforeEach(() => {
   localStorage.clear();
@@ -70,8 +72,8 @@ test("unselected bound arrows update when rotating their target elements", async
   expect(ellipseArrow.x).toEqual(0);
   expect(ellipseArrow.y).toEqual(0);
   expect(ellipseArrow.points[0]).toEqual([0, 0]);
-  expect(ellipseArrow.points[1][0]).toBeCloseTo(48.5, 1);
-  expect(ellipseArrow.points[1][1]).toBeCloseTo(126.5, 1);
+  expect(ellipseArrow.points[1][0]).toBeCloseTo(48.98, 1);
+  expect(ellipseArrow.points[1][1]).toBeCloseTo(125.79, 1);
 
   expect(textArrow.endBinding?.elementId).toEqual(text.id);
   expect(textArrow.x).toEqual(360);

@@ -1,8 +1,10 @@
 import { render } from "@testing-library/react";
 
+import { EditorJotaiProvider } from "../editor-jotai";
 import fallbackLangData from "../locales/en.json";
 
 import Trans from "./Trans";
+
 import type { TranslationKeys } from "../i18n";
 
 describe("Test <Trans/>", () => {
@@ -17,7 +19,7 @@ describe("Test <Trans/>", () => {
     };
 
     const { getByTestId } = render(
-      <>
+      <EditorJotaiProvider>
         <div data-testid="test1">
           <Trans
             i18nKey={"transTest.key1" as unknown as TranslationKeys}
@@ -51,7 +53,7 @@ describe("Test <Trans/>", () => {
             connect-link={(el) => <a href="https://example.com">{el}</a>}
           />
         </div>
-      </>,
+      </EditorJotaiProvider>,
     );
 
     expect(getByTestId("test1").innerHTML).toEqual("Hello world");

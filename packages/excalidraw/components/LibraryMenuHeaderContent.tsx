@@ -1,12 +1,24 @@
+import clsx from "clsx";
 import { useCallback, useState } from "react";
-import { t } from "../i18n";
-import Trans from "./Trans";
-import { jotaiScope } from "../jotai";
-import type { LibraryItem, LibraryItems, UIAppState } from "../types";
-import { useApp, useExcalidrawSetAppState } from "./App";
+
+import { muteFSAbortError } from "@excalidraw/common";
+
+import { useUIAppState } from "../context/ui-appState";
+import { fileOpen } from "../data/filesystem";
 import { saveLibraryAsJSON } from "../data/json";
-import type Library from "../data/library";
 import { libraryItemsAtom } from "../data/library";
+import { useAtom } from "../editor-jotai";
+import { useLibraryCache } from "../hooks/useLibraryItemSvg";
+import { t } from "../i18n";
+
+import { useApp, useExcalidrawSetAppState } from "./App";
+import ConfirmDialog from "./ConfirmDialog";
+import { Dialog } from "./Dialog";
+import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+import PublishLibrary from "./PublishLibrary";
+import { ToolButton } from "./ToolButton";
+import Trans from "./Trans";
+import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
   DotsIcon,
   ExportIcon,
@@ -14,18 +26,9 @@ import {
   publishIcon,
   TrashIcon,
 } from "./icons";
-import { ToolButton } from "./ToolButton";
-import { fileOpen } from "../data/filesystem";
-import { muteFSAbortError } from "../utils";
-import { useAtom } from "jotai";
-import ConfirmDialog from "./ConfirmDialog";
-import PublishLibrary from "./PublishLibrary";
-import { Dialog } from "./Dialog";
-import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import { isLibraryMenuOpenAtom } from "./LibraryMenu";
-import { useUIAppState } from "../context/ui-appState";
-import clsx from "clsx";
-import { useLibraryCache } from "../hooks/useLibraryItemSvg";
+
+import type Library from "../data/library";
+import type { LibraryItem, LibraryItems, UIAppState } from "../types";
 
 const getSelectedItems = (
   libraryItems: LibraryItems,
@@ -51,10 +54,9 @@ export const LibraryDropdownMenuButton: React.FC<{
   appState,
   className,
 }) => {
-  const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
+  const [libraryItemsData] = useAtom(libraryItemsAtom);
   const [isLibraryMenuOpen, setIsLibraryMenuOpen] = useAtom(
     isLibraryMenuOpenAtom,
-    jotaiScope,
   );
 
   const renderRemoveLibAlert = () => {
@@ -286,7 +288,7 @@ export const LibraryDropdownMenu = ({
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
 
-  const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
+  const [libraryItemsData] = useAtom(libraryItemsAtom);
 
   const removeFromLibrary = async (libraryItems: LibraryItems) => {
     const nextItems = libraryItems.filter(

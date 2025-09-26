@@ -1,4 +1,3 @@
-import type { InclusiveRange } from "../math";
 import {
   pointFrom,
   pointRotateRads,
@@ -6,32 +5,37 @@ import {
   rangeIntersection,
   rangesOverlap,
   type GlobalPoint,
-} from "../math";
-import { TOOL_TYPE } from "./constants";
-import type { Bounds } from "./element/bounds";
+} from "@excalidraw/math";
+
+import { TOOL_TYPE, KEYS } from "@excalidraw/common";
 import {
   getCommonBounds,
   getDraggedElementsBounds,
   getElementAbsoluteCoords,
-} from "./element/bounds";
-import type { MaybeTransformHandleType } from "./element/transformHandles";
-import { isBoundToContainer, isFrameLikeElement } from "./element/typeChecks";
+} from "@excalidraw/element";
+import { isBoundToContainer } from "@excalidraw/element";
+
+import { getMaximumGroups } from "@excalidraw/element";
+
+import {
+  getSelectedElements,
+  getVisibleAndNonSelectedElements,
+} from "@excalidraw/element";
+
+import type { InclusiveRange } from "@excalidraw/math";
+
+import type { Bounds } from "@excalidraw/element";
+import type { MaybeTransformHandleType } from "@excalidraw/element";
 import type {
   ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
-} from "./element/types";
-import { getMaximumGroups } from "./groups";
-import { KEYS } from "./keys";
-import {
-  getSelectedElements,
-  getVisibleAndNonSelectedElements,
-} from "./scene/selection";
+} from "@excalidraw/element/types";
+
 import type {
   AppClassProperties,
   AppState,
   KeyboardModifiersObject,
-  NullableGridSize,
 } from "./types";
 
 const SNAP_DISTANCE = 8;
@@ -165,11 +169,18 @@ export const isSnappingEnabled = ({
   selectedElements: NonDeletedExcalidrawElement[];
 }) => {
   if (event) {
+    // Allow snapping for lasso tool when dragging selected elements
+    // but not during lasso selection phase
+    const isLassoDragging =
+      app.state.activeTool.type === "lasso" &&
+      app.state.selectedElementsAreBeingDragged;
+
     return (
-      (app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
-      (!app.state.objectsSnapModeEnabled &&
-        event[KEYS.CTRL_OR_CMD] &&
-        !isGridModeEnabled(app))
+      (app.state.activeTool.type !== "lasso" || isLassoDragging) &&
+      ((app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
+        (!app.state.objectsSnapModeEnabled &&
+          event[KEYS.CTRL_OR_CMD] &&
+          !isGridModeEnabled(app)))
     );
   }
 
@@ -306,20 +317,13 @@ const getReferenceElements = (
   selectedElements: NonDeletedExcalidrawElement[],
   appState: AppState,
   elementsMap: ElementsMap,
-) => {
-  const selectedFrames = selectedElements
-    .filter((element) => isFrameLikeElement(element))
-    .map((frame) => frame.id);
-
-  return getVisibleAndNonSelectedElements(
+) =>
+  getVisibleAndNonSelectedElements(
     elements,
     selectedElements,
     appState,
     elementsMap,
-  ).filter(
-    (element) => !(element.frameId && selectedFrames.includes(element.frameId)),
   );
-};
 
 export const getVisibleGaps = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -1407,19 +1411,4 @@ export const isActiveToolNonLinearSnappable = (
     activeToolType === TOOL_TYPE.image ||
     activeToolType === TOOL_TYPE.text
   );
-};
-
-// TODO: Rounding this point causes some shake when free drawing
-export const getGridPoint = (
-  x: number,
-  y: number,
-  gridSize: NullableGridSize,
-): [number, number] => {
-  if (gridSize) {
-    return [
-      Math.round(x / gridSize) * gridSize,
-      Math.round(y / gridSize) * gridSize,
-    ];
-  }
-  return [x, y];
 };

@@ -1,17 +1,21 @@
 import React, { useEffect, useRef } from "react";
-import type { RoughCanvas } from "roughjs/bin/canvas";
+
+import { isShallowEqual } from "@excalidraw/common";
+
+import type {
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "@excalidraw/element/types";
+
+import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderStaticScene } from "../../renderer/staticScene";
-import { isShallowEqual } from "../../utils";
-import type { AppState, StaticCanvasAppState } from "../../types";
+
 import type {
   RenderableElementsMap,
   StaticCanvasRenderConfig,
 } from "../../scene/types";
-import type {
-  NonDeletedExcalidrawElement,
-  NonDeletedSceneElementsMap,
-} from "../../element/types";
-import { isRenderThrottlingEnabled } from "../../reactUtils";
+import type { AppState, StaticCanvasAppState } from "../../types";
+import type { RoughCanvas } from "roughjs/bin/canvas";
 
 type StaticCanvasProps = {
   canvas: HTMLCanvasElement;
@@ -31,6 +35,13 @@ const StaticCanvas = (props: StaticCanvasProps) => {
   const isComponentMounted = useRef(false);
 
   useEffect(() => {
+    props.canvas.style.width = `${props.appState.width}px`;
+    props.canvas.style.height = `${props.appState.height}px`;
+    props.canvas.width = props.appState.width * props.scale;
+    props.canvas.height = props.appState.height * props.scale;
+  }, [props.appState.height, props.appState.width, props.canvas, props.scale]);
+
+  useEffect(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper) {
       return;
@@ -43,26 +54,6 @@ const StaticCanvas = (props: StaticCanvasProps) => {
 
       wrapper.replaceChildren(canvas);
       canvas.classList.add("excalidraw__canvas", "static");
-    }
-
-    const widthString = `${props.appState.width}px`;
-    const heightString = `${props.appState.height}px`;
-    if (canvas.style.width !== widthString) {
-      canvas.style.width = widthString;
-    }
-    if (canvas.style.height !== heightString) {
-      canvas.style.height = heightString;
-    }
-
-    const scaledWidth = props.appState.width * props.scale;
-    const scaledHeight = props.appState.height * props.scale;
-    // setting width/height resets the canvas even if dimensions not changed,
-    // which would cause flicker when we skip frame (due to throttling)
-    if (canvas.width !== scaledWidth) {
-      canvas.width = scaledWidth;
-    }
-    if (canvas.height !== scaledHeight) {
-      canvas.height = scaledHeight;
     }
 
     renderStaticScene(
@@ -83,34 +74,35 @@ const StaticCanvas = (props: StaticCanvasProps) => {
   return <div className="excalidraw__canvas-wrapper" ref={wrapperRef} />;
 };
 
-const getRelevantAppStateProps = (
-  appState: AppState,
-): StaticCanvasAppState => ({
-  zoom: appState.zoom,
-  scrollX: appState.scrollX,
-  scrollY: appState.scrollY,
-  width: appState.width,
-  height: appState.height,
-  viewModeEnabled: appState.viewModeEnabled,
-  openDialog: appState.openDialog,
-  hoveredElementIds: appState.hoveredElementIds,
-  offsetLeft: appState.offsetLeft,
-  offsetTop: appState.offsetTop,
-  theme: appState.theme,
-  pendingImageElementId: appState.pendingImageElementId,
-  shouldCacheIgnoreZoom: appState.shouldCacheIgnoreZoom,
-  viewBackgroundColor: appState.viewBackgroundColor,
-  exportScale: appState.exportScale,
-  selectedElementsAreBeingDragged: appState.selectedElementsAreBeingDragged,
-  gridSize: appState.gridSize,
-  gridStep: appState.gridStep,
-  frameRendering: appState.frameRendering,
-  selectedElementIds: appState.selectedElementIds,
-  frameToHighlight: appState.frameToHighlight,
-  editingGroupId: appState.editingGroupId,
-  currentHoveredFontFamily: appState.currentHoveredFontFamily,
-  croppingElementId: appState.croppingElementId,
-});
+const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
+  const relevantAppStateProps = {
+    zoom: appState.zoom,
+    scrollX: appState.scrollX,
+    scrollY: appState.scrollY,
+    width: appState.width,
+    height: appState.height,
+    viewModeEnabled: appState.viewModeEnabled,
+    openDialog: appState.openDialog,
+    hoveredElementIds: appState.hoveredElementIds,
+    offsetLeft: appState.offsetLeft,
+    offsetTop: appState.offsetTop,
+    theme: appState.theme,
+    shouldCacheIgnoreZoom: appState.shouldCacheIgnoreZoom,
+    viewBackgroundColor: appState.viewBackgroundColor,
+    exportScale: appState.exportScale,
+    selectedElementsAreBeingDragged: appState.selectedElementsAreBeingDragged,
+    gridSize: appState.gridSize,
+    gridStep: appState.gridStep,
+    frameRendering: appState.frameRendering,
+    selectedElementIds: appState.selectedElementIds,
+    frameToHighlight: appState.frameToHighlight,
+    editingGroupId: appState.editingGroupId,
+    currentHoveredFontFamily: appState.currentHoveredFontFamily,
+    croppingElementId: appState.croppingElementId,
+  };
+
+  return relevantAppStateProps;
+};
 
 const areEqual = (
   prevProps: StaticCanvasProps,

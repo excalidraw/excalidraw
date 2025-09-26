@@ -3,19 +3,37 @@ import {
   FONT_FAMILY_FALLBACKS,
   CJK_HAND_DRAWN_FALLBACK_FONT,
   WINDOWS_EMOJI_FALLBACK_FONT,
-  isSafari,
   getFontFamilyFallbacks,
-} from "../constants";
-import { isTextElement } from "../element";
-import { charWidth, getContainerElement } from "../element/textElement";
-import { containsCJK } from "../element/textWrapping";
-import { ShapeCache } from "../scene/ShapeCache";
-import { getFontString, PromisePool, promiseTry } from "../utils";
-import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
+} from "@excalidraw/common";
+import { getContainerElement } from "@excalidraw/element";
+import { charWidth } from "@excalidraw/element";
+import { containsCJK } from "@excalidraw/element";
+
+import {
+  FONT_METADATA,
+  type FontMetadata,
+  getFontString,
+  PromisePool,
+  promiseTry,
+} from "@excalidraw/common";
+
+import { ShapeCache } from "@excalidraw/element";
+
+import { isTextElement } from "@excalidraw/element";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
+
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
+import type { Scene } from "@excalidraw/element";
 
 import { CascadiaFontFaces } from "./Cascadia";
 import { ComicShannsFontFaces } from "./ComicShanns";
 import { EmojiFontFaces } from "./Emoji";
+import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
 import { ExcalifontFontFaces } from "./Excalifont";
 import { HelveticaFontFaces } from "./Helvetica";
 import { LiberationFontFaces } from "./Liberation";
@@ -23,15 +41,6 @@ import { LilitaFontFaces } from "./Lilita";
 import { NunitoFontFaces } from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
-
-import { FONT_METADATA, type FontMetadata } from "./FontMetadata";
-import type {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  FontFamilyValues,
-} from "../element/types";
-import type Scene from "../scene/Scene";
-import type { ValueOf } from "../utility-types";
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
@@ -137,48 +146,26 @@ export class Fonts {
 
   /**
    * Load font faces for a given scene and trigger scene update.
-   *
-   * FontFaceSet loadingdone event we listen on may not always
-   * fire (looking at you Safari), so on init we manually load all
-   * fonts and rerender scene text elements once done.
-   *
-   * For Safari we make sure to check against each loaded font face
-   * with the unique characters per family in the scene,
-   * otherwise fonts might remain unloaded.
    */
   public loadSceneFonts = async (): Promise<FontFace[]> => {
     const sceneFamilies = this.getSceneFamilies();
-    const charsPerFamily = isSafari
-      ? Fonts.getCharsPerFamily(this.scene.getNonDeletedElements())
-      : undefined;
+    const charsPerFamily = Fonts.getCharsPerFamily(
+      this.scene.getNonDeletedElements(),
+    );
 
     return Fonts.loadFontFaces(sceneFamilies, charsPerFamily);
   };
 
   /**
    * Load font faces for passed elements - use when the scene is unavailable (i.e. export).
-   *
-   * For Safari we make sure to check against each loaded font face,
-   * with the unique characters per family in the elements
-   * otherwise fonts might remain unloaded.
    */
   public static loadElementsFonts = async (
     elements: readonly ExcalidrawElement[],
   ): Promise<FontFace[]> => {
     const fontFamilies = Fonts.getUniqueFamilies(elements);
-    const charsPerFamily = isSafari
-      ? Fonts.getCharsPerFamily(elements)
-      : undefined;
+    const charsPerFamily = Fonts.getCharsPerFamily(elements);
 
     return Fonts.loadFontFaces(fontFamilies, charsPerFamily);
-  };
-
-  /**
-   * Load all registered font faces.
-   */
-  public static loadAllFonts = async (): Promise<FontFace[]> => {
-    const allFamilies = Fonts.getAllFamilies();
-    return Fonts.loadFontFaces(allFamilies);
   };
 
   /**
@@ -223,7 +210,7 @@ export class Fonts {
 
   private static async loadFontFaces(
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
-    charsPerFamily?: Record<number, Set<string>>,
+    charsPerFamily: Record<number, Set<string>>,
   ) {
     // add all registered font faces into the `document.fonts` (if not added already)
     for (const { fontFaces, metadata } of Fonts.registered.values()) {
@@ -248,7 +235,7 @@ export class Fonts {
 
   private static *fontFacesLoader(
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
-    charsPerFamily?: Record<number, Set<string>>,
+    charsPerFamily: Record<number, Set<string>>,
   ): Generator<Promise<void | readonly [number, FontFace[]]>> {
     for (const [index, fontFamily] of fontFamilies.entries()) {
       const font = getFontString({
@@ -256,12 +243,9 @@ export class Fonts {
         fontSize: 16,
       });
 
-      // WARN: without "text" param it does not have to mean that all font faces are loaded, instead it could be just one!
-      // for Safari on init, we rather check with the "text" param, even though it's less efficient, as otherwise fonts might remain unloaded
-      const text =
-        isSafari && charsPerFamily
-          ? Fonts.getCharacters(charsPerFamily, fontFamily)
-          : "";
+      // WARN: without "text" param it does not have to mean that all font faces are loaded as it could be just one irrelevant font face!
+      // instead, we are always checking chars used in the family, so that no required font faces remain unloaded
+      const text = Fonts.getCharacters(charsPerFamily, fontFamily);
 
       if (!window.document.fonts.check(font, text)) {
         yield promiseTry(async () => {
@@ -478,37 +462,6 @@ export class Fonts {
     return Array.from(Fonts.registered.keys());
   }
 }
-
-/**
- * Calculates vertical offset for a text with alphabetic baseline.
- */
-export const getVerticalOffset = (
-  fontFamily: ExcalidrawTextElement["fontFamily"],
-  fontSize: ExcalidrawTextElement["fontSize"],
-  lineHeightPx: number,
-) => {
-  const { unitsPerEm, ascender, descender } =
-    Fonts.registered.get(fontFamily)?.metadata.metrics ||
-    FONT_METADATA[FONT_FAMILY.Virgil].metrics;
-
-  const fontSizeEm = fontSize / unitsPerEm;
-  const lineGap =
-    (lineHeightPx - fontSizeEm * ascender + fontSizeEm * descender) / 2;
-
-  const verticalOffset = fontSizeEm * ascender + lineGap;
-  return verticalOffset;
-};
-
-/**
- * Gets line height forr a selected family.
- */
-export const getLineHeight = (fontFamily: FontFamilyValues) => {
-  const { lineHeight } =
-    Fonts.registered.get(fontFamily)?.metadata.metrics ||
-    FONT_METADATA[FONT_FAMILY.Excalifont].metrics;
-
-  return lineHeight as ExcalidrawTextElement["lineHeight"];
-};
 
 export interface ExcalidrawFontFaceDescriptor {
   uri: string;
