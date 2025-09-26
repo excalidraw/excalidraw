@@ -27,6 +27,8 @@ import {
 } from '../lib/chat/config';
 import { generateSimpleHash } from '../lib/chat/hash';
 import { StreamingIndicator } from './ChatPanel/StreamingIndicator';
+import { MessageContentWithRefs } from './ChatPanel/InlineRefs';
+import { useCitationFocus } from '../hooks/useCitationFocus';
 
 
 
@@ -45,6 +47,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const [loadingPhase, setLoadingPhase] = useState<'idle' | 'planning' | 'executing'>('idle');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Citation focus hook
+  const { focusCitation } = useCitationFocus({ excalidrawAPI });
   const invitedRoomRef = useRef<string | null>(null);
   const chatPanelRef = useRef<HTMLDivElement>(null);
   const collabAPI = useAtomValue(collabAPIAtom);
@@ -1130,136 +1135,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     }
   };
 
-  // Handle citation chip click: focus PDF on canvas and optionally switch page
-  const handleCitationClick = async (citation: ChatCitation) => {
-    const detail: RAGFocusDetail = {
-      documentId: citation.documentId,
-      chunkId: citation.chunkId,
-      page: citation.page,
-      chunk_index: citation.chunk_index
-    };
-
-    try {
-      const { documentId, page } = detail;
-      if (isDev()) console.log('RAG citation focus requested:', detail);
-
-      // Get current scene elements
-      const elements = excalidrawAPI.getSceneElements();
-
-      // Find all PDF elements with matching documentId and prefer the topmost (last in array)
-      const matches = elements.filter((el: any) => el.type === 'image' && el.customData?.pdf?.documentId === documentId);
-      const pdfElement = matches.length > 0 ? matches[matches.length - 1] : null;
-
-      if (!pdfElement) {
-        excalidrawAPI.setToast({ message: 'Document not found on canvas', closable: true, duration: 3000 });
-        if (isDev()) console.warn('PDF document not found on canvas:', documentId, 'matches=', matches.length);
-        return;
-      }
-
-      // Center viewport on the element and select it
-      const elementCenter = { x: pdfElement.x + pdfElement.width / 2, y: pdfElement.y + pdfElement.height / 2 };
-      const appState = excalidrawAPI.getAppState();
-      const containerWidth = (appState as any)?.width || window.innerWidth;
-      const containerHeight = (appState as any)?.height || window.innerHeight;
-      const newAppState = {
-        ...appState,
-        scrollX: -elementCenter.x + (containerWidth / 2) / (appState.zoom?.value || 1),
-        scrollY: -elementCenter.y + (containerHeight / 2) / (appState.zoom?.value || 1),
-        selectedElementIds: { [pdfElement.id]: true } as const
-      };
-      excalidrawAPI.updateScene({ appState: newAppState });
-
-      // Switch to target page if specified and different
-      if (page && pdfElement.customData?.pdf?.page !== page) {
-        const { navigatePDFPage } = await import('../pdf/pdf-navigation-handler');
-        await navigatePDFPage(excalidrawAPI, pdfElement, page);
-      }
-
-      if (isDev()) console.log('RAG citation focus completed successfully');
-    } catch (error) {
-      const message = error instanceof Error && /Thumbnail not found/i.test(error.message)
-        ? 'Thumbnails missing for this PDF. Reopen/import the PDF to reindex.'
-        : 'Failed to focus citation';
-      excalidrawAPI.setToast({ message, closable: true, duration: 3000 });
-      if (isDev()) console.error('Error focusing RAG citation:', error);
-    }
-  };
-
-  // Render assistant content and make inline markers like 〖R:2〗 or 〖R:2, R:5〗 clickable.
-  // Each number maps to message.citations[index-1]. If mapping is missing, show plain text.
-  const renderContentWithInlineRefs = (message: ChatMessage): React.ReactNode => {
-    const text = message.content || '';
-    const citations = message.citations || [];
-
-    // Only enhance assistant messages
-    if (message.role !== 'assistant' || !text) return text;
-
-    const parts: React.ReactNode[] = [];
-    const regex = /〖([^〗]+)〗/g; // match full-width brackets content
-    let lastIndex = 0;
-    let match: RegExpExecArray | null;
-    let keyCounter = 0;
-
-    while ((match = regex.exec(text)) !== null) {
-      const before = text.slice(lastIndex, match.index);
-      if (before) parts.push(<span key={`t-${keyCounter++}`}>{before}</span>);
-
-      const inside = match[1];
-      // Extract all numbers inside, tolerate formats like "R:2, R:5" or "2,5"
-      const numbers = (inside.match(/\b\d+\b/g) || []).map(n => parseInt(n, 10)).filter(n => Number.isFinite(n));
-
-      if (numbers.length === 0 || citations.length === 0) {
-        // If no valid mapping, keep original marker text
-        parts.push(<span key={`m-${keyCounter++}`}>{match[0]}</span>);
-      } else {
-        parts.push(
-          <span key={`refs-${keyCounter++}`} style={{ display: 'inline-flex', gap: '4px', verticalAlign: 'baseline' }}>
-            {numbers.map((num, i) => {
-              const c = citations[num - 1];
-              if (!c) {
-                return <span key={`r-${num}-${i}`}>〖R:{num}〗</span>;
-              }
-              return (
-                <button
-                  key={`rbtn-${num}-${i}`}
-                  onClick={() => handleCitationClick(c)}
-                  title={`${c.snippet || ''}${c.page ? ` (Page ${c.page})` : ''}`}
-                  style={{
-                    padding: '0 6px',
-                    fontSize: '10px',
-                    fontFamily: 'Monaco, "Lucida Console", monospace',
-                    backgroundColor: '#fff',
-                    border: '1px solid #dadce0',
-                    borderRadius: '10px',
-                    cursor: 'pointer',
-                    color: '#1a73e8',
-                    lineHeight: 1.4
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#e8f0fe';
-                    e.currentTarget.style.borderColor = '#1a73e8';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#fff';
-                    e.currentTarget.style.borderColor = '#dadce0';
-                  }}
-                >
-                  R:{num}
-                </button>
-              );
-            })}
-          </span>
-        );
-      }
-
-      lastIndex = match.index + match[0].length;
-    }
-
-    const tail = text.slice(lastIndex);
-    if (tail) parts.push(<span key={`t-${keyCounter++}`}>{tail}</span>);
-
-    return parts;
-  };
 
   const clearHistory = async () => {
     try {
@@ -1456,7 +1331,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                   wordWrap: 'break-word'
                 }}
               >
-                {renderContentWithInlineRefs(message)}
+                <MessageContentWithRefs
+                  message={message}
+                  onCitationClick={focusCitation}
+                />
 
                 {/* Streaming indicator */}
                 {message.isStreaming && (
