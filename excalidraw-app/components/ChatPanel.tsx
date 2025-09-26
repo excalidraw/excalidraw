@@ -29,6 +29,9 @@ import { generateSimpleHash } from '../lib/chat/hash';
 import { StreamingIndicator } from './ChatPanel/StreamingIndicator';
 import { MessageContentWithRefs } from './ChatPanel/InlineRefs';
 import { useCitationFocus } from '../hooks/useCitationFocus';
+import { ChatHeader } from './ChatPanel/ChatHeader';
+import { ChatInputBar } from './ChatPanel/ChatInputBar';
+import { ChatMessagesList } from './ChatPanel/ChatMessagesList';
 
 
 
@@ -1079,12 +1082,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
 
   // Clipboard functionality with fallback
   const copyToClipboard = async (text: string): Promise<boolean> => {
