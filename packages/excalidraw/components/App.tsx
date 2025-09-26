@@ -41,9 +41,6 @@ import {
   LINE_CONFIRM_THRESHOLD,
   MAX_ALLOWED_FILE_BYTES,
   MIME_TYPES,
-  MQ_MAX_HEIGHT_LANDSCAPE,
-  MQ_MAX_WIDTH_LANDSCAPE,
-  MQ_MAX_WIDTH_PORTRAIT,
   MQ_RIGHT_SIDEBAR_MIN_WIDTH,
   POINTER_BUTTON,
   ROUNDNESS,
@@ -101,6 +98,13 @@ import {
   CLASSES,
   Emitter,
   MINIMUM_ARROW_SIZE,
+  DOUBLE_TAP_POSITION_THRESHOLD,
+  isMobileOrTablet,
+  MQ_MAX_MOBILE,
+  MQ_MIN_TABLET,
+  MQ_MAX_TABLET,
+  MQ_MAX_HEIGHT_LANDSCAPE,
+  MQ_MAX_WIDTH_LANDSCAPE,
 } from "@excalidraw/common";
 
 import {
@@ -233,6 +237,9 @@ import {
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
+  StoreDelta,
+  type ApplyToOptions,
+  positionElementsOnGrid,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -259,6 +266,7 @@ import type {
   MagicGenerationData,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
+  SceneElementsMap,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -318,7 +326,13 @@ import {
   isEraserActive,
   isHandToolActive,
 } from "../appState";
-import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
+import {
+  copyTextToSystemClipboard,
+  parseClipboard,
+  parseDataTransferEvent,
+  type ParsedDataTransferFile,
+} from "../clipboard";
+
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
@@ -340,7 +354,6 @@ import {
   generateIdFromFile,
   getDataURL,
   getDataURL_sync,
-  getFileFromEvent,
   ImageURLToFile,
   isImageFileHandle,
   isSupportedImageFile,
@@ -422,12 +435,14 @@ import { findShapeByKey } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
 
+import type { ExcalidrawLibraryIds } from "../data/types";
+
 import type {
   RenderInteractiveSceneCallback,
   ScrollBars,
 } from "../scene/types";
 
-import type { PastedMixedContent } from "../clipboard";
+import type { ClipboardData, PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
 import type { FileSystemHandle } from "../data/filesystem";
@@ -527,6 +542,7 @@ export const useExcalidrawActionManager = () =>
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
+let firstTapPosition: { x: number; y: number } | null = null;
 let isHoldingSpace: boolean = false;
 let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
@@ -650,9 +666,14 @@ class App extends React.Component<AppProps, AppState> {
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
+  defaultSelectionTool: "selection" | "lasso" = "selection";
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
+    this.defaultSelectionTool = isMobileOrTablet()
+      ? ("lasso" as const)
+      : ("selection" as const);
     const {
       excalidrawAPI,
       viewModeEnabled = false,
@@ -697,6 +718,7 @@ class App extends React.Component<AppProps, AppState> {
     if (excalidrawAPI) {
       const api: ExcalidrawImperativeAPI = {
         updateScene: this.updateScene,
+        applyDeltas: this.applyDeltas,
         mutateElement: this.mutateElement,
         updateLibrary: this.library.updateLibrary,
         addFiles: this.addFiles,
@@ -1602,7 +1624,8 @@ class App extends React.Component<AppProps, AppState> {
                           renderWelcomeScreen={
                             !this.state.isLoading &&
                             this.state.showWelcomeScreen &&
-                            this.state.activeTool.type === "selection" &&
+                            this.state.activeTool.type ===
+                              this.defaultSelectionTool &&
                             !this.state.zenModeEnabled &&
                             !this.scene.getElementsIncludingDeleted().length
                           }
@@ -2342,7 +2365,11 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-    const scene = restore(initialData, null, null, { repairBindings: true });
+    const scene = restore(initialData, null, null, {
+      repairBindings: true,
+      deleteInvisibleElements: true,
+    });
+    const activeTool = scene.appState.activeTool;
     scene.appState = {
       ...scene.appState,
       theme: this.props.theme || scene.appState.theme,
@@ -2352,8 +2379,13 @@ class App extends React.Component<AppProps, AppState> {
       // with a library install link, which should auto-open the library)
       openSidebar: scene.appState?.openSidebar || this.state.openSidebar,
       activeTool:
-        scene.appState.activeTool.type === "image"
-          ? { ...scene.appState.activeTool, type: "selection" }
+        activeTool.type === "image" ||
+        activeTool.type === "lasso" ||
+        activeTool.type === "selection"
+          ? {
+              ...activeTool,
+              type: this.defaultSelectionTool,
+            }
           : scene.appState.activeTool,
       isLoading: false,
       toast: this.state.toast,
@@ -2394,9 +2426,16 @@ class App extends React.Component<AppProps, AppState> {
 
   private isMobileBreakpoint = (width: number, height: number) => {
     return (
-      width < MQ_MAX_WIDTH_PORTRAIT ||
+      width <= MQ_MAX_MOBILE ||
       (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
     );
+  };
+
+  private isTabletBreakpoint = (editorWidth: number, editorHeight: number) => {
+    const minSide = Math.min(editorWidth, editorHeight);
+    const maxSide = Math.max(editorWidth, editorHeight);
+
+    return minSide >= MQ_MIN_TABLET && maxSide <= MQ_MAX_TABLET;
   };
 
   private refreshViewportBreakpoints = () => {
@@ -2405,14 +2444,14 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const { clientWidth: viewportWidth, clientHeight: viewportHeight } =
-      document.body;
+    const { width: editorWidth, height: editorHeight } =
+      container.getBoundingClientRect();
 
     const prevViewportState = this.device.viewport;
 
     const nextViewportState = updateObject(prevViewportState, {
-      isLandscape: viewportWidth > viewportHeight,
-      isMobile: this.isMobileBreakpoint(viewportWidth, viewportHeight),
+      isLandscape: editorWidth > editorHeight,
+      isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
     });
 
     if (prevViewportState !== nextViewportState) {
@@ -2441,6 +2480,17 @@ class App extends React.Component<AppProps, AppState> {
     const nextEditorState = updateObject(prevEditorState, {
       isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
       canFitSidebar: editorWidth > sidebarBreakpoint,
+    });
+
+    // also check if we need to update the app state
+    this.setState({
+      stylesPanelMode:
+        // NOTE: we could also remove the isMobileOrTablet check here and
+        // always switch to compact mode when the editor is narrow (e.g. < MQ_MIN_WIDTH_DESKTOP)
+        // but not too narrow (> MQ_MAX_WIDTH_MOBILE)
+        this.isTabletBreakpoint(editorWidth, editorHeight) && isMobileOrTablet()
+          ? "compact"
+          : "full",
     });
 
     if (prevEditorState !== nextEditorState) {
@@ -2959,6 +3009,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private static resetTapTwice() {
     didTapTwice = false;
+    firstTapPosition = null;
   }
 
   private onTouchStart = (event: TouchEvent) => {
@@ -2969,6 +3020,13 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!didTapTwice) {
       didTapTwice = true;
+
+      if (event.touches.length === 1) {
+        firstTapPosition = {
+          x: event.touches[0].clientX,
+          y: event.touches[0].clientY,
+        };
+      }
       clearTimeout(tappedTwiceTimer);
       tappedTwiceTimer = window.setTimeout(
         App.resetTapTwice,
@@ -2976,15 +3034,29 @@ class App extends React.Component<AppProps, AppState> {
       );
       return;
     }
-    // insert text only if we tapped twice with a single finger
+
+    // insert text only if we tapped twice with a single finger at approximately the same position
     // event.touches.length === 1 will also prevent inserting text when user's zooming
-    if (didTapTwice && event.touches.length === 1) {
+    if (didTapTwice && event.touches.length === 1 && firstTapPosition) {
       const touch = event.touches[0];
-      // @ts-ignore
-      this.handleCanvasDoubleClick({
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-      });
+      const distance = pointDistance(
+        pointFrom(touch.clientX, touch.clientY),
+        pointFrom(firstTapPosition.x, firstTapPosition.y),
+      );
+
+      // only create text if the second tap is within the threshold of the first tap
+      // this prevents accidental text creation during dragging/selection
+      if (distance <= DOUBLE_TAP_POSITION_THRESHOLD) {
+        // end lasso trail and deselect elements just in case
+        this.lassoTrail.endPath();
+        this.deselectElements();
+
+        // @ts-ignore
+        this.handleCanvasDoubleClick({
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+        });
+      }
       didTapTwice = false;
       clearTimeout(tappedTwiceTimer);
     }
@@ -3012,7 +3084,166 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  // TODO: this is so spaghetti, we should refactor it and cover it with tests
+  // TODO: Cover with tests
+  private async insertClipboardContent(
+    data: ClipboardData,
+    dataTransferFiles: ParsedDataTransferFile[],
+    isPlainPaste: boolean,
+  ) {
+    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+      {
+        clientX: this.lastViewportPosition.x,
+        clientY: this.lastViewportPosition.y,
+      },
+      this.state,
+    );
+
+    // ------------------- Error -------------------
+    if (data.errorMessage) {
+      this.setState({ errorMessage: data.errorMessage });
+      return;
+    }
+
+    // ------------------- Mixed content with no files -------------------
+    if (dataTransferFiles.length === 0 && !isPlainPaste && data.mixedContent) {
+      await this.addElementsFromMixedContentPaste(data.mixedContent, {
+        isPlainPaste,
+        sceneX,
+        sceneY,
+      });
+      return;
+    }
+
+    // ------------------- Spreadsheet -------------------
+    if (data.spreadsheet && !isPlainPaste) {
+      this.setState({
+        pasteDialog: {
+          data: data.spreadsheet,
+          shown: true,
+        },
+      });
+      return;
+    }
+
+    // ------------------- Images or SVG code -------------------
+    const imageFiles = dataTransferFiles.map((data) => data.file);
+
+    if (imageFiles.length === 0 && data.text && !isPlainPaste) {
+      const trimmedText = data.text.trim();
+      if (trimmedText.startsWith("<svg") && trimmedText.endsWith("</svg>")) {
+        // ignore SVG validation/normalization which will be done during image
+        // initialization
+        imageFiles.push(SVGStringToFile(trimmedText));
+      }
+    }
+
+    if (imageFiles.length > 0) {
+      if (this.isToolSupported("image")) {
+        await this.insertImages(imageFiles, sceneX, sceneY);
+      } else {
+        this.setState({ errorMessage: t("errors.imageToolNotSupported") });
+      }
+      return;
+    }
+
+    // ------------------- Elements -------------------
+    if (data.elements) {
+      const elements = (
+        data.programmaticAPI
+          ? convertToExcalidrawElements(
+              data.elements as ExcalidrawElementSkeleton[],
+            )
+          : data.elements
+      ) as readonly ExcalidrawElement[];
+      // TODO: remove formatting from elements if isPlainPaste
+      this.addElementsFromPasteOrLibrary({
+        elements,
+        files: data.files || null,
+        position: isMobileOrTablet() ? "center" : "cursor",
+        retainSeed: isPlainPaste,
+      });
+      return;
+    }
+
+    // ------------------- Only textual stuff remaining -------------------
+    if (!data.text) {
+      return;
+    }
+
+    // ------------------- Successful Mermaid -------------------
+    if (!isPlainPaste && isMaybeMermaidDefinition(data.text)) {
+      const api = await import("@excalidraw/mermaid-to-excalidraw");
+      try {
+        const { elements: skeletonElements, files } =
+          await api.parseMermaidToExcalidraw(data.text);
+
+        const elements = convertToExcalidrawElements(skeletonElements, {
+          regenerateIds: true,
+        });
+
+        this.addElementsFromPasteOrLibrary({
+          elements,
+          files,
+          position: isMobileOrTablet() ? "center" : "cursor",
+        });
+
+        return;
+      } catch (err: any) {
+        console.warn(
+          `parsing pasted text as mermaid definition failed: ${err.message}`,
+        );
+      }
+    }
+
+    // ------------------- Pure embeddable URLs -------------------
+    const nonEmptyLines = normalizeEOL(data.text)
+      .split(/\n+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const embbeddableUrls = nonEmptyLines
+      .map((str) => maybeParseEmbedSrc(str))
+      .filter(
+        (string) =>
+          embeddableURLValidator(string, this.props.validateEmbeddable) &&
+          (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(string) ||
+            getEmbedLink(string)?.type === "video"),
+      );
+
+    if (
+      !isPlainPaste &&
+      embbeddableUrls.length > 0 &&
+      embbeddableUrls.length === nonEmptyLines.length
+    ) {
+      const embeddables: NonDeleted<ExcalidrawEmbeddableElement>[] = [];
+      for (const url of embbeddableUrls) {
+        const prevEmbeddable: ExcalidrawEmbeddableElement | undefined =
+          embeddables[embeddables.length - 1];
+        const embeddable = this.insertEmbeddableElement({
+          sceneX: prevEmbeddable
+            ? prevEmbeddable.x + prevEmbeddable.width + 20
+            : sceneX,
+          sceneY,
+          link: normalizeLink(url),
+        });
+        if (embeddable) {
+          embeddables.push(embeddable);
+        }
+      }
+      if (embeddables.length) {
+        this.store.scheduleCapture();
+        this.setState({
+          selectedElementIds: Object.fromEntries(
+            embeddables.map((embeddable) => [embeddable.id, true]),
+          ),
+        });
+      }
+      return;
+    }
+
+    // ------------------- Text -------------------
+    this.addTextFromPaste(data.text, isPlainPaste);
+  }
+
   public pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent) => {
       const isPlainPaste = !!IS_PLAIN_PASTE;
@@ -3037,47 +3268,14 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-        {
-          clientX: this.lastViewportPosition.x,
-          clientY: this.lastViewportPosition.y,
-        },
-        this.state,
-      );
-
       // must be called in the same frame (thus before any awaits) as the paste
       // event else some browsers (FF...) will clear the clipboardData
       // (something something security)
-      let file = event?.clipboardData?.files[0];
-      const data = await parseClipboard(event, isPlainPaste);
-      if (!file && !isPlainPaste) {
-        if (data.mixedContent) {
-          return this.addElementsFromMixedContentPaste(data.mixedContent, {
-            isPlainPaste,
-            sceneX,
-            sceneY,
-          });
-        } else if (data.text) {
-          const string = data.text.trim();
-          if (string.startsWith("<svg") && string.endsWith("</svg>")) {
-            // ignore SVG validation/normalization which will be done during image
-            // initialization
-            file = SVGStringToFile(string);
-          }
-        }
-      }
+      const dataTransferList = await parseDataTransferEvent(event);
 
-      // prefer spreadsheet data over image file (MS Office/Libre Office)
-      if (isSupportedImageFile(file) && !data.spreadsheet) {
-        if (!this.isToolSupported("image")) {
-          this.setState({ errorMessage: t("errors.imageToolNotSupported") });
-          return;
-        }
+      const filesList = dataTransferList.getFiles();
 
-        this.createImageElement({ sceneX, sceneY, imageFile: file });
-
-        return;
-      }
+      const data = await parseClipboard(dataTransferList, isPlainPaste);
 
       if (this.props.onPaste) {
         try {
@@ -3089,106 +3287,9 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (data.errorMessage) {
-        this.setState({ errorMessage: data.errorMessage });
-      } else if (data.spreadsheet && !isPlainPaste) {
-        this.setState({
-          pasteDialog: {
-            data: data.spreadsheet,
-            shown: true,
-          },
-        });
-      } else if (data.elements) {
-        const elements = (
-          data.programmaticAPI
-            ? convertToExcalidrawElements(
-                data.elements as ExcalidrawElementSkeleton[],
-              )
-            : data.elements
-        ) as readonly ExcalidrawElement[];
-        // TODO remove formatting from elements if isPlainPaste
-        this.addElementsFromPasteOrLibrary({
-          elements,
-          files: data.files || null,
-          position: "cursor",
-          retainSeed: isPlainPaste,
-        });
-      } else if (data.text) {
-        if (data.text && isMaybeMermaidDefinition(data.text)) {
-          const api = await import("@excalidraw/mermaid-to-excalidraw");
+      await this.insertClipboardContent(data, filesList, isPlainPaste);
 
-          try {
-            const { elements: skeletonElements, files } =
-              await api.parseMermaidToExcalidraw(data.text);
-
-            const elements = convertToExcalidrawElements(skeletonElements, {
-              regenerateIds: true,
-            });
-
-            this.addElementsFromPasteOrLibrary({
-              elements,
-              files,
-              position: "cursor",
-            });
-
-            return;
-          } catch (err: any) {
-            console.warn(
-              `parsing pasted text as mermaid definition failed: ${err.message}`,
-            );
-          }
-        }
-
-        const nonEmptyLines = normalizeEOL(data.text)
-          .split(/\n+/)
-          .map((s) => s.trim())
-          .filter(Boolean);
-
-        const embbeddableUrls = nonEmptyLines
-          .map((str) => maybeParseEmbedSrc(str))
-          .filter((string) => {
-            return (
-              embeddableURLValidator(string, this.props.validateEmbeddable) &&
-              (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(string) ||
-                getEmbedLink(string)?.type === "video")
-            );
-          });
-
-        if (
-          !IS_PLAIN_PASTE &&
-          embbeddableUrls.length > 0 &&
-          // if there were non-embeddable text (lines) mixed in with embeddable
-          // urls, ignore and paste as text
-          embbeddableUrls.length === nonEmptyLines.length
-        ) {
-          const embeddables: NonDeleted<ExcalidrawEmbeddableElement>[] = [];
-          for (const url of embbeddableUrls) {
-            const prevEmbeddable: ExcalidrawEmbeddableElement | undefined =
-              embeddables[embeddables.length - 1];
-            const embeddable = this.insertEmbeddableElement({
-              sceneX: prevEmbeddable
-                ? prevEmbeddable.x + prevEmbeddable.width + 20
-                : sceneX,
-              sceneY,
-              link: normalizeLink(url),
-            });
-            if (embeddable) {
-              embeddables.push(embeddable);
-            }
-          }
-          if (embeddables.length) {
-            this.store.scheduleCapture();
-            this.setState({
-              selectedElementIds: Object.fromEntries(
-                embeddables.map((embeddable) => [embeddable.id, true]),
-              ),
-            });
-          }
-          return;
-        }
-        this.addTextFromPaste(data.text, isPlainPaste);
-      }
-      this.setActiveTool({ type: "selection" });
+      this.setActiveTool({ type: this.defaultSelectionTool }, true);
       event?.preventDefault();
     },
   );
@@ -3200,7 +3301,9 @@ class App extends React.Component<AppProps, AppState> {
     retainSeed?: boolean;
     fitToContent?: boolean;
   }) => {
-    const elements = restoreElements(opts.elements, null, undefined);
+    const elements = restoreElements(opts.elements, null, {
+      deleteInvisibleElements: true,
+    });
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;
@@ -3332,7 +3435,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.setActiveTool({ type: "selection" });
+    this.setActiveTool({ type: this.defaultSelectionTool }, true);
 
     if (opts.fitToContent) {
       this.scrollToContent(duplicatedElements, {
@@ -3375,45 +3478,11 @@ class App extends React.Component<AppProps, AppState> {
           }
         }),
       );
-      let y = sceneY;
-      let firstImageYOffsetDone = false;
-      const nextSelectedIds: Record<ExcalidrawElement["id"], true> = {};
-      for (const response of responses) {
-        if (response.file) {
-          const initializedImageElement = await this.createImageElement({
-            sceneX,
-            sceneY: y,
-            imageFile: response.file,
-          });
 
-          if (initializedImageElement) {
-            // vertically center first image in the batch
-            if (!firstImageYOffsetDone) {
-              firstImageYOffsetDone = true;
-              y -= initializedImageElement.height / 2;
-            }
-            // hack to reset the `y` coord because we vertically center during
-            // insertImageElement
-            this.scene.mutateElement(
-              initializedImageElement,
-              { y },
-              { informMutation: false, isDragging: false },
-            );
-
-            y = initializedImageElement.y + initializedImageElement.height + 25;
-
-            nextSelectedIds[initializedImageElement.id] = true;
-          }
-        }
-      }
-
-      this.setState({
-        selectedElementIds: makeNextSelectedElementIds(
-          nextSelectedIds,
-          this.state,
-        ),
-      });
-
+      const imageFiles = responses
+        .filter((response): response is { file: File } => !!response.file)
+        .map((response) => response.file);
+      await this.insertImages(imageFiles, sceneX, sceneY);
       const error = responses.find((response) => !!response.errorMessage);
       if (error && error.errorMessage) {
         this.setState({ errorMessage: error.errorMessage });
@@ -3578,7 +3647,7 @@ class App extends React.Component<AppProps, AppState> {
           ...updateActiveTool(
             this.state,
             prevState.activeTool.locked
-              ? { type: "selection" }
+              ? { type: this.defaultSelectionTool }
               : prevState.activeTool,
           ),
           locked: !prevState.activeTool.locked,
@@ -3932,6 +4001,27 @@ class App extends React.Component<AppProps, AppState> {
       }
     },
   );
+
+  public applyDeltas = (
+    deltas: StoreDelta[],
+    options?: ApplyToOptions,
+  ): [SceneElementsMap, AppState, boolean] => {
+    // squash all deltas together, starting with a fresh new delta instance
+    const aggregatedDelta = StoreDelta.squash(...deltas);
+
+    // create new instance of elements map & appState, so we don't accidentaly mutate existing ones
+    const nextAppState = { ...this.state };
+    const nextElements = new Map(
+      this.scene.getElementsMapIncludingDeleted(),
+    ) as SceneElementsMap;
+
+    return StoreDelta.applyTo(
+      aggregatedDelta,
+      nextElements,
+      nextAppState,
+      options,
+    );
+  };
 
   public mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     element: TElement,
@@ -4470,7 +4560,7 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
       ) {
-        const shape = findShapeByKey(event.key);
+        const shape = findShapeByKey(event.key, this);
         if (shape) {
           if (this.state.activeTool.type !== shape) {
             trackEvent(
@@ -4563,7 +4653,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
         if (this.state.activeTool.type === "laser") {
-          this.setActiveTool({ type: "selection" });
+          this.setActiveTool({ type: this.defaultSelectionTool });
         } else {
           this.setActiveTool({ type: "laser" });
         }
@@ -4729,7 +4819,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ suggestedBindings: [] });
     }
     if (nextActiveTool.type === "image") {
-      this.onImageAction();
+      this.onImageToolbarButtonClick();
     }
 
     this.setState((prevState) => {
@@ -4927,17 +5017,8 @@ class App extends React.Component<AppProps, AppState> {
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
         const isDeleted = !nextOriginalText.trim();
+        updateElement(nextOriginalText, isDeleted);
 
-        if (isDeleted && !isExistingElement) {
-          // let's just remove the element from the scene, as it's an empty just created text element
-          this.scene.replaceAllElements(
-            this.scene
-              .getElementsIncludingDeleted()
-              .filter((x) => x.id !== element.id),
-          );
-        } else {
-          updateElement(nextOriginalText, isDeleted);
-        }
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -4961,15 +5042,16 @@ class App extends React.Component<AppProps, AppState> {
             }));
           });
         }
+
         if (isDeleted) {
           fixBindingsAfterDeletion(this.scene.getNonDeletedElements(), [
             element,
           ]);
         }
 
-        // we need to record either way, whether the text element was added or removed
-        // since we need to sync this delta to other clients, otherwise it would end up with inconsistencies
-        this.store.scheduleCapture();
+        if (!isDeleted || isExistingElement) {
+          this.store.scheduleCapture();
+        }
 
         flushSync(() => {
           this.setState({
@@ -5416,7 +5498,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     // we should only be able to double click when mode is selection
-    if (this.state.activeTool.type !== "selection") {
+    if (this.state.activeTool.type !== this.defaultSelectionTool) {
       return;
     }
 
@@ -5708,8 +5790,9 @@ class App extends React.Component<AppProps, AppState> {
     const elementsMap = this.scene.getNonDeletedElementsMap();
     const frames = this.scene
       .getNonDeletedFramesLikes()
-      .filter((frame): frame is ExcalidrawFrameLikeElement =>
-        isCursorInFrame(sceneCoords, frame, elementsMap),
+      .filter(
+        (frame): frame is ExcalidrawFrameLikeElement =>
+          !frame.locked && isCursorInFrame(sceneCoords, frame, elementsMap),
       );
 
     return frames.length ? frames[frames.length - 1] : null;
@@ -6027,6 +6110,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       hasDeselectedButton ||
       (this.state.activeTool.type !== "selection" &&
+        this.state.activeTool.type !== "lasso" &&
         this.state.activeTool.type !== "text" &&
         this.state.activeTool.type !== "eraser")
     ) {
@@ -6189,7 +6273,12 @@ class App extends React.Component<AppProps, AppState> {
             !isElbowArrow(hitElement) ||
             !(hitElement.startBinding || hitElement.endBinding)
           ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            if (
+              this.state.activeTool.type !== "lasso" ||
+              selectedElements.length > 0
+            ) {
+              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            }
             if (this.state.activeEmbeddable?.state === "hover") {
               this.setState({ activeEmbeddable: null });
             }
@@ -6306,7 +6395,12 @@ class App extends React.Component<AppProps, AppState> {
             !isElbowArrow(element) ||
             !(element.startBinding || element.endBinding)
           ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            if (
+              this.state.activeTool.type !== "lasso" ||
+              Object.keys(this.state.selectedElementIds).length > 0
+            ) {
+              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+            }
           }
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
@@ -6315,7 +6409,12 @@ class App extends React.Component<AppProps, AppState> {
           !isElbowArrow(element) ||
           !(element.startBinding || element.endBinding)
         ) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          if (
+            this.state.activeTool.type !== "lasso" ||
+            Object.keys(this.state.selectedElementIds).length > 0
+          ) {
+            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          }
         }
       }
 
@@ -6577,11 +6676,117 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (this.state.activeTool.type === "lasso") {
-      this.lassoTrail.startPath(
-        pointerDownState.origin.x,
-        pointerDownState.origin.y,
-        event.shiftKey,
-      );
+      const hitSelectedElement =
+        pointerDownState.hit.element &&
+        this.isASelectedElement(pointerDownState.hit.element);
+
+      if (
+        !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
+        !pointerDownState.resize.handleType &&
+        !hitSelectedElement
+      ) {
+        this.lassoTrail.startPath(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          event.shiftKey,
+        );
+
+        // block dragging after lasso selection on PCs until the next pointer down
+        // (on mobile or tablet, we want to allow user to drag immediately)
+        pointerDownState.drag.blockDragging = !isMobileOrTablet();
+      }
+
+      // only for mobile or tablet, if we hit an element, select it immediately like normal selection
+      if (
+        isMobileOrTablet() &&
+        pointerDownState.hit.element &&
+        !hitSelectedElement
+      ) {
+        this.setState((prevState) => {
+          const nextSelectedElementIds: { [id: string]: true } = {
+            ...prevState.selectedElementIds,
+            [pointerDownState.hit.element!.id]: true,
+          };
+
+          const previouslySelectedElements: ExcalidrawElement[] = [];
+
+          Object.keys(prevState.selectedElementIds).forEach((id) => {
+            const element = this.scene.getElement(id);
+            element && previouslySelectedElements.push(element);
+          });
+
+          const hitElement = pointerDownState.hit.element!;
+
+          // if hitElement is frame-like, deselect all of its elements
+          // if they are selected
+          if (isFrameLikeElement(hitElement)) {
+            getFrameChildren(previouslySelectedElements, hitElement.id).forEach(
+              (element) => {
+                delete nextSelectedElementIds[element.id];
+              },
+            );
+          } else if (hitElement.frameId) {
+            // if hitElement is in a frame and its frame has been selected
+            // disable selection for the given element
+            if (nextSelectedElementIds[hitElement.frameId]) {
+              delete nextSelectedElementIds[hitElement.id];
+            }
+          } else {
+            // hitElement is neither a frame nor an element in a frame
+            // but since hitElement could be in a group with some frames
+            // this means selecting hitElement will have the frames selected as well
+            // because we want to keep the invariant:
+            // - frames and their elements are not selected at the same time
+            // we deselect elements in those frames that were previously selected
+
+            const groupIds = hitElement.groupIds;
+            const framesInGroups = new Set(
+              groupIds
+                .flatMap((gid) =>
+                  getElementsInGroup(this.scene.getNonDeletedElements(), gid),
+                )
+                .filter((element) => isFrameLikeElement(element))
+                .map((frame) => frame.id),
+            );
+
+            if (framesInGroups.size > 0) {
+              previouslySelectedElements.forEach((element) => {
+                if (element.frameId && framesInGroups.has(element.frameId)) {
+                  // deselect element and groups containing the element
+                  delete nextSelectedElementIds[element.id];
+                  element.groupIds
+                    .flatMap((gid) =>
+                      getElementsInGroup(
+                        this.scene.getNonDeletedElements(),
+                        gid,
+                      ),
+                    )
+                    .forEach((element) => {
+                      delete nextSelectedElementIds[element.id];
+                    });
+                }
+              });
+            }
+          }
+
+          return {
+            ...selectGroupsForSelectedElements(
+              {
+                editingGroupId: prevState.editingGroupId,
+                selectedElementIds: nextSelectedElementIds,
+              },
+              this.scene.getNonDeletedElements(),
+              prevState,
+              this,
+            ),
+            showHyperlinkPopup:
+              hitElement.link || isEmbeddableElement(hitElement)
+                ? "info"
+                : false,
+          };
+        });
+        pointerDownState.hit.wasAddedToSelection = true;
+      }
     } else if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
     } else if (
@@ -6961,6 +7166,7 @@ class App extends React.Component<AppProps, AppState> {
         hasOccurred: false,
         offset: null,
         origin: { ...origin },
+        blockDragging: false,
       },
       eventListeners: {
         onMove: null,
@@ -7036,7 +7242,10 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
-    if (this.state.activeTool.type === "selection") {
+    if (
+      this.state.activeTool.type === "selection" ||
+      this.state.activeTool.type === "lasso"
+    ) {
       const elements = this.scene.getNonDeletedElements();
       const elementsMap = this.scene.getNonDeletedElementsMap();
       const selectedElements = this.scene.getSelectedElements(this.state);
@@ -7045,6 +7254,16 @@ class App extends React.Component<AppProps, AppState> {
         selectedElements.length === 1 &&
         !this.state.selectedLinearElement?.isEditing &&
         !isElbowArrow(selectedElements[0]) &&
+        !(
+          isLineElement(selectedElements[0]) &&
+          LinearElementEditor.getPointIndexUnderCursor(
+            selectedElements[0],
+            elementsMap,
+            this.state.zoom,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ) !== -1
+        ) &&
         !(
           this.state.selectedLinearElement &&
           this.state.selectedLinearElement.hoverPointIndex !== -1
@@ -7243,7 +7462,18 @@ class App extends React.Component<AppProps, AppState> {
           // on CMD/CTRL, drill down to hit element regardless of groups etc.
           if (event[KEYS.CTRL_OR_CMD]) {
             if (event.altKey) {
-              // ctrl + alt means we're lasso selecting
+              // ctrl + alt means we're lasso selecting - start lasso trail and switch to lasso tool
+
+              // Close any open dialogs that might interfere with lasso selection
+              if (this.state.openDialog?.name === "elementLinkSelector") {
+                this.setOpenDialog(null);
+              }
+              this.lassoTrail.startPath(
+                pointerDownState.origin.x,
+                pointerDownState.origin.y,
+                event.shiftKey,
+              );
+              this.setActiveTool({ type: "lasso", fromSelection: true });
               return false;
             }
             if (!this.state.selectedElementIds[hitElement.id]) {
@@ -7464,7 +7694,9 @@ class App extends React.Component<AppProps, AppState> {
     resetCursor(this.interactiveCanvas);
     if (!this.state.activeTool.locked) {
       this.setState({
-        activeTool: updateActiveTool(this.state, { type: "selection" }),
+        activeTool: updateActiveTool(this.state, {
+          type: this.defaultSelectionTool,
+        }),
       });
     }
   };
@@ -7631,16 +7863,14 @@ class App extends React.Component<AppProps, AppState> {
     return element;
   };
 
-  private createImageElement = async ({
+  private newImagePlaceholder = ({
     sceneX,
     sceneY,
     addToFrameUnderCursor = true,
-    imageFile,
   }: {
     sceneX: number;
     sceneY: number;
     addToFrameUnderCursor?: boolean;
-    imageFile: File;
   }) => {
     const [gridX, gridY] = getGridPoint(
       sceneX,
@@ -7659,7 +7889,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const placeholderSize = 100 / this.state.zoom.value;
 
-    const placeholderImageElement = newImageElement({
+    return newImageElement({
       type: "image",
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
@@ -7676,13 +7906,6 @@ class App extends React.Component<AppProps, AppState> {
       width: placeholderSize,
       height: placeholderSize,
     });
-
-    const initializedImageElement = await this.insertImageElement(
-      placeholderImageElement,
-      imageFile,
-    );
-
-    return initializedImageElement;
   };
 
   private handleLinearElementOnPointerDown = (
@@ -8248,15 +8471,18 @@ class App extends React.Component<AppProps, AppState> {
         event.shiftKey &&
         this.state.selectedLinearElement.elementId ===
           pointerDownState.hit.element?.id;
+
       if (
         (hasHitASelectedElement ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
         !isSelectingPointsInLineEditor &&
-        this.state.activeTool.type !== "lasso"
+        !pointerDownState.drag.blockDragging
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
-
-        if (selectedElements.every((element) => element.locked)) {
+        if (
+          selectedElements.length > 0 &&
+          selectedElements.every((element) => element.locked)
+        ) {
           return;
         }
 
@@ -8276,6 +8502,29 @@ class App extends React.Component<AppProps, AppState> {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
         pointerDownState.drag.hasOccurred = true;
+
+        // prevent immediate dragging during lasso selection to avoid element displacement
+        // only allow dragging if we're not in the middle of lasso selection
+        // (on mobile, allow dragging if we hit an element)
+        if (
+          this.state.activeTool.type === "lasso" &&
+          this.lassoTrail.hasCurrentTrail &&
+          !(isMobileOrTablet() && pointerDownState.hit.element) &&
+          !this.state.activeTool.fromSelection
+        ) {
+          return;
+        }
+
+        // Clear lasso trail when starting to drag selected elements with lasso tool
+        // Only clear if we're actually dragging (not during lasso selection)
+        if (
+          this.state.activeTool.type === "lasso" &&
+          selectedElements.length > 0 &&
+          pointerDownState.drag.hasOccurred &&
+          !this.state.activeTool.fromSelection
+        ) {
+          this.lassoTrail.endPath();
+        }
 
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
@@ -8871,6 +9120,7 @@ class App extends React.Component<AppProps, AppState> {
   ): (event: PointerEvent) => void {
     return withBatchedUpdates((childEvent: PointerEvent) => {
       this.removePointer(childEvent);
+      pointerDownState.drag.blockDragging = false;
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
       }
@@ -9159,7 +9409,7 @@ class App extends React.Component<AppProps, AppState> {
             this.setState((prevState) => ({
               newElement: null,
               activeTool: updateActiveTool(this.state, {
-                type: "selection",
+                type: this.defaultSelectionTool,
               }),
               selectedElementIds: makeNextSelectedElementIds(
                 {
@@ -9775,7 +10025,9 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           newElement: null,
           suggestedBindings: [],
-          activeTool: updateActiveTool(this.state, { type: "selection" }),
+          activeTool: updateActiveTool(this.state, {
+            type: this.defaultSelectionTool,
+          }),
         });
       } else {
         this.setState({
@@ -9975,64 +10227,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  /**
-   * inserts image into elements array and rerenders
-   */
-  private insertImageElement = async (
-    placeholderImageElement: ExcalidrawImageElement,
-    imageFile: File,
-  ) => {
-    // we should be handling all cases upstream, but in case we forget to handle
-    // a future case, let's throw here
-    if (!this.isToolSupported("image")) {
-      this.setState({ errorMessage: t("errors.imageToolNotSupported") });
-      return;
-    }
-
-    this.scene.insertElement(placeholderImageElement);
-
-    try {
-      const initializedImageElement = await this.initializeImage(
-        placeholderImageElement,
-        imageFile,
-      );
-
-      const nextElements = this.scene
-        .getElementsIncludingDeleted()
-        .map((element) => {
-          if (element.id === initializedImageElement.id) {
-            return initializedImageElement;
-          }
-
-          return element;
-        });
-
-      this.updateScene({
-        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        elements: nextElements,
-        appState: {
-          selectedElementIds: makeNextSelectedElementIds(
-            { [initializedImageElement.id]: true },
-            this.state,
-          ),
-        },
-      });
-
-      return initializedImageElement;
-    } catch (error: any) {
-      this.store.scheduleAction(CaptureUpdateAction.NEVER);
-      this.scene.mutateElement(placeholderImageElement, {
-        isDeleted: true,
-      });
-      this.actionManager.executeAction(actionFinalize);
-      this.setState({
-        errorMessage: error.message || t("errors.imageInsertError"),
-      });
-      return null;
-    }
-  };
-
-  private onImageAction = async () => {
+  private onImageToolbarButtonClick = async () => {
     try {
       const clientX = this.state.width / 2 + this.state.offsetLeft;
       const clientY = this.state.height / 2 + this.state.offsetTop;
@@ -10042,24 +10237,15 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
-      const imageFile = await fileOpen({
+      const imageFiles = await fileOpen({
         description: "Image",
         extensions: Object.keys(
           IMAGE_MIME_TYPES,
         ) as (keyof typeof IMAGE_MIME_TYPES)[],
+        multiple: true,
       });
 
-      await this.createImageElement({
-        sceneX: x,
-        sceneY: y,
-        addToFrameUnderCursor: false,
-        imageFile,
-      });
-
-      // avoid being batched (just in case)
-      this.setState({}, () => {
-        this.actionManager.executeAction(actionFinalize);
-      });
+      this.insertImages(imageFiles, x, y);
     } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error(error);
@@ -10069,7 +10255,9 @@ class App extends React.Component<AppProps, AppState> {
       this.setState(
         {
           newElement: null,
-          activeTool: updateActiveTool(this.state, { type: "selection" }),
+          activeTool: updateActiveTool(this.state, {
+            type: this.defaultSelectionTool,
+          }),
         },
         () => {
           this.actionManager.executeAction(actionFinalize);
@@ -10121,7 +10309,7 @@ class App extends React.Component<AppProps, AppState> {
     if (erroredFiles.size) {
       this.store.scheduleAction(CaptureUpdateAction.NEVER);
       this.scene.replaceAllElements(
-        elements.map((element) => {
+        this.scene.getElementsIncludingDeleted().map((element) => {
           if (
             isInitializedImageElement(element) &&
             erroredFiles.has(element.fileId)
@@ -10254,84 +10442,174 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private insertImages = async (
+    imageFiles: File[],
+    sceneX: number,
+    sceneY: number,
+  ) => {
+    const gridPadding = 50 / this.state.zoom.value;
+    // Create, position, and insert placeholders
+    const placeholders = positionElementsOnGrid(
+      imageFiles.map(() => this.newImagePlaceholder({ sceneX, sceneY })),
+      sceneX,
+      sceneY,
+      gridPadding,
+    );
+    placeholders.forEach((el) => this.scene.insertElement(el));
+
+    // Create, position, insert and select initialized (replacing placeholders)
+    const initialized = await Promise.all(
+      placeholders.map(async (placeholder, i) => {
+        try {
+          return await this.initializeImage(
+            placeholder,
+            await normalizeFile(imageFiles[i]),
+          );
+        } catch (error: any) {
+          this.setState({
+            errorMessage: error.message || t("errors.imageInsertError"),
+          });
+          return newElementWith(placeholder, { isDeleted: true });
+        }
+      }),
+    );
+    const initializedMap = arrayToMap(initialized);
+
+    const positioned = positionElementsOnGrid(
+      initialized.filter((el) => !el.isDeleted),
+      sceneX,
+      sceneY,
+      gridPadding,
+    );
+    const positionedMap = arrayToMap(positioned);
+
+    const nextElements = this.scene
+      .getElementsIncludingDeleted()
+      .map((el) => positionedMap.get(el.id) ?? initializedMap.get(el.id) ?? el);
+
+    this.updateScene({
+      appState: {
+        selectedElementIds: makeNextSelectedElementIds(
+          Object.fromEntries(positioned.map((el) => [el.id, true])),
+          this.state,
+        ),
+      },
+      elements: nextElements,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+
+    this.setState({}, () => {
+      // actionFinalize after all state values have been updated
+      this.actionManager.executeAction(actionFinalize);
+    });
+  };
+
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
-    // must be retrieved first, in the same frame
-    const { file, fileHandle } = await getFileFromEvent(event);
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
       this.state,
     );
+    const dataTransferList = await parseDataTransferEvent(event);
 
-    try {
-      // if image tool not supported, don't show an error here and let it fall
-      // through so we still support importing scene data from images. If no
-      // scene data encoded, we'll show an error then
-      if (isSupportedImageFile(file) && this.isToolSupported("image")) {
-        // first attempt to decode scene from the image if it's embedded
-        // ---------------------------------------------------------------------
+    // must be retrieved first, in the same frame
+    const fileItems = dataTransferList.getFiles();
 
-        if (file?.type === MIME_TYPES.png || file?.type === MIME_TYPES.svg) {
-          try {
-            const scene = await loadFromBlob(
-              file,
-              this.state,
-              this.scene.getElementsIncludingDeleted(),
-              fileHandle,
-            );
-            this.syncActionResult({
-              ...scene,
-              appState: {
-                ...(scene.appState || this.state),
-                isLoading: false,
-              },
-              replaceFiles: true,
-              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-            });
-            return;
-          } catch (error: any) {
-            // Don't throw for image scene daa
-            if (error.name !== "EncodingError") {
-              throw new Error(t("alerts.couldNotLoadInvalidFile"));
-            }
+    if (fileItems.length === 1) {
+      const { file, fileHandle } = fileItems[0];
+
+      if (
+        file &&
+        (file.type === MIME_TYPES.png || file.type === MIME_TYPES.svg)
+      ) {
+        try {
+          const scene = await loadFromBlob(
+            file,
+            this.state,
+            this.scene.getElementsIncludingDeleted(),
+            fileHandle,
+          );
+          this.syncActionResult({
+            ...scene,
+            appState: {
+              ...(scene.appState || this.state),
+              isLoading: false,
+            },
+            replaceFiles: true,
+            captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          });
+          return;
+        } catch (error: any) {
+          if (error.name !== "EncodingError") {
+            throw new Error(t("alerts.couldNotLoadInvalidFile"));
           }
+          // if EncodingError, fall through to insert as regular image
         }
-
-        // if no scene is embedded or we fail for whatever reason, fall back
-        // to importing as regular image
-        // ---------------------------------------------------------------------
-        this.createImageElement({ sceneX, sceneY, imageFile: file });
-
-        return;
       }
-    } catch (error: any) {
-      return this.setState({
-        isLoading: false,
-        errorMessage: error.message,
-      });
     }
 
-    const libraryJSON = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
-    if (libraryJSON && typeof libraryJSON === "string") {
+    const imageFiles = fileItems
+      .map((data) => data.file)
+      .filter((file) => isSupportedImageFile(file));
+
+    if (imageFiles.length > 0 && this.isToolSupported("image")) {
+      return this.insertImages(imageFiles, sceneX, sceneY);
+    }
+    const excalidrawLibrary_ids = dataTransferList.getData(
+      MIME_TYPES.excalidrawlibIds,
+    );
+    const excalidrawLibrary_data = dataTransferList.getData(
+      MIME_TYPES.excalidrawlib,
+    );
+    if (excalidrawLibrary_ids || excalidrawLibrary_data) {
       try {
-        const libraryItems = parseLibraryJSON(libraryJSON);
-        this.addElementsFromPasteOrLibrary({
-          elements: distributeLibraryItemsOnSquareGrid(libraryItems),
-          position: event,
-          files: null,
-        });
+        let libraryItems: LibraryItems | null = null;
+        if (excalidrawLibrary_ids) {
+          const { itemIds } = JSON.parse(
+            excalidrawLibrary_ids,
+          ) as ExcalidrawLibraryIds;
+          const allLibraryItems = await this.library.getLatestLibrary();
+          libraryItems = allLibraryItems.filter((item) =>
+            itemIds.includes(item.id),
+          );
+          // legacy library dataTransfer format
+        } else if (excalidrawLibrary_data) {
+          libraryItems = parseLibraryJSON(excalidrawLibrary_data);
+        }
+        if (libraryItems?.length) {
+          libraryItems = libraryItems.map((item) => ({
+            ...item,
+            // #6465
+            elements: duplicateElements({
+              type: "everything",
+              elements: item.elements,
+              randomizeSeed: true,
+            }).duplicatedElements,
+          }));
+
+          this.addElementsFromPasteOrLibrary({
+            elements: distributeLibraryItemsOnSquareGrid(libraryItems),
+            position: event,
+            files: null,
+          });
+        }
       } catch (error: any) {
         this.setState({ errorMessage: error.message });
       }
       return;
     }
 
-    if (file) {
-      // Attempt to parse an excalidraw/excalidrawlib file
-      await this.loadFileToCanvas(file, fileHandle);
+    if (fileItems.length > 0) {
+      const { file, fileHandle } = fileItems[0];
+      if (file) {
+        // Attempt to parse an excalidraw/excalidrawlib file
+        await this.loadFileToCanvas(file, fileHandle);
+      }
     }
 
-    if (event.dataTransfer?.types?.includes("text/plain")) {
-      const text = event.dataTransfer?.getData("text");
+    const textItem = dataTransferList.findByType(MIME_TYPES.text);
+
+    if (textItem) {
+      const text = textItem.value;
       if (
         text &&
         embeddableURLValidator(text, this.props.validateEmbeddable) &&
@@ -10442,7 +10720,7 @@ class App extends React.Component<AppProps, AppState> {
           event.nativeEvent.pointerType === "pen" &&
           // always allow if user uses a pen secondary button
           event.button !== POINTER_BUTTON.SECONDARY)) &&
-      this.state.activeTool.type !== "selection"
+      this.state.activeTool.type !== this.defaultSelectionTool
     ) {
       return;
     }

@@ -96,6 +96,8 @@ export const getMimeType = (blob: Blob | string): string => {
     return MIME_TYPES.jpg;
   } else if (/\.svg$/.test(name)) {
     return MIME_TYPES.svg;
+  } else if (/\.excalidrawlib$/.test(name)) {
+    return MIME_TYPES.excalidrawlib;
   } else if (/\.pdf$/.test(name)) {
     return "application/pdf";
   }

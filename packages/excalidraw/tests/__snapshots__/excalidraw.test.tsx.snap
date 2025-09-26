@@ -688,6 +688,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
               aria-haspopup="dialog"
               aria-label="Canvas background"
               class="color-picker__button active-color properties-trigger has-outline"
+              data-openpopup="canvasBackground"
               data-state="closed"
               style="--swatch-color: #ffffff;"
               title="Show background color picker"
