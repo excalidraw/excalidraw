@@ -1,7 +1,14 @@
 import rough from "roughjs/bin/rough";
 import { getStroke } from "perfect-freehand";
 
-import { isRightAngleRads } from "@excalidraw/math";
+import {
+  type GlobalPoint,
+  isRightAngleRads,
+  lineSegment,
+  pointFrom,
+  pointRotateRads,
+  type Radians,
+} from "@excalidraw/math";
 
 import {
   BOUND_TEXT_PADDING,
@@ -14,6 +21,7 @@ import {
   getFontString,
   isRTL,
   getVerticalOffset,
+  invariant,
 } from "@excalidraw/common";
 
 import type {
@@ -32,7 +40,7 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "@excalidraw/excalidraw/scene/types";
 
-import { getElementAbsoluteCoords } from "./bounds";
+import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
@@ -1039,6 +1047,66 @@ export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
 }
 
 export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
+  return getSvgPathFromStroke(getFreedrawOutlinePoints(element));
+}
+
+export function getFreedrawOutlineAsSegments(
+  element: ExcalidrawFreeDrawElement,
+  points: [number, number][],
+  elementsMap: ElementsMap,
+) {
+  const bounds = getElementBounds(
+    {
+      ...element,
+      angle: 0 as Radians,
+    },
+    elementsMap,
+  );
+  const center = pointFrom<GlobalPoint>(
+    (bounds[0] + bounds[2]) / 2,
+    (bounds[1] + bounds[3]) / 2,
+  );
+
+  invariant(points.length >= 2, "Freepath outline must have at least 2 points");
+
+  return points.slice(2).reduce(
+    (acc, curr) => {
+      acc.push(
+        lineSegment<GlobalPoint>(
+          acc[acc.length - 1][1],
+          pointRotateRads(
+            pointFrom<GlobalPoint>(curr[0] + element.x, curr[1] + element.y),
+            center,
+            element.angle,
+          ),
+        ),
+      );
+      return acc;
+    },
+    [
+      lineSegment<GlobalPoint>(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            points[0][0] + element.x,
+            points[0][1] + element.y,
+          ),
+          center,
+          element.angle,
+        ),
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            points[1][0] + element.x,
+            points[1][1] + element.y,
+          ),
+          center,
+          element.angle,
+        ),
+      ),
+    ],
+  );
+}
+
+export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement) {
   // If input points are empty (should they ever be?) return a dot
   const inputPoints = element.simulatePressure
     ? element.points
@@ -1057,7 +1125,7 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
   };
 
-  return getSvgPathFromStroke(getStroke(inputPoints as number[][], options));
+  return getStroke(inputPoints as number[][], options) as [number, number][];
 }
 
 function med(A: number[], B: number[]) {

@@ -129,6 +129,7 @@ export const CLASSES = {
   ZOOM_ACTIONS: "zoom-actions",
   SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
   CONVERT_ELEMENT_TYPE_POPUP: "ConvertElementTypePopup",
+  SHAPE_ACTIONS_THEME_SCOPE: "shape-actions-theme-scope",
 };
 
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
@@ -259,13 +260,20 @@ export const IMAGE_MIME_TYPES = {
   jfif: "image/jfif",
 } as const;
 
-export const MIME_TYPES = {
+export const STRING_MIME_TYPES = {
   text: "text/plain",
   html: "text/html",
   json: "application/json",
   // excalidraw data
   excalidraw: "application/vnd.excalidraw+json",
+  // LEGACY: fully-qualified library JSON data
   excalidrawlib: "application/vnd.excalidrawlib+json",
+  // list of excalidraw library item ids
+  excalidrawlibIds: "application/vnd.excalidrawlib.ids+json",
+} as const;
+
+export const MIME_TYPES = {
+  ...STRING_MIME_TYPES,
   // image-encoded excalidraw data
   "excalidraw.svg": "image/svg+xml",
   "excalidraw.png": "image/png",
@@ -342,10 +350,20 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
 
 // breakpoints
 // -----------------------------------------------------------------------------
-// md screen
-export const MQ_MAX_WIDTH_PORTRAIT = 730;
+
+// mobile: up to 699px
+export const MQ_MAX_MOBILE = 599;
+
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
 export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
+
+// tablets
+export const MQ_MIN_TABLET = MQ_MAX_MOBILE + 1; // lower bound (excludes phones)
+export const MQ_MAX_TABLET = 1400; // upper bound (excludes laptops/desktops)
+
+// desktop/laptop
+export const MQ_MIN_WIDTH_DESKTOP = 1440;
+
 // sidebar
 export const MQ_RIGHT_SIDEBAR_MIN_WIDTH = 1229;
 // -----------------------------------------------------------------------------
