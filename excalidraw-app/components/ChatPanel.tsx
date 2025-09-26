@@ -26,8 +26,6 @@ import {
   isStreamingSupported
 } from '../lib/chat/config';
 import { generateSimpleHash } from '../lib/chat/hash';
-import { StreamingIndicator } from './ChatPanel/StreamingIndicator';
-import { MessageContentWithRefs } from './ChatPanel/InlineRefs';
 import { useCitationFocus } from '../hooks/useCitationFocus';
 import { ChatHeader } from './ChatPanel/ChatHeader';
 import { ChatInputBar } from './ChatPanel/ChatInputBar';
@@ -49,7 +47,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const [isInvitingAI, setIsInvitingAI] = useState(false);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const [loadingPhase, setLoadingPhase] = useState<'idle' | 'planning' | 'executing'>('idle');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Citation focus hook
   const { focusCitation } = useCitationFocus({ excalidrawAPI });
@@ -85,10 +82,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   // Resolve LLM service base URL from env or window at runtime
   const LLM_BASE_URL = getLLMBaseURL();
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   // Check service health on mount
   useEffect(() => {
@@ -1174,380 +1167,39 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           100% { transform: rotate(360deg); }
         }
       `}</style>
-      {/* Header */}
-      <div style={{
-        padding: '16px 20px',
-        backgroundColor: '#f8f9fa',
-        borderBottom: '1px solid #ddd',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        minHeight: '60px' // Ensure header has good height
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontWeight: 600 }}>AI Assistant</span>
-          <div style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            backgroundColor: isConnected ? '#28a745' : '#dc3545'
-          }} title={isConnected ? 'Connected' : 'Disconnected'} />
-        </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          {streamingState.isActive && (
-            <button
-              onClick={cleanupStreaming}
-              style={{
-                padding: '4px 8px',
-                backgroundColor: '#dc3545',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
-              title="Cancel streaming"
-            >
-              Cancel
-            </button>
-          )}
-          {!aiInvited && (
-            <button
-              onClick={inviteAI}
-              disabled={isInvitingAI || !collabAPI}
-              style={{
-                padding: '4px 8px',
-                backgroundColor: isInvitingAI ? '#ccc' : '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: isInvitingAI ? 'not-allowed' : 'pointer',
-                fontSize: '12px'
-              }}
-              title="Invite AI to collaborate on canvas"
-            >
-              {isInvitingAI ? 'Inviting...' : '+ AI'}
-            </button>
-          )}
-          {aiInvited && (
-            <span style={{
-              padding: '4px 8px',
-              backgroundColor: aiSyncStatus === 'synced' ? '#28a745' : '#6c757d',
-              color: 'white',
-              borderRadius: '4px',
-              fontSize: '12px'
-            }}
-            title={
-              aiSyncStatus === 'synced' ? 'AI is collaborating on the canvas' : 'AI sync status unknown'
-            }>
-              {aiSyncStatus === 'synced' ? '✓ AI Active' : '? AI Status'}
-            </span>
-          )}
-          <button
-            onClick={clearHistory}
-            style={{
-              padding: '4px 8px',
-              backgroundColor: 'transparent',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '12px'
-            }}
-            title="Clear History"
-          >
-            Clear
-          </button>
-          <button
-            onClick={onToggle}
-            style={{
-              padding: '4px 8px',
-              backgroundColor: 'transparent',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '12px'
-            }}
-            title="Close Chat"
-          >
-            ✕
-          </button>
-        </div>
-      </div>
+      <ChatHeader
+        isConnected={isConnected}
+        streamingState={streamingState}
+        aiInvited={aiInvited}
+        isInvitingAI={isInvitingAI}
+        aiSyncStatus={aiSyncStatus}
+        onCancel={cleanupStreaming}
+        onInviteAI={inviteAI}
+        onClearHistory={clearHistory}
+        onClose={onToggle}
+        hasCollabAPI={Boolean(collabAPI)}
+      />
 
-      {/* Messages */}
-      <div style={{
-        flex: 1,
-        padding: '20px',
-        overflowY: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px'
-      }}>
-        {messages.length === 0 && (
-          <div style={{
-            textAlign: 'center',
-            color: '#6c757d',
-            fontSize: '14px',
-            padding: '20px'
-          }}>
-            {!aiInvited ? (
-              <>
-                Click "+ AI" above to invite the AI assistant to collaborate on your canvas.
-                <br />
-                <small>The AI will join as a real collaborator and can create/modify elements.</small>
-              </>
-            ) : (
-              <>
-                AI assistant is now collaborating on your canvas!
-                <br />
-                <small>Pure collaboration mode active</small>
-                <br />
-                Try: "Create a blue rectangle" or "Add a text box saying 'Hello'"
-              </>
-            )}
-          </div>
-        )}
+      <ChatMessagesList
+        messages={messages}
+        onCitationClick={focusCitation}
+        onCopy={handleCopy}
+        copiedMessageId={copiedMessageId}
+        streamingState={streamingState}
+        isLoading={isLoading}
+        isStreamingMessageActive={isStreamingMessageActive}
+        loadingPhase={loadingPhase}
+        aiInvited={aiInvited}
+        error={error}
+      />
 
-        {messages.map((message) => {
-          return (
-            <div
-              key={message.id}
-              style={{
-                alignSelf: message.role === 'user' ? 'flex-end' : 'flex-start',
-                maxWidth: '80%'
-              }}
-            >
-              <div
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: '12px',
-                  backgroundColor: message.role === 'user' ? '#007bff' : '#f8f9fa',
-                  color: message.role === 'user' ? 'white' : '#333',
-                  fontSize: '14px',
-                  lineHeight: 1.4,
-                  wordWrap: 'break-word'
-                }}
-              >
-                <MessageContentWithRefs
-                  message={message}
-                  onCitationClick={focusCitation}
-                />
-
-                {/* Streaming indicator */}
-                {message.isStreaming && (
-                  <div style={{
-                    marginTop: '8px',
-                    color: '#6c757d'
-                  }}>
-                    <StreamingIndicator
-                      phase={streamingState.phase}
-                      currentToolName={streamingState.currentToolName}
-                      currentMessage={streamingState.currentMessage}
-                      isCompact={true}
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* References block removed: inline 〖R:n〗 markers are now clickable instead */}
-              {!message.isStreaming && (
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginTop: '4px'
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: '11px',
-                      color: '#6c757d',
-                      textAlign: message.role === 'user' ? 'right' : 'left'
-                    }}
-                  >
-                    {formatTimestamp(message.timestamp)}
-                    {message.role === 'assistant' && (() => {
-                      const timingParts: string[] = [];
-                      if (typeof message.planningDurationMs === 'number') {
-                        timingParts.push(`planning ${formatDuration(message.planningDurationMs)}`);
-                      }
-                      if (typeof message.executionDurationMs === 'number') {
-                        timingParts.push(`execution ${formatDuration(message.executionDurationMs)}`);
-                      }
-                      if (timingParts.length === 0 && typeof message.durationMs === 'number') {
-                        timingParts.push(`total ${formatDuration(message.durationMs)}`);
-                      }
-                      if (timingParts.length === 0) {
-                        return null;
-                      }
-                      return <span style={{ marginLeft: 6 }}>· {timingParts.join(' · ')}</span>;
-                    })()}
-                  </div>
-                  {message.role === 'assistant' && (
-                    <button
-                      onClick={() => handleCopy(message)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleCopy(message);
-                        }
-                      }}
-                      aria-label="Copy reply"
-                      title="Copy reply"
-                      style={{
-                        padding: '4px 8px',
-                        border: '1px solid #ddd',
-                        background: '#fff',
-                        cursor: 'pointer',
-                        fontSize: '11px',
-                        borderRadius: '4px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        color: '#6c757d',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#f8f9fa';
-                        e.currentTarget.style.borderColor = '#007bff';
-                        e.currentTarget.style.color = '#007bff';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#fff';
-                        e.currentTarget.style.borderColor = '#ddd';
-                        e.currentTarget.style.color = '#6c757d';
-                      }}
-                    >
-                      {copiedMessageId === message.id ? (
-                        <>
-                          <span>✓</span>
-                          <span>Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                          </svg>
-                          <span>Copy</span>
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-
-        {isLoading && !isStreamingMessageActive && (() => {
-          const streamingLabels = streamingState.isActive
-            ? getStreamingIndicatorLabels(streamingState)
-            : null;
-          const loaderLabel = streamingLabels
-            ? streamingLabels.label
-            : loadingPhase === 'planning'
-              ? 'Planning...'
-              : 'Executing...';
-          const loaderSubLabel = streamingLabels?.subLabel;
-
-          return (
-          <div style={{
-            alignSelf: 'flex-start',
-            maxWidth: '80%'
-          }}>
-            <div
-              role="status"
-              aria-live="polite"
-              aria-label={loaderLabel}
-              style={{
-                padding: '10px 14px',
-                borderRadius: '12px',
-                backgroundColor: '#f8f9fa',
-                color: '#6c757d'
-              }}
-            >
-              {streamingState.isActive ? (
-                <StreamingIndicator
-                  phase={streamingState.phase}
-                  currentToolName={streamingState.currentToolName}
-                  currentMessage={streamingState.currentMessage}
-                  isCompact={false}
-                />
-              ) : (
-                <StreamingIndicator
-                  phase={loadingPhase === 'planning' ? 'planning' : 'toolExecution'}
-                  currentToolName={undefined}
-                  currentMessage={undefined}
-                  isCompact={false}
-                />
-              )}
-            </div>
-          </div>
-          );
-        })()}
-
-        {error && (
-          <div style={{
-            padding: '8px 12px',
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
-            borderRadius: '6px',
-            fontSize: '13px',
-            border: '1px solid #f5c6cb'
-          }}>
-            Error: {error}
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input */}
-      <div style={{
-        padding: '16px 20px',
-        borderTop: '1px solid #ddd',
-        backgroundColor: '#f8f9fa'
-      }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <textarea
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={isConnected ? "Type your message..." : "Service disconnected"}
-            disabled={!isConnected || isLoading}
-            style={{
-              flex: 1,
-              padding: '8px 12px',
-              border: '1px solid #ddd',
-              borderRadius: '6px',
-              resize: 'none',
-              fontSize: '14px',
-              minHeight: '36px',
-              maxHeight: '100px',
-              fontFamily: 'inherit'
-            }}
-            rows={1}
-          />
-          <button
-            onClick={sendMessage}
-            disabled={!inputMessage.trim() || !isConnected || isLoading}
-            style={{
-              padding: '8px 12px',
-              backgroundColor: (!inputMessage.trim() || !isConnected || isLoading) ? '#ccc' : '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: (!inputMessage.trim() || !isConnected || isLoading) ? 'not-allowed' : 'pointer',
-              fontSize: '14px',
-              minWidth: '60px'
-            }}
-          >
-            Send
-          </button>
-        </div>
-      </div>
+      <ChatInputBar
+        value={inputMessage}
+        onChange={setInputMessage}
+        onSend={sendMessage}
+        disabled={!isConnected || isLoading}
+        placeholder={isConnected ? "Type your message..." : "Service disconnected"}
+      />
     </div>
   );
 };
