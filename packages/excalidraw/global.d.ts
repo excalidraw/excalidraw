@@ -101,7 +101,10 @@ declare module "image-blob-reduce" {
 
 interface CustomMatchers {
   toBeNonNaNNumber(): void;
-  toCloselyEqualPoints(points: readonly [number, number][]): void;
+  toCloselyEqualPoints(
+    points: readonly [number, number][],
+    precision?: number,
+  ): void;
 }
 
 declare namespace jest {
