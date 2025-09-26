@@ -53,6 +53,8 @@ const MainMenu = Object.assign(
               onSelect={composeEventHandlers(onSelect, () => {
                 setAppState({ openMenu: null });
               })}
+              placement="bottom"
+              className={device.editor.isMobile ? "main-menu-dropdown" : ""}
             >
               {children}
               {device.editor.isMobile && appState.collaborators.size > 0 && (

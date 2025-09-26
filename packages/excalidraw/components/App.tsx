@@ -666,14 +666,9 @@ class App extends React.Component<AppProps, AppState> {
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
-  defaultSelectionTool: "selection" | "lasso" = "selection";
-
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
-    this.defaultSelectionTool = isMobileOrTablet()
-      ? ("lasso" as const)
-      : ("selection" as const);
     const {
       excalidrawAPI,
       viewModeEnabled = false,
@@ -1625,7 +1620,7 @@ class App extends React.Component<AppProps, AppState> {
                             !this.state.isLoading &&
                             this.state.showWelcomeScreen &&
                             this.state.activeTool.type ===
-                              this.defaultSelectionTool &&
+                              this.state.preferredSelectionTool &&
                             !this.state.zenModeEnabled &&
                             !this.scene.getElementsIncludingDeleted().length
                           }
@@ -2384,12 +2379,13 @@ class App extends React.Component<AppProps, AppState> {
         activeTool.type === "selection"
           ? {
               ...activeTool,
-              type: this.defaultSelectionTool,
+              type: scene.appState.preferredSelectionTool,
             }
           : scene.appState.activeTool,
       isLoading: false,
       toast: this.state.toast,
     };
+
     if (initialData?.scrollToContent) {
       scene.appState = {
         ...scene.appState,
@@ -2490,6 +2486,8 @@ class App extends React.Component<AppProps, AppState> {
         // but not too narrow (> MQ_MAX_WIDTH_MOBILE)
         this.isTabletBreakpoint(editorWidth, editorHeight) && isMobileOrTablet()
           ? "compact"
+          : this.isMobileBreakpoint(editorWidth, editorHeight)
+          ? "mobile"
           : "full",
     });
 
@@ -3289,7 +3287,7 @@ class App extends React.Component<AppProps, AppState> {
 
       await this.insertClipboardContent(data, filesList, isPlainPaste);
 
-      this.setActiveTool({ type: this.defaultSelectionTool }, true);
+      this.setActiveTool({ type: this.state.preferredSelectionTool }, true);
       event?.preventDefault();
     },
   );
@@ -3435,7 +3433,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.setActiveTool({ type: this.defaultSelectionTool }, true);
+    this.setActiveTool({ type: this.state.preferredSelectionTool }, true);
 
     if (opts.fitToContent) {
       this.scrollToContent(duplicatedElements, {
@@ -3647,7 +3645,7 @@ class App extends React.Component<AppProps, AppState> {
           ...updateActiveTool(
             this.state,
             prevState.activeTool.locked
-              ? { type: this.defaultSelectionTool }
+              ? { type: this.state.preferredSelectionTool }
               : prevState.activeTool,
           ),
           locked: !prevState.activeTool.locked,
@@ -3989,7 +3987,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (appState) {
-        this.setState(appState);
+        this.setState({
+          ...appState,
+          // keep existing stylesPanelMode as it needs to be preserved
+          // or set at startup
+          stylesPanelMode: this.state.stylesPanelMode,
+        } as Pick<AppState, K> | null);
       }
 
       if (elements) {
@@ -4653,7 +4656,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
         if (this.state.activeTool.type === "laser") {
-          this.setActiveTool({ type: this.defaultSelectionTool });
+          this.setActiveTool({ type: this.state.preferredSelectionTool });
         } else {
           this.setActiveTool({ type: "laser" });
         }
@@ -5498,7 +5501,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     // we should only be able to double click when mode is selection
-    if (this.state.activeTool.type !== this.defaultSelectionTool) {
+    if (this.state.activeTool.type !== this.state.preferredSelectionTool) {
       return;
     }
 
@@ -6489,6 +6492,10 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.snapLines) {
       this.setAppState({ snapLines: [] });
+    }
+
+    if (this.state.openPopup) {
+      this.setState({ openPopup: null });
     }
 
     this.updateGestureOnPointerDown(event);
@@ -7695,7 +7702,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.state.activeTool.locked) {
       this.setState({
         activeTool: updateActiveTool(this.state, {
-          type: this.defaultSelectionTool,
+          type: this.state.preferredSelectionTool,
         }),
       });
     }
@@ -9409,7 +9416,7 @@ class App extends React.Component<AppProps, AppState> {
             this.setState((prevState) => ({
               newElement: null,
               activeTool: updateActiveTool(this.state, {
-                type: this.defaultSelectionTool,
+                type: this.state.preferredSelectionTool,
               }),
               selectedElementIds: makeNextSelectedElementIds(
                 {
@@ -10026,7 +10033,7 @@ class App extends React.Component<AppProps, AppState> {
           newElement: null,
           suggestedBindings: [],
           activeTool: updateActiveTool(this.state, {
-            type: this.defaultSelectionTool,
+            type: this.state.preferredSelectionTool,
           }),
         });
       } else {
@@ -10256,7 +10263,7 @@ class App extends React.Component<AppProps, AppState> {
         {
           newElement: null,
           activeTool: updateActiveTool(this.state, {
-            type: this.defaultSelectionTool,
+            type: this.state.preferredSelectionTool,
           }),
         },
         () => {
@@ -10720,7 +10727,7 @@ class App extends React.Component<AppProps, AppState> {
           event.nativeEvent.pointerType === "pen" &&
           // always allow if user uses a pen secondary button
           event.button !== POINTER_BUTTON.SECONDARY)) &&
-      this.state.activeTool.type !== this.defaultSelectionTool
+      this.state.activeTool.type !== this.state.preferredSelectionTool
     ) {
       return;
     }
