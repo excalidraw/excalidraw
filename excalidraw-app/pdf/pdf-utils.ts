@@ -135,18 +135,14 @@ async function renderPdfPage(
 
     const renderContext = {
       // OffscreenCanvasRenderingContext2D is acceptable for pdf.js renderer
-      canvasContext: context,
+      canvasContext: context as any, // Cast to avoid TS compatibility issues with pdf.js
       viewport: page.getViewport({ scale }),
       intent: 'print',
-    } as {
-      canvasContext: OffscreenCanvasRenderingContext2D;
-      viewport: unknown;
-      intent: 'print';
     };
 
     await page.render(renderContext).promise;
 
-    const blob = await canvas.convertToBlob({
+    const blob = await (canvas as any).convertToBlob({
       quality: 0.85,
       type: 'image/jpeg'
     });
