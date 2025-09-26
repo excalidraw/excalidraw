@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 /**
  * Simple Chat Panel Component
- * 
+ *
  * A clean, simple chat interface for communicating with the LLM service.
  * Avoids complex type dependencies and focuses on core functionality.
  */
@@ -13,69 +13,27 @@ import { useAtomValue } from '../app-jotai';
 import { collabAPIAtom } from '../collab/Collab';
 import { getCollaborationLinkData } from '../data';
 import { exportToCanvas } from '@excalidraw/excalidraw';
+import type { ChatPanelProps, ChatMessage, ChatCitation, StreamingState } from '../lib/chat/types';
+import { formatTimestamp, formatDuration, getExecutionInfoLines } from '../lib/chat/format';
+import {
+  getLLMBaseURL,
+  getStreamingFeatureFlag,
+  getThumbnailEnabled,
+  getMaxThumbnailDim,
+  getThumbnailQuality,
+  getMaxThumbnailBytes,
+  isDev,
+  isStreamingSupported
+} from '../lib/chat/config';
+import { generateSimpleHash } from '../lib/chat/hash';
+import { StreamingIndicator } from './ChatPanel/StreamingIndicator';
 
-interface ChatPanelProps {
-  excalidrawAPI: ExcalidrawImperativeAPI;
-  isVisible?: boolean;
-  onToggle: () => void;
-}
 
-interface ChatCitation {
-  index: number;
-  documentId: string;
-  chunkId: string;
-  page?: number;
-  chunk_index?: number;
-  source?: string;
-  snippet?: string;
-}
 
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: string;
-  durationMs?: number;
-  planningDurationMs?: number;
-  executionDurationMs?: number;
-  citations?: ChatCitation[];
-  executionInfo?: {
-    tools?: string[];
-    useRAG?: boolean;
-    needsSnapshot?: boolean;
-    planningDurationMs?: number;
-    executionDurationMs?: number;
-    totalDurationMs?: number;
-  };
-}
-
-// Simple hash function for content deduplication
-const generateSimpleHash = async (data: string): Promise<string> => {
-  if (typeof crypto !== 'undefined' && crypto.subtle) {
-    try {
-      const encoder = new TextEncoder();
-      const buffer = await crypto.subtle.digest('SHA-1', encoder.encode(data));
-      const hashArray = Array.from(new Uint8Array(buffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    } catch {
-      // Fallback to simple hash if crypto API fails
-    }
-  }
-  
-  // Simple rolling hash fallback
-  let hash = 0;
-  for (let i = 0; i < data.length; i++) {
-    const char = data.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
-  }
-  return Math.abs(hash).toString(16);
-};
-
-const ChatPanel: React.FC<ChatPanelProps> = ({ 
-  excalidrawAPI, 
-  isVisible = true, 
-  onToggle 
+const ChatPanel: React.FC<ChatPanelProps> = ({
+  excalidrawAPI,
+  isVisible = true,
+  onToggle
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -90,17 +48,34 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const invitedRoomRef = useRef<string | null>(null);
   const chatPanelRef = useRef<HTMLDivElement>(null);
   const collabAPI = useAtomValue(collabAPIAtom);
-  
+  const streamClosedRef = useRef<boolean>(false);
+  const lastActiveToolRef = useRef<string | undefined>(undefined);
+  const uiIndicatorLogRef = useRef<string>('');
+  const responseGenTimerRef = useRef<number | undefined>(undefined);
+  const activeAssistantMessageIdRef = useRef<string | null>(null);
+  const planningAbortControllerRef = useRef<AbortController | null>(null);
+
   // Simplified AI sync status
   const [aiSyncStatus, setAiSyncStatus] = useState<'unknown' | 'synced'>('unknown');
 
-  // Resolve LLM service base URL from env or window at runtime (typed via vite/client)
-  const LLM_BASE_URL: string = (
-    import.meta.env?.VITE_LLM_SERVICE_URL ??
-    (window as any)?.__EXCALIDRAW_LLM_SERVICE_URL ??
-    (window as any)?.__LLM_SERVICE_URL ??
-    'http://localhost:3001'
-  );
+   // Streaming state
+  const [streamingState, setStreamingState] = useState<StreamingState>({
+    isActive: false,
+    phase: 'idle',
+    currentMessage: undefined,
+    currentToolName: undefined
+  });
+  const isStreamingMessageActive = messages.some((msg) => msg.isStreaming);
+
+  // Check if streaming is enabled
+  const streamingEnabled = getStreamingFeatureFlag();
+
+  if (streamingEnabled && !isStreamingSupported()) {
+    console.warn('Streaming is enabled but EventSource is not available in this environment. Falling back to non-streaming execution.');
+  }
+
+  // Resolve LLM service base URL from env or window at runtime
+  const LLM_BASE_URL = getLLMBaseURL();
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -117,11 +92,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   // Manual AI invitation function
   const inviteAI = async () => {
     if (!collabAPI || isInvitingAI) return;
-    
+
     setIsInvitingAI(true);
     try {
       let roomId, roomKey;
-      
+
       // Check if already in a collaboration session
       if (collabAPI.isCollaborating()) {
         const activeLink = collabAPI.getActiveRoomLink?.() || window.location.href;
@@ -129,28 +104,28 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         if (linkData) {
           roomId = linkData.roomId;
           roomKey = linkData.roomKey;
-          if (import.meta.env.DEV) console.log('Using existing collaboration room for AI:', { roomId });
+          if (isDev()) console.log('Using existing collaboration room for AI:', { roomId });
         }
       }
-      
+
       // If no existing collaboration, start a new collaboration session
       if (!roomId || !roomKey) {
-        if (import.meta.env.DEV) console.log('Starting new collaboration session for AI chat');
-        
+        if (isDev()) console.log('Starting new collaboration session for AI chat');
+
         // Start collaboration - this will create roomId and roomKey automatically
         const scene = await collabAPI.startCollaboration(null);
-        
+
         // Wait a moment for collaboration to initialize
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
         // Now get the collaboration link data
         const activeLink = collabAPI.getActiveRoomLink?.() || window.location.href;
         const linkData = getCollaborationLinkData(activeLink);
-        
+
         if (linkData) {
           roomId = linkData.roomId;
           roomKey = linkData.roomKey;
-          if (import.meta.env.DEV) console.log('Created new collaboration session for AI:', { roomId });
+          if (isDev()) console.log('Created new collaboration session for AI:', { roomId });
         } else {
           throw new Error('Failed to get collaboration link data after starting collaboration');
         }
@@ -163,14 +138,14 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomId, roomKey, username })
       });
-      
+
       if (resp.ok) {
         invitedRoomRef.current = roomId;
         setAiInvited(true);
-        if (import.meta.env.DEV) console.log('AI bot successfully registered for collaboration room:', roomId);
-        
+        if (isDev()) console.log('AI bot successfully registered for collaboration room:', roomId);
+
         // AI bot maintains its own scene state through collaboration
-        if (import.meta.env.DEV) console.log('AI bot registered - no manual sync needed in pure collaboration mode');
+        if (isDev()) console.log('AI bot registered - no manual sync needed in pure collaboration mode');
         setAiSyncStatus('synced');
 
         // Force a one-time full-scene sync and viewport broadcast so the bot has
@@ -180,21 +155,21 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           const elements = excalidrawAPI.getSceneElementsIncludingDeleted();
           if (collabAPI) {
             await collabAPI.syncElements(elements as any);
-            if (import.meta.env.DEV) console.log('Forced full-scene sync broadcast to AI bot');
+            if (isDev()) console.log('Forced full-scene sync broadcast to AI bot');
             collabAPI.broadcastViewport(true);
-            if (import.meta.env.DEV) console.log('Forced viewport broadcast to AI bot');
+            if (isDev()) console.log('Forced viewport broadcast to AI bot');
           } else {
-            if (import.meta.env.DEV) console.warn('Collab API unavailable; skipped forced sync and viewport broadcast');
+            if (isDev()) console.warn('Collab API unavailable; skipped forced sync and viewport broadcast');
           }
         } catch (syncErr) {
-          if (import.meta.env.DEV) console.warn('Failed to force initial sync/viewport broadcast to AI bot:', syncErr);
+          if (isDev()) console.warn('Failed to force initial sync/viewport broadcast to AI bot:', syncErr);
         }
-        
+
       } else {
         throw new Error(`Failed to register AI bot: ${await resp.text()}`);
       }
     } catch (err) {
-      if (import.meta.env.DEV) console.error('Failed to invite AI to collaboration:', err);
+      if (isDev()) console.error('Failed to invite AI to collaboration:', err);
       setError(`Failed to invite AI: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsInvitingAI(false);
@@ -205,16 +180,23 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   useEffect(() => {
     const autoInviteIfNeeded = async () => {
       if (!isVisible || !collabAPI || aiInvited) return;
-      
+
       // Auto-invite: start collaboration + invite AI when chat opens
-      if (import.meta.env.DEV) console.log('Chat opened - auto-inviting AI with collaboration');
+      if (isDev()) console.log('Chat opened - auto-inviting AI with collaboration');
       await inviteAI();
     };
-    
+
     if (isVisible && collabAPI) {
       setTimeout(autoInviteIfNeeded, 100);
     }
   }, [isVisible, collabAPI, aiInvited]);
+
+  // Cleanup streaming on unmount
+  useEffect(() => {
+    return () => {
+      cleanupStreaming();
+    };
+  }, []);
 
   // No cleanup needed - pure collaboration mode
 
@@ -225,7 +207,597 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       setIsConnected(data.status === 'healthy');
     } catch (err) {
       setIsConnected(false);
-      if (import.meta.env.DEV) console.error('Failed to check service health:', err);
+      if (isDev()) console.error('Failed to check service health:', err);
+    }
+  };
+
+  // Cleanup streaming resources
+  const cleanupStreaming = (options: { skipClose?: boolean } = {}) => {
+    const { skipClose = false } = options;
+
+    streamClosedRef.current = true;
+
+    setStreamingState(prev => {
+      if (prev.eventSource && !skipClose) {
+        if (isDev()) {
+          console.log('🔄 Streaming cleanup initiated', {
+            streamId: prev.streamId,
+            phase: prev.phase,
+            timestamp: new Date().toISOString()
+          });
+        }
+
+        prev.eventSource.close();
+
+        // The server will detect connection close and automatically abort execution
+        // via the AbortController mechanism - no additional cancellation request needed
+      }
+      // Clear any pending response-generation debounce
+      if (responseGenTimerRef.current) {
+        clearTimeout(responseGenTimerRef.current);
+        responseGenTimerRef.current = undefined;
+      }
+      lastActiveToolRef.current = undefined;
+
+      // Abort planning request if in progress
+      if (planningAbortControllerRef.current) {
+        try {
+          planningAbortControllerRef.current.abort();
+          if (isDev()) console.log('🛑 Planning fetch aborted');
+        } catch {}
+        planningAbortControllerRef.current = null;
+      }
+
+      // Stop spinner on the active assistant message
+      if (activeAssistantMessageIdRef.current) {
+        const targetId = activeAssistantMessageIdRef.current;
+        setMessages(prev => prev.map(msg =>
+          msg.id === targetId ? { ...msg, isStreaming: false } : msg
+        ));
+        activeAssistantMessageIdRef.current = null;
+      }
+
+      return {
+        isActive: false,
+        phase: 'idle',
+        currentMessage: undefined,
+        currentToolName: undefined,
+        eventSource: undefined,
+        streamId: undefined
+      } satisfies StreamingState;
+    });
+
+    setIsLoading(false);
+    setLoadingPhase('idle');
+  };
+
+  // Handle streaming message execution
+  const sendStreamingMessage = async (userMessage: ChatMessage) => {
+    const startTs = performance.now ? performance.now() : Date.now();
+    let assistantMessageId: string | null = null;
+    let eventSourceRefLocal: EventSource | null = null;
+
+    try {
+      streamClosedRef.current = false;
+      // Step 0: Plan the message before streaming
+      setStreamingState({
+        isActive: true,
+        phase: 'planning',
+        currentMessage: undefined,
+        currentToolName: undefined
+      });
+
+      const planAbortController = new AbortController();
+      planningAbortControllerRef.current = planAbortController;
+      const planResponse = await fetch(`${LLM_BASE_URL}/api/chat/plan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userMessage.content,
+          sessionId: 'default'
+        }),
+        signal: planAbortController.signal
+      });
+
+      let planData: any = null;
+      try {
+        planData = await planResponse.json();
+      } catch {
+        planData = null;
+      }
+
+      if (!planResponse.ok || !planData?.success || !planData?.plan) {
+        const planError = planData?.error || `Planning failed with status ${planResponse.status}`;
+        setError(planError);
+        cleanupStreaming({ skipClose: true });
+        setIsLoading(false);
+        setLoadingPhase('idle');
+        return;
+      }
+
+      // Clear planning abort controller now that we have a response
+      planningAbortControllerRef.current = null;
+
+      const planPayload = planData.plan;
+      setLoadingPhase('executing');
+
+      // Phase 1: Initialize streaming context
+      setStreamingState({
+        isActive: true,
+        phase: 'initializing',
+        currentMessage: undefined,
+        currentToolName: undefined
+      });
+
+      // Build request body (similar to non-streaming version)
+      const elements = excalidrawAPI.getSceneElements();
+      const appState = excalidrawAPI.getAppState();
+
+      const canvasContext = {
+        elements: elements.length > 0 ? elements.slice(0, 50) : [],
+        selection: {
+          selectedElementIds: appState.selectedElementIds,
+          count: Object.keys(appState.selectedElementIds).length
+        }
+      };
+
+      let roomId, roomKey;
+      try {
+        const linkData = getCollaborationLinkData(window.location.href);
+        if (linkData) {
+          roomId = linkData.roomId;
+          roomKey = linkData.roomKey;
+        }
+      } catch (err) {
+        if (isDev()) console.warn('Could not extract room info for streaming:', err);
+      }
+
+      // Generate snapshots (simplified for streaming)
+      let snapshots: { fullCanvas?: string; selection?: string; thumbnail?: string; thumbnailHash?: string } = {};
+      try {
+        const thumbnailEnabled = getThumbnailEnabled();
+
+        if (thumbnailEnabled && elements.length > 0) {
+          const { exportToCanvas } = await import('@excalidraw/excalidraw');
+          const thumbnailCanvas = await exportToCanvas({
+            elements: elements,
+            appState: { ...appState, exportBackground: true },
+            files: excalidrawAPI.getFiles(),
+            maxWidthOrHeight: 512,
+          });
+          snapshots.thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.5);
+        }
+      } catch (err) {
+        if (isDev()) console.warn('Failed to generate streaming snapshots:', err);
+      }
+
+      const initRequestBody = {
+        message: userMessage.content,
+        sessionId: 'default',
+        plan: planPayload,
+        canvas: canvasContext,
+        snapshots,
+        roomId,
+        roomKey
+      };
+
+      // Step 1: Initialize streaming execution
+      const initResponse = await fetch(`${LLM_BASE_URL}/api/chat/exec/stream/init`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(initRequestBody),
+      });
+
+      if (!initResponse.ok) {
+        throw new Error(`Failed to initialize stream: ${initResponse.status}`);
+      }
+
+      const initData = await initResponse.json();
+      const streamId = initData.streamId;
+
+      if (!streamId) {
+        throw new Error('No stream ID received from initialization');
+      }
+
+      // Step 2: Open EventSource connection
+      const eventSourceUrl = `${LLM_BASE_URL}/api/chat/exec/stream/${streamId}`;
+      const eventSource = new EventSource(eventSourceUrl);
+      eventSourceRefLocal = eventSource;
+
+      setStreamingState(prev => ({ ...prev, eventSource, streamId }));
+
+      // Create assistant message placeholder
+      assistantMessageId = (Date.now() + 1).toString();
+      activeAssistantMessageIdRef.current = assistantMessageId;
+      const assistantMessage: ChatMessage = {
+        id: assistantMessageId,
+        role: 'assistant',
+        content: '',
+        timestamp: new Date().toISOString(),
+        isStreaming: true,
+        toolCalls: []
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+
+      // Stream lifecycle telemetry
+      const streamTelemetry = {
+        streamId,
+        startTime: Date.now(),
+        events: []
+      };
+
+      const logEvent = (eventType: string, data?: any) => {
+        const timestamp = Date.now();
+        streamTelemetry.events.push({
+          type: eventType,
+          timestamp,
+          duration: timestamp - streamTelemetry.startTime,
+          data
+        });
+
+        if (isDev()) {
+          console.log(`📡 [${eventType}]`, {
+            streamId,
+            elapsed: `${timestamp - streamTelemetry.startTime}ms`,
+            data
+          });
+        }
+      };
+
+      // Handle streaming events
+      eventSource.onmessage = (event) => {
+        logEvent('message', { type: event.type });
+      };
+
+      eventSource.addEventListener('connected', (event) => {
+        const data = JSON.parse(event.data);
+        logEvent('connected', { heartbeatInterval: data.heartbeatInterval });
+      });
+
+      eventSource.addEventListener('planAccepted', (event) => {
+        const data = JSON.parse(event.data);
+        setStreamingState(prev => ({
+          ...prev,
+          phase: 'planning',
+          currentToolName: undefined,
+          currentMessage: undefined
+        }));
+        logEvent('planAccepted', { planTools: data.plan?.tools?.length || 0 });
+      });
+
+      eventSource.addEventListener('progress', (event) => {
+        const data = JSON.parse(event.data);
+        // Debounce responseGeneration so we don't flash it right before toolCallStart
+        if (data.phase === 'responseGeneration') {
+          if (responseGenTimerRef.current) {
+            clearTimeout(responseGenTimerRef.current);
+          }
+          responseGenTimerRef.current = window.setTimeout(() => {
+            setStreamingState(prevInner => ({
+              ...prevInner,
+              phase: 'responseGeneration',
+              currentToolName: prevInner.currentToolName,
+              currentMessage: prevInner.currentMessage
+            }));
+            if (isDev()) {
+              console.log('⏳ responseGeneration shown after debounce');
+            }
+          }, 300);
+          if (isDev()) {
+            console.log('⏱️ responseGeneration progress received; waiting 300ms to show');
+          }
+          return;
+        }
+
+        setStreamingState(prev => {
+          const toolName = prev.currentToolName ?? lastActiveToolRef.current;
+          const next = {
+            ...prev,
+            phase: data.phase,
+            currentMessage:
+              data.phase === 'toolExecution'
+                ? (toolName ? `${toolName} tool is executing...` : prev.currentMessage)
+                : data.message ?? prev.currentMessage,
+            currentToolName: data.phase === 'toolExecution' ? prev.currentToolName : undefined
+          } as StreamingState;
+          if (isDev()) {
+            console.log('🎯 progress update', {
+              incomingPhase: data.phase,
+              message: data.message,
+              prevTool: prev.currentToolName,
+              lastTool: lastActiveToolRef.current,
+              nextTool: next.currentToolName,
+              nextMessage: next.currentMessage
+            });
+          }
+          return next;
+        });
+        logEvent('progress', { phase: data.phase, message: data.message });
+      });
+
+      eventSource.addEventListener('toolCallStart', (event) => {
+        const data = JSON.parse(event.data);
+        lastActiveToolRef.current = data.toolName;
+        if (responseGenTimerRef.current) {
+          clearTimeout(responseGenTimerRef.current);
+          responseGenTimerRef.current = undefined;
+          if (isDev()) console.log('🛑 cancelled responseGeneration debounce due to toolCallStart');
+        }
+        setStreamingState(prev => {
+          const next = {
+            ...prev,
+            phase: 'toolExecution',
+            currentToolName: data.toolName,
+            currentMessage: `${data.toolName} tool is executing...`
+          } as StreamingState;
+          if (isDev()) {
+            console.log('🔧 toolCallStart state', {
+              toolName: data.toolName,
+              prevTool: prev.currentToolName,
+              nextTool: next.currentToolName
+            });
+          }
+          return next;
+        });
+        logEvent('toolCallStart', { toolName: data.toolName, callId: data.callId });
+
+        // Update tool calls in message
+        if (assistantMessageId) {
+          setMessages(prev => prev.map(msg =>
+            msg.id === assistantMessageId ? {
+              ...msg,
+              toolCalls: [...(msg.toolCalls || []), {
+                id: data.callId,
+                toolName: data.toolName,
+                status: 'executing' as const,
+                startTime: Date.now()
+              }]
+            } : msg
+          ));
+        }
+      });
+
+      eventSource.addEventListener('toolCallEnd', (event) => {
+        const data = JSON.parse(event.data);
+        logEvent('toolCallEnd', {
+          toolName: data.toolName,
+          callId: data.callId,
+          success: data.success,
+          duration: data.duration
+        });
+
+        setStreamingState(prev => {
+          const next = {
+            ...prev,
+            phase: 'responseGeneration',
+            currentToolName: prev.currentToolName === data.toolName ? undefined : prev.currentToolName,
+            currentMessage:
+              prev.currentToolName === data.toolName
+                ? undefined
+                : prev.currentMessage
+          } as StreamingState;
+          if (isDev()) {
+            console.log('✅ toolCallEnd state', {
+              toolName: data.toolName,
+              prevTool: prev.currentToolName,
+              nextTool: next.currentToolName
+            });
+          }
+          return next;
+        });
+        if (lastActiveToolRef.current === data.toolName) {
+          lastActiveToolRef.current = undefined;
+        }
+
+        // Update tool calls in message
+        if (assistantMessageId) {
+          setMessages(prev => prev.map(msg =>
+            msg.id === assistantMessageId ? {
+              ...msg,
+              toolCalls: (msg.toolCalls || []).map(call =>
+                call.id === data.callId ? {
+                  ...call,
+                  status: data.success ? 'completed' : 'failed',
+                  duration: data.duration,
+                  summary: data.summary
+                } : call
+              )
+            } : msg
+          ));
+        }
+      });
+
+      eventSource.addEventListener('token', (event) => {
+        const data = JSON.parse(event.data);
+        if (responseGenTimerRef.current) {
+          clearTimeout(responseGenTimerRef.current);
+          responseGenTimerRef.current = undefined;
+          if (isDev()) console.log('🛑 cancelled responseGeneration debounce due to token');
+        }
+        setStreamingState(prev => ({
+          ...prev,
+          phase: 'responseGeneration',
+          currentToolName: undefined,
+          currentMessage: undefined
+        }));
+        lastActiveToolRef.current = undefined;
+        logEvent('token', { tokenLength: data.token?.length, fullTextLength: data.fullText?.length });
+
+        // Update message content incrementally
+        if (assistantMessageId) {
+          setMessages(prev => prev.map(msg =>
+            msg.id === assistantMessageId ? {
+              ...msg,
+              content: data.fullText
+            } : msg
+          ));
+        }
+      });
+
+      eventSource.addEventListener('usage', (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          logEvent('usage', {
+            totalTokens: data.usage?.total_tokens,
+            promptTokens: data.usage?.prompt_tokens,
+            completionTokens: data.usage?.completion_tokens
+          });
+
+          if (assistantMessageId) {
+            setMessages(prev => prev.map(msg =>
+              msg.id === assistantMessageId ? {
+                ...msg,
+                usage: data.usage
+              } : msg
+            ));
+          }
+        } catch (err) {
+          if (isDev()) console.warn('Failed to parse usage event', err);
+        }
+      });
+
+      eventSource.addEventListener('final', (event) => {
+        const data = JSON.parse(event.data);
+        const endTs = performance.now ? performance.now() : Date.now();
+        const totalDuration = endTs - startTs;
+
+        // Final telemetry with comprehensive stream summary
+        logEvent('final', {
+          success: data.success,
+          contentLength: data.content?.length,
+          citationsCount: data.citations?.length || 0,
+          totalDurationMs: Math.round(totalDuration),
+          serverDuration: data.duration,
+          totalEvents: streamTelemetry.events.length
+        });
+
+        // Log complete telemetry summary in development
+        if (isDev()) {
+          console.log('📊 Stream Telemetry Summary', {
+            streamId,
+            totalDuration: Math.round(totalDuration),
+            events: streamTelemetry.events,
+            performance: {
+              eventCount: streamTelemetry.events.length,
+              avgEventInterval: Math.round(totalDuration / Math.max(streamTelemetry.events.length - 1, 1))
+            }
+          });
+        }
+
+        // Update final message
+        if (assistantMessageId) {
+          setMessages(prev => prev.map(msg =>
+            msg.id === assistantMessageId ? {
+              ...msg,
+              content: data.content,
+              isStreaming: false,
+              durationMs: totalDuration,
+              citations: data.citations,
+              executionInfo: {
+                totalDurationMs: Math.round(totalDuration),
+                tools: (msg.toolCalls || []).map(tc => tc.toolName)
+              }
+            } : msg
+          ));
+        }
+
+        streamClosedRef.current = true;
+        eventSource.close();
+        if (responseGenTimerRef.current) {
+          clearTimeout(responseGenTimerRef.current);
+          responseGenTimerRef.current = undefined;
+        }
+        activeAssistantMessageIdRef.current = null;
+        cleanupStreaming({ skipClose: true });
+        setIsLoading(false);
+        setLoadingPhase('idle');
+      });
+
+      eventSource.addEventListener('error', (event) => {
+        if (streamClosedRef.current || eventSource.readyState === EventSource.CLOSED) {
+          if (isDev()) {
+            console.debug('EventSource error ignored (stream already closed)', { event });
+          }
+          return;
+        }
+
+        let parsed = null;
+        try {
+          parsed = JSON.parse((event as MessageEvent).data);
+        } catch (e) {
+          parsed = null;
+        }
+
+        if (parsed) {
+          logEvent('error', { error: parsed.error, code: parsed.code, phase: parsed.phase });
+          setError(`Streaming error: ${parsed.error}`);
+        } else {
+          logEvent('error', { error: 'connection', details: 'SSE transport error (non-200 response)' });
+          setError('Streaming connection failed. Please try again.');
+        }
+
+        streamClosedRef.current = true;
+        eventSource.close();
+        if (responseGenTimerRef.current) {
+          clearTimeout(responseGenTimerRef.current);
+          responseGenTimerRef.current = undefined;
+        }
+        activeAssistantMessageIdRef.current = null;
+        cleanupStreaming({ skipClose: true });
+        setIsLoading(false);
+        setLoadingPhase('idle');
+      });
+
+      eventSource.onerror = (event) => {
+        if (streamClosedRef.current || eventSource.readyState === EventSource.CLOSED) {
+          if (isDev()) {
+            console.debug('EventSource closed cleanly', { readyState: eventSource.readyState, event });
+          }
+          return;
+        }
+
+        console.error('EventSource error:', event);
+        logEvent('error', { error: 'connection', details: 'EventSource error' });
+        setError('Connection lost during streaming');
+        eventSource.close();
+        if (responseGenTimerRef.current) {
+          clearTimeout(responseGenTimerRef.current);
+          responseGenTimerRef.current = undefined;
+        }
+        activeAssistantMessageIdRef.current = null;
+        cleanupStreaming({ skipClose: true });
+        setIsLoading(false);
+        setLoadingPhase('idle');
+      };
+
+    } catch (err) {
+      const isAbort = err instanceof Error && (err.name === 'AbortError' || /aborted/i.test(err.message || ''));
+      if (isAbort && streamClosedRef.current) {
+        if (isDev()) console.log('✔️ Planning/stream aborted by user');
+        setIsLoading(false);
+        setLoadingPhase('idle');
+        planningAbortControllerRef.current = null;
+        return;
+      }
+
+      const errorMessage = err instanceof Error ? err.message : 'Streaming failed';
+      setError(errorMessage);
+      eventSourceRefLocal?.close();
+      if (responseGenTimerRef.current) {
+        clearTimeout(responseGenTimerRef.current);
+        responseGenTimerRef.current = undefined;
+      }
+      activeAssistantMessageIdRef.current = null;
+      cleanupStreaming({ skipClose: true });
+      setIsLoading(false);
+      setLoadingPhase('idle');
+      if (isDev()) console.error('Streaming error:', err);
     }
   };
 
@@ -245,6 +817,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     setError(null);
     setLoadingPhase('planning');
 
+    // Use streaming if enabled
+    if (streamingEnabled) {
+      await sendStreamingMessage(userMessage);
+      return;
+    }
+
     let planPayload: any = null;
     let planUseRAGValue: boolean | undefined;
     let planNeedsSnapshotValue: boolean | undefined;
@@ -257,6 +835,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     let plannedToolsForExecution: string[] = [];
 
     try {
+      const planAbortController = new AbortController();
+      planningAbortControllerRef.current = planAbortController;
       const planResponse = await fetch(`${LLM_BASE_URL}/api/chat/plan`, {
         method: 'POST',
         headers: {
@@ -265,7 +845,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         body: JSON.stringify({
           message: userMessage.content,
           sessionId: 'default'
-        })
+        }),
+        signal: planAbortController.signal
       });
 
       let planData: any = null;
@@ -280,7 +861,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         throw new Error(planErrorMessage);
       }
 
-      planPayload = planData.plan;
+      // Clear planning abort controller now that we have a response
+      planningAbortControllerRef.current = null;
+
+      const planPayload = planData.plan;
       const planEndTs = getNow();
       if (typeof planData.durationMs === 'number' && Number.isFinite(planData.durationMs)) {
         planDurationMs = Math.max(0, Math.round(planData.durationMs));
@@ -307,7 +891,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       plannedToolsForExecution = toolListForDisplay;
       setLoadingPhase('executing');
 
-      if (import.meta.env.DEV) {
+      if (isDev()) {
         console.log('Planning result', { plan: planPayload, allowlist: toolListForDisplay });
       }
 
@@ -316,7 +900,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       // Get canvas context for AI (after planning completes)
       const elements = excalidrawAPI.getSceneElements();
       const appState = excalidrawAPI.getAppState();
-      
+
       const canvasContext = {
         elements: elements.length > 0 ? elements.slice(0, 50) : [], // Limit for payload size
         selection: {
@@ -334,22 +918,20 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           roomKey = linkData.roomKey;
         }
       } catch (err) {
-        if (import.meta.env.DEV) console.warn('Could not extract room info for LLM service:', err);
+        if (isDev()) console.warn('Could not extract room info for LLM service:', err);
       }
 
       // Generate snapshots for visual analysis
       let snapshots: { fullCanvas?: string; selection?: string; thumbnail?: string; thumbnailHash?: string } = {};
       try {
         const refreshedAppState = excalidrawAPI.getAppState();
-        
+
         // Generate thumbnail for preattach (if enabled and elements exist)
-        const thumbnailEnabled = String(
-          import.meta.env.VITE_LLM_INCLUDE_THUMBNAIL_SNAPSHOT ?? (window as any)?.__LLM_INCLUDE_THUMBNAIL_SNAPSHOT ?? 'false'
-        ).toLowerCase() === 'true';
-        const maxThumbnailDim = Number(import.meta.env.VITE_LLM_THUMBNAIL_MAX_DIM ?? 512);
-        const thumbnailQuality = Number(import.meta.env.VITE_LLM_THUMBNAIL_JPEG_QUALITY ?? 0.5);
-        const maxThumbnailBytes = Number(import.meta.env.VITE_LLM_THUMBNAIL_MAX_BYTES ?? 300000);
-        
+        const thumbnailEnabled = getThumbnailEnabled();
+        const maxThumbnailDim = getMaxThumbnailDim();
+        const thumbnailQuality = getThumbnailQuality();
+        const maxThumbnailBytes = getMaxThumbnailBytes();
+
         if (thumbnailEnabled && isVisible && elements.length > 0) {
           try {
             const thumbnailCanvas = await exportToCanvas({
@@ -362,30 +944,30 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
               files: excalidrawAPI.getFiles(),
               maxWidthOrHeight: maxThumbnailDim,
             });
-            
+
             const thumbnailDataURL = thumbnailCanvas.toDataURL('image/jpeg', thumbnailQuality);
-            
+
             // Check size limit
             const thumbnailSizeBytes = Math.round((thumbnailDataURL.length - 'data:image/jpeg;base64,'.length) * 0.75);
-            
+
             if (thumbnailSizeBytes <= maxThumbnailBytes) {
               snapshots.thumbnail = thumbnailDataURL;
-              
+
               // Generate simple hash for deduplication
               const base64Data = thumbnailDataURL.split(',')[1];
               snapshots.thumbnailHash = await generateSimpleHash(base64Data);
-              
-              if (import.meta.env.DEV) {
+
+              if (isDev()) {
                 console.log(`Generated thumbnail: ${(thumbnailSizeBytes/1000).toFixed(1)}KB, hash: ${snapshots.thumbnailHash}`);
               }
-            } else if (import.meta.env.DEV) {
+            } else if (isDev()) {
               console.warn(`Thumbnail too large: ${(thumbnailSizeBytes/1000).toFixed(1)}KB > ${(maxThumbnailBytes/1000).toFixed(1)}KB limit`);
             }
           } catch (thumbnailError) {
-            if (import.meta.env.DEV) console.warn('Failed to generate thumbnail:', thumbnailError);
+            if (isDev()) console.warn('Failed to generate thumbnail:', thumbnailError);
           }
         }
-        
+
         // Generate canvas snapshot
         const canvas = await exportToCanvas({
           elements: elements,
@@ -397,10 +979,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           files: excalidrawAPI.getFiles(),
           maxWidthOrHeight: 1200,
         });
-        
+
         const canvasDataURL = canvas.toDataURL('image/png', 0.8);
         snapshots.fullCanvas = canvasDataURL;
-        
+
         // Generate selection snapshot if elements are selected
         if (Object.keys(refreshedAppState.selectedElementIds).length > 0) {
           const selectedElements = elements.filter(el => refreshedAppState.selectedElementIds[el.id]);
@@ -415,7 +997,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
               files: excalidrawAPI.getFiles(),
               maxWidthOrHeight: 800,
             });
-            
+
             const selectionDataURL = selectionCanvas.toDataURL('image/png', 0.8);
             snapshots.selection = selectionDataURL;
           }
@@ -485,7 +1067,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
       setError(errorMessage);
-      if (import.meta.env.DEV) console.error('Chat error:', err);
+      if (isDev()) console.error('Chat error:', err);
     } finally {
       setIsLoading(false);
       setLoadingPhase('idle');
@@ -507,9 +1089,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         return true;
       }
     } catch (e) {
-      if (import.meta.env.DEV) console.warn('Modern clipboard API failed, falling back to execCommand:', e);
+      if (isDev()) console.warn('Modern clipboard API failed, falling back to execCommand:', e);
     }
-    
+
     // Fallback for older browsers or permission issues
     try {
       const textarea = document.createElement('textarea');
@@ -523,7 +1105,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       document.body.removeChild(textarea);
       return success;
     } catch (e) {
-      if (import.meta.env.DEV) console.warn('Copy failed:', e);
+      if (isDev()) console.warn('Copy failed:', e);
       return false;
     }
   };
@@ -559,7 +1141,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
     try {
       const { documentId, page } = detail;
-      if (import.meta.env.DEV) console.log('RAG citation focus requested:', detail);
+      if (isDev()) console.log('RAG citation focus requested:', detail);
 
       // Get current scene elements
       const elements = excalidrawAPI.getSceneElements();
@@ -570,7 +1152,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
       if (!pdfElement) {
         excalidrawAPI.setToast({ message: 'Document not found on canvas', closable: true, duration: 3000 });
-        if (import.meta.env.DEV) console.warn('PDF document not found on canvas:', documentId, 'matches=', matches.length);
+        if (isDev()) console.warn('PDF document not found on canvas:', documentId, 'matches=', matches.length);
         return;
       }
 
@@ -593,13 +1175,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         await navigatePDFPage(excalidrawAPI, pdfElement, page);
       }
 
-      if (import.meta.env.DEV) console.log('RAG citation focus completed successfully');
+      if (isDev()) console.log('RAG citation focus completed successfully');
     } catch (error) {
       const message = error instanceof Error && /Thumbnail not found/i.test(error.message)
         ? 'Thumbnails missing for this PDF. Reopen/import the PDF to reindex.'
         : 'Failed to focus citation';
       excalidrawAPI.setToast({ message, closable: true, duration: 3000 });
-      if (import.meta.env.DEV) console.error('Error focusing RAG citation:', error);
+      if (isDev()) console.error('Error focusing RAG citation:', error);
     }
   };
 
@@ -687,57 +1269,18 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       setMessages([]);
       setError(null);
     } catch (err) {
-      if (import.meta.env.DEV) console.error('Failed to clear history:', err);
+      if (isDev()) console.error('Failed to clear history:', err);
     }
   };
 
-  const formatTimestamp = (timestamp: string): string => {
-    try {
-      return new Date(timestamp).toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      });
-    } catch {
-      return '';
-    }
-  };
 
-  const formatDuration = (ms?: number): string => {
-    if (ms == null) return '';
-    const s = (ms / 1000).toFixed(1);
-    return `${s}s`;
-  };
-
-  const getExecutionInfoLines = (info?: ChatMessage['executionInfo']): string[] => {
-    if (!info) return [];
-    const lines: string[] = [];
-    if (info.tools && info.tools.length > 0) {
-      lines.push(`tools: [${info.tools.join(', ')}]`);
-    }
-    if (typeof info.useRAG === 'boolean') {
-      lines.push(`useRAG: ${info.useRAG}`);
-    }
-    if (typeof info.needsSnapshot === 'boolean') {
-      lines.push(`needsSnapshot: ${info.needsSnapshot}`);
-    }
-    if (typeof info.planningDurationMs === 'number') {
-      lines.push(`planning: ${formatDuration(info.planningDurationMs)}`);
-    }
-    if (typeof info.executionDurationMs === 'number') {
-      lines.push(`execution: ${formatDuration(info.executionDurationMs)}`);
-    }
-    if (typeof info.totalDurationMs === 'number') {
-      lines.push(`total: ${formatDuration(info.totalDurationMs)}`);
-    }
-    return lines;
-  };
 
   if (!isVisible) {
     return null; // Button is now handled in renderTopRightUI
   }
 
   return (
-    <div 
+    <div
       ref={chatPanelRef}
       style={{
         position: 'fixed',
@@ -753,6 +1296,12 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         zIndex: 999, // Lower than top UI elements
         fontFamily: 'system-ui, -apple-system, sans-serif'
       }}>
+      <style>{`
+        @keyframes chatPanelSpin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
       {/* Header */}
       <div style={{
         padding: '16px 20px',
@@ -773,6 +1322,23 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
           }} title={isConnected ? 'Connected' : 'Disconnected'} />
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
+          {streamingState.isActive && (
+            <button
+              onClick={cleanupStreaming}
+              style={{
+                padding: '4px 8px',
+                backgroundColor: '#dc3545',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+              title="Cancel streaming"
+            >
+              Cancel
+            </button>
+          )}
           {!aiInvited && (
             <button
               onClick={inviteAI}
@@ -891,99 +1457,127 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 }}
               >
                 {renderContentWithInlineRefs(message)}
+
+                {/* Streaming indicator */}
+                {message.isStreaming && (
+                  <div style={{
+                    marginTop: '8px',
+                    color: '#6c757d'
+                  }}>
+                    <StreamingIndicator
+                      phase={streamingState.phase}
+                      currentToolName={streamingState.currentToolName}
+                      currentMessage={streamingState.currentMessage}
+                      isCompact={true}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* References block removed: inline 〖R:n〗 markers are now clickable instead */}
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginTop: '4px'
-                }}
-              >
+              {!message.isStreaming && (
                 <div
                   style={{
-                    fontSize: '11px',
-                    color: '#6c757d',
-                    textAlign: message.role === 'user' ? 'right' : 'left'
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: '4px'
                   }}
                 >
-                  {formatTimestamp(message.timestamp)}
-                  {message.role === 'assistant' && (() => {
-                    const timingParts: string[] = [];
-                    if (typeof message.planningDurationMs === 'number') {
-                      timingParts.push(`planning ${formatDuration(message.planningDurationMs)}`);
-                    }
-                    if (typeof message.executionDurationMs === 'number') {
-                      timingParts.push(`execution ${formatDuration(message.executionDurationMs)}`);
-                    }
-                    if (timingParts.length === 0 && typeof message.durationMs === 'number') {
-                      timingParts.push(`total ${formatDuration(message.durationMs)}`);
-                    }
-                    if (timingParts.length === 0) {
-                      return null;
-                    }
-                    return <span style={{ marginLeft: 6 }}>· {timingParts.join(' · ')}</span>;
-                  })()}
-                </div>
-                {message.role === 'assistant' && (
-                  <button
-                    onClick={() => handleCopy(message)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleCopy(message);
-                      }
-                    }}
-                    aria-label="Copy reply"
-                    title="Copy reply"
+                  <div
                     style={{
-                      padding: '4px 8px',
-                      border: '1px solid #ddd',
-                      background: '#fff',
-                      cursor: 'pointer',
                       fontSize: '11px',
-                      borderRadius: '4px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
                       color: '#6c757d',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f8f9fa';
-                      e.currentTarget.style.borderColor = '#007bff';
-                      e.currentTarget.style.color = '#007bff';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#fff';
-                      e.currentTarget.style.borderColor = '#ddd';
-                      e.currentTarget.style.color = '#6c757d';
+                      textAlign: message.role === 'user' ? 'right' : 'left'
                     }}
                   >
-                    {copiedMessageId === message.id ? (
-                      <>
-                        <span>✓</span>
-                        <span>Copied!</span>
-                      </>
-                    ) : (
-                      <>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                        <span>Copy</span>
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
+                    {formatTimestamp(message.timestamp)}
+                    {message.role === 'assistant' && (() => {
+                      const timingParts: string[] = [];
+                      if (typeof message.planningDurationMs === 'number') {
+                        timingParts.push(`planning ${formatDuration(message.planningDurationMs)}`);
+                      }
+                      if (typeof message.executionDurationMs === 'number') {
+                        timingParts.push(`execution ${formatDuration(message.executionDurationMs)}`);
+                      }
+                      if (timingParts.length === 0 && typeof message.durationMs === 'number') {
+                        timingParts.push(`total ${formatDuration(message.durationMs)}`);
+                      }
+                      if (timingParts.length === 0) {
+                        return null;
+                      }
+                      return <span style={{ marginLeft: 6 }}>· {timingParts.join(' · ')}</span>;
+                    })()}
+                  </div>
+                  {message.role === 'assistant' && (
+                    <button
+                      onClick={() => handleCopy(message)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleCopy(message);
+                        }
+                      }}
+                      aria-label="Copy reply"
+                      title="Copy reply"
+                      style={{
+                        padding: '4px 8px',
+                        border: '1px solid #ddd',
+                        background: '#fff',
+                        cursor: 'pointer',
+                        fontSize: '11px',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        color: '#6c757d',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#f8f9fa';
+                        e.currentTarget.style.borderColor = '#007bff';
+                        e.currentTarget.style.color = '#007bff';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#fff';
+                        e.currentTarget.style.borderColor = '#ddd';
+                        e.currentTarget.style.color = '#6c757d';
+                      }}
+                    >
+                      {copiedMessageId === message.id ? (
+                        <>
+                          <span>✓</span>
+                          <span>Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                          </svg>
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}
 
-        {isLoading && (
+        {isLoading && !isStreamingMessageActive && (() => {
+          const streamingLabels = streamingState.isActive
+            ? getStreamingIndicatorLabels(streamingState)
+            : null;
+          const loaderLabel = streamingLabels
+            ? streamingLabels.label
+            : loadingPhase === 'planning'
+              ? 'Planning...'
+              : 'Executing...';
+          const loaderSubLabel = streamingLabels?.subLabel;
+
+          return (
           <div style={{
             alignSelf: 'flex-start',
             maxWidth: '80%'
@@ -991,54 +1585,33 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
             <div
               role="status"
               aria-live="polite"
+              aria-label={loaderLabel}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
                 padding: '10px 14px',
                 borderRadius: '12px',
                 backgroundColor: '#f8f9fa',
-                color: '#6c757d',
-                fontSize: '14px'
+                color: '#6c757d'
               }}
             >
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '28px',
-                  height: '28px'
-                }}
-                aria-label={loadingPhase === 'planning' ? 'Planning request' : 'Executing request'}
-              >
-                <svg width="18" height="18" viewBox="0 0 50 50" role="img">
-                  <circle
-                    cx="25"
-                    cy="25"
-                    r="18"
-                    fill="none"
-                    stroke="#007bff"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                    strokeDasharray="31.4 31.4"
-                  >
-                    <animateTransform
-                      attributeName="transform"
-                      type="rotate"
-                      repeatCount="indefinite"
-                      dur="1s"
-                      values="0 25 25;360 25 25"
-                    />
-                  </circle>
-                </svg>
-              </div>
-              <span>
-                {loadingPhase === 'planning' ? 'Planning...' : 'Executing...'}
-              </span>
+              {streamingState.isActive ? (
+                <StreamingIndicator
+                  phase={streamingState.phase}
+                  currentToolName={streamingState.currentToolName}
+                  currentMessage={streamingState.currentMessage}
+                  isCompact={false}
+                />
+              ) : (
+                <StreamingIndicator
+                  phase={loadingPhase === 'planning' ? 'planning' : 'toolExecution'}
+                  currentToolName={undefined}
+                  currentMessage={undefined}
+                  isCompact={false}
+                />
+              )}
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {error && (
           <div style={{
