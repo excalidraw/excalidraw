@@ -12,18 +12,15 @@ import {
 import {
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
-} from "@excalidraw/element";
-
-import {
   hasBoundTextElement,
   isElbowArrow,
   isImageElement,
   isLinearElement,
   isTextElement,
   isArrowElement,
+  hasStrokeColor,
+  toolIsArrow,
 } from "@excalidraw/element";
-
-import { hasStrokeColor, toolIsArrow } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
@@ -902,16 +899,14 @@ export const ShapesSwitcher = ({
             {t("toolBar.mermaidToExcalidraw")}
           </DropdownMenu.Item>
           {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
-            <>
-              <DropdownMenu.Item
-                onSelect={() => app.onMagicframeToolSelect()}
-                icon={MagicIcon}
-                data-testid="toolbar-magicframe"
-              >
-                {t("toolBar.magicframe")}
-                <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
-              </DropdownMenu.Item>
-            </>
+            <DropdownMenu.Item
+              onSelect={() => app.onMagicframeToolSelect()}
+              icon={MagicIcon}
+              data-testid="toolbar-magicframe"
+            >
+              {t("toolBar.magicframe")}
+              <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
+            </DropdownMenu.Item>
           )}
         </DropdownMenu.Content>
       </DropdownMenu>
