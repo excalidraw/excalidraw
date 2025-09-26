@@ -14,7 +14,7 @@ import type { FileSystemHandle } from "browser-fs-access";
 
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 
-const INPUT_CHANGE_INTERVAL_MS = 500;
+const INPUT_CHANGE_INTERVAL_MS = 5000;
 
 export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
