@@ -172,8 +172,7 @@
     "wrapSelectionInFrame": "Wrap selection in frame",
     "tab": "Tab",
     "shapeSwitch": "Switch shape",
-    
-    "custom": "Custom",
+    "custom": "Corner values",
     "topLeft": "Top Left",
     "topRight": "Top Right",
     "bottomLeft": "Bottom Left",

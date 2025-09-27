@@ -50,12 +50,13 @@ type _ExcalidrawElementBase = Readonly<{
     type: RoundnessType;
     value?: number;
     corners? :{
-      topLeft? : number;
-      topRight? : number;
-      bottomLeft? : number;
-      bottomRight? : number;
-
-    } };
+      topLeft : number;
+      topRight : number;
+      bottomLeft : number;
+      bottomRight : number;
+    },
+    cornerLink?: boolean,
+  };
   roughness: number;
   opacity: number;
   width: number;

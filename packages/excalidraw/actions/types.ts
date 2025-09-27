@@ -105,6 +105,7 @@ export type ActionName =
   | "changeRoundness"
   // nambahin ini
   | "customizeRoundness"
+  | "linkCorner"
   | "alignTop"
   | "alignBottom"
   | "alignLeft"

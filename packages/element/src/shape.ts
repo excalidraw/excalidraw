@@ -625,27 +625,6 @@ const generateElementShape = (
       let shape: ElementShapes[typeof element.type];
       // this is for rendering the stroke/bg of the embeddable, especially
       // when the src url is not set
-      // console.log(element.roundness?.type)
-      // if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
-      //   const w = element.width;
-      //   const h = element.height;
-      //   const r = getCornerRadius(Math.min(w, h), element);
-      //   shape = generator.path(
-      //     `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
-      //       h - r
-      //     } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
-      //       h - r
-      //     } L 0 ${r} Q 0 0, ${r} 0`,
-      //     generateRoughOptions(
-      //       modifyIframeLikeForRoughOptions(
-      //         element,
-      //         isExporting,
-      //         embedsValidationStatus,
-      //       ),
-      //       true,
-      //     ),
-      //   );
-      // }
       if (element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS) {
         shape = generator.rectangle(
           0,
@@ -662,21 +641,15 @@ const generateElementShape = (
           ),
         );
       } 
-      // Kalau pilihan custom
       else {
         const w = element.width;
         const h = element.height;
         const r = getCornerRadius(Math.min(w, h), element);
 
-        // console.log(element.id, w, h, r)
-
         const tl = element.roundness?.corners?.topLeft ?? DEFAULT_ADAPTIVE_RADIUS;
         const tr = element.roundness?.corners?.topRight ?? DEFAULT_ADAPTIVE_RADIUS;
         const bl = element.roundness?.corners?.bottomLeft ?? DEFAULT_ADAPTIVE_RADIUS;
         const br = element.roundness?.corners?.bottomRight ?? DEFAULT_ADAPTIVE_RADIUS;
-
-        // Dummy
-        console.log(tl, tr, bl ,br)
 
         shape = generator.path(
 
