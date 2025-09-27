@@ -76,9 +76,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
   // Simple wrapper for sending messages via hook
   const sendMessage = async () => {
-    if (!inputMessage.trim()) return;
-    await sendChatMessage(inputMessage);
+    const trimmed = inputMessage.trim();
+    if (!trimmed) return;
     setInputMessage('');
+    await sendChatMessage(trimmed);
   };
 
   // Cleanup streaming on unmount
