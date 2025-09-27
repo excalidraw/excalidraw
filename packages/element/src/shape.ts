@@ -700,53 +700,101 @@ const generateElementShape = (
       }
       return shape;
     }
-    case "diamond": {
-      let shape: ElementShapes[typeof element.type];
+   case "diamond": {
+  let shape: ElementShapes[typeof element.type];
 
-      const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
-        getDiamondPoints(element);
-      if (element.roundness) {
-        const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
+  const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+    getDiamondPoints(element);
 
-        const horizontalRadius = getCornerRadius(
-          Math.abs(rightY - topY),
-          element,
-        );
+  if (
+    element.roundness?.type === ROUNDNESS.CUSTOMIZED &&
+    element.roundness.corners
+  ) {
+    const {
+     topLeft:     rTop     = 0,
+     topRight:    rRight   = 0,
+     bottomRight: rBottom  = 0,
+     bottomLeft:  rLeft    = 0,
+    } = element.roundness.corners;
 
-        shape = generator.path(
-          `M ${topX + verticalRadius} ${topY + horizontalRadius} L ${
-            rightX - verticalRadius
-          } ${rightY - horizontalRadius}
-            C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
-            rightX - verticalRadius
-          } ${rightY + horizontalRadius}
-            L ${bottomX + verticalRadius} ${bottomY - horizontalRadius}
-            C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
-            bottomX - verticalRadius
-          } ${bottomY - horizontalRadius}
-            L ${leftX + verticalRadius} ${leftY + horizontalRadius}
-            C ${leftX} ${leftY}, ${leftX} ${leftY}, ${leftX + verticalRadius} ${
-            leftY - horizontalRadius
-          }
-            L ${topX - verticalRadius} ${topY + horizontalRadius}
-            C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
-            topY + horizontalRadius
-          }`,
-          generateRoughOptions(element, true),
-        );
-      } else {
-        shape = generator.polygon(
-          [
-            [topX, topY],
-            [rightX, rightY],
-            [bottomX, bottomY],
-            [leftX, leftY],
-          ],
-          generateRoughOptions(element),
-        );
+    const T = { x: topX,    y: topY };
+    const R = { x: rightX,  y: rightY };
+    const B = { x: bottomX, y: bottomY };
+    const L = { x: leftX,   y: leftY };
+
+    const move = (p0: {x:number;y:number}, p1: {x:number;y:number}, d: number) => {
+      const vx = p1.x - p0.x, vy = p1.y - p0.y;
+      const len = Math.hypot(vx, vy) || 1;
+      const t = d / len;
+      return { x: p0.x + vx * t, y: p0.y + vy * t };
+    };
+
+    const T_L = move(T, L, rTop);
+    const T_R = move(T, R, rTop);
+
+    const R_T = move(R, T, rRight);
+    const R_B = move(R, B, rRight);
+
+    const B_R = move(B, R, rBottom);
+    const B_L = move(B, L, rBottom);
+
+    const L_B = move(L, B, rLeft);
+    const L_T = move(L, T, rLeft);
+
+    const d =
+      `M ${T_L.x} ${T_L.y} ` +
+      `Q ${T.x} ${T.y} ${T_R.x} ${T_R.y} ` + // TOP
+      `L ${R_T.x} ${R_T.y} ` +
+      `Q ${R.x} ${R.y} ${R_B.x} ${R_B.y} ` + // RIGHT
+      `L ${B_R.x} ${B_R.y} ` +
+      `Q ${B.x} ${B.y} ${B_L.x} ${B_L.y} ` + // BOTTOM
+      `L ${L_B.x} ${L_B.y} ` +
+      `Q ${L.x} ${L.y} ${L_T.x} ${L_T.y} ` + // LEFT
+      `Z`;
+
+    shape = generator.path(d, generateRoughOptions(element, true));
+    return shape;
+  }
+
+  if (element.roundness) {
+    const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
+    const horizontalRadius = getCornerRadius(Math.abs(rightY - topY), element);
+
+    shape = generator.path(
+      `M ${topX + verticalRadius} ${topY + horizontalRadius} L ${
+        rightX - verticalRadius
+      } ${rightY - horizontalRadius}
+        C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
+          rightX - verticalRadius
+        } ${rightY + horizontalRadius}
+        L ${bottomX + verticalRadius} ${bottomY - horizontalRadius}
+        C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
+          bottomX - verticalRadius
+        } ${bottomY - horizontalRadius}
+        L ${leftX + verticalRadius} ${leftY + horizontalRadius}
+        C ${leftX} ${leftY}, ${leftX} ${leftY}, ${leftX + verticalRadius} ${
+        leftY - horizontalRadius
       }
-      return shape;
-    }
+        L ${topX - verticalRadius} ${topY + horizontalRadius}
+        C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
+        topY + horizontalRadius
+      }`,
+      generateRoughOptions(element, true),
+    );
+  } else {
+    shape = generator.polygon(
+      [
+        [topX, topY],
+        [rightX, rightY],
+        [bottomX, bottomY],
+        [leftX, leftY],
+      ],
+      generateRoughOptions(element),
+    );
+  }
+  return shape;
+}
+
     case "ellipse": {
       const shape: ElementShapes[typeof element.type] = generator.ellipse(
         element.width / 2,

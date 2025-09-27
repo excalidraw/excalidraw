@@ -44,6 +44,7 @@ export const canCustomizeRoundness = (type: ElementOrToolType) =>
   type === "rectangle" ||
   type === "iframe" ||
   type === "embeddable" ||
+  type === "diamond" ||
   type === "image";
 
 export const toolIsArrow = (type: ElementOrToolType) => type === "arrow";
