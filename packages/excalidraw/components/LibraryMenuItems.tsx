@@ -9,8 +9,9 @@ import React, {
 import { MIME_TYPES, arrayToMap } from "@excalidraw/common";
 
 import { duplicateElements } from "@excalidraw/element";
+
 import { deburr } from "../deburr";
-import { serializeLibraryAsJSON } from "../data/json";
+
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { useScrollPosition } from "../hooks/useScrollPosition";
 import { t } from "../i18n";
