@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 
 import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
 
@@ -33,23 +33,7 @@ export const LibraryUnit = memo(
     svgCache: SvgCache;
   }) => {
     const ref = useRef<HTMLDivElement | null>(null);
-    const svg = useLibraryItemSvg(id, elements, svgCache);
-
-    useEffect(() => {
-      const node = ref.current;
-
-      if (!node) {
-        return;
-      }
-
-      if (svg) {
-        node.innerHTML = svg.outerHTML;
-      }
-
-      return () => {
-        node.innerHTML = "";
-      };
-    }, [svg]);
+    const svg = useLibraryItemSvg(id, elements, svgCache, ref);
 
     const [isHovered, setIsHovered] = useState(false);
     const isMobile = useDevice().editor.isMobile;

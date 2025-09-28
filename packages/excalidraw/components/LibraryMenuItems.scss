@@ -1,8 +1,15 @@
 @import "open-color/open-color";
 
 .excalidraw {
-  --container-padding-y: 1.5rem;
+  --container-padding-y: 1rem;
   --container-padding-x: 0.75rem;
+
+  .library-menu-items-header {
+    display: flex;
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
 
   .library-menu-items__no-items {
     text-align: center;
@@ -10,13 +17,24 @@
     line-height: 1.5;
     font-size: 0.875rem;
     width: 100%;
+    min-height: 55px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
     &__label {
       color: var(--color-primary);
       font-weight: 700;
       font-size: 1.125rem;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.25rem;
     }
+  }
+
+  .library-menu-items__no-items__hint {
+    color: var(--color-border-outline);
+    padding: 0.75rem 1rem;
   }
 
   &.theme--dark {
@@ -34,7 +52,7 @@
     overflow-y: auto;
     flex-direction: column;
     height: 100%;
-    justify-content: center;
+    justify-content: flex-start;
     margin: 0;
 
     position: relative;
@@ -51,25 +69,44 @@
     }
 
     &__items {
+      // so that spinner is relative-positioned to this container
+      position: relative;
+
       row-gap: 0.5rem;
-      padding: var(--container-padding-y) 0;
+      padding: 1rem 0 var(--container-padding-y) 0;
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
-      margin-bottom: 1rem;
     }
 
     &__header {
+      display: flex;
+      align-items: center;
+      flex: 1 1 auto;
+
       color: var(--color-primary);
       font-size: 1.125rem;
       font-weight: 700;
       margin-bottom: 0.75rem;
       width: 100%;
-      padding-right: 4rem; // due to dropdown button
       box-sizing: border-box;
 
       &--excal {
         margin-top: 2rem;
+      }
+
+      &__hint {
+        margin-left: auto;
+        font-size: 10px;
+        color: var(--color-border-outline);
+        font-weight: 400;
+
+        kbd {
+          font-family: monospace;
+          border: 1px solid var(--color-border-outline);
+          border-radius: 4px;
+          padding: 1px 3px;
+        }
       }
     }
 
@@ -77,6 +114,24 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
       grid-gap: 1rem;
+    }
+
+    &__search {
+      flex: 1 1 auto;
+      margin: 0;
+
+      .ExcTextField__input {
+        height: var(--lg-button-size);
+        input {
+          font-size: 0.875rem;
+        }
+      }
+
+      &.hideCancelButton input::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+        appearance: none;
+        display: none;
+      }
     }
 
     .separator {

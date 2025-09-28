@@ -181,7 +181,12 @@
   "library": {
     "noItems": "No items added yet...",
     "hint_emptyLibrary": "Select an item on canvas to add it here, or install a library from the public repository, below.",
-    "hint_emptyPrivateLibrary": "Select an item on canvas to add it here."
+    "hint_emptyPrivateLibrary": "Select an item on canvas to add it here.",
+    "search": {
+      "inputPlaceholder": "Search library",
+      "heading": "Library matches",
+      "noResults": "No matching items found..."
+    }
   },
   "search": {
     "title": "Find on canvas",
@@ -227,7 +232,7 @@
     "clear": "Clear",
     "remove": "Remove",
     "embed": "Toggle embedding",
-    "publishLibrary": "Publish",
+    "publishLibrary": "Publish selected",
     "submit": "Submit",
     "confirm": "Confirm",
     "embeddableInteractionButton": "Click to interact"

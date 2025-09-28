@@ -100,6 +100,19 @@ $verticalBreakpoint: 861px;
         border-radius: var(--border-radius-lg);
         cursor: pointer;
 
+        --icon-size: 1rem;
+
+        &.command-item-large {
+          height: 2.75rem;
+          --icon-size: 1.5rem;
+
+          .icon {
+            width: var(--icon-size);
+            height: var(--icon-size);
+            margin-right: 0.625rem;
+          }
+        }
+
         &:active {
           background-color: var(--color-surface-low);
         }
@@ -130,9 +143,17 @@ $verticalBreakpoint: 861px;
     }
 
     .icon {
-      width: 16px;
-      height: 16px;
-      margin-right: 6px;
+      width: var(--icon-size, 1rem);
+      height: var(--icon-size, 1rem);
+      margin-right: 0.375rem;
+
+      .library-item-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+      }
     }
   }
 }
