@@ -176,7 +176,9 @@
     "topLeft": "Top Left",
     "topRight": "Top Right",
     "bottomLeft": "Bottom Left",
-    "bottomRight": "Bottom Right"
+    "bottomRight": "Bottom Right",
+    "top": "Top",
+    "bottom": "Bottom"
   },
   "elementLink": {
     "title": "Link to object",

@@ -1428,11 +1428,9 @@ export const actionChangeRoundness = register({
       getNonDeletedElements(elements),
       appState,
     );
-
     const hasLegacyRoundness = targetElements.some(
       (el) => el.roundness?.type === ROUNDNESS.LEGACY,
     );
-
     const getCurrentEdgeType = () => {
       return getFormValue(
               elements,
@@ -1470,7 +1468,6 @@ export const actionChangeRoundness = register({
                 icon: EdgeCustomIcon,
               },
             ]}
-
             value={getCurrentEdgeType()}
             onChange={
               (value) => {
@@ -1496,22 +1493,17 @@ export const actionCustomizeRoundness = register({
   label: "Customize edge roundness",
   trackEvent: false,
   perform: (elements, appState, value) => {
-
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isElbowArrow(el)) {
           return el;
         }    
 
-        const { roundness } = value;
-        const { type, corners } = roundness;
-
         return newElementWith(el, {
           roundness:{
-              ...roundness,
-              type: type,
-              corners: corners,
-      
+              ...value.roundness,
+              type: value.roundness.type,
+              corners: value.roundness.corners,
             }
           ,
         });
@@ -1527,7 +1519,6 @@ export const actionCustomizeRoundness = register({
       getNonDeletedElements(elements),
       appState,
     );
-
     const getCurrentCornerValue = (corner : 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight') => {
         return getFormValue(
         elements,
@@ -1543,7 +1534,6 @@ export const actionCustomizeRoundness = register({
         (hasSelection) => hasSelection ? DEFAULT_ADAPTIVE_RADIUS : 0
       );
     }
-    
     const getCurrentLinkValue = () => {
       return getFormValue(
         elements,
@@ -1555,10 +1545,19 @@ export const actionCustomizeRoundness = register({
         (hasSelection) => hasSelection ? null : false
       );
     }
-
+    const getCurrentElementType = () => {
+      return getFormValue(
+        elements,
+        app,
+        (element) => {
+          return element.type;
+        },
+        (element) => !isArrowElement(element) && element.hasOwnProperty("roundness"),
+        (hasSelection) => hasSelection ? null : ""
+      );
+    }
     const updateCornersValue = (corner: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight', newValue: number) => {      
       if (Number.isNaN(newValue)) return;
-
       const cornerLink = getCurrentLinkValue();
       let currentCorners = {
           topLeft: getCurrentCornerValue('topLeft'),
@@ -1566,7 +1565,6 @@ export const actionCustomizeRoundness = register({
           bottomLeft: getCurrentCornerValue('bottomLeft'),
           bottomRight: getCurrentCornerValue('bottomRight'),
         };
-
       if (cornerLink){
         for (const [key, val] of Object.entries(currentCorners) ) {
           currentCorners[key as keyof typeof currentCorners ] = newValue
@@ -1574,10 +1572,8 @@ export const actionCustomizeRoundness = register({
       } else {
         currentCorners[corner] = newValue;
       }
-
       updateData({
         roundness: {
-          ...targetElements.at(0)?.roundness,
           type: ROUNDNESS.CUSTOMIZED,
           corners: currentCorners,
           cornerLink: cornerLink,
@@ -1589,49 +1585,72 @@ export const actionCustomizeRoundness = register({
       <legend>{t("labels.custom")}</legend>
       { <>{renderAction("linkCorner")} </> }
       <div className="corner-inputs">
-        <input
-          type="text"
-          placeholder={t("labels.topLeft")}
-          inputMode="numeric"
-          value={getCurrentCornerValue('topLeft')}
-          onChange={(e) => {
-            const val = Number(e.target.value);
-            updateCornersValue('topLeft', val)
-          }}
-
-          min={0}
-        />
-        <input
-          type="text"
-          placeholder={t("labels.topRight")}
-          value={getCurrentCornerValue('topRight')}
-          onChange={(e) => {
-            const val = Number(e.target.value);
-            updateCornersValue('topRight', val)
-          }}
-          min={0}
-        />
-        <input
-          type="text"
-          placeholder={t("labels.bottomLeft")}
-          value={getCurrentCornerValue('bottomLeft')}
-          onChange={(e) => {
-            const val = Number(e.target.value);
-            updateCornersValue('bottomLeft', val)
-          }}
-          min={0}
-        />
-        <input
-          type="text"
-          placeholder={t("labels.bottomRight")}
-          value={getCurrentCornerValue('bottomRight')}
-          onChange={(e) => {
-            const val = Number(e.target.value);
-            updateCornersValue('bottomRight', val)
-          }}
-          min={0}
-        />
-      </div>
+        <div className="input-group">
+          <legend>{  
+            getCurrentElementType() === "rectangle" ?
+            t("labels.topLeft") : t("labels.top") 
+          }</legend>
+          <input
+            type="text"
+            placeholder={t("labels.topLeft")}
+            inputMode="numeric"
+            value={getCurrentCornerValue('topLeft')}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              updateCornersValue('topLeft', val)
+            }}
+            min={0}
+          />
+        </div>
+        <div className="input-group">
+          <legend>{  
+            getCurrentElementType() === "rectangle" ?
+            t("labels.topRight") : t("labels.right") 
+          }</legend>
+          <input
+            type="text"
+            placeholder={t("labels.topRight")}
+            value={getCurrentCornerValue('topRight')}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              updateCornersValue('topRight', val)
+            }}
+            min={0}
+          />
+        </div>
+        <div className="input-group">
+          <legend>{  
+            getCurrentElementType() === "rectangle" ?
+            t("labels.bottomLeft") : t("labels.bottom") 
+          }</legend>
+          <input
+            type="text"
+            placeholder={t("labels.bottomLeft")}
+            value={getCurrentCornerValue('bottomLeft')}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              updateCornersValue('bottomLeft', val)
+            }}
+            min={0}
+          />
+        </div>
+        <div className="input-group">
+          <legend>{  
+            getCurrentElementType() === "rectangle" ?
+            t("labels.bottomRight") : t("labels.left") 
+          }</legend>
+          <input
+            type="text"
+            placeholder={t("labels.bottomRight")}
+            value={getCurrentCornerValue('bottomRight')}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              updateCornersValue('bottomRight', val)
+            }}
+            min={0}
+          />
+        </div>
+    </div>
     </fieldset>
     );
   },
@@ -1669,7 +1688,6 @@ export const actionLinkCorner = register({
         elements,
         app,
         (element) => {
-          
           return element.roundness?.cornerLink;
         },
         (element) => !isArrowElement(element) && element.hasOwnProperty("roundness"),
