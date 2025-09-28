@@ -953,6 +953,7 @@ function CommandPaletteInner({
                     onMouseMove={() => setCurrentCommand(command)}
                     showShortcut={!app.device.viewport.isMobile}
                     appState={uiAppState}
+                    size={category === "Library" ? "large" : "small"}
                   />
                 ))}
               </div>
@@ -991,6 +992,7 @@ const CommandItem = ({
   onClick,
   showShortcut,
   appState,
+  size = "small",
 }: {
   command: CommandPaletteItem;
   isSelected: boolean;
@@ -999,6 +1001,7 @@ const CommandItem = ({
   onClick: (event: React.MouseEvent) => void;
   showShortcut: boolean;
   appState: UIAppState;
+  size?: "small" | "large";
 }) => {
   const noop = () => {};
 
@@ -1007,6 +1010,7 @@ const CommandItem = ({
       className={clsx("command-item", {
         "item-selected": isSelected,
         "item-disabled": disabled,
+        "command-item-large": size === "large",
       })}
       ref={(ref) => {
         if (isSelected && !disabled) {
@@ -1023,6 +1027,7 @@ const CommandItem = ({
         {command.icon && (
           <InlineIcon
             className="icon"
+            size="var(--icon-size, 1rem)"
             icon={
               typeof command.icon === "function"
                 ? command.icon(appState)
