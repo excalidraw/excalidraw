@@ -1704,7 +1704,7 @@ export const actionLinkCorner = register({
         }}
       >
         {getCurrentLinkValue() ? 
-          LinkUnlockIcon : LinkLockIcon
+          LinkLockIcon : LinkUnlockIcon
         }
       </button>
     </fieldset>
