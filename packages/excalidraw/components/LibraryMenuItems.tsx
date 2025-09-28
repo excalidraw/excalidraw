@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 
-import { MIME_TYPES, arrayToMap } from "@excalidraw/common";
+import { MIME_TYPES, arrayToMap, nextAnimationFrame } from "@excalidraw/common";
 
 import { duplicateElements } from "@excalidraw/element";
 
@@ -244,6 +244,14 @@ export default function LibraryMenuItems({
       ? CACHED_ITEMS_RENDERED_PER_BATCH
       : ITEMS_RENDERED_PER_BATCH;
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    // focus could be stolen by tab trigger button
+    nextAnimationFrame(() => {
+      searchInputRef.current?.focus();
+    });
+  }, []);
+
   return (
     <div
       className="library-menu-items-container"
@@ -265,6 +273,7 @@ export default function LibraryMenuItems({
       {!isLibraryEmpty && (
         <div className="library-menu-items-container__search">
           <input
+          ref={searchInputRef}
             type="search"
             className="library-menu-items-container__search__input"
             placeholder={t("searchIcons")}

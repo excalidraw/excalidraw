@@ -122,6 +122,11 @@ export const getFontString = ({
   return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
 };
 
+/** executes callback in the frame that's after the current one */
+export const nextAnimationFrame = async (cb: () => any) => {
+  requestAnimationFrame(() => requestAnimationFrame(cb));
+};
+
 export const debounce = <T extends any[]>(
   fn: (...args: T) => void,
   timeout: number,
