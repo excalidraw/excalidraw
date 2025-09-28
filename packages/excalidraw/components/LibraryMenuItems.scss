@@ -1,8 +1,15 @@
 @import "open-color/open-color";
 
 .excalidraw {
-  --container-padding-y: 1.5rem;
+  --container-padding-y: 1rem;
   --container-padding-x: 0.75rem;
+
+  .library-menu-items-header {
+    display: flex;
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
 
   .library-menu-items__no-items {
     text-align: center;
@@ -10,13 +17,24 @@
     line-height: 1.5;
     font-size: 0.875rem;
     width: 100%;
+    min-height: 55px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
     &__label {
       color: var(--color-primary);
       font-weight: 700;
       font-size: 1.125rem;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.25rem;
     }
+  }
+
+  .library-menu-items__no-items__hint {
+    color: var(--color-border-outline);
+    padding: 0.75rem 1rem;
   }
 
   &.theme--dark {
@@ -51,25 +69,44 @@
     }
 
     &__items {
+      // so that spinner is relative-positioned to this container
+      position: relative;
+
       row-gap: 0.5rem;
-      padding: var(--container-padding-y) 0;
+      padding: 1rem 0 var(--container-padding-y) 0;
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
-      margin-bottom: 1rem;
     }
 
     &__header {
+      display: flex;
+      align-items: center;
+      flex: 1 1 auto;
+
       color: var(--color-primary);
       font-size: 1.125rem;
       font-weight: 700;
       margin-bottom: 0.75rem;
       width: 100%;
-      padding-right: 4rem; // due to dropdown button
       box-sizing: border-box;
 
       &--excal {
         margin-top: 2rem;
+      }
+
+      &__hint {
+        margin-left: auto;
+        font-size: 10px;
+        color: var(--color-border-outline);
+        font-weight: 400;
+
+        kbd {
+          font-family: monospace;
+          border: 1px solid var(--color-border-outline);
+          border-radius: 4px;
+          padding: 1px 3px;
+        }
       }
     }
 
@@ -80,36 +117,20 @@
     }
 
     &__search {
-      padding: 0 var(--container-padding-x);
-      margin-bottom: 0.75rem;
-      margin-top: 1rem;
-      flex-shrink: 0;
+      flex: 1 1 auto;
+      margin: 0;
 
-      &__input {
-        box-sizing: border-box;
-        width: 80%;
-        margin: 0;
-        font-size: 0.875rem;
-        font-family: inherit;
-        background-color: transparent;
-        color: var(--text-primary-color);
-        outline: none;
+      .ExcTextField__input {
         height: var(--lg-button-size);
-        border: 1px solid var(--default-border-color);
-        letter-spacing: 0.4px;
-        border-radius: var(--border-radius-lg);
+        input {
+          font-size: 0.875rem;
+        }
+      }
 
-        padding: 0.5rem;
+      &.hideCancelButton input::-webkit-search-cancel-button {
+        -webkit-appearance: none;
         appearance: none;
-
-        &:focus-visible {
-          box-shadow: none;
-          border-color: var(--color-primary);
-        }
-
-        &::placeholder {
-          color: var(--color-gray-60);
-        }
+        display: none;
       }
     }
 
