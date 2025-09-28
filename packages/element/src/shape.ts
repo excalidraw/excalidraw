@@ -645,22 +645,12 @@ const generateElementShape = (
         const w = element.width;
         const h = element.height;
         const corners = element.roundness?.corners;
-        
         // find the minimum length to use to prevent weird overlapping shapes caused by large numbers
-        const halfMinimumLength = Math.min(element.width, element.height)/2
-
+        const halfMinimumLength = Math.min(w, h)/2
         let tl = Math.min(corners?.topLeft ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
         let tr = Math.min(corners?.topRight ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
         let bl = Math.min(corners?.bottomLeft ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength); 
         let br = Math.min(corners?.bottomRight ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
-
-        if (element.roundness && element.roundness.corners) {
-          element.roundness.corners.topLeft = tl;
-          element.roundness.corners.topRight = tr;
-          element.roundness.corners.bottomLeft = bl;
-          element.roundness.corners.bottomRight = br;
-        }
-
         shape = generator.path(
           `M ${tl} 0`+                    
            `L ${w - tr} 0` +                 
@@ -699,22 +689,18 @@ const generateElementShape = (
       const R = { x: rightX,  y: rightY };
       const B = { x: bottomX, y: bottomY };
       const L = { x: leftX,   y: leftY };
-
       const move = (p0: {x:number;y:number}, p1: {x:number;y:number}, d: number) => {
         const vx = p1.x - p0.x, vy = p1.y - p0.y;
         const len = Math.hypot(vx, vy);
         const t = d / len;
         return { x: p0.x + vx * t, y: p0.y + vy * t };
       };
- 
       // use one of the edges to prevent overlapping corners from making weird shapes
       const halfMinimumLength = Math.hypot(rightX - topX, rightY - topY) / 2
-
       let tl = Math.min(corners?.topLeft?? DEFAULT_ADAPTIVE_RADIUS , halfMinimumLength);
       let tr = Math.min(corners?.topRight ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
       let bl = Math.min(corners?.bottomLeft ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength); 
       let br = Math.min(corners?.bottomRight ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
-
       const T_L = move(T, L, tl);
       const T_R = move(T, R, tl);
       const R_T = move(R, T, tr);
@@ -723,7 +709,6 @@ const generateElementShape = (
       const B_L = move(B, L, br);
       const L_B = move(L, B, bl);
       const L_T = move(L, T, bl);
-
       const d =
         `M ${T_L.x} ${T_L.y} ` +
         `Q ${T.x} ${T.y} ${T_R.x} ${T_R.y} ` +
