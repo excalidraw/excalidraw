@@ -89,7 +89,8 @@ export const isWritableElement = (
   (target instanceof HTMLInputElement &&
     (target.type === "text" ||
       target.type === "number" ||
-      target.type === "password"));
+      target.type === "password" ||
+      target.type === "search"));
 
 export const getFontFamilyString = ({
   fontFamily,
@@ -115,6 +116,11 @@ export const getFontString = ({
   fontFamily: FontFamilyValues;
 }) => {
   return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
+};
+
+/** executes callback in the frame that's after the current one */
+export const nextAnimationFrame = async (cb: () => any) => {
+  requestAnimationFrame(() => requestAnimationFrame(cb));
 };
 
 export const debounce = <T extends any[]>(
