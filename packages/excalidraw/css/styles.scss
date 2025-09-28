@@ -761,3 +761,23 @@ body.excalidraw-cursor-resize * {
     font-family: "Assistant";
   }
 }
+
+.corner-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px 0;
+  width: 100%;
+
+  input {
+    padding: 4px 8px;
+    width: 100%; 
+    box-sizing: border-box;  
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+     appearance: none;
+    }
+
+  }
+}

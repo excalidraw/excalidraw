@@ -644,50 +644,33 @@ const generateElementShape = (
       else {
         const w = element.width;
         const h = element.height;
-        const r = getCornerRadius(Math.min(w, h), element);
-
-        let tl = element.roundness?.corners?.topLeft ?? DEFAULT_ADAPTIVE_RADIUS;
-        let tr = element.roundness?.corners?.topRight ?? DEFAULT_ADAPTIVE_RADIUS;
-        let bl = element.roundness?.corners?.bottomLeft ?? DEFAULT_ADAPTIVE_RADIUS;
-        let br = element.roundness?.corners?.bottomRight ?? DEFAULT_ADAPTIVE_RADIUS;
-
+        const corners = element.roundness?.corners;
+        
+        // find the minimum length to use to prevent weird overlapping shapes caused by large numbers
         const halfMinimumLength = Math.min(element.width, element.height)/2
-        
-        // console.log(w, h)
-        // console.log("Half Min: " + halfMinimumLength)
-        
-        tl = Math.min(tl, halfMinimumLength);
-        tr = Math.min(tr, halfMinimumLength);
-        bl = Math.min(bl, halfMinimumLength);
-        br = Math.min(br, halfMinimumLength);
 
-
+        let tl = Math.min(corners?.topLeft ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
+        let tr = Math.min(corners?.topRight ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
+        let bl = Math.min(corners?.bottomLeft ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength); 
+        let br = Math.min(corners?.bottomRight ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
 
         if (element.roundness && element.roundness.corners) {
           element.roundness.corners.topLeft = tl;
           element.roundness.corners.topRight = tr;
           element.roundness.corners.bottomLeft = bl;
           element.roundness.corners.bottomRight = br;
-
-          // console.log(element.roundness.corners.topLeft + " " + element.roundness.corners.topRight + " " + element.roundness.corners.bottomLeft + " " + element.roundness.corners.bottomRight)
         }
 
-        
-        // Dummy
-        // console.log(tl, tr, bl ,br)
-
         shape = generator.path(
-
-          //Todo: Nanti modify untuk bisa menyesuaikan dengan input manualnya
-          `M ${tl} 0`+                     // Pindahin kursor ke posisi awal
-           `L ${w - tr} 0` +                 // Garis atas
-           `Q ${w} 0, ${w} ${tr}` +          // Kurva kanan atas
-           `L ${w} ${h - br}` +              // Garis kanan
-           `Q ${w} ${h}, ${w - br} ${h}` +   // Kurva kanan bawah
-           `L ${bl} ${h}` +                 // Garis bawah
-           `Q 0 ${h}, 0 ${h - bl}` +         // Kurva kiri bawah
-           `L 0 ${tl}` +                     // Garis kiri
-           `Q 0 0, ${tl} 0`,              // Kurva kanan atas
+          `M ${tl} 0`+                    
+           `L ${w - tr} 0` +                 
+           `Q ${w} 0, ${w} ${tr}` +         
+           `L ${w} ${h - br}` +           
+           `Q ${w} ${h}, ${w - br} ${h}` +   
+           `L ${bl} ${h}` +                 
+           `Q 0 ${h}, 0 ${h - bl}` +         
+           `L 0 ${tl}` +                     
+           `Q 0 0, ${tl} 0`,            
           generateRoughOptions(
             modifyIframeLikeForRoughOptions(
               element,
@@ -701,86 +684,58 @@ const generateElementShape = (
       return shape;
     }
    case "diamond": {
-  let shape: ElementShapes[typeof element.type];
+    let shape: ElementShapes[typeof element.type];
 
-  const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
-    getDiamondPoints(element);
+    const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+      getDiamondPoints(element);
 
-  if (
-    element.roundness?.type === ROUNDNESS.CUSTOMIZED &&
-    element.roundness.corners
-  ) {
-    const {
-     topLeft:     rTop     = 0,
-     topRight:    rRight   = 0,
-     bottomRight: rBottom  = 0,
-     bottomLeft:  rLeft    = 0,
-    } = element.roundness.corners;
+    if ( 
+      element.roundness?.type === ROUNDNESS.CUSTOMIZED 
+      &&
+      element.roundness 
+    ) {
+      const corners = element.roundness?.corners;
+      const T = { x: topX,    y: topY };
+      const R = { x: rightX,  y: rightY };
+      const B = { x: bottomX, y: bottomY };
+      const L = { x: leftX,   y: leftY };
 
-    const T = { x: topX,    y: topY };
-    const R = { x: rightX,  y: rightY };
-    const B = { x: bottomX, y: bottomY };
-    const L = { x: leftX,   y: leftY };
+      const move = (p0: {x:number;y:number}, p1: {x:number;y:number}, d: number) => {
+        const vx = p1.x - p0.x, vy = p1.y - p0.y;
+        const len = Math.hypot(vx, vy);
+        const t = d / len;
+        return { x: p0.x + vx * t, y: p0.y + vy * t };
+      };
+ 
+      // use one of the edges to prevent overlapping corners from making weird shapes
+      const halfMinimumLength = Math.hypot(rightX - topX, rightY - topY) / 2
 
-    const move = (p0: {x:number;y:number}, p1: {x:number;y:number}, d: number) => {
-      const vx = p1.x - p0.x, vy = p1.y - p0.y;
-      const len = Math.hypot(vx, vy) || 1;
-      const t = d / len;
-      return { x: p0.x + vx * t, y: p0.y + vy * t };
-    };
+      let tl = Math.min(corners?.topLeft?? DEFAULT_ADAPTIVE_RADIUS , halfMinimumLength);
+      let tr = Math.min(corners?.topRight ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
+      let bl = Math.min(corners?.bottomLeft ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength); 
+      let br = Math.min(corners?.bottomRight ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
 
-    const T_L = move(T, L, rTop);
-    const T_R = move(T, R, rTop);
+      const T_L = move(T, L, tl);
+      const T_R = move(T, R, tl);
+      const R_T = move(R, T, tr);
+      const R_B = move(R, B, tr);
+      const B_R = move(B, R, br);
+      const B_L = move(B, L, br);
+      const L_B = move(L, B, bl);
+      const L_T = move(L, T, bl);
 
-    const R_T = move(R, T, rRight);
-    const R_B = move(R, B, rRight);
-
-    const B_R = move(B, R, rBottom);
-    const B_L = move(B, L, rBottom);
-
-    const L_B = move(L, B, rLeft);
-    const L_T = move(L, T, rLeft);
-
-    const d =
-      `M ${T_L.x} ${T_L.y} ` +
-      `Q ${T.x} ${T.y} ${T_R.x} ${T_R.y} ` + // TOP
-      `L ${R_T.x} ${R_T.y} ` +
-      `Q ${R.x} ${R.y} ${R_B.x} ${R_B.y} ` + // RIGHT
-      `L ${B_R.x} ${B_R.y} ` +
-      `Q ${B.x} ${B.y} ${B_L.x} ${B_L.y} ` + // BOTTOM
-      `L ${L_B.x} ${L_B.y} ` +
-      `Q ${L.x} ${L.y} ${L_T.x} ${L_T.y} ` + // LEFT
-      `Z`;
-
-    shape = generator.path(d, generateRoughOptions(element, true));
-    return shape;
-  }
-
-  if (element.roundness) {
-    const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
-    const horizontalRadius = getCornerRadius(Math.abs(rightY - topY), element);
-
-    shape = generator.path(
-      `M ${topX + verticalRadius} ${topY + horizontalRadius} L ${
-        rightX - verticalRadius
-      } ${rightY - horizontalRadius}
-        C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
-          rightX - verticalRadius
-        } ${rightY + horizontalRadius}
-        L ${bottomX + verticalRadius} ${bottomY - horizontalRadius}
-        C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
-          bottomX - verticalRadius
-        } ${bottomY - horizontalRadius}
-        L ${leftX + verticalRadius} ${leftY + horizontalRadius}
-        C ${leftX} ${leftY}, ${leftX} ${leftY}, ${leftX + verticalRadius} ${
-        leftY - horizontalRadius
-      }
-        L ${topX - verticalRadius} ${topY + horizontalRadius}
-        C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
-        topY + horizontalRadius
-      }`,
-      generateRoughOptions(element, true),
-    );
+      const d =
+        `M ${T_L.x} ${T_L.y} ` +
+        `Q ${T.x} ${T.y} ${T_R.x} ${T_R.y} ` +
+        `L ${R_T.x} ${R_T.y} ` +
+        `Q ${R.x} ${R.y} ${R_B.x} ${R_B.y} ` +
+        `L ${B_R.x} ${B_R.y} ` +
+        `Q ${B.x} ${B.y} ${B_L.x} ${B_L.y} ` +
+        `L ${L_B.x} ${L_B.y} ` +
+        `Q ${L.x} ${L.y} ${L_T.x} ${L_T.y} ` + 
+        `Z`;
+      shape = generator.path(d, generateRoughOptions(element, true));
+      return shape;
   } else {
     shape = generator.polygon(
       [
@@ -794,7 +749,6 @@ const generateElementShape = (
   }
   return shape;
 }
-
     case "ellipse": {
       const shape: ElementShapes[typeof element.type] = generator.ellipse(
         element.width / 2,

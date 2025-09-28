@@ -1543,7 +1543,7 @@ export const actionCustomizeRoundness = register({
         (hasSelection) => hasSelection ? DEFAULT_ADAPTIVE_RADIUS : 0
       );
     }
-
+    
     const getCurrentLinkValue = () => {
       return getFormValue(
         elements,
@@ -1560,7 +1560,6 @@ export const actionCustomizeRoundness = register({
       if (Number.isNaN(newValue)) return;
 
       const cornerLink = getCurrentLinkValue();
-
       let currentCorners = {
           topLeft: getCurrentCornerValue('topLeft'),
           topRight: getCurrentCornerValue('topRight'),
@@ -1585,62 +1584,51 @@ export const actionCustomizeRoundness = register({
         }
     });
   };
-
     return (
       <fieldset>
       <legend>{t("labels.custom")}</legend>
-
       { <>{renderAction("linkCorner")} </> }
-
-      <div className="corner-inputs" style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '8px',
-        padding: '8px 0',
-        width: '100%'
-      }}>
+      <div className="corner-inputs">
         <input
-          type="number"
+          type="text"
           placeholder={t("labels.topLeft")}
+          inputMode="numeric"
           value={getCurrentCornerValue('topLeft')}
           onChange={(e) => {
-            const val = parseInt(e.target.value);
+            const val = Number(e.target.value);
             updateCornersValue('topLeft', val)
           }}
-          style={{ padding: '4px 8px', width: '100%', boxSizing: 'border-box' }}
+
           min={0}
         />
         <input
-          type="number"
+          type="text"
           placeholder={t("labels.topRight")}
           value={getCurrentCornerValue('topRight')}
           onChange={(e) => {
-            const val = parseInt(e.target.value);
+            const val = Number(e.target.value);
             updateCornersValue('topRight', val)
           }}
-          style={{ padding: '4px 8px', width: '100%', boxSizing: 'border-box' }}
           min={0}
         />
         <input
-          type="number"
-          placeholder={ t("labels.bottomLeft")}
+          type="text"
+          placeholder={t("labels.bottomLeft")}
           value={getCurrentCornerValue('bottomLeft')}
           onChange={(e) => {
-            const val = parseInt(e.target.value);
+            const val = Number(e.target.value);
             updateCornersValue('bottomLeft', val)
           }}
-          style={{ padding: '4px 8px', width: '100%', boxSizing: 'border-box' }}
           min={0}
         />
         <input
-          type="number"
+          type="text"
           placeholder={t("labels.bottomRight")}
           value={getCurrentCornerValue('bottomRight')}
           onChange={(e) => {
-            const val = parseInt(e.target.value);
+            const val = Number(e.target.value);
             updateCornersValue('bottomRight', val)
           }}
-          style={{ padding: '4px 8px', width: '100%', boxSizing: 'border-box' }}
           min={0}
         />
       </div>
@@ -1649,8 +1637,6 @@ export const actionCustomizeRoundness = register({
   },
 });
 
-// =======================================================================================================
-
 export const actionLinkCorner = register({
   name: "linkCorner",
   label: "Link and Unlink Corners Value",
@@ -1658,8 +1644,6 @@ export const actionLinkCorner = register({
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) => {
-        
-        console.log(value)
 
         return newElementWith(el, {
           roundness : {
@@ -1695,19 +1679,14 @@ export const actionLinkCorner = register({
 
     return (
     <fieldset>
-      {/* <legend>{t("labels.custom")}</legend> */}
       <button
         onClick={()=>{
           const lockVal = getCurrentLinkValue()
-          console.log(lockVal)
-
           updateData(!lockVal)
         }}
       >
         {getCurrentLinkValue() ? 
-          LinkUnlockIcon
-        : 
-          LinkLockIcon
+          LinkUnlockIcon : LinkLockIcon
         }
       </button>
     </fieldset>
