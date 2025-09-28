@@ -152,17 +152,12 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
 ): TElement => {
   let didChange = false;
   for (const key in updates) {
-    const val = (updates as any)[key];
-    
-    const { type, value, corners } = val;
-
-    console.log("key: ",key,"value : "+ type , value, corners)
-    
-    if (typeof val !== "undefined") {
+    const value = (updates as any)[key];
+    if (typeof value !== "undefined") {
       if (
-        (element as any)[key] === val &&
+        (element as any)[key] === value &&
         // if object, always update because its attrs could have changed
-        (typeof val !== "object" || val === null)
+        (typeof value !== "object" || value === null)
       ) {
         continue;
       }
