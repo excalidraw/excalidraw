@@ -218,12 +218,15 @@ function CommandPaletteInner({
   });
 
   const [libraryItemsData] = useAtom(libraryItemsAtom);
-  const libraryCommands: CommandPaletteItem[] = useMemo(
-    () =>
+  const libraryCommands: CommandPaletteItem[] = useMemo(() => {
+    return (
       libraryItemsData.libraryItems
-        ?.filter((libraryItem) => !!libraryItem.name)
+        ?.filter(
+          (libraryItem): libraryItem is MarkRequired<LibraryItem, "name"> =>
+            !!libraryItem.name,
+        )
         .map((libraryItem) => ({
-          label: libraryItem.name ?? "Unknown Library Item",
+          label: libraryItem.name,
           icon: (
             <LibraryItemIcon
               id={libraryItem.id}
@@ -232,15 +235,15 @@ function CommandPaletteInner({
           ),
           category: "Library",
           order: getCategoryOrder("Library"),
-          haystack: deburr(libraryItem.name ?? "Unknown Library Item"),
+          haystack: deburr(libraryItem.name),
           perform: () => {
             app.onInsertElements(
               distributeLibraryItemsOnSquareGrid([libraryItem]),
             );
           },
-        })) || [],
-    [app, libraryItemsData.libraryItems],
-  );
+        })) || []
+    );
+  }, [app, libraryItemsData.libraryItems]);
 
   useEffect(() => {
     // these props change often and we don't want them to re-run the effect
@@ -974,23 +977,9 @@ const LibraryItemIcon = ({
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const { svgCache } = useLibraryCache();
-  const svg = useLibraryItemSvg(id, elements, svgCache);
 
-  useEffect(() => {
-    const node = ref.current;
+  useLibraryItemSvg(id, elements, svgCache, ref);
 
-    if (!node) {
-      return;
-    }
-
-    if (svg) {
-      node.innerHTML = svg.outerHTML;
-    }
-
-    return () => {
-      node.innerHTML = "";
-    };
-  }, [svg]);
   return <div className="library-item-icon" ref={ref} />;
 };
 
