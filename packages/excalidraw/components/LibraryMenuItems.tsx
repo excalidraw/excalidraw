@@ -276,7 +276,7 @@ export default function LibraryMenuItems({
           ref={searchInputRef}
             type="search"
             className="library-menu-items-container__search__input"
-            placeholder={t("searchIcons")}
+              placeholder={t("library.librarySearchPlaceholder")}
             value={libraryItemsSearch}
             onChange={(event) => setLibraryItemsSearch(event.target.value)}
           />
