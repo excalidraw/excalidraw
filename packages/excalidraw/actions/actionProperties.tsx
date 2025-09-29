@@ -1440,8 +1440,6 @@ export const actionChangeRoundness = register({
                   ? null
                   : element.roundness?.type === ROUNDNESS.CUSTOMIZED
                   ? "custom"
-                  : element.roundness
-                  ? "round"
                   : "sharp",
               (element) =>
                 !isArrowElement(element) && element.hasOwnProperty("roundness"),
@@ -1621,7 +1619,7 @@ export const actionCustomizeRoundness = register({
         <div className="input-group">
           <legend>{  
             getCurrentElementType() === "rectangle" ?
-            t("labels.bottomLeft") : t("labels.bottom") 
+            t("labels.bottomLeft") : t("labels.left") 
           }</legend>
           <input
             type="text"
@@ -1637,7 +1635,7 @@ export const actionCustomizeRoundness = register({
         <div className="input-group">
           <legend>{  
             getCurrentElementType() === "rectangle" ?
-            t("labels.bottomRight") : t("labels.left") 
+            t("labels.bottomRight") : t("labels.bottom") 
           }</legend>
           <input
             type="text"
