@@ -1128,7 +1128,9 @@ class App extends React.Component<AppProps, AppState> {
       (otherBinding &&
         arrow[otherBinding]?.mode === "inside" &&
         arrow[otherBinding]?.elementId === hoveredElement?.id) ||
-      (currentBinding && arrow[currentBinding]?.mode === "inside");
+      (currentBinding &&
+        arrow[currentBinding]?.mode === "inside" &&
+        hoveredElement?.id === arrow[currentBinding]?.elementId);
 
     if (
       currentBinding &&
@@ -8372,6 +8374,12 @@ class App extends React.Component<AppProps, AppState> {
     elementType: ExcalidrawLinearElement["type"],
     pointerDownState: PointerDownState,
   ): void => {
+    if (event.ctrlKey) {
+      flushSync(() => {
+        this.setState({ isBindingEnabled: false });
+      });
+    }
+
     if (this.state.multiElement) {
       const { multiElement, selectedLinearElement } = this.state;
 

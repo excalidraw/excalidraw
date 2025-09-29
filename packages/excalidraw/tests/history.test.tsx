@@ -4571,16 +4571,12 @@ describe("history", () => {
         expect(h.elements).toEqual([
           expect.objectContaining({
             id: rect1.id,
-            boundElements: [{ id: arrowId, type: "arrow" }],
+            boundElements: [],
           }),
           expect.objectContaining({ id: rect2.id, boundElements: [] }),
           expect.objectContaining({
             id: arrowId,
-            startBinding: expect.objectContaining({
-              elementId: rect1.id,
-              fixedPoint: [1, 0.5001],
-              mode: "inside",
-            }),
+            startBinding: null,
             endBinding: null,
           }),
         ]);
@@ -4644,21 +4640,12 @@ describe("history", () => {
           expect(h.elements).toEqual([
             expect.objectContaining({
               id: rect1.id,
-              boundElements: [
-                expect.objectContaining({
-                  id: arrowId,
-                  type: "arrow",
-                }),
-              ],
+              boundElements: [],
             }),
             expect.objectContaining({ id: rect2.id, boundElements: [] }),
             expect.objectContaining({
               id: arrowId,
-              startBinding: expect.objectContaining({
-                elementId: rect1.id,
-                fixedPoint: [1, 0.5001],
-                mode: "inside",
-              }),
+              startBinding: null,
               endBinding: null,
             }),
           ]);
@@ -4724,21 +4711,12 @@ describe("history", () => {
         expect(h.elements).toEqual([
           expect.objectContaining({
             id: rect1.id,
-            boundElements: [
-              expect.objectContaining({
-                id: arrowId,
-                type: "arrow",
-              }),
-            ],
+            boundElements: [],
           }),
           expect.objectContaining({ id: rect2.id, boundElements: [] }),
           expect.objectContaining({
             id: arrowId,
-            startBinding: expect.objectContaining({
-              elementId: rect1.id,
-              fixedPoint: [1, 0.5001],
-              mode: "inside",
-            }),
+            startBinding: null,
             endBinding: null,
           }),
         ]);
@@ -4811,12 +4789,7 @@ describe("history", () => {
             expect.arrayContaining([
               expect.objectContaining({
                 id: rect1.id,
-                boundElements: [
-                  expect.objectContaining({
-                    id: arrowId,
-                    type: "arrow",
-                  }),
-                ],
+                boundElements: [],
               }),
               expect.objectContaining({
                 id: rect2.id,
@@ -4824,11 +4797,7 @@ describe("history", () => {
               }),
               expect.objectContaining({
                 id: arrowId,
-                startBinding: expect.objectContaining({
-                  elementId: rect1.id,
-                  fixedPoint: [1, 0.5001],
-                  mode: "inside",
-                }),
+                startBinding: null,
                 endBinding: expect.objectContaining({
                   // now we are back in the previous state!
                   elementId: remoteContainer.id,
