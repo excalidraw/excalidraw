@@ -281,18 +281,28 @@ export const LibraryMenu = memo(() => {
           if (target.closest(`.${CLASSES.SIDEBAR}`)) {
             // stop propagation so that we don't prevent it downstream
             // (default browser behavior is to clear search input on ESC)
-            event.stopPropagation();
             if (selectedItems.length > 0) {
+              event.stopPropagation();
               setSelectedItems([]);
             } else if (
               isWritableElement(target) &&
               target instanceof HTMLInputElement &&
               !target.value
             ) {
+              event.stopPropagation();
               // if search input empty -> close library
               // (maybe not a good idea?)
               setAppState({ openSidebar: null });
               app.focusContainer();
+            }
+          } else if (selectedItems.length > 0) {
+            const { x, y } = app.lastViewportPosition;
+            const elementUnderCursor = document.elementFromPoint(x, y);
+            // also deselect elements if sidebar doesn't have focus but the
+            // cursor is over it
+            if (elementUnderCursor?.closest(`.${CLASSES.SIDEBAR}`)) {
+              event.stopPropagation();
+              setSelectedItems([]);
             }
           }
         }

@@ -138,10 +138,13 @@ export default function LibraryMenuItems({
           }
 
           const selectedItemsMap = arrayToMap(selectedItems);
+          // Support both top-down and bottom-up selection by using min/max
+          const minRange = Math.min(rangeStart, rangeEnd);
+          const maxRange = Math.max(rangeStart, rangeEnd);
           const nextSelectedIds = orderedItems.reduce(
             (acc: LibraryItem["id"][], item, idx) => {
               if (
-                (idx >= rangeStart && idx <= rangeEnd) ||
+                (idx >= minRange && idx <= maxRange) ||
                 selectedItemsMap.has(item.id)
               ) {
                 acc.push(item.id);
@@ -168,6 +171,14 @@ export default function LibraryMenuItems({
       unpublishedItems,
     ],
   );
+
+  useEffect(() => {
+    // if selection is removed (e.g. via esc), reset last selected item
+    // so that subsequent shift+clicks don't select a large range
+    if (!selectedItems.length) {
+      setLastSelectedItem(null);
+    }
+  }, [selectedItems]);
 
   const getInsertedElements = useCallback(
     (id: string) => {
