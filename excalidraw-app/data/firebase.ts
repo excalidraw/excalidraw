@@ -317,3 +317,10 @@ export const loadFilesFromFirebase = async (
 
   return { loadedFiles, erroredFiles };
 };
+
+export const deleteRoomFromFirebase = async (
+  roomId: string,
+  roomKey: string,
+): Promise<void> => {
+  // TODO: delete the room...
+};

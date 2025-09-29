@@ -106,6 +106,10 @@
 
         color: var(--text-primary-color);
 
+        &__text {
+          margin-bottom: 1rem;
+        }
+
         & strong {
           display: block;
           font-weight: 700;
@@ -155,11 +159,16 @@
         & p + p {
           margin-top: 1em;
         }
+
+        & h3 {
+          font-weight: 600;
+        }
       }
 
       &__actions {
         display: flex;
         justify-content: center;
+        gap: 0.75rem;
       }
     }
   }
