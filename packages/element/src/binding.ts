@@ -390,6 +390,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
 
 const bindingStrategyForSimpleArrowEndpointDragging = (
   point: GlobalPoint,
+  currentBinding: FixedPointBinding | null,
   oppositeBinding: FixedPointBinding | null,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
@@ -439,6 +440,17 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
   // so we break any existing binding
   if (!hit) {
     return { current: { mode: null }, other };
+  }
+
+  // Already inside binding over the same hit element should remain inside bound
+  if (
+    hit.id === currentBinding?.elementId &&
+    currentBinding.mode === "inside"
+  ) {
+    return {
+      current: { mode: "inside", focusPoint: point, element: hit },
+      other,
+    };
   }
 
   // The dragged point is inside the hovered bindable element
@@ -579,6 +591,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
 
     const { current, other } = bindingStrategyForSimpleArrowEndpointDragging(
       globalPoint,
+      arrow.startBinding,
       arrow.endBinding,
       elementsMap,
       elements,
@@ -600,6 +613,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
     );
     const { current, other } = bindingStrategyForSimpleArrowEndpointDragging(
       globalPoint,
+      arrow.endBinding,
       arrow.startBinding,
       elementsMap,
       elements,

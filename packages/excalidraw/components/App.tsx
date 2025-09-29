@@ -1108,6 +1108,38 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
+    const startDragged =
+      this.state.selectedLinearElement?.selectedPointsIndices?.includes(0);
+    const endDragged =
+      this.state.selectedLinearElement?.selectedPointsIndices?.includes(
+        arrow.points.length - 1,
+      );
+    const currentBinding = startDragged
+      ? "startBinding"
+      : endDragged
+      ? "endBinding"
+      : null;
+    const isAlreadyInsideBindingToSameElement = startDragged
+      ? arrow.startBinding?.mode === "inside" &&
+        arrow.startBinding?.elementId === hoveredElement?.id
+      : endDragged
+      ? arrow.endBinding?.mode === "inside" &&
+        arrow.endBinding?.elementId === hoveredElement?.id
+      : false;
+    if (
+      currentBinding &&
+      arrow[currentBinding]?.mode === "inside" &&
+      hoveredElement?.id !== arrow[currentBinding]?.elementId
+    ) {
+      // Update binding out of place to orbit mode
+      this.scene.mutateElement(arrow, {
+        [currentBinding]: {
+          ...arrow[currentBinding],
+          mode: "orbit",
+        },
+      });
+    }
+
     if (
       !hoveredElement ||
       (this.previousHoveredBindableElement &&
@@ -1131,7 +1163,8 @@ class App extends React.Component<AppProps, AppState> {
       this.previousHoveredBindableElement = null;
     } else if (
       !this.bindModeHandler &&
-      (!this.state.newElement || !arrow.startBinding || isOverlapping)
+      (!this.state.newElement || !arrow.startBinding || isOverlapping) &&
+      !isAlreadyInsideBindingToSameElement
     ) {
       // We are hovering a bindable element
       this.bindModeHandler = setTimeout(effector, BIND_MODE_TIMEOUT);
