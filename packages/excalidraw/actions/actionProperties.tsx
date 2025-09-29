@@ -25,7 +25,7 @@ import {
   DEFAULT_PROPORTIONAL_RADIUS,
 } from "@excalidraw/common";
 
-import { canBecomePolygon, getNonDeletedElements, isUsingCustiomizedRadius } from "@excalidraw/element";
+import { canBecomePolygon, getNonDeletedElements} from "@excalidraw/element";
 
 import {
   bindLinearElement,
@@ -146,7 +146,6 @@ import {
 import { register } from "./register";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
-import { customAlphabet } from "nanoid";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -566,7 +565,6 @@ export const actionChangeStrokeWidth = register({
   ),
 });
 
-//
 export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   label: "labels.sloppiness",
@@ -1401,7 +1399,10 @@ export const actionChangeRoundness = register({
                   ...el.roundness,
                   type: ROUNDNESS.PROPORTIONAL_RADIUS,
                 }
-              : value === "custom" ?
+              : value === "round" ?
+               {
+                type: ROUNDNESS.ADAPTIVE_RADIUS,
+              } :
               {
                 ...el.roundness,
                 type: ROUNDNESS.CUSTOMIZED,
@@ -1412,7 +1413,7 @@ export const actionChangeRoundness = register({
                   bottomRight: el.roundness?.corners?.bottomRight?? DEFAULT_ADAPTIVE_RADIUS,
                 },
                 cornerLink : el.roundness?.cornerLink ?? true,
-              } : null,
+              } ,
 
         });
       }),
@@ -1431,6 +1432,7 @@ export const actionChangeRoundness = register({
     const hasLegacyRoundness = targetElements.some(
       (el) => el.roundness?.type === ROUNDNESS.LEGACY,
     );
+
     const getCurrentEdgeType = () => {
       return getFormValue(
               elements,
@@ -1439,8 +1441,8 @@ export const actionChangeRoundness = register({
                 hasLegacyRoundness
                   ? null
                   : element.roundness?.type === ROUNDNESS.CUSTOMIZED
-                  ? "custom"
-                  : element.roundness
+                  ? "custom" 
+                  : element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS
                   ? "round"
                   : "sharp",
               (element) =>
@@ -1448,6 +1450,18 @@ export const actionChangeRoundness = register({
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemRoundness,
             );
+    }
+
+    const getCurrentElementType = () => {
+      return getFormValue(
+        elements,
+        app,
+        (element) => {
+          return element.type;
+        },
+        (element) => !isArrowElement(element) && element.hasOwnProperty("roundness"),
+        (hasSelection) => hasSelection ? null : ""
+      );
     }
 
     return (
@@ -1462,6 +1476,12 @@ export const actionChangeRoundness = register({
                 text: t("labels.sharp"),
                 icon: EdgeSharpIcon,
               },
+              getCurrentElementType() === "image" || getCurrentElementType() === "line" ? 
+              {
+                value: "round",
+                text: t("labels.round"),
+                icon: EdgeRoundIcon,  
+              } : 
               {
                 value: "custom",
                 text: t("labels.custom"),
@@ -1621,7 +1641,7 @@ export const actionCustomizeRoundness = register({
         <div className="input-group">
           <legend>{  
             getCurrentElementType() === "rectangle" ?
-            t("labels.bottomLeft") : t("labels.bottom") 
+            t("labels.bottomLeft") : t("labels.left") 
           }</legend>
           <input
             type="text"
@@ -1637,7 +1657,7 @@ export const actionCustomizeRoundness = register({
         <div className="input-group">
           <legend>{  
             getCurrentElementType() === "rectangle" ?
-            t("labels.bottomRight") : t("labels.left") 
+            t("labels.bottomRight") : t("labels.bottom") 
           }</legend>
           <input
             type="text"
@@ -1704,7 +1724,7 @@ export const actionLinkCorner = register({
         }}
       >
         {getCurrentLinkValue() ? 
-          LinkUnlockIcon : LinkLockIcon
+          LinkLockIcon : LinkUnlockIcon
         }
       </button>
     </fieldset>

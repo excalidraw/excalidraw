@@ -625,7 +625,7 @@ const generateElementShape = (
       let shape: ElementShapes[typeof element.type];
       // this is for rendering the stroke/bg of the embeddable, especially
       // when the src url is not set
-      if (element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS) {
+      if (!element.roundness || element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS) {
         shape = generator.rectangle(
           0,
           0,
@@ -637,7 +637,7 @@ const generateElementShape = (
               isExporting,
               embedsValidationStatus,
             ),
-            false,
+            true,
           ),
         );
       } 
@@ -667,7 +667,7 @@ const generateElementShape = (
               isExporting,
               embedsValidationStatus,
             ),
-            true,
+            false,
           ),
         );
       }
@@ -754,7 +754,6 @@ const generateElementShape = (
       const points = element.points.length
         ? element.points
         : [pointFrom<LocalPoint>(0, 0)];
-
       if (isElbowArrow(element)) {
         // NOTE (mtolmacs): Temporary fix for extremely big arrow shapes
         if (
@@ -776,9 +775,10 @@ const generateElementShape = (
             ),
           ];
         }
-      } else if (!element.roundness) {
+      } else if (element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS ) {
         // curve is always the first element
         // this simplifies finding the curve for an element
+        // EDIT: changed from detecting if roundness is available to detecting if its sharp or round edges
         if (options.fill) {
           shape = [
             generator.polygon(points as unknown as RoughPoint[], options),

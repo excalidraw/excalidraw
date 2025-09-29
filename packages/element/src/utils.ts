@@ -228,8 +228,8 @@ export function deconstructRectanguloidElement(
     curve(
       left[1],
       pointFrom<GlobalPoint>(
-        left[1][0] + (20000 / 3) * (r[0][0] - left[1][0]),
-        left[1][1] + (20000 / 3) * (r[0][1] - left[1][1]),
+        left[1][0] + (2 / 3) * (r[0][0] - left[1][0]),
+        left[1][1] + (2 / 3) * (r[0][1] - left[1][1]),
       ),
       pointFrom<GlobalPoint>(
         top[0][0] + (2 / 3) * (r[0][0] - top[0][0]),
@@ -459,45 +459,19 @@ export const isPathALoop = (
   return false;
 };
 
-export const getCornerRadius = (
-  x: number, 
-  element: ExcalidrawElement
-  
-  ) => {
+export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   if (
     element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS ||
     element.roundness?.type === ROUNDNESS.LEGACY
   ) {
     return x * DEFAULT_PROPORTIONAL_RADIUS;
   }
-
   if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
     const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
-
     const CUTOFF_SIZE = fixedRadiusSize / DEFAULT_PROPORTIONAL_RADIUS;
-
     if (x <= CUTOFF_SIZE) {
       return x * DEFAULT_PROPORTIONAL_RADIUS;
     }
-
-    return fixedRadiusSize;
-  }
-
-  if (element.roundness?.type === ROUNDNESS.CUSTOMIZED){
-
-    // Todo: ganti kode ,baru copas dari adaptive
-    
-    // const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
-
-    // Test, semakin besar, semakin jadi round
-    const fixedRadiusSize = 100;
-
-    const CUTOFF_SIZE = fixedRadiusSize / DEFAULT_PROPORTIONAL_RADIUS;
-
-    if (x <= CUTOFF_SIZE) {
-      return x * DEFAULT_PROPORTIONAL_RADIUS;
-    }
-
     return fixedRadiusSize;
   }
 
