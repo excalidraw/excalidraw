@@ -185,7 +185,8 @@
     "search": {
       "inputPlaceholder": "Search library",
       "heading": "Library matches",
-      "noResults": "No matching items found..."
+      "noResults": "No matching items found...",
+      "clearSearch": "Clear search"
     }
   },
   "search": {

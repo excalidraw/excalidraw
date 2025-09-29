@@ -34,6 +34,8 @@ import { TextField } from "./TextField";
 
 import { useDevice } from "./App";
 
+import { Button } from "./Button";
+
 import type { ExcalidrawLibraryIds } from "../data/types";
 
 import type {
@@ -319,7 +321,14 @@ export default function LibraryMenuItems({
       <div className="library-menu-items-container__header">
         {t("library.search.heading")}
         {!isLoading && (
-          <div className="library-menu-items-container__header__hint">
+          <div
+            className="library-menu-items-container__header__hint"
+            style={{ cursor: "pointer" }}
+            onPointerDown={(e) => e.preventDefault()}
+            onClick={(event) => {
+              setSearchInputValue("");
+            }}
+          >
             <kbd>esc</kbd> to clear
           </div>
         )}
@@ -341,6 +350,15 @@ export default function LibraryMenuItems({
           <div className="library-menu-items__no-items__hint">
             {t("library.search.noResults")}
           </div>
+          <Button
+            onPointerDown={(e) => e.preventDefault()}
+            onSelect={() => {
+              setSearchInputValue("");
+            }}
+            style={{ width: "auto", marginTop: "1rem" }}
+          >
+            {t("library.search.clearSearch")}
+          </Button>
         </div>
       )}
     </>
