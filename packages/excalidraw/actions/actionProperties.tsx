@@ -1431,6 +1431,7 @@ export const actionChangeRoundness = register({
     const hasLegacyRoundness = targetElements.some(
       (el) => el.roundness?.type === ROUNDNESS.LEGACY,
     );
+
     const getCurrentEdgeType = () => {
       return getFormValue(
               elements,
@@ -1448,6 +1449,18 @@ export const actionChangeRoundness = register({
             );
     }
 
+    const getCurrentElementType = () => {
+      return getFormValue(
+        elements,
+        app,
+        (element) => {
+          return element.type;
+        },
+        (element) => !isArrowElement(element) && element.hasOwnProperty("roundness"),
+        (hasSelection) => hasSelection ? null : ""
+      );
+    }
+
     return (
       <fieldset>
         <legend>{t("labels.edges")}</legend>
@@ -1460,6 +1473,12 @@ export const actionChangeRoundness = register({
                 text: t("labels.sharp"),
                 icon: EdgeSharpIcon,
               },
+              getCurrentElementType() === "line" ? 
+              {
+                value: "round",
+                text: t("labels.round"),
+                icon: EdgeRoundIcon,  
+              } : 
               {
                 value: "custom",
                 text: t("labels.custom"),
