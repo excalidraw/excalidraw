@@ -41,6 +41,7 @@ import {
   ZoomResetIcon,
 } from "../components/icons";
 import { setCursor } from "../cursor";
+import { constrainScrollState } from "../scene/scrollConstraints";
 
 import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
@@ -138,7 +139,7 @@ export const actionZoomIn = register({
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
-      appState: {
+      appState: constrainScrollState({
         ...appState,
         ...getStateForZoom(
           {
@@ -149,7 +150,7 @@ export const actionZoomIn = register({
           appState,
         ),
         userToFollow: null,
-      },
+      }),
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
@@ -179,7 +180,7 @@ export const actionZoomOut = register({
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
-      appState: {
+      appState: constrainScrollState({
         ...appState,
         ...getStateForZoom(
           {
@@ -190,7 +191,7 @@ export const actionZoomOut = register({
           appState,
         ),
         userToFollow: null,
-      },
+      }),
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
