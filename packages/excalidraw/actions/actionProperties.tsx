@@ -25,7 +25,7 @@ import {
   DEFAULT_PROPORTIONAL_RADIUS,
 } from "@excalidraw/common";
 
-import { canBecomePolygon, getNonDeletedElements, isUsingCustiomizedRadius } from "@excalidraw/element";
+import { canBecomePolygon, getNonDeletedElements} from "@excalidraw/element";
 
 import {
   bindLinearElement,
@@ -146,7 +146,6 @@ import {
 import { register } from "./register";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
-import { customAlphabet } from "nanoid";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -566,7 +565,6 @@ export const actionChangeStrokeWidth = register({
   ),
 });
 
-//
 export const actionChangeSloppiness = register({
   name: "changeSloppiness",
   label: "labels.sloppiness",

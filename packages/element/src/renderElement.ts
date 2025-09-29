@@ -832,7 +832,6 @@ export const renderElement = (
       // beforehand because math helpers (such as getElementAbsoluteCoords)
       // rely on existing shapes
       ShapeCache.generateElementShape(element, renderConfig);
-
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
