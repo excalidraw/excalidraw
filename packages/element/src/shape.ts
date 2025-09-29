@@ -625,7 +625,7 @@ const generateElementShape = (
       let shape: ElementShapes[typeof element.type];
       // this is for rendering the stroke/bg of the embeddable, especially
       // when the src url is not set
-      if (element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS) {
+      if (!element.roundness || element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS) {
         shape = generator.rectangle(
           0,
           0,
