@@ -117,6 +117,7 @@ export const actionClearCanvas = register({
         currentItemBackgroundColor: appState.currentItemBackgroundColor,
         currentItemStrokeWidth: appState.currentItemStrokeWidth,
         currentItemFillStyle: appState.currentItemFillStyle,
+        viewBackgroundColor: appState.viewBackgroundColor,
         exportBackground: appState.exportBackground,
         exportEmbedScene: appState.exportEmbedScene,
         gridSize: appState.gridSize,
