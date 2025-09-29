@@ -217,6 +217,7 @@ const ColorPickerPopupContent = ({
             appState.stylesPanelMode === "compact" ||
             appState.stylesPanelMode === "mobile"
           }
+          showHotKey={appState.stylesPanelMode !== "mobile"}
         >
           {colorInputJSX}
         </Picker>

@@ -40,6 +40,7 @@ interface PickerProps {
   showTitle?: boolean;
   onEyeDropperToggle: (force?: boolean) => void;
   onEscape: (event: React.KeyboardEvent | KeyboardEvent) => void;
+  showHotKey?: boolean;
 }
 
 export const Picker = React.forwardRef(
@@ -55,6 +56,7 @@ export const Picker = React.forwardRef(
       showTitle,
       onEyeDropperToggle,
       onEscape,
+      showHotKey = true,
     }: PickerProps,
     ref,
   ) => {
@@ -187,12 +189,18 @@ export const Picker = React.forwardRef(
               palette={palette}
               onChange={onChange}
               activeShade={activeShade}
+              showHotKey={showHotKey}
             />
           </div>
 
           <div>
             <PickerHeading>{t("colorPicker.shades")}</PickerHeading>
-            <ShadeList color={color} onChange={onChange} palette={palette} />
+            <ShadeList
+              color={color}
+              onChange={onChange}
+              palette={palette}
+              showHotKey={showHotKey}
+            />
           </div>
           {children}
         </div>
