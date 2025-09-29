@@ -1119,25 +1119,38 @@ class App extends React.Component<AppProps, AppState> {
       : endDragged
       ? "endBinding"
       : null;
-    const isAlreadyInsideBindingToSameElement = startDragged
-      ? arrow.startBinding?.mode === "inside" &&
-        arrow.startBinding?.elementId === hoveredElement?.id
+    const otherBinding = startDragged
+      ? "endBinding"
       : endDragged
-      ? arrow.endBinding?.mode === "inside" &&
-        arrow.endBinding?.elementId === hoveredElement?.id
-      : false;
+      ? "startBinding"
+      : null;
+    const isAlreadyInsideBindingToSameElement =
+      (otherBinding &&
+        arrow[otherBinding]?.mode === "inside" &&
+        arrow[otherBinding]?.elementId === hoveredElement?.id) ||
+      (currentBinding && arrow[currentBinding]?.mode === "inside");
+
     if (
       currentBinding &&
+      otherBinding &&
       arrow[currentBinding]?.mode === "inside" &&
-      hoveredElement?.id !== arrow[currentBinding]?.elementId
+      hoveredElement?.id !== arrow[currentBinding]?.elementId &&
+      arrow[otherBinding]?.elementId !== arrow[currentBinding]?.elementId
     ) {
       // Update binding out of place to orbit mode
-      this.scene.mutateElement(arrow, {
-        [currentBinding]: {
-          ...arrow[currentBinding],
-          mode: "orbit",
+      this.scene.mutateElement(
+        arrow,
+        {
+          [currentBinding]: {
+            ...arrow[currentBinding],
+            mode: "orbit",
+          },
         },
-      });
+        {
+          informMutation: false,
+          isDragging: true,
+        },
+      );
     }
 
     if (

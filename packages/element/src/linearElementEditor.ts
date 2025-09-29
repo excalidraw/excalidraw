@@ -25,6 +25,7 @@ import {
 
 import {
   deconstructLinearOrFreeDrawElement,
+  getHoveredElementForBinding,
   isPathALoop,
   moveArrowAboveBindable,
   type Store,
@@ -301,11 +302,21 @@ export class LinearElementEditor {
     const customLineAngle =
       linearElementEditor.customLineAngle ??
       determineCustomLinearAngle(pivotPoint, element.points[idx]);
+    const hoveredElement = getHoveredElementForBinding(
+      pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+      elements,
+      elementsMap,
+    );
 
     // Determine if point movement should happen and how much
     let deltaX = 0;
     let deltaY = 0;
-    if (shouldRotateWithDiscreteAngle(event)) {
+    if (
+      shouldRotateWithDiscreteAngle(event) &&
+      !hoveredElement &&
+      !element.startBinding &&
+      !element.endBinding
+    ) {
       const [width, height] = LinearElementEditor._getShiftLockedDelta(
         element,
         elementsMap,
@@ -453,11 +464,22 @@ export class LinearElementEditor {
     const endIsSelected = selectedPointsIndices.includes(
       element.points.length - 1,
     );
+    const hoveredElement = getHoveredElementForBinding(
+      pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+      elements,
+      elementsMap,
+    );
 
     // Determine if point movement should happen and how much
     let deltaX = 0;
     let deltaY = 0;
-    if (shouldRotateWithDiscreteAngle(event) && singlePointDragged) {
+    if (
+      shouldRotateWithDiscreteAngle(event) &&
+      singlePointDragged &&
+      !hoveredElement &&
+      !element.startBinding &&
+      !element.endBinding
+    ) {
       const [width, height] = LinearElementEditor._getShiftLockedDelta(
         element,
         elementsMap,
