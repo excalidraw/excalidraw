@@ -273,19 +273,24 @@ export namespace OpenAIOutput {
    */
   interface CompletionUsage {
     /**
-     * Number of tokens in the generated completion.
+     * Number of tokens in the request input.
      */
-    completion_tokens: number;
+    input_tokens: number;
 
     /**
-     * Number of tokens in the prompt.
+     * Number of tokens in the generated output.
      */
-    prompt_tokens: number;
+    output_tokens: number;
 
     /**
-     * Total number of tokens used in the request (prompt + completion).
+     * Total number of tokens used in the request (input + output).
      */
     total_tokens: number;
+
+    /**
+     * Number of tokens spent on reasoning (if available).
+     */
+    reasoning_tokens?: number;
   }
 
   export interface APIError {

@@ -45,6 +45,41 @@ export const useChatStream = ({
   const LLM_BASE_URL = getLLMBaseURL();
   const streamingEnabled = getStreamingFeatureFlag();
 
+  const normalizeUsageForMessage = (usage: any | undefined) => {
+    if (!usage || typeof usage !== 'object') {
+      return undefined;
+    }
+
+    const inputTokens = usage.input_tokens ?? usage.prompt_tokens ?? usage.total_prompt_tokens ?? usage.request_tokens ?? 0;
+    const outputTokens = usage.output_tokens ?? usage.completion_tokens ?? usage.total_completion_tokens ?? usage.response_tokens ?? 0;
+    const totalTokens = usage.total_tokens ?? (inputTokens + outputTokens);
+    const reasoningTokens = usage.reasoning_tokens ?? usage.output_tokens_details?.reasoning_tokens ?? 0;
+
+    return {
+      input_tokens: inputTokens,
+      output_tokens: outputTokens,
+      total_tokens: totalTokens,
+      reasoning_tokens: reasoningTokens
+    };
+  };
+
+  const mapToolCallsForMessage = (toolCalls: any): ChatMessage['toolCalls'] | undefined => {
+    if (!Array.isArray(toolCalls) || toolCalls.length === 0) {
+      return undefined;
+    }
+
+    return toolCalls.map((tc: any, index: number) => {
+      const id = tc.id || tc.call_id || tc.tool_call_id || `tool-${Date.now()}-${index}`;
+      const toolName = tc.function?.name || tc.name || 'tool';
+      return {
+        id,
+        toolName,
+        status: 'completed',
+        summary: typeof tc.summary === 'string' ? tc.summary : undefined
+      } satisfies ChatMessage['toolCalls'][number];
+    });
+  };
+
   const requestPlanData = useCallback(async (message: string) => {
     const planAbortController = new AbortController();
     planningAbortControllerRef.current = planAbortController;
@@ -394,14 +429,21 @@ export const useChatStream = ({
           const data = JSON.parse(event.data);
           logEvent('final', data);
 
+          const eventContent = typeof data.content === 'string'
+            ? data.content
+            : (typeof data.response === 'string' ? data.response : undefined);
+          const toolSummary = typeof data.tool_summary === 'string' ? data.tool_summary.trim() : undefined;
+          const contentPieces = [eventContent, toolSummary].filter(Boolean);
+          const finalContent = contentPieces.length > 0
+            ? contentPieces.join(eventContent && toolSummary ? '\n\n' : '')
+            : undefined;
+          const normalizedUsage = normalizeUsageForMessage(data.usage);
+          const mappedToolCalls = mapToolCallsForMessage(data.toolCalls ?? data.tool_calls);
+          const responseId = data.response_id || data.id || undefined;
+          const finishReason = data.finish_reason || undefined;
+          const executionInfo = data.executionInfo ?? undefined;
+
           onMessagesUpdate(prev => {
-            const content = typeof data.response === 'string' ? data.response : undefined;
-            const toolSummary = typeof data.tool_summary === 'string' ? data.tool_summary.trim() : undefined;
-
-            const finalContent = [content, toolSummary]
-              .filter(Boolean)
-              .join(content && toolSummary ? '\n\n' : '');
-
             if (assistantMessageId) {
               const currentId = assistantMessageId;
               return prev.map(msg =>
@@ -411,10 +453,13 @@ export const useChatStream = ({
                       isStreaming: false,
                       content: finalContent || msg.content,
                       durationMs: data.duration ?? msg.durationMs,
-                      planningDurationMs: data.executionInfo?.planningDurationMs ?? msg.planningDurationMs,
-                      executionDurationMs: data.executionInfo?.executionDurationMs ?? msg.executionDurationMs,
-                      executionInfo: data.executionInfo ?? msg.executionInfo,
-                      usage: data.usage ?? msg.usage
+                      planningDurationMs: executionInfo?.planningDurationMs ?? msg.planningDurationMs,
+                      executionDurationMs: executionInfo?.executionDurationMs ?? msg.executionDurationMs,
+                      executionInfo: executionInfo ?? msg.executionInfo,
+                      usage: normalizedUsage ?? msg.usage,
+                      toolCalls: mappedToolCalls ?? msg.toolCalls,
+                      responseId: responseId ?? msg.responseId,
+                      finishReason: finishReason ?? msg.finishReason
                     }
                   : msg
               );
@@ -423,14 +468,17 @@ export const useChatStream = ({
             const newMessage: ChatMessage = {
               id: `assistant-${Date.now()}`,
               role: 'assistant',
-              content: finalContent,
+              content: finalContent || '',
               timestamp: new Date().toISOString(),
               isStreaming: false,
               durationMs: data.duration,
-              planningDurationMs: data.executionInfo?.planningDurationMs,
-              executionDurationMs: data.executionInfo?.executionDurationMs,
-              executionInfo: data.executionInfo,
-              usage: data.usage
+              planningDurationMs: executionInfo?.planningDurationMs,
+              executionDurationMs: executionInfo?.executionDurationMs,
+              executionInfo,
+              usage: normalizedUsage,
+              toolCalls: mappedToolCalls,
+              responseId,
+              finishReason
             };
             return [...prev, newMessage];
           });

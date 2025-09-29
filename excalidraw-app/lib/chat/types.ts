@@ -44,10 +44,13 @@ export interface ChatMessage {
     summary?: string;
   }>;
   usage?: {
-    prompt_tokens: number;
-    completion_tokens: number;
+    input_tokens: number;
+    output_tokens: number;
     total_tokens: number;
+    reasoning_tokens?: number;
   };
+  responseId?: string;
+  finishReason?: string;
 }
 
 export interface StreamingState {
