@@ -354,6 +354,7 @@ export class LinearElementEditor {
       element,
       elements,
       app,
+      event.shiftKey,
     );
 
     LinearElementEditor.movePoints(element, app.scene, positions, {
@@ -517,6 +518,7 @@ export class LinearElementEditor {
       element,
       elements,
       app,
+      event.shiftKey,
     );
 
     LinearElementEditor.movePoints(element, app.scene, positions, {
@@ -2054,6 +2056,7 @@ const pointDraggingUpdates = (
   element: NonDeleted<ExcalidrawLinearElement>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   app: AppClassProperties,
+  shiftKey: boolean,
 ): {
   positions: PointsPositionUpdates;
   updates?: PointMoveOtherUpdates;
@@ -2099,6 +2102,7 @@ const pointDraggingUpdates = (
     app.state,
     {
       newArrow: !!app.state.newElement,
+      shiftKey,
     },
   );
 

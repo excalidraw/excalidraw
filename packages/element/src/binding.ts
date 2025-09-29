@@ -241,6 +241,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
   endIdx: number,
   appState: AppState,
   globalBindMode?: AppState["bindMode"],
+  shiftKey?: boolean,
 ): {
   start: BindingStrategy;
   end: BindingStrategy;
@@ -334,12 +335,11 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
 
       const otherIsInsideBinding =
         !!appState.selectedLinearElement?.initialState.arrowStartIsInside;
-
       const other: BindingStrategy = {
         mode: otherIsInsideBinding ? "inside" : "orbit",
         element: otherElement,
-        focusPoint: otherIsInsideBinding
-          ? origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y)
+        focusPoint: shiftKey
+          ? elementCenterPoint(otherElement, elementsMap)
           : origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y),
       };
 
@@ -396,6 +396,7 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   globalBindMode: AppState["bindMode"],
   arrow: NonDeleted<ExcalidrawArrowElement>,
+  shiftKey?: boolean,
 ): { current: BindingStrategy; other: BindingStrategy } => {
   let current: BindingStrategy = { mode: undefined };
   let other: BindingStrategy = { mode: undefined };
@@ -515,6 +516,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
   appState: AppState,
   opts?: {
     newArrow?: boolean;
+    shiftKey?: boolean;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   const globalBindMode = appState.bindMode || "orbit";
@@ -574,6 +576,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
       endIdx,
       appState,
       globalBindMode,
+      opts?.shiftKey,
     );
 
     return { start, end };
@@ -597,6 +600,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
       elements,
       globalBindMode,
       arrow,
+      opts?.shiftKey,
     );
 
     return { start: current, end: other };
@@ -619,6 +623,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
       elements,
       globalBindMode,
       arrow,
+      opts?.shiftKey,
     );
 
     return { start: other, end: current };
