@@ -172,6 +172,14 @@ export default function LibraryMenuItems({
     ],
   );
 
+  useEffect(() => {
+    // if selection is removed (e.g. via esc), reset last selected item
+    // so that subsequent shift+clicks don't select a large range
+    if (!selectedItems.length) {
+      setLastSelectedItem(null);
+    }
+  }, [selectedItems]);
+
   const getInsertedElements = useCallback(
     (id: string) => {
       let targetElements;
