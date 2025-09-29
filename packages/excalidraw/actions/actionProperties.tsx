@@ -1401,7 +1401,10 @@ export const actionChangeRoundness = register({
                   ...el.roundness,
                   type: ROUNDNESS.PROPORTIONAL_RADIUS,
                 }
-              : value === "custom" ?
+              : value === "round" ?
+               {
+                type: ROUNDNESS.ADAPTIVE_RADIUS,
+              } :
               {
                 ...el.roundness,
                 type: ROUNDNESS.CUSTOMIZED,
@@ -1412,7 +1415,7 @@ export const actionChangeRoundness = register({
                   bottomRight: el.roundness?.corners?.bottomRight?? DEFAULT_ADAPTIVE_RADIUS,
                 },
                 cornerLink : el.roundness?.cornerLink ?? true,
-              } : null,
+              } ,
 
         });
       }),
@@ -1440,7 +1443,9 @@ export const actionChangeRoundness = register({
                 hasLegacyRoundness
                   ? null
                   : element.roundness?.type === ROUNDNESS.CUSTOMIZED
-                  ? "custom"
+                  ? "custom" 
+                  : element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS
+                  ? "round"
                   : "sharp",
               (element) =>
                 !isArrowElement(element) && element.hasOwnProperty("roundness"),
@@ -1473,7 +1478,7 @@ export const actionChangeRoundness = register({
                 text: t("labels.sharp"),
                 icon: EdgeSharpIcon,
               },
-              getCurrentElementType() === "line" ? 
+              getCurrentElementType() === "image" || getCurrentElementType() === "line" ? 
               {
                 value: "round",
                 text: t("labels.round"),

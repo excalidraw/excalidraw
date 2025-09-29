@@ -754,6 +754,7 @@ const generateElementShape = (
       const points = element.points.length
         ? element.points
         : [pointFrom<LocalPoint>(0, 0)];
+        console.log(element)
 
       if (isElbowArrow(element)) {
         // NOTE (mtolmacs): Temporary fix for extremely big arrow shapes
@@ -776,9 +777,10 @@ const generateElementShape = (
             ),
           ];
         }
-      } else if (!element.roundness) {
+      } else if (element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS ) {
         // curve is always the first element
         // this simplifies finding the curve for an element
+        // EDIT: changed from detecting if roundness is available to detecting if its sharp or round
         if (options.fill) {
           shape = [
             generator.polygon(points as unknown as RoughPoint[], options),
@@ -849,7 +851,7 @@ const generateElementShape = (
     }
     case "frame":
     case "magicframe":
-    case "text":
+    case "text": 
     case "image": {
       const shape: ElementShapes[typeof element.type] = null;
       // we return (and cache) `null` to make sure we don't regenerate
