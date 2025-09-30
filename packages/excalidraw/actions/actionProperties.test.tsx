@@ -211,20 +211,29 @@ describe("element roundness", () => {
         height: 100,
       });
 
-      const halfMinLength = 0.5 * Math.min(rect.width, rect.height);
+      const halfMinLength = Math.min(rect.width, rect.height)/2;
 
       expect(rect.roundness?.corners?.bottomLeft).not.toBeGreaterThan(halfMinLength);
       expect(rect.roundness?.corners?.topLeft).not.toBeGreaterThanOrEqual(halfMinLength);
       expect(rect.roundness?.corners?.bottomRight).not.toBeGreaterThanOrEqual(halfMinLength);
       expect(rect.roundness?.corners?.topRight).not.toBeGreaterThanOrEqual(halfMinLength);
     });
+
+    it("should have corner link set as true on default for customized mode",()=>{
+      const rect = API.createElement({
+        type: "rectangle",
+        roundness: roundnessConfig,  
+      });
+
+      expect(rect.roundness?.cornerLink).toBe(true);
+    }); 
   });
 
   describe("corner values of diamond", () => {
     it("should not have negative values", () => {
       const diamond = API.createElement({
         type: "diamond",
-        // roundness: roundnessConfig,
+        roundness: roundnessConfig,
       });
 
       expect(diamond.roundness?.corners?.bottomLeft).toBeGreaterThanOrEqual(0);
@@ -240,26 +249,21 @@ describe("element roundness", () => {
       });
 
       const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] = getDiamondPoints(diamond);
-
-      if (diamond.roundness?.type === ROUNDNESS.CUSTOMIZED && diamond.roundness) {
-        const corners = diamond.roundness?.corners;
-        const T = { x: topX,    y: topY };
-        const R = { x: rightX,  y: rightY };
-        const B = { x: bottomX, y: bottomY };
-        const L = { x: leftX,   y: leftY };
-        const move = (p0: {x:number;y:number}, p1: {x:number;y:number}, d: number) => {
-          const vx = p1.x - p0.x, vy = p1.y - p0.y;
-          const len = Math.hypot(vx, vy);
-          const t = d / len;
-          return { x: p0.x + vx * t, y: p0.y + vy * t };
-        };
-      }
       
-      const halfMinimumLength = Math.hypot(rightX - topX, rightY - topY) / 2
+      const halfMinimumLength = Math.hypot(rightX - topX, rightY - topY) / 2;
       expect(diamond.roundness?.corners?.bottomLeft).not.toBeGreaterThan(halfMinimumLength);
-      expect(diamond.roundness?.corners?.topLeft).toBeGreaterThanOrEqual(halfMinimumLength);
-      expect(diamond.roundness?.corners?.bottomRight).toBeGreaterThanOrEqual(halfMinimumLength);
-      expect(diamond.roundness?.corners?.topRight).toBeGreaterThanOrEqual(halfMinimumLength);
+      expect(diamond.roundness?.corners?.topLeft).not.toBeGreaterThanOrEqual(halfMinimumLength);
+      expect(diamond.roundness?.corners?.bottomRight).not.toBeGreaterThanOrEqual(halfMinimumLength);
+      expect(diamond.roundness?.corners?.topRight).not.toBeGreaterThanOrEqual(halfMinimumLength);
     });
+
+    it("should have corner link set as true on default for customized mode",()=>{
+      const diamond = API.createElement({
+        type: "diamond",
+        roundness: roundnessConfig,
+      });
+
+      expect(diamond.roundness?.cornerLink).toBe(true);
+    }); 
   });
 });
