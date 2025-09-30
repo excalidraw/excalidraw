@@ -140,7 +140,7 @@ export default defineConfig(({ mode }) => {
         },
 
         workbox: {
-	        // don't precache fonts, locales and separate chunks
+          // don't precache fonts, locales and separate chunks
           globIgnores: [
             "fonts.css",
             "**/locales/**",
