@@ -13,6 +13,8 @@ import { getShortcutKey } from "@excalidraw/common";
 
 import { isNodeInFlowchart } from "@excalidraw/element";
 
+import { memo, type ReactNode } from "react";
+
 import { t } from "../i18n";
 import { isEraserActive } from "../appState";
 import { isGridModeEnabled } from "../snapping";
@@ -20,8 +22,6 @@ import { isGridModeEnabled } from "../snapping";
 import "./HintViewer.scss";
 
 import type { AppClassProperties, Device, UIAppState } from "../types";
-
-import type { ReactNode } from "react";
 
 interface HintViewerProps {
   appState: UIAppState;
@@ -183,34 +183,31 @@ const getHintNodes = (hintText: string): ReactNode[] => {
     );
 };
 
-export const HintViewer = ({
-  appState,
-  isMobile,
-  device,
-  app,
-}: HintViewerProps) => {
-  const hints = getHints({
-    appState,
-    isMobile,
-    device,
-    app,
-  });
+export const HintViewer = memo(
+  ({ appState, isMobile, device, app }: HintViewerProps) => {
+    const hints = getHints({
+      appState,
+      isMobile,
+      device,
+      app,
+    });
 
-  if (!hints) {
-    return null;
-  }
+    if (!hints) {
+      return null;
+    }
 
-  const hint = Array.isArray(hints)
-    ? hints
-        .map((hint) => {
-          return getShortcutKey(hint).replace(/\. ?$/, "");
-        })
-        .join(". ")
-    : getShortcutKey(hints);
+    const hint = Array.isArray(hints)
+      ? hints
+          .map((hint) => {
+            return getShortcutKey(hint).replace(/\. ?$/, "");
+          })
+          .join(". ")
+      : getShortcutKey(hints);
 
-  return (
-    <div className="HintViewer">
-      <span>{getHintNodes(hint)}</span>
-    </div>
-  );
-};
+    return (
+      <div className="HintViewer">
+        <span>{getHintNodes(hint)}</span>
+      </div>
+    );
+  },
+);
