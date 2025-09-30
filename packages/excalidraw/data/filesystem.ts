@@ -8,13 +8,15 @@ import { EVENT, MIME_TYPES, debounce } from "@excalidraw/common";
 
 import { AbortError } from "../errors";
 
+import { normalizeFile } from "./blob";
+
 import type { FileSystemHandle } from "browser-fs-access";
 
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 
-const INPUT_CHANGE_INTERVAL_MS = 500;
+const INPUT_CHANGE_INTERVAL_MS = 5000;
 
-export const fileOpen = <M extends boolean | undefined = false>(opts: {
+export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
   description: string;
   multiple?: M;
@@ -35,8 +37,8 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
     return acc.concat(`.${ext}`);
   }, [] as string[]);
 
-  //zsviczian https://github.com/excalidraw/excalidraw/pull/9027
-  return _fileOpen({
+  //zsviczian https://github.com/excalidraw/excalidraw/pull/9027 (there are multiple changes adding variables like isresolved, need to check if this is still required for iOS18)
+  const files = await _fileOpen({
     description: opts.description,
     extensions,
     mimeTypes,
@@ -103,7 +105,14 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
         }
       };
     },
-  }) as Promise<RetType>;
+  });
+
+  if (Array.isArray(files)) {
+    return (await Promise.all(
+      files.map((file) => normalizeFile(file)),
+    )) as RetType;
+  }
+  return (await normalizeFile(files)) as RetType;
 };
 
 export const fileSave = (
