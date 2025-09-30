@@ -58,7 +58,6 @@
     }
   }
 
-
   .alert {
     pointer-events: none;
     position: absolute;
@@ -74,17 +73,14 @@
     white-space: pre;
 
     &--warning {
-    @extend .alert;
-    background-color: var(--color-warning);
-    color: var(--color-text-warning);
+      background-color: var(--color-warning);
+      color: var(--color-text-warning);
     }
 
     &--danger {
-    @extend .alert;
-    background-color: var(--color-danger-dark);
-    color: var(--color-danger-text);
+      background-color: var(--color-danger-dark);
+      color: var(--color-danger-text);
     }
-
   }
 }
 

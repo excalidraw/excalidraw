@@ -904,12 +904,12 @@ const ExcalidrawWrapper = () => {
 
         <TTDDialogTrigger />
         {isCollaborating && isOffline && (
-          <div className="alert--warning">
+          <div className="alertalert--warning">
             {t("alerts.collabOfflineWarning")}
           </div>
         )}
         {localStorageQuotaExceeded && (
-          <div className="alert--danger">
+          <div className="alert alert--danger">
             {t("alerts.localStorageQuotaExceeded")}
           </div>
         )}
