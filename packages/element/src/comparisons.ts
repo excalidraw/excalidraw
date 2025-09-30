@@ -39,7 +39,6 @@ export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "diamond" ||
   type === "image";
 
-// 
 export const canCustomizeRoundness = (type: ElementOrToolType) =>
   type === "rectangle" ||
   type === "embeddable" ||
