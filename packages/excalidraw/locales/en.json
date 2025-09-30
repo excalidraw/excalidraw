@@ -230,10 +230,11 @@
     "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Exit zen mode",
     "cancel": "Cancel",
+    "saveLibNames": "Save name(s) and exit",
     "clear": "Clear",
     "remove": "Remove",
     "embed": "Toggle embedding",
-    "publishLibrary": "Publish selected",
+    "publishLibrary": "Rename or publish",
     "submit": "Submit",
     "confirm": "Confirm",
     "embeddableInteractionButton": "Click to interact"
