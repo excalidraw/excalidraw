@@ -414,7 +414,6 @@ export const ROUNDNESS = {
   // (see DEFAULT_ADAPTIVE_RADIUS constant)
   ADAPTIVE_RADIUS: 3,
 
-
   // Used for radius rectangles customization
   CUSTOMIZED: 4,
 
