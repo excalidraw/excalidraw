@@ -413,7 +413,14 @@ export const ROUNDNESS = {
   // NOTE right now we don't allow configuration and use a constant radius
   // (see DEFAULT_ADAPTIVE_RADIUS constant)
   ADAPTIVE_RADIUS: 3,
+
+
+  // Used for radius rectangles customization
+  CUSTOMIZED: 4,
+
 } as const;
+
+
 
 export const ROUGHNESS = {
   architect: 0,

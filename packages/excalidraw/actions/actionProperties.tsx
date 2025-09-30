@@ -21,9 +21,11 @@ import {
   getLineHeight,
   isTransparent,
   reduceToCommonValue,
+  DEFAULT_ADAPTIVE_RADIUS,
+  DEFAULT_PROPORTIONAL_RADIUS,
 } from "@excalidraw/common";
 
-import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
+import { canBecomePolygon, getNonDeletedElements} from "@excalidraw/element";
 
 import {
   bindLinearElement,
@@ -126,11 +128,15 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  EdgeCustomIcon,
+  LinkLockIcon,
+  LinkUnlockIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
 import { getLanguage, t } from "../i18n";
 import {
+  canCustomizeRoundness,
   canHaveArrowheads,
   getSelectedElements,
   getTargetElements,
@@ -1388,13 +1394,27 @@ export const actionChangeRoundness = register({
 
         return newElementWith(el, {
           roundness:
-            value === "round"
+            value === "sharp"
               ? {
-                  type: isUsingAdaptiveRadius(el.type)
-                    ? ROUNDNESS.ADAPTIVE_RADIUS
-                    : ROUNDNESS.PROPORTIONAL_RADIUS,
+                  ...el.roundness,
+                  type: ROUNDNESS.PROPORTIONAL_RADIUS,
                 }
-              : null,
+              : value === "round" ?
+               {
+                type: ROUNDNESS.ADAPTIVE_RADIUS,
+              } :
+              {
+                ...el.roundness,
+                type: ROUNDNESS.CUSTOMIZED,
+                corners : {
+                  topLeft: el.roundness?.corners?.topLeft?? DEFAULT_ADAPTIVE_RADIUS,
+                  topRight: el.roundness?.corners?.topRight?? DEFAULT_ADAPTIVE_RADIUS,
+                  bottomLeft: el.roundness?.corners?.bottomLeft?? DEFAULT_ADAPTIVE_RADIUS,
+                  bottomRight: el.roundness?.corners?.bottomRight?? DEFAULT_ADAPTIVE_RADIUS,
+                },
+                cornerLink : el.roundness?.cornerLink ?? true,
+              } ,
+
         });
       }),
       appState: {
@@ -1409,10 +1429,40 @@ export const actionChangeRoundness = register({
       getNonDeletedElements(elements),
       appState,
     );
-
     const hasLegacyRoundness = targetElements.some(
       (el) => el.roundness?.type === ROUNDNESS.LEGACY,
     );
+
+    const getCurrentEdgeType = () => {
+      return getFormValue(
+              elements,
+              app,
+              (element) =>
+                hasLegacyRoundness
+                  ? null
+                  : element.roundness?.type === ROUNDNESS.CUSTOMIZED
+                  ? "custom" 
+                  : element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS
+                  ? "round"
+                  : "sharp",
+              (element) =>
+                !isArrowElement(element) && element.hasOwnProperty("roundness"),
+              (hasSelection) =>
+                hasSelection ? null : appState.currentItemRoundness,
+            );
+    }
+
+    const getCurrentElementType = () => {
+      return getFormValue(
+        elements,
+        app,
+        (element) => {
+          return element.type;
+        },
+        (element) => !isArrowElement(element) && element.hasOwnProperty("roundness"),
+        (hasSelection) => hasSelection ? null : ""
+      );
+    }
 
     return (
       <fieldset>
@@ -1426,31 +1476,258 @@ export const actionChangeRoundness = register({
                 text: t("labels.sharp"),
                 icon: EdgeSharpIcon,
               },
+              getCurrentElementType() === "image" || getCurrentElementType() === "line" ? 
               {
                 value: "round",
                 text: t("labels.round"),
-                icon: EdgeRoundIcon,
+                icon: EdgeRoundIcon,  
+              } : 
+              {
+                value: "custom",
+                text: t("labels.custom"),
+                icon: EdgeCustomIcon,
               },
             ]}
-            value={getFormValue(
-              elements,
-              app,
-              (element) =>
-                hasLegacyRoundness
-                  ? null
-                  : element.roundness
-                  ? "round"
-                  : "sharp",
-              (element) =>
-                !isArrowElement(element) && element.hasOwnProperty("roundness"),
-              (hasSelection) =>
-                hasSelection ? null : appState.currentItemRoundness,
-            )}
-            onChange={(value) => updateData(value)}
+            value={getCurrentEdgeType()}
+            onChange={
+              (value) => {
+                updateData(value)
+              }
+            }
           />
+          {((canCustomizeRoundness(appState.activeTool.type) ||
+          targetElements.some((element) => canCustomizeRoundness(element.type)))
+          && getCurrentEdgeType() === "custom" )
+            && (
+            <>{renderAction("customizeRoundness")}</>
+          )}
           {renderAction("togglePolygon")}
         </div>
       </fieldset>
+    );
+  },
+});
+
+export const actionCustomizeRoundness = register({
+  name: "customizeRoundness",
+  label: "Customize edge roundness",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isElbowArrow(el)) {
+          return el;
+        }    
+
+        return newElementWith(el, {
+          roundness:{
+              ...value.roundness,
+              type: value.roundness.type,
+              corners: value.roundness.corners,
+            }
+          ,
+        });
+      }),
+      appState: {
+        ...appState,
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app, renderAction }) => {
+    const targetElements = getTargetElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+    const getCurrentCornerValue = (corner : 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight') => {
+        return getFormValue(
+        elements,
+        app,
+        (element) => {
+          if (element.roundness?.corners) {
+            const corners = element.roundness.corners;
+
+            return corners[corner];
+          }
+        },
+        (element) => !isArrowElement(element) && element.hasOwnProperty("roundness"),
+        (hasSelection) => hasSelection ? DEFAULT_ADAPTIVE_RADIUS : 0
+      );
+    }
+    const getCurrentLinkValue = () => {
+      return getFormValue(
+        elements,
+        app,
+        (element) => {
+          return element.roundness?.cornerLink;
+        },
+        (element) => !isArrowElement(element) && element.hasOwnProperty("roundness"),
+        (hasSelection) => hasSelection ? null : false
+      );
+    }
+    const getCurrentElementType = () => {
+      return getFormValue(
+        elements,
+        app,
+        (element) => {
+          return element.type;
+        },
+        (element) => !isArrowElement(element) && element.hasOwnProperty("roundness"),
+        (hasSelection) => hasSelection ? null : ""
+      );
+    }
+    const updateCornersValue = (corner: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight', newValue: number) => {      
+      if (Number.isNaN(newValue)) return;
+      const cornerLink = getCurrentLinkValue();
+      let currentCorners = {
+          topLeft: getCurrentCornerValue('topLeft'),
+          topRight: getCurrentCornerValue('topRight'),
+          bottomLeft: getCurrentCornerValue('bottomLeft'),
+          bottomRight: getCurrentCornerValue('bottomRight'),
+        };
+      if (cornerLink){
+        for (const [key, val] of Object.entries(currentCorners) ) {
+          currentCorners[key as keyof typeof currentCorners ] = newValue
+        }
+      } else {
+        currentCorners[corner] = newValue;
+      }
+      updateData({
+        roundness: {
+          type: ROUNDNESS.CUSTOMIZED,
+          corners: currentCorners,
+          cornerLink: cornerLink,
+        }
+    });
+  };
+    return (
+      <fieldset>
+      <legend>{t("labels.custom")}</legend>
+      { <>{renderAction("linkCorner")} </> }
+      <div className="corner-inputs">
+        <div className="input-group">
+          <legend>{  
+            getCurrentElementType() === "rectangle" ?
+            t("labels.topLeft") : t("labels.top") 
+          }</legend>
+          <input
+            type="text"
+            placeholder={t("labels.topLeft")}
+            inputMode="numeric"
+            value={getCurrentCornerValue('topLeft')}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              updateCornersValue('topLeft', val)
+            }}
+            min={0}
+          />
+        </div>
+        <div className="input-group">
+          <legend>{  
+            getCurrentElementType() === "rectangle" ?
+            t("labels.topRight") : t("labels.right") 
+          }</legend>
+          <input
+            type="text"
+            placeholder={t("labels.topRight")}
+            value={getCurrentCornerValue('topRight')}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              updateCornersValue('topRight', val)
+            }}
+            min={0}
+          />
+        </div>
+        <div className="input-group">
+          <legend>{  
+            getCurrentElementType() === "rectangle" ?
+            t("labels.bottomLeft") : t("labels.left") 
+          }</legend>
+          <input
+            type="text"
+            placeholder={t("labels.bottomLeft")}
+            value={getCurrentCornerValue('bottomLeft')}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              updateCornersValue('bottomLeft', val)
+            }}
+            min={0}
+          />
+        </div>
+        <div className="input-group">
+          <legend>{  
+            getCurrentElementType() === "rectangle" ?
+            t("labels.bottomRight") : t("labels.bottom") 
+          }</legend>
+          <input
+            type="text"
+            placeholder={t("labels.bottomRight")}
+            value={getCurrentCornerValue('bottomRight')}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              updateCornersValue('bottomRight', val)
+            }}
+            min={0}
+          />
+        </div>
+    </div>
+    </fieldset>
+    );
+  },
+});
+
+export const actionLinkCorner = register({
+  name: "linkCorner",
+  label: "Link and Unlink Corners Value",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+
+        return newElementWith(el, {
+          roundness : {
+            ...el.roundness,
+            type : ROUNDNESS.CUSTOMIZED,
+            cornerLink: value,
+          }  
+        });
+      }),
+      appState: {
+        ...appState,
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app, renderAction }) => {
+    const targetElements = getTargetElements(
+      getNonDeletedElements(elements),
+      appState,
+    );
+    const getCurrentLinkValue = () => {
+      return getFormValue(
+        elements,
+        app,
+        (element) => {
+          return element.roundness?.cornerLink;
+        },
+        (element) => !isArrowElement(element) && element.hasOwnProperty("roundness"),
+        (hasSelection) => hasSelection ? null : false
+      );
+    }
+
+    return (
+    <fieldset>
+      <button
+        onClick={()=>{
+          const lockVal = getCurrentLinkValue()
+          updateData(!lockVal)
+        }}
+      >
+        {getCurrentLinkValue() ? 
+          LinkLockIcon : LinkUnlockIcon
+        }
+      </button>
+    </fieldset>
     );
   },
 });

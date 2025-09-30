@@ -21,6 +21,8 @@ import {
   assertNever,
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
+  ROUNDNESS,
+  DEFAULT_ADAPTIVE_RADIUS,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -74,6 +76,7 @@ import type {
 
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+import { t } from "@excalidraw/excalidraw/i18n";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -622,17 +625,12 @@ const generateElementShape = (
       let shape: ElementShapes[typeof element.type];
       // this is for rendering the stroke/bg of the embeddable, especially
       // when the src url is not set
-
-      if (element.roundness) {
-        const w = element.width;
-        const h = element.height;
-        const r = getCornerRadius(Math.min(w, h), element);
-        shape = generator.path(
-          `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
-            h - r
-          } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
-            h - r
-          } L 0 ${r} Q 0 0, ${r} 0`,
+      if (!element.roundness || element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS) {
+        shape = generator.rectangle(
+          0,
+          0,
+          element.width,
+          element.height,
           generateRoughOptions(
             modifyIframeLikeForRoughOptions(
               element,
@@ -642,12 +640,27 @@ const generateElementShape = (
             true,
           ),
         );
-      } else {
-        shape = generator.rectangle(
-          0,
-          0,
-          element.width,
-          element.height,
+      } 
+      else {
+        const w = element.width;
+        const h = element.height;
+        const corners = element.roundness?.corners;
+        // find the minimum length to use to prevent weird overlapping shapes caused by large numbers
+        const halfMinimumLength = Math.min(w, h)/2
+        let tl = Math.min(corners?.topLeft ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
+        let tr = Math.min(corners?.topRight ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
+        let bl = Math.min(corners?.bottomLeft ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength); 
+        let br = Math.min(corners?.bottomRight ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
+        shape = generator.path(
+          `M ${tl} 0`+                    
+           `L ${w - tr} 0` +                 
+           `Q ${w} 0, ${w} ${tr}` +         
+           `L ${w} ${h - br}` +           
+           `Q ${w} ${h}, ${w - br} ${h}` +   
+           `L ${bl} ${h}` +                 
+           `Q 0 ${h}, 0 ${h - bl}` +         
+           `L 0 ${tl}` +                     
+           `Q 0 0, ${tl} 0`,            
           generateRoughOptions(
             modifyIframeLikeForRoughOptions(
               element,
@@ -660,53 +673,67 @@ const generateElementShape = (
       }
       return shape;
     }
-    case "diamond": {
-      let shape: ElementShapes[typeof element.type];
+   case "diamond": {
+    let shape: ElementShapes[typeof element.type];
 
-      const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
-        getDiamondPoints(element);
-      if (element.roundness) {
-        const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
+    const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+      getDiamondPoints(element);
 
-        const horizontalRadius = getCornerRadius(
-          Math.abs(rightY - topY),
-          element,
-        );
-
-        shape = generator.path(
-          `M ${topX + verticalRadius} ${topY + horizontalRadius} L ${
-            rightX - verticalRadius
-          } ${rightY - horizontalRadius}
-            C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
-            rightX - verticalRadius
-          } ${rightY + horizontalRadius}
-            L ${bottomX + verticalRadius} ${bottomY - horizontalRadius}
-            C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
-            bottomX - verticalRadius
-          } ${bottomY - horizontalRadius}
-            L ${leftX + verticalRadius} ${leftY + horizontalRadius}
-            C ${leftX} ${leftY}, ${leftX} ${leftY}, ${leftX + verticalRadius} ${
-            leftY - horizontalRadius
-          }
-            L ${topX - verticalRadius} ${topY + horizontalRadius}
-            C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
-            topY + horizontalRadius
-          }`,
-          generateRoughOptions(element, true),
-        );
-      } else {
-        shape = generator.polygon(
-          [
-            [topX, topY],
-            [rightX, rightY],
-            [bottomX, bottomY],
-            [leftX, leftY],
-          ],
-          generateRoughOptions(element),
-        );
-      }
+    if ( 
+      element.roundness?.type === ROUNDNESS.CUSTOMIZED 
+      &&
+      element.roundness 
+    ) {
+      const corners = element.roundness?.corners;
+      const T = { x: topX,    y: topY };
+      const R = { x: rightX,  y: rightY };
+      const B = { x: bottomX, y: bottomY };
+      const L = { x: leftX,   y: leftY };
+      const move = (p0: {x:number;y:number}, p1: {x:number;y:number}, d: number) => {
+        const vx = p1.x - p0.x, vy = p1.y - p0.y;
+        const len = Math.hypot(vx, vy);
+        const t = d / len;
+        return { x: p0.x + vx * t, y: p0.y + vy * t };
+      };
+      // use one of the edges to prevent overlapping corners from making weird shapes
+      const halfMinimumLength = Math.hypot(rightX - topX, rightY - topY) / 2
+      let tl = Math.min(corners?.topLeft?? DEFAULT_ADAPTIVE_RADIUS , halfMinimumLength);
+      let tr = Math.min(corners?.topRight ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
+      let bl = Math.min(corners?.bottomLeft ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength); 
+      let br = Math.min(corners?.bottomRight ?? DEFAULT_ADAPTIVE_RADIUS, halfMinimumLength);
+      const T_L = move(T, L, tl);
+      const T_R = move(T, R, tl);
+      const R_T = move(R, T, tr);
+      const R_B = move(R, B, tr);
+      const B_R = move(B, R, br);
+      const B_L = move(B, L, br);
+      const L_B = move(L, B, bl);
+      const L_T = move(L, T, bl);
+      const d =
+        `M ${T_L.x} ${T_L.y} ` +
+        `Q ${T.x} ${T.y} ${T_R.x} ${T_R.y} ` +
+        `L ${R_T.x} ${R_T.y} ` +
+        `Q ${R.x} ${R.y} ${R_B.x} ${R_B.y} ` +
+        `L ${B_R.x} ${B_R.y} ` +
+        `Q ${B.x} ${B.y} ${B_L.x} ${B_L.y} ` +
+        `L ${L_B.x} ${L_B.y} ` +
+        `Q ${L.x} ${L.y} ${L_T.x} ${L_T.y} ` + 
+        `Z`;
+      shape = generator.path(d, generateRoughOptions(element, true));
       return shape;
-    }
+  } else {
+    shape = generator.polygon(
+      [
+        [topX, topY],
+        [rightX, rightY],
+        [bottomX, bottomY],
+        [leftX, leftY],
+      ],
+      generateRoughOptions(element),
+    );
+  }
+  return shape;
+}
     case "ellipse": {
       const shape: ElementShapes[typeof element.type] = generator.ellipse(
         element.width / 2,
@@ -727,7 +754,6 @@ const generateElementShape = (
       const points = element.points.length
         ? element.points
         : [pointFrom<LocalPoint>(0, 0)];
-
       if (isElbowArrow(element)) {
         // NOTE (mtolmacs): Temporary fix for extremely big arrow shapes
         if (
@@ -749,9 +775,10 @@ const generateElementShape = (
             ),
           ];
         }
-      } else if (!element.roundness) {
+      } else if (element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS ) {
         // curve is always the first element
         // this simplifies finding the curve for an element
+        // EDIT: changed from detecting if roundness is available to detecting if its sharp or round edges
         if (options.fill) {
           shape = [
             generator.polygon(points as unknown as RoughPoint[], options),
