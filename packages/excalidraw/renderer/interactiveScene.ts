@@ -735,7 +735,14 @@ const _renderInteractiveScene = ({
   appState,
   renderConfig,
   device,
-}: InteractiveSceneRenderConfig) => {
+  animationState,
+  deltaTime,
+}: InteractiveSceneRenderConfig): {
+  scrollBars?: ReturnType<typeof getScrollBars>;
+  atLeastOneVisibleElement: boolean;
+  elementsMap: RenderableElementsMap;
+  animationState?: typeof animationState;
+} => {
   if (canvas === null) {
     return { atLeastOneVisibleElement: false, elementsMap };
   }
@@ -744,6 +751,8 @@ const _renderInteractiveScene = ({
     canvas,
     scale,
   );
+
+  const nextAnimationState = animationState;
 
   const context = bootstrapCanvas({
     canvas,
@@ -1191,6 +1200,7 @@ const _renderInteractiveScene = ({
     scrollBars,
     atLeastOneVisibleElement: visibleElements.length > 0,
     elementsMap,
+    animationState: nextAnimationState,
   };
 };
 
