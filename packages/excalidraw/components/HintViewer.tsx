@@ -21,6 +21,8 @@ import "./HintViewer.scss";
 
 import type { AppClassProperties, Device, UIAppState } from "../types";
 
+import type { ReactNode } from "react";
+
 interface HintViewerProps {
   appState: UIAppState;
   isMobile: boolean;
@@ -165,6 +167,22 @@ const getHints = ({
   return null;
 };
 
+const getHintNodes = (hintText: string): ReactNode[] => {
+  const parts = hintText.split(/(<.+?>)/);
+
+  return parts
+    .filter((part) => part.length > 0)
+    .map((part, i) =>
+      part.startsWith("<") && part.endsWith(">") ? (
+        <span key={`${part}-${i}`} className="HintViewer__key">
+          {part.slice(1, -1)}
+        </span>
+      ) : (
+        part
+      ),
+    );
+};
+
 export const HintViewer = ({
   appState,
   isMobile,
@@ -192,7 +210,7 @@ export const HintViewer = ({
 
   return (
     <div className="HintViewer">
-      <span>{hint}</span>
+      <span>{getHintNodes(hint)}</span>
     </div>
   );
 };
