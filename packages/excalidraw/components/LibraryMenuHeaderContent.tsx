@@ -247,14 +247,6 @@ export const LibraryDropdownMenuButton: React.FC<{
               {t("buttons.export")}
             </DropdownMenu.Item>
           )}
-          {!!items.length && (
-            <DropdownMenu.Item
-              onSelect={() => setShowRemoveLibAlert(true)}
-              icon={TrashIcon}
-            >
-              {resetLabel}
-            </DropdownMenu.Item>
-          )}
           {itemsSelected && (
             <DropdownMenu.Item
               icon={publishIcon}
@@ -262,6 +254,14 @@ export const LibraryDropdownMenuButton: React.FC<{
               data-testid="lib-dropdown--remove"
             >
               {t("buttons.publishLibrary")}
+            </DropdownMenu.Item>
+          )}
+          {!!items.length && (
+            <DropdownMenu.Item
+              onSelect={() => setShowRemoveLibAlert(true)}
+              icon={TrashIcon}
+            >
+              {resetLabel}
             </DropdownMenu.Item>
           )}
         </DropdownMenu.Content>

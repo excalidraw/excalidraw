@@ -6,6 +6,7 @@ import {
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
   COLOR_PALETTE,
   isTransparent,
+  isWritableElement,
 } from "@excalidraw/common";
 
 import type { ColorTuple, ColorPaletteCustom } from "@excalidraw/common";
@@ -132,7 +133,9 @@ const ColorPickerPopupContent = ({
       preventAutoFocusOnTouch={!!appState.editingTextElement}
       onFocusOutside={(event) => {
         // refocus due to eye dropper
-        focusPickerContent();
+        if (!isWritableElement(event.target)) {
+          focusPickerContent();
+        }
         event.preventDefault();
       }}
       onPointerDownOutside={(event) => {

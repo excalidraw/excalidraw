@@ -102,6 +102,8 @@ import {
   MQ_MAX_MOBILE,
   MQ_MIN_TABLET,
   MQ_MAX_TABLET,
+  MQ_MAX_HEIGHT_LANDSCAPE,
+  MQ_MAX_WIDTH_LANDSCAPE,
 } from "@excalidraw/common";
 
 import {
@@ -436,6 +438,8 @@ import { Toast } from "./Toast";
 import { findShapeByKey } from "./shapes";
 
 import UnlockPopup from "./UnlockPopup";
+
+import type { ExcalidrawLibraryIds } from "../data/types";
 
 import type {
   RenderInteractiveSceneCallback,
@@ -2522,9 +2526,12 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
-    const minSide = Math.min(width, height);
-    return width !== 0 && this.allowMobileMode && //zsviczian changing tabs in Obsidian causes MobileMenu to be rendered
-      minSide <= MQ_MAX_MOBILE;
+    return (
+      width !== 0 && this.allowMobileMode && ( //zsviczian changing tabs in Obsidian causes MobileMenu to be rendered
+        width <= MQ_MAX_MOBILE ||
+        (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
+      )
+    );
   };
 
   private isTabletBreakpoint = (editorWidth: number, editorHeight: number) => {
@@ -11282,7 +11289,10 @@ startLineEditor = (
     const initialized = await Promise.all(
       placeholders.map(async (placeholder, i) => {
         try {
-          return await this.initializeImage(placeholder, imageFiles[i]);
+          return await this.initializeImage(
+            placeholder,
+            await normalizeFile(imageFiles[i]),
+          );
         } catch (error: any) {
           this.setState({
             errorMessage: error.message || t("errors.imageInsertError"),
@@ -11381,16 +11391,44 @@ startLineEditor = (
     if (imageFiles.length > 0 && this.isToolSupported("image")) {
       return this.insertImages(imageFiles, sceneX, sceneY);
     }
-
-    const libraryJSON = dataTransferList.getData(MIME_TYPES.excalidrawlib);
-    if (libraryJSON && typeof libraryJSON === "string") {
+    const excalidrawLibrary_ids = dataTransferList.getData(
+      MIME_TYPES.excalidrawlibIds,
+    );
+    const excalidrawLibrary_data = dataTransferList.getData(
+      MIME_TYPES.excalidrawlib,
+    );
+    if (excalidrawLibrary_ids || excalidrawLibrary_data) {
       try {
-        const libraryItems = parseLibraryJSON(libraryJSON);
-        this.addElementsFromPasteOrLibrary({
-          elements: distributeLibraryItemsOnSquareGrid(libraryItems),
-          position: event,
-          files: null,
-        });
+        let libraryItems: LibraryItems | null = null;
+        if (excalidrawLibrary_ids) {
+          const { itemIds } = JSON.parse(
+            excalidrawLibrary_ids,
+          ) as ExcalidrawLibraryIds;
+          const allLibraryItems = await this.library.getLatestLibrary();
+          libraryItems = allLibraryItems.filter((item) =>
+            itemIds.includes(item.id),
+          );
+          // legacy library dataTransfer format
+        } else if (excalidrawLibrary_data) {
+          libraryItems = parseLibraryJSON(excalidrawLibrary_data);
+        }
+        if (libraryItems?.length) {
+          libraryItems = libraryItems.map((item) => ({
+            ...item,
+            // #6465
+            elements: duplicateElements({
+              type: "everything",
+              elements: item.elements,
+              randomizeSeed: true,
+            }).duplicatedElements,
+          }));
+
+          this.addElementsFromPasteOrLibrary({
+            elements: distributeLibraryItemsOnSquareGrid(libraryItems),
+            position: event,
+            files: null,
+          });
+        }
       } catch (error: any) {
         this.setState({ errorMessage: error.message });
       }
