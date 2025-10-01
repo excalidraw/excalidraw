@@ -168,14 +168,14 @@ const getHints = ({
 };
 
 const getHintNodes = (hintText: string): ReactNode[] => {
-  const parts = hintText.split(/(<.+?>)/);
+  const parts = hintText.split(/(<<.+?>>)/);
 
   return parts
     .filter((part) => part.length > 0)
     .map((part, i) =>
-      part.startsWith("<") && part.endsWith(">") ? (
+      part.startsWith("<<") && part.endsWith(">>") ? (
         <span key={`${part}-${i}`} className="HintViewer__key">
-          {part.slice(1, -1)}
+          {part.slice(2, -2)}
         </span>
       ) : (
         <span>{part}</span>
