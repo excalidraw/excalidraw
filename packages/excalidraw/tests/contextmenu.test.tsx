@@ -140,7 +140,7 @@ describe("contextMenu element", () => {
       "hyperlink",
       "copyElementLink",
       "toggleElementLock",
-      "imageExport"
+      "imageExport",
     ];
 
     expect(contextMenu).not.toBeNull();

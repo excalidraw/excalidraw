@@ -13,7 +13,13 @@ import {
   probablySupportsClipboardWriteText,
   readSystemClipboard,
 } from "../clipboard";
-import { DuplicateIcon, cutIcon, pngIcon, svgIcon,ExportIcon } from "../components/icons";
+import {
+  DuplicateIcon,
+  cutIcon,
+  pngIcon,
+  svgIcon,
+  ExportIcon,
+} from "../components/icons";
 import { exportCanvas, prepareElementsForExport } from "../data/index";
 import { t } from "../i18n";
 
@@ -326,14 +332,10 @@ export const imageExport = register({
 
   predicate: (elements) => elements.length > 0,
 
-  keyTest: (event) =>
-    event.code === KEYS.E && event.altKey && event.shiftKey,
+  keyTest: (event) => event.code === KEYS.E && event.altKey && event.shiftKey,
 
   keywords: ["export", "selection", "download", "png", "image"],
 });
-
-
-
 
 export const copyText = register({
   name: "copyText",
