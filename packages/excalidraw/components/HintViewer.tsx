@@ -178,7 +178,7 @@ const getHintNodes = (hintText: string): ReactNode[] => {
           {part.slice(1, -1)}
         </span>
       ) : (
-        part
+        <span>{part}</span>
       ),
     );
 };
@@ -206,7 +206,7 @@ export const HintViewer = memo(
 
     return (
       <div className="HintViewer">
-        <span>{getHintNodes(hint)}</span>
+        <div>{getHintNodes(hint)}</div>
       </div>
     );
   },
