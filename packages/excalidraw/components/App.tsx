@@ -2298,17 +2298,19 @@ class App extends React.Component<AppProps, AppState> {
 
   // #6688 Keyboard canvas panning methods  for View mode
   private handleKeyboardPanningKeyDown = (event: KeyboardEvent) => {
-    if (!this.state.viewModeEnabled) return;
-    
+    if (!this.state.viewModeEnabled) {
+      return;
+    }
+
     const { code } = event;
     if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(code)) {
       return;
     }
-    
+
     // Prevent default browser scrolling
     event.preventDefault();
     this.keyboardPanningKeys.add(code);
-    
+
     // Start animation if not already running
     if (!this.keyboardPanningAnimationFrame) {
       this.startKeyboardPanningAnimation();
@@ -2325,10 +2327,10 @@ class App extends React.Component<AppProps, AppState> {
     const MIN_VELOCITY = 0.5; // minimum velocity before stopping
 
     const animate = (currentTime: number) => {
-      const deltaTime = this.keyboardPanningLastFrameTime 
+      const deltaTime = this.keyboardPanningLastFrameTime
         ? (currentTime - this.keyboardPanningLastFrameTime) / 1000
         : 1 / 60; // fallback to 60fps
-      
+
       this.keyboardPanningLastFrameTime = currentTime;
 
       // Adjust movement speed based on zoom level
@@ -2341,10 +2343,18 @@ class App extends React.Component<AppProps, AppState> {
       let targetVelocityY = 0;
 
       // Calculate target velocity based on pressed keys
-      if (keys.has("ArrowLeft")) targetVelocityX -= zoomAdjustedSpeed;
-      if (keys.has("ArrowRight")) targetVelocityX += zoomAdjustedSpeed;
-      if (keys.has("ArrowUp")) targetVelocityY -= zoomAdjustedSpeed;
-      if (keys.has("ArrowDown")) targetVelocityY += zoomAdjustedSpeed;
+      if (keys.has("ArrowLeft")) {
+        targetVelocityX -= zoomAdjustedSpeed;
+      }
+      if (keys.has("ArrowRight")) {
+        targetVelocityX += zoomAdjustedSpeed;
+      }
+      if (keys.has("ArrowUp")) {
+        targetVelocityY -= zoomAdjustedSpeed;
+      }
+      if (keys.has("ArrowDown")) {
+        targetVelocityY += zoomAdjustedSpeed;
+      }
 
       // Normalize diagonal movement to maintain consistent speed
       if (targetVelocityX !== 0 && targetVelocityY !== 0) {
@@ -2354,16 +2364,21 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const velocity = this.keyboardPanningVelocity;
-      
+
       // Smooth acceleration/deceleration with exponential interpolation
-      velocity.x = velocity.x * DECAY_FACTOR + targetVelocityX * (1 - DECAY_FACTOR);
-      velocity.y = velocity.y * DECAY_FACTOR + targetVelocityY * (1 - DECAY_FACTOR);
+      velocity.x =
+        velocity.x * DECAY_FACTOR + targetVelocityX * (1 - DECAY_FACTOR);
+      velocity.y =
+        velocity.y * DECAY_FACTOR + targetVelocityY * (1 - DECAY_FACTOR);
 
       // Adjust minimum velocity based on zoom level for consistent feel
       const zoomAdjustedMinVelocity = MIN_VELOCITY / this.state.zoom.value;
 
       // Apply movement if velocity is significant enough
-      if (Math.abs(velocity.x) > zoomAdjustedMinVelocity || Math.abs(velocity.y) > zoomAdjustedMinVelocity) {
+      if (
+        Math.abs(velocity.x) > zoomAdjustedMinVelocity ||
+        Math.abs(velocity.y) > zoomAdjustedMinVelocity
+      ) {
         const deltaX = velocity.x * deltaTime;
         const deltaY = velocity.y * deltaTime;
 
@@ -2380,7 +2395,11 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // Continue animation if we have any movement or keys pressed
-      if (keys.size > 0 || Math.abs(velocity.x) > zoomAdjustedMinVelocity || Math.abs(velocity.y) > zoomAdjustedMinVelocity) {
+      if (
+        keys.size > 0 ||
+        Math.abs(velocity.x) > zoomAdjustedMinVelocity ||
+        Math.abs(velocity.y) > zoomAdjustedMinVelocity
+      ) {
         this.keyboardPanningAnimationFrame = requestAnimationFrame(animate);
       } else {
         this.keyboardPanningAnimationFrame = undefined;
@@ -2801,8 +2820,15 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(document, EVENT.COPY, this.onCopy, { passive: false }),
       addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
       // #6688 Keyboard panning listeners for view mode
-      addEventListener(document, EVENT.KEYDOWN, this.handleKeyboardPanningKeyDown, { passive: false }),
-      addEventListener(document, EVENT.KEYUP, this.handleKeyboardPanningKeyUp, { passive: true }),
+      addEventListener(
+        document,
+        EVENT.KEYDOWN,
+        this.handleKeyboardPanningKeyDown,
+        { passive: false },
+      ),
+      addEventListener(document, EVENT.KEYUP, this.handleKeyboardPanningKeyUp, {
+        passive: true,
+      }),
       addEventListener(
         document,
         EVENT.POINTER_MOVE,
