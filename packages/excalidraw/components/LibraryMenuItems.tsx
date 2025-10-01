@@ -34,6 +34,8 @@ import { TextField } from "./TextField";
 
 import { useDevice } from "./App";
 
+import { Button } from "./Button";
+
 import type { ExcalidrawLibraryIds } from "../data/types";
 
 import type {
@@ -136,10 +138,13 @@ export default function LibraryMenuItems({
           }
 
           const selectedItemsMap = arrayToMap(selectedItems);
+          // Support both top-down and bottom-up selection by using min/max
+          const minRange = Math.min(rangeStart, rangeEnd);
+          const maxRange = Math.max(rangeStart, rangeEnd);
           const nextSelectedIds = orderedItems.reduce(
             (acc: LibraryItem["id"][], item, idx) => {
               if (
-                (idx >= rangeStart && idx <= rangeEnd) ||
+                (idx >= minRange && idx <= maxRange) ||
                 selectedItemsMap.has(item.id)
               ) {
                 acc.push(item.id);
@@ -166,6 +171,14 @@ export default function LibraryMenuItems({
       unpublishedItems,
     ],
   );
+
+  useEffect(() => {
+    // if selection is removed (e.g. via esc), reset last selected item
+    // so that subsequent shift+clicks don't select a large range
+    if (!selectedItems.length) {
+      setLastSelectedItem(null);
+    }
+  }, [selectedItems]);
 
   const getInsertedElements = useCallback(
     (id: string) => {
@@ -319,7 +332,14 @@ export default function LibraryMenuItems({
       <div className="library-menu-items-container__header">
         {t("library.search.heading")}
         {!isLoading && (
-          <div className="library-menu-items-container__header__hint">
+          <div
+            className="library-menu-items-container__header__hint"
+            style={{ cursor: "pointer" }}
+            onPointerDown={(e) => e.preventDefault()}
+            onClick={(event) => {
+              setSearchInputValue("");
+            }}
+          >
             <kbd>esc</kbd> to clear
           </div>
         )}
@@ -341,6 +361,15 @@ export default function LibraryMenuItems({
           <div className="library-menu-items__no-items__hint">
             {t("library.search.noResults")}
           </div>
+          <Button
+            onPointerDown={(e) => e.preventDefault()}
+            onSelect={() => {
+              setSearchInputValue("");
+            }}
+            style={{ width: "auto", marginTop: "1rem" }}
+          >
+            {t("library.search.clearSearch")}
+          </Button>
         </div>
       )}
     </>

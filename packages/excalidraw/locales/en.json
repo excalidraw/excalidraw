@@ -185,7 +185,8 @@
     "search": {
       "inputPlaceholder": "Search library",
       "heading": "Library matches",
-      "noResults": "No matching items found..."
+      "noResults": "No matching items found...",
+      "clearSearch": "Clear search"
     }
   },
   "search": {
@@ -229,10 +230,11 @@
     "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Exit zen mode",
     "cancel": "Cancel",
+    "saveLibNames": "Save name(s) and exit",
     "clear": "Clear",
     "remove": "Remove",
     "embed": "Toggle embedding",
-    "publishLibrary": "Publish selected",
+    "publishLibrary": "Rename or publish",
     "submit": "Submit",
     "confirm": "Confirm",
     "embeddableInteractionButton": "Click to interact"
@@ -258,7 +260,8 @@
     "resetLibrary": "This will clear your library. Are you sure?",
     "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
     "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
-    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!"
+    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!",
+    "localStorageQuotaExceeded": "Browser storage quota exceeded. Changes will not be saved."
   },
   "errors": {
     "unsupportedFileType": "Unsupported file type.",
