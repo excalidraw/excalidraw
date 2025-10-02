@@ -192,7 +192,7 @@ export const HintViewer = React.memo(
     const hintElement = React.createElement(
       React.Fragment,
       {},
-      getTransChildren(hint, {
+      ...getTransChildren(hint, {
         shortcut: (el) => <span className="HintViewer__key">{el}</span>,
       }),
     );
