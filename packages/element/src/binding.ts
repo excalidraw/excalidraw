@@ -1599,6 +1599,23 @@ export const bindingBorderTest = (
   fullShape?: boolean,
 ): boolean => {
   const p = pointFrom<GlobalPoint>(x, y);
+  // If the element is inside a frame, ignore binding requests coming from
+  // outside of the frame's visible area. This ensures that hidden parts of
+  // elements (clipped by the frame) are not bindable.
+  if (element.frameId) {
+    const frame = elementsMap.get(element.frameId);
+    if (frame && isFrameLikeElement(frame)) {
+      const frameBounds = getElementBounds(frame, elementsMap);
+      if (
+        p[0] < frameBounds[0] ||
+        p[0] > frameBounds[2] ||
+        p[1] < frameBounds[1] ||
+        p[1] > frameBounds[3]
+      ) {
+        return false;
+      }
+    }
+  }
   const threshold = maxBindingGap(element, element.width, element.height, zoom);
   const shouldTestInside =
     // disable fullshape snapping for frame elements so we
