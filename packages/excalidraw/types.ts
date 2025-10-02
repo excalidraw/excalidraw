@@ -740,6 +740,7 @@ export type AppClassProperties = {
   updateEditorAtom: App["updateEditorAtom"];
 
   defaultSelectionTool: "selection" | "lasso";
+  initialAppState: App["initialAppState"];
 };
 
 export type PointerDownState = Readonly<{
