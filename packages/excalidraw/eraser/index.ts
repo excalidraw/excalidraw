@@ -39,6 +39,13 @@ import type { AnimationFrameHandler } from "../animation-frame-handler";
 
 import type App from "../components/App";
 
+// Type definition for sizeMapping callback parameter
+interface SizeMappingCallbackParam {
+  pressure: number;
+  totalLength: number;
+  currentIndex: number;
+}
+
 export class EraserTrail extends AnimatedTrail {
   private elementsToErase: Set<ExcalidrawElement["id"]> = new Set();
   private groupsToErase: Set<ExcalidrawElement["id"]> = new Set();
@@ -48,7 +55,7 @@ export class EraserTrail extends AnimatedTrail {
       streamline: 0.2,
       size: 5,
       keepHead: true,
-      sizeMapping: (c) => {
+      sizeMapping: (c: SizeMappingCallbackParam) => {
         const DECAY_TIME = 200;
         const DECAY_LENGTH = 10;
         const t = Math.max(
@@ -63,7 +70,7 @@ export class EraserTrail extends AnimatedTrail {
         return Math.min(easeOut(l), easeOut(t));
       },
       fill: () =>
-        app.state.theme === THEME.LIGHT
+        this.app.state.theme === THEME.LIGHT
           ? "rgba(0, 0, 0, 0.2)"
           : "rgba(255, 255, 255, 0.2)",
     });
@@ -87,7 +94,7 @@ export class EraserTrail extends AnimatedTrail {
     const eraserPath: GlobalPoint[] =
       super
         .getCurrentTrail()
-        ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1])) || [];
+        ?.originalPoints?.map((p: [number, number, number]) => pointFrom<GlobalPoint>(p[0], p[1])) || [];
 
     if (eraserPath.length < 2) {
       return [];
