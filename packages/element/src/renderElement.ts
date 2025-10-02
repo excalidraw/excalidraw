@@ -98,7 +98,7 @@ const isPendingImageElement = (
 const shouldResetImageFilter = (
   element: ExcalidrawElement,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   return (
     appState.theme === THEME.DARK &&
@@ -225,7 +225,7 @@ const generateElementCanvas = (
   elementsMap: NonDeletedSceneElementsMap,
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ): ExcalidrawElementWithCanvas | null => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -277,7 +277,7 @@ const generateElementCanvas = (
     context.filter = IMAGE_INVERT_FILTER;
   }
 
-  drawElementOnCanvas(element, rc, context, renderConfig, appState);
+  drawElementOnCanvas(element, rc, context, renderConfig);
 
   context.restore();
 
@@ -412,7 +412,6 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
 ) => {
   switch (element.type) {
     case "rectangle":
@@ -558,7 +557,7 @@ const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   const zoom: Zoom = renderConfig
     ? appState.zoom
@@ -615,7 +614,7 @@ const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
   allElementsMap: NonDeletedSceneElementsMap,
 ) => {
   const element = elementWithCanvas.element;
@@ -733,7 +732,7 @@ export const renderElement = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   const reduceAlphaForSelection =
     appState.openDialog?.name === "elementLinkSelector" &&
@@ -803,7 +802,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig, appState);
+        drawElementOnCanvas(element, rc, context, renderConfig);
         context.restore();
       } else {
         const elementWithCanvas = generateElementWithCanvas(
@@ -896,13 +895,7 @@ export const renderElement = (
 
           tempCanvasContext.translate(-shiftX, -shiftY);
 
-          drawElementOnCanvas(
-            element,
-            tempRc,
-            tempCanvasContext,
-            renderConfig,
-            appState,
-          );
+          drawElementOnCanvas(element, tempRc, tempCanvasContext, renderConfig);
 
           tempCanvasContext.translate(shiftX, shiftY);
 
@@ -941,7 +934,7 @@ export const renderElement = (
           }
 
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig, appState);
+          drawElementOnCanvas(element, rc, context, renderConfig);
         }
 
         context.restore();
@@ -1122,7 +1115,7 @@ export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement) {
     smoothing: 0.5,
     streamline: 0.5,
     easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
+    last: true,
   };
 
   return getStroke(inputPoints as number[][], options) as [number, number][];
