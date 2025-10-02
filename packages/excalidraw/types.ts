@@ -337,6 +337,7 @@ export interface AppState {
   currentHoveredFontFamily: FontFamilyValues | null;
   currentItemRoundness: StrokeRoundness;
   currentItemArrowType: "sharp" | "round" | "elbow";
+  currentItemContainerBehavior: ExcalidrawElement["containerBehavior"];
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
