@@ -1,8 +1,7 @@
 import { MIME_TYPES } from "@excalidraw/common";
 import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 import {
-  copyBlobToClipboardAsPng,
-  copyTextToSystemClipboard,
+  copyBlobToClipboard,
   copyToClipboard,
 } from "@excalidraw/excalidraw/clipboard";
 import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
@@ -204,10 +203,12 @@ export const exportToClipboard = async (
   },
 ) => {
   if (opts.type === "svg") {
-    const svg = await exportToSvg(opts);
-    await copyTextToSystemClipboard(svg.outerHTML);
+    const blob = exportToSvg(opts).then(
+      (svg) => new Blob([svg.outerHTML], { type: MIME_TYPES.svg }),
+    );
+    await copyBlobToClipboard(blob, MIME_TYPES.text);
   } else if (opts.type === "png") {
-    await copyBlobToClipboardAsPng(exportToBlob(opts));
+    await copyBlobToClipboard(exportToBlob(opts), MIME_TYPES.png);
   } else if (opts.type === "json") {
     await copyToClipboard(opts.elements, opts.files);
   } else {
