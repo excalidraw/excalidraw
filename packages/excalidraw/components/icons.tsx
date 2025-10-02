@@ -514,6 +514,14 @@ export const HamburgerMenuIcon = createIcon(
   tablerIconProps,
 );
 
+export const HamburgerCloseMenuIcon = createIcon(
+  <g strokeWidth="1.5">
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+    <line x1="6" y1="18" x2="18" y2="6"></line>
+  </g>,
+  tablerIconProps,
+);
+
 export const ExportIcon = createIcon(
   <path
     strokeWidth="1.25"
