@@ -138,6 +138,9 @@ const loadMathJax = async () => {
   if (!mathJaxLoaded) {
     mathJaxLoading = true;
 
+    // Load the document creator last
+    const mathjax = (await import("mathjax-full/js/mathjax")).mathjax;
+
     // MathJax components we use
     const AsciiMath = (await import("mathjax-full/js/input/asciimath"))
       .AsciiMath;
@@ -159,6 +162,8 @@ const loadMathJax = async () => {
 
     // Import some TeX packages
     await import("mathjax-full/js/input/tex/ams/AmsConfiguration");
+    await import("mathjax-full/js/input/tex/bbox/BboxConfiguration");
+    await import("mathjax-full/js/input/tex/color/ColorConfiguration");
     await import(
       "mathjax-full/js/input/tex/boldsymbol/BoldsymbolConfiguration"
     );
@@ -170,8 +175,8 @@ const loadMathJax = async () => {
       await import("mathjax-full/js/input/tex/physics/PhysicsConfiguration");
     }
     const texPackages = includeMhchemPhysics
-      ? ["base", "ams", "boldsymbol", "mhchem", "physics"]
-      : ["base", "ams", "boldsymbol"];
+      ? ["base", "color", "ams", "boldsymbol", "mhchem", "physics"]
+      : ["base", "color", "ams", "boldsymbol"];
 
     // Types needed to lazy-load MathJax
     const LiteElement = (await import("mathjax-full/js/adaptors/lite/Element"))
@@ -190,9 +195,6 @@ const loadMathJax = async () => {
       )
     ).MathJax;
     mathJax.amFixes = MathJax.InputJax.AsciiMath.AM.Augment;
-
-    // Load the document creator last
-    const mathjax = (await import("mathjax-full/js/mathjax")).mathjax;
 
     type E = typeof LiteElement;
     type T = typeof LiteText;
