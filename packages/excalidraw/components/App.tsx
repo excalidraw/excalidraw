@@ -666,6 +666,12 @@ class App extends React.Component<AppProps, AppState> {
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
+  // #6688 Keyboard canvas panning properties for View mode
+  private keyboardPanningVelocity = { x: 0, y: 0 };
+  private keyboardPanningKeys = new Set<string>();
+  private keyboardPanningAnimationFrame: number | undefined;
+  private keyboardPanningLastFrameTime = 0;
+
   defaultSelectionTool: "selection" | "lasso" = "selection";
 
   constructor(props: AppProps) {
@@ -2290,6 +2296,131 @@ class App extends React.Component<AppProps, AppState> {
     event.preventDefault();
   };
 
+  // #6688 Keyboard canvas panning methods  for View mode
+  private handleKeyboardPanningKeyDown = (event: KeyboardEvent) => {
+    if (!this.state.viewModeEnabled) {
+      return;
+    }
+
+    const { code } = event;
+    if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(code)) {
+      return;
+    }
+
+    // Prevent default browser scrolling
+    event.preventDefault();
+    this.keyboardPanningKeys.add(code);
+
+    // Start animation if not already running
+    if (!this.keyboardPanningAnimationFrame) {
+      this.startKeyboardPanningAnimation();
+    }
+  };
+
+  private handleKeyboardPanningKeyUp = (event: KeyboardEvent) => {
+    this.keyboardPanningKeys.delete(event.code);
+  };
+
+  private startKeyboardPanningAnimation = () => {
+    const BASE_MOVEMENT_SPEED = 500; // base pixels per second at 100% zoom
+    const DECAY_FACTOR = 0.85; // velocity decay per frame
+    const MIN_VELOCITY = 0.5; // minimum velocity before stopping
+
+    const animate = (currentTime: number) => {
+      const deltaTime = this.keyboardPanningLastFrameTime
+        ? (currentTime - this.keyboardPanningLastFrameTime) / 1000
+        : 1 / 60; // fallback to 60fps
+
+      this.keyboardPanningLastFrameTime = currentTime;
+
+      // Adjust movement speed based on zoom level
+      // When zoomed in (zoom > 1), move slower
+      // When zoomed out (zoom < 1), move faster
+      const zoomAdjustedSpeed = BASE_MOVEMENT_SPEED / this.state.zoom.value;
+
+      const keys = this.keyboardPanningKeys;
+      let targetVelocityX = 0;
+      let targetVelocityY = 0;
+
+      // Calculate target velocity based on pressed keys
+      if (keys.has("ArrowLeft")) {
+        targetVelocityX -= zoomAdjustedSpeed;
+      }
+      if (keys.has("ArrowRight")) {
+        targetVelocityX += zoomAdjustedSpeed;
+      }
+      if (keys.has("ArrowUp")) {
+        targetVelocityY -= zoomAdjustedSpeed;
+      }
+      if (keys.has("ArrowDown")) {
+        targetVelocityY += zoomAdjustedSpeed;
+      }
+
+      // Normalize diagonal movement to maintain consistent speed
+      if (targetVelocityX !== 0 && targetVelocityY !== 0) {
+        const factor = Math.sqrt(0.5); // 1/sqrt(2) to normalize diagonal movement
+        targetVelocityX *= factor;
+        targetVelocityY *= factor;
+      }
+
+      const velocity = this.keyboardPanningVelocity;
+
+      // Smooth acceleration/deceleration with exponential interpolation
+      velocity.x =
+        velocity.x * DECAY_FACTOR + targetVelocityX * (1 - DECAY_FACTOR);
+      velocity.y =
+        velocity.y * DECAY_FACTOR + targetVelocityY * (1 - DECAY_FACTOR);
+
+      // Adjust minimum velocity based on zoom level for consistent feel
+      const zoomAdjustedMinVelocity = MIN_VELOCITY / this.state.zoom.value;
+
+      // Apply movement if velocity is significant enough
+      if (
+        Math.abs(velocity.x) > zoomAdjustedMinVelocity ||
+        Math.abs(velocity.y) > zoomAdjustedMinVelocity
+      ) {
+        const deltaX = velocity.x * deltaTime;
+        const deltaY = velocity.y * deltaTime;
+
+        this.updateScene({
+          appState: {
+            scrollX: this.state.scrollX - deltaX,
+            scrollY: this.state.scrollY - deltaY,
+          },
+        });
+      } else {
+        // Stop when velocity is too small
+        velocity.x = 0;
+        velocity.y = 0;
+      }
+
+      // Continue animation if we have any movement or keys pressed
+      if (
+        keys.size > 0 ||
+        Math.abs(velocity.x) > zoomAdjustedMinVelocity ||
+        Math.abs(velocity.y) > zoomAdjustedMinVelocity
+      ) {
+        this.keyboardPanningAnimationFrame = requestAnimationFrame(animate);
+      } else {
+        this.keyboardPanningAnimationFrame = undefined;
+        this.keyboardPanningLastFrameTime = 0;
+      }
+    };
+
+    this.keyboardPanningLastFrameTime = 0;
+    this.keyboardPanningAnimationFrame = requestAnimationFrame(animate);
+  };
+
+  private stopKeyboardPanning = () => {
+    this.keyboardPanningKeys.clear();
+    this.keyboardPanningVelocity = { x: 0, y: 0 };
+    if (this.keyboardPanningAnimationFrame) {
+      cancelAnimationFrame(this.keyboardPanningAnimationFrame);
+      this.keyboardPanningAnimationFrame = undefined;
+    }
+    this.keyboardPanningLastFrameTime = 0;
+  };
+
   private resetHistory = () => {
     this.history.clear();
   };
@@ -2606,6 +2737,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public componentWillUnmount() {
     (window as any).launchQueue?.setConsumer(() => {});
+    this.stopKeyboardPanning();
     this.renderer.destroy();
     this.scene.destroy();
     this.scene = new Scene();
@@ -2687,6 +2819,16 @@ class App extends React.Component<AppProps, AppState> {
       }), // #3553
       addEventListener(document, EVENT.COPY, this.onCopy, { passive: false }),
       addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
+      // #6688 Keyboard panning listeners for view mode
+      addEventListener(
+        document,
+        EVENT.KEYDOWN,
+        this.handleKeyboardPanningKeyDown,
+        { passive: false },
+      ),
+      addEventListener(document, EVENT.KEYUP, this.handleKeyboardPanningKeyUp, {
+        passive: true,
+      }),
       addEventListener(
         document,
         EVENT.POINTER_MOVE,
@@ -2883,6 +3025,10 @@ class App extends React.Component<AppProps, AppState> {
     if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
       this.addEventListeners();
       this.deselectElements();
+      // #6688 Stop keyboard panning when exiting view mode
+      if (!this.state.viewModeEnabled) {
+        this.stopKeyboardPanning();
+      }
     }
 
     // cleanup
