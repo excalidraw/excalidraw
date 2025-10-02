@@ -13,13 +13,14 @@ import { getShortcutKey } from "@excalidraw/common";
 
 import { isNodeInFlowchart } from "@excalidraw/element";
 
-import { memo, type ReactNode } from "react";
+import React from "react";
 
 import { t } from "../i18n";
 import { isEraserActive } from "../appState";
 import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
+import { getTransChildren } from "./Trans";
 
 import type { AppClassProperties, Device, UIAppState } from "../types";
 
@@ -167,23 +168,7 @@ const getHints = ({
   return null;
 };
 
-const getHintNodes = (hintText: string): ReactNode[] => {
-  const parts = hintText.split(/(<<.+?>>)/);
-
-  return parts
-    .filter((part) => part.length > 0)
-    .map((part, i) =>
-      part.startsWith("<<") && part.endsWith(">>") ? (
-        <span key={`${part}-${i}`} className="HintViewer__key">
-          {part.slice(2, -2)}
-        </span>
-      ) : (
-        <span>{part}</span>
-      ),
-    );
-};
-
-export const HintViewer = memo(
+export const HintViewer = React.memo(
   ({ appState, isMobile, device, app }: HintViewerProps) => {
     const hints = getHints({
       appState,
@@ -204,9 +189,17 @@ export const HintViewer = memo(
           .join(". ")
       : getShortcutKey(hints);
 
+    const hintElement = React.createElement(
+      React.Fragment,
+      {},
+      getTransChildren(hint, {
+        shortcut: (el) => <span className="HintViewer__key">{el}</span>,
+      }),
+    );
+
     return (
       <div className="HintViewer">
-        <div>{getHintNodes(hint)}</div>
+        <span>{hintElement}</span>
       </div>
     );
   },
