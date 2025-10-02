@@ -8,6 +8,7 @@ $wide-viewport-width: 1000px;
     pointer-events: none;
     box-sizing: border-box;
     position: absolute;
+    text-align: center;
     left: 0;
     top: 100%;
     max-width: 100%;
@@ -21,14 +22,8 @@ $wide-viewport-width: 1000px;
       padding-right: 2rem;
     }
 
-    > div {
+    > span {
       padding: 0.25rem;
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: baseline;
-      gap: 0.2rem;
     }
 
     &__key {
