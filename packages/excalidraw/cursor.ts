@@ -21,6 +21,57 @@ const laserPointerCursorDataURL_darkMode = `data:${
   `${laserPointerCursorSVG_tag}${laserPointerCursorBackgroundSVG}${laserPointerCursorIconSVG}</svg>`,
 )}`;
 
+let annotationCursorCache: any;
+let annotationCursorDataURL: string;
+
+const createAnnotationCursor = () => {
+  const cursorSize = 16;
+  annotationCursorCache = document.createElement("canvas");
+  annotationCursorCache.width = cursorSize;
+  annotationCursorCache.height = cursorSize;
+  const context = annotationCursorCache.getContext("2d")!;
+  
+  // Clear canvas
+  context.clearRect(0, 0, cursorSize, cursorSize);
+  
+  // Draw outer glow
+  const centerX = cursorSize / 2;
+  const centerY = cursorSize / 2;
+  
+  // Outer circle (glow effect)
+  context.beginPath();
+  context.arc(centerX, centerY, 6, 0, 2 * Math.PI);
+  context.fillStyle = "rgba(255, 59, 48, 0.3)";
+  context.fill();
+  
+  // Middle circle
+  context.beginPath();
+  context.arc(centerX, centerY, 3, 0, 2 * Math.PI);
+  context.fillStyle = "#ff3b30";
+  context.fill();
+  
+  // Inner white dot
+  context.beginPath();
+  context.arc(centerX, centerY, 1, 0, 2 * Math.PI);
+  context.fillStyle = "#ffffff";
+  context.fill();
+  
+  annotationCursorDataURL = annotationCursorCache.toDataURL() as DataURL;
+};
+
+export const setAnnotationCursor = (
+  interactiveCanvas: HTMLCanvasElement | null,
+) => {
+  if (!annotationCursorCache) {
+    createAnnotationCursor();
+  }
+
+  setCursor(
+    interactiveCanvas,
+    `url(${annotationCursorDataURL}) 8 8, crosshair`,
+  );
+};
+
 export const resetCursor = (interactiveCanvas: HTMLCanvasElement | null) => {
   if (interactiveCanvas) {
     interactiveCanvas.style.cursor = "";
@@ -100,6 +151,9 @@ export const setCursorForShape = (
         ? laserPointerCursorDataURL_lightMode
         : laserPointerCursorDataURL_darkMode;
     interactiveCanvas.style.cursor = `url(${url}), auto`;
+  } else if (appState.activeTool.type === "annotation") {
+    // Use canvas-generated red dot cursor for annotation tool
+    setAnnotationCursor(interactiveCanvas);
   } else if (!["image", "custom"].includes(appState.activeTool.type)) {
     interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   } else if (appState.activeTool.type !== "image") {
