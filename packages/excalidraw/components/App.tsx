@@ -744,6 +744,7 @@ class App extends React.Component<AppProps, AppState> {
         scrollToContent: this.scrollToContent,
         setForceRenderAllEmbeddables: this.setForceRenderAllEmbeddables, //zsviczian
         zoomToFit: this.zoomToFit, //zsviczian
+        refreshEditorBreakpoints: this.refreshEditorBreakpoints, //zsviczian
         getColorAtScenePoint: this.getColorAtScenePoint, //zsviczian
         startLineEditor: this.startLineEditor, //zsviczian
         getSceneElements: this.getSceneElements,
@@ -2592,7 +2593,9 @@ class App extends React.Component<AppProps, AppState> {
         // NOTE: we could also remove the isMobileOrTablet check here and
         // always switch to compact mode when the editor is narrow (e.g. < MQ_MIN_WIDTH_DESKTOP)
         // but not too narrow (> MQ_MAX_WIDTH_MOBILE)
-        this.isTabletBreakpoint(editorWidth, editorHeight) && isMobileOrTablet()
+        this.isTabletBreakpoint(editorWidth, editorHeight) &&
+        isMobileOrTablet() &&
+        !this.state.trayModeEnabled //zsviczian
           ? "compact"
           : "full",
     });

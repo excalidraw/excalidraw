@@ -185,8 +185,8 @@ export const SelectedShapeActions = ({
 
   // zsviczian
   const showToggleFrameRoleAction =
-    targetElements.length > 0 &&
-    targetElements.every((el) => el.type === "frame") ||
+    (targetElements.length > 0 &&
+      targetElements.every((el) => el.type === "frame")) ||
     appState.activeTool.type === "frame";
 
   return (
@@ -379,6 +379,12 @@ export const CompactShapeActions = ({
 
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
+  // zsviczian
+  const showToggleFrameRoleAction =
+    (targetElements.length > 0 &&
+      targetElements.every((el) => el.type === "frame")) ||
+    appState.activeTool.type === "frame";
+
   return (
     <div className="compact-shape-actions">
       {/* Stroke Color */}
@@ -397,6 +403,7 @@ export const CompactShapeActions = ({
 
       {/* Combined Properties (Fill, Stroke, Opacity) */}
       {(showFillIcons ||
+        showToggleFrameRoleAction || //zsviczian
         hasStrokeWidth(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeWidth(element.type)) ||
         hasStrokeStyle(appState.activeTool.type) ||
@@ -462,6 +469,15 @@ export const CompactShapeActions = ({
                       canChangeRoundness(element.type),
                     )) &&
                     renderAction("changeRoundness")}
+                  {/* //zsviczian: add frame role toggle  */}
+                  {showToggleFrameRoleAction && (
+                    <fieldset>
+                      <legend>{t2("COMP_FRAME")}</legend>
+                      <div className="buttonList">
+                        {renderAction("toggleFrameRole")}
+                      </div>
+                    </fieldset>
+                  )}
                   {renderAction("changeOpacity")}
                 </div>
               </PropertiesPopover>

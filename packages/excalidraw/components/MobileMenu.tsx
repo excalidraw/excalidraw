@@ -87,7 +87,11 @@ export const MobileMenu = ({
       !appState.viewModeEnabled;
 
     return (
-      <FixedSideContainer side="top" className="App-top-bar">
+      <FixedSideContainer
+        side="top"
+        className="App-top-bar"
+        sidepanelOpen={!!appState.openSidebar /*zsviczian*/}
+      >
         {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
         <Section heading="shapes">
           {(heading: React.ReactNode) => (

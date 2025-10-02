@@ -900,6 +900,7 @@ export interface ExcalidrawImperativeAPI {
   };
   setForceRenderAllEmbeddables: InstanceType<typeof App>["setForceRenderAllEmbeddables"]; //zsviczian
   zoomToFit: InstanceType<typeof App>["zoomToFit"]; //zsviczian
+  refreshEditorBreakpoints: InstanceType<typeof App>["refreshEditorBreakpoints"]; //zsviczian
   getColorAtScenePoint: InstanceType<typeof App>["getColorAtScenePoint"]; //zsviczian
   startLineEditor: InstanceType<typeof App>["startLineEditor"]; //zsviczian
   getSceneElements: InstanceType<typeof App>["getSceneElements"];

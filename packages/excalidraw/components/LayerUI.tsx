@@ -299,7 +299,7 @@ const LayerUI = ({
       appState.openDialog?.name !== "elementLinkSelector";
 
     return (
-      <FixedSideContainer side="top">
+      <FixedSideContainer side="top" sidepanelOpen={!!appState.openSidebar /*zsviczian*/}>
         <div className="App-menu App-menu_top">
           <Stack.Col
             gap={spacing.menuTopGap}
@@ -411,7 +411,7 @@ const LayerUI = ({
             )}
           <div
             className={clsx(
-              "layer-ui__wrapper__top-right zen-mode-transition",
+              "mobile-misc-tools-container zen-mode-transition", //zsviczian
               {
                 "transition-right": appState.zenModeEnabled,
                 "layer-ui__wrapper__top-right--compact":
