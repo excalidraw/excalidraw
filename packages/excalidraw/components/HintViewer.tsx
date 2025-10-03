@@ -13,11 +13,14 @@ import { getShortcutKey } from "@excalidraw/common";
 
 import { isNodeInFlowchart } from "@excalidraw/element";
 
+import React from "react";
+
 import { t } from "../i18n";
 import { isEraserActive } from "../appState";
 import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
+import { nodesFromTextWithTags } from "./Trans";
 
 import type { AppClassProperties, Device, UIAppState } from "../types";
 
@@ -165,34 +168,39 @@ const getHints = ({
   return null;
 };
 
-export const HintViewer = ({
-  appState,
-  isMobile,
-  device,
-  app,
-}: HintViewerProps) => {
-  const hints = getHints({
-    appState,
-    isMobile,
-    device,
-    app,
-  });
+export const HintViewer = React.memo(
+  ({ appState, isMobile, device, app }: HintViewerProps) => {
+    const hints = getHints({
+      appState,
+      isMobile,
+      device,
+      app,
+    });
 
-  if (!hints) {
-    return null;
-  }
+    if (!hints) {
+      return null;
+    }
 
-  const hint = Array.isArray(hints)
-    ? hints
-        .map((hint) => {
-          return getShortcutKey(hint).replace(/\. ?$/, "");
-        })
-        .join(". ")
-    : getShortcutKey(hints);
+    const hint = Array.isArray(hints)
+      ? hints
+          .map((hint) => {
+            return getShortcutKey(hint).replace(/\. ?$/, "");
+          })
+          .join(". ")
+      : getShortcutKey(hints);
 
-  return (
-    <div className="HintViewer">
-      <span>{hint}</span>
-    </div>
-  );
-};
+    const hintElement = React.createElement(
+      React.Fragment,
+      {},
+      ...nodesFromTextWithTags(hint, {
+        shortcut: (el) => <span className="HintViewer__key">{el}</span>,
+      }),
+    );
+
+    return (
+      <div className="HintViewer">
+        <span>{hintElement}</span>
+      </div>
+    );
+  },
+);
