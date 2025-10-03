@@ -30,6 +30,8 @@ $wide-viewport-width: 1000px;
     }
 
     &__key {
+      display: inline-block;
+      margin: 0 0.1rem;
       font-family: monospace;
       border: 1px solid var(--color-gray-40);
       border-radius: 5px;
