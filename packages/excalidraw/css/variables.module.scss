@@ -188,10 +188,13 @@
   border: none;
   box-shadow: 0 0 0 1px var(--color-surface-lowest);
   background-color: var(--color-surface-low);
-  width: var(--mobile-action-button-size, 2rem);
-  height: var(--mobile-action-button-size, 2rem);
 
   &:active {
     box-shadow: 0 0 0 1px var(--color-brand-active);
+  }
+
+  @include isMobile() {
+    width: var(--mobile-action-button-size, 2rem);
+    height: var(--mobile-action-button-size, 2rem);
   }
 }
