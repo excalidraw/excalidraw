@@ -20,7 +20,7 @@ import { isEraserActive } from "../appState";
 import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
-import { getTransChildren } from "./Trans";
+import { nodesFromTextWithTags } from "./Trans";
 
 import type { AppClassProperties, Device, UIAppState } from "../types";
 
@@ -192,7 +192,7 @@ export const HintViewer = React.memo(
     const hintElement = React.createElement(
       React.Fragment,
       {},
-      ...getTransChildren(hint, {
+      ...nodesFromTextWithTags(hint, {
         shortcut: (el) => <span className="HintViewer__key">{el}</span>,
       }),
     );
