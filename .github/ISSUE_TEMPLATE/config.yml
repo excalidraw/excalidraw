@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discord Community
+    url: https://discord.gg/UexuTaE
+    about: Join our Discord community to discuss ideas, get help, and connect with other users and contributors.
+  - name: 📚 Documentation
+    url: https://docs.excalidraw.com
+    about: Check our documentation for guides, API references, and integration examples.
+  - name: 🐛 Bug Reports
+    url: https://github.com/excalidraw/excalidraw/issues/new?template=bug_report.yml
+    about: Report a bug or unexpected behavior in Excalidraw.
+  - name: ✨ Feature Requests
+    url: https://github.com/excalidraw/excalidraw/issues/new?template=feature_request.yml
+    about: Suggest a new feature or enhancement for Excalidraw.
+  - name: 🚀 Enhancements
+    url: https://github.com/excalidraw/excalidraw/issues/new?template=enhancement.yml
+    about: Suggest an improvement to existing functionality.
