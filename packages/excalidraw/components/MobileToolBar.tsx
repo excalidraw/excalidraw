@@ -202,7 +202,7 @@ export const MobileToolBar = ({
         app={app}
         options={SELECTION_TOOLS}
         activeTool={activeTool}
-        defaultOption={app.state.preferredSelectionTool}
+        defaultOption={app.state.preferredSelectionTool.type}
         namePrefix="selectionType"
         title={capitalizeString(t("toolBar.selection"))}
         data-testid="toolbar-selection"
@@ -210,13 +210,13 @@ export const MobileToolBar = ({
           if (type === "selection" || type === "lasso") {
             app.setActiveTool({ type });
             setAppState({
-              preferredSelectionTool: type,
+              preferredSelectionTool: { type, initialized: true },
             });
           }
         }}
         displayedOption={
           SELECTION_TOOLS.find(
-            (tool) => tool.type === app.state.preferredSelectionTool,
+            (tool) => tool.type === app.state.preferredSelectionTool.type,
           ) || SELECTION_TOOLS[0]
         }
       />

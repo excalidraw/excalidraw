@@ -55,7 +55,10 @@ export const getDefaultAppState = (): Omit<
       fromSelection: false,
       lastActiveTool: null,
     },
-    preferredSelectionTool: "selection",
+    preferredSelectionTool: {
+      type: "selection",
+      initialized: false,
+    },
     penMode: false,
     penDetected: false,
     errorMessage: null,

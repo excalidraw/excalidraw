@@ -1063,7 +1063,7 @@ export const ShapesSwitcher = ({
   const lassoToolSelected =
     app.state.stylesPanelMode === "full" &&
     activeTool.type === "lasso" &&
-    app.state.preferredSelectionTool !== "lasso";
+    app.state.preferredSelectionTool.type !== "lasso";
 
   const embeddableToolSelected = activeTool.type === "embeddable";
 
@@ -1102,7 +1102,7 @@ export const ShapesSwitcher = ({
                 app={app}
                 options={SELECTION_TOOLS}
                 activeTool={activeTool}
-                defaultOption={app.state.preferredSelectionTool}
+                defaultOption={app.state.preferredSelectionTool.type}
                 namePrefix="selectionType"
                 title={capitalizeString(t("toolBar.selection"))}
                 data-testid="toolbar-selection"
@@ -1110,13 +1110,14 @@ export const ShapesSwitcher = ({
                   if (type === "selection" || type === "lasso") {
                     app.setActiveTool({ type });
                     setAppState({
-                      preferredSelectionTool: type,
+                      preferredSelectionTool: { type, initialized: true },
                     });
                   }
                 }}
                 displayedOption={
                   SELECTION_TOOLS.find(
-                    (tool) => tool.type === app.state.preferredSelectionTool,
+                    (tool) =>
+                      tool.type === app.state.preferredSelectionTool.type,
                   ) || SELECTION_TOOLS[0]
                 }
                 fillable={activeTool.type === "selection"}

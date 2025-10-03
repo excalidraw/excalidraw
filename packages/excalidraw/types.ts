@@ -316,7 +316,10 @@ export interface AppState {
     // indicates if the current tool is temporarily switched on from the selection tool
     fromSelection: boolean;
   } & ActiveTool;
-  preferredSelectionTool: "selection" | "lasso";
+  preferredSelectionTool: {
+    type: "selection" | "lasso";
+    initialized: boolean;
+  };
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
