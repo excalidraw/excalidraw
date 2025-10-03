@@ -3,24 +3,46 @@
 .excalidraw {
   .dropdown-menu {
     position: absolute;
-    top: 100%;
+    top: 2.5rem;
     margin-top: 0.5rem;
 
+    &--placement-top {
+      top: auto;
+      bottom: 100%;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
     &--mobile {
-      left: 0;
       width: 100%;
       row-gap: 0.75rem;
+
+      // When main menu is in the top toolbar, position relative to trigger
+      &.main-menu-dropdown {
+        min-width: 232px;
+        max-width: calc(100vw - var(--editor-container-padding) * 2);
+        margin-top: 0;
+        margin-bottom: 0;
+        z-index: var(--zIndex-layerUI);
+
+        @media screen and (orientation: landscape) {
+          max-width: 232px;
+        }
+      }
 
       .dropdown-menu-container {
         padding: 8px 8px;
         box-sizing: border-box;
-        // background-color: var(--island-bg-color);
+        max-height: calc(
+          100svh - var(--editor-container-padding) * 2 - 2.25rem
+        );
         box-shadow: var(--shadow-island);
         border-radius: var(--border-radius-lg);
         position: relative;
         transition: box-shadow 0.5s ease-in-out;
         display: flex;
         flex-direction: column;
+        overflow-y: auto;
 
         &.zen-mode {
           box-shadow: none;
@@ -30,7 +52,7 @@
 
     .dropdown-menu-container {
       background-color: var(--island-bg-color);
-      max-height: calc(100vh - 150px);
+
       overflow-y: auto;
       --gap: 2;
     }

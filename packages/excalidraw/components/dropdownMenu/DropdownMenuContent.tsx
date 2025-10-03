@@ -17,6 +17,7 @@ const MenuContent = ({
   className = "",
   onSelect,
   style,
+  placement = "bottom",
 }: {
   children?: React.ReactNode;
   onClickOutside?: () => void;
@@ -26,6 +27,7 @@ const MenuContent = ({
    */
   onSelect?: (event: Event) => void;
   style?: React.CSSProperties;
+  placement?: "top" | "bottom";
 }) => {
   const device = useDevice();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -58,6 +60,7 @@ const MenuContent = ({
 
   const classNames = clsx(`dropdown-menu ${className}`, {
     "dropdown-menu--mobile": device.editor.isMobile,
+    "dropdown-menu--placement-top": placement === "top",
   }).trim();
 
   return (
