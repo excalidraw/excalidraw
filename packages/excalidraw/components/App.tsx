@@ -3241,7 +3241,18 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // ------------------- Text -------------------
-    this.addTextFromPaste(data.text, isPlainPaste);
+    // Preserve formatting as a single block when the content looks like code;
+    // otherwise keep default behavior (split into multiple lines/elements).
+    const looksLikeCodeForText = (s: string) => {
+      if (!s) return false;
+      if (/```|\b(function|const|let|var|class|import|export|return|if|else|for|while|try|catch)\b/.test(s)) return true;
+      if (/\{\s*\}|=>|::|::=/.test(s)) return true;
+      const lines = s.split(/\r?\n/);
+      const indented = lines.filter((l) => /^\s{2,}|\t/.test(l)).length;
+      return indented >= 2;
+    };
+
+    this.addTextFromPaste(data.text, isPlainPaste || looksLikeCodeForText(data.text));
   }
 
   public pasteFromClipboard = withBatchedUpdates(
@@ -3491,8 +3502,8 @@ class App extends React.Component<AppProps, AppState> {
       const textNodes = mixedContent.filter((node) => node.type === "text");
       if (textNodes.length) {
         this.addTextFromPaste(
-          textNodes.map((node) => node.value).join("\n\n"),
-          isPlainPaste,
+          textNodes.map((node) => node.value).join(""),
+          true,
         );
       }
     }
@@ -3539,8 +3550,8 @@ class App extends React.Component<AppProps, AppState> {
     const lines = isPlainPaste ? [text] : text.split("\n");
     const textElements = lines.reduce(
       (acc: ExcalidrawTextElement[], line, idx) => {
-        const originalText = normalizeText(line).trim();
-        if (originalText.length) {
+        const originalText = normalizeText(line);
+        if (originalText.trim().length) {
           const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
             x,
             y: currentY,
