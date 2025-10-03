@@ -113,7 +113,18 @@ export const MobileMenu = ({
                     />
                   </Stack.Row>
                 </Island>
-                <div className="mobile-misc-tools-container">
+                <div
+                  className="mobile-misc-tools-container"
+                  style={
+                    //zsviczian
+                    document.body?.classList.contains("mod-rtl")
+                      ? {
+                          right: "inherit",
+                          left: "calc(var(--editor-container-padding) * -1)",
+                        }
+                      : undefined
+                  }
+                >
                   {!appState.viewModeEnabled && //zsviczian
                     renderTopRightUI?.(true, appState)}
                   {!appState.viewModeEnabled &&

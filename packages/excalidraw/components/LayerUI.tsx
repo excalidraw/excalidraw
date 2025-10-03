@@ -418,6 +418,14 @@ const LayerUI = ({
                   appState.stylesPanelMode === "compact",
               },
             )}
+            style={ //zsviczian
+              document.body?.classList.contains("mod-rtl")
+                ? {
+                    right: "inherit",
+                    left: "calc(var(--editor-container-padding) * -1)",
+                  }
+                : undefined
+            }
           >
             {appState.collaborators.size > 0 && (
               <UserList
