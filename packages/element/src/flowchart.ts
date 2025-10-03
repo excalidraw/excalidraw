@@ -513,110 +513,73 @@ export class FlowChartNavigator {
     this.visitedNodes.clear();
   }    
   
-// inside FlowChartNavigator class
+  exploreSiblingByGraph(
+    element: ExcalidrawElement,
+    elementsMap: ElementsMap,
+    forward: boolean,
+  ): ExcalidrawElement["id"] | null {
+    if (!isBindableElement(element)) {
+      return null;
+    }
+    const opposite: Record<LinkDirection, LinkDirection> = {
+      up: "down",
+      down: "up",
+      left: "right",
+      right: "left",
+    };
+    const dirs: LinkDirection[] = ["up", "right", "down", "left"];
+    const parentCandidates: ExcalidrawBindableElement[] = [];
 
-/**
- * Find "sibling" nodes (nodes that share at least one common parent with `element`)
- * and return the id of the next sibling (forward === true -> next to the right,
- * forward === false -> previous / to the left).
- *
- * elementsMap: ElementsMap (map of all non-deleted elements)
- */
-exploreSiblingByGraph(
-  element: ExcalidrawElement,
-  elementsMap: ElementsMap,
-  forward: boolean,
-): ExcalidrawElement["id"] | null {
-  // must be a bindable node (flowchart node)
-  if (!isBindableElement(element)) {
-    return null;
-  }
-
-  // helper: opposite direction
-  const opposite: Record<LinkDirection, LinkDirection> = {
-    up: "down",
-    down: "up",
-    left: "right",
-    right: "left",
-  };
-
-  // collect parent candidates (predecessors) in all four directions
-  const dirs: LinkDirection[] = ["up", "right", "down", "left"];
-  const parentCandidates: ExcalidrawBindableElement[] = [];
-
-  for (const dir of dirs) {
-    const preds = getPredecessors(element as ExcalidrawBindableElement, elementsMap, dir);
-    for (const p of preds) {
-      // ensure it's a bindable element (type-narrow)
-      if (isBindableElement(p)) {
-        parentCandidates.push(p);
+    for (const dir of dirs) {
+      const preds = getPredecessors(element as ExcalidrawBindableElement, elementsMap, dir);
+      for (const p of preds) {
+        if (isBindableElement(p)) {
+          parentCandidates.push(p);
+        }
       }
     }
-  }
+    if (parentCandidates.length === 0) {
+      return null;
+    }
+    const siblingsMap = new Map<string, ExcalidrawBindableElement>();
 
-  if (parentCandidates.length === 0) {
-    // no parent found -> no siblings by graph definition
-    return null;
-  }
-
-  // collect children (successors of each parent) that are in the parent's
-  // outward direction (opposite of direction used to find the parent).
-  // Because we found parents via getPredecessors called per-direction,
-  // we need to re-run per-direction to know which direction produced that parent.
-  // Simpler approach: re-check for each dir.
-  const siblingsMap = new Map<string, ExcalidrawBindableElement>();
-
-  for (const dir of dirs) {
-    const preds = getPredecessors(element as ExcalidrawBindableElement, elementsMap, dir);
-    const op = opposite[dir];
-    for (const parent of preds) {
-      if (!isBindableElement(parent)) continue;
-      // get children that the parent points to in the opposite direction
-      const children = getSuccessors(parent, elementsMap, op);
-      for (const c of children) {
-        if (!isBindableElement(c)) continue;
-        // exclude the current node itself
-        if (c.id === element.id) continue;
-        // deduplicate by id
-        if (!siblingsMap.has(c.id)) siblingsMap.set(c.id, c);
+    for (const dir of dirs) {
+      const preds = getPredecessors(element as ExcalidrawBindableElement, elementsMap, dir);
+      const op = opposite[dir];
+      for (const parent of preds) {
+        if (!isBindableElement(parent)) continue;
+        const children = getSuccessors(parent, elementsMap, op);
+        for (const c of children) {
+          if (!isBindableElement(c)) continue;
+          if (c.id === element.id) continue;
+          if (!siblingsMap.has(c.id)) siblingsMap.set(c.id, c);
+        }
       }
     }
+
+    const siblings = Array.from(siblingsMap.values());
+    if (siblings.length === 0) return null;
+    siblings.sort((a, b) => a.x - b.x || a.y - b.y);
+    const current = element as ExcalidrawBindableElement;
+    let idx = siblings.findIndex((s) =>
+      forward ? s.x > current.x || (s.x === current.x && s.y > current.y)
+              : s.x < current.x || (s.x === current.x && s.y < current.y)
+    );
+
+    if (idx === -1) {
+      idx = forward ? 0 : siblings.length - 1;
+    }
+
+    const next = siblings[idx];
+    if (next) {
+      this.visitedNodes.add(next.id);
+      this.sameLevelNodes = siblings as ExcalidrawElement[];
+      this.sameLevelIndex = idx;
+      this.isExploring = true;
+      return next.id;
+    }
+    return null;
   }
-
-  const siblings = Array.from(siblingsMap.values());
-  if (siblings.length === 0) return null;
-
-  // Sort siblings by visual order (left-to-right then top-to-bottom)
-  siblings.sort((a, b) => a.x - b.x || a.y - b.y);
-
-  // Find the next sibling relative to the current element's position
-  const current = element as ExcalidrawBindableElement;
-  let idx = siblings.findIndex((s) =>
-    forward ? s.x > current.x || (s.x === current.x && s.y > current.y)
-            : s.x < current.x || (s.x === current.x && s.y < current.y)
-  );
-
-  if (idx === -1) {
-    // wrap around
-    idx = forward ? 0 : siblings.length - 1;
-  }
-
-  const next = siblings[idx];
-  if (next) {
-    // optional: keep track in visitedNodes if you want; not required
-    this.visitedNodes.add(next.id);
-    // store same-level nodes so repeated presses can use them if desired
-    this.sameLevelNodes = siblings as ExcalidrawElement[];
-    this.sameLevelIndex = idx;
-    this.isExploring = true;
-    // we don't set this.direction (direction is orthogonal to sibling navigation)
-    return next.id;
-  }
-  return null;
-}
-
-
-//yaha ytak 
 
   exploreByDirection(
     element: ExcalidrawElement,
