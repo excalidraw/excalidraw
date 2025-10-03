@@ -17,7 +17,7 @@ const TAG_START_REGEXP = /<([\w-]+)>/;
 // Used for extracting "link" from "</link>"
 const TAG_END_REGEXP = /<\/([\w-]+)>/;
 
-export const getTransChildren = (
+export const nodesFromTextWithTags = (
   format: string,
   props: {
     [key: string]: React.ReactNode | ((el: React.ReactNode) => React.ReactNode);
@@ -164,7 +164,7 @@ const Trans = ({
   return React.createElement(
     React.Fragment,
     {},
-    ...getTransChildren(t(i18nKey), props),
+    ...nodesFromTextWithTags(t(i18nKey), props),
   );
 };
 
