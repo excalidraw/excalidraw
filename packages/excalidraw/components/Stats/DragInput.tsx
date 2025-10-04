@@ -351,6 +351,9 @@ const StatsDragInput = <
               handleInputValue(eventTarget.value, elements, appState);
               app.focusContainer();
             }
+            if (event.key === KEYS.ESCAPE) {
+              setInputValue(value.toString());
+            }
           }
         }}
         ref={inputRef}
