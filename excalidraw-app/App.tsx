@@ -45,6 +45,7 @@ import {
   exportToPlus,
   share,
   youtubeIcon,
+  ExternalLinkIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { isElementLink } from "@excalidraw/element";
 import { restore, restoreAppState } from "@excalidraw/excalidraw/data/restore";
@@ -1008,6 +1009,18 @@ const ExcalidrawWrapper = () => {
               ],
               perform: async () => {
                 setShareDialogState({ isOpen: true, type: "share" });
+              },
+            },
+            {
+              label: "AI Assistant",
+              category: DEFAULT_CATEGORIES.app,
+              icon: ExternalLinkIcon,
+              keywords: ["ai", "assistant", "chat", "help", "create", "generate", "draw"],
+              predicate: true,
+              perform: () => {
+                if (typeof (window as any).toggleAIChatbot === "function") {
+                  (window as any).toggleAIChatbot();
+                }
               },
             },
             {

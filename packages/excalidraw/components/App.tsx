@@ -2999,7 +2999,12 @@ class App extends React.Component<AppProps, AppState> {
     const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
       document.activeElement,
     );
-    if (!isExcalidrawActive || isWritableElement(event.target)) {
+    
+    // Check if the event comes from an element that should prevent canvas clipboard handling
+    const target = event.target as Element;
+    const isFromPreventClipboardElement = target?.closest?.('[data-prevent-canvas-clipboard="true"]');
+    
+    if (!isExcalidrawActive || isWritableElement(event.target) || isFromPreventClipboardElement) {
       return;
     }
     this.actionManager.executeAction(actionCopy, "keyboard", event);
@@ -3253,6 +3258,13 @@ class App extends React.Component<AppProps, AppState> {
       const isExcalidrawActive =
         this.excalidrawContainerRef.current?.contains(target);
       if (event && !isExcalidrawActive) {
+        return;
+      }
+
+      // Check if the event comes from an element that should prevent canvas clipboard handling
+      const eventTarget = event?.target as Element;
+      const isFromPreventClipboardElement = eventTarget?.closest?.('[data-prevent-canvas-clipboard="true"]');
+      if (event && isFromPreventClipboardElement) {
         return;
       }
 

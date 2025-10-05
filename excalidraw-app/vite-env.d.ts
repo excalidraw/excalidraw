@@ -38,6 +38,12 @@ interface ImportMetaEnv {
 
   VITE_APP_GIT_SHA: string;
 
+  // LLM API Keys
+  VITE_OPENAI_API_KEY: string;
+  VITE_GOOGLE_API_KEY: string;
+  VITE_ANTHROPIC_API_KEY: string;
+  VITE_XAI_API_KEY: string;
+
   MODE: string;
 
   DEV: string;

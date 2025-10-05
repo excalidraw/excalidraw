@@ -73,6 +73,7 @@ import {
   TextSizeIcon,
   adjustmentsIcon,
   DotsHorizontalIcon,
+  AiAssistantIcon,
 } from "./icons";
 
 import type {
@@ -890,6 +891,20 @@ export const ShapesSwitcher = ({
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate
           </div>
+          <DropdownMenu.Item
+            onSelect={() => {
+              if (typeof (window as any).toggleAIChatbot === "function") {
+                (window as any).toggleAIChatbot();
+              }
+            }}
+            icon={AiAssistantIcon}
+            data-testid="toolbar-ai-assistant"
+            selected={app.props.aiEnabled !== false}
+            shortcut={KEYS.C.toLocaleUpperCase()}
+          >
+            AI Assistant
+            <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
+          </DropdownMenu.Item>
           {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
           <DropdownMenu.Item
             onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}

@@ -9,14 +9,28 @@ import { getDataURL } from "@excalidraw/excalidraw/data/blob";
 import { safelyParseJSON } from "@excalidraw/common";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import { AIChatbot } from "./AIChatbot";
+import { useState } from "react";
 
 export const AIComponents = ({
   excalidrawAPI,
 }: {
   excalidrawAPI: ExcalidrawImperativeAPI;
 }) => {
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+
+  const toggleChatbot = () => setIsChatbotOpen((prev) => !prev);
+
+  // Expose chatbot toggle function globally for external access
+  (window as any).toggleAIChatbot = toggleChatbot;
+
   return (
     <>
+      <AIChatbot
+        excalidrawAPI={excalidrawAPI}
+        isOpen={isChatbotOpen}
+        onClose={() => setIsChatbotOpen(false)}
+      />
       <DiagramToCodePlugin
         generate={async ({ frame, children }) => {
           const appState = excalidrawAPI.getAppState();

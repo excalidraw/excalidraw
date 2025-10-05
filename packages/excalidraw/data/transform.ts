@@ -734,6 +734,89 @@ export const convertToExcalidrawElements = (
     }
   }
 
+  // Handle bound text elements (text elements with containerId and container elements with boundElements)
+  for (const [id, element] of elementsWithIds) {
+    if (element.type === "text" && element.containerId) {
+      const textElement = elementStore.getElement(id) as ExcalidrawTextElement;
+      
+      // Map the old containerId to new containerId if needed
+      const newContainerId = oldToNewElementIdMap.get(element.containerId) || element.containerId;
+      const containerElement = elementStore.getElement(newContainerId);
+      
+      if (textElement && containerElement && isArrowElement(containerElement)) {
+        // Set the text element properties for bound text
+        Object.assign(textElement, {
+          containerId: containerElement.id,
+          verticalAlign: VERTICAL_ALIGN.MIDDLE,
+          textAlign: TEXT_ALIGN.CENTER,
+          autoResize: true,
+          angle: 0,
+        });
+
+        // Add text to container's bound elements if not already present
+        const boundElements = containerElement.boundElements || [];
+        const textAlreadyBound = boundElements.some(be => be.type === "text" && be.id === textElement.id);
+        
+        if (!textAlreadyBound) {
+          Object.assign(containerElement, {
+            boundElements: [...boundElements, { type: "text", id: textElement.id }],
+          });
+        }
+
+        // Update the element store with the modified elements
+        elementStore.add(textElement);
+        elementStore.add(containerElement);
+
+        // Redraw text bounding box to position it correctly on the arrow
+        redrawTextBoundingBox(textElement, containerElement, scene);
+      }
+    }
+  }
+
+  // Handle container elements that have boundElements arrays with text references
+  for (const [id, element] of elementsWithIds) {
+    if (element.boundElements && Array.isArray(element.boundElements)) {
+      const containerElement = elementStore.getElement(id);
+      
+      if (containerElement && isArrowElement(containerElement)) {
+        // Process each bound element reference
+        const updatedBoundElements = element.boundElements.map(boundElementRef => {
+          if (boundElementRef.type === "text") {
+            // Map old text element ID to new ID if needed
+            const newTextId = oldToNewElementIdMap.get(boundElementRef.id) || boundElementRef.id;
+            const textElement = elementStore.getElement(newTextId) as ExcalidrawTextElement;
+            
+            if (textElement) {
+              // Ensure the text element has the correct container reference
+              Object.assign(textElement, {
+                containerId: containerElement.id,
+                verticalAlign: VERTICAL_ALIGN.MIDDLE,
+                textAlign: TEXT_ALIGN.CENTER,
+                autoResize: true,
+                angle: 0,
+              });
+              
+              elementStore.add(textElement);
+              
+              // Redraw text bounding box to position it correctly
+              redrawTextBoundingBox(textElement, containerElement, scene);
+              
+              return { type: "text", id: newTextId };
+            }
+          }
+          return boundElementRef;
+        });
+
+        // Update container with mapped bound elements
+        Object.assign(containerElement, {
+          boundElements: updatedBoundElements,
+        });
+        
+        elementStore.add(containerElement);
+      }
+    }
+  }
+
   // Once all the excalidraw elements are created, we can add frames since we
   // need to calculate coordinates and dimensions of frame which is possible after all
   // frame children are processed.
