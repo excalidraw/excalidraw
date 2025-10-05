@@ -1,4 +1,4 @@
-# Excalidraw with AI Features 🤖
+# Excalidraw with AI Features
 
 <div align="center">
   <img src="./public/image.png" alt="Excalidraw AI Chatbot" width="800" />
@@ -10,13 +10,13 @@ This is a modified version of Excalidraw that includes a powerful **AI Chatbot A
 
 > **⭐ Built on top of the amazing [Excalidraw](https://github.com/excalidraw/excalidraw) project!**
 > 
-> This repository is a fork of the original [Excalidraw](https://github.com/excalidraw/excalidraw) by the Excalidraw team. All the core features, whiteboard functionality, and collaboration capabilities are from the original project. I've only added the AI Chatbot Assistant feature on top of it. **All credit for the base application goes to the original Excalidraw team!** 🙌
-> 
-> Check out the original project: [https://github.com/excalidraw/excalidraw](https://github.com/excalidraw/excalidraw)
+> This repository is a fork of the original [Excalidraw](https://github.com/excalidraw/excalidraw) by the Excalidraw team. All the core features, whiteboard functionality, and collaboration capabilities are from the original project. I've only added the AI Chatbot Assistant feature on top of it. 
+>
+>**All credit for the base application goes to the original Excalidraw team!** 🙌 
 
 ## ✨ AI Features (What's New)
 
-### 🤖 AI Chatbot Assistant
+### AI Chatbot Assistant
 
 The AI Chatbot is your intelligent companion for creating diagrams and getting help with Excalidraw. It can:
 
@@ -27,7 +27,7 @@ The AI Chatbot is your intelligent companion for creating diagrams and getting h
 - **Support image attachments** for visual context
 - **Maintain chat history** across sessions
 
-### 🚀 How to Use
+### How to Use
 
 #### Opening the AI Assistant
 
@@ -59,14 +59,14 @@ Here are some examples of what you can ask the AI:
 "What keyboard shortcuts are available?"
 ```
 
-### 🎯 Keyboard Shortcuts
+### Keyboard Shortcuts
 
 - `C` - Open/Close AI Assistant
 - `Enter` - Send message
 - `Shift + Enter` - New line in message
 - `Escape` - Close AI Assistant
 
-### 🤖 Available AI Models
+### Available AI Models
 
 The chatbot supports multiple AI providers and models:
 
@@ -87,7 +87,7 @@ The chatbot supports multiple AI providers and models:
 - **Grok 4** - Latest Grok model
 - **Grok 3** - Previous generation
 
-### 🔧 Configuration
+### Configuration
 
 To use the AI features, you need to set up API keys in your environment:
 
@@ -110,7 +110,7 @@ VITE_XAI_API_KEY=your_xai_api_key_here
 
 You only need to add keys for the providers you want to use.
 
-### 📋 Features
+### Features
 
 - ✅ **Multi-model support** - Switch between different AI models
 - ✅ **Image attachments** - Attach up to 5 images per message
@@ -122,7 +122,7 @@ You only need to add keys for the providers you want to use.
 - ✅ **Flowchart generation** - Create complex flowcharts with arrows and labels
 - ✅ **Error handling** - Clear error messages and fallbacks
 
-### 🎨 What the AI Can Create
+### What the AI Can Create
 
 - Rectangles, circles, diamonds, and other shapes
 - Text elements with custom styling
@@ -165,46 +165,6 @@ You only need to add keys for the providers you want to use.
 - API usage is subject to the provider's rate limits and quotas
 - Different models may produce different results - experiment to find what works best
 - The AI is designed specifically for Excalidraw and understands its element types and styling
-
-## 🎨 Original Excalidraw Features (Included)
-
-All the amazing features from the original [Excalidraw](https://github.com/excalidraw/excalidraw) project are included:
-
-- 💯 Free & open-source
-- 🎨 Infinite, canvas-based whiteboard
-- ✍️ Hand-drawn like style
-- 🌓 Dark mode
-- 🏗️ Customizable
-- 📷 Image support
-- 😀 Shape libraries support
-- 🌐 Localization (i18n) support
-- 🖼️ Export to PNG, SVG & clipboard
-- 💾 Open format - export drawings as an `.excalidraw` json file
-- ⚒️ Wide range of tools - rectangle, circle, diamond, arrow, line, free-draw, eraser...
-- ➡️ Arrow-binding & labeled arrows
-- 🔙 Undo / Redo
-- 🔍 Zoom and panning support
-- 📡 PWA support (works offline)
-- 🤼 Real-time collaboration
-- 🔒 End-to-end encryption
-- 💾 Local-first support (autosaves to the browser)
-- 🔗 Shareable links
-
-For more details about these features, visit the [original Excalidraw repository](https://github.com/excalidraw/excalidraw).
-
----
-
-## 🙏 Credits
-
-This project is built on top of the amazing [**Excalidraw**](https://github.com/excalidraw/excalidraw) open-source project.
-
-**Original Excalidraw:**
-- Website: [excalidraw.com](https://excalidraw.com)
-- GitHub: [github.com/excalidraw/excalidraw](https://github.com/excalidraw/excalidraw)
-- License: MIT
-
-**What I added:** AI Chatbot Assistant with multi-model support  
-**Everything else:** Original Excalidraw features and functionality
 
 ---
 
