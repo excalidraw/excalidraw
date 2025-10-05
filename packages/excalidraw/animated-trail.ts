@@ -44,6 +44,7 @@ export class AnimatedTrail implements Trail {
     this.animationFrameHandler.register(this, this.onFrame.bind(this));
 
     this.trailElement = document.createElementNS(SVG_NS, "path");
+    
     if (this.options.animateTrail) {
       this.trailAnimation = document.createElementNS(SVG_NS, "animate");
       // TODO: make this configurable
@@ -160,6 +161,16 @@ export class AnimatedTrail implements Trail {
     const svgPaths = paths.join(" ").trim();
 
     this.trailElement.setAttribute("d", svgPaths);
+    
+    // Add glow effect for annotation tool
+    if (this.app.state.activeTool.type === "annotation") {
+      this.trailElement.style.filter = "drop-shadow(0 0 8px #ff3b30) drop-shadow(0 0 16px #ff3b3066)";
+      this.trailElement.style.strokeWidth = "4";
+    } else {
+      this.trailElement.style.filter = "";
+      this.trailElement.style.strokeWidth = "";
+    }
+    
     if (this.trailAnimation) {
       this.trailElement.setAttribute(
         "fill",
