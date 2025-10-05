@@ -2147,7 +2147,7 @@ const pointDraggingUpdates = (
       ),
     };
 
-    if (endIsDragged) {
+    if (endIsDragged && updates.endBinding.mode === "orbit") {
       updates.suggestedBinding = end.element;
     }
   } else if (endIsDragged) {

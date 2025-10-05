@@ -209,6 +209,35 @@ const renderBindingHighlightForBindableElement = (
   const opacity = clamp((1 / BIND_MODE_TIMEOUT) * remainingTime, 0.0001, 1);
   const offset = element.strokeWidth / 2;
 
+  const enclosingFrame = element.frameId && allElementsMap.get(element.frameId);
+  if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
+    context.translate(
+      enclosingFrame.x + appState.scrollX,
+      enclosingFrame.y + appState.scrollY,
+    );
+
+    context.beginPath();
+
+    if (FRAME_STYLE.radius && context.roundRect) {
+      context.roundRect(
+        -1,
+        -1,
+        enclosingFrame.width + 1,
+        enclosingFrame.height + 1,
+        FRAME_STYLE.radius / appState.zoom.value,
+      );
+    } else {
+      context.rect(-1, -1, enclosingFrame.width + 1, enclosingFrame.height + 1);
+    }
+
+    context.clip();
+
+    context.translate(
+      -(enclosingFrame.x + appState.scrollX),
+      -(enclosingFrame.y + appState.scrollY),
+    );
+  }
+
   switch (element.type) {
     case "magicframe":
     case "frame":

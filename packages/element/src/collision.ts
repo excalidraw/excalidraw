@@ -36,6 +36,7 @@ import {
   getCubicBezierCurveBound,
   getDiamondPoints,
   getElementBounds,
+  pointInsideBounds,
 } from "./bounds";
 import {
   hasBoundTextElement,
@@ -224,6 +225,20 @@ const bindingBorderTest = (
   const elementBounds = getElementBounds(element, elementsMap);
   if (!doBoundsIntersect(bounds, elementBounds)) {
     return false;
+  }
+
+  // If the element is inside a frame, we should clip the element
+  if (element.frameId) {
+    const enclosingFrame = elementsMap.get(element.frameId);
+    if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
+      const enclosingFrameBounds = getElementBounds(
+        enclosingFrame,
+        elementsMap,
+      );
+      if (!pointInsideBounds(p, enclosingFrameBounds)) {
+        return false;
+      }
+    }
   }
 
   // Do the intersection test against the element since it's close enough

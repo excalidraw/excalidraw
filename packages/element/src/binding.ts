@@ -25,6 +25,7 @@ import {
   doBoundsIntersect,
   getCenterForBounds,
   getElementBounds,
+  pointInsideBounds,
 } from "./bounds";
 import {
   getAllHoveredElementAtPoint,
@@ -47,6 +48,7 @@ import {
   isBindableElement,
   isBoundToContainer,
   isElbowArrow,
+  isFrameLikeElement,
   isRectanguloidElement,
   isTextElement,
 } from "./typeChecks";
@@ -553,6 +555,65 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
     return { start, end };
   }
 
+  // Handle binding to shapes where the frame cuts out a part of the shape
+  {
+    const globalPoint = LinearElementEditor.getPointGlobalCoordinates(
+      arrow,
+      draggingPoints.get(startDragged ? startIdx : endIdx)!.point,
+      elementsMap,
+    );
+    const hoveredElement = getHoveredElementForBinding(
+      globalPoint,
+      elements,
+      elementsMap,
+    );
+    const intersectionPoint =
+      hoveredElement &&
+      hoveredElement.frameId &&
+      bindPointToSnapToElementOutline(
+        arrow,
+        hoveredElement,
+        startDragged ? "start" : "end",
+        elementsMap,
+        undefined,
+        true,
+      );
+    if (intersectionPoint) {
+      const enclosingFrame = elementsMap.get(hoveredElement.frameId);
+      if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
+        const enclosingFrameBounds = getElementBounds(
+          enclosingFrame,
+          elementsMap,
+        );
+        if (!pointInsideBounds(intersectionPoint, enclosingFrameBounds)) {
+          if (isElbowArrow(arrow)) {
+            return {
+              start: { mode: startDragged ? null : start.mode },
+              end: { mode: endDragged ? null : end.mode },
+            };
+          }
+
+          return {
+            start: startDragged
+              ? {
+                  mode: "inside",
+                  element: hoveredElement,
+                  focusPoint: globalPoint,
+                }
+              : start,
+            end: endDragged
+              ? {
+                  mode: "inside",
+                  element: hoveredElement,
+                  focusPoint: globalPoint,
+                }
+              : end,
+          };
+        }
+      }
+    }
+  }
+
   // Handle simpler elbow arrow binding
   if (isElbowArrow(arrow)) {
     return bindingStrategyForElbowArrowEndpointDragging(
@@ -901,6 +962,7 @@ export const bindPointToSnapToElementOutline = (
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
   customIntersector?: LineSegment<GlobalPoint>,
+  ignoreFrameCutouts?: boolean,
 ): GlobalPoint => {
   const aabb = aabbForElement(bindableElement, elementsMap);
   const localPoint =
@@ -1018,6 +1080,21 @@ export const bindPointToSnapToElementOutline = (
     pointDistanceSq(edgePoint, intersection) < PRECISION
   ) {
     return edgePoint;
+  }
+
+  // Frames can cut out bindables, so ignore the intersection if
+  // it isn't in the frame
+  if (!ignoreFrameCutouts && bindableElement.frameId) {
+    const enclosingFrame = elementsMap.get(bindableElement.frameId);
+    if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
+      const enclosingFrameBounds = getElementBounds(
+        enclosingFrame,
+        elementsMap,
+      );
+      if (!pointInsideBounds(intersection, enclosingFrameBounds)) {
+        return edgePoint;
+      }
+    }
   }
 
   return intersection;
