@@ -506,7 +506,12 @@ const drawElementOnCanvas = (
         }
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
-        context.font = getFontString(element);
+        context.font = getFontString({ 
+          fontFamily: element.fontFamily, 
+          fontSize: element.fontSize,
+          bold: element.bold,
+          italic: element.italic
+        });
         context.fillStyle = element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
@@ -532,11 +537,42 @@ const drawElementOnCanvas = (
         );
 
         for (let index = 0; index < lines.length; index++) {
+          const lineY = index * lineHeightPx + verticalOffset;
           context.fillText(
             lines[index],
             horizontalOffset,
-            index * lineHeightPx + verticalOffset,
+            lineY,
           );
+          
+          // Add underline if enabled
+          if (element.underline) {
+            let lineWidth = context.measureText(lines[index]).width;
+            
+            // Add extra width for italic text to match our text measurement
+            if (element.italic) {
+              lineWidth += lineWidth * 0.1;
+            }
+            
+            const underlineY = lineY + element.fontSize * 0.1; // Position underline slightly below baseline
+            const underlineThickness = Math.max(1, element.fontSize * 0.05); // Scale thickness with font size
+            
+            context.save();
+            context.strokeStyle = element.strokeColor;
+            context.lineWidth = underlineThickness;
+            context.beginPath();
+            
+            let underlineStartX = horizontalOffset;
+            if (element.textAlign === "center") {
+              underlineStartX = horizontalOffset - lineWidth / 2;
+            } else if (element.textAlign === "right") {
+              underlineStartX = horizontalOffset - lineWidth;
+            }
+            
+            context.moveTo(underlineStartX, underlineY);
+            context.lineTo(underlineStartX + lineWidth, underlineY);
+            context.stroke();
+            context.restore();
+          }
         }
         context.restore();
         if (shouldTemporarilyAttach) {

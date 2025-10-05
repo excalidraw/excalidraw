@@ -80,14 +80,24 @@ export const redrawTextBoundingBox = (
       : textElement.width;
     boundTextUpdates.text = wrapText(
       textElement.originalText,
-      getFontString(textElement),
+      getFontString({ 
+        fontFamily: textElement.fontFamily, 
+        fontSize: textElement.fontSize,
+        bold: textElement.bold,
+        italic: textElement.italic
+      }),
       maxWidth,
     );
   }
 
   const metrics = measureText(
     boundTextUpdates.text,
-    getFontString(textElement),
+    getFontString({ 
+      fontFamily: textElement.fontFamily, 
+      fontSize: textElement.fontSize,
+      bold: textElement.bold,
+      italic: textElement.italic
+    }),
     textElement.lineHeight,
   );
 
@@ -170,13 +180,23 @@ export const handleBindTextResize = (
       if (text) {
         text = wrapText(
           textElement.originalText,
-          getFontString(textElement),
+          getFontString({ 
+            fontFamily: textElement.fontFamily, 
+            fontSize: textElement.fontSize,
+            bold: textElement.bold,
+            italic: textElement.italic
+          }),
           maxWidth,
         );
       }
       const metrics = measureText(
         text,
-        getFontString(textElement),
+        getFontString({ 
+          fontFamily: textElement.fontFamily, 
+          fontSize: textElement.fontSize,
+          bold: textElement.bold,
+          italic: textElement.italic
+        }),
         textElement.lineHeight,
       );
       nextHeight = metrics.height;

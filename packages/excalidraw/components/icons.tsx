@@ -2373,3 +2373,32 @@ export const presentationIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+// Text formatting icons
+export const BoldIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M7 5h6a3.5 3.5 0 0 1 0 7h-6z" />
+    <path d="M13 12h1a3.5 3.5 0 0 1 0 7h-7v-7" />
+  </g>,
+  tablerIconProps,
+);
+
+export const ItalicIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="11" y1="5" x2="17" y2="5" />
+    <line x1="7" y1="19" x2="13" y2="19" />
+    <line x1="14" y1="5" x2="10" y2="19" />
+  </g>,
+  tablerIconProps,
+);
+
+export const UnderlineIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M7 5v5a5 5 0 0 0 10 0v-5" />
+    <path d="M5 19h14" />
+  </g>,
+  tablerIconProps,
+);

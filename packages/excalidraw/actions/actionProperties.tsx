@@ -124,6 +124,9 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  BoldIcon,
+  ItalicIcon,
+  UnderlineIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -1894,4 +1897,281 @@ export const actionChangeArrowType = register({
       </fieldset>
     );
   },
+});
+
+// Text formatting helper function
+const changeTextFormatting = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  app: AppClassProperties,
+  property: "bold" | "italic" | "underline",
+  value: boolean,
+) => {
+  const updatedElements = changeProperty(
+    elements,
+    appState,
+    (oldElement) => {
+      if (isTextElement(oldElement)) {
+        return newElementWith(oldElement, {
+          [property]: value,
+        });
+      }
+      return oldElement;
+    },
+    true,
+  );
+
+  const currentItemProperty = `currentItem${property.charAt(0).toUpperCase() + property.slice(1)}`;
+  
+  return {
+    elements: updatedElements,
+    appState: {
+      ...appState,
+      [currentItemProperty]: value,
+    },
+    captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+  };
+};
+
+export const actionTextFormatting = register({
+  name: "textFormatting",
+  label: "labels.textFormatting",
+  trackEvent: false,
+  perform: (elements, appState, formData, app) => {
+    if (formData && typeof formData === "object" && "property" in formData && "value" in formData) {
+      return changeTextFormatting(elements, appState, app, formData.property, formData.value);
+    }
+    return false;
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const handleFormatClick = (property: "bold" | "italic" | "underline") => {
+      let currentValue = false;
+      
+      const selectedElements = getSelectedElements(elements, appState, {
+        includeBoundTextElement: true,
+      });
+      
+      if (selectedElements.length > 0) {
+        const textElements = selectedElements.filter(isTextElement);
+        const boundTextElements = selectedElements
+          .map(el => getBoundTextElement(el, app.scene.getNonDeletedElementsMap()))
+          .filter(Boolean);
+        
+        const allTextElements = [...textElements, ...boundTextElements];
+        currentValue = allTextElements.some(el => el && el[property]);
+      } else {
+        const currentItemProperty = property === "bold" ? "currentItemBold" : 
+          property === "italic" ? "currentItemItalic" : "currentItemUnderline";
+        currentValue = (appState as any)[currentItemProperty] || false;
+      }
+      
+      const newValue = !currentValue;
+      console.log(`Toggling ${property} from ${currentValue} to ${newValue}`);
+      updateData({ property, value: newValue });
+    };
+
+    return (
+      <fieldset>
+        <legend>{t("labels.textFormatting")}</legend>
+        <div className="buttonList">
+          <RadioSelection
+            type="button"
+            options={[
+              {
+                value: "bold",
+                text: t("labels.textBold"),
+                icon: BoldIcon,
+                testId: "text-bold",
+              },
+            ]}
+            value={getFormValue(
+              elements,
+              app,
+              (element) => {
+                if (isTextElement(element)) {
+                  return element.bold ? "bold" : null;
+                }
+                const boundTextElement = getBoundTextElement(
+                  element,
+                  app.scene.getNonDeletedElementsMap(),
+                );
+                if (boundTextElement) {
+                  return boundTextElement.bold ? "bold" : null;
+                }
+                return null;
+              },
+              (element) =>
+                isTextElement(element) ||
+                getBoundTextElement(
+                  element,
+                  app.scene.getNonDeletedElementsMap(),
+                ) !== null,
+              (hasSelection) => (hasSelection ? null : appState.currentItemBold ? "bold" : null),
+            )}
+            onClick={() => handleFormatClick("bold")}
+          />
+          <RadioSelection
+            type="button"
+            options={[
+              {
+                value: "italic",
+                text: t("labels.textItalic"),
+                icon: ItalicIcon,
+                testId: "text-italic",
+              },
+            ]}
+            value={getFormValue(
+              elements,
+              app,
+              (element) => {
+                if (isTextElement(element)) {
+                  return element.italic ? "italic" : null;
+                }
+                const boundTextElement = getBoundTextElement(
+                  element,
+                  app.scene.getNonDeletedElementsMap(),
+                );
+                if (boundTextElement) {
+                  return boundTextElement.italic ? "italic" : null;
+                }
+                return null;
+              },
+              (element) =>
+                isTextElement(element) ||
+                getBoundTextElement(
+                  element,
+                  app.scene.getNonDeletedElementsMap(),
+                ) !== null,
+              (hasSelection) => (hasSelection ? null : appState.currentItemItalic ? "italic" : null),
+            )}
+            onClick={() => handleFormatClick("italic")}
+          />
+          <RadioSelection
+            type="button"
+            options={[
+              {
+                value: "underline",
+                text: t("labels.textUnderline"),
+                icon: UnderlineIcon,
+                testId: "text-underline",
+              },
+            ]}
+            value={getFormValue(
+              elements,
+              app,
+              (element) => {
+                if (isTextElement(element)) {
+                  return element.underline ? "underline" : null;
+                }
+                const boundTextElement = getBoundTextElement(
+                  element,
+                  app.scene.getNonDeletedElementsMap(),
+                );
+                if (boundTextElement) {
+                  return boundTextElement.underline ? "underline" : null;
+                }
+                return null;
+              },
+              (element) =>
+                isTextElement(element) ||
+                getBoundTextElement(
+                  element,
+                  app.scene.getNonDeletedElementsMap(),
+                ) !== null,
+              (hasSelection) => (hasSelection ? null : appState.currentItemUnderline ? "underline" : null),
+            )}
+            onClick={() => handleFormatClick("underline")}
+          />
+        </div>
+      </fieldset>
+    );
+  },
+});
+
+// Individual keyboard shortcut actions for text formatting
+export const actionToggleBold = register({
+  name: "toggleBold",
+  label: "labels.textBold",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    const currentValue = getFormValue(
+      elements,
+      app,
+      (element) => {
+        if (isTextElement(element)) {
+          return element.bold;
+        }
+        const boundTextElement = getBoundTextElement(
+          element,
+          app.scene.getNonDeletedElementsMap(),
+        );
+        return boundTextElement?.bold;
+      },
+      (element) =>
+        isTextElement(element) ||
+        getBoundTextElement(element, app.scene.getNonDeletedElementsMap()) !== null,
+      (hasSelection) => hasSelection ? null : appState.currentItemBold,
+    );
+    
+    return changeTextFormatting(elements, appState, app, "bold", !currentValue);
+  },
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.B,
+});
+
+export const actionToggleItalic = register({
+  name: "toggleItalic", 
+  label: "labels.textItalic",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    const currentValue = getFormValue(
+      elements,
+      app,
+      (element) => {
+        if (isTextElement(element)) {
+          return element.italic;
+        }
+        const boundTextElement = getBoundTextElement(
+          element,
+          app.scene.getNonDeletedElementsMap(),
+        );
+        return boundTextElement?.italic;
+      },
+      (element) =>
+        isTextElement(element) ||
+        getBoundTextElement(element, app.scene.getNonDeletedElementsMap()) !== null,
+      (hasSelection) => hasSelection ? null : appState.currentItemItalic,
+    );
+    
+    return changeTextFormatting(elements, appState, app, "italic", !currentValue);
+  },
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.I,
+});
+
+export const actionToggleUnderline = register({
+  name: "toggleUnderline",
+  label: "labels.textUnderline", 
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    const currentValue = getFormValue(
+      elements,
+      app,
+      (element) => {
+        if (isTextElement(element)) {
+          return element.underline;
+        }
+        const boundTextElement = getBoundTextElement(
+          element,
+          app.scene.getNonDeletedElementsMap(),
+        );
+        return boundTextElement?.underline;
+      },
+      (element) =>
+        isTextElement(element) ||
+        getBoundTextElement(element, app.scene.getNonDeletedElementsMap()) !== null,
+      (hasSelection) => hasSelection ? null : appState.currentItemUnderline,
+    );
+    
+    return changeTextFormatting(elements, appState, app, "underline", !currentValue);
+  },
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.U,
 });

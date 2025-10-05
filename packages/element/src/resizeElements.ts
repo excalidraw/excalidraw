@@ -330,6 +330,8 @@ export const resizeSingleTextElement = (
       getFontString({
         fontSize: element.fontSize,
         fontFamily: element.fontFamily,
+        bold: element.bold,
+        italic: element.italic,
       }),
       element.lineHeight,
     );
@@ -338,12 +340,22 @@ export const resizeSingleTextElement = (
 
     const text = wrapText(
       element.originalText,
-      getFontString(element),
+      getFontString({ 
+        fontFamily: element.fontFamily, 
+        fontSize: element.fontSize,
+        bold: element.bold,
+        italic: element.italic
+      }),
       Math.abs(newWidth),
     );
     const metrics = measureText(
       text,
-      getFontString(element),
+      getFontString({ 
+        fontFamily: element.fontFamily, 
+        fontSize: element.fontSize,
+        bold: element.bold,
+        italic: element.italic
+      }),
       element.lineHeight,
     );
 
@@ -739,7 +751,12 @@ export const resizeSingleElement = (
       };
     } else {
       const minWidth = getApproxMinLineWidth(
-        getFontString(boundTextElement),
+        getFontString({ 
+          fontFamily: boundTextElement.fontFamily, 
+          fontSize: boundTextElement.fontSize,
+          bold: boundTextElement.bold,
+          italic: boundTextElement.italic
+        }),
         boundTextElement.lineHeight,
       );
       const minHeight = getApproxMinLineHeight(

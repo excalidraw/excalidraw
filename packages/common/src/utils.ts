@@ -112,11 +112,27 @@ export const getFontFamilyString = ({
 export const getFontString = ({
   fontSize,
   fontFamily,
+  bold,
+  italic,
 }: {
   fontSize: number;
   fontFamily: FontFamilyValues;
+  bold?: boolean;
+  italic?: boolean;
 }) => {
-  return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
+  let fontString = '';
+  
+  if (italic) {
+    fontString += 'italic ';
+  }
+  
+  if (bold) {
+    fontString += 'bold ';
+  }
+  
+  fontString += `${fontSize}px ${getFontFamilyString({ fontFamily })}`;
+  
+  return fontString as FontString;
 };
 
 /** executes callback in the frame that's after the current one */
