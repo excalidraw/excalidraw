@@ -1,5 +1,11 @@
-import { FRAME_STYLE, throttleRAF } from "@excalidraw/common";
-import { isElementLink } from "@excalidraw/element";
+import {
+  FRAME_STYLE,
+  isCanvasFilterSupported,
+  THEME,
+  THEME_FILTER,
+  throttleRAF,
+} from "@excalidraw/common";
+import { applyFiltersToImage, isElementLink } from "@excalidraw/element";
 import { createPlaceholderEmbeddableLabel } from "@excalidraw/element";
 import { getBoundTextElement } from "@excalidraw/element";
 import {
@@ -458,6 +464,20 @@ const _renderStaticScene = ({
       console.error(error);
     }
   });
+
+  if (
+    isExporting &&
+    appState.theme === THEME.DARK &&
+    !isCanvasFilterSupported()
+  ) {
+    const invertedCanvas = applyFiltersToImage(
+      canvas,
+      normalizedWidth,
+      normalizedHeight,
+      THEME_FILTER,
+    );
+    context.drawImage(invertedCanvas, 0, 0, normalizedWidth, normalizedHeight);
+  }
 };
 
 /** throttled to animation framerate */
