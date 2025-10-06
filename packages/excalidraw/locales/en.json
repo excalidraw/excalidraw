@@ -55,6 +55,7 @@
     "arrowtype_round": "Curved arrow",
     "arrowtype_elbowed": "Elbow arrow",
     "fontSize": "Font size",
+    "customFontSize": "Custom size",
     "fontFamily": "Font family",
     "addWatermark": "Add \"Made with Excalidraw\"",
     "handDrawn": "Hand-drawn",
