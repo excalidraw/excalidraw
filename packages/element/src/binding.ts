@@ -999,6 +999,29 @@ export const bindPointToSnapToElementOutline = (
       intersector,
       FIXED_BINDING_DISTANCE,
     ).sort(pointDistanceSq)[0];
+
+    if (!intersection) {
+      const anotherPoint = pointFrom<GlobalPoint>(
+        !isHorizontal ? center[0] : snapPoint[0],
+        isHorizontal ? center[1] : snapPoint[1],
+      );
+      const anotherIntersector = lineSegment(
+        anotherPoint,
+        pointFromVector(
+          vectorScale(
+            vectorNormalize(vectorFromPoint(snapPoint, anotherPoint)),
+            Math.max(bindableElement.width, bindableElement.height) * 2,
+          ),
+          anotherPoint,
+        ),
+      );
+      intersection = intersectElementWithLineSegment(
+        bindableElement,
+        elementsMap,
+        anotherIntersector,
+        FIXED_BINDING_DISTANCE,
+      ).sort(pointDistanceSq)[0];
+    }
   } else {
     intersection = intersectElementWithLineSegment(
       bindableElement,

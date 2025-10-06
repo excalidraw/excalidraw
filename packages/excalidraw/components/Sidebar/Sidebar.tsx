@@ -9,7 +9,13 @@ import React, {
   useCallback,
 } from "react";
 
-import { EVENT, isDevEnv, KEYS, updateObject } from "@excalidraw/common";
+import {
+  CLASSES,
+  EVENT,
+  isDevEnv,
+  KEYS,
+  updateObject,
+} from "@excalidraw/common";
 
 import { useUIAppState } from "../../context/ui-appState";
 import { atom, useSetAtom } from "../../editor-jotai";
@@ -137,7 +143,11 @@ export const SidebarInner = forwardRef(
     return (
       <Island
         {...rest}
-        className={clsx("sidebar", { "sidebar--docked": docked }, className)}
+        className={clsx(
+          CLASSES.SIDEBAR,
+          { "sidebar--docked": docked },
+          className,
+        )}
         ref={islandRef}
       >
         <SidebarPropsContext.Provider value={headerPropsRef.current}>

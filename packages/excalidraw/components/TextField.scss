@@ -12,6 +12,10 @@
   --ExcTextField--border-active: var(--color-brand-active);
   --ExcTextField--placeholder: var(--color-border-outline-variant);
 
+  &.theme--dark {
+    --ExcTextField--border: var(--color-border-outline-variant);
+  }
+
   .ExcTextField {
     position: relative;
 

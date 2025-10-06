@@ -125,6 +125,7 @@ export const ENV = {
 };
 
 export const CLASSES = {
+  SIDEBAR: "sidebar",
   SHAPE_ACTIONS_MENU: "App-menu__left",
   ZOOM_ACTIONS: "zoom-actions",
   SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
@@ -266,7 +267,10 @@ export const STRING_MIME_TYPES = {
   json: "application/json",
   // excalidraw data
   excalidraw: "application/vnd.excalidraw+json",
+  // LEGACY: fully-qualified library JSON data
   excalidrawlib: "application/vnd.excalidrawlib+json",
+  // list of excalidraw library item ids
+  excalidrawlibIds: "application/vnd.excalidrawlib.ids+json",
 } as const;
 
 export const MIME_TYPES = {
@@ -350,6 +354,9 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
 
 // mobile: up to 699px
 export const MQ_MAX_MOBILE = 599;
+
+export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
+export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
 
 // tablets
 export const MQ_MIN_TABLET = MQ_MAX_MOBILE + 1; // lower bound (excludes phones)
