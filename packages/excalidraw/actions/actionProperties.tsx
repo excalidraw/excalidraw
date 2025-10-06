@@ -21,9 +21,14 @@ import {
   getLineHeight,
   isTransparent,
   reduceToCommonValue,
+  BOUND_TEXT_PADDING,
 } from "@excalidraw/common";
 
-import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
+import {
+  canBecomePolygon,
+  getNonDeletedElements,
+  isFlowchartNodeElement,
+} from "@excalidraw/element";
 
 import {
   bindLinearElement,
@@ -126,6 +131,8 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  stickyNoteIcon,
+  growingContainerIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -1499,6 +1506,155 @@ export const actionChangeRoundness = register({
             onChange={(value) => updateData(value)}
           />
           {renderAction("togglePolygon")}
+        </div>
+      </fieldset>
+    );
+  },
+});
+
+export const actionChangeContainerBehavior = register({
+  name: "changeContainerBehavior",
+  label: "labels.container",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+    let selected = getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    });
+
+    if (selected.length === 0 && appState.editingTextElement) {
+      selected = [appState.editingTextElement];
+    }
+
+    const containerIdsToUpdate = new Set<string>();
+
+    // collect directly selected eligible containers
+    for (const el of selected) {
+      if (isFlowchartNodeElement(el) && getBoundTextElement(el, elementsMap)) {
+        containerIdsToUpdate.add(el.id);
+      }
+    }
+
+    // if none, and exactly one selected text element -> use its container if eligible
+    if (
+      containerIdsToUpdate.size === 0 &&
+      selected.length === 1 &&
+      isTextElement(selected[0]) &&
+      selected[0].containerId
+    ) {
+      const container = elementsMap.get(selected[0].containerId);
+      if (
+        container &&
+        isFlowchartNodeElement(container) &&
+        getBoundTextElement(container, elementsMap)
+      ) {
+        containerIdsToUpdate.add(container.id);
+      }
+    }
+
+    if (containerIdsToUpdate.size === 0) {
+      // nothing to update
+      return false;
+    }
+
+    const nextElements = elements.map((el) =>
+      containerIdsToUpdate.has(el.id)
+        ? newElementWith(el, {
+            containerBehavior: {
+              textFlow: value,
+              margin: el.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+            },
+          })
+        : el,
+    );
+
+    return {
+      elements: nextElements,
+      appState: {
+        ...appState,
+        currentItemContainerBehavior: {
+          textFlow: value,
+          margin:
+            appState.currentItemContainerBehavior?.margin ?? BOUND_TEXT_PADDING,
+        },
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+    let selected = getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    });
+
+    if (selected.length === 0 && appState.editingTextElement) {
+      selected = [appState.editingTextElement];
+    }
+
+    let targetContainers: ExcalidrawElement[] = [];
+
+    // case 1: one text element selected -> target its container if eligible
+    if (
+      selected.length === 1 &&
+      isTextElement(selected[0]) &&
+      selected[0].containerId
+    ) {
+      const container = elementsMap.get(selected[0].containerId);
+      if (
+        container &&
+        isFlowchartNodeElement(container) &&
+        getBoundTextElement(container, elementsMap)
+      ) {
+        targetContainers = [container];
+      }
+    } else {
+      // case 2: any eligible containers directly selected
+      targetContainers = selected.filter(
+        (el) =>
+          isFlowchartNodeElement(el) && getBoundTextElement(el, elementsMap),
+      );
+    }
+
+    if (targetContainers.length === 0) {
+      return null;
+    }
+
+    const value =
+      reduceToCommonValue(
+        targetContainers,
+        (el) => el.containerBehavior?.textFlow ?? "growing",
+      ) ??
+      // mixed selection -> show null so nothing appears selected
+      null;
+
+    return (
+      <fieldset>
+        {appState.stylesPanelMode === "full" && (
+          <legend>{t("labels.container")}</legend>
+        )}
+        <div className="buttonList">
+          <RadioSelection
+            group="container"
+            options={[
+              {
+                value: "growing",
+                text: t("labels.container_growing"),
+                icon: growingContainerIcon,
+              },
+              {
+                value: "fixed",
+                text: t("labels.container_fixed"),
+                icon: stickyNoteIcon,
+              },
+            ]}
+            value={
+              value ??
+              (targetContainers.length
+                ? null
+                : appState.currentItemContainerBehavior?.textFlow ?? "growing")
+            }
+            onChange={(val) => updateData(val)}
+          />
         </div>
       </fieldset>
     );

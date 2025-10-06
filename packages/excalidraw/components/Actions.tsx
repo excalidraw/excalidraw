@@ -10,6 +10,9 @@ import {
 } from "@excalidraw/common";
 
 import {
+  getContainerElement,
+  hasContainerBehavior,
+  isFlowchartNodeElement,
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
   hasBoundTextElement,
@@ -144,6 +147,15 @@ export const SelectedShapeActions = ({
   ) {
     isSingleElementBoundContainer = true;
   }
+
+  const textContainer =
+    targetElements.length === 1 && isTextElement(targetElements[0])
+      ? getContainerElement(targetElements[0], elementsMap)
+      : null;
+
+  const isStickyNoteContainer =
+    textContainer && isFlowchartNodeElement(textContainer);
+
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
   );
@@ -207,6 +219,12 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeRoundness")}</>
       )}
 
+      {hasContainerBehavior(appState.activeTool.type) ||
+        (targetElements.some(
+          (element) =>
+            isFlowchartNodeElement(element) && hasBoundTextElement(element),
+        ) && <>{renderAction("changeContainerBehavior")}</>)}
+
       {(toolIsArrow(appState.activeTool.type) ||
         targetElements.some((element) => toolIsArrow(element.type))) && (
         <>{renderAction("changeArrowType")}</>
@@ -229,6 +247,8 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
       )}
+
+      {isStickyNoteContainer && <>{renderAction("changeContainerBehavior")}</>}
 
       {renderAction("changeOpacity")}
 
@@ -322,6 +342,14 @@ export const CompactShapeActions = ({
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
   );
+
+  const textContainer =
+    targetElements.length === 1 && isTextElement(targetElements[0])
+      ? getContainerElement(targetElements[0], elementsMap)
+      : null;
+
+  const isStickyNoteContainer =
+    textContainer && isFlowchartNodeElement(textContainer);
 
   const showFillIcons =
     (hasBackground(appState.activeTool.type) &&
@@ -440,6 +468,12 @@ export const CompactShapeActions = ({
                       canChangeRoundness(element.type),
                     )) &&
                     renderAction("changeRoundness")}
+                  {hasContainerBehavior(appState.activeTool.type) ||
+                    (targetElements.some(
+                      (element) =>
+                        isFlowchartNodeElement(element) &&
+                        hasBoundTextElement(element),
+                    ) && <>{renderAction("changeContainerBehavior")}</>)}
                   {renderAction("changeOpacity")}
                 </div>
               </PropertiesPopover>
@@ -599,6 +633,9 @@ export const CompactShapeActions = ({
                       renderAction("changeTextAlign")}
                     {shouldAllowVerticalAlign(targetElements, elementsMap) &&
                       renderAction("changeVerticalAlign")}
+                    {isStickyNoteContainer && (
+                      <>{renderAction("changeContainerBehavior")}</>
+                    )}
                   </div>
                 </PropertiesPopover>
               )}
