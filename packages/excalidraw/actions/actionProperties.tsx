@@ -81,6 +81,8 @@ import { RadioSelection } from "../components/RadioSelection";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { FontPicker } from "../components/FontPicker/FontPicker";
 import { IconPicker } from "../components/IconPicker";
+import { CustomFontSizeInput } from "../components/CustomFontSizeInput";
+import "../components/CustomFontSizeInput.scss";
 // TODO barnabasmolnar/editor-redesign
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
 // ArrowHead icons
@@ -714,77 +716,95 @@ export const actionChangeFontSize = register({
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, () => value, value);
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => (
-    <fieldset>
-      <legend>{t("labels.fontSize")}</legend>
-      <div className="buttonList">
-        <RadioSelection
-          group="font-size"
-          options={[
-            {
-              value: 16,
-              text: t("labels.small"),
-              icon: FontSizeSmallIcon,
-              testId: "fontSize-small",
-            },
-            {
-              value: 20,
-              text: t("labels.medium"),
-              icon: FontSizeMediumIcon,
-              testId: "fontSize-medium",
-            },
-            {
-              value: 28,
-              text: t("labels.large"),
-              icon: FontSizeLargeIcon,
-              testId: "fontSize-large",
-            },
-            {
-              value: 36,
-              text: t("labels.veryLarge"),
-              icon: FontSizeExtraLargeIcon,
-              testId: "fontSize-veryLarge",
-            },
-          ]}
-          value={getFormValue(
-            elements,
-            app,
-            (element) => {
-              if (isTextElement(element)) {
-                return element.fontSize;
-              }
-              const boundTextElement = getBoundTextElement(
-                element,
-                app.scene.getNonDeletedElementsMap(),
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const currentFontSize = getFormValue(
+      elements,
+      app,
+      (element) => {
+        if (isTextElement(element)) {
+          return element.fontSize;
+        }
+        const boundTextElement = getBoundTextElement(
+          element,
+          app.scene.getNonDeletedElementsMap(),
+        );
+        if (boundTextElement) {
+          return boundTextElement.fontSize;
+        }
+        return null;
+      },
+      (element) =>
+        isTextElement(element) ||
+        getBoundTextElement(
+          element,
+          app.scene.getNonDeletedElementsMap(),
+        ) !== null,
+      (hasSelection) =>
+        hasSelection
+          ? null
+          : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+    );
+
+    const presetValues = [16, 20, 28, 36];
+    const isPresetValue = currentFontSize !== null && presetValues.includes(currentFontSize);
+
+    return (
+      <fieldset>
+        <legend>{t("labels.fontSize")}</legend>
+        <div className="buttonList">
+          <RadioSelection
+            group="font-size"
+            options={[
+              {
+                value: 16,
+                text: t("labels.small"),
+                icon: FontSizeSmallIcon,
+                testId: "fontSize-small",
+              },
+              {
+                value: 20,
+                text: t("labels.medium"),
+                icon: FontSizeMediumIcon,
+                testId: "fontSize-medium",
+              },
+              {
+                value: 28,
+                text: t("labels.large"),
+                icon: FontSizeLargeIcon,
+                testId: "fontSize-large",
+              },
+              {
+                value: 36,
+                text: t("labels.veryLarge"),
+                icon: FontSizeExtraLargeIcon,
+                testId: "fontSize-veryLarge",
+              },
+            ]}
+            value={isPresetValue ? currentFontSize : null}
+            onChange={(value) => {
+              withCaretPositionPreservation(
+                () => updateData(value),
+                appState.stylesPanelMode === "compact",
+                !!appState.editingTextElement,
+                data?.onPreventClose,
               );
-              if (boundTextElement) {
-                return boundTextElement.fontSize;
-              }
-              return null;
-            },
-            (element) =>
-              isTextElement(element) ||
-              getBoundTextElement(
-                element,
-                app.scene.getNonDeletedElementsMap(),
-              ) !== null,
-            (hasSelection) =>
-              hasSelection
-                ? null
-                : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
-          )}
-          onChange={(value) => {
-            withCaretPositionPreservation(
-              () => updateData(value),
-              appState.stylesPanelMode === "compact",
-              !!appState.editingTextElement,
-              data?.onPreventClose,
-            );
-          }}
-        />
-      </div>
-    </fieldset>
-  ),
+            }}
+          />
+          <CustomFontSizeInput
+            value={currentFontSize}
+            onChange={(fontSize) => {
+              withCaretPositionPreservation(
+                () => updateData(fontSize),
+                appState.stylesPanelMode === "compact",
+                !!appState.editingTextElement,
+                data?.onPreventClose,
+              );
+            }}
+          />
+        </div>
+      </fieldset>
+    );
+  },
 });
 
 export const actionDecreaseFontSize = register({
