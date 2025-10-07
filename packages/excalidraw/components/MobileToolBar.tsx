@@ -153,8 +153,8 @@ export const MobileToolBar = ({
   const MIN_WIDTH = MIN_TOOLS * WIDTH + (MIN_TOOLS - 1) * GAP;
   const ADDITIONAL_WIDTH = WIDTH + GAP;
 
-  const showImageToolOutside = toolbarWidth >= MIN_WIDTH + 1 * ADDITIONAL_WIDTH;
-  const showTextToolOutside = toolbarWidth >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
+  const showTextToolOutside = toolbarWidth >= MIN_WIDTH + 1 * ADDITIONAL_WIDTH;
+  const showImageToolOutside = toolbarWidth >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
   const showFrameToolOutside = toolbarWidth >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
 
   const extraTools = [
@@ -164,7 +164,7 @@ export const MobileToolBar = ({
     "laser",
     "magicframe",
   ].filter((tool) => {
-    if (showTextToolOutside && tool === "text") {
+    if (showImageToolOutside && tool === "image") {
       return false;
     }
     if (showFrameToolOutside && tool === "frame") {
@@ -315,23 +315,6 @@ export const MobileToolBar = ({
         }
       />
 
-      {/* Image */}
-      {showImageToolOutside && (
-        <ToolButton
-          className={clsx({
-            active: activeTool.type === "image",
-          })}
-          type="radio"
-          icon={ImageIcon}
-          checked={activeTool.type === "image"}
-          name="editor-current-shape"
-          title={`${capitalizeString(t("toolBar.image"))}`}
-          aria-label={capitalizeString(t("toolBar.image"))}
-          data-testid="toolbar-image"
-          onChange={() => handleToolChange("image")}
-        />
-      )}
-
       {/* Text Tool */}
       {showTextToolOutside && (
         <ToolButton
@@ -346,6 +329,23 @@ export const MobileToolBar = ({
           aria-label={capitalizeString(t("toolBar.text"))}
           data-testid="toolbar-text"
           onChange={() => handleToolChange("text")}
+        />
+      )}
+
+      {/* Image */}
+      {showImageToolOutside && (
+        <ToolButton
+          className={clsx({
+            active: activeTool.type === "image",
+          })}
+          type="radio"
+          icon={ImageIcon}
+          checked={activeTool.type === "image"}
+          name="editor-current-shape"
+          title={`${capitalizeString(t("toolBar.image"))}`}
+          aria-label={capitalizeString(t("toolBar.image"))}
+          data-testid="toolbar-image"
+          onChange={() => handleToolChange("image")}
         />
       )}
 
@@ -400,6 +400,17 @@ export const MobileToolBar = ({
               selected={activeTool.type === "text"}
             >
               {t("toolBar.text")}
+            </DropdownMenu.Item>
+          )}
+
+          {!showImageToolOutside && (
+            <DropdownMenu.Item
+              onSelect={() => app.setActiveTool({ type: "image" })}
+              icon={ImageIcon}
+              data-testid="toolbar-image"
+              selected={activeTool.type === "image"}
+            >
+              {t("toolBar.image")}
             </DropdownMenu.Item>
           )}
           {!showFrameToolOutside && (
