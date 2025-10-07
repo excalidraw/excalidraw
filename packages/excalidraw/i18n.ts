@@ -23,6 +23,7 @@ export const languages: Language[] = [
   ...[
     { code: "ar-SA", label: "العربية", rtl: true },
     { code: "bg-BG", label: "Български" },
+    { code: "bn-BD", label: "বাংলা" },
     { code: "ca-ES", label: "Català" },
     { code: "cs-CZ", label: "Česky" },
     { code: "de-DE", label: "Deutsch" },
