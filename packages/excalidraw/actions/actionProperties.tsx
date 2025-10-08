@@ -295,6 +295,8 @@ const changeFontSize = (
   };
 };
 
+// Toggle Ligatures
+
 // -----------------------------------------------------------------------------
 
 export const actionChangeStrokeColor = register({
