@@ -610,6 +610,10 @@ class App extends React.Component<AppProps, AppState> {
    * insert to DOM before user initially scrolls to them) */
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
+  // No peers detection properties
+  private lastRoomId: string | null = null;
+  private noPeersTimeout: number | null = null;
+
   private handleToastClose = () => {
     this.setToast(null);
   };
@@ -2948,6 +2952,51 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.state.isLoading) {
       this.props.onChange?.(elements, this.state, this.files);
       this.onChangeEmitter.trigger(elements, this.state, this.files);
+    }
+    const getRoomId = () => {
+      // Excalidraw uses #room=... in the URL for collaboration
+      const hash = window.location.hash;
+      const match = hash.match(/room=([^&]+)/);
+      return match ? match[1] : null;
+    };
+    const roomId = getRoomId();
+    const isInRoom = !!roomId;
+    const collaboratorsCount = this.state.collaborators.size;
+
+    // If user just joined a room, start the timeout
+    if (isInRoom && roomId !== this.lastRoomId) {
+      this.lastRoomId = roomId;
+      if (this.noPeersTimeout) {
+        clearTimeout(this.noPeersTimeout);
+      }
+      this.noPeersTimeout = window.setTimeout(() => {
+        // Only show if still in the room and still no peers
+        if (getRoomId() === roomId && this.state.collaborators.size === 0) {
+          this.setToast({
+            message:
+              "No active peers found for this room. Start a new drawing or invite collaborators.",
+            closable: true,
+            duration: 6000,
+          });
+        }
+      }, 2500); // 2.5 seconds
+    }
+
+    // If a collaborator joins, or user leaves the room, clear the toast/timeout
+    if (
+      (!isInRoom && this.lastRoomId) ||
+      (isInRoom &&
+        collaboratorsCount > 0 &&
+        this.state.toast?.message?.includes("No active peers found"))
+    ) {
+      if (this.noPeersTimeout) {
+        clearTimeout(this.noPeersTimeout);
+        this.noPeersTimeout = null;
+      }
+      this.lastRoomId = isInRoom ? roomId : null;
+      if (this.state.toast?.message?.includes("No active peers found")) {
+        this.setToast(null);
+      }
     }
   }
 
