@@ -10,4 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: docker build -t excalidraw .
+      - run: |
+    docker build \
+      -t excalidraw:latest \
+      -t excalidraw:${{ github.sha }} \
+      -t excalidraw:${{ github.run_id }} \
+      -t excalidraw:$(date +%Y%m%d-%H%M%S) \
+      .
