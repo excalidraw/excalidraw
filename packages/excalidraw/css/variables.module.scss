@@ -122,6 +122,17 @@
       color: var(--button-color, var(--color-on-primary-container));
     }
   }
+
+  @include isMobile() {
+    width: var(--mobile-action-button-size, var(--default-button-size));
+    height: var(--mobile-action-button-size, var(--default-button-size));
+  }
+}
+
+@mixin buttonNoHighlight {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 @mixin outlineButtonIconStyles {
@@ -186,5 +197,10 @@
 
   &:active {
     box-shadow: 0 0 0 1px var(--color-brand-active);
+  }
+
+  @include isMobile() {
+    width: var(--mobile-action-button-size, 2rem);
+    height: var(--mobile-action-button-size, 2rem);
   }
 }

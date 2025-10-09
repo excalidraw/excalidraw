@@ -2319,22 +2319,10 @@ export const adjustmentsIcon = createIcon(
   tablerIconProps,
 );
 
-export const backgroundIcon = createIcon(
-  <g strokeWidth={1}>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M6 10l4 -4" />
-    <path d="M6 14l8 -8" />
-    <path d="M6 18l12 -12" />
-    <path d="M10 18l8 -8" />
-    <path d="M14 18l4 -4" />
-  </g>,
-  tablerIconProps,
-);
-
 export const strokeIcon = createIcon(
   <g strokeWidth={1}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <rect x="6" y="6" width="12" height="12" fill="none" />
+    <path d="M6 10l4 -4 L6 14l8 -8 L6 18l12 -12 L10 18l8 -8 L14 18l4 -4" />
   </g>,
   tablerIconProps,
 );

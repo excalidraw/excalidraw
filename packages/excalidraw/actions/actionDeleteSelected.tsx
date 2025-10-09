@@ -1,4 +1,8 @@
-import { KEYS, updateActiveTool } from "@excalidraw/common";
+import {
+  KEYS,
+  MOBILE_ACTION_BUTTON_BG,
+  updateActiveTool,
+} from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
 import { fixBindingsAfterDeletion } from "@excalidraw/element";
@@ -299,7 +303,7 @@ export const actionDeleteSelected = register({
       appState: {
         ...nextAppState,
         activeTool: updateActiveTool(appState, {
-          type: app.defaultSelectionTool,
+          type: app.state.preferredSelectionTool.type,
         }),
         multiElement: null,
         activeEmbeddable: null,
@@ -323,7 +327,15 @@ export const actionDeleteSelected = register({
       title={t("labels.delete")}
       aria-label={t("labels.delete")}
       onClick={() => updateData(null)}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      disabled={
+        !isSomeElementSelected(getNonDeletedElements(elements), appState)
+      }
+      style={{
+        ...(appState.stylesPanelMode === "mobile" &&
+        appState.openPopup !== "compactOtherProperties"
+          ? MOBILE_ACTION_BUTTON_BG
+          : {}),
+      }}
     />
   ),
 });
