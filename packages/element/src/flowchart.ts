@@ -34,6 +34,7 @@ import {
   type ExcalidrawBindableElement,
   type ExcalidrawElement,
   type ExcalidrawFlowchartNodeElement,
+  type ExcalidrawLinearElement,
   type NonDeletedSceneElementsMap,
   type Ordered,
   type OrderedExcalidrawElement,
@@ -623,6 +624,98 @@ export class FlowChartNavigator {
     }
 
     return null;
+  }
+
+  /**
+   * Navigate to the next or previous sibling element in a flowchart.
+   * Siblings are elements that share the same parent node.
+   * 
+   * @param element - The current element to navigate from
+   * @param direction - "next" to go to next sibling, "prev" to go to previous sibling
+   * @param elementsMap - Map of all elements in the scene
+   * @returns The ID of the next/prev sibling element, or null if navigation is not possible
+   * 
+   * Navigation is circular: going "next" from the last sibling returns to the first,
+   * and going "prev" from the first sibling goes to the last.
+   */
+  navigateToSibling(
+    element: ExcalidrawElement,
+    direction: "next" | "prev",
+    elementsMap: ElementsMap,
+  ): ExcalidrawElement["id"] | null {
+    // Only bindable elements (rectangles, diamonds, ellipses) can have parent-child relationships
+    if (!isBindableElement(element)) {
+      return null;
+    }
+
+    // Find the parent arrow: an arrow where the current element is the end point (child)
+    // This arrow's start point will be the parent node
+    const parentArrow = [...elementsMap.values()].find(
+      (el): el is ExcalidrawLinearElement =>
+        isElbowArrow(el) && el.endBinding?.elementId === element.id,
+    );
+
+    // If no parent arrow exists, or it doesn't have a start binding, element has no parent
+    if (!parentArrow || !parentArrow.startBinding) {
+      return null;
+    }
+
+    const parentId = parentArrow.startBinding.elementId;
+
+    // Get all arrows that connect from the same parent (all children of this parent)
+    // IMPORTANT: Include the current element in this list so we can find its position
+    const siblingArrows = [...elementsMap.values()].filter(
+      (el): el is ExcalidrawLinearElement =>
+        isElbowArrow(el) &&
+        el.startBinding?.elementId === parentId &&
+        el.endBinding?.elementId != null,
+    );
+
+    // Need at least 2 siblings (including current element) to navigate
+    if (siblingArrows.length <= 1) {
+      return null;
+    }
+
+    // Map arrows to their target elements and sort by visual position
+    const siblings = siblingArrows
+      .map((arrow) => {
+        const siblingId = arrow.endBinding!.elementId;
+        const sibling = elementsMap.get(siblingId);
+        return sibling ? { element: sibling, arrow } : null;
+      })
+      .filter((item): item is { element: ExcalidrawElement; arrow: ExcalidrawLinearElement } => item !== null)
+      .sort((a, b) => {
+        // Sort by Y position first (top to bottom)
+        // Use a threshold of 10 pixels to account for minor alignment differences
+        if (Math.abs(a.element.y - b.element.y) > 10) {
+          return a.element.y - b.element.y;
+        }
+        // If Y positions are similar, sort by X position (left to right)
+        return a.element.x - b.element.x;
+      });
+
+    if (siblings.length <= 1) {
+      return null;
+    }
+
+    // Find where the current element is in the sorted siblings list
+    const currentIndex = siblings.findIndex((s) => s.element.id === element.id);
+    
+    if (currentIndex === -1) {
+      // Current element not found in siblings (shouldn't happen)
+      // Fallback to first sibling
+      return siblings[0].element.id;
+    }
+
+    // Calculate next/prev index with circular (wrap-around) navigation
+    // "next": move forward, wrap to 0 if at end
+    // "prev": move backward, wrap to last if at beginning
+    const nextIndex =
+      direction === "next"
+        ? (currentIndex + 1) % siblings.length
+        : (currentIndex - 1 + siblings.length) % siblings.length;
+
+    return siblings[nextIndex].element.id;
   }
 }
 

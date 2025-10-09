@@ -4168,6 +4168,72 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
+        // Sibling navigation with [ and ] keys
+        // Allows navigation between elements that share the same parent in a flowchart
+        // Press ] to go to next sibling, [ to go to previous sibling (circular navigation)
+        if (
+          (event.key === "[" || event.key === "]") &&
+          selectedElements.length === 1
+        ) {
+          event.preventDefault();
+
+          // Determine navigation direction based on key pressed
+          // ] = next sibling (forward), [ = previous sibling (backward)
+          const direction = event.key === "]" ? "next" : "prev";
+          
+          // Call the sibling navigation method to find the next/prev sibling
+          const nextId = this.flowChartNavigator.navigateToSibling(
+            selectedElements[0],
+            direction,
+            this.scene.getNonDeletedElementsMap(),
+          );
+
+          // If a sibling was found, update the selection
+          if (nextId) {
+            // Update the selected element to the sibling
+            this.setState((prevState) => ({
+              selectedElementIds: makeNextSelectedElementIds(
+                {
+                  [nextId]: true,
+                },
+                prevState,
+              ),
+            }));
+
+            // Get the sibling element to check if it's in viewport
+            const nextNode = this.scene
+              .getNonDeletedElementsMap()
+              .get(nextId);
+
+            // If the sibling is not fully visible in the viewport, scroll to it
+            if (
+              nextNode &&
+              !isElementCompletelyInViewport(
+                [nextNode],
+                this.canvas.width / window.devicePixelRatio,
+                this.canvas.height / window.devicePixelRatio,
+                {
+                  offsetLeft: this.state.offsetLeft,
+                  offsetTop: this.state.offsetTop,
+                  scrollX: this.state.scrollX,
+                  scrollY: this.state.scrollY,
+                  zoom: this.state.zoom,
+                },
+                this.scene.getNonDeletedElementsMap(),
+                this.getEditorUIOffsets(),
+              )
+            ) {
+              // Smoothly scroll to bring the sibling into view
+              this.scrollToContent([nextNode], {
+                animate: true,
+                duration: 300,
+              });
+            }
+          }
+
+          return;
+        }
+
         if (
           selectedElements.length === 1 &&
           isImageElement(selectedElements[0]) &&
