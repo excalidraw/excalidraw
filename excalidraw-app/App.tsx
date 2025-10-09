@@ -60,6 +60,7 @@ import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconc
 import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
 import type {
   FileId,
+  InitializedExcalidrawImageElement,
   NonDeletedExcalidrawElement,
   OrderedExcalidrawElement,
 } from "@excalidraw/element";
@@ -428,7 +429,8 @@ const ExcalidrawWrapper = () => {
         const fileIds =
           data.scene.elements?.reduce((acc: FileId[], element: OrderedExcalidrawElement) => {
             if (isInitializedImageElement(element)) {
-              return acc.concat(element.fileId);
+              const imgElement = element as InitializedExcalidrawImageElement;
+              return acc.concat(imgElement.fileId);
             }
             return acc;
           }, [] as FileId[]) || [];
@@ -533,9 +535,9 @@ const ExcalidrawWrapper = () => {
               if (
                 isInitializedImageElement(element) &&
                 // only load and update images that aren't already loaded
-                !currFiles[element.fileId]
+                !currFiles[(element as InitializedExcalidrawImageElement).fileId]
               ) {
-                return acc.concat(element.fileId);
+                return acc.concat((element as InitializedExcalidrawImageElement).fileId);
               }
               return acc;
             }, [] as FileId[]) || [];
