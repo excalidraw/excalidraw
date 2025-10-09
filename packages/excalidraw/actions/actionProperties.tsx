@@ -534,39 +534,40 @@ export const actionChangeStrokeWidth = register({
       {appState.stylesPanelMode === "full" && (
         <legend>{t("labels.strokeWidth")}</legend>
       )}
-      <div className="buttonList">
-        <RadioSelection
-          group="stroke-width"
-          options={[
-            {
-              value: STROKE_WIDTH.thin,
-              text: t("labels.thin"),
-              icon: StrokeWidthBaseIcon,
-              testId: "strokeWidth-thin",
-            },
-            {
-              value: STROKE_WIDTH.bold,
-              text: t("labels.bold"),
-              icon: StrokeWidthBoldIcon,
-              testId: "strokeWidth-bold",
-            },
-            {
-              value: STROKE_WIDTH.extraBold,
-              text: t("labels.extraBold"),
-              icon: StrokeWidthExtraBoldIcon,
-              testId: "strokeWidth-extraBold",
-            },
-          ]}
-          value={getFormValue(
+      <div className="range-wrapper">
+        {(() => {
+          const sliderValue = getFormValue(
             elements,
             app,
             (element) => element.strokeWidth,
             (element) => element.hasOwnProperty("strokeWidth"),
             (hasSelection) =>
               hasSelection ? null : appState.currentItemStrokeWidth,
-          )}
-          onChange={(value) => updateData(value)}
-        />
+          );
+          const safeValue = sliderValue == null ? 2 : sliderValue;
+          return (
+            <>
+              <input
+                type="range"
+                min={0.5}
+                max={10}
+                step={0.25}
+                value={safeValue}
+                onChange={e => updateData(Number(e.target.value))}
+                className="range-input"
+                data-testid="strokeWidth-slider"
+                style={{
+                  height: '3px',
+                  background: 'repeating-linear-gradient(90deg, #a259ff, #a259ff 100%)',
+                  borderRadius: '2px',
+                  accentColor: '#a259ff',
+                }}
+              />
+              <div className="value-bubble">{safeValue}</div>
+              <div className="zero-label">0</div>
+            </>
+          );
+        })()}
       </div>
     </fieldset>
   ),
