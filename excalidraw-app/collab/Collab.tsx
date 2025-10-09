@@ -424,8 +424,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     forceFetchFiles?: boolean;
   }) => {
     const unfetchedImages = opts.elements
-      .filter((element): element is InitializedExcalidrawImageElement => {
-        if (!isInitializedImageElement(element)) return false;
+      .filter(isInitializedImageElement)
+      .filter((element) => {
         return (
           !this.fileManager.isFileTracked(element.fileId) &&
           !element.isDeleted &&
