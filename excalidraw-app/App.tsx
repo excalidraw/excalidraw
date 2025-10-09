@@ -62,7 +62,7 @@ import type {
   FileId,
   NonDeletedExcalidrawElement,
   OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
+} from "@excalidraw/element";
 import type {
   AppState,
   ExcalidrawImperativeAPI,
@@ -70,8 +70,7 @@ import type {
   ExcalidrawInitialDataState,
   UIAppState,
 } from "@excalidraw/excalidraw/types";
-import type { ResolutionType } from "@excalidraw/common/utility-types";
-import type { ResolvablePromise } from "@excalidraw/common/utils";
+import type { ResolutionType, ResolvablePromise } from "@excalidraw/common";
 
 import CustomStats from "./CustomStats";
 import {
@@ -427,7 +426,7 @@ const ExcalidrawWrapper = () => {
         }
       } else {
         const fileIds =
-          data.scene.elements?.reduce((acc, element) => {
+          data.scene.elements?.reduce((acc: FileId[], element: OrderedExcalidrawElement) => {
             if (isInitializedImageElement(element)) {
               return acc.concat(element.fileId);
             }
@@ -669,6 +668,7 @@ const ExcalidrawWrapper = () => {
     }
   };
 
+
   const [latestShareableLink, setLatestShareableLink] = useState<string | null>(
     null,
   );
@@ -845,18 +845,22 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
         theme={editorTheme}
         renderTopRightUI={(isMobile) => {
-          if (isMobile || !collabAPI || isCollabDisabled) {
+          if (isMobile) {
             return null;
           }
           return (
             <div className="top-right-ui">
-              {collabError.message && <CollabError collabError={collabError} />}
-              <LiveCollaborationTrigger
-                isCollaborating={isCollaborating}
-                onSelect={() =>
-                  setShareDialogState({ isOpen: true, type: "share" })
-                }
-              />
+              {!isCollabDisabled && collabAPI && (
+                <>
+                  {collabError.message && <CollabError collabError={collabError} />}
+                  <LiveCollaborationTrigger
+                    isCollaborating={isCollaborating}
+                    onSelect={() =>
+                      setShareDialogState({ isOpen: true, type: "share" })
+                    }
+                  />
+                </>
+              )}
             </div>
           );
         }}
@@ -904,7 +908,7 @@ const ExcalidrawWrapper = () => {
 
         <TTDDialogTrigger />
         {isCollaborating && isOffline && (
-          <div className="alertalert--warning">
+          <div className="alert alert--warning">
             {t("alerts.collabOfflineWarning")}
           </div>
         )}
