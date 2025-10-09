@@ -89,4 +89,46 @@ describe("Aligning elements", () => {
     expect(selected[0].x).toEqual(100);
     expect(selected[1].x).toEqual(100);
   });
+
+  it("aligns two elements vertically centered", () => {
+    createAndSelectTwoRectangles();
+
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress(KEYS.V);
+    });
+
+    const selected = API.getSelectedElements();
+    // Both elements should have the same center y
+    const centerY0 = selected[0].y + selected[0].height / 2;
+    const centerY1 = selected[1].y + selected[1].height / 2;
+    expect(centerY0).toEqual(centerY1);
+  });
+
+  it("aligns two elements horizontally centered", () => {
+    createAndSelectTwoRectangles();
+
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress(KEYS.H);
+    });
+
+    const selected = API.getSelectedElements();
+    // Both elements should have the same center x
+    const centerX0 = selected[0].x + selected[0].width / 2;
+    const centerX1 = selected[1].x + selected[1].width / 2;
+    expect(centerX0).toEqual(centerX1);
+  });
+
+  it("groups two elements", () => {
+    createAndSelectTwoRectangles();
+
+    Keyboard.withModifierKeys({ ctrl: true, g: true }, () => {
+      Keyboard.keyPress("g");
+    });
+
+    const selected = API.getSelectedElements();
+    expect(selected[0].groupIds.length).toBeGreaterThan(0);
+    expect(selected[0].groupIds).toEqual(selected[1].groupIds);
+  });
 });
+
+// We recommend installing an extension to run vitest tests.
