@@ -911,6 +911,22 @@ const ExcalidrawWrapper = () => {
         {localStorageQuotaExceeded && (
           <div className="alert alert--danger">
             {t("alerts.localStorageQuotaExceeded")}
+            <div
+              className="tooltip-wrapper"
+              style={{ display: "inline-block", marginLeft: "6px" }}
+            >
+              <span
+                className="tooltip-icon"
+                aria-label="More info"
+                tabIndex={0}
+              >
+                ℹ️
+              </span>
+              <div className="tooltip-content">
+                Your browser’s local storage is full. Try clearing cache or
+                removing saved drawings to continue saving changes.
+              </div>
+            </div>
           </div>
         )}
         {latestShareableLink && (
