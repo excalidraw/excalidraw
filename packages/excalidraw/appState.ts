@@ -25,6 +25,7 @@ export const getDefaultAppState = (): Omit<
 > => {
   return {
     showWelcomeScreen: false,
+    currentItemUseLigatures: false,
     theme: THEME.LIGHT,
     collaborators: new Map(),
     currentChartType: "bar",
@@ -249,6 +250,11 @@ const APP_STATE_STORAGE_CONF = (<
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
   stylesPanelMode: { browser: true, export: false, server: false },
+  currentItemUseLigatures: {
+    browser: false,
+    export: false,
+    server: false,
+  },
 });
 
 const _clearAppStateForStorage = <
