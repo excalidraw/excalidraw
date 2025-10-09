@@ -1,7 +1,10 @@
+// packages/excalidraw/components/ColorPicker/ColorInput.tsx
+
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { KEYS, getShortcutKey } from "@excalidraw/common";
+import { invertHexColor } from "../../../common/src/colors"; // ⬅️ NEW: Import utility
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
@@ -14,12 +17,14 @@ import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
+// ⬅️ NEW: Add theme prop to the interface
 interface ColorInputProps {
   color: string;
   onChange: (color: string) => void;
   label: string;
   colorPickerType: ColorPickerType;
   placeholder?: string;
+  theme: "light" | "dark"; // ⬅️ NEW: The theme prop
 }
 
 export const ColorInput = ({
@@ -28,6 +33,7 @@ export const ColorInput = ({
   label,
   colorPickerType,
   placeholder,
+  theme, // ⬅️ NEW: Destructure the theme prop
 }: ColorInputProps) => {
   const device = useDevice();
   const [innerValue, setInnerValue] = useState(color);
@@ -35,21 +41,44 @@ export const ColorInput = ({
     activeColorPickerSectionAtom,
   );
 
-  useEffect(() => {
-    setInnerValue(color);
-  }, [color]);
+  // 1. Calculate the color to display based on the theme
+  const displayValue = 
+    theme === "dark" && color.startsWith("#") && color.length >= 4 && color !== "transparent"
+      ? invertHexColor(color) 
+      : color;
 
+  // 2. Update innerValue when the main 'color' prop changes (using the calculated displayValue)
+  useEffect(() => {
+    // We update innerValue with the *displayed* value, not the raw prop 'color'
+    setInnerValue(displayValue); 
+  }, [displayValue]); // Depend on displayValue instead of raw 'color'
+
+  // 3. Update changeColor to handle both display and saving logic
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
-      const color = getColor(value);
+      
+      let colorToSave = value.startsWith("#") ? value : `#${value}`;
+      
+      // If in dark mode, the user entered the visually inverted color.
+      // We must invert it BACK to get the true color to save to the element state.
+      if (theme === "dark" && colorToSave.startsWith("#")) {
+        // We only invert back if it looks like a valid partial or full hex
+        if (colorToSave.length >= 4 || colorToSave.length === 0) {
+          colorToSave = invertHexColor(colorToSave);
+        }
+      }
+      
+      const color = getColor(colorToSave);
 
       if (color) {
         onChange(color);
       }
+      
+      // Update the inner value to reflect the user's input immediately
       setInnerValue(value);
     },
-    [onChange],
+    [onChange, theme], // Depend on theme as it changes logic
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -81,9 +110,11 @@ export const ColorInput = ({
         onChange={(event) => {
           changeColor(event.target.value);
         }}
-        value={(innerValue || "").replace(/^#/, "")}
+        // Display innerValue (which holds the current displayed/inverted color)
+        value={(innerValue || "").replace(/^#/, "")} 
         onBlur={() => {
-          setInnerValue(color);
+          // On blur, reset to the clean, currently-saved display value
+          setInnerValue(displayValue.replace(/^#/, "")); 
         }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
