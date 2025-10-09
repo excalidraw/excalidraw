@@ -95,6 +95,7 @@ export type ActionName =
   | "zoomToFitSelection"
   | "zoomToFitSelectionInViewport"
   | "changeFontFamily"
+  | "toggleLigatures"
   | "changeTextAlign"
   | "changeVerticalAlign"
   | "toggleFullScreen"

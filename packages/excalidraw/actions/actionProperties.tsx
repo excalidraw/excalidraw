@@ -224,8 +224,8 @@ const offsetElementAfterFontResize = (
       prevElement.textAlign === "left"
         ? prevElement.x
         : prevElement.x +
-          (prevElement.width - nextElement.width) /
-            (prevElement.textAlign === "center" ? 2 : 1),
+        (prevElement.width - nextElement.width) /
+        (prevElement.textAlign === "center" ? 2 : 1),
     // centering vertically is non-standard, but for Excalidraw I think
     // it makes sense
     y: prevElement.y + (prevElement.height - nextElement.height) / 2,
@@ -295,9 +295,52 @@ const changeFontSize = (
   };
 };
 
-// Toggle Ligatures
-
 // -----------------------------------------------------------------------------
+
+export const actionToggleLigatures = register({
+  name: "toggleLigatures",
+  label: "labels.showFonts",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      appState: {
+        ...appState,
+        ...value,
+      },
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => {
+    return (
+      <fieldset>
+        {appState.stylesPanelMode === "full" && (
+          <legend>{t("labels.toggleLigatures")}</legend>
+        )}
+        <div className="buttonList">
+          <button
+            type="button"
+            className={`properties-trigger ${
+              appState.currentItemUseLigatures ? "active" : ""
+            }`}
+            onClick={() =>
+              updateData({
+                currentItemUseLigatures: !appState.currentItemUseLigatures,
+              })
+            }
+            aria-pressed={appState.currentItemUseLigatures}
+            title={
+              appState.currentItemUseLigatures
+                ? t("labels.showFonts")
+                : t("labels.showFonts")
+            }
+          >
+            {appState.currentItemUseLigatures ? "On" : "Off"}
+          </button>
+        </div>
+      </fieldset>
+    );
+  }
+});
 
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
@@ -312,8 +355,8 @@ export const actionChangeStrokeColor = register({
           (el) => {
             return hasStrokeColor(el.type)
               ? newElementWith(el, {
-                  strokeColor: value.currentItemStrokeColor,
-                })
+                strokeColor: value.currentItemStrokeColor,
+              })
               : el;
           },
           true,
@@ -471,9 +514,8 @@ export const actionChangeFillStyle = register({
             options={[
               {
                 value: "hachure",
-                text: `${
-                  allElementsZigZag ? t("labels.zigzag") : t("labels.hachure")
-                } (${getShortcutKey("Alt-Click")})`,
+                text: `${allElementsZigZag ? t("labels.zigzag") : t("labels.hachure")
+                  } (${getShortcutKey("Alt-Click")})`,
                 icon: allElementsZigZag ? FillZigZagIcon : FillHachureIcon,
                 active: allElementsZigZag ? true : undefined,
                 testId: `fill-hachure`,
@@ -502,8 +544,8 @@ export const actionChangeFillStyle = register({
             onClick={(value, event) => {
               const nextValue =
                 event.altKey &&
-                value === "hachure" &&
-                selectedElements.every((el) => el.fillStyle === "hachure")
+                  value === "hachure" &&
+                  selectedElements.every((el) => el.fillStyle === "hachure")
                   ? "zigzag"
                   : value;
 
@@ -1442,10 +1484,10 @@ export const actionChangeRoundness = register({
           roundness:
             value === "round"
               ? {
-                  type: isUsingAdaptiveRadius(el.type)
-                    ? ROUNDNESS.ADAPTIVE_RADIUS
-                    : ROUNDNESS.PROPORTIONAL_RADIUS,
-                }
+                type: isUsingAdaptiveRadius(el.type)
+                  ? ROUNDNESS.ADAPTIVE_RADIUS
+                  : ROUNDNESS.PROPORTIONAL_RADIUS,
+              }
               : null,
         });
       }),
@@ -1491,8 +1533,8 @@ export const actionChangeRoundness = register({
                 hasLegacyRoundness
                   ? null
                   : element.roundness
-                  ? "round"
-                  : "sharp",
+                    ? "round"
+                    : "sharp",
               (element) =>
                 !isArrowElement(element) && element.hasOwnProperty("roundness"),
               (hasSelection) =>
@@ -1700,8 +1742,8 @@ export const actionChangeArrowType = register({
         roundness:
           value === ARROW_TYPE.round
             ? {
-                type: ROUNDNESS.PROPORTIONAL_RADIUS,
-              }
+              type: ROUNDNESS.PROPORTIONAL_RADIUS,
+            }
             : null,
         elbowed: value === ARROW_TYPE.elbow,
         points:
@@ -1743,28 +1785,28 @@ export const actionChangeArrowType = register({
         const startBinding =
           startElement && newElement.startBinding
             ? {
-                // @ts-ignore TS cannot discern check above
-                ...newElement.startBinding!,
-                ...calculateFixedPointForElbowArrowBinding(
-                  newElement,
-                  startElement,
-                  "start",
-                  elementsMap,
-                ),
-              }
+              // @ts-ignore TS cannot discern check above
+              ...newElement.startBinding!,
+              ...calculateFixedPointForElbowArrowBinding(
+                newElement,
+                startElement,
+                "start",
+                elementsMap,
+              ),
+            }
             : null;
         const endBinding =
           endElement && newElement.endBinding
             ? {
-                // @ts-ignore TS cannot discern check above
-                ...newElement.endBinding,
-                ...calculateFixedPointForElbowArrowBinding(
-                  newElement,
-                  endElement,
-                  "end",
-                  elementsMap,
-                ),
-              }
+              // @ts-ignore TS cannot discern check above
+              ...newElement.endBinding,
+              ...calculateFixedPointForElbowArrowBinding(
+                newElement,
+                endElement,
+                "end",
+                elementsMap,
+              ),
+            }
             : null;
 
         newElement = {
@@ -1863,8 +1905,8 @@ export const actionChangeArrowType = register({
                   return element.elbowed
                     ? ARROW_TYPE.elbow
                     : element.roundness
-                    ? ARROW_TYPE.round
-                    : ARROW_TYPE.sharp;
+                      ? ARROW_TYPE.round
+                      : ARROW_TYPE.sharp;
                 }
 
                 return null;
