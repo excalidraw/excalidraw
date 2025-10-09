@@ -255,9 +255,11 @@ export const textWysiwyg = ({
 
       const font = getFontString(updatedTextElement);
 
-      // Make sure text editor height doesn't go beyond viewport
+      const ligaturesOn = !!appState.currentItemUseLigatures;
+
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
+
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -279,7 +281,8 @@ export const textWysiwyg = ({
         color: updatedTextElement.strokeColor,
         opacity: updatedTextElement.opacity / 100,
         filter: "var(--theme-filter)",
-        maxHeight: `${editorMaxHeight}px`,
+        fontVariantLigatures: ligaturesOn ? "normal" : "none",
+        fontFeatureSettings: ligaturesOn ? "normal" : "'liga' 0",
       });
       editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
