@@ -3,5 +3,70 @@
 .excalidraw {
   .excalidraw-button {
     @include outlineButtonStyles;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    background: none;
+    border: none;
+    color: var(--color-on-surface);
+    transition: background-color 0.1s ease-in-out, border-color 0.1s ease-in-out, color 0.1s ease-in-out;
+    user-select: none;
+    text-decoration: none;
+    white-space: nowrap;
+    vertical-align: middle;
+    box-sizing: border-box;
+    height: 32px;
+    min-width: 32px;
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    &:hover:not(:disabled),
+    &:focus:not(:disabled) {
+      background-color: var(--button-hover-bg);
+      color: var(--color-on-surface);
+      text-decoration: none;
+      border-color: var(--default-border-color);
+      box-shadow: 0 0 0 1px var(--default-border-color);
+    }
+
+    &:active:not(:disabled) {
+      background-color: var(--button-active-bg);
+      color: var(--color-on-surface);
+      border-color: var(--color-primary-darkest);
+      box-shadow: 0 0 0 1px var(--color-primary-darkest);
+    }
+
+    &.excalidraw-button--primary {
+      background-color: var(--color-primary);
+      color: var(--color-on-primary-container);
+      border: 1px solid var(--color-primary);
+
+      &:hover:not(:disabled),
+      &:focus:not(:disabled) {
+        background-color: var(--color-primary-hover);
+        color: var(--color-on-primary-container);
+        border-color: var(--color-primary-hover);
+        box-shadow: 0 0 0 1px var(--color-primary-hover);
+      }
+
+      &:active:not(:disabled) {
+        background-color: var(--color-brand-active);
+        color: var(--color-on-primary-container);
+        border-color: var(--color-brand-active);
+        box-shadow: 0 0 0 1px var(--color-brand-active);
+      }
+    }
   }
 }
