@@ -1,33 +1,62 @@
 @import "../../packages/excalidraw/css/variables.module.scss";
 
 .excalidraw {
+
+  // added css for the error
   .collab-errors-button {
-    width: 26px;
-    height: 26px;
-    margin-inline-end: 1rem;
-
-    color: var(--color-danger);
-
-    flex-shrink: 0;
+    opacity: 0;
+    animation: fadeIn 0.4s ease-out forwards;
+    border-radius: 8px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  .collab-errors-button-shake {
-    animation: strong-shake 0.15s 6;
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-color-scheme: light) {
+    .collab-errors-button {
+      background-color: #f8f9fa;
+      color: #333;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .collab-errors-button {
+      background-color: #2b2b2b;
+      color: #f5f5f5;
+    }
   }
 
   @keyframes strong-shake {
     0% {
       transform: rotate(0deg);
     }
+
     25% {
       transform: rotate(10deg);
     }
+
     50% {
       transform: rotate(0deg);
     }
+
     75% {
       transform: rotate(-10deg);
     }
+
     100% {
       transform: rotate(0deg);
     }
