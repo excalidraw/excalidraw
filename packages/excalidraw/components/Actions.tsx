@@ -217,6 +217,7 @@ export const SelectedShapeActions = ({
         <>
           {renderAction("changeFontFamily")}
           {renderAction("changeFontSize")}
+          {renderAction("toggleLigatures")}
           {(appState.activeTool.type === "text" ||
             suppportsHorizontalAlign(targetElements, elementsMap)) &&
             renderAction("changeTextAlign")}
@@ -592,8 +593,12 @@ export const CompactShapeActions = ({
                 >
                   <div className="selected-shape-actions">
                     {(appState.activeTool.type === "text" ||
-                      targetElements.some(isTextElement)) &&
-                      renderAction("changeFontSize")}
+                      targetElements.some(isTextElement)) && (
+                      <>
+                        {renderAction("changeFontSize")}
+                        {renderAction("toggleLigatures")}
+                      </>
+                    )}
                     {(appState.activeTool.type === "text" ||
                       suppportsHorizontalAlign(targetElements, elementsMap)) &&
                       renderAction("changeTextAlign")}

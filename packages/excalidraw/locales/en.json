@@ -119,6 +119,7 @@
     "showBackground": "Show background color picker",
     "showFonts": "Show font picker",
     "toggleTheme": "Toggle light/dark theme",
+    "toggleLigatures": "Font Ligatures",
     "theme": "Theme",
     "personalLib": "Personal Library",
     "excalidrawLib": "Excalidraw Library",
