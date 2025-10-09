@@ -287,6 +287,12 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  .excalidraw-ui-top-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .App-toolbar-content {
     display: flex;
     flex-direction: column;
