@@ -129,6 +129,12 @@
   }
 }
 
+@mixin buttonNoHighlight {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
 @mixin outlineButtonIconStyles {
   @include outlineButtonStyles;
   padding: 0;
