@@ -1192,11 +1192,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@excalidraw/common@0.18.0", "@excalidraw/common@file:c:\\Users\\sd232\\OneDrive\\Desktop\\New folder\\excalidraw\\packages\\common":
+"@excalidraw/common@0.18.0", "@excalidraw/common@file:c:\\Users\\sd232\\OneDrive\\Desktop\\github\\excalidraw\\packages\\common":
   version "0.18.0"
   resolved "file:packages/common"
 
-"@excalidraw/element@0.18.0", "@excalidraw/element@file:c:\\Users\\sd232\\OneDrive\\Desktop\\New folder\\excalidraw\\packages\\element":
+"@excalidraw/element@0.18.0", "@excalidraw/element@file:c:\\Users\\sd232\\OneDrive\\Desktop\\github\\excalidraw\\packages\\element":
   version "0.18.0"
   resolved "file:packages/element"
   dependencies:
@@ -1208,7 +1208,7 @@
   resolved "https://registry.npmjs.org/@excalidraw/eslint-config/-/eslint-config-1.0.3.tgz"
   integrity sha512-GemHNF5Z6ga0BWBSX7GJaNBUchLu6RwTcAB84eX1MeckRNhNasAsPCdelDlFalz27iS4RuYEQh0bPE8SRxJgbQ==
 
-"@excalidraw/excalidraw@*", "@excalidraw/excalidraw@file:c:\\Users\\sd232\\OneDrive\\Desktop\\New folder\\excalidraw\\packages\\excalidraw":
+"@excalidraw/excalidraw@*", "@excalidraw/excalidraw@file:c:\\Users\\sd232\\OneDrive\\Desktop\\github\\excalidraw\\packages\\excalidraw":
   version "0.18.0"
   resolved "file:packages/excalidraw"
   dependencies:
@@ -1257,7 +1257,7 @@
   resolved "https://registry.npmjs.org/@excalidraw/markdown-to-text/-/markdown-to-text-0.1.2.tgz"
   integrity sha512-1nDXBNAojfi3oSFwJswKREkFm5wrSjqay81QlyRv2pkITG/XYB5v+oChENVBQLcxQwX4IUATWvXM5BcaNhPiIg==
 
-"@excalidraw/math@0.18.0", "@excalidraw/math@file:c:\\Users\\sd232\\OneDrive\\Desktop\\New folder\\excalidraw\\packages\\math":
+"@excalidraw/math@0.18.0", "@excalidraw/math@file:c:\\Users\\sd232\\OneDrive\\Desktop\\github\\excalidraw\\packages\\math":
   version "0.18.0"
   resolved "file:packages/math"
   dependencies:
@@ -1288,7 +1288,7 @@
   resolved "https://registry.npmjs.org/@excalidraw/random-username/-/random-username-1.1.0.tgz"
   integrity sha512-nULYsQxkWHnbmHvcs+efMkJ4/9TtvNyFeLyHdeGxW0zHs6P+jYVqcRff9A6Vq9w9JXeDRnRh2VKvTtS19GW2qA==
 
-"@excalidraw/utils@file:c:\\Users\\sd232\\OneDrive\\Desktop\\New folder\\excalidraw\\packages\\utils":
+"@excalidraw/utils@file:c:\\Users\\sd232\\OneDrive\\Desktop\\github\\excalidraw\\packages\\utils":
   version "0.1.2"
   resolved "file:packages/utils"
   dependencies:
@@ -5196,7 +5196,7 @@ events@^3.2.0:
   resolved "https://registry.npmjs.org/events/-/events-3.3.0.tgz"
   integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
 
-"excalidraw-app@file:c:\\Users\\sd232\\OneDrive\\Desktop\\New folder\\excalidraw\\excalidraw-app":
+"excalidraw-app@file:c:\\Users\\sd232\\OneDrive\\Desktop\\github\\excalidraw\\excalidraw-app":
   version "1.0.0"
   resolved "file:excalidraw-app"
   dependencies:
@@ -9549,7 +9549,7 @@ why-is-node-running@^2.3.0:
     siginfo "^2.0.0"
     stackback "0.0.2"
 
-"with-nextjs@file:c:\\Users\\sd232\\OneDrive\\Desktop\\New folder\\excalidraw\\examples\\with-nextjs":
+"with-nextjs@file:c:\\Users\\sd232\\OneDrive\\Desktop\\github\\excalidraw\\examples\\with-nextjs":
   version "0.1.0"
   resolved "file:examples/with-nextjs"
   dependencies:
@@ -9557,7 +9557,7 @@ why-is-node-running@^2.3.0:
     react "19.0.0"
     react-dom "19.0.0"
 
-"with-script-in-browser@file:c:\\Users\\sd232\\OneDrive\\Desktop\\New folder\\excalidraw\\examples\\with-script-in-browser":
+"with-script-in-browser@file:c:\\Users\\sd232\\OneDrive\\Desktop\\github\\excalidraw\\examples\\with-script-in-browser":
   version "1.0.0"
   resolved "file:examples/with-script-in-browser"
   dependencies:
