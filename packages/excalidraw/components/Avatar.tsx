@@ -27,13 +27,14 @@ export const Avatar = ({
   return (
     <div className={clsx("Avatar", className)} style={style} onClick={onClick}>
       {loadImg ? (
-        <img
-          className="Avatar-img"
-          src={src}
-          alt={shortName}
-          referrerPolicy="no-referrer"
-          onError={() => setError(true)}
-        />
+       <img 
+  className="Avatar-img"
+  src={src}
+  alt={shortName || "User avatar"}
+  referrerPolicy="no-referrer"
+  onError={() => setError(true)}
+/>
+
       ) : (
         shortName
       )}
