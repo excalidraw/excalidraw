@@ -43,6 +43,14 @@ import type {
   NonDeletedExcalidrawElement,
 } from "./types";
 
+/**
+ * Extra padding applied only for rectangle containers to make text breathing room
+ * larger without modifying upstream common constants.
+ *
+ * Tweak the number below to adjust how much extra space you want.
+ */
+const ADDITIONAL_RECT_PADDING = 6;
+
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
@@ -353,8 +361,13 @@ export const getContainerCenter = (
 };
 
 export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
-  let offsetX = BOUND_TEXT_PADDING;
-  let offsetY = BOUND_TEXT_PADDING;
+  // Form the effective padding that should be used for content offset.
+  // For rectangles, add a bit of extra padding to improve look.
+  const extraForRectangle = container.type === "rectangle" ? ADDITIONAL_RECT_PADDING : 0;
+  const effectivePadding = BOUND_TEXT_PADDING + extraForRectangle;
+
+  let offsetX = effectivePadding;
+  let offsetY = effectivePadding;
 
   if (container.type === "ellipse") {
     // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6172
@@ -448,18 +461,28 @@ export const computeContainerDimensionForBoundText = (
   containerType: ExtractSetType<typeof VALID_CONTAINER_TYPES>,
 ) => {
   dimension = Math.ceil(dimension);
-  const padding = BOUND_TEXT_PADDING * 2;
 
-  if (containerType === "ellipse") {
-    return Math.round(((dimension + padding) / Math.sqrt(2)) * 2);
-  }
+  // For arrow we keep previous behavior using BOUND_TEXT_PADDING directly (the
+  // arrow logic used a larger multiplier, so keep it intact).
   if (containerType === "arrow") {
+    const padding = BOUND_TEXT_PADDING;
     return dimension + padding * 8;
   }
-  if (containerType === "diamond") {
-    return 2 * (dimension + padding);
+
+  // For other container types compute effective padding (only rectangle will get extra).
+  const padding =
+    containerType === "rectangle"
+      ? BOUND_TEXT_PADDING + ADDITIONAL_RECT_PADDING
+      : BOUND_TEXT_PADDING;
+
+  if (containerType === "ellipse") {
+    return Math.round(((dimension + padding * 2) / Math.sqrt(2)) * 2);
   }
-  return dimension + padding;
+  if (containerType === "diamond") {
+    return 2 * (dimension + padding * 2);
+  }
+  // rectangle & default
+  return dimension + padding * 2;
 };
 
 export const getBoundTextMaxWidth = (
@@ -473,18 +496,25 @@ export const getBoundTextMaxWidth = (
       ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO;
     return Math.max(ARROW_LABEL_WIDTH_FRACTION * width, minWidth);
   }
+
+  // effective padding takes rectangle extra into account
+  const effectivePadding =
+    container.type === "rectangle"
+      ? BOUND_TEXT_PADDING + ADDITIONAL_RECT_PADDING
+      : BOUND_TEXT_PADDING;
+
   if (container.type === "ellipse") {
     // The width of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse -https://github.com/excalidraw/excalidraw/pull/6172
-    return Math.round((width / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
+    return Math.round((width / 2) * Math.sqrt(2)) - effectivePadding * 2;
   }
   if (container.type === "diamond") {
     // The width of the largest rectangle inscribed inside a rhombus is
     // Math.round(width / 2) - https://github.com/excalidraw/excalidraw/pull/6265
-    return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
+    return Math.round(width / 2) - effectivePadding * 2;
   }
-  return width - BOUND_TEXT_PADDING * 2;
+  return width - effectivePadding * 2;
 };
 
 export const getBoundTextMaxHeight = (
@@ -499,18 +529,24 @@ export const getBoundTextMaxHeight = (
     }
     return height;
   }
+
+  const effectivePadding =
+    container.type === "rectangle"
+      ? BOUND_TEXT_PADDING + ADDITIONAL_RECT_PADDING
+      : BOUND_TEXT_PADDING;
+
   if (container.type === "ellipse") {
     // The height of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.height / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse - https://github.com/excalidraw/excalidraw/pull/6172
-    return Math.round((height / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
+    return Math.round((height / 2) * Math.sqrt(2)) - effectivePadding * 2;
   }
   if (container.type === "diamond") {
     // The height of the largest rectangle inscribed inside a rhombus is
     // Math.round(height / 2) - https://github.com/excalidraw/excalidraw/pull/6265
-    return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
+    return Math.round(height / 2) - effectivePadding * 2;
   }
-  return height - BOUND_TEXT_PADDING * 2;
+  return height - effectivePadding * 2;
 };
 
 /** retrieves text from text elements and concatenates to a single string */
