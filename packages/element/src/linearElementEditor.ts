@@ -559,14 +559,12 @@ export class LinearElementEditor {
           const bindingElement = isBindingEnabled(appState)
             ? getHoveredElementForBinding(
                 (selectedPointsIndices?.length ?? 0) > 1
-                  ? tupleToCoors(
-                      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                  ? LinearElementEditor.getPointAtIndexGlobalCoordinates(
                         element,
                         selectedPoint!,
                         elementsMap,
-                      ),
-                    )
-                  : pointerCoords,
+                      )
+                  : pointFrom(pointerCoords.x, pointerCoords.y),
                 elements,
                 elementsMap,
                 appState.zoom,
@@ -918,7 +916,7 @@ export class LinearElementEditor {
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
         endBindingElement: getHoveredElementForBinding(
-          scenePointer,
+          pointFrom(scenePointer.x, scenePointer.y),
           elements,
           elementsMap,
           app.state.zoom,

@@ -2266,7 +2266,7 @@ const getHoveredElement = (
   zoom?: AppState["zoom"],
 ) => {
   return getHoveredElementForBinding(
-    tupleToCoors(origPoint),
+    origPoint,
     elements,
     elementsMap,
     zoom,
