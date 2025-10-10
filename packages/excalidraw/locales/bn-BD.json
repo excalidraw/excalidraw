@@ -8,20 +8,20 @@
     "moveCanvas": "ক্যানভাস সরান",
     "cut": "কাট করুন",
     "copy": "কপি করুন",
-    "copyAsPng": "পীএনজী ছবির মতন কপি করুন",
-    "copyAsSvg": "এসভীজী ছবির মতন কপি করুন",
+    "copyAsPng": "PNG ছবির মতন কপি করুন",
+    "copyAsSvg": "SVG ছবির মতন কপি করুন",
     "copyText": "লিখিত তথ্যের মতন কপি করুন",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "সোর্স ক্লিপবোর্ডে কপি করুন",
+    "convertToCode": "কোডে রূপান্তর করুন",
     "bringForward": "অধিকতর সামনে আনুন",
     "sendToBack": "অধিকতর পিছনে নিয়ে যান",
     "bringToFront": "সবার সামনে আনুন",
     "sendBackward": "সবার পিছনে নিয়ে যান",
-    "delete": "মুছা",
+    "delete": "মুছুন",
     "copyStyles": "ডিজাইন কপি করুন",
     "pasteStyles": "ডিজাইন পেস্ট করুন",
     "stroke": "রেখাংশ",
-    "background": "পটভূমি",
+    "background": "ব্যাকগ্রাউন্ড",
     "fill": "রং",
     "strokeWidth": "রেখাংশের বেধ",
     "strokeStyle": "রেখাংশের ডিজাইন",
@@ -38,15 +38,15 @@
     "arrowhead_none": "কিছু না",
     "arrowhead_arrow": "তীর",
     "arrowhead_bar": "রেখাংশ",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "বৃত্ত",
+    "arrowhead_circle_outline": "বৃত্ত (আউটলাইন)",
     "arrowhead_triangle": "ত্রিভূজ",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
-    "fontSize": "লেখনীর মাত্রা",
+    "arrowhead_triangle_outline": "ত্রিভূজ (আউটলাইন)",
+    "arrowhead_diamond": "ডায়মন্ড",
+    "arrowhead_diamond_outline": "ডায়মন্ড (আউটলাইন)",
+    "fontSize": "ফন্ট সাইজ",
     "fontFamily": "লেখনীর হরফ",
-    "addWatermark": "এক্সক্যালিড্র দ্বারা প্রস্তুত",
+    "addWatermark": "Excalidraw দ্বারা প্রস্তুত",
     "handDrawn": "হাতে আঁকা",
     "normal": "স্বাভাবিক",
     "code": "কোড",
@@ -70,7 +70,7 @@
     "fileTitle": "ফাইলের নাম",
     "colorPicker": "রং পছন্দ করুন",
     "canvasColors": "ক্যানভাসের রং",
-    "canvasBackground": "ক্যানভাসের পটভূমি",
+    "canvasBackground": "ক্যানভাসের ব্যাকগ্রাউন্ড",
     "drawingCanvas": "ব্যবহৃত ক্যানভাস",
     "layers": "মাত্রা",
     "actions": "ক্রিয়া",
@@ -80,11 +80,10 @@
     "untitled": "অনামী",
     "name": "নাম",
     "yourName": "আপনার নাম",
-    "madeWithExcalidraw": "এক্সক্যালিড্র দ্বারা তৈরি",
-    "group": "দল গঠন করুন",
-    "ungroup": "দল বিভেদ করুন",
+    "madeWithExcalidraw": "Excalidraw দ্বারা তৈরি",
+    "group": "গ্রুপ করুন",
+    "ungroup": "গ্রুপ ভাঙুন",
     "collaborators": "সহযোগী",
-    "showGrid": "গ্রিড দেখান",
     "addToLibrary": "সংগ্রহে যোগ করুন",
     "removeFromLibrary": "সংগ্রহ থেকে বের করুন",
     "libraryLoadingMessage": "সংগ্রহ তৈরি হচ্ছে",
@@ -102,59 +101,99 @@
     "flipHorizontal": "অনুভূমিক আবর্তন",
     "flipVertical": "উলম্ব আবর্তন",
     "viewMode": "দৃশ্য",
-    "share": "ভাগ করুন",
-    "showStroke": "",
-    "showBackground": "",
-    "toggleTheme": "",
-    "personalLib": "",
-    "excalidrawLib": "",
-    "decreaseFontSize": "লেখনীর মাত্রা কমান",
-    "increaseFontSize": "লেখনীর মাত্রা বাড়ান",
-    "unbindText": "",
-    "bindText": "",
-    "createContainerFromText": "",
+    "share": "শেয়ার করুন",
+    "showStroke": "স্ট্রোক কালার পিকার দেখান",
+    "showBackground": "ব্যাকগ্রাউন্ড কালার পিকার দেখান",
+    "toggleTheme": "লাইট/ডার্ক থিম পরিবর্তন করুন",
+    "personalLib": "ব্যক্তিগত লাইব্রেরি",
+    "excalidrawLib": "Excalidraw লাইব্রেরি",
+    "decreaseFontSize": "ফন্ট সাইজ কমান",
+    "increaseFontSize": "ফন্ট সাইজ বাড়ান",
+    "unbindText": "টেক্সট আলাদা করুন",
+    "bindText": "টেক্সট কন্টেইনারে যুক্ত করুন",
+    "createContainerFromText": "টেক্সট থেকে কন্টেইনার তৈরি করুন",
     "link": {
       "edit": "লিঙ্ক সংশোধন",
-      "editEmbed": "",
+      "editEmbed": "এমবেড লিঙ্ক এডিট করুন",
       "create": "লিঙ্ক তৈরী",
-      "createEmbed": "",
       "label": "লিঙ্ক নামকরণ",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "লিঙ্ক ও এমবেড",
+      "empty": "কোনো লিঙ্ক সেট করা হয়নি",
+      "hint": "এখানে আপনার লিঙ্ক টাইপ করুন বা পেস্ট করুন",
+      "goToElement": "টার্গেট উপাদানে যান"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "লাইন এডিট করুন",
+      "editArrow": "তীর এডিট করুন"
     },
     "elementLock": {
-      "lock": "আবদ্ধ করুন",
-      "unlock": "বিচ্ছিন্ন করুন",
-      "lockAll": "সব আবদ্ধ করুন",
-      "unlockAll": "সব বিচ্ছিন্ন করুন"
+      "lock": "লক করুন",
+      "unlock": "আনলক করুন",
+      "lockAll": "সব লক করুন",
+      "unlockAll": "সব আনলক করুন"
     },
     "statusPublished": "প্রকাশিত",
     "sidebarLock": "লক",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": "",
-    "textToDiagram": "",
-    "prompt": ""
+    "selectAllElementsInFrame": "ফ্রেমের সব উপাদান সিলেক্ট করুন",
+    "removeAllElementsFromFrame": "ফ্রেম থেকে সব উপাদান সরান",
+    "eyeDropper": "ক্যানভাস থেকে কালার নিন",
+    "textToDiagram": "টেক্সট টু ডায়াগ্রাম",
+    "prompt": "প্রম্পট",
+    "changeStroke": "স্ট্রোক কালার পরিবর্তন করুন",
+    "changeBackground": "ব্যাকগ্রাউন্ড কালার পরিবর্তন করুন",
+    "arrowhead_crowfoot_many": "ক্রো'স ফুট (একাধিক)",
+    "arrowhead_crowfoot_one": "ক্রো'স ফুট (একটি)",
+    "arrowhead_crowfoot_one_or_many": "ক্রো'স ফুট (এক বা একাধিক)",
+    "more_options": "আরও অপশন",
+    "arrowtypes": "অ্যারো টাইপ",
+    "arrowtype_sharp": "তীক্ষ্ণ অ্যারো",
+    "arrowtype_round": "গোলাকার অ্যারো",
+    "arrowtype_elbowed": "কনুই অ্যারো",
+    "clearCanvas": "ক্যানভাস পরিষ্কার করুন",
+    "toggleGrid": "গ্রিড চালু/বন্ধ করুন",
+    "loadScene": "ফাইল থেকে সিন লোড করুন",
+    "showFonts": "ফন্ট পিকার দেখান",
+    "theme": "থিম",
+    "polygon": {
+      "breakPolygon": "পলিগন ভাঙুন",
+      "convertToPolygon": "পলিগনে রূপান্তর করুন"
+    },
+    "followUs": "আমাদের ফলো করুন",
+    "discordChat": "ডিসকর্ড চ্যাট",
+    "zoomToFitViewport": "ভিউপোর্টে ফিট করার জন্য জুম করুন",
+    "zoomToFitSelection": "নির্বাচনে ফিট করার জন্য জুম করুন",
+    "zoomToFit": "ফিট করার জন্য জুম করুন",
+    "installPWA": "অ্যাপ ইনস্টল করুন",
+    "autoResize": "স্বয়ংক্রিয় আকার পরিবর্তন",
+    "imageCropping": "ছবি ক্রপিং",
+    "unCroppedDimension": "আনক্রপড মাত্রা",
+    "copyElementLink": "উপাদানের লিঙ্ক কপি করুন",
+    "linkToElement": "উপাদানের লিঙ্ক",
+    "wrapSelectionInFrame": "সিলেকশনকে ফ্রেমে মুড়ান",
+    "tab": "ট্যাব",
+    "shapeSwitch": "আকৃতি পরিবর্তন করুন"
   },
   "library": {
     "noItems": "সংগ্রহে কিছু যোগ করা হয়নি",
-    "hint_emptyLibrary": "এখানে যোগ করার জন্য ক্যানভাসে একটি বস্তু নির্বাচন করুন, অথবা নীচে, প্রকাশ্য সংগ্রহশালা থেকে একটি সংগ্রহ ইনস্টল করুন৷",
-    "hint_emptyPrivateLibrary": "এখানে যোগ করার জন্য ক্যানভাসে একটি বস্তু নির্বাচন করুন"
+    "hint_emptyLibrary": "এখানে যোগ করার জন্য ক্যানভাসে একটি বস্তু নির্বাচন করুন, অথবা নীচে, প্রকাশ্য সংগ্রহ থেকে একটি সংগ্রহ ইনস্টল করুন৷",
+    "hint_emptyPrivateLibrary": "এখানে যোগ করার জন্য ক্যানভাসে একটি বস্তু নির্বাচন করুন",
+    "search": {
+      "inputPlaceholder": "লাইব্রেরি খুঁজুন",
+      "heading": "লাইব্রেরি ম্যাচ",
+      "noResults": "কোনো ম্যাচিং আইটেম পাওয়া যায়নি...",
+      "clearSearch": "সার্চ পরিষ্কার করুন"
+    }
   },
   "buttons": {
-    "clearReset": "ক্যানভাস সাফ করুন",
-    "exportJSON": "জেসন নিবদ্ধ করুন",
-    "exportImage": "",
-    "export": "",
+    "clearReset": "ক্যানভাস পরিষ্কার করুন",
+    "exportJSON": "JSON এক্সপোর্ট করুন",
+    "exportImage": "ইমেজ এক্সপোর্ট করুন...",
+    "export": "এক্সপোর্ট করুন...",
     "copyToClipboard": "ক্লিপবোর্ডে কপি করুন",
     "save": "জমা করুন",
     "saveAs": "অন্যভাবে জমা করুন",
-    "load": "",
-    "getShareableLink": "ভাগযোগ্য লিঙ্ক পান",
+    "load": "ওপেন করুন",
+    "getShareableLink": "শেয়ারযোগ্য লিঙ্ক পান",
     "close": "বন্ধ করুন",
     "selectLanguage": "ভাষা চিহ্নিত করুন",
     "scrollBackToContent": "বিষয়বস্তুতে ফেরত যান",
@@ -166,30 +205,33 @@
     "edit": "সংশোধন করুন",
     "undo": "ফেরত যান",
     "redo": "পুনরায় করুন",
-    "resetLibrary": "সংগ্রহ সাফ করুন",
+    "resetLibrary": "সংগ্রহ পরিষ্কার করুন",
     "createNewRoom": "নতুন রুম বানান",
-    "fullScreen": "পূর্ণস্ক্রীন",
+    "fullScreen": "সম্পূর্ণ স্ক্রীন",
     "darkMode": "ডার্ক মোড",
     "lightMode": "লাইট মোড",
     "zenMode": "জেন মোড",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "অবজেক্টে স্ন্যাপ করুন",
     "exitZenMode": "জেন মোড বন্ধ করুন",
     "cancel": "বাতিল",
-    "clear": "সাফ",
-    "remove": "বিয়োগ",
-    "embed": "",
-    "publishLibrary": "সংগ্রহ প্রকাশ করুন",
+    "clear": "পরিষ্কার",
+    "remove": "সরান",
+    "embed": "এম্বেডিং টগল করুন",
+    "publishLibrary": "নাম পরিবর্তন করুন বা প্রকাশ করুন",
     "submit": "জমা করুন",
     "confirm": "নিশ্চিত করুন",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "ইন্টারঅ্যাক্ট করতে ক্লিক করুন",
+    "copyLink": "লিঙ্ক কপি করুন",
+    "systemMode": "সিস্টেম মোড",
+    "saveLibNames": "লাইব্রেরির নাম সংরক্ষণ করুন"
   },
   "alerts": {
-    "clearReset": "এটি পুরো ক্যানভাস সাফ করবে। আপনি কি নিশ্চিত?",
-    "couldNotCreateShareableLink": "ভাগ করা যায় এমন লিঙ্ক তৈরি করা যায়নি।",
-    "couldNotCreateShareableLinkTooBig": "ভাগ করা যায় এমন লিঙ্ক তৈরি করা যায়নি: দৃশ্যটি খুব বড়",
+    "clearReset": "এটি পুরো ক্যানভাস পরিষ্কার করবে। আপনি কি নিশ্চিত?",
+    "couldNotCreateShareableLink": "শেয়ার করা যায় এমন লিঙ্ক তৈরি করা যায়নি।",
+    "couldNotCreateShareableLinkTooBig": "শেয়ার করা যায় এমন লিঙ্ক তৈরি করা যায়নি: দৃশ্যটি খুব বড়",
     "couldNotLoadInvalidFile": "অবৈধ ফাইল লোড করা যায়নি",
     "importBackendFailed": "ব্যাকেন্ড থেকে আপলোড ব্যর্থ হয়েছে।",
-    "cannotExportEmptyCanvas": "খালি ক্যানভাস নিবদ্ধ করা যাবে না।",
+    "cannotExportEmptyCanvas": "খালি ক্যানভাস এক্সপোর্ট করা যাবে না।",
     "couldNotCopyToClipboard": "ক্লিপবোর্ডে কপি করা যায়নি।",
     "decryptFailed": "তথ্য ডিক্রিপ্ট করা যায়নি।",
     "uploadedSecurly": "আপলোডটি এন্ড-টু-এন্ড এনক্রিপশনের মাধ্যমে সুরক্ষিত করা হয়েছে, যার অর্থ হল এক্সক্যালিড্র সার্ভার এবং তৃতীয় পক্ষের দ্বারা পড়তে পারা সম্ভব নয়।",
@@ -200,44 +242,45 @@
     "confirmAddLibrary": "এটি আপনার সংগ্রহে {{numShapes}} আকার(গুলি) যোগ করবে। আপনি কি নিশ্চিত?",
     "imageDoesNotContainScene": "এই ছবিতে কোনো দৃশ্যের তথ্য আছে বলে মনে হয় না৷ আপনি কি নিবদ্ধ করার সময় দৃশ্য এমবেডিং করতে সক্ষম?",
     "cannotRestoreFromImage": "এই ফাইল থেকে দৃশ্য পুনরুদ্ধার করা যায়নি",
-    "invalidSceneUrl": "সরবরাহ করা লিঙ্ক থেকে দৃশ্য লোড করা যায়নি৷ এটি হয় বিকৃত, অথবা বৈধ এক্সক্যালিড্র জেসন তথ্য নেই৷",
+    "invalidSceneUrl": "সরবরাহ করা লিঙ্ক থেকে দৃশ্য লোড করা যায়নি৷ এটি হয় বিকৃত, অথবা বৈধ Excalidraw জেসন তথ্য নেই৷",
     "resetLibrary": "এটি আপনার সংগ্রহ পরিষ্কার করবে। আপনি কি নিশ্চিত?",
     "removeItemsFromsLibrary": "সংগ্রহ থেকে {{count}} বস্তু বিয়োগ করা হবে। আপনি কি নিশ্চিত?",
     "invalidEncryptionKey": "অবৈধ এনক্রীপশন কী।",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "আপনি অফলাইনে আছেন। অন্যরা আপনার পরিবর্তনগুলি দেখতে পাবেন না।",
+    "localStorageQuotaExceeded": "স্থানীয় স্টোরেজের সীমা অতিক্রম করেছে। আপনার ব্রাউজারের ক্যাশে পরিষ্কার করার চেষ্টা করুন।"
   },
   "errors": {
     "unsupportedFileType": "অসমর্থিত ফাইল।",
     "imageInsertError": "ছবি সন্নিবেশ করা যায়নি। পরে আবার চেষ্টা করুন...",
     "fileTooBig": "ফাইলটি খুব বড়। সর্বাধিক অনুমোদিত আকার হল {{maxSize}}৷",
-    "svgImageInsertError": "এসভীজী ছবি সন্নিবেশ করা যায়নি। এসভীজী মার্কআপটি অবৈধ মনে হচ্ছে৷",
-    "failedToFetchImage": "",
-    "invalidSVGString": "এসভীজী মার্কআপটি অবৈধ মনে হচ্ছে৷",
+    "svgImageInsertError": "SVG ছবি সন্নিবেশ করা যায়নি। SVG মার্কআপটি অবৈধ মনে হচ্ছে৷",
+    "failedToFetchImage": "ছবি আনতে ব্যর্থ হয়েছে। আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন এবং আবার চেষ্টা করুন।",
     "cannotResolveCollabServer": "কোল্যাব সার্ভারের সাথে সংযোগ করা যায়নি। পৃষ্ঠাটি পুনরায় লোড করে আবার চেষ্টা করুন।",
     "importLibraryError": "সংগ্রহ লোড করা যায়নি",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": "",
-    "imageToolNotSupported": "",
+    "collabSaveFailed": "সহযোগিতার ডেটা সংরক্ষণ করতে ব্যর্থ। আবার চেষ্টা করুন।",
+    "collabSaveFailed_sizeExceeded": "সহযোগিতার ডেটা সংরক্ষণ করতে ব্যর্থ। দৃশ্যটি খুব বড়।",
+    "imageToolNotSupported": "এই ব্রাউজারে ছবি টুল সমর্থিত নয়।",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "Brave ব্রাউজারে টেক্সট পরিমাপে সমস্যা রয়েছে।",
+      "line2": "এই সমস্যাটি ঠিক করতে, Brave Shield নিষ্ক্রিয় করুন",
+      "line3": "অথবা অন্য ব্রাউজার ব্যবহার করুন।",
+      "line4": "আরও তথ্যের জন্য GitHub-এ আমাদের ইস্যু দেখুন।"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "iframe": "",
-      "image": ""
+      "embeddable": "এমবেডযোগ্য উপাদান লাইব্রেরিতে যোগ করা যাবে না।",
+      "iframe": "আইফ্রেম উপাদান লাইব্রেরিতে যোগ করা যাবে না।",
+      "image": "ছবি লাইব্রেরিতে যোগ করার সুবিধা শীঘ্রই আসছে!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "সিস্টেম ক্লিপবোর্ড থেকে পড়তে পারিনি, পেস্ট করা যায়নি।",
+    "asyncPasteFailedOnParse": "পেস্ট করা যায়নি।",
+    "copyToSystemClipboardFailed": "ক্লিপবোর্ডে কপি করা যায়নি।",
+    "saveLibraryError": "লাইব্রেরি সংরক্ষণ করতে ব্যর্থ"
   },
   "toolBar": {
     "selection": "বাছাই",
     "image": "চিত্র সন্নিবেশ",
     "rectangle": "আয়তক্ষেত্র",
-    "diamond": "রুহিতন",
+    "diamond": "ডায়মন্ড",
     "ellipse": "উপবৃত্ত",
     "arrow": "তীর",
     "line": "রেখা",
@@ -245,17 +288,18 @@
     "text": "লেখা",
     "library": "সংগ্রহ",
     "lock": "আঁকার পরে নির্বাচিত টুল সক্রিয় রাখুন",
-    "penMode": "",
+    "penMode": "পেন মোড",
     "link": "একটি নির্বাচিত আকৃতির জন্য লিঙ্ক যোগ বা আপডেট করুন",
     "eraser": "ঝাড়ন",
-    "frame": "",
-    "magicframe": "",
-    "embeddable": "",
-    "laser": "",
-    "hand": "",
-    "extraTools": "",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "frame": "ফ্রেম",
+    "magicframe": "ম্যাজিক ফ্রেম",
+    "embeddable": "এমবেডযোগ্য",
+    "laser": "লেজার পয়েন্টার",
+    "hand": "হাত (প্যান)",
+    "extraTools": "অতিরিক্ত টুলস",
+    "mermaidToExcalidraw": "মারমেইড থেকে Excalidraw",
+    "lasso": "ল্যাসো নির্বাচন",
+    "convertElementType": "উপাদানের ধরন পরিবর্তন করুন"
   },
   "headings": {
     "canvasActions": "ক্যানভাস কার্যকলাপ",
@@ -263,11 +307,11 @@
     "shapes": "আকার(গুলি)"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "ক্যানভাস সরানোর জন্য হুইল বা স্পেসবার ধরে রাখুন",
     "linearElement": "একাধিক বিন্দু শুরু করতে ক্লিক করুন, একক লাইনের জন্য টেনে আনুন",
     "freeDraw": "ক্লিক করুন এবং টেনে আনুন, আপনার কাজ শেষ হলে ছেড়ে দিন",
     "text": "বিশেষ্য: আপনি নির্বাচন টুলের সাথে যে কোনো জায়গায় ডাবল-ক্লিক করে পাঠ্য যোগ করতে পারেন",
-    "embeddable": "",
+    "embeddable": "ওয়েবসাইট এমবেড করতে URL যোগ করুন",
     "text_selected": "লেখা সম্পাদনা করতে ডাবল-ক্লিক করুন বা এন্টার টিপুন",
     "text_editing": "লেখা সম্পাদনা শেষ করতে এসকেপ বা কন্ট্রোল/কম্যান্ড যোগে এন্টার টিপুন",
     "linearElementMulti": "শেষ বিন্দুতে ক্লিক করুন অথবা শেষ করতে এসকেপ বা এন্টার টিপুন",
@@ -275,16 +319,21 @@
     "resize": "আপনি আকার পরিবর্তন করার সময় শিফ্ট ধরে রেখে অনুপাতকে সীমাবদ্ধ করতে পারেন,\nকেন্দ্র থেকে আকার পরিবর্তন করতে অল্ট ধরে রাখুন",
     "resizeImage": "আপনি শিফ্ট ধরে রেখে অবাধে আকার পরিবর্তন করতে পারেন, কেন্দ্র থেকে আকার পরিবর্তন করতে অল্ট ধরুন",
     "rotate": "আপনি ঘোরানোর সময় শিফ্ট ধরে রেখে কোণগুলিকে সীমাবদ্ধ করতে পারেন",
-    "lineEditor_info": "",
+    "lineEditor_info": "পয়েন্ট সম্পাদনা করতে কন্ট্রোল/কম্যান্ড ধরে ডাবল-ক্লিক করুন বা কন্ট্রোল/কম্যান্ড + এন্টার চাপুন",
     "lineEditor_pointSelected": "বিন্দু(গুলি) মুছতে ডিলিট টিপুন, কন্ট্রোল/কম্যান্ড যোগে ডি টিপুন নকল করতে অথবা সরানোর জন্য টানুন",
     "lineEditor_nothingSelected": "সম্পাদনা করার জন্য একটি বিন্দু নির্বাচন করুন (একাধিক নির্বাচন করতে শিফ্ট ধরে রাখুন),\nঅথবা অল্ট ধরে রাখুন এবং নতুন বিন্দু যোগ করতে ক্লিক করুন",
-    "placeImage": "ছবিটি স্থাপন করতে ক্লিক করুন, অথবা নিজে আকার সেট করতে ক্লিক করুন এবং টেনে আনুন",
     "publishLibrary": "আপনার নিজস্ব সংগ্রহ প্রকাশ করুন",
     "bindTextToElement": "লেখা যোগ করতে এন্টার টিপুন",
-    "deepBoxSelect": "",
+    "deepBoxSelect": "গভীর নির্বাচনের জন্য কন্ট্রোল/কম্যান্ড ধরে রাখুন, এবং টেনে আনা প্রতিরোধ করুন",
     "eraserRevert": "মুছে ফেলার জন্য চিহ্নিত উপাদানগুলিকে ফিরিয়ে আনতে অল্ট ধরে রাখুন",
-    "firefox_clipboard_write": "",
-    "disableSnapping": ""
+    "firefox_clipboard_write": "এই বৈশিষ্ট্যটি সম্ভবত \"dom.events.asyncClipboard.clipboardItem\" ফ্ল্যাগ \"true\" এ সেট করে সক্ষম করা যেতে পারে। Firefox এ ব্রাউজার ফ্ল্যাগ পরিবর্তন করতে \"about:config\" পৃষ্ঠায় যান।",
+    "disableSnapping": "স্ন্যাপিং নিষ্ক্রিয় করতে কন্ট্রোল/কম্যান্ড ধরে রাখুন",
+    "dismissSearch": "অনুসন্ধান বাতিল করতে এস্কেপ চাপুন",
+    "arrowTool": "তীর টুল",
+    "lineEditor_line_info": "পয়েন্ট সম্পাদনা করতে ডাবল-ক্লিক করুন বা এন্টার চাপুন",
+    "createFlowchart": "একটি সাধারণ উপাদান থেকে ফ্লোচার্ট তৈরি করুন",
+    "enterCropEditor": "ছবি ক্রপ করতে ছবিটি ডাবল ক্লিক করুন বা এন্টার চাপুন",
+    "leaveCropEditor": "ক্রপিং শেষ করতে ছবির বাইরে ক্লিক করুন বা এন্টার বা এস্কেপ চাপুন"
   },
   "canvasError": {
     "cannotShowPreview": "প্রিভিউ দেখাতে অপারগ",
@@ -307,219 +356,297 @@
     "desc_inProgressIntro": "লাইভ-সহযোগীতার সেশন এখন চলছে।",
     "desc_shareLink": "আপনি যার সাথে সহযোগিতা করতে চান তাদের সাথে এই লিঙ্কটি ভাগ করুন: ",
     "desc_exitSession": "অধিবেশন বন্ধ করা আপনাকে রুম থেকে সংযোগ বিচ্ছিন্ন করবে, কিন্তু আপনি স্থানীয়ভাবে দৃশ্যের সাথে কাজ চালিয়ে যেতে সক্ষম হবেন। মনে রাখবেন যে এটি অন্য লোকেদের প্রভাবিত করবে না এবং তারা এখনও তাদের সংস্করণে সহযোগিতা করতে সক্ষম হবে।",
-    "shareTitle": "এক্সক্যালিড্র লাইভ সহযোগিতা সেশনে যোগ দিন"
+    "shareTitle": "Excalidraw লাইভ সহযোগিতা সেশনে যোগ দিন"
   },
   "errorDialog": {
     "title": "ত্রুটি"
   },
   "exportDialog": {
-    "disk_title": "",
-    "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": "",
-    "excalidrawplus_description": "",
-    "excalidrawplus_button": "নিবদ্ধ",
-    "excalidrawplus_exportError": ""
+    "disk_title": "ফাইলে সংরক্ষণ",
+    "disk_details": "আপনার ডিভাইসে PNG, SVG বা Excalidraw ফাইল হিসাবে সংরক্ষণ করুন।",
+    "disk_button": "ফাইলে সংরক্ষণ করুন",
+    "link_title": "শেয়ারযোগ্য লিংক",
+    "link_details": "শুধুমাত্র পড়ার যোগ্য লিংক হিসাবে এক্সপোর্ট করুন।",
+    "link_button": "লিংকে এক্সপোর্ট করুন",
+    "excalidrawplus_description": "আপনার Excalidraw+ ওয়ার্কস্পেসে দৃশ্য সংরক্ষণ করুন।",
+    "excalidrawplus_button": "এক্সপোর্ট",
+    "excalidrawplus_exportError": "এই মুহূর্তে Excalidraw+ এ এক্সপোর্ট করা যায়নি..."
   },
   "helpDialog": {
-    "blog": "",
+    "blog": "আমাদের ব্লগ পড়ুন",
     "click": "ক্লিক",
-    "deepSelect": "",
-    "deepBoxSelect": "",
-    "curvedArrow": "",
-    "curvedLine": "",
-    "documentation": "",
-    "doubleClick": "",
-    "drag": "",
-    "editor": "",
-    "editLineArrowPoints": "",
-    "editText": "",
-    "github": "",
-    "howto": "",
+    "deepSelect": "গভীর নির্বাচন",
+    "deepBoxSelect": "বক্সের মধ্যে গভীর নির্বাচন, এবং টেনে আনা প্রতিরোধ করুন",
+    "curvedArrow": "বাঁকা তীর",
+    "curvedLine": "বাঁকা রেখা",
+    "documentation": "ডকুমেন্টেশন",
+    "doubleClick": "ডাবল-ক্লিক",
+    "drag": "টানুন",
+    "editor": "এডিটর",
+    "editLineArrowPoints": "লাইন/তীরের পয়েন্ট সম্পাদনা করুন",
+    "editText": "টেক্সট সম্পাদনা করুন / লেবেল যোগ করুন",
+    "github": "কোনো সমস্যা পেয়েছেন? জমা দিন",
+    "howto": "আমাদের গাইড অনুসরণ করুন",
     "or": "অথবা",
-    "preventBinding": "",
-    "tools": "",
-    "shortcuts": "",
-    "textFinish": "",
-    "textNewLine": "",
-    "title": "",
-    "view": "",
-    "zoomToFit": "",
-    "zoomToSelection": "",
-    "toggleElementLock": "",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "preventBinding": "তীর বাইন্ডিং প্রতিরোধ করুন",
+    "tools": "টুলস",
+    "shortcuts": "কিবোর্ড শর্টকাট",
+    "textFinish": "সম্পাদনা শেষ করুন (টেক্সট এডিটর)",
+    "textNewLine": "নতুন লাইন যোগ করুন (টেক্সট এডিটর)",
+    "title": "সাহায্য",
+    "view": "দেখুন",
+    "zoomToFit": "সমস্ত উপাদান ফিট করার জন্য জুম করুন",
+    "zoomToSelection": "নির্বাচনে জুম করুন",
+    "toggleElementLock": "নির্বাচন লক/আনলক করুন",
+    "movePageUpDown": "পৃষ্ঠা উপর/নিচে সরান",
+    "movePageLeftRight": "পৃষ্ঠা বাম/ডানে সরান",
+    "createFlowchart": "ফ্লোচার্ট তৈরি করুন",
+    "navigateFlowchart": "ফ্লোচার্ট নেভিগেট করুন",
+    "cropStart": "ছবি ক্রপ করা শুরু করুন",
+    "cropFinish": "ছবি ক্রপ করা শেষ করুন"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "ক্যানভাস পরিষ্কার করুন"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "লাইব্রেরি প্রকাশ করুন",
+    "itemName": "আইটেমের নাম",
+    "authorName": "লেখকের নাম",
+    "githubUsername": "গিটহাব ইউজারনেম",
+    "twitterUsername": "টুইটার ইউজারনেম",
+    "libraryName": "লাইব্রেরির নাম",
+    "libraryDesc": "লাইব্রেরির বিবরণ",
+    "website": "ওয়েবসাইট",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "authorName": "আপনার নাম বা ইউজারনেম",
+      "libraryName": "আপনার লাইব্রেরির নাম",
+      "libraryDesc": "লাইব্রেরির বিবরণ যা মানুষজনকে এর ব্যবহার বুঝতে সাহায্য করবে",
+      "githubHandle": "গিটহাব হ্যান্ডেল (ঐচ্ছিক), যাতে আপনি পর্যালোচনার জন্য জমা দেওয়ার পর লাইব্রেরি সম্পাদনা করতে পারেন",
+      "twitterHandle": "টুইটার ইউজারনেম (ঐচ্ছিক), যাতে টুইটারে প্রচারের সময় আমরা জানি কাকে কৃতিত্ব দিতে হবে",
+      "website": "আপনার ব্যক্তিগত ওয়েবসাইট বা অন্যত্রের লিংক (ঐচ্ছিক)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "আবশ্যক",
+      "website": "একটি বৈধ URL লিখুন"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
-    "noteLicense": "",
-    "noteItems": "",
-    "atleastOneLibItem": "",
-    "republishWarning": ""
+    "noteDescription": "অন্যরা তাদের অঙ্কনে ব্যবহার করার জন্য <link>পাবলিক লাইব্রেরি রিপোজিটরিতে</link> অন্তর্ভুক্ত করার জন্য আপনার লাইব্রেরি জমা দিন।",
+    "noteGuidelines": "লাইব্রেরিটি প্রথমে ম্যানুয়ালি অনুমোদিত হতে হবে। জমা দেওয়ার আগে অনুগ্রহ করে <link>নির্দেশিকা</link> পড়ুন। যোগাযোগ এবং প্রয়োজনে পরিবর্তন করার জন্য আপনার একটি গিটহাব অ্যাকাউন্ট লাগবে, তবে এটি কঠোরভাবে প্রয়োজনীয় নয়।",
+    "noteLicense": "জমা দেওয়ার মাধ্যমে, আপনি সম্মত হন যে লাইব্রেরিটি <link>MIT লাইসেন্সের</link> অধীনে প্রকাশিত হবে, যার সংক্ষিপ্ত অর্থ হল যে কেউ সীমাবদ্ধতা ছাড়াই এগুলি ব্যবহার করতে পারবে।",
+    "noteItems": "প্রতিটি লাইব্রেরি আইটেমের নিজস্ব নাম থাকতে হবে যাতে এটি ফিল্টার করা যায়। নিম্নলিখিত লাইব্রেরি আইটেমগুলি অন্তর্ভুক্ত করা হবে:",
+    "atleastOneLibItem": "শুরু করার জন্য অনুগ্রহ করে কমপক্ষে একটি লাইব্রেরি আইটেম নির্বাচন করুন",
+    "republishWarning": "নোট: নির্বাচিত কিছু আইটেম ইতিমধ্যে প্রকাশিত/জমা দেওয়া হিসাবে চিহ্নিত। আপনার শুধুমাত্র একটি বিদ্যমান লাইব্রেরি বা জমা আপডেট করার সময় আইটেমগুলি পুনরায় জমা দেওয়া উচিত।"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": ""
+    "title": "লাইব্রেরি সফলভাবে প্রকাশিত হয়েছে",
+    "content": "আপনার লাইব্রেরি সফলভাবে প্রকাশিত হয়েছে। অন্যরা এখন এটি ব্যবহার করতে পারবেন।"
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "লাইব্রেরি রিসেট করুন",
+    "removeItemsFromLib": "লাইব্রেরি থেকে আইটেম সরান"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "এক্সপোর্ট করুন",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "ব্যাকগ্রাউন্ড সহ",
+      "onlySelected": "শুধুমাত্র নির্বাচিত",
+      "darkMode": "ডার্ক মোড",
+      "embedScene": "দৃশ্য এমবেড করুন",
+      "scale": "স্কেল",
+      "padding": "প্যাডিং"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "দৃশ্যের ডেটা এক্সপোর্ট করা PNG/SVG ফাইলে সংরক্ষিত হবে যাতে দৃশ্যটি তা থেকে পুনরুদ্ধার করা যায়।\nএক্সপোর্ট করা ফাইলের আকার বৃদ্ধি করবে।"
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG তে এক্সপোর্ট করুন",
+      "exportToSvg": "SVG তে এক্সপোর্ট করুন",
+      "copyPngToClipboard": "ক্লিপবোর্ডে PNG কপি করুন"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "PNG কপি করুন"
     }
   },
   "encrypted": {
-    "tooltip": "",
-    "link": ""
+    "tooltip": "আপনার অঙ্কনগুলি এন্ড-টু-এন্ড এনক্রিপ্ট করা হয়েছে, Excalidraw সার্ভারগুলি সেগুলি দেখতে পাবে না।",
+    "link": "Excalidraw এ এন্ড-টু-এন্ড এনক্রিপশন সম্পর্কে ব্লগ পোস্ট"
   },
   "stats": {
     "angle": "কোণ",
-    "element": "",
-    "elements": "",
-    "height": "",
-    "scene": "",
-    "selected": "",
-    "storage": "",
-    "title": "",
-    "total": "",
-    "version": "",
-    "versionCopy": "",
-    "versionNotAvailable": "",
-    "width": "প্রস্থ"
+    "height": "উচ্চতা",
+    "scene": "দৃশ্য",
+    "selected": "নির্বাচিত",
+    "storage": "স্টোরেজ",
+    "title": "পরিসংখ্যান",
+    "total": "মোট",
+    "version": "ভার্সন",
+    "versionCopy": "ভার্সন কপি করতে ক্লিক করুন",
+    "versionNotAvailable": "ভার্সন পাওয়া যায় নি",
+    "width": "প্রস্থ",
+    "shapes": "আকার",
+    "fullTitle": "Excalidraw পরিসংখ্যান",
+    "generalStats": "সাধারণ পরিসংখ্যান",
+    "elementProperties": "উপাদানের বৈশিষ্ট্য"
   },
   "toast": {
     "addedToLibrary": "সংগ্রহশালায় যুক্ত হয়েছে",
-    "copyStyles": "",
+    "copyStyles": "স্টাইল কপি করুন",
     "copyToClipboard": "ক্লিপবোর্ডে কপি করা হয়েছে।",
-    "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
-    "canvas": "",
+    "copyToClipboardAsPng": "{{exportSelection}} কে PNG হিসেবে ক্লিপবোর্ডে কপি করা হয়েছে\n({{exportColorScheme}})",
+    "fileSaved": "ফাইল সেভ হয়েছে।",
+    "fileSavedToFilename": "{filename} এ সেভ করা হয়েছে",
+    "canvas": "ক্যানভাস",
     "selection": "বাছাই",
-    "pasteAsSingleElement": "",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "pasteAsSingleElement": "একটি একক উপাদান হিসেবে পেস্ট করতে {{shortcut}} ব্যবহার করুন,\nঅথবা বিদ্যমান টেক্সট এডিটরে পেস্ট করুন",
+    "unableToEmbed": "এই url এম্বেড করা বর্তমানে অনুমোদিত নয়। url হোয়াইটলিস্ট করার জন্য GitHub এ একটি ইস্যু তৈরি করুন",
+    "unrecognizedLinkFormat": "আপনি যে লিঙ্কটি এম্বেড করেছেন তা প্রত্যাশিত ফরম্যাটের সাথে মেলে না। সোর্স সাইট দ্বারা প্রদত্ত 'embed' স্ট্রিং পেস্ট করার চেষ্টা করুন",
+    "copyToClipboardAsSvg": "{{exportSelection}} কে SVG হিসেবে ক্লিপবোর্ডে কপি করা হয়েছে\n({{exportColorScheme}})",
+    "elementLinkCopied": "লিঙ্ক ক্লিপবোর্ডে কপি করা হয়েছে"
   },
   "colors": {
-    "transparent": "",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "transparent": "স্বচ্ছ",
+    "black": "কালো",
+    "white": "সাদা",
+    "red": "লাল",
+    "pink": "গোলাপি",
+    "grape": "আঙুর রং",
+    "violet": "বেগুনি",
+    "gray": "ধূসর",
+    "blue": "নীল",
+    "cyan": "আকাশি নীল",
+    "teal": "সবুজাভ নীল",
+    "green": "সবুজ",
+    "yellow": "হলুদ",
+    "orange": "কমলা",
+    "bronze": "ব্রোঞ্জ"
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "আপনার সমস্ত ডেটা স্থানীয়ভাবে আপনার ব্রাউজারে সংরক্ষিত।",
+      "center_heading_plus": "আপনি কি Excalidraw+ এ যেতে চেয়েছিলেন?",
+      "menuHint": "এক্সপোর্ট, পছন্দসমূহ, ভাষা..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "এক্সপোর্ট, পছন্দসমূহ এবং আরও...",
+      "center_heading": "ডায়াগ্রাম। সহজ। সরল।",
+      "toolbarHint": "একটি টুল বেছে নিন এবং অঙ্কন শুরু করুন!",
+      "helpHint": "শর্টকাট এবং সাহায্য"
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "সবচেয়ে বেশি ব্যবহৃত কাস্টম রং",
+    "colors": "রং",
+    "shades": "শেড",
+    "hexCode": "হেক্স কোড",
+    "noShades": "এই রঙের জন্য কোনো শেড নেই",
+    "color": "রং"
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "ছবি হিসেবে এক্সপোর্ট করুন",
+        "button": "ছবি হিসেবে এক্সপোর্ট করুন",
+        "description": "দৃশ্যের ডেটা একটি ছবি হিসাবে এক্সপোর্ট করুন যা থেকে আপনি পরে ইমপোর্ট করতে পারবেন।"
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "ডিস্কে সংরক্ষণ করুন",
+        "button": "ডিস্কে সংরক্ষণ করুন",
+        "description": "দৃশ্যের ডেটা একটি ফাইলে এক্সপোর্ট করুন যা থেকে আপনি পরে ইমপোর্ট করতে পারবেন।"
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Excalidraw+ এ এক্সপোর্ট করুন",
+        "description": "আপনার Excalidraw+ ওয়ার্কস্পেসে দৃশ্য সংরক্ষণ করুন।"
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "ফাইল থেকে লোড করুন",
+        "button": "ফাইল থেকে লোড করুন",
+        "description": "ফাইল থেকে লোড করা আপনার <bold>বিদ্যমান বিষয়বস্তু প্রতিস্থাপন করবে</bold>।<br></br>নিচের যেকোনো বিকল্প ব্যবহার করে আপনি প্রথমে আপনার অঙ্কনের ব্যাকআপ নিতে পারেন।"
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "লিঙ্ক থেকে লোড করুন",
+        "button": "আমার বিষয়বস্তু প্রতিস্থাপন করুন",
+        "description": "বাহ্যিক অঙ্কন লোড করা আপনার <bold>বিদ্যমান বিষয়বস্তু প্রতিস্থাপন করবে</bold>।<br></br>নিচের যেকোনো বিকল্প ব্যবহার করে আপনি প্রথমে আপনার অঙ্কনের ব্যাকআপ নিতে পারেন।"
       }
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "মারমেইড থেকে Excalidraw",
+    "button": "রূপান্তর করুন",
+    "description": "মারমেইড সিনট্যাক্স Excalidraw এলিমেন্টে রূপান্তর করুন",
+    "syntax": "সিনট্যাক্স",
+    "preview": "প্রিভিউ"
+  },
+  "elementLink": {
+    "title": "এলিমেন্ট লিঙ্ক",
+    "desc": "এই এলিমেন্টে একটি লিঙ্ক যোগ করুন",
+    "notFound": "এলিমেন্ট পাওয়া যায়নি"
+  },
+  "search": {
+    "title": "অনুসন্ধান",
+    "noMatch": "কোনো ম্যাচ পাওয়া যায়নি",
+    "singleResult": "১টি ফলাফল পাওয়া গেছে",
+    "multipleResults": "{{count}}টি ফলাফল পাওয়া গেছে",
+    "placeholder": "অনুসন্ধান করুন...",
+    "frames": "ফ্রেম",
+    "texts": "টেক্সট"
+  },
+  "element": {
+    "rectangle": "আয়তক্ষেত্র",
+    "diamond": "ডায়মন্ড",
+    "ellipse": "উপবৃত্ত",
+    "arrow": "তীর",
+    "line": "রেখা",
+    "freedraw": "মুক্ত অঙ্কন",
+    "text": "টেক্সট",
+    "image": "ছবি",
+    "group": "গ্রুপ",
+    "frame": "ফ্রেম",
+    "magicframe": "ম্যাজিক ফ্রেম",
+    "embeddable": "এমবেডযোগ্য",
+    "selection": "নির্বাচন",
+    "iframe": "আইফ্রেম"
+  },
+  "shareDialog": {
+    "or": "অথবা"
+  },
+  "quickSearch": {
+    "placeholder": "দ্রুত অনুসন্ধান..."
+  },
+  "fontList": {
+    "badge": {
+      "old": "পুরাতন"
+    },
+    "sceneFonts": "দৃশ্যের ফন্ট",
+    "availableFonts": "উপলব্ধ ফন্ট",
+    "empty": "কোনো ফন্ট পাওয়া যায়নি"
+  },
+  "userList": {
+    "empty": "এখনো কোনো ব্যবহারকারী নেই",
+    "hint": {
+      "text": "ব্যবহারকারীর তথ্য দেখতে হোভার করুন",
+      "followStatus": "অনুসরণের অবস্থা",
+      "inCall": "কলে আছেন",
+      "micMuted": "মাইক বন্ধ",
+      "isSpeaking": "কথা বলছেন"
+    }
+  },
+  "commandPalette": {
+    "title": "কমান্ড প্যালেট",
+    "shortcuts": {
+      "select": "নির্বাচন করুন",
+      "confirm": "নিশ্চিত করুন",
+      "close": "বন্ধ করুন"
+    },
+    "recents": "সাম্প্রতিক",
+    "search": {
+      "placeholder": "কমান্ড অনুসন্ধান করুন...",
+      "noMatch": "কোনো ম্যাচ পাওয়া যায়নি"
+    },
+    "itemNotAvailable": "আইটেমটি বর্তমানে পাওয়া যায় নি",
+    "shortcutHint": "শর্টকাট দেখতে {{shortcut}} টিপুন"
   }
 }
