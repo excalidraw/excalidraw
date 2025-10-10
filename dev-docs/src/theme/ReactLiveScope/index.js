@@ -34,6 +34,27 @@ const ExcalidrawScope = {
   useI18n: ExcalidrawComp.useI18n,
   convertToExcalidrawElements: ExcalidrawComp.convertToExcalidrawElements,
   CaptureUpdateAction: ExcalidrawComp.CaptureUpdateAction,
+  // expose docusaurus color mode hook and a small ThemeButton for examples
+  useColorMode,
+  ThemeButton: function ThemeButton() {
+    const { colorMode, setColorMode } = useColorMode();
+    // simple button to toggle between light and dark
+    return (
+      <button
+        onClick={() => setColorMode(colorMode === "dark" ? "light" : "dark")}
+        style={{
+          padding: "6px 10px",
+          borderRadius: 6,
+          border: "1px solid var(--ifm-pre-border-color)",
+          background: "var(--ifm-pre-background)",
+          color: "var(--ifm-color)",
+          cursor: "pointer",
+        }}
+      >
+        {colorMode === "dark" ? "Switch to light" : "Switch to dark"}
+      </button>
+    );
+  },
 };
 
 export default ExcalidrawScope;
