@@ -50,7 +50,7 @@ function getDialogSize(size: DialogSize): number {
 export const Dialog = (props: DialogProps) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [lastActiveElement] = useState(document.activeElement);
-  const { id } = useExcalidrawContainer();
+  const { id, container } = useExcalidrawContainer();
   const isFullscreen = useDevice().viewport.isMobile;
 
   useEffect(() => {
@@ -99,7 +99,15 @@ export const Dialog = (props: DialogProps) => {
   const onClose = () => {
     setAppState({ openMenu: null });
     setIsLibraryMenuOpen(false);
-    (lastActiveElement as HTMLElement).focus();
+    
+    // Always focus the main Excalidraw container to ensure keyboard events work
+    if (container) {
+      container.focus();
+    } else {
+      // Fallback to previous behavior if container not found
+      (lastActiveElement as HTMLElement)?.focus();
+    }
+    
     props.onCloseRequest();
   };
 
