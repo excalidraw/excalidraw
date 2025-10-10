@@ -4557,9 +4557,37 @@ class App extends React.Component<AppProps, AppState> {
           selectedGroupIds.length === 1 &&
           elementsAreInSameGroup(selectedElements)
         ) {
-          this.setState({
-            editingGroupId: selectedGroupIds[0],
+          const nextEditingGroupId = selectedGroupIds[0];
+          const selectedElements = getElementsInGroup(
+            this.scene.getNonDeletedElementsMap(),
+            nextEditingGroupId,
+          );
+
+          const nextGroupIds: Record<string, true> = {};
+          const nextSelectedElementIds: Record<string, true> = {};
+          selectedElements.forEach((element) => {
+            const editingGroupIndex =
+              element.groupIds.indexOf(nextEditingGroupId);
+            const groupIds = element.groupIds.slice(0, editingGroupIndex);
+
+            if (groupIds.length > 0) {
+              const lastGroupId = groupIds[groupIds.length - 1];
+              nextGroupIds[lastGroupId] = true;
+              nextSelectedElementIds[element.id] = true;
+            } else if (!isBoundToContainer(element)) {
+              nextSelectedElementIds[element.id] = true;
+            }
           });
+
+          this.setState((prevState) => ({
+            ...prevState,
+            selectedElementIds: makeNextSelectedElementIds(
+              nextSelectedElementIds,
+              prevState,
+            ),
+            selectedGroupIds: nextGroupIds,
+            editingGroupId: nextEditingGroupId,
+          }));
         }
       } else if (
         !event.ctrlKey &&
