@@ -322,6 +322,10 @@ export interface AppState {
     // indicates if the current tool is temporarily switched on from the selection tool
     fromSelection: boolean;
   } & ActiveTool;
+  preferredSelectionTool: {
+    type: "selection" | "lasso";
+    initialized: boolean;
+  };
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
@@ -370,7 +374,6 @@ export interface AppState {
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" }
     | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
-
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -455,7 +458,7 @@ export interface AppState {
   bindMode: BindMode;
 
   /** properties sidebar mode - determines whether to show compact or complete sidebar */
-  stylesPanelMode: "compact" | "full";
+  stylesPanelMode: "compact" | "full" | "mobile";
 }
 
 export type SearchMatch = {
@@ -578,6 +581,10 @@ export interface ExcalidrawProps {
     /** excludes the duplicated elements */
     prevElements: readonly ExcalidrawElement[],
   ) => ExcalidrawElement[] | void;
+  renderTopLeftUI?: (
+    isMobile: boolean,
+    appState: UIAppState,
+  ) => JSX.Element | null;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -745,8 +752,7 @@ export type AppClassProperties = {
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
-
-  defaultSelectionTool: "selection" | "lasso";
+  onPointerDownEmitter: App["onPointerDownEmitter"];
 
   bindModeHandler: App["bindModeHandler"];
 };

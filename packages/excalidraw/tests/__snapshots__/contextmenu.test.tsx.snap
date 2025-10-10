@@ -957,6 +957,10 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -1153,6 +1157,10 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -1367,6 +1375,10 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -1698,6 +1710,10 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -2029,6 +2045,10 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -2243,6 +2263,10 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -2484,6 +2508,10 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -2782,6 +2810,10 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id3": true,
   },
@@ -3154,6 +3186,10 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -3647,6 +3683,10 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -3970,6 +4010,10 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -4293,6 +4337,10 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id3": true,
   },
@@ -5578,6 +5626,10 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -6795,6 +6847,10 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -7733,6 +7789,10 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -8730,6 +8790,10 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -9724,6 +9788,10 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
