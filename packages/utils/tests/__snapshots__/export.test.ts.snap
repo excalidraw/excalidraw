@@ -80,6 +80,10 @@ exports[`exportToSvg > with default arguments 1`] = `
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": false,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
