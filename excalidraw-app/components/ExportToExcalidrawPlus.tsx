@@ -18,7 +18,8 @@ import { useI18n } from "@excalidraw/excalidraw/i18n";
 import type {
   FileId,
   NonDeletedExcalidrawElement,
-} from "@excalidraw/element/types";
+  InitializedExcalidrawImageElement,
+} from "@excalidraw/element";
 import type {
   AppState,
   BinaryFileData,
@@ -46,7 +47,7 @@ export const exportToExcalidrawPlus = async (
   );
 
   const blob = new Blob(
-    [encryptedData.iv, new Uint8Array(encryptedData.encryptedBuffer)],
+    [encryptedData.iv.buffer as ArrayBuffer, encryptedData.encryptedBuffer],
     {
       type: MIME_TYPES.binary,
     },
@@ -62,8 +63,11 @@ export const exportToExcalidrawPlus = async (
 
   const filesMap = new Map<FileId, BinaryFileData>();
   for (const element of elements) {
-    if (isInitializedImageElement(element) && files[element.fileId]) {
-      filesMap.set(element.fileId, files[element.fileId]);
+    if (isInitializedImageElement(element)) {
+      const imageElement = element as InitializedExcalidrawImageElement;
+      if (files[imageElement.fileId]) {
+        filesMap.set(imageElement.fileId, files[imageElement.fileId]);
+      }
     }
   }
 
