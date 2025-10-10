@@ -674,6 +674,92 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         roomLinkData: existingRoomLinkData,
       });
       scenePromise.resolve(sceneData);
+
+      // eslint-disable-next-line no-console
+      console.log("✅ first-in-room event triggered");
+      // try app toast first (non-breaking; if toast import isn't present this will throw)
+      try {
+        // try common paths for toast — safe-guarded using require to avoid breaking imports
+        // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const maybeToast =
+          // try workspace-local Toast component (common in this repo)
+          (require("../components/Toast") as any)?.toast ||
+          // try expoited toast from package
+          (require("@excalidraw/excalidraw") as any)?.toast ||
+          // fallback to global (if anything wired to window)
+          (window as any).toast;
+
+        if (maybeToast) {
+          maybeToast({
+            message:
+              "No active peers found for this room. Start a new drawing or invite collaborators.",
+            type: "warning",
+            duration: 5000,
+          });
+        } else {
+          throw new Error("toast-not-found");
+        }
+      } catch (err) {
+        // Last-resort visible DOM overlay (guaranteed to show)
+        try {
+          const id = "collab-no-peers-overlay";
+          if (!document.getElementById(id)) {
+            const overlay = document.createElement("div");
+            overlay.id = id;
+            Object.assign(overlay.style, {
+              position: "fixed",
+              left: "0",
+              top: "0",
+              right: "0",
+              bottom: "0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: "2147483647", // very high z-index to ensure visibility
+              background: "rgba(0,0,0,0.35)",
+              pointerEvents: "auto",
+            } as Partial<CSSStyleDeclaration>);
+
+            const card = document.createElement("div");
+            Object.assign(card.style, {
+              background: "#fff",
+              padding: "20px",
+              borderRadius: "8px",
+              maxWidth: "520px",
+              width: "90%",
+              boxSizing: "border-box",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+              color: "#111",
+              textAlign: "left",
+            } as Partial<CSSStyleDeclaration>);
+
+            card.innerHTML = `
+              <h3 style="margin:0 0 8px 0;font-size:18px;">No active peers found for this room</h3>
+              <p style="margin:0 0 12px 0;color:#333">Start a new drawing or invite collaborators.</p>
+              <div style="display:flex;justify-content:flex-end">
+                <button id="${id}-close" style="padding:8px 12px;border-radius:6px;border:none;background:#0b5fff;color:#fff;cursor:pointer">OK</button>
+              </div>
+            `;
+
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+
+            const btn = document.getElementById(`${id}-close`);
+            if (btn) {
+              btn.addEventListener("click", () => {
+                overlay.remove();
+              });
+            }
+          }
+        } catch (domErr) {
+          // absolute last resort: use alert (always visible)
+          // eslint-disable-next-line no-alert
+          alert(
+            "No active peers found for this room. Start a new drawing or invite collaborators.",
+          );
+        }
+      }
     });
 
     this.portal.socket.on(
