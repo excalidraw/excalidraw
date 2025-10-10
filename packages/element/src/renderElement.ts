@@ -418,11 +418,36 @@ const drawElementOnCanvas = (
     case "rectangle":
     case "iframe":
     case "embeddable":
-    case "diamond":
-    case "ellipse": {
+    case "diamond": {
       context.lineJoin = "round";
       context.lineCap = "round";
       rc.draw(ShapeCache.get(element)!);
+      break;
+    }
+    case "ellipse": {
+      context.lineJoin = "round";
+      context.lineCap = "round";
+
+      const cx = element.width / 2;
+      const cy = element.height / 2;
+      const rx = element.width / 2;
+      const ry = element.height / 2;
+
+      context.save();
+      context.lineWidth = element.strokeWidth;
+      context.strokeStyle = element.strokeColor;
+      const strokeStyle = (element as any).strokeStyle as
+        | "solid"
+        | "dashed"
+        | "dotted"
+        | undefined;
+
+
+      context.beginPath();
+      context.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+      context.stroke();
+
+      context.restore();
       break;
     }
     case "arrow":
