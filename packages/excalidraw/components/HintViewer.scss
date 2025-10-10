@@ -21,9 +21,12 @@ $wide-viewport-width: 1000px;
     font-size: 0.75rem;
 
     @include isMobile {
-      position: static;
-      padding-right: 2rem;
+      display: none;
     }
+    @include isTabletOrMobile {
+    display: none;
+    }
+
 
     > span {
       padding: 0.25rem;
