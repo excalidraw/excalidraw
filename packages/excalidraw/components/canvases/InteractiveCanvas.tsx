@@ -72,6 +72,7 @@ type InteractiveCanvasProps = {
 
 const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   const isComponentMounted = useRef(false);
+  const dpr = window.devicePixelRatio || 1;
 
   useEffect(() => {
     if (!isComponentMounted.current) {
@@ -99,22 +100,14 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           remoteSelectedElementIds.get(id)!.push(socketId);
         }
       }
-      if (!user.pointer || user.pointer.renderCursor === false) {
-        return;
-      }
-      if (user.username) {
-        remotePointerUsernames.set(socketId, user.username);
-      }
-      if (user.userState) {
-        remotePointerUserStates.set(socketId, user.userState);
-      }
+      if (!user.pointer || user.pointer.renderCursor === false) return;
+      if (user.username) remotePointerUsernames.set(socketId, user.username);
+      if (user.userState) remotePointerUserStates.set(socketId, user.userState);
+
       remotePointerViewportCoords.set(
         socketId,
         sceneCoordsToViewportCoords(
-          {
-            sceneX: user.pointer.x,
-            sceneY: user.pointer.y,
-          },
+          { sceneX: user.pointer.x, sceneY: user.pointer.y },
           props.appState,
         ),
       );
@@ -135,7 +128,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         visibleElements: props.visibleElements,
         selectedElements: props.selectedElements,
         allElementsMap: props.allElementsMap,
-        scale: window.devicePixelRatio,
+        scale: dpr * props.scale,
         appState: props.appState,
         renderConfig: {
           remotePointerViewportCoords,
@@ -151,7 +144,17 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       },
       isRenderThrottlingEnabled(),
     );
-  });
+  }, [
+    props.canvas,
+    props.elementsMap,
+    props.visibleElements,
+    props.selectedElements,
+    props.sceneNonce,
+    props.selectionNonce,
+    props.scale,
+    props.appState,
+    props.renderScrollbars,
+  ]);
 
   return (
     <canvas
@@ -163,8 +166,8 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           ? CURSOR_TYPE.GRAB
           : CURSOR_TYPE.AUTO,
       }}
-      width={props.appState.width * props.scale}
-      height={props.appState.height * props.scale}
+      width={props.appState.width * dpr * props.scale}
+      height={props.appState.height * dpr * props.scale}
       ref={props.handleCanvasRef}
       onContextMenu={props.onContextMenu}
       onPointerMove={props.onPointerMove}
@@ -205,7 +208,7 @@ const getRelevantAppStateProps = (
   suggestedBindings: appState.suggestedBindings,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
-  collaborators: appState.collaborators, // Necessary for collab. sessions
+  collaborators: appState.collaborators,
   activeEmbeddable: appState.activeEmbeddable,
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
@@ -220,14 +223,10 @@ const areEqual = (
   prevProps: InteractiveCanvasProps,
   nextProps: InteractiveCanvasProps,
 ) => {
-  // This could be further optimised if needed, as we don't have to render interactive canvas on each scene mutation
   if (
     prevProps.selectionNonce !== nextProps.selectionNonce ||
     prevProps.sceneNonce !== nextProps.sceneNonce ||
     prevProps.scale !== nextProps.scale ||
-    // we need to memoize on elementsMap because they may have renewed
-    // even if sceneNonce didn't change (e.g. we filter elements out based
-    // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||
     prevProps.selectedElements !== nextProps.selectedElements ||
@@ -236,10 +235,7 @@ const areEqual = (
     return false;
   }
 
-  // Comparing the interactive appState for changes in case of some edge cases
   return isShallowEqual(
-    // asserting AppState because we're being passed the whole AppState
-    // but resolve to only the InteractiveCanvas-relevant props
     getRelevantAppStateProps(prevProps.appState as AppState),
     getRelevantAppStateProps(nextProps.appState as AppState),
   );

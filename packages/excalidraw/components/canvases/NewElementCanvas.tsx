@@ -23,14 +23,15 @@ interface NewElementCanvasProps {
 
 const NewElementCanvas = (props: NewElementCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const dpr = window.devicePixelRatio || 1;
+
   useEffect(() => {
-    if (!canvasRef.current) {
-      return;
-    }
+    if (!canvasRef.current) return;
+
     renderNewElementScene(
       {
         canvas: canvasRef.current,
-        scale: props.scale,
+        scale: props.scale * dpr,
         newElement: props.appState.newElement,
         elementsMap: props.elementsMap,
         allElementsMap: props.allElementsMap,
@@ -40,7 +41,14 @@ const NewElementCanvas = (props: NewElementCanvasProps) => {
       },
       isRenderThrottlingEnabled(),
     );
-  });
+  }, [
+    props.appState,
+    props.elementsMap,
+    props.allElementsMap,
+    props.scale,
+    props.rc,
+    props.renderConfig,
+  ]);
 
   return (
     <canvas
@@ -49,8 +57,8 @@ const NewElementCanvas = (props: NewElementCanvasProps) => {
         width: props.appState.width,
         height: props.appState.height,
       }}
-      width={props.appState.width * props.scale}
-      height={props.appState.height * props.scale}
+      width={props.appState.width * props.scale * dpr}
+      height={props.appState.height * props.scale * dpr}
       ref={canvasRef}
     />
   );
