@@ -202,15 +202,40 @@ export const loadFromBlob = async (
   /** FileSystemHandle. Defaults to `blob.handle` if defined, otherwise null. */
   fileHandle?: FileSystemHandle | null,
 ) => {
+  //new new
+ const supportedExtensions = ['.excalidraw', '.excalidraw.json', '.json'];
+const fileName = (blob as any).name || (fileHandle as any)?.name || '';
+const fileExtension = fileName.slice(fileName.lastIndexOf('.'));
+
+if (!supportedExtensions.includes(fileExtension)) {
+  alert('Unsupported file type. Please upload a valid Excalidraw file.');
+  return {
+    elements: [],
+    appState: {
+      errorMessage: "Unsupported file type. Please upload a valid Excalidraw file.",
+    },
+    files: {},
+  };
+}
+//new new
   const ret = await loadSceneOrLibraryFromBlob(
     blob,
     localAppState,
     localElements,
     fileHandle,
   );
+  //new new
   if (ret.type !== MIME_TYPES.excalidraw) {
-    throw new Error("Error: invalid file");
-  }
+  alert("This file doesn't contain a valid Excalidraw scene.");
+  return {
+    elements: [],
+    appState: {
+      errorMessage: "Invalid scene file.",
+    },
+    files: {},
+  };
+}
+//new new
   return ret.data;
 };
 
