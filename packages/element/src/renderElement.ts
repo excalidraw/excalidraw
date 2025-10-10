@@ -108,6 +108,15 @@ const shouldResetImageFilter = (
   );
 };
 
+const shouldResetTextFilter = (
+  element: ExcalidrawElement,
+  appState: StaticCanvasAppState,
+) => {
+  // In dark mode, text elements (including emojis) need the inverse filter
+  // to counteract the CSS-level canvas filter and maintain proper colors
+  return appState.theme === THEME.DARK && isTextElement(element);
+};
+
 const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
     case "freedraw":
@@ -272,8 +281,9 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  // in dark theme, revert the image color filter
-  if (shouldResetImageFilter(element, renderConfig, appState)) {
+  // in dark theme, revert the image/text color filter to counteract CSS-level canvas filter
+  if (shouldResetImageFilter(element, renderConfig, appState) || 
+      shouldResetTextFilter(element, appState)) {
     context.filter = IMAGE_INVERT_FILTER;
   }
 
@@ -862,7 +872,8 @@ export const renderElement = (
         context.save();
         context.translate(cx, cy);
 
-        if (shouldResetImageFilter(element, renderConfig, appState)) {
+        if (shouldResetImageFilter(element, renderConfig, appState) || 
+            shouldResetTextFilter(element, appState)) {
           context.filter = "none";
         }
         const boundTextElement = getBoundTextElement(element, elementsMap);
