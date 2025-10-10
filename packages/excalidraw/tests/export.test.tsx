@@ -218,4 +218,44 @@ describe("export", () => {
     // src/tests/fixtures/svg-image-exporting-reference.svg
     expect(svgText).toMatchSnapshot(`svg export output`);
   });
+
+  it("export svg: bound text inside linked shape inherits link", async () => {
+    const container = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 100,
+      height: 60,
+      id: "rect1",
+    });
+    // @ts-expect-error setting link for test
+    container.link = "https://example.com";
+    const textEl = API.createElement({
+      type: "text",
+      text: "Click me",
+      x: 10,
+      y: 10,
+      containerId: container.id,
+      width: 80,
+      height: 20,
+      id: "text1",
+    });
+    // minimal binding setup
+    // @ts-expect-error test mutation
+    container.boundElements = [{ type: "text", id: textEl.id }];
+
+    const svg = await exportToSvg(
+      [container, textEl],
+      { ...getDefaultAppState(), exportBackground: false },
+      {},
+    );
+    const svgText = svg.outerHTML;
+    // container anchor
+    expect(svgText).toMatch(/<a[^>]+href="https:\/\/example.com"/);
+    // bound text anchor (inherited)
+    // Should render exactly twice (shape + text)
+    const anchorMatches =
+      svgText.match(/<a[^>]+href="https:\/\/example.com"/g) || [];
+    expect(anchorMatches.length).toBe(2);
+  });
 });
