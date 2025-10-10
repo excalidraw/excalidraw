@@ -3,6 +3,24 @@ import type {
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
+// =========================================================================
+// STROKE WIDTH CONSTANTS (Conceptual File: packages/excalidraw/element/types.ts)
+// =========================================================================
+
+export const STROKE_WIDTH = {
+  // NEW: Extra Thin stroke width (0.5) to solve Issue #9842 (Pen size is too big)
+  extraThin: 0.5, 
+  thin: 1, 
+  bold: 2,
+  extraBold: 3,
+} as const;
+
+export type StrokeWidth = typeof STROKE_WIDTH[keyof typeof STROKE_WIDTH];
+
+// =========================================================================
+// END STROKE WIDTH CONSTANTS
+// =========================================================================
+
 import type { CaptureUpdateActionType } from "@excalidraw/element";
 
 import type {
@@ -213,6 +231,6 @@ export interface Action {
         ) => boolean;
       };
   /** if set to `true`, allow action to be performed in viewMode.
-   *  Defaults to `false` */
+   * Defaults to `false` */
   viewMode?: boolean;
 }

@@ -2,9 +2,10 @@
 
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
-
+import React from "react";
 import { KEYS, getShortcutKey } from "@excalidraw/common";
-import { invertHexColor } from "../../../common/src/colors"; // ⬅️ NEW: Import utility
+import { invertHexColor } from "@excalidraw/common/colors";
+
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
