@@ -1,0 +1,62 @@
+# LiveCollaborationTrigger
+
+If you implement live collaboration support and want to expose the same UI button as on [excalidraw.com](https://excalidraw.com), you can render the `<LiveCollaborationTrigger/>` component using the [renderTopRightUI](/docs/@excalidraw/excalidraw/api/props#rendertoprightui) prop.
+
+You'll need to supply `onSelect()` to handle opening of your collaboration dialog, but the button will display `appState.collaborators` count provided you have supplied it.
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `onSelect` | `function` | Yes |  | Handler called when the user clicks on the button |
+| `isCollaborating` | `boolean` | Yes | false | Whether live collaboration session is in effect. Modifies button style. |
+
+```tsx live
+function App() {
+  const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+  const [isCollaborating, setIsCollaborating] = useState(false);
+  return (
+    <div style={{ height: "500px" }}>
+      <p style={{ fontSize: "16px" }}>
+        Selecting the checkbox to see the collaborator count
+      </p>
+      <label style={{ fontSize: "16px", fontWeight: "bold" }}>
+        <input
+          type="checkbox"
+          checked={isCollaborating}
+          onChange={() => {
+            if (!isCollaborating) {
+              const collaborators = new Map();
+              collaborators.set("id1", {
+                username: "Doremon",
+                avatarUrl: "../../../../img/doremon.png",
+              });
+              collaborators.set("id3", {
+                username: "Pika",
+                avatarUrl: "../../../../img/pika.jpeg",
+              });
+              excalidrawAPI.updateScene({ collaborators });
+            } else {
+              excalidrawAPI.updateScene({
+                collaborators: new Map(),
+              });
+            }
+            setIsCollaborating(!isCollaborating);
+          }}
+        />
+        Show Collaborators
+      </label>
+      <Excalidraw
+        ref={(api) => setExcalidrawAPI(api)}
+        renderTopRightUI={() => (
+          <LiveCollaborationTrigger
+            isCollaborating={isCollaborating}
+            onSelect={() => {
+              window.alert("You clicked on collab button");
+              setIsCollaborating(true);
+            }}
+          />
+        )}
+      ></Excalidraw>
+    </div>
+  );
+}
+```

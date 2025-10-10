@@ -1,0 +1,47 @@
+.excalidraw {
+  .Dialog__action-button {
+    position: relative;
+    display: flex;
+    column-gap: 0.5rem;
+    align-items: center;
+    padding: 0.5rem 1.5rem;
+    border: 1px solid var(--default-border-color);
+    background-color: transparent;
+    height: 3rem;
+    border-radius: var(--border-radius-lg);
+    letter-spacing: 0.4px;
+    color: inherit;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    user-select: none;
+
+    svg {
+      display: block;
+      width: 1rem;
+      height: 1rem;
+    }
+
+    &--danger {
+      background-color: var(--color-danger);
+      border-color: var(--color-danger);
+      color: #fff;
+    }
+
+    &--primary {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+  }
+
+  &.theme--dark {
+    .Dialog__action-button--danger {
+      color: var(--color-gray-100);
+    }
+
+    .Dialog__action-button--primary {
+      color: var(--color-gray-100);
+    }
+  }
+}

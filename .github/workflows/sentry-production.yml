@@ -1,0 +1,37 @@
+name: New Sentry production release
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  sentry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.x
+      - name: Install and build
+        run: |
+          yarn --frozen-lockfile
+          yarn build:app
+        env:
+          CI: true
+      - name: Install Sentry
+        run: |
+          curl -sL https://sentry.io/get-cli/ | bash
+      - name: Create new Sentry release
+        run: |
+          export SENTRY_RELEASE=$(sentry-cli releases propose-version)
+          sentry-cli releases new $SENTRY_RELEASE --project $SENTRY_PROJECT
+          sentry-cli releases set-commits --auto $SENTRY_RELEASE
+          sentry-cli releases files $SENTRY_RELEASE upload-sourcemaps --no-rewrite ./build/static/js/ --url-prefix "~/static/js"
+          sentry-cli releases finalize $SENTRY_RELEASE
+          sentry-cli releases deploys $SENTRY_RELEASE new -e production
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}

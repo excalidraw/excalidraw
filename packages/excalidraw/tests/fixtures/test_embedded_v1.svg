@@ -1,0 +1,16 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 97 77">
+  <!-- svg-source:excalidraw -->
+  <!-- payload-type:application/vnd.excalidraw+json --><!-- payload-start -->ewogICJ0eXBlIjogImV4Y2FsaWRyYXciLAogICJ2ZXJzaW9uIjogMiwKICAic291cmNlIjogImh0dHBzOi8vZXhjYWxpZHJhdy5jb20iLAogICJlbGVtZW50cyI6IFsKICAgIHsKICAgICAgImlkIjogInRabVFwa0cyQlZ2SzNxT01icHVXeiIsCiAgICAgICJ0eXBlIjogInRleHQiLAogICAgICAieCI6IDg2MS4xMTExMTExMTExMTExLAogICAgICAieSI6IDM1Ni4zMzMzMzMzMzMzMzMzLAogICAgICAid2lkdGgiOiA3NywKICAgICAgImhlaWdodCI6IDU3LAogICAgICAiYW5nbGUiOiAwLAogICAgICAic3Ryb2tlQ29sb3IiOiAiIzAwMDAwMCIsCiAgICAgICJiYWNrZ3JvdW5kQ29sb3IiOiAiIzg2OGU5NiIsCiAgICAgICJmaWxsU3R5bGUiOiAiY3Jvc3MtaGF0Y2giLAogICAgICAic3Ryb2tlV2lkdGgiOiAyLAogICAgICAic3Ryb2tlU3R5bGUiOiAic29saWQiLAogICAgICAicm91Z2huZXNzIjogMSwKICAgICAgIm9wYWNpdHkiOiAxMDAsCiAgICAgICJncm91cElkcyI6IFtdLAogICAgICAic3Ryb2tlU2hhcnBuZXNzIjogInJvdW5kIiwKICAgICAgInNlZWQiOiA0NzYzNjM3OTMsCiAgICAgICJ2ZXJzaW9uIjogMjMsCiAgICAgICJ2ZXJzaW9uTm9uY2UiOiA1OTc0MzUxMzUsCiAgICAgICJpc0RlbGV0ZWQiOiBmYWxzZSwKICAgICAgImJvdW5kRWxlbWVudElkcyI6IG51bGwsCiAgICAgICJ0ZXh0IjogInRlc3QiLAogICAgICAiZm9udFNpemUiOiAzNiwKICAgICAgImZvbnRGYW1pbHkiOiAxLAogICAgICAidGV4dEFsaWduIjogImxlZnQiLAogICAgICAidmVydGljYWxBbGlnbiI6ICJ0b3AiLAogICAgICAiYmFzZWxpbmUiOiA0MQogICAgfQogIF0sCiAgImFwcFN0YXRlIjogewogICAgInZpZXdCYWNrZ3JvdW5kQ29sb3IiOiAiI2ZmZmZmZiIsCiAgICAiZ3JpZFNpemUiOiBudWxsCiAgfQp9<!-- payload-end -->
+  <defs>
+    <style>
+      @font-face {
+        font-family: "Virgil";
+        src: url("https://excalidraw.com/Virgil.woff2");
+      }
+      @font-face {
+        font-family: "Cascadia";
+        src: url("https://excalidraw.com/Cascadia.woff2");
+      }
+    </style>
+  </defs>
+  <rect x="0" y="0" width="97" height="77" fill="#ffffff"></rect><g transform="translate(10 10) rotate(0 38.5 28.5)"><text x="0" y="41" font-family="Virgil, Segoe UI Emoji" font-size="36px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">test</text></g></svg>

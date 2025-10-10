@@ -1,0 +1,210 @@
+.zoom-actions,
+.undo-redo-buttons {
+  background-color: var(--island-bg-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 0 0 1px var(--color-surface-lowest);
+}
+
+.zoom-button,
+.undo-redo-buttons button {
+  border-radius: 0 !important;
+  background-color: var(--color-surface-low) !important;
+  font-size: 0.875rem !important;
+  width: var(--lg-button-size);
+  height: var(--lg-button-size);
+
+  svg {
+    width: var(--lg-icon-size) !important;
+    height: var(--lg-icon-size) !important;
+  }
+
+  .ToolIcon__icon {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.reset-zoom-button {
+  border-left: 0 !important;
+  border-right: 0 !important;
+  padding: 0 0.625rem !important;
+  width: 3.75rem !important;
+  justify-content: center;
+  color: var(--text-primary-color);
+}
+
+.zoom-out-button {
+  border-top-left-radius: var(--border-radius-lg) !important;
+  border-bottom-left-radius: var(--border-radius-lg) !important;
+
+  :root[dir="rtl"] & {
+    transform: scaleX(-1);
+  }
+
+  .ToolIcon__icon {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+}
+
+.zoom-in-button {
+  border-top-right-radius: var(--border-radius-lg) !important;
+  border-bottom-right-radius: var(--border-radius-lg) !important;
+
+  :root[dir="rtl"] & {
+    transform: scaleX(-1);
+  }
+
+  .ToolIcon__icon {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+  }
+}
+
+.undo-redo-buttons {
+  .undo-button-container button {
+    border-top-left-radius: var(--border-radius-lg) !important;
+    border-bottom-left-radius: var(--border-radius-lg) !important;
+    border-right: 0 !important;
+
+    :root[dir="rtl"] & {
+      transform: scaleX(-1);
+    }
+
+    .ToolIcon__icon {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+  }
+
+  .redo-button-container button {
+    border-top-right-radius: var(--border-radius-lg) !important;
+    border-bottom-right-radius: var(--border-radius-lg) !important;
+
+    :root[dir="rtl"] & {
+      transform: scaleX(-1);
+    }
+
+    .ToolIcon__icon {
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+    }
+  }
+}
+
+.compact-shape-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding: 0.5rem;
+
+  .compact-action-item {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 2.5rem;
+
+    --default-button-size: 2rem;
+
+    .compact-action-button {
+      width: 2rem;
+      height: 2rem;
+      border: none;
+      border-radius: var(--border-radius-lg);
+      background: transparent;
+      color: var(--color-on-surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+        flex: 0 0 auto;
+      }
+
+      &:hover {
+        background: var(--button-hover-bg, var(--island-bg-color));
+        border-color: var(
+          --button-hover-border,
+          var(--button-border, var(--default-border-color))
+        );
+      }
+
+      &:active {
+        background: var(--button-active-bg, var(--island-bg-color));
+        border-color: var(--button-active-border, var(--color-primary-darkest));
+      }
+    }
+
+    .compact-popover-content {
+      .popover-section {
+        margin-bottom: 1rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .popover-section-title {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: var(--color-text-secondary);
+          margin-bottom: 0.5rem;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .buttonList {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.25rem;
+        }
+      }
+    }
+  }
+}
+
+.compact-shape-actions-island {
+  width: fit-content;
+  overflow-x: hidden;
+}
+
+.compact-popover-content {
+  .popover-section {
+    margin-bottom: 1rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .popover-section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .buttonList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+  }
+}
+
+.shape-actions-theme-scope {
+  --button-border: transparent;
+  --button-bg: var(--color-surface-mid);
+}
+
+:root.theme--dark .shape-actions-theme-scope {
+  --button-hover-bg: #363541;
+  --button-bg: var(--color-surface-high);
+}

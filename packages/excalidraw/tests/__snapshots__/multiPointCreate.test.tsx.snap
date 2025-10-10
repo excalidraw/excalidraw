@@ -1,0 +1,113 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`multi point mode in linear elements > arrow 3`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "elbowed": false,
+  "endArrowhead": "arrow",
+  "endBinding": null,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 110,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "lastCommittedPoint": [
+    70,
+    110,
+  ],
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "points": [
+    [
+      0,
+      0,
+    ],
+    [
+      20,
+      30,
+    ],
+    [
+      70,
+      110,
+    ],
+  ],
+  "roughness": 1,
+  "roundness": {
+    "type": 2,
+  },
+  "seed": 1278240551,
+  "startArrowhead": null,
+  "startBinding": null,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "arrow",
+  "updated": 1,
+  "version": 8,
+  "versionNonce": 1604849351,
+  "width": 70,
+  "x": 30,
+  "y": 30,
+}
+`;
+
+exports[`multi point mode in linear elements > line 3`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "endArrowhead": null,
+  "endBinding": null,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 110,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "lastCommittedPoint": [
+    70,
+    110,
+  ],
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "points": [
+    [
+      0,
+      0,
+    ],
+    [
+      20,
+      30,
+    ],
+    [
+      70,
+      110,
+    ],
+  ],
+  "polygon": false,
+  "roughness": 1,
+  "roundness": null,
+  "seed": 1278240551,
+  "startArrowhead": null,
+  "startBinding": null,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "line",
+  "updated": 1,
+  "version": 8,
+  "versionNonce": 1604849351,
+  "width": 70,
+  "x": 30,
+  "y": 30,
+}
+`;

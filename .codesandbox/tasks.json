@@ -1,0 +1,50 @@
+{
+  // These tasks will run in order when initializing your CodeSandbox project.
+  "setupTasks": [
+    {
+      "name": "Install Dependencies",
+      "command": "yarn install"
+    }
+  ],
+
+  // These tasks can be run from CodeSandbox. Running one will open a log in the app.
+  "tasks": {
+    "build": {
+      "name": "Build",
+      "command": "yarn build",
+      "runAtStart": false
+    },
+    "fix": {
+      "name": "Fix",
+      "command": "yarn fix",
+      "runAtStart": false
+    },
+    "prettier": {
+      "name": "Prettify",
+      "command": "yarn prettier",
+      "runAtStart": false
+    },
+    "start": {
+      "name": "Start Excalidraw",
+      "command": "yarn start",
+      "runAtStart": true,
+      "preview": {
+        "port": 3000
+      }
+    },
+    "test": {
+      "name": "Run Tests",
+      "command": "yarn test",
+      "runAtStart": false
+    },
+    "install-deps": {
+      "name": "Install Dependencies",
+      "command": "yarn install",
+      "restartOn": {
+        "files": ["yarn.lock"],
+        "branch": false,
+        "resume": false
+      }
+    }
+  }
+}

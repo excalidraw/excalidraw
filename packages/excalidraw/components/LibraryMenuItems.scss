@@ -1,0 +1,154 @@
+@import "open-color/open-color";
+
+.excalidraw {
+  --container-padding-y: 1rem;
+  --container-padding-x: 0.75rem;
+
+  .library-menu-items-header {
+    display: flex;
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .library-menu-items__no-items {
+    text-align: center;
+    color: var(--color-gray-70);
+    line-height: 1.5;
+    font-size: 0.875rem;
+    width: 100%;
+    min-height: 55px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    &__label {
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 1.125rem;
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  .library-menu-items__no-items__hint {
+    color: var(--color-border-outline);
+    padding: 0.75rem 1rem;
+  }
+
+  &.theme--dark {
+    .library-menu-items__no-items {
+      color: var(--color-gray-40);
+    }
+  }
+
+  .library-menu-items-container {
+    width: 100%;
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    overflow-y: auto;
+    flex-direction: column;
+    height: 100%;
+    justify-content: flex-start;
+    margin: 0;
+
+    position: relative;
+
+    & > div {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+
+    &__row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    &__items {
+      // so that spinner is relative-positioned to this container
+      position: relative;
+
+      row-gap: 0.5rem;
+      padding: 1rem 0 var(--container-padding-y) 0;
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      flex: 1 1 auto;
+
+      color: var(--color-primary);
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      width: 100%;
+      box-sizing: border-box;
+
+      &--excal {
+        margin-top: 2rem;
+      }
+
+      &__hint {
+        margin-left: auto;
+        font-size: 10px;
+        color: var(--color-border-outline);
+        font-weight: 400;
+
+        kbd {
+          font-family: monospace;
+          border: 1px solid var(--color-border-outline);
+          border-radius: 4px;
+          padding: 1px 3px;
+        }
+      }
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-gap: 1rem;
+    }
+
+    &__search {
+      flex: 1 1 auto;
+      margin: 0;
+
+      .ExcTextField__input {
+        height: var(--lg-button-size);
+        input {
+          font-size: 0.875rem;
+        }
+      }
+
+      &.hideCancelButton input::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+        appearance: none;
+        display: none;
+      }
+    }
+
+    .separator {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin: 0.6em 0.2em;
+      color: var(--text-primary-color);
+    }
+  }
+
+  .library-menu-items-private-library-container {
+    // so that when you toggle between pending item and no items, there's
+    // no layout shift (this is hardcoded and works only with ENG locale)
+    min-height: 3.75rem;
+    width: 100%;
+  }
+}

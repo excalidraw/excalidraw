@@ -1,0 +1,11 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{files}/rooms/{room}/{file} {
+    	allow get, write: if true;
+    }
+    match /{files}/shareLinks/{shareLink}/{file} {
+    	allow get, write: if true;
+    }
+  }
+}

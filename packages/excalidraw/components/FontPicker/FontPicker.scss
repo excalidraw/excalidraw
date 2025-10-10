@@ -1,0 +1,20 @@
+@import "../../css/variables.module.scss";
+
+.excalidraw {
+  .FontPicker__container {
+    display: grid;
+    grid-template-columns: calc(1rem + 3 * var(--default-button-size)) 1rem 1fr; // calc ~ 2 gaps + 4 buttons
+    align-items: center;
+
+    @include isMobile {
+      max-width: calc(
+        2rem + 4 * var(--default-button-size)
+      ); // 4 gaps + 4 buttons
+    }
+
+    &--compact {
+      display: block;
+      grid-template-columns: none;
+    }
+  }
+}

@@ -1,0 +1,771 @@
+@import "./variables.module.scss";
+@import "./theme";
+
+:root {
+  --zIndex-canvas: 1;
+  --zIndex-interactiveCanvas: 2;
+  --zIndex-svgLayer: 3;
+  --zIndex-wysiwyg: 3;
+  --zIndex-canvasButtons: 3;
+  --zIndex-layerUI: 4;
+  --zIndex-eyeDropperBackdrop: 5;
+  --zIndex-eyeDropperPreview: 6;
+  --zIndex-hyperlinkContainer: 7;
+
+  --zIndex-modal: 1000;
+  --zIndex-popup: 1001;
+  --zIndex-toast: 999999;
+
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+  --sat: env(safe-area-inset-top);
+}
+
+body.excalidraw-cursor-resize,
+body.excalidraw-cursor-resize a:hover,
+body.excalidraw-cursor-resize * {
+  cursor: ew-resize;
+}
+
+.excalidraw {
+  --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
+    Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--ui-font);
+
+  position: relative;
+  overflow: hidden;
+  color: var(--text-primary-color);
+  display: flex;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+
+  button {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  // serves 2 purposes:
+  // 1. prevent selecting text outside the component when double-clicking or
+  //    dragging inside it (e.g. on canvas)
+  // 2. prevent selecting UI, both from the inside, and from outside the
+  //    component (e.g. if you select text in a sidebar)
+  user-select: none;
+
+  .excalidraw-link,
+  a {
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--link-color);
+    user-select: none;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+    &:active {
+      text-decoration: none;
+    }
+  }
+
+  canvas {
+    touch-action: none;
+
+    // following props improve blurriness at certain devicePixelRatios.
+    // AFAIK it doesn't affect export (in fact, export seems sharp either way).
+
+    image-rendering: pixelated; // chromium
+    // NOTE: must be declared *after* the above
+    image-rendering: -moz-crisp-edges; // FF
+
+    z-index: var(--zIndex-canvas);
+
+    &.interactive {
+      z-index: var(--zIndex-interactiveCanvas);
+    }
+
+    // Remove the main canvas from document flow to avoid resizeObserver
+    // feedback loop (see https://github.com/excalidraw/excalidraw/pull/3379)
+  }
+
+  &__canvas-wrapper,
+  &__canvas.static {
+    pointer-events: none;
+  }
+
+  &__canvas {
+    position: absolute;
+  }
+
+  &__embeddable {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  &__embeddable-container {
+    position: absolute;
+    z-index: 2;
+    transform-origin: top left;
+    pointer-events: none;
+  }
+
+  &.theme--dark {
+    // The percentage is inspired by
+    // https://material.io/design/color/dark-theme.html#properties, which
+    // recommends surface color of #121212, 93% yields #111111 for #FFF
+
+    canvas {
+      filter: var(--theme-filter);
+    }
+  }
+
+  .FixedSideContainer {
+    padding-top: var(--sat, 0);
+    padding-right: var(--sar, 0);
+    padding-bottom: var(--sab, 0);
+    padding-left: var(--sal, 0);
+  }
+
+  .panelRow {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .selected-shape-actions {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.75rem;
+
+    h3,
+    legend,
+    .control-label {
+      margin: 0;
+      margin-bottom: 0.25rem;
+      font-size: 0.75rem;
+      color: var(--text-primary-color);
+      font-weight: 400;
+      display: block;
+    }
+
+    .control-label input {
+      display: block;
+      width: 100%;
+    }
+
+    legend {
+      padding: 0;
+    }
+
+    .iconSelectList {
+      flex-wrap: wrap;
+      position: relative;
+    }
+
+    .buttonList {
+      flex-wrap: wrap;
+      display: flex;
+      column-gap: 0.5rem;
+      row-gap: 0.5rem;
+
+      label {
+        font-size: 0.75rem;
+      }
+
+      input[type="radio"],
+      input[type="button"] {
+        opacity: 0;
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .iconRow {
+        margin-top: 8px;
+      }
+    }
+
+    fieldset {
+      margin: 0;
+      padding: 0;
+      border: none;
+    }
+  }
+
+  .divider {
+    width: 1px;
+    background-color: $oc-gray-2;
+    margin: 1px;
+  }
+
+  .welcome-screen-menu-item:focus-visible,
+  .dropdown-menu-item:focus-visible,
+  button:focus-visible,
+  .buttonList label:focus-within,
+  input:focus-visible {
+    outline: transparent;
+    box-shadow: 0 0 0 1px var(--color-brand-hover);
+  }
+
+  .buttonList {
+    .ToolIcon__icon {
+      all: unset !important;
+      display: flex !important;
+    }
+
+    button {
+      background-color: transparent;
+    }
+
+    label,
+    button,
+    .zIndexButton {
+      @include outlineButtonIconStyles;
+    }
+  }
+
+  .App-top-bar {
+    z-index: var(--zIndex-layerUI);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .App-bottom-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    --bar-padding: calc(4 * var(--space-factor));
+    z-index: 4;
+    display: flex;
+    align-items: flex-end;
+    pointer-events: none;
+
+    > .Island {
+      width: 100%;
+      max-width: 100%;
+      min-width: 100%;
+      box-sizing: border-box;
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      pointer-events: var(--ui-pointerEvents);
+    }
+  }
+
+  .App-toolbar {
+    width: 100%;
+
+    .eraser {
+      &.ToolIcon:hover {
+        --icon-fill-color: #fff;
+        --keybinding-color: #fff;
+      }
+      &.active {
+        background-color: var(--color-primary);
+      }
+    }
+  }
+
+  .App-toolbar-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+
+    .dropdown-menu--mobile {
+      bottom: 55px;
+      top: auto;
+    }
+  }
+
+  .App-mobile-menu {
+    width: 100%;
+    overflow-x: visible;
+    overflow-y: auto;
+    box-sizing: border-box;
+    margin-bottom: var(--bar-padding);
+
+    .selected-shape-actions {
+      padding: 8px 8px 0 8px;
+    }
+  }
+
+  .App-menu {
+    display: grid;
+    color: var(--icon-fill-color);
+  }
+
+  .shapes-section {
+    display: flex;
+    justify-content: center;
+    pointer-events: none !important;
+
+    & > * {
+      pointer-events: var(--ui-pointerEvents);
+    }
+  }
+
+  .App-menu_top {
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-gap: 1rem;
+    align-items: flex-start;
+    cursor: default;
+    pointer-events: none !important;
+
+    & > * {
+      pointer-events: var(--ui-pointerEvents);
+    }
+
+    @media (min-width: 1536px) {
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-gap: 3rem;
+    }
+  }
+
+  .App-menu_top > *:first-child {
+    justify-self: flex-start;
+  }
+
+  .selected-shape-actions-container {
+    width: fit-content;
+
+    &--compact {
+      min-width: 48px;
+    }
+  }
+
+  .App-menu_top > *:last-child {
+    justify-self: flex-end;
+  }
+
+  .App-menu_bottom {
+    position: absolute;
+    bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    cursor: default;
+    pointer-events: none !important;
+    box-sizing: border-box;
+    padding: 0 1rem;
+
+    &--transition-left {
+      section {
+        width: 185px;
+      }
+    }
+
+    section {
+      display: flex;
+    }
+  }
+
+  .App-menu_bottom > *:first-child {
+    justify-self: flex-start;
+  }
+
+  .App-menu_bottom > *:last-child {
+    justify-self: flex-end;
+  }
+
+  .App-menu_left {
+    grid-template-rows: 1fr auto 1fr;
+    height: 100%;
+  }
+
+  .App-menu_right {
+    grid-template-rows: 1fr;
+    height: 100%;
+  }
+
+  .App-menu__left {
+    overflow-y: auto;
+    padding: 0.75rem;
+    width: 12.5rem;
+    box-sizing: border-box;
+    position: absolute;
+  }
+
+  .dropdown-select {
+    height: 1.5rem;
+    padding: 0;
+    padding-inline-start: 0.5rem;
+    padding-inline-end: 1.5rem;
+    color: var(--icon-fill-color);
+    background-color: var(--button-gray-1);
+    border-radius: var(--space-factor);
+    border: 1px solid var(--button-gray-2);
+    font-size: 0.8rem;
+    font-family: inherit;
+    outline: none;
+    appearance: none;
+    background-image: var(--dropdown-icon);
+    background-repeat: no-repeat;
+    background-position: right 0.7rem top 50%, 0 0;
+
+    :root[dir="rtl"] & {
+      background-position: left 0.7rem top 50%, 0 0;
+    }
+
+    background-size: 0.65em auto, 100%;
+
+    &:focus {
+      box-shadow: 0 0 0 2px var(--focus-highlight-color);
+    }
+
+    &:hover {
+      background-color: var(--button-gray-2);
+    }
+
+    &:active {
+      background-color: var(--button-gray-2);
+    }
+
+    &__language {
+      height: 2rem;
+      background-color: var(--island-bg-color);
+      border-color: var(--default-border-color) !important;
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--island-bg-color);
+      }
+    }
+  }
+
+  .scroll-back-to-content {
+    border-radius: var(--border-radius-lg);
+    background-color: var(--island-bg-color);
+    color: var(--icon-fill-color);
+
+    border: 1px solid var(--default-border-color);
+    padding: 10px 20px;
+    position: absolute;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    pointer-events: var(--ui-pointerEvents);
+    font-family: inherit;
+
+    &:hover {
+      background-color: var(--button-hover-bg);
+    }
+
+    &:active {
+      border: 1px solid var(--button-active-border);
+    }
+  }
+
+  .help-icon {
+    @include outlineButtonStyles;
+    @include filledButtonOnCanvas;
+
+    width: var(--lg-button-size);
+    height: var(--lg-button-size);
+
+    svg {
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
+    }
+  }
+
+  .reset-zoom-button {
+    font-family: var(--ui-font);
+  }
+
+  .finalize-button {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 0.4em;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-inline-start: 0.6em;
+  }
+
+  .undo-redo-buttons,
+  .eraser-buttons {
+    display: grid;
+    grid-auto-flow: column;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-inline-start: 0.6em;
+  }
+
+  @include isMobile {
+    aside {
+      display: none;
+    }
+    .scroll-back-to-content {
+      bottom: calc(80px + var(--sab, 0));
+      z-index: -1;
+    }
+  }
+
+  .rtl-mirror {
+    :root[dir="rtl"] & {
+      transform: scaleX(-1);
+    }
+  }
+
+  .zen-mode-visibility {
+    visibility: visible;
+    opacity: 1;
+    height: auto;
+    width: auto;
+    transition: opacity 0.5s;
+
+    &.zen-mode-visibility--hidden {
+      visibility: hidden;
+      opacity: 0;
+      height: 0;
+      width: 0;
+      transition: opacity 0.5s;
+    }
+  }
+
+  .disable-pointerEvents {
+    pointer-events: none !important;
+  }
+
+  &.excalidraw--view-mode {
+    .App-menu {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
+  input.is-redacted {
+    // we don't use type=password because browsers (chrome?) prompt
+    // you to save it which is annoying
+    -webkit-text-security: disc;
+  }
+
+  input[type="text"],
+  textarea:not(.excalidraw-wysiwyg) {
+    color: var(--text-primary-color);
+    border: 1.5px solid var(--input-border-color);
+    padding: 0.75rem;
+    white-space: nowrap;
+    border-radius: var(--space-factor);
+    background-color: var(--input-bg-color);
+
+    &:not(:focus) {
+      &:hover {
+        border-color: var(--color-brand-hover);
+      }
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-brand-hover);
+    }
+  }
+
+  @media print {
+    .App-bottom-bar,
+    .FixedSideContainer,
+    .layer-ui__wrapper {
+      display: none;
+    }
+  }
+
+  // use custom, minimalistic scrollbar
+  // (doesn't work in Firefox)
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 3px;
+  }
+
+  select::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+  ::-webkit-scrollbar-thumb:active {
+    background: var(--scrollbar-thumb);
+  }
+
+  .mobile-misc-tools-container {
+    position: absolute;
+    top: calc(5rem - var(--editor-container-padding));
+    right: calc(var(--editor-container-padding) * -1);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--sidebar-border-color);
+    border-top-left-radius: var(--border-radius-lg);
+    border-bottom-left-radius: var(--border-radius-lg);
+    border-right: 0;
+    overflow: hidden;
+
+    background-color: var(--island-bg-color);
+
+    .ToolIcon__icon {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0;
+    }
+
+    .default-sidebar-trigger {
+      border: 0;
+    }
+  }
+
+  .App-toolbar--mobile {
+    overflow: visible;
+    max-width: 98vw;
+
+    .ToolIcon__keybinding {
+      display: none;
+    }
+  }
+  .UserList-Wrapper {
+    margin: 0;
+    padding: 0;
+    border: none;
+    text-align: left;
+
+    legend {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 400;
+      margin: 0 0 0.25rem;
+      padding: 0;
+    }
+  }
+
+  .main-menu-trigger {
+    @include filledButtonOnCanvas;
+  }
+
+  .App-mobile-menu,
+  .App-menu__left {
+    --button-border: transparent;
+    --button-bg: var(--color-surface-mid);
+  }
+
+  @at-root .excalidraw.theme--dark#{&} {
+    .App-mobile-menu,
+    .App-menu__left {
+      --button-hover-bg: #363541;
+      --button-bg: var(--color-surface-high);
+    }
+  }
+
+  .App-menu__left {
+    .buttonList {
+      padding: 0.25rem 0;
+    }
+  }
+
+  .excalidraw__paragraph {
+    margin: 1rem 0;
+  }
+
+  .Modal__content {
+    .excalidraw__paragraph:first-child {
+      margin-top: 0;
+    }
+    .excalidraw__paragraph + .excalidraw__paragraph {
+      margin-top: 0rem;
+    }
+  }
+}
+
+.ErrorSplash.excalidraw {
+  min-height: 100vh;
+  padding: 20px 0;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: text;
+
+  .ErrorSplash-messageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px;
+    background-color: $oc-red-1;
+    border: 3px solid $oc-red-9;
+  }
+
+  .ErrorSplash-paragraph {
+    margin: 15px 0;
+    max-width: 600px;
+
+    &.align-center {
+      text-align: center;
+    }
+  }
+
+  .bigger,
+  .bigger button {
+    font-size: 1.1em;
+  }
+
+  .smaller,
+  .smaller button {
+    font-size: 0.9em;
+  }
+
+  .ErrorSplash-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    textarea {
+      width: 100%;
+      margin: 10px 0;
+      font-family: "Cascadia";
+      font-size: 0.8em;
+    }
+  }
+}
+
+.excalidraw__embeddable-container {
+  .excalidraw__embeddable-container__inner {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--embeddable-radius);
+  }
+
+  .excalidraw__embeddable__outer {
+    width: 100%;
+    height: 100%;
+    & > * {
+      border-radius: var(--embeddable-radius);
+    }
+  }
+
+  .excalidraw__embeddable-hint {
+    position: absolute;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1rem 1.6rem;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    font-family: "Assistant";
+  }
+}

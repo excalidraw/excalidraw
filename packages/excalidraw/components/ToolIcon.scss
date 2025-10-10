@@ -1,0 +1,199 @@
+@import "open-color/open-color.scss";
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .ToolIcon {
+    border-radius: var(--border-radius-lg);
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+
+    &__hidden {
+      display: none !important;
+    }
+
+    @include toolbarButtonColorStates;
+  }
+
+  .ToolIcon--plain {
+    background-color: transparent;
+    .ToolIcon__icon {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
+  .ToolIcon_type_radio,
+  .ToolIcon_type_checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .ToolIcon__icon {
+    box-sizing: border-box;
+    width: var(--default-button-size);
+    height: var(--default-button-size);
+    color: var(--icon-fill-color);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: var(--border-radius-lg);
+
+    & + .ToolIcon__label {
+      margin-inline-start: 0;
+    }
+
+    svg {
+      position: relative;
+      width: var(--default-icon-size);
+      height: var(--default-icon-size);
+      color: var(--icon-fill-color);
+    }
+  }
+
+  .ToolIcon__label {
+    display: flex;
+    align-items: center;
+    color: var(--icon-fill-color);
+    font-family: var(--ui-font);
+    margin: 0 0.8em;
+    text-overflow: ellipsis;
+
+    .Spinner {
+      margin-left: 0.6em;
+    }
+  }
+
+  .ToolIcon_size_small .ToolIcon__icon {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.8em;
+  }
+
+  .ToolIcon_type_button,
+  .Modal .ToolIcon_type_button {
+    padding: 0;
+    border: none;
+    margin: 0;
+    font-size: inherit;
+    background-color: initial;
+
+    &:focus-visible {
+      box-shadow: 0 0 0 2px var(--focus-highlight-color);
+    }
+
+    &.ToolIcon--selected {
+      background-color: var(--button-gray-2);
+
+      &:active {
+        background-color: var(--button-gray-3);
+      }
+    }
+
+    &:active {
+      background-color: var(--button-gray-3);
+    }
+
+    &:disabled {
+      cursor: default;
+
+      &:active,
+      &:focus-visible,
+      &:hover {
+        background-color: initial;
+        border: none;
+        box-shadow: none;
+      }
+
+      svg {
+        color: var(--color-disabled);
+      }
+    }
+
+    &--show {
+      visibility: visible;
+    }
+
+    &--hide {
+      display: none !important;
+    }
+  }
+
+  .ToolIcon_type_floating {
+    background-color: transparent;
+
+    &:hover {
+      background-color: transparent;
+    }
+
+    &:active {
+      background-color: transparent;
+    }
+
+    .ToolIcon__icon {
+      background-color: var(--button-gray-1);
+      &:hover {
+        background-color: var(--button-gray-2);
+      }
+      &:active {
+        background-color: var(--button-gray-3);
+      }
+
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
+  .ToolIcon__keybinding {
+    position: absolute;
+    bottom: 2px;
+    right: 3px;
+    font-size: 0.625rem;
+    color: var(--keybinding-color);
+    font-family: var(--ui-font);
+    user-select: none;
+  }
+
+  .unlocked-icon {
+    :root[dir="ltr"] & {
+      left: 2px;
+    }
+
+    :root[dir="rtl"] & {
+      right: 2px;
+    }
+  }
+
+  .App-toolbar-container {
+    .ToolIcon__icon {
+      width: var(--lg-button-size);
+      height: var(--lg-button-size);
+
+      @media screen and (max-width: 450px) {
+        width: 1.8rem;
+        height: 1.8rem;
+      }
+      @media screen and (max-width: 379px) {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+
+      svg {
+        width: var(--lg-icon-size);
+        height: var(--lg-icon-size);
+      }
+    }
+
+    .ToolIcon__LaserPointer .ToolIcon__icon,
+    .ToolIcon__MagicButton .ToolIcon__icon {
+      width: var(--default-button-size);
+      height: var(--default-button-size);
+    }
+  }
+}

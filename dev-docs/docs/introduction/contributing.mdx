@@ -1,0 +1,72 @@
+# Contributing
+
+Pull requests are welcome. For major changes, please [open an issue](https://github.com/excalidraw/excalidraw/issues/new) first to discuss what you would like to change.
+
+We have a [roadmap](https://github.com/orgs/excalidraw/projects/3) which we strongly recommend to go through and check if something interests you.
+For new contributors we would recommend to start with *Easy* tasks.
+
+In case you want to pick up something from the roadmap, comment on that issue and one of the project maintainers will assign it to you, post which you can discuss in the issue and start working on it.
+
+## Setup
+
+### Option 1 - Manual
+
+1. Fork and clone the repo
+1. Run `yarn` to install dependencies
+1. Create a branch for your PR with `git checkout -b your-branch-name`
+
+> To keep `master` branch pointing to remote repository and make pull requests from branches on your fork, run:
+>
+> ```bash
+> git remote add upstream https://github.com/excalidraw/excalidraw.git
+> git fetch upstream
+> git branch --set-upstream-to=upstream/master master
+> ```
+
+### Option 2 - CodeSandbox
+
+1. Go to https://codesandbox.io/p/github/excalidraw/excalidraw
+1. Connect your GitHub account
+1. Go to Git tab on left side
+1. Tap on `Fork Sandbox`
+1. Write your code
+1. Commit and PR automatically
+
+## Pull Request Guidelines
+
+Don't worry if you get any of the below wrong, or if you don't know how. We'll gladly help out.
+
+### Title
+
+Make sure the title starts with a semantic prefix:
+
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation only changes
+- **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance
+- **test**: Adding missing tests or correcting existing tests
+- **build**: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+- **ci**: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
+- **chore**: Other changes that don't modify src or test files
+- **revert**: Reverts a previous commit
+
+### Testing
+
+Once you submit your pull request it will automatically be tested. Be sure to check the results of the test and fix any issues that arise.
+
+It's also a good idea to consider if your change should include additional tests. This is highly recommended for new features or bug-fixes. For example, it's good practice to create a test for each bug you fix which ensures that we don't regress the code in the future.
+
+Finally - always manually test your changes using the convenient staging environment deployed for each pull request. As much as local development attempts to replicate production, there can still be subtle differences in behavior. For larger features consider testing your change in multiple browsers as well.
+
+:::note
+Some checks, such as the `lint` and `test`, require approval from the maintainers to run. 
+They will appear as `Expected — Waiting for status to be reported` in the PR checks when they are waiting for approval.
+:::
+
+## Translating
+
+To translate Excalidraw into other languages, please visit [our Crowdin page](https://crowdin.com/project/excalidraw). To add a new language, [open an issue](https://github.com/excalidraw/excalidraw/issues/new) so we can get things set up on our end first.
+
+Translations will be available on the app if they exceed a certain threshold of completion (currently **85%**).

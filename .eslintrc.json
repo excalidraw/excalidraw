@@ -1,0 +1,43 @@
+{
+  "extends": ["@excalidraw/eslint-config", "react-app"],
+  "rules": {
+    "import/order": [
+      "warn",
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"],
+        "pathGroups": [
+          {
+            "pattern": "@excalidraw/**",
+            "group": "external",
+            "position": "after"
+          }
+        ],
+        "newlines-between": "always-and-inside-groups",
+        "warnOnUnassignedImports": true
+      }
+    ],
+    "import/no-anonymous-default-export": "off",
+    "no-restricted-globals": "off",
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      {
+        "prefer": "type-imports",
+        "disallowTypeAnnotations": false,
+        "fixStyle": "separate-type-imports"
+      }
+    ],
+    "no-restricted-imports": [
+      "error",
+      {
+        "name": "jotai",
+        "message": "Do not import from \"jotai\" directly. Use our app-specific modules (\"editor-jotai\" or \"app-jotai\")."
+      }
+    ],
+    "react/jsx-no-target-blank": [
+      "error",
+      {
+        "allowReferrer": true
+      }
+    ]
+  }
+}

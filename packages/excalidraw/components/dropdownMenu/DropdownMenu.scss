@@ -1,0 +1,221 @@
+@import "../../css/variables.module.scss";
+
+.excalidraw {
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    margin-top: 0.5rem;
+
+    &--mobile {
+      left: 0;
+      width: 100%;
+      row-gap: 0.75rem;
+
+      .dropdown-menu-container {
+        padding: 8px 8px;
+        box-sizing: border-box;
+        // background-color: var(--island-bg-color);
+        box-shadow: var(--shadow-island);
+        border-radius: var(--border-radius-lg);
+        position: relative;
+        transition: box-shadow 0.5s ease-in-out;
+        display: flex;
+        flex-direction: column;
+
+        &.zen-mode {
+          box-shadow: none;
+        }
+      }
+    }
+
+    .dropdown-menu-container {
+      background-color: var(--island-bg-color);
+      max-height: calc(100vh - 150px);
+      overflow-y: auto;
+      --gap: 2;
+    }
+
+    .dropdown-menu-item-base {
+      display: flex;
+      column-gap: 0.625rem;
+      font-size: 0.875rem;
+      color: var(--color-on-surface);
+      width: 100%;
+      box-sizing: border-box;
+      font-weight: 400;
+      font-family: inherit;
+    }
+
+    &.manual-hover {
+      // disable built-in hover due to keyboard navigation
+      .dropdown-menu-item {
+        &:hover {
+          background-color: transparent;
+        }
+
+        &--hovered {
+          background-color: var(--button-hover-bg) !important;
+        }
+
+        &--selected {
+          background-color: var(--color-primary-light) !important;
+        }
+      }
+    }
+
+    &.fonts {
+      margin-top: 1rem;
+      // display max 7 items per list, where each has 2rem (2.25) height and 1px margin top & bottom
+      // count in 2 groups, where each allocates 1.3*0.75rem font-size and 0.5rem margin bottom, plus one extra 1rem margin top
+      max-height: calc(7 * (2rem + 2px) + 2 * (0.5rem + 1.3 * 0.75rem) + 1rem);
+
+      @media screen and (min-width: 1921px) {
+        max-height: calc(
+          7 * (2.25rem + 2px) + 2 * (0.5rem + 1.3 * 0.75rem) + 1rem
+        );
+      }
+
+      .dropdown-menu-item-base {
+        display: inline-flex;
+      }
+
+      .dropdown-menu-group:not(:first-child) {
+        margin-top: 1rem;
+      }
+
+      .dropdown-menu-group-title {
+        font-size: 0.75rem;
+        text-align: left;
+        font-weight: 400;
+        margin: 0 0 0.5rem;
+        line-height: 1.3;
+      }
+    }
+
+    .dropdown-menu-item {
+      height: 2rem;
+      margin: 1px;
+      padding: 0 0.5rem;
+      width: calc(100% - 2px);
+      background-color: transparent;
+      border: 1px solid transparent;
+      align-items: center;
+      cursor: pointer;
+      border-radius: var(--border-radius-md);
+      flex: 1 0 auto;
+
+      @media screen and (min-width: 1921px) {
+        height: 2.25rem;
+      }
+
+      &__text {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        gap: 0.75rem;
+      }
+
+      &__shortcut {
+        margin-inline-start: auto;
+        opacity: 0.5;
+
+        &--orphaned {
+          text-align: right;
+          font-size: 0.875rem;
+          padding: 0 0.625rem;
+        }
+      }
+
+      &--selected {
+        background: var(--color-primary-light);
+        --icon-fill-color: var(--color-primary-darker);
+      }
+
+      &:hover {
+        background-color: var(--button-hover-bg);
+        text-decoration: none;
+      }
+
+      &:active {
+        background-color: var(--button-hover-bg);
+        border-color: var(--color-brand-active);
+      }
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+        display: block;
+      }
+    }
+
+    .dropdown-menu-item-bare {
+      align-items: center;
+      height: 2rem;
+      justify-content: space-between;
+
+      @media screen and (min-width: 1921px) {
+        height: 2.25rem;
+      }
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+        display: block;
+      }
+    }
+
+    .dropdown-menu-item-custom {
+      margin-top: 0.5rem;
+    }
+
+    .dropdown-menu-group-title {
+      font-size: 14px;
+      text-align: left;
+      margin: 10px 0;
+      font-weight: 500;
+    }
+  }
+
+  .dropdown-menu-button {
+    @include outlineButtonStyles;
+    width: var(--lg-button-size);
+    height: var(--lg-button-size);
+
+    --background: var(--color-surface-mid);
+
+    background-color: var(--background);
+
+    @at-root .excalidraw.theme--dark#{&} {
+      --background: var(--color-surface-high);
+      &:hover {
+        --background: #363541;
+      }
+    }
+
+    &:hover {
+      --background: var(--color-surface-high);
+      background-color: var(--background);
+      text-decoration: none;
+    }
+
+    &:active {
+      border-color: var(--color-primary);
+    }
+
+    svg {
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
+    }
+
+    &--mobile {
+      border: none;
+      margin: 0;
+      padding: 0;
+      width: var(--default-button-size);
+      height: var(--default-button-size);
+    }
+  }
+}

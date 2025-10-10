@@ -1,0 +1,172 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .publish-library {
+    &__fields {
+      display: flex;
+      flex-direction: column;
+
+      label {
+        padding: 1em 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        span {
+          font-weight: 500;
+          font-size: 1rem;
+          color: $oc-gray-6;
+        }
+        input,
+        textarea {
+          width: 70%;
+          padding: 0.6em;
+          font-family: var(--ui-font);
+        }
+
+        .required {
+          color: $oc-red-8;
+          margin: 0.2rem;
+        }
+      }
+    }
+
+    &__buttons {
+      display: flex;
+      padding: 0.2rem 0;
+      justify-content: flex-end;
+      gap: 0.5rem;
+
+      .ToolIcon__icon {
+        min-width: 2.5rem;
+        width: auto;
+        font-size: 1rem;
+      }
+
+      .ToolIcon_type_button {
+        margin-left: 1rem;
+        padding: 0 0.5rem;
+      }
+
+      &--confirm.ToolIcon_type_button {
+        background-color: $oc-blue-6;
+
+        &:hover {
+          background-color: $oc-blue-8;
+        }
+      }
+
+      &--cancel.ToolIcon_type_button {
+        background-color: $oc-gray-5;
+        &:hover {
+          background-color: $oc-gray-6;
+        }
+      }
+
+      .ToolIcon__icon {
+        color: $oc-white;
+        .Spinner {
+          --spinner-color: #fff;
+          svg {
+            padding: 0.5rem;
+          }
+        }
+      }
+    }
+
+    .selected-library-items {
+      display: flex;
+      flex-wrap: wrap;
+
+      .single-library-item-wrapper {
+        width: 9rem;
+      }
+    }
+
+    &-warning {
+      color: $oc-red-6;
+    }
+
+    &-note {
+      padding: 1em 0;
+      font-style: italic;
+      font-size: 14px;
+      display: block;
+    }
+  }
+
+  .single-library-item {
+    position: relative;
+
+    &-status {
+      position: absolute;
+      top: 0.3rem;
+      left: 0.3rem;
+      font-size: 0.7rem;
+      color: $oc-red-7;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 0.1rem 0.2rem;
+      border-radius: 0.2rem;
+    }
+
+    &__svg {
+      background-color: $oc-white;
+      padding: 0.3rem;
+      width: 7.5rem;
+      height: 7.5rem;
+      border: 1px solid var(--button-gray-2);
+      svg {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .ToolIcon__icon {
+      background-color: $oc-white;
+      width: auto;
+      height: auto;
+      margin: 0 0.5rem;
+    }
+    .ToolIcon,
+    .ToolIcon_type_button:hover {
+      background-color: white;
+    }
+    .required,
+    .error {
+      color: $oc-red-8;
+      font-weight: 700;
+      font-size: 1rem;
+      margin: 0.2rem;
+    }
+    .error {
+      font-weight: 500;
+      margin: 0;
+      padding: 0.3em 0;
+    }
+
+    &--remove {
+      position: absolute;
+      top: 0.2rem;
+      right: 1rem;
+
+      .ToolIcon__icon {
+        margin: 0;
+      }
+      .ToolIcon__icon {
+        background-color: $oc-red-6;
+        &:hover {
+          background-color: $oc-red-7;
+        }
+        &:active {
+          background-color: $oc-red-8;
+        }
+      }
+      svg {
+        color: $oc-white;
+        padding: 0.26rem;
+        border-radius: 0.3em;
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+  }
+}

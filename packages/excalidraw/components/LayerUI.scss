@@ -1,0 +1,123 @@
+@import "open-color/open-color";
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .layer-ui__wrapper.animate {
+    transition: width 0.1s ease-in-out;
+  }
+  .layer-ui__wrapper {
+    // when the rightside sidebar is docked, we need to resize the UI by its
+    // width, making the nested UI content shift to the left. To do this,
+    // we need the UI container to actually have dimensions set, but
+    // then we also need to disable pointer events else the canvas below
+    // wouldn't be interactive.
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: var(--zIndex-layerUI);
+
+    &__top-right {
+      display: flex;
+      width: 100%;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      pointer-events: none !important;
+
+      &--compact {
+        gap: 0.5rem;
+      }
+
+      & > * {
+        pointer-events: var(--ui-pointerEvents);
+      }
+    }
+
+    &__footer {
+      width: 100%;
+
+      &-right {
+        z-index: 100;
+        display: flex;
+      }
+    }
+
+    .zen-mode-transition {
+      transition: transform 0.5s ease-in-out;
+
+      :root[dir="ltr"] &.transition-left {
+        transform: translate(-999px, 0);
+      }
+
+      :root[dir="ltr"] &.transition-right {
+        transform: translate(999px, 0);
+      }
+
+      :root[dir="rtl"] &.transition-left {
+        transform: translate(999px, 0);
+      }
+
+      :root[dir="rtl"] &.transition-right {
+        transform: translate(-999px, 0);
+      }
+
+      &.layer-ui__wrapper__footer-left--transition-bottom {
+        transform: translate(0, 92px);
+      }
+    }
+
+    .disable-zen-mode {
+      padding: 10px;
+      position: absolute;
+      bottom: 0;
+      [dir="ltr"] & {
+        right: 1rem;
+      }
+      [dir="rtl"] & {
+        left: 1rem;
+      }
+      opacity: 0;
+      visibility: hidden;
+      transition: visibility 0s linear 0s, opacity 0.5s;
+
+      font-family: var(--ui-font);
+      font-size: 0.75rem;
+      font-weight: 500;
+      line-height: 1;
+
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--default-border-color);
+      background-color: var(--island-bg-color);
+      color: var(--text-primary-color);
+
+      &:hover {
+        background-color: var(--button-hover-bg);
+      }
+      &:active {
+        border-color: var(--color-primary);
+      }
+
+      &--visible {
+        opacity: 1;
+        visibility: visible;
+        transition: visibility 0s linear 300ms, opacity 0.5s;
+        transition-delay: 0.8s;
+
+        pointer-events: var(--ui-pointerEvents);
+      }
+    }
+
+    .layer-ui__wrapper__footer-left,
+    .footer-center,
+    .layer-ui__wrapper__footer-right {
+      & > * {
+        pointer-events: var(--ui-pointerEvents);
+      }
+    }
+
+    .layer-ui__wrapper__footer-right {
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+  }
+}
