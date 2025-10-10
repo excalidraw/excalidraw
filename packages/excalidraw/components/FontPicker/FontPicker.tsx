@@ -106,6 +106,7 @@ export const FontPicker = React.memo(
           <FontPickerTrigger
             selectedFontFamily={selectedFontFamily}
             isOpened={isOpened}
+            compactMode={compactMode}
           />
           {isOpened && (
             <FontPickerList

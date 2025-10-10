@@ -543,3 +543,8 @@ export enum UserIdleState {
 export const LINE_POLYGON_POINT_MERGE_DISTANCE = 20;
 
 export const DOUBLE_TAP_POSITION_THRESHOLD = 35;
+
+// glass background for mobile action buttons
+export const MOBILE_ACTION_BUTTON_BG = {
+  background: "var(--mobile-action-button-bg)",
+} as const;

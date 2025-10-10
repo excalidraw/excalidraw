@@ -7,6 +7,12 @@
     }
   }
 
+  .color-picker__title {
+    padding: 0 0.5rem;
+    font-size: 0.875rem;
+    text-align: left;
+  }
+
   .color-picker__heading {
     padding: 0 0.5rem;
     font-size: 0.75rem;
@@ -156,6 +162,15 @@
       border-radius: calc(var(--radius) + 1px);
       width: 1.625rem;
       height: 1.625rem;
+    }
+
+    &.compact-sizing {
+      width: var(--mobile-action-button-size);
+      height: var(--mobile-action-button-size);
+    }
+
+    &.mobile-border {
+      border: 1px solid var(--mobile-color-border);
     }
   }
 
