@@ -4220,6 +4220,73 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
+        // Sibling navigation with [ and ] keys
+        // Navigate between elements that share the same parent in a flowchart
+        if (event.key === "[" || event.key === "]") {
+          const selectedElements = getSelectedElements(
+            this.scene.getNonDeletedElementsMap(),
+            this.state,
+          );
+
+          // Only works when a single element is selected
+          if (selectedElements.length === 1) {
+            event.preventDefault();
+
+            // Determine navigation direction: [ = previous, ] = next
+            const direction = event.key === "[" ? "prev" : "next";
+
+            // Call the navigator to find the sibling element
+            const siblingId = this.flowChartNavigator.navigateToSibling(
+              selectedElements[0],
+              direction,
+              this.scene.getNonDeletedElementsMap(),
+            );
+
+            // If a sibling was found, update selection and scroll to it
+            if (siblingId) {
+              this.setState((prevState) => ({
+                selectedElementIds: makeNextSelectedElementIds(
+                  {
+                    [siblingId]: true,
+                  },
+                  prevState,
+                ),
+              }));
+
+              // Get the sibling element to check if it's in viewport
+              const siblingElement = this.scene
+                .getNonDeletedElementsMap()
+                .get(siblingId);
+
+              // Scroll to the sibling if it's not fully visible
+              if (
+                siblingElement &&
+                !isElementCompletelyInViewport(
+                  [siblingElement],
+                  this.canvas.width / window.devicePixelRatio,
+                  this.canvas.height / window.devicePixelRatio,
+                  {
+                    offsetLeft: this.state.offsetLeft,
+                    offsetTop: this.state.offsetTop,
+                    scrollX: this.state.scrollX,
+                    scrollY: this.state.scrollY,
+                    zoom: this.state.zoom,
+                  },
+                  this.scene.getNonDeletedElementsMap(),
+                  this.getEditorUIOffsets(),
+                )
+              ) {
+                this.scrollToContent(siblingElement, {
+                  animate: true,
+                  duration: 300,
+                  canvasOffsets: this.getEditorUIOffsets(),
+                });
+              }
+            }
+            return;
+          }
+        }
+
         const arrowKeyPressed = isArrowKey(event.key);
 
         if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed && !event.shiftKey) {
