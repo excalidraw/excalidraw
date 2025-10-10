@@ -99,3 +99,11 @@ pre a {
 .excalidraw .Stats table {
   display: table;
 }
+
+.excalidraw svg text {
+  pointer-events: none;
+}
+
+.excalidraw svg a text {
+  pointer-events: auto;
+}
