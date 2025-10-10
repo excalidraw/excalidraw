@@ -31,6 +31,9 @@ interface HintViewerProps {
   app: AppClassProperties;
 }
 
+const shortcutFromKeyString = (key: string) =>
+  `<kbd>${getShortcutKey(key)}</kbd>`;
+
 const getHints = ({
   appState,
   isMobile,
@@ -45,7 +48,9 @@ const getHints = ({
     appState.openSidebar.tab === CANVAS_SEARCH_TAB &&
     appState.searchMatches?.matches.length
   ) {
-    return t("hints.dismissSearch");
+    return t("hints.dismissSearch", {
+      shortcut: shortcutFromKeyString(t("keys.escape")),
+    });
   }
 
   if (appState.openSidebar && !device.editor.canFitSidebar) {
@@ -53,14 +58,21 @@ const getHints = ({
   }
 
   if (isEraserActive(appState)) {
-    return t("hints.eraserRevert");
+    return t("hints.eraserRevert", {
+      shortcut: shortcutFromKeyString("Alt"),
+    });
   }
   if (activeTool.type === "arrow" || activeTool.type === "line") {
     if (multiMode) {
-      return t("hints.linearElementMulti");
+      return t("hints.linearElementMulti", {
+        shortcut_1: shortcutFromKeyString(t("keys.escape")),
+        shortcut_2: shortcutFromKeyString(t("keys.enter")),
+      });
     }
     if (activeTool.type === "arrow") {
-      return t("hints.arrowTool", { arrowShortcut: getShortcutKey("A") });
+      return t("hints.arrowTool", {
+        shortcut: shortcutFromKeyString("A"),
+      });
     }
     return t("hints.linearElement");
   }
@@ -86,27 +98,43 @@ const getHints = ({
   ) {
     const targetElement = selectedElements[0];
     if (isLinearElement(targetElement) && targetElement.points.length === 2) {
-      return t("hints.lockAngle");
+      return t("hints.lockAngle", {
+        shortcut: shortcutFromKeyString(t("keys.shift")),
+      });
     }
     return isImageElement(targetElement)
-      ? t("hints.resizeImage")
+      ? t("hints.resizeImage", {
+          shortcut_1: shortcutFromKeyString(t("keys.shift")),
+          shortcut_2: shortcutFromKeyString("Alt"),
+        })
       : t("hints.resize");
   }
 
   if (isRotating && lastPointerDownWith === "mouse") {
-    return t("hints.rotate");
+    return t("hints.rotate", {
+      shortcut: shortcutFromKeyString(t("keys.shift")),
+    });
   }
 
   if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
-    return t("hints.text_selected");
+    return t("hints.text_selected", {
+      shortcut: shortcutFromKeyString(t("keys.enter")),
+    });
   }
 
   if (appState.editingTextElement) {
-    return t("hints.text_editing");
+    return t("hints.text_editing", {
+      shortcut_1: shortcutFromKeyString(t("keys.escape")),
+      shortcut_2: shortcutFromKeyString("CtrlOrCmd"),
+      shortcut_3: shortcutFromKeyString(t("keys.enter")),
+    });
   }
 
   if (appState.croppingElementId) {
-    return t("hints.leaveCropEditor");
+    return t("hints.leaveCropEditor", {
+      shortcut_1: shortcutFromKeyString(t("keys.enter")),
+      shortcut_2: shortcutFromKeyString(t("keys.escape")),
+    });
   }
 
   if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
@@ -181,6 +209,7 @@ export const HintViewer = React.memo(
       return null;
     }
 
+    // TODO: remove getShortcutKey
     const hint = Array.isArray(hints)
       ? hints
           .map((hint) => {
@@ -193,7 +222,7 @@ export const HintViewer = React.memo(
       React.Fragment,
       {},
       ...nodesFromTextWithTags(hint, {
-        shortcut: (el) => <span className="HintViewer__key">{el}</span>,
+        kbd: (el) => <span className="HintViewer__key">{el}</span>,
       }),
     );
 
