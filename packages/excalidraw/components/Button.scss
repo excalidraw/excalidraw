@@ -15,7 +15,8 @@
     background: none;
     border: none;
     color: var(--color-on-surface);
-    transition: background-color 0.1s ease-in-out, border-color 0.1s ease-in-out, color 0.1s ease-in-out;
+    // Enhanced transition - added transform and box-shadow
+    transition: all 0.15s ease-in-out;
     user-select: none;
     text-decoration: none;
     white-space: nowrap;
@@ -38,14 +39,19 @@
       color: var(--color-on-surface);
       text-decoration: none;
       border-color: var(--default-border-color);
-      box-shadow: 0 0 0 1px var(--default-border-color);
+      box-shadow: 0 0 0 1px var(--default-border-color), 
+                  0 2px 8px rgba(0, 0, 0, 0.12); // Added subtle shadow
+      transform: translateY(-1px); // Added lift effect
     }
 
     &:active:not(:disabled) {
       background-color: var(--button-active-bg);
       color: var(--color-on-surface);
       border-color: var(--color-primary-darkest);
-      box-shadow: 0 0 0 1px var(--color-primary-darkest);
+      box-shadow: 0 0 0 1px var(--color-primary-darkest),
+                  0 1px 2px rgba(0, 0, 0, 0.1); // Reduced shadow on click
+      transform: translateY(0); // Reset lift
+      transition-duration: 0.05s; // Faster feedback on click
     }
 
     &.excalidraw-button--primary {
@@ -58,14 +64,19 @@
         background-color: var(--color-primary-hover);
         color: var(--color-on-primary-container);
         border-color: var(--color-primary-hover);
-        box-shadow: 0 0 0 1px var(--color-primary-hover);
+        box-shadow: 0 0 0 1px var(--color-primary-hover),
+                    0 2px 8px rgba(0, 0, 0, 0.15); // Added shadow
+        transform: translateY(-1px); // Added lift
       }
 
       &:active:not(:disabled) {
         background-color: var(--color-brand-active);
         color: var(--color-on-primary-container);
         border-color: var(--color-brand-active);
-        box-shadow: 0 0 0 1px var(--color-brand-active);
+        box-shadow: 0 0 0 1px var(--color-brand-active),
+                    0 1px 2px rgba(0, 0, 0, 0.1); // Reduced shadow
+        transform: translateY(0); // Reset lift
+        transition-duration: 0.05s; // Faster feedback
       }
     }
   }
