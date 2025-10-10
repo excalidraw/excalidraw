@@ -5,16 +5,16 @@ import type { Merge } from "./utility-types";
 export const COLOR_OUTLINE_CONTRAST_THRESHOLD = 240;
 
 // FIXME can't put to utils.ts rn because of circular dependency
-const pick = <R extends Record<string, any>, K extends readonly (keyof R)[]>(
+const pick = <R extends Record<string, any>, K extends readonly string[]>(
   source: R,
   keys: K,
 ) => {
-  return keys.reduce((acc, key: K[number]) => {
+  return keys.reduce((acc, key) => {
     if (key in source) {
-      acc[key] = source[key];
+      (acc as any)[key] = source[key];
     }
     return acc;
-  }, {} as Pick<R, K[number]>) as Pick<R, K[number]>;
+  }, {} as Record<string, any>) as Pick<R, K[number]>;
 };
 
 export type ColorPickerColor =
@@ -42,13 +42,10 @@ export const ELEMENTS_PALETTE_SHADE_INDEXES = [0, 2, 4, 6, 8] as const;
 export const CANVAS_PALETTE_SHADE_INDEXES = [0, 1, 2, 3, 4] as const;
 
 export const getSpecificColorShades = (
-  color: Exclude<
-    ColorPickerColor,
-    "transparent" | "white" | "black" | "bronze"
-  >,
+  color: string,
   indexArr: Readonly<ColorShadesIndexes>,
 ) => {
-  return indexArr.map((index) => oc[color][index]) as any as ColorTuple;
+  return indexArr.map((index) => (oc as any)[color][index]) as any as ColorTuple;
 };
 
 export const COLOR_PALETTE = {
@@ -67,6 +64,11 @@ export const COLOR_PALETTE = {
   green: getSpecificColorShades("green", ELEMENTS_PALETTE_SHADE_INDEXES),
   yellow: getSpecificColorShades("yellow", ELEMENTS_PALETTE_SHADE_INDEXES),
   orange: getSpecificColorShades("orange", ELEMENTS_PALETTE_SHADE_INDEXES),
+  rose: ["#fef2f2", "#fce7f3", "#fbcfe8", "#f9a8d4", "#f472b6"],
+  fuchsia: ["#fdf4ff", "#fae8ff", "#f5d0fe", "#f0abfc", "#e879f9"],
+  purple: ["#faf5ff", "#f3e8ff", "#e9d5ff", "#d8b4fe", "#c084fc"],
+  sky: ["#f0f9ff", "#e0f2fe", "#bae6fd", "#7dd3fc", "#38bdf8"],
+  mint: ["#f0fdf4", "#dcfce7", "#bbf7d0", "#86efac", "#4ade80"],
   // radix bronze shades 3,5,7,9,11
   bronze: ["#f8f1ee", "#eaddd7", "#d2bab0", "#a18072", "#846358"],
 } as ColorPalette;
@@ -82,6 +84,11 @@ const COMMON_ELEMENT_SHADES = pick(COLOR_PALETTE, [
   "yellow",
   "orange",
   "red",
+  "rose",
+  "fuchsia",
+  "purple",
+  "sky",
+  "mint",
 ]);
 
 // -----------------------------------------------------------------------------

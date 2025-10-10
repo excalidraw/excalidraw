@@ -122,10 +122,6 @@ export const Picker = React.forwardRef(
 
     useImperativeHandle(ref, () => pickerRef.current!);
 
-    useEffect(() => {
-      pickerRef?.current?.focus();
-    }, []);
-
     return (
       <div role="dialog" aria-modal="true" aria-label={t("labels.colorPicker")}>
         <div

@@ -1,6 +1,6 @@
 import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 import {
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
@@ -31,6 +31,7 @@ import { Picker } from "./Picker";
 import PickerHeading from "./PickerHeading";
 import { TopPicks } from "./TopPicks";
 import { activeColorPickerSectionAtom, isColorDark } from "./colorPickerUtils";
+import { collapseDownIcon, collapseUpIcon } from "../icons";
 
 import "./ColorPicker.scss";
 
@@ -103,6 +104,7 @@ const ColorPickerPopupContent = ({
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const colorInputJSX = (
     <div>
@@ -119,6 +121,8 @@ const ColorPickerPopupContent = ({
     </div>
   );
 
+  const [gradientText, setGradientText] = useState("");
+
   const colorPickerContentRef = useRef<HTMLDivElement>(null);
 
   const focusPickerContent = () => {
@@ -128,9 +132,9 @@ const ColorPickerPopupContent = ({
   return (
     <PropertiesPopover
       container={container}
-      style={{ maxWidth: "13rem" }}
+      style={{ maxWidth: "13rem", maxHeight: "400px", overflow: "auto" }}
       // Improve focus handling for text editing scenarios
-      preventAutoFocusOnTouch={!!appState.editingTextElement}
+      preventAutoFocusOnTouch={true}
       onFocusOutside={(event) => {
         // refocus due to eye dropper
         if (!isWritableElement(event.target)) {
@@ -166,61 +170,103 @@ const ColorPickerPopupContent = ({
         }
       }}
     >
-      {palette ? (
-        <Picker
-          ref={colorPickerContentRef}
-          palette={palette}
-          color={color}
-          onChange={(changedColor) => {
-            // Save caret position before color change if editing text
-            const savedSelection = appState.editingTextElement
-              ? saveCaretPosition()
-              : null;
-
-            onChange(changedColor);
-
-            // Restore caret position after color change if editing text
-            if (appState.editingTextElement && savedSelection) {
-              restoreCaretPosition(savedSelection);
-            }
-          }}
-          onEyeDropperToggle={(force) => {
-            setEyeDropperState((state) => {
-              if (force) {
-                state = state || {
-                  keepOpenOnAlt: true,
-                  onSelect: onChange,
-                  colorPickerType: type,
-                };
-                state.keepOpenOnAlt = true;
-                return state;
-              }
-
-              return force === false || state
-                ? null
-                : {
-                    keepOpenOnAlt: false,
-                    onSelect: onChange,
-                    colorPickerType: type,
-                  };
-            });
-          }}
-          onEscape={(event) => {
-            if (eyeDropperState) {
-              setEyeDropperState(null);
-            } else {
-              // close explicitly on Escape
-              updateData({ openPopup: null });
-            }
-          }}
-          type={type}
-          elements={elements}
-          updateData={updateData}
+      <div style={{ display: "flex", justifyContent: "flex-end", padding: "4px", gap: "4px" }}>
+        <button
+          className="minimize-btn"
+          onClick={() => setIsMinimized(true)}
+          disabled={isMinimized}
         >
-          {colorInputJSX}
-        </Picker>
-      ) : (
-        colorInputJSX
+          Minimize
+        </button>
+        <button
+          className="maximize-btn"
+          onClick={() => setIsMinimized(false)}
+          disabled={!isMinimized}
+        >
+          Maximize
+        </button>
+      </div>
+      {!isMinimized && (
+        <>
+          {palette ? (
+            <Picker
+              ref={colorPickerContentRef}
+              palette={palette}
+              color={color}
+              onChange={(changedColor) => {
+                // Save caret position before color change if editing text
+                const savedSelection = appState.editingTextElement
+                  ? saveCaretPosition()
+                  : null;
+
+                onChange(changedColor);
+
+                // Restore caret position after color change if editing text
+                if (appState.editingTextElement && savedSelection) {
+                  restoreCaretPosition(savedSelection);
+                }
+              }}
+              onEyeDropperToggle={(force) => {
+                setEyeDropperState((state) => {
+                  if (force) {
+                    state = state || {
+                      keepOpenOnAlt: true,
+                      onSelect: onChange,
+                      colorPickerType: type,
+                    };
+                    state.keepOpenOnAlt = true;
+                    return state;
+                  }
+
+                  return force === false || state
+                    ? null
+                    : {
+                        keepOpenOnAlt: false,
+                        onSelect: onChange,
+                        colorPickerType: type,
+                      };
+                });
+              }}
+              onEscape={(event) => {
+                if (eyeDropperState) {
+                  setEyeDropperState(null);
+                } else {
+                  // close explicitly on Escape
+                  updateData({ openPopup: null });
+                }
+              }}
+              type={type}
+              elements={elements}
+              updateData={updateData}
+            >
+              {colorInputJSX}
+              <div style={{ marginTop: 12 }}>
+                <PickerHeading>{t("colorPicker.gradient" as any)}</PickerHeading>
+                <input
+                  aria-label={t("colorPicker.gradient" as any)}
+                  placeholder="linear-gradient(45deg,#f00,#0f0)"
+                  value={gradientText}
+                  onChange={(e) => setGradientText(e.target.value)}
+                  style={{ width: "100%" }}
+                />
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 6 }}>
+                  <button
+                    className="properties-popover__apply"
+                    onClick={() => {
+                      if (gradientText.trim()) {
+                        onChange(gradientText.trim());
+                      }
+                    }}
+                  >
+                    {t("labels.apply" as any)}
+                  </button>
+                </div>
+              </div>
+            </Picker>
+          ) : (
+            colorInputJSX
+          )}
+        </>
       )}
     </PropertiesPopover>
   );
