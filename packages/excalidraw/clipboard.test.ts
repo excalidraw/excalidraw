@@ -129,6 +129,23 @@ describe("parseClipboard()", () => {
     ]);
   });
 
+  it("should parse <image> `src` data URLs out of text/html", async () => {
+    const clipboardData = await parseClipboard(
+      createPasteEvent({
+        types: {
+          "text/html": `<img src="data:image/png;base64,UGxlYXNlIHNldCBhIHVzZXItYWdlbnQgYW5kIHJlc3BlY3Qgb3VyIHJvYm90IHBvbGljeSBodHRwczovL3cud2lraS80d0pTLiBTZWUgYWxzbyBUNDAwMTE5Lgo=" />`,
+        },
+      }),
+    );
+    expect(clipboardData.mixedContent).toEqual([
+      {
+        type: "imageUrl",
+        value:
+          "data:image/png;base64,UGxlYXNlIHNldCBhIHVzZXItYWdlbnQgYW5kIHJlc3BlY3Qgb3VyIHJvYm90IHBvbGljeSBodHRwczovL3cud2lraS80d0pTLiBTZWUgYWxzbyBUNDAwMTE5Lgo=",
+      },
+    ]);
+  });
+
   it("should parse text content alongside <image> `src` urls out of text/html", async () => {
     const clipboardData = await parseClipboard(
       await parseDataTransferEvent(
