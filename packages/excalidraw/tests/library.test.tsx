@@ -67,9 +67,8 @@ describe("library items inserting", () => {
       type: "arrow",
       endBinding: {
         elementId: "rectangle1",
-        focus: -1,
-        gap: 0,
         fixedPoint: [0.5, 1],
+        mode: "orbit",
       },
     });
 
