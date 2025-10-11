@@ -1,0 +1,63 @@
+.wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.trigger {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.selectedSwatch {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
+
+.panel {
+  position: absolute;
+  left: 110%;
+  top: 0;
+  min-width: 160px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  padding: 8px 12px;
+  border-radius: 8px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.colorGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.swatch, .swatchSelected {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #eee;
+  cursor: pointer;
+  transition: border 0.15s;
+}
+
+.swatchSelected {
+  border: 2px solid #007aff;
+}
+
+.closeBtn {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #888;
+  cursor: pointer;
+  margin-bottom: 2px;
+}
