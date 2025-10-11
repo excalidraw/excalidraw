@@ -288,6 +288,11 @@ const initializeScene = async (opts: {
     }
   }
 
+  if (window.location.hash === "#new") {
+  localStorage.removeItem("excalidraw"); // start fresh
+}
+
+
   if (roomLinkData && opts.collabAPI) {
     const { excalidrawAPI } = opts;
 
