@@ -29,7 +29,7 @@ import {
   type Store,
 } from "@excalidraw/element";
 
-import type { Radians } from "@excalidraw/math";
+import type { GenericPoint, Radians, ViewportPoint } from "@excalidraw/math";
 
 import type {
   AppState,
@@ -456,7 +456,7 @@ export class LinearElementEditor {
         if (coords.length) {
           suggestedBindings = maybeSuggestBindingsForLinearElementAtCoords(
             element,
-            coords,
+            coords.map(c => pointFrom(c.x, c.y)),
             app.scene,
             app.state.zoom,
           );
@@ -674,8 +674,7 @@ export class LinearElementEditor {
       element,
       elementsMap,
       appState.zoom,
-      scenePointer.x,
-      scenePointer.y,
+      pointFrom(scenePointer.x, scenePointer.y)
     );
     if (!isElbowArrow(element) && clickedPointIndex >= 0) {
       return null;
@@ -932,8 +931,7 @@ export class LinearElementEditor {
       element,
       elementsMap,
       appState.zoom,
-      scenePointer.x,
-      scenePointer.y,
+      pointFrom(scenePointer.x, scenePointer.y)
     );
     // if we clicked on a point, set the element as hitElement otherwise
     // it would get deselected if the point is outside the hitbox area
@@ -1190,8 +1188,7 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     elementsMap: ElementsMap,
     zoom: AppState["zoom"],
-    x: number,
-    y: number,
+    cursorPointer: GlobalPoint,
   ) {
     const pointHandles = LinearElementEditor.getPointsGlobalCoordinates(
       element,
@@ -1204,7 +1201,7 @@ export class LinearElementEditor {
     while (--idx > -1) {
       const p = pointHandles[idx];
       if (
-        pointDistance(pointFrom(x, y), pointFrom(p[0], p[1])) * zoom.value <
+        pointDistance(cursorPointer, pointFrom(p[0], p[1])) * zoom.value <
         // +1px to account for outline stroke
         LinearElementEditor.POINT_HANDLE_SIZE + 1
       ) {

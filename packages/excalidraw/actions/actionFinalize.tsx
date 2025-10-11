@@ -244,7 +244,7 @@ export const actionFinalize = register({
               ),
             );
 
-          maybeBindLinearElement(element, appState, coords, scene);
+          maybeBindLinearElement(element, appState, pointFrom(coords.x, coords.y), scene);
         }
       }
     }
