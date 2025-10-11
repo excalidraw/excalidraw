@@ -30,7 +30,7 @@ interface HintViewerProps {
   app: AppClassProperties;
 }
 
-const shortcutFromKeyString = (key: string) =>
+const getTaggedShortcutKey = (key: string) =>
   `<kbd>${getShortcutKey(key)}</kbd>`;
 
 const getHints = ({
@@ -48,7 +48,7 @@ const getHints = ({
     appState.searchMatches?.matches.length
   ) {
     return t("hints.dismissSearch", {
-      shortcut: shortcutFromKeyString(t("keys.escape")),
+      shortcut: getTaggedShortcutKey(t("keys.escape")),
     });
   }
 
@@ -58,19 +58,19 @@ const getHints = ({
 
   if (isEraserActive(appState)) {
     return t("hints.eraserRevert", {
-      shortcut: shortcutFromKeyString("Alt"),
+      shortcut: getTaggedShortcutKey("Alt"),
     });
   }
   if (activeTool.type === "arrow" || activeTool.type === "line") {
     if (multiMode) {
       return t("hints.linearElementMulti", {
-        shortcut_1: shortcutFromKeyString(t("keys.escape")),
-        shortcut_2: shortcutFromKeyString(t("keys.enter")),
+        shortcut_1: getTaggedShortcutKey(t("keys.escape")),
+        shortcut_2: getTaggedShortcutKey(t("keys.enter")),
       });
     }
     if (activeTool.type === "arrow") {
       return t("hints.arrowTool", {
-        shortcut: shortcutFromKeyString("A"),
+        shortcut: getTaggedShortcutKey("A"),
       });
     }
     return t("hints.linearElement");
@@ -98,51 +98,51 @@ const getHints = ({
     const targetElement = selectedElements[0];
     if (isLinearElement(targetElement) && targetElement.points.length === 2) {
       return t("hints.lockAngle", {
-        shortcut: shortcutFromKeyString(t("keys.shift")),
+        shortcut: getTaggedShortcutKey(t("keys.shift")),
       });
     }
     return isImageElement(targetElement)
       ? t("hints.resizeImage", {
-          shortcut_1: shortcutFromKeyString(t("keys.shift")),
-          shortcut_2: shortcutFromKeyString("Alt"),
+          shortcut_1: getTaggedShortcutKey(t("keys.shift")),
+          shortcut_2: getTaggedShortcutKey("Alt"),
         })
       : t("hints.resize", {
-          shortcut: shortcutFromKeyString(t("keys.shift")),
-          shortcut_2: shortcutFromKeyString("Alt"),
+          shortcut: getTaggedShortcutKey(t("keys.shift")),
+          shortcut_2: getTaggedShortcutKey("Alt"),
         });
   }
 
   if (isRotating && lastPointerDownWith === "mouse") {
     return t("hints.rotate", {
-      shortcut: shortcutFromKeyString(t("keys.shift")),
+      shortcut: getTaggedShortcutKey(t("keys.shift")),
     });
   }
 
   if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
     return t("hints.text_selected", {
-      shortcut: shortcutFromKeyString(t("keys.enter")),
+      shortcut: getTaggedShortcutKey(t("keys.enter")),
     });
   }
 
   if (appState.editingTextElement) {
     return t("hints.text_editing", {
-      shortcut_1: shortcutFromKeyString(t("keys.escape")),
-      shortcut_2: `${shortcutFromKeyString(
+      shortcut_1: getTaggedShortcutKey(t("keys.escape")),
+      shortcut_2: `${getTaggedShortcutKey(
         "CtrlOrCmd",
-      )} + ${shortcutFromKeyString(t("keys.enter"))}`,
+      )} + ${getTaggedShortcutKey(t("keys.enter"))}`,
     });
   }
 
   if (appState.croppingElementId) {
     return t("hints.leaveCropEditor", {
-      shortcut_1: shortcutFromKeyString(t("keys.enter")),
-      shortcut_2: shortcutFromKeyString(t("keys.escape")),
+      shortcut_1: getTaggedShortcutKey(t("keys.enter")),
+      shortcut_2: getTaggedShortcutKey(t("keys.escape")),
     });
   }
 
   if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
     return t("hints.enterCropEditor", {
-      shortcut: shortcutFromKeyString(t("keys.enter")),
+      shortcut: getTaggedShortcutKey(t("keys.enter")),
     });
   }
 
@@ -155,21 +155,21 @@ const getHints = ({
     ) {
       return [
         t("hints.deepBoxSelect", {
-          shortcut: shortcutFromKeyString("CtrlOrCmd"),
+          shortcut: getTaggedShortcutKey("CtrlOrCmd"),
         }),
       ];
     }
 
     if (isGridModeEnabled(app) && appState.selectedElementsAreBeingDragged) {
       return t("hints.disableSnapping", {
-        shortcut: shortcutFromKeyString("CtrlOrCmd"),
+        shortcut: getTaggedShortcutKey("CtrlOrCmd"),
       });
     }
 
     if (!selectedElements.length && !isMobile) {
       return [
         t("hints.canvasPanning", {
-          shortcut: shortcutFromKeyString(t("keys.spacebar")),
+          shortcut: getTaggedShortcutKey(t("keys.spacebar")),
         }),
       ];
     }
@@ -179,25 +179,25 @@ const getHints = ({
         if (appState.selectedLinearElement?.isEditing) {
           return appState.selectedLinearElement.selectedPointsIndices
             ? t("hints.lineEditor_pointSelected", {
-                shortcut_1: shortcutFromKeyString(t("keys.delete")),
-                shortcut_2: `${shortcutFromKeyString(
+                shortcut_1: getTaggedShortcutKey(t("keys.delete")),
+                shortcut_2: `${getTaggedShortcutKey(
                   "CtrlOrCmd",
-                )} + ${shortcutFromKeyString("D")}`,
+                )} + ${getTaggedShortcutKey("D")}`,
               })
             : t("hints.lineEditor_nothingSelected", {
-                shortcut_1: shortcutFromKeyString(t("keys.shift")),
-                shortcut_2: shortcutFromKeyString("ALt"),
+                shortcut_1: getTaggedShortcutKey(t("keys.shift")),
+                shortcut_2: getTaggedShortcutKey("ALt"),
               });
         }
         return isLineElement(selectedElements[0])
           ? t("hints.lineEditor_line_info", {
-              shortcut: shortcutFromKeyString(t("keys.enter")),
+              shortcut: getTaggedShortcutKey(t("keys.enter")),
             })
           : t("hints.lineEditor_info", {
-              shortcut_1: shortcutFromKeyString("CtrlOrCmd"),
-              shortcut_2: `${shortcutFromKeyString(
+              shortcut_1: getTaggedShortcutKey("CtrlOrCmd"),
+              shortcut_2: `${getTaggedShortcutKey(
                 "CtrlOrCmd",
-              )} + ${shortcutFromKeyString(t("keys.enter"))}`,
+              )} + ${getTaggedShortcutKey(t("keys.enter"))}`,
             });
       }
       if (
@@ -206,10 +206,10 @@ const getHints = ({
         isTextBindableContainer(selectedElements[0])
       ) {
         const bindTextToElement = t("hints.bindTextToElement", {
-          shortcut: shortcutFromKeyString(t("keys.enter")),
+          shortcut: getTaggedShortcutKey(t("keys.enter")),
         });
         const createFlowChart = t("hints.createFlowchart", {
-          shortcut: shortcutFromKeyString("CtrlOrCmd"),
+          shortcut: getTaggedShortcutKey("CtrlOrCmd"),
         });
         if (isFlowchartNodeElement(selectedElements[0])) {
           if (
