@@ -7774,7 +7774,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     const boundElement = getHoveredElementForBinding(
-      pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
+      pointerDownState.origin,
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
       this.state.zoom,
@@ -8078,7 +8078,7 @@ class App extends React.Component<AppProps, AppState> {
         points: [...element.points, pointFrom<LocalPoint>(0, 0)],
       });
       const boundElement = getHoveredElementForBinding(
-        pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
+        pointerDownState.origin,
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
         this.state.zoom,
@@ -10399,7 +10399,7 @@ class App extends React.Component<AppProps, AppState> {
     considerAll: boolean,
   ): void => {
     const hoveredBindableElement = getHoveredElementForBinding(
-      pointFrom(pointerCoords.x, pointerCoords.y),
+      pointerCoords,
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
       this.state.zoom,
