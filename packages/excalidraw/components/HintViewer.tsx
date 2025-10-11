@@ -127,8 +127,9 @@ const getHints = ({
   if (appState.editingTextElement) {
     return t("hints.text_editing", {
       shortcut_1: shortcutFromKeyString(t("keys.escape")),
-      shortcut_2: shortcutFromKeyString("CtrlOrCmd"),
-      shortcut_3: shortcutFromKeyString(t("keys.enter")),
+      shortcut_2: `${shortcutFromKeyString(
+        "CtrlOrCmd",
+      )} + ${shortcutFromKeyString(t("keys.enter"))}`,
     });
   }
 
@@ -179,8 +180,9 @@ const getHints = ({
           return appState.selectedLinearElement.selectedPointsIndices
             ? t("hints.lineEditor_pointSelected", {
                 shortcut_1: shortcutFromKeyString(t("keys.delete")),
-                shortcut_2: shortcutFromKeyString("CtrlOrCmd"),
-                shortcut_3: shortcutFromKeyString("D"),
+                shortcut_2: `${shortcutFromKeyString(
+                  "CtrlOrCmd",
+                )} + ${shortcutFromKeyString("D")}`,
               })
             : t("hints.lineEditor_nothingSelected", {
                 shortcut_1: shortcutFromKeyString(t("keys.shift")),
