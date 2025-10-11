@@ -47,7 +47,7 @@ import { updateBrowserStateVersion } from "./tabSync";
 
 const filesStore = createStore("files-db", "files-store");
 
-export const localStorageQuotaExceededAtom = atom(false);
+export const localStorageQuotaExceededAtom = atom(true);
 
 class LocalFileManager extends FileManager {
   clearObsoleteFiles = async (opts: { currentFileIds: FileId[] }) => {
