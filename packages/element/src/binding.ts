@@ -386,8 +386,11 @@ export const getSuggestedBindingsForArrows = (
 
 export const maybeSuggestBindingsForLinearElementAtCoords = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
-  /** scene pointers */
-  pointers: GlobalPoint[],
+  /** scene coords */
+  pointerCoords: {
+    x: number;
+    y: number;
+  }[],
   scene: Scene,
   zoom: AppState["zoom"],
   // During line creation the start binding hasn't been written yet
@@ -395,10 +398,10 @@ export const maybeSuggestBindingsForLinearElementAtCoords = (
   oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
 ): ExcalidrawBindableElement[] =>
   Array.from(
-    pointers.reduce(
-      (acc: Set<NonDeleted<ExcalidrawBindableElement>>, pointer) => {
+    pointerCoords.reduce(
+      (acc: Set<NonDeleted<ExcalidrawBindableElement>>, coords) => {
         const hoveredBindableElement = getHoveredElementForBinding(
-          pointer,
+          pointFrom(coords.x, coords.y),
           scene.getNonDeletedElements(),
           scene.getNonDeletedElementsMap(),
           zoom,
@@ -426,7 +429,7 @@ export const maybeSuggestBindingsForLinearElementAtCoords = (
 export const maybeBindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   appState: AppState,
-  pointer: GlobalPoint,
+  pointerCoords: { x: number; y: number },
   scene: Scene,
 ): void => {
   const elements = scene.getNonDeletedElements();
@@ -442,7 +445,7 @@ export const maybeBindLinearElement = (
   }
 
   const hoveredElement = getHoveredElementForBinding(
-    pointer,
+    pointFrom(pointerCoords.x, pointerCoords.y),
     elements,
     elementsMap,
     appState.zoom,
@@ -1585,12 +1588,12 @@ const newBoundElements = (
 
 export const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
-  pointer: GlobalPoint,
+  point: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
   zoom?: AppState["zoom"],
   fullShape?: boolean,
 ): boolean => {
-  const [x, y] = pointer;
+  const [x, y] = point;
   const threshold = maxBindingGap(element, element.width, element.height, zoom);
   const shouldTestInside =
     // disable fullshape snapping for frame elements so we
@@ -1615,9 +1618,9 @@ export const bindingBorderTest = (
   const intersections = intersectElementWithLineSegment(
     element,
     elementsMap,
-    lineSegment(elementCenterPoint(element, elementsMap), pointer),
+    lineSegment(elementCenterPoint(element, elementsMap), point),
   );
-  const distance = distanceToElement(element, elementsMap, pointer);
+  const distance = distanceToElement(element, elementsMap, point);
 
   return shouldTestInside
     ? intersections.length === 0 || distance <= threshold

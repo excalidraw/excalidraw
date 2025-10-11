@@ -6003,7 +6003,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           suggestedBindings: maybeSuggestBindingsForLinearElementAtCoords(
             newElement,
-            [pointFrom(scenePointerX, scenePointerY)],
+            [scenePointer],
             this.scene,
             this.state.zoom,
             this.state.startBoundElement,
@@ -6388,7 +6388,8 @@ class App extends React.Component<AppProps, AppState> {
           element,
           elementsMap,
           this.state.zoom,
-          pointFrom(scenePointerX, scenePointerY),
+          scenePointerX,
+          scenePointerY,
         );
         segmentMidPointHoveredCoords =
           LinearElementEditor.getSegmentMidpointHitCoords(
@@ -7278,7 +7279,8 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements[0],
             elementsMap,
             this.state.zoom,
-            pointFrom(pointerDownState.origin.x, pointerDownState.origin.y)
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
           ) !== -1
         ) &&
         !(
@@ -8979,7 +8981,7 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({
               suggestedBindings: maybeSuggestBindingsForLinearElementAtCoords(
                 newElement,
-                [pointFrom(pointerCoords.x, pointerCoords.y)],
+                [pointerCoords],
                 this.scene,
                 this.state.zoom,
                 this.state.startBoundElement,
