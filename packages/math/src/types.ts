@@ -21,13 +21,13 @@ export type Degrees = number & { _brand: "excalimath_degree" };
 /**
  * A number range which includes the start and end numbers in the range.
  */
-export type InclusiveRange = ViewportPoint & { _brand: "excalimath_degree" };
+export type InclusiveRange = [number, number] & { _brand: "excalimath_degree" };
 
 //
 // Point
 //
 
-export type ViewportPoint = [x: number, y: number];
+type ViewportPoint = [x: number, y: number];
 
 /**
  * Represents a 2D position in world or canvas space. A

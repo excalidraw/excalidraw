@@ -2,7 +2,7 @@ import { pointsEqual } from "./point";
 import { lineSegment, pointOnLineSegment } from "./segment";
 import { PRECISION } from "./utils";
 
-import type { GenericPoint, GlobalPoint, LocalPoint, Polygon } from "./types";
+import type { GenericPoint, Polygon } from "./types";
 
 export function polygon<Point extends GenericPoint>(
   ...points: Point[]

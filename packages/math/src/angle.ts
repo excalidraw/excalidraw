@@ -3,8 +3,6 @@ import { PRECISION } from "./utils";
 import type {
   Degrees,
   GenericPoint,
-  GlobalPoint,
-  LocalPoint,
   PolarCoords,
   Radians,
 } from "./types";

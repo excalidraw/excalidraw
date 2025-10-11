@@ -3,8 +3,6 @@ import { PRECISION } from "./utils";
 import { vectorFromPoint, vectorScale } from "./vector";
 
 import type {
-  LocalPoint,
-  GlobalPoint,
   Radians,
   Degrees,
   Vector,
