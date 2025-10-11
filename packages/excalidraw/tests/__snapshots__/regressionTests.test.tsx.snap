@@ -2249,10 +2249,14 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
       "updated": {
         "id0": {
           "deleted": {
-            "version": 5,
+            "version": 4,
+            "x": 20,
+            "y": 20,
           },
           "inserted": {
             "version": 3,
+            "x": 10,
+            "y": 10,
           },
         },
       },
@@ -11094,26 +11098,38 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
       "updated": {
         "id0": {
           "deleted": {
-            "version": 6,
+            "version": 5,
+            "x": 20,
+            "y": 20,
           },
           "inserted": {
             "version": 4,
+            "x": 10,
+            "y": 10,
           },
         },
         "id3": {
           "deleted": {
-            "version": 6,
+            "version": 5,
+            "x": 40,
+            "y": 20,
           },
           "inserted": {
             "version": 4,
+            "x": 30,
+            "y": 10,
           },
         },
         "id6": {
           "deleted": {
-            "version": 6,
+            "version": 5,
+            "x": 60,
+            "y": 20,
           },
           "inserted": {
             "version": 4,
+            "x": 50,
+            "y": 10,
           },
         },
       },

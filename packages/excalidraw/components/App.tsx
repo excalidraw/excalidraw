@@ -240,6 +240,7 @@ import {
   StoreDelta,
   type ApplyToOptions,
   positionElementsOnGrid,
+  calculateDragOffset,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -8782,14 +8783,20 @@ class App extends React.Component<AppProps, AppState> {
               );
             });
 
+            const { x: diffX, y: diffY } = calculateDragOffset(
+              getCommonBounds(elementsWithDuplicates),
+              dragOffset,
+              snapOffset,
+              event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+            );
             const mappedClonedElements = elementsWithDuplicates.map((el) => {
               if (idsOfElementsToDuplicate.has(el.id)) {
                 const origEl = pointerDownState.originalElements.get(el.id);
 
                 if (origEl) {
                   return newElementWith(el, {
-                    x: origEl.x,
-                    y: origEl.y,
+                    x: origEl.x + diffX,
+                    y: origEl.y + diffY,
                   });
                 }
               }

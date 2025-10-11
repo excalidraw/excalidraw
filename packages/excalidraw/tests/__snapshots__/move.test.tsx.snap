@@ -24,11 +24,11 @@ exports[`duplicate element on move when ALT is clicked > rectangle 5`] = `
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 5,
-  "versionNonce": 23633383,
+  "version": 4,
+  "versionNonce": 1014066025,
   "width": 30,
-  "x": 30,
-  "y": 20,
+  "x": 0,
+  "y": 40,
 }
 `;
 
@@ -57,7 +57,7 @@ exports[`duplicate element on move when ALT is clicked > rectangle 6`] = `
   "type": "rectangle",
   "updated": 1,
   "version": 7,
-  "versionNonce": 81784553,
+  "versionNonce": 915032327,
   "width": 30,
   "x": -10,
   "y": 60,

@@ -95,7 +95,7 @@ export const dragSelectedElements = (
     origElements.push(origElement);
   }
 
-  const adjustedOffset = calculateOffset(
+  const adjustedOffset = calculateDragOffset(
     getCommonBounds(origElements),
     offset,
     snapOffset,
@@ -125,7 +125,7 @@ export const dragSelectedElements = (
   });
 };
 
-const calculateOffset = (
+export const calculateDragOffset = (
   commonBounds: Bounds,
   dragOffset: { x: number; y: number },
   snapOffset: { x: number; y: number },

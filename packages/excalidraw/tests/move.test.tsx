@@ -172,7 +172,7 @@ describe("duplicate element on move when ALT is clicked", () => {
     expect(h.elements.length).toEqual(2);
 
     // previous element should stay intact
-    expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
+    expect([h.elements[0].x, h.elements[0].y]).toEqual([0, 40]);
     expect([h.elements[1].x, h.elements[1].y]).toEqual([-10, 60]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
