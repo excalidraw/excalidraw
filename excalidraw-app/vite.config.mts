@@ -120,9 +120,9 @@ export default defineConfig(({ mode }) => {
       woff2BrowserPlugin(),
       react(),
       checker({
-        typescript: true,
+        typescript: process.env.VITE_APP_DISABLE_SENTRY !== "true", // Disable for Docker builds
         eslint:
-          envVars.VITE_APP_ENABLE_ESLINT === "false"
+          envVars.VITE_APP_ENABLE_ESLINT === "false" || process.env.VITE_APP_DISABLE_SENTRY === "true"
             ? undefined
             : { lintCommand: 'eslint "./**/*.{js,ts,tsx}"' },
         overlay: {
