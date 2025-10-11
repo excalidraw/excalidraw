@@ -3,7 +3,7 @@
     "rootDir": "./",
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "types": ["vitest/globals", "@testing-library/jest-dom"],
+    "types": ["vitest/globals", "@testing-library/react", "node"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
