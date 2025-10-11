@@ -9,7 +9,7 @@ import { useDevice, useExcalidrawSetAppState } from "../App";
 import { UserList } from "../UserList";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 import { withInternalFallback } from "../hoc/withInternalFallback";
-import { HamburgerMenuIcon } from "../icons";
+import { HamburgerMenuIcon,HamburgerCloseMenuIcon} from "../icons";
 
 import * as DefaultItems from "./DefaultItems";
 
@@ -46,7 +46,7 @@ const MainMenu = Object.assign(
               data-testid="main-menu-trigger"
               className="main-menu-trigger"
             >
-              {HamburgerMenuIcon}
+              {appState.openMenu === "canvas" ? HamburgerCloseMenuIcon : HamburgerMenuIcon}
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
               onClickOutside={onClickOutside}
