@@ -208,7 +208,7 @@ const getHints = ({
         const bindTextToElement = t("hints.bindTextToElement", {
           shortcut: getTaggedShortcutKey(t("keys.enter")),
         });
-        const createFlowChart = t("hints.createFlowchart", {
+        const createFlowchart = t("hints.createFlowchart", {
           shortcut: getTaggedShortcutKey("CtrlOrCmd"),
         });
         if (isFlowchartNodeElement(selectedElements[0])) {
@@ -218,10 +218,10 @@ const getHints = ({
               app.scene.getNonDeletedElementsMap(),
             )
           ) {
-            return [bindTextToElement, createFlowChart];
+            return [bindTextToElement, createFlowchart];
           }
 
-          return [bindTextToElement, createFlowChart];
+          return [bindTextToElement, createFlowchart];
         }
 
         return bindTextToElement;
