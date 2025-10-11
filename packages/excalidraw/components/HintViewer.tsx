@@ -107,7 +107,10 @@ const getHints = ({
           shortcut_1: shortcutFromKeyString(t("keys.shift")),
           shortcut_2: shortcutFromKeyString("Alt"),
         })
-      : t("hints.resize");
+      : t("hints.resize", {
+          shortcut: shortcutFromKeyString(t("keys.shift")),
+          shortcut_2: shortcutFromKeyString("Alt"),
+        });
   }
 
   if (isRotating && lastPointerDownWith === "mouse") {
@@ -138,7 +141,9 @@ const getHints = ({
   }
 
   if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
-    return t("hints.enterCropEditor");
+    return t("hints.enterCropEditor", {
+      shortcut: shortcutFromKeyString(t("keys.enter")),
+    });
   }
 
   if (activeTool.type === "selection") {
@@ -148,33 +153,63 @@ const getHints = ({
       !appState.editingTextElement &&
       !appState.selectedLinearElement?.isEditing
     ) {
-      return [t("hints.deepBoxSelect")];
+      return [
+        t("hints.deepBoxSelect", {
+          shortcut: shortcutFromKeyString("CtrlOrCmd"),
+        }),
+      ];
     }
 
     if (isGridModeEnabled(app) && appState.selectedElementsAreBeingDragged) {
-      return t("hints.disableSnapping");
+      return t("hints.disableSnapping", {
+        shortcut: shortcutFromKeyString("CtrlOrCmd"),
+      });
     }
 
     if (!selectedElements.length && !isMobile) {
-      return [t("hints.canvasPanning")];
+      return [
+        t("hints.canvasPanning", {
+          shortcut: shortcutFromKeyString(t("keys.spacebar")),
+        }),
+      ];
     }
 
     if (selectedElements.length === 1) {
       if (isLinearElement(selectedElements[0])) {
         if (appState.selectedLinearElement?.isEditing) {
           return appState.selectedLinearElement.selectedPointsIndices
-            ? t("hints.lineEditor_pointSelected")
-            : t("hints.lineEditor_nothingSelected");
+            ? t("hints.lineEditor_pointSelected", {
+                shortcut_1: shortcutFromKeyString(t("keys.delete")),
+                shortcut_2: shortcutFromKeyString("CtrlOrCmd"),
+                shortcut_3: shortcutFromKeyString("D"),
+              })
+            : t("hints.lineEditor_nothingSelected", {
+                shortcut_1: shortcutFromKeyString(t("keys.shift")),
+                shortcut_2: shortcutFromKeyString("ALt"),
+              });
         }
         return isLineElement(selectedElements[0])
-          ? t("hints.lineEditor_line_info")
-          : t("hints.lineEditor_info");
+          ? t("hints.lineEditor_line_info", {
+              shortcut: shortcutFromKeyString(t("keys.enter")),
+            })
+          : t("hints.lineEditor_info", {
+              shortcut_1: shortcutFromKeyString("CtrlOrCmd"),
+              shortcut_2: `${shortcutFromKeyString(
+                "CtrlOrCmd",
+              )} + ${shortcutFromKeyString(t("keys.enter"))}`,
+            });
       }
       if (
         !appState.newElement &&
         !appState.selectedElementsAreBeingDragged &&
         isTextBindableContainer(selectedElements[0])
       ) {
+        const bindTextToElement = t("hints.bindTextToElement", {
+          shortcut: shortcutFromKeyString(t("keys.enter")),
+        });
+        const createFlowChart = t("hints.createFlowchart", {
+          shortcut: shortcutFromKeyString("CtrlOrCmd"),
+        });
         if (isFlowchartNodeElement(selectedElements[0])) {
           if (
             isNodeInFlowchart(
@@ -182,13 +217,13 @@ const getHints = ({
               app.scene.getNonDeletedElementsMap(),
             )
           ) {
-            return [t("hints.bindTextToElement"), t("hints.createFlowchart")];
+            return [bindTextToElement, createFlowChart];
           }
 
-          return [t("hints.bindTextToElement"), t("hints.createFlowchart")];
+          return [bindTextToElement, createFlowChart];
         }
 
-        return t("hints.bindTextToElement");
+        return bindTextToElement;
       }
     }
   }
@@ -209,7 +244,7 @@ export const HintViewer = React.memo(
       return null;
     }
 
-    // TODO: remove getShortcutKey
+    // TODO: remove use simpler regex
     const hint = Array.isArray(hints)
       ? hints
           .map((hint) => {

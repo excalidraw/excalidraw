@@ -338,7 +338,7 @@
   },
   "hints": {
     "dismissSearch": "{{shortcut}} to dismiss search",
-    "canvasPanning": "To move canvas, hold mouse wheel or Space while dragging, or use the hand tool",
+    "canvasPanning": "To move canvas, hold mouse wheel or {{shortcut}} while dragging, or use the hand tool",
     "linearElement": "Click to start multiple points, drag for single line",
     "arrowTool": "Click to start multiple points, drag for single line. Press {{shortcut}} again to change arrow type.",
     "freeDraw": "Click and drag, release when you're finished",
@@ -348,21 +348,21 @@
     "text_editing": "Press {{shortcut_1}} or {{shortcut_2}} + {{shortcut_3}} to finish editing",
     "linearElementMulti": "Click on last point or press {{shortcut_1}} or {{shortcut_2}} to finish",
     "lockAngle": "You can constrain angle by holding {{shortcut}}",
-    "resize": "You can constrain proportions by holding Shift while resizing,\nhold Alt to resize from the center",
+    "resize": "You can constrain proportions by holding {{shortcut_1}} while resizing,\nhold {{shortcut_2}} to resize from the center",
     "resizeImage": "You can resize freely by holding {{shortcut_1}},\nhold {{shortcut_2}} to resize from the center",
     "rotate": "You can constrain angles by holding {{shortcut}} while rotating",
-    "lineEditor_info": "Hold CtrlOrCmd and Double-click or press CtrlOrCmd + Enter to edit points",
-    "lineEditor_line_info": "Double-click or press Enter to edit points",
-    "lineEditor_pointSelected": "Press Delete to remove point(s),\nCtrlOrCmd + D to duplicate, or drag to move",
-    "lineEditor_nothingSelected": "Select a point to edit (hold Shift to select multiple),\nor hold Alt and click to add new points",
+    "lineEditor_info": "Hold {{shortcut_1}} and Double-click or press {{shortcut_2}} to edit points",
+    "lineEditor_line_info": "Double-click or press {{shortcut}} to edit points",
+    "lineEditor_pointSelected": "Press {{shortcut_1}} to remove point(s),\n{{shortcut_2}} + {{shortcut_3}} to duplicate, or drag to move",
+    "lineEditor_nothingSelected": "Select a point to edit (hold {{shortcut_1}} to select multiple),\nor hold {{shortcut_2}} and click to add new points",
     "publishLibrary": "Publish your own library",
-    "bindTextToElement": "Press Enter to add text",
-    "createFlowchart": "Hold CtrlOrCmd and Arrow key to create a flowchart",
-    "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
+    "bindTextToElement": "Press {{shortcut}} to add text",
+    "createFlowchart": "Hold {{shortcut}} and Arrow key to create a flowchart",
+    "deepBoxSelect": "Hold {{shortcut}} to deep select, and to prevent dragging",
     "eraserRevert": "Hold {{shortcut}} to revert the elements marked for deletion",
     "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
-    "disableSnapping": "Hold CtrlOrCmd to disable snapping",
-    "enterCropEditor": "Double click the image or press Enter to crop the image",
+    "disableSnapping": "Hold {{shortcut}} to disable snapping",
+    "enterCropEditor": "Double click the image or press {{shortcut}} to crop the image",
     "leaveCropEditor": "Click outside the image or press {{shortcut_1}} or {{shortcut_2}} to finish cropping"
   },
   "canvasError": {
@@ -652,6 +652,8 @@
   "keys": {
     "escape": "Esc",
     "enter": "Enter",
-    "shift": "Shift"
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete"
   }
 }
