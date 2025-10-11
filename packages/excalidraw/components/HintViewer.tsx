@@ -107,7 +107,7 @@ const getHints = ({
           shortcut_2: getTaggedShortcutKey("Alt"),
         })
       : t("hints.resize", {
-          shortcut: getTaggedShortcutKey(t("keys.shift")),
+          shortcut_1: getTaggedShortcutKey(t("keys.shift")),
           shortcut_2: getTaggedShortcutKey("Alt"),
         });
   }
