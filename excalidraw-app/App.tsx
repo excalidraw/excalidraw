@@ -923,8 +923,7 @@ const ExcalidrawWrapper = () => {
                 ℹ️
               </span>
               <div className="tooltip-content">
-                Your browser’s local storage is full. Try clearing cache or
-                removing saved drawings to continue saving changes.
+                {t("alerts.tooltipslocalStorageInfo")}
               </div>
             </div>
           </div>
