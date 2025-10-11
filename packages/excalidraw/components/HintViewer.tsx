@@ -253,11 +253,7 @@ export const HintViewer = React.memo(
       if (index % 2 === 1) {
         const shortcutMatch =
           part[0] === "<" && part.match(/^<kbd>([^<]+)<\/kbd>$/);
-        return (
-          <span key={index} className="HintViewer__key">
-            {shortcutMatch ? shortcutMatch[1] : part}
-          </span>
-        );
+        return <kbd key={index}>{shortcutMatch ? shortcutMatch[1] : part}</kbd>;
       }
       return part;
     });

@@ -29,7 +29,7 @@ $wide-viewport-width: 1000px;
       padding: 0.25rem;
     }
 
-    &__key {
+    kbd {
       display: inline-block;
       margin: 0 0.1rem;
       font-family: monospace;
@@ -44,7 +44,7 @@ $wide-viewport-width: 1000px;
   &.theme--dark {
     .HintViewer {
       color: var(--color-gray-60);
-      &__key {
+      kbd {
         border-color: var(--color-gray-60);
       }
     }
