@@ -20,7 +20,6 @@ import { isEraserActive } from "../appState";
 import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
-import { nodesFromTextWithTags } from "./Trans";
 
 import type { AppClassProperties, Device, UIAppState } from "../types";
 
@@ -244,26 +243,26 @@ export const HintViewer = React.memo(
       return null;
     }
 
-    // TODO: remove use simpler regex
     const hint = Array.isArray(hints)
-      ? hints
-          .map((hint) => {
-            return getShortcutKey(hint).replace(/\. ?$/, "");
-          })
-          .join(". ")
-      : getShortcutKey(hints);
+      ? hints.map((hint) => hint.replace(/\. ?$/, "")).join(". ")
+      : hints;
 
-    const hintElement = React.createElement(
-      React.Fragment,
-      {},
-      ...nodesFromTextWithTags(hint, {
-        kbd: (el) => <span className="HintViewer__key">{el}</span>,
-      }),
-    );
+    const hintJSX = hint.split(/(<kbd>[^<]+<\/kbd>)/g).map((part, index) => {
+      if (index % 2 === 1) {
+        const shortcutMatch =
+          part[0] === "<" && part.match(/^<kbd>([^<]+)<\/kbd>$/);
+        return (
+          <span key={index} className="HintViewer__key">
+            {shortcutMatch ? shortcutMatch[1] : part}
+          </span>
+        );
+      }
+      return part;
+    });
 
     return (
       <div className="HintViewer">
-        <span>{hintElement}</span>
+        <span>{hintJSX}</span>
       </div>
     );
   },
