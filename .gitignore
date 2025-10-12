@@ -13,6 +13,8 @@
 *.log
 *.tgz
 build
+# Allow PDF.js files needed for the app
+!public/pdf/build/
 dist
 firebase
 logs
