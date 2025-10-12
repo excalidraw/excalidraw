@@ -27,8 +27,10 @@ interface HintViewerProps {
   app: AppClassProperties;
 }
 
-const getTaggedShortcutKey = (key: string) =>
-  `<kbd>${getShortcutKey(key)}</kbd>`;
+const getTaggedShortcutKey = (key: string | string[]) =>
+  Array.isArray(key)
+    ? `<kbd>${key.map(getShortcutKey).join(" + ")}</kbd>`
+    : `<kbd>${getShortcutKey(key)}</kbd>`;
 
 const getHints = ({
   appState,
@@ -124,9 +126,7 @@ const getHints = ({
   if (appState.editingTextElement) {
     return t("hints.text_editing", {
       shortcut_1: getTaggedShortcutKey("Escape"),
-      shortcut_2: `${getTaggedShortcutKey(
-        "CtrlOrCmd",
-      )} + ${getTaggedShortcutKey("Enter")}`,
+      shortcut_2: getTaggedShortcutKey(["CtrlOrCmd", "Enter"]),
     });
   }
 
@@ -177,9 +177,7 @@ const getHints = ({
           return appState.selectedLinearElement.selectedPointsIndices
             ? t("hints.lineEditor_pointSelected", {
                 shortcut_1: getTaggedShortcutKey("Delete"),
-                shortcut_2: `${getTaggedShortcutKey(
-                  "CtrlOrCmd",
-                )} + ${getTaggedShortcutKey("D")}`,
+                shortcut_2: getTaggedShortcutKey(["CtrlOrCmd", "D"]),
               })
             : t("hints.lineEditor_nothingSelected", {
                 shortcut_1: getTaggedShortcutKey("Shift"),
@@ -192,9 +190,7 @@ const getHints = ({
             })
           : t("hints.lineEditor_info", {
               shortcut_1: getTaggedShortcutKey("CtrlOrCmd"),
-              shortcut_2: `${getTaggedShortcutKey(
-                "CtrlOrCmd",
-              )} + ${getTaggedShortcutKey("Enter")}`,
+              shortcut_2: getTaggedShortcutKey(["CtrlOrCmd", "Enter"]),
             });
       }
       if (
