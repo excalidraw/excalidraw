@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
     // We need to specify the envDir since now there are no
     //more located in parallel with the vite.config.ts file but in parent dir
     envDir: "../",
+    publicDir: "../public",
     resolve: {
       alias: [
         {
