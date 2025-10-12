@@ -23,6 +23,15 @@ RUN npm install -g http-server
 # Copy only the built static files from builder
 COPY --from=builder /app/excalidraw-app/build ./build
 
+# Copy public assets as a workaround for publicDir not working in Docker
+# Note: publicDir config should handle this, but doesn't work reliably in Docker
+COPY --from=builder /app/public/apple-touch-icon.png ./build/
+COPY --from=builder /app/public/favicon-16x16.png ./build/
+COPY --from=builder /app/public/favicon-32x32.png ./build/
+COPY --from=builder /app/public/favicon.ico ./build/
+COPY --from=builder /app/public/favicon.svg ./build/
+COPY --from=builder /app/public/pdf ./build/pdf
+
 # Expose port (Railway provides $PORT)
 EXPOSE $PORT
 
