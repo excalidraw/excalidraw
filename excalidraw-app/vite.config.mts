@@ -8,6 +8,7 @@ import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 export default defineConfig(({ mode }) => {
   // To load .env variables
   const envVars = loadEnv(mode, `../`);
@@ -21,7 +22,6 @@ export default defineConfig(({ mode }) => {
     // We need to specify the envDir since now there are no
     //more located in parallel with the vite.config.ts file but in parent dir
     envDir: "../",
-    publicDir: "../public",
     resolve: {
       alias: [
         {
@@ -112,6 +112,18 @@ export default defineConfig(({ mode }) => {
       assetsInlineLimit: 0,
     },
     plugins: [
+      viteStaticCopy({
+        targets: [
+          {
+            src: '../public/*',
+            dest: '.'
+          },
+          {
+            src: '../public/screenshots',
+            dest: '.'
+          }
+        ]
+      }),
       Sitemap({
         hostname: "https://excalidraw.com",
         outDir: "build",

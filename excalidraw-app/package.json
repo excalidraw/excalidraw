@@ -56,6 +56,7 @@
     "vite-plugin-html": "3.2.2",
     "vite-plugin-pwa": "1.0.2",
     "vite-plugin-sitemap": "0.7.1",
+    "vite-plugin-static-copy": "3.1.3",
     "vite-plugin-svgr": "4.3.0"
   }
 }
