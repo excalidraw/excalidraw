@@ -80,6 +80,7 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: "build",
       rollupOptions: {
+        external: ["/pdf/build/pdf.mjs", "/pdf/build/pdf.worker.mjs"],
         output: {
           assetFileNames(chunkInfo) {
             if (chunkInfo?.name?.endsWith(".woff2")) {
