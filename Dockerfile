@@ -12,12 +12,6 @@ RUN yarn install --frozen-lockfile --network-timeout 600000
 # Build the application
 RUN yarn build:app:docker
 
-# Explicitly copy PDF files from public directory to build output
-RUN mkdir -p /app/excalidraw-app/build/pdf/build && \
-    cp /app/public/pdf/build/*.mjs /app/excalidraw-app/build/pdf/build/ && \
-    echo "PDF files copied successfully" && \
-    ls -la /app/excalidraw-app/build/pdf/build/
-
 # Production stage - only built files and http-server
 FROM node:18-alpine
 
