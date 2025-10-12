@@ -14,6 +14,6 @@ export const getShortcutKey = (shortcut: string): string =>
       /\b(Ctrl|Cmd|Command|CtrlOrCmd)\b/gi,
       isDarwin ? t("keys.cmd") : t("keys.ctrl"),
     )
-    .replace(/\b(Esc(?:cape)?)\b/i, t("keys.escape"))
+    .replace(/\b(Esc(?:ape)?)\b/i, t("keys.escape"))
     .replace(/\b(Space(?:bar)?)\b/i, t("keys.spacebar"))
     .replace(/\b(Del(?:ete)?)\b/i, t("keys.delete"));
