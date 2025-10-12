@@ -233,6 +233,7 @@ export const SearchMenu = () => {
               scrollX: app.state.scrollX,
               scrollY: app.state.scrollY,
               zoom: app.state.zoom,
+              offsetTop: app.state.offsetTop,
             },
             app.scene.getNonDeletedElementsMap(),
             app.getEditorUIOffsets(),
