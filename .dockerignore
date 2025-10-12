@@ -1,8 +1,9 @@
 # Exclude build artifacts and dependencies (will be installed fresh)
 **/node_modules
-**/build
-# Allow PDF.js files needed for the app
-!public/pdf/build/
+# Exclude build directories but NOT excalidraw-app/public/pdf/build (needed for PDF.js)
+excalidraw-app/build
+packages/*/build
+examples/*/build
 **/dist
 **/.git
 .git
