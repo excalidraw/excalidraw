@@ -1,6 +1,8 @@
 # Exclude build artifacts and dependencies (will be installed fresh)
 **/node_modules
 **/build
+# Allow PDF.js files needed for the app
+!public/pdf/build/
 **/dist
 **/.git
 .git
