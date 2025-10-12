@@ -50,7 +50,7 @@
     "build:preview": "yarn build && vite preview --port 5000"
   },
   "devDependencies": {
-    "cross-env": "10.0.0",
+    "cross-env": "7.0.3",
     "vite-plugin-checker": "0.10.2",
     "vite-plugin-ejs": "1.7.0",
     "vite-plugin-html": "3.2.2",

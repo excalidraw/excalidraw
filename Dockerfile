@@ -1,5 +1,5 @@
 # Build stage - full monorepo for workspace dependencies
-FROM node:20-alpine AS builder
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ RUN yarn install --frozen-lockfile --network-timeout 600000
 RUN yarn build:app:docker
 
 # Production stage - only built files and http-server
-FROM node:20-alpine
+FROM node:18-alpine
 
 WORKDIR /app
 
