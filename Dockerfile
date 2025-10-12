@@ -23,14 +23,6 @@ RUN npm install -g http-server
 # Copy only the built static files from builder
 COPY --from=builder /app/excalidraw-app/build ./build
 
-# Copy favicon files from root public directory
-# Note: These are in root public/, not excalidraw-app/public/
-COPY --from=builder /app/public/apple-touch-icon.png ./build/
-COPY --from=builder /app/public/favicon-16x16.png ./build/
-COPY --from=builder /app/public/favicon-32x32.png ./build/
-COPY --from=builder /app/public/favicon.ico ./build/
-COPY --from=builder /app/public/favicon.svg ./build/
-
 # Expose port (Railway provides $PORT)
 EXPOSE $PORT
 
