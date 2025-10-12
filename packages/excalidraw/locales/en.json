@@ -650,6 +650,10 @@
     "shortcutHint": "For Command palette, use {{shortcut}}"
   },
   "keys": {
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
     "escape": "Esc",
     "enter": "Enter",
     "shift": "Shift",
