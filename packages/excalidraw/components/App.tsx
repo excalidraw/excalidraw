@@ -215,7 +215,6 @@ import {
   isElementInGroup,
   isSelectedViaGroup,
   selectGroupsForSelectedElements,
-  elementsAreInSameGroup,
   syncInvalidIndices,
   syncMovedIndices,
   excludeElementsInFramesFromSelection,
@@ -4555,7 +4554,9 @@ class App extends React.Component<AppProps, AppState> {
           }
         } else if (
           selectedGroupIds.length === 1 &&
-          elementsAreInSameGroup(selectedElements)
+          selectedElements.every((element) =>
+            isElementInGroup(element, selectedGroupIds[0]),
+          )
         ) {
           const nextEditingGroupId = selectedGroupIds[0];
           const selectedElements = getElementsInGroup(
@@ -4565,15 +4566,17 @@ class App extends React.Component<AppProps, AppState> {
 
           const nextGroupIds: Record<string, true> = {};
           const nextSelectedElementIds: Record<string, true> = {};
+          // iterate through elements in the group
           selectedElements.forEach((element) => {
             const editingGroupIndex =
               element.groupIds.indexOf(nextEditingGroupId);
             const groupIds = element.groupIds.slice(0, editingGroupIndex);
-
+            // we can confidently select element if it's in a nested group
             if (groupIds.length > 0) {
               const lastGroupId = groupIds[groupIds.length - 1];
               nextGroupIds[lastGroupId] = true;
               nextSelectedElementIds[element.id] = true;
+              // otherwise, we need to filter out bound text elements
             } else if (!isBoundToContainer(element)) {
               nextSelectedElementIds[element.id] = true;
             }
