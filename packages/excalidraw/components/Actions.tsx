@@ -1187,7 +1187,10 @@ export const ShapesSwitcher = ({
               // on top of it
               (laserToolSelected && !app.props.isCollaborating),
           })}
-          onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
+          onToggle={() => {
+            setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen);
+            setAppState({ openMenu: null, openPopup: null });
+          }}
           title={t("toolBar.extraTools")}
         >
           {frameToolSelected

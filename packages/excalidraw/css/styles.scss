@@ -12,6 +12,11 @@
   --zIndex-eyeDropperPreview: 6;
   --zIndex-hyperlinkContainer: 7;
 
+  --zIndex-ui-styles-popup: 40;
+  --zIndex-ui-bottom: 60;
+  --zIndex-ui-library: 80;
+  --zIndex-ui-top: 100;
+
   --zIndex-modal: 1000;
   --zIndex-popup: 1001;
   --zIndex-toast: 999999;
@@ -237,7 +242,7 @@ body.excalidraw-cursor-resize * {
   }
 
   .App-top-bar {
-    z-index: var(--zIndex-layerUI);
+    z-index: var(--zIndex-ui-top);
     display: flex;
     flex-direction: column;
   }
@@ -255,7 +260,7 @@ body.excalidraw-cursor-resize * {
     left: 50%;
     transform: translateX(-50%);
     --bar-padding: calc(4 * var(--space-factor));
-    z-index: var(--zIndex-layerUI);
+    z-index: var(--zIndex-ui-bottom);
     display: flex;
     flex-direction: column;
 
@@ -296,6 +301,12 @@ body.excalidraw-cursor-resize * {
   .App-toolbar-content {
     display: flex;
     flex-direction: column;
+
+    pointer-events: none;
+
+    & > * {
+      pointer-events: var(--ui-pointerEvents);
+    }
   }
 
   .App-mobile-menu {

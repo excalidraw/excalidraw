@@ -62,7 +62,9 @@ export const PropertiesPopover = React.forwardRef<
           alignOffset={-16}
           sideOffset={20}
           style={{
-            zIndex: "var(--zIndex-popup)",
+            zIndex: "var(--zIndex-ui-styles-popup)",
+            marginLeft:
+              editorInterface.formFactor === "phone" ? "0.5rem" : undefined,
           }}
           onPointerLeave={onPointerLeave}
           onKeyDown={onKeyDown}
