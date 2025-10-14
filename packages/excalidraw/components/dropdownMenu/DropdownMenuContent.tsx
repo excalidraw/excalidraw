@@ -74,7 +74,12 @@ const MenuContent = ({
         {/* the zIndex ensures this menu has higher stacking order,
     see https://github.com/excalidraw/excalidraw/pull/1445 */}
         {device.editor.isMobile ? (
-          <Stack.Col className="dropdown-menu-container">{children}</Stack.Col>
+          <Stack.Col
+            className="dropdown-menu-container"
+            style={{ ["--gap" as any]: 1.25 }}
+          >
+            {children}
+          </Stack.Col>
         ) : (
           <Island
             className="dropdown-menu-container"

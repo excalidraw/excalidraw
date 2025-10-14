@@ -319,8 +319,9 @@ export const ColorPicker = ({
     openRef.current = appState.openPopup;
   }, [appState.openPopup]);
   const compactMode =
-    appState.stylesPanelMode === "compact" ||
-    appState.stylesPanelMode === "mobile";
+    type !== "canvasBackground" &&
+    (appState.stylesPanelMode === "compact" ||
+      appState.stylesPanelMode === "mobile");
 
   return (
     <div>

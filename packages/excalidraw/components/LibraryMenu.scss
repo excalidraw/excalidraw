@@ -133,6 +133,7 @@
   }
 
   .layer-ui__library .library-menu-dropdown-container {
+    z-index: 1;
     position: relative;
     &--in-heading {
       margin-left: auto;
