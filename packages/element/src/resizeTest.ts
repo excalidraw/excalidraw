@@ -9,13 +9,17 @@ import { SIDE_RESIZING_THRESHOLD } from "@excalidraw/common";
 
 import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
 
-import type { AppState, Device, Zoom } from "@excalidraw/excalidraw/types";
+import type {
+  AppState,
+  EditorInterface,
+  Zoom,
+} from "@excalidraw/excalidraw/types";
 
 import { getElementAbsoluteCoords } from "./bounds";
 import {
   getTransformHandlesFromCoords,
   getTransformHandles,
-  getOmitSidesForDevice,
+  getOmitSidesForEditorInterface,
   canResizeFromSides,
 } from "./transformHandles";
 import { isImageElement, isLinearElement } from "./typeChecks";
@@ -51,7 +55,7 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
   y: number,
   zoom: Zoom,
   pointerType: PointerType,
-  device: Device,
+  editorInterface: EditorInterface,
 ): MaybeTransformHandleType => {
   if (!appState.selectedElementIds[element.id]) {
     return false;
@@ -63,7 +67,7 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
       zoom,
       elementsMap,
       pointerType,
-      getOmitSidesForDevice(device),
+      getOmitSidesForEditorInterface(editorInterface),
     );
 
   if (
@@ -86,7 +90,7 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
     return filter[0] as TransformHandleType;
   }
 
-  if (canResizeFromSides(device)) {
+  if (canResizeFromSides(editorInterface)) {
     const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
       element,
       elementsMap,
@@ -132,7 +136,7 @@ export const getElementWithTransformHandleType = (
   zoom: Zoom,
   pointerType: PointerType,
   elementsMap: ElementsMap,
-  device: Device,
+  editorInterface: EditorInterface,
 ) => {
   return elements.reduce((result, element) => {
     if (result) {
@@ -146,7 +150,7 @@ export const getElementWithTransformHandleType = (
       scenePointerY,
       zoom,
       pointerType,
-      device,
+      editorInterface,
     );
     return transformHandleType ? { element, transformHandleType } : null;
   }, null as { element: NonDeletedExcalidrawElement; transformHandleType: MaybeTransformHandleType } | null);
@@ -160,14 +164,14 @@ export const getTransformHandleTypeFromCoords = <
   scenePointerY: number,
   zoom: Zoom,
   pointerType: PointerType,
-  device: Device,
+  editorInterface: EditorInterface,
 ): MaybeTransformHandleType => {
   const transformHandles = getTransformHandlesFromCoords(
     [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
     0 as Radians,
     zoom,
     pointerType,
-    getOmitSidesForDevice(device),
+    getOmitSidesForEditorInterface(editorInterface),
   );
 
   const found = Object.keys(transformHandles).find((key) => {
@@ -183,7 +187,7 @@ export const getTransformHandleTypeFromCoords = <
     return found as MaybeTransformHandleType;
   }
 
-  if (canResizeFromSides(device)) {
+  if (canResizeFromSides(editorInterface)) {
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
 

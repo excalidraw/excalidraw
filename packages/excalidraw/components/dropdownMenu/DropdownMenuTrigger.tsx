@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import { useDevice } from "../App";
+import { useEditorInterface } from "../App";
 
 const MenuTrigger = ({
   className = "",
@@ -14,12 +14,12 @@ const MenuTrigger = ({
   onToggle: () => void;
   title?: string;
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">) => {
-  const device = useDevice();
+  const editorInterface = useEditorInterface();
   const classNames = clsx(
     `dropdown-menu-button ${className}`,
     "zen-mode-transition",
     {
-      "dropdown-menu-button--mobile": device.editor.isMobile,
+      "dropdown-menu-button--mobile": editorInterface.formFactor === "phone",
     },
   ).trim();
   return (

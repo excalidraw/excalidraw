@@ -449,9 +449,6 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
-
-  /** properties sidebar mode - determines whether to show compact or complete sidebar */
-  stylesPanelMode: "compact" | "full" | "mobile";
 }
 
 export type SearchMatch = {
@@ -715,7 +712,7 @@ export type AppClassProperties = {
     }
   >;
   files: BinaryFiles;
-  device: App["device"];
+  editorInterface: App["editorInterface"];
   scene: App["scene"];
   syncActionResult: App["syncActionResult"];
   fonts: App["fonts"];
@@ -732,6 +729,7 @@ export type AppClassProperties = {
   setActiveTool: App["setActiveTool"];
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
+  setDesktopUIMode: App["setDesktopUIMode"];
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
@@ -885,16 +883,19 @@ export interface ExcalidrawImperativeAPI {
   ) => UnsubscribeCallback;
 }
 
-export type Device = Readonly<{
-  viewport: {
-    isMobile: boolean;
-    isLandscape: boolean;
-  };
-  editor: {
-    isMobile: boolean;
-    canFitSidebar: boolean;
-  };
+export type StylesPanelMode = "compact" | "full" | "mobile";
+
+export type EditorInterface = Readonly<{
+  formFactor: "phone" | "tablet" | "desktop";
+  desktopUIMode: "compact" | "full";
+  userAgent: Readonly<{
+    raw: string;
+    isMobileDevice: boolean;
+    platform: "ios" | "android" | "other" | "unknown";
+  }>;
   isTouchScreen: boolean;
+  canFitSidebar: boolean;
+  isLandscape: boolean;
 }>;
 
 export type FrameNameBounds = {

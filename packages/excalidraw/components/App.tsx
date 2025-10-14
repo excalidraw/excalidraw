@@ -406,6 +406,13 @@ import { LassoTrail } from "../lasso";
 
 import { EraserTrail } from "../eraser";
 
+import {
+  DESKTOP_UI_MODE_STORAGE_KEY,
+  createUserAgentDescriptor,
+  deriveFormFactor,
+  deriveStylesPanelMode,
+} from "../editorInterface";
+
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
   convertElementTypePopupAtom,
@@ -459,7 +466,8 @@ import type {
   LibraryItems,
   PointerDownState,
   SceneData,
-  Device,
+  EditorInterface,
+  StylesPanelMode,
   FrameNameBoundsCache,
   SidebarName,
   SidebarTabName,
@@ -480,19 +488,20 @@ import type { Action, ActionResult } from "../actions/types";
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
 
-const deviceContextInitialValue = {
-  viewport: {
-    isMobile: false,
-    isLandscape: false,
-  },
-  editor: {
-    isMobile: false,
-    canFitSidebar: false,
-  },
+const editorInterfaceContextInitialValue: EditorInterface = {
+  formFactor: "desktop",
+  desktopUIMode: "full",
+  userAgent: createUserAgentDescriptor(
+    typeof navigator !== "undefined" ? navigator.userAgent : "",
+  ),
   isTouchScreen: false,
+  canFitSidebar: false,
+  isLandscape: true,
 };
-const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
-DeviceContext.displayName = "DeviceContext";
+const EditorInterfaceContext = React.createContext<EditorInterface>(
+  editorInterfaceContextInitialValue,
+);
+EditorInterfaceContext.displayName = "EditorInterfaceContext";
 
 export const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
@@ -528,7 +537,10 @@ ExcalidrawActionManagerContext.displayName = "ExcalidrawActionManagerContext";
 
 export const useApp = () => useContext(AppContext);
 export const useAppProps = () => useContext(AppPropsContext);
-export const useDevice = () => useContext<Device>(DeviceContext);
+export const useEditorInterface = () =>
+  useContext<EditorInterface>(EditorInterfaceContext);
+export const useStylesPanelMode = () =>
+  deriveStylesPanelMode(useEditorInterface());
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
 export const useExcalidrawElements = () =>
@@ -576,7 +588,52 @@ class App extends React.Component<AppProps, AppState> {
   rc: RoughCanvas;
   unmounted: boolean = false;
   actionManager: ActionManager;
-  device: Device = deviceContextInitialValue;
+  editorInterface: EditorInterface = editorInterfaceContextInitialValue;
+  private stylesPanelMode: StylesPanelMode = deriveStylesPanelMode(
+    editorInterfaceContextInitialValue,
+  );
+  private loadDesktopUIModePreference = () => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
+    try {
+      const stored = window.localStorage.getItem(DESKTOP_UI_MODE_STORAGE_KEY);
+      if (stored === "compact" || stored === "full") {
+        return stored as EditorInterface["desktopUIMode"];
+      }
+    } catch (error) {
+      // ignore storage access issues (e.g., Safari private mode)
+    }
+
+    return null;
+  };
+
+  private persistDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    try {
+      window.localStorage.setItem(DESKTOP_UI_MODE_STORAGE_KEY, mode);
+    } catch (error) {
+      // ignore storage access issues (e.g., Safari private mode)
+    }
+  };
+
+  public setDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
+    if (mode !== "compact" && mode !== "full") {
+      return;
+    }
+    if (mode === this.editorInterface.desktopUIMode) {
+      return;
+    }
+
+    this.editorInterface = updateObject(this.editorInterface, {
+      desktopUIMode: mode,
+    });
+    this.persistDesktopUIMode(mode);
+    this.reconcileStylesPanelMode(this.editorInterface);
+  };
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
@@ -691,6 +748,16 @@ class App extends React.Component<AppProps, AppState> {
       width: window.innerWidth,
       height: window.innerHeight,
     };
+
+    const storedDesktopUIMode = this.loadDesktopUIModePreference();
+    const userAgentDescriptor = createUserAgentDescriptor(
+      typeof navigator !== "undefined" ? navigator.userAgent : "",
+    );
+    this.editorInterface = updateObject(this.editorInterface, {
+      desktopUIMode: storedDesktopUIMode ?? this.editorInterface.desktopUIMode,
+      userAgent: userAgentDescriptor,
+    });
+    this.stylesPanelMode = deriveStylesPanelMode(this.editorInterface);
 
     this.id = nanoid();
     this.library = new Library(this);
@@ -1566,7 +1633,7 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--view-mode":
             this.state.viewModeEnabled ||
             this.state.openDialog?.name === "elementLinkSelector",
-          "excalidraw--mobile": this.device.editor.isMobile,
+          "excalidraw--mobile": this.editorInterface.formFactor === "phone",
         })}
         style={{
           ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
@@ -1588,7 +1655,7 @@ class App extends React.Component<AppProps, AppState> {
             <ExcalidrawContainerContext.Provider
               value={this.excalidrawContainerValue}
             >
-              <DeviceContext.Provider value={this.device}>
+              <EditorInterfaceContext.Provider value={this.editorInterface}>
                 <ExcalidrawSetAppStateContext.Provider value={this.setAppState}>
                   <ExcalidrawAppStateContext.Provider value={this.state}>
                     <ExcalidrawElementsContext.Provider
@@ -1816,7 +1883,7 @@ class App extends React.Component<AppProps, AppState> {
                           renderScrollbars={
                             this.props.renderScrollbars === true
                           }
-                          device={this.device}
+                          editorInterface={this.editorInterface}
                           renderInteractiveSceneCallback={
                             this.renderInteractiveSceneCallback
                           }
@@ -1852,7 +1919,7 @@ class App extends React.Component<AppProps, AppState> {
                     </ExcalidrawElementsContext.Provider>
                   </ExcalidrawAppStateContext.Provider>
                 </ExcalidrawSetAppStateContext.Provider>
-              </DeviceContext.Provider>
+              </EditorInterfaceContext.Provider>
             </ExcalidrawContainerContext.Provider>
           </AppPropsContext.Provider>
         </AppContext.Provider>
@@ -2369,7 +2436,8 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!scene.appState.preferredSelectionTool.initialized) {
       scene.appState.preferredSelectionTool = {
-        type: this.device.editor.isMobile ? "lasso" : "selection",
+        type:
+          this.editorInterface.formFactor === "phone" ? "lasso" : "selection",
         initialized: true,
       };
     }
@@ -2443,30 +2511,7 @@ class App extends React.Component<AppProps, AppState> {
     return minSide >= MQ_MIN_TABLET && maxSide <= MQ_MAX_TABLET;
   };
 
-  private refreshViewportBreakpoints = () => {
-    const container = this.excalidrawContainerRef.current;
-    if (!container) {
-      return;
-    }
-
-    const { width: editorWidth, height: editorHeight } =
-      container.getBoundingClientRect();
-
-    const prevViewportState = this.device.viewport;
-
-    const nextViewportState = updateObject(prevViewportState, {
-      isLandscape: editorWidth > editorHeight,
-      isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
-    });
-
-    if (prevViewportState !== nextViewportState) {
-      this.device = { ...this.device, viewport: nextViewportState };
-      return true;
-    }
-    return false;
-  };
-
-  private refreshEditorBreakpoints = () => {
+  private refreshEditorInterface = () => {
     const container = this.excalidrawContainerRef.current;
     if (!container) {
       return;
@@ -2480,42 +2525,43 @@ class App extends React.Component<AppProps, AppState> {
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
 
-    const prevEditorState = this.device.editor;
-
-    const nextEditorState = updateObject(prevEditorState, {
-      isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
+    const nextEditorInterface = updateObject(this.editorInterface, {
+      formFactor: deriveFormFactor(editorWidth, editorHeight, {
+        isMobile: (width, height) => this.isMobileBreakpoint(width, height),
+        isTablet: (width, height) => this.isTabletBreakpoint(width, height),
+      }),
       canFitSidebar: editorWidth > sidebarBreakpoint,
+      isLandscape: editorWidth > editorHeight,
     });
 
-    const stylesPanelMode =
-      // NOTE: we could also remove the isMobileOrTablet check here and
-      // always switch to compact mode when the editor is narrow (e.g. < MQ_MIN_WIDTH_DESKTOP)
-      // but not too narrow (> MQ_MAX_WIDTH_MOBILE)
-      this.isTabletBreakpoint(editorWidth, editorHeight) && isMobileOrTablet()
-        ? "compact"
-        : this.isMobileBreakpoint(editorWidth, editorHeight)
-        ? "mobile"
-        : "full";
+    const didChange = nextEditorInterface !== this.editorInterface;
 
-    // also check if we need to update the app state
-    this.setState((prevState) => ({
-      stylesPanelMode,
-      // reset to box selection mode if the UI changes to full
-      // where you'd not be able to change the mode yourself currently
-      preferredSelectionTool:
-        stylesPanelMode === "full"
-          ? {
-              type: "selection",
-              initialized: true,
-            }
-          : prevState.preferredSelectionTool,
-    }));
-
-    if (prevEditorState !== nextEditorState) {
-      this.device = { ...this.device, editor: nextEditorState };
-      return true;
+    if (didChange) {
+      this.editorInterface = nextEditorInterface;
     }
-    return false;
+
+    this.reconcileStylesPanelMode(nextEditorInterface);
+
+    return didChange;
+  };
+
+  private reconcileStylesPanelMode = (nextEditorInterface: EditorInterface) => {
+    const nextStylesPanelMode = deriveStylesPanelMode(nextEditorInterface);
+    if (nextStylesPanelMode === this.stylesPanelMode) {
+      return;
+    }
+
+    const prevStylesPanelMode = this.stylesPanelMode;
+    this.stylesPanelMode = nextStylesPanelMode;
+
+    if (prevStylesPanelMode !== "full" && nextStylesPanelMode === "full") {
+      this.setState((prevState) => ({
+        preferredSelectionTool: {
+          type: "selection",
+          initialized: true,
+        },
+      }));
+    }
   };
 
   private clearImageShapeCache(filesMap?: BinaryFiles) {
@@ -2593,13 +2639,12 @@ class App extends React.Component<AppProps, AppState> {
       // in mobile breakpoint (0 width/height), making everything fail
       !isTestEnv()
     ) {
-      this.refreshViewportBreakpoints();
-      this.refreshEditorBreakpoints();
+      this.refreshEditorInterface();
     }
 
     if (supportsResizeObserver && this.excalidrawContainerRef.current) {
       this.resizeObserver = new ResizeObserver(() => {
-        this.refreshEditorBreakpoints();
+        this.refreshEditorInterface();
         this.updateDOMRect();
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
@@ -2653,11 +2698,8 @@ class App extends React.Component<AppProps, AppState> {
     this.scene
       .getElementsIncludingDeleted()
       .forEach((element) => ShapeCache.delete(element));
-    this.refreshViewportBreakpoints();
+    this.refreshEditorInterface();
     this.updateDOMRect();
-    if (!supportsResizeObserver) {
-      this.refreshEditorBreakpoints();
-    }
     this.setState({});
   });
 
@@ -2820,7 +2862,7 @@ class App extends React.Component<AppProps, AppState> {
       prevProps.UIOptions.dockedSidebarBreakpoint !==
       this.props.UIOptions.dockedSidebarBreakpoint
     ) {
-      this.refreshEditorBreakpoints();
+      this.refreshEditorInterface();
     }
 
     const hasFollowedPersonLeft =
@@ -3428,7 +3470,7 @@ class App extends React.Component<AppProps, AppState> {
         // from library, not when pasting from clipboard. Alas.
         openSidebar:
           this.state.openSidebar &&
-          this.device.editor.canFitSidebar &&
+          this.editorInterface.canFitSidebar &&
           editorJotaiStore.get(isSidebarDockedAtom)
             ? this.state.openSidebar
             : null,
@@ -3626,7 +3668,7 @@ class App extends React.Component<AppProps, AppState> {
       !isPlainPaste &&
       textElements.length > 1 &&
       PLAIN_PASTE_TOAST_SHOWN === false &&
-      !this.device.editor.isMobile
+      this.editorInterface.formFactor !== "phone"
     ) {
       this.setToast({
         message: t("toast.pasteAsSingleElement", {
@@ -3658,7 +3700,9 @@ class App extends React.Component<AppProps, AppState> {
       trackEvent(
         "toolbar",
         "toggleLock",
-        `${source} (${this.device.editor.isMobile ? "mobile" : "desktop"})`,
+        `${source} (${
+          this.editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+        })`,
       );
     }
     this.setState((prevState) => {
@@ -4010,12 +4054,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (appState) {
-        this.setState({
-          ...appState,
-          // keep existing stylesPanelMode as it needs to be preserved
-          // or set at startup
-          stylesPanelMode: this.state.stylesPanelMode,
-        } as Pick<AppState, K> | null);
+        this.setState(appState as Pick<AppState, K> | null);
       }
 
       if (elements) {
@@ -4593,7 +4632,9 @@ class App extends React.Component<AppProps, AppState> {
               "toolbar",
               shape,
               `keyboard (${
-                this.device.editor.isMobile ? "mobile" : "desktop"
+                this.editorInterface.formFactor === "phone"
+                  ? "mobile"
+                  : "desktop"
               })`,
             );
           }
@@ -5099,7 +5140,7 @@ class App extends React.Component<AppProps, AppState> {
       // caret (i.e. deselect). There's not much use for always selecting
       // the text on edit anyway (and users can select-all from contextmenu
       // if needed)
-      autoSelect: !this.device.isTouchScreen,
+      autoSelect: !this.editorInterface.isTouchScreen,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
@@ -5732,7 +5773,7 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElementsMap(),
           this.state,
           pointFrom(scenePointer.x, scenePointer.y),
-          this.device.editor.isMobile,
+          this.editorInterface.formFactor === "phone",
         )
       ) {
         return element;
@@ -5767,7 +5808,7 @@ class App extends React.Component<AppProps, AppState> {
       elementsMap,
       this.state,
       pointFrom(lastPointerDownCoords.x, lastPointerDownCoords.y),
-      this.device.editor.isMobile,
+      this.editorInterface.formFactor === "phone",
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUpEvent!,
@@ -5778,7 +5819,7 @@ class App extends React.Component<AppProps, AppState> {
       elementsMap,
       this.state,
       pointFrom(lastPointerUpCoords.x, lastPointerUpCoords.y),
-      this.device.editor.isMobile,
+      this.editorInterface.formFactor === "phone",
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       hideHyperlinkToolip();
@@ -6176,7 +6217,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.zoom,
             event.pointerType,
             this.scene.getNonDeletedElementsMap(),
-            this.device,
+            this.editorInterface,
           );
         if (
           elementWithTransformHandleType &&
@@ -6200,7 +6241,7 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerY,
         this.state.zoom,
         event.pointerType,
-        this.device,
+        this.editorInterface,
       );
       if (transformHandleType) {
         setCursor(
@@ -6586,10 +6627,12 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      !this.device.isTouchScreen &&
+      !this.editorInterface.isTouchScreen &&
       ["pen", "touch"].includes(event.pointerType)
     ) {
-      this.device = updateObject(this.device, { isTouchScreen: true });
+      this.editorInterface = updateObject(this.editorInterface, {
+        isTouchScreen: true,
+      });
     }
 
     if (isPanning) {
@@ -6912,7 +6955,7 @@ class App extends React.Component<AppProps, AppState> {
     const clicklength =
       event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
 
-    if (this.device.editor.isMobile && clicklength < 300) {
+    if (this.editorInterface.formFactor === "phone" && clicklength < 300) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
         scenePointer.y,
@@ -6931,7 +6974,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    if (this.device.isTouchScreen) {
+    if (this.editorInterface.isTouchScreen) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
         scenePointer.y,
@@ -6961,7 +7004,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.handleEmbeddableCenterClick(this.hitLinkElement);
       } else {
-        this.redirectToLink(event, this.device.isTouchScreen);
+        this.redirectToLink(event, this.editorInterface.isTouchScreen);
       }
     } else if (this.state.viewModeEnabled) {
       this.setState({
@@ -7308,7 +7351,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.zoom,
             event.pointerType,
             this.scene.getNonDeletedElementsMap(),
-            this.device,
+            this.editorInterface,
           );
         if (elementWithTransformHandleType != null) {
           if (
@@ -7337,7 +7380,7 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.origin.y,
           this.state.zoom,
           event.pointerType,
-          this.device,
+          this.editorInterface,
         );
       }
       if (pointerDownState.resize.handleType) {
@@ -9387,7 +9430,7 @@ class App extends React.Component<AppProps, AppState> {
           newElement &&
           !multiElement
         ) {
-          if (this.device.isTouchScreen) {
+          if (this.editorInterface.isTouchScreen) {
             const FIXED_DELTA_X = Math.min(
               (this.state.width * 0.7) / this.state.zoom.value,
               100,

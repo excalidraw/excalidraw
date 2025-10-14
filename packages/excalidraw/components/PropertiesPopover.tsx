@@ -4,7 +4,7 @@ import React, { type ReactNode } from "react";
 
 import { isInteractive } from "@excalidraw/common";
 
-import { useDevice } from "./App";
+import { useEditorInterface } from "./App";
 import { Island } from "./Island";
 
 interface PropertiesPopoverProps {
@@ -39,7 +39,7 @@ export const PropertiesPopover = React.forwardRef<
     },
     ref,
   ) => {
-    const device = useDevice();
+    const editorInterface = useEditorInterface();
 
     return (
       <Popover.Portal container={container}>
@@ -48,12 +48,14 @@ export const PropertiesPopover = React.forwardRef<
           className={clsx("focus-visible-none", className)}
           data-prevent-outside-click
           side={
-            device.editor.isMobile && !device.viewport.isLandscape
+            editorInterface.formFactor === "phone" &&
+            !editorInterface.isLandscape
               ? "bottom"
               : "right"
           }
           align={
-            device.editor.isMobile && !device.viewport.isLandscape
+            editorInterface.formFactor === "phone" &&
+            !editorInterface.isLandscape
               ? "center"
               : "start"
           }
@@ -68,7 +70,7 @@ export const PropertiesPopover = React.forwardRef<
           onPointerDownOutside={onPointerDownOutside}
           onOpenAutoFocus={(e) => {
             // prevent auto-focus on touch devices to avoid keyboard popup
-            if (preventAutoFocusOnTouch && device.isTouchScreen) {
+            if (preventAutoFocusOnTouch && editorInterface.isTouchScreen) {
               e.preventDefault();
             }
           }}

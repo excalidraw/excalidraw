@@ -192,9 +192,7 @@ export const withExcalidrawDimensions = async (
   mockBoundingClientRect(dimensions);
   act(() => {
     // @ts-ignore
-    h.app.refreshViewportBreakpoints();
-    // @ts-ignore
-    h.app.refreshEditorBreakpoints();
+    h.app.refreshEditorInterface();
     window.h.app.refresh();
   });
 
@@ -203,9 +201,7 @@ export const withExcalidrawDimensions = async (
   restoreOriginalGetBoundingClientRect();
   act(() => {
     // @ts-ignore
-    h.app.refreshViewportBreakpoints();
-    // @ts-ignore
-    h.app.refreshEditorBreakpoints();
+    h.app.refreshEditorInterface();
     window.h.app.refresh();
   });
 };
