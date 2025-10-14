@@ -6,7 +6,7 @@
  * Avoids complex type dependencies and focuses on core functionality.
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { RAGFocusDetail } from '../types/rag.types';
 import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
 import { useAtomValue } from '../app-jotai';
@@ -21,6 +21,7 @@ import { useInviteAI } from '../hooks/useInviteAI';
 import { ChatHeader } from './ChatPanel/ChatHeader';
 import { ChatInputBar } from './ChatPanel/ChatInputBar';
 import { ChatMessagesList } from './ChatPanel/ChatMessagesList';
+import { isPremiumSignedUser } from '../app_constants';
 
 const ChatPanel: React.FC<ChatPanelProps> = ({
   excalidrawAPI,
@@ -35,6 +36,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
   const chatPanelRef = useRef<HTMLDivElement>(null);
   const collabAPI = useAtomValue(collabAPIAtom);
+  const premiumCollabAPI = isPremiumSignedUser ? collabAPI : null;
 
   // Custom hooks
   const { focusCitation } = useCitationFocus({ excalidrawAPI });
@@ -47,7 +49,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     hasCollabAPI
   } = useInviteAI({
     excalidrawAPI,
-    collabAPI,
+    collabAPI: premiumCollabAPI,
     isVisible,
     onError: setError
   });
@@ -71,6 +73,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
   // Check service health on mount
   useEffect(() => {
+    if (!isPremiumSignedUser) {
+      return;
+    }
     checkServiceHealth();
   }, []);
 
@@ -161,6 +166,13 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     }
   };
 
+  const handleInviteAI = useCallback(async () => {
+    if (!isPremiumSignedUser) {
+      return;
+    }
+    await inviteAI();
+  }, [inviteAI]);
+
   if (!isVisible) {
     return null; // Button is now handled in renderTopRightUI
   }
@@ -189,7 +201,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         isInvitingAI={isInvitingAI}
         aiSyncStatus={aiSyncStatus}
         onCancel={cleanupStreaming}
-        onInviteAI={inviteAI}
+        onInviteAI={handleInviteAI}
         onClearHistory={clearHistory}
         onClose={onToggle}
         hasCollabAPI={hasCollabAPI}
