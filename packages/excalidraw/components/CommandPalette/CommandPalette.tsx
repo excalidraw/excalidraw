@@ -836,7 +836,12 @@ function CommandPaletteInner({
 
     let matchingCommands =
       commandSearch?.length > 1
-        ? [...allCommands, ...libraryCommands]
+        ? [
+            ...allCommands
+              .filter(isCommandAvailable)
+              .sort((a, b) => a.order - b.order),
+            ...libraryCommands,
+          ]
         : allCommands
             .filter(isCommandAvailable)
             .sort((a, b) => a.order - b.order);
