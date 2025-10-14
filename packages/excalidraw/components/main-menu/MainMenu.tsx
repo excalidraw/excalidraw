@@ -30,9 +30,6 @@ const MainMenu = Object.assign(
       const device = useDevice();
       const appState = useUIAppState();
       const setAppState = useExcalidrawSetAppState();
-      const onClickOutside = device.editor.isMobile
-        ? undefined
-        : () => setAppState({ openMenu: null });
 
       return (
         <MainMenuTunnel.In>
@@ -51,7 +48,7 @@ const MainMenu = Object.assign(
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
-              onClickOutside={onClickOutside}
+              onClickOutside={() => setAppState({ openMenu: null })}
               onSelect={composeEventHandlers(onSelect, () => {
                 setAppState({ openMenu: null });
               })}
