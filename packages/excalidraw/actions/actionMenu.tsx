@@ -25,6 +25,8 @@ export const actionShortcuts = register({
             : {
                 name: "help",
               },
+        openMenu: null,
+        openPopup: null,
       },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };

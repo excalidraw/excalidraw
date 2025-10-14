@@ -41,6 +41,8 @@ const MainMenu = Object.assign(
               onToggle={() => {
                 setAppState({
                   openMenu: appState.openMenu === "canvas" ? null : "canvas",
+                  openPopup: null,
+                  openDialog: null,
                 });
               }}
               data-testid="main-menu-trigger"
