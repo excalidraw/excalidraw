@@ -356,7 +356,7 @@ export interface AppState {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
-  openMenu: "canvas" | "shape" | null;
+  openMenu: "canvas" | null;
   openPopup:
     | "canvasBackground"
     | "elementBackground"

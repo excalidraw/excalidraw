@@ -159,7 +159,7 @@ function Picker<T>({
       side={isMobile ? "right" : "bottom"}
       align="start"
       sideOffset={isMobile ? 8 : 12}
-      style={{ zIndex: "var(--zIndex-popup)" }}
+      style={{ zIndex: "var(--zIndex-ui-styles-popup)" }}
       onKeyDown={handleKeyDown}
     >
       <div
