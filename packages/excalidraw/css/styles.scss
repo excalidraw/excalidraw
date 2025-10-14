@@ -301,6 +301,12 @@ body.excalidraw-cursor-resize * {
   .App-toolbar-content {
     display: flex;
     flex-direction: column;
+
+    pointer-events: none;
+
+    & > * {
+      pointer-events: var(--ui-pointerEvents);
+    }
   }
 
   .App-mobile-menu {
