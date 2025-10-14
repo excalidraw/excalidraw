@@ -374,7 +374,10 @@ export const MobileToolBar = ({
                 extraToolSelected || isOtherShapesMenuOpen,
             },
           )}
-          onToggle={() => setIsOtherShapesMenuOpen(!isOtherShapesMenuOpen)}
+          onToggle={() => {
+            setIsOtherShapesMenuOpen(!isOtherShapesMenuOpen);
+            setAppState({ openMenu: null, openPopup: null });
+          }}
           title={t("toolBar.extraTools")}
           style={{
             width: WIDTH,
