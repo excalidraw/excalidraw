@@ -476,7 +476,6 @@ function CommandPaletteInner({
           },
           perform: () => {
             setAppState((prevState) => ({
-              openMenu: prevState.openMenu === "shape" ? null : "shape",
               openPopup: "elementStroke",
             }));
           },
@@ -496,7 +495,6 @@ function CommandPaletteInner({
           },
           perform: () => {
             setAppState((prevState) => ({
-              openMenu: prevState.openMenu === "shape" ? null : "shape",
               openPopup: "elementBackground",
             }));
           },
