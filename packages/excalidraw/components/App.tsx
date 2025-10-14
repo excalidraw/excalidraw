@@ -753,8 +753,16 @@ class App extends React.Component<AppProps, AppState> {
     const userAgentDescriptor = createUserAgentDescriptor(
       typeof navigator !== "undefined" ? navigator.userAgent : "",
     );
+    // allow host app to control formFactor and desktopUIMode via props
     this.editorInterface = updateObject(this.editorInterface, {
-      desktopUIMode: storedDesktopUIMode ?? this.editorInterface.desktopUIMode,
+      desktopUIMode:
+        typeof props.desktopUIMode !== "undefined"
+          ? props.desktopUIMode
+          : storedDesktopUIMode ?? this.editorInterface.desktopUIMode,
+      formFactor:
+        typeof props.formFactor !== "undefined"
+          ? props.formFactor
+          : this.editorInterface.formFactor,
       userAgent: userAgentDescriptor,
     });
     this.stylesPanelMode = deriveStylesPanelMode(this.editorInterface);

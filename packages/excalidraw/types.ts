@@ -691,6 +691,12 @@ export type AppProps = Merge<
     isCollaborating: boolean;
     children?: React.ReactNode;
     aiEnabled: boolean;
+    /**
+     * Optionally control the editor form factor and desktop UI mode from the host app.
+     * If not provided, we will take care of it internally.
+     */
+    formFactor?: EditorInterface["formFactor"];
+    desktopUIMode?: EditorInterface["desktopUIMode"];
   }
 >;
 
