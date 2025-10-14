@@ -44,6 +44,11 @@ body.excalidraw-cursor-resize * {
   height: 100%;
   width: 100%;
 
+  button,
+  label {
+    @include buttonNoHighlight;
+  }
+
   button {
     cursor: pointer;
     user-select: none;
@@ -235,27 +240,32 @@ body.excalidraw-cursor-resize * {
     z-index: var(--zIndex-layerUI);
     display: flex;
     flex-direction: column;
-    align-items: center;
+  }
+
+  .App-welcome-screen {
+    z-index: var(--zIndex-layerUI);
   }
 
   .App-bottom-bar {
     position: absolute;
-    top: 0;
+    // account for margins
+    width: calc(100% - 28px);
+    max-width: 450px;
     bottom: 0;
-    left: 0;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
     --bar-padding: calc(4 * var(--space-factor));
-    z-index: 4;
+    z-index: var(--zIndex-layerUI);
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
+
     pointer-events: none;
+    justify-content: center;
 
     > .Island {
-      width: 100%;
-      max-width: 100%;
-      min-width: 100%;
       box-sizing: border-box;
       max-height: 100%;
+      padding: 4px;
       display: flex;
       flex-direction: column;
       pointer-events: var(--ui-pointerEvents);
@@ -263,7 +273,8 @@ body.excalidraw-cursor-resize * {
   }
 
   .App-toolbar {
-    width: 100%;
+    display: flex;
+    justify-content: center;
 
     .eraser {
       &.ToolIcon:hover {
@@ -276,16 +287,15 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-toolbar-content {
+  .excalidraw-ui-top-left {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px;
+    gap: 0.5rem;
+  }
 
-    .dropdown-menu--mobile {
-      bottom: 55px;
-      top: auto;
-    }
+  .App-toolbar-content {
+    display: flex;
+    flex-direction: column;
   }
 
   .App-mobile-menu {
@@ -506,7 +516,7 @@ body.excalidraw-cursor-resize * {
       display: none;
     }
     .scroll-back-to-content {
-      bottom: calc(80px + var(--sab, 0));
+      bottom: calc(100px + var(--sab, 0));
       z-index: -1;
     }
   }

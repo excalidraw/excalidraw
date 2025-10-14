@@ -338,11 +338,13 @@ export const FontPickerList = React.memo(
         onKeyDown={onKeyDown}
         preventAutoFocusOnTouch={!!app.state.editingTextElement}
       >
-        <QuickSearch
-          ref={inputRef}
-          placeholder={t("quickSearch.placeholder")}
-          onChange={debounce(setSearchTerm, 20)}
-        />
+        {app.state.stylesPanelMode === "full" && (
+          <QuickSearch
+            ref={inputRef}
+            placeholder={t("quickSearch.placeholder")}
+            onChange={debounce(setSearchTerm, 20)}
+          />
+        )}
         <ScrollableList
           className="dropdown-menu fonts manual-hover"
           placeholder={t("fontList.empty")}

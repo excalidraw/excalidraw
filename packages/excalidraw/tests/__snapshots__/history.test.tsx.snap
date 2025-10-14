@@ -81,6 +81,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id4": true,
   },
@@ -699,6 +703,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id4": true,
   },
@@ -1190,6 +1198,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -1556,6 +1568,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -1925,6 +1941,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -2187,6 +2207,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -2634,6 +2658,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -2945,6 +2973,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -3275,6 +3307,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -3577,6 +3613,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -3868,6 +3908,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -4108,6 +4152,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -4370,6 +4418,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -4649,6 +4701,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -4883,6 +4939,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -5117,6 +5177,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -5369,6 +5433,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -5633,6 +5701,10 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -5890,6 +5962,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id1": true,
   },
@@ -6212,7 +6288,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "offsetTop": 0,
   "openDialog": null,
   "openMenu": null,
-  "openPopup": "elementBackground",
+  "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
   "pasteDialog": {
@@ -6221,6 +6297,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id8": true,
   },
@@ -6650,6 +6730,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id1": true,
   },
@@ -7029,6 +7113,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -7340,6 +7428,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -7658,6 +7750,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -7890,6 +7986,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -8244,6 +8344,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -8598,6 +8702,10 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
     "id3": true,
@@ -9006,6 +9114,10 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -9295,6 +9407,10 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -9561,6 +9677,10 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -9828,6 +9948,10 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -10065,6 +10189,10 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -10361,6 +10489,10 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -10712,6 +10844,10 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -10953,6 +11089,10 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -11400,6 +11540,10 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -11662,6 +11806,10 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -11899,6 +12047,10 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -12129,7 +12281,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "offsetTop": 0,
   "openDialog": null,
   "openMenu": null,
-  "openPopup": "elementStroke",
+  "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
   "pasteDialog": {
@@ -12138,6 +12290,10 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -12546,6 +12702,10 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -12755,6 +12915,10 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -12967,6 +13131,10 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -13267,6 +13435,10 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -13570,6 +13742,10 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": -50,
@@ -13814,6 +13990,10 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -14053,6 +14233,10 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -14292,6 +14476,10 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -14541,6 +14729,10 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -14877,6 +15069,10 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -15046,6 +15242,10 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -15335,6 +15535,10 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -15600,6 +15804,10 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -15743,7 +15951,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "offsetTop": 0,
   "openDialog": null,
   "openMenu": null,
-  "openPopup": "elementBackground",
+  "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
   "pasteDialog": {
@@ -15752,6 +15960,10 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -16039,6 +16251,10 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -16200,6 +16416,10 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -16913,6 +17133,10 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -17556,6 +17780,10 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -18199,6 +18427,10 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
@@ -18926,6 +19158,10 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -19685,6 +19921,10 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -20167,6 +20407,10 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id1": true,
   },
@@ -20680,6 +20924,10 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id3": true,
   },
@@ -21141,6 +21389,10 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },

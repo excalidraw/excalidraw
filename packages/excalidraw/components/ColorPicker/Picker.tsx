@@ -37,8 +37,10 @@ interface PickerProps {
   palette: ColorPaletteCustom;
   updateData: (formData?: any) => void;
   children?: React.ReactNode;
+  showTitle?: boolean;
   onEyeDropperToggle: (force?: boolean) => void;
   onEscape: (event: React.KeyboardEvent | KeyboardEvent) => void;
+  showHotKey?: boolean;
 }
 
 export const Picker = React.forwardRef(
@@ -51,11 +53,21 @@ export const Picker = React.forwardRef(
       palette,
       updateData,
       children,
+      showTitle,
       onEyeDropperToggle,
       onEscape,
+      showHotKey = true,
     }: PickerProps,
     ref,
   ) => {
+    const title = showTitle
+      ? type === "elementStroke"
+        ? t("labels.stroke")
+        : type === "elementBackground"
+        ? t("labels.background")
+        : null
+      : null;
+
     const [customColors] = React.useState(() => {
       if (type === "canvasBackground") {
         return [];
@@ -154,6 +166,8 @@ export const Picker = React.forwardRef(
           // to allow focusing by clicking but not by tabbing
           tabIndex={-1}
         >
+          {title && <div className="color-picker__title">{title}</div>}
+
           {!!customColors.length && (
             <div>
               <PickerHeading>
@@ -175,12 +189,18 @@ export const Picker = React.forwardRef(
               palette={palette}
               onChange={onChange}
               activeShade={activeShade}
+              showHotKey={showHotKey}
             />
           </div>
 
           <div>
             <PickerHeading>{t("colorPicker.shades")}</PickerHeading>
-            <ShadeList color={color} onChange={onChange} palette={palette} />
+            <ShadeList
+              color={color}
+              onChange={onChange}
+              palette={palette}
+              showHotKey={showHotKey}
+            />
           </div>
           {children}
         </div>

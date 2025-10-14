@@ -89,7 +89,7 @@ export const SHAPES = [
 ] as const;
 
 export const getToolbarTools = (app: AppClassProperties) => {
-  return app.defaultSelectionTool === "lasso"
+  return app.state.preferredSelectionTool.type === "lasso"
     ? ([
         {
           value: "lasso",

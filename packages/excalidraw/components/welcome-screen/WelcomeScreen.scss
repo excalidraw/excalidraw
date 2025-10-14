@@ -252,16 +252,12 @@
     }
   }
 
-  @media (max-height: 599px) {
+  &.excalidraw--mobile {
     .welcome-screen-center {
-      margin-top: 4rem;
+      margin-bottom: 2rem;
     }
   }
-  @media (min-height: 600px) and (max-height: 900px) {
-    .welcome-screen-center {
-      margin-top: 8rem;
-    }
-  }
+
   @media (max-height: 500px), (max-width: 320px) {
     .welcome-screen-center {
       display: none;
