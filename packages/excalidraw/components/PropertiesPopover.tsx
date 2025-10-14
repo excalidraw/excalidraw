@@ -61,6 +61,7 @@ export const PropertiesPopover = React.forwardRef<
           sideOffset={20}
           style={{
             zIndex: "var(--zIndex-ui-styles-popup)",
+            marginLeft: device.editor.isMobile ? "0.5rem" : undefined,
           }}
           onPointerLeave={onPointerLeave}
           onKeyDown={onKeyDown}
