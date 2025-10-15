@@ -12,6 +12,7 @@ import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   invariant,
+  isMobileOrTablet,
   THEME,
   throttleRAF,
 } from "@excalidraw/common";
@@ -1032,7 +1033,10 @@ const _renderInteractiveScene = ({
         // do not show transform handles when text is being edited
         !isTextElement(appState.editingTextElement) &&
         // do not show transform handles when image is being cropped
-        !appState.croppingElementId
+        !appState.croppingElementId &&
+        // HACK: Disable transform handles for linear elements on mobile until a
+        // better way of showing them is found
+        !(isLinearElement(selectedElements[0]) && isMobileOrTablet())
       ) {
         renderTransformHandles(
           context,
