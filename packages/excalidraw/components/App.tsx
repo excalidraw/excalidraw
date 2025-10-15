@@ -756,13 +756,10 @@ class App extends React.Component<AppProps, AppState> {
     // allow host app to control formFactor and desktopUIMode via props
     this.editorInterface = updateObject(this.editorInterface, {
       desktopUIMode:
-        typeof props.desktopUIMode !== "undefined"
-          ? props.desktopUIMode
-          : storedDesktopUIMode ?? this.editorInterface.desktopUIMode,
-      formFactor:
-        typeof props.formFactor !== "undefined"
-          ? props.formFactor
-          : this.editorInterface.formFactor,
+        props.UIOptions.desktopUIMode ??
+        storedDesktopUIMode ??
+        this.editorInterface.desktopUIMode,
+      formFactor: props.UIOptions.formFactor ?? this.editorInterface.formFactor,
       userAgent: userAgentDescriptor,
     });
     this.stylesPanelMode = deriveStylesPanelMode(this.editorInterface);
@@ -2534,7 +2531,7 @@ class App extends React.Component<AppProps, AppState> {
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
 
     // if host doesn't control formFactor, we'll update it ourselves
-    if (!this.props.formFactor) {
+    if (!this.props.UIOptions.formFactor) {
       const nextEditorInterface = updateObject(this.editorInterface, {
         formFactor: deriveFormFactor(editorWidth, editorHeight, {
           isMobile: (width, height) => this.isMobileBreakpoint(width, height),
@@ -2547,7 +2544,7 @@ class App extends React.Component<AppProps, AppState> {
       if (didChange) {
         this.editorInterface = nextEditorInterface;
         this.reconcileStylesPanelMode(nextEditorInterface);
-        this.props.onEditorInterfaceChange?.(nextEditorInterface);
+        this.props.UIOptions.onEditorInterfaceChange?.(nextEditorInterface);
       }
       return didChange;
     }

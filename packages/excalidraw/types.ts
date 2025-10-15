@@ -673,6 +673,17 @@ export type UIOptions = Partial<{
   tools: {
     image: boolean;
   };
+  /**
+   * Optionally control the editor form factor and desktop UI mode from the host app.
+   * If not provided, we will take care of it internally.
+   */
+  formFactor?: EditorInterface["formFactor"];
+  desktopUIMode?: EditorInterface["desktopUIMode"];
+  /**
+   * Listener called when the editor interface is refreshed and
+   * form factor is not controlled by host.
+   */
+  onEditorInterfaceChange?: (editorInterface: EditorInterface) => void;
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
 }>;
@@ -691,17 +702,6 @@ export type AppProps = Merge<
     isCollaborating: boolean;
     children?: React.ReactNode;
     aiEnabled: boolean;
-    /**
-     * Optionally control the editor form factor and desktop UI mode from the host app.
-     * If not provided, we will take care of it internally.
-     */
-    formFactor?: EditorInterface["formFactor"];
-    desktopUIMode?: EditorInterface["desktopUIMode"];
-    /**
-     * Listener called when the editor interface is refreshed and
-     * form factor is not controlled by host.
-     */
-    onEditorInterfaceChange?: (editorInterface: EditorInterface) => void;
   }
 >;
 
