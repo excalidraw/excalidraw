@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { isFiniteNumber } from "@excalidraw/math";
+import { isDevEnv } from "@excalidraw/common";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
@@ -30,6 +31,7 @@ import {
   saveMermaidDataToStorage,
 } from "./common";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
+import { TTDDialogCloseButton } from "./TTDDialogCloseButton";
 
 import "./TTDDialog.scss";
 
@@ -97,7 +99,7 @@ export const TTDDialogBase = withInternalFallback(
     const app = useApp();
     const setAppState = useExcalidrawSetAppState();
 
-    const someRandomDivRef = useRef<HTMLDivElement>(null);
+    const previewCanvasRef = useRef<HTMLDivElement>(null);
 
     const [ttdGeneration, setTtdGeneration] = useAtom(ttdGenerationAtom);
 
@@ -175,7 +177,7 @@ export const TTDDialogBase = withInternalFallback(
 
         try {
           await convertMermaidToExcalidraw({
-            canvasRef: someRandomDivRef,
+            canvasRef: previewCanvasRef,
             data,
             mermaidToExcalidrawLib,
             setError,
@@ -183,14 +185,16 @@ export const TTDDialogBase = withInternalFallback(
           });
           trackEvent("ai", "mermaid parse success", "ttd");
         } catch (error: any) {
-          console.info(
-            `%cTTD mermaid render errror: ${error.message}`,
-            "color: red",
-          );
-          console.info(
-            `>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nTTD mermaid definition render errror: ${error.message}`,
-            "color: yellow",
-          );
+          if (isDevEnv()) {
+            console.info(
+              `%cTTD mermaid render errror: ${error.message}`,
+              "color: red",
+            );
+            console.info(
+              `>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nTTD mermaid definition render errror: ${error.message}`,
+              "color: yellow",
+            );
+          }
           trackEvent("ai", "mermaid parse failed", "ttd");
           setError(
             new Error(
@@ -244,6 +248,11 @@ export const TTDDialogBase = withInternalFallback(
         {...rest}
         autofocus={false}
       >
+        <TTDDialogCloseButton
+          onClose={() => {
+            app.setOpenDialog(null);
+          }}
+        />
         <TTDDialogTabs dialog="ttd" tab={tab}>
           {"__fallback" in rest && rest.__fallback ? (
             <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
@@ -378,7 +387,6 @@ export const TTDDialogBase = withInternalFallback(
                   label="Preview"
                   panelAction={{
                     action: () => {
-                      console.info("Panel action clicked");
                       insertToEditor({ app, data });
                     },
                     label: "Insert",
@@ -386,7 +394,7 @@ export const TTDDialogBase = withInternalFallback(
                   }}
                 >
                   <TTDDialogOutput
-                    canvasRef={someRandomDivRef}
+                    canvasRef={previewCanvasRef}
                     error={error}
                     loaded={mermaidToExcalidrawLib.loaded}
                   />

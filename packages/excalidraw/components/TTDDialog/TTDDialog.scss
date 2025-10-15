@@ -34,6 +34,36 @@ $verticalBreakpoint: 861px;
     }
   }
 
+  .ttd-dialog-close {
+    @include outlineButtonStyles;
+
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 10;
+
+    --button-bg: transparent;
+    border: 0 !important;
+
+    width: var(--lg-button-size);
+    height: var(--lg-button-size);
+    padding: 0;
+
+    svg {
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
+    }
+
+    &:hover {
+      background: var(--button-hover-bg, var(--island-bg-color));
+    }
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      top: 1rem;
+      right: 1rem;
+    }
+  }
+
   .ttd-dialog-desc {
     font-size: 15px;
     font-style: italic;
