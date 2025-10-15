@@ -23,7 +23,7 @@ import {
   getOmitSidesForDevice,
   getTransformHandles,
   getTransformHandlesFromCoords,
-  shouldShowBoundingBox,
+  hasBoundingBox,
 } from "@excalidraw/element";
 import {
   isElbowArrow,
@@ -893,7 +893,7 @@ const _renderInteractiveScene = ({
 
   // Paint selected elements
   if (!appState.multiElement && !appState.selectedLinearElement?.isEditing) {
-    const showBoundingBox = shouldShowBoundingBox(selectedElements, appState);
+    const showBoundingBox = hasBoundingBox(selectedElements, appState);
 
     const isSingleLinearElementSelected =
       selectedElements.length === 1 && isLinearElement(selectedElements[0]);
@@ -1033,13 +1033,7 @@ const _renderInteractiveScene = ({
         // do not show transform handles when text is being edited
         !isTextElement(appState.editingTextElement) &&
         // do not show transform handles when image is being cropped
-        !appState.croppingElementId &&
-        // HACK: Disable transform handles for linear elements on mobile until a
-        // better way of showing them is found
-        !(
-          isLinearElement(selectedElements[0]) &&
-          (isMobileOrTablet() || selectedElements[0].points.length === 2)
-        )
+        !appState.croppingElementId
       ) {
         renderTransformHandles(
           context,
