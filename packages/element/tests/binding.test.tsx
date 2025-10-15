@@ -10,6 +10,8 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { UI, Pointer, Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
 import { fireEvent, render } from "@excalidraw/excalidraw/tests/test-utils";
 
+import { LinearElementEditor } from "@excalidraw/element";
+
 import { getTransformHandles } from "../src/transformHandles";
 import {
   getTextEditor,
@@ -413,16 +415,12 @@ describe("element binding", () => {
     expect(arrow.endBinding?.elementId).toBe(rectRight.id);
 
     // Drag arrow off of bound rectangle range
-    const handles = getTransformHandles(
+    const [elX, elY] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
       arrow,
-      h.state.zoom,
-      arrayToMap(h.elements),
-      "mouse",
-    ).se!;
-
+      -1,
+      h.scene.getNonDeletedElementsMap(),
+    );
     Keyboard.keyDown(KEYS.CTRL_OR_CMD);
-    const elX = handles[0] + handles[2] / 2;
-    const elY = handles[1] + handles[3] / 2;
     mouse.downAt(elX, elY);
     mouse.moveTo(300, 400);
     mouse.up();

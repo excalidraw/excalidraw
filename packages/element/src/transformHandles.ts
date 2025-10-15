@@ -2,6 +2,7 @@ import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   isAndroid,
   isIOS,
+  isMobileOrTablet,
 } from "@excalidraw/common";
 
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
@@ -326,7 +327,7 @@ export const getTransformHandles = (
   );
 };
 
-export const shouldShowBoundingBox = (
+export const hasBoundingBox = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: InteractiveCanvasAppState,
 ) => {
@@ -345,5 +346,7 @@ export const shouldShowBoundingBox = (
     return true;
   }
 
-  return element.points.length > 2;
+  // on mobile/tablet we currently don't show bbox because of resize issues
+  // (also prob best for simplicity's sake)
+  return element.points.length > 2 && !isMobileOrTablet();
 };
