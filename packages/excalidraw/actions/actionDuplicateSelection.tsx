@@ -1,6 +1,7 @@
 import {
   DEFAULT_GRID_SIZE,
   KEYS,
+  MOBILE_ACTION_BUTTON_BG,
   arrayToMap,
   getShortcutKey,
 } from "@excalidraw/common";
@@ -115,7 +116,15 @@ export const actionDuplicateSelection = register({
       )}`}
       aria-label={t("labels.duplicateSelection")}
       onClick={() => updateData(null)}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      disabled={
+        !isSomeElementSelected(getNonDeletedElements(elements), appState)
+      }
+      style={{
+        ...(appState.stylesPanelMode === "mobile" &&
+        appState.openPopup !== "compactOtherProperties"
+          ? MOBILE_ACTION_BUTTON_BG
+          : {}),
+      }}
     />
   ),
 });

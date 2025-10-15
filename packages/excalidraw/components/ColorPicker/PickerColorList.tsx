@@ -20,6 +20,7 @@ interface PickerColorListProps {
   color: string | null;
   onChange: (color: string) => void;
   activeShade: number;
+  showHotKey?: boolean;
 }
 
 const PickerColorList = ({
@@ -27,6 +28,7 @@ const PickerColorList = ({
   color,
   onChange,
   activeShade,
+  showHotKey = true,
 }: PickerColorListProps) => {
   const colorObj = getColorNameAndShadeFromColor({
     color,
@@ -82,7 +84,7 @@ const PickerColorList = ({
             key={key}
           >
             <div className="color-picker__button-outline" />
-            <HotkeyLabel color={color} keyLabel={keybinding} />
+            {showHotKey && <HotkeyLabel color={color} keyLabel={keybinding} />}
           </button>
         );
       })}
