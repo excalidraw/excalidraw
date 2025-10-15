@@ -138,8 +138,7 @@ $verticalBreakpoint: 861px;
     flex-grow: 1;
     position: relative;
 
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
-      left center;
+    background: var(--color-surface-primary-container);
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--dialog-border-color);
 
@@ -152,9 +151,23 @@ $verticalBreakpoint: 861px;
       height: 200px;
     }
 
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg opacity='0.08' fill='none' stroke='%23000' stroke-width='2'%3E%3Crect x='30' y='20' width='50' height='30' rx='4'/%3E%3Crect x='120' y='20' width='50' height='30' rx='4'/%3E%3Crect x='30' y='80' width='50' height='30' rx='4'/%3E%3Crect x='120' y='80' width='50' height='30' rx='4'/%3E%3Crect x='75' y='140' width='50' height='30' rx='4'/%3E%3Cpath d='M55 50 L55 80' marker-end='url(%23arrowhead)'/%3E%3Cpath d='M145 50 L145 80' marker-end='url(%23arrowhead)'/%3E%3Cpath d='M80 95 L100 140' marker-end='url(%23arrowhead)'/%3E%3Cpath d='M145 95 L100 140' marker-end='url(%23arrowhead)'/%3E%3Cdefs%3E%3Cmarker id='arrowhead' markerWidth='10' markerHeight='10' refX='5' refY='3' orient='auto'%3E%3Cpolygon points='0 0, 10 3, 0 6' /%3E%3C/marker%3E%3C/defs%3E%3C/g%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 60%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
     canvas {
       max-width: 100%;
       max-height: 100%;
+      position: relative;
+      z-index: 1;
     }
   }
 
@@ -334,7 +347,13 @@ $verticalBreakpoint: 861px;
     font-size: 0.625rem;
     opacity: 0.6;
     display: flex;
-    gap: 0.125rem;
+    align-items: center;
+    gap: 0.25rem;
+
+    &__label {
+      opacity: 0.8;
+      padding: 0 0.125rem;
+    }
 
     &__key {
       border: 1px solid gray;
