@@ -311,7 +311,7 @@ export const getTransformHandles = (
     };
   }
   const margin = isLinearElement(element)
-    ? DEFAULT_TRANSFORM_HANDLE_SPACING + 8
+    ? DEFAULT_TRANSFORM_HANDLE_SPACING + 12
     : isImageElement(element)
     ? 0
     : DEFAULT_TRANSFORM_HANDLE_SPACING;
