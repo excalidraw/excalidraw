@@ -12,7 +12,6 @@ import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   invariant,
-  isMobileOrTablet,
   THEME,
   throttleRAF,
 } from "@excalidraw/common";
