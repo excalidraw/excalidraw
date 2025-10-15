@@ -8,7 +8,7 @@ import { atom, useAtom } from "../editor-jotai";
 import { getLanguage, t } from "../i18n";
 
 import Collapsible from "./Stats/Collapsible";
-import { useDevice } from "./App";
+import { useEditorInterface } from "./App";
 
 import "./IconPicker.scss";
 
@@ -38,7 +38,7 @@ function Picker<T>({
   onClose: () => void;
   numberOfOptionsToAlwaysShow?: number;
 }) {
-  const device = useDevice();
+  const editorInterface = useEditorInterface();
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     const pressedOption = options.find(
@@ -152,7 +152,7 @@ function Picker<T>({
     );
   };
 
-  const isMobile = device.editor.isMobile;
+  const isMobile = editorInterface.formFactor === "phone";
 
   return (
     <Popover.Content

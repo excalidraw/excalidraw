@@ -254,9 +254,7 @@ describe("textWysiwyg", () => {
     beforeEach(async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
       // @ts-ignore
-      h.app.refreshViewportBreakpoints();
-      // @ts-ignore
-      h.app.refreshEditorBreakpoints();
+      h.app.refreshEditorInterface();
 
       API.setElements([]);
     });
@@ -363,9 +361,7 @@ describe("textWysiwyg", () => {
     beforeEach(async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
       // @ts-ignore
-      h.app.refreshViewportBreakpoints();
-      // @ts-ignore
-      h.app.refreshEditorBreakpoints();
+      h.app.refreshEditorInterface();
 
       textElement = UI.createElement("text");
 

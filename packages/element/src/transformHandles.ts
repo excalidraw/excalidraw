@@ -1,15 +1,11 @@
-import {
-  DEFAULT_TRANSFORM_HANDLE_SPACING,
-  isAndroid,
-  isIOS,
-} from "@excalidraw/common";
+import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "@excalidraw/common";
 
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import type { Radians } from "@excalidraw/math";
 
 import type {
-  Device,
+  EditorInterface,
   InteractiveCanvasAppState,
   Zoom,
 } from "@excalidraw/excalidraw/types";
@@ -111,20 +107,21 @@ const generateTransformHandle = (
   return [xx - width / 2, yy - height / 2, width, height];
 };
 
-export const canResizeFromSides = (device: Device) => {
-  if (device.viewport.isMobile) {
-    return false;
-  }
-
-  if (device.isTouchScreen && (isAndroid || isIOS)) {
+export const canResizeFromSides = (editorInterface: EditorInterface) => {
+  if (
+    editorInterface.formFactor === "phone" &&
+    editorInterface.userAgent.isMobileDevice
+  ) {
     return false;
   }
 
   return true;
 };
 
-export const getOmitSidesForDevice = (device: Device) => {
-  if (canResizeFromSides(device)) {
+export const getOmitSidesForEditorInterface = (
+  editorInterface: EditorInterface,
+) => {
+  if (canResizeFromSides(editorInterface)) {
     return DEFAULT_OMIT_SIDES;
   }
 

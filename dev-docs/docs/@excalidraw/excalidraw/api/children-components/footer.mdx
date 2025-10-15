@@ -9,7 +9,7 @@ You will need to import the `Footer` component from the package and wrap your co
 ```jsx live
 function App() {
   return (
-    <div style={{ height: "500px"}}>
+    <div style={{ height: "500px" }}>
       <Excalidraw>
         <Footer>
           <button
@@ -27,19 +27,19 @@ function App() {
 
 This will only work for `Desktop` devices.
 
-For `mobile` you will need to render it inside the [MainMenu](#mainmenu). You can use the [`useDevice`](#useDevice) hook to check the type of device, this will be available only inside the `children` of `Excalidraw` component.
+For `mobile` you will need to render it inside the [MainMenu](#mainmenu). You can use the [`useEditorInterface`](#useEditorInterface) hook to check the type of device, this will be available only inside the `children` of `Excalidraw` component.
 
 Open the `Menu` in the below playground and you will see the `custom footer` rendered.
 
 ```jsx live noInline
 const MobileFooter = ({}) => {
-  const device = useDevice();
-  if (device.editor.isMobile) {
+  const editorInterface = useEditorInterface();
+  if (editorInterface.formFactor === "phone") {
     return (
       <Footer>
         <button
           className="custom-footer"
-          style= {{ marginLeft: '20px', height: '2rem'}}
+          style={{ marginLeft: "20px", height: "2rem" }}
           onClick={() => alert("This is custom footer in mobile menu")}
         >
           custom footer

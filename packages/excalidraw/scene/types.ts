@@ -16,7 +16,7 @@ import type {
   InteractiveCanvasAppState,
   StaticCanvasAppState,
   SocketId,
-  Device,
+  EditorInterface,
   PendingExcalidrawElements,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
@@ -97,7 +97,7 @@ export type InteractiveSceneRenderConfig = {
   scale: number;
   appState: InteractiveCanvasAppState;
   renderConfig: InteractiveCanvasRenderConfig;
-  device: Device;
+  editorInterface: EditorInterface;
   callback: (data: RenderInteractiveSceneCallback) => void;
 };
 
