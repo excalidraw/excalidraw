@@ -1036,7 +1036,10 @@ const _renderInteractiveScene = ({
         !appState.croppingElementId &&
         // HACK: Disable transform handles for linear elements on mobile until a
         // better way of showing them is found
-        !(isLinearElement(selectedElements[0]) && isMobileOrTablet())
+        !(
+          isLinearElement(selectedElements[0]) &&
+          (isMobileOrTablet() || selectedElements[0].points.length === 2)
+        )
       ) {
         renderTransformHandles(
           context,

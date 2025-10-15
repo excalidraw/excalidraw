@@ -6165,7 +6165,13 @@ class App extends React.Component<AppProps, AppState> {
         (!this.state.selectedLinearElement ||
           this.state.selectedLinearElement.hoverPointIndex === -1) &&
         this.state.openDialog?.name !== "elementLinkSelector" &&
-        !(selectedElements.length === 1 && isElbowArrow(selectedElements[0]))
+        !(selectedElements.length === 1 && isElbowArrow(selectedElements[0])) &&
+        // HACK: Disable transform handles for linear elements on mobile until a
+        // better way of showing them is found
+        !(
+          isLinearElement(selectedElements[0]) &&
+          (isMobileOrTablet() || selectedElements[0].points.length === 2)
+        )
       ) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
@@ -7284,7 +7290,10 @@ class App extends React.Component<AppProps, AppState> {
         selectedElements.length === 1 &&
         !this.state.selectedLinearElement?.isEditing &&
         !isElbowArrow(selectedElements[0]) &&
-        !(isLinearElement(selectedElements[0]) && isMobileOrTablet()) &&
+        !(
+          isLinearElement(selectedElements[0]) &&
+          (isMobileOrTablet() || selectedElements[0].points.length === 2)
+        ) &&
         !(
           this.state.selectedLinearElement &&
           this.state.selectedLinearElement.hoverPointIndex !== -1
