@@ -2533,23 +2533,35 @@ class App extends React.Component<AppProps, AppState> {
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
 
+    // if host doesn't control formFactor, we'll update it ourselves
+    if (!this.props.formFactor) {
+      const nextEditorInterface = updateObject(this.editorInterface, {
+        formFactor: deriveFormFactor(editorWidth, editorHeight, {
+          isMobile: (width, height) => this.isMobileBreakpoint(width, height),
+          isTablet: (width, height) => this.isTabletBreakpoint(width, height),
+        }),
+        canFitSidebar: editorWidth > sidebarBreakpoint,
+        isLandscape: editorWidth > editorHeight,
+      });
+      const didChange = nextEditorInterface !== this.editorInterface;
+      if (didChange) {
+        this.editorInterface = nextEditorInterface;
+        this.reconcileStylesPanelMode(nextEditorInterface);
+        this.props.onEditorInterfaceChange?.(nextEditorInterface);
+      }
+      return didChange;
+    }
+
+    // host controls formFactor, just update sidebar/landscape for context
     const nextEditorInterface = updateObject(this.editorInterface, {
-      formFactor: deriveFormFactor(editorWidth, editorHeight, {
-        isMobile: (width, height) => this.isMobileBreakpoint(width, height),
-        isTablet: (width, height) => this.isTabletBreakpoint(width, height),
-      }),
       canFitSidebar: editorWidth > sidebarBreakpoint,
       isLandscape: editorWidth > editorHeight,
     });
-
     const didChange = nextEditorInterface !== this.editorInterface;
-
     if (didChange) {
       this.editorInterface = nextEditorInterface;
+      this.reconcileStylesPanelMode(nextEditorInterface);
     }
-
-    this.reconcileStylesPanelMode(nextEditorInterface);
-
     return didChange;
   };
 

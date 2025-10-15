@@ -697,6 +697,11 @@ export type AppProps = Merge<
      */
     formFactor?: EditorInterface["formFactor"];
     desktopUIMode?: EditorInterface["desktopUIMode"];
+    /**
+     * Listener called when the editor interface is refreshed and
+     * form factor is not controlled by host.
+     */
+    onEditorInterfaceChange?: (editorInterface: EditorInterface) => void;
   }
 >;
 
