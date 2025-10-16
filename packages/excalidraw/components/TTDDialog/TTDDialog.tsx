@@ -16,10 +16,7 @@ import { withInternalFallback } from "../hoc/withInternalFallback";
 import { ArrowRightIcon } from "../icons";
 
 import MermaidToExcalidraw from "./MermaidToExcalidraw";
-import TTDDialogTabs from "./TTDDialogTabs";
-import { TTDDialogTabTriggers } from "./TTDDialogTabTriggers";
-import { TTDDialogTabTrigger } from "./TTDDialogTabTrigger";
-import { TTDDialogTab } from "./TTDDialogTab";
+import { TTDDialogPanelSwitch } from "./TTDDialogPanelSwitch";
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
 import { TTDDialogPanel } from "./TTDDialogPanel";
@@ -306,101 +303,130 @@ export const TTDDialogBase = withInternalFallback(
             app.setOpenDialog(null);
           }}
         />
-        <TTDDialogTabs dialog="ttd" tab={tab}>
-          {"__fallback" in rest && rest.__fallback ? (
+        {"__fallback" in rest && rest.__fallback ? (
+          <>
             <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
-          ) : (
-            <TTDDialogTabTriggers>
-              <TTDDialogTabTrigger tab="text-to-diagram">
-                <div style={{ display: "flex", alignItems: "center" }}>
+            <div className="ttd-dialog-content">
+              <MermaidToExcalidraw
+                mermaidToExcalidrawLib={mermaidToExcalidrawLib}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <TTDDialogPanelSwitch
+              checked={tab === "mermaid"}
+              onCheckedChange={(checked) => {
+                setAppState({
+                  openDialog: {
+                    name: "ttd",
+                    tab: checked ? "mermaid" : "text-to-diagram",
+                  },
+                });
+              }}
+              leftLabel={
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                   {t("labels.textToDiagram")}
                   <div className="ttd-dialog-ai-badge">AI Beta</div>
                 </div>
-              </TTDDialogTabTrigger>
-              <TTDDialogTabTrigger tab="mermaid">Mermaid</TTDDialogTabTrigger>
-            </TTDDialogTabTriggers>
-          )}
-
-          <TTDDialogTab className="ttd-dialog-content" tab="mermaid">
-            <MermaidToExcalidraw
-              mermaidToExcalidrawLib={mermaidToExcalidrawLib}
+              }
+              rightLabel="Mermaid to diagram"
+              ariaLabel="Toggle between AI text-to-diagram and Mermaid code input"
             />
-          </TTDDialogTab>
-          {!("__fallback" in rest) && (
-            <TTDDialogTab className="ttd-dialog-content" tab="text-to-diagram">
-              <div className="ttd-dialog-desc">
-                Currently we use Mermaid as a middle step, so you'll get best
-                results if you describe a diagram, workflow, flow chart, and
-                similar.
+            {tab === "mermaid" ? (
+              <div className="ttd-dialog-content">
+                <MermaidToExcalidraw
+                  mermaidToExcalidrawLib={mermaidToExcalidrawLib}
+                />
               </div>
-              <TTDDialogPanels>
-                <TTDDialogPanel
-                  label={t("labels.prompt")}
-                  panelAction={{
-                    action: onGenerate,
-                    label: "Generate",
-                    icon: ArrowRightIcon,
-                  }}
-                  onTextSubmitInProgess={onTextSubmitInProgess}
-                  panelActionDisabled={
-                    prompt.length > MAX_PROMPT_LENGTH ||
-                    rateLimits?.rateLimitRemaining === 0
-                  }
-                  renderTopRight={() =>
-                    rateLimits ? (
-                      <RateLimitDisplay
-                        rateLimitRemaining={rateLimits.rateLimitRemaining}
+            ) : (
+              <div className="ttd-dialog-content">
+                <div className="ttd-dialog-desc">
+                  Currently we use Mermaid as a middle step, so you'll get best
+                  results if you describe a diagram, workflow, flow chart, and
+                  similar.
+                </div>
+                <TTDDialogPanels>
+                  <TTDDialogPanel
+                    label={t("labels.prompt")}
+                    panelAction={{
+                      action: onGenerate,
+                      label: "Generate",
+                      icon: ArrowRightIcon,
+                    }}
+                    onTextSubmitInProgess={onTextSubmitInProgess}
+                    panelActionDisabled={
+                      prompt.length > MAX_PROMPT_LENGTH ||
+                      rateLimits?.rateLimitRemaining === 0
+                    }
+                    renderTopRight={() =>
+                      rateLimits ? (
+                        <RateLimitDisplay
+                          rateLimitRemaining={rateLimits.rateLimitRemaining}
+                        />
+                      ) : null
+                    }
+                    renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
+                    renderBottomRight={() => (
+                      <PromptFooter
+                        generatedResponse={ttdGeneration?.generatedResponse ?? null}
+                        promptLength={prompt.length}
+                        onViewMermaid={() => {
+                          if (ttdGeneration?.generatedResponse) {
+                            saveMermaidDataToStorage(
+                              ttdGeneration.generatedResponse,
+                            );
+                            setAppState({
+                              openDialog: { name: "ttd", tab: "mermaid" },
+                            });
+                          }
+                        }}
                       />
-                    ) : null
-                  }
-                  renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
-                  renderBottomRight={() => (
-                    <PromptFooter
-                      generatedResponse={ttdGeneration?.generatedResponse ?? null}
-                      promptLength={prompt.length}
-                      onViewMermaid={() => {
-                        if (ttdGeneration?.generatedResponse) {
-                          saveMermaidDataToStorage(
-                            ttdGeneration.generatedResponse,
-                          );
-                          setAppState({
-                            openDialog: { name: "ttd", tab: "mermaid" },
-                          });
-                        }
+                    )}
+                  >
+                    <TTDDialogInput
+                      onChange={handleTextChange}
+                      input={text}
+                      placeholder={`Make a top-down flowchart:
+
+Start: "Christmas" [rectangle]
+
+Arrow labeled "Get money" to "Go shopping" [rounded rectangle]
+
+Then a decision "Let me think" [diamond]
+
+From the decision, three branches to [rectangles]: "Laptop", "iPhone", "Car"
+
+Label the three branches: "One", "Two", "Three"
+
+Arrange the three outcomes left-to-right, tidy spacing.`}
+                      onKeyboardSubmit={() => {
+                        refOnGenerate.current();
                       }}
                     />
-                  )}
-                >
-                  <TTDDialogInput
-                    onChange={handleTextChange}
-                    input={text}
-                    placeholder={"Describe what you want to see..."}
-                    onKeyboardSubmit={() => {
-                      refOnGenerate.current();
+                  </TTDDialogPanel>
+                  <TTDDialogPanel
+                    label="Preview"
+                    panelAction={{
+                      action: () => {
+                        insertToEditor({ app, data });
+                      },
+                      label: "Insert",
+                      icon: ArrowRightIcon,
                     }}
-                  />
-                </TTDDialogPanel>
-                <TTDDialogPanel
-                  label="Preview"
-                  panelAction={{
-                    action: () => {
-                      insertToEditor({ app, data });
-                    },
-                    label: "Insert",
-                    icon: ArrowRightIcon,
-                  }}
-                >
-                  <TTDDialogOutput
-                    canvasRef={previewCanvasRef}
-                    error={error}
-                    loaded={mermaidToExcalidrawLib.loaded}
-                    hasContent={!!ttdGeneration?.generatedResponse}
-                  />
-                </TTDDialogPanel>
-              </TTDDialogPanels>
-            </TTDDialogTab>
-          )}
-        </TTDDialogTabs>
+                  >
+                    <TTDDialogOutput
+                      canvasRef={previewCanvasRef}
+                      error={error}
+                      loaded={mermaidToExcalidrawLib.loaded}
+                      hasContent={!!ttdGeneration?.generatedResponse}
+                    />
+                  </TTDDialogPanel>
+                </TTDDialogPanels>
+              </div>
+            )}
+          </>
+        )}
       </Dialog>
     );
   },

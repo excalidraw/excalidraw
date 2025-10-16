@@ -42,7 +42,6 @@ export const TTDDialogPanel = ({
         className={clsx("ttd-dialog-panel-button-container", {
           invisible: !panelAction,
         })}
-        style={{ display: "flex", alignItems: "center" }}
       >
         <Button
           className="ttd-dialog-panel-button"
