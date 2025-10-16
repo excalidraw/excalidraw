@@ -9,6 +9,18 @@ COPY . .
 # Install dependencies with full workspace structure
 RUN yarn install --frozen-lockfile --network-timeout 600000
 
+# Declare build-time variables (Railway will inject these from environment variables)
+ARG VITE_CANVAS_AUTH_ENABLED
+ARG VITE_CLERK_PUBLISHABLE_KEY
+ARG VITE_CANVAS_APP_URL
+ARG VITE_APP_WS_SERVER_URL
+
+# Make them available as environment variables during build
+ENV VITE_CANVAS_AUTH_ENABLED=$VITE_CANVAS_AUTH_ENABLED
+ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
+ENV VITE_CANVAS_APP_URL=$VITE_CANVAS_APP_URL
+ENV VITE_APP_WS_SERVER_URL=$VITE_APP_WS_SERVER_URL
+
 # Build the application
 RUN yarn build:app:docker
 
