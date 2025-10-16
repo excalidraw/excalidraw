@@ -16,6 +16,7 @@ interface TTDDialogPanelProps {
   panelActionDisabled?: boolean;
   onTextSubmitInProgess?: boolean;
   renderTopRight?: () => ReactNode;
+  renderBeforeButton?: () => ReactNode;
   renderSubmitShortcut?: () => ReactNode;
   renderBottomRight?: () => ReactNode;
 }
@@ -27,6 +28,7 @@ export const TTDDialogPanel = ({
   panelActionDisabled = false,
   onTextSubmitInProgess,
   renderTopRight,
+  renderBeforeButton,
   renderSubmitShortcut,
   renderBottomRight,
 }: TTDDialogPanelProps) => {
@@ -43,6 +45,7 @@ export const TTDDialogPanel = ({
           invisible: !panelAction,
         })}
       >
+        {renderBeforeButton?.()}
         <Button
           className="ttd-dialog-panel-button"
           onSelect={panelAction ? panelAction.action : () => {}}
@@ -54,9 +57,7 @@ export const TTDDialogPanel = ({
           </div>
           {onTextSubmitInProgess && <Spinner />}
         </Button>
-        {!panelActionDisabled &&
-          !onTextSubmitInProgess &&
-          renderSubmitShortcut?.()}
+        {!onTextSubmitInProgess && renderSubmitShortcut?.()}
         {renderBottomRight?.()}
       </div>
     </div>

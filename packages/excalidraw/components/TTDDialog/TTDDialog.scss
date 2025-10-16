@@ -400,6 +400,11 @@ $verticalBreakpoint: 861px;
       padding: 2px 3px;
       border-radius: 4px;
     }
+
+    &.disabled {
+      opacity: 0.25;
+      pointer-events: none;
+    }
   }
 
   .ttd-dialog-ai-badge {

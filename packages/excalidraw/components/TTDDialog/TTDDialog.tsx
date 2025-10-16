@@ -176,7 +176,6 @@ export const TTDDialogBase = withInternalFallback(
         prompt.length < MIN_PROMPT_LENGTH ||
         onTextSubmitInProgess ||
         rateLimits?.rateLimitRemaining === 0 ||
-        // means this is not a text-to-diagram dialog (needed for TS only)
         "__fallback" in rest
       ) {
         if (prompt.length < MIN_PROMPT_LENGTH) {
@@ -287,6 +286,28 @@ export const TTDDialogBase = withInternalFallback(
 
     const [error, setError] = useState<Error | null>(null);
 
+    useEffect(() => {
+      if (tab !== "text-to-diagram") {
+        return;
+      }
+
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (
+          event.key === "Enter" &&
+          (event.metaKey || event.ctrlKey) &&
+          !event.shiftKey
+        ) {
+          event.preventDefault();
+          insertToEditor({ app, data });
+        }
+      };
+
+      document.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }, [tab]);
+
     return (
       <Dialog
         className="ttd-dialog"
@@ -366,7 +387,7 @@ export const TTDDialogBase = withInternalFallback(
                         />
                       ) : null
                     }
-                    renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
+                    renderSubmitShortcut={() => <TTDDialogSubmitShortcut variant="enter" />}
                     renderBottomRight={() => (
                       <PromptFooter
                         generatedResponse={ttdGeneration?.generatedResponse ?? null}
@@ -403,6 +424,7 @@ Arrange the three outcomes left-to-right, tidy spacing.`}
                       onKeyboardSubmit={() => {
                         refOnGenerate.current();
                       }}
+                      shortcutType="enter"
                     />
                   </TTDDialogPanel>
                   <TTDDialogPanel
@@ -414,6 +436,7 @@ Arrange the three outcomes left-to-right, tidy spacing.`}
                       label: "Insert",
                       icon: ArrowRightIcon,
                     }}
+                    renderSubmitShortcut={() => <TTDDialogSubmitShortcut variant="ctrlEnter" />}
                   >
                     <TTDDialogOutput
                       canvasRef={previewCanvasRef}
