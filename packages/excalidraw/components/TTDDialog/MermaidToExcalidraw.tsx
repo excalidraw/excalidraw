@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useDeferredValue } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 import { EDITOR_LS_KEYS, debounce, isDevEnv } from "@excalidraw/common";
 
@@ -9,6 +9,7 @@ import { ArrowRightIcon } from "../icons";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { t } from "../../i18n";
 import Trans from "../Trans";
+import { Switch } from "../Switch";
 
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
@@ -41,7 +42,13 @@ const MermaidToExcalidraw = ({
       EditorLocalStorage.get<string>(EDITOR_LS_KEYS.MERMAID_TO_EXCALIDRAW) ||
       MERMAID_EXAMPLE,
   );
-  const deferredText = useDeferredValue(text.trim());
+  const [autoConvert, setAutoConvert] = useState(() => {
+    const stored = EditorLocalStorage.get<boolean>(
+      EDITOR_LS_KEYS.MERMAID_AUTO_CONVERT,
+    );
+    return stored ?? true; // default to true (auto-convert mode)
+  });
+  const [lastConvertedText, setLastConvertedText] = useState(text.trim());
   const [error, setError] = useState<Error | null>(null);
   const [hasContent, setHasContent] = useState(false);
 
@@ -53,33 +60,82 @@ const MermaidToExcalidraw = ({
 
   const app = useApp();
 
-  useEffect(() => {
-    convertMermaidToExcalidraw({
-      canvasRef,
-      data,
-      mermaidToExcalidrawLib,
-      setError,
-      mermaidDefinition: deferredText,
-    })
-      .then(() => {
-        setHasContent(data.current.elements.length > 0);
+  // Extracted conversion logic to avoid duplication
+  const performConversion = useCallback(
+    (mermaidDefinition: string) => {
+      if (!mermaidDefinition) {
+        return;
+      }
+
+      convertMermaidToExcalidraw({
+        canvasRef,
+        data,
+        mermaidToExcalidrawLib,
+        setError,
+        mermaidDefinition,
       })
-      .catch((err) => {
-        if (isDevEnv()) {
-          console.error("Failed to parse mermaid definition", err);
-        }
-        setHasContent(false);
-      });
+        .then(() => {
+          setHasContent(data.current.elements.length > 0);
+        })
+        .catch((err) => {
+          if (isDevEnv()) {
+            console.error("Failed to parse mermaid definition", err);
+          }
+          setHasContent(false);
+        });
+    },
+    [mermaidToExcalidrawLib],
+  );
 
-    debouncedSaveMermaidDefinition(deferredText);
-  }, [deferredText, mermaidToExcalidrawLib]);
+  // Stable ref to always use latest performConversion in debounced function
+  const performConversionRef = useRef(performConversion);
+  performConversionRef.current = performConversion;
 
+  // Debounced conversion for auto-convert mode (performance optimization)
+  const debouncedConvert = useRef(
+    debounce((definition: string) => {
+      performConversionRef.current(definition);
+    }, 300),
+  ).current;
+
+  // Single conversion effect with clear logic
+  useEffect(() => {
+    const trimmedText = text.trim();
+
+    if (autoConvert) {
+      // Auto mode: debounced conversion on text change (300ms delay)
+      debouncedConvert(trimmedText);
+    } else {
+      // Manual mode: convert only when explicitly triggered via lastConvertedText
+      if (lastConvertedText) {
+        performConversionRef.current(lastConvertedText);
+      }
+    }
+  }, [autoConvert, text, lastConvertedText, debouncedConvert]);
+
+  // Save to local storage on text change
+  useEffect(() => {
+    debouncedSaveMermaidDefinition(text.trim());
+  }, [text]);
+
+  // Save auto-convert preference to local storage
+  useEffect(() => {
+    EditorLocalStorage.set(EDITOR_LS_KEYS.MERMAID_AUTO_CONVERT, autoConvert);
+  }, [autoConvert]);
+
+  // Cleanup: flush pending operations on unmount
   useEffect(
     () => () => {
       debouncedSaveMermaidDefinition.flush();
+      debouncedConvert.flush?.();
     },
-    [],
+    [debouncedConvert],
   );
+
+  const onConvert = () => {
+    // Trigger conversion by updating the lastConvertedText
+    setLastConvertedText(text.trim());
+  };
 
   const onInsertToEditor = () => {
     insertToEditor({
@@ -89,6 +145,28 @@ const MermaidToExcalidraw = ({
       shouldSaveMermaidDataToStorage: true,
     });
   };
+
+  const onInsertRef = useRef(onInsertToEditor);
+  onInsertRef.current = onInsertToEditor;
+
+  // Global keyboard shortcut: Cmd/Ctrl+Enter to insert
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key === "Enter" &&
+        (event.metaKey || event.ctrlKey) &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        onInsertRef.current();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <>
@@ -109,26 +187,46 @@ const MermaidToExcalidraw = ({
         />
       </div>
       <TTDDialogPanels>
-        <TTDDialogPanel label={t("mermaid.syntax")}>
+        <TTDDialogPanel
+          label={t("mermaid.syntax")}
+          panelAction={{
+            action: onConvert,
+            label: "Convert",
+            icon: ArrowRightIcon,
+          }}
+          panelActionDisabled={autoConvert}
+          renderBeforeButton={() => (
+            <div className="ttd-dialog-auto-convert-wrapper">
+              <label htmlFor="mermaid-auto-convert" className="ttd-dialog-auto-convert-label">
+                Auto convert
+              </label>
+              <Switch
+                name="mermaid-auto-convert"
+                checked={autoConvert}
+                onChange={(checked) => setAutoConvert(checked)}
+              />
+            </div>
+          )}
+          renderSubmitShortcut={() => (
+            <TTDDialogSubmitShortcut variant="enter" disabled={autoConvert} />
+          )}
+        >
           <TTDDialogInput
             input={text}
             placeholder={"Write Mermaid diagram defintion here..."}
             onChange={(event) => setText(event.target.value)}
-            onKeyboardSubmit={() => {
-              onInsertToEditor();
-            }}
+            onKeyboardSubmit={onConvert}
+            shortcutType="enter"
           />
         </TTDDialogPanel>
         <TTDDialogPanel
           label={t("mermaid.preview")}
           panelAction={{
-            action: () => {
-              onInsertToEditor();
-            },
+            action: onInsertToEditor,
             label: t("mermaid.button"),
             icon: ArrowRightIcon,
           }}
-          renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
+          renderSubmitShortcut={() => <TTDDialogSubmitShortcut variant="ctrlEnter" />}
         >
           <TTDDialogOutput
             canvasRef={canvasRef}
