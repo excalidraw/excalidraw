@@ -11,7 +11,6 @@ import { atom, useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
 import { useApp, useExcalidrawSetAppState } from "../App";
 import { Dialog } from "../Dialog";
-import { InlineIcon } from "../InlineIcon";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { ArrowRightIcon } from "../icons";
 
@@ -40,6 +39,20 @@ import type { BinaryFiles } from "../../types";
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 1000;
 
+const DEFAULT_PROMPT = `Make a top-down flowchart:
+
+Start: "Christmas" [rectangle]
+
+Arrow labeled "Get money" to "Go shopping" [rounded rectangle]
+
+Then a decision "Let me think" [diamond]
+
+From the decision, three branches to [rectangles]: "Laptop", "iPhone", "Car"
+
+Label the three branches: "One", "Two", "Three"
+
+Arrange the three outcomes left-to-right, tidy spacing.`;
+
 const rateLimitsAtom = atom<{
   rateLimit: number;
   rateLimitRemaining: number;
@@ -61,28 +74,10 @@ const RateLimitDisplay = ({ rateLimitRemaining }: RateLimitDisplayProps) => {
 };
 
 interface PromptFooterProps {
-  generatedResponse: string | null;
   promptLength: number;
-  onViewMermaid: () => void;
 }
 
-const PromptFooter = ({
-  generatedResponse,
-  promptLength,
-  onViewMermaid,
-}: PromptFooterProps) => {
-  if (generatedResponse) {
-    return (
-      <div
-        className="excalidraw-link ttd-dialog-view-mermaid-link"
-        onClick={onViewMermaid}
-      >
-        View as Mermaid
-        <InlineIcon icon={ArrowRightIcon} />
-      </div>
-    );
-  }
-
+const PromptFooter = ({ promptLength }: PromptFooterProps) => {
   const ratio = promptLength / MAX_PROMPT_LENGTH;
   if (ratio > 0.8) {
     const isExceeded = ratio > 1;
@@ -153,7 +148,7 @@ export const TTDDialogBase = withInternalFallback(
 
     const [ttdGeneration, setTtdGeneration] = useAtom(ttdGenerationAtom);
 
-    const [text, setText] = useState(ttdGeneration?.prompt ?? "");
+    const [text, setText] = useState(ttdGeneration?.prompt ?? DEFAULT_PROMPT);
 
     const prompt = text.trim();
 
@@ -209,6 +204,8 @@ export const TTDDialogBase = withInternalFallback(
             generatedResponse,
             prompt: s?.prompt ?? null,
           }));
+          // Automatically save to storage so it's available in Mermaid mode
+          saveMermaidDataToStorage(generatedResponse);
         }
 
         if (isFiniteNumber(rateLimit) && isFiniteNumber(rateLimitRemaining)) {
@@ -389,38 +386,13 @@ export const TTDDialogBase = withInternalFallback(
                     }
                     renderSubmitShortcut={() => <TTDDialogSubmitShortcut variant="enter" />}
                     renderBottomRight={() => (
-                      <PromptFooter
-                        generatedResponse={ttdGeneration?.generatedResponse ?? null}
-                        promptLength={prompt.length}
-                        onViewMermaid={() => {
-                          if (ttdGeneration?.generatedResponse) {
-                            saveMermaidDataToStorage(
-                              ttdGeneration.generatedResponse,
-                            );
-                            setAppState({
-                              openDialog: { name: "ttd", tab: "mermaid" },
-                            });
-                          }
-                        }}
-                      />
+                      <PromptFooter promptLength={prompt.length} />
                     )}
                   >
                     <TTDDialogInput
                       onChange={handleTextChange}
                       input={text}
-                      placeholder={`Make a top-down flowchart:
-
-Start: "Christmas" [rectangle]
-
-Arrow labeled "Get money" to "Go shopping" [rounded rectangle]
-
-Then a decision "Let me think" [diamond]
-
-From the decision, three branches to [rectangles]: "Laptop", "iPhone", "Car"
-
-Label the three branches: "One", "Two", "Three"
-
-Arrange the three outcomes left-to-right, tidy spacing.`}
+                      placeholder=""
                       onKeyboardSubmit={() => {
                         refOnGenerate.current();
                       }}

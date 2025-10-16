@@ -283,11 +283,14 @@ $verticalBreakpoint: 861px;
       border-radius: var(--border-radius-lg);
       border: 1px solid var(--dialog-border-color);
       white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
       padding: 0.85rem;
       box-sizing: border-box;
       width: 100%;
       font-family: monospace;
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
 
       @media screen and (max-width: $verticalBreakpoint) {
         width: auto;
@@ -428,11 +431,6 @@ $verticalBreakpoint: 861px;
     &--exceeded {
       color: var(--color-danger);
     }
-  }
-
-  .ttd-dialog-view-mermaid-link {
-    margin-left: auto;
-    font-size: 14px;
   }
 
   .ttd-dialog-char-count {
