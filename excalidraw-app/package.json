@@ -26,6 +26,7 @@
     "node": "18.0.0 - 22.x.x"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.10.0",
     "@excalidraw/random-username": "1.0.0",
     "@sentry/browser": "9.0.1",
     "callsites": "4.2.0",
