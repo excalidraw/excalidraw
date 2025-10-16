@@ -27,6 +27,14 @@ interface ImportMetaEnv {
 
   VITE_APP_FIREBASE_CONFIG: string;
 
+  VITE_AUTH_SERVICE_URL?: string;
+  VITE_CANVAS_AUTH_ENABLED?: string;
+  VITE_CLERK_PUBLISHABLE_KEY?: string;
+  VITE_CANVAS_APP_URL?: string;
+  VITE_APP_API_URL?: string;
+  VITE_SESSION_ENDPOINT?: string;
+  VITE_PREMIUM_COOKIE_NAME?: string;
+
   // whether to disable live reload / HMR. Usuaully what you want to do when
   // debugging Service Workers.
   VITE_APP_DEV_DISABLE_LIVE_RELOAD: string;

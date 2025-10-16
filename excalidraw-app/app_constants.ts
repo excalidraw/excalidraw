@@ -60,6 +60,15 @@ export const isExcalidrawPlusSignedUser = document.cookie.includes(
   COOKIES.AUTH_STATE_COOKIE,
 );
 
+export const isAuthShellEnabled =
+  typeof import.meta !== "undefined" &&
+  typeof import.meta.env !== "undefined" &&
+  ["1", "true", "yes", "on"].includes(
+    String(import.meta.env.VITE_CANVAS_AUTH_ENABLED ?? "")
+      .trim()
+      .toLowerCase(),
+  );
+
 export const isPremiumSignedUser = document.cookie.includes(
   COOKIES.PREMIUM_AUTH_COOKIE,
 );

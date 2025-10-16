@@ -21,7 +21,7 @@ import { useInviteAI } from '../hooks/useInviteAI';
 import { ChatHeader } from './ChatPanel/ChatHeader';
 import { ChatInputBar } from './ChatPanel/ChatInputBar';
 import { ChatMessagesList } from './ChatPanel/ChatMessagesList';
-import { isPremiumSignedUser } from '../app_constants';
+import { isAuthShellEnabled } from '../app_constants';
 
 const ChatPanel: React.FC<ChatPanelProps> = ({
   excalidrawAPI,
@@ -36,7 +36,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
   const chatPanelRef = useRef<HTMLDivElement>(null);
   const collabAPI = useAtomValue(collabAPIAtom);
-  const premiumCollabAPI = isPremiumSignedUser ? collabAPI : null;
+  const canAccessPremiumFeatures = isAuthShellEnabled;
+  const premiumCollabAPI = canAccessPremiumFeatures ? collabAPI : null;
 
   // Custom hooks
   const { focusCitation } = useCitationFocus({ excalidrawAPI });
@@ -73,16 +74,16 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
 
   // Check service health on mount
   useEffect(() => {
-    if (!isPremiumSignedUser) {
+    if (!canAccessPremiumFeatures) {
       return;
     }
     checkServiceHealth();
-  }, []);
+  }, [canAccessPremiumFeatures]);
 
   // Simple wrapper for sending messages via hook
   const sendMessage = async () => {
     const trimmed = inputMessage.trim();
-    if (!trimmed) return;
+    if (!trimmed || !canAccessPremiumFeatures) return;
     setInputMessage('');
     await sendChatMessage(trimmed);
   };
@@ -95,6 +96,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   }, [cleanupStreaming]);
 
   const checkServiceHealth = async () => {
+    if (!canAccessPremiumFeatures) {
+      setIsConnected(false);
+      return;
+    }
     try {
       const response = await fetch(`${LLM_BASE_URL}/api/health`);
       const data = await response.json();
@@ -155,6 +160,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   };
 
   const clearHistory = async () => {
+    if (!canAccessPremiumFeatures) {
+      return;
+    }
     try {
       await fetch(`${LLM_BASE_URL}/api/chat/history/default`, {
         method: 'DELETE'
@@ -167,11 +175,11 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   };
 
   const handleInviteAI = useCallback(async () => {
-    if (!isPremiumSignedUser) {
+    if (!canAccessPremiumFeatures) {
       return;
     }
     await inviteAI();
-  }, [inviteAI]);
+  }, [inviteAI, canAccessPremiumFeatures]);
 
   if (!isVisible) {
     return null; // Button is now handled in renderTopRightUI
@@ -224,7 +232,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
         value={inputMessage}
         onChange={setInputMessage}
         onSend={sendMessage}
-        disabled={!isConnected || isLoading}
+        disabled={!canAccessPremiumFeatures || !isConnected || isLoading}
         placeholder={isConnected ? "Type your message..." : "Service disconnected"}
       />
     </div>
