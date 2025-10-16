@@ -138,7 +138,7 @@ $verticalBreakpoint: 861px;
     flex-grow: 1;
     position: relative;
 
-    background: var(--color-surface-primary-container);
+    background: rgba(245, 245, 245, 0);
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--dialog-border-color);
 
@@ -151,23 +151,30 @@ $verticalBreakpoint: 861px;
       height: 200px;
     }
 
-    &::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg opacity='0.08' fill='none' stroke='%23000' stroke-width='2'%3E%3Crect x='30' y='20' width='50' height='30' rx='4'/%3E%3Crect x='120' y='20' width='50' height='30' rx='4'/%3E%3Crect x='30' y='80' width='50' height='30' rx='4'/%3E%3Crect x='120' y='80' width='50' height='30' rx='4'/%3E%3Crect x='75' y='140' width='50' height='30' rx='4'/%3E%3Cpath d='M55 50 L55 80' marker-end='url(%23arrowhead)'/%3E%3Cpath d='M145 50 L145 80' marker-end='url(%23arrowhead)'/%3E%3Cpath d='M80 95 L100 140' marker-end='url(%23arrowhead)'/%3E%3Cpath d='M145 95 L100 140' marker-end='url(%23arrowhead)'/%3E%3Cdefs%3E%3Cmarker id='arrowhead' markerWidth='10' markerHeight='10' refX='5' refY='3' orient='auto'%3E%3Cpolygon points='0 0, 10 3, 0 6' /%3E%3C/marker%3E%3C/defs%3E%3C/g%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 60%;
-      pointer-events: none;
-      z-index: 0;
-    }
-
     canvas {
       max-width: 100%;
       max-height: 100%;
       position: relative;
       z-index: 1;
+    }
+  }
+
+  .ttd-dialog-output-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+
+    svg {
+      width: 60%;
+      height: 60%;
+      max-width: 100%;
+      max-height: 100%;
+      color: var(--color-gray-50);
     }
   }
 
@@ -178,6 +185,10 @@ $verticalBreakpoint: 861px;
     align-items: center;
     justify-content: center;
     flex-grow: 1;
+
+    &--error {
+      opacity: 0.15;
+    }
   }
 
   .ttd-dialog-output-error {
@@ -359,6 +370,42 @@ $verticalBreakpoint: 861px;
       border: 1px solid gray;
       padding: 2px 3px;
       border-radius: 4px;
+    }
+  }
+
+  .ttd-dialog-ai-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1px 6px;
+    margin-left: 10px;
+    font-size: 10px;
+    border-radius: 12px;
+    background: var(--color-promo);
+    color: var(--color-surface-lowest);
+  }
+
+  .ttd-dialog-rate-limit {
+    font-size: 12px;
+    margin-left: auto;
+
+    &--exceeded {
+      color: var(--color-danger);
+    }
+  }
+
+  .ttd-dialog-view-mermaid-link {
+    margin-left: auto;
+    font-size: 14px;
+  }
+
+  .ttd-dialog-char-count {
+    margin-left: auto;
+    font-size: 12px;
+    font-family: monospace;
+
+    &--exceeded {
+      color: var(--color-danger);
     }
   }
 }

@@ -48,6 +48,59 @@ const rateLimitsAtom = atom<{
   rateLimitRemaining: number;
 } | null>(null);
 
+interface RateLimitDisplayProps {
+  rateLimitRemaining: number;
+}
+
+const RateLimitDisplay = ({ rateLimitRemaining }: RateLimitDisplayProps) => {
+  const isExceeded = rateLimitRemaining === 0;
+  return (
+    <div
+      className={`ttd-dialog-rate-limit ${isExceeded ? "ttd-dialog-rate-limit--exceeded" : ""}`}
+    >
+      {rateLimitRemaining} requests left today
+    </div>
+  );
+};
+
+interface PromptFooterProps {
+  generatedResponse: string | null;
+  promptLength: number;
+  onViewMermaid: () => void;
+}
+
+const PromptFooter = ({
+  generatedResponse,
+  promptLength,
+  onViewMermaid,
+}: PromptFooterProps) => {
+  if (generatedResponse) {
+    return (
+      <div
+        className="excalidraw-link ttd-dialog-view-mermaid-link"
+        onClick={onViewMermaid}
+      >
+        View as Mermaid
+        <InlineIcon icon={ArrowRightIcon} />
+      </div>
+    );
+  }
+
+  const ratio = promptLength / MAX_PROMPT_LENGTH;
+  if (ratio > 0.8) {
+    const isExceeded = ratio > 1;
+    return (
+      <div
+        className={`ttd-dialog-char-count ${isExceeded ? "ttd-dialog-char-count--exceeded" : ""}`}
+      >
+        Length: {promptLength}/{MAX_PROMPT_LENGTH}
+      </div>
+    );
+  }
+
+  return null;
+};
+
 const ttdGenerationAtom = atom<{
   generatedResponse: string | null;
   prompt: string | null;
@@ -261,21 +314,7 @@ export const TTDDialogBase = withInternalFallback(
               <TTDDialogTabTrigger tab="text-to-diagram">
                 <div style={{ display: "flex", alignItems: "center" }}>
                   {t("labels.textToDiagram")}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: "1px 6px",
-                      marginLeft: "10px",
-                      fontSize: 10,
-                      borderRadius: "12px",
-                      background: "var(--color-promo)",
-                      color: "var(--color-surface-lowest)",
-                    }}
-                  >
-                    AI Beta
-                  </div>
+                  <div className="ttd-dialog-ai-badge">AI Beta</div>
                 </div>
               </TTDDialogTabTrigger>
               <TTDDialogTabTrigger tab="mermaid">Mermaid</TTDDialogTabTrigger>
@@ -307,72 +346,30 @@ export const TTDDialogBase = withInternalFallback(
                     prompt.length > MAX_PROMPT_LENGTH ||
                     rateLimits?.rateLimitRemaining === 0
                   }
-                  renderTopRight={() => {
-                    if (!rateLimits) {
-                      return null;
-                    }
-
-                    return (
-                      <div
-                        className="ttd-dialog-rate-limit"
-                        style={{
-                          fontSize: 12,
-                          marginLeft: "auto",
-                          color:
-                            rateLimits.rateLimitRemaining === 0
-                              ? "var(--color-danger)"
-                              : undefined,
-                        }}
-                      >
-                        {rateLimits.rateLimitRemaining} requests left today
-                      </div>
-                    );
-                  }}
+                  renderTopRight={() =>
+                    rateLimits ? (
+                      <RateLimitDisplay
+                        rateLimitRemaining={rateLimits.rateLimitRemaining}
+                      />
+                    ) : null
+                  }
                   renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
-                  renderBottomRight={() => {
-                    if (typeof ttdGeneration?.generatedResponse === "string") {
-                      return (
-                        <div
-                          className="excalidraw-link"
-                          style={{ marginLeft: "auto", fontSize: 14 }}
-                          onClick={() => {
-                            if (
-                              typeof ttdGeneration?.generatedResponse ===
-                              "string"
-                            ) {
-                              saveMermaidDataToStorage(
-                                ttdGeneration.generatedResponse,
-                              );
-                              setAppState({
-                                openDialog: { name: "ttd", tab: "mermaid" },
-                              });
-                            }
-                          }}
-                        >
-                          View as Mermaid
-                          <InlineIcon icon={ArrowRightIcon} />
-                        </div>
-                      );
-                    }
-                    const ratio = prompt.length / MAX_PROMPT_LENGTH;
-                    if (ratio > 0.8) {
-                      return (
-                        <div
-                          style={{
-                            marginLeft: "auto",
-                            fontSize: 12,
-                            fontFamily: "monospace",
-                            color:
-                              ratio > 1 ? "var(--color-danger)" : undefined,
-                          }}
-                        >
-                          Length: {prompt.length}/{MAX_PROMPT_LENGTH}
-                        </div>
-                      );
-                    }
-
-                    return null;
-                  }}
+                  renderBottomRight={() => (
+                    <PromptFooter
+                      generatedResponse={ttdGeneration?.generatedResponse ?? null}
+                      promptLength={prompt.length}
+                      onViewMermaid={() => {
+                        if (ttdGeneration?.generatedResponse) {
+                          saveMermaidDataToStorage(
+                            ttdGeneration.generatedResponse,
+                          );
+                          setAppState({
+                            openDialog: { name: "ttd", tab: "mermaid" },
+                          });
+                        }
+                      }}
+                    />
+                  )}
                 >
                   <TTDDialogInput
                     onChange={handleTextChange}
@@ -397,6 +394,7 @@ export const TTDDialogBase = withInternalFallback(
                     canvasRef={previewCanvasRef}
                     error={error}
                     loaded={mermaidToExcalidrawLib.loaded}
+                    hasContent={!!ttdGeneration?.generatedResponse}
                   />
                 </TTDDialogPanel>
               </TTDDialogPanels>

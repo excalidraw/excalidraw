@@ -1,12 +1,19 @@
+import clsx from "clsx";
 import Spinner from "../Spinner";
+import { DiagramPlaceholder } from "./assets/DiagramPlaceholder";
 
-const ErrorComp = ({ error }: { error: string }) => {
+interface ErrorDisplayProps {
+  error: string;
+}
+
+const ErrorDisplay = ({ error }: ErrorDisplayProps) => {
   return (
     <div
       data-testid="ttd-dialog-output-error"
       className="ttd-dialog-output-error"
     >
-      Error! <p>{error}</p>
+      Error!
+      <p>{error}</p>
     </div>
   );
 };
@@ -15,21 +22,29 @@ interface TTDDialogOutputProps {
   error: Error | null;
   canvasRef: React.RefObject<HTMLDivElement | null>;
   loaded: boolean;
+  hasContent?: boolean;
 }
 
 export const TTDDialogOutput = ({
   error,
   canvasRef,
   loaded,
+  hasContent = false,
 }: TTDDialogOutputProps) => {
   return (
     <div className="ttd-dialog-output-wrapper">
-      {error && <ErrorComp error={error.message} />}
+      {!hasContent && (
+        <div className="ttd-dialog-output-placeholder">
+          <DiagramPlaceholder />
+        </div>
+      )}
+      {error && <ErrorDisplay error={error.message} />}
       {loaded ? (
         <div
           ref={canvasRef}
-          style={{ opacity: error ? "0.15" : 1 }}
-          className="ttd-dialog-output-canvas-container"
+          className={clsx("ttd-dialog-output-canvas-container", {
+            "ttd-dialog-output-canvas-container--error": !!error,
+          })}
         />
       ) : (
         <Spinner size="2rem" />

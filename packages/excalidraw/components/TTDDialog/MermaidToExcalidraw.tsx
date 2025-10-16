@@ -43,6 +43,7 @@ const MermaidToExcalidraw = ({
   );
   const deferredText = useDeferredValue(text.trim());
   const [error, setError] = useState<Error | null>(null);
+  const [hasContent, setHasContent] = useState(false);
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const data = useRef<{
@@ -59,11 +60,16 @@ const MermaidToExcalidraw = ({
       mermaidToExcalidrawLib,
       setError,
       mermaidDefinition: deferredText,
-    }).catch((err) => {
-      if (isDevEnv()) {
-        console.error("Failed to parse mermaid definition", err);
-      }
-    });
+    })
+      .then(() => {
+        setHasContent(data.current.elements.length > 0);
+      })
+      .catch((err) => {
+        if (isDevEnv()) {
+          console.error("Failed to parse mermaid definition", err);
+        }
+        setHasContent(false);
+      });
 
     debouncedSaveMermaidDefinition(deferredText);
   }, [deferredText, mermaidToExcalidrawLib]);
@@ -128,6 +134,7 @@ const MermaidToExcalidraw = ({
             canvasRef={canvasRef}
             loaded={mermaidToExcalidrawLib.loaded}
             error={error}
+            hasContent={hasContent}
           />
         </TTDDialogPanel>
       </TTDDialogPanels>
