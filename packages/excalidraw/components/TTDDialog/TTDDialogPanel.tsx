@@ -57,7 +57,13 @@ export const TTDDialogPanel = ({
           </div>
           {onTextSubmitInProgess && <Spinner />}
         </Button>
-        {!onTextSubmitInProgess && renderSubmitShortcut?.()}
+        <div
+          className={clsx({
+            invisible: onTextSubmitInProgess,
+          })}
+        >
+          {renderSubmitShortcut?.()}
+        </div>
         {renderBottomRight?.()}
       </div>
     </div>
