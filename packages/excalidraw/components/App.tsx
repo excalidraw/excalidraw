@@ -5827,6 +5827,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    const isLaserTool = this.state.activeTool.type === TOOL_TYPE.laser;
     this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
     this.lastPointerMoveEvent = event.nativeEvent;
 
@@ -6138,7 +6139,8 @@ class App extends React.Component<AppProps, AppState> {
       (this.state.activeTool.type !== "selection" &&
         this.state.activeTool.type !== "lasso" &&
         this.state.activeTool.type !== "text" &&
-        this.state.activeTool.type !== "eraser")
+        this.state.activeTool.type !== "eraser" &&
+        this.state.activeTool.type !== TOOL_TYPE.laser)
     ) {
       return;
     }
@@ -6299,6 +6301,14 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({
               activeEmbeddable: { element: hitElement, state: "hover" },
             });
+          } else if (
+            // Show pointer cursor when hovering over links with laser pointer tool
+            isLaserTool &&
+            hitElement &&
+            hitElement.link &&
+            !isElementLink(hitElement.link)
+          ) {
+            setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
           } else if (
             !hitElement ||
             // Ebow arrows can only be moved when unconnected
@@ -6937,7 +6947,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    if (this.device.isTouchScreen) {
+    if (this.device.isTouchScreen || this.state.activeTool.type === "laser") {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
         scenePointer.y,
@@ -6955,6 +6965,15 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement &&
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
+      // Skip internal links to objects when using laser pointer
+      if (
+        this.state.activeTool.type === "laser" &&
+        this.hitLinkElement.link &&
+        isElementLink(this.hitLinkElement.link)
+      ) {
+        // Skip internal element links for laser pointer
+        return;
+      }
       if (
         clicklength < 300 &&
         isIframeLikeElement(this.hitLinkElement) &&
