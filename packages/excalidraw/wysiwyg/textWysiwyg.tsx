@@ -225,23 +225,21 @@ export const textWysiwyg = ({
           coordY = y;
         }
       }
+      // getViewportCoords already returns DOM-space coordinates
       let [viewportX, viewportY] = getViewportCoords(coordX, coordY);
 
-      // account for scroll offsets and zoom
       const zoom = appState.zoom.value;
-      const scrollX = appState.scrollX;
-      const scrollY = appState.scrollY;
       const canvasWidth = appState.width;
       const canvasHeight = appState.height;
 
-      // Compute scaled text box dimensions
+      // Compute scaled textarea dimensions
       const scaledWidth = width * zoom;
       const scaledHeight = height * zoom;
 
-      // Add small padding for safety
+      // Padding to prevent tight clipping at edges
       const padding = 4;
 
-      // Clamp visible coordinates so the textarea never overflows
+      // Clamp within visible screen
       viewportX = Math.max(
         padding,
         Math.min(viewportX, canvasWidth - scaledWidth - padding),
@@ -251,20 +249,18 @@ export const textWysiwyg = ({
         Math.min(viewportY, canvasHeight - scaledHeight - padding),
       );
 
-      // Compute actual DOM position including scroll offset
-      const domX = viewportX + scrollX * zoom;
-      const domY = viewportY + scrollY * zoom;
+      // No extra scroll offsets here — getViewportCoords already includes that!
+      const domX = viewportX;
+      const domY = viewportY;
 
-      // add 5% buffer otherwise it causes wysiwyg to jump
+      // Add small buffer for text measurement jitter
       height *= 1.05;
 
       const font = getFontString(updatedTextElement);
-
       const editorMaxHeight = (canvasHeight - viewportY) / zoom;
 
       Object.assign(editable.style, {
         font,
-        // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
         width: `${width}px`,
         height: `${height}px`,
@@ -285,6 +281,7 @@ export const textWysiwyg = ({
         filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
       });
+
       editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
