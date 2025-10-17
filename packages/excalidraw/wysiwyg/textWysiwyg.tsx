@@ -147,7 +147,7 @@ export const textWysiwyg = ({
         app.scene.getNonDeletedElementsMap(),
       );
 
-      let width = updatedTextElement.width;
+      const width = updatedTextElement.width;
 
       // set to element height by default since that's
       // what is going to be used for unbounded text
@@ -225,31 +225,51 @@ export const textWysiwyg = ({
           coordY = y;
         }
       }
-      const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
+      let [viewportX, viewportY] = getViewportCoords(coordX, coordY);
 
-      if (!container) {
-        maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
-        width = Math.min(width, maxWidth);
-      } else {
-        width += 0.5;
-      }
+      // account for scroll offsets and zoom
+      const zoom = appState.zoom.value;
+      const scrollX = appState.scrollX;
+      const scrollY = appState.scrollY;
+      const canvasWidth = appState.width;
+      const canvasHeight = appState.height;
+
+      // Compute scaled text box dimensions
+      const scaledWidth = width * zoom;
+      const scaledHeight = height * zoom;
+
+      // Add small padding for safety
+      const padding = 4;
+
+      // Clamp visible coordinates so the textarea never overflows
+      viewportX = Math.max(
+        padding,
+        Math.min(viewportX, canvasWidth - scaledWidth - padding),
+      );
+      viewportY = Math.max(
+        padding,
+        Math.min(viewportY, canvasHeight - scaledHeight - padding),
+      );
+
+      // Compute actual DOM position including scroll offset
+      const domX = viewportX + scrollX * zoom;
+      const domY = viewportY + scrollY * zoom;
 
       // add 5% buffer otherwise it causes wysiwyg to jump
       height *= 1.05;
 
       const font = getFontString(updatedTextElement);
 
-      // Make sure text editor height doesn't go beyond viewport
-      const editorMaxHeight =
-        (appState.height - viewportY) / appState.zoom.value;
+      const editorMaxHeight = (canvasHeight - viewportY) / zoom;
+
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
         width: `${width}px`,
         height: `${height}px`,
-        left: `${viewportX}px`,
-        top: `${viewportY}px`,
+        left: `${domX}px`,
+        top: `${domY}px`,
         transform: getTransform(
           width,
           height,
