@@ -250,7 +250,7 @@ function SessionGuard({
   }
 
   return (
-    <AuthShellProvider value={{ signOut: handleSignOut }}>
+    <AuthShellProvider value={{ signOut: handleSignOut, getToken }}>
       {children}
     </AuthShellProvider>
   );

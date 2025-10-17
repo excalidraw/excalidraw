@@ -22,6 +22,7 @@ import { ChatHeader } from './ChatPanel/ChatHeader';
 import { ChatInputBar } from './ChatPanel/ChatInputBar';
 import { ChatMessagesList } from './ChatPanel/ChatMessagesList';
 import { isAuthShellEnabled } from '../app_constants';
+import { useAuthShell } from '../auth-shell/AuthShellContext';
 
 const ChatPanel: React.FC<ChatPanelProps> = ({
   excalidrawAPI,
@@ -42,6 +43,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   // Custom hooks
   const { focusCitation } = useCitationFocus({ excalidrawAPI });
   const { generateSnapshots } = useSnapshots({ excalidrawAPI, isVisible });
+  const authShell = useAuthShell();
+  const getToken = authShell?.getToken;
   const {
     aiInvited,
     isInvitingAI,
@@ -52,7 +55,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     excalidrawAPI,
     collabAPI: premiumCollabAPI,
     isVisible,
-    onError: setError
+    onError: setError,
+    getToken
   });
   const {
     streamingState,
@@ -64,7 +68,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     excalidrawAPI,
     onMessagesUpdate: setMessages,
     onError: setError,
-    generateSnapshots
+    generateSnapshots,
+    getToken
   });
 
   const isStreamingMessageActive = messages.some((msg) => msg.isStreaming);
@@ -101,9 +106,15 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       return;
     }
     try {
-      const response = await fetch(`${LLM_BASE_URL}/api/health`);
-      const data = await response.json();
-      setIsConnected(data.status === 'healthy');
+      const response = await fetch(`${LLM_BASE_URL}/health`);
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await response.json();
+        setIsConnected(Boolean((data as any).ok || (data as any).status === 'healthy'));
+      } else {
+        const text = await response.text();
+        setIsConnected(response.ok && (text.trim().length > 0));
+      }
     } catch (err) {
       setIsConnected(false);
       if (isDev()) console.error('Failed to check service health:', err);
@@ -164,8 +175,10 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       return;
     }
     try {
-      await fetch(`${LLM_BASE_URL}/api/chat/history/default`, {
-        method: 'DELETE'
+      const token = await (getToken ? getToken() : Promise.resolve(null));
+      await fetch(`${LLM_BASE_URL}/v1/chat/history/default`, {
+        method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined
       });
       setMessages([]);
       setError(null);

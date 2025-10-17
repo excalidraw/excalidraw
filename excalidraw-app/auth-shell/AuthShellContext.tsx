@@ -2,6 +2,7 @@ import { createContext, useContext, type ReactNode } from "react";
 
 export interface AuthShellContextValue {
   signOut: () => Promise<void> | void;
+  getToken?: () => Promise<string | null>;
 }
 
 const AuthShellContext = createContext<AuthShellContextValue | null>(null);
