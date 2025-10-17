@@ -9,6 +9,7 @@ export interface UseChatStreamProps {
   onMessagesUpdate: (updater: (prev: ChatMessage[]) => ChatMessage[]) => void;
   onError: (error: string | null) => void;
   generateSnapshots: (needsSnapshot?: boolean) => Promise<{ fullCanvas?: string; selection?: string; thumbnail?: string; thumbnailHash?: string }>;
+  getToken?: () => Promise<string | null>;
 }
 
 export interface UseChatStreamResult {
@@ -23,7 +24,8 @@ export const useChatStream = ({
   excalidrawAPI,
   onMessagesUpdate,
   onError,
-  generateSnapshots
+  generateSnapshots,
+  getToken
 }: UseChatStreamProps): UseChatStreamResult => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingPhase, setLoadingPhase] = useState<'idle' | 'planning' | 'executing'>('idle');
@@ -63,12 +65,13 @@ export const useChatStream = ({
     };
   };
 
+  type ToolCall = NonNullable<ChatMessage['toolCalls']>[number];
   const mapToolCallsForMessage = (toolCalls: any): ChatMessage['toolCalls'] | undefined => {
     if (!Array.isArray(toolCalls) || toolCalls.length === 0) {
       return undefined;
     }
 
-    return toolCalls.map((tc: any, index: number) => {
+    return toolCalls.map((tc: any, index: number): ToolCall => {
       const id = tc.id || tc.call_id || tc.tool_call_id || `tool-${Date.now()}-${index}`;
       const toolName = tc.function?.name || tc.name || 'tool';
       return {
@@ -76,7 +79,7 @@ export const useChatStream = ({
         toolName,
         status: 'completed',
         summary: typeof tc.summary === 'string' ? tc.summary : undefined
-      } satisfies ChatMessage['toolCalls'][number];
+      } as ToolCall;
     });
   };
 
@@ -85,10 +88,12 @@ export const useChatStream = ({
     planningAbortControllerRef.current = planAbortController;
 
     try {
-      const response = await fetch(`${LLM_BASE_URL}/api/chat/plan`, {
+      const token = (await getToken?.()) || undefined;
+      const response = await fetch(`${LLM_BASE_URL}/v1/chat/plan`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         body: JSON.stringify({
           message,
@@ -115,7 +120,7 @@ export const useChatStream = ({
         planningAbortControllerRef.current = null;
       }
     }
-  }, [LLM_BASE_URL]);
+  }, [LLM_BASE_URL, getToken]);
 
   const cleanupStreaming = useCallback((options: { skipClose?: boolean } = {}) => {
     const { skipClose = false } = options;
@@ -255,10 +260,12 @@ export const useChatStream = ({
       };
 
       // Step 2: Register streaming context with backend
-      const initResponse = await fetch(`${LLM_BASE_URL}/api/chat/exec/stream/init`, {
+      const token = (await getToken?.()) || undefined;
+      const initResponse = await fetch(`${LLM_BASE_URL}/v1/chat/exec/stream/init`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         body: JSON.stringify(streamingRequestBody)
       });
@@ -274,9 +281,12 @@ export const useChatStream = ({
       }
 
       const streamId: string = initData.streamId;
+      const accessToken: string | undefined = initData.accessToken;
 
       // Step 3: Open EventSource connection using server-provided streamId
-      const eventSourceUrl = `${LLM_BASE_URL}/api/chat/exec/stream/${encodeURIComponent(streamId)}`;
+      const eventSourceUrl = accessToken
+        ? `${LLM_BASE_URL}/v1/chat/exec/stream/${encodeURIComponent(streamId)}?access_token=${encodeURIComponent(accessToken)}`
+        : `${LLM_BASE_URL}/v1/chat/exec/stream/${encodeURIComponent(streamId)}`;
       const eventSource = new EventSource(eventSourceUrl);
       eventSourceRefLocal = eventSource;
 
@@ -294,250 +304,50 @@ export const useChatStream = ({
         }
       };
 
-      eventSource.addEventListener('phase', (event) => {
-        if (streamClosedRef.current) return;
-
-        try {
-          const data = JSON.parse(event.data);
-          setStreamingState(prev => ({
-            ...prev,
-            phase: data.phase,
-            currentMessage: data.message,
-            currentToolName: data.currentToolName
-          }));
-          logEvent('phase', data);
-        } catch (err) {
-          if (isDev()) console.warn('Failed to parse phase event:', err);
-        }
-      });
-
-      eventSource.addEventListener('message', (event) => {
-        if (streamClosedRef.current) return;
-
-        try {
-          const data = JSON.parse(event.data);
-
-          if (data.type === 'assistant_message_start') {
-            const resolvedId = assignAssistantMessageId(data.messageId);
-
-            const assistantMessage: ChatMessage = {
-              id: resolvedId,
-              role: 'assistant',
-              content: data.initialContent || '',
-              timestamp: new Date().toISOString(),
-              isStreaming: true
-            };
-
-            onMessagesUpdate(prev => [...prev, assistantMessage]);
-          } else if (data.type === 'content_delta') {
-            if (!assistantMessageId) {
-              const resolvedId = assignAssistantMessageId(data.messageId);
-
-              const assistantMessage: ChatMessage = {
-                id: resolvedId,
-                role: 'assistant',
-                content: data.delta || '',
-                timestamp: new Date().toISOString(),
-                isStreaming: true
-              };
-
-              onMessagesUpdate(prev => [...prev, assistantMessage]);
-            } else if (data.messageId && data.messageId !== assistantMessageId) {
-              const resolvedId = assignAssistantMessageId(data.messageId);
-
-              const assistantMessage: ChatMessage = {
-                id: resolvedId,
-                role: 'assistant',
-                content: data.delta || '',
-                timestamp: new Date().toISOString(),
-                isStreaming: true
-              };
-
-              onMessagesUpdate(prev => [...prev, assistantMessage]);
-            } else {
-              onMessagesUpdate(prev => prev.map(msg =>
-                msg.id === assistantMessageId
-                  ? { ...msg, content: msg.content + (data.delta || '') }
-                  : msg
-              ));
-            }
-          } else if (data.type === 'assistant_message_complete' && assistantMessageId) {
-            const executionEndTs = performance.now ? performance.now() : Date.now();
-            const executionDurationMs = Math.round(executionEndTs - startTs);
-
-            onMessagesUpdate(prev => prev.map(msg =>
-              msg.id === assistantMessageId
-                ? {
-                    ...msg,
-                    isStreaming: false,
-                    durationMs: executionDurationMs,
-                    planningDurationMs: data.planningDurationMs,
-                    executionDurationMs: data.executionDurationMs
-                  }
-                : msg
-            ));
-
-            activeAssistantMessageIdRef.current = null;
-          }
-
-          logEvent('message', data);
-        } catch (err) {
-          if (isDev()) console.warn('Failed to parse message event:', err);
-        }
-      });
-
+      // Minimal Responses API events
       eventSource.addEventListener('token', (event) => {
         if (streamClosedRef.current) return;
-
         try {
-          const data = JSON.parse(event.data);
-
+          const data = JSON.parse((event as MessageEvent).data);
           if (!assistantMessageId) {
-            const resolvedId = assignAssistantMessageId();
-
+            const resolvedId = assignAssistantMessageId(null);
             const assistantMessage: ChatMessage = {
               id: resolvedId,
               role: 'assistant',
-              content: data.fullText || data.token || '',
+              content: data.content || '',
               timestamp: new Date().toISOString(),
               isStreaming: true
             };
-
             onMessagesUpdate(prev => [...prev, assistantMessage]);
-            return;
+          } else {
+            onMessagesUpdate(prev => prev.map(msg =>
+              msg.id === assistantMessageId
+                ? { ...msg, content: msg.content + (data.content || '') }
+                : msg
+            ));
           }
-
-          onMessagesUpdate(prev => prev.map(msg =>
-            msg.id === assistantMessageId
-              ? {
-                  ...msg,
-                  content: data.fullText ?? (msg.content + (data.token || ''))
-                }
-              : msg
-          ));
-
-          logEvent('token', data);
         } catch (err) {
           if (isDev()) console.warn('Failed to parse token event:', err);
         }
       });
 
-      eventSource.addEventListener('final', (event) => {
+      eventSource.addEventListener('done', () => {
         if (streamClosedRef.current) return;
-
-        try {
-          const data = JSON.parse(event.data);
-          logEvent('final', data);
-
-          const eventContent = typeof data.content === 'string'
-            ? data.content
-            : (typeof data.response === 'string' ? data.response : undefined);
-          const toolSummary = typeof data.tool_summary === 'string' ? data.tool_summary.trim() : undefined;
-          const contentPieces = [eventContent, toolSummary].filter(Boolean);
-          const finalContent = contentPieces.length > 0
-            ? contentPieces.join(eventContent && toolSummary ? '\n\n' : '')
-            : undefined;
-          const normalizedUsage = normalizeUsageForMessage(data.usage);
-          const mappedToolCalls = mapToolCallsForMessage(data.toolCalls ?? data.tool_calls);
-          const responseId = data.response_id || data.id || undefined;
-          const finishReason = data.finish_reason || undefined;
-          const executionInfo = data.executionInfo ?? undefined;
-
-          onMessagesUpdate(prev => {
-            if (assistantMessageId) {
-              const currentId = assistantMessageId;
-              return prev.map(msg =>
-                msg.id === currentId
-                  ? {
-                      ...msg,
-                      isStreaming: false,
-                      content: finalContent || msg.content,
-                      durationMs: data.duration ?? msg.durationMs,
-                      planningDurationMs: executionInfo?.planningDurationMs ?? msg.planningDurationMs,
-                      executionDurationMs: executionInfo?.executionDurationMs ?? msg.executionDurationMs,
-                      executionInfo: executionInfo ?? msg.executionInfo,
-                      usage: normalizedUsage ?? msg.usage,
-                      toolCalls: mappedToolCalls ?? msg.toolCalls,
-                      responseId: responseId ?? msg.responseId,
-                      finishReason: finishReason ?? msg.finishReason
-                    }
-                  : msg
-              );
-            }
-
-            const newMessage: ChatMessage = {
-              id: `assistant-${Date.now()}`,
-              role: 'assistant',
-              content: finalContent || '',
-              timestamp: new Date().toISOString(),
-              isStreaming: false,
-              durationMs: data.duration,
-              planningDurationMs: executionInfo?.planningDurationMs,
-              executionDurationMs: executionInfo?.executionDurationMs,
-              executionInfo,
-              usage: normalizedUsage,
-              toolCalls: mappedToolCalls,
-              responseId,
-              finishReason
-            };
-            return [...prev, newMessage];
-          });
-        } catch (err) {
-          if (isDev()) console.warn('Failed to parse final event:', err);
+        if (assistantMessageId) {
+          onMessagesUpdate(prev => prev.map(msg =>
+            msg.id === assistantMessageId ? { ...msg, isStreaming: false } : msg
+          ));
         }
-
+        setStreamingState(prev => ({ ...prev, isActive: false, phase: 'idle' }));
+        setIsLoading(false);
         if (eventSourceRefLocal) {
           eventSourceRefLocal.close();
           eventSourceRefLocal = null;
         }
-
         cleanupStreaming({ skipClose: true });
       });
 
-      eventSource.addEventListener('toolCallStart', (event) => {
-        if (streamClosedRef.current) return;
-
-        try {
-          const data = JSON.parse(event.data);
-          const toolName = data.toolName || data.name || 'tool';
-
-          lastActiveToolRef.current = toolName;
-          setStreamingState(prev => ({
-            ...prev,
-            phase: 'toolExecution',
-            currentToolName: toolName,
-            currentMessage: typeof data.summary === 'string' ? data.summary : undefined
-          }));
-
-          logEvent('toolCallStart', data);
-        } catch (err) {
-          if (isDev()) console.warn('Failed to parse toolCallStart event:', err);
-        }
-      });
-
-      eventSource.addEventListener('toolCallEnd', (event) => {
-        if (streamClosedRef.current) return;
-
-        try {
-          const data = JSON.parse(event.data);
-          const toolName = data.toolName || lastActiveToolRef.current;
-
-          if (toolName) {
-            lastActiveToolRef.current = undefined;
-          }
-
-          setStreamingState(prev => ({
-            ...prev,
-            phase: 'responseGeneration',
-            currentToolName: undefined,
-            currentMessage: typeof data.summary === 'string' ? data.summary : undefined
-          }));
-
-          logEvent('toolCallEnd', data);
-        } catch (err) {
-          if (isDev()) console.warn('Failed to parse toolCallEnd event:', err);
-        }
-      });
+      // Tool call events not used yet; can be added later
 
       eventSource.onerror = (event) => {
         if (streamClosedRef.current || eventSource.readyState === EventSource.CLOSED) {
@@ -658,10 +468,12 @@ export const useChatStream = ({
         ...(roomId && roomKey ? { roomId, roomKey } : {})
       };
 
-      const response = await fetch(`${LLM_BASE_URL}/api/chat/execute`, {
+      const token = (await getToken?.()) || undefined;
+      const response = await fetch(`${LLM_BASE_URL}/v1/chat/execute`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         body: JSON.stringify(requestBody)
       });
@@ -703,7 +515,7 @@ export const useChatStream = ({
       setIsLoading(false);
       setLoadingPhase('idle');
     }
-  }, [LLM_BASE_URL, excalidrawAPI, generateSnapshots, onError, onMessagesUpdate]);
+  }, [LLM_BASE_URL, excalidrawAPI, generateSnapshots, onError, onMessagesUpdate, getToken]);
 
   const sendMessage = useCallback(async (inputMessage: string) => {
     if (!inputMessage.trim() || isLoading) return;

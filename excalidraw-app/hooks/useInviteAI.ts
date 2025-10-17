@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
 import { getCollaborationLinkData } from '../data';
-import { isDev } from '../lib/chat/config';
+import { isDev, getLLMBaseURL } from '../lib/chat/config';
 
 export interface UseInviteAIProps {
   excalidrawAPI: ExcalidrawImperativeAPI;
   collabAPI: any;
   isVisible: boolean;
   onError: (error: string) => void;
+  getToken?: () => Promise<string | null>;
 }
 
 export interface UseInviteAIResult {
@@ -22,7 +23,8 @@ export const useInviteAI = ({
   excalidrawAPI,
   collabAPI,
   isVisible,
-  onError
+  onError,
+  getToken
 }: UseInviteAIProps): UseInviteAIResult => {
   const [aiInvited, setAiInvited] = useState(false);
   const [isInvitingAI, setIsInvitingAI] = useState(false);
@@ -74,9 +76,14 @@ export const useInviteAI = ({
 
       // Register AI bot with the collaboration room
       const username = 'AI Assistant';
-      const resp = await fetch('/api/ai/register', {
+      const LLM_BASE_URL = getLLMBaseURL();
+      const token = (await getToken?.()) || undefined;
+      const resp = await fetch(`${LLM_BASE_URL}/v1/ai/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ roomId, roomKey, username })
       });
 
@@ -115,7 +122,7 @@ export const useInviteAI = ({
     } finally {
       setIsInvitingAI(false);
     }
-  }, [collabAPI, isInvitingAI, excalidrawAPI, onError]);
+  }, [collabAPI, isInvitingAI, excalidrawAPI, onError, getToken]);
 
   // Auto-invite AI when chat opens (enhanced behavior)
   useEffect(() => {
