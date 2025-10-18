@@ -115,6 +115,7 @@ const ColorPickerPopupContent = ({
         }}
         colorPickerType={type}
         placeholder={t("colorPicker.color")}
+        theme={appState.theme} // ⬅️ NEW: Pass the current theme
       />
     </div>
   );
