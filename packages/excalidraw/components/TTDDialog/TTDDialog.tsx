@@ -20,6 +20,7 @@ import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
 import { TTDDialogPanel } from "./TTDDialogPanel";
 import { TTDDialogPanels } from "./TTDDialogPanels";
+import { TTDDialogCTAPopup } from "./TTDDialogCTAPopup";
 
 import {
   convertMermaidToExcalidraw,
@@ -164,13 +165,20 @@ export const TTDDialogBase = withInternalFallback(
 
     const [onTextSubmitInProgess, setOnTextSubmitInProgess] = useState(false);
     const [rateLimits, setRateLimits] = useAtom(rateLimitsAtom);
+    const [isCtaPopupOpen, setIsCtaPopupOpen] = useState(false);
 
     const onGenerate = async () => {
+      if (rateLimits?.rateLimitRemaining === 0) {
+        if (!isCtaPopupOpen) {
+          setIsCtaPopupOpen(true);
+        }
+        return;
+      }
+
       if (
         prompt.length > MAX_PROMPT_LENGTH ||
         prompt.length < MIN_PROMPT_LENGTH ||
         onTextSubmitInProgess ||
-        rateLimits?.rateLimitRemaining === 0 ||
         "__fallback" in rest
       ) {
         if (prompt.length < MIN_PROMPT_LENGTH) {
@@ -422,6 +430,22 @@ export const TTDDialogBase = withInternalFallback(
             )}
           </>
         )}
+        <TTDDialogCTAPopup
+          isOpen={isCtaPopupOpen}
+          onClose={() => setIsCtaPopupOpen(false)}
+          onExploreClick={() => {
+            window.open(
+              import.meta.env.VITE_APP_PLUS_URI || "https://plus.excalidraw.com",
+              "_blank",
+            );
+          }}
+          onFreeTrialClick={() => {
+            window.open(
+              import.meta.env.VITE_APP_PLUS_TRIAL_URI || "https://app.excalidraw.com/",
+              "_blank",
+            );
+          }}
+        />
       </Dialog>
     );
   },
