@@ -7,7 +7,6 @@
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import type { RAGFocusDetail } from '../types/rag.types';
 import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
 import { useAtomValue } from '../app-jotai';
 import { collabAPIAtom } from '../collab/Collab';
@@ -23,6 +22,20 @@ import { ChatInputBar } from './ChatPanel/ChatInputBar';
 import { ChatMessagesList } from './ChatPanel/ChatMessagesList';
 import { isAuthShellEnabled } from '../app_constants';
 import { useAuthShell } from '../auth-shell/AuthShellContext';
+
+const panelContainerStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 0,
+  right: 0,
+  bottom: 0,
+  width: '380px',
+  backgroundColor: 'white',
+  borderLeft: '1px solid #ddd',
+  display: 'flex',
+  flexDirection: 'column',
+  zIndex: 1000,
+  fontFamily: 'system-ui, -apple-system, sans-serif'
+};
 
 const ChatPanel: React.FC<ChatPanelProps> = ({
   excalidrawAPI,
@@ -77,30 +90,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   // Resolve LLM service base URL from env or window at runtime
   const LLM_BASE_URL = getLLMBaseURL();
 
-  // Check service health on mount
-  useEffect(() => {
-    if (!canAccessPremiumFeatures) {
-      return;
-    }
-    checkServiceHealth();
-  }, [canAccessPremiumFeatures]);
-
-  // Simple wrapper for sending messages via hook
-  const sendMessage = async () => {
-    const trimmed = inputMessage.trim();
-    if (!trimmed || !canAccessPremiumFeatures) return;
-    setInputMessage('');
-    await sendChatMessage(trimmed);
-  };
-
-  // Cleanup streaming on unmount
-  useEffect(() => {
-    return () => {
-      cleanupStreaming();
-    };
-  }, [cleanupStreaming]);
-
-  const checkServiceHealth = async () => {
+  const checkServiceHealth = useCallback(async () => {
     if (!canAccessPremiumFeatures) {
       setIsConnected(false);
       return;
@@ -119,7 +109,31 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       setIsConnected(false);
       if (isDev()) console.error('Failed to check service health:', err);
     }
-  };
+  }, [LLM_BASE_URL, canAccessPremiumFeatures]);
+
+  // Check service health on mount and when base URL/auth gating changes
+  useEffect(() => {
+    if (canAccessPremiumFeatures) {
+      checkServiceHealth();
+    }
+  }, [canAccessPremiumFeatures, checkServiceHealth]);
+
+  // Simple wrapper for sending messages via hook
+  const sendMessage = useCallback(async () => {
+    const trimmed = inputMessage.trim();
+    if (!trimmed || !canAccessPremiumFeatures) return;
+    setInputMessage('');
+    await sendChatMessage(trimmed);
+  }, [inputMessage, canAccessPremiumFeatures, sendChatMessage]);
+
+  // Cleanup streaming on unmount
+  useEffect(() => {
+    return () => {
+      cleanupStreaming();
+    };
+  }, [cleanupStreaming]);
+
+  
 
   // Clipboard functionality with fallback
   const copyToClipboard = async (text: string): Promise<boolean> => {
@@ -199,22 +213,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   }
 
   return (
-    <div
-      ref={chatPanelRef}
-      style={{
-        position: 'fixed',
-        top: 0,
-        right: 0,
-        bottom: 0,
-        width: '380px',
-        backgroundColor: 'white',
-        borderLeft: '1px solid #ddd',
-        display: 'flex',
-        flexDirection: 'column',
-        zIndex: 1000,
-        fontFamily: 'system-ui, -apple-system, sans-serif'
-      }}
-    >
+    <div ref={chatPanelRef} style={panelContainerStyle}>
       <ChatHeader
         isConnected={isConnected}
         streamingState={streamingState}
