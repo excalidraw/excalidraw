@@ -96,14 +96,9 @@ import {
   Emitter,
   MINIMUM_ARROW_SIZE,
   DOUBLE_TAP_POSITION_THRESHOLD,
-  MQ_MAX_MOBILE,
-  MQ_MIN_TABLET,
-  MQ_MAX_TABLET,
-  MQ_MAX_HEIGHT_LANDSCAPE,
-  MQ_MAX_WIDTH_LANDSCAPE,
   DESKTOP_UI_MODE_STORAGE_KEY,
   createUserAgentDescriptor,
-  deriveFormFactor,
+  getFormFactor,
   deriveStylesPanelMode,
   isIOS,
   isBrave,
@@ -755,7 +750,9 @@ class App extends React.Component<AppProps, AppState> {
         props.UIOptions.desktopUIMode ??
         storedDesktopUIMode ??
         this.editorInterface.desktopUIMode,
-      formFactor: props.UIOptions.formFactor ?? this.editorInterface.formFactor,
+      formFactor:
+        props.UIOptions.formFactor ??
+        getFormFactor(this.state.width, this.state.height),
       userAgent: userAgentDescriptor,
     });
     this.stylesPanelMode = deriveStylesPanelMode(this.editorInterface);
@@ -806,6 +803,7 @@ class App extends React.Component<AppProps, AppState> {
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
+        getFormFactor: () => getFormFactor(this.state.width, this.state.height),
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
         onChange: (cb) => this.onChangeEmitter.on(cb),
@@ -2498,20 +2496,6 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private isMobileBreakpoint = (width: number, height: number) => {
-    return (
-      width <= MQ_MAX_MOBILE ||
-      (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
-    );
-  };
-
-  private isTabletBreakpoint = (editorWidth: number, editorHeight: number) => {
-    const minSide = Math.min(editorWidth, editorHeight);
-    const maxSide = Math.max(editorWidth, editorHeight);
-
-    return minSide >= MQ_MIN_TABLET && maxSide <= MQ_MAX_TABLET;
-  };
-
   private refreshEditorInterface = () => {
     const container = this.excalidrawContainerRef.current;
     if (!container) {
@@ -2526,27 +2510,10 @@ class App extends React.Component<AppProps, AppState> {
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
 
-    // if host doesn't control formFactor, we'll update it ourselves
-    if (!this.props.UIOptions.formFactor) {
-      const nextEditorInterface = updateObject(this.editorInterface, {
-        formFactor: deriveFormFactor(editorWidth, editorHeight, {
-          isMobile: (width, height) => this.isMobileBreakpoint(width, height),
-          isTablet: (width, height) => this.isTabletBreakpoint(width, height),
-        }),
-        canFitSidebar: editorWidth > sidebarBreakpoint,
-        isLandscape: editorWidth > editorHeight,
-      });
-      const didChange = nextEditorInterface !== this.editorInterface;
-      if (didChange) {
-        this.editorInterface = nextEditorInterface;
-        this.reconcileStylesPanelMode(nextEditorInterface);
-        this.props.UIOptions.onEditorInterfaceChange?.(nextEditorInterface);
-      }
-      return didChange;
-    }
-
-    // host controls formFactor, just update sidebar/landscape for context
     const nextEditorInterface = updateObject(this.editorInterface, {
+      formFactor:
+        this.props.UIOptions.formFactor ??
+        getFormFactor(editorWidth, editorHeight),
       canFitSidebar: editorWidth > sidebarBreakpoint,
       isLandscape: editorWidth > editorHeight,
     });

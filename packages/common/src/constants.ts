@@ -323,26 +323,6 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
   },
 };
 
-// breakpoints
-// -----------------------------------------------------------------------------
-
-// mobile: up to 699px
-export const MQ_MAX_MOBILE = 599;
-
-export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
-export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
-
-// tablets
-export const MQ_MIN_TABLET = MQ_MAX_MOBILE + 1; // lower bound (excludes phones)
-export const MQ_MAX_TABLET = 1400; // upper bound (excludes laptops/desktops)
-
-// desktop/laptop
-export const MQ_MIN_WIDTH_DESKTOP = 1440;
-
-// sidebar
-export const MQ_RIGHT_SIDEBAR_MIN_WIDTH = 1229;
-// -----------------------------------------------------------------------------
-
 export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 
 export const EXPORT_SCALES = [1, 2, 3];

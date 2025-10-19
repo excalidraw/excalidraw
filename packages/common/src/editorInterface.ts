@@ -13,8 +13,29 @@ export type EditorInterface = Readonly<{
   isLandscape: boolean;
 }>;
 
+// storage key
 export const DESKTOP_UI_MODE_STORAGE_KEY = "excalidraw.desktopUIMode";
 
+// breakpoints
+// mobile: up to 699px
+export const MQ_MAX_MOBILE = 599;
+
+export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
+export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
+
+// tablets
+export const MQ_MIN_TABLET = MQ_MAX_MOBILE + 1; // lower bound (excludes phones)
+export const MQ_MAX_TABLET = 1400; // upper bound (excludes laptops/desktops)
+
+// desktop/laptop
+export const MQ_MIN_WIDTH_DESKTOP = 1440;
+
+// sidebar
+export const MQ_RIGHT_SIDEBAR_MIN_WIDTH = 1229;
+
+// -----------------------------------------------------------------------------
+
+// user agent detections
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
 export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
@@ -40,6 +61,24 @@ export const isMobile =
     navigator.userAgent,
   ) ||
   /android|ios|ipod|blackberry|windows phone/i.test(navigator.platform);
+
+// utilities
+export const isMobileBreakpoint = (width: number, height: number) => {
+  return (
+    width <= MQ_MAX_MOBILE ||
+    (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
+  );
+};
+
+export const isTabletBreakpoint = (
+  editorWidth: number,
+  editorHeight: number,
+) => {
+  const minSide = Math.min(editorWidth, editorHeight);
+  const maxSide = Math.max(editorWidth, editorHeight);
+
+  return minSide >= MQ_MIN_TABLET && maxSide <= MQ_MAX_TABLET;
+};
 
 export const isMobileOrTablet = (): boolean => {
   const ua = navigator.userAgent || "";
@@ -97,19 +136,15 @@ export const isMobileOrTablet = (): boolean => {
   return false;
 };
 
-export const deriveFormFactor = (
+export const getFormFactor = (
   editorWidth: number,
   editorHeight: number,
-  breakpoints: {
-    isMobile: (width: number, height: number) => boolean;
-    isTablet: (width: number, height: number) => boolean;
-  },
 ): EditorInterface["formFactor"] => {
-  if (breakpoints.isMobile(editorWidth, editorHeight)) {
+  if (isMobileBreakpoint(editorWidth, editorHeight)) {
     return "phone";
   }
 
-  if (breakpoints.isTablet(editorWidth, editorHeight)) {
+  if (isTabletBreakpoint(editorWidth, editorHeight)) {
     return "tablet";
   }
 
