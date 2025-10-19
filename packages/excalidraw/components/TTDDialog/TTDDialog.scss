@@ -427,6 +427,8 @@ $verticalBreakpoint: 861px;
   .ttd-dialog-rate-limit {
     font-size: 12px;
     margin-left: auto;
+    color: var(--color-primary);
+    font-weight: 600;
 
     &--exceeded {
       color: var(--color-danger);

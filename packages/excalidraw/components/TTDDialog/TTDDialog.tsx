@@ -169,9 +169,7 @@ export const TTDDialogBase = withInternalFallback(
 
     const onGenerate = async () => {
       if (rateLimits?.rateLimitRemaining === 0) {
-        if (!isCtaPopupOpen) {
-          setIsCtaPopupOpen(true);
-        }
+        setIsCtaPopupOpen(true);
         return;
       }
 
@@ -382,8 +380,7 @@ export const TTDDialogBase = withInternalFallback(
                     }}
                     onTextSubmitInProgess={onTextSubmitInProgess}
                     panelActionDisabled={
-                      prompt.length > MAX_PROMPT_LENGTH ||
-                      rateLimits?.rateLimitRemaining === 0
+                      prompt.length > MAX_PROMPT_LENGTH
                     }
                     renderTopRight={() =>
                       rateLimits ? (
