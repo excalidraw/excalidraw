@@ -7,6 +7,7 @@ import {
   cloneJSON,
   SVG_DOCUMENT_PREAMBLE,
 } from "@excalidraw/common";
+import jsPDF from "jspdf";
 
 import { getNonDeletedElements } from "@excalidraw/element";
 
@@ -160,7 +161,7 @@ export const exportCanvas = async (
     }
   }
 
-  const tempCanvas = exportToCanvas(elements, appState, files, {
+  const tempCanvas = await exportToCanvas(elements, appState, files, {
     exportBackground,
     viewBackgroundColor,
     exportPadding,
@@ -209,6 +210,45 @@ export const exportCanvas = async (
         throw new Error(t("alerts.couldNotCopyToClipboard"));
       }
     }
+  } else if(type === "pdf"){
+      const canvas = tempCanvas;
+      const imgData = canvas.toDataURL("image/png");
+
+      // create jsPDF instance
+      const pdf = new jsPDF({
+        orientation: canvas.width > canvas.height ? "landscape" : "portrait",
+        unit: "px",
+        format: [canvas.width, canvas.height],
+      });
+
+      // add canvas image to PDF
+      const canvasWidth = tempCanvas.width;
+      const canvasHeight = tempCanvas.height;
+
+      // Max PDF page size (jsPDF limitation)
+      const MAX_PX = 14400; // px
+
+      // Scale down if canvas is bigger than max
+      const scale = Math.min(1, MAX_PX / Math.max(canvasWidth, canvasHeight));
+
+      pdf.addImage(
+        tempCanvas,
+        "PNG",
+        0,
+        0,
+        canvasWidth * scale,
+        canvasHeight * scale
+      );
+
+      // generate Blob from PDF and save
+      const pdfBlob = pdf.output("blob");
+      return fileSave(pdfBlob, {
+        description: "Export to PDF",
+        name,
+        extension: "pdf" as any,
+        mimeTypes: ["application/pdf"],
+        fileHandle,
+      });
   } else {
     // shouldn't happen
     throw new Error("Unsupported export type");
