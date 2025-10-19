@@ -35,7 +35,7 @@ import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import { getNonDeletedElements } from "@excalidraw/element";
 
-type MobileMenuProps = {
+type TrayMenuProps = {
   appState: UIAppState;
   actionManager: ActionManager;
   renderJSONExportDialog: () => React.ReactNode;
@@ -58,7 +58,7 @@ type MobileMenuProps = {
   app: AppClassProperties;
 };
 
-export const MobileMenu = ({
+export const TrayMenu = ({
   appState,
   elements,
   actionManager,
@@ -74,7 +74,7 @@ export const MobileMenu = ({
   renderWelcomeScreen,
   UIOptions,
   app,
-}: MobileMenuProps) => {
+}: TrayMenuProps) => {
   const {
     WelcomeScreenCenterTunnel,
     MainMenuTunnel,
@@ -97,7 +97,7 @@ export const MobileMenu = ({
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
               <Stack.Row gap={1} className="App-toolbar-container">
-                <Island padding={1} className="App-toolbar App-toolbar--mobile">
+                <Island padding={1} className="App-toolbar">
                   {heading}
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
@@ -109,7 +109,7 @@ export const MobileMenu = ({
                   </Stack.Row>
                 </Island>
                 <div
-                  className="mobile-misc-tools-container"
+                  className="tray-misc-tools-container"
                   style={
                     //zsviczian
                     document.body?.classList.contains("mod-rtl")
@@ -217,7 +217,7 @@ export const MobileMenu = ({
       <div className="App-toolbar-content">
         <MainMenuTunnel.Out />
         {showEditMenu ? ( //zsviczian
-          actionManager.renderAction("toggleEditMenu")
+          actionManager.renderAction("toggleTrayEditMenu")
         ) : (
           <div className="ToolIcon__icon" aria-hidden="true" />
         )}
@@ -260,7 +260,7 @@ export const MobileMenu = ({
           !appState.viewModeEnabled &&
           appState.openDialog?.name !== "elementLinkSelector" &&
           showSelectedShapeActions(appState, elements) ? (
-            <Section className="App-mobile-menu" heading="selectedShapeActions">
+            <Section className="App-tray-menu" heading="selectedShapeActions">
               <SelectedShapeActions
                 appState={appState}
                 elementsMap={app.scene.getNonDeletedElementsMap()}
@@ -288,6 +288,17 @@ export const MobileMenu = ({
               )}
           </footer>
         </Island>
+        {appState.stylesPanelMode === "tray" ? ( //zsviczian display zoom menu in tray mode
+          <Island padding={1} style={{ marginLeft: `4px` }}>
+            <ZoomActions
+              renderAction={actionManager.renderAction}
+              zoom={appState.zoom}
+              trayMode={true}
+            />
+          </Island>
+        ) : (
+          ""
+        )}
       </div>
     </>
   );

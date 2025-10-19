@@ -450,7 +450,7 @@
     }
 
     @include isMobile {
-      display: block; //zsviczian (was none)
+      display: none;
     }
   }
 

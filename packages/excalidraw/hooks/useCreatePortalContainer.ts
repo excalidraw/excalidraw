@@ -13,7 +13,7 @@ export const useCreatePortalContainer = (opts?: {
   const [div, setDiv] = useState<HTMLDivElement | null>(null);
 
   const device = useDevice();
-  const { theme } = useUIAppState();
+  const { theme, stylesPanelMode } = useUIAppState(); //zsviczian
 
   const { container: excalidrawContainer } = useExcalidrawContainer();
 
@@ -22,6 +22,10 @@ export const useCreatePortalContainer = (opts?: {
       div.className = "";
       div.classList.add("excalidraw", ...(opts?.className?.split(/\s+/) || []));
       div.classList.toggle("excalidraw--mobile", device.editor.isMobile);
+      div.classList.toggle(
+        "excalidraw--tray",
+        !device.editor.isMobile && stylesPanelMode === "tray",
+      ); //zsviczian
       div.classList.toggle("theme--dark", theme === THEME.DARK);
       if (opts?.style) {
         //zsviczian
@@ -32,7 +36,14 @@ export const useCreatePortalContainer = (opts?: {
         div.setAttribute("style", styleString);
       }
     }
-  }, [div, theme, device.editor.isMobile, opts?.className, opts?.style]); //zsviczian added opts?.style
+  }, [
+    div,
+    theme,
+    device.editor.isMobile,
+    opts?.className,
+    opts?.style,
+    stylesPanelMode,
+  ]); //zsviczian added opts?.style and stylesPanelMode
 
   useLayoutEffect(() => {
     const container = opts?.parentSelector

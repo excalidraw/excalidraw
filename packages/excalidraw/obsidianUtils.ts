@@ -1,15 +1,33 @@
 import { type GlobalPoint } from "@excalidraw/math/types";
-import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
-import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
-import { FONT_FAMILY, getVerticalOffset, ZOOM_STEP, MAX_ZOOM, MIN_ZOOM, viewportCoordsToSceneCoords } from "@excalidraw/common";
-import type { ElementsMap, ExcalidrawElement, ExcalidrawTextElement, NonDeletedExcalidrawElement } from "@excalidraw/element/types";
-import { Fonts } from "./fonts";
-import type { FontMetadata } from "@excalidraw/common";
+
+import {
+  FONT_FAMILY,
+  getVerticalOffset,
+  ZOOM_STEP,
+  MAX_ZOOM,
+  MIN_ZOOM,
+} from "@excalidraw/common";
+
 import { FONT_METADATA } from "@excalidraw/common";
-import type { AppState } from "./types";
+
 import { intersectElementWithLineSegment } from "@excalidraw/element/collision";
 import { lineSegment } from "@excalidraw/math";
-import { getElementAbsoluteCoords, getLineHeightInPx } from "@excalidraw/element";
+import { getLineHeightInPx } from "@excalidraw/element";
+
+import type { FontMetadata } from "@excalidraw/common";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
+
+import { Fonts } from "./fonts";
+import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
+
+import type { AppState } from "./types";
+
+import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
 
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
 export let hostPlugin: any = null;
@@ -82,20 +100,27 @@ export function getOpenAIDefaultVisionModel() {
   return getHostPlugin().settings.openAIDefaultVisionModel;
 }
 
-export function getFontMetrics(fontFamily: ExcalidrawTextElement["fontFamily"], fontSize: number = 20): {
-  unitsPerEm: number,
-  ascender: number,
-  descender: number,
-  lineHeight: number,
-  baseline: number,
-  fontString: string
+export function getFontMetrics(
+  fontFamily: ExcalidrawTextElement["fontFamily"],
+  fontSize: number = 20,
+): {
+  unitsPerEm: number;
+  ascender: number;
+  descender: number;
+  lineHeight: number;
+  baseline: number;
+  fontString: string;
 } {
   // Get the font metadata, fallback to Excalifont if not found
-  const metadata = FONT_METADATA[fontFamily] ?? FONT_METADATA[FONT_FAMILY.Excalifont];
+  const metadata =
+    FONT_METADATA[fontFamily] ?? FONT_METADATA[FONT_FAMILY.Excalifont];
   const { unitsPerEm, ascender, descender, lineHeight } = metadata.metrics;
 
   // Calculate baseline offset using the existing utility function
-  const lineHeightPx = getLineHeightInPx(fontSize, lineHeight as ExcalidrawTextElement["lineHeight"]);
+  const lineHeightPx = getLineHeightInPx(
+    fontSize,
+    lineHeight as ExcalidrawTextElement["lineHeight"],
+  );
   const baseline = getVerticalOffset(fontFamily, fontSize, lineHeightPx);
 
   // Get the font string from registered fonts or use font family name as fallback
@@ -105,7 +130,9 @@ export function getFontMetrics(fontFamily: ExcalidrawTextElement["fontFamily"], 
     fontString = fontFaces.fontFaces[0].fontFace.family;
   } else {
     // Fallback to font family enum name
-    const fontFamilyName = Object.entries(FONT_FAMILY).find(([_, value]) => value === fontFamily)?.[0];
+    const fontFamilyName = Object.entries(FONT_FAMILY).find(
+      ([_, value]) => value === fontFamily,
+    )?.[0];
     fontString = fontFamilyName || "Excalifont";
   }
 
@@ -115,7 +142,7 @@ export function getFontMetrics(fontFamily: ExcalidrawTextElement["fontFamily"], 
     descender,
     lineHeight,
     baseline,
-    fontString
+    fontString,
   };
 }
 
@@ -240,7 +267,6 @@ export async function loadMermaid(): Promise<MermaidToExcalidrawLibProps> {
   return await loadMermaidLib();
 }
 
-
 //moved here as part of https://github.com/zsviczian/excalidraw/pull/286
 export const intersectElementWithLine = (
   element: ExcalidrawElement,
@@ -252,7 +278,12 @@ export const intersectElementWithLine = (
   gap: number = 0,
   elementsMap: ElementsMap,
 ): GlobalPoint[] | undefined => {
-  return intersectElementWithLineSegment(element, elementsMap, lineSegment(a, b), gap);
+  return intersectElementWithLineSegment(
+    element,
+    elementsMap,
+    lineSegment(a, b),
+    gap,
+  );
 };
 
 //disable double click
@@ -287,3 +318,6 @@ export const shouldDisableZoom = (appState: AppState): boolean => {
   }
   return false;
 };
+
+export const isFullPanelMode = (appState: AppState): boolean => 
+  appState.stylesPanelMode === "full" || appState.stylesPanelMode === "tray";

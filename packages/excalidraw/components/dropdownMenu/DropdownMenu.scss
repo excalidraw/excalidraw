@@ -28,6 +28,28 @@
       }
     }
 
+    &--tray { //zsviczian
+      left: 0;
+      width: 100%;
+      row-gap: 0.75rem;
+
+      .dropdown-menu-container {
+        padding: 8px 8px;
+        box-sizing: border-box;
+        // background-color: var(--island-bg-color);
+        box-shadow: var(--shadow-island);
+        border-radius: var(--border-radius-lg);
+        position: relative;
+        transition: box-shadow 0.5s ease-in-out;
+        display: flex;
+        flex-direction: column;
+
+        &.zen-mode {
+          box-shadow: none;
+        }
+      }
+    }
+
     .dropdown-menu-container {
       background-color: var(--island-bg-color);
       max-height: calc(100vh - 150px);
@@ -213,6 +235,14 @@
     }
 
     &--mobile {
+      border: none;
+      margin: 0;
+      padding: 0;
+      width: var(--default-button-size);
+      height: var(--default-button-size);
+    }
+
+    &--tray { //zsviczian
       border: none;
       margin: 0;
       padding: 0;
