@@ -72,8 +72,6 @@ export type ActionName =
   | "changeArrowProperties"
   | "changeOpacity"
   | "changeFontSize"
-  | "toggleCanvasMenu"
-  | "toggleEditMenu"
   | "toggleTrayEditMenu" //zsviczian
   | "undo"
   | "redo"

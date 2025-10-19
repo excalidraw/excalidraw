@@ -131,7 +131,10 @@ export const actionClearCanvas = register({
         pasteDialog: appState.pasteDialog,
         activeTool:
           appState.activeTool.type === "image"
-            ? { ...appState.activeTool, type: app.defaultSelectionTool }
+            ? {
+                ...appState.activeTool,
+                type: app.state.preferredSelectionTool.type,
+              }
             : appState.activeTool,
         colorPalette: appState.colorPalette, //zsviczian
         trayModeEnabled: appState.trayModeEnabled, //zsviczian
@@ -528,7 +531,7 @@ export const actionToggleEraserTool = register({
     if (isEraserActive(appState)) {
       activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveTool || {
-          type: app.defaultSelectionTool,
+          type: app.state.preferredSelectionTool.type,
         }),
         lastActiveToolBeforeEraser: null,
       });
@@ -559,7 +562,7 @@ export const actionToggleLassoTool = register({
   icon: LassoIcon,
   trackEvent: { category: "toolbar" },
   predicate: (elements, appState, props, app) => {
-    return app.defaultSelectionTool !== "lasso";
+    return app.state.preferredSelectionTool.type !== "lasso";
   },
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
