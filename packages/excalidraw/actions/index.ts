@@ -46,6 +46,7 @@ export {
 export { actionToggleFrameRole } from "./actionProperties"; //zsviczian
 
 export { actionCopyStyles, actionPasteStyles } from "./actionStyles";
+export { actionToggleTrayEditMenu } from "./actionTrayMenu"; //zsviczian
 export {
   actionToggleCanvasMenu,
   actionToggleEditMenu,

@@ -286,6 +286,11 @@ body.excalidraw-cursor-resize * {
       bottom: 55px;
       top: auto;
     }
+
+    .dropdown-menu--tray {
+      bottom: 55px;
+      top: auto;
+    } //zsviczian
   }
 
   .App-mobile-menu {
@@ -299,6 +304,18 @@ body.excalidraw-cursor-resize * {
       padding: 8px 8px 0 8px;
     }
   }
+
+  .App-tray-menu {
+    width: 100%;
+    overflow-x: visible;
+    overflow-y: auto;
+    box-sizing: border-box;
+    margin-bottom: var(--bar-padding);
+
+    .selected-shape-actions {
+      padding: 8px 8px 0 8px;
+    }
+  } //zsviczian
 
   .App-menu {
     display: grid;
@@ -511,6 +528,16 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  @include isTray {
+    aside {
+      display: none;
+    }
+    .scroll-back-to-content {
+      bottom: calc(80px + var(--sab, 0));
+      z-index: -1;
+    }
+  } //zsviczian
+
   .rtl-mirror {
     :root[dir="rtl"] & {
       transform: scaleX(-1);
@@ -636,6 +663,31 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  .tray-misc-tools-container {
+    position: absolute;
+    top: calc(5rem - var(--editor-container-padding));
+    right: calc(var(--editor-container-padding) * -1);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--sidebar-border-color);
+    border-top-left-radius: var(--border-radius-lg);
+    border-bottom-left-radius: var(--border-radius-lg);
+    border-right: 0;
+    overflow: hidden;
+
+    background-color: var(--island-bg-color);
+
+    .ToolIcon__icon {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0;
+    }
+
+    .default-sidebar-trigger {
+      border: 0;
+    }
+  } //zsviczian
+
   .App-toolbar--mobile {
     overflow: visible;
     max-width: 98vw;
@@ -644,6 +696,16 @@ body.excalidraw-cursor-resize * {
       display: block; //zsviczian
     }
   }
+
+  .App-toolbar--tray {
+    overflow: visible;
+    max-width: 98vw;
+
+    .ToolIcon__keybinding {
+      display: block;
+    }
+  } //zsviczian
+
   .UserList-Wrapper {
     margin: 0;
     padding: 0;
@@ -663,6 +725,7 @@ body.excalidraw-cursor-resize * {
     @include filledButtonOnCanvas;
   }
 
+  .App-tray-menu, //zsviczian
   .App-mobile-menu,
   .App-menu__left {
     --button-border: transparent;
@@ -670,6 +733,7 @@ body.excalidraw-cursor-resize * {
   }
 
   @at-root .excalidraw.theme--dark#{&} {
+    .App-tray-menu, //zsviczian
     .App-mobile-menu,
     .App-menu__left {
       --button-hover-bg: #363541;

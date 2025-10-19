@@ -10,6 +10,7 @@ import { Island } from "../Island";
 import Stack from "../Stack";
 
 import { DropdownMenuContentPropsContext } from "./common";
+import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 
 const MenuContent = ({
   children,
@@ -28,6 +29,7 @@ const MenuContent = ({
   style?: React.CSSProperties;
 }) => {
   const device = useDevice();
+  const appState = useUIAppState(); //zsviczian
   const menuRef = useRef<HTMLDivElement>(null);
 
   const callbacksRef = useStable({ onClickOutside });
@@ -58,6 +60,8 @@ const MenuContent = ({
 
   const classNames = clsx(`dropdown-menu ${className}`, {
     "dropdown-menu--mobile": device.editor.isMobile,
+    "dropdown-menu--tray":
+      !device.editor.isMobile && appState.stylesPanelMode === "tray", //zsviczian
   }).trim();
 
   return (

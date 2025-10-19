@@ -74,6 +74,7 @@ export type ActionName =
   | "changeFontSize"
   | "toggleCanvasMenu"
   | "toggleEditMenu"
+  | "toggleTrayEditMenu" //zsviczian
   | "undo"
   | "redo"
   | "finalize"

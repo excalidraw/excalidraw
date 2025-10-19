@@ -20,8 +20,11 @@ const MenuTrigger = ({
     `dropdown-menu-button ${className}`,
     "zen-mode-transition",
     {
-      "dropdown-menu-button--mobile":
-        device.editor.isMobile || appState.trayModeEnabled, //zsviczian
+      "dropdown-menu-button--mobile": device.editor.isMobile,
+    },
+    {
+      "dropdown-menu-button--tray":
+        !device.editor.isMobile && appState.stylesPanelMode === "tray", //zsviczian
     },
   ).trim();
   return (

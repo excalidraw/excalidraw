@@ -1638,18 +1638,19 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--view-mode":
             this.state.viewModeEnabled ||
             this.state.openDialog?.name === "elementLinkSelector",
-          "excalidraw--mobile":
-            this.device.editor.isMobile ||
-            (!(this.state.viewModeEnabled || this.state.zenModeEnabled) &&
-              this.state.trayModeEnabled), //zsviczian
+          "excalidraw--mobile": this.device.editor.isMobile,
+          "excalidraw--tray":
+            !(this.state.viewModeEnabled || this.state.zenModeEnabled) &&
+            !this.device.editor.isMobile &&
+            this.state.stylesPanelMode === "tray", //zsviczian
         })}
         style={{
           //zsviczian
           ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
-              ? POINTER_EVENTS.disabled
-              : POINTER_EVENTS.enabled,
+            ? POINTER_EVENTS.disabled
+            : POINTER_EVENTS.enabled,
           //zsviczian
-          ...this.state.dynamicStyle || {}, //zsviczian
+          ...(this.state.dynamicStyle || {}), //zsviczian
           ["--right-sidebar-width" as any]: "302px",
         }}
         ref={this.excalidrawContainerRef}
@@ -2597,6 +2598,8 @@ class App extends React.Component<AppProps, AppState> {
         isMobileOrTablet() &&
         !this.state.trayModeEnabled //zsviczian
           ? "compact"
+          : this.state.trayModeEnabled //zsviczian
+          ? "tray"
           : "full",
     });
 

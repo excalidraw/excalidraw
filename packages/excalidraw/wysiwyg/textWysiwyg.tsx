@@ -668,6 +668,7 @@ export const textWysiwyg = ({
         event.target instanceof SVGElement) &&
       (event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
         event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MOBILE_MENU}`) ||
+        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_TRAY_MENU}`) ||
         event.target.closest(`.${CLASSES.MOBILE_TOOLBAR}`));
     // panning canvas
     if (event.button === POINTER_BUTTON.WHEEL) {

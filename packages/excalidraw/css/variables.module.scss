@@ -6,6 +6,12 @@
   }
 }
 
+@mixin isTray() {
+  @at-root .excalidraw--tray#{&} {
+    @content;
+  }
+} //zsviczian
+
 @mixin toolbarButtonColorStates {
   &.fillable {
     .ToolIcon_type_radio,

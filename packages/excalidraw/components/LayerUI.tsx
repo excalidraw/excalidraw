@@ -67,6 +67,8 @@ import { LaserPointerButton } from "./LaserPointerButton";
 import "./LayerUI.scss";
 import "./Toolbar.scss";
 
+import { TrayMenu } from "./TrayMenu";
+
 import type { ActionManager } from "../actions/manager";
 
 import type { Language } from "../i18n";
@@ -299,7 +301,10 @@ const LayerUI = ({
       appState.openDialog?.name !== "elementLinkSelector";
 
     return (
-      <FixedSideContainer side="top" sidepanelOpen={!!appState.openSidebar /*zsviczian*/}>
+      <FixedSideContainer
+        side="top"
+        sidepanelOpen={!!appState.openSidebar /*zsviczian*/}
+      >
         <div className="App-menu App-menu_top">
           <Stack.Col
             gap={spacing.menuTopGap}
@@ -340,14 +345,7 @@ const LayerUI = ({
                         >
                           <HintViewer
                             appState={appState}
-                            isMobile={
-                              device.editor.isMobile ||
-                              (!(
-                                appState.viewModeEnabled ||
-                                appState.zenModeEnabled
-                              ) &&
-                                appState.trayModeEnabled)
-                            } //zsviczian
+                            isMobile={device.editor.isMobile}
                             device={device}
                             app={app}
                           />
@@ -434,7 +432,10 @@ const LayerUI = ({
               />
             )}
             {!appState.viewModeEnabled && //zsviczian
-              renderTopRightUI?.(device.editor.isMobile, appState)}
+              renderTopRightUI?.(
+                device.editor.isMobile || isTrayMode, //zsviczian added isTrayMode
+                appState,
+              )}
             {!appState.viewModeEnabled &&
               appState.openDialog?.name !== "elementLinkSelector" &&
               // hide button when sidebar docked
@@ -457,10 +458,12 @@ const LayerUI = ({
     );
   };
 
-  const isTrayModeOrMobile =
-    device.editor.isMobile ||
-    (!(appState.viewModeEnabled || appState.zenModeEnabled) &&
-      appState.trayModeEnabled); //zsviczian
+  const isTrayMode =
+    !(appState.viewModeEnabled || appState.zenModeEnabled) &&
+    !device.editor.isMobile &&
+    appState.stylesPanelMode === "tray"; //zsviczian
+  const isTrayModeOrMobile = isTrayMode || device.editor.isMobile; //zsviczian
+
   const renderSidebars = () => {
     return (
       <DefaultSidebar
@@ -517,7 +520,7 @@ const LayerUI = ({
           {appState.errorMessage}
         </ErrorDialog>
       )}
-      {eyeDropperState && ( //!device.editor.isMobile && //zsviczian
+      {eyeDropperState && !device.editor.isMobile && (
         <EyeDropper
           colorPickerType={eyeDropperState.colorPickerType}
           onCancel={() => {
@@ -596,7 +599,28 @@ const LayerUI = ({
           }
         />
       )}
-      {isTrayModeOrMobile && ( //zsviczian Added isTrayMode condition
+      {isTrayMode &&
+        !device.editor.isMobile && ( //zsviczian Added isTrayMode condition
+          <TrayMenu
+            app={app}
+            appState={appState}
+            elements={elements}
+            actionManager={actionManager}
+            renderJSONExportDialog={renderJSONExportDialog}
+            renderImageExportDialog={renderImageExportDialog}
+            setAppState={setAppState}
+            onLockToggle={onLockToggle}
+            onHandToolToggle={onHandToolToggle}
+            onPenModeToggle={onPenModeToggle}
+            renderTopRightUI={renderTopRightUI}
+            renderCustomStats={renderCustomStats}
+            renderSidebars={renderSidebars}
+            device={device}
+            renderWelcomeScreen={renderWelcomeScreen}
+            UIOptions={UIOptions}
+          />
+        )}
+      {device.editor.isMobile && (
         <MobileMenu
           app={app}
           appState={appState}

@@ -128,6 +128,7 @@ export const CLASSES = {
   SIDEBAR: "sidebar",
   SHAPE_ACTIONS_MENU: "App-menu__left",
   SHAPE_ACTIONS_MOBILE_MENU: "App-mobile-menu", //zsviczian
+  SHAPE_ACTIONS_TRAY_MENU: "App-tray-menu", //zsviczian
   MOBILE_TOOLBAR: "App-toolbar-content", //zsviczian
   ZOOM_ACTIONS: "zoom-actions",
   SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",

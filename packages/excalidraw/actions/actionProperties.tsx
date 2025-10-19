@@ -140,7 +140,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 
-import { t2 } from "../obsidianUtils";
+import { isFullPanelMode, t2 } from "../obsidianUtils";
 import {
   withCaretPositionPreservation,
   restoreCaretPosition,
@@ -347,7 +347,7 @@ export const actionChangeStrokeColor = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <>
-      {appState.stylesPanelMode === "full" && (
+      {isFullPanelMode(appState) && ( //zsviczian
         <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       )}
       <ColorPicker
@@ -435,7 +435,7 @@ export const actionChangeBackgroundColor = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <>
-      {appState.stylesPanelMode === "full" && (
+      {isFullPanelMode(appState) && ( //zsviczian
         <h3 aria-hidden="true">{t("labels.background")}</h3>
       )}
       <ColorPicker
@@ -566,7 +566,7 @@ export const actionChangeStrokeWidth = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      {appState.stylesPanelMode === "full" && (
+      {isFullPanelMode(appState) && ( //zsviczian (may be removed once mobile mode is merged)
         <legend>{t("labels.strokeWidth")}</legend>
       )}
       <div className="buttonList">
@@ -631,7 +631,7 @@ export const actionChangeSloppiness = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      {appState.stylesPanelMode === "full" && (
+      {isFullPanelMode(appState) && ( //zsviczian (may be removed once mobile mode is merged)
         <legend>{t("labels.sloppiness")}</legend>
       )}
       <div className="buttonList">
@@ -686,7 +686,7 @@ export const actionChangeStrokeStyle = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
-      {appState.stylesPanelMode === "full" && (
+      {isFullPanelMode(appState) && ( //zsviczian (may be removed once mobile mode is merged)
         <legend>{t("labels.strokeStyle")}</legend>
       )}
       <div className="buttonList">
@@ -1347,14 +1347,14 @@ export const actionChangeFontFamily = register({
 
     return (
       <fieldset>
-        {appState.stylesPanelMode === "full" && (
+        {isFullPanelMode(appState) && ( //zsviczian
           <legend>{t("labels.fontFamily")}</legend>
         )}
         <FontPicker
           isOpened={appState.openPopup === "fontFamily"}
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
-          compactMode={appState.stylesPanelMode === "compact"}
+          compactMode={!isFullPanelMode(appState) /*zsviczian*/}
           onSelect={(fontFamily) => {
             withCaretPositionPreservation(
               () => {
