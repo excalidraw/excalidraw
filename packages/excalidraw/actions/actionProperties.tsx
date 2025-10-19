@@ -58,6 +58,8 @@ import {
   toggleLinePolygonState,
 } from "@excalidraw/element";
 
+import { deriveStylesPanelMode } from "@excalidraw/common";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import type {
@@ -138,8 +140,6 @@ import {
   withCaretPositionPreservation,
   restoreCaretPosition,
 } from "../hooks/useTextEditorFocus";
-
-import { deriveStylesPanelMode } from "../editorInterface";
 
 import { register } from "./register";
 

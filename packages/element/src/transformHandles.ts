@@ -1,11 +1,13 @@
-import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "@excalidraw/common";
+import {
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
+  type EditorInterface,
+} from "@excalidraw/common";
 
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import type { Radians } from "@excalidraw/math";
 
 import type {
-  EditorInterface,
   InteractiveCanvasAppState,
   Zoom,
 } from "@excalidraw/excalidraw/types";

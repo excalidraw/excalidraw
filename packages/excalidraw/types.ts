@@ -3,6 +3,7 @@ import type {
   UserIdleState,
   throttleRAF,
   MIME_TYPES,
+  EditorInterface,
 } from "@excalidraw/common";
 
 import type { SuggestedBinding } from "@excalidraw/element";
@@ -893,21 +894,6 @@ export interface ExcalidrawImperativeAPI {
     callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
 }
-
-export type StylesPanelMode = "compact" | "full" | "mobile";
-
-export type EditorInterface = Readonly<{
-  formFactor: "phone" | "tablet" | "desktop";
-  desktopUIMode: "compact" | "full";
-  userAgent: Readonly<{
-    raw: string;
-    isMobileDevice: boolean;
-    platform: "ios" | "android" | "other" | "unknown";
-  }>;
-  isTouchScreen: boolean;
-  canFitSidebar: boolean;
-  isLandscape: boolean;
-}>;
 
 export type FrameNameBounds = {
   x: number;

@@ -37,7 +37,6 @@ import {
   FRAME_STYLE,
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
-  isBrave,
   LINE_CONFIRM_THRESHOLD,
   MAX_ALLOWED_FILE_BYTES,
   MIME_TYPES,
@@ -55,13 +54,11 @@ import {
   ZOOM_STEP,
   POINTER_EVENTS,
   TOOL_TYPE,
-  isIOS,
   supportsResizeObserver,
   DEFAULT_COLLISION_THRESHOLD,
   DEFAULT_TEXT_ALIGN,
   ARROW_TYPE,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
-  isSafari,
   isLocalLink,
   normalizeLink,
   toValidURL,
@@ -99,12 +96,20 @@ import {
   Emitter,
   MINIMUM_ARROW_SIZE,
   DOUBLE_TAP_POSITION_THRESHOLD,
-  isMobileOrTablet,
   MQ_MAX_MOBILE,
   MQ_MIN_TABLET,
   MQ_MAX_TABLET,
   MQ_MAX_HEIGHT_LANDSCAPE,
   MQ_MAX_WIDTH_LANDSCAPE,
+  DESKTOP_UI_MODE_STORAGE_KEY,
+  createUserAgentDescriptor,
+  deriveFormFactor,
+  deriveStylesPanelMode,
+  isIOS,
+  isBrave,
+  isSafari,
+  type EditorInterface,
+  type StylesPanelMode,
 } from "@excalidraw/common";
 
 import {
@@ -406,13 +411,6 @@ import { LassoTrail } from "../lasso";
 
 import { EraserTrail } from "../eraser";
 
-import {
-  DESKTOP_UI_MODE_STORAGE_KEY,
-  createUserAgentDescriptor,
-  deriveFormFactor,
-  deriveStylesPanelMode,
-} from "../editorInterface";
-
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
   convertElementTypePopupAtom,
@@ -466,8 +464,6 @@ import type {
   LibraryItems,
   PointerDownState,
   SceneData,
-  EditorInterface,
-  StylesPanelMode,
   FrameNameBoundsCache,
   SidebarName,
   SidebarTabName,
@@ -3236,7 +3232,8 @@ class App extends React.Component<AppProps, AppState> {
       this.addElementsFromPasteOrLibrary({
         elements,
         files: data.files || null,
-        position: isMobileOrTablet() ? "center" : "cursor",
+        position:
+          this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
         retainSeed: isPlainPaste,
       });
       return;
@@ -3261,7 +3258,8 @@ class App extends React.Component<AppProps, AppState> {
         this.addElementsFromPasteOrLibrary({
           elements,
           files,
-          position: isMobileOrTablet() ? "center" : "cursor",
+          position:
+            this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
         });
 
         return;
@@ -6783,12 +6781,13 @@ class App extends React.Component<AppProps, AppState> {
 
         // block dragging after lasso selection on PCs until the next pointer down
         // (on mobile or tablet, we want to allow user to drag immediately)
-        pointerDownState.drag.blockDragging = !isMobileOrTablet();
+        pointerDownState.drag.blockDragging =
+          this.editorInterface.formFactor === "desktop";
       }
 
       // only for mobile or tablet, if we hit an element, select it immediately like normal selection
       if (
-        isMobileOrTablet() &&
+        this.editorInterface.formFactor !== "desktop" &&
         pointerDownState.hit.element &&
         !hitSelectedElement
       ) {
@@ -8599,7 +8598,10 @@ class App extends React.Component<AppProps, AppState> {
         if (
           this.state.activeTool.type === "lasso" &&
           this.lassoTrail.hasCurrentTrail &&
-          !(isMobileOrTablet() && pointerDownState.hit.element) &&
+          !(
+            this.editorInterface.formFactor !== "desktop" &&
+            pointerDownState.hit.element
+          ) &&
           !this.state.activeTool.fromSelection
         ) {
           return;

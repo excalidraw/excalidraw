@@ -5,15 +5,14 @@ import {
   type Radians,
 } from "@excalidraw/math";
 
-import { SIDE_RESIZING_THRESHOLD } from "@excalidraw/common";
+import {
+  SIDE_RESIZING_THRESHOLD,
+  type EditorInterface,
+} from "@excalidraw/common";
 
 import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
 
-import type {
-  AppState,
-  EditorInterface,
-  Zoom,
-} from "@excalidraw/excalidraw/types";
+import type { AppState, Zoom } from "@excalidraw/excalidraw/types";
 
 import { getElementAbsoluteCoords } from "./bounds";
 import {

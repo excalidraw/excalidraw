@@ -1,4 +1,4 @@
-import type { UserIdleState } from "@excalidraw/common";
+import type { UserIdleState, EditorInterface } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
   NonDeletedElementsMap,
@@ -16,7 +16,6 @@ import type {
   InteractiveCanvasAppState,
   StaticCanvasAppState,
   SocketId,
-  EditorInterface,
   PendingExcalidrawElements,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";

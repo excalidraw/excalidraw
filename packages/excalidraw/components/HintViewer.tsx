@@ -9,7 +9,7 @@ import {
   isTextElement,
 } from "@excalidraw/element";
 
-import { getShortcutKey } from "@excalidraw/common";
+import { getShortcutKey, type EditorInterface } from "@excalidraw/common";
 
 import { isNodeInFlowchart } from "@excalidraw/element";
 
@@ -19,7 +19,7 @@ import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
 
-import type { AppClassProperties, EditorInterface, UIAppState } from "../types";
+import type { AppClassProperties, UIAppState } from "../types";
 
 interface HintViewerProps {
   appState: UIAppState;

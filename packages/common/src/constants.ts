@@ -6,32 +6,6 @@ import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
 
 import { COLOR_PALETTE } from "./colors";
 
-export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-export const isWindows = /^Win/.test(navigator.platform);
-export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
-export const isFirefox =
-  typeof window !== "undefined" &&
-  "netscape" in window &&
-  navigator.userAgent.indexOf("rv:") > 1 &&
-  navigator.userAgent.indexOf("Gecko") > 1;
-export const isChrome = navigator.userAgent.indexOf("Chrome") !== -1;
-export const isSafari =
-  !isChrome && navigator.userAgent.indexOf("Safari") !== -1;
-export const isIOS =
-  /iPad|iPhone/i.test(navigator.platform) ||
-  // iPadOS 13+
-  (navigator.userAgent.includes("Mac") && "ontouchend" in document);
-// keeping function so it can be mocked in test
-export const isBrave = () =>
-  (navigator as any).brave?.isBrave?.name === "isBrave";
-
-export const isMobile =
-  isIOS ||
-  /android|webos|ipod|blackberry|iemobile|opera mini/i.test(
-    navigator.userAgent,
-  ) ||
-  /android|ios|ipod|blackberry|windows phone/i.test(navigator.platform);
-
 export const supportsResizeObserver =
   typeof window !== "undefined" && "ResizeObserver" in window;
 

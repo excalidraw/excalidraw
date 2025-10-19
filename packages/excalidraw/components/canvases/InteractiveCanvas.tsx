@@ -4,6 +4,7 @@ import {
   CURSOR_TYPE,
   isShallowEqual,
   sceneCoordsToViewportCoords,
+  type EditorInterface,
 } from "@excalidraw/common";
 
 import type {
@@ -20,11 +21,7 @@ import type {
   RenderableElementsMap,
   RenderInteractiveSceneCallback,
 } from "../../scene/types";
-import type {
-  AppState,
-  EditorInterface,
-  InteractiveCanvasAppState,
-} from "../../types";
+import type { AppState, InteractiveCanvasAppState } from "../../types";
 import type { DOMAttributes } from "react";
 
 type InteractiveCanvasProps = {
