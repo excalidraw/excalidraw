@@ -60,7 +60,7 @@ export const TTDDialogCTAPopup = ({
           </h3>
           <p className="ttd-dialog-cta-popup__text">
             You've used all your free AI generations for today. Upgrade to
-            Excalidraw+ for extended number of generations and many more!
+            Excalidraw+ for more generations and other awesome features!
           </p>
           <div className="ttd-dialog-cta-popup__buttons">
             <button
