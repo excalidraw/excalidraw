@@ -150,11 +150,9 @@ const getHints = ({
       !appState.editingTextElement &&
       !appState.selectedLinearElement?.isEditing
     ) {
-      return [
-        t("hints.deepBoxSelect", {
-          shortcut: getTaggedShortcutKey("CtrlOrCmd"),
-        }),
-      ];
+      return t("hints.deepBoxSelect", {
+        shortcut: getTaggedShortcutKey("CtrlOrCmd"),
+      });
     }
 
     if (isGridModeEnabled(app) && appState.selectedElementsAreBeingDragged) {
@@ -164,11 +162,10 @@ const getHints = ({
     }
 
     if (!selectedElements.length && !isMobile) {
-      return [
-        t("hints.canvasPanning", {
-          shortcut: getTaggedShortcutKey("Space"),
-        }),
-      ];
+      return t("hints.canvasPanning", {
+        shortcut_1: getTaggedShortcutKey(t("keys.mmb")),
+        shortcut_2: getTaggedShortcutKey("Space"),
+      });
     }
 
     if (selectedElements.length === 1) {
@@ -202,7 +199,7 @@ const getHints = ({
           shortcut: getTaggedShortcutKey("Enter"),
         });
         const createFlowchart = t("hints.createFlowchart", {
-          shortcut: getTaggedShortcutKey("CtrlOrCmd"),
+          shortcut: getTaggedShortcutKey(["CtrlOrCmd", "↑↓"]),
         });
         if (isFlowchartNodeElement(selectedElements[0])) {
           if (
@@ -243,7 +240,7 @@ export const HintViewer = ({
   }
 
   const hint = Array.isArray(hints)
-    ? hints.map((hint) => hint.replace(/\. ?$/, "")).join(". ")
+    ? hints.map((hint) => hint.replace(/\. ?$/, "")).join(", ")
     : hints;
 
   const hintJSX = hint.split(/(<kbd>[^<]+<\/kbd>)/g).map((part, index) => {
