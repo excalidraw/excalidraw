@@ -3,8 +3,9 @@ import { unstable_batchedUpdates } from "react-dom";
 
 import { KEYS, queryFocusableElements } from "@excalidraw/common";
 
-import "./Popover.scss";
 import clsx from "clsx";
+
+import "./Popover.scss";
 
 type Props = {
   top?: number;
