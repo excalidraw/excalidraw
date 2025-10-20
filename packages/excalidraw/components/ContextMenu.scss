@@ -1,6 +1,10 @@
 @import "../css/variables.module.scss";
 
 .excalidraw {
+  .context-menu-popover {
+    z-index: var(--zIndex-ui-context-menu);
+  }
+
   .context-menu {
     position: relative;
     border-radius: 4px;
