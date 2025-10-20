@@ -49,7 +49,7 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "more_options": "Інші опції",
     "arrowtypes": "Тип стрілки",
     "arrowtype_sharp": "Гостра стрілка",
     "arrowtype_round": "Вигнута стрілка",
@@ -129,17 +129,21 @@
     "createContainerFromText": "Огорнути текст у контейнер",
     "link": {
       "edit": "Редагування посилання",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "Редагувати вбудоване посилання",
+      "create": "Додати посилання",
       "label": "Посилання",
       "labelEmbed": "Посилання і вкладення",
       "empty": "Посилання відсутнє",
-      "hint": "",
-      "goToElement": ""
+      "hint": "Введіть або вставте ваше посилання тут",
+      "goToElement": "Перейти до цільового елемента"
     },
     "lineEditor": {
       "edit": "Редагувати лінію",
       "editArrow": "Редагувати стрілку"
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "Блокувати",
@@ -161,28 +165,38 @@
     "zoomToFit": "Збільшити, щоб умістити всі елементи",
     "installPWA": "Встановити Excalidraw локально (PWA)",
     "autoResize": "Увімкнути автоматичне змінення розміру тексту",
-    "imageCropping": "",
-    "unCroppedDimension": "",
-    "copyElementLink": "",
-    "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "imageCropping": "Обрізка зображення",
+    "unCroppedDimension": "Необрізаний розмір",
+    "copyElementLink": "Копіювати посилання на об'єкт",
+    "linkToElement": "Посилання на об’єкт",
+    "wrapSelectionInFrame": "Обтікання виділеного фрагмента рамкою",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "Посилання на об’єкт",
+    "desc": "Натисніть на фігуру на полотні або вставте посилання.",
+    "notFound": "Зв'язаний об'єкт не знайдено на полотні."
   },
   "library": {
     "noItems": "Тут поки пусто...",
     "hint_emptyLibrary": "Виберіть об'єкт на полотні, щоб додати його сюди або встановіть бібліотеку з публічного репозиторію, що нижче.",
-    "hint_emptyPrivateLibrary": "Виберіть елемент на полотні, щоб додати його сюди."
+    "hint_emptyPrivateLibrary": "Виберіть елемент на полотні, щоб додати його сюди.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "Знайти на полотні",
     "noMatch": "Збігів не знайдено...",
     "singleResult": "результат",
     "multipleResults": "результати",
-    "placeholder": "Знайти текст на полотні..."
+    "placeholder": "Знайти текст на полотні...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Прив'язати до об'єктів",
     "exitZenMode": "Вийти з дзен-режиму",
     "cancel": "Скасувати",
+    "saveLibNames": "",
     "clear": "Очистити",
     "remove": "Видалити",
     "embed": "Перемкнути вкладення",
-    "publishLibrary": "Опублікувати",
+    "publishLibrary": "",
     "submit": "Надіслати",
     "confirm": "Підтвердити",
     "embeddableInteractionButton": "Натисніть для взаємодії"
@@ -245,7 +260,8 @@
     "resetLibrary": "Це призведе до очищення бібліотеки. Ви впевнені?",
     "removeItemsFromsLibrary": "Видалити {{count}} елемент(ів) з бібліотеки?",
     "invalidEncryptionKey": "Ключ шифрування повинен бути довжиною до 22 символів. Спільну роботу вимкнено.",
-    "collabOfflineWarning": "Немає підключення до Інтернету.\nВаші зміни не будуть збережені!"
+    "collabOfflineWarning": "Немає підключення до Інтернету.\nВаші зміни не будуть збережені!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Непідтримуваний тип файлу.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Виділення",
+    "lasso": "",
     "image": "Вставити зображення",
     "rectangle": "Прямокутник",
     "diamond": "Ромб",
@@ -295,7 +312,8 @@
     "laser": "Лазерний вказівник",
     "hand": "Рука (інструмент для панорамування)",
     "extraTools": "Інші інструменти",
-    "mermaidToExcalidraw": "Mermaid у Excalidraw"
+    "mermaidToExcalidraw": "Mermaid у Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Прямокутник",
@@ -319,31 +337,31 @@
     "shapes": "Фігури"
   },
   "hints": {
-    "dismissSearch": "Escape, щоб відхилити пошук",
-    "canvasPanning": "Щоб перемістити полотно, утримуйте коліщатко миші або пробіл під час перетягування, або скористайтеся інструментом Рука",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Натисніть щоб додати кілька точок. Перетягніть щоб намалювати одну лінію",
-    "arrowTool": "Натисніть, щоб почати кілька точок, перетягніть для однієї лінії. Натисніть {{arrowShortcut}} знову, щоб змінити тип стрілки.",
+    "arrowTool": "",
     "freeDraw": "Натисніть і потягніть, відпустіть коли завершите",
     "text": "Порада: можна також додати текст, двічі клацнувши по будь-якому місці інструментом вибору",
     "embeddable": "Клікніть та перетягніть для створення вбудованого вебсайту",
-    "text_selected": "Подвійний клік або натисніть клавішу ENTER, щоб редагувати текст",
-    "text_editing": "Натисніть клавішу Escape або Ctrl/Cmd+ENTER, щоб завершити редагування",
-    "linearElementMulti": "Натисніть на останню точку, клацніть Esc або Enter щоб завершити",
-    "lockAngle": "Ви можете обмежити кут, утримуюючи SHIFT",
-    "resize": "Ви можете зберегти пропорції, утримуючи SHIFT під час зміни розміру,\nутримуйте ALT для змінення розміру від центру",
-    "resizeImage": "Ви можете змінювати розміри утримуючи клавішу SHIFT, втримуйте клавішу ALT щоб змінювати розмір відносно центру",
-    "rotate": "Ви можете обмежити кути, утримуючи SHIFT під час обертання",
-    "lineEditor_info": "Утримуйте CtrlOrCmd і двічі клацніть або натисніть CtrlOrCmd + Enter, щоб редагувати цятки",
-    "lineEditor_pointSelected": "Натисніть Delete для видалення точку (точок), або Ctrl/Cmd+D для дублювання, перетаскування працює як звично",
-    "lineEditor_nothingSelected": "Виберіть точку для редагування (втримуйте клавішу SHIFT для вибору кількох точок), або клавішу Alt для додавання нових точок",
-    "placeImage": "Клацніть, щоб розмістити зображення, або натисніть та потягніть щоб змінити його розмір",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Опублікувати свою власну бібліотеку",
-    "bindTextToElement": "Натисніть Enter, щоб додати текст",
-    "createFlowchart": "Утримуйте CtrlOrCmd і клавішу зі стрілкою, щоб створити графік",
-    "deepBoxSelect": "Втримуйте Ctrl/Cmd для глибокого виділення та щоб попередити перетягування",
-    "eraserRevert": "Втримуйте клавішу Alt, щоб повернути елементи позначені для видалення",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Цю функцію можна ввімкнути, встановивши значення \"true\" для налаштування \"dom.events.asyncClipboard.clipboardItem\". Перейдіть на сторінку «about:config», щоб змінити налаштування браузера у Firefox.",
-    "disableSnapping": "Утримуйте Ctrl чи Cmd, щоб відключити прив'язку",
+    "disableSnapping": "",
     "enterCropEditor": "",
     "leaveCropEditor": ""
   },
@@ -417,8 +435,8 @@
     "toggleElementLock": "Заблокувати/розблокувати вибране",
     "movePageUpDown": "Пересунути сторінку вгору/вниз",
     "movePageLeftRight": "Пересунути сторінку вліво/вправо",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Обрізати зображення",
+    "cropFinish": "Закінчити обрізку зображення"
   },
   "clearCanvasDialog": {
     "title": "Очистити полотно"
@@ -509,7 +527,7 @@
     "copyStyles": "Скопійовані стилі.",
     "copyToClipboard": "Скопіювати до буферу обміну.",
     "copyToClipboardAsPng": "Скопійовано {{exportSelection}} до буфера обміну як PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "Скопійовано {{exportSelection}} до буфера обміну як SVG\n({{exportColorScheme}})",
     "fileSaved": "Файл збережено.",
     "fileSavedToFilename": "Збережено в {filename}",
     "canvas": "полотно",
@@ -517,7 +535,7 @@
     "pasteAsSingleElement": "Використайте {{shortcut}} для вставки самостійного зразка або використайте в текстовому редакторі",
     "unableToEmbed": "Вбудування цієї url на даний час не допускається. Підніміть питання на GitHub, щоб попросити внести URL-адресу до білого списку",
     "unrecognizedLinkFormat": "Посилання, яке ви вставили, не відповідає очікуваному формату. Будь ласка, спробуйте вставити рядок \"embed\", наданий сайтом-джерелом",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Посилання скопійовано в буфер обміну"
   },
   "colors": {
     "transparent": "Прозорий",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Найбільш використовувані користувацькі кольори",
     "colors": "Кольори",
     "shades": "Тіні",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Команда недоступна...",
     "shortcutHint": "Для панелі команд використовуйте {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
