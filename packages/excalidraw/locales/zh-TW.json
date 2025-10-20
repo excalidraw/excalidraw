@@ -8,8 +8,8 @@
     "moveCanvas": "移動畫布",
     "cut": "剪下",
     "copy": "複製",
-    "copyAsPng": "以PNG格式儲存到剪貼板",
-    "copyAsSvg": "以SVG格式複製到剪貼板",
+    "copyAsPng": "以 PNG 格式儲存到剪貼簿",
+    "copyAsSvg": "以 SVG 格式複製到剪貼簿",
     "copyText": "以文字格式複製至剪貼簿",
     "copySource": "複製來源至剪貼簿",
     "convertToCode": "轉換為程式碼",
@@ -55,8 +55,8 @@
     "arrowtype_round": "彎角箭頭",
     "arrowtype_elbowed": "直角箭頭",
     "fontSize": "字型大小",
-    "fontFamily": "字體集",
-    "addWatermark": "加上 \"Made with Excalidraw\" 浮水印",
+    "fontFamily": "字型系列",
+    "addWatermark": "加上「以 Excalidraw 製作」浮水印",
     "handDrawn": "手寫",
     "normal": "一般",
     "code": "代碼",
@@ -114,12 +114,12 @@
     "flipHorizontal": "水平翻轉",
     "flipVertical": "垂直翻轉",
     "viewMode": "檢視模式",
-    "share": "共享",
+    "share": "分享",
     "showStroke": "顯示線條檢色器",
     "showBackground": "顯示背景檢色器",
     "showFonts": "顯示字型選單",
-    "toggleTheme": "切換 亮色/暗色 主題",
-    "theme": "佈景主題",
+    "toggleTheme": "切換淺色/深色主題",
+    "theme": "主題",
     "personalLib": "個人資料庫",
     "excalidrawLib": "Excalidraw 資料庫",
     "decreaseFontSize": "縮小文字",
@@ -132,7 +132,7 @@
       "editEmbed": "編輯可嵌入連結",
       "create": "新增連結",
       "label": "連結",
-      "labelEmbed": "連結&嵌入",
+      "labelEmbed": "連結與嵌入",
       "empty": "未設定連結",
       "hint": "在此輸入或貼上連結",
       "goToElement": "移至目標元素"
@@ -140,6 +140,10 @@
     "lineEditor": {
       "edit": "編輯線條",
       "editArrow": "編輯箭頭"
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "鎖定",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "未剪裁尺寸",
     "copyElementLink": "複製此物件的連結",
     "linkToElement": "連結至物件",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "將選取內容放入框架",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "連結至物件",
@@ -174,18 +180,26 @@
   },
   "library": {
     "noItems": "尚未加入任何物件...",
-    "hint_emptyLibrary": "選取畫布上的物件以加入，或從下方的公開 repository 中安裝資料庫",
-    "hint_emptyPrivateLibrary": "選擇畫布上的物件以在此加入"
+    "hint_emptyLibrary": "選取畫布上的物件以加入，或從下方的公開儲存庫中安裝資料庫。",
+    "hint_emptyPrivateLibrary": "選擇畫布上的物件以在此加入。",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "在畫布上尋找",
     "noMatch": "未找到符合項目…",
     "singleResult": "結果",
     "multipleResults": "結果",
-    "placeholder": "在畫布上尋找文字…"
+    "placeholder": "在畫布上尋找文字…",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
-    "clearReset": "重置 canvas",
+    "clearReset": "重設畫布",
     "exportJSON": "匯出至檔案",
     "exportImage": "匯出圖片",
     "export": "儲存至...",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "吸附至物件",
     "exitZenMode": "離開專注模式",
     "cancel": "取消",
+    "saveLibNames": "",
     "clear": "清除",
     "remove": "刪除",
     "embed": "切換嵌入",
-    "publishLibrary": "發布",
+    "publishLibrary": "",
     "submit": "送出",
     "confirm": "確認",
     "embeddableInteractionButton": "點擊以互動"
@@ -245,7 +260,8 @@
     "resetLibrary": "這會清除您的資料庫，是否確定？",
     "removeItemsFromsLibrary": "從資料庫刪除 {{count}} 項？",
     "invalidEncryptionKey": "加密鍵必須為22字元。即時協作已停用。",
-    "collabOfflineWarning": "沒有可用的網路連線。\n變更無法儲存！"
+    "collabOfflineWarning": "沒有可用的網路連線。\n變更無法儲存！",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "不支援的檔案類型。",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "選取",
+    "lasso": "",
     "image": "插入圖片",
     "rectangle": "長方形",
     "diamond": "菱形",
@@ -295,7 +312,8 @@
     "laser": "雷射筆",
     "hand": "手形（平移工具）",
     "extraTools": "更多工具",
-    "mermaidToExcalidraw": "Mermaid 至 Excalidraw"
+    "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "矩形",
@@ -319,33 +337,33 @@
     "shapes": "形狀"
   },
   "hints": {
-    "dismissSearch": "按 Escape 鍵可停止搜尋",
-    "canvasPanning": "若要移動畫布，請在拖曳時按住滑鼠滾輪或空白鍵，或使用手形工具",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "點擊以繪製多點曲線；或拖曳以繪製直線",
-    "arrowTool": "點擊以開始建立多點，拖曳可建立單一線段。再次按下 {{arrowShortcut}} 來變更箭頭類型。",
+    "arrowTool": "",
     "freeDraw": "點擊並拖曳來繪圖，放開即結束",
     "text": "提示：亦可使用選取工具在任何地方雙擊來加入文字",
     "embeddable": "點擊並拖移以建立嵌入網站",
-    "text_selected": "雙擊滑鼠或按 Enter 以編輯文字",
-    "text_editing": "按跳脫鍵或 Ctrl 或 Cmd + Enter 以結束編輯",
-    "linearElementMulti": "按下 Escape 或 Enter 以結束繪製",
-    "lockAngle": "按住 SHIFT 可限制旋轉角度",
-    "resize": "縮放時按住 Shift 可保持原比例縮放；\\n按住 Alt 可由中心點進行縮放",
-    "resizeImage": "按住 SHIFT 可任意縮放，按住 ALT 可由中央縮放。",
-    "rotate": "旋轉時按住 Shift 可限制旋轉角度",
-    "lineEditor_info": "按住 Ctrl 或 Cmd 並雙擊或按住 Ctrl 或 Cmd + Enter 來編輯控制點",
-    "lineEditor_pointSelected": "按下 Delete 可移除錨點；Ctrl 或 Cmd + D 可複製；或可拖曳來移動",
-    "lineEditor_nothingSelected": "選擇要編輯的錨點（按住 SHIFT 可多選），\n或按住 Alt 並點擊以增加新錨點。",
-    "placeImage": "點擊以放置圖片，或點擊並拖曳以手動調整其尺寸。",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "發布個人資料庫",
-    "bindTextToElement": "按下 Enter 以加入文字。",
-    "createFlowchart": "按住 Ctrl 或 Cmd 及方向鍵以建立流程圖",
-    "deepBoxSelect": "按住 Ctrl 或 Cmd 以深度選取並避免拖曳",
-    "eraserRevert": "按住 Alt 以反選取已標記待刪除的元素",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "此功能有機會透過將 \"dom.events.asyncClipboard.clipboardItem\" 設定為 \"true\" 來開啟。\n若要變更 Firefox 瀏覽器的此設定值，請至 \"about:config\" 頁面。",
-    "disableSnapping": "按住 Ctrl 或 Cmd 以禁用吸附",
-    "enterCropEditor": "雙擊圖片或按 ENTER 以裁切圖片",
-    "leaveCropEditor": "點擊圖片外的位置或按 ENTER 或 ESCAPE 以完成裁切"
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "最常使用的自訂顏色",
     "colors": "顏色",
     "shades": "漸變色",
@@ -628,6 +647,18 @@
       "noMatch": "沒有符合的指令…"
     },
     "itemNotAvailable": "指令無法使用…",
-    "shortcutHint": ""
+    "shortcutHint": "使用 {{shortcut}} 開啟指令面板"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
