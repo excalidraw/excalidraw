@@ -141,6 +141,10 @@
       "edit": "Bewerk regel",
       "editArrow": ""
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "Vergrendel",
       "unlock": "Ontgrendel",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "Nog geen items toegevoegd...",
     "hint_emptyLibrary": "Selecteer een item op het canvas om het hier toe te voegen of installeer een bibliotheek uit de openbare repository, hieronder.",
-    "hint_emptyPrivateLibrary": "Selecteer een item op het canvas om het hier toe te voegen."
+    "hint_emptyPrivateLibrary": "Selecteer een item op het canvas om het hier toe te voegen.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
-    "placeholder": ""
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "",
     "exitZenMode": "Verlaat zen modus",
     "cancel": "Annuleren",
+    "saveLibNames": "",
     "clear": "Wissen",
     "remove": "Verwijderen",
     "embed": "Insluiten in-/uitschakelen",
-    "publishLibrary": "Publiceren",
+    "publishLibrary": "",
     "submit": "Versturen",
     "confirm": "Bevestigen",
     "embeddableInteractionButton": "Klik voor interactie"
@@ -245,7 +260,8 @@
     "resetLibrary": "Dit zal je bibliotheek wissen. Weet je het zeker?",
     "removeItemsFromsLibrary": "Verwijder {{count}} item(s) uit bibliotheek?",
     "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld.",
-    "collabOfflineWarning": "Geen internetverbinding beschikbaar.\nJe wijzigingen worden niet opgeslagen!"
+    "collabOfflineWarning": "Geen internetverbinding beschikbaar.\nJe wijzigingen worden niet opgeslagen!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Niet-ondersteund bestandstype.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Selectie",
+    "lasso": "",
     "image": "Voeg afbeelding in",
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
@@ -295,7 +312,8 @@
     "laser": "Laseraanwijzer",
     "hand": "",
     "extraTools": "Meer tools",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "",
@@ -320,25 +338,25 @@
   },
   "hints": {
     "dismissSearch": "",
-    "canvasPanning": "Om de canvas te verplaatsen, houd muiswiel of spatiebalk ingedrukt tijdens slepen, of gebruik het handgereedschap",
+    "canvasPanning": "",
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "arrowTool": "",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
     "embeddable": "Klink-sleep om een website-insluiting te maken",
-    "text_selected": "Dubbelklik of druk op ENTER om tekst te bewerken",
-    "text_editing": "Druk op Escape of CtrlOrCmd+ENTER om het bewerken te voltooien",
-    "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
-    "lockAngle": "Je kunt de hoek beperken door SHIFT ingedrukt te houden",
-    "resize": "Houd tijdens het vergroten SHIFT ingedrukt om verhoudingen te behouden,\ngebruik ALT om vanuit het midden te vergroten/verkleinen",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
     "resizeImage": "",
-    "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait",
-    "lineEditor_info": "Houd CtrlOrCmd en Dubbelklik of druk op CtrlOrCmd + Enter om punten te bewerken",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
-    "placeImage": "",
     "publishLibrary": "Publiceer je eigen bibliotheek",
-    "bindTextToElement": "Druk op enter om tekst toe te voegen",
+    "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
     "eraserRevert": "",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "",
     "colors": "",
     "shades": "",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "",
     "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
