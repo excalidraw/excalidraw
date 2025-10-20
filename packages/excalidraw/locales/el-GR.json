@@ -141,6 +141,10 @@
       "edit": "Επεξεργασία γραμμής",
       "editArrow": "Επεξεργασία βέλους"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "Κλείδωμα",
       "unlock": "Ξεκλείδωμα",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "Δεν έχουν προστεθεί αντικείμενα ακόμη...",
     "hint_emptyLibrary": "Επιλέξτε ένα στοιχείο στον καμβά για να το προσθέσετε εδώ, ή εγκαταστήστε μια βιβλιοθήκη από το δημόσιο αποθετήριο, παρακάτω.",
-    "hint_emptyPrivateLibrary": "Επιλέξτε ένα στοιχείο στον καμβά για να το προσθέσετε εδώ."
+    "hint_emptyPrivateLibrary": "Επιλέξτε ένα στοιχείο στον καμβά για να το προσθέσετε εδώ.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
-    "placeholder": ""
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Επαναφορά του καμβά",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Προσκόλληση σε αντικείμενα",
     "exitZenMode": "Έξοδος από την λειτουργία Zen",
     "cancel": "Ακύρωση",
+    "saveLibNames": "",
     "clear": "Καθαρισμός",
     "remove": "Κατάργηση",
     "embed": "Εναλλαγή ενσωμάτωσης",
-    "publishLibrary": "Δημοσίευση",
+    "publishLibrary": "",
     "submit": "Υποβολή",
     "confirm": "Επιβεβαίωση",
     "embeddableInteractionButton": "Κάντε κλικ για αλληλεπίδραση"
@@ -245,7 +260,8 @@
     "resetLibrary": "Αυτό θα καθαρίσει τη βιβλιοθήκη σας. Είστε σίγουροι;",
     "removeItemsFromsLibrary": "Διαγραφή {{count}} αντικειμένου(ων) από τη βιβλιοθήκη;",
     "invalidEncryptionKey": "Το κλειδί κρυπτογράφησης πρέπει να είναι 22 χαρακτήρες. Η ζωντανή συνεργασία είναι απενεργοποιημένη.",
-    "collabOfflineWarning": "Δεν υπάρχει διαθέσιμη σύνδεση στο internet.\nΟι αλλαγές σας δεν θα αποθηκευτούν!"
+    "collabOfflineWarning": "Δεν υπάρχει διαθέσιμη σύνδεση στο internet.\nΟι αλλαγές σας δεν θα αποθηκευτούν!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Μη υποστηριζόμενος τύπος αρχείου.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Επιλογή",
+    "lasso": "",
     "image": "Εισαγωγή εικόνας",
     "rectangle": "Ορθογώνιο",
     "diamond": "Ρόμβος",
@@ -295,7 +312,8 @@
     "laser": "Δείκτης λέιζερ",
     "hand": "Χέρι (εργαλείο μετακίνησης)",
     "extraTools": "Περισσότερα εργαλεία",
-    "mermaidToExcalidraw": "Mermaid σε Excalidraw"
+    "mermaidToExcalidraw": "Mermaid σε Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Ορθογώνιο",
@@ -320,30 +338,30 @@
   },
   "hints": {
     "dismissSearch": "",
-    "canvasPanning": "Για να μετακινήσετε τον καμβά, κρατήστε πατημένο τον τροχό του ποντικιού ή το πλήκτρο κενού ενώ σύρετε, ή χρησιμοποιήστε το εργαλείο χειρός",
+    "canvasPanning": "",
     "linearElement": "Κάνε κλικ για να ξεκινήσεις πολλαπλά σημεία, σύρε για μια γραμμή",
-    "arrowTool": "Κάντε κλικ για να ξεκινήσετε πολλά σημεία, σύρετε για μία γραμμή. Πατήστε {{arrowShortcut}} ξανά για να αλλάξετε τον τύπο βέλους.",
+    "arrowTool": "",
     "freeDraw": "Κάντε κλικ και σύρτε, απελευθερώσατε όταν έχετε τελειώσει",
     "text": "Tip: μπορείτε επίσης να προσθέστε κείμενο με διπλό-κλικ οπουδήποτε με το εργαλείο επιλογών",
     "embeddable": "Κάντε κλικ και σύρετε για να δημιουργήσετε μια ενσωματωμένη ιστοσελίδα",
-    "text_selected": "Κάντε διπλό κλικ ή πατήστε ENTER για να επεξεργαστείτε το κείμενο",
-    "text_editing": "Πατήστε Escape ή CtrlOrCmd+ENTER για να ολοκληρώσετε την επεξεργασία",
-    "linearElementMulti": "Κάνε κλικ στο τελευταίο σημείο ή πάτησε Escape ή Enter για να τελειώσεις",
-    "lockAngle": "Μπορείτε να περιορίσετε τη γωνία κρατώντας πατημένο το SHIFT",
-    "resize": "Μπορείς να περιορίσεις τις αναλογίες κρατώντας το SHIFT ενώ αλλάζεις μέγεθος,\nκράτησε πατημένο το ALT για αλλαγή μεγέθους από το κέντρο",
-    "resizeImage": "Μπορείτε να αλλάξετε το μέγεθος ελεύθερα κρατώντας πατημένο το SHIFT,\nκρατήστε πατημένο το ALT για να αλλάξετε το μέγεθος από το κέντρο",
-    "rotate": "Μπορείς να περιορίσεις τις γωνίες κρατώντας πατημένο το πλήκτρο SHIFT κατά την περιστροφή",
-    "lineEditor_info": "Κρατήστε πατημένο Ctrl ή Cmd και πατήστε το πλήκτρο Ctrl ή Cmd + Enter για επεξεργασία σημείων",
-    "lineEditor_pointSelected": "Πατήστε Διαγραφή για αφαίρεση σημείου(ων),\nCtrlOrCmd+D για αντιγραφή, ή σύρετε για μετακίνηση",
-    "lineEditor_nothingSelected": "Επιλέξτε ένα σημείο για να επεξεργαστείτε (κρατήστε πατημένο το SHIFT για να επιλέξετε πολλαπλά),\nή κρατήστε πατημένο το Alt και κάντε κλικ για να προσθέσετε νέα σημεία",
-    "placeImage": "Κάντε κλικ για να τοποθετήσετε την εικόνα ή κάντε κλικ και σύρετε για να ορίσετε το μέγεθός της χειροκίνητα",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Δημοσιεύστε τη δική σας βιβλιοθήκη",
-    "bindTextToElement": "Πατήστε Enter για προσθήκη κειμένου",
-    "createFlowchart": "Κρατήστε το πλήκτρο Ctrl ή Cmd και το βελάκι για να δημιουργήσετε ένα διάγραμμα ροής",
-    "deepBoxSelect": "Κρατήστε πατημένο το CtrlOrCmd για να επιλέξετε βαθιά, και να αποτρέψετε τη μεταφορά",
-    "eraserRevert": "Κρατήστε πατημένο το Alt για να επαναφέρετε τα στοιχεία που σημειώθηκαν για διαγραφή",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Αυτή η επιλογή μπορεί πιθανώς να ενεργοποιηθεί αλλάζοντας την ρύθμιση \"dom.events.asyncClipboard.clipboardItem\" σε \"true\". Για να αλλάξετε τις ρυθμίσεις του προγράμματος περιήγησης στο Firefox, επισκεφθείτε τη σελίδα \"about:config\".",
-    "disableSnapping": "Κρατήστε πατημένο το Ctrl ή το Cmd για απενεργοποίηση προσκόλλησης",
+    "disableSnapping": "",
     "enterCropEditor": "",
     "leaveCropEditor": ""
   },
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Πιο χρησιμοποιούμενα χρώματα",
     "colors": "Χρώματα",
     "shades": "Αποχρώσεις",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Η εντολή δεν είναι διαθέσιμη...",
     "shortcutHint": "Για την παλέτα εντολών, χρησιμοποιήστε το {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
