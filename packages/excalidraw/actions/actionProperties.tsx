@@ -17,7 +17,6 @@ import {
   randomInteger,
   arrayToMap,
   getFontFamilyString,
-  getShortcutKey,
   getLineHeight,
   isTransparent,
   reduceToCommonValue,
@@ -141,6 +140,8 @@ import {
   withCaretPositionPreservation,
   restoreCaretPosition,
 } from "../hooks/useTextEditorFocus";
+
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
