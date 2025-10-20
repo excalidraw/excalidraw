@@ -141,6 +141,10 @@
       "edit": "编辑线条",
       "editArrow": "编辑箭头"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "锁定",
       "unlock": "解除锁定",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "未裁剪的尺寸",
     "copyElementLink": "复制此对象的链接",
     "linkToElement": "链接到对象",
-    "wrapSelectionInFrame": "用选中的元素创建画框"
+    "wrapSelectionInFrame": "用选中的元素创建画框",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "链接到对象",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "尚未添加任何项目……",
     "hint_emptyLibrary": "选中画布上的项目添加到此处，或从下方的公共素材库中导入。",
-    "hint_emptyPrivateLibrary": "选中画布上的项目添加到此处。"
+    "hint_emptyPrivateLibrary": "选中画布上的项目添加到此处。",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "在画布上查找",
     "noMatch": "无匹配项…",
     "singleResult": "结果",
     "multipleResults": "结果",
-    "placeholder": "在画布上查找文本…"
+    "placeholder": "在画布上查找文本…",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "重置画布",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "吸附至对象",
     "exitZenMode": "退出禅模式",
     "cancel": "取消",
+    "saveLibNames": "",
     "clear": "清除",
     "remove": "删除",
     "embed": "切换嵌入",
-    "publishLibrary": "发布",
+    "publishLibrary": "",
     "submit": "提交",
     "confirm": "确定",
     "embeddableInteractionButton": "点击以开始交互"
@@ -245,7 +260,8 @@
     "resetLibrary": "这将会清除你的素材库。你确定要这么做吗？",
     "removeItemsFromsLibrary": "确定要从素材库中删除 {{count}} 个项目吗？",
     "invalidEncryptionKey": "密钥必须包含22个字符。实时协作已被禁用。",
-    "collabOfflineWarning": "无网络连接。\n您的改动将不会被保存！"
+    "collabOfflineWarning": "无网络连接。\n您的改动将不会被保存！",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "不支持的文件格式。",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "选择",
+    "lasso": "",
     "image": "插入图像",
     "rectangle": "矩形",
     "diamond": "菱形",
@@ -295,7 +312,8 @@
     "laser": "激光笔",
     "hand": "抓手（平移工具）",
     "extraTools": "更多工具",
-    "mermaidToExcalidraw": "Mermaid 至 Excalidraw"
+    "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "矩形",
@@ -319,33 +337,33 @@
     "shapes": "形状"
   },
   "hints": {
-    "dismissSearch": "按 esc 取消搜索",
-    "canvasPanning": "要移动画布，请按住鼠标滚轮或空格键同时拖拽鼠标，或使用抓手工具。",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "点击创建多个点 拖动创建直线",
-    "arrowTool": "点击创建多个点，拖动创建直线。按 {{arrowShortcut}} 切换箭头类型。",
+    "arrowTool": "",
     "freeDraw": "点击并拖动，完成时松开",
     "text": "提示：您也可以使用选择工具双击任意位置来添加文字",
     "embeddable": "点击并拖动以创建嵌入网页",
-    "text_selected": "双击或按回车键以编辑文本",
-    "text_editing": "按下 Escape 或 CtrlOrCmd+ENTER 完成编辑",
-    "linearElementMulti": "点击最后一个点或按下 Esc/Enter 来完成",
-    "lockAngle": "可以按住 Shift 来约束角度",
-    "resize": "您可以按住SHIFT来限制比例大小，\n按住ALT来调整中心大小",
-    "resizeImage": "按住SHIFT可以自由缩放，\n按住ALT可以从中间缩放",
-    "rotate": "旋转时可以按住 Shift 来约束角度",
-    "lineEditor_info": "按住 CtrlOrCmd 并双击或按 CtrlOrCmd + Enter 来编辑点",
-    "lineEditor_pointSelected": "按下 Delete 移除点，CtrlOrCmd+D 以复制，拖动以移动",
-    "lineEditor_nothingSelected": "选择要编辑的点 (按住 SHIFT 选择多个)，\n或按住 Alt 并点击以添加新点",
-    "placeImage": "点击放置图像，或者点击并拖动以手动设置图像大小",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "发布您自己的素材库",
-    "bindTextToElement": "按下 Enter 以添加文本",
-    "createFlowchart": "按住 CtrlOrCmd 键和方向键以创建流程图",
-    "deepBoxSelect": "按住 Ctrl 或 Cmd 以深度选择，并避免拖拽",
-    "eraserRevert": "按住 Alt 以反选被标记删除的元素",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "将高级配置首选项“dom.events.asyncClipboard.clipboardItem”设置为“true”可以启用此功能。要更改 Firefox 的高级配置首选项，请前往“about:config”页面。",
-    "disableSnapping": "按住 CtrlOrCmd 以禁用吸附",
-    "enterCropEditor": "双击图片或按 ENTER 开始裁剪",
-    "leaveCropEditor": "点击图片外面或按 ENTER 或 ESCAPE 完成裁剪"
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "常用自定义颜色",
     "colors": "颜色",
     "shades": "色调明暗",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "命令不可用……",
     "shortcutHint": "用 {{shortcut}} 打开命令面板"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
