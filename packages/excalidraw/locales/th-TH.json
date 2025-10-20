@@ -130,7 +130,7 @@
     "link": {
       "edit": "แก้ไขลิงก์",
       "editEmbed": "",
-      "create": "",
+      "create": "เพิ่มลิงค์",
       "label": "ลิงค์",
       "labelEmbed": "ลิงค์และการฝัง",
       "empty": "ไม่ได้ใส่ลิงค์",
@@ -140,6 +140,10 @@
     "lineEditor": {
       "edit": "แก้ไขเส้น",
       "editArrow": "แก้ไขลูกศร"
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "ล็อก",
@@ -161,28 +165,38 @@
     "zoomToFit": "",
     "installPWA": "",
     "autoResize": "",
-    "imageCropping": "",
+    "imageCropping": "การครอบตัดรูปภาพ",
     "unCroppedDimension": "",
-    "copyElementLink": "",
-    "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "copyElementLink": "คัดลอกลิงค์ไปสู่วัตถุ",
+    "linkToElement": "ลิงค์ไปสู่วัตถุ",
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
-    "title": "",
+    "title": "ลิงค์ไปสู่วัตถุ",
     "desc": "",
     "notFound": ""
   },
   "library": {
     "noItems": "ยังไม่มีรายการที่เพิ่มเข้าไปได้",
     "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyPrivateLibrary": "",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
-    "placeholder": ""
+    "placeholder": "ค้นหาข้อความในผืนผ้าใบ",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "รีเซ็ทผืนผ้าใบ",
@@ -190,7 +204,7 @@
     "exportImage": "ส่งออกเป็นรูปภาพ",
     "export": "บันทึกไปยัง",
     "copyToClipboard": "คัดลอกไปยังคลิปบอร์ด",
-    "copyLink": "",
+    "copyLink": "คัดลอกลิงก์",
     "save": "บันทึกเป็นไฟล์ปัจจุบัน",
     "saveAs": "บันทึกเป็น",
     "load": "เปิด",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "",
     "exitZenMode": "ออกจากโหมด Zen",
     "cancel": "ยกเลิก",
+    "saveLibNames": "",
     "clear": "เคลียร์",
     "remove": "ลบ",
     "embed": "สลับการฝัง",
-    "publishLibrary": "เผยแพร่",
+    "publishLibrary": "",
     "submit": "ตกลง",
     "confirm": "ยืนยัน",
     "embeddableInteractionButton": "คลิกเพื่อปฏิสัมพันธ์"
@@ -245,7 +260,8 @@
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": "",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "ไม่รองรับชนิดของไฟล์นี้",
@@ -271,18 +287,19 @@
       "image": "การสนับสนุนสำหรับเพิ่มรูปภาพลงในไลบลารีจะมาในเร็ว ๆ นี้"
     },
     "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
+    "asyncPasteFailedOnParse": "ไม่สามารถวางได้",
     "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
-    "selection": "",
-    "image": "",
+    "selection": "การเลือก",
+    "lasso": "",
+    "image": "แทรกรูปภาพ",
     "rectangle": "สี่เหลี่ยมผืนผ้า",
-    "diamond": "",
+    "diamond": "รูปเพชร",
     "ellipse": "วงรี",
     "arrow": "ลูกศร",
-    "line": "",
-    "freedraw": "",
+    "line": "เส้น",
+    "freedraw": "เขียนรูป",
     "text": "ข้อความ",
     "library": "คลัง",
     "lock": "",
@@ -295,7 +312,8 @@
     "laser": "ตัวชี้เลเซอร์",
     "hand": "มือ (เครื่องมือเลื่อน)",
     "extraTools": "เครื่องมืออื่นๆ",
-    "mermaidToExcalidraw": "เมอร์เมดเป็นเอกซ์คาลิดรอว์"
+    "mermaidToExcalidraw": "เมอร์เมดเป็นเอกซ์คาลิดรอว์",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "สี่เหลี่ยม",
@@ -319,24 +337,24 @@
     "shapes": "รูปร่าง"
   },
   "hints": {
-    "dismissSearch": "เพื่อปิดการค้นหา",
-    "canvasPanning": "การเลื่อนผืนผ้าใบ ให้กดปุ่มเมาส์กลางหรือกดปุ่ม Spacebar ค้างไว้ขณะลาก หรือใช้เครื่องมือรูปมือ",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "คลิกเพื่อเริ่มหลายจุด ลากสำหรับเส้นเดียว",
-    "arrowTool": "คลิกเพื่อเริ่มหลายจุด ลากสำหรับเส้นเดียว กด {{arrowShortcut}} อีกครั้งเพื่อเปลี่ยนประเภทลูกศร",
+    "arrowTool": "",
     "freeDraw": "",
     "text": "",
     "embeddable": "คลิกและลากเพื่อสร้างการฝังสำหรับเว็บไซต์",
-    "text_selected": "คลิกสองครั้งหรือกด ENTER เพื่อแก้ไขข้อความ",
-    "text_editing": "กดปุ่ม Esc หรือกด Ctrl, Cmd + Enter เพื่อเสร็จการแก้ไข",
-    "linearElementMulti": "คลิกที่จุดสุดท้ายหรือกด Escape หรือ Enter เพื่อเสร็จสิ้น",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
     "rotate": "",
     "lineEditor_info": "",
-    "lineEditor_pointSelected": "กดปุ่ม Delete เพื่อลบจุด\nกด Ctrl หรือ Cmd + D เพื่อทำซ้ำหรือลากเพื่อเคลื่อนย้าย",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
-    "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
     "createFlowchart": "",
@@ -379,18 +397,18 @@
   "exportDialog": {
     "disk_title": "",
     "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
+    "disk_button": "บันทึกเป็นไฟล์",
+    "link_title": "ลิงก์ที่สามารถแชร์ได้",
     "link_details": "",
-    "link_button": "",
+    "link_button": "ส่งออกไปยังไฟล์",
     "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
+    "excalidrawplus_button": "ส่งออก",
     "excalidrawplus_exportError": "ไม่สามารถส่งออกไปที่ Excalidraw+ ได้ในขณะนี้"
   },
   "helpDialog": {
     "blog": "อ่านบล็อกของพวกเรา",
     "click": "คลิก",
-    "deepSelect": "",
+    "deepSelect": "การเลือเชิงลึก",
     "deepBoxSelect": "",
     "createFlowchart": "",
     "navigateFlowchart": "",
@@ -399,14 +417,14 @@
     "documentation": "",
     "doubleClick": "ดับเบิลคลิก",
     "drag": "ลาก",
-    "editor": "",
+    "editor": "ตัวแก้ไข",
     "editLineArrowPoints": "",
     "editText": "แก้ไขข้อความ / เพิ่มข้อความ",
     "github": "",
     "howto": "",
-    "or": "",
+    "or": "หรือ",
     "preventBinding": "",
-    "tools": "",
+    "tools": "เครื่องมือ",
     "shortcuts": "",
     "textFinish": "",
     "textNewLine": "",
@@ -431,7 +449,7 @@
     "twitterUsername": "ชื่อผู้ใช้ Twitter",
     "libraryName": "",
     "libraryDesc": "",
-    "website": "",
+    "website": "เว็บไซต์",
     "placeholder": {
       "authorName": "",
       "libraryName": "",
@@ -441,7 +459,7 @@
       "website": ""
     },
     "errors": {
-      "required": "",
+      "required": "จำเป็น",
       "website": ""
     },
     "noteDescription": "",
@@ -460,14 +478,14 @@
     "removeItemsFromLib": ""
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "ส่งออกเป็นรูปภาพ",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
+      "withBackground": "พื้นหลัง",
+      "onlySelected": "เฉพาะที่เลือก",
       "darkMode": "โหมดกลางคืน",
       "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "scale": "อัตราส่วน",
+      "padding": "การเว้นระยะ"
     },
     "tooltip": {
       "embedScene": ""
@@ -478,8 +496,8 @@
       "copyPngToClipboard": "คัดลอก PNG ไปยังคลิปบอร์ด"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "คัดลอกไปยังคลิปบอร์ด"
     }
   },
@@ -488,15 +506,15 @@
     "link": ""
   },
   "stats": {
-    "angle": "",
+    "angle": "องศา",
     "shapes": "รูปร่าง",
     "height": "ความสูง",
     "scene": "ฉาก",
     "selected": "ถูกเลือกแล้ว",
     "storage": "การจัดเก็บข้อมูล",
     "fullTitle": "",
-    "title": "",
-    "generalStats": "",
+    "title": "คุณสมบัติ",
+    "generalStats": "ทั่วไป",
     "elementProperties": "",
     "total": "รวมทั้งหมด",
     "version": "เวอร์ชั่น",
@@ -510,17 +528,17 @@
     "copyToClipboard": "คัดลอกไปยังคลิปบอร์ดแล้ว",
     "copyToClipboardAsPng": "",
     "copyToClipboardAsSvg": "",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
+    "fileSaved": "ข้อมูลได้รับการบันทึก",
+    "fileSavedToFilename": "บันทึกเป็น {filename}",
     "canvas": "ผืนผ้าใบ",
-    "selection": "",
+    "selection": "การเลือก",
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "คัดลอกไปยังคลิปบอร์ดแล้ว"
   },
   "colors": {
-    "transparent": "",
+    "transparent": "โปร่งใส",
     "black": "สีดำ",
     "white": "สีขาว",
     "red": "สีแดง",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "",
     "colors": "สี",
     "shades": "รูปร่าง",
@@ -564,54 +583,54 @@
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "บันทึกไปยังดิสก์",
+        "button": "บันทึกไปยังดิสก์",
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
+        "title": "Excalidraw+",
+        "button": "นำออกไปยัง Excalidraw+",
         "description": ""
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "โหลดจากไฟล์",
+        "button": "โหลดจากไฟล์",
         "description": ""
       },
       "shareableLink": {
         "title": "",
-        "button": "",
+        "button": "แทนที่เนื้อหาของฉัน",
         "description": ""
       }
     }
   },
   "mermaid": {
     "title": "",
-    "button": "",
+    "button": "แทรก",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "ดูตัวอย่าง"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "ค้นหาด่วน"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "เก่า"
     },
-    "sceneFonts": "",
+    "sceneFonts": "ในฉากนี้",
     "availableFonts": "",
-    "empty": ""
+    "empty": "ไม่พบแบบอักษร"
   },
   "userList": {
-    "empty": "",
+    "empty": "ไม่พบผู้ใช้",
     "hint": {
-      "text": "",
-      "followStatus": "",
-      "inCall": "",
-      "micMuted": "",
+      "text": "คลิกที่ผู้ใช้เพื่อติดตาม",
+      "followStatus": "คุณกำลังติดตามผู้ใช้นี้",
+      "inCall": "ผู้ใช้นี้กำลังอยู่ในการโทรด้วยเสียง",
+      "micMuted": "ไมโครโฟนของผู้ใช้ถูกปิดเสียง",
       "isSpeaking": "ผู้ใช้งานกำลังสนทนาอยู่"
     }
   },
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "",
     "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
