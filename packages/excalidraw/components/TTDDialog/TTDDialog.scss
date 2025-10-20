@@ -98,9 +98,32 @@ $verticalBreakpoint: 861px;
     font-weight: 600;
     font-family: inherit;
     letter-spacing: 0.4px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover {
+      color: var(--color-primary);
+    }
 
     &[data-state="active"] {
       border-bottom: 2px solid var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    .ttd-dialog-ai-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      font-size: 10px;
+      line-height: 1;
+      border-radius: 12px;
+      background: var(--color-promo);
+      color: var(--color-surface-lowest);
+      vertical-align: middle;
     }
   }
 
@@ -458,97 +481,6 @@ $verticalBreakpoint: 861px;
 
     &--exceeded {
       color: var(--color-danger);
-    }
-  }
-
-  .ttd-dialog-panel-switch-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    padding-inline: 2.5rem;
-    flex-shrink: 0;
-  }
-
-  .ttd-dialog-panel-switch-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    color: var(--color-on-surface);
-    opacity: 0.5;
-    transition: opacity 0.2s ease, outline 0.2s ease;
-    user-select: none;
-    background: none;
-    border: none;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-family: inherit;
-    line-height: 1.5;
-
-    &--active {
-      opacity: 1;
-    }
-
-    &:hover {
-      opacity: 0.8;
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--color-primary);
-      outline-offset: 2px;
-    }
-
-    &:active {
-      opacity: 0.7;
-    }
-  }
-
-  .ttd-dialog-panel-switch-root {
-    width: 44px;
-    height: 26px;
-    background-color: var(--color-gray-20);
-    border-radius: 9999px;
-    position: relative;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    border: none;
-
-    &[data-state="checked"] {
-      background-color: var(--color-primary);
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--color-primary);
-      outline-offset: 2px;
-    }
-
-    @at-root .excalidraw.theme--dark#{&} {
-      background-color: var(--color-gray-60);
-
-      &[data-state="checked"] {
-        background-color: var(--color-primary);
-      }
-    }
-  }
-
-  .ttd-dialog-panel-switch-thumb {
-    display: block;
-    width: 20px;
-    height: 20px;
-    background-color: white;
-    border-radius: 9999px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease;
-    transform: translateX(3px);
-    will-change: transform;
-
-    &[data-state="checked"] {
-      transform: translateX(21px);
-    }
-
-    @at-root .excalidraw.theme--dark#{&} {
-      background-color: var(--color-gray-10);
     }
   }
 

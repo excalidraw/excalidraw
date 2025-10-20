@@ -16,7 +16,6 @@ import { ArrowRightIcon, brainIcon } from "../icons";
 import { Switch } from "../Switch";
 
 import MermaidToExcalidraw from "./MermaidToExcalidraw";
-import { TTDDialogPanelSwitch } from "./TTDDialogPanelSwitch";
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
 import { TTDDialogPanel } from "./TTDDialogPanel";
@@ -368,26 +367,38 @@ export const TTDDialogBase = withInternalFallback(
           </div>
         </>
       ) : (
-        <>
-          <TTDDialogPanelSwitch
-            checked={tab === "mermaid"}
-            onCheckedChange={(checked) => {
-              setAppState({
-                openDialog: {
-                  name: "ttd",
-                  tab: checked ? "mermaid" : "text-to-diagram",
-                },
-              });
-            }}
-            leftLabel={
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                {t("labels.textToDiagram")}
-                <div className="ttd-dialog-ai-badge">AI Beta</div>
-              </div>
-            }
-            rightLabel="Mermaid to diagram"
-            ariaLabel="Toggle between AI text-to-diagram and Mermaid code input"
-          />
+        <div className="ttd-dialog-tabs-root">
+          <div className="ttd-dialog-triggers">
+            <button
+              className="ttd-dialog-tab-trigger"
+              data-state={tab === "text-to-diagram" ? "active" : "inactive"}
+              onClick={() => {
+                setAppState({
+                  openDialog: {
+                    name: "ttd",
+                    tab: "text-to-diagram",
+                  },
+                });
+              }}
+            >
+              {t("labels.textToDiagram")}
+              <span className="ttd-dialog-ai-badge">AI Beta</span>
+            </button>
+            <button
+              className="ttd-dialog-tab-trigger"
+              data-state={tab === "mermaid" ? "active" : "inactive"}
+              onClick={() => {
+                setAppState({
+                  openDialog: {
+                    name: "ttd",
+                    tab: "mermaid",
+                  },
+                });
+              }}
+            >
+              Mermaid to diagram
+            </button>
+          </div>
           {tab === "mermaid" ? (
             <div className="ttd-dialog-content">
               <MermaidToExcalidraw
@@ -467,7 +478,7 @@ export const TTDDialogBase = withInternalFallback(
               </TTDDialogPanels>
             </div>
           )}
-        </>
+        </div>
       )}
       <TTDDialogCTAPopup
         isOpen={isCtaPopupOpen}
