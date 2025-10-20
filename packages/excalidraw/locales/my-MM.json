@@ -141,6 +141,10 @@
       "edit": "",
       "editArrow": ""
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "",
     "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyPrivateLibrary": "",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
-    "placeholder": ""
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
@@ -216,6 +230,7 @@
     "objectsSnapMode": "",
     "exitZenMode": "ဇင်မြင်ကွင်းမှထွက်",
     "cancel": "",
+    "saveLibNames": "",
     "clear": "",
     "remove": "",
     "embed": "",
@@ -245,7 +260,8 @@
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": "",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
+    "lasso": "",
     "image": "",
     "rectangle": "စတုဂံ",
     "diamond": "စိန်",
@@ -295,7 +312,8 @@
     "laser": "",
     "hand": "",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "",
@@ -328,15 +346,15 @@
     "embeddable": "",
     "text_selected": "",
     "text_editing": "",
-    "linearElementMulti": "နောက်ဆုံးအမှတ်ပေါ်တွင်ကလစ်နှိပ်ခြင်း၊ Escape (သို့) Enter နှိပ်ခြင်းတို့ဖြင့်အဆုံးသတ်နိုင်",
+    "linearElementMulti": "",
     "lockAngle": "",
-    "resize": "အချိုးအစားကန့်သတ်ရန် Shift နှင့် ဗဟိုမှချိန်ညှိရန် Alt တို့ကိုနှိပ်ထားနိုင်သည်",
+    "resize": "",
     "resizeImage": "",
-    "rotate": "Shift ကိုနှိပ်ထားခြင်းဖြင့် ထောင့်အလိုက်လှည့်နိုင်သည်",
+    "rotate": "",
     "lineEditor_info": "",
+    "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
-    "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
     "createFlowchart": "",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "",
     "colors": "",
     "shades": "",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "",
     "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
