@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "Triangel (kontur)",
     "arrowhead_diamond": "Romb",
     "arrowhead_diamond_outline": "Romb (kontur)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_many": "Kråkfot (många)",
+    "arrowhead_crowfoot_one": "Kråkfot (en)",
+    "arrowhead_crowfoot_one_or_many": "Kråkfot (en eller många)",
+    "more_options": "Fler alternativ",
     "arrowtypes": "Piltyp",
     "arrowtype_sharp": "Rak",
     "arrowtype_round": "Böjd",
@@ -141,6 +141,10 @@
       "edit": "Redigera linje",
       "editArrow": "Redigera pil"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "Lås",
       "unlock": "Lås upp",
@@ -161,11 +165,13 @@
     "zoomToFit": "Zooma för att rymma alla element",
     "installPWA": "Installera Excalidraw lokalt (PWA)",
     "autoResize": "Aktivera automatisk skalning av text",
-    "imageCropping": "",
-    "unCroppedDimension": "",
+    "imageCropping": "Bildbeskärning",
+    "unCroppedDimension": "Obeskuren dimension",
     "copyElementLink": "Kopiera länk till objektet",
     "linkToElement": "Länk till objektet",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "Omslut urvaled i ram",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "Länk till objektet",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "Inga objekt tillagda ännu...",
     "hint_emptyLibrary": "Välj ett objekt på canvasen för att lägga till det här, eller installera ett bibliotek från det publika arkivet, nedan.",
-    "hint_emptyPrivateLibrary": "Välj ett objekt på canvasen för att lägga till det här."
+    "hint_emptyPrivateLibrary": "Välj ett objekt på canvasen för att lägga till det här.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "Hitta på canvas",
     "noMatch": "Inga träffar hittades...",
     "singleResult": "resultat",
     "multipleResults": "resultat",
-    "placeholder": "Hitta text på canvas..."
+    "placeholder": "Hitta text på canvas...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Fäst mot objekt",
     "exitZenMode": "Gå ur zen-läge",
     "cancel": "Avbryt",
+    "saveLibNames": "",
     "clear": "Rensa",
     "remove": "Ta bort",
     "embed": "Växla inbäddning",
-    "publishLibrary": "Publicera",
+    "publishLibrary": "",
     "submit": "Skicka",
     "confirm": "Bekräfta",
     "embeddableInteractionButton": "Klicka för att interagera"
@@ -245,7 +260,8 @@
     "resetLibrary": "Detta kommer att rensa ditt bibliotek. Är du säker?",
     "removeItemsFromsLibrary": "Ta bort {{count}} objekt från biblioteket?",
     "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat.",
-    "collabOfflineWarning": "Ingen internetanslutning tillgänglig.\nDina ändringar kommer inte att sparas!"
+    "collabOfflineWarning": "Ingen internetanslutning tillgänglig.\nDina ändringar kommer inte att sparas!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Filtypen stöds inte.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Markering",
+    "lasso": "",
     "image": "Infoga bild",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
@@ -295,7 +312,8 @@
     "laser": "Laserpekare",
     "hand": "Hand (panoreringsverktyg)",
     "extraTools": "Fler verktyg",
-    "mermaidToExcalidraw": "Mermaid till Excalidraw"
+    "mermaidToExcalidraw": "Mermaid till Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Rektangel",
@@ -319,31 +337,31 @@
     "shapes": "Former"
   },
   "hints": {
-    "dismissSearch": "[Esc] för att avfärda sökning",
-    "canvasPanning": "För att flytta whiteboarden, håll mushjulet eller mellanslagstangenten medan du drar eller använd handverktyget",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
-    "arrowTool": "Klicka för att påbörja multipla punkter, dra för en linje. Använd {{arrowShortcut}} igen för att ändra typ av pil.",
+    "arrowTool": "",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
     "embeddable": "Klicka-dra för att skapa en webbplats-inbäddning",
-    "text_selected": "Dubbelklicka eller tryck ENTER för att redigera text",
-    "text_editing": "Tryck Escape eller CtrlOrCmd + ENTER för att slutföra redigeringen",
-    "linearElementMulti": "Klicka på sista punkten eller tryck Escape eller Enter för att avsluta",
-    "lockAngle": "Du kan begränsa vinkeln genom att hålla SKIFT",
-    "resize": "Du kan behålla proportioner genom att hålla SHIFT medan du ändrar storlek,\nhåller du ALT ändras storlek relativt mitten",
-    "resizeImage": "Du kan ändra storlek fritt genom att hålla SHIFT,\nhåll ALT för att ändra storlek från mitten",
-    "rotate": "Du kan begränsa vinklar genom att hålla SHIFT medan du roterar",
-    "lineEditor_info": "Håll Ctrl/Cmd och dubbelklicka eller tryck på Ctrl/Cmd + Enter för att redigera punkter",
-    "lineEditor_pointSelected": "Tryck på Ta bort för att ta bort punkt(er), Ctrl + D eller Cmd + D för att duplicera, eller dra för att flytta",
-    "lineEditor_nothingSelected": "Välj en punkt att redigera (håll SHIFT för att välja flera),\neller håll ned Alt och klicka för att lägga till nya punkter",
-    "placeImage": "Klicka för att placera bilden, eller klicka och dra för att ställa in dess storlek manuellt",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Publicera ditt eget bibliotek",
-    "bindTextToElement": "Tryck på Enter för att lägga till text",
-    "createFlowchart": "Håll CtrlOrCmd och piltangent för att skapa ett flödesschema",
-    "deepBoxSelect": "Håll Ctrl eller Cmd för att djupvälja, och för att förhindra att dra",
-    "eraserRevert": "Håll Alt för att återställa de element som är markerade för borttagning",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Denna funktion kan sannolikt aktiveras genom att ställa in \"dom.events.asyncClipboard.clipboardItem\" flaggan till \"true\". För att ändra webbläsarens flaggor i Firefox, besök \"about:config\" sidan.",
-    "disableSnapping": "Håll Ctrl eller Cmd för att inaktivera fästning",
+    "disableSnapping": "",
     "enterCropEditor": "",
     "leaveCropEditor": ""
   },
@@ -417,8 +435,8 @@
     "toggleElementLock": "Lås/Lås upp valda",
     "movePageUpDown": "Flytta sida upp/ner",
     "movePageLeftRight": "Flytta sida vänster/höger",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Beskär bild",
+    "cropFinish": "Slutför bildbeskärningen"
   },
   "clearCanvasDialog": {
     "title": "Rensa canvas"
@@ -509,7 +527,7 @@
     "copyStyles": "Kopierade stilar.",
     "copyToClipboard": "Kopierad till urklipp.",
     "copyToClipboardAsPng": "Kopierade {{exportSelection}} till urklipp som PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "Kopierade {{exportSelection}} till urklipp som SVG\n({{exportColorScheme}})",
     "fileSaved": "Fil sparad.",
     "fileSavedToFilename": "Sparad till {filename}",
     "canvas": "arbetsyta",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Mest frekvent använda anpassade färger",
     "colors": "Färger",
     "shades": "Nyanser",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Kommandot är inte tillgängligt...",
     "shortcutHint": "För kommandopalett, använd {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
