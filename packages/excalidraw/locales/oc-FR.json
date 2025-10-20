@@ -141,6 +141,10 @@
       "edit": "Modificar la linha",
       "editArrow": "Modificar sageta"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "Verrolhar",
       "unlock": "Desverrolhar",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
     "hint_emptyLibrary": "Seleccionatz un element d’apondre aquí, o installatz una bibliotèca del depaus public, çai-jos.",
-    "hint_emptyPrivateLibrary": "Seleccionatz un element d’apondre aquí pel canabàs."
+    "hint_emptyPrivateLibrary": "Seleccionatz un element d’apondre aquí pel canabàs.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
-    "placeholder": ""
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Ancorar als objèctes",
     "exitZenMode": "Sortir del mòde zen",
     "cancel": "Anullar",
+    "saveLibNames": "",
     "clear": "Escafar",
     "remove": "Tirar",
     "embed": "Alternar l’integracion",
-    "publishLibrary": "Publicar",
+    "publishLibrary": "",
     "submit": "Enviar",
     "confirm": "Confirmar",
     "embeddableInteractionButton": "Clicar per interagir"
@@ -245,7 +260,8 @@
     "resetLibrary": "Aquò suprimirà vòstra bibliotèca. O volètz vertadièrament ?",
     "removeItemsFromsLibrary": "Suprimir {{count}} element(s) de la bibliotèca ?",
     "invalidEncryptionKey": "La clau de chiframent deu conténer 22 caractèrs. La collaboracion en dirèct es desactivada.",
-    "collabOfflineWarning": "Cap de connexion pas disponibla.\nVòstras modificacions seràn pas salvadas !"
+    "collabOfflineWarning": "Cap de connexion pas disponibla.\nVòstras modificacions seràn pas salvadas !",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Tipe de fichièr pas pres en carga.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Seleccion",
+    "lasso": "",
     "image": "Inserir imatge",
     "rectangle": "Rectangle",
     "diamond": "Lausange",
@@ -295,7 +312,8 @@
     "laser": "Puntador laser",
     "hand": "Man (aisina de desplaçament de la vista)",
     "extraTools": "Mai d’aisinas",
-    "mermaidToExcalidraw": "De Mermaid cap a Excalidraw"
+    "mermaidToExcalidraw": "De Mermaid cap a Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Rectangle",
@@ -326,22 +344,22 @@
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
     "embeddable": "",
-    "text_selected": "Clicatz dos còps o quichatz ENTRADA per modificar lo tèxt",
-    "text_editing": "Quichatz ESCAPAR o CtrlOrCmd+ENTRADA per acabar la modificacion",
-    "linearElementMulti": "Clicatz sul darrièr punt o quichatz Ecap o Entrada per acabar",
-    "lockAngle": "Podètz restrénger l’angle en mantenent MAJ",
-    "resize": "Podètz servar las proporcions en mantenent la tòca MAJ pendent lo redimensionament,\nmantenètz la tòca ALT per redimensionar a partir del centre",
-    "resizeImage": "Podètz retalhar liurament en quichant CTRL,\nquichatz ALT per retalhar a partir del centre",
-    "rotate": "Podètz restrénger los angles en mantenent MAJ pendent la rotacion",
-    "lineEditor_info": "Tenètz quichat Ctrl o Cmd e doble clic o quichatz Ctrl o Cmd + Entrada per modificar los ponches",
-    "lineEditor_pointSelected": "Quichar Suprimir per tirar lo(s) punt(s),\nCtrlOCmd+D per duplicar, o lisatz per desplaçar",
-    "lineEditor_nothingSelected": "Seleccionar un punt d’editar (manténer Maj. per ne seleccionar mantun),\no manténer Alt e clicar per n’apondre de novèls",
-    "placeImage": "Clicatz per plaçar l’imatge, o clicatz e lisatz per definir sa talha manualament",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Publicar vòstra pròpria bibliotèca",
-    "bindTextToElement": "Quichatz Entrada per apondre de tèxte",
+    "bindTextToElement": "",
     "createFlowchart": "",
-    "deepBoxSelect": "Gardar CtrlOCmd per una seleccion gropada e empachar lo desplaçament",
-    "eraserRevert": "Tenètz quichat Alt per anullar los elements marcats per supression",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "",
     "disableSnapping": "",
     "enterCropEditor": "",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Colors personalizadas mai utilizadas",
     "colors": "Colors",
     "shades": "Nuanças",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "La comanda es pas disponibla...",
     "shortcutHint": "Per contrarotlar la paleta, utilizatz {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
