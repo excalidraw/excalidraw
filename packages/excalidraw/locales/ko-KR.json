@@ -141,6 +141,10 @@
       "edit": "선 수정하기",
       "editArrow": "화살표 수정"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "잠금",
       "unlock": "잠금 해제",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "추가된 아이템 없음",
     "hint_emptyLibrary": "캔버스 위에서 아이템을 선택하여 여기에 추가를 하거나, 아래의 공용 저장소에서 라이브러리를 설치하세요.",
-    "hint_emptyPrivateLibrary": "캔버스 위에서 아이템을 선택하여 여기 추가하세요."
+    "hint_emptyPrivateLibrary": "캔버스 위에서 아이템을 선택하여 여기 추가하세요.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "캔버스에서 찾기",
     "noMatch": "결과를 찾을 수 없습니다...",
     "singleResult": "개의 결과",
     "multipleResults": "개의 결과",
-    "placeholder": "캔버스에서 텍스트 찾기..."
+    "placeholder": "캔버스에서 텍스트 찾기...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "캔버스 초기화",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "다른 요소들에 정렬시키기",
     "exitZenMode": "젠 모드 종료하기",
     "cancel": "취소",
+    "saveLibNames": "",
     "clear": "지우기",
     "remove": "삭제",
     "embed": "임베딩 토글",
-    "publishLibrary": "게시하기",
+    "publishLibrary": "",
     "submit": "제출",
     "confirm": "확인",
     "embeddableInteractionButton": "클릭하여 상호작용"
@@ -245,7 +260,8 @@
     "resetLibrary": "당신의 라이브러리를 초기화 합니다. 계속하시겠습니까?",
     "removeItemsFromsLibrary": "{{count}}개의 아이템을 라이브러리에서 삭제하시겠습니까?",
     "invalidEncryptionKey": "암호화 키는 반드시 22글자여야 합니다. 실시간 협업이 비활성화됩니다.",
-    "collabOfflineWarning": "인터넷에 연결되어 있지 않습니다.\n변경 사항들이 저장되지 않습니다!"
+    "collabOfflineWarning": "인터넷에 연결되어 있지 않습니다.\n변경 사항들이 저장되지 않습니다!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "지원하지 않는 파일 형식 입니다.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "선택",
+    "lasso": "",
     "image": "이미지 삽입",
     "rectangle": "사각형",
     "diamond": "다이아몬드",
@@ -295,7 +312,8 @@
     "laser": "레이저 포인터",
     "hand": "손 (패닝 도구)",
     "extraTools": "다른 도구",
-    "mermaidToExcalidraw": "Mermaid를 Excalidraw로"
+    "mermaidToExcalidraw": "Mermaid를 Excalidraw로",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "직사각형",
@@ -319,31 +337,31 @@
     "shapes": "모양"
   },
   "hints": {
-    "dismissSearch": "ESC를 눌러서 검색 종료",
-    "canvasPanning": "캔버스를 옮기려면 마우스 휠이나 스페이스바를 누르고 드래그하거나, 손 도구를 사용하기",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
-    "arrowTool": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요. 화살표 종류를 바꾸려면 {{arrowShortcut}} 키를 누르세요.",
+    "arrowTool": "",
     "freeDraw": "클릭 후 드래그하세요. 완료되면 놓으세요.",
     "text": "팁: 선택 툴로 아무 곳이나 더블 클릭해 텍스트를 추가할 수도 있습니다.",
     "embeddable": "클릭 및 드래그하여 웹사이트 임베드 만들기",
-    "text_selected": "더블 클릭 또는 ENTER를 눌러서 텍스트 수정",
-    "text_editing": "ESC나 CtrlOrCmd+ENTER를 눌러서 수정을 종료하기",
-    "linearElementMulti": "마지막 지점을 클릭하거나 Esc 또는 Enter 키를 눌러 완료하세요.",
-    "lockAngle": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
-    "resize": "SHIFT 키를 누르면서 조정하면 크기의 비율이 제한됩니다.\nALT를 누르면서 조정하면 중앙을 기준으로 크기를 조정합니다.",
-    "resizeImage": "SHIFT를 눌러서 자유롭게 크기를 변경하거나,\nALT를 눌러서 중앙을 고정하고 크기를 변경하기",
-    "rotate": "SHIFT 키를 누르면서 회전하면 각도를 제한할 수 있습니다.",
-    "lineEditor_info": "꼭짓점을 수정하려면 CtrlOrCmd 키를 누르고 더블 클릭을 하거나 CtrlOrCmd + Enter를 누르세요.",
-    "lineEditor_pointSelected": "Delete 키로 꼭짓점을 제거하거나,\nCtrlOrCmd+D 로 복제하거나, 드래그 해서 이동시키기",
-    "lineEditor_nothingSelected": "꼭짓점을 선택해서 수정하거나 (SHIFT를 눌러서 여러개 선택),\nAlt를 누르고 클릭해서 새로운 꼭짓점 추가하기",
-    "placeImage": "클릭해서 이미지를 배치하거나, 클릭하고 드래그해서 사이즈를 조정하기",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "당신만의 라이브러리를 게시하기",
-    "bindTextToElement": "Enter 키를 눌러서 텍스트 추가하기",
+    "bindTextToElement": "",
     "createFlowchart": "",
-    "deepBoxSelect": "CtrlOrCmd 키를 눌러서 깊게 선택하고, 드래그하지 않도록 하기",
-    "eraserRevert": "Alt를 눌러서 삭제하도록 지정된 요소를 되돌리기",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "이 기능은 설정에서 \"dom.events.asyncClipboard.clipboardItem\" 플래그를 \"true\"로 설정하여 활성화할 수 있습니다. Firefox에서 브라우저 플래그를 수정하려면, \"about:config\" 페이지에 접속하세요.",
-    "disableSnapping": "CtrlOrCmd 키를 눌러서 다른 요소와의 정렬 무시하기",
+    "disableSnapping": "",
     "enterCropEditor": "",
     "leaveCropEditor": ""
   },
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "가장 많이 사용된 색상들",
     "colors": "색상",
     "shades": "색조",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "",
     "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
