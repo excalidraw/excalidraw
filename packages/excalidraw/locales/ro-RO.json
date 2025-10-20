@@ -141,6 +141,10 @@
       "edit": "Editare linie",
       "editArrow": "Editare săgeată"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "Blocare",
       "unlock": "Deblocare",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "Dimensiune nedecupată",
     "copyElementLink": "Copiere link către obiect",
     "linkToElement": "Link către obiect",
-    "wrapSelectionInFrame": "Încapsulare selecție în cadru"
+    "wrapSelectionInFrame": "Încapsulare selecție în cadru",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "Link către obiect",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "Niciun element adăugat încă...",
     "hint_emptyLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici sau instalează o bibliotecă din depozitul public, de mai jos.",
-    "hint_emptyPrivateLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici."
+    "hint_emptyPrivateLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "Găsire pe pânză",
     "noMatch": "Nicio potrivire găsită...",
     "singleResult": "rezultat",
     "multipleResults": "rezultate",
-    "placeholder": "Găsire text pe pânză..."
+    "placeholder": "Găsire text pe pânză...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Ancorare la obiecte",
     "exitZenMode": "Ieșire din modul zen",
     "cancel": "Anulare",
+    "saveLibNames": "",
     "clear": "Ștergere",
     "remove": "Eliminare",
     "embed": "Comutare încorporare",
-    "publishLibrary": "Publicare",
+    "publishLibrary": "",
     "submit": "Trimitere",
     "confirm": "Confirmare",
     "embeddableInteractionButton": "Clic pentru interacționare"
@@ -245,7 +260,8 @@
     "resetLibrary": "Această opțiune va elimina conținutul din bibliotecă. Confirmi?",
     "removeItemsFromsLibrary": "Ștergi {{count}} element(e) din bibliotecă?",
     "invalidEncryptionKey": "Cheia de criptare trebuie să aibă 22 de caractere. Colaborarea în direct este dezactivată.",
-    "collabOfflineWarning": "Nu este disponibilă nicio conexiune la internet.\nModificările nu vor fi salvate!"
+    "collabOfflineWarning": "Nu este disponibilă nicio conexiune la internet.\nModificările nu vor fi salvate!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Tip de fișier neacceptat.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Selecție",
+    "lasso": "",
     "image": "Introducere imagine",
     "rectangle": "Dreptunghi",
     "diamond": "Romb",
@@ -295,7 +312,8 @@
     "laser": "Indicator laser",
     "hand": "Mână (instrument de panoramare)",
     "extraTools": "Mai multe instrumente",
-    "mermaidToExcalidraw": "Mermaid la Excalidraw"
+    "mermaidToExcalidraw": "Mermaid la Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Dreptunghi",
@@ -319,33 +337,33 @@
     "shapes": "Forme"
   },
   "hints": {
-    "dismissSearch": "Apasă tasta Escape pentru a închide căutarea",
-    "canvasPanning": "Pentru a muta pânză, ține apăsată rotița mausului sau bara de spațiu sau folosește instrumentul în formă de mână",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
-    "arrowTool": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie. Apasă {{arrowShortcut}} din nou pentru a schimba tipul săgeții.",
+    "arrowTool": "",
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
     "embeddable": "Dă clic și trage pentru a crea un cod de încorporare de pagină web",
-    "text_selected": "Dă dublu clic sau apasă tasta Enter pentru a edita textul",
-    "text_editing": "Apasă tasta Escape sau Ctrl sau Cmd + Enter pentru a finaliza editarea",
-    "linearElementMulti": "Dă clic pe ultimul punct sau apasă tasta Escape sau tasta Enter pentru a termina",
-    "lockAngle": "Poți constrânge unghiul prin ținerea apăsată a tastei SHIFT",
-    "resize": "Poți constrânge proporțiile, ținând apăsată tasta SHIFT în timp ce redimensionezi,\nține apăsată tasta ALT pentru a redimensiona de la centru",
-    "resizeImage": "Poți redimensiona liber ținând apăsată tasta SHIFT,\nține apăsată tasta ALT pentru a redimensiona din centru",
-    "rotate": "Poți constrânge unghiurile, ținând apăsată tasta SHIFT în timp ce rotești",
-    "lineEditor_info": "Ține apăsată tasta Ctrl sau Cmd și dă dublu clic sau apasă tasta Ctrl sau Cmd + Enter pentru a edita puncte",
-    "lineEditor_pointSelected": "Apasă tasta Delete pentru a elimina punctele,\ncombinația de taste Ctrl sau Cmd + D pentru a le duplica sau glisează-le pentru a le schimba poziția",
-    "lineEditor_nothingSelected": "Selectează un punct pentru a-l edita (ține apăsată tasta SHIFT pentru a selecta mai multe),\nsau ține apăsată tasta Alt și dă clic pentru a adăuga puncte noi",
-    "placeImage": "Dă clic pentru a poziționa imaginea sau dă clic și glisează pentru a seta manual dimensiunea imaginii",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Publică propria bibliotecă",
-    "bindTextToElement": "Apasă tasta Enter pentru a adăuga text",
-    "createFlowchart": "Ține apăsată tasta CtrlOrCmd și tasta săgeată pentru a crea o organigramă",
-    "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea",
-    "eraserRevert": "Ține apăsată tasta Alt pentru a anula elementele marcate pentru ștergere",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Această caracteristică poate fi probabil activată prin setarea preferinței „dom.events.asyncClipboard.clipboardItem” ca „true”. Pentru a schimba preferințele navigatorului în Firefox, accesează pagina „about:config”.",
-    "disableSnapping": "Ține apăsat CtrlOrCmd pentru a dezactiva ancorarea",
-    "enterCropEditor": "Dă dublu clic pe imagine sau apasă ENTER pentru a decupa imaginea",
-    "leaveCropEditor": "Dă clic în afara imaginii sau apasă ENTER sau ESCAPE pentru a finaliza decuparea"
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Cele mai utilizate culori personalizate",
     "colors": "Culori",
     "shades": "Nuanțe",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Comanda nu este disponibilă...",
     "shortcutHint": "Pentru paleta de comenzi, folosește {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
