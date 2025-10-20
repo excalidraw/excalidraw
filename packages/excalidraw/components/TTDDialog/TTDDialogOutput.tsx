@@ -23,6 +23,9 @@ interface TTDDialogOutputProps {
   canvasRef: React.RefObject<HTMLDivElement | null>;
   loaded: boolean;
   hasContent?: boolean;
+  showMermaidCode?: boolean;
+  mermaidCode?: string;
+  onMermaidCodeChange?: (code: string) => void;
 }
 
 export const TTDDialogOutput = ({
@@ -30,7 +33,20 @@ export const TTDDialogOutput = ({
   canvasRef,
   loaded,
   hasContent = false,
+  showMermaidCode = false,
+  mermaidCode = "",
+  onMermaidCodeChange,
 }: TTDDialogOutputProps) => {
+  if (showMermaidCode && mermaidCode) {
+    return (
+      <textarea
+        className="ttd-dialog-mermaid-code"
+        value={mermaidCode}
+        onChange={(e) => onMermaidCodeChange?.(e.target.value)}
+      />
+    );
+  }
+
   return (
     <div className="ttd-dialog-output-wrapper">
       {!hasContent && (

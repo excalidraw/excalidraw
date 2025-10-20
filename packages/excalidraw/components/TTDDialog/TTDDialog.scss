@@ -130,9 +130,19 @@ $verticalBreakpoint: 861px;
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--dialog-border-color);
     white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
     padding: 0.85rem;
     box-sizing: border-box;
     font-family: monospace;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    &::placeholder {
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
 
     @media screen and (min-width: $verticalBreakpoint) {
       width: 100%;
@@ -291,6 +301,12 @@ $verticalBreakpoint: 861px;
       font-family: monospace;
       overflow-y: auto;
       overflow-x: hidden;
+
+      &::placeholder {
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
 
       @media screen and (max-width: $verticalBreakpoint) {
         width: auto;
@@ -533,6 +549,51 @@ $verticalBreakpoint: 861px;
 
     @at-root .excalidraw.theme--dark#{&} {
       background-color: var(--color-gray-10);
+    }
+  }
+
+  .ttd-dialog-code-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-left: auto;
+  }
+
+  .ttd-dialog-code-toggle-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-gray-50);
+    user-select: none;
+    cursor: pointer;
+    white-space: nowrap;
+
+    @at-root .excalidraw.theme--dark#{&} {
+      color: var(--color-gray-40);
+    }
+  }
+
+  .ttd-dialog-mermaid-code {
+    flex: 1 1 auto;
+    min-height: 0;
+    resize: none;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--dialog-border-color);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding: 0.85rem;
+    box-sizing: border-box;
+    width: 100%;
+    font-family: monospace;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: var(--color-surface-primary-container);
+    color: var(--color-on-surface);
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      width: auto;
+      height: 10rem;
+      flex: 0 0 auto;
     }
   }
 }
