@@ -338,7 +338,7 @@
   },
   "hints": {
     "dismissSearch": "{{shortcut}} to dismiss search",
-    "canvasPanning": "To move canvas, hold mouse wheel or {{shortcut}} while dragging, or use the hand tool",
+    "canvasPanning": "To move canvas, hold {{shortcut_1}} or {{shortcut_2}} while dragging, or use the hand tool",
     "linearElement": "Click to start multiple points, drag for single line",
     "arrowTool": "Click to start multiple points, drag for single line. Press {{shortcut}} again to change arrow type.",
     "freeDraw": "Click and drag, release when you're finished",
@@ -356,8 +356,8 @@
     "lineEditor_pointSelected": "Press {{shortcut_1}} to remove point(s),\n{{shortcut_2}} to duplicate, or drag to move",
     "lineEditor_nothingSelected": "Select a point to edit (hold {{shortcut_1}} to select multiple),\nor hold {{shortcut_2}} and click to add new points",
     "publishLibrary": "Publish your own library",
-    "bindTextToElement": "Press {{shortcut}} to add text",
-    "createFlowchart": "Hold {{shortcut}} and Arrow key to create a flowchart",
+    "bindTextToElement": "{{shortcut}} to add text",
+    "createFlowchart": "{{shortcut}} to create a flowchart",
     "deepBoxSelect": "Hold {{shortcut}} to deep select, and to prevent dragging",
     "eraserRevert": "Hold {{shortcut}} to revert the elements marked for deletion",
     "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
@@ -658,6 +658,7 @@
     "enter": "Enter",
     "shift": "Shift",
     "spacebar": "Space",
-    "delete": "Delete"
+    "delete": "Delete",
+    "mmb": "Scroll wheel"
   }
 }
