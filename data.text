@@ -1,0 +1,36 @@
+Based on the bugs I identified in the Factory Method Pattern Java code, here's a properly formatted feature request:
+
+---
+
+### Is your feature request related to a problem? Please describe.
+
+Yes, the Factory Method Pattern documentation contains incomplete Java code examples that won't compile. The code references several undefined fields and constants (ELFARSENAL, ORCARSENAL, LOGGER, MANUFACTURED) which makes it difficult for developers to understand and implement the pattern correctly. This creates confusion for learners trying to use this as a reference implementation.
+
+### Describe the solution you'd like
+
+I would like the Java code examples to be complete and compilable. Specifically:
+
+1. **Add arsenal map declarations** in both `ElfBlacksmith` and `OrcBlacksmith` classes:
+```java
+private static final Map<WeaponType, Weapon> ELFARSENAL = new EnumMap<>(WeaponType.class);
+private static final Map<WeaponType, Weapon> ORCARSENAL = new EnumMap<>(WeaponType.class);
+```
+
+2. **Add LOGGER and constant declarations** in the main App class:
+```java
+private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+private static final String MANUFACTURED = "{} manufactured {}";
+```
+
+3. **Include initialization code** for the arsenal maps (or at least document that initialization is required)
+
+4. **Add null-safety checks** in the `manufactureWeapon` methods to handle cases where a weapon type isn't in the arsenal
+
+5. **Include basic class definitions** for `Weapon` and `WeaponType` (even if simplified) to make the example self-contained
+
+### Describe alternatives you've considered
+
+1. **Add code comments** indicating which parts are omitted for brevity, with references to the complete implementation
+2. **Link to a working GitHub repository** with the full, compilable code
+3. **Add a disclaimer** at the beginning stating "Note: This is pseudocode for illustration purposes"
+4. **Create a separate "Complete Example" section** with fully functional code
