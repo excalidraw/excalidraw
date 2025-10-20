@@ -141,6 +141,10 @@
       "edit": "",
       "editArrow": ""
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "",
     "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyPrivateLibrary": "",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
-    "placeholder": ""
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "清空畫布",
@@ -216,6 +230,7 @@
     "objectsSnapMode": "",
     "exitZenMode": "",
     "cancel": "",
+    "saveLibNames": "",
     "clear": "",
     "remove": "",
     "embed": "",
@@ -245,7 +260,8 @@
     "resetLibrary": "",
     "removeItemsFromsLibrary": "",
     "invalidEncryptionKey": "",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "",
+    "lasso": "",
     "image": "",
     "rectangle": "",
     "diamond": "",
@@ -295,7 +312,8 @@
     "laser": "",
     "hand": "",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "",
@@ -334,9 +352,9 @@
     "resizeImage": "",
     "rotate": "",
     "lineEditor_info": "",
+    "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
-    "placeImage": "",
     "publishLibrary": "",
     "bindTextToElement": "",
     "createFlowchart": "",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "",
     "colors": "",
     "shades": "",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "",
     "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
