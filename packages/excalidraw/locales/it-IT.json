@@ -46,14 +46,14 @@
     "arrowhead_triangle_outline": "Triangolo (contorno)",
     "arrowhead_diamond": "Diamante",
     "arrowhead_diamond_outline": "Diamante (contorno)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_many": "Zampe di gallina (molti)",
+    "arrowhead_crowfoot_one": "Zampa di gallina (una)",
+    "arrowhead_crowfoot_one_or_many": "Zampe di gallina (una o molte)",
+    "more_options": "Altre opzioni",
     "arrowtypes": "Tipo di freccia",
-    "arrowtype_sharp": "",
+    "arrowtype_sharp": "Freccia affilata",
     "arrowtype_round": "Freccia curva",
-    "arrowtype_elbowed": "",
+    "arrowtype_elbowed": "Freccia a gomito",
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
@@ -129,17 +129,21 @@
     "createContainerFromText": "Avvolgi il testo in un container",
     "link": {
       "edit": "Modifica link",
-      "editEmbed": "",
+      "editEmbed": "Modifica link incorporabile",
       "create": "Aggiungi link",
       "label": "Link",
       "labelEmbed": "Collega & incorpora",
       "empty": "Nessun collegamento impostato",
       "hint": "Digita o incolla qui il tuo link",
-      "goToElement": ""
+      "goToElement": "Vai all'elemento di destinazione"
     },
     "lineEditor": {
       "edit": "Modifica linea",
       "editArrow": "Modifica freccia"
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "Blocca",
@@ -161,28 +165,38 @@
     "zoomToFit": "Zoom per adattare tutti gli elementi",
     "installPWA": "Installa Excalidraw localmente (PWA)",
     "autoResize": "Abilita ridimensionamento automatico del testo",
-    "imageCropping": "",
-    "unCroppedDimension": "",
+    "imageCropping": "Ritaglio immagine",
+    "unCroppedDimension": "Dimensione non ritagliata",
     "copyElementLink": "Copia il link all'oggetto",
     "linkToElement": "Link all'oggetto",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "Avvolgi la selezione nella cornice",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "Link all'oggetto",
-    "desc": "",
-    "notFound": ""
+    "desc": "Fare clic su una forma su tela o incollare un link.",
+    "notFound": "L'oggetto collegato non è stato trovato sulla tela."
   },
   "library": {
     "noItems": "Nessun elemento ancora aggiunto...",
     "hint_emptyLibrary": "Seleziona un elemento sulla tela per aggiungerlo qui, o installa una libreria dal repository pubblico qui sotto.",
-    "hint_emptyPrivateLibrary": "Seleziona un elemento sulla tela per aggiungerlo qui."
+    "hint_emptyPrivateLibrary": "Seleziona un elemento sulla tela per aggiungerlo qui.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
-    "title": "",
+    "title": "Trova sulla tela",
     "noMatch": "Non è stato trovato nessun risultato...",
     "singleResult": "risultato",
     "multipleResults": "risultati",
-    "placeholder": ""
+    "placeholder": "Trova testo sulla tela...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Aggancia agli oggetti",
     "exitZenMode": "Uscire dalla modalità zen",
     "cancel": "Annulla",
+    "saveLibNames": "",
     "clear": "Cancella",
     "remove": "Rimuovi",
     "embed": "Attiva/disattiva incorporamento",
-    "publishLibrary": "Pubblica",
+    "publishLibrary": "",
     "submit": "Invia",
     "confirm": "Conferma",
     "embeddableInteractionButton": "Clicca per interagire"
@@ -245,7 +260,8 @@
     "resetLibrary": "Questa azione cancellerà l'intera libreria. Sei sicuro?",
     "removeItemsFromsLibrary": "Eliminare {{count}} elementi dalla libreria?",
     "invalidEncryptionKey": "La chiave di cifratura deve essere composta da 22 caratteri. La collaborazione live è disabilitata.",
-    "collabOfflineWarning": "Nessuna connessione internet disponibile.\nLe tue modifiche non verranno salvate!"
+    "collabOfflineWarning": "Nessuna connessione internet disponibile.\nLe tue modifiche non verranno salvate!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Tipo di file non supportato.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Selezione",
+    "lasso": "",
     "image": "Inserisci immagine",
     "rectangle": "Rettangolo",
     "diamond": "Rombo",
@@ -295,7 +312,8 @@
     "laser": "Puntatore laser",
     "hand": "Mano (strumento di panoramica)",
     "extraTools": "Altri strumenti",
-    "mermaidToExcalidraw": "Da Mermaid a Excalidraw"
+    "mermaidToExcalidraw": "Da Mermaid a Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Rettangolo",
@@ -320,30 +338,30 @@
   },
   "hints": {
     "dismissSearch": "",
-    "canvasPanning": "Per spostare la tela, tieni premuta la rotellina del mouse o la barra spaziatrice mentre trascini oppure usa lo strumento mano",
+    "canvasPanning": "",
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "arrowTool": "",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
     "embeddable": "Fare click e trascina per creare un incorporamento web",
-    "text_selected": "Fai doppio click o premi INVIO per modificare il testo",
-    "text_editing": "Premi ESC o CtrlOCmd+INVIO per completare le modifiche",
-    "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
-    "lockAngle": "Puoi limitare l'angolo tenendo premuto SHIFT",
-    "resize": "Per vincolare le proporzioni, tieni premuto MAIUSC durante il ridimensionamento;\nper ridimensionare dal centro, tieni premuto ALT",
-    "resizeImage": "Puoi ridimensionare liberamente tenendo premuto SHIFT,\ntieni premuto ALT per ridimensionare dal centro",
-    "rotate": "Puoi mantenere gli angoli tenendo premuto SHIFT durante la rotazione",
-    "lineEditor_info": "Tieni premuto Ctrl o Cmd e doppio clic oppure premi Ctrl o Cmd + Invio per modificare i punti",
-    "lineEditor_pointSelected": "Premi Elimina per rimuovere il punto(i),\nCtrlOCmd+D per duplicare o trascinare per spostare",
-    "lineEditor_nothingSelected": "Seleziona un punto da modificare (tieni premuto MAIUSC per selezionare più punti),\noppure tieni premuto Alt e fai clic per aggiungere nuovi punti",
-    "placeImage": "Fai click per posizionare l'immagine, o click e trascina per impostarne la dimensione manualmente",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Pubblica la tua libreria",
-    "bindTextToElement": "Premi invio per aggiungere il testo",
+    "bindTextToElement": "",
     "createFlowchart": "",
-    "deepBoxSelect": "Tieni premuto CtrlOCmd per selezionare in profondità e per impedire il trascinamento",
-    "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Questa funzione può essere abilitata impostando il flag \"dom.events.asyncClipboard.clipboardItem\" su \"true\". Per modificare i flag del browser in Firefox, visitare la pagina \"about:config\".",
-    "disableSnapping": "Tieni premuto Ctrl o Cmd per disabilitare lo snap",
+    "disableSnapping": "",
     "enterCropEditor": "",
     "leaveCropEditor": ""
   },
@@ -392,7 +410,7 @@
     "click": "click",
     "deepSelect": "Selezione profonda",
     "deepBoxSelect": "Seleziona in profondità all'interno della casella e previene il trascinamento",
-    "createFlowchart": "",
+    "createFlowchart": "Crea un diagramma di flusso da un elemento generico",
     "navigateFlowchart": "Naviga un diagramma di flusso",
     "curvedArrow": "Freccia curva",
     "curvedLine": "Linea curva",
@@ -417,8 +435,8 @@
     "toggleElementLock": "Blocca/sblocca selezione",
     "movePageUpDown": "Sposta la pagina su/giù",
     "movePageLeftRight": "Sposta la pagina a sinistra/destra",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Ritaglia immagine",
+    "cropFinish": "Termina ritaglio immagine"
   },
   "clearCanvasDialog": {
     "title": "Svuota la tela"
@@ -494,7 +512,7 @@
     "scene": "Scena",
     "selected": "Selezionato",
     "storage": "Memoria",
-    "fullTitle": "",
+    "fullTitle": "Proprietà della tela & forma",
     "title": "Proprietà",
     "generalStats": "Generale",
     "elementProperties": "Proprietà delle forme",
@@ -509,7 +527,7 @@
     "copyStyles": "Stili copiati.",
     "copyToClipboard": "Copiato negli appunti.",
     "copyToClipboardAsPng": "{{exportSelection}} copiato negli appunti come PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "Copiato {{exportSelection}} negli appunti come SVG\n({{exportColorScheme}})",
     "fileSaved": "File salvato.",
     "fileSavedToFilename": "Salvato in {filename}",
     "canvas": "tela",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Colori personalizzati più utilizzati",
     "colors": "Colori",
     "shades": "Sfumature",
@@ -599,7 +618,7 @@
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "vecchio"
     },
     "sceneFonts": "In questa scena",
     "availableFonts": "Font disponibili",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Il comando non è disponibile...",
     "shortcutHint": "Per i comandi della tavolozza, usa {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
