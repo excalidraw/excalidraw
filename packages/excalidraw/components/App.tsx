@@ -80,7 +80,6 @@ import {
   wrapEvent,
   updateObject,
   updateActiveTool,
-  getShortcutKey,
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
@@ -410,6 +409,8 @@ import { isMaybeMermaidDefinition } from "../mermaid";
 import { LassoTrail } from "../lasso";
 
 import { EraserTrail } from "../eraser";
+
+import { getShortcutKey } from "../shortcut";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
