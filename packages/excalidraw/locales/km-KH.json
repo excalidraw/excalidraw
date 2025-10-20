@@ -141,6 +141,10 @@
       "edit": "កែសម្រួលបន្ទាត់",
       "editArrow": ""
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "ចាក់សោ",
       "unlock": "ដោះសោ",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "មិនទាន់មានធាតុបន្ថែមទេ...",
     "hint_emptyLibrary": "ជ្រើសរើសធាតុនៅលើបាវដើម្បីបន្ថែមវានៅទីនេះ ឬដំឡើងបណ្ណាល័យពីឃ្លាំងសាធារណៈខាងក្រោម។",
-    "hint_emptyPrivateLibrary": "ជ្រើសរើសធាតុនៅលើបាវដើម្បីបន្ថែមវានៅទីនេះ"
+    "hint_emptyPrivateLibrary": "ជ្រើសរើសធាតុនៅលើបាវដើម្បីបន្ថែមវានៅទីនេះ",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
-    "placeholder": ""
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "កំណត់បាវឡើងវិញ",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "",
     "exitZenMode": "ចេញពី zen​ ម៉ូត",
     "cancel": "បោះបង់",
+    "saveLibNames": "",
     "clear": "សម្អាត",
     "remove": "ដកចេញ",
     "embed": "",
-    "publishLibrary": "បោះពុម្ពផ្សាយ",
+    "publishLibrary": "",
     "submit": "ដាក់​ស្នើ",
     "confirm": "បញ្ជាក់",
     "embeddableInteractionButton": ""
@@ -245,7 +260,8 @@
     "resetLibrary": "វានឹងសម្អាតបាវទាំងមូល។ តើ​អ្នក​ប្រាកដ​ឬ​អត់?",
     "removeItemsFromsLibrary": "តើអ្នកប្រាកដថាចង់លុប {{count}} ធាតុចេញពីបណ្ណាល័យទេ?",
     "invalidEncryptionKey": "សោអ៊ីនគ្រីបត្រូវតែមាន 22 តួអក្សរ។ ការសហការផ្ទាល់ត្រូវបានបិទ។",
-    "collabOfflineWarning": "គ្មានការតភ្ជាប់អ៊ីនធឺណិត។\nការផ្លាស់ប្តូររបស់អ្នកនឹងមិនត្រូវបានរក្សាទុកទេ!"
+    "collabOfflineWarning": "គ្មានការតភ្ជាប់អ៊ីនធឺណិត។\nការផ្លាស់ប្តូររបស់អ្នកនឹងមិនត្រូវបានរក្សាទុកទេ!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "ប្រភេទឯកសារមិនត្រូវបានគាំទ្រទេ។",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "ការជ្រើសរើស",
+    "lasso": "",
     "image": "បញ្ចូលរូបភាព",
     "rectangle": "ចតុ​កោណ​កែង​",
     "diamond": "ពេជ្រ",
@@ -295,7 +312,8 @@
     "laser": "",
     "hand": "ដៃ (panning tool)",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "",
@@ -320,28 +338,28 @@
   },
   "hints": {
     "dismissSearch": "",
-    "canvasPanning": "ដើម្បីផ្លាស់ទីបាវ សូមសង្កត់កង់កណ្ដុរឬគ្រាប់ចុចspacebarខណៈពេលកំពុងអូស ឬប្រើឧបករណ៍ដៃ។",
+    "canvasPanning": "",
     "linearElement": "ចុចដើម្បីបង្កើតចំណុចច្រើន អូសដើម្បីបង្កើតបន្ទាត់មួយ",
     "arrowTool": "",
     "freeDraw": "ចុច​ហើយ​អូស លែង​ពេល​រួចរាល់",
     "text": "គន្លឹះ៖ អ្នកក៏អាចបន្ថែមអត្ថបទដោយចុចពីរដងនៅកន្លែងណាមួយដោយប្រើឧបករណ៍ជ្រើសរើស",
     "embeddable": "",
-    "text_selected": "ចុចពីរដង ឬចុច ENTER ដើម្បីកែសម្រួលអត្ថបទ",
-    "text_editing": "ចុច Escape ឬ CtrlOrCmd +ENTER ដើម្បីបញ្ចប់ការកែសម្រួល",
-    "linearElementMulti": "ចុចលើចំណុចចុងក្រោយ ឬចុច Esc/Enter ដើម្បីបញ្ចប់",
-    "lockAngle": "អ្នកអាចសង្កត់ Shift ដើម្បីកំណត់មុំ",
-    "resize": "អ្នកអាចសង្កត់ SHIFT ដើម្បីបងំ្ខឲមានសមាមាត្រ ខណៈពេលដែលប្តូរទំហំ\nសង្កត់ ALT ដើម្បីប្តូរទំហំពីកណ្តាល",
-    "resizeImage": "អ្នកអាចប្តូរទំហំរូបភាពដោយសេរីដោយសង្កត់ SHIFT,\nសង្កត់ ALT ដើម្បីប្តូរទំហំពីកណ្តាល",
-    "rotate": "អ្នកអាចសង្កត់ Shift ខណៈពេលកំពុងបង្វិល ដើម្បីកម្រិតមុំ",
-    "lineEditor_info": "សង្កត់ CtrlOrCmd ហើយចុចពីរដង ឬចុច CtrlOrCmd + Enter ដើម្បីកែសម្រួលចំណុច",
-    "lineEditor_pointSelected": "ចុច Delete ដើម្បីលុបចំណុច(ច្រើន)\nCtrlOrCmd+D ដើម្បីចម្លង, ឬអូសដើម្បីផ្លាស់ទី",
-    "lineEditor_nothingSelected": "ជ្រើសរើសចំណុចដែលត្រូវកែសម្រួល (សង្កត់ SHIFT ដើម្បីជ្រើសរើសច្រើនចំណុច)\nឬ សង្កត់ Alt ហើយចុចដើម្បីបន្ថែមចំណុចថ្មី។",
-    "placeImage": "ចុចដើម្បីដាក់រូបភាព ឬចុចហើយអូសដើម្បីកំណត់ទំហំរបស់រូបភាពដោយដៃ",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "បោះពុម្ពផ្សាយបណ្ណាល័យផ្ទាល់ខ្លួនរបស់អ្នក",
-    "bindTextToElement": "ចុច Enter ដើម្បីបន្ថែមអត្ថបទ",
+    "bindTextToElement": "",
     "createFlowchart": "",
-    "deepBoxSelect": "សង្កត់ CtrlOrCmd ដើម្បីជ្រើសរើសយ៉ាងជ្រៅ និងជៀសវាងការអូស",
-    "eraserRevert": "សង្កត់ Alt ដើម្បីដកការជ្រើសរើសធាតុដែលត្រូវបានសម្គាល់សម្រាប់ការលុប",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "បើកមុខងារនេះដោយកំណត់ទង់ \"dom.events.asyncClipboard.clipboardItem\" ទៅ \"true\" \nដើម្បីផ្លាស់ប្តូរទង់កម្មវិធីរុករកនៅក្នុង Firefox សូមចូលទៅកាន់ទំព័រ \"about:config\"។",
     "disableSnapping": "",
     "enterCropEditor": "",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "ពណ៌ផ្ទាល់ខ្លួនដែលប្រើច្រើនបំផុត",
     "colors": "ពណ៌",
     "shades": "ស្រមោល",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "",
     "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
