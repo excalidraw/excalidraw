@@ -1,4 +1,29 @@
+import fs from "fs";
+import path from "path";
+import util from "util";
+
+import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
+
+import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
+
 import {
+  newArrowElement,
+  newElement,
+  newEmbeddableElement,
+  newFrameElement,
+  newFreeDrawElement,
+  newIframeElement,
+  newImageElement,
+  newLinearElement,
+  newMagicFrameElement,
+  newTextElement,
+} from "@excalidraw/element";
+
+import { isLinearElementType } from "@excalidraw/element";
+import { getSelectedElements } from "@excalidraw/element";
+import { selectGroupsForSelectedElements } from "@excalidraw/element";
+
+import type {
   ExcalidrawElement,
   ExcalidrawGenericElement,
   ExcalidrawTextElement,
@@ -9,29 +34,22 @@ import {
   ExcalidrawFrameElement,
   ExcalidrawElementType,
   ExcalidrawMagicFrameElement,
-} from "../../element/types";
-import { newElement, newTextElement, newLinearElement } from "../../element";
-import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
-import { getDefaultAppState } from "../../appState";
-import { GlobalTestState, createEvent, fireEvent } from "../test-utils";
-import fs from "fs";
-import util from "util";
-import path from "path";
+  ExcalidrawElbowArrowElement,
+  ExcalidrawArrowElement,
+  FixedSegment,
+} from "@excalidraw/element/types";
+
+import type { Mutable } from "@excalidraw/common/utility-types";
+
 import { getMimeType } from "../../data/blob";
-import {
-  newEmbeddableElement,
-  newFrameElement,
-  newFreeDrawElement,
-  newIframeElement,
-  newImageElement,
-  newMagicFrameElement,
-} from "../../element/newElement";
-import { Point } from "../../types";
-import { getSelectedElements } from "../../scene/selection";
-import { isLinearElementType } from "../../element/typeChecks";
-import { Mutable } from "../../utility-types";
-import { assertNever } from "../../utils";
 import { createTestHook } from "../../components/App";
+import { getDefaultAppState } from "../../appState";
+import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
+
+import type { Action } from "../../actions/types";
+import type App from "../../components/App";
+import type { AppState } from "../../types";
+
 
 const readFile = util.promisify(fs.readFile);
 // so that window.h is available when App.tsx is not imported as well.
@@ -40,12 +58,51 @@ createTestHook();
 const { h } = window;
 
 export class API {
-  static setSelectedElements = (elements: ExcalidrawElement[]) => {
-    h.setState({
-      selectedElementIds: elements.reduce((acc, element) => {
-        acc[element.id] = true;
-        return acc;
-      }, {} as Record<ExcalidrawElement["id"], true>),
+  static updateScene: InstanceType<typeof App>["updateScene"] = (...args) => {
+    act(() => {
+      h.app.updateScene(...args);
+    });
+  };
+  static setAppState: React.Component<any, AppState>["setState"] = (
+    state,
+    cb,
+  ) => {
+    act(() => {
+      h.setState(state, cb);
+    });
+  };
+
+  static setElements = (elements: readonly ExcalidrawElement[]) => {
+    act(() => {
+      h.elements = elements;
+    });
+  };
+
+  static setSelectedElements = (elements: ExcalidrawElement[], editingGroupId?: string | null) => {
+    act(() => {
+      h.setState({
+        ...selectGroupsForSelectedElements(
+        {
+          editingGroupId: editingGroupId ?? null,
+          selectedElementIds: elements.reduce((acc, element) => {
+            acc[element.id] = true;
+            return acc;
+          }, {} as Record<ExcalidrawElement["id"], true>),
+        },
+        elements,
+        h.state,
+        h.app,
+        )
+      });
+    });
+  };
+
+  // eslint-disable-next-line prettier/prettier
+  static updateElement = <T extends ExcalidrawElement>(
+    ...args: Parameters<typeof h.app.scene.mutateElement<T>>
+  ) => {
+    act(() => {
+      h.app.scene.mutateElement(...args);
     });
   };
 
@@ -69,16 +126,31 @@ export class API {
     return selectedElements[0];
   };
 
-  static getStateHistory = () => {
+  static getUndoStack = () => {
     // @ts-ignore
-    return h.history.stateHistory;
+    return h.history.undoStack;
+  };
+
+  static getRedoStack = () => {
+    // @ts-ignore
+    return h.history.redoStack;
+  };
+
+  static getSnapshot = () => {
+    return Array.from(h.store.snapshot.elements.values());
   };
 
   static clearSelection = () => {
-    // @ts-ignore
-    h.app.clearSelection(null);
+    act(() => {
+      // @ts-ignore
+      h.app.clearSelection(null);
+    });
     expect(API.getSelectedElements().length).toBe(0);
   };
+
+  static getElement = <T extends ExcalidrawElement>(element: T): T => {
+    return h.app.scene.getElementsMapIncludingDeleted().get(element.id) as T || element;
+  }
 
   static createElement = <
     T extends Exclude<ExcalidrawElementType, "selection"> = "rectangle",
@@ -104,7 +176,7 @@ export class API {
     isDeleted?: boolean;
     frameId?: ExcalidrawElement["id"] | null;
     index?: ExcalidrawElement["index"];
-    groupIds?: string[];
+    groupIds?: ExcalidrawElement["groupIds"];
     // generic element props
     strokeColor?: ExcalidrawGenericElement["strokeColor"];
     backgroundColor?: ExcalidrawGenericElement["backgroundColor"];
@@ -126,17 +198,25 @@ export class API {
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
       : never;
-    points?: T extends "arrow" | "line" ? readonly Point[] : never;
+    points?: T extends "arrow" | "line" | "freedraw" ? readonly LocalPoint[] : never;
     locked?: boolean;
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
     status?: T extends "image" ? ExcalidrawImageElement["status"] : never;
     startBinding?: T extends "arrow"
-      ? ExcalidrawLinearElement["startBinding"]
+      ? ExcalidrawArrowElement["startBinding"] | ExcalidrawElbowArrowElement["startBinding"]
       : never;
     endBinding?: T extends "arrow"
-      ? ExcalidrawLinearElement["endBinding"]
+      ? ExcalidrawArrowElement["endBinding"] | ExcalidrawElbowArrowElement["endBinding"]
       : never;
+    startArrowhead?: T extends "arrow"
+      ? ExcalidrawArrowElement["startArrowhead"] | ExcalidrawElbowArrowElement["startArrowhead"]
+      : never;
+    endArrowhead?: T extends "arrow"
+      ? ExcalidrawArrowElement["endArrowhead"] | ExcalidrawElbowArrowElement["endArrowhead"]
+      : never;
+    elbowed?: boolean;
+    fixedSegments?: FixedSegment[] | null;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
@@ -157,10 +237,7 @@ export class API {
     const base: Omit<
       ExcalidrawGenericElement,
       | "id"
-      | "width"
-      | "height"
       | "type"
-      | "seed"
       | "version"
       | "versionNonce"
       | "isDeleted"
@@ -168,11 +245,14 @@ export class API {
       | "link"
       | "updated"
     > = {
+      seed: 1,
       x,
       y,
+      width,
+      height,
       frameId: rest.frameId ?? null,
       index: rest.index ?? null,
-      angle: rest.angle ?? 0,
+      angle: (rest.angle ?? 0) as Radians,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:
         rest.backgroundColor ?? appState.currentItemBackgroundColor,
@@ -201,8 +281,6 @@ export class API {
       case "ellipse":
         element = newElement({
           type: type as "rectangle" | "diamond" | "ellipse",
-          width,
-          height,
           ...base,
         });
         break;
@@ -237,21 +315,32 @@ export class API {
         element = newFreeDrawElement({
           type: type as "freedraw",
           simulatePressure: true,
+          points: rest.points,
           ...base,
         });
         break;
       case "arrow":
+        element = newArrowElement({
+          ...base,
+          width,
+          height,
+          type,
+          points: rest.points ?? [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(100, 100),
+          ],
+          elbowed: rest.elbowed ?? false,
+        });
+        break;
       case "line":
         element = newLinearElement({
           ...base,
           width,
           height,
           type,
-          startArrowhead: null,
-          endArrowhead: null,
           points: rest.points ?? [
-            [0, 0],
-            [100, 100],
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(100, 100),
           ],
         });
         break;
@@ -282,6 +371,8 @@ export class API {
     if (element.type === "arrow") {
       element.startBinding = rest.startBinding ?? null;
       element.endBinding = rest.endBinding ?? null;
+      element.startArrowhead = rest.startArrowhead ?? null;
+      element.endArrowhead = rest.endArrowhead ?? null;
     }
     if (id) {
       element.id = id;
@@ -293,6 +384,81 @@ export class API {
       element.groupIds = groupIds;
     }
     return element as any;
+  };
+
+  static createTextContainer = (opts?: {
+    frameId?: ExcalidrawElement["id"];
+    groupIds?: ExcalidrawElement["groupIds"];
+    label?: {
+      text?: string;
+      frameId?: ExcalidrawElement["id"] | null;
+      groupIds?: ExcalidrawElement["groupIds"];
+    };
+  }) => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      frameId: opts?.frameId || null,
+      groupIds: opts?.groupIds,
+    });
+
+    const text = API.createElement({
+      type: "text",
+      text: opts?.label?.text || "sample-text",
+      width: 50,
+      height: 20,
+      fontSize: 16,
+      containerId: rectangle.id,
+      frameId:
+        opts?.label?.frameId === undefined
+          ? opts?.frameId ?? null
+          : opts?.label?.frameId ?? null,
+      groupIds: opts?.label?.groupIds === undefined
+      ? opts?.groupIds
+      : opts?.label?.groupIds ,
+
+    });
+
+    h.app.scene.mutateElement(
+      rectangle,
+      {
+        boundElements: [{ type: "text", id: text.id }],
+      },
+    );
+
+    return [rectangle, text];
+  };
+
+  static createLabeledArrow = (opts?: {
+    frameId?: ExcalidrawElement["id"];
+    label?: {
+      text?: string;
+      frameId?: ExcalidrawElement["id"] | null;
+    };
+  }) => {
+    const arrow = API.createElement({
+      type: "arrow",
+      frameId: opts?.frameId || null,
+    });
+
+    const text = API.createElement({
+      type: "text",
+      width: 50,
+      height: 20,
+      containerId: arrow.id,
+      frameId:
+        opts?.label?.frameId === undefined
+          ? opts?.frameId ?? null
+          : opts?.label?.frameId ?? null,
+    });
+
+    h.app.scene.mutateElement(
+      arrow,
+      {
+        boundElements: [{ type: "text", id: text.id }],
+      },
+    );
+
+    return [arrow, text];
   };
 
   static readFile = async <T extends "utf8" | null>(
@@ -312,34 +478,58 @@ export class API {
     });
   };
 
-  static drop = async (blob: Blob) => {
-    const fileDropEvent = createEvent.drop(GlobalTestState.interactiveCanvas);
-    const text = await new Promise<string>((resolve, reject) => {
-      try {
-        const reader = new FileReader();
-        reader.onload = () => {
-          resolve(reader.result as string);
-        };
-        reader.readAsText(blob);
-      } catch (error: any) {
-        reject(error);
-      }
-    });
+  static drop = async (items: ({kind: "string", value: string, type: string} | {kind: "file", file: File | Blob, type?: string })[]) => {
 
-    const files = [blob] as File[] & { item: (index: number) => File };
+    const fileDropEvent = createEvent.drop(GlobalTestState.interactiveCanvas);
+
+    const dataTransferFileItems = items.filter(i => i.kind === "file") as {kind: "file", file: File | Blob, type: string }[];
+
+    const files = dataTransferFileItems.map(item => item.file) as File[] & { item: (index: number) => File };
+    // https://developer.mozilla.org/en-US/docs/Web/API/FileList/item
     files.item = (index: number) => files[index];
 
     Object.defineProperty(fileDropEvent, "dataTransfer", {
       value: {
+        // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/files
         files,
-        getData: (type: string) => {
-          if (type === blob.type) {
-            return text;
+        // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/items
+        items: items.map((item, idx) => {
+          if (item.kind === "string")  {
+            return {
+              kind: "string",
+              type: item.type,
+              // https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem/getAsString
+              getAsString: (cb: (text: string) => any) => cb(item.value),
+            };
           }
-          return "";
+          return {
+            kind: "file",
+            type: item.type || item.file.type,
+            // https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem/getAsFile
+            getAsFile: () => item.file,
+          };
+        }),
+        // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/getData
+        getData: (type: string) => {
+          return items.find((item) => item.type === "string" && item.type === type) || "";
         },
+        // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types
+        types: Array.from(new Set(items.map((item) => item.kind === "file" ? "Files" : item.type))),
       },
     });
-    fireEvent(GlobalTestState.interactiveCanvas, fileDropEvent);
+    Object.defineProperty(fileDropEvent, "clientX", {
+      value: 0,
+    });
+    Object.defineProperty(fileDropEvent, "clientY", {
+      value: 0,
+    });
+
+    await fireEvent(GlobalTestState.interactiveCanvas, fileDropEvent);
+  };
+
+  static executeAction = (action: Action) => {
+    act(() => {
+      h.app.actionManager.executeAction(action);
+    });
   };
 }

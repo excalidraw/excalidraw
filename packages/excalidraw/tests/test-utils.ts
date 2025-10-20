@@ -1,22 +1,34 @@
 import "pepjs";
-
+import { act } from "@testing-library/react";
 import {
   render,
   queries,
-  RenderResult,
-  RenderOptions,
   waitFor,
   fireEvent,
+  cleanup,
 } from "@testing-library/react";
+import ansi from "ansicolor";
 
-import * as toolQueries from "./queries/toolQueries";
-import { ImportedDataState } from "../data/types";
+import { ORIG_ID, arrayToMap } from "@excalidraw/common";
+
+import { getSelectedElements } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { AllPossibleKeys } from "@excalidraw/common/utility-types";
+
 import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
 
-import { SceneData } from "../types";
-import { getSelectedElements } from "../scene/selection";
-import { ExcalidrawElement } from "../element/types";
-import { UI } from "./helpers/ui";
+import { Pointer, UI } from "./helpers/ui";
+import * as toolQueries from "./queries/toolQueries";
+
+import type { History } from "../history";
+
+import type { RenderResult, RenderOptions } from "@testing-library/react";
+
+import type { ImportedDataState } from "../data/types";
+
+export { cleanup as unmountComponent };
 
 const customQueries = {
   ...queries,
@@ -32,6 +44,10 @@ type TestRenderFn = (
 ) => Promise<RenderResult<typeof customQueries>>;
 
 const renderApp: TestRenderFn = async (ui, options) => {
+  // when tests reuse Pointer instances let's reset the last
+  // pointer poisitions so there's no leak between tests
+  Pointer.resetAll();
+
   if (options?.localStorageData) {
     initLocalStorage(options.localStorageData);
     delete options.localStorageData;
@@ -72,6 +88,12 @@ const renderApp: TestRenderFn = async (ui, options) => {
       renderResult.container.querySelector("canvas.interactive");
     if (!interactiveCanvas) {
       throw new Error("not initialized yet");
+    }
+
+    // hack-awaiting app.initialScene() which solves some test race conditions
+    // (later we may switch this with proper event listener)
+    if (window.h.state.isLoading) {
+      throw new Error("still loading");
     }
   });
 
@@ -124,10 +146,6 @@ const initLocalStorage = (data: ImportedDataState) => {
   }
 };
 
-export const updateSceneData = (data: SceneData) => {
-  (window.collab as any).excalidrawAPI.updateScene(data);
-};
-
 const originalGetBoundingClientRect =
   global.window.HTMLDivElement.prototype.getBoundingClientRect;
 
@@ -172,20 +190,24 @@ export const withExcalidrawDimensions = async (
   cb: () => void,
 ) => {
   mockBoundingClientRect(dimensions);
-  // @ts-ignore
-  h.app.refreshViewportBreakpoints();
-  // @ts-ignore
-  h.app.refreshEditorBreakpoints();
-  window.h.app.refresh();
+  act(() => {
+    // @ts-ignore
+    h.app.refreshViewportBreakpoints();
+    // @ts-ignore
+    h.app.refreshEditorBreakpoints();
+    window.h.app.refresh();
+  });
 
   await cb();
 
   restoreOriginalGetBoundingClientRect();
-  // @ts-ignore
-  h.app.refreshViewportBreakpoints();
-  // @ts-ignore
-  h.app.refreshEditorBreakpoints();
-  window.h.app.refresh();
+  act(() => {
+    // @ts-ignore
+    h.app.refreshViewportBreakpoints();
+    // @ts-ignore
+    h.app.refreshEditorBreakpoints();
+    window.h.app.refresh();
+  });
 };
 
 export const restoreOriginalGetBoundingClientRect = () => {
@@ -248,3 +270,228 @@ expect.extend({
     };
   },
 });
+
+/**
+ * Serializer for IEE754 float pointing numbers to avoid random failures due to tiny precision differences
+ */
+expect.addSnapshotSerializer({
+  serialize(val, config, indentation, depth, refs, printer) {
+    return printer(val.toFixed(5), config, indentation, depth, refs);
+  },
+  test(val) {
+    return (
+      typeof val === "number" &&
+      Number.isFinite(val) &&
+      !Number.isNaN(val) &&
+      !Number.isInteger(val)
+    );
+  },
+});
+
+export const getCloneByOrigId = <T extends boolean = false>(
+  origId: ExcalidrawElement["id"],
+  returnNullIfNotExists: T = false as T,
+): T extends true ? ExcalidrawElement | null : ExcalidrawElement => {
+  const clonedElement = window.h.elements?.find(
+    (el) => (el as any)[ORIG_ID] === origId,
+  );
+  if (clonedElement) {
+    return clonedElement;
+  }
+  if (returnNullIfNotExists !== true) {
+    throw new Error(`cloned element not found for origId: ${origId}`);
+  }
+  return null as T extends true ? ExcalidrawElement | null : ExcalidrawElement;
+};
+
+/**
+ * Assertion helper that strips the actual elements of extra attributes
+ * so that diffs are easier to read in case of failure.
+ *
+ * Asserts element order as well, and selected element ids
+ * (when `selected: true` set for given element).
+ *
+ * If testing cloned elements, you can use { `[ORIG_ID]: origElement.id }
+ * If you need to refer to cloned element properties, you can use
+ * `getCloneByOrigId()`, e.g.: `{ frameId: getCloneByOrigId(origFrame.id)?.id }`
+ */
+export const assertElements = <T extends AllPossibleKeys<ExcalidrawElement>>(
+  actualElements: readonly ExcalidrawElement[],
+  /** array order matters */
+  expectedElements: (Partial<Record<T, any>> & {
+    /** meta, will be stripped for element attribute checks */
+    selected?: true;
+  } & (
+      | {
+          id: ExcalidrawElement["id"];
+        }
+      | { [ORIG_ID]?: string }
+    ))[],
+) => {
+  const h = window.h;
+
+  const expectedElementsWithIds: (typeof expectedElements[number] & {
+    id: ExcalidrawElement["id"];
+  })[] = expectedElements.map((el) => {
+    if ("id" in el) {
+      return el;
+    }
+    const actualElement = actualElements.find(
+      (act) => (act as any)[ORIG_ID] === el[ORIG_ID],
+    );
+    if (actualElement) {
+      return { ...el, id: actualElement.id };
+    }
+    return {
+      ...el,
+      id: "UNKNOWN_ID",
+    };
+  });
+
+  const map_expectedElements = arrayToMap(expectedElementsWithIds);
+
+  const selectedElementIds = expectedElementsWithIds.reduce(
+    (acc: Record<ExcalidrawElement["id"], true>, el) => {
+      if (el.selected) {
+        acc[el.id] = true;
+      }
+      return acc;
+    },
+    {},
+  );
+
+  const mappedActualElements = actualElements.map((el) => {
+    const expectedElement = map_expectedElements.get(el.id);
+    if (expectedElement) {
+      const pickedAttrs: Record<string, any> = {};
+
+      for (const key of Object.keys(expectedElement)) {
+        if (key === "selected") {
+          delete expectedElement.selected;
+          continue;
+        }
+        pickedAttrs[key] = (el as any)[key];
+      }
+
+      if (ORIG_ID in expectedElement) {
+        // @ts-ignore
+        pickedAttrs[ORIG_ID] = (el as any)[ORIG_ID];
+      }
+
+      return pickedAttrs;
+    }
+    return el;
+  });
+
+  try {
+    // testing order separately for even easier diffs
+    expect(actualElements.map((x) => x.id)).toEqual(
+      expectedElementsWithIds.map((x) => x.id),
+    );
+  } catch (err: any) {
+    let errStr = "\n\nmismatched element order\n\n";
+
+    errStr += `actual:   ${ansi.lightGray(
+      `[${err.actual
+        .map((id: string, index: number) => {
+          const act = actualElements[index];
+
+          return `${
+            id === err.expected[index] ? ansi.green(id) : ansi.red(id)
+          } (${act.type.slice(0, 4)}${
+            ORIG_ID in act ? ` ↳ ${(act as any)[ORIG_ID]}` : ""
+          })`;
+        })
+        .join(", ")}]`,
+    )}\n${ansi.lightGray(
+      `expected: [${err.expected
+        .map((exp: string, index: number) => {
+          const expEl = actualElements.find((el) => el.id === exp);
+          const origEl =
+            expEl &&
+            actualElements.find((el) => el.id === (expEl as any)[ORIG_ID]);
+          return expEl
+            ? `${
+                exp === err.actual[index]
+                  ? ansi.green(expEl.id)
+                  : ansi.red(expEl.id)
+              } (${expEl.type.slice(0, 4)}${origEl ? ` ↳ ${origEl.id}` : ""})`
+            : exp;
+        })
+        .join(", ")}]\n`,
+    )}`;
+
+    throw trimErrorStack(new Error(errStr), 1);
+  }
+
+  expect(mappedActualElements).toEqual(
+    expect.arrayContaining(expectedElementsWithIds),
+  );
+
+  expect(h.state.selectedElementIds).toEqual(selectedElementIds);
+};
+
+const stripProps = (
+  deltas: Record<string, { deleted: any; inserted: any }>,
+  props: string[],
+) =>
+  Object.entries(deltas).reduce((acc, curr) => {
+    const { inserted, deleted, ...rest } = curr[1];
+
+    for (const prop of props) {
+      delete inserted[prop];
+      delete deleted[prop];
+    }
+
+    acc[curr[0]] = {
+      inserted,
+      deleted,
+      ...rest,
+    };
+
+    return acc;
+  }, {} as Record<string, any>);
+
+export const checkpointHistory = (history: History, name: string) => {
+  expect(
+    history.undoStack.map((x) => ({
+      ...x,
+      elements: {
+        ...x.elements,
+        added: stripProps(x.elements.added, ["seed", "versionNonce"]),
+        removed: stripProps(x.elements.removed, ["seed", "versionNonce"]),
+        updated: stripProps(x.elements.updated, ["seed", "versionNonce"]),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] undo stack`);
+
+  expect(
+    history.redoStack.map((x) => ({
+      ...x,
+      elements: {
+        ...x.elements,
+        added: stripProps(x.elements.added, ["seed", "versionNonce"]),
+        removed: stripProps(x.elements.removed, ["seed", "versionNonce"]),
+        updated: stripProps(x.elements.updated, ["seed", "versionNonce"]),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] redo stack`);
+};
+
+/**
+ * removes one or more leading stack trace lines (leading to files) from the
+ * error stack trace
+ */
+export const trimErrorStack = (error: Error, range = 1) => {
+  const stack = error.stack?.split("\n");
+  if (stack) {
+    stack.splice(1, range);
+    error.stack = stack.join("\n");
+  }
+  return error;
+};
+
+export const stripIgnoredNodesFromErrorMessage = (error: Error) => {
+  error.message = error.message.replace(/\s+Ignored nodes:[\s\S]+/, "");
+  return error;
+};

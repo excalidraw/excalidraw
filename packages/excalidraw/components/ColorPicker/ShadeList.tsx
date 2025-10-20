@@ -1,23 +1,32 @@
 import clsx from "clsx";
-import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
+
+import type { ColorPaletteCustom } from "@excalidraw/common";
+
+import { useAtom } from "../../editor-jotai";
+import { t } from "../../i18n";
+
+import HotkeyLabel from "./HotkeyLabel";
 import {
   activeColorPickerSectionAtom,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
-import HotkeyLabel from "./HotkeyLabel";
-import { t } from "../../i18n";
-import { ColorPaletteCustom } from "../../colors";
 
 interface ShadeListProps {
-  hex: string;
+  color: string | null;
   onChange: (color: string) => void;
   palette: ColorPaletteCustom;
+  showHotKey?: boolean;
 }
 
-export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
+export const ShadeList = ({
+  color,
+  onChange,
+  palette,
+  showHotKey,
+}: ShadeListProps) => {
   const colorObj = getColorNameAndShadeFromColor({
-    color: hex || "transparent",
+    color: color || "transparent",
     palette,
   });
 
@@ -52,7 +61,7 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
               key={i}
               type="button"
               className={clsx(
-                "color-picker__button color-picker__button--large",
+                "color-picker__button color-picker__button--large has-outline",
                 { active: i === shade },
               )}
               aria-label="Shade"
@@ -64,7 +73,9 @@ export const ShadeList = ({ hex, onChange, palette }: ShadeListProps) => {
               }}
             >
               <div className="color-picker__button-outline" />
-              <HotkeyLabel color={color} keyLabel={i + 1} isShade />
+              {showHotKey && (
+                <HotkeyLabel color={color} keyLabel={i + 1} isShade />
+              )}
             </button>
           ))}
         </div>

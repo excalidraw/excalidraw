@@ -1,6 +1,9 @@
 // place here categories that you want to track. We want to track just a
+
+import { isDevEnv } from "@excalidraw/common";
+
 // small subset of categories at a given time.
-const ALLOWED_CATEGORIES_TO_TRACK = ["ai", "command_palette"] as string[];
+const ALLOWED_CATEGORIES_TO_TRACK = new Set(["command_palette", "export"]);
 
 export const trackEvent = (
   category: string,
@@ -9,17 +12,20 @@ export const trackEvent = (
   value?: number,
 ) => {
   try {
-    // prettier-ignore
     if (
-      typeof window === "undefined"
-      || import.meta.env.VITE_WORKER_ID
-      // comment out to debug locally
-      || import.meta.env.PROD
+      typeof window === "undefined" ||
+      import.meta.env.VITE_WORKER_ID ||
+      import.meta.env.VITE_APP_ENABLE_TRACKING !== "true"
     ) {
       return;
     }
 
-    if (!ALLOWED_CATEGORIES_TO_TRACK.includes(category)) {
+    if (!ALLOWED_CATEGORIES_TO_TRACK.has(category)) {
+      return;
+    }
+
+    if (isDevEnv()) {
+      // comment out to debug in dev
       return;
     }
 

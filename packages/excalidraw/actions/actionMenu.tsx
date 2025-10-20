@@ -1,57 +1,10 @@
-import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
-import { t } from "../i18n";
-import { showSelectedShapeActions, getNonDeletedElements } from "../element";
+import { KEYS } from "@excalidraw/common";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import { HelpIconThin } from "../components/icons";
+
 import { register } from "./register";
-import { KEYS } from "../keys";
-
-export const actionToggleCanvasMenu = register({
-  name: "toggleCanvasMenu",
-  label: "buttons.menu",
-  trackEvent: { category: "menu" },
-  perform: (_, appState) => ({
-    appState: {
-      ...appState,
-      openMenu: appState.openMenu === "canvas" ? null : "canvas",
-    },
-    commitToHistory: false,
-  }),
-  PanelComponent: ({ appState, updateData }) => (
-    <ToolButton
-      type="button"
-      icon={HamburgerMenuIcon}
-      aria-label={t("buttons.menu")}
-      onClick={updateData}
-      selected={appState.openMenu === "canvas"}
-    />
-  ),
-});
-
-export const actionToggleEditMenu = register({
-  name: "toggleEditMenu",
-  label: "buttons.edit",
-  trackEvent: { category: "menu" },
-  perform: (_elements, appState) => ({
-    appState: {
-      ...appState,
-      openMenu: appState.openMenu === "shape" ? null : "shape",
-    },
-    commitToHistory: false,
-  }),
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <ToolButton
-      visible={showSelectedShapeActions(
-        appState,
-        getNonDeletedElements(elements),
-      )}
-      type="button"
-      icon={palette}
-      aria-label={t("buttons.edit")}
-      onClick={updateData}
-      selected={appState.openMenu === "shape"}
-    />
-  ),
-});
 
 export const actionShortcuts = register({
   name: "toggleShortcuts",
@@ -72,8 +25,10 @@ export const actionShortcuts = register({
             : {
                 name: "help",
               },
+        openMenu: null,
+        openPopup: null,
       },
-      commitToHistory: false,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,

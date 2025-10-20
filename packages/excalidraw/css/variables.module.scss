@@ -50,6 +50,15 @@
         color: var(--color-on-primary-container);
       }
     }
+
+    &[aria-disabled="true"] {
+      background: initial;
+      border: none;
+
+      svg {
+        color: var(--color-disabled);
+      }
+    }
   }
 }
 
@@ -113,6 +122,27 @@
       color: var(--button-color, var(--color-on-primary-container));
     }
   }
+
+  @include isMobile() {
+    width: var(--mobile-action-button-size, var(--default-button-size));
+    height: var(--mobile-action-button-size, var(--default-button-size));
+  }
+}
+
+@mixin buttonNoHighlight {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+@mixin outlineButtonIconStyles {
+  @include outlineButtonStyles;
+  padding: 0;
+
+  svg {
+    width: var(--default-icon-size);
+    height: var(--default-icon-size);
+  }
 }
 
 @mixin avatarStyles {
@@ -126,7 +156,7 @@
   align-items: center;
   cursor: pointer;
   font-size: 0.75rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
   color: var(--color-gray-90);
   flex: 0 0 auto;
@@ -168,12 +198,9 @@
   &:active {
     box-shadow: 0 0 0 1px var(--color-brand-active);
   }
-}
 
-$theme-filter: "invert(93%) hue-rotate(180deg)";
-$right-sidebar-width: "302px";
-
-:export {
-  themeFilter: unquote($theme-filter);
-  rightSidebarWidth: unquote($right-sidebar-width);
+  @include isMobile() {
+    width: var(--mobile-action-button-size, 2rem);
+    height: var(--mobile-action-button-size, 2rem);
+  }
 }

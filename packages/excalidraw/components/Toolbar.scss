@@ -10,6 +10,16 @@
       }
     }
 
+    &--compact {
+      .ToolIcon__keybinding {
+        display: none;
+      }
+
+      .App-toolbar__divider {
+        margin: 0;
+      }
+    }
+
     &__divider {
       width: 1px;
       height: 1.5rem;
@@ -32,6 +42,10 @@
       background-color: var(--button-hover-bg);
       box-shadow: 0 0 0 1px
         var(--button-active-border, var(--color-primary-darkest)) inset;
+    }
+
+    &:hover {
+      background-color: transparent;
     }
 
     &--selected,

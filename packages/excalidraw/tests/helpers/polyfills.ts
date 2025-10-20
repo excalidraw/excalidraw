@@ -1,3 +1,5 @@
+import { URL } from "node:url";
+
 class ClipboardEvent {
   constructor(
     type: "paste" | "copy",
@@ -45,42 +47,43 @@ class DataTransferItem {
   }
 }
 
-class DataTransferList {
-  items: DataTransferItem[] = [];
-
+class DataTransferItemList extends Array<DataTransferItem> {
   add(data: string | File, type: string = ""): void {
     if (typeof data === "string") {
-      this.items.push(new DataTransferItem("string", type, data));
+      this.push(new DataTransferItem("string", type, data));
     } else if (data instanceof File) {
-      this.items.push(new DataTransferItem("file", type, data));
+      this.push(new DataTransferItem("file", type, data));
     }
   }
 
   clear(): void {
-    this.items = [];
+    this.clear();
   }
 }
 
 class DataTransfer {
-  public items: DataTransferList = new DataTransferList();
-  private _types: Record<string, string> = {};
+  public items: DataTransferItemList = new DataTransferItemList();
 
   get files() {
-    return this.items.items
+    return this.items
       .filter((item) => item.kind === "file")
       .map((item) => item.getAsFile()!);
   }
 
   add(data: string | File, type: string = ""): void {
-    this.items.add(data, type);
+    if (typeof data === "string") {
+      this.items.add(data, type);
+    } else {
+      this.items.add(data);
+    }
   }
 
   setData(type: string, value: string) {
-    this._types[type] = value;
+    this.items.add(value, type);
   }
 
   getData(type: string) {
-    return this._types[type] || "";
+    return this.items.find((item) => item.type === type)?.data || "";
   }
 }
 
@@ -88,4 +91,6 @@ export const testPolyfills = {
   ClipboardEvent,
   DataTransfer,
   DataTransferItem,
+  // https://github.com/vitest-dev/vitest/pull/4164#issuecomment-2172729965
+  URL,
 };

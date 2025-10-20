@@ -1,13 +1,18 @@
-import React from "react";
-import { ExcalidrawElement } from "../element/types";
-import {
+import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+} from "@excalidraw/element/types";
+
+import type { CaptureUpdateActionType } from "@excalidraw/element";
+
+import type {
   AppClassProperties,
   AppState,
   ExcalidrawProps,
   BinaryFiles,
   UIAppState,
 } from "../types";
-import { MarkOptional } from "../utility-types";
+import type React from "react";
 
 export type ActionSource =
   | "ui"
@@ -20,19 +25,15 @@ export type ActionSource =
 export type ActionResult =
   | {
       elements?: readonly ExcalidrawElement[] | null;
-      appState?: MarkOptional<
-        AppState,
-        "offsetTop" | "offsetLeft" | "width" | "height"
-      > | null;
+      appState?: Partial<AppState> | null;
       files?: BinaryFiles | null;
-      commitToHistory: boolean;
-      syncHistory?: boolean;
+      captureUpdate: CaptureUpdateActionType;
       replaceFiles?: boolean;
     }
   | false;
 
 type ActionFn = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly OrderedExcalidrawElement[],
   appState: Readonly<AppState>,
   formData: any,
   app: AppClassProperties,
@@ -67,10 +68,10 @@ export type ActionName =
   | "changeSloppiness"
   | "changeStrokeStyle"
   | "changeArrowhead"
+  | "changeArrowType"
+  | "changeArrowProperties"
   | "changeOpacity"
   | "changeFontSize"
-  | "toggleCanvasMenu"
-  | "toggleEditMenu"
   | "undo"
   | "redo"
   | "finalize"
@@ -131,7 +132,17 @@ export type ActionName =
   | "setEmbeddableAsActiveTool"
   | "createContainerFromText"
   | "wrapTextInContainer"
-  | "commandPalette";
+  | "commandPalette"
+  | "autoResize"
+  | "elementStats"
+  | "searchMenu"
+  | "copyElementLink"
+  | "linkToElement"
+  | "cropEditor"
+  | "wrapSelectionInFrame"
+  | "toggleLassoTool"
+  | "toggleShapeSwitch"
+  | "togglePolygon";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -140,6 +151,10 @@ export type PanelComponentProps = {
   appProps: ExcalidrawProps;
   data?: Record<string, any>;
   app: AppClassProperties;
+  renderAction: (
+    name: ActionName,
+    data?: PanelComponentProps["data"],
+  ) => React.JSX.Element | null;
 };
 
 export interface Action {
@@ -185,7 +200,9 @@ export interface Action {
           | "history"
           | "menu"
           | "collab"
-          | "hyperlink";
+          | "hyperlink"
+          | "search_menu"
+          | "shape_switch";
         action?: string;
         predicate?: (
           appState: Readonly<AppState>,

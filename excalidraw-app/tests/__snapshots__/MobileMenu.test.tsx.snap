@@ -5,7 +5,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
   class="welcome-screen-center"
 >
   <div
-    class="welcome-screen-center__logo virgil welcome-screen-decor"
+    class="welcome-screen-center__logo excalifont welcome-screen-decor"
   >
     <div
       class="ExcalidrawLogo is-small"
@@ -48,7 +48,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
     </div>
   </div>
   <div
-    class="welcome-screen-center__heading welcome-screen-decor virgil"
+    class="welcome-screen-center__heading welcome-screen-decor excalifont"
   >
     All your data is saved locally in your browser.
   </div>
@@ -198,7 +198,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
     <a
       class="welcome-screen-menu-item "
       href="undefined/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest"
-      rel="noreferrer"
+      rel="noopener"
       target="_blank"
     >
       <div
@@ -216,23 +216,22 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
           stroke-width="2"
           viewBox="0 0 24 24"
         >
-          <g>
+          <g
+            stroke-width="1.5"
+          >
             <path
               d="M0 0h24v24H0z"
               fill="none"
               stroke="none"
             />
             <path
-              d="M10 12l10 0"
+              d="M15 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"
             />
             <path
-              d="M10 12l4 4"
+              d="M21 12h-13l3 -3"
             />
             <path
-              d="M10 12l4 -4"
-            />
-            <path
-              d="M4 4l0 16"
+              d="M11 15l-3 -3"
             />
           </g>
         </svg>

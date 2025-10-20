@@ -1,11 +1,14 @@
-import { LaserPointerOptions } from "@excalidraw/laser-pointer";
-import { AnimatedTrail, Trail } from "./animated-trail";
-import { AnimationFrameHandler } from "./animation-frame-handler";
-import type App from "./components/App";
-import { SocketId } from "./types";
-import { easeOut } from "./utils";
+import { DEFAULT_LASER_COLOR, easeOut } from "@excalidraw/common";
+
+import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
+
+import { AnimatedTrail } from "./animated-trail";
 import { getClientColor } from "./clients";
-import { DEFAULT_LASER_COLOR } from "./constants";
+
+import type { Trail } from "./animated-trail";
+import type { AnimationFrameHandler } from "./animation-frame-handler";
+import type App from "./components/App";
+import type { SocketId } from "./types";
 
 export class LaserTrails implements Trail {
   public localTrail: AnimatedTrail;

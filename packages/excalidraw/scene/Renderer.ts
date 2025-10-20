@@ -1,16 +1,21 @@
-import { isElementInViewport } from "../element/sizeHelpers";
-import { isImageElement } from "../element/typeChecks";
-import {
+import { isElementInViewport } from "@excalidraw/element";
+
+import { memoize, toBrandedType } from "@excalidraw/common";
+
+import type {
+  ExcalidrawElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import type { Scene } from "@excalidraw/element";
+
 import { renderInteractiveSceneThrottled } from "../renderer/interactiveScene";
 import { renderStaticSceneThrottled } from "../renderer/staticScene";
 
-import { AppState } from "../types";
-import { memoize, toBrandedType } from "../utils";
-import Scene from "./Scene";
-import { RenderableElementsMap } from "./types";
+import type { RenderableElementsMap } from "./types";
+
+import type { AppState } from "../types";
 
 export class Renderer {
   private scene: Scene;
@@ -64,31 +69,26 @@ export class Renderer {
 
     const getRenderableElements = ({
       elements,
-      editingElement,
-      pendingImageElementId,
+      editingTextElement,
+      newElementId,
     }: {
       elements: readonly NonDeletedExcalidrawElement[];
-      editingElement: AppState["editingElement"];
-      pendingImageElementId: AppState["pendingImageElementId"];
+      editingTextElement: AppState["editingTextElement"];
+      newElementId: ExcalidrawElement["id"] | undefined;
     }) => {
       const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
 
       for (const element of elements) {
-        if (isImageElement(element)) {
-          if (
-            // => not placed on canvas yet (but in elements array)
-            pendingImageElementId === element.id
-          ) {
-            continue;
-          }
+        if (newElementId === element.id) {
+          continue;
         }
 
         // we don't want to render text element that's being currently edited
         // (it's rendered on remote only)
         if (
-          !editingElement ||
-          editingElement.type !== "text" ||
-          element.id !== editingElement.id
+          !editingTextElement ||
+          editingTextElement.type !== "text" ||
+          element.id !== editingTextElement.id
         ) {
           elementsMap.set(element.id, element);
         }
@@ -105,11 +105,10 @@ export class Renderer {
         scrollY,
         height,
         width,
-        editingElement,
-        pendingImageElementId,
-        // unused but serves we cache on it to invalidate elements if they
-        // get mutated
-        versionNonce: _versionNonce,
+        editingTextElement,
+        newElementId,
+        // cache-invalidation nonce
+        sceneNonce: _sceneNonce,
       }: {
         zoom: AppState["zoom"];
         offsetLeft: AppState["offsetLeft"];
@@ -118,16 +117,18 @@ export class Renderer {
         scrollY: AppState["scrollY"];
         height: AppState["height"];
         width: AppState["width"];
-        editingElement: AppState["editingElement"];
-        pendingImageElementId: AppState["pendingImageElementId"];
-        versionNonce: ReturnType<InstanceType<typeof Scene>["getVersionNonce"]>;
+        editingTextElement: AppState["editingTextElement"];
+        /** note: first render of newElement will always bust the cache
+         * (we'd have to prefilter elements outside of this function) */
+        newElementId: ExcalidrawElement["id"] | undefined;
+        sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;
       }) => {
         const elements = this.scene.getNonDeletedElements();
 
         const elementsMap = getRenderableElements({
           elements,
-          editingElement,
-          pendingImageElementId,
+          editingTextElement,
+          newElementId,
         });
 
         const visibleElements = getVisibleCanvasElements({

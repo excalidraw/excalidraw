@@ -1,9 +1,11 @@
-import { useExcalidrawSetAppState } from "../App";
-import { SidebarTriggerProps } from "./common";
-import { useUIAppState } from "../../context/ui-appState";
 import clsx from "clsx";
 
+import { useUIAppState } from "../../context/ui-appState";
+import { useExcalidrawSetAppState } from "../App";
+
 import "./SidebarTrigger.scss";
+
+import type { SidebarTriggerProps } from "./common";
 
 export const SidebarTrigger = ({
   name,
@@ -28,7 +30,11 @@ export const SidebarTrigger = ({
             .querySelector(".layer-ui__wrapper")
             ?.classList.remove("animate");
           const isOpen = event.target.checked;
-          setAppState({ openSidebar: isOpen ? { name, tab } : null });
+          setAppState({
+            openSidebar: isOpen ? { name, tab } : null,
+            openMenu: null,
+            openPopup: null,
+          });
           onToggle?.(isOpen);
         }}
         checked={appState.openSidebar?.name === name}

@@ -1,4 +1,30 @@
-import type { Point, ToolType } from "../../types";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
+
+import {
+  elementCenterPoint,
+  getCommonBounds,
+  getElementPointsCoords,
+} from "@excalidraw/element";
+import { cropElement } from "@excalidraw/element";
+import {
+  getTransformHandles,
+  getTransformHandlesFromCoords,
+  OMIT_SIDES_FOR_FRAME,
+  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  type TransformHandle,
+  type TransformHandleDirection,
+} from "@excalidraw/element";
+import {
+  isLinearElement,
+  isFreeDrawElement,
+  isTextElement,
+  isFrameLikeElement,
+} from "@excalidraw/element";
+import { KEYS, arrayToMap } from "@excalidraw/common";
+
+import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
+
+import type { TransformHandleType } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -9,31 +35,17 @@ import type {
   ExcalidrawDiamondElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
-} from "../../element/types";
-import {
-  getTransformHandles,
-  getTransformHandlesFromCoords,
-  OMIT_SIDES_FOR_FRAME,
-  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-  TransformHandleType,
-  type TransformHandle,
-  type TransformHandleDirection,
-} from "../../element/transformHandles";
-import { KEYS } from "../../keys";
-import { fireEvent, GlobalTestState, screen } from "../test-utils";
-import { mutateElement } from "../../element/mutateElement";
-import { API } from "./api";
-import {
-  isLinearElement,
-  isFreeDrawElement,
-  isTextElement,
-  isFrameLikeElement,
-} from "../../element/typeChecks";
-import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
-import { rotatePoint } from "../../math";
-import { getTextEditor } from "../queries/dom";
-import { arrayToMap } from "../../utils";
+  ExcalidrawImageElement,
+  ElementsMap,
+} from "@excalidraw/element/types";
+
 import { createTestHook } from "../../components/App";
+import { getTextEditor, TEXT_EDITOR_SELECTOR } from "../queries/dom";
+import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
+
+import { API } from "./api";
+
+import type { ToolType } from "../../types";
 
 // so that window.h is available when App.tsx is not imported as well.
 createTestHook();
@@ -68,8 +80,11 @@ export class Keyboard {
     }
   };
 
-  static keyDown = (key: string) => {
-    fireEvent.keyDown(document, {
+  static keyDown = (
+    key: string,
+    target: HTMLElement | Document | Window = document,
+  ) => {
+    fireEvent.keyDown(target, {
       key,
       ctrlKey,
       shiftKey,
@@ -77,8 +92,11 @@ export class Keyboard {
     });
   };
 
-  static keyUp = (key: string) => {
-    fireEvent.keyUp(document, {
+  static keyUp = (
+    key: string,
+    target: HTMLElement | Document | Window = document,
+  ) => {
+    fireEvent.keyUp(target, {
       key,
       ctrlKey,
       shiftKey,
@@ -86,9 +104,9 @@ export class Keyboard {
     });
   };
 
-  static keyPress = (key: string) => {
-    Keyboard.keyDown(key);
-    Keyboard.keyUp(key);
+  static keyPress = (key: string, target?: HTMLElement | Document | Window) => {
+    Keyboard.keyDown(key, target);
+    Keyboard.keyUp(key, target);
   };
 
   static codeDown = (code: string) => {
@@ -113,39 +131,68 @@ export class Keyboard {
     Keyboard.codeDown(code);
     Keyboard.codeUp(code);
   };
+
+  static undo = () => {
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress("z");
+    });
+  };
+
+  static redo = () => {
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress("z");
+    });
+  };
+
+  static exitTextEditor = (textarea: HTMLTextAreaElement) => {
+    fireEvent.keyDown(textarea, { key: KEYS.ESCAPE });
+  };
 }
 
-const getElementPointForSelection = (element: ExcalidrawElement): Point => {
-  const { x, y, width, height, angle } = element;
-  const target: Point = [
+const getElementPointForSelection = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+): GlobalPoint => {
+  const { x, y, width, angle } = element;
+  const target = pointFrom<GlobalPoint>(
     x +
       (isLinearElement(element) || isFreeDrawElement(element) ? 0 : width / 2),
     y,
-  ];
-  let center: Point;
+  );
+  let center: GlobalPoint;
 
   if (isLinearElement(element)) {
     const bounds = getElementPointsCoords(element, element.points);
-    center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2];
+    center = pointFrom(
+      (bounds[0] + bounds[2]) / 2,
+      (bounds[1] + bounds[3]) / 2,
+    );
   } else {
-    center = [x + width / 2, y + height / 2];
+    center = elementCenterPoint(element, elementsMap);
   }
 
   if (isTextElement(element)) {
     return center;
   }
 
-  return rotatePoint(target, center, angle);
+  return pointRotateRads(target, center, angle);
 };
 
 export class Pointer {
   public clientX = 0;
   public clientY = 0;
 
+  static activePointers: Pointer[] = [];
+  static resetAll() {
+    Pointer.activePointers.forEach((pointer) => pointer.reset());
+  }
+
   constructor(
     private readonly pointerType: "mouse" | "touch" | "pen",
     private readonly pointerId = 1,
-  ) {}
+  ) {
+    Pointer.activePointers.push(this);
+  }
 
   reset() {
     this.clientX = 0;
@@ -258,7 +305,12 @@ export class Pointer {
       elements = Array.isArray(elements) ? elements : [elements];
       elements.forEach((element) => {
         this.reset();
-        this.click(...getElementPointForSelection(element));
+        this.click(
+          ...getElementPointForSelection(
+            element,
+            h.app.scene.getElementsMapIncludingDeleted(),
+          ),
+        );
       });
     });
 
@@ -267,13 +319,23 @@ export class Pointer {
 
   clickOn(element: ExcalidrawElement) {
     this.reset();
-    this.click(...getElementPointForSelection(element));
+    this.click(
+      ...getElementPointForSelection(
+        element,
+        h.app.scene.getElementsMapIncludingDeleted(),
+      ),
+    );
     this.reset();
   }
 
   doubleClickOn(element: ExcalidrawElement) {
     this.reset();
-    this.doubleClick(...getElementPointForSelection(element));
+    this.doubleClick(
+      ...getElementPointForSelection(
+        element,
+        h.app.scene.getElementsMapIncludingDeleted(),
+      ),
+    );
     this.reset();
   }
 }
@@ -287,14 +349,16 @@ const transform = (
   keyboardModifiers: KeyboardModifiers = {},
 ) => {
   const elements = Array.isArray(element) ? element : [element];
-  h.setState({
-    selectedElementIds: elements.reduce(
-      (acc, e) => ({
-        ...acc,
-        [e.id]: true,
-      }),
-      {},
-    ),
+  act(() => {
+    h.setState({
+      selectedElementIds: elements.reduce(
+        (acc, e) => ({
+          ...acc,
+          [e.id]: true,
+        }),
+        {},
+      ),
+    });
   });
   let handleCoords: TransformHandle | undefined;
   if (elements.length === 1) {
@@ -303,13 +367,14 @@ const transform = (
       h.state.zoom,
       arrayToMap(h.elements),
       "mouse",
+      {},
     )[handle];
   } else {
     const [x1, y1, x2, y2] = getCommonBounds(elements);
     const isFrameSelected = elements.some(isFrameLikeElement);
     const transformHandles = getTransformHandlesFromCoords(
       [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
-      0,
+      0 as Radians,
       h.state.zoom,
       "mouse",
       isFrameSelected ? OMIT_SIDES_FOR_FRAME : OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
@@ -361,7 +426,10 @@ const proxy = <T extends ExcalidrawElement>(
 };
 
 /** Tools that can be used to draw shapes */
-type DrawingToolName = Exclude<ToolType, "lock" | "selection" | "eraser">;
+type DrawingToolName = Exclude<
+  ToolType,
+  "lock" | "selection" | "eraser" | "lasso"
+>;
 
 type Element<T extends DrawingToolName> = T extends "line" | "freedraw"
   ? ExcalidrawLinearElement
@@ -431,7 +499,7 @@ export class UI {
       width?: number;
       height?: number;
       angle?: number;
-      points?: T extends "line" | "arrow" | "freedraw" ? Point[] : never;
+      points?: T extends "line" | "arrow" | "freedraw" ? LocalPoint[] : never;
     } = {},
   ): Element<T> & {
     /** Returns the actual, current element from the elements array, instead
@@ -440,9 +508,9 @@ export class UI {
   } {
     const width = initialWidth ?? initialHeight ?? size;
     const height = initialHeight ?? size;
-    const points: Point[] = initialPoints ?? [
-      [0, 0],
-      [width, height],
+    const points: LocalPoint[] = initialPoints ?? [
+      pointFrom(0, 0),
+      pointFrom(width, height),
     ];
 
     UI.clickTool(type);
@@ -474,7 +542,9 @@ export class UI {
     const origElement = h.elements[h.elements.length - 1] as any;
 
     if (angle !== 0) {
-      mutateElement(origElement, { angle });
+      act(() => {
+        h.app.scene.mutateElement(origElement, { angle });
+      });
     }
 
     return proxy(origElement);
@@ -483,23 +553,23 @@ export class UI {
   static async editText<
     T extends ExcalidrawTextElement | ExcalidrawTextContainer,
   >(element: T, text: string) {
-    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
     const openedEditor =
-      document.querySelector<HTMLTextAreaElement>(textEditorSelector);
+      document.querySelector<HTMLTextAreaElement>(TEXT_EDITOR_SELECTOR);
 
     if (!openedEditor) {
       mouse.select(element);
       Keyboard.keyPress(KEYS.ENTER);
     }
 
-    const editor = await getTextEditor(textEditorSelector);
+    const editor = await getTextEditor();
     if (!editor) {
       throw new Error("Can't find wysiwyg text editor in the dom");
     }
 
     fireEvent.input(editor, { target: { value: text } });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    editor.blur();
+    act(() => {
+      editor.blur();
+    });
 
     return isTextElement(element)
       ? element
@@ -510,6 +580,14 @@ export class UI {
         );
   }
 
+  static updateInput = (input: HTMLInputElement, value: string | number) => {
+    act(() => {
+      input.focus();
+      fireEvent.change(input, { target: { value: String(value) } });
+      input.blur();
+    });
+  };
+
   static resize(
     element: ExcalidrawElement | ExcalidrawElement[],
     handle: TransformHandleDirection,
@@ -517,6 +595,39 @@ export class UI {
     keyboardModifiers: KeyboardModifiers = {},
   ) {
     return transform(element, handle, mouseMove, keyboardModifiers);
+  }
+
+  static crop(
+    element: ExcalidrawImageElement,
+    handle: TransformHandleDirection,
+    naturalWidth: number,
+    naturalHeight: number,
+    mouseMove: [deltaX: number, deltaY: number],
+    keepAspectRatio = false,
+  ) {
+    const handleCoords = getTransformHandles(
+      element,
+      h.state.zoom,
+      arrayToMap(h.elements),
+      "mouse",
+      {},
+    )[handle]!;
+
+    const clientX = handleCoords[0] + handleCoords[2] / 2;
+    const clientY = handleCoords[1] + handleCoords[3] / 2;
+
+    const mutations = cropElement(
+      element,
+      h.scene.getNonDeletedElementsMap(),
+      handle,
+      naturalWidth,
+      naturalHeight,
+      clientX + mouseMove[0],
+      clientY + mouseMove[1],
+      keepAspectRatio ? element.width / element.height : undefined,
+    );
+
+    API.updateElement(element, mutations);
   }
 
   static rotate(
@@ -545,5 +656,27 @@ export class UI {
     return GlobalTestState.renderResult.container.querySelector(
       ".context-menu",
     ) as HTMLElement | null;
+  };
+
+  static queryStats = () => {
+    return GlobalTestState.renderResult.container.querySelector(
+      ".exc-stats",
+    ) as HTMLElement | null;
+  };
+
+  static queryStatsProperty = (label: string) => {
+    const elementStats = UI.queryStats()?.querySelector("#elementStats");
+
+    expect(elementStats).not.toBeNull();
+
+    if (elementStats) {
+      return (
+        elementStats?.querySelector(
+          `.exc-stats__row .drag-input-container[data-testid="${label}"]`,
+        ) || null
+      );
+    }
+
+    return null;
   };
 }

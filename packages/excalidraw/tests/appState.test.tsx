@@ -1,11 +1,15 @@
-import { queryByTestId, render, waitFor } from "./test-utils";
+import React from "react";
 
-import { Excalidraw } from "../index";
-import { API } from "./helpers/api";
+import { EXPORT_DATA_TYPES, MIME_TYPES } from "@excalidraw/common";
+
+import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+
 import { getDefaultAppState } from "../appState";
-import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
+import { Excalidraw } from "../index";
+
+import { API } from "./helpers/api";
 import { Pointer, UI } from "./helpers/ui";
-import { ExcalidrawTextElement } from "../element/types";
+import { fireEvent, queryByTestId, render, waitFor } from "./test-utils";
 
 const { h } = window;
 
@@ -31,20 +35,23 @@ describe("appState", () => {
       expect(h.state.viewBackgroundColor).toBe("#F00");
     });
 
-    API.drop(
-      new Blob(
-        [
-          JSON.stringify({
-            type: EXPORT_DATA_TYPES.excalidraw,
-            appState: {
-              viewBackgroundColor: "#000",
-            },
-            elements: [API.createElement({ type: "rectangle", id: "A" })],
-          }),
-        ],
-        { type: MIME_TYPES.json },
-      ),
-    );
+    await API.drop([
+      {
+        kind: "file",
+        file: new Blob(
+          [
+            JSON.stringify({
+              type: EXPORT_DATA_TYPES.excalidraw,
+              appState: {
+                viewBackgroundColor: "#000",
+              },
+              elements: [API.createElement({ type: "rectangle", id: "A" })],
+            }),
+          ],
+          { type: MIME_TYPES.json },
+        ),
+      },
+    ]);
 
     await waitFor(() => {
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
@@ -69,7 +76,7 @@ describe("appState", () => {
     UI.clickTool("text");
 
     expect(h.state.currentItemFontSize).toBe(30);
-    queryByTestId(container, "fontSize-small")!.click();
+    fireEvent.click(queryByTestId(container, "fontSize-small")!);
     expect(h.state.currentItemFontSize).toBe(16);
 
     const mouse = new Pointer("mouse");

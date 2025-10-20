@@ -1,28 +1,28 @@
 import { deflate, inflate } from "pako";
+
 import { encryptData, decryptData } from "./encryption";
 
 // -----------------------------------------------------------------------------
 // byte (binary) strings
 // -----------------------------------------------------------------------------
 
-// fast, Buffer-compatible implem
-export const toByteString = (
-  data: string | Uint8Array | ArrayBuffer,
-): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const blob =
-      typeof data === "string"
-        ? new Blob([new TextEncoder().encode(data)])
-        : new Blob([data instanceof Uint8Array ? data : new Uint8Array(data)]);
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (!event.target || typeof event.target.result !== "string") {
-        return reject(new Error("couldn't convert to byte string"));
-      }
-      resolve(event.target.result);
-    };
-    reader.readAsBinaryString(blob);
-  });
+// Buffer-compatible implem.
+//
+// Note that in V8, spreading the uint8array (by chunks) into
+// `String.fromCharCode(...uint8array)` tends to be faster for large
+// strings/buffers, in case perf is needed in the future.
+export const toByteString = (data: string | Uint8Array | ArrayBuffer) => {
+  const bytes =
+    typeof data === "string"
+      ? new TextEncoder().encode(data)
+      : data instanceof Uint8Array
+      ? data
+      : new Uint8Array(data);
+  let bstring = "";
+  for (const byte of bytes) {
+    bstring += String.fromCharCode(byte);
+  }
+  return bstring;
 };
 
 const byteStringToArrayBuffer = (byteString: string) => {
@@ -46,15 +46,38 @@ const byteStringToString = (byteString: string) => {
  * @param isByteString set to true if already byte string to prevent bloat
  *  due to reencoding
  */
-export const stringToBase64 = async (str: string, isByteString = false) => {
-  return isByteString ? window.btoa(str) : window.btoa(await toByteString(str));
+export const stringToBase64 = (str: string, isByteString = false) => {
+  return isByteString ? window.btoa(str) : window.btoa(toByteString(str));
 };
 
 // async to align with stringToBase64
-export const base64ToString = async (base64: string, isByteString = false) => {
+export const base64ToString = (base64: string, isByteString = false) => {
   return isByteString
     ? window.atob(base64)
     : byteStringToString(window.atob(base64));
+};
+
+export const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
+  if (typeof Buffer !== "undefined") {
+    // Node.js environment
+    return Buffer.from(base64, "base64").buffer;
+  }
+  // Browser environment
+  return byteStringToArrayBuffer(atob(base64));
+};
+
+// -----------------------------------------------------------------------------
+// base64url
+// -----------------------------------------------------------------------------
+
+export const base64urlToString = (str: string) => {
+  return window.atob(
+    // normalize base64URL to base64
+    str
+      .replace(/-/g, "+")
+      .replace(/_/g, "/")
+      .padEnd(str.length + ((4 - (str.length % 4)) % 4), "="),
+  );
 };
 
 // -----------------------------------------------------------------------------
@@ -73,18 +96,18 @@ type EncodedData = {
 /**
  * Encodes (and potentially compresses via zlib) text to byte string
  */
-export const encode = async ({
+export const encode = ({
   text,
   compress,
 }: {
   text: string;
   /** defaults to `true`. If compression fails, falls back to bstring alone. */
   compress?: boolean;
-}): Promise<EncodedData> => {
+}): EncodedData => {
   let deflated!: string;
   if (compress !== false) {
     try {
-      deflated = await toByteString(deflate(text));
+      deflated = toByteString(deflate(text));
     } catch (error: any) {
       console.error("encode: cannot deflate", error);
     }
@@ -93,11 +116,11 @@ export const encode = async ({
     version: "1",
     encoding: "bstring",
     compressed: !!deflated,
-    encoded: deflated || (await toByteString(text)),
+    encoded: deflated || toByteString(text),
   };
 };
 
-export const decode = async (data: EncodedData): Promise<string> => {
+export const decode = (data: EncodedData): string => {
   let decoded: string;
 
   switch (data.encoding) {
@@ -105,7 +128,7 @@ export const decode = async (data: EncodedData): Promise<string> => {
       // if compressed, do not double decode the bstring
       decoded = data.compressed
         ? data.encoded
-        : await byteStringToString(data.encoded);
+        : byteStringToString(data.encoded);
       break;
     default:
       throw new Error(`decode: unknown encoding "${data.encoding}"`);

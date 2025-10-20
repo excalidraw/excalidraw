@@ -1,21 +1,26 @@
-import ReactDOM from "react-dom";
-import { render, fireEvent } from "./test-utils";
-import { Excalidraw } from "../index";
-import * as StaticScene from "../renderer/staticScene";
-import * as InteractiveCanvas from "../renderer/interactiveScene";
-import { reseed } from "../random";
-import { bindOrUnbindLinearElement } from "../element/binding";
-import {
+import React from "react";
+import { vi } from "vitest";
+
+import { bindOrUnbindLinearElement } from "@excalidraw/element";
+
+import { KEYS, reseed } from "@excalidraw/common";
+
+import "@excalidraw/utils/test-utils";
+
+import type {
   ExcalidrawLinearElement,
   NonDeleted,
   ExcalidrawRectangleElement,
-} from "../element/types";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { KEYS } from "../keys";
-import { vi } from "vitest";
+} from "@excalidraw/element/types";
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+import { Excalidraw } from "../index";
+import * as InteractiveCanvas from "../renderer/interactiveScene";
+import * as StaticScene from "../renderer/staticScene";
+
+import { UI, Pointer, Keyboard } from "./helpers/ui";
+import { render, fireEvent, act, unmountComponent } from "./test-utils";
+
+unmountComponent();
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,
@@ -46,9 +51,9 @@ describe("move element", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `6`,
+        `5`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -77,30 +82,31 @@ describe("move element", () => {
     // create elements
     const rectA = UI.createElement("rectangle", { size: 100 });
     const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
-    const line = UI.createElement("line", { x: 110, y: 50, size: 80 });
-    const elementsMap = h.app.scene.getNonDeletedElementsMap();
-    // bind line to two rectangles
-    bindOrUnbindLinearElement(
-      line.get() as NonDeleted<ExcalidrawLinearElement>,
-      rectA.get() as ExcalidrawRectangleElement,
-      rectB.get() as ExcalidrawRectangleElement,
-      elementsMap,
-    );
+    const arrow = UI.createElement("arrow", { x: 110, y: 50, size: 80 });
+    act(() => {
+      // bind line to two rectangles
+      bindOrUnbindLinearElement(
+        arrow.get() as NonDeleted<ExcalidrawLinearElement>,
+        rectA.get() as ExcalidrawRectangleElement,
+        rectB.get() as ExcalidrawRectangleElement,
+        h.app.scene,
+      );
+    });
 
-    // select the second rectangles
+    // select the second rectangle
     new Pointer("mouse").clickOn(rectB);
 
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-      `21`,
+      `17`,
     );
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`19`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`13`);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([200, 0]);
-    expect([line.x, line.y]).toEqual([110, 50]);
-    expect([line.width, line.height]).toEqual([80, 80]);
+    expect([arrow.x, arrow.y]).toEqual([110, 50]);
+    expect([arrow.width, arrow.height]).toEqual([80, 80]);
 
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
@@ -118,8 +124,8 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
-    expect([Math.round(line.x), Math.round(line.y)]).toEqual([110, 50]);
-    expect([Math.round(line.width), Math.round(line.height)]).toEqual([81, 81]);
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[110, 50]]);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[81, 81.4]]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
@@ -139,9 +145,9 @@ describe("duplicate element on move when ALT is clicked", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `6`,
+        `5`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -160,8 +166,6 @@ describe("duplicate element on move when ALT is clicked", () => {
     fireEvent.pointerMove(canvas, { clientX: 10, clientY: 60 });
     fireEvent.pointerUp(canvas);
 
-    // TODO: This used to be 4, but binding made it go up to 5. Do we need
-    // that additional render?
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`4`);
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`3`);
     expect(h.state.selectionElement).toBeNull();

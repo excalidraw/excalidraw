@@ -3,14 +3,16 @@ import {
   COLOR_VOICE_CALL,
   COLOR_WHITE,
   THEME,
-} from "./constants";
+  UserIdleState,
+} from "@excalidraw/common";
+
 import { roundRect } from "./renderer/roundRect";
-import { InteractiveCanvasRenderConfig } from "./scene/types";
-import {
+
+import type { InteractiveCanvasRenderConfig } from "./scene/types";
+import type {
   Collaborator,
   InteractiveCanvasAppState,
   SocketId,
-  UserIdleState,
 } from "./types";
 
 function hashToInteger(id: string) {

@@ -1,8 +1,10 @@
-import { Excalidraw } from "../index";
 import { queryByTestId, fireEvent } from "@testing-library/react";
-import { render } from "../tests/test-utils";
-import { Pointer, UI } from "../tests/helpers/ui";
+import React from "react";
+
+import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
+import { Pointer, UI } from "../tests/helpers/ui";
+import { render } from "../tests/test-utils";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

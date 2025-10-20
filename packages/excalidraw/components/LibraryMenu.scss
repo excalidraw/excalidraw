@@ -11,7 +11,7 @@
   .library-actions-counter {
     background-color: var(--color-primary);
     color: var(--color-primary-light);
-    font-weight: bold;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -133,15 +133,10 @@
   }
 
   .layer-ui__library .library-menu-dropdown-container {
+    z-index: 1;
     position: relative;
-
     &--in-heading {
-      padding: 0;
-      position: absolute;
-      top: 1rem;
-      right: 0.75rem;
-      z-index: 1;
-
+      margin-left: auto;
       .dropdown-menu {
         top: 100%;
       }

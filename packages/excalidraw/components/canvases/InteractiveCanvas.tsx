@@ -1,28 +1,41 @@
 import React, { useEffect, useRef } from "react";
-import { isShallowEqual, sceneCoordsToViewportCoords } from "../../utils";
-import { CURSOR_TYPE } from "../../constants";
+
+import {
+  CURSOR_TYPE,
+  isShallowEqual,
+  sceneCoordsToViewportCoords,
+} from "@excalidraw/common";
+
+import type {
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "@excalidraw/element/types";
+
 import { t } from "../../i18n";
-import type { DOMAttributes } from "react";
-import type { AppState, InteractiveCanvasAppState } from "../../types";
+import { isRenderThrottlingEnabled } from "../../reactUtils";
+import { renderInteractiveScene } from "../../renderer/interactiveScene";
+
 import type {
   InteractiveCanvasRenderConfig,
   RenderableElementsMap,
   RenderInteractiveSceneCallback,
 } from "../../scene/types";
-import type { NonDeletedExcalidrawElement } from "../../element/types";
-import { isRenderThrottlingEnabled } from "../../reactUtils";
-import { renderInteractiveScene } from "../../renderer/interactiveScene";
+import type { AppState, Device, InteractiveCanvasAppState } from "../../types";
+import type { DOMAttributes } from "react";
 
 type InteractiveCanvasProps = {
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   canvas: HTMLCanvasElement | null;
   elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   selectedElements: readonly NonDeletedExcalidrawElement[];
-  versionNonce: number | undefined;
+  allElementsMap: NonDeletedSceneElementsMap;
+  sceneNonce: number | undefined;
   selectionNonce: number | undefined;
   scale: number;
   appState: InteractiveCanvasAppState;
+  renderScrollbars: boolean;
+  device: Device;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
@@ -121,6 +134,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         elementsMap: props.elementsMap,
         visibleElements: props.visibleElements,
         selectedElements: props.selectedElements,
+        allElementsMap: props.allElementsMap,
         scale: window.devicePixelRatio,
         appState: props.appState,
         renderConfig: {
@@ -130,8 +144,9 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           remotePointerUsernames,
           remotePointerUserStates,
           selectionColor,
-          renderScrollbars: false,
+          renderScrollbars: props.renderScrollbars,
         },
+        device: props.device,
         callback: props.renderInteractiveSceneCallback,
       },
       isRenderThrottlingEnabled(),
@@ -175,14 +190,13 @@ const getRelevantAppStateProps = (
   width: appState.width,
   height: appState.height,
   viewModeEnabled: appState.viewModeEnabled,
+  openDialog: appState.openDialog,
   editingGroupId: appState.editingGroupId,
-  editingLinearElement: appState.editingLinearElement,
   selectedElementIds: appState.selectedElementIds,
   frameToHighlight: appState.frameToHighlight,
   offsetLeft: appState.offsetLeft,
   offsetTop: appState.offsetTop,
   theme: appState.theme,
-  pendingImageElementId: appState.pendingImageElementId,
   selectionElement: appState.selectionElement,
   selectedGroupIds: appState.selectedGroupIds,
   selectedLinearElement: appState.selectedLinearElement,
@@ -195,6 +209,11 @@ const getRelevantAppStateProps = (
   activeEmbeddable: appState.activeEmbeddable,
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
+  editingTextElement: appState.editingTextElement,
+  isCropping: appState.isCropping,
+  croppingElementId: appState.croppingElementId,
+  searchMatches: appState.searchMatches,
+  activeLockedId: appState.activeLockedId,
 });
 
 const areEqual = (
@@ -204,14 +223,15 @@ const areEqual = (
   // This could be further optimised if needed, as we don't have to render interactive canvas on each scene mutation
   if (
     prevProps.selectionNonce !== nextProps.selectionNonce ||
-    prevProps.versionNonce !== nextProps.versionNonce ||
+    prevProps.sceneNonce !== nextProps.sceneNonce ||
     prevProps.scale !== nextProps.scale ||
     // we need to memoize on elementsMap because they may have renewed
-    // even if versionNonce didn't change (e.g. we filter elements out based
+    // even if sceneNonce didn't change (e.g. we filter elements out based
     // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||
-    prevProps.selectedElements !== nextProps.selectedElements
+    prevProps.selectedElements !== nextProps.selectedElements ||
+    prevProps.renderScrollbars !== nextProps.renderScrollbars
   ) {
     return false;
   }

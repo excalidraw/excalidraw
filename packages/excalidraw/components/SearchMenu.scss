@@ -1,0 +1,141 @@
+@import "open-color/open-color";
+@import "../css//variables.module.scss";
+
+.excalidraw {
+  .layer-ui__search {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0 0 0;
+  }
+
+  .layer-ui__search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.75rem;
+    .ExcTextField {
+      flex: 1 0 auto;
+    }
+
+    .ExcTextField__input {
+      background-color: #f5f5f9;
+      @at-root .excalidraw.theme--dark#{&} {
+        background-color: #31303b;
+      }
+
+      border-radius: var(--border-radius-md);
+      border: 0;
+
+      input::placeholder {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .layer-ui__search-count {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 8px 0 8px;
+    margin: 0 0.75rem 0.25rem 0.75rem;
+    font-size: 0.8em;
+
+    .result-nav {
+      display: flex;
+
+      .result-nav-btn {
+        width: 36px;
+        height: 36px;
+        --button-border: transparent;
+
+        &:active {
+          background-color: var(--color-surface-high);
+        }
+
+        &:first-child {
+          margin-right: 4px;
+        }
+      }
+    }
+  }
+
+  .layer-ui__search-result-container {
+    overflow-y: auto;
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0 0.75rem;
+
+    gap: 0.125rem;
+  }
+
+  .layer-ui__search .collapsible-items {
+    gap: 2px;
+  }
+
+  .layer-ui__search-result-title {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-weight: 700;
+
+    .title-icon {
+      width: 0.875rem;
+      height: 0.875rem;
+      margin-right: 0.25rem;
+      svg g {
+        stroke-width: 1.25;
+      }
+    }
+  }
+
+  .layer-ui__divider {
+    width: 100%;
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+
+  .layer-ui__result-item {
+    display: flex;
+    align-items: center;
+    min-height: 1.875rem;
+    flex: 0 0 auto;
+    padding: 0.25rem 0.75rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+    outline: none;
+    font-size: 16px;
+
+    border-radius: var(--border-radius-md);
+
+    .text-icon {
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.75rem;
+    }
+
+    .preview-text {
+      flex: 1;
+      max-height: 48px;
+      line-height: 24px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: break-all;
+    }
+
+    &:hover {
+      background-color: var(--color-surface-high);
+    }
+    &:active {
+      border-color: var(--color-primary);
+    }
+
+    &.active {
+      background-color: var(--color-surface-high);
+    }
+  }
+}

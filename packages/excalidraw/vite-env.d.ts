@@ -21,11 +21,11 @@ interface ImportMetaEnv {
 
   VITE_APP_FIREBASE_CONFIG: string;
 
-  // whether to enable Service Workers in development
-  VITE_APP_DEV_ENABLE_SW: string;
   // whether to disable live reload / HMR. Usuaully what you want to do when
   // debugging Service Workers.
   VITE_APP_DEV_DISABLE_LIVE_RELOAD: string;
+  // To enable bounding box for text containers
+  VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX: string;
 
   FAST_REFRESH: string;
 
@@ -36,17 +36,15 @@ interface ImportMetaEnv {
 
   //Debug flags
 
-  // To enable bounding box for text containers
-  VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX: string;
   VITE_APP_DISABLE_SENTRY: string;
   // Set this flag to false if you want to open the overlay by default
   VITE_APP_COLLAPSE_OVERLAY: string;
   // Enable eslint in dev server
   VITE_APP_ENABLE_ESLINT: string;
+  VITE_APP_ENABLE_TRACKING: string;
 
-  VITE_PKG_NAME: string;
-  VITE_PKG_VERSION: string;
-  VITE_IS_EXCALIDRAW_NPM_PACKAGE: string;
+  PKG_NAME: string;
+  PKG_VERSION: string;
 
   VITE_APP_PLUS_LP: string;
   VITE_APP_PLUS_APP: string;

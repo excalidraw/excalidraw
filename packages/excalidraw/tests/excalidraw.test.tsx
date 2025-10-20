@@ -1,9 +1,13 @@
-import { fireEvent, GlobalTestState, toggleMenu, render } from "./test-utils";
-import { Excalidraw, Footer, MainMenu } from "../index";
 import { queryByText, queryByTestId } from "@testing-library/react";
-import { GRID_SIZE, THEME } from "../constants";
-import { t } from "../i18n";
+import React from "react";
 import { useMemo } from "react";
+
+import { THEME } from "@excalidraw/common";
+
+import { t } from "../i18n";
+import { Excalidraw, Footer, MainMenu } from "../index";
+
+import { fireEvent, GlobalTestState, toggleMenu, render } from "./test-utils";
 
 const { h } = window;
 
@@ -90,7 +94,7 @@ describe("<Excalidraw/>", () => {
   describe("Test gridModeEnabled prop", () => {
     it('should show grid mode in context menu when gridModeEnabled is "undefined"', async () => {
       const { container } = await render(<Excalidraw />);
-      expect(h.state.gridSize).toBe(null);
+      expect(h.state.gridModeEnabled).toBe(false);
 
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
@@ -101,15 +105,15 @@ describe("<Excalidraw/>", () => {
         clientY: 1,
       });
       const contextMenu = document.querySelector(".context-menu");
-      fireEvent.click(queryByText(contextMenu as HTMLElement, "Show grid")!);
-      expect(h.state.gridSize).toBe(GRID_SIZE);
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Toggle grid")!);
+      expect(h.state.gridModeEnabled).toBe(true);
     });
 
     it('should not show grid mode in context menu when gridModeEnabled is not "undefined"', async () => {
       const { container } = await render(
         <Excalidraw gridModeEnabled={false} />,
       );
-      expect(h.state.gridSize).toBe(null);
+      expect(h.state.gridModeEnabled).toBe(false);
 
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
@@ -121,7 +125,7 @@ describe("<Excalidraw/>", () => {
       });
       const contextMenu = document.querySelector(".context-menu");
       expect(queryByText(contextMenu as HTMLElement, "Show grid")).toBe(null);
-      expect(h.state.gridSize).toBe(null);
+      expect(h.state.gridModeEnabled).toBe(false);
     });
   });
 

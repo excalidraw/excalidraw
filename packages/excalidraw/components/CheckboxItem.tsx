@@ -1,5 +1,6 @@
-import React from "react";
 import clsx from "clsx";
+import React from "react";
+
 import { checkIcon } from "./icons";
 
 import "./CheckboxItem.scss";
@@ -22,7 +23,12 @@ export const CheckboxItem: React.FC<{
         ).focus();
       }}
     >
-      <button className="Checkbox-box" role="checkbox" aria-checked={checked}>
+      <button
+        type="button"
+        className="Checkbox-box"
+        role="checkbox"
+        aria-checked={checked}
+      >
         {checkIcon}
       </button>
       <div className="Checkbox-label">{children}</div>

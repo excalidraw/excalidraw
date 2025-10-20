@@ -1,7 +1,15 @@
+import { exportToCanvas } from "@excalidraw/utils/export";
 import React, { useEffect, useRef, useState } from "react";
 
-import type { ActionManager } from "../actions/manager";
-import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
+import {
+  DEFAULT_EXPORT_PADDING,
+  EXPORT_IMAGE_TYPES,
+  isFirefox,
+  EXPORT_SCALES,
+  cloneJSON,
+} from "@excalidraw/common";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import {
   actionExportWithDarkMode,
@@ -11,30 +19,26 @@ import {
   actionChangeProjectName,
 } from "../actions/actionExport";
 import { probablySupportsClipboardBlob } from "../clipboard";
-import {
-  DEFAULT_EXPORT_PADDING,
-  EXPORT_IMAGE_TYPES,
-  isFirefox,
-  EXPORT_SCALES,
-} from "../constants";
-
+import { prepareElementsForExport } from "../data";
 import { canvasToBlob } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import { useCopyStatus } from "../hooks/useCopiedIndicator";
+
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
-import { exportToCanvas } from "../../utils/export";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
 import { RadioGroup } from "./RadioGroup";
 import { Switch } from "./Switch";
 import { Tooltip } from "./Tooltip";
+import { FilledButton } from "./FilledButton";
 
 import "./ImageExportDialog.scss";
-import { FilledButton } from "./FilledButton";
-import { cloneJSON } from "../utils";
-import { prepareElementsForExport } from "../data";
+
+import type { ActionManager } from "../actions/manager";
+
+import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -89,6 +93,21 @@ const ImageExportModal = ({
   const previewRef = useRef<HTMLDivElement>(null);
   const [renderError, setRenderError] = useState<Error | null>(null);
 
+  const { onCopy, copyStatus, resetCopyStatus } = useCopyStatus();
+
+  useEffect(() => {
+    // if user changes setting right after export to clipboard, reset the status
+    // so they don't have to wait for the timeout to click the button again
+    resetCopyStatus();
+  }, [
+    projectName,
+    exportWithBackground,
+    exportDarkMode,
+    exportScale,
+    embedScene,
+    resetCopyStatus,
+  ]);
+
   const { exportedElements, exportingFrame } = prepareElementsForExport(
     elementsSnapshot,
     appStateSnapshot,
@@ -105,6 +124,7 @@ const ImageExportModal = ({
     if (!maxWidth) {
       return;
     }
+
     exportToCanvas({
       elements: exportedElements,
       appState: {
@@ -294,11 +314,17 @@ const ImageExportModal = ({
             <FilledButton
               className="ImageExportModal__settings__buttons__button"
               label={t("imageExportDialog.title.copyPngToClipboard")}
-              onClick={() =>
-                onExportImage(EXPORT_IMAGE_TYPES.clipboard, exportedElements, {
-                  exportingFrame,
-                })
-              }
+              status={copyStatus}
+              onClick={async () => {
+                await onExportImage(
+                  EXPORT_IMAGE_TYPES.clipboard,
+                  exportedElements,
+                  {
+                    exportingFrame,
+                  },
+                );
+                onCopy();
+              }}
               icon={copyIcon}
             >
               {t("imageExportDialog.button.copyPngToClipboard")}

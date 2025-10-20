@@ -1,4 +1,5 @@
-import { VERSIONS } from "../../constants";
+import { VERSIONS } from "@excalidraw/common";
+
 import {
   diamondFixture,
   ellipseFixture,
@@ -12,7 +13,7 @@ export const diagramFixture = {
   elements: [diamondFixture, ellipseFixture, rectangleFixture],
   appState: {
     viewBackgroundColor: "#ffffff",
-    gridSize: null,
+    gridModeEnabled: false,
   },
   files: {},
 };

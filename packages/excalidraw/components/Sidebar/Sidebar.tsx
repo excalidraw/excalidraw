@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React, {
   useEffect,
   useLayoutEffect,
@@ -7,29 +8,32 @@ import React, {
   useImperativeHandle,
   useCallback,
 } from "react";
-import { Island } from "../Island";
-import { atom, useSetAtom } from "jotai";
-import { jotaiScope } from "../../jotai";
+
 import {
-  SidebarPropsContext,
-  SidebarProps,
-  SidebarPropsContextValue,
-} from "./common";
-import { SidebarHeader } from "./SidebarHeader";
-import clsx from "clsx";
+  CLASSES,
+  EVENT,
+  isDevEnv,
+  KEYS,
+  updateObject,
+} from "@excalidraw/common";
+
+import { useUIAppState } from "../../context/ui-appState";
+import { atom, useSetAtom } from "../../editor-jotai";
+import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useDevice, useExcalidrawSetAppState } from "../App";
-import { updateObject } from "../../utils";
-import { KEYS } from "../../keys";
-import { EVENT } from "../../constants";
-import { SidebarTrigger } from "./SidebarTrigger";
-import { SidebarTabTriggers } from "./SidebarTabTriggers";
+import { Island } from "../Island";
+
+import { SidebarHeader } from "./SidebarHeader";
 import { SidebarTabTrigger } from "./SidebarTabTrigger";
+import { SidebarTabTriggers } from "./SidebarTabTriggers";
+import { SidebarTrigger } from "./SidebarTrigger";
+import { SidebarPropsContext } from "./common";
 import { SidebarTabs } from "./SidebarTabs";
 import { SidebarTab } from "./SidebarTab";
-import { useUIAppState } from "../../context/ui-appState";
-import { useOutsideClick } from "../../hooks/useOutsideClick";
 
 import "./Sidebar.scss";
+
+import type { SidebarProps, SidebarPropsContextValue } from "./common";
 
 /**
  * Flags whether the currently rendered Sidebar is docked or not, for use
@@ -53,7 +57,7 @@ export const SidebarInner = forwardRef(
     }: SidebarProps & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">,
     ref: React.ForwardedRef<HTMLDivElement>,
   ) => {
-    if (import.meta.env.DEV && onDock && docked == null) {
+    if (isDevEnv() && onDock && docked == null) {
       console.warn(
         "Sidebar: `docked` must be set when `onDock` is supplied for the sidebar to be user-dockable. To hide this message, either pass `docked` or remove `onDock`",
       );
@@ -61,7 +65,7 @@ export const SidebarInner = forwardRef(
 
     const setAppState = useExcalidrawSetAppState();
 
-    const setIsSidebarDockedAtom = useSetAtom(isSidebarDockedAtom, jotaiScope);
+    const setIsSidebarDockedAtom = useSetAtom(isSidebarDockedAtom);
 
     useLayoutEffect(() => {
       setIsSidebarDockedAtom(!!docked);
@@ -139,7 +143,11 @@ export const SidebarInner = forwardRef(
     return (
       <Island
         {...rest}
-        className={clsx("sidebar", { "sidebar--docked": docked }, className)}
+        className={clsx(
+          CLASSES.SIDEBAR,
+          { "sidebar--docked": docked },
+          className,
+        )}
         ref={islandRef}
       >
         <SidebarPropsContext.Provider value={headerPropsRef.current}>

@@ -1,18 +1,22 @@
 import {
   fileOpen as _fileOpen,
   fileSave as _fileSave,
-  FileSystemHandle,
   supported as nativeFileSystemSupported,
 } from "browser-fs-access";
-import { EVENT, MIME_TYPES } from "../constants";
+
+import { EVENT, MIME_TYPES, debounce } from "@excalidraw/common";
+
 import { AbortError } from "../errors";
-import { debounce } from "../utils";
+
+import { normalizeFile } from "./blob";
+
+import type { FileSystemHandle } from "browser-fs-access";
 
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 
-const INPUT_CHANGE_INTERVAL_MS = 500;
+const INPUT_CHANGE_INTERVAL_MS = 5000;
 
-export const fileOpen = <M extends boolean | undefined = false>(opts: {
+export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
   description: string;
   multiple?: M;
@@ -33,7 +37,7 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
     return acc.concat(`.${ext}`);
   }, [] as string[]);
 
-  return _fileOpen({
+  const files = await _fileOpen({
     description: opts.description,
     extensions,
     mimeTypes,
@@ -72,7 +76,14 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
         }
       };
     },
-  }) as Promise<RetType>;
+  });
+
+  if (Array.isArray(files)) {
+    return (await Promise.all(
+      files.map((file) => normalizeFile(file)),
+    )) as RetType;
+  }
+  return (await normalizeFile(files)) as RetType;
 };
 
 export const fileSave = (
@@ -82,6 +93,7 @@ export const fileSave = (
     name: string;
     /** file extension */
     extension: FILE_EXTENSION;
+    mimeTypes?: string[];
     description: string;
     /** existing FileSystemHandle */
     fileHandle?: FileSystemHandle | null;
@@ -93,10 +105,11 @@ export const fileSave = (
       fileName: `${opts.name}.${opts.extension}`,
       description: opts.description,
       extensions: [`.${opts.extension}`],
+      mimeTypes: opts.mimeTypes,
     },
     opts.fileHandle,
   );
 };
 
-export type { FileSystemHandle };
 export { nativeFileSystemSupported };
+export type { FileSystemHandle };

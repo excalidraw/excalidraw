@@ -9,7 +9,7 @@
     top: 0;
     bottom: 0;
     right: 0;
-    z-index: 5;
+    z-index: var(--zIndex-ui-library);
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -30,7 +30,7 @@
 
     overflow: hidden;
     border-radius: 0;
-    width: calc(#{$right-sidebar-width} - var(--space-factor) * 2);
+    width: calc(var(--right-sidebar-width) - var(--space-factor) * 2);
 
     border-left: 1px solid var(--sidebar-border-color);
 

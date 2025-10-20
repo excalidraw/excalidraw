@@ -1,5 +1,9 @@
+import React from "react";
+
+import { CODES } from "@excalidraw/common";
+
+import { copiedStyles } from "../actions/actionStyles";
 import { Excalidraw } from "../index";
-import { CODES } from "../keys";
 import { API } from "../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import {
@@ -9,7 +13,6 @@ import {
   screen,
   togglePopover,
 } from "../tests/test-utils";
-import { copiedStyles } from "../actions/actionStyles";
 
 const { h } = window;
 
@@ -49,7 +52,7 @@ describe("actionStyles", () => {
     // Roughness
     fireEvent.click(screen.getByTitle("Cartoonist"));
     // Opacity
-    fireEvent.change(screen.getByLabelText("Opacity"), {
+    fireEvent.change(screen.getByTestId("opacity"), {
       target: { value: "60" },
     });
 

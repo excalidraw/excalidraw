@@ -1,31 +1,36 @@
+import { KEYS, CODES, isDarwin } from "@excalidraw/common";
+
 import {
   moveOneLeft,
   moveOneRight,
   moveAllLeft,
   moveAllRight,
-} from "../zindex";
-import { KEYS, CODES } from "../keys";
-import { t } from "../i18n";
-import { getShortcutKey } from "../utils";
-import { register } from "./register";
+} from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
 import {
   BringForwardIcon,
   BringToFrontIcon,
   SendBackwardIcon,
   SendToBackIcon,
 } from "../components/icons";
-import { isDarwin } from "../constants";
+import { t } from "../i18n";
+import { getShortcutKey } from "../shortcut";
+
+import { register } from "./register";
 
 export const actionSendBackward = register({
   name: "sendBackward",
   label: "labels.sendBackward",
+  keywords: ["move down", "zindex", "layer"],
   icon: SendBackwardIcon,
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, value, app) => {
     return {
-      elements: moveOneLeft(elements, appState),
+      elements: moveOneLeft(elements, appState, app.scene),
       appState,
-      commitToHistory: true,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyPriority: 40,
@@ -48,13 +53,14 @@ export const actionSendBackward = register({
 export const actionBringForward = register({
   name: "bringForward",
   label: "labels.bringForward",
+  keywords: ["move up", "zindex", "layer"],
   icon: BringForwardIcon,
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, value, app) => {
     return {
-      elements: moveOneRight(elements, appState),
+      elements: moveOneRight(elements, appState, app.scene),
       appState,
-      commitToHistory: true,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyPriority: 40,
@@ -77,13 +83,14 @@ export const actionBringForward = register({
 export const actionSendToBack = register({
   name: "sendToBack",
   label: "labels.sendToBack",
+  keywords: ["move down", "zindex", "layer"],
   icon: SendToBackIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
       elements: moveAllLeft(elements, appState),
       appState,
-      commitToHistory: true,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) =>
@@ -113,6 +120,7 @@ export const actionSendToBack = register({
 export const actionBringToFront = register({
   name: "bringToFront",
   label: "labels.bringToFront",
+  keywords: ["move up", "zindex", "layer"],
   icon: BringToFrontIcon,
   trackEvent: { category: "element" },
 
@@ -120,7 +128,7 @@ export const actionBringToFront = register({
     return {
       elements: moveAllRight(elements, appState),
       appState,
-      commitToHistory: true,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) =>

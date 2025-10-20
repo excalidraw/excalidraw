@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import { EVENT } from "../../constants";
-import { composeEventHandlers } from "../../utils";
+
+import { EVENT, composeEventHandlers } from "@excalidraw/common";
 
 export const DropdownMenuContentPropsContext = React.createContext<{
   onSelect?: (event: Event) => void;
@@ -9,9 +9,11 @@ export const DropdownMenuContentPropsContext = React.createContext<{
 export const getDropdownMenuItemClassName = (
   className = "",
   selected = false,
+  hovered = false,
 ) => {
-  return `dropdown-menu-item dropdown-menu-item-base ${className} ${
-    selected ? "dropdown-menu-item--selected" : ""
+  return `dropdown-menu-item dropdown-menu-item-base ${className}
+  ${selected ? "dropdown-menu-item--selected" : ""} ${
+    hovered ? "dropdown-menu-item--hovered" : ""
   }`.trim();
 };
 

@@ -1,14 +1,15 @@
-@import "../css/variables.module";
+@import "../css/variables.module.scss";
 
 .excalidraw {
   --avatar-size: 1.75rem;
   --avatarList-gap: 0.625rem;
   --userList-padding: var(--space-factor);
 
-  .UserList-wrapper {
+  .UserList__wrapper {
     display: flex;
     width: 100%;
     justify-content: flex-end;
+    align-items: center;
     pointer-events: none !important;
   }
 
@@ -20,10 +21,6 @@
     justify-content: flex-end;
     align-items: center;
     gap: var(--avatarList-gap);
-
-    &:empty {
-      display: none;
-    }
 
     box-sizing: border-box;
 
@@ -157,66 +154,7 @@
   }
 
   .UserList__collaborators {
-    position: static;
     top: auto;
-    margin-top: 0;
     max-height: 50vh;
-    overflow-y: auto;
-    padding: 0.25rem 0.5rem;
-    border-top: 1px solid var(--userlist-collaborators-border-color);
-    border-bottom: 1px solid var(--userlist-collaborators-border-color);
-
-    &__empty {
-      color: var(--color-gray-60);
-      font-size: 0.75rem;
-      line-height: 150%;
-      padding: 0.5rem 0;
-    }
-  }
-
-  .UserList__hint {
-    padding: 0.5rem 0.75rem;
-    overflow: hidden;
-    text-align: center;
-    color: var(--userlist-hint-text-color);
-    font-size: 0.75rem;
-    line-height: 150%;
-  }
-
-  .UserList__search-wrapper {
-    position: relative;
-    height: 2.5rem;
-
-    svg {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      left: 0.75rem;
-      width: 1.25rem;
-      height: 1.25rem;
-      color: var(--color-gray-40);
-      z-index: 1;
-    }
-  }
-
-  .UserList__search {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    box-sizing: border-box;
-    border: 0 !important;
-    border-radius: 0 !important;
-    font-size: 0.875rem;
-    padding-left: 2.5rem !important;
-    padding-right: 0.75rem !important;
-
-    &::placeholder {
-      color: var(--color-gray-40);
-    }
-
-    &:focus {
-      box-shadow: none !important;
-    }
   }
 }

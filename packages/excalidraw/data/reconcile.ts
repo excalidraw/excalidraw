@@ -1,8 +1,18 @@
-import { OrderedExcalidrawElement } from "../element/types";
-import { orderByFractionalIndex, syncInvalidIndices } from "../fractionalIndex";
-import { AppState } from "../types";
-import { MakeBrand } from "../utility-types";
-import { arrayToMap } from "../utils";
+import throttle from "lodash.throttle";
+
+import { arrayToMap, isDevEnv, isTestEnv } from "@excalidraw/common";
+
+import {
+  orderByFractionalIndex,
+  syncInvalidIndices,
+  validateFractionalIndices,
+} from "@excalidraw/element";
+
+import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
+
+import type { MakeBrand } from "@excalidraw/common/utility-types";
+
+import type { AppState } from "../types";
 
 export type ReconciledExcalidrawElement = OrderedExcalidrawElement &
   MakeBrand<"ReconciledElement">;
@@ -10,7 +20,7 @@ export type ReconciledExcalidrawElement = OrderedExcalidrawElement &
 export type RemoteExcalidrawElement = OrderedExcalidrawElement &
   MakeBrand<"RemoteExcalidrawElement">;
 
-const shouldDiscardRemoteElement = (
+export const shouldDiscardRemoteElement = (
   localAppState: AppState,
   local: OrderedExcalidrawElement | undefined,
   remote: RemoteExcalidrawElement,
@@ -18,9 +28,9 @@ const shouldDiscardRemoteElement = (
   if (
     local &&
     // local element is being edited
-    (local.id === localAppState.editingElement?.id ||
+    (local.id === localAppState.editingTextElement?.id ||
       local.id === localAppState.resizingElement?.id ||
-      local.id === localAppState.draggingElement?.id ||
+      local.id === localAppState.newElement?.id ||
       // local element is newer
       local.version > remote.version ||
       // resolve conflicting edits deterministically by taking the one with
@@ -32,6 +42,33 @@ const shouldDiscardRemoteElement = (
   }
   return false;
 };
+
+const validateIndicesThrottled = throttle(
+  (
+    orderedElements: readonly OrderedExcalidrawElement[],
+    localElements: readonly OrderedExcalidrawElement[],
+    remoteElements: readonly RemoteExcalidrawElement[],
+  ) => {
+    if (isDevEnv() || isTestEnv() || window?.DEBUG_FRACTIONAL_INDICES) {
+      // create new instances due to the mutation
+      const elements = syncInvalidIndices(
+        orderedElements.map((x) => ({ ...x })),
+      );
+
+      validateFractionalIndices(elements, {
+        // throw in dev & test only, to remain functional on `DEBUG_FRACTIONAL_INDICES`
+        shouldThrow: isTestEnv() || isDevEnv(),
+        includeBoundTextValidation: true,
+        reconciliationContext: {
+          localElements,
+          remoteElements,
+        },
+      });
+    }
+  },
+  1000 * 60,
+  { leading: true, trailing: false },
+);
 
 export const reconcileElements = (
   localElements: readonly OrderedExcalidrawElement[],
@@ -71,6 +108,8 @@ export const reconcileElements = (
   }
 
   const orderedElements = orderByFractionalIndex(reconciledElements);
+
+  validateIndicesThrottled(orderedElements, localElements, remoteElements);
 
   // de-duplicate indices
   syncInvalidIndices(orderedElements);

@@ -25,6 +25,7 @@
     margin-bottom: auto;
     margin-inline-start: auto;
     margin-inline-end: 0.6em;
+    z-index: var(--zIndex-layerUI);
 
     svg {
       width: 1.2rem;
@@ -40,6 +41,10 @@
       }
       &.highlighted {
         color: var(--color-promo);
+        font-weight: 700;
+        .dropdown-menu-item__icon g {
+          stroke-width: 2;
+        }
       }
     }
   }
@@ -53,7 +58,7 @@
     }
   }
 
-  .collab-offline-warning {
+  .alert {
     pointer-events: none;
     position: absolute;
     top: 6.5rem;
@@ -64,10 +69,18 @@
     text-align: center;
     line-height: 1.5;
     border-radius: var(--border-radius-md);
-    background-color: var(--color-warning);
-    color: var(--color-text-warning);
     z-index: 6;
     white-space: pre;
+
+    &--warning {
+      background-color: var(--color-warning);
+      color: var(--color-text-warning);
+    }
+
+    &--danger {
+      background-color: var(--color-danger-dark);
+      color: var(--color-danger-text);
+    }
   }
 }
 

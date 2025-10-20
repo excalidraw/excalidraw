@@ -1,16 +1,18 @@
+import clsx from "clsx";
 import {
   forwardRef,
   useRef,
   useImperativeHandle,
-  KeyboardEvent,
   useLayoutEffect,
   useState,
 } from "react";
-import clsx from "clsx";
 
-import "./TextField.scss";
 import { Button } from "./Button";
 import { eyeIcon, eyeClosedIcon } from "./icons";
+
+import "./TextField.scss";
+
+import type { KeyboardEvent } from "react";
 
 type TextFieldProps = {
   onChange?: (value: string) => void;
@@ -21,9 +23,12 @@ type TextFieldProps = {
   fullWidth?: boolean;
   selectOnRender?: boolean;
 
+  icon?: React.ReactNode;
   label?: string;
+  className?: string;
   placeholder?: string;
   isRedacted?: boolean;
+  type?: "text" | "search";
 } & ({ value: string } | { defaultValue: string });
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
@@ -37,6 +42,9 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       selectOnRender,
       onKeyDown,
       isRedacted = false,
+      icon,
+      className,
+      type,
       ...rest
     },
     ref,
@@ -47,6 +55,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
 
     useLayoutEffect(() => {
       if (selectOnRender) {
+        // focusing first is needed because vitest/jsdom
+        innerRef.current?.focus();
         innerRef.current?.select();
       }
     }, [selectOnRender]);
@@ -56,14 +66,16 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
 
     return (
       <div
-        className={clsx("ExcTextField", {
+        className={clsx("ExcTextField", className, {
           "ExcTextField--fullWidth": fullWidth,
+          "ExcTextField--hasIcon": !!icon,
         })}
         onClick={() => {
           innerRef.current?.focus();
         }}
       >
-        <div className="ExcTextField__label">{label}</div>
+        {icon}
+        {label && <div className="ExcTextField__label">{label}</div>}
         <div
           className={clsx("ExcTextField__input", {
             "ExcTextField__input--readonly": readonly,
@@ -86,6 +98,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             ref={innerRef}
             onChange={(event) => onChange?.(event.target.value)}
             onKeyDown={onKeyDown}
+            type={type}
           />
           {isRedacted && (
             <Button

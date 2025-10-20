@@ -1,9 +1,11 @@
+import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
-import {
-  ExcalidrawElementSkeleton,
-  convertToExcalidrawElements,
-} from "./transform";
-import { ExcalidrawArrowElement } from "../element/types";
+
+import type { ExcalidrawArrowElement } from "@excalidraw/element/types";
+
+import { convertToExcalidrawElements } from "./transform";
+
+import type { ExcalidrawElementSkeleton } from "./transform";
 
 const opts = { regenerateIds: false };
 
@@ -310,28 +312,32 @@ describe("Test Transform", () => {
   });
 
   describe("Test Frames", () => {
+    const elements: ExcalidrawElementSkeleton[] = [
+      {
+        type: "rectangle",
+        x: 10,
+        y: 10,
+        strokeWidth: 2,
+        id: "1",
+      },
+      {
+        type: "diamond",
+        x: 120,
+        y: 20,
+        backgroundColor: "#fff3bf",
+        strokeWidth: 2,
+        label: {
+          text: "HELLO EXCALIDRAW",
+          strokeColor: "#099268",
+          fontSize: 30,
+        },
+        id: "2",
+      },
+    ];
+
     it("should transform frames and update frame ids when regenerated", () => {
       const elementsSkeleton: ExcalidrawElementSkeleton[] = [
-        {
-          type: "rectangle",
-          x: 10,
-          y: 10,
-          strokeWidth: 2,
-          id: "1",
-        },
-        {
-          type: "diamond",
-          x: 120,
-          y: 20,
-          backgroundColor: "#fff3bf",
-          strokeWidth: 2,
-          label: {
-            text: "HELLO EXCALIDRAW",
-            strokeColor: "#099268",
-            fontSize: 30,
-          },
-          id: "2",
-        },
+        ...elements,
         {
           type: "frame",
           children: ["1", "2"],
@@ -353,28 +359,9 @@ describe("Test Transform", () => {
       });
     });
 
-    it("should consider max of calculated and frame dimensions when provided", () => {
+    it("should consider user defined frame dimensions over calculated when provided", () => {
       const elementsSkeleton: ExcalidrawElementSkeleton[] = [
-        {
-          type: "rectangle",
-          x: 10,
-          y: 10,
-          strokeWidth: 2,
-          id: "1",
-        },
-        {
-          type: "diamond",
-          x: 120,
-          y: 20,
-          backgroundColor: "#fff3bf",
-          strokeWidth: 2,
-          label: {
-            text: "HELLO EXCALIDRAW",
-            strokeColor: "#099268",
-            fontSize: 30,
-          },
-          id: "2",
-        },
+        ...elements,
         {
           type: "frame",
           children: ["1", "2"],
@@ -389,7 +376,27 @@ describe("Test Transform", () => {
       );
       const frame = excalidrawElements.find((ele) => ele.type === "frame")!;
       expect(frame.width).toBe(800);
-      expect(frame.height).toBe(126);
+      expect(frame.height).toBe(100);
+    });
+
+    it("should consider user defined frame coordinates calculated when provided", () => {
+      const elementsSkeleton: ExcalidrawElementSkeleton[] = [
+        ...elements,
+        {
+          type: "frame",
+          children: ["1", "2"],
+          name: "My frame",
+          x: 100,
+          y: 300,
+        },
+      ];
+      const excalidrawElements = convertToExcalidrawElements(
+        elementsSkeleton,
+        opts,
+      );
+      const frame = excalidrawElements.find((ele) => ele.type === "frame")!;
+      expect(frame.x).toBe(100);
+      expect(frame.y).toBe(300);
     });
   });
 
@@ -420,7 +427,7 @@ describe("Test Transform", () => {
       const [arrow, text, rectangle, ellipse] = excalidrawElements;
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255,
+        x: 255.5,
         y: 239,
         boundElements: [{ id: text.id, type: "text" }],
         startBinding: {
@@ -430,7 +437,7 @@ describe("Test Transform", () => {
         },
         endBinding: {
           elementId: ellipse.id,
-          focus: 0,
+          focus: -0,
         },
       });
 
@@ -505,7 +512,7 @@ describe("Test Transform", () => {
 
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255,
+        x: 255.5,
         y: 239,
         boundElements: [{ id: text1.id, type: "text" }],
         startBinding: {
@@ -515,7 +522,7 @@ describe("Test Transform", () => {
         },
         endBinding: {
           elementId: text3.id,
-          focus: 0,
+          focus: -0,
         },
       });
 
@@ -723,7 +730,7 @@ describe("Test Transform", () => {
       const [, , arrow, text] = excalidrawElements;
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255,
+        x: 255.5,
         y: 239,
         boundElements: [
           {
@@ -773,8 +780,8 @@ describe("Test Transform", () => {
       const [arrow, rect] = excalidrawElements;
       expect((arrow as ExcalidrawArrowElement).endBinding).toStrictEqual({
         elementId: "rect-1",
-        focus: 0,
-        gap: 205,
+        focus: -0,
+        gap: 25,
       });
       expect(rect.boundElements).toStrictEqual([
         {
@@ -912,10 +919,7 @@ describe("Test Transform", () => {
         x: 111.262,
         y: 57,
         strokeWidth: 2,
-        points: [
-          [0, 0],
-          [272.985, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(272.985, 0)],
         label: {
           text: "How are you?",
           fontSize: 20,
@@ -938,7 +942,7 @@ describe("Test Transform", () => {
         x: 77.017,
         y: 79,
         strokeWidth: 2,
-        points: [[0, 0]],
+        points: [pointFrom(0, 0)],
         label: {
           text: "Friendship",
           fontSize: 20,
