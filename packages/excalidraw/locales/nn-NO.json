@@ -141,6 +141,10 @@
       "edit": "",
       "editArrow": ""
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "",
       "unlock": "",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "",
     "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyPrivateLibrary": "",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
-    "placeholder": ""
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "",
     "exitZenMode": "Avslutt zen-modus",
     "cancel": "Avbryt",
+    "saveLibNames": "",
     "clear": "Tøm",
     "remove": "Fjern",
     "embed": "",
-    "publishLibrary": "Publiser",
+    "publishLibrary": "",
     "submit": "Send inn",
     "confirm": "Stadfest",
     "embeddableInteractionButton": ""
@@ -245,7 +260,8 @@
     "resetLibrary": "Dette vil fjerne alt innhald frå biblioteket. Er du sikker?",
     "removeItemsFromsLibrary": "Slette {{count}} element frå biblioteket?",
     "invalidEncryptionKey": "Krypteringsnøkkelen må ha 22 teikn. Sanntidssamarbeid er deaktivert.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Filtypen er ikkje støtta.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Vel",
+    "lasso": "",
     "image": "Sett in bilete",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
@@ -295,7 +312,8 @@
     "laser": "",
     "hand": "",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "",
@@ -326,22 +344,22 @@
     "freeDraw": "Klikk og drag, slepp når du er ferdig",
     "text": "Tips: du kan òg leggje til tekst ved å dobbeltklikke kor som helst med utvalgsverktyet",
     "embeddable": "",
-    "text_selected": "Dobbelklikk eller trykk ENTER for å redigere teksta",
-    "text_editing": "Trykk Escape eller CtrlOrCmd+ENTER for å fullføre redigeringa",
-    "linearElementMulti": "Klikk på siste punkt eller trykk Escape eller Enter for å fullføre",
-    "lockAngle": "Du kan begrense vinkelen ved å holde nede SKIFT",
-    "resize": "Du kan halde fram med forholdet ved å trykke SHIFT medan du endrar storleik,\ntrykk ALT for å endre storleiken frå midten",
-    "resizeImage": "Du kan endre storleiken fritt ved å halde inne SHIFT,\nhald ALT for å endre storleik frå sentrum",
-    "rotate": "Du kan låse vinklane ved å halde SHIFT medan du roterer",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
     "lineEditor_info": "",
-    "lineEditor_pointSelected": "Trykk på Slett for å fjerne punkt(a),\nCtrl / Cmd+D for å duplisere, eller drag for å flytte",
-    "lineEditor_nothingSelected": "Vel eit punkt å redigere (hald inne SHIFT for å velje fleire),\neller hald inne Alt og klikk for å legge til nye punkt",
-    "placeImage": "Klikk for å plassere biletet, eller klikk og drag for å velje storleik manuelt",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Publiser ditt eige bibliotek",
-    "bindTextToElement": "Trykk på enter for å legge til tekst",
+    "bindTextToElement": "",
     "createFlowchart": "",
-    "deepBoxSelect": "Hald inne Ctrl / Cmd for å velje djupt, og forhindre flytting",
-    "eraserRevert": "Hald inne Alt for å reversere markering av element for sletting",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "",
     "disableSnapping": "",
     "enterCropEditor": "",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "",
     "colors": "",
     "shades": "",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "",
     "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
