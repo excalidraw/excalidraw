@@ -141,6 +141,10 @@
       "edit": "Uredi črto",
       "editArrow": "Uredi puščico"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "Zakleni",
       "unlock": "Odkleni",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "Neobrezana dimenzija",
     "copyElementLink": "Kopiraj povezavo do objekta",
     "linkToElement": "Povezava do objekta",
-    "wrapSelectionInFrame": "Zavij izbor v okvir"
+    "wrapSelectionInFrame": "Zavij izbor v okvir",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "Povezava do objekta",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "Dodan še ni noben element...",
     "hint_emptyLibrary": "Izberite element na platnu, da ga dodate sem, ali namestite knjižnico iz javnega skladišča spodaj.",
-    "hint_emptyPrivateLibrary": "Izberite element na platnu, da ga dodate sem."
+    "hint_emptyPrivateLibrary": "Izberite element na platnu, da ga dodate sem.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "Poišči na platnu",
     "noMatch": "Ni zadetkov ...",
     "singleResult": "rezultat",
     "multipleResults": "rezultata/i/ov",
-    "placeholder": "Poišči besedilo na platnu ..."
+    "placeholder": "Poišči besedilo na platnu ...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Ponastavi platno",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Pripenjanje na predmete",
     "exitZenMode": "Zapri način Zen",
     "cancel": "Prekliči",
+    "saveLibNames": "",
     "clear": "Počisti",
     "remove": "Odstrani",
     "embed": "Preklopi vdelavo",
-    "publishLibrary": "Objavi",
+    "publishLibrary": "",
     "submit": "Pošlji",
     "confirm": "Potrdi",
     "embeddableInteractionButton": "Kliknite za interakcijo"
@@ -245,7 +260,8 @@
     "resetLibrary": "To bo počistilo vašo knjižnico. Ali ste prepričani?",
     "removeItemsFromsLibrary": "Izbriši elemente ({{count}}) iz knjižnice?",
     "invalidEncryptionKey": "Ključ za šifriranje mora vsebovati 22 znakov. Sodelovanje v živo je onemogočeno.",
-    "collabOfflineWarning": "Internetna povezava ni na voljo.\nVaše spremembe ne bodo shranjene!"
+    "collabOfflineWarning": "Internetna povezava ni na voljo.\nVaše spremembe ne bodo shranjene!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Nepodprt tip datoteke.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Izbor",
+    "lasso": "",
     "image": "Vstavi sliko",
     "rectangle": "Pravokotnik",
     "diamond": "Diamant",
@@ -295,7 +312,8 @@
     "laser": "Laserski kazalec",
     "hand": "Roka (orodje za premikanje)",
     "extraTools": "Več orodij",
-    "mermaidToExcalidraw": "Mermaid v Excalidraw"
+    "mermaidToExcalidraw": "Mermaid v Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Pravokotnik",
@@ -319,33 +337,33 @@
     "shapes": "Oblike"
   },
   "hints": {
-    "dismissSearch": "Pritisnite Escape, da opustite iskanje",
-    "canvasPanning": "Za premikanje platna med vlečenjem držite kolesce miške ali preslednico ali uporabite orodje roka",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Kliknite za začetek več točk, povlecite za posamezno črto",
-    "arrowTool": "Kliknite za začetek več točk, povlecite za eno črto. Ponovno pritisnite {{arrowShortcut}}, da spremenite vrsto puščice.",
+    "arrowTool": "",
     "freeDraw": "Kliknite in povlecite, spustite, ko končate",
     "text": "Namig: besedilo lahko dodate tudi z dvoklikom kjer koli z orodjem za izbiro",
     "embeddable": "Kliknite in povlecite, da ustvarite spletno vdelavo",
-    "text_selected": "Dvokliknite ali pritisnite tipko Enter, da uredite besedilo",
-    "text_editing": "Pritisnite tipko Escape ali CtrlOrCmd+Enter za zaključek urejanja",
-    "linearElementMulti": "Kliknite zadnjo točko ali pritisnite Escape ali Enter, da končate",
-    "lockAngle": "Kot lahko omejite tako, da držite tipko Shift",
-    "resize": "Razmerja lahko omejite tako, da držite tipko Shift med spreminjanjem velikosti. Držite tipko Alt, da spremenite velikost od središča",
-    "resizeImage": "Velikost lahko prosto spreminjate tako, da držite tipko Shift. Držite tipko Alt, da spremenite velikost od središča",
-    "rotate": "Kote lahko omejite tako, da med vrtenjem držite tipko Shift",
-    "lineEditor_info": "Držite CtrlOrCmd in dvokliknite ali pritisnite CtrlOrCmd + Enter za urejanje točk",
-    "lineEditor_pointSelected": "Pritisnite tipko Delete, da odstranite točko(e), CtrlOrCmd+D za podvojitev ali povlecite za premikanje",
-    "lineEditor_nothingSelected": "Izberite točko za urejanje (pridržite tipko Shift za izbiro več točk), ali držite tipko Alt in kliknite za dodajanje novih točk",
-    "placeImage": "Kliknite, da postavite sliko, ali kliknite in povlecite, da ročno nastavite njeno velikost",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Objavi svojo knjižnico",
-    "bindTextToElement": "Pritisnite tipko Enter za dodajanje besedila",
-    "createFlowchart": "Držite CtrlOrCmd in puščično tipko, da ustvarite diagram poteka",
-    "deepBoxSelect": "Držite tipko CtrlOrCmd za globoko izbiro in preprečitev vlečenja",
-    "eraserRevert": "Pridržite tipko Alt, da razveljavite elemente, označene za brisanje",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "To funkcijo lahko verjetno omogočite z nastavitvijo zastavice \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Če želite spremeniti zastavice brskalnika v Firefoxu, obiščite stran \"about:config\".",
-    "disableSnapping": "Držite CtrlOrCmd, da onemogočite pripenjanje",
-    "enterCropEditor": "Dvokliknite sliko ali pritisnite ENTER, da jo obrežete",
-    "leaveCropEditor": "Kliknite zunaj slike ali pritisnite ENTER ali ESCAPE, da končate obrezovanje"
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Predogleda ni bilo mogoče prikazati",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Najpogosteje uporabljene barve po meri",
     "colors": "Barve",
     "shades": "Odtenki",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Ukaz ni na voljo ...",
     "shortcutHint": "Za paleto ukazov uporabi {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
