@@ -141,6 +141,10 @@
       "edit": "Muokkaa riviä",
       "editArrow": ""
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "Lukitse",
       "unlock": "Poista lukitus",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "Kirjastossa ei ole vielä yhtään kohdetta...",
     "hint_emptyLibrary": "Valitse lisättävä kohde piirtoalueelta, tai asenna alta julkinen kirjasto.",
-    "hint_emptyPrivateLibrary": "Valitse lisättävä kohde piirtoalueelta."
+    "hint_emptyPrivateLibrary": "Valitse lisättävä kohde piirtoalueelta.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
-    "placeholder": ""
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "",
     "exitZenMode": "Poistu zen-tilasta",
     "cancel": "Peruuta",
+    "saveLibNames": "",
     "clear": "Pyyhi",
     "remove": "Poista",
     "embed": "",
-    "publishLibrary": "Julkaise",
+    "publishLibrary": "",
     "submit": "Lähetä",
     "confirm": "Vahvista",
     "embeddableInteractionButton": ""
@@ -245,7 +260,8 @@
     "resetLibrary": "Tämä tyhjentää kirjastosi. Jatketaanko?",
     "removeItemsFromsLibrary": "Poista {{count}} kohdetta kirjastosta?",
     "invalidEncryptionKey": "Salausavaimen on oltava 22 merkkiä pitkä. Live-yhteistyö ei ole käytössä.",
-    "collabOfflineWarning": "Internet-yhteyttä ei ole saatavilla.\nMuutoksiasi ei tallenneta!"
+    "collabOfflineWarning": "Internet-yhteyttä ei ole saatavilla.\nMuutoksiasi ei tallenneta!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Tiedostotyyppiä ei tueta.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Valinta",
+    "lasso": "",
     "image": "Lisää kuva",
     "rectangle": "Suorakulmio",
     "diamond": "Vinoneliö",
@@ -295,7 +312,8 @@
     "laser": "Laserosoitin",
     "hand": "Käsi (panning-työkalu)",
     "extraTools": "Lisää työkaluja",
-    "mermaidToExcalidraw": "Mermaid Excalidrawiksi"
+    "mermaidToExcalidraw": "Mermaid Excalidrawiksi",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "",
@@ -320,28 +338,28 @@
   },
   "hints": {
     "dismissSearch": "",
-    "canvasPanning": "Piirtoalueen liikuttamiseksi pidä hiiren pyörää tai välilyöntiä pohjassa tai käytä käsityökalua",
+    "canvasPanning": "",
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "arrowTool": "",
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
     "embeddable": "",
-    "text_selected": "Kaksoisnapsauta tai paina ENTER muokataksesi tekstiä",
-    "text_editing": "Paina Escape tai CtrlOrCmd+ENTER lopettaaksesi muokkaamisen",
-    "linearElementMulti": "Lopeta klikkaamalla viimeistä pistettä, painamalla Escape- tai Enter-näppäintä",
-    "lockAngle": "Voit rajoittaa kulmaa pitämällä SHIFT-näppäintä alaspainettuna",
-    "resize": "Voit rajoittaa mittasuhteet pitämällä SHIFT-näppäintä alaspainettuna kun muutat kokoa, pidä ALT-näppäintä alaspainettuna muuttaaksesi kokoa keskipisteen suhteen",
-    "resizeImage": "Voit muuttaa kokoa vapaasti pitämällä SHIFTiä pohjassa, pidä ALT pohjassa muuttaaksesi kokoa keskipisteen ympäri",
-    "rotate": "Voit rajoittaa kulman pitämällä SHIFT pohjassa pyörittäessäsi",
-    "lineEditor_info": "Pidä CtrlOrCmd pohjassa ja kaksoisnapsauta tai paina CtrlOrCmd + Enter muokataksesi pisteitä",
-    "lineEditor_pointSelected": "Poista piste(et) painamalla delete, monista painamalla CtrlOrCmd+D, tai liikuta raahaamalla",
-    "lineEditor_nothingSelected": "Valitse muokattava piste (monivalinta pitämällä SHIFT pohjassa), tai paina Alt ja klikkaa lisätäksesi uusia pisteitä",
-    "placeImage": "Klikkaa asettaaksesi kuvan, tai klikkaa ja raahaa asettaaksesi sen koon manuaalisesti",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Julkaise oma kirjasto",
-    "bindTextToElement": "Lisää tekstiä painamalla enter",
+    "bindTextToElement": "",
     "createFlowchart": "",
-    "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus painamalla CtrlOrCmd",
-    "eraserRevert": "Pidä Alt alaspainettuna, kumotaksesi merkittyjen elementtien poistamisen",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Tämä ominaisuus voidaan todennäköisesti ottaa käyttöön asettamalla \"dom.events.asyncClipboard.clipboardItem\" kohta \"true\":ksi. Vaihtaaksesi selaimen kohdan Firefoxissa, käy \"about:config\" sivulla.",
     "disableSnapping": "",
     "enterCropEditor": "",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Eniten käytetyt omat värit",
     "colors": "Värit",
     "shades": "Varjot",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Komento ei ole käytettävissä...",
     "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
