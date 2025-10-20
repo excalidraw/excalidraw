@@ -141,6 +141,10 @@
       "edit": "লাইন সম্পাদনা করুন",
       "editArrow": ""
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "আবদ্ধ করুন",
       "unlock": "বিচ্ছিন্ন করুন",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "সংগ্রহে কিছু যোগ করা হয়নি",
     "hint_emptyLibrary": "এখানে যোগ করার জন্য ক্যানভাসে একটি বস্তু নির্বাচন করুন, অথবা নীচে, প্রকাশ্য সংগ্রহশালা থেকে একটি সংগ্রহ ইনস্টল করুন৷",
-    "hint_emptyPrivateLibrary": "এখানে যোগ করার জন্য ক্যানভাসে একটি বস্তু নির্বাচন করুন"
+    "hint_emptyPrivateLibrary": "এখানে যোগ করার জন্য ক্যানভাসে একটি বস্তু নির্বাচন করুন",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
-    "placeholder": ""
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "ক্যানভাস সাফ করুন",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "",
     "exitZenMode": "জেন মোড বন্ধ করুন",
     "cancel": "বাতিল",
+    "saveLibNames": "",
     "clear": "সাফ",
     "remove": "বিয়োগ",
     "embed": "",
-    "publishLibrary": "সংগ্রহ প্রকাশ করুন",
+    "publishLibrary": "",
     "submit": "জমা করুন",
     "confirm": "নিশ্চিত করুন",
     "embeddableInteractionButton": ""
@@ -245,7 +260,8 @@
     "resetLibrary": "এটি আপনার সংগ্রহ পরিষ্কার করবে। আপনি কি নিশ্চিত?",
     "removeItemsFromsLibrary": "সংগ্রহ থেকে {{count}} বস্তু বিয়োগ করা হবে। আপনি কি নিশ্চিত?",
     "invalidEncryptionKey": "অবৈধ এনক্রীপশন কী।",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "অসমর্থিত ফাইল।",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "বাছাই",
+    "lasso": "",
     "image": "চিত্র সন্নিবেশ",
     "rectangle": "আয়তক্ষেত্র",
     "diamond": "রুহিতন",
@@ -295,7 +312,8 @@
     "laser": "",
     "hand": "",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "",
@@ -326,22 +344,22 @@
     "freeDraw": "ক্লিক করুন এবং টেনে আনুন, আপনার কাজ শেষ হলে ছেড়ে দিন",
     "text": "বিশেষ্য: আপনি নির্বাচন টুলের সাথে যে কোনো জায়গায় ডাবল-ক্লিক করে পাঠ্য যোগ করতে পারেন",
     "embeddable": "",
-    "text_selected": "লেখা সম্পাদনা করতে ডাবল-ক্লিক করুন বা এন্টার টিপুন",
-    "text_editing": "লেখা সম্পাদনা শেষ করতে এসকেপ বা কন্ট্রোল/কম্যান্ড যোগে এন্টার টিপুন",
-    "linearElementMulti": "শেষ বিন্দুতে ক্লিক করুন অথবা শেষ করতে এসকেপ বা এন্টার টিপুন",
-    "lockAngle": "ঘোরানোর সময় আপনি শিফ্ট ধরে রেখে কোণ সীমাবদ্ধ করতে পারেন",
-    "resize": "আপনি আকার পরিবর্তন করার সময় শিফ্ট ধরে রেখে অনুপাতকে সীমাবদ্ধ করতে পারেন,\nকেন্দ্র থেকে আকার পরিবর্তন করতে অল্ট ধরে রাখুন",
-    "resizeImage": "আপনি শিফ্ট ধরে রেখে অবাধে আকার পরিবর্তন করতে পারেন, কেন্দ্র থেকে আকার পরিবর্তন করতে অল্ট ধরুন",
-    "rotate": "আপনি ঘোরানোর সময় শিফ্ট ধরে রেখে কোণগুলিকে সীমাবদ্ধ করতে পারেন",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
     "lineEditor_info": "",
-    "lineEditor_pointSelected": "বিন্দু(গুলি) মুছতে ডিলিট টিপুন, কন্ট্রোল/কম্যান্ড যোগে ডি টিপুন নকল করতে অথবা সরানোর জন্য টানুন",
-    "lineEditor_nothingSelected": "সম্পাদনা করার জন্য একটি বিন্দু নির্বাচন করুন (একাধিক নির্বাচন করতে শিফ্ট ধরে রাখুন),\nঅথবা অল্ট ধরে রাখুন এবং নতুন বিন্দু যোগ করতে ক্লিক করুন",
-    "placeImage": "ছবিটি স্থাপন করতে ক্লিক করুন, অথবা নিজে আকার সেট করতে ক্লিক করুন এবং টেনে আনুন",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "আপনার নিজস্ব সংগ্রহ প্রকাশ করুন",
-    "bindTextToElement": "লেখা যোগ করতে এন্টার টিপুন",
+    "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
-    "eraserRevert": "মুছে ফেলার জন্য চিহ্নিত উপাদানগুলিকে ফিরিয়ে আনতে অল্ট ধরে রাখুন",
+    "eraserRevert": "",
     "firefox_clipboard_write": "",
     "disableSnapping": "",
     "enterCropEditor": "",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "",
     "colors": "",
     "shades": "",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "",
     "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
