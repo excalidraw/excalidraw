@@ -49,7 +49,7 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "more_options": "Pilihan lain",
     "arrowtypes": "Jenis panah",
     "arrowtype_sharp": "Panah runcing",
     "arrowtype_round": "Panah melengkung",
@@ -141,6 +141,10 @@
       "edit": "Edit tautan",
       "editArrow": "Ubah Panah"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "Kuncikan",
       "unlock": "Lepas",
@@ -161,11 +165,13 @@
     "zoomToFit": "Memperbesar agar unsur pas semua",
     "installPWA": "Install Excalidraw secara lokal (PWA)",
     "autoResize": "Mengaktifkan pengubahan ukuran teks secara otomatis",
-    "imageCropping": "",
-    "unCroppedDimension": "",
+    "imageCropping": "Pemangkasan gambar",
+    "unCroppedDimension": "Dimensi yang tidak dipotong",
     "copyElementLink": "Salin tautan ke objek",
     "linkToElement": "Taut ke objek",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "Bungkus pilihan dalam bingkai",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "Taut ke objek",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
     "hint_emptyLibrary": "Pilih item pada kanvas untuk menambahkan nya di sini, atau pasang pustaka dari gudang di bawah ini.",
-    "hint_emptyPrivateLibrary": "Pilih item pada kanvas untuk menambahkan nya di sini."
+    "hint_emptyPrivateLibrary": "Pilih item pada kanvas untuk menambahkan nya di sini.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "Temukan di kanvas",
     "noMatch": "Tidak ada kecocokan yang ditemukan...",
     "singleResult": "hasil",
     "multipleResults": "semua hasil",
-    "placeholder": "Temukan teks di kanvas..."
+    "placeholder": "Temukan teks di kanvas...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Keluar dari mode zen",
     "cancel": "Batal",
+    "saveLibNames": "",
     "clear": "Hapus",
     "remove": "Hapus",
     "embed": "Mati/nyala penyematan",
-    "publishLibrary": "Terbitkan",
+    "publishLibrary": "",
     "submit": "Kirimkan",
     "confirm": "Konfirmasi",
     "embeddableInteractionButton": "Pencet untuk interaksi"
@@ -245,7 +260,8 @@
     "resetLibrary": "Ini akan menghapus pustaka Anda. Anda yakin?",
     "removeItemsFromsLibrary": "Hapus {{count}} item dari pustaka?",
     "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan.",
-    "collabOfflineWarning": "Tidak ada koneksi internet.\nPerubahan tidak akan disimpan!"
+    "collabOfflineWarning": "Tidak ada koneksi internet.\nPerubahan tidak akan disimpan!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Tipe file tidak didukung.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Pilihan",
+    "lasso": "",
     "image": "Sisipkan gambar",
     "rectangle": "Persegi",
     "diamond": "Berlian",
@@ -295,7 +312,8 @@
     "laser": "Penunjuk laser",
     "hand": "Tangan (alat panning)",
     "extraTools": "Alat-alat lain",
-    "mermaidToExcalidraw": "Mermaid menjadi Excalidraw"
+    "mermaidToExcalidraw": "Mermaid menjadi Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Persegi Panjang",
@@ -319,33 +337,33 @@
     "shapes": "Bentuk"
   },
   "hints": {
-    "dismissSearch": "Tekan Esc untuk batal cari",
-    "canvasPanning": "Untuk memindahkan kanvas, tekan roda mouse atau spacebar sambil menyeret, atau menggunakan alat tangan",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Pencet untuk membuat titik-titik, seret untuk satu garis",
-    "arrowTool": "Pencet untuk membuat titik-titik, seret untuk satu garis. Tekan {{arrowShortcut}} lagi untuk ganti jenis arah.",
+    "arrowTool": "",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
     "embeddable": "Pencet-seret untuk membuat sematan situs",
-    "text_selected": "Klik ganda atau tekan ENTER untuk edit teks",
-    "text_editing": "Tekan Escape atau CtrlAtauCmd+ENTER untuk selesai mengedit",
-    "linearElementMulti": "Pencet titik terakhir; atau tekan Esc atau Enter untuk sudahi",
-    "lockAngle": "Anda dapat menjaga sudut dengan menahan SHIFT",
-    "resize": "Anda dapat menjaga proposi dengan menekan SHIFT sambil mengubah ukuran,\ntekan AlT untuk mengubah ukuran dari tengah",
-    "resizeImage": "Anda dapat mengubah secara bebas dengan menekan SHIFT,\nTekan ALT untuk mengubah dari tengah",
-    "rotate": "Anda dapat menjaga sudut dengan menahan SHIFT sambil memutar",
-    "lineEditor_info": "Tekan Ctrl/Cmd dan Dobel-klik atau tekan Ctrl/Cmd +Enter untuk mengedit poin",
-    "lineEditor_pointSelected": "Tekan Delete untuk menghapus titik, Ctrl/Cmd + D untuk menduplikasi, atau seret untuk memindahkan",
-    "lineEditor_nothingSelected": "Pilih titik untuk diubah (tahan Shift untuk pilih banyak),\natau tahan Alt dan pencet untuk tambah titik",
-    "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Terbitkan pustaka Anda",
-    "bindTextToElement": "Tekan Enter untuk tambah teks",
-    "createFlowchart": "Tahan Ctrl/Cmd dan tombol arah untuk ada bagan alir",
-    "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran",
-    "eraserRevert": "Tahan Alt untuk batal menandai unsur ingin dihapus",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Fitur ini dapat diaktifkan melalui pengaturan flag \"dom.events.asyncClipboard.clipboardItem\" ke \"true\". Untuk mengganti flag di Firefox, pergi ke laman \"about:config\".",
-    "disableSnapping": "Tahan Ctrl/Cmd untuk lepas cantol",
-    "enterCropEditor": "Pencet 2x gambar atau tekan Enter untuk memangkas gambar",
-    "leaveCropEditor": "Pencet bagian luar gambar atau tekan Enter atau Esc untuk sudahi pangkas"
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Warna yang sering dipakai",
     "colors": "Warna",
     "shades": "Nuansa",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Perintah tidak tersedia...",
     "shortcutHint": "Untuk palet perintah, gunakan {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
