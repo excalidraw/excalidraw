@@ -51,9 +51,9 @@
     "arrowhead_crowfoot_one_or_many": "चिड़िया पैर (एक या अनेक)",
     "more_options": "और विकल्प",
     "arrowtypes": "तीर प्रकार",
-    "arrowtype_sharp": "नुकीला तीर",
+    "arrowtype_sharp": "तीक्ष्ण तीर",
     "arrowtype_round": "गोलाकार तीर",
-    "arrowtype_elbowed": "समकोणिय तीर",
+    "arrowtype_elbowed": "कोहनी तीर",
     "fontSize": "अक्षर का आकार",
     "fontFamily": "अक्षर वर्ग",
     "addWatermark": "\"एक्स काली ड्रॉ द्वारा बनाया हुवा\" जोड़े",
@@ -141,6 +141,10 @@
       "edit": "रेखा संपादित करे",
       "editArrow": "तीर संपादन"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "ताले में रखें",
       "unlock": "ताला खोलें",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "कटाई पूर्व आयाम",
     "copyElementLink": "वस्तु की कड़ी कॉपी करें",
     "linkToElement": "वस्तु की कड़ी",
-    "wrapSelectionInFrame": "चौकट में चुने हुवे को लपेटे"
+    "wrapSelectionInFrame": "चौकट में चुने हुवे को लपेटे",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "वस्तु की कड़ी",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "अभी तक कोई अवयव जोडा नहीं गया.",
     "hint_emptyLibrary": "यहाँ जोड़ने के लिए चित्रपटल से एक अवयव चुने, अथवा जन कोष से एक संग्रह नीचे स्थापित करें.",
-    "hint_emptyPrivateLibrary": "यहाँ जोड़ने के लिए चित्रपटल से एक अवयव चुने."
+    "hint_emptyPrivateLibrary": "यहाँ जोड़ने के लिए चित्रपटल से एक अवयव चुने.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "पटल पर धूंडे",
     "noMatch": "कोई मिलता जुलता नहीं मिला",
     "singleResult": "परिणाम",
     "multipleResults": "परिणाम",
-    "placeholder": "पटल पर पाठ्य धूंडे"
+    "placeholder": "पटल पर पाठ्य धूंडे",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "चित्रपटल स्वच्छ करें",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "वस्तुओं से पकड़े",
     "exitZenMode": "एकाग्र स्थिति से बाहर निकलें",
     "cancel": "रद्द करें",
+    "saveLibNames": "",
     "clear": "साफ़ करे",
     "remove": "हटाएं",
     "embed": "जड़ना पलटें",
-    "publishLibrary": "प्रकाशित करें",
+    "publishLibrary": "",
     "submit": "प्रस्तुत करे",
     "confirm": "पुष्टि करें",
     "embeddableInteractionButton": "संवाद स्थापना के लिए क्लिक करें"
@@ -245,7 +260,8 @@
     "resetLibrary": "यह पूरा संग्रह रिक्त करेगा. क्या आप इसे होने देना चहाते हों?",
     "removeItemsFromsLibrary": "{{count}} वस्तु(यें) संग्रह से हटायें?",
     "invalidEncryptionKey": "कूटलेखन कुंजी 22 अक्षरों की होनी चाहिये, इसलिये जीवंत सहयोग अक्षम हैं",
-    "collabOfflineWarning": "कोई इंटरनेट कनेक्शन उपलब्ध नहीं है।\nआपके बदलाव सहेजे नहीं जाएंगे!"
+    "collabOfflineWarning": "कोई इंटरनेट कनेक्शन उपलब्ध नहीं है।\nआपके बदलाव सहेजे नहीं जाएंगे!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "असमर्थित फाइल प्रकार",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "चयन",
+    "lasso": "",
     "image": "प्रतिमा सम्मिलित करें",
     "rectangle": "आयात",
     "diamond": "ईंट",
@@ -295,7 +312,8 @@
     "laser": "लेसर टॉर्च",
     "hand": "हाथ ( खिसका के देखने का औज़ार)",
     "extraTools": "अधिक उपकरण",
-    "mermaidToExcalidraw": "मर्मेड से एक्सकाली में"
+    "mermaidToExcalidraw": "मर्मेड से एक्सकाली में",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "आयत",
@@ -319,33 +337,33 @@
     "shapes": "आकृतियाँ"
   },
   "hints": {
-    "dismissSearch": "धूँड़ना रोकने के लिए एस्केप बटन दबायें",
-    "canvasPanning": "चित्रपटल को सरकाने के लिए, ड्रैग करते समय माउस व्हील को पकड़े रखे या स्पेसबार को दबाए रखे, अथवा हाथ वाले औज़ार का उपयोग करें",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, एकमात्र रेखा के लिए खींचें",
-    "arrowTool": "अनेक बिंदुओं के लिए क्लिक करे, एक रेख के लिए खींचे. तीर प्रकार बदलने के लिए {{arrowShortcut}} पुनः दबाये.",
+    "arrowTool": "",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोडे",
     "text": "आप चयन उपकरण से कहीं भी डबल-क्लिक करके पाठ्य को जोड़ सकते हों",
     "embeddable": "वेबसाइट बनाकर जड़ने के लिए क्लिक-ड़्रैग करें",
-    "text_selected": "लिपि को संपादित करने के लिए एंटर दबायें या एंटर पर डबल-क्लिक करें",
-    "text_editing": "संपादन पूर्ण करने के लिये एस्केप या कंट्रोल+एंटर दबायें",
-    "linearElementMulti": "अंतिम बिंदु पर क्लिक करें या समाप्त होने के लिए एस्केप या एंटर दबाएं",
-    "lockAngle": "आप शिफ़्ट पकड़कर कोण को बाध्य कर सकते हों",
-    "resize": "आकार बदलते समय आप SHIFT को पकड़ कर अनुपात में कमी कर सकते हैं,\nकेंद्र से आकार बदलने के लिए ALT दबाए रखें",
-    "resizeImage": "आप शिफ़्ट दबायें रखकर बिना किसी बाधा के आकार बड़ा छोटा सकते हैं, केंद्र से आकार बदलने के लिए आल्ट दबायें रखें",
-    "rotate": "आप घुमाते समय शिफ़्ट पकड़कर कोणों को बाध्य कर सकते हैं",
-    "lineEditor_info": "बिंदुओं को सम्पादित करने के लिए CtrlOrCmd को दबायें रखते हुये डबल क्लिक करे, अथवा CtrlOrCmd + Enter साथ दबाये",
-    "lineEditor_pointSelected": "बिंदु(ओं) को हटाने के लिये डिलीट दबायें, प्रतिलिपि के लिए कंट्रोल-या-कम्मांड दबायें, या सरकाने के लिए ड्रैग करें",
-    "lineEditor_nothingSelected": "एक बिंदु संपादन के लिए चयन करें ( अनेक बिंदुओं के लिए शिफ़्ट दबायें रखें), अथवा नए बिंदुओं को जोड़ने के लिये ऑल्ट दबायें रखते हुवे क्लिक करें.",
-    "placeImage": "प्रतिमा स्थापित करने के लिए क्लिक करें, अथवा प्रतिमा के आकार हस्तोंस्थापित करने के लिये क्लिक करके ड्रैग करें",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "आपका अपना समूहकोष प्रकाशित करे",
-    "bindTextToElement": "पाठ जोड़ने के लिए एंटर दबायें",
-    "createFlowchart": "फ़्लोचार्ट बनाने के लिए कंट्रोलयाकमांड कुंजी के साथ बाण कुंजी दबायें रख़े",
-    "deepBoxSelect": "गहरे चयन के लिये और ड्रेग रोकथाम के लिये कंट्रोल-या-कमांड दबायें रख़े",
-    "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "\"dom.events.asyncClipboard.clipboardItem\" फ़्लैग को \"true\" पर सेट करके इस सुविधा को संभवतः सक्षम किया जा सकता है। Firefox में ब्राउज़र फ़्लैग बदलने के लिए, \"about:config\" पृष्ठ पर जाएँ।",
-    "disableSnapping": "स्नैपिंग को निष्क्रिय करने के लिए कंट्रोल-या-कमांड दबाए रखें",
-    "enterCropEditor": "प्रतिमा काटने के लिये प्रतिमा पर डबल क्लिक करे अथवा एंटर दबायें",
-    "leaveCropEditor": "प्रतिमा के काटने की प्रक्रिया समाप्त करने हेतु यातो प्रतिमा के बाहर क्लिक करे अथवा एंटर या ऐस्केप बटन दबायें"
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "अधिकांश उपयोगित रंग",
     "colors": "रंग",
     "shades": "छाया",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "आदेश उपलब्ध नाही हैं.",
     "shortcutHint": "आदेश फलक के लिए, {{shortcut}} का उपयोग कीजिए"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
