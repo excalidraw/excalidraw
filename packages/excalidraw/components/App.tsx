@@ -96,7 +96,6 @@ import {
   Emitter,
   MINIMUM_ARROW_SIZE,
   DOUBLE_TAP_POSITION_THRESHOLD,
-  DESKTOP_UI_MODE_STORAGE_KEY,
   createUserAgentDescriptor,
   getFormFactor,
   deriveStylesPanelMode,
@@ -105,6 +104,8 @@ import {
   isSafari,
   type EditorInterface,
   type StylesPanelMode,
+  loadDesktopUIModePreference,
+  setDesktopUIMode,
 } from "@excalidraw/common";
 
 import {
@@ -583,48 +584,6 @@ class App extends React.Component<AppProps, AppState> {
   private stylesPanelMode: StylesPanelMode = deriveStylesPanelMode(
     editorInterfaceContextInitialValue,
   );
-  private loadDesktopUIModePreference = () => {
-    if (typeof window === "undefined") {
-      return null;
-    }
-
-    try {
-      const stored = window.localStorage.getItem(DESKTOP_UI_MODE_STORAGE_KEY);
-      if (stored === "compact" || stored === "full") {
-        return stored as EditorInterface["desktopUIMode"];
-      }
-    } catch (error) {
-      // ignore storage access issues (e.g., Safari private mode)
-    }
-
-    return null;
-  };
-
-  private persistDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
-    if (typeof window === "undefined") {
-      return;
-    }
-    try {
-      window.localStorage.setItem(DESKTOP_UI_MODE_STORAGE_KEY, mode);
-    } catch (error) {
-      // ignore storage access issues (e.g., Safari private mode)
-    }
-  };
-
-  public setDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
-    if (mode !== "compact" && mode !== "full") {
-      return;
-    }
-    if (mode === this.editorInterface.desktopUIMode) {
-      return;
-    }
-
-    this.editorInterface = updateObject(this.editorInterface, {
-      desktopUIMode: mode,
-    });
-    this.persistDesktopUIMode(mode);
-    this.reconcileStylesPanelMode(this.editorInterface);
-  };
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
@@ -740,7 +699,7 @@ class App extends React.Component<AppProps, AppState> {
       height: window.innerHeight,
     };
 
-    const storedDesktopUIMode = this.loadDesktopUIModePreference();
+    const storedDesktopUIMode = loadDesktopUIModePreference();
     const userAgentDescriptor = createUserAgentDescriptor(
       typeof navigator !== "undefined" ? navigator.userAgent : "",
     );
@@ -750,9 +709,7 @@ class App extends React.Component<AppProps, AppState> {
         props.UIOptions.desktopUIMode ??
         storedDesktopUIMode ??
         this.editorInterface.desktopUIMode,
-      formFactor:
-        props.UIOptions.formFactor ??
-        getFormFactor(this.state.width, this.state.height),
+      formFactor: this.getFormFactor(),
       userAgent: userAgentDescriptor,
     });
     this.stylesPanelMode = deriveStylesPanelMode(this.editorInterface);
@@ -2496,6 +2453,13 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private getFormFactor = () => {
+    const { width, height } = this.state;
+    return this.props.UIOptions.formFactor ?? isTestEnv()
+      ? "desktop"
+      : getFormFactor(width, height);
+  };
+
   private refreshEditorInterface = () => {
     const container = this.excalidrawContainerRef.current;
     if (!container) {
@@ -2511,9 +2475,7 @@ class App extends React.Component<AppProps, AppState> {
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
 
     const nextEditorInterface = updateObject(this.editorInterface, {
-      formFactor:
-        this.props.UIOptions.formFactor ??
-        getFormFactor(editorWidth, editorHeight),
+      formFactor: this.getFormFactor(),
       canFitSidebar: editorWidth > sidebarBreakpoint,
       isLandscape: editorWidth > editorHeight,
     });
@@ -2542,6 +2504,14 @@ class App extends React.Component<AppProps, AppState> {
         },
       }));
     }
+  };
+
+  private setDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
+    const nextMode = setDesktopUIMode(mode);
+    this.editorInterface = updateObject(this.editorInterface, {
+      desktopUIMode: nextMode,
+    });
+    this.reconcileStylesPanelMode(this.editorInterface);
   };
 
   private clearImageShapeCache(filesMap?: BinaryFiles) {

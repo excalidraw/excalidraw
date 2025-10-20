@@ -14,7 +14,7 @@ export type EditorInterface = Readonly<{
 }>;
 
 // storage key
-export const DESKTOP_UI_MODE_STORAGE_KEY = "excalidraw.desktopUIMode";
+const DESKTOP_UI_MODE_STORAGE_KEY = "excalidraw.desktopUIMode";
 
 // breakpoints
 // mobile: up to 699px
@@ -184,4 +184,42 @@ export const createUserAgentDescriptor = (
     isMobileDevice: isMobileOrTablet(),
     platform,
   } as const;
+};
+
+export const loadDesktopUIModePreference = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const stored = window.localStorage.getItem(DESKTOP_UI_MODE_STORAGE_KEY);
+    if (stored === "compact" || stored === "full") {
+      return stored as EditorInterface["desktopUIMode"];
+    }
+  } catch (error) {
+    // ignore storage access issues (e.g., Safari private mode)
+  }
+
+  return null;
+};
+
+const persistDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+  try {
+    window.localStorage.setItem(DESKTOP_UI_MODE_STORAGE_KEY, mode);
+  } catch (error) {
+    // ignore storage access issues (e.g., Safari private mode)
+  }
+};
+
+export const setDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
+  if (mode !== "compact" && mode !== "full") {
+    return;
+  }
+
+  persistDesktopUIMode(mode);
+
+  return mode;
 };

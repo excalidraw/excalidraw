@@ -30,7 +30,7 @@ describe("Test MobileMenu", () => {
       {
         "canFitSidebar": false,
         "desktopUIMode": "full",
-        "formFactor": "phone",
+        "formFactor": "desktop",
         "isLandscape": true,
         "isTouchScreen": false,
         "userAgent": {
