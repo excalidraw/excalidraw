@@ -6,8 +6,17 @@ $verticalBreakpoint: 861px;
   .Modal.Dialog.ttd-dialog {
     padding: 1.25rem;
 
+    @media screen and (max-width: $verticalBreakpoint) {
+      padding: 0.75rem;
+    }
+
     &.Dialog--fullscreen {
       margin-top: 0;
+    }
+
+    // Hide the default Dialog close button, we use our custom styled one
+    .Dialog__close {
+      display: none;
     }
 
     .Island {
@@ -48,7 +57,7 @@ $verticalBreakpoint: 861px;
     position: absolute;
     top: 1.5rem;
     right: 1.5rem;
-    z-index: 10;
+    z-index: 100;
 
     --button-bg: transparent;
     border: 0 !important;
@@ -67,8 +76,8 @@ $verticalBreakpoint: 861px;
     }
 
     @media screen and (max-width: $verticalBreakpoint) {
-      top: 1rem;
-      right: 1rem;
+      top: 0.75rem;
+      right: 0.75rem;
     }
   }
 
@@ -131,6 +140,11 @@ $verticalBreakpoint: 861px;
     border-bottom: 1px solid var(--color-surface-high);
     margin-bottom: 1.5rem;
     padding-inline: 2.5rem;
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      padding-inline: 1.25rem;
+      margin-bottom: 1rem;
+    }
   }
 
   .ttd-dialog-content {
@@ -141,9 +155,17 @@ $verticalBreakpoint: 861px;
     flex-direction: column;
     overflow: hidden;
 
+    @media screen and (max-width: $verticalBreakpoint) {
+      padding-inline: 1.25rem;
+    }
+
     &[hidden] {
       display: none;
     }
+  }
+
+  .ttd-dialog-error-banner-container {
+    flex-shrink: 0;
   }
 
   .ttd-dialog-input {
@@ -187,8 +209,13 @@ $verticalBreakpoint: 861px;
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--dialog-border-color);
 
-    height: 400px;
+    height: 100%;
     width: auto;
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      padding: 0.65rem;
+      min-height: 200px;
+    }
 
     @media screen and (min-width: $verticalBreakpoint) {
       width: 100%;
@@ -220,6 +247,60 @@ $verticalBreakpoint: 861px;
       max-width: 100%;
       max-height: 100%;
       color: var(--color-gray-50);
+    }
+  }
+
+  .ttd-dialog-output-syntax-error {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    text-align: center;
+    z-index: 2;
+
+    &__icon {
+      font-size: 3rem;
+      line-height: 1;
+      animation: error-bounce 0.5s ease-out;
+    }
+
+    &__title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-danger);
+
+      @at-root .excalidraw.theme--dark#{&} {
+        color: #ff8787;
+      }
+    }
+
+    &__message {
+      font-size: 0.875rem;
+      color: var(--color-gray-60);
+      max-width: 400px;
+      line-height: 1.5;
+
+      @at-root .excalidraw.theme--dark#{&} {
+        color: var(--color-gray-40);
+      }
+    }
+  }
+
+  .ttd-dialog-output-canvas-container--hidden {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  @keyframes error-bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
     }
   }
 
@@ -264,14 +345,20 @@ $verticalBreakpoint: 861px;
     min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
     overflow: hidden;
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
 
     @media screen and (min-width: $verticalBreakpoint) {
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: minmax(0, 1fr);
       gap: 4rem;
+      overflow: hidden;
     }
   }
 
@@ -283,12 +370,31 @@ $verticalBreakpoint: 861px;
     flex: 1 1 auto;
     overflow: hidden;
 
+    @media screen and (max-width: $verticalBreakpoint) {
+      &:first-child {
+        flex: 0 0 auto;
+        max-height: 25vh;
+        min-height: 180px;
+      }
+
+      &:last-child {
+        flex: 1 1 auto;
+        min-height: 300px;
+        overflow: visible;
+      }
+    }
+
     &__header {
       display: flex;
       margin: 0px 4px 4px 4px;
       align-items: center;
       gap: 1rem;
       flex-shrink: 0;
+
+      @media screen and (max-width: $verticalBreakpoint) {
+        margin: 0px 2px 4px 2px;
+        gap: 0.5rem;
+      }
 
       label {
         font-size: 14px;
@@ -300,6 +406,10 @@ $verticalBreakpoint: 861px;
     &:first-child {
       .ttd-dialog-panel-button-container:not(.invisible) {
         margin-bottom: 4rem;
+
+        @media screen and (max-width: $verticalBreakpoint) {
+          margin-bottom: 1rem;
+        }
       }
     }
 
@@ -333,8 +443,9 @@ $verticalBreakpoint: 861px;
 
       @media screen and (max-width: $verticalBreakpoint) {
         width: auto;
-        height: 10rem;
+        height: 5rem;
         flex: 0 0 auto;
+        padding: 0.65rem;
       }
     }
   }
@@ -346,6 +457,11 @@ $verticalBreakpoint: 861px;
     align-items: center;
     justify-content: flex-end;
     flex-shrink: 0;
+
+    @media screen and (max-width: $verticalBreakpoint) {
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+    }
 
     &.invisible {
       .ttd-dialog-panel-button {

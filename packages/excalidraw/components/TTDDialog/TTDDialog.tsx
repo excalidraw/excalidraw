@@ -21,6 +21,8 @@ import { TTDDialogOutput } from "./TTDDialogOutput";
 import { TTDDialogPanel } from "./TTDDialogPanel";
 import { TTDDialogPanels } from "./TTDDialogPanels";
 import { TTDDialogCTAPopup } from "./TTDDialogCTAPopup";
+import { TTDDialogErrorBanner } from "./TTDDialogErrorBanner";
+import { TTDDialogErrorToast } from "./TTDDialogErrorToast";
 
 import {
 convertMermaidToExcalidraw,
@@ -153,6 +155,21 @@ export const TTDDialogBase = withInternalFallback(
   const [onTextSubmitInProgess, setOnTextSubmitInProgess] = useState(false);
   const [rateLimits, setRateLimits] = useAtom(rateLimitsAtom);
   const [isCtaPopupOpen, setIsCtaPopupOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isMobileView, setIsMobileView] = useState(false);
+
+  // Detect mobile view using media query
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 860px)");
+    setIsMobileView(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsMobileView(e.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
   const onGenerate = async () => {
     if (rateLimits?.rateLimitRemaining === 0) {
@@ -167,17 +184,13 @@ export const TTDDialogBase = withInternalFallback(
       "__fallback" in rest
     ) {
       if (prompt.length < MIN_PROMPT_LENGTH) {
-        setError(
-          new Error(
-            `Prompt is too short (min ${MIN_PROMPT_LENGTH} characters)`,
-          ),
+        setErrorMessage(
+          `Prompt is too short (min ${MIN_PROMPT_LENGTH} characters)`,
         );
       }
       if (prompt.length > MAX_PROMPT_LENGTH) {
-        setError(
-          new Error(
-            `Prompt is too long (max ${MAX_PROMPT_LENGTH} characters)`,
-          ),
+        setErrorMessage(
+          `Prompt is too long (max ${MAX_PROMPT_LENGTH} characters)`,
         );
       }
 
@@ -204,11 +217,11 @@ export const TTDDialogBase = withInternalFallback(
       }
 
       if (error) {
-        setError(error);
+        setErrorMessage(error.message);
         return;
       }
       if (!generatedResponse) {
-        setError(new Error("Generation failed"));
+        setErrorMessage("Generation failed");
         return;
       }
 
@@ -217,11 +230,15 @@ export const TTDDialogBase = withInternalFallback(
           canvasRef: previewCanvasRef,
           data,
           mermaidToExcalidrawLib,
-          setError,
+          setError: () => {}, // Error handled via errorMessage state
           mermaidDefinition: generatedResponse,
         });
+        setHasValidDiagram(true);
+        setRenderErrorMessage(null);
         trackEvent("ai", "mermaid parse success", "ttd");
       } catch (error: any) {
+        setHasValidDiagram(false);
+        setRenderErrorMessage(error.message || "Unknown syntax error");
         if (isDevEnv()) {
           console.info(
             `%cTTD mermaid render error: ${error.message}`,
@@ -233,10 +250,8 @@ export const TTDDialogBase = withInternalFallback(
           );
         }
         trackEvent("ai", "mermaid parse failed", "ttd");
-        setError(
-          new Error(
-            "Generated an invalid diagram :(. You may also try a different prompt.",
-          ),
+        setErrorMessage(
+          "Generated an invalid diagram :(. You may also try a different prompt.",
         );
       }
     } catch (error: any) {
@@ -244,7 +259,7 @@ export const TTDDialogBase = withInternalFallback(
       if (!message || message === "Failed to fetch") {
         message = "Request failed";
       }
-      setError(new Error(message));
+      setErrorMessage(message);
     } finally {
       setOnTextSubmitInProgess(false);
     }
@@ -272,15 +287,18 @@ export const TTDDialogBase = withInternalFallback(
     files: BinaryFiles | null;
   }>({ elements: [], files: null });
 
-  const [error, setError] = useState<Error | null>(null);
   const [showMermaidCode, setShowMermaidCode] = useState(false);
   const [editedMermaidCode, setEditedMermaidCode] = useState<string>("");
+  const [hasValidDiagram, setHasValidDiagram] = useState(false);
+  const [renderErrorMessage, setRenderErrorMessage] = useState<string | null>(null);
 
   // Reset to preview mode when new diagram is generated and sync edited code
   useEffect(() => {
     if (ttdGeneration?.generatedResponse) {
       setShowMermaidCode(false);
       setEditedMermaidCode(ttdGeneration.generatedResponse);
+      setHasValidDiagram(false); // Will be set to true after successful render
+      setRenderErrorMessage(null); // Clear any previous render errors
     }
   }, [ttdGeneration?.generatedResponse]);
 
@@ -297,20 +315,22 @@ export const TTDDialogBase = withInternalFallback(
             canvasRef: previewCanvasRef,
             data,
             mermaidToExcalidrawLib,
-            setError,
+            setError: () => {}, // Error handled via errorMessage state
             mermaidDefinition: editedMermaidCode,
           });
+          setHasValidDiagram(true);
+          setRenderErrorMessage(null);
         } catch (error: any) {
+          setHasValidDiagram(false);
+          setRenderErrorMessage(error.message || "Unknown syntax error");
           if (isDevEnv()) {
             console.info(
               `%cTTD mermaid render error: ${error.message}`,
               "color: red",
             );
           }
-          setError(
-            new Error(
-              "Failed to render diagram. You may try generating again.",
-            ),
+          setErrorMessage(
+            "Syntax error in diagram code. Please fix the code or generate a new diagram.",
           );
         }
       }
@@ -318,6 +338,26 @@ export const TTDDialogBase = withInternalFallback(
 
     renderDiagram();
   }, [showMermaidCode, editedMermaidCode, mermaidToExcalidrawLib.loaded]);
+
+  // Reactively clear validation errors when conditions are met
+  useEffect(() => {
+    if (errorMessage) {
+      // Clear "too short" error when prompt becomes valid
+      if (
+        errorMessage.includes("too short") &&
+        prompt.length >= MIN_PROMPT_LENGTH
+      ) {
+        setErrorMessage(null);
+      }
+      // Clear "too long" error when prompt becomes valid
+      if (
+        errorMessage.includes("too long") &&
+        prompt.length <= MAX_PROMPT_LENGTH
+      ) {
+        setErrorMessage(null);
+      }
+    }
+  }, [prompt.length, errorMessage]);
 
   useEffect(() => {
     if (tab !== "text-to-diagram") {
@@ -407,6 +447,16 @@ export const TTDDialogBase = withInternalFallback(
             </div>
           ) : (
             <div className="ttd-dialog-content">
+              {!isMobileView && (
+                <div className="ttd-dialog-error-banner-container">
+                  {errorMessage && (
+                    <TTDDialogErrorBanner
+                      message={errorMessage}
+                      onClose={() => setErrorMessage(null)}
+                    />
+                  )}
+                </div>
+              )}
               <TTDDialogPanels>
                 <TTDDialogPanel
                   label={t("labels.prompt")}
@@ -434,7 +484,7 @@ export const TTDDialogBase = withInternalFallback(
                   <TTDDialogInput
                     onChange={handleTextChange}
                     input={text}
-                    placeholder="What should we draw today? Describe the a diagram, workflow, flow chart, and similar details."
+                    placeholder="What should we draw today? Describe a diagram, workflow, flow chart, and similar details."
                     onKeyboardSubmit={() => {
                       refOnGenerate.current();
                     }}
@@ -467,12 +517,13 @@ export const TTDDialogBase = withInternalFallback(
                 >
                   <TTDDialogOutput
                     canvasRef={previewCanvasRef}
-                    error={error}
+                    error={null}
                     loaded={mermaidToExcalidrawLib.loaded}
-                    hasContent={!!ttdGeneration?.generatedResponse}
+                    hasContent={hasValidDiagram}
                     showMermaidCode={showMermaidCode}
                     mermaidCode={editedMermaidCode}
                     onMermaidCodeChange={setEditedMermaidCode}
+                    renderError={renderErrorMessage}
                   />
                 </TTDDialogPanel>
               </TTDDialogPanels>
@@ -496,6 +547,14 @@ export const TTDDialogBase = withInternalFallback(
           );
         }}
       />
+      {isMobileView && (
+        <TTDDialogErrorToast
+          isOpen={!!errorMessage}
+          message={errorMessage || ""}
+          onClose={() => setErrorMessage(null)}
+          autoHideDuration={5000}
+        />
+      )}
     </Dialog>
   );
 },

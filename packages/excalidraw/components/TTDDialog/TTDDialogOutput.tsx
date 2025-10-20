@@ -26,6 +26,7 @@ interface TTDDialogOutputProps {
   showMermaidCode?: boolean;
   mermaidCode?: string;
   onMermaidCodeChange?: (code: string) => void;
+  renderError?: string | null; // TTD panel syntax error display
 }
 
 export const TTDDialogOutput = ({
@@ -36,6 +37,7 @@ export const TTDDialogOutput = ({
   showMermaidCode = false,
   mermaidCode = "",
   onMermaidCodeChange,
+  renderError = null,
 }: TTDDialogOutputProps) => {
   if (showMermaidCode && mermaidCode) {
     return (
@@ -49,9 +51,20 @@ export const TTDDialogOutput = ({
 
   return (
     <div className="ttd-dialog-output-wrapper">
-      {!hasContent && (
+      {!hasContent && !renderError && (
         <div className="ttd-dialog-output-placeholder">
           <DiagramPlaceholder />
+        </div>
+      )}
+      {renderError && (
+        <div className="ttd-dialog-output-syntax-error">
+          <div className="ttd-dialog-output-syntax-error__icon">⚠️</div>
+          <div className="ttd-dialog-output-syntax-error__title">
+            Syntax Error
+          </div>
+          <div className="ttd-dialog-output-syntax-error__message">
+            {renderError}
+          </div>
         </div>
       )}
       {error && <ErrorDisplay error={error.message} />}
@@ -60,6 +73,7 @@ export const TTDDialogOutput = ({
           ref={canvasRef}
           className={clsx("ttd-dialog-output-canvas-container", {
             "ttd-dialog-output-canvas-container--error": !!error,
+            "ttd-dialog-output-canvas-container--hidden": !!renderError,
           })}
         />
       ) : (
