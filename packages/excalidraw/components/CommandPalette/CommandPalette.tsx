@@ -7,11 +7,12 @@ import {
   EVENT,
   KEYS,
   capitalizeString,
-  getShortcutKey,
   isWritableElement,
 } from "@excalidraw/common";
 
 import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionToggleShapeSwitch";
+
+import { getShortcutKey } from "@excalidraw/excalidraw/shortcut";
 
 import type { MarkRequired } from "@excalidraw/common/utility-types";
 

@@ -3,7 +3,6 @@ import {
   KEYS,
   MOBILE_ACTION_BUTTON_BG,
   arrayToMap,
-  getShortcutKey,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -26,6 +25,7 @@ import { DuplicateIcon } from "../components/icons";
 
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
