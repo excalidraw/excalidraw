@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "Triangle (vora)",
     "arrowhead_diamond": "Rombe",
     "arrowhead_diamond_outline": "Rombe (vora)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_many": "Potes de gall (moltes)",
+    "arrowhead_crowfoot_one": "Potes de gall (una)",
+    "arrowhead_crowfoot_one_or_many": "Potes de gall (una o moltes)",
+    "more_options": "Més opcions",
     "arrowtypes": "Tipus de fletxa",
     "arrowtype_sharp": "Fletxa Esmolada",
     "arrowtype_round": "Fletxa corba",
@@ -129,17 +129,21 @@
     "createContainerFromText": "Ajusta el text al contenidor",
     "link": {
       "edit": "Edita l'enllaç",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "Editar enllaç incrustable",
+      "create": "Afegir un enllaç",
       "label": "Enllaç",
       "labelEmbed": "Enllaça i encasta",
       "empty": "No s'ha definit cap enllaç",
-      "hint": "",
-      "goToElement": ""
+      "hint": "Escriu o enganxa un enllaç aquí",
+      "goToElement": "Anar a l'element objectiu"
     },
     "lineEditor": {
       "edit": "Editar línia",
       "editArrow": "Edita la fletxa"
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "Bloca",
@@ -161,28 +165,38 @@
     "zoomToFit": "Zoom per veure tots els elements",
     "installPWA": "Instal·la Excalidraw localment (PWA)",
     "autoResize": "Activa la redimensió de text automàtica",
-    "imageCropping": "",
-    "unCroppedDimension": "",
-    "copyElementLink": "",
-    "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "imageCropping": "Retallar la imatge",
+    "unCroppedDimension": "Dimensió sense retallar",
+    "copyElementLink": "Copiar enllaç a objecte",
+    "linkToElement": "Enllaç a l'objecte",
+    "wrapSelectionInFrame": "Embolica la selecció en un marc",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "Enllaç a l'objecte",
+    "desc": "Fes clic en una forma al llenç o enganxa un enllaç.",
+    "notFound": "L'objecte enllaçat no s'ha trobat al llenç."
   },
   "library": {
     "noItems": "Encara no s'hi han afegit elements...",
     "hint_emptyLibrary": "Trieu un element o un llenç per a afegir-lo aquí, o instal·leu una biblioteca del repositori públic, més avall.",
-    "hint_emptyPrivateLibrary": "Trieu un element o un llenç per a afegir-lo aquí."
+    "hint_emptyPrivateLibrary": "Trieu un element o un llenç per a afegir-lo aquí.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "Troba al llenç",
     "noMatch": "No hem trobat coincidències...",
     "singleResult": "resultat",
     "multipleResults": "resultats",
-    "placeholder": "Troba al llenç..."
+    "placeholder": "Troba al llenç...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Neteja el llenç",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Ajusta als objectes",
     "exitZenMode": "Surt de mode zen",
     "cancel": "Cancel·la",
+    "saveLibNames": "",
     "clear": "Neteja",
     "remove": "Suprimeix",
     "embed": "Commuta incrustació",
-    "publishLibrary": "Publica",
+    "publishLibrary": "",
     "submit": "Envia",
     "confirm": "Confirma",
     "embeddableInteractionButton": "Feu clic per interactuar"
@@ -245,7 +260,8 @@
     "resetLibrary": "Això buidarà la biblioteca. N'esteu segur?",
     "removeItemsFromsLibrary": "Suprimir {{count}} element(s) de la biblioteca?",
     "invalidEncryptionKey": "La clau d'encriptació ha de tenir 22 caràcters. La col·laboració en directe està desactivada.",
-    "collabOfflineWarning": "Sense connexió a internet disponible.\nEls vostres canvis no seran guardats!"
+    "collabOfflineWarning": "Sense connexió a internet disponible.\nEls vostres canvis no seran guardats!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Tipus de fitxer no suportat.",
@@ -267,15 +283,16 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Els elements incrustables no poden afegir-se a la biblioteca.",
-      "iframe": "",
-      "image": ""
+      "iframe": "Elements IFrame no es poden afegir a la biblioteca.",
+      "image": "Suport per a afegir imatges a la biblioteca aviat!"
     },
-    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnRead": "No s'ha pogut enganxar (no s'ha pogut llegir del porta-retalls del sistema).",
     "asyncPasteFailedOnParse": "No s'ha pogut enganxar.",
     "copyToSystemClipboardFailed": "No s'ha pogut copiar al porta-retalls."
   },
   "toolBar": {
     "selection": "Selecció",
+    "lasso": "",
     "image": "Insereix imatge",
     "rectangle": "Rectangle",
     "diamond": "Rombe",
@@ -287,15 +304,16 @@
     "library": "Biblioteca",
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
     "penMode": "Mode de llapis - evita tocar",
-    "link": "",
+    "link": "Afegeix/actualitza l'enllaç per a una forma seleccionada",
     "eraser": "Esborrador",
     "frame": "Eina de marc",
-    "magicframe": "",
-    "embeddable": "",
+    "magicframe": "De Wireframe a codi",
+    "embeddable": "Incrustació Web",
     "laser": "Punter làser",
     "hand": "Mà (eina de desplaçament)",
     "extraTools": "Més eines",
-    "mermaidToExcalidraw": "Mermaid a Excalidraw"
+    "mermaidToExcalidraw": "Mermaid a Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Rectangle",
@@ -308,8 +326,8 @@
     "image": "Imatge",
     "group": "Grup",
     "frame": "Marc",
-    "magicframe": "",
-    "embeddable": "",
+    "magicframe": "De Wireframe a codi",
+    "embeddable": "Incrustació Web",
     "selection": "Selecció",
     "iframe": "IFrame"
   },
@@ -320,30 +338,30 @@
   },
   "hints": {
     "dismissSearch": "",
-    "canvasPanning": "Per moure el llenç, manteniu premuda la roda del ratolí o la barra espaiadora mentre arrossegueu o utilitzeu l'eina manual",
+    "canvasPanning": "",
     "linearElement": "Feu clic per a dibuixar múltiples punts; arrossegueu per a una sola línia",
     "arrowTool": "",
     "freeDraw": "Feu clic i arrossegueu, deixeu anar per a finalitzar",
     "text": "Consell: també podeu afegir text fent doble clic en qualsevol lloc amb l'eina de selecció",
-    "embeddable": "",
-    "text_selected": "Feu doble clic o premeu Retorn per a editar el text",
-    "text_editing": "Premeu Escapada o Ctrl+Retorn (o Ordre+Retorn) per a finalitzar l'edició",
-    "linearElementMulti": "Feu clic a l'ultim punt, o pitgeu Esc o Retorn per a finalitzar",
-    "lockAngle": "Per restringir els angles, mantenir premut el majúscul (SHIFT)",
-    "resize": "Per restringir les proporcions mentres es canvia la mida, mantenir premut el majúscul (SHIFT); per canviar la mida des del centre, mantenir premut ALT",
-    "resizeImage": "Podeu redimensionar lliurement prement MAJÚSCULA;\nper a redimensionar des del centre, premeu ALT",
-    "rotate": "Per restringir els angles mentre gira, mantenir premut el majúscul (SHIFT)",
-    "lineEditor_info": "Mantingueu premut Ctrl o Cmd i feu doble clic o premeu Ctrl o Cmd + Retorn per editar els punts",
-    "lineEditor_pointSelected": "Premeu Suprimir per a eliminar el(s) punt(s), CtrlOrCmd+D per a duplicar-lo, o arrossegueu-lo per a moure'l",
-    "lineEditor_nothingSelected": "Seleccioneu un punt per a editar-lo (premeu SHIFT si voleu\nselecció múltiple), o manteniu Alt i feu clic per a afegir més punts",
-    "placeImage": "Feu clic per a col·locar la imatge o clic i arrossegar per a establir-ne la mida manualment",
+    "embeddable": "Feu clic i arrossegueu per crear una Incrustació Web",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Publiqueu la vostra pròpia llibreria",
-    "bindTextToElement": "Premeu enter per a afegir-hi text",
+    "bindTextToElement": "",
     "createFlowchart": "",
-    "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament",
-    "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "És probable que aquesta funció es pugui activar posant la marca \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Per canviar les marques del navegador al Firefox, visiteu la pàgina \"about:config\".",
-    "disableSnapping": "Manteniu premut CtrlOrCmd per a desactivar l'ajustament",
+    "disableSnapping": "",
     "enterCropEditor": "",
     "leaveCropEditor": ""
   },
@@ -392,8 +410,8 @@
     "click": "clic",
     "deepSelect": "Selecció profunda",
     "deepBoxSelect": "Seleccioneu profundament dins del quadre i eviteu arrossegar",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "createFlowchart": "Crear un diagrama de flux a partir d'un element genèric",
+    "navigateFlowchart": "Navegar per un diagrama de flux",
     "curvedArrow": "Fletxa corba",
     "curvedLine": "Línia corba",
     "documentation": "Documentació",
@@ -418,7 +436,7 @@
     "movePageUpDown": "Mou la pàgina cap amunt/a baix",
     "movePageLeftRight": "Mou la pàgina cap a l'esquerra/dreta",
     "cropStart": "Retallar l'imatge",
-    "cropFinish": ""
+    "cropFinish": "Finalitza el retall d'imatge"
   },
   "clearCanvasDialog": {
     "title": "Neteja el llenç"
@@ -465,7 +483,7 @@
       "withBackground": "Fons",
       "onlySelected": "Només seleccionat",
       "darkMode": "Mode fosc",
-      "embedScene": "",
+      "embedScene": "Incrusta escena",
       "scale": "Escala",
       "padding": "Marge intern (padding)"
     },
@@ -494,7 +512,7 @@
     "scene": "Escena",
     "selected": "Seleccionat",
     "storage": "Emmagatzematge",
-    "fullTitle": "",
+    "fullTitle": "Propietats del Llenç i de la Forma",
     "title": "Propietats",
     "generalStats": "General",
     "elementProperties": "Propietats de la forma",
@@ -509,15 +527,15 @@
     "copyStyles": "S'han copiat els estils.",
     "copyToClipboard": "S'ha copiat al porta-retalls.",
     "copyToClipboardAsPng": "S'ha copiat {{exportSelection}} al porta-retalls en format PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "S'ha copiat {{exportSelection}} al porta-retalls com a SVG\n({{exportColorScheme}})",
     "fileSaved": "S'ha desat el fitxer.",
     "fileSavedToFilename": "S'ha desat a {filename}",
     "canvas": "el llenç",
     "selection": "la selecció",
     "pasteAsSingleElement": "Fer servir {{shortcut}} per enganxar com un sol element,\no enganxeu-lo en un editor de text existent",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": "",
-    "elementLinkCopied": ""
+    "unableToEmbed": "Actualment no es permet incrustar aquesta URL. Planteja un problema a GitHub per sol·licitar que l'URL estigui a la llista blanca",
+    "unrecognizedLinkFormat": "L'enllaç que has incrustat no coincideix amb el format esperat. Si us plau, intenta enganxar l'enllaç 'embed' proporcionada pel lloc web d'origen",
+    "elementLinkCopied": "Enllaç copiat al porta-retalls"
   },
   "colors": {
     "transparent": "Transparent",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Colors personalitzats més usats",
     "colors": "Colors",
     "shades": "Ombres",
@@ -561,17 +580,17 @@
       "exportToImage": {
         "title": "Exporteu com a imatge",
         "button": "Exporteu com a imatge",
-        "description": ""
+        "description": "Exporta les dades de l'escena com una imatge des de la qual podràs importar-les més tard."
       },
       "saveToDisk": {
         "title": "Deseu al disc",
         "button": "Deseu al disc",
-        "description": ""
+        "description": "Exporta les dades de l'escena a un fitxer des del qual podràs importar-les més tard."
       },
       "excalidrawPlus": {
         "title": "Excalidraw+",
         "button": "Exporta a Excalidraw+",
-        "description": ""
+        "description": "Desa l'escena al teu espai de treball d'Excalidraw+."
       }
     },
     "modal": {
@@ -590,7 +609,7 @@
   "mermaid": {
     "title": "Mermaid a Excalidraw",
     "button": "Inseriu",
-    "description": "",
+    "description": "Actualment només s'admeten els diagrames <flowchartLink>Flowchart</flowchartLink>, <sequenceLink> Sequence, </sequenceLink> i <classLink> Class </classLink>. Els altres tipus es representaran com a imatge a Excalidraw.",
     "syntax": "Sintaxi de Mermaid",
     "preview": "Previsualització"
   },
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Ordre no disponible...",
     "shortcutHint": "Per obrir la paleta d'ordres, utilitza {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
