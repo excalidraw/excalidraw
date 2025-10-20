@@ -50,9 +50,9 @@
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
     "more_options": "",
-    "arrowtypes": "",
-    "arrowtype_sharp": "",
-    "arrowtype_round": "",
+    "arrowtypes": "Вид стрелка",
+    "arrowtype_sharp": "Остра стрелка",
+    "arrowtype_round": "Извита стрелка",
     "arrowtype_elbowed": "",
     "fontSize": "Размер на шрифта",
     "fontFamily": "Семейство шрифтове",
@@ -130,7 +130,7 @@
     "link": {
       "edit": "Редактирай линк",
       "editEmbed": "",
-      "create": "",
+      "create": "Добавяне на връзка",
       "label": "Линк",
       "labelEmbed": "",
       "empty": "Няма зададен линк",
@@ -140,6 +140,10 @@
     "lineEditor": {
       "edit": "Редактирай линия",
       "editArrow": "Редактирай стрелка"
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "Заключи",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "Няма добавени неща все още...",
     "hint_emptyLibrary": "Избери предмет от платното, за да го добавиш тук или инсталирай библиотека от публичното хранилище по-долу.",
-    "hint_emptyPrivateLibrary": "Избери предмет от платното, за да го добавиш тук."
+    "hint_emptyPrivateLibrary": "Избери предмет от платното, за да го добавиш тук.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "",
     "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "singleResult": "резултат",
+    "multipleResults": "резултати",
+    "placeholder": "Търсене на текст по платното...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Прилепване към обекти",
     "exitZenMode": "Спиране на режим Зен",
     "cancel": "Отмени",
+    "saveLibNames": "",
     "clear": "Изчисти",
     "remove": "Премахване",
     "embed": "Включи вмъкване",
-    "publishLibrary": "Публикувай",
+    "publishLibrary": "",
     "submit": "Изпрати",
     "confirm": "Потвърждаване",
     "embeddableInteractionButton": "Натисни, за да взаимодействаш"
@@ -245,7 +260,8 @@
     "resetLibrary": "Това ще изчисти библиотеката ви. Сигурни ли сте?",
     "removeItemsFromsLibrary": "Изтрий {{count}} елемент(а) от библиотеката?",
     "invalidEncryptionKey": "Ключът за енкрипция трябва да е от 22 знака. Сътрудничеството на живо е изключено.",
-    "collabOfflineWarning": "Няма налична интернет връзка.\nВашите промени няма да бъдат запазени!"
+    "collabOfflineWarning": "Няма налична интернет връзка.\nВашите промени няма да бъдат запазени!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Този файлов формат не се поддържа.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Селекция",
+    "lasso": "",
     "image": "Вмъкване на изображение",
     "rectangle": "Правоъгълник",
     "diamond": "Диамант",
@@ -295,7 +312,8 @@
     "laser": "Лазерна показалка",
     "hand": "",
     "extraTools": "Още инструменти",
-    "mermaidToExcalidraw": "Mermaid към Excalidraw"
+    "mermaidToExcalidraw": "Mermaid към Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Правоъгълник",
@@ -320,25 +338,25 @@
   },
   "hints": {
     "dismissSearch": "",
-    "canvasPanning": "За да местите платното, задръжте колелцето на мишката или интервал, докато местите, или използвайте инструмента ръка",
+    "canvasPanning": "",
     "linearElement": "Кликнете, за да стартирате няколко точки, плъзнете за една линия",
     "arrowTool": "",
     "freeDraw": "Натиснете и влачете, пуснете като сте готови",
     "text": "Подсказка: Можете също да добавите текст като натиснете някъде два път с инструмента за селекция",
     "embeddable": "Натисни-премести, за да създадеш вметка за уебсайт",
-    "text_selected": "Кликнете два пъти или натиснете ENTER, за да редактирате текст",
+    "text_selected": "",
     "text_editing": "",
-    "linearElementMulti": "Кликнете върху последната точка или натиснете Escape или Enter, за да завършите",
-    "lockAngle": "Можете да ограничите ъгъла, като задържите SHIFT",
-    "resize": "Може да ограничите при преоразмеряване като задържите SHIFT,\nзадръжте ALT за преоразмерите през центъра",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
     "resizeImage": "",
-    "rotate": "Можете да ограничите ъглите, като държите SHIFT, докато се въртите",
+    "rotate": "",
     "lineEditor_info": "",
-    "lineEditor_pointSelected": "Натиснете Delete за да изтриете точка(и), CtrlOrCmd+D за дуплициране, или извлачете за да преместите",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
-    "placeImage": "",
     "publishLibrary": "Публикувайте собствена библиотека",
-    "bindTextToElement": "Натиснете Enter, за да добавите",
+    "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
     "eraserRevert": "",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Най-често използвани цветове",
     "colors": "Цветове",
     "shades": "Нюанси",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "",
     "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
