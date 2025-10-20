@@ -46,14 +46,14 @@
     "arrowhead_triangle_outline": "Triângulo (contorno)",
     "arrowhead_diamond": "Diamante",
     "arrowhead_diamond_outline": "Diamante (contorno)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_many": "Pé de pássaro (muitos)",
+    "arrowhead_crowfoot_one": "Pé de pássaro (um)",
+    "arrowhead_crowfoot_one_or_many": "Pé de pássaro (um ou muitos)",
+    "more_options": "Mais opções",
     "arrowtypes": "Tipo de seta",
     "arrowtype_sharp": "Seta afiada",
     "arrowtype_round": "Seta curva",
-    "arrowtype_elbowed": "",
+    "arrowtype_elbowed": "Seta dobrada",
     "fontSize": "Tamanho da fonte",
     "fontFamily": "Família da fonte",
     "addWatermark": "Adicionar \"Feito com Excalidraw\"",
@@ -129,17 +129,21 @@
     "createContainerFromText": "Envolver texto em um contêiner",
     "link": {
       "edit": "Editar link",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "Editar link incorporável",
+      "create": "Adicionar link",
       "label": "Link",
       "labelEmbed": "Vincular e incorporar",
       "empty": "Nenhum link foi definido",
-      "hint": "",
+      "hint": "Digite ou cole o seu link aqui",
       "goToElement": ""
     },
     "lineEditor": {
       "edit": "Editar linha",
       "editArrow": "Editar seta"
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "Bloquear",
@@ -156,33 +160,43 @@
     "prompt": "Prompt",
     "followUs": "Siga-nos",
     "discordChat": "Discord",
-    "zoomToFitViewport": "",
+    "zoomToFitViewport": "Zoom para caber na tela",
     "zoomToFitSelection": "Ampliar para ajustar a seleção",
     "zoomToFit": "Ampliar para encaixar todos os elementos",
     "installPWA": "Instalar excalidraw localmente (PWA)",
     "autoResize": "Habilitar redimensionamento automático de texto",
-    "imageCropping": "",
-    "unCroppedDimension": "",
-    "copyElementLink": "",
-    "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "imageCropping": "Recorte de imagem",
+    "unCroppedDimension": "Dimensão sem recortes",
+    "copyElementLink": "Copiar link para o objeto",
+    "linkToElement": "Links para o objeto",
+    "wrapSelectionInFrame": "Ajustar seleção no frame",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
-    "desc": "",
-    "notFound": ""
+    "desc": "Clique em uma forma na tela ou cole um link.",
+    "notFound": "Objeto vinculado não foi encontrado na tela."
   },
   "library": {
     "noItems": "Nenhum item adicionado ainda...",
     "hint_emptyLibrary": "Selecione um item na tela para adicioná-lo aqui, ou instale uma biblioteca do repositório público, abaixo.",
-    "hint_emptyPrivateLibrary": "Selecione um item na tela para adicioná-lo aqui."
+    "hint_emptyPrivateLibrary": "Selecione um item na tela para adicioná-lo aqui.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "Procurar na tela",
     "noMatch": "Nenhum resultado encontrado...",
     "singleResult": "resultado",
     "multipleResults": "resultados",
-    "placeholder": "Procurar texto na tela..."
+    "placeholder": "Procurar texto na tela...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Limpar a tela",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Encaixar em objetos",
     "exitZenMode": "Sair do modo zen",
     "cancel": "Cancelar",
+    "saveLibNames": "",
     "clear": "Limpar",
     "remove": "Remover",
     "embed": "Alternar incorporação",
-    "publishLibrary": "Publicar",
+    "publishLibrary": "",
     "submit": "Enviar",
     "confirm": "Confirmar",
     "embeddableInteractionButton": "Clique para interagir"
@@ -245,7 +260,8 @@
     "resetLibrary": "Isto limpará a sua biblioteca. Você tem certeza?",
     "removeItemsFromsLibrary": "Excluir {{count}} item(ns) da biblioteca?",
     "invalidEncryptionKey": "A chave de encriptação deve ter 22 caracteres. A colaboração ao vivo está desabilitada.",
-    "collabOfflineWarning": "Sem conexão com a internet disponível.\nSuas alterações não serão salvas!"
+    "collabOfflineWarning": "Sem conexão com a internet disponível.\nSuas alterações não serão salvas!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Tipo de arquivo não suportado.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Seleção",
+    "lasso": "",
     "image": "Inserir imagem",
     "rectangle": "Retângulo",
     "diamond": "Losango",
@@ -292,10 +309,11 @@
     "frame": "Ferramenta de quadro",
     "magicframe": "Wireframe para código",
     "embeddable": "Página web incorporada",
-    "laser": "",
+    "laser": "Ponteiro de laser",
     "hand": "Mão (ferramenta de rolagem)",
     "extraTools": "Mais ferramentas",
-    "mermaidToExcalidraw": "Mermaid para Excalidraw"
+    "mermaidToExcalidraw": "Mermaid para Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Retângulo",
@@ -319,33 +337,33 @@
     "shapes": "Formas"
   },
   "hints": {
-    "dismissSearch": "Pressione Esc para descartar a pesquisa",
-    "canvasPanning": "Para mover a tela, segure a roda do mouse ou a barra de espaço enquanto arrasta ou use a ferramenta de mão",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
-    "arrowTool": "Clique para começar vários pontos, arraste para uma única linha. Pressione {{arrowShortcut}} novamente para alterar o tipo de seta.",
+    "arrowTool": "",
     "freeDraw": "Toque e arraste, solte quando terminar",
     "text": "Dica: você também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
     "embeddable": "Clique e arraste para criar um site incorporado",
-    "text_selected": "Clique duplo ou tecle ENTER para editar o texto",
-    "text_editing": "Pressione Esc ou Ctrl/Cmd+ENTER para encerrar a edição",
-    "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
-    "lockAngle": "Você pode restringir o ângulo segurando o SHIFT",
-    "resize": "Você pode restringir proporções segurando SHIFT enquanto redimensiona,\nsegure ALT para redimensionar do centro",
-    "resizeImage": "Você pode redimensionar livremente segurando SHIFT,\nsegure ALT para redimensionar a partir do centro",
-    "rotate": "Você pode restringir os ângulos segurando SHIFT enquanto gira",
-    "lineEditor_info": "Pressione Ctrl/Cmd e duplo-clique ou pressione Ctrl/Cmd + Enter para editar pontos",
-    "lineEditor_pointSelected": "Pressione Delete para remover o(s) ponto(s),\nCtrl/Cmd+D para duplicar ou arraste para mover",
-    "lineEditor_nothingSelected": "Selecione um ponto para editar (segure SHIFT para selecionar vários) ou segure Alt e clique para adicionar novos pontos",
-    "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Publicar sua própria biblioteca",
-    "bindTextToElement": "Pressione Enter para adicionar o texto",
-    "createFlowchart": "Segure Ctrl ou Cmd e a tecla de seta para criar um fluxograma",
-    "deepBoxSelect": "Pressione Ctrl/Cmd para seleção profunda e para evitar arrastar",
-    "eraserRevert": "Segure a tecla Alt para inverter os elementos marcados para exclusão",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Esse recurso pode ser ativado configurando a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\".",
-    "disableSnapping": "Pressione Ctrl/Cmd para desabilitar o encaixe",
+    "disableSnapping": "",
     "enterCropEditor": "",
-    "leaveCropEditor": "Clique fora da imagem ou pressione ENTER ou ESC para finalizar o corte"
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -393,7 +411,7 @@
     "deepSelect": "Seleção profunda",
     "deepBoxSelect": "Use a seleção profunda dentro da caixa para previnir arrastar",
     "createFlowchart": "Crie um fluxograma a partir de um elemento genérico",
-    "navigateFlowchart": "",
+    "navigateFlowchart": "Navegar por um fluxograma",
     "curvedArrow": "Seta curva",
     "curvedLine": "Linha curva",
     "documentation": "Documentação",
@@ -417,7 +435,7 @@
     "toggleElementLock": "Bloquear/desbloquear seleção",
     "movePageUpDown": "Mover a página para cima/baixo",
     "movePageLeftRight": "Mover a página para esquerda/direita",
-    "cropStart": "",
+    "cropStart": "Recortar imagem",
     "cropFinish": "Finalizar corte da imagem"
   },
   "clearCanvasDialog": {
@@ -509,14 +527,14 @@
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado para área de transferência.",
     "copyToClipboardAsPng": "{{exportSelection}} copiado para a área de transferência como PNG ({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "Copiado {{exportSelection}} para a área de transferência com SVG ({{exportColorScheme}})",
     "fileSaved": "Arquivo salvo.",
     "fileSavedToFilename": "Salvo em {filename}",
     "canvas": "tela",
     "selection": "seleção",
     "pasteAsSingleElement": "Use {{shortcut}} para colar como um único elemento,\nou cole em um editor de texto já existente",
     "unableToEmbed": "No momento não é permitido incorporar esta URL. Crie uma issue no GitHub para solicitar a lista branca da URL",
-    "unrecognizedLinkFormat": "",
+    "unrecognizedLinkFormat": "O link incorporado não corresponde ao formato esperado. Por favor, tente colar a string 'incorporada' que foi fornecida pelo site de origem",
     "elementLinkCopied": ""
   },
   "colors": {
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Cores personalizadas mais usadas",
     "colors": "Cores",
     "shades": "Tons",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Comando indisponível...",
     "shortcutHint": "Para a paleta de comandos, use {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
