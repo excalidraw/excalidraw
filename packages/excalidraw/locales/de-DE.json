@@ -141,6 +141,10 @@
       "edit": "Linie bearbeiten",
       "editArrow": "Pfeil bearbeiten"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "Sperren",
       "unlock": "Entsperren",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "Nicht zugeschnittene Dimension",
     "copyElementLink": "Link zum Objekt kopieren",
     "linkToElement": "Link zum Objekt",
-    "wrapSelectionInFrame": "Auswahl in Rahmen einbetten"
+    "wrapSelectionInFrame": "Auswahl in Rahmen einbetten",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "Link zum Objekt",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
     "hint_emptyLibrary": "Wähle ein Element auf der Zeichenfläche, um es hier hinzuzufügen. Oder installiere eine Bibliothek aus dem öffentlichen Verzeichnis.",
-    "hint_emptyPrivateLibrary": "Wähle ein Element von der Zeichenfläche, um es hier hinzuzufügen."
+    "hint_emptyPrivateLibrary": "Wähle ein Element von der Zeichenfläche, um es hier hinzuzufügen.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "Auf Zeichenfläche suchen",
     "noMatch": "Keine Treffer gefunden...",
     "singleResult": "Ergebnis",
     "multipleResults": "Ergebnisse",
-    "placeholder": "Text auf Zeichenfläche suchen..."
+    "placeholder": "Text auf Zeichenfläche suchen...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Einrasten an Objekten",
     "exitZenMode": "Zen-Modus verlassen",
     "cancel": "Abbrechen",
+    "saveLibNames": "",
     "clear": "Löschen",
     "remove": "Entfernen",
     "embed": "Einbettung umschalten",
-    "publishLibrary": "Veröffentlichen",
+    "publishLibrary": "",
     "submit": "Absenden",
     "confirm": "Bestätigen",
     "embeddableInteractionButton": "Klicken, um zu interagieren"
@@ -245,7 +260,8 @@
     "resetLibrary": "Dieses löscht deine Bibliothek. Bist du sicher?",
     "removeItemsFromsLibrary": "{{count}} Element(e) aus der Bibliothek löschen?",
     "invalidEncryptionKey": "Verschlüsselungsschlüssel muss 22 Zeichen lang sein. Die Live-Zusammenarbeit ist deaktiviert.",
-    "collabOfflineWarning": "Keine Internetverbindung verfügbar.\nDeine Änderungen werden nicht gespeichert!"
+    "collabOfflineWarning": "Keine Internetverbindung verfügbar.\nDeine Änderungen werden nicht gespeichert!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Nicht unterstützter Dateityp.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Auswahl",
+    "lasso": "",
     "image": "Bild einfügen",
     "rectangle": "Rechteck",
     "diamond": "Raute",
@@ -295,7 +312,8 @@
     "laser": "Laserpointer",
     "hand": "Hand (Schwenkwerkzeug)",
     "extraTools": "Weitere Werkzeuge",
-    "mermaidToExcalidraw": "Mermaid zu Excalidraw"
+    "mermaidToExcalidraw": "Mermaid zu Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Rechteck",
@@ -319,33 +337,33 @@
     "shapes": "Formen"
   },
   "hints": {
-    "dismissSearch": "Escape zum Verwerfen der Suche",
-    "canvasPanning": "Um die Zeichenfläche zu verschieben, halte das Mausrad oder die Leertaste während des Ziehens, oder verwende das Hand-Werkzeug",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
-    "arrowTool": "Klicken, um mit mehreren Punkten zu starten, ziehen für eine einzelne Linie. Drücke {{arrowShortcut}} erneut, um den Pfeiltyp zu ändern.",
+    "arrowTool": "",
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
     "embeddable": "Klicken und ziehen, um eine Webseiten-Einbettung zu erstellen",
-    "text_selected": "Doppelklicken oder Eingabetaste drücken, um Text zu bearbeiten",
-    "text_editing": "Drücke Escape oder CtrlOrCmd+Eingabetaste, um die Bearbeitung abzuschließen",
-    "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
-    "lockAngle": "Du kannst Winkel einschränken, indem du SHIFT gedrückt hältst",
-    "resize": "Du kannst die Proportionen einschränken, indem du SHIFT während der Größenänderung gedrückt hältst. Halte ALT gedrückt, um die Größe vom Zentrum aus zu ändern",
-    "resizeImage": "Du kannst die Größe frei ändern, indem du SHIFT gedrückt hältst; halte ALT, um die Größe vom Zentrum aus zu ändern",
-    "rotate": "Du kannst Winkel einschränken, indem du SHIFT während der Drehung gedrückt hältst",
-    "lineEditor_info": "CtrlOrCmd halten und Doppelklick oder CtrlOrCmd + Eingabe drücken, um Punkte zu bearbeiten",
-    "lineEditor_pointSelected": "Drücke Löschen, um Punkt(e) zu entfernen, CtrlOrCmd+D zum Duplizieren oder ziehe zum Verschieben",
-    "lineEditor_nothingSelected": "Wähle einen zu bearbeitenden Punkt (halte SHIFT gedrückt um mehrere Punkte auszuwählen),\noder halte Alt gedrückt und klicke um neue Punkte hinzuzufügen",
-    "placeImage": "Klicken, um das Bild zu platzieren oder klicken und ziehen um seine Größe manuell zu setzen",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Veröffentliche deine eigene Bibliothek",
-    "bindTextToElement": "Zum Hinzufügen Eingabetaste drücken",
-    "createFlowchart": "Halte StrgOrCmd und die Pfeiltaste gedrückt, um ein Flussdiagramm zu erstellen",
-    "deepBoxSelect": "Halte CtrlOrCmd gedrückt, um innerhalb der Gruppe auszuwählen, und um Ziehen zu vermeiden",
-    "eraserRevert": "Halte Alt gedrückt, um die zum Löschen markierten Elemente zurückzusetzen",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Diese Funktion kann wahrscheinlich aktiviert werden, indem die Einstellung \"dom.events.asyncClipboard.clipboardItem\" auf \"true\" gesetzt wird. Um die Browsereinstellungen in Firefox zu ändern, besuche die Seite \"about:config\".",
-    "disableSnapping": "Halte CtrlOrCmd gedrückt, um das Einrasten zu deaktivieren",
-    "enterCropEditor": "Doppelklicke auf das Bild oder drücke ENTER, um das Bild zuschneiden",
-    "leaveCropEditor": "Klicke außerhalb des Bildes oder drücke ENTER oder ESCAPE um das Zuschneiden zu beenden"
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Beliebteste benutzerdefinierte Farben",
     "colors": "Farben",
     "shades": "Schattierungen",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Befehl ist nicht verfügbar...",
     "shortcutHint": "Benutze {{shortcut}} für Befehlspalette"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
