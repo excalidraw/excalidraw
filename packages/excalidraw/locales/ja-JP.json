@@ -21,9 +21,9 @@
     "copyStyles": "スタイルのコピー",
     "pasteStyles": "スタイルの貼り付け",
     "stroke": "線",
-    "changeStroke": "",
+    "changeStroke": "線の色を変更",
     "background": "背景",
-    "changeBackground": "",
+    "changeBackground": "背景色変更",
     "fill": "塗りつぶし",
     "strokeWidth": "線の太さ",
     "strokeStyle": "線の種類",
@@ -49,11 +49,11 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
-    "arrowtypes": "",
+    "more_options": "詳細設定",
+    "arrowtypes": "矢印の種類",
     "arrowtype_sharp": "鋭い矢印",
-    "arrowtype_round": "",
-    "arrowtype_elbowed": "",
+    "arrowtype_round": "曲線矢印",
+    "arrowtype_elbowed": "ひじ矢印",
     "fontSize": "フォントの大きさ",
     "fontFamily": "フォントの種類",
     "addWatermark": "\"Made with Excalidraw\"と表示",
@@ -95,13 +95,13 @@
     "group": "グループ化",
     "ungroup": "グループ化を解除",
     "collaborators": "共同編集者",
-    "toggleGrid": "",
+    "toggleGrid": "グリッドを切り替え",
     "addToLibrary": "ライブラリに追加",
     "removeFromLibrary": "ライブラリから削除",
     "libraryLoadingMessage": "ライブラリを読み込み中…",
     "libraries": "ライブラリを参照する",
     "loadingScene": "シーンを読み込み中…",
-    "loadScene": "",
+    "loadScene": "ファイルからシーン",
     "align": "配置",
     "alignTop": "上揃え",
     "alignBottom": "下揃え",
@@ -117,7 +117,7 @@
     "share": "共有",
     "showStroke": "ストロークカラーピッカーを表示",
     "showBackground": "背景色ピッカーを表示",
-    "showFonts": "",
+    "showFonts": "フォント選択を表示",
     "toggleTheme": "ライト/ダークテーマに変更",
     "theme": "テーマ",
     "personalLib": "個人ライブラリ",
@@ -129,17 +129,21 @@
     "createContainerFromText": "コンテナ内でテキストを折り返す",
     "link": {
       "edit": "リンクを編集",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "埋め込みリンク編集",
+      "create": "リンクを追加",
       "label": "リンク",
       "labelEmbed": "リンクと埋め込み",
       "empty": "リンクが設定されていません",
-      "hint": "",
-      "goToElement": ""
+      "hint": "リンクを入力・貼り付け",
+      "goToElement": "対象要素に移動"
     },
     "lineEditor": {
       "edit": "行を編集",
       "editArrow": "矢印を編集"
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "ロック",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "まだアイテムが追加されていません…",
     "hint_emptyLibrary": "キャンバス上のアイテムを選択してここに追加するか、以下の公開リポジトリからライブラリをインストールしてください。",
-    "hint_emptyPrivateLibrary": "キャンバス上のアイテムを選択すると、ここに追加されます。"
+    "hint_emptyPrivateLibrary": "キャンバス上のアイテムを選択すると、ここに追加されます。",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "キャンバスで検索",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "noMatch": "一致なし…",
+    "singleResult": "結果",
+    "multipleResults": "結果数",
+    "placeholder": "キャンバス内のテキストを検索…",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",
@@ -211,15 +225,16 @@
     "fullScreen": "フルスクリーン",
     "darkMode": "ダークモード",
     "lightMode": "ライトモード",
-    "systemMode": "",
+    "systemMode": "システムモード",
     "zenMode": "集中モード",
     "objectsSnapMode": "オブジェクトにスナップ",
     "exitZenMode": "集中モードをやめる",
     "cancel": "キャンセル",
+    "saveLibNames": "",
     "clear": "消去",
     "remove": "削除",
     "embed": "埋め込みの切り替え",
-    "publishLibrary": "公開",
+    "publishLibrary": "",
     "submit": "送信",
     "confirm": "確認",
     "embeddableInteractionButton": "クリックして操作"
@@ -245,7 +260,8 @@
     "resetLibrary": "ライブラリを消去します。本当によろしいですか？",
     "removeItemsFromsLibrary": "{{count}} 個のアイテムをライブラリから削除しますか？",
     "invalidEncryptionKey": "暗号化キーは22文字でなければなりません。共同編集は無効化されています。",
-    "collabOfflineWarning": "インターネットに接続されていません。\n変更は保存されません！"
+    "collabOfflineWarning": "インターネットに接続されていません。\n変更は保存されません！",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "サポートされていないファイル形式です。",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "選択",
+    "lasso": "",
     "image": "画像を挿入",
     "rectangle": "矩形",
     "diamond": "ひし形",
@@ -295,7 +312,8 @@
     "laser": "レーザーポインター",
     "hand": "手 (パンニングツール)",
     "extraTools": "その他のツール",
-    "mermaidToExcalidraw": "Mermaid を Excalidraw に変換"
+    "mermaidToExcalidraw": "Mermaid を Excalidraw に変換",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "",
@@ -306,8 +324,8 @@
     "freedraw": "",
     "text": "文字",
     "image": "画像",
-    "group": "",
-    "frame": "",
+    "group": "グループ",
+    "frame": "フレーム",
     "magicframe": "ワイヤーフレームからコードを生成",
     "embeddable": "",
     "selection": "",
@@ -320,30 +338,30 @@
   },
   "hints": {
     "dismissSearch": "",
-    "canvasPanning": "キャンバスを移動するには、マウスホイールまたはスペースバーを押しながらドラッグするか、手ツールを使用します",
+    "canvasPanning": "",
     "linearElement": "クリックすると複数の頂点からなる曲線を開始、ドラッグすると直線",
     "arrowTool": "",
     "freeDraw": "クリックしてドラッグします。離すと終了します",
     "text": "ヒント: 選択ツールを使用して任意の場所をダブルクリックしてテキストを追加することもできます",
     "embeddable": "クリックしてドラッグし、ウェブサイトを埋め込む",
-    "text_selected": "テキストを編集するには、ダブルクリックまたはEnterキーを押します",
-    "text_editing": "Esc キーまたは CtrlOrCmd+ENTER キーを押して編集を終了します",
-    "linearElementMulti": "最後のポイントをクリックするか、EscまたはEnterを押して終了します",
-    "lockAngle": "SHIFTを押したままにすると、角度を制限することができます",
-    "resize": "サイズを変更中にSHIFTを押すと縦横比を固定できます。Altを押すと中央からサイズを変更できます",
-    "resizeImage": "SHIFTを長押しすると自由にサイズを変更できます。\n中央からサイズを変更するにはALTを長押しします",
-    "rotate": "回転中にSHIFT キーを押すと角度を制限することができます",
-    "lineEditor_info": "CtrlOrCmd を押したままダブルクリックするか、CtrlOrCmd + Enter を押して点を編集します",
-    "lineEditor_pointSelected": "Deleteキーを押すと点を削除、CtrlOrCmd+Dで複製、マウスドラッグで移動",
-    "lineEditor_nothingSelected": "編集する点を選択（SHIFTを押したままで複数選択）、\nAltキーを押しながらクリックすると新しい点を追加",
-    "placeImage": "クリックして画像を配置するか、クリックしてドラッグしてサイズを手動で設定します",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "自分のライブラリを公開",
-    "bindTextToElement": "Enterを押してテキストを追加",
+    "bindTextToElement": "",
     "createFlowchart": "",
-    "deepBoxSelect": "CtrlOrCmd を押し続けることでドラッグを抑止し、深い選択を行います",
-    "eraserRevert": "Alt を押し続けることで削除マークされた要素を元に戻す",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "この機能は、\"dom.events.asyncClipboard.clipboardItem\" フラグを \"true\" に設定することで有効になる可能性があります。Firefox でブラウザーの設定を変更するには、\"about:config\" ページを参照してください。",
-    "disableSnapping": "CtrlOrCmd を押している間スナップを無効化",
+    "disableSnapping": "",
     "enterCropEditor": "",
     "leaveCropEditor": ""
   },
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "最も使用されているカスタム色",
     "colors": "色",
     "shades": "影",
@@ -601,12 +620,12 @@
     "badge": {
       "old": ""
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "このシーン内",
+    "availableFonts": "利用可能フォント",
+    "empty": "フォントなし"
   },
   "userList": {
-    "empty": "",
+    "empty": "ユーザーなし",
     "hint": {
       "text": "ユーザーをクリックしてフォロー",
       "followStatus": "現在このユーザーをフォローしています",
@@ -618,9 +637,9 @@
   "commandPalette": {
     "title": "",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "選択",
+      "confirm": "確認",
+      "close": "閉じる"
     },
     "recents": "",
     "search": {
@@ -628,6 +647,18 @@
       "noMatch": ""
     },
     "itemNotAvailable": "",
-    "shortcutHint": ""
+    "shortcutHint": "コマンドパレットには{{shortcut}}を使用"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
