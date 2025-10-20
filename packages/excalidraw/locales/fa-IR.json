@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "مثلث (پیرامون)",
     "arrowhead_diamond": "الماس",
     "arrowhead_diamond_outline": "الماس (پیرامون)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_many": "پای کلاغی (بسیار)",
+    "arrowhead_crowfoot_one": "پای کلاغی (یک)",
+    "arrowhead_crowfoot_one_or_many": "پای کلاغی (یک یا بسیار)",
+    "more_options": "امکانات بیشتر",
     "arrowtypes": "نوع پیکان",
     "arrowtype_sharp": "پیکان تیز",
     "arrowtype_round": "پیکان منحنی",
@@ -141,6 +141,10 @@
       "edit": "ویرایش لینک",
       "editArrow": "ویرایش پیکان"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "قفل",
       "unlock": "باز کردن",
@@ -161,11 +165,13 @@
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
     "installPWA": "نصب Excalidraw روی دستگاه (PWA)",
     "autoResize": "فعالسازی تنظیم خودکار سایز",
-    "imageCropping": "",
-    "unCroppedDimension": "",
+    "imageCropping": "برش عکس",
+    "unCroppedDimension": "اندازه غیر برشی",
     "copyElementLink": "کپی لینک به آیتم",
     "linkToElement": "لینک به آیتم",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "انتخاب را در قاب قرار دهید",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "لینک به آیتم",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "آیتمی به اینجا اضافه نشده...",
     "hint_emptyLibrary": "یک آیتم روی بوم را برای اضافه شده به اینجا انتخاب کنید، یا یک کتابخانه از مخزن عمومی در بخش پایین را نصب کنید.",
-    "hint_emptyPrivateLibrary": "یک آیتم روی بوم را برای اضافه شدن به اینجا انتخاب کنید."
+    "hint_emptyPrivateLibrary": "یک آیتم روی بوم را برای اضافه شدن به اینجا انتخاب کنید.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "جستجو در بوم",
     "noMatch": "هیچ موردی یافت نشد...",
     "singleResult": "نتیجه",
     "multipleResults": "نتایج",
-    "placeholder": "جستجوی متن در بوم..."
+    "placeholder": "جستجوی متن در بوم...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "به اشیاء بچسبد",
     "exitZenMode": "خروج از حالت تمرکز",
     "cancel": "لغو",
+    "saveLibNames": "",
     "clear": "پاکسازی",
     "remove": "پاک کردن",
     "embed": "تغییر افزونه",
-    "publishLibrary": "انتشار",
+    "publishLibrary": "",
     "submit": "ارسال",
     "confirm": "تایید",
     "embeddableInteractionButton": "کلیک برای تعامل"
@@ -245,7 +260,8 @@
     "resetLibrary": "ین کار کل صفحه را پاک میکند. آیا مطمئنید?",
     "removeItemsFromsLibrary": "حذف {{count}} آیتم(ها) از کتابخانه?",
     "invalidEncryptionKey": "کلید رمزگذاری باید 22 کاراکتر باشد. همکاری زنده غیرفعال است.",
-    "collabOfflineWarning": "اتصال به اینترنت در دسترس نیست.\nتغییرات شما ذخیره نمی شود!"
+    "collabOfflineWarning": "اتصال به اینترنت در دسترس نیست.\nتغییرات شما ذخیره نمی شود!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "نوع فایل پشتیبانی نشده.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "گزینش",
+    "lasso": "",
     "image": "وارد کردن تصویر",
     "rectangle": "مستطیل",
     "diamond": "لوزی",
@@ -295,7 +312,8 @@
     "laser": "اشاره گر لیزری",
     "hand": "دست (ابزار پانینگ)",
     "extraTools": "ابزارهای بیشتر",
-    "mermaidToExcalidraw": "مرمید به excalidraw"
+    "mermaidToExcalidraw": "مرمید به excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "مستطیل",
@@ -319,33 +337,33 @@
     "shapes": "اشکال"
   },
   "hints": {
-    "dismissSearch": "لغو جستجو با فشردن Esc",
-    "canvasPanning": "برای حرکت دادن بوم، چرخ ماوس یا فاصله را در حین کشیدن نگه دارید یا از ابزار دستی استفاده کنید",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
-    "arrowTool": "برای آغاز چند نقطه کلیک کنید، برای خط تکی بکشید. مجددا روی {{arrowShortcut}} کلیک کنید تا نوع پیکان را تغییر دهید.",
+    "arrowTool": "",
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
     "embeddable": "کلیک-درگ برای ساخت افزونه وب",
-    "text_selected": "دوبار کلیک کنید یا Enter را فشار دهید تا نقاط را ویرایش کنید",
-    "text_editing": "Escape یا CtrlOrCmd+ENTER را فشار دهید تا ویرایش تمام شود",
-    "linearElementMulti": "روی آخرین نقطه کلیک کنید یا کلید ESC را بزنید یا کلید Enter را بزنید برای اتمام کار",
-    "lockAngle": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
-    "resize": "می توانید با نگه داشتن SHIFT در هنگام تغییر اندازه، نسبت ها را محدود کنید،ALT را برای تغییر اندازه از مرکز نگه دارید",
-    "resizeImage": "با نگه داشتن SHIFT می توانید آزادانه اندازه را تغییر دهید،\nبرای تغییر اندازه از مرکز، ALT را نگه دارید",
-    "rotate": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
-    "lineEditor_info": "CtrlOrCmd را نگه دارید و دوبار کلیک کنید یا CtrlOrCmd + Enter را فشار دهید تا نقاط را ویرایش کنید",
-    "lineEditor_pointSelected": "برای حذف نقطه Delete برای کپی زدن Ctrl یا Cmd+D را بزنید و یا برای جابجایی بکشید",
-    "lineEditor_nothingSelected": "یک نقطه را برای ویرایش انتخاب کنید (SHIFT را برای انتخاب چندگانه نگه دارید)،\nیا Alt را نگه دارید و برای افزودن نقاط جدید کلیک کنید",
-    "placeImage": "برای قرار دادن تصویر کلیک کنید، یا کلیک کنید و بکشید تا اندازه آن به صورت دستی تنظیم شود",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "کتابخانه خود را منتشر کنید",
-    "bindTextToElement": "برای افزودن اینتر را بزنید",
-    "createFlowchart": "کلید Ctrl یا Cmd را نگه دارید و از کلید های جهت دار برای ایجاد فلوچارت استفاده کنید.",
-    "deepBoxSelect": "CtrlOrCmd را برای انتخاب عمیق و جلوگیری از کشیدن نگه دارید",
-    "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "احتمالاً می‌توان این ویژگی را با تنظیم پرچم «dom.events.asyncClipboard.clipboardItem» روی «true» فعال کرد. برای تغییر پرچم های مرورگر در فایرفاکس، از صفحه \"about:config\" دیدن کنید.",
-    "disableSnapping": "نگه داشتن کنترل یا کامند برای غیر فعال شدن چفت شدن",
-    "enterCropEditor": "دو بار روی تصویر بزنید یا Enter را فشار دهید تا تصویر را برش دهید",
-    "leaveCropEditor": "در خارج از تصویر کلیک کنید یا Enter یا Escape را فشار دهید تا برش تمام شود"
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "رنگ های به‌تازگی به‌کار گرفته شده",
     "colors": "رنگ‌ها",
     "shades": "جلوه‌ها",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "دستور در دسترس نیست...",
     "shortcutHint": "برای تخته دستور ها {{shortcut}} را بکار بگیرید"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
