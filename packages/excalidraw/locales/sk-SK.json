@@ -141,6 +141,10 @@
       "edit": "Upraviť čiaru",
       "editArrow": "Upraviť šípku"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "Zamknúť",
       "unlock": "Odomknúť",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "Pôvodné rozmery",
     "copyElementLink": "Kopírovať odkaz na objekt",
     "linkToElement": "Odkaz na objekt",
-    "wrapSelectionInFrame": "Zabaliť výber do rámu"
+    "wrapSelectionInFrame": "Zabaliť výber do rámu",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "Odkaz na objekt",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "Zatiaľ neboli pridané žiadne položky...",
     "hint_emptyLibrary": "Vyberte položku z plátna pre jej pridanie do knižnice alebo použite knižnicu z verejného zoznamu knižníc nižšie.",
-    "hint_emptyPrivateLibrary": "Vyberte položku z plátna pre jej pridanie do knižnice."
+    "hint_emptyPrivateLibrary": "Vyberte položku z plátna pre jej pridanie do knižnice.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "Vyhľadať v plátne",
     "noMatch": "Neboli nájdené žiadne výsledky...",
     "singleResult": "výsledok",
     "multipleResults": "výsledky",
-    "placeholder": "Vyhľadať text v plátne..."
+    "placeholder": "Vyhľadať text v plátne...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Prichytiť k objektom",
     "exitZenMode": "Zrušiť režim zen",
     "cancel": "Zrušiť",
+    "saveLibNames": "",
     "clear": "Vymazať",
     "remove": "Odstrániť",
     "embed": "Prepnúť zapustenie",
-    "publishLibrary": "Uverejniť",
+    "publishLibrary": "",
     "submit": "Potvrdiť",
     "confirm": "Potvrdiť",
     "embeddableInteractionButton": "Kliknite pre interakciu"
@@ -245,7 +260,8 @@
     "resetLibrary": "Týmto vyprázdnite vašu knižnicu. Ste si istý?",
     "removeItemsFromsLibrary": "Odstrániť {{count}} položiek z knižnice?",
     "invalidEncryptionKey": "Šifrovací kľúč musí mať 22 znakov. Živá spolupráca je vypnutá.",
-    "collabOfflineWarning": "Internetové pripojenie nie je dostupné.\nVaše zmeny nebudú uložené!"
+    "collabOfflineWarning": "Internetové pripojenie nie je dostupné.\nVaše zmeny nebudú uložené!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Nepodporovaný typ súboru.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Výber",
+    "lasso": "",
     "image": "Vložiť obrázok",
     "rectangle": "Obdĺžnik",
     "diamond": "Diamant",
@@ -295,7 +312,8 @@
     "laser": "Laserový ukazovateľ",
     "hand": "Ruka (nástroj pre pohyb plátna)",
     "extraTools": "Ďalšie nástroje",
-    "mermaidToExcalidraw": "Mermaid do Excalidraw"
+    "mermaidToExcalidraw": "Mermaid do Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Obdĺžnik",
@@ -319,33 +337,33 @@
     "shapes": "Tvary"
   },
   "hints": {
-    "dismissSearch": "Stačte Escape pre zrušenie vyhľadávania",
-    "canvasPanning": "Pre pohyb plátna podržte koliesko myši alebo medzerník počas ťahania, alebo použite nástroj ruka",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
-    "arrowTool": "Kliknite pre začatie pridávania viacerých bodov, potiahnite pre pridanie jednej čiary. Stlačte znovu {{arrowShortcut}} pre zmenu typu šípky.",
+    "arrowTool": "",
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
     "embeddable": "Kliknite a ťahajte pre zapustenie webovej stránky",
-    "text_selected": "Použite dvojklik alebo stlačte Enter na editáciu textu",
-    "text_editing": "Stlačte Escape alebo CtrlOrCmd+ENTER na ukončenie editovania",
-    "linearElementMulti": "Kliknite na počiatočný bod alebo stlačte Escape alebo Enter na ukončenie",
-    "lockAngle": "Počas rotácie obmedzíte uhol podržaním SHIFT",
-    "resize": "Počas zmeny veľkosti zachováte proporcie podržaním SHIFT,\\npodržaním ALT meníte veľkosť so zachovaním stredu",
-    "resizeImage": "Podržte SHIFT pre voľnú zmenu veľkosti, podržte ALT pre zmenu veľkosti od stredu",
-    "rotate": "Počas rotácie obmedzíte uhol podržaním SHIFT",
-    "lineEditor_info": "Podržte CtrlOrCmd a kliknite dva krát alebo stlačte CtrlOrCmd + Enter pre editáciu bodov",
-    "lineEditor_pointSelected": "Stačte Delete na vymazanie bodu (bodov), CtrlOrCmd+D na duplikovanie, alebo potiahnite na presunutie",
-    "lineEditor_nothingSelected": "Zvoľte bod na upravovanie (podržte SHIFT pre zvolenie viacerých bodov) alebo podržte Alt a kliknite na pridanie nového bodu",
-    "placeImage": "Kliknite pre umiestnenie obrázka alebo kliknite a ťahajte pre zmenu jeho veľkosti",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Uverejniť vašu knižnicu",
-    "bindTextToElement": "Stlačte enter na pridanie textu",
-    "createFlowchart": "Stačte CtrlOrCmd a klávesu šípky pre vytvorenie diagramu",
-    "deepBoxSelect": "Podržte CtrlOrCmd na výber v skupine alebo zamedzeniu potiahnutia",
-    "eraserRevert": "Podržte Alt pre prehodenie položiek určených na vymazanie",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Táto sa funkcionalita sa dá zapnúť nastavením \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Pre zmenu nastavení vo Firefox-e otvorte stránku \"about:config\".",
-    "disableSnapping": "Podržte CtrlOrCmd pre vypnutie prichytávania",
-    "enterCropEditor": "Kliknite dva krát na obrázok alebo stlačte ENTER pre jeho orezanie",
-    "leaveCropEditor": "Kliknite mimo obrázok, alebo stlačte ENTER alebo ESCAPE pre dokončenie jeho orezávania"
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Najpoužívanejšie vlastné farby",
     "colors": "Farby",
     "shades": "Odtiene",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Príkaz nie je dostupný...",
     "shortcutHint": "Použite paletu príkazov pomocou {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
