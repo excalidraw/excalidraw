@@ -141,6 +141,10 @@
       "edit": "Upravit čáru",
       "editArrow": "Upravit šipku"
     },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
+    },
     "elementLock": {
       "lock": "Uzamknout",
       "unlock": "Odemknout",
@@ -165,7 +169,9 @@
     "unCroppedDimension": "",
     "copyElementLink": "Kopírovat odkaz na objekt",
     "linkToElement": "Odkaz na objekt",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
     "title": "Odkaz na objekt",
@@ -175,14 +181,22 @@
   "library": {
     "noItems": "Dosud neexistují žádné položky...",
     "hint_emptyLibrary": "Vyberte položku na plátně a přidejte ji sem nebo nainstalujte knihovnu z veřejného úložiště níže.",
-    "hint_emptyPrivateLibrary": "Vyberte položku na plátně a přidejte ji sem."
+    "hint_emptyPrivateLibrary": "Vyberte položku na plátně a přidejte ji sem.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "Najít na plátně",
     "noMatch": "Nebyla nalezena žádná shoda...",
     "singleResult": "výsledek",
     "multipleResults": "výsledky",
-    "placeholder": ""
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Resetovat plátno",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Přichytávat k objektům",
     "exitZenMode": "Opustit zen mód",
     "cancel": "Zrušit",
+    "saveLibNames": "",
     "clear": "Vyčistit",
     "remove": "Odstranit",
     "embed": "Přepínač vkládání",
-    "publishLibrary": "Zveřejnit",
+    "publishLibrary": "",
     "submit": "Odeslat",
     "confirm": "Potvrdit",
     "embeddableInteractionButton": "Klikněte pro interakci"
@@ -245,7 +260,8 @@
     "resetLibrary": "Tímto vymažete vaši knihovnu. Jste si jisti?",
     "removeItemsFromsLibrary": "Smazat {{count}} položek z knihovny?",
     "invalidEncryptionKey": "Šifrovací klíč musí mít 22 znaků. Live spolupráce je zakázána.",
-    "collabOfflineWarning": "Není k dispozici žádné internetové připojení.\nVaše změny nebudou uloženy!"
+    "collabOfflineWarning": "Není k dispozici žádné internetové připojení.\nVaše změny nebudou uloženy!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Nepodporovaný typ souboru.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Výběr",
+    "lasso": "",
     "image": "Vložit obrázek",
     "rectangle": "Obdélník",
     "diamond": "Diamant",
@@ -295,7 +312,8 @@
     "laser": "Laserové ukazovátko",
     "hand": "Ruka (nástroj pro posouvání)",
     "extraTools": "Více nástrojů",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Obdélník",
@@ -320,28 +338,28 @@
   },
   "hints": {
     "dismissSearch": "",
-    "canvasPanning": "Chcete-li přesunout plátno, podržte kolečko nebo mezerník při tažení nebo použijte nástroj Ruka",
+    "canvasPanning": "",
     "linearElement": "Kliknutím pro více bodů, táhnutím pro jednu čáru",
     "arrowTool": "",
     "freeDraw": "Klikněte a táhněte, pro ukončení pusťte",
     "text": "Tip: Text můžete také přidat dvojitým kliknutím kdekoli pomocí nástroje pro výběr",
     "embeddable": "",
-    "text_selected": "Dvojklikem nebo stisknutím klávesy ENTER upravíte text",
-    "text_editing": "Stiskněte Escape nebo Ctrl/Cmd+ENTER pro dokončení úprav",
-    "linearElementMulti": "Klikněte na poslední bod nebo stiskněte Escape anebo Enter pro dokončení",
-    "lockAngle": "Úhel můžete omezit podržením SHIFT",
-    "resize": "Můžete omezit proporce podržením SHIFT při změně velikosti,\npodržte ALT pro změnu velikosti od středu",
-    "resizeImage": "Můžete volně změnit velikost podržením SHIFT,\npodržením klávesy ALT změníte velikosti od středu",
-    "rotate": "Úhly můžete omezit podržením SHIFT při otáčení",
-    "lineEditor_info": "Podržte Ctrl/Cmd a dvakrát klikněte nebo stiskněte Ctrl/Cmd + Enter pro úpravu bodů",
-    "lineEditor_pointSelected": "Stisknutím tlačítka Delete odstraňte bod(y),\nCtrl/Cmd+D pro duplicitu nebo táhnutím pro přesun",
-    "lineEditor_nothingSelected": "Vyberte bod, který chcete upravit (podržením klávesy SHIFT vyberete více položek),\nnebo podržením klávesy Alt a kliknutím přidáte nové body",
-    "placeImage": "Kliknutím umístěte obrázek, nebo klepnutím a přetažením ručně nastavíte jeho velikost",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Publikovat vlastní knihovnu",
-    "bindTextToElement": "Stiskněte Enter pro přidání textu",
+    "bindTextToElement": "",
     "createFlowchart": "",
-    "deepBoxSelect": "Podržte Ctrl/Cmd pro hluboký výběr a pro zabránění táhnutí",
-    "eraserRevert": "Podržením klávesy Alt vrátíte prvky označené pro smazání",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Tato funkce může být povolena nastavením vlajky \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Chcete-li změnit vlajky prohlížeče ve Firefoxu, navštivte stránku \"about:config\".",
     "disableSnapping": "",
     "enterCropEditor": "",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Nejpoužívanější vlastní barvy",
     "colors": "Barvy",
     "shades": "Stíny",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Příkaz není k dispozici...",
     "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
