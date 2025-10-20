@@ -47,9 +47,9 @@
     "arrowhead_diamond": "Losange",
     "arrowhead_diamond_outline": "Losange (contour)",
     "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_one": "Pied de Corde (un)",
+    "arrowhead_crowfoot_one_or_many": "Pied du corbeau (un ou plusieurs)",
+    "more_options": "Plus d'options",
     "arrowtypes": "Type de flèche",
     "arrowtype_sharp": "Flèche pointue",
     "arrowtype_round": "Flèche incurvée",
@@ -129,17 +129,21 @@
     "createContainerFromText": "Encadrer le texte dans un conteneur",
     "link": {
       "edit": "Modifier le lien",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "Editer le lien intégrable",
+      "create": "Ajouter un lien",
       "label": "Lien",
       "labelEmbed": "Lier & intégrer",
       "empty": "Aucun lien défini",
-      "hint": "",
-      "goToElement": ""
+      "hint": "Tapez ou collez votre lien ici",
+      "goToElement": "Aller à l'élément cible"
     },
     "lineEditor": {
       "edit": "Modifier la ligne",
       "editArrow": "Modifier la flèche"
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "Verrouiller",
@@ -161,28 +165,38 @@
     "zoomToFit": "Zoomer pour voir tous les éléments",
     "installPWA": "Installer Excalidraw localement (PWA)",
     "autoResize": "Activer le redimensionnement automatique du texte",
-    "imageCropping": "",
-    "unCroppedDimension": "",
-    "copyElementLink": "",
-    "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "imageCropping": "Recadrage de l'image",
+    "unCroppedDimension": "Dimension non recadrée",
+    "copyElementLink": "Copier le lien vers un objet",
+    "linkToElement": "Lien vers un objet",
+    "wrapSelectionInFrame": "Mettre la sélection dans un cadre",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "Lien vers un objet",
+    "desc": "Cliquez sur une forme sur le canvas ou collez un lien.",
+    "notFound": "L'objet lié n'a pas été trouvé sur le canvas."
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
     "hint_emptyLibrary": "Sélectionnez un élément sur le canevas pour l'ajouter ici ou installez une bibliothèque depuis le dépôt public, ci-dessous.",
-    "hint_emptyPrivateLibrary": "Sélectionnez un élément sur le canevas pour l'ajouter ici."
+    "hint_emptyPrivateLibrary": "Sélectionnez un élément sur le canevas pour l'ajouter ici.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "Rechercher sur le canevas",
     "noMatch": "Aucun résultat trouvé...",
     "singleResult": "résultat",
     "multipleResults": "résultats",
-    "placeholder": "Rechercher du texte sur la toile..."
+    "placeholder": "Rechercher du texte sur la toile...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Aimanter aux objets",
     "exitZenMode": "Quitter le mode zen",
     "cancel": "Annuler",
+    "saveLibNames": "",
     "clear": "Effacer",
     "remove": "Supprimer",
     "embed": "Activer/Désactiver l'intégration",
-    "publishLibrary": "Publier",
+    "publishLibrary": "",
     "submit": "Envoyer",
     "confirm": "Confirmer",
     "embeddableInteractionButton": "Cliquez pour interagir"
@@ -245,7 +260,8 @@
     "resetLibrary": "Cela va effacer votre bibliothèque. Êtes-vous sûr·e ?",
     "removeItemsFromsLibrary": "Supprimer {{count}} élément(s) de la bibliothèque ?",
     "invalidEncryptionKey": "La clé de chiffrement doit comporter 22 caractères. La collaboration en direct est désactivée.",
-    "collabOfflineWarning": "Aucune connexion internet disponible.\nVos modifications ne seront pas enregistrées !"
+    "collabOfflineWarning": "Aucune connexion internet disponible.\nVos modifications ne seront pas enregistrées !",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Type de fichier non supporté.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Sélection",
+    "lasso": "",
     "image": "Insérer une image",
     "rectangle": "Rectangle",
     "diamond": "Losange",
@@ -295,7 +312,8 @@
     "laser": "Pointeur laser",
     "hand": "Mains (outil de déplacement de la vue)",
     "extraTools": "Plus d'outils",
-    "mermaidToExcalidraw": "De Mermaid à Excalidraw"
+    "mermaidToExcalidraw": "De Mermaid à Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Rectangle",
@@ -319,31 +337,31 @@
     "shapes": "Formes"
   },
   "hints": {
-    "dismissSearch": "Échapper pour annuler la recherche",
-    "canvasPanning": "Pour déplacer la zone de dessin, maintenez la molette de la souris enfoncée ou la barre d'espace tout en faisant glisser, ou utiliser l'outil main.",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
-    "arrowTool": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne. Appuyez à nouveau sur {{arrowShortcut}} pour changer le type de flèche.",
+    "arrowTool": "",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
     "embeddable": "Cliquez et glissez pour créer une intégration de site web",
-    "text_selected": "Double-cliquez ou appuyez sur ENTRÉE pour modifier le texte",
-    "text_editing": "Appuyez sur ÉCHAP ou Ctrl/Cmd+ENTRÉE pour terminer l'édition",
-    "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur Échap ou Entrée pour terminer",
-    "lockAngle": "Vous pouvez restreindre l'angle en maintenant MAJ",
-    "resize": "Vous pouvez conserver les proportions en maintenant la touche MAJ pendant le redimensionnement, maintenez la touche ALT pour redimensionner par rapport au centre",
-    "resizeImage": "Vous pouvez redimensionner librement en maintenant SHIFT,\nmaintenez ALT pour redimensionner depuis le centre",
-    "rotate": "Vous pouvez restreindre les angles en maintenant MAJ pendant la rotation",
-    "lineEditor_info": "Maintenez CtrlOrCmd et Double-cliquez ou appuyez sur CtrlOrCmd + Entrée pour modifier les points",
-    "lineEditor_pointSelected": "Appuyer sur Suppr. pour supprimer des points, Ctrl ou Cmd+D pour dupliquer, ou faire glisser pour déplacer",
-    "lineEditor_nothingSelected": "Sélectionner un point pour éditer (maintenir la touche MAJ pour en sélectionner plusieurs),\nou maintenir la touche Alt enfoncée et cliquer pour ajouter de nouveaux points",
-    "placeImage": "Cliquez pour placer l'image, ou cliquez et faites glisser pour définir sa taille manuellement",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Publier votre propre bibliothèque",
-    "bindTextToElement": "Appuyer sur Entrée pour ajouter du texte",
+    "bindTextToElement": "",
     "createFlowchart": "",
-    "deepBoxSelect": "Maintenir Ctrl ou Cmd pour sélectionner dans les groupes et empêcher le déplacement",
-    "eraserRevert": "Maintenez Alt enfoncé pour annuler les éléments marqués pour suppression",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Cette fonctionnalité devrait pouvoir être activée en définissant l'option \"dom.events.asyncClipboard.clipboard.clipboardItem\" à \"true\". Pour modifier les paramètres du navigateur dans Firefox, visitez la page \"about:config\".",
-    "disableSnapping": "Maintenez CtrlOuCmd pour désactiver l'aimantation",
+    "disableSnapping": "",
     "enterCropEditor": "",
     "leaveCropEditor": ""
   },
@@ -417,8 +435,8 @@
     "toggleElementLock": "Verrouiller/déverrouiller la sélection",
     "movePageUpDown": "Déplacer la page vers le haut/bas",
     "movePageLeftRight": "Déplacer la page vers la gauche/droite",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Rogner l’image",
+    "cropFinish": "Terminer le recadrage de l'image"
   },
   "clearCanvasDialog": {
     "title": "Effacer la zone de dessin"
@@ -517,7 +535,7 @@
     "pasteAsSingleElement": "Utiliser {{shortcut}} pour coller comme un seul élément,\nou coller dans un éditeur de texte existant",
     "unableToEmbed": "Intégrer cet URL n'est actuellement pas autorisé. Ouvrez un ticket sur GitHub pour demander son ajout à la liste blanche",
     "unrecognizedLinkFormat": "Le lien que vous avez intégré ne correspond pas au format attendu. Veuillez essayer de coller la chaîne d'intégration fournie par le site source",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Lien copié dans le presse-papiers"
   },
   "colors": {
     "transparent": "Transparent",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Couleurs personnalisées les plus fréquemment utilisées",
     "colors": "Couleurs",
     "shades": "Nuances",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Commande non disponible...",
     "shortcutHint": "Pour la palette de commandes, utilisez {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
