@@ -5,11 +5,9 @@ import { EDITOR_LS_KEYS, debounce, isDevEnv } from "@excalidraw/common";
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useApp } from "../App";
-import { ArrowRightIcon } from "../icons";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { t } from "../../i18n";
 import Trans from "../Trans";
-import { Switch } from "../Switch";
 
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
@@ -26,6 +24,7 @@ import "./MermaidToExcalidraw.scss";
 
 import type { BinaryFiles } from "../../types";
 import type { MermaidToExcalidrawLibProps } from "./common";
+import { ArrowRightIcon } from "@excalidraw/excalidraw/components/icons";
 
 const MERMAID_EXAMPLE =
   "flowchart TD\n A[Christmas] -->|Get money| B(Go shopping)\n B --> C{Let me think}\n C -->|One| D[Laptop]\n C -->|Two| E[iPhone]\n C -->|Three| F[Car]";
@@ -42,13 +41,6 @@ const MermaidToExcalidraw = ({
       EditorLocalStorage.get<string>(EDITOR_LS_KEYS.MERMAID_TO_EXCALIDRAW) ||
       MERMAID_EXAMPLE,
   );
-  const [autoConvert, setAutoConvert] = useState(() => {
-    const stored = EditorLocalStorage.get<boolean>(
-      EDITOR_LS_KEYS.MERMAID_AUTO_CONVERT,
-    );
-    return stored ?? true; // default to true (auto-convert mode)
-  });
-  const [lastConvertedText, setLastConvertedText] = useState(text.trim());
   const [error, setError] = useState<Error | null>(null);
   const [hasContent, setHasContent] = useState(false);
 
@@ -98,30 +90,16 @@ const MermaidToExcalidraw = ({
     }, 300),
   ).current;
 
-  // Single conversion effect with clear logic
+  // Auto-convert on text change with debounce
   useEffect(() => {
     const trimmedText = text.trim();
-
-    if (autoConvert) {
-      // Auto mode: debounced conversion on text change (300ms delay)
-      debouncedConvert(trimmedText);
-    } else {
-      // Manual mode: convert only when explicitly triggered via lastConvertedText
-      if (lastConvertedText) {
-        performConversionRef.current(lastConvertedText);
-      }
-    }
-  }, [autoConvert, text, lastConvertedText, debouncedConvert]);
+    debouncedConvert(trimmedText);
+  }, [text, debouncedConvert]);
 
   // Save to local storage on text change
   useEffect(() => {
     debouncedSaveMermaidDefinition(text.trim());
   }, [text]);
-
-  // Save auto-convert preference to local storage
-  useEffect(() => {
-    EditorLocalStorage.set(EDITOR_LS_KEYS.MERMAID_AUTO_CONVERT, autoConvert);
-  }, [autoConvert]);
 
   // Cleanup: flush pending operations on unmount
   useEffect(
@@ -131,11 +109,6 @@ const MermaidToExcalidraw = ({
     },
     [debouncedConvert],
   );
-
-  const onConvert = () => {
-    // Trigger conversion by updating the lastConvertedText
-    setLastConvertedText(text.trim());
-  };
 
   const onInsertToEditor = () => {
     insertToEditor({
@@ -189,34 +162,11 @@ const MermaidToExcalidraw = ({
       <TTDDialogPanels>
         <TTDDialogPanel
           label={t("mermaid.syntax")}
-          panelAction={{
-            action: onConvert,
-            label: "Convert",
-            icon: ArrowRightIcon,
-          }}
-          panelActionDisabled={autoConvert}
-          renderBeforeButton={() => (
-            <div className="ttd-dialog-auto-convert-wrapper">
-              <label htmlFor="mermaid-auto-convert" className="ttd-dialog-auto-convert-label">
-                Auto convert
-              </label>
-              <Switch
-                name="mermaid-auto-convert"
-                checked={autoConvert}
-                onChange={(checked) => setAutoConvert(checked)}
-              />
-            </div>
-          )}
-          renderSubmitShortcut={() => (
-            <TTDDialogSubmitShortcut variant="enter" disabled={autoConvert} />
-          )}
         >
           <TTDDialogInput
             input={text}
             placeholder={"Write Mermaid diagram defintion here..."}
             onChange={(event) => setText(event.target.value)}
-            onKeyboardSubmit={onConvert}
-            shortcutType="enter"
           />
         </TTDDialogPanel>
         <TTDDialogPanel
