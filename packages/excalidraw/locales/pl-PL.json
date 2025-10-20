@@ -8,27 +8,27 @@
     "moveCanvas": "Przesuń obszar roboczy",
     "cut": "Wytnij",
     "copy": "Kopiuj",
-    "copyAsPng": "Skopiuj do schowka jako plik PNG",
-    "copyAsSvg": "Skopiuj do schowka jako plik SVG",
-    "copyText": "Skopiuj do schowka jako tekst",
-    "copySource": "Skopiuj źródło do schowka",
+    "copyAsPng": "Kopiuj do schowka jako plik PNG",
+    "copyAsSvg": "Kopiuj do schowka jako plik SVG",
+    "copyText": "Kopiuj do schowka jako tekst",
+    "copySource": "Kopiuj źródło do schowka",
     "convertToCode": "Skonwertuj na kod",
-    "bringForward": "Przenieś wyżej",
+    "bringForward": "Przesuń warstwę wyżej",
     "sendToBack": "Przenieś na spód",
     "bringToFront": "Przenieś na wierzch",
-    "sendBackward": "Przenieś niżej",
+    "sendBackward": "Przenieś warstwę niżej",
     "delete": "Usuń",
     "copyStyles": "Kopiuj style",
     "pasteStyles": "Wklej style",
-    "stroke": "Kolor obramowania",
+    "stroke": "Kreska",
     "changeStroke": "Zmień kolor kreski",
-    "background": "Kolor wypełnienia",
+    "background": "Tło",
     "changeBackground": "Zmień kolor tła",
     "fill": "Wypełnienie",
-    "strokeWidth": "Grubość obramowania",
-    "strokeStyle": "Styl obrysu",
+    "strokeWidth": "Szerokość kreski",
+    "strokeStyle": "Styl kreski",
     "strokeStyle_solid": "Pełny",
-    "strokeStyle_dashed": "Kreskowany",
+    "strokeStyle_dashed": "Linia przerywana",
     "strokeStyle_dotted": "Kropkowany",
     "sloppiness": "Styl kreski",
     "opacity": "Przezroczystość",
@@ -49,7 +49,7 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "more_options": "Więcej opcji",
     "arrowtypes": "Typ strzałki",
     "arrowtype_sharp": "Ostra strzałka",
     "arrowtype_round": "Zaokrąglona strzałka",
@@ -129,17 +129,21 @@
     "createContainerFromText": "Zawijaj tekst w kontenerze",
     "link": {
       "edit": "Edytuj łącze",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "Edytuj osadzalne łącze",
+      "create": "Dodaj link",
       "label": "Łącze",
       "labelEmbed": "Podlinkuj i osadź",
       "empty": "Brakujący link",
-      "hint": "",
-      "goToElement": ""
+      "hint": "Wpisz lub wklej swój link tutaj",
+      "goToElement": "Przejdź do elementu docelowego"
     },
     "lineEditor": {
       "edit": "Edytuj linię",
       "editArrow": "Edytuj strzałkę"
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "Zablokuj",
@@ -163,26 +167,36 @@
     "autoResize": "Włącz automatyczne zmiany rozmiaru tekstu",
     "imageCropping": "Przycinanie obrazu",
     "unCroppedDimension": "Nieprzycięty wymiar",
-    "copyElementLink": "",
-    "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "copyElementLink": "Kopiuj link do obiektu",
+    "linkToElement": "Link do obiektu",
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "Link do obiektu",
+    "desc": "Kliknij kształt na obszarze roboczym lub wklej link.",
+    "notFound": "Powiązany obiekt nie został znaleziony na płótnie."
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
     "hint_emptyLibrary": "Wybierz element na płótnie, aby go tutaj dodać, lub zainstaluj bibliotekę z poniższego publicznego repozytorium.",
-    "hint_emptyPrivateLibrary": "Wybierz element, aby dodać go tutaj."
+    "hint_emptyPrivateLibrary": "Wybierz element, aby dodać go tutaj.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
   },
   "search": {
     "title": "Znajdź na płótnie",
     "noMatch": "Nie znaleziono pasujących elementów...",
     "singleResult": "wynik",
     "multipleResults": "wyniki",
-    "placeholder": "Znajdź tekst na płótnie..."
+    "placeholder": "Znajdź tekst na płótnie...",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -216,10 +230,11 @@
     "objectsSnapMode": "Przyciąganie do obiektów",
     "exitZenMode": "Wyjdź z trybu Zen",
     "cancel": "Anuluj",
+    "saveLibNames": "",
     "clear": "Wyczyść",
     "remove": "Usuń",
     "embed": "Przełącz osadzenie",
-    "publishLibrary": "Opublikuj",
+    "publishLibrary": "",
     "submit": "Prześlij",
     "confirm": "Zatwierdź",
     "embeddableInteractionButton": "Kliknij, aby wejść w interakcję"
@@ -245,7 +260,8 @@
     "resetLibrary": "To wyczyści twoją bibliotekę. Jesteś pewien?",
     "removeItemsFromsLibrary": "Usunąć {{count}} element(ów) z biblioteki?",
     "invalidEncryptionKey": "Klucz szyfrowania musi składać się z 22 znaków. Współpraca na żywo jest wyłączona.",
-    "collabOfflineWarning": "Brak połączenia z Internetem.\nTwoje zmiany nie zostaną zapisane!"
+    "collabOfflineWarning": "Brak połączenia z Internetem.\nTwoje zmiany nie zostaną zapisane!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Nieobsługiwany typ pliku.",
@@ -276,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Zaznaczenie",
+    "lasso": "",
     "image": "Wstaw obraz",
     "rectangle": "Prostokąt",
     "diamond": "Romb",
@@ -295,7 +312,8 @@
     "laser": "Wskaźnik laserowy",
     "hand": "Ręka (narzędzie do przesuwania)",
     "extraTools": "Więcej narzędzi",
-    "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw"
+    "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw",
+    "convertElementType": ""
   },
   "element": {
     "rectangle": "Prostokąt",
@@ -319,33 +337,33 @@
     "shapes": "Kształty"
   },
   "hints": {
-    "dismissSearch": "Wyjdź, aby odrzucić wyszukiwanie",
-    "canvasPanning": "Aby przesunąć płótno, przytrzymaj kółko myszy lub spację podczas przeciągania, albo użyj narzędzia ręki",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
-    "arrowTool": "Kliknij, aby rozpocząć dodawanie wielu punktów, przeciągnij, aby narysować pojedynczą linię. Naciśnij przycisk {{arrowShortcut}} ponownie, aby zmienić typ strzałki.",
+    "arrowTool": "",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
     "embeddable": "Kliknij i przeciągnij, aby stworzyć osadzenie strony",
-    "text_selected": "Kliknij dwukrotnie lub naciśnij ENTER, aby edytować tekst",
-    "text_editing": "Naciśnij Escape lub Ctrl (Cmd w macOS) + ENTER, aby zakończyć edycję",
-    "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
-    "lockAngle": "Możesz ograniczyć kąt trzymając SHIFT",
-    "resize": "Możesz zachować proporcję trzymająć wcisnięty SHIFT, przytrzymaj ALT by zmienić rozmiar względem środka",
-    "resizeImage": "Możesz zmienić rozmiar swobodnie trzymając SHIFT,\nprzytrzymaj ALT, aby przeskalować względem środka obiektu",
-    "rotate": "Możesz obracać element w równych odstępach trzymając wciśnięty SHIFT",
-    "lineEditor_info": "Przytrzymaj CtrlOrCmd i kliknij dwukrotnie lub naciśnij CtrlOrCmd + Enter, aby edytować punkty",
-    "lineEditor_pointSelected": "Naciśnij przycisk Delete, aby usunąć punkt. Ctrl/Cmd+D, aby go zduplikować. Przeciągnij, aby go przenieść",
-    "lineEditor_nothingSelected": "Wybierz punkt do edycji (przytrzymaj SHIFT, aby wybrać wiele),\nlub przytrzymaj Alt i kliknij, aby dodać nowe punkty",
-    "placeImage": "Kliknij, aby umieścić obraz, lub kliknij i przeciągnij, aby ustawić jego rozmiar ręcznie",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Opublikuj własną bibliotekę",
-    "bindTextToElement": "Wciśnij enter, aby dodać tekst",
-    "createFlowchart": "Przytrzymaj klawisz CtrlOrCmd i Arrow, aby utworzyć graf",
-    "deepBoxSelect": "Przytrzymaj CtrlOrCmd, aby wybrać w obrębie grupy i uniknąć przeciągania",
-    "eraserRevert": "Przytrzymaj Alt, aby przywrócić elementy oznaczone do usunięcia",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Ta funkcja może być włączona poprzez ustawienie flagi \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Aby zmienić flagi przeglądarki w Firefox, odwiedź stronę \"about:config\".",
-    "disableSnapping": "Przytrzymaj Ctrl lub Cmd, aby wyłączyć przyciąganie",
-    "enterCropEditor": "Kliknij dwukrotnie na obraz lub naciśnij ENTER, aby przyciąć obraz",
-    "leaveCropEditor": "Kliknij poza obrazem albo naciśnij ENTER lub ESCAPE, aby zakończyć przycinanie"
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
@@ -517,7 +535,7 @@
     "pasteAsSingleElement": "Użyj {{shortcut}}, aby wkleić jako pojedynczy element,\nlub wklej do istniejącego edytora tekstu",
     "unableToEmbed": "Osadzenie tego linku jest obecnie niedozwolone. Zgłoś propozycję na portalu GitHub, aby dodać go do listy dozwolonych wyjątków",
     "unrecognizedLinkFormat": "Osadzony link ma niewłaściwy format. Spróbuj wkleić całą zawartość pola \"embed\" z oryginalnej strony.",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Łącze skopiowane do schowka"
   },
   "colors": {
     "transparent": "Przezroczysty",
@@ -550,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "Najczęściej używane kolory",
     "colors": "Kolory",
     "shades": "Odcienie",
@@ -629,5 +648,17 @@
     },
     "itemNotAvailable": "Polecenie jest niedostępne...",
     "shortcutHint": "Przywołaj paletę poleceń za pomocą {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
