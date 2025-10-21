@@ -9,7 +9,7 @@ import { trackEvent } from "../../analytics";
 import { useUIAppState } from "../../context/ui-appState";
 import { atom, useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
-import { useApp, useExcalidrawSetAppState } from "../App";
+import { useApp } from "../App";
 import { Dialog } from "../Dialog";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { ArrowRightIcon, brainIcon } from "../icons";
@@ -23,6 +23,10 @@ import { TTDDialogPanels } from "./TTDDialogPanels";
 import { TTDDialogCTAPopup } from "./TTDDialogCTAPopup";
 import { TTDDialogErrorBanner } from "./TTDDialogErrorBanner";
 import { TTDDialogErrorToast } from "./TTDDialogErrorToast";
+import TTDDialogTabs from "./TTDDialogTabs";
+import { TTDDialogTab } from "./TTDDialogTab";
+import { TTDDialogTabTrigger } from "./TTDDialogTabTrigger";
+import { TTDDialogTabTriggers } from "./TTDDialogTabTriggers";
 
 import {
 convertMermaidToExcalidraw,
@@ -100,6 +104,7 @@ type OnTextSubmitRetValue = {
     }
 );
 
+
 export const TTDDialog = (
   props:
     | {
@@ -133,7 +138,6 @@ export const TTDDialogBase = withInternalFallback(
     | { __fallback: true }
   )) => {
   const app = useApp();
-  const setAppState = useExcalidrawSetAppState();
 
   const previewCanvasRef = useRef<HTMLDivElement>(null);
 
@@ -225,11 +229,6 @@ export const TTDDialogBase = withInternalFallback(
         setErrorMessage("Generation failed");
         return;
       }
-
-      await renderMermaidDiagram(
-        generatedResponse,
-        "Generated an invalid diagram. You may also try a different prompt.",
-      );
     } catch (error: unknown) {
       let message: string | undefined;
       if (error instanceof Error) {
@@ -271,7 +270,6 @@ export const TTDDialogBase = withInternalFallback(
   const [hasValidDiagram, setHasValidDiagram] = useState(false);
   const [renderErrorMessage, setRenderErrorMessage] = useState<string | null>(null);
 
-  // Helper function to render mermaid diagram (eliminates duplicate code)
   const renderMermaidDiagram = async (
     mermaidDefinition: string,
     errorContext: string,
@@ -281,7 +279,7 @@ export const TTDDialogBase = withInternalFallback(
         canvasRef: previewCanvasRef,
         data,
         mermaidToExcalidrawLib,
-        setError: () => {}, // Error handled via errorMessage state
+        setError: () => {},
         mermaidDefinition,
       });
       setHasValidDiagram(true);
@@ -307,8 +305,8 @@ export const TTDDialogBase = withInternalFallback(
     if (ttdGeneration?.generatedResponse) {
       setShowMermaidCode(false);
       setEditedMermaidCode(ttdGeneration.generatedResponse);
-      setHasValidDiagram(false); // Will be set to true after successful render
-      setRenderErrorMessage(null); // Clear any previous render errors
+      setHasValidDiagram(false);
+      setRenderErrorMessage(null);
     }
   }, [ttdGeneration?.generatedResponse]);
 
@@ -333,7 +331,6 @@ export const TTDDialogBase = withInternalFallback(
   // Reactively clear validation errors when conditions are met
   useEffect(() => {
     if (errorMessage) {
-      // Clear "too short" error when prompt becomes valid
       if (
         errorMessage.includes("too short") &&
         prompt.length >= MIN_PROMPT_LENGTH
@@ -398,129 +395,106 @@ export const TTDDialogBase = withInternalFallback(
           </div>
         </>
       ) : (
-        <div className="ttd-dialog-tabs-root">
-          <div className="ttd-dialog-triggers">
-            <button
-              className="ttd-dialog-tab-trigger"
-              data-state={tab === "text-to-diagram" ? "active" : "inactive"}
-              onClick={() => {
-                setAppState({
-                  openDialog: {
-                    name: "ttd",
-                    tab: "text-to-diagram",
-                  },
-                });
-              }}
-            >
+        <TTDDialogTabs dialog="ttd" tab={tab}>
+          <TTDDialogTabTriggers>
+            <TTDDialogTabTrigger tab="text-to-diagram">
               {t("labels.textToDiagram")}
               <span className="ttd-dialog-ai-badge">AI Beta</span>
-            </button>
-            <button
-              className="ttd-dialog-tab-trigger"
-              data-state={tab === "mermaid" ? "active" : "inactive"}
-              onClick={() => {
-                setAppState({
-                  openDialog: {
-                    name: "ttd",
-                    tab: "mermaid",
-                  },
-                });
-              }}
-            >
+            </TTDDialogTabTrigger>
+            <TTDDialogTabTrigger tab="mermaid">
               Mermaid to diagram
-            </button>
-          </div>
-          {tab === "mermaid" ? (
-            <div className="ttd-dialog-content">
-              <MermaidToExcalidraw
-                mermaidToExcalidrawLib={mermaidToExcalidrawLib}
-              />
-            </div>
-          ) : (
-            <div className="ttd-dialog-content">
-              {!isMobileView && (
-                <div className="ttd-dialog-error-banner-container">
-                  {errorMessage && (
-                    <TTDDialogErrorBanner
-                      message={errorMessage}
-                      onClose={() => setErrorMessage(null)}
+            </TTDDialogTabTrigger>
+          </TTDDialogTabTriggers>
+
+          <TTDDialogTab tab="text-to-diagram" className="ttd-dialog-content">
+            {!isMobileView && (
+              <div className="ttd-dialog-error-banner-container">
+                {errorMessage && (
+                  <TTDDialogErrorBanner
+                    message={errorMessage}
+                    onClose={() => setErrorMessage(null)}
+                  />
+                )}
+              </div>
+            )}
+            <TTDDialogPanels>
+              <TTDDialogPanel
+                label={t("labels.prompt")}
+                panelAction={{
+                  action: onGenerate,
+                  label: "Generate",
+                  icon: brainIcon,
+                }}
+                onTextSubmitInProgess={onTextSubmitInProgess}
+                panelActionDisabled={
+                  prompt.length > MAX_PROMPT_LENGTH
+                }
+                renderTopRight={() =>
+                  rateLimits ? (
+                    <RateLimitDisplay
+                      rateLimitRemaining={rateLimits.rateLimitRemaining}
                     />
-                  )}
-                </div>
-              )}
-              <TTDDialogPanels>
-                <TTDDialogPanel
-                  label={t("labels.prompt")}
-                  panelAction={{
-                    action: onGenerate,
-                    label: "Generate",
-                    icon: brainIcon,
+                  ) : null
+                }
+                renderSubmitShortcut={() => <TTDDialogSubmitShortcut variant="enter" />}
+                renderBottomRight={() => (
+                  <PromptFooter promptLength={prompt.length} />
+                )}
+              >
+                <TTDDialogInput
+                  onChange={handleTextChange}
+                  input={text}
+                  placeholder="What should we draw today? Describe a diagram, workflow, flow chart, and similar details."
+                  onKeyboardSubmit={() => {
+                    refOnGenerate.current();
                   }}
-                  onTextSubmitInProgess={onTextSubmitInProgess}
-                  panelActionDisabled={
-                    prompt.length > MAX_PROMPT_LENGTH
-                  }
-                  renderTopRight={() =>
-                    rateLimits ? (
-                      <RateLimitDisplay
-                        rateLimitRemaining={rateLimits.rateLimitRemaining}
-                      />
-                    ) : null
-                  }
-                  renderSubmitShortcut={() => <TTDDialogSubmitShortcut variant="enter" />}
-                  renderBottomRight={() => (
-                    <PromptFooter promptLength={prompt.length} />
-                  )}
-                >
-                  <TTDDialogInput
-                    onChange={handleTextChange}
-                    input={text}
-                    placeholder="What should we draw today? Describe a diagram, workflow, flow chart, and similar details."
-                    onKeyboardSubmit={() => {
-                      refOnGenerate.current();
-                    }}
-                    shortcutType="enter"
-                  />
-                </TTDDialogPanel>
-                <TTDDialogPanel
-                  label="Preview"
-                  panelAction={{
-                    action: () => {
-                      insertToEditor({ app, data });
-                    },
-                    label: "Insert",
-                    icon: ArrowRightIcon,
-                  }}
-                  renderTopRight={() => (
-                    <div className="ttd-dialog-code-toggle-wrapper">
-                      <label htmlFor="ttd-code-toggle" className="ttd-dialog-code-toggle-label">
-                        Edit as code
-                      </label>
-                      <Switch
-                        name="ttd-code-toggle"
-                        checked={showMermaidCode}
-                        onChange={(checked) => setShowMermaidCode(checked)}
-                        disabled={!ttdGeneration?.generatedResponse}
-                      />
-                    </div>
-                  )}
-                  renderSubmitShortcut={() => <TTDDialogSubmitShortcut variant="ctrlEnter" />}
-                >
-                  <TTDDialogOutput
-                    canvasRef={previewCanvasRef}
-                    error={null}
-                    loaded={mermaidToExcalidrawLib.loaded}
-                    hasContent={hasValidDiagram}
-                    showMermaidCode={showMermaidCode}
-                    mermaidCode={editedMermaidCode}
-                    onMermaidCodeChange={setEditedMermaidCode}
-                    renderError={renderErrorMessage}
-                  />
-                </TTDDialogPanel>
-              </TTDDialogPanels>
-            </div>
-          )}
-        </div>
+                  shortcutType="enter"
+                />
+              </TTDDialogPanel>
+              <TTDDialogPanel
+                label="Preview"
+                panelAction={{
+                  action: () => {
+                    insertToEditor({ app, data });
+                  },
+                  label: "Insert",
+                  icon: ArrowRightIcon,
+                }}
+                renderTopRight={() => (
+                  <div className="ttd-dialog-code-toggle-wrapper">
+                    <label htmlFor="ttd-code-toggle" className="ttd-dialog-code-toggle-label">
+                      Edit as code
+                    </label>
+                    <Switch
+                      name="ttd-code-toggle"
+                      checked={showMermaidCode}
+                      onChange={(checked) => setShowMermaidCode(checked)}
+                      disabled={!ttdGeneration?.generatedResponse}
+                    />
+                  </div>
+                )}
+                renderSubmitShortcut={() => <TTDDialogSubmitShortcut variant="ctrlEnter" />}
+              >
+                <TTDDialogOutput
+                  canvasRef={previewCanvasRef}
+                  error={null}
+                  loaded={mermaidToExcalidrawLib.loaded}
+                  hasContent={hasValidDiagram}
+                  showMermaidCode={showMermaidCode}
+                  mermaidCode={editedMermaidCode}
+                  onMermaidCodeChange={setEditedMermaidCode}
+                  renderError={renderErrorMessage}
+                />
+              </TTDDialogPanel>
+            </TTDDialogPanels>
+          </TTDDialogTab>
+
+          <TTDDialogTab tab="mermaid" className="ttd-dialog-content">
+            <MermaidToExcalidraw
+              mermaidToExcalidrawLib={mermaidToExcalidrawLib}
+            />
+          </TTDDialogTab>
+        </TTDDialogTabs>
       )}
       <TTDDialogCTAPopup
         isOpen={isCtaPopupOpen}
