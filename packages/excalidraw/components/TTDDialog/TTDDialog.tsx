@@ -473,13 +473,13 @@ export const TTDDialogBase = withInternalFallback(
         onClose={() => setIsCtaPopupOpen(false)}
         onExploreClick={() => {
           window.open(
-            import.meta.env.VITE_APP_PLUS_URI || "https://plus.excalidraw.com",
+            import.meta.env.VITE_APP_PLUS_LP || "https://plus.excalidraw.com",
             "_blank",
           );
         }}
         onFreeTrialClick={() => {
           window.open(
-            import.meta.env.VITE_APP_PLUS_TRIAL_URI || "https://app.excalidraw.com/",
+            import.meta.env.VITE_APP_PLUS_TRIAL || "https://app.excalidraw.com/",
             "_blank",
           );
         }}
