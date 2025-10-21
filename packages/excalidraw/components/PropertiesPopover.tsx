@@ -4,7 +4,7 @@ import React, { type ReactNode } from "react";
 
 import { isInteractive } from "@excalidraw/common";
 
-import { useDevice } from "./App";
+import { useApp, useDevice } from "./App";
 import { Island } from "./Island";
 
 interface PropertiesPopoverProps {
@@ -40,19 +40,20 @@ export const PropertiesPopover = React.forwardRef<
     ref,
   ) => {
     const device = useDevice();
+    const app = useApp();
+    const { offsetTop, offsetLeft } = app.state;
 
-    const collisionPadding = React.useMemo(() => {
-      if (!container) {
-        return 8;
-      }
-      const rect = container.getBoundingClientRect();
-      return {
-        top: Math.max(8, rect.top),
-        right: Math.max(8, window.innerWidth - rect.right),
-        bottom: Math.max(8, window.innerHeight - rect.bottom),
-        left: Math.max(8, rect.left),
-      };
-    }, [container]);
+    const collisionPadding = container
+      ? (() => {
+          const rect = container.getBoundingClientRect();
+          return {
+            top: Math.max(8, rect.top),
+            right: Math.max(8, window.innerWidth - rect.right - offsetLeft),
+            bottom: Math.max(8, window.innerHeight - rect.bottom - offsetTop),
+            left: Math.max(8, rect.left),
+          };
+        })()
+      : 8;
 
     return (
       <Popover.Portal container={container}>
