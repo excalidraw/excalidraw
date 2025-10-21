@@ -40,6 +40,7 @@ import type { BinaryFiles } from "../../types";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 1000;
+const MOBILE_BREAKPOINT = 860;
 
 const DEFAULT_PROMPT = "";
 
@@ -53,34 +54,34 @@ rateLimitRemaining: number;
 }
 
 const RateLimitDisplay = ({ rateLimitRemaining }: RateLimitDisplayProps) => {
-const isExceeded = rateLimitRemaining === 0;
-return (
-  <div
-    className={`ttd-dialog-rate-limit ${isExceeded ? "ttd-dialog-rate-limit--exceeded" : ""}`}
-  >
-    {rateLimitRemaining} requests left today
-  </div>
-);
+  const isExceeded = rateLimitRemaining === 0;
+  return (
+    <div
+      className={`ttd-dialog-rate-limit ${isExceeded ? "ttd-dialog-rate-limit--exceeded" : ""}`}
+    >
+      {rateLimitRemaining} requests left today
+    </div>
+  );
 };
 
 interface PromptFooterProps {
-promptLength: number;
+  promptLength: number;
 }
 
 const PromptFooter = ({ promptLength }: PromptFooterProps) => {
-const ratio = promptLength / MAX_PROMPT_LENGTH;
-if (ratio > 0.8) {
-  const isExceeded = ratio > 1;
-  return (
-    <div
-      className={`ttd-dialog-char-count ${isExceeded ? "ttd-dialog-char-count--exceeded" : ""}`}
-    >
-      Length: {promptLength}/{MAX_PROMPT_LENGTH}
-    </div>
-  );
-}
+  const ratio = promptLength / MAX_PROMPT_LENGTH;
+  if (ratio > 0.8) {
+    const isExceeded = ratio > 1;
+    return (
+      <div
+        className={`ttd-dialog-char-count ${isExceeded ? "ttd-dialog-char-count--exceeded" : ""}`}
+      >
+        Length: {promptLength}/{MAX_PROMPT_LENGTH}
+      </div>
+    );
+  }
 
-return null;
+  return null;
 };
 
 const ttdGenerationAtom = atom<{
@@ -88,23 +89,23 @@ generatedResponse: string | null;
 prompt: string | null;
 } | null>(null);
 
-type OnTestSubmitRetValue = {
-rateLimit?: number | null;
-rateLimitRemaining?: number | null;
+type OnTextSubmitRetValue = {
+  rateLimit?: number | null;
+  rateLimitRemaining?: number | null;
 } & (
-| { generatedResponse: string | undefined; error?: null | undefined }
-| {
-    error: Error;
-    generatedResponse?: null | undefined;
-  }
+  | { generatedResponse: string | undefined; error?: null | undefined }
+  | {
+      error: Error;
+      generatedResponse?: null | undefined;
+    }
 );
 
 export const TTDDialog = (
-props:
-  | {
-      onTextSubmit(value: string): Promise<OnTestSubmitRetValue>;
-    }
-  | { __fallback: true },
+  props:
+    | {
+        onTextSubmit(value: string): Promise<OnTextSubmitRetValue>;
+      }
+    | { __fallback: true },
 ) => {
 const appState = useUIAppState();
 
@@ -119,18 +120,18 @@ return <TTDDialogBase {...props} tab={appState.openDialog.tab} />;
 * Text to diagram (TTD) dialog
 */
 export const TTDDialogBase = withInternalFallback(
-"TTDDialogBase",
-({
-  tab,
-  ...rest
-}: {
-  tab: "text-to-diagram" | "mermaid";
-} & (
-  | {
-      onTextSubmit(value: string): Promise<OnTestSubmitRetValue>;
-    }
-  | { __fallback: true }
-)) => {
+  "TTDDialogBase",
+  ({
+    tab,
+    ...rest
+  }: {
+    tab: "text-to-diagram" | "mermaid";
+  } & (
+    | {
+        onTextSubmit(value: string): Promise<OnTextSubmitRetValue>;
+      }
+    | { __fallback: true }
+  )) => {
   const app = useApp();
   const setAppState = useExcalidrawSetAppState();
 
@@ -160,7 +161,7 @@ export const TTDDialogBase = withInternalFallback(
 
   // Detect mobile view using media query
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 860px)");
+    const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
     setIsMobileView(mediaQuery.matches);
 
     const handleChange = (e: MediaQueryListEvent) => {
@@ -225,37 +226,15 @@ export const TTDDialogBase = withInternalFallback(
         return;
       }
 
-      try {
-        await convertMermaidToExcalidraw({
-          canvasRef: previewCanvasRef,
-          data,
-          mermaidToExcalidrawLib,
-          setError: () => {}, // Error handled via errorMessage state
-          mermaidDefinition: generatedResponse,
-        });
-        setHasValidDiagram(true);
-        setRenderErrorMessage(null);
-        trackEvent("ai", "mermaid parse success", "ttd");
-      } catch (error: any) {
-        setHasValidDiagram(false);
-        setRenderErrorMessage(error.message || "Unknown syntax error");
-        if (isDevEnv()) {
-          console.info(
-            `%cTTD mermaid render error: ${error.message}`,
-            "color: red",
-          );
-          console.info(
-            `>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nTTD mermaid definition render error: ${error.message}`,
-            "color: yellow",
-          );
-        }
-        trackEvent("ai", "mermaid parse failed", "ttd");
-        setErrorMessage(
-          "Generated an invalid diagram :(. You may also try a different prompt.",
-        );
+      await renderMermaidDiagram(
+        generatedResponse,
+        "Generated an invalid diagram. You may also try a different prompt.",
+      );
+    } catch (error: unknown) {
+      let message: string | undefined;
+      if (error instanceof Error) {
+        message = error.message;
       }
-    } catch (error: any) {
-      let message: string | undefined = error.message;
       if (!message || message === "Failed to fetch") {
         message = "Request failed";
       }
@@ -292,6 +271,37 @@ export const TTDDialogBase = withInternalFallback(
   const [hasValidDiagram, setHasValidDiagram] = useState(false);
   const [renderErrorMessage, setRenderErrorMessage] = useState<string | null>(null);
 
+  // Helper function to render mermaid diagram (eliminates duplicate code)
+  const renderMermaidDiagram = async (
+    mermaidDefinition: string,
+    errorContext: string,
+  ) => {
+    try {
+      await convertMermaidToExcalidraw({
+        canvasRef: previewCanvasRef,
+        data,
+        mermaidToExcalidrawLib,
+        setError: () => {}, // Error handled via errorMessage state
+        mermaidDefinition,
+      });
+      setHasValidDiagram(true);
+      setRenderErrorMessage(null);
+      trackEvent("ai", "mermaid parse success", "ttd");
+    } catch (error: unknown) {
+      setHasValidDiagram(false);
+      const errorMsg =
+        error instanceof Error ? error.message : "Unknown syntax error";
+      setRenderErrorMessage(errorMsg);
+
+      if (isDevEnv()) {
+        console.error(`TTD mermaid render error:`, error);
+      }
+
+      trackEvent("ai", "mermaid parse failed", "ttd");
+      setErrorMessage(errorContext);
+    }
+  };
+
   // Reset to preview mode when new diagram is generated and sync edited code
   useEffect(() => {
     if (ttdGeneration?.generatedResponse) {
@@ -310,29 +320,10 @@ export const TTDDialogBase = withInternalFallback(
         editedMermaidCode &&
         mermaidToExcalidrawLib.loaded
       ) {
-        try {
-          await convertMermaidToExcalidraw({
-            canvasRef: previewCanvasRef,
-            data,
-            mermaidToExcalidrawLib,
-            setError: () => {}, // Error handled via errorMessage state
-            mermaidDefinition: editedMermaidCode,
-          });
-          setHasValidDiagram(true);
-          setRenderErrorMessage(null);
-        } catch (error: any) {
-          setHasValidDiagram(false);
-          setRenderErrorMessage(error.message || "Unknown syntax error");
-          if (isDevEnv()) {
-            console.info(
-              `%cTTD mermaid render error: ${error.message}`,
-              "color: red",
-            );
-          }
-          setErrorMessage(
-            "Syntax error in diagram code. Please fix the code or generate a new diagram.",
-          );
-        }
+        await renderMermaidDiagram(
+          editedMermaidCode,
+          "Syntax error in diagram code. Please fix the code or generate a new diagram.",
+        );
       }
     };
 
