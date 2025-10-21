@@ -399,6 +399,7 @@ describe("binding for simple arrows", () => {
         y: 250,
         width: 220,
         height: 1,
+        points: [pointFrom(0, 0), pointFrom(110, 0), pointFrom(220, 1)],
       });
       expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
       expect(arrow.endBinding?.elementId).toBe(rectRight.id);
