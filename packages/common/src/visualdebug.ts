@@ -63,6 +63,8 @@ export const debugDrawLine = (
   );
 };
 
+export const testDebug = () => {};
+
 export const debugDrawPoint = (
   p: GlobalPoint,
   opts?: {
