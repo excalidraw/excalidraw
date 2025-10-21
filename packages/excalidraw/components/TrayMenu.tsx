@@ -66,7 +66,6 @@ export const TrayMenu = ({
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
-
   renderTopRightUI,
   renderCustomStats,
   renderSidebars,
@@ -101,7 +100,7 @@ export const TrayMenu = ({
                   {heading}
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
-                      appState={appState}
+                      setAppState={setAppState}
                       activeTool={appState.activeTool}
                       UIOptions={UIOptions}
                       app={app}

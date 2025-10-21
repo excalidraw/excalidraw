@@ -267,6 +267,14 @@ body.excalidraw-cursor-resize * {
     pointer-events: none;
     justify-content: center;
 
+    @include isTray {
+      flex-direction: row;
+      left: 0;
+      transform: none;
+      justify-content: flex-start;
+      align-items: flex-end;
+    } //zsviczian
+
     > .Island {
       box-sizing: border-box;
       max-height: 100%;
@@ -312,6 +320,14 @@ body.excalidraw-cursor-resize * {
       bottom: 55px;
       top: auto;
     } //zsviczian
+
+    @include isTray {
+      flex-direction: row;
+    } //zsviczian
+    
+    label.ToolIcon.is-mobile {
+      background-color: var(--color-surface-low);
+    }
   }
 
   .App-mobile-menu {

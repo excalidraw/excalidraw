@@ -2,7 +2,7 @@
 @import "../css/variables.module.scss";
 
 .excalidraw {
-  .mobile-toolbar {
+  .excalidraw-mobile-toolbar {
     display: flex;
     flex: 1;
     align-items: center;
@@ -15,11 +15,11 @@
     justify-content: space-between;
   }
 
-  .mobile-toolbar::-webkit-scrollbar {
+  .excalidraw-mobile-toolbar::-webkit-scrollbar {
     display: none;
   }
 
-  .mobile-toolbar .ToolIcon {
+  .excalidraw-mobile-toolbar .ToolIcon {
     min-width: 2rem;
     min-height: 2rem;
     border-radius: 4px;
@@ -51,12 +51,12 @@
     }
   }
 
-  .mobile-toolbar .App-toolbar__extra-tools-dropdown {
+  .excalidraw-mobile-toolbar .App-toolbar__extra-tools-dropdown {
     min-width: 160px;
     z-index: var(--zIndex-layerUI);
   }
 
-  .mobile-toolbar-separator {
+  .excalidraw-mobile-toolbar-separator {
     width: 1px;
     height: 24px;
     background: var(--default-border-color);
@@ -64,12 +64,12 @@
     flex-shrink: 0;
   }
 
-  .mobile-toolbar-undo {
+  .excalidraw-mobile-toolbar-undo {
     display: flex;
     align-items: center;
   }
 
-  .mobile-toolbar-undo .ToolIcon {
+  .excalidraw-mobile-toolbar-undo .ToolIcon {
     min-width: 32px;
     min-height: 32px;
     width: 32px;

@@ -363,7 +363,7 @@ export interface AppState {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
-  openMenu: "canvas" | null;
+  openMenu: "canvas" | "shape" | null; //zsviczian
   openPopup:
     | "canvasBackground"
     | "elementBackground"

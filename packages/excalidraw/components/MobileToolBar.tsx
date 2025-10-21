@@ -187,8 +187,8 @@ export const MobileToolBar = ({
       : extraToolsIcon
     : extraToolsIcon;
 
-  return (
-    <div className="mobile-toolbar" ref={toolbarRef}>
+  return (// added excalidraw- prefix due to Obsidian style conflict
+    <div className="excalidraw-mobile-toolbar" ref={toolbarRef}>
       {/* Hand Tool */}
       <HandButton
         checked={isHandToolActive(app.state)}
