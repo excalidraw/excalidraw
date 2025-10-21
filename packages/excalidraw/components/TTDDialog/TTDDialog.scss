@@ -591,9 +591,9 @@ $verticalBreakpoint: 861px;
   }
 
   .ttd-dialog-char-count {
-    margin-left: auto;
     font-size: 12px;
     font-family: monospace;
+    margin-left: auto;
 
     &--exceeded {
       color: var(--color-danger);

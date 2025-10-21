@@ -188,17 +188,6 @@ export const TTDDialogBase = withInternalFallback(
       onTextSubmitInProgess ||
       "__fallback" in rest
     ) {
-      if (prompt.length < MIN_PROMPT_LENGTH) {
-        setErrorMessage(
-          `Prompt is too short (min ${MIN_PROMPT_LENGTH} characters)`,
-        );
-      }
-      if (prompt.length > MAX_PROMPT_LENGTH) {
-        setErrorMessage(
-          `Prompt is too long (max ${MAX_PROMPT_LENGTH} characters)`,
-        );
-      }
-
       return;
     }
 
@@ -328,24 +317,6 @@ export const TTDDialogBase = withInternalFallback(
     renderDiagram();
   }, [showMermaidCode, editedMermaidCode, mermaidToExcalidrawLib.loaded]);
 
-  // Reactively clear validation errors when conditions are met
-  useEffect(() => {
-    if (errorMessage) {
-      if (
-        errorMessage.includes("too short") &&
-        prompt.length >= MIN_PROMPT_LENGTH
-      ) {
-        setErrorMessage(null);
-      }
-      // Clear "too long" error when prompt becomes valid
-      if (
-        errorMessage.includes("too long") &&
-        prompt.length <= MAX_PROMPT_LENGTH
-      ) {
-        setErrorMessage(null);
-      }
-    }
-  }, [prompt.length, errorMessage]);
 
   useEffect(() => {
     if (tab !== "text-to-diagram") {
@@ -427,19 +398,20 @@ export const TTDDialogBase = withInternalFallback(
                 }}
                 onTextSubmitInProgess={onTextSubmitInProgess}
                 panelActionDisabled={
+                  prompt.length < MIN_PROMPT_LENGTH ||
                   prompt.length > MAX_PROMPT_LENGTH
                 }
-                renderTopRight={() =>
-                  rateLimits ? (
-                    <RateLimitDisplay
-                      rateLimitRemaining={rateLimits.rateLimitRemaining}
-                    />
-                  ) : null
-                }
-                renderSubmitShortcut={() => <TTDDialogSubmitShortcut variant="enter" />}
-                renderBottomRight={() => (
-                  <PromptFooter promptLength={prompt.length} />
+                renderTopRight={() => (
+                  <>
+                    <PromptFooter promptLength={prompt.length} />
+                    {rateLimits && (
+                      <RateLimitDisplay
+                        rateLimitRemaining={rateLimits.rateLimitRemaining}
+                      />
+                    )}
+                  </>
                 )}
+                renderSubmitShortcut={() => <TTDDialogSubmitShortcut variant="enter" />}
               >
                 <TTDDialogInput
                   onChange={handleTextChange}
