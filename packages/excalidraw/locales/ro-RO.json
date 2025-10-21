@@ -142,8 +142,8 @@
       "editArrow": "Editare săgeată"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Întrerupere poligon",
+      "convertToPolygon": "Convertire în poligon"
     },
     "elementLock": {
       "lock": "Blocare",
@@ -170,8 +170,8 @@
     "copyElementLink": "Copiere link către obiect",
     "linkToElement": "Link către obiect",
     "wrapSelectionInFrame": "Încapsulare selecție în cadru",
-    "tab": "",
-    "shapeSwitch": ""
+    "tab": "Filă",
+    "shapeSwitch": "Comutare formă"
   },
   "elementLink": {
     "title": "Link către obiect",
@@ -183,10 +183,10 @@
     "hint_emptyLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici sau instalează o bibliotecă din depozitul public, de mai jos.",
     "hint_emptyPrivateLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Căutare în bibliotecă",
+      "heading": "Potriviri din bibliotecă",
+      "noResults": "Niciun element potrivit găsit...",
+      "clearSearch": "Ștergere căutare"
     }
   },
   "search": {
@@ -195,8 +195,8 @@
     "singleResult": "rezultat",
     "multipleResults": "rezultate",
     "placeholder": "Găsire text pe pânză...",
-    "frames": "",
-    "texts": ""
+    "frames": "Cadre",
+    "texts": "Texte"
   },
   "buttons": {
     "clearReset": "Resetare pânză",
@@ -230,7 +230,7 @@
     "objectsSnapMode": "Ancorare la obiecte",
     "exitZenMode": "Ieșire din modul zen",
     "cancel": "Anulare",
-    "saveLibNames": "",
+    "saveLibNames": "Salvare nume și ieșire",
     "clear": "Ștergere",
     "remove": "Eliminare",
     "embed": "Comutare încorporare",
