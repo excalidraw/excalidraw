@@ -41,6 +41,19 @@ export const PropertiesPopover = React.forwardRef<
   ) => {
     const device = useDevice();
 
+    const collisionPadding = React.useMemo(() => {
+      if (!container) {
+        return 8;
+      }
+      const rect = container.getBoundingClientRect();
+      return {
+        top: Math.max(8, rect.top),
+        right: Math.max(8, window.innerWidth - rect.right),
+        bottom: Math.max(8, window.innerHeight - rect.bottom),
+        left: Math.max(8, rect.left),
+      };
+    }, [container]);
+
     return (
       <Popover.Portal container={container}>
         <Popover.Content
@@ -60,7 +73,7 @@ export const PropertiesPopover = React.forwardRef<
           alignOffset={-16}
           sideOffset={20}
           collisionBoundary={container ?? undefined}
-          collisionPadding={8}
+          collisionPadding={collisionPadding}
           style={{
             zIndex: "var(--zIndex-ui-styles-popup)",
             marginLeft: device.editor.isMobile ? "0.5rem" : undefined,
