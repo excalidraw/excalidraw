@@ -596,14 +596,14 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
           return {
             start: startDragged
               ? {
-                  mode: "orbit",
+                  mode: globalBindMode === "orbit" ? "orbit" : "inside",
                   element: enclosingFrame,
                   focusPoint: globalPoint,
                 }
               : start,
             end: endDragged
               ? {
-                  mode: "orbit",
+                  mode: globalBindMode === "orbit" ? "orbit" : "inside",
                   element: enclosingFrame,
                   focusPoint: globalPoint,
                 }
