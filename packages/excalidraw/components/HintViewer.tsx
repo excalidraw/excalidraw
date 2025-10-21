@@ -46,7 +46,10 @@ const getHints = ({
     appState.selectedLinearElement?.isDragging ||
     isArrowElement(appState.newElement)
   ) {
-    return t("hints.arrowBindModifiers");
+    return t("hints.arrowBindModifiers", {
+      shortcut_1: getTaggedShortcutKey("Alt"),
+      shortcut_2: getTaggedShortcutKey("CtrlOrCmd"),
+    });
   }
 
   if (
