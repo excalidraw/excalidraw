@@ -94,7 +94,9 @@ Use `npm` or `yarn` to install the package.
 
 ```bash
 npm install react react-dom @excalidraw/excalidraw
-# or
+```
+or
+```bash
 yarn add react react-dom @excalidraw/excalidraw
 ```
 
