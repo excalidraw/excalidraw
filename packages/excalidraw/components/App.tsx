@@ -80,7 +80,6 @@ import {
   wrapEvent,
   updateObject,
   updateActiveTool,
-  getShortcutKey,
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
@@ -173,7 +172,7 @@ import {
   getContainerElement,
   isValidTextContainer,
   redrawTextBoundingBox,
-  shouldShowBoundingBox,
+  hasBoundingBox,
   getFrameChildren,
   isCursorInFrame,
   addElementsToFrame,
@@ -405,6 +404,8 @@ import { isMaybeMermaidDefinition } from "../mermaid";
 import { LassoTrail } from "../lasso";
 
 import { EraserTrail } from "../eraser";
+
+import { getShortcutKey } from "../shortcut";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -5262,7 +5263,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       considerBoundingBox &&
       this.state.selectedElementIds[element.id] &&
-      shouldShowBoundingBox([element], this.state)
+      hasBoundingBox([element], this.state)
     ) {
       // if hitting the bounding box, return early
       // but if not, we should check for other cases as well (e.g. frame name)
@@ -6165,7 +6166,13 @@ class App extends React.Component<AppProps, AppState> {
         (!this.state.selectedLinearElement ||
           this.state.selectedLinearElement.hoverPointIndex === -1) &&
         this.state.openDialog?.name !== "elementLinkSelector" &&
-        !(selectedElements.length === 1 && isElbowArrow(selectedElements[0]))
+        !(selectedElements.length === 1 && isElbowArrow(selectedElements[0])) &&
+        // HACK: Disable transform handles for linear elements on mobile until a
+        // better way of showing them is found
+        !(
+          isLinearElement(selectedElements[0]) &&
+          (isMobileOrTablet() || selectedElements[0].points.length === 2)
+        )
       ) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
@@ -7285,14 +7292,8 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.selectedLinearElement?.isEditing &&
         !isElbowArrow(selectedElements[0]) &&
         !(
-          isLineElement(selectedElements[0]) &&
-          LinearElementEditor.getPointIndexUnderCursor(
-            selectedElements[0],
-            elementsMap,
-            this.state.zoom,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-          ) !== -1
+          isLinearElement(selectedElements[0]) &&
+          (isMobileOrTablet() || selectedElements[0].points.length === 2)
         ) &&
         !(
           this.state.selectedLinearElement &&
@@ -11204,6 +11205,17 @@ class App extends React.Component<AppProps, AppState> {
       return [actionCopy, ...options];
     }
 
+    const zIndexActions: ContextMenuItems =
+      this.state.stylesPanelMode === "full"
+        ? [
+            CONTEXT_MENU_SEPARATOR,
+            actionSendBackward,
+            actionBringForward,
+            actionSendToBack,
+            actionBringToFront,
+          ]
+        : [];
+
     return [
       CONTEXT_MENU_SEPARATOR,
       actionCut,
@@ -11229,11 +11241,7 @@ class App extends React.Component<AppProps, AppState> {
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,
-      CONTEXT_MENU_SEPARATOR,
-      actionSendBackward,
-      actionBringForward,
-      actionSendToBack,
-      actionBringToFront,
+      ...zIndexActions,
       CONTEXT_MENU_SEPARATOR,
       actionFlipHorizontal,
       actionFlipVertical,

@@ -1,6 +1,5 @@
 import clsx from "clsx";
-
-import { getShortcutKey } from "@excalidraw/common";
+import { getShortcutKey } from "@excalidraw/excalidraw/shortcut";
 
 interface TTDDialogSubmitShortcutProps {
   variant?: "enter" | "ctrlEnter";
