@@ -4,7 +4,6 @@ import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   CURSOR_TYPE,
   THEME,
-  getShortcutKey,
   updateActiveTool,
   CODES,
   KEYS,
@@ -45,6 +44,7 @@ import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 

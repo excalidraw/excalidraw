@@ -28,11 +28,24 @@ $wide-viewport-width: 1000px;
     > span {
       padding: 0.25rem;
     }
+
+    kbd {
+      display: inline-block;
+      margin: 0 1px;
+      font-family: monospace;
+      border: 1px solid var(--color-gray-40);
+      border-radius: 4px;
+      padding: 1px 3px;
+      font-size: 10px;
+    }
   }
 
   &.theme--dark {
     .HintViewer {
       color: var(--color-gray-60);
+      kbd {
+        border-color: var(--color-gray-60);
+      }
     }
   }
 }
