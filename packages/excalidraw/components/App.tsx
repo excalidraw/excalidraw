@@ -79,7 +79,6 @@ import {
   wrapEvent,
   updateObject,
   updateActiveTool,
-  getShortcutKey,
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
@@ -409,6 +408,8 @@ import { isMaybeMermaidDefinition } from "../mermaid";
 import { LassoTrail } from "../lasso";
 
 import { EraserTrail } from "../eraser";
+
+import { getShortcutKey } from "../shortcut";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -12061,6 +12062,17 @@ startLineEditor = (
       return [actionCopy, ...options];
     }
 
+    const zIndexActions: ContextMenuItems =
+      this.state.stylesPanelMode === "full"
+        ? [
+            CONTEXT_MENU_SEPARATOR,
+            actionSendBackward,
+            actionBringForward,
+            actionSendToBack,
+            actionBringToFront,
+          ]
+        : [];
+
     return [
       CONTEXT_MENU_SEPARATOR,
       actionCut,
@@ -12086,11 +12098,7 @@ startLineEditor = (
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,
-      CONTEXT_MENU_SEPARATOR,
-      actionSendBackward,
-      actionBringForward,
-      actionSendToBack,
-      actionBringToFront,
+      ...zIndexActions,
       CONTEXT_MENU_SEPARATOR,
       actionFlipHorizontal,
       actionFlipVertical,
