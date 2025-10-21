@@ -15,7 +15,7 @@
 <div align="center">
   <h2>
     An open source virtual hand-drawn style whiteboard. </br>
-    Collaborative and end-to-end encrypted. </br>
+    It is Collaborative and end-to-end encrypted. </br>
   <br />
   </h2>
 </div>
@@ -83,12 +83,27 @@ The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase
 - 🔒&nbsp;End-to-end encryption.
 - 💾&nbsp;Local-first support (autosaves to the browser).
 - 🔗&nbsp;Shareable links (export to a readonly link you can share with others).
+### Example Usage
+
+Here’s a simple example of how to use Excalidraw in your React app:
+
+```jsx
+import React from "react";
+import { Excalidraw } from "@excalidraw/excalidraw";
+
+export default function App() {
+  return (
+    <div style={{ height: "500px" }}>
+      <Excalidraw />
+    </div>
+  );
+}
 
 We'll be adding these features as drop-in plugins for the npm package in the future.
 
 ## Quick start
 
-**Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
+**Note:** The following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
 
 Use `npm` or `yarn` to install the package.
 
