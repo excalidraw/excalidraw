@@ -409,44 +409,49 @@ const renderBindingHighlightForBindableElement = (
   const radius = 0.5 * (Math.min(element.width, element.height) / 2);
 
   // Draw center snap area
-  context.save();
-  context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
+  if (!isFrameLikeElement(element)) {
+    context.save();
+    context.translate(
+      element.x + appState.scrollX,
+      element.y + appState.scrollY,
+    );
 
-  const PROGRESS_RATIO = (1 / BIND_MODE_TIMEOUT) * remainingTime;
+    const PROGRESS_RATIO = (1 / BIND_MODE_TIMEOUT) * remainingTime;
 
-  context.strokeStyle = "rgba(0, 0, 0, 0.2)";
-  context.lineWidth = 1 / appState.zoom.value;
-  context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
-  context.lineDashOffset = (-PROGRESS_RATIO * 10) / appState.zoom.value;
+    context.strokeStyle = "rgba(0, 0, 0, 0.2)";
+    context.lineWidth = 1 / appState.zoom.value;
+    context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
+    context.lineDashOffset = (-PROGRESS_RATIO * 10) / appState.zoom.value;
 
-  context.beginPath();
-  context.ellipse(
-    element.width / 2,
-    element.height / 2,
-    radius,
-    radius,
-    0,
-    0,
-    2 * Math.PI,
-  );
-  context.stroke();
+    context.beginPath();
+    context.ellipse(
+      element.width / 2,
+      element.height / 2,
+      radius,
+      radius,
+      0,
+      0,
+      2 * Math.PI,
+    );
+    context.stroke();
 
-  // context.strokeStyle = "transparent";
-  context.fillStyle = "rgba(0, 0, 0, 0.04)";
-  context.beginPath();
-  context.ellipse(
-    element.width / 2,
-    element.height / 2,
-    radius * (1 - opacity),
-    radius * (1 - opacity),
-    0,
-    0,
-    2 * Math.PI,
-  );
+    // context.strokeStyle = "transparent";
+    context.fillStyle = "rgba(0, 0, 0, 0.04)";
+    context.beginPath();
+    context.ellipse(
+      element.width / 2,
+      element.height / 2,
+      radius * (1 - opacity),
+      radius * (1 - opacity),
+      0,
+      0,
+      2 * Math.PI,
+    );
 
-  context.fill();
+    context.fill();
 
-  context.restore();
+    context.restore();
+  }
 
   return {
     runtime: (state?.runtime ?? 0) + deltaTime,

@@ -596,15 +596,15 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
           return {
             start: startDragged
               ? {
-                  mode: "inside",
-                  element: hoveredElement,
+                  mode: "orbit",
+                  element: enclosingFrame,
                   focusPoint: globalPoint,
                 }
               : start,
             end: endDragged
               ? {
-                  mode: "inside",
-                  element: hoveredElement,
+                  mode: "orbit",
+                  element: enclosingFrame,
                   focusPoint: globalPoint,
                 }
               : end,
