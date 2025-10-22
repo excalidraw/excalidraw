@@ -366,15 +366,14 @@ export const adjustBoundTextSize = (
   container: ExcalidrawTextContainer,
   boundText: ExcalidrawTextElementWithContainer,
   scene: Scene,
+  wrapTextFirst = true,
 ) => {
   const maxWidth = getBoundTextMaxWidth(container, boundText);
   const maxHeight = getBoundTextMaxHeight(container, boundText);
 
-  const wrappedText = wrapText(
-    boundText.text,
-    getFontString(boundText),
-    maxWidth,
-  );
+  const wrappedText = wrapTextFirst
+    ? wrapText(boundText.text, getFontString(boundText), maxWidth)
+    : boundText.originalText;
 
   let metrics = measureText(
     wrappedText,
