@@ -11,12 +11,12 @@
     "copyAsPng": "کپی در حافطه موقت به صورت PNG",
     "copyAsSvg": "کپی در حافطه موقت به صورت SVG",
     "copyText": "کپی در حافطه موقت به صورت متن",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "کپی کردن منبع",
+    "convertToCode": "تبدیل به کد",
     "bringForward": "جلو آوردن",
     "sendToBack": "پس فرستادن",
-    "bringToFront": "جلو آوردن",
-    "sendBackward": "پس فرستادن",
+    "bringToFront": "آوردن به جلوترین لایه",
+    "sendBackward": "فرستادن به عقب‌ترین لایه",
     "delete": "حذف",
     "copyStyles": "کپی سبک",
     "pasteStyles": "جای گذاری سبک",
@@ -38,12 +38,12 @@
     "arrowhead_none": "هیچ کدام",
     "arrowhead_arrow": "پیکان",
     "arrowhead_bar": "میله ای",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "دایره",
+    "arrowhead_circle_outline": "دایره توخالی",
     "arrowhead_triangle": "مثلث",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "مثلث توخالی",
+    "arrowhead_diamond": "لوزی",
+    "arrowhead_diamond_outline": "لوزی توخالی",
     "fontSize": "اندازه قلم",
     "fontFamily": "نوع قلم",
     "addWatermark": "\"ساخته شده با Excalidraw\" را اضافه کن",
@@ -115,12 +115,12 @@
     "createContainerFromText": "متن را در یک جایگاه بپیچید",
     "link": {
       "edit": "ویرایش لینک",
-      "editEmbed": "",
+      "editEmbed": "ویرایش جاسازی",
       "create": "ایجاد پیوند",
-      "createEmbed": "",
+      "createEmbed": "ایجاد جاسازی",
       "label": "لینک",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "جاسازی شده",
+      "empty": "لینک برای نمایش وجود ندارد"
     },
     "lineEditor": {
       "edit": "ویرایش لینک",
@@ -134,11 +134,11 @@
     },
     "statusPublished": "منتشر شده",
     "sidebarLock": "باز نگه داشتن سایدبار",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "انتخاب همه عناصر در قاب",
+    "removeAllElementsFromFrame": "حذف همه عناصر از قاب",
     "eyeDropper": "انتخاب رنگ از کرباس",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "متن به نمودار (آزمایشی)",
+    "prompt": "فرمان / دستور"
   },
   "library": {
     "noItems": "آیتمی به اینجا اضافه نشده...",
@@ -172,16 +172,16 @@
     "darkMode": "حالت تیره",
     "lightMode": "حالت روشن",
     "zenMode": "حالت ذن",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "چسبیدن اشیاء به یکدیگر",
     "exitZenMode": "خروج از حالت تمرکز",
     "cancel": "لغو",
     "clear": "پاک کردن",
     "remove": "پاک کردن",
-    "embed": "",
+    "embed": "جاسازی/قرار دادن",
     "publishLibrary": "انتشار",
     "submit": "ارسال",
     "confirm": "تایید",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "کلیک برای تعامل"
   },
   "alerts": {
     "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",
@@ -211,13 +211,13 @@
     "imageInsertError": "عکس ارسال نشد. بعداً دوباره تلاش کنید...",
     "fileTooBig": "فایل خیلی بزرگ است حداکثر اندازه مجاز {{maxSize}}.",
     "svgImageInsertError": "تصویر SVG وارد نشد. نشانه گذاری SVG نامعتبر به نظر می رسد.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "واکشی تصویر ناموفق بود",
     "invalidSVGString": "SVG نادرست.",
     "cannotResolveCollabServer": "به سرور collab متصل نشد. لطفا صفحه را مجددا بارگذاری کنید و دوباره تلاش کنید.",
     "importLibraryError": "داده‌ها بارگذاری نشدند",
     "collabSaveFailed": "در پایگاه داده باطن ذخیره نشد. اگر مشکلات همچنان ادامه داشت، باید فایل خود را به صورت محلی ذخیره کنید تا مطمئن شوید کار خود را از دست نمی دهید.",
     "collabSaveFailed_sizeExceeded": "در پایگاه داده بکند ذخیره نشد. اگر مشکلات همچنان ادامه داشت، باید فایل خود را به صورت محلی ذخیره کنید تا مطمئن شوید کار خود را از دست نمی دهید.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "ابزار تصویر در این محیط پشتیبانی نمی‌شود",
     "brave_measure_text_error": {
       "line1": "به نظر می‌رسد از مرورگر Brave با تنظیم <bold> مسدود کردن شدید اثرانگشت</bold> استفاده می‌کنید.",
       "line2": "این می تواند منجر به شکستن <bold>عناصر متن</bold> در نقاشی های شما شود.",
@@ -225,13 +225,13 @@
       "line4": "اگر غیرفعال کردن این تنظیم نمایش عناصر متنی را برطرف نکرد، لطفاً یک <issueLink>مشکل</issueLink> را در GitHub ما باز کنید یا برای ما در <discordLink>Discord</discordLink> بنویسید."
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "iframe": "",
-      "image": ""
+      "embeddable": "عناصر قابل جاسازی در کتابخانه پشتیبانی نمی‌شوند.",
+      "iframe": "عناصر IFrame در کتابخانه پشتیبانی نمی‌شوند.",
+      "image": "خطا در پردازش نوع عنصر تصویر در کتابخانه."
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "خواندن محتوای کلیپ‌بورد ناموفق بود.",
+    "asyncPasteFailedOnParse": "تجزیه محتوای جای‌گذاری شده ناموفق بود.",
+    "copyToSystemClipboardFailed": "کپی در کلیپ‌بورد سیستم ناموفق بود."
   },
   "toolBar": {
     "selection": "گزینش",
@@ -248,14 +248,14 @@
     "penMode": "حالت قلم - جلوگیری از تماس",
     "link": "افزودن/به‌روزرسانی پیوند برای شکل انتخابی",
     "eraser": "پاک کن",
-    "frame": "",
-    "magicframe": "",
-    "embeddable": "",
-    "laser": "",
+    "frame": "قاب",
+    "magicframe": "قاب جادویی (آزمایشی)",
+    "embeddable": "جاسازی محتوا (یوتیوب، گوگل مپس و...)",
+    "laser": "اشاره‌گر لیزری (آزمایشی)",
     "hand": "دست (ابزار پانینگ)",
     "extraTools": "ابزارهای بیشتر",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "mermaidToExcalidraw": "Mermaid به Excalidraw (آزمایشی)",
+    "magicSettings": "تنظیمات جادویی"
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",
@@ -267,7 +267,7 @@
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
-    "embeddable": "",
+    "embeddable": "برای جاسازی محتوای وب (مانند ویدیو یا نقشه) کلیک کنید، یا لینک را جای‌گذاری کنید.",
     "text_selected": "دوبار کلیک کنید یا Enter را فشار دهید تا نقاط را ویرایش کنید",
     "text_editing": "Escape یا CtrlOrCmd+ENTER را فشار دهید تا ویرایش تمام شود",
     "linearElementMulti": "روی آخرین نقطه کلیک کنید یا کلید ESC را بزنید یا کلید Enter را بزنید برای اتمام کار",
@@ -284,7 +284,7 @@
     "deepBoxSelect": "CtrlOrCmd را برای انتخاب عمیق و جلوگیری از کشیدن نگه دارید",
     "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند",
     "firefox_clipboard_write": "احتمالاً می‌توان این ویژگی را با تنظیم پرچم «dom.events.asyncClipboard.clipboardItem» روی «true» فعال کرد. برای تغییر پرچم های مرورگر در فایرفاکس، از صفحه \"about:config\" دیدن کنید.",
-    "disableSnapping": ""
+    "disableSnapping": "غیرفعال کردن چسبیدن به اشیاء"
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -292,11 +292,11 @@
     "canvasTooBigTip": "نکته: سعی کنید دورترین عناصر را کمی به همدیگر نزدیک کنید."
   },
   "errorSplash": {
-    "headingMain": "",
+    "headingMain": "خطایی رخ داد",
     "clearCanvasMessage": "اگر بازنشانی صفحه مشکل را حل نکرد این را امتحان کنید ",
     "clearCanvasCaveat": " این باعث میشود کارهای شما ذخیره نشود ",
-    "trackedToSentry": "",
-    "openIssueMessage": "",
+    "trackedToSentry": "این خطا به صورت خودکار در Sentry ردیابی شده است.",
+    "openIssueMessage": "ما بسیار سپاسگزار خواهیم بود اگر یک گزارش مشکل (Issue) در GitHub باز کنید و مشکل را با جزئیات بیشتری توضیح دهید، ترجیحاً با بازتولید خطا.",
     "sceneContent": "محتوای صحنه:"
   },
   "roomDialog": {
@@ -376,9 +376,9 @@
       "required": "لازم",
       "website": "وارد کردن آدرس درست"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
-    "noteLicense": "",
+    "noteDescription": "کتابخانه شما در کتابخانه عمومی منتشر خواهد شد تا دیگران بتوانند از آن در طراحی‌های خود استفاده کنند.",
+    "noteGuidelines": "قبل از ارسال، مطمئن شوید که کتابخانه شما از دستورالعمل‌های ما پیروی می‌کند.",
+    "noteLicense": "با ارسال، شما موافقت می‌کنید که کتابخانه شما تحت مجوز MIT منتشر شود، به این معنی که هر کسی می‌تواند بدون محدودیت از آن استفاده کند.",
     "noteItems": "هر مورد کتابخانه باید نام خاص خود را داشته باشد تا قابل فیلتر باشد. اقلام کتابخانه زیر شامل خواهد شد:",
     "atleastOneLibItem": "لطفاً حداقل یک مورد از کتابخانه را برای شروع انتخاب کنید",
     "republishWarning": "توجه: برخی از موارد انتخاب شده به عنوان قبلاً منتشر شده/ارسال شده علامت گذاری شده اند. شما فقط باید هنگام به‌روزرسانی یک کتابخانه موجود یا ارسال، موارد را دوباره ارسال کنید."
@@ -392,22 +392,22 @@
     "removeItemsFromLib": "موارد انتخاب شده از موارد پسندیده حذف شوند"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "خروجی تصویر",
     "label": {
       "withBackground": "پس زمینه",
-      "onlySelected": "",
+      "onlySelected": "فقط موارد انتخاب شده",
       "darkMode": "حالت تیره",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "embedScene": "جاسازی صحنه",
+      "scale": "مقیاس",
+      "padding": "فاصله داخلی"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "داده‌های صحنه در فایل PNG/SVG صادر شده جاسازی می‌شود تا بتوان آن را بعداً ویرایش کرد. این کار اندازه فایل خروجی را افزایش می‌دهد."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "خروجی به PNG",
+      "exportToSvg": "خروجی به SVG",
+      "copyPngToClipboard": "کپی PNG در کلیپ‌بورد"
     },
     "button": {
       "exportToPng": "PNG",
@@ -444,8 +444,8 @@
     "canvas": "بوم",
     "selection": "انتخاب",
     "pasteAsSingleElement": "از {{shortcut}} برای چسباندن به عنوان یک عنصر استفاده کنید،\nیا در یک ویرایشگر متن موجود جایگذاری کنید",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "جاسازی این نوع محتوا امکان‌پذیر نیست.",
+    "unrecognizedLinkFormat": "فرمت لینک شناسایی نشد یا پشتیبانی نمی‌شود."
   },
   "colors": {
     "transparent": "شفاف",
@@ -478,48 +478,48 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
+    "mostUsedCustomColors": "بیشترین رنگ‌های سفارشی استفاده شده",
     "colors": "رنگ‌ها",
     "shades": "جلوه‌ها",
     "hexCode": "کدِ هگز",
-    "noShades": ""
+    "noShades": "سایه‌ای برای این رنگ موجود نیست"
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "خروجی به تصویر",
+        "button": "خروجی گرفتن به عنوان تصویر",
+        "description": "یک تصویر از صحنه فعلی ایجاد کنید."
       },
       "saveToDisk": {
         "title": "ذخیره در دیسک",
         "button": "ذخیره در دیسک",
-        "description": ""
+        "description": "صحنه فعلی را در یک فایل ذخیره کنید."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "ذخیره در Excalidraw+",
+        "description": "صحنه را در فضای کاری ابری Excalidraw+ خود ذخیره کنید."
       }
     },
     "modal": {
       "loadFromFile": {
         "title": "بارگذاری از فایل",
         "button": "بارگذاری از فایل",
-        "description": ""
+        "description": "بارگذاری صحنه از یک فایل، محتوای فعلی را بازنویسی خواهد کرد."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "بارگذاری از لینک",
+        "button": "بازنویسی محتوای من",
+        "description": "بارگذاری یک نقاشی خارجی، محتوای فعلی شما را بازنویسی می‌کند."
       }
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
+    "title": "Mermaid به Excalidraw",
+    "button": "درج کردن",
+    "description": "کد <link>Mermaid</link> خود را برای تبدیل به نمودار Excalidraw اینجا جای‌گذاری کنید (آزمایشی).",
+    "syntax": "سینتکس Mermaid",
     "preview": "پیش‌نمایش"
   }
 }
