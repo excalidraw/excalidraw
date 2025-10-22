@@ -18,12 +18,12 @@
     }
 
     &--hover {
-      border-color: var(--color-primary);
+      background-color: var(--color-surface-mid);
     }
 
+    &:active:not(:has(.library-unit__checkbox:hover)),
     &--selected {
-      border-color: var(--color-primary);
-      border-width: 1px;
+      background-color: var(--color-surface-high);
     }
 
     &--skeleton {

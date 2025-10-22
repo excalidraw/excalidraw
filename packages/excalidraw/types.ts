@@ -248,8 +248,10 @@ export type ObservedElementsAppState = {
   editingGroupId: AppState["editingGroupId"];
   selectedElementIds: AppState["selectedElementIds"];
   selectedGroupIds: AppState["selectedGroupIds"];
-  selectedLinearElementId: LinearElementEditor["elementId"] | null;
-  selectedLinearElementIsEditing: boolean | null;
+  selectedLinearElement: {
+    elementId: LinearElementEditor["elementId"];
+    isEditing: boolean;
+  } | null;
   croppingElementId: AppState["croppingElementId"];
   lockedMultiSelections: AppState["lockedMultiSelections"];
   activeLockedId: AppState["activeLockedId"];
@@ -314,6 +316,10 @@ export interface AppState {
     // indicates if the current tool is temporarily switched on from the selection tool
     fromSelection: boolean;
   } & ActiveTool;
+  preferredSelectionTool: {
+    type: "selection" | "lasso";
+    initialized: boolean;
+  };
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
@@ -344,12 +350,16 @@ export interface AppState {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
-  openMenu: "canvas" | "shape" | null;
+  openMenu: "canvas" | null;
   openPopup:
     | "canvasBackground"
     | "elementBackground"
     | "elementStroke"
     | "fontFamily"
+    | "compactTextProperties"
+    | "compactStrokeStyles"
+    | "compactOtherProperties"
+    | "compactArrowProperties"
     | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:
@@ -358,7 +368,6 @@ export interface AppState {
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" }
     | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
-
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -441,6 +450,9 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+
+  /** properties sidebar mode - determines whether to show compact or complete sidebar */
+  stylesPanelMode: "compact" | "full" | "mobile";
 }
 
 export type SearchMatch = {
@@ -563,6 +575,10 @@ export interface ExcalidrawProps {
     /** excludes the duplicated elements */
     prevElements: readonly ExcalidrawElement[],
   ) => ExcalidrawElement[] | void;
+  renderTopLeftUI?: (
+    isMobile: boolean,
+    appState: UIAppState,
+  ) => JSX.Element | null;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -731,6 +747,7 @@ export type AppClassProperties = {
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
+  onPointerDownEmitter: App["onPointerDownEmitter"];
 };
 
 export type PointerDownState = Readonly<{
@@ -780,6 +797,10 @@ export type PointerDownState = Readonly<{
     // by default same as PointerDownState.origin. On alt-duplication, reset
     // to current pointer position at time of duplication.
     origin: { x: number; y: number };
+    // Whether to block drag after lasso selection
+    // this is meant to be used to block dragging after lasso selection on PCs
+    // until the next pointer down
+    blockDragging: boolean;
   };
   // We need to have these in the state so that we can unsubscribe them
   eventListeners: {
@@ -801,6 +822,7 @@ export type UnsubscribeCallback = () => void;
 
 export interface ExcalidrawImperativeAPI {
   updateScene: InstanceType<typeof App>["updateScene"];
+  applyDeltas: InstanceType<typeof App>["applyDeltas"];
   mutateElement: InstanceType<typeof App>["mutateElement"];
   updateLibrary: InstanceType<typeof Library>["updateLibrary"];
   resetScene: InstanceType<typeof App>["resetScene"];

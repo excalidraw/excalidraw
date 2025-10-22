@@ -21,7 +21,6 @@ import {
   APP_NAME,
   EVENT,
   THEME,
-  TITLE_TIMEOUT,
   VERSION_TIMEOUT,
   debounce,
   getVersion,
@@ -134,6 +133,7 @@ import {
   LibraryIndexedDBAdapter,
   LibraryLocalStorageMigrationAdapter,
   LocalData,
+  localStorageQuotaExceededAtom,
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
@@ -791,11 +791,6 @@ const ExcalidrawWrapper = () => {
       }
     };
 
-    const titleTimeout = setTimeout(
-      () => (document.title = APP_NAME),
-      TITLE_TIMEOUT,
-    );
-
     const syncData = debounce(() => {
       if (isTestEnv()) {
         return;
@@ -886,7 +881,6 @@ const ExcalidrawWrapper = () => {
         visibilityChange,
         false,
       );
-      clearTimeout(titleTimeout);
     };
   }, [isCollabDisabled, collabAPI, excalidrawAPI, setLangCode]);
 
@@ -1025,6 +1019,8 @@ const ExcalidrawWrapper = () => {
   };
 
   const isOffline = useAtomValue(isOfflineAtom);
+
+  const localStorageQuotaExceeded = useAtomValue(localStorageQuotaExceededAtom);
 
   const onCollabDialogOpen = useCallback(
     () => setShareDialogState({ isOpen: true, type: "collaborationOnly" }),
@@ -1233,8 +1229,13 @@ const ExcalidrawWrapper = () => {
 
         <TTDDialogTrigger />
         {isCollaborating && isOffline && (
-          <div className="collab-offline-warning">
+          <div className="alertalert--warning">
             {t("alerts.collabOfflineWarning")}
+          </div>
+        )}
+        {localStorageQuotaExceeded && (
+          <div className="alert alert--danger">
+            {t("alerts.localStorageQuotaExceeded")}
           </div>
         )}
         {latestShareableLink && (

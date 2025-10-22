@@ -28,6 +28,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     excalidrawAPI,
     isCollaborating = false,
     onPointerUpdate,
+    renderTopLeftUI,
     renderTopRightUI,
     langCode = defaultLang.code,
     viewModeEnabled,
@@ -121,6 +122,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           excalidrawAPI={excalidrawAPI}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
+          renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
           langCode={langCode}
           viewModeEnabled={viewModeEnabled ?? !!scrollConstraints}
@@ -231,6 +233,7 @@ export { defaultLang, useI18n, languages } from "./i18n";
 export {
   restore,
   restoreAppState,
+  restoreElement,
   restoreElements,
   restoreLibraryItems,
 } from "./data/restore";

@@ -17,6 +17,7 @@ const MenuContent = ({
   className = "",
   onSelect,
   style,
+  placement = "bottom",
 }: {
   children?: React.ReactNode;
   onClickOutside?: () => void;
@@ -26,6 +27,7 @@ const MenuContent = ({
    */
   onSelect?: (event: Event) => void;
   style?: React.CSSProperties;
+  placement?: "top" | "bottom";
 }) => {
   const device = useDevice();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -58,6 +60,7 @@ const MenuContent = ({
 
   const classNames = clsx(`dropdown-menu ${className}`, {
     "dropdown-menu--mobile": device.editor.isMobile,
+    "dropdown-menu--placement-top": placement === "top",
   }).trim();
 
   return (
@@ -71,7 +74,12 @@ const MenuContent = ({
         {/* the zIndex ensures this menu has higher stacking order,
     see https://github.com/excalidraw/excalidraw/pull/1445 */}
         {device.editor.isMobile ? (
-          <Stack.Col className="dropdown-menu-container">{children}</Stack.Col>
+          <Stack.Col
+            className="dropdown-menu-container"
+            style={{ ["--gap" as any]: 1.25 }}
+          >
+            {children}
+          </Stack.Col>
         ) : (
           <Island
             className="dropdown-menu-container"

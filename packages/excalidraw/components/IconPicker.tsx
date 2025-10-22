@@ -152,16 +152,14 @@ function Picker<T>({
     );
   };
 
+  const isMobile = device.editor.isMobile;
+
   return (
     <Popover.Content
-      side={
-        device.editor.isMobile && !device.viewport.isLandscape
-          ? "top"
-          : "bottom"
-      }
+      side={isMobile ? "right" : "bottom"}
       align="start"
-      sideOffset={12}
-      style={{ zIndex: "var(--zIndex-popup)" }}
+      sideOffset={isMobile ? 8 : 12}
+      style={{ zIndex: "var(--zIndex-ui-styles-popup)" }}
       onKeyDown={handleKeyDown}
     >
       <div

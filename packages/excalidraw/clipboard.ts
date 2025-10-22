@@ -5,6 +5,7 @@ import {
   arrayToMap,
   isMemberOf,
   isPromiseLike,
+  EVENT,
 } from "@excalidraw/common";
 
 import { mutateElement } from "@excalidraw/element";
@@ -16,14 +17,25 @@ import {
 
 import { getContainingFrame } from "@excalidraw/element";
 
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
+import type { IMAGE_MIME_TYPES, STRING_MIME_TYPES } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import { ExcalidrawError } from "./errors";
-import { createFile, isSupportedImageFileType } from "./data/blob";
+import {
+  createFile,
+  getFileHandle,
+  isSupportedImageFileType,
+  normalizeFile,
+} from "./data/blob";
+
 import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
+
+import type { FileSystemHandle } from "./data/filesystem";
 
 import type { Spreadsheet } from "./charts";
 
@@ -92,7 +104,7 @@ export const createPasteEvent = ({
     console.warn("createPasteEvent: no types or files provided");
   }
 
-  const event = new ClipboardEvent("paste", {
+  const event = new ClipboardEvent(EVENT.PASTE, {
     clipboardData: new DataTransfer(),
   });
 
@@ -101,10 +113,11 @@ export const createPasteEvent = ({
       if (typeof value !== "string") {
         files = files || [];
         files.push(value);
+        event.clipboardData?.items.add(value);
         continue;
       }
       try {
-        event.clipboardData?.setData(type, value);
+        event.clipboardData?.items.add(value, type);
         if (event.clipboardData?.getData(type) !== value) {
           throw new Error(`Failed to set "${type}" as clipboardData item`);
         }
@@ -229,14 +242,10 @@ function parseHTMLTree(el: ChildNode) {
   return result;
 }
 
-const maybeParseHTMLPaste = (
-  event: ClipboardEvent,
+const maybeParseHTMLDataItem = (
+  dataItem: ParsedDataTransferItemType<typeof MIME_TYPES["html"]>,
 ): { type: "mixedContent"; value: PastedMixedContent } | null => {
-  const html = event.clipboardData?.getData(MIME_TYPES.html);
-
-  if (!html) {
-    return null;
-  }
+  const html = dataItem.value;
 
   try {
     const doc = new DOMParser().parseFromString(html, MIME_TYPES.html);
@@ -332,18 +341,21 @@ export const readSystemClipboard = async () => {
  * Parses "paste" ClipboardEvent.
  */
 const parseClipboardEventTextData = async (
-  event: ClipboardEvent,
+  dataList: ParsedDataTranferList,
   isPlainPaste = false,
 ): Promise<ParsedClipboardEventTextData> => {
   try {
-    const mixedContent = !isPlainPaste && event && maybeParseHTMLPaste(event);
+    const htmlItem = dataList.findByType(MIME_TYPES.html);
+
+    const mixedContent =
+      !isPlainPaste && htmlItem && maybeParseHTMLDataItem(htmlItem);
 
     if (mixedContent) {
       if (mixedContent.value.every((item) => item.type === "text")) {
         return {
           type: "text",
           value:
-            event.clipboardData?.getData(MIME_TYPES.text) ||
+            dataList.getData(MIME_TYPES.text) ??
             mixedContent.value
               .map((item) => item.value)
               .join("\n")
@@ -354,23 +366,156 @@ const parseClipboardEventTextData = async (
       return mixedContent;
     }
 
-    const text = event.clipboardData?.getData(MIME_TYPES.text);
-
-    return { type: "text", value: (text || "").trim() };
+    return {
+      type: "text",
+      value: (dataList.getData(MIME_TYPES.text) || "").trim(),
+    };
   } catch {
     return { type: "text", value: "" };
   }
+};
+
+type AllowedParsedDataTransferItem =
+  | {
+      type: ValueOf<typeof IMAGE_MIME_TYPES>;
+      kind: "file";
+      file: File;
+      fileHandle: FileSystemHandle | null;
+    }
+  | { type: ValueOf<typeof STRING_MIME_TYPES>; kind: "string"; value: string };
+
+type ParsedDataTransferItem =
+  | {
+      type: string;
+      kind: "file";
+      file: File;
+      fileHandle: FileSystemHandle | null;
+    }
+  | { type: string; kind: "string"; value: string };
+
+type ParsedDataTransferItemType<
+  T extends AllowedParsedDataTransferItem["type"],
+> = AllowedParsedDataTransferItem & { type: T };
+
+export type ParsedDataTransferFile = Extract<
+  AllowedParsedDataTransferItem,
+  { kind: "file" }
+>;
+
+type ParsedDataTranferList = ParsedDataTransferItem[] & {
+  /**
+   * Only allows filtering by known `string` data types, since `file`
+   * types can have multiple items of the same type (e.g. multiple image files)
+   * unlike `string` data transfer items.
+   */
+  findByType: typeof findDataTransferItemType;
+  /**
+   * Only allows filtering by known `string` data types, since `file`
+   * types can have multiple items of the same type (e.g. multiple image files)
+   * unlike `string` data transfer items.
+   */
+  getData: typeof getDataTransferItemData;
+  getFiles: typeof getDataTransferFiles;
+};
+
+const findDataTransferItemType = function <
+  T extends ValueOf<typeof STRING_MIME_TYPES>,
+>(this: ParsedDataTranferList, type: T): ParsedDataTransferItemType<T> | null {
+  return (
+    this.find(
+      (item): item is ParsedDataTransferItemType<T> => item.type === type,
+    ) || null
+  );
+};
+const getDataTransferItemData = function <
+  T extends ValueOf<typeof STRING_MIME_TYPES>,
+>(
+  this: ParsedDataTranferList,
+  type: T,
+):
+  | ParsedDataTransferItemType<ValueOf<typeof STRING_MIME_TYPES>>["value"]
+  | null {
+  const item = this.find(
+    (
+      item,
+    ): item is ParsedDataTransferItemType<ValueOf<typeof STRING_MIME_TYPES>> =>
+      item.type === type,
+  );
+
+  return item?.value ?? null;
+};
+
+const getDataTransferFiles = function (
+  this: ParsedDataTranferList,
+): ParsedDataTransferFile[] {
+  return this.filter(
+    (item): item is ParsedDataTransferFile => item.kind === "file",
+  );
+};
+
+export const parseDataTransferEvent = async (
+  event: ClipboardEvent | DragEvent | React.DragEvent<HTMLDivElement>,
+): Promise<ParsedDataTranferList> => {
+  let items: DataTransferItemList | undefined = undefined;
+
+  if (isClipboardEvent(event)) {
+    items = event.clipboardData?.items;
+  } else {
+    const dragEvent = event;
+    items = dragEvent.dataTransfer?.items;
+  }
+
+  const dataItems = (
+    await Promise.all(
+      Array.from(items || []).map(
+        async (item): Promise<ParsedDataTransferItem | null> => {
+          if (item.kind === "file") {
+            let file = item.getAsFile();
+            if (file) {
+              const fileHandle = await getFileHandle(item);
+              file = await normalizeFile(file);
+              return {
+                type: file.type,
+                kind: "file",
+                file,
+                fileHandle,
+              };
+            }
+          } else if (item.kind === "string") {
+            const { type } = item;
+            let value: string;
+            if ("clipboardData" in event && event.clipboardData) {
+              value = event.clipboardData?.getData(type);
+            } else {
+              value = await new Promise<string>((resolve) => {
+                item.getAsString((str) => resolve(str));
+              });
+            }
+            return { type, kind: "string", value };
+          }
+
+          return null;
+        },
+      ),
+    )
+  ).filter((data): data is ParsedDataTransferItem => data != null);
+
+  return Object.assign(dataItems, {
+    findByType: findDataTransferItemType,
+    getData: getDataTransferItemData,
+    getFiles: getDataTransferFiles,
+  });
 };
 
 /**
  * Attempts to parse clipboard event.
  */
 export const parseClipboard = async (
-  event: ClipboardEvent,
+  dataList: ParsedDataTranferList,
   isPlainPaste = false,
 ): Promise<ClipboardData> => {
   const parsedEventData = await parseClipboardEventTextData(
-    event,
+    dataList,
     isPlainPaste,
   );
 
@@ -518,4 +663,15 @@ const copyTextViaExecCommand = (text: string | null) => {
   textarea.remove();
 
   return success;
+};
+
+export const isClipboardEvent = (
+  event: React.SyntheticEvent | Event,
+): event is ClipboardEvent => {
+  /** not using instanceof ClipboardEvent due to tests (jsdom) */
+  return (
+    event.type === EVENT.PASTE ||
+    event.type === EVENT.COPY ||
+    event.type === EVENT.CUT
+  );
 };

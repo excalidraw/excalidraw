@@ -79,6 +79,10 @@ exports[`given element A and group of elements B and given both are selected whe
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
     "id3": true,
@@ -109,6 +113,7 @@ exports[`given element A and group of elements B and given both are selected whe
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -504,6 +509,10 @@ exports[`given element A and group of elements B and given both are selected whe
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
     "id3": true,
@@ -536,6 +545,7 @@ exports[`given element A and group of elements B and given both are selected whe
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -919,6 +929,10 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -942,6 +956,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -1484,6 +1499,10 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -1507,6 +1526,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -1690,6 +1710,10 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -1718,6 +1742,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -2073,6 +2098,10 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -2098,6 +2127,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -2317,6 +2347,10 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -2340,6 +2374,7 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -2496,6 +2531,10 @@ exports[`regression tests > can drag element that covers another element, while 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id6": true,
   },
@@ -2521,6 +2560,7 @@ exports[`regression tests > can drag element that covers another element, while 
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -2820,6 +2860,10 @@ exports[`regression tests > change the properties of a shape > [end of test] app
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -2843,6 +2887,7 @@ exports[`regression tests > change the properties of a shape > [end of test] app
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -3074,6 +3119,10 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -3099,6 +3148,7 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -3314,6 +3364,10 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -3339,6 +3393,7 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -3549,6 +3604,10 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id3": true,
   },
@@ -3574,6 +3633,7 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -3806,6 +3866,10 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id6": true,
   },
@@ -3832,6 +3896,7 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -4119,6 +4184,10 @@ exports[`regression tests > deleting last but one element in editing group shoul
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -4144,6 +4213,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -4554,6 +4624,10 @@ exports[`regression tests > deselects group of selected elements on pointer down
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
     "id3": true,
@@ -4606,6 +4680,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -4836,6 +4911,10 @@ exports[`regression tests > deselects group of selected elements on pointer up w
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
     "id3": true,
@@ -4860,6 +4939,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -5111,6 +5191,10 @@ exports[`regression tests > deselects selected element on pointer down when poin
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -5162,6 +5246,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -5318,6 +5403,10 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -5341,6 +5430,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -5517,6 +5607,10 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -5540,6 +5634,7 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -5909,6 +6004,10 @@ exports[`regression tests > drags selected elements from point inside common bou
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
     "id3": true,
@@ -5936,6 +6035,7 @@ exports[`regression tests > drags selected elements from point inside common bou
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -6205,6 +6305,10 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -6226,6 +6330,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -6415,15 +6520,16 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           "selectedElementIds": {
             "id9": true,
           },
-          "selectedLinearElementId": "id9",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id9",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {
             "id6": true,
           },
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -6491,13 +6597,19 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           "selectedElementIds": {
             "id12": true,
           },
-          "selectedLinearElementId": "id12",
+          "selectedLinearElement": {
+            "elementId": "id12",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {
             "id9": true,
           },
-          "selectedLinearElementId": "id9",
+          "selectedLinearElement": {
+            "elementId": "id9",
+            "isEditing": false,
+          },
         },
       },
     },
@@ -6563,15 +6675,16 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           "selectedElementIds": {
             "id15": true,
           },
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
         "inserted": {
           "selectedElementIds": {
             "id12": true,
           },
-          "selectedLinearElementId": "id12",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id12",
+            "isEditing": false,
+          },
         },
       },
     },
@@ -6698,12 +6811,13 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
-          "selectedLinearElementId": "id15",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id15",
+            "isEditing": false,
+          },
         },
         "inserted": {
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -6721,15 +6835,16 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
           "selectedElementIds": {
             "id22": true,
           },
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
         "inserted": {
           "selectedElementIds": {
             "id15": true,
           },
-          "selectedLinearElementId": "id15",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id15",
+            "isEditing": false,
+          },
         },
       },
     },
@@ -6854,12 +6969,13 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
-          "selectedLinearElementId": "id22",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id22",
+            "isEditing": false,
+          },
         },
         "inserted": {
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -6894,12 +7010,13 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
         "inserted": {
-          "selectedLinearElementId": "id22",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id22",
+            "isEditing": false,
+          },
         },
       },
     },
@@ -7048,6 +7165,10 @@ exports[`regression tests > given a group of selected elements with an element t
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
     "id6": true,
@@ -7074,6 +7195,7 @@ exports[`regression tests > given a group of selected elements with an element t
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -7372,7 +7494,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
   "offsetTop": 0,
   "openDialog": null,
   "openMenu": null,
-  "openPopup": "elementBackground",
+  "openPopup": null,
   "openSidebar": null,
   "originSnapOffset": null,
   "pasteDialog": {
@@ -7381,6 +7503,10 @@ exports[`regression tests > given a selected element A and a not selected elemen
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -7407,6 +7533,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -7659,6 +7786,10 @@ exports[`regression tests > given selected element A with lower z-index than uns
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -7684,6 +7815,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -7893,6 +8025,10 @@ exports[`regression tests > given selected element A with lower z-index than uns
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -7918,6 +8054,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -8132,6 +8269,10 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -8155,6 +8296,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -8311,6 +8453,10 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -8334,6 +8480,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -8490,6 +8637,10 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -8513,6 +8664,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -8669,6 +8821,10 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -8719,6 +8875,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -8748,13 +8905,14 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] undo stack 
           "selectedElementIds": {
             "id0": true,
           },
-          "selectedLinearElementId": "id0",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {},
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -8897,6 +9055,10 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -8947,6 +9109,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -8976,13 +9139,14 @@ exports[`regression tests > key 6 selects line tool > [end of test] undo stack 1
           "selectedElementIds": {
             "id0": true,
           },
-          "selectedLinearElementId": "id0",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {},
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -9123,6 +9287,10 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -9144,6 +9312,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -9318,6 +9487,10 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -9368,6 +9541,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -9397,13 +9571,14 @@ exports[`regression tests > key a selects arrow tool > [end of test] undo stack 
           "selectedElementIds": {
             "id0": true,
           },
-          "selectedLinearElementId": "id0",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {},
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -9546,6 +9721,10 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -9569,6 +9748,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -9725,6 +9905,10 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -9775,6 +9959,7 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -9804,13 +9989,14 @@ exports[`regression tests > key l selects line tool > [end of test] undo stack 1
           "selectedElementIds": {
             "id0": true,
           },
-          "selectedLinearElementId": "id0",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
+          },
         },
         "inserted": {
           "selectedElementIds": {},
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
       },
     },
@@ -9951,6 +10137,10 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -9974,6 +10164,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -10130,6 +10321,10 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -10151,6 +10346,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -10325,6 +10521,10 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -10348,6 +10548,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -10504,6 +10705,10 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
     "id3": true,
@@ -10535,6 +10740,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -11034,6 +11240,10 @@ exports[`regression tests > noop interaction after undo shouldn't create history
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -11059,6 +11269,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -11313,6 +11524,10 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -11334,6 +11549,7 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -11435,6 +11651,10 @@ exports[`regression tests > shift click on selected element should deselect it o
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -11458,6 +11678,7 @@ exports[`regression tests > shift click on selected element should deselect it o
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -11634,6 +11855,10 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
     "id3": true,
@@ -11661,6 +11886,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -11952,6 +12178,10 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
     "id3": true,
@@ -11981,6 +12211,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -12380,6 +12611,10 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
     "id15": true,
@@ -12413,6 +12648,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -13022,6 +13258,10 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -13043,6 +13283,7 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -13144,6 +13385,10 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -13169,6 +13414,7 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -13774,6 +14020,10 @@ exports[`regression tests > switches from group of selected elements to another 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id3": true,
     "id6": true,
@@ -13828,6 +14078,7 @@ exports[`regression tests > switches from group of selected elements to another 
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -14112,6 +14363,10 @@ exports[`regression tests > switches selected element on pointer down > [end of 
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {
     "id3": true,
   },
@@ -14165,6 +14420,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -14375,6 +14631,10 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -14396,6 +14656,7 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -14497,6 +14758,10 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -14520,6 +14785,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -14544,12 +14810,13 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
     "appState": AppStateDelta {
       "delta": Delta {
         "deleted": {
-          "selectedLinearElementId": null,
-          "selectedLinearElementIsEditing": null,
+          "selectedLinearElement": null,
         },
         "inserted": {
-          "selectedLinearElementId": "id6",
-          "selectedLinearElementIsEditing": false,
+          "selectedLinearElement": {
+            "elementId": "id6",
+            "isEditing": false,
+          },
         },
       },
     },
@@ -14887,6 +15154,10 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -14908,6 +15179,7 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -15012,6 +15284,10 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
   },
   "penDetected": false,
   "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -15033,6 +15309,7 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,

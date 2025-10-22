@@ -17,6 +17,7 @@ interface PropertiesPopoverProps {
   onPointerLeave?: React.PointerEventHandler<HTMLDivElement>;
   onFocusOutside?: Popover.PopoverContentProps["onFocusOutside"];
   onPointerDownOutside?: Popover.PopoverContentProps["onPointerDownOutside"];
+  preventAutoFocusOnTouch?: boolean;
 }
 
 export const PropertiesPopover = React.forwardRef<
@@ -34,6 +35,7 @@ export const PropertiesPopover = React.forwardRef<
       onFocusOutside,
       onPointerLeave,
       onPointerDownOutside,
+      preventAutoFocusOnTouch = false,
     },
     ref,
   ) => {
@@ -58,12 +60,19 @@ export const PropertiesPopover = React.forwardRef<
           alignOffset={-16}
           sideOffset={20}
           style={{
-            zIndex: "var(--zIndex-popup)",
+            zIndex: "var(--zIndex-ui-styles-popup)",
+            marginLeft: device.editor.isMobile ? "0.5rem" : undefined,
           }}
           onPointerLeave={onPointerLeave}
           onKeyDown={onKeyDown}
           onFocusOutside={onFocusOutside}
           onPointerDownOutside={onPointerDownOutside}
+          onOpenAutoFocus={(e) => {
+            // prevent auto-focus on touch devices to avoid keyboard popup
+            if (preventAutoFocusOnTouch && device.isTouchScreen) {
+              e.preventDefault();
+            }
+          }}
           onCloseAutoFocus={(e) => {
             e.stopPropagation();
             // prevents focusing the trigger
