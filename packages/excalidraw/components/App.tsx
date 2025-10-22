@@ -9388,7 +9388,7 @@ class App extends React.Component<AppProps, AppState> {
           newElement &&
           !multiElement
         ) {
-          if (this.device.isTouchScreen) {
+          if (this.device.isTouchScreen && newElement!.points.length > 1) {
             const FIXED_DELTA_X = Math.min(
               (this.state.width * 0.7) / this.state.zoom.value,
               100,
