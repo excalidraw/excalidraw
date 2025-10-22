@@ -1,4 +1,8 @@
-import { isFiniteNumber, pointFrom } from "@excalidraw/math";
+import {
+  curveSimplifyWithRDP,
+  isFiniteNumber,
+  pointFrom,
+} from "@excalidraw/math";
 
 import {
   DEFAULT_FONT_FAMILY,
@@ -18,7 +22,11 @@ import {
   normalizeLink,
   getLineHeight,
 } from "@excalidraw/common";
-import { getNonDeletedElements, isValidPolygon } from "@excalidraw/element";
+import {
+  getNonDeletedElements,
+  isFreeDrawElement,
+  isValidPolygon,
+} from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
 import {
   updateElbowArrowPoints,
@@ -622,6 +630,12 @@ export const restoreElements = (
       ) {
         (element as Mutable<ExcalidrawLinearElement>).endBinding = null;
       }
+    }
+
+    if (isFreeDrawElement(element)) {
+      Object.assign(element, {
+        points: curveSimplifyWithRDP(element.points, 0.5),
+      });
     }
   }
 

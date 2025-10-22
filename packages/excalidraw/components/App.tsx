@@ -239,6 +239,7 @@ import {
   StoreDelta,
   type ApplyToOptions,
   positionElementsOnGrid,
+  shouldSkipFreedrawPoint,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -8922,10 +8923,7 @@ class App extends React.Component<AppProps, AppState> {
           const points = newElement.points;
           const dx = pointerCoords.x - newElement.x;
           const dy = pointerCoords.y - newElement.y;
-
-          const lastPoint = points.length > 0 && points[points.length - 1];
-          const discardPoint =
-            lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
+          const discardPoint = shouldSkipFreedrawPoint(points, dx, dy, 0.5);
 
           if (!discardPoint) {
             const pressures = newElement.simulatePressure

@@ -1,6 +1,7 @@
 import { isPoint, pointDistance, pointFrom, pointFromVector } from "./point";
 import { vector, vectorNormal, vectorNormalize, vectorScale } from "./vector";
 import { LegendreGaussN24CValues, LegendreGaussN24TValues } from "./constants";
+import { lineSegment } from "./segment";
 
 import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
 
@@ -519,4 +520,78 @@ export function curvePointAtLength<P extends GlobalPoint | LocalPoint>(
   }
 
   return bezierEquation(c, t);
+}
+
+export function perpendicularDistance<Point extends GlobalPoint | LocalPoint>(
+  point: Point,
+  [lineStart, lineEnd]: LineSegment<Point>,
+): number {
+  const dx = lineEnd[0] - lineStart[0];
+  const dy = lineEnd[1] - lineStart[1];
+  const norm = dx * dx + dy * dy;
+
+  if (norm === 0) {
+    return pointDistance(point, lineStart);
+  }
+
+  const u =
+    ((point[0] - lineStart[0]) * dx + (point[1] - lineStart[1]) * dy) / norm;
+
+  if (u < 0) {
+    return pointDistance(point, lineStart);
+  }
+  if (u > 1) {
+    return pointDistance(point, lineEnd);
+  }
+
+  const projX = lineStart[0] + u * dx;
+  const projY = lineStart[1] + u * dy;
+
+  return Math.sqrt(
+    (point[0] - projX) * (point[0] - projX) +
+      (point[1] - projY) * (point[1] - projY),
+  );
+}
+
+export function curveSimplifyWithRDP<Point extends LocalPoint | GlobalPoint>(
+  points: readonly Point[],
+  epsilon: number = 0.5,
+): readonly Point[] {
+  if (points.length <= 2) {
+    return points;
+  }
+
+  const stack: Array<{ start: number; end: number }> = [
+    { start: 0, end: points.length - 1 },
+  ];
+  const keep = new Set<number>();
+
+  keep.add(0);
+  keep.add(points.length - 1);
+
+  while (stack.length > 0) {
+    const segment = stack.pop()!;
+    let maxDist = 0;
+    let maxIndex = -1;
+
+    for (let i = segment.start + 1; i < segment.end; i++) {
+      const dist = perpendicularDistance(
+        points[i],
+        lineSegment(points[segment.start], points[segment.end]),
+      );
+
+      if (dist > maxDist) {
+        maxDist = dist;
+        maxIndex = i;
+      }
+    }
+
+    if (maxDist > epsilon && maxIndex !== -1) {
+      keep.add(maxIndex);
+      stack.push({ start: segment.start, end: maxIndex });
+      stack.push({ start: maxIndex, end: segment.end });
+    }
+  }
+
+  return points.filter((_, index) => keep.has(index));
 }
