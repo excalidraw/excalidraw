@@ -20,6 +20,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
+  "currentItemFixedStrokeWidth": true,
   "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,

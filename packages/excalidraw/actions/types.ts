@@ -36,7 +36,7 @@ type ActionFn = (
   elements: readonly OrderedExcalidrawElement[],
   appState: Readonly<AppState>,
   formData: any,
-  app: AppClassProperties,
+  app: AppClassProperties
 ) => ActionResult | Promise<ActionResult>;
 
 export type UpdaterFn = (res: ActionResult) => void;
@@ -70,6 +70,7 @@ export type ActionName =
   | "changeArrowhead"
   | "changeArrowType"
   | "changeArrowProperties"
+  | "changeStrokeType"
   | "changeOpacity"
   | "changeFontSize"
   | "undo"
@@ -153,7 +154,7 @@ export type PanelComponentProps = {
   app: AppClassProperties;
   renderAction: (
     name: ActionName,
-    data?: PanelComponentProps["data"],
+    data?: PanelComponentProps["data"]
   ) => React.JSX.Element | null;
 };
 
@@ -164,14 +165,14 @@ export interface Action {
     | ((
         elements: readonly ExcalidrawElement[],
         appState: Readonly<AppState>,
-        app: AppClassProperties,
+        app: AppClassProperties
       ) => string);
   keywords?: string[];
   icon?:
     | React.ReactNode
     | ((
         appState: UIAppState,
-        elements: readonly ExcalidrawElement[],
+        elements: readonly ExcalidrawElement[]
       ) => React.ReactNode);
   PanelComponent?: React.FC<PanelComponentProps>;
   perform: ActionFn;
@@ -180,13 +181,13 @@ export interface Action {
     event: React.KeyboardEvent | KeyboardEvent,
     appState: AppState,
     elements: readonly ExcalidrawElement[],
-    app: AppClassProperties,
+    app: AppClassProperties
   ) => boolean;
   predicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     appProps: ExcalidrawProps,
-    app: AppClassProperties,
+    app: AppClassProperties
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
   trackEvent:
@@ -207,7 +208,7 @@ export interface Action {
         predicate?: (
           appState: Readonly<AppState>,
           elements: readonly ExcalidrawElement[],
-          value: any,
+          value: any
         ) => boolean;
       };
   /** if set to `true`, allow action to be performed in viewMode.
