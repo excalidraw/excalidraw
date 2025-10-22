@@ -102,9 +102,7 @@ export const AIComponents = ({
         onTextSubmit={async (input) => {
           try {
             const response = await fetch(
-              `${
-                import.meta.env.VITE_APP_AI_BACKEND
-              }/v1/ai/text-to-diagram/generate`,
+              `/api/ai/text-to-diagram/generate`,
               {
                 method: "POST",
                 headers: {

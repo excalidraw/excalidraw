@@ -6,7 +6,7 @@ import Spinner from "../Spinner";
 import type { ReactNode } from "react";
 
 interface TTDDialogPanelProps {
-  label: string;
+  label: string | ReactNode;
   children: ReactNode;
   panelAction?: {
     label: string;
@@ -33,16 +33,19 @@ export const TTDDialogPanel = ({
   return (
     <div className="ttd-dialog-panel">
       <div className="ttd-dialog-panel__header">
-        <label>{label}</label>
+        {typeof label === "string" ? <label>{label}</label> : label}
         {renderTopRight?.()}
       </div>
-
       {children}
       <div
         className={clsx("ttd-dialog-panel-button-container", {
           invisible: !panelAction,
         })}
-        style={{ display: "flex", alignItems: "center" }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+        }}
       >
         <Button
           className="ttd-dialog-panel-button"
