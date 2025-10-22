@@ -56,6 +56,7 @@ const crowdinMap = {
   "vi-VN": "en-vi",
   "mr-IN": "en-mr",
   "th-TH": "en-th",
+  "mn-MN": "en-mn",
 };
 
 const flags = {
@@ -109,6 +110,7 @@ const flags = {
   "vi-VN": "🇻🇳",
   "mr-IN": "🇮🇳",
   "th-TH": "🇹🇭",
+  "mn-MN": "🇲🇳",
 };
 
 const languages = {
@@ -162,6 +164,7 @@ const languages = {
   "vi-VN": "Tiếng Việt",
   "mr-IN": "मराठी",
   "th-TH": "ภาษาไทย",
+  "mn-MN": "Монгол",
 };
 
 const percentages = fs.readFileSync(
