@@ -26,7 +26,7 @@ import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
 import { TTDDialogPanel } from "./TTDDialogPanel";
 import { TTDDialogPanels } from "./TTDDialogPanels";
-import { ChatInterface } from "./ChatInterface";
+import { ChatInterface } from "../Chat";
 
 import {
   convertMermaidToExcalidraw,
@@ -39,7 +39,7 @@ import "./TTDDialog.scss";
 
 import type { ChangeEventHandler } from "react";
 import type { MermaidToExcalidrawLibProps } from "./common";
-import type { ChatMessage, ChatHistory, ChatHistorySnapshot } from "./types";
+import type { ChatMessageType, ChatHistory, ChatHistorySnapshot } from "../Chat";
 
 import type { BinaryFiles } from "../../types";
 
@@ -151,8 +151,8 @@ export const TTDDialogBase = withInternalFallback(
       setRedoStack([]); // Clear redo stack when new action is performed
     };
 
-    const addMessage = (message: Omit<ChatMessage, "id" | "timestamp">) => {
-      const newMessage: ChatMessage = {
+    const addMessage = (message: Omit<ChatMessageType, "id" | "timestamp">) => {
+      const newMessage: ChatMessageType = {
         ...message,
         id: Math.random().toString(36).substr(2, 9),
         timestamp: new Date(),
@@ -164,7 +164,7 @@ export const TTDDialogBase = withInternalFallback(
       }));
     };
 
-    const updateLastMessage = (updates: Partial<ChatMessage>) => {
+    const updateLastMessage = (updates: Partial<ChatMessageType>) => {
       setChatHistory((prev) => ({
         ...prev,
         messages: prev.messages.map((msg, index) =>
