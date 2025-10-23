@@ -95,11 +95,62 @@ $verticalBreakpoint: 861px;
     height: 100%;
     display: flex;
     flex-direction: column;
+    overflow: visible;
 
     &[hidden] {
       display: none;
     }
     position: relative;
+  }
+
+  .ttd-dialog-layout {
+    display: flex;
+    height: 100%;
+    transition: all 0.6s ease-out;
+    overflow: visible;
+
+    &--chat-only {
+      .ttd-dialog-chat-panel {
+        width: 100%;
+        flex: 1;
+        transition: all 0.6s ease-out;
+      }
+    }
+
+    &--split {
+      gap: 2rem;
+      min-width: 0; // Allow flex items to shrink
+
+      .ttd-dialog-chat-panel {
+        width: 50%;
+        flex: 0 0 50%;
+        min-width: 0;
+        transition: all 0.6s ease-out;
+      }
+
+      .ttd-dialog-preview-panel {
+        width: 50%;
+        flex: 0 0 50%;
+        min-width: 0;
+        max-width: 50%;
+        opacity: 1;
+        transform: translateX(0);
+        transition: all 0.6s ease-out;
+        animation: slideInFromRight 0.6s ease-out 0.1s both;
+        overflow: hidden;
+      }
+    }
+  }
+
+  @keyframes slideInFromRight {
+    0% {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 
   .ttd-dialog-input {
@@ -134,6 +185,8 @@ $verticalBreakpoint: 861px;
     flex-grow: 1;
     position: relative;
     overflow: hidden;
+    max-width: 100%;
+    max-height: 100%;
 
     background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
       left center;
@@ -142,16 +195,22 @@ $verticalBreakpoint: 861px;
 
     height: 400px;
     width: auto;
+    max-width: 100%;
 
     @media screen and (min-width: $verticalBreakpoint) {
       width: 100%;
+      max-width: 100%;
       // acts as min-height
       height: 200px;
+      max-height: 500px;
     }
 
     canvas {
       max-width: 100%;
       max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
     }
   }
 
@@ -274,6 +333,16 @@ $verticalBreakpoint: 861px;
       grid-template-columns: 1fr 1fr;
       gap: 4rem;
     }
+  }
+
+  .ttd-dialog-chat-panel,
+  .ttd-dialog-preview-panel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    overflow: hidden;
   }
 
   .ttd-dialog-panel {
@@ -557,8 +626,6 @@ $verticalBreakpoint: 861px;
       }
 
       &--listening {
-        background: var(--color-error);
-        color: white;
         animation: pulse 1.5s ease-in-out infinite;
 
         &:hover:not(:disabled) {

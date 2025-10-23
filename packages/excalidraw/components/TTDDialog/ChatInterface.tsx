@@ -140,27 +140,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const handleSubmit = () => {
     const trimmedPrompt = inputValue.trim();
     if (trimmedPrompt && !isGenerating) {
-      // Build context from previous messages (latest first)
-      const contextMessages = [...messages].reverse();
-      let contextText = "";
-      
-      for (const message of contextMessages) {
-        const messageText = `${message.type === "user" ? "User" : "Assistant"}: ${message.content}`;
-        const newContextLength = contextText.length + messageText.length + 2; // +2 for newline
-        
-        if (newContextLength > 1000) {
-          break;
-        }
-        
-        contextText = messageText + (contextText ? "\n" : "") + contextText;
-      }
-      
-      // Combine context with current prompt
-      const fullPrompt = contextText 
-        ? `${contextText}\n\nUser: ${trimmedPrompt}`
-        : trimmedPrompt;
-      
-      onSendMessage(fullPrompt);
+      onSendMessage(trimmedPrompt);
       setInputValue("");
     }
   };
@@ -231,6 +211,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       <div className="chat-interface__input-container">
         <div className="chat-interface__input-wrapper">
           <textarea
+            autoFocus
             ref={inputRef}
             className="chat-interface__input"
             value={inputValue}
@@ -261,7 +242,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             >
               <InlineIcon
                 size="1.5em"
-                icon={isListening ? microphoneMutedIcon : microphoneIcon}
+                icon={isListening ? microphoneIcon : microphoneMutedIcon}
               />
             </button>
           )}

@@ -275,6 +275,7 @@ export const TTDDialogBase = withInternalFallback(
 
     const [onTextSubmitInProgess, setOnTextSubmitInProgess] = useState(false);
     const [rateLimits, setRateLimits] = useAtom(rateLimitsAtom);
+    const [showPreview, setShowPreview] = useState(false);
 
     const onGenerate = async (promptWithContext: string) => {
       if (
@@ -315,6 +316,11 @@ export const TTDDialogBase = withInternalFallback(
         content: "",
         isGenerating: true,
       });
+
+      // Show preview when we have a generated response (with a small delay for smooth animation)
+      setTimeout(() => {
+        setShowPreview(true);
+      }, 200);
 
       try {
         setOnTextSubmitInProgess(true);
@@ -503,7 +509,13 @@ export const TTDDialogBase = withInternalFallback(
           </TTDDialogTab>
           {!("__fallback" in rest) && (
             <TTDDialogTab className="ttd-dialog-content" tab="text-to-diagram">
-              <TTDDialogPanels>
+              <div
+                className={`ttd-dialog-layout ${
+                  showPreview
+                    ? "ttd-dialog-layout--split"
+                    : "ttd-dialog-layout--chat-only"
+                }`}
+              >
                 <TTDDialogPanel
                   label={
                     <div style={{ display: "flex", gap: 5 }}>
@@ -524,6 +536,7 @@ export const TTDDialogBase = withInternalFallback(
                       </Tooltip>
                     </div>
                   }
+                  className="ttd-dialog-chat-panel"
                 >
                   <ChatInterface
                     messages={chatHistory.messages}
@@ -565,24 +578,27 @@ export const TTDDialogBase = withInternalFallback(
                     }
                   />
                 </TTDDialogPanel>
-                <TTDDialogPanel
-                  label="Preview"
-                  panelAction={{
-                    action: () => {
-                      console.info("Panel action clicked");
-                      insertToEditor({ app, data });
-                    },
-                    label: "Insert",
-                    icon: ArrowRightIcon,
-                  }}
-                >
-                  <TTDDialogOutput
-                    canvasRef={someRandomDivRef}
-                    error={error}
-                    loaded={mermaidToExcalidrawLib.loaded}
-                  />
-                </TTDDialogPanel>
-              </TTDDialogPanels>
+                {showPreview && (
+                  <TTDDialogPanel
+                    label="Preview"
+                    panelAction={{
+                      action: () => {
+                        console.info("Panel action clicked");
+                        insertToEditor({ app, data });
+                      },
+                      label: "Insert",
+                      icon: ArrowRightIcon,
+                    }}
+                    className="ttd-dialog-preview-panel"
+                  >
+                    <TTDDialogOutput
+                      canvasRef={someRandomDivRef}
+                      error={error}
+                      loaded={mermaidToExcalidrawLib.loaded}
+                    />
+                  </TTDDialogPanel>
+                )}
+              </div>
             </TTDDialogTab>
           )}
         </TTDDialogTabs>
