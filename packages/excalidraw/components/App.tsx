@@ -571,6 +571,9 @@ const gesture: Gesture = {
 };
 
 class App extends React.Component<AppProps, AppState> {
+  // 新增属性，用于记录右键按下位置
+  private _rightClickDownPos: { x: number; y: number } | null = null;
+
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
   rc: RoughCanvas;
@@ -1564,7 +1567,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const showShapeSwitchPanel =
       editorJotaiStore.get(convertElementTypePopupAtom)?.type === "panel";
-
+    //JIGENG返回的组件
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -6484,6 +6487,10 @@ class App extends React.Component<AppProps, AppState> {
     if (target.setPointerCapture) {
       target.setPointerCapture(event.pointerId);
     }
+    //右键按下,记录按下位置
+    if (event.button === POINTER_BUTTON.SECONDARY) {
+      this._rightClickDownPos = { x: event.clientX, y: event.clientY };
+    }
 
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
@@ -7009,6 +7016,7 @@ class App extends React.Component<AppProps, AppState> {
     lastPointerUp?.();
     this.missingPointerEventCleanupEmitter.trigger(event).clear();
   };
+  //ji1拖拽移动逻辑
 
   // Returns whether the event is a panning
   public handleCanvasPanUsingWheelOrSpaceDrag = (
@@ -7018,6 +7026,7 @@ class App extends React.Component<AppProps, AppState> {
       !(
         gesture.pointers.size <= 1 &&
         (event.button === POINTER_BUTTON.WHEEL ||
+          event.button === POINTER_BUTTON.SECONDARY ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           isHandToolActive(this.state) ||
           this.state.viewModeEnabled)
@@ -10741,6 +10750,16 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     event.preventDefault();
 
+    // --- 新增逻辑: 右键移动超过20px直接返回 ---
+    if (this._rightClickDownPos) {
+      const dx = Math.abs(event.clientX - this._rightClickDownPos.x);
+      const dy = Math.abs(event.clientY - this._rightClickDownPos.y);
+      if (dx > 20 || dy > 20) {
+        this._rightClickDownPos = null; // 清理坐标
+        return; // 阻止菜单显示
+      }
+      this._rightClickDownPos = null; // 清理坐标
+    }
     if (
       (("pointerType" in event.nativeEvent &&
         event.nativeEvent.pointerType === "touch") ||
