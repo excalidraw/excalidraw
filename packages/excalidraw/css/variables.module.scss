@@ -1,4 +1,4 @@
-@import "open-color/open-color.scss";
+@import "open-color/open-color.scss"; 
 
 @mixin isMobile() {
   @at-root .excalidraw--mobile#{&} {
@@ -203,4 +203,16 @@
     width: var(--mobile-action-button-size, 2rem);
     height: var(--mobile-action-button-size, 2rem);
   }
+}  /* ----------------------------------------------------
+   TOOLBAR VARIABLES
+   ---------------------------------------------------- */
+:root {
+  --toolbar-height: 56px;
+  --toolbar-padding: 0.5rem 1rem;
+  --toolbar-gap: 0.5rem;
+  --toolbar-button-size: 40px;
+  --toolbar-icon-size: 20px;
+  --toolbar-bg: var(--oc-gray-0);
+  --toolbar-border: var(--oc-gray-3);
+  --toolbar-button-padding: 0.5rem;
 }
