@@ -126,6 +126,7 @@ const DefaultMainMenu: React.FC<{
       <MainMenu.Separator />
       <MainMenu.DefaultItems.ToggleTheme />
       <MainMenu.DefaultItems.ChangeCanvasBackground />
+      <MainMenu.DefaultItems.ChangeGridType />
     </MainMenu>
   );
 };
