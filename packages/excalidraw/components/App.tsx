@@ -572,6 +572,9 @@ const gesture: Gesture = {
 };
 
 class App extends React.Component<AppProps, AppState> {
+  // 新增属性，用于记录右键按下位置
+  private _rightClickDownPos: { x: number; y: number } | null = null;
+
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
   rc: RoughCanvas;
@@ -1560,7 +1563,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const showShapeSwitchPanel =
       editorJotaiStore.get(convertElementTypePopupAtom)?.type === "panel";
-
+    //JIGENG返回的组件
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -4153,7 +4156,7 @@ class App extends React.Component<AppProps, AppState> {
         };
   };
 
-  // Input handling
+  // ji1输入按键逻辑Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
       // normalize `event.key` when CapsLock is pressed #2372
@@ -4248,10 +4251,16 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         const arrowKeyPressed = isArrowKey(event.key);
-
-        if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed && !event.shiftKey) {
+        //ji2ctrl按键逻辑
+        if (
+          event[KEYS.CTRL_OR_CMD] &&
+          (arrowKeyPressed || event.key === KEYS.ENTER) &&
+          !event.shiftKey
+        ) {
           event.preventDefault();
-
+          //ji5【自】enter和右键相同逻辑
+          const directionKey =
+            event.key === KEYS.ENTER ? KEYS.ARROW_RIGHT : event.key;
           const selectedElements = getSelectedElements(
             this.scene.getNonDeletedElementsMap(),
             this.state,
@@ -4264,7 +4273,7 @@ class App extends React.Component<AppProps, AppState> {
             this.flowChartCreator.createNodes(
               selectedElements[0],
               this.state,
-              getLinkDirectionFromKey(event.key),
+              getLinkDirectionFromKey(directionKey),
               this.scene,
             );
           }
@@ -4296,7 +4305,7 @@ class App extends React.Component<AppProps, AppState> {
 
           return;
         }
-
+        //ji2alt+方向键导航
         if (event.altKey) {
           const selectedElements = getSelectedElements(
             this.scene.getNonDeletedElementsMap(),
@@ -4555,24 +4564,19 @@ class App extends React.Component<AppProps, AppState> {
             isTextElement(selectedElement) ||
             isValidTextContainer(selectedElement)
           ) {
-            let container;
-            if (!isTextElement(selectedElement)) {
-              container = selectedElement as ExcalidrawTextContainer;
+            //回车进入编辑模式,已移植到SPACE逻辑
+            //TODO添加一个节点,并且进入编辑模式
+            if (
+              selectedElements.length === 1 &&
+              isFlowchartNodeElement(selectedElements[0])
+            ) {
+              this.flowChartCreator.createNodes(
+                selectedElements[0],
+                this.state,
+                "right",
+                this.scene,
+              );
             }
-            const midPoint = getContainerCenter(
-              selectedElement,
-              this.state,
-              this.scene.getNonDeletedElementsMap(),
-            );
-            const sceneX = midPoint.x;
-            const sceneY = midPoint.y;
-            this.startTextEditing({
-              sceneX,
-              sceneY,
-              container,
-            });
-            event.preventDefault();
-            return;
           } else if (isFrameLikeElement(selectedElement)) {
             this.setState({
               editingFrame: selectedElement.id,
@@ -4616,6 +4620,33 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+        if (selectedElements.length === 1) {
+          const selectedElement = selectedElements[0];
+          if (
+            isTextElement(selectedElement) ||
+            isValidTextContainer(selectedElement)
+          ) {
+            let container;
+            if (!isTextElement(selectedElement)) {
+              container = selectedElement as ExcalidrawTextContainer;
+            }
+            const midPoint = getContainerCenter(
+              selectedElement,
+              this.state,
+              this.scene.getNonDeletedElementsMap(),
+            );
+            const sceneX = midPoint.x;
+            const sceneY = midPoint.y;
+            this.startTextEditing({
+              sceneX,
+              sceneY,
+              container,
+            });
+            event.preventDefault();
+            return;
+          }
+        }
         isHoldingSpace = true;
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
         event.preventDefault();
@@ -5100,7 +5131,7 @@ class App extends React.Component<AppProps, AppState> {
       // caret (i.e. deselect). There's not much use for always selecting
       // the text on edit anyway (and users can select-all from contextmenu
       // if needed)
-      autoSelect: !this.device.isTouchScreen,
+      autoSelect: false,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
@@ -6489,6 +6520,10 @@ class App extends React.Component<AppProps, AppState> {
     if (target.setPointerCapture) {
       target.setPointerCapture(event.pointerId);
     }
+    //右键按下,记录按下位置
+    if (event.button === POINTER_BUTTON.SECONDARY) {
+      this._rightClickDownPos = { x: event.clientX, y: event.clientY };
+    }
 
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
@@ -7018,6 +7053,7 @@ class App extends React.Component<AppProps, AppState> {
     lastPointerUp?.();
     this.missingPointerEventCleanupEmitter.trigger(event).clear();
   };
+  //ji1拖拽移动逻辑
 
   // Returns whether the event is a panning
   public handleCanvasPanUsingWheelOrSpaceDrag = (
@@ -7027,6 +7063,7 @@ class App extends React.Component<AppProps, AppState> {
       !(
         gesture.pointers.size <= 1 &&
         (event.button === POINTER_BUTTON.WHEEL ||
+          event.button === POINTER_BUTTON.SECONDARY ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           isHandToolActive(this.state) ||
           this.state.viewModeEnabled)
@@ -10744,6 +10781,16 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     event.preventDefault();
 
+    // --- 新增逻辑: 右键移动超过20px直接返回 ---
+    if (this._rightClickDownPos) {
+      const dx = Math.abs(event.clientX - this._rightClickDownPos.x);
+      const dy = Math.abs(event.clientY - this._rightClickDownPos.y);
+      if (dx > 20 || dy > 20) {
+        this._rightClickDownPos = null; // 清理坐标
+        return; // 阻止菜单显示
+      }
+      this._rightClickDownPos = null; // 清理坐标
+    }
     if (
       (("pointerType" in event.nativeEvent &&
         event.nativeEvent.pointerType === "touch") ||
