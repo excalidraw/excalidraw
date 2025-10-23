@@ -1,56 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
-import { EVENT, KEYS } from "@excalidraw/common";
-import {
-  ArrowRightIcon,
-  UndoIcon,
-  RedoIcon,
-  microphoneIcon,
-  microphoneMutedIcon,
-} from "../icons";
+import { KEYS } from "@excalidraw/common";
+import { ArrowRightIcon, UndoIcon, RedoIcon } from "../icons";
 import { InlineIcon } from "../InlineIcon";
 import { ToolButton } from "../ToolButton";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInterfaceProps } from "./types";
-
-// Speech Recognition API types
-interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResultList;
-  resultIndex: number;
-}
-
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string;
-  message: string;
-}
-
-interface SpeechRecognition extends EventTarget {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start(): void;
-  stop(): void;
-  abort(): void;
-  onstart: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onend: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onresult:
-    | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => any)
-    | null;
-  onerror:
-    | ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => any)
-    | null;
-}
-
-interface SpeechRecognitionConstructor {
-  new (): SpeechRecognition;
-}
-
-// Extend Window interface for Speech Recognition API
-declare global {
-  interface Window {
-    SpeechRecognition: SpeechRecognitionConstructor;
-    webkitSpeechRecognition: SpeechRecognitionConstructor;
-  }
-}
+import { SpeechRecognitionButton } from "../SpeechRecognition";
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   messages,
@@ -67,69 +22,26 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   canRedo = false,
 }) => {
   const [inputValue, setInputValue] = useState(currentPrompt);
-  const [isListening, setIsListening] = useState(false);
-  const [speechSupported, setSpeechSupported] = useState(false);
-  const [speechError, setSpeechError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Update input when currentPrompt changes externally
   useEffect(() => {
     setInputValue(currentPrompt);
   }, [currentPrompt]);
 
-  // Initialize speech recognition
-  useEffect(() => {
-    const SpeechRecognition =
-      window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+  const handleSpeechTranscript = (transcript: string) => {
+    const newValue = inputValue + (inputValue ? " " : "") + transcript;
+    setInputValue(newValue);
+    onPromptChange(newValue);
+  };
 
-    if (SpeechRecognition) {
-      setSpeechSupported(true);
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = "en-US";
-
-      recognition.onstart = () => {
-        setIsListening(true);
-        setSpeechError(null);
-      };
-
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
-        const transcript = event.results[0][0].transcript;
-        const newValue = inputValue + (inputValue ? " " : "") + transcript;
-        setInputValue(newValue);
-        onPromptChange(newValue);
-      };
-
-      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-        console.error("Speech recognition error:", event.error);
-        setSpeechError(`Speech recognition error: ${event.error}`);
-        setIsListening(false);
-      };
-
-      recognition.onend = () => {
-        setIsListening(false);
-      };
-
-      recognitionRef.current = recognition;
-    } else {
-      setSpeechSupported(false);
-      setSpeechError("Speech recognition not supported in this browser");
-    }
-
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-    };
-  }, [inputValue, onPromptChange]);
+  const handleSpeechError = (error: string) => {
+    console.error("Speech recognition error:", error);
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value;
@@ -142,23 +54,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     if (trimmedPrompt && !isGenerating) {
       onSendMessage(trimmedPrompt);
       setInputValue("");
-    }
-  };
-
-  const handleVoiceDictation = () => {
-    if (!speechSupported || !recognitionRef.current) {
-      return;
-    }
-
-    if (isListening) {
-      recognitionRef.current.stop();
-    } else {
-      try {
-        recognitionRef.current.start();
-      } catch (error) {
-        console.error("Failed to start speech recognition:", error);
-        setSpeechError("Failed to start voice recognition. Please try again.");
-      }
     }
   };
 
@@ -227,25 +122,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               target.style.height = Math.min(target.scrollHeight, 120) + "px";
             }}
           />
-          {speechSupported && (
-            <button
-              className={`chat-interface__voice-button ${
-                isListening ? "chat-interface__voice-button--listening" : ""
-              }`}
-              onClick={handleVoiceDictation}
-              disabled={isGenerating}
-              type="button"
-              title={isListening ? "Stop voice input" : "Start voice input"}
-              aria-label={
-                isListening ? "Stop voice input" : "Start voice input"
-              }
-            >
-              <InlineIcon
-                size="1.5em"
-                icon={isListening ? microphoneIcon : microphoneMutedIcon}
-              />
-            </button>
-          )}
+          <SpeechRecognitionButton
+            onTranscript={handleSpeechTranscript}
+            onError={handleSpeechError}
+            disabled={isGenerating}
+            className="chat-interface__speech-recognition"
+            buttonClassName="chat-interface__voice-button"
+          />
           <button
             className="chat-interface__send-button"
             onClick={handleSubmit}
@@ -255,10 +138,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <InlineIcon size="1.5em" icon={ArrowRightIcon} />
           </button>
         </div>
-
-        {speechError && (
-          <div className="chat-interface__speech-error">{speechError}</div>
-        )}
 
         {(canUndo || canRedo || rateLimits) && (
           <div className="chat-interface__footer">
