@@ -20,7 +20,8 @@ import {
   ENV,
   FONT_FAMILY,
   getFontFamilyFallbacks,
-  isDarwin,
+  isAndroid,
+  isIOS,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 
@@ -91,7 +92,8 @@ export const isWritableElement = (
   (target instanceof HTMLInputElement &&
     (target.type === "text" ||
       target.type === "number" ||
-      target.type === "password"));
+      target.type === "password" ||
+      target.type === "search"));
 
 export const getFontFamilyString = ({
   fontFamily,
@@ -117,6 +119,11 @@ export const getFontString = ({
   fontFamily: FontFamilyValues;
 }) => {
   return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
+};
+
+/** executes callback in the frame that's after the current one */
+export const nextAnimationFrame = async (cb: () => any) => {
+  requestAnimationFrame(() => requestAnimationFrame(cb));
 };
 
 export const debounce = <T extends any[]>(
@@ -417,19 +424,6 @@ export const allowFullScreen = () =>
   document.documentElement.requestFullscreen();
 
 export const exitFullScreen = () => document.exitFullscreen();
-
-export const getShortcutKey = (shortcut: string): string => {
-  shortcut = shortcut
-    .replace(/\bAlt\b/i, "Alt")
-    .replace(/\bShift\b/i, "Shift")
-    .replace(/\b(Enter|Return)\b/i, "Enter");
-  if (isDarwin) {
-    return shortcut
-      .replace(/\bCtrlOrCmd\b/gi, "Cmd")
-      .replace(/\bAlt\b/i, "Option");
-  }
-  return shortcut.replace(/\bCtrlOrCmd\b/gi, "Ctrl");
-};
 
 export const viewportCoordsToSceneCoords = (
   { clientX, clientY }: { clientX: number; clientY: number },
@@ -1277,4 +1271,60 @@ export const reduceToCommonValue = <T, R = T>(
   }
 
   return commonValue;
+};
+
+export const isMobileOrTablet = (): boolean => {
+  const ua = navigator.userAgent || "";
+  const platform = navigator.platform || "";
+  const uaData = (navigator as any).userAgentData as
+    | { mobile?: boolean; platform?: string }
+    | undefined;
+
+  // --- 1) chromium: prefer ua client hints -------------------------------
+  if (uaData) {
+    const plat = (uaData.platform || "").toLowerCase();
+    const isDesktopOS =
+      plat === "windows" ||
+      plat === "macos" ||
+      plat === "linux" ||
+      plat === "chrome os";
+    if (uaData.mobile === true) {
+      return true;
+    }
+    if (uaData.mobile === false && plat === "android") {
+      const looksTouchTablet =
+        matchMedia?.("(hover: none)").matches &&
+        matchMedia?.("(pointer: coarse)").matches;
+      return looksTouchTablet;
+    }
+    if (isDesktopOS) {
+      return false;
+    }
+  }
+
+  // --- 2) ios (includes ipad) --------------------------------------------
+  if (isIOS) {
+    return true;
+  }
+
+  // --- 3) android legacy ua fallback -------------------------------------
+  if (isAndroid) {
+    const isAndroidPhone = /Mobile/i.test(ua);
+    const isAndroidTablet = !isAndroidPhone;
+    if (isAndroidPhone || isAndroidTablet) {
+      const looksTouchTablet =
+        matchMedia?.("(hover: none)").matches &&
+        matchMedia?.("(pointer: coarse)").matches;
+      return looksTouchTablet;
+    }
+  }
+
+  // --- 4) last resort desktop exclusion ----------------------------------
+  const looksDesktopPlatform =
+    /Win|Linux|CrOS|Mac/.test(platform) ||
+    /Windows NT|X11|CrOS|Macintosh/.test(ua);
+  if (looksDesktopPlatform) {
+    return false;
+  }
+  return false;
 };

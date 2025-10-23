@@ -43,6 +43,7 @@ import {
   isFreeDrawElement,
   isLineElement,
   isLinearElement,
+  isLineElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -322,19 +323,42 @@ export const getElementLineSegments = (
 
   if (shape.type === "polycurve") {
     const curves = shape.data;
-    const points = curves
-      .map((curve) => pointsOnBezierCurves(curve, 10))
-      .flat();
-    let i = 0;
+    const pointsOnCurves = curves.map((curve) =>
+      pointsOnBezierCurves(curve, 10),
+    );
+
     const segments: LineSegment<GlobalPoint>[] = [];
-    while (i < points.length - 1) {
-      segments.push(
-        lineSegment(
-          pointFrom(points[i][0], points[i][1]),
-          pointFrom(points[i + 1][0], points[i + 1][1]),
-        ),
-      );
-      i++;
+
+    if (
+      (isLineElement(element) && !element.polygon) ||
+      isArrowElement(element)
+    ) {
+      for (const points of pointsOnCurves) {
+        let i = 0;
+
+        while (i < points.length - 1) {
+          segments.push(
+            lineSegment(
+              pointFrom(points[i][0], points[i][1]),
+              pointFrom(points[i + 1][0], points[i + 1][1]),
+            ),
+          );
+          i++;
+        }
+      }
+    } else {
+      const points = pointsOnCurves.flat();
+      let i = 0;
+
+      while (i < points.length - 1) {
+        segments.push(
+          lineSegment(
+            pointFrom(points[i][0], points[i][1]),
+            pointFrom(points[i + 1][0], points[i + 1][1]),
+          ),
+        );
+        i++;
+      }
     }
 
     return segments;
@@ -1127,7 +1151,9 @@ export interface BoundingBox {
 }
 
 export const getCommonBoundingBox = (
-  elements: ExcalidrawElement[] | readonly NonDeleted<ExcalidrawElement>[],
+  elements:
+    | readonly ExcalidrawElement[]
+    | readonly NonDeleted<ExcalidrawElement>[],
 ): BoundingBox => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   return {

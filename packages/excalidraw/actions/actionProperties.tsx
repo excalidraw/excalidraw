@@ -17,7 +17,6 @@ import {
   randomInteger,
   arrayToMap,
   getFontFamilyString,
-  getShortcutKey,
   getLineHeight,
   isTransparent,
   reduceToCommonValue,
@@ -136,6 +135,13 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
+
+import {
+  withCaretPositionPreservation,
+  restoreCaretPosition,
+} from "../hooks/useTextEditorFocus";
+
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
@@ -321,9 +327,11 @@ export const actionChangeStrokeColor = register({
         : CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <>
-      <h3 aria-hidden="true">{t("labels.stroke")}</h3>
+      {appState.stylesPanelMode === "full" && (
+        <h3 aria-hidden="true">{t("labels.stroke")}</h3>
+      )}
       <ColorPicker
         topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
         palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
@@ -341,6 +349,10 @@ export const actionChangeStrokeColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
+        compactMode={
+          appState.stylesPanelMode === "compact" ||
+          appState.stylesPanelMode === "mobile"
+        }
       />
     </>
   ),
@@ -398,9 +410,11 @@ export const actionChangeBackgroundColor = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <>
-      <h3 aria-hidden="true">{t("labels.background")}</h3>
+      {appState.stylesPanelMode === "full" && (
+        <h3 aria-hidden="true">{t("labels.background")}</h3>
+      )}
       <ColorPicker
         topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
         palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
@@ -418,6 +432,10 @@ export const actionChangeBackgroundColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
+        compactMode={
+          appState.stylesPanelMode === "compact" ||
+          appState.stylesPanelMode === "mobile"
+        }
       />
     </>
   ),
@@ -518,7 +536,7 @@ export const actionChangeStrokeWidth = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
       <legend>{t("labels.strokeWidth")}</legend>
       <div className="buttonList">
@@ -575,7 +593,7 @@ export const actionChangeSloppiness = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
       <legend>{t("labels.sloppiness")}</legend>
       <div className="buttonList">
@@ -628,7 +646,7 @@ export const actionChangeStrokeStyle = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
       <legend>{t("labels.strokeStyle")}</legend>
       <div className="buttonList">
@@ -697,7 +715,7 @@ export const actionChangeFontSize = register({
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, () => value, value);
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <fieldset>
       <legend>{t("labels.fontSize")}</legend>
       <div className="buttonList">
@@ -756,7 +774,15 @@ export const actionChangeFontSize = register({
                 ? null
                 : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
           )}
-          onChange={(value) => updateData(value)}
+          onChange={(value) => {
+            withCaretPositionPreservation(
+              () => updateData(value),
+              appState.stylesPanelMode === "compact" ||
+                appState.stylesPanelMode === "mobile",
+              !!appState.editingTextElement,
+              data?.onPreventClose,
+            );
+          }}
         />
       </div>
     </fieldset>
@@ -1093,21 +1119,30 @@ export const actionChangeFontFamily = register({
     }, []);
 
     return (
-      <fieldset>
-        <legend>{t("labels.fontFamily")}</legend>
+      <>
+        {appState.stylesPanelMode === "full" && (
+          <legend>{t("labels.fontFamily")}</legend>
+        )}
         <FontPicker
           isOpened={appState.openPopup === "fontFamily"}
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
+          compactMode={appState.stylesPanelMode !== "full"}
           onSelect={(fontFamily) => {
-            setBatchedData({
-              openPopup: null,
-              currentHoveredFontFamily: null,
-              currentItemFontFamily: fontFamily,
-            });
-
-            // defensive clear so immediate close won't abuse the cached elements
-            cachedElementsRef.current.clear();
+            withCaretPositionPreservation(
+              () => {
+                setBatchedData({
+                  openPopup: null,
+                  currentHoveredFontFamily: null,
+                  currentItemFontFamily: fontFamily,
+                });
+                // defensive clear so immediate close won't abuse the cached elements
+                cachedElementsRef.current.clear();
+              },
+              appState.stylesPanelMode === "compact" ||
+                appState.stylesPanelMode === "mobile",
+              !!appState.editingTextElement,
+            );
           }}
           onHover={(fontFamily) => {
             setBatchedData({
@@ -1164,29 +1199,33 @@ export const actionChangeFontFamily = register({
               }
 
               setBatchedData({
+                ...batchedData,
                 openPopup: "fontFamily",
               });
             } else {
-              // close, use the cache and clear it afterwards
-              const data = {
-                openPopup: null,
+              const fontFamilyData = {
                 currentHoveredFontFamily: null,
                 cachedElements: new Map(cachedElementsRef.current),
                 resetAll: true,
               } as ChangeFontFamilyData;
 
-              if (isUnmounted.current) {
-                // in case the component was unmounted by the parent, trigger the update directly
-                updateData({ ...batchedData, ...data });
-              } else {
-                setBatchedData(data);
-              }
-
+              setBatchedData({
+                ...fontFamilyData,
+              });
               cachedElementsRef.current.clear();
+
+              // Refocus text editor when font picker closes if we were editing text
+              if (
+                (appState.stylesPanelMode === "compact" ||
+                  appState.stylesPanelMode === "mobile") &&
+                appState.editingTextElement
+              ) {
+                restoreCaretPosition(null); // Just refocus without saved position
+              }
             }
           }}
         />
-      </fieldset>
+      </>
     );
   },
 });
@@ -1225,8 +1264,9 @@ export const actionChangeTextAlign = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => {
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
     const elementsMap = app.scene.getNonDeletedElementsMap();
+
     return (
       <fieldset>
         <legend>{t("labels.textAlign")}</legend>
@@ -1275,7 +1315,15 @@ export const actionChangeTextAlign = register({
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemTextAlign,
             )}
-            onChange={(value) => updateData(value)}
+            onChange={(value) => {
+              withCaretPositionPreservation(
+                () => updateData(value),
+                appState.stylesPanelMode === "compact" ||
+                  appState.stylesPanelMode === "mobile",
+                !!appState.editingTextElement,
+                data?.onPreventClose,
+              );
+            }}
           />
         </div>
       </fieldset>
@@ -1317,7 +1365,7 @@ export const actionChangeVerticalAlign = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => {
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
     return (
       <fieldset>
         <div className="buttonList">
@@ -1367,7 +1415,15 @@ export const actionChangeVerticalAlign = register({
                 ) !== null,
               (hasSelection) => (hasSelection ? null : VERTICAL_ALIGN.MIDDLE),
             )}
-            onChange={(value) => updateData(value)}
+            onChange={(value) => {
+              withCaretPositionPreservation(
+                () => updateData(value),
+                appState.stylesPanelMode === "compact" ||
+                  appState.stylesPanelMode === "mobile",
+                !!appState.editingTextElement,
+                data?.onPreventClose,
+              );
+            }}
           />
         </div>
       </fieldset>
@@ -1612,6 +1668,25 @@ export const actionChangeArrowhead = register({
           />
         </div>
       </fieldset>
+    );
+  },
+});
+
+export const actionChangeArrowProperties = register({
+  name: "changeArrowProperties",
+  label: "Change arrow properties",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    // This action doesn't perform any changes directly
+    // It's just a container for the arrow type and arrowhead actions
+    return false;
+  },
+  PanelComponent: ({ elements, appState, updateData, app, renderAction }) => {
+    return (
+      <div className="selected-shape-actions">
+        {renderAction("changeArrowhead")}
+        {renderAction("changeArrowType")}
+      </div>
     );
   },
 });
