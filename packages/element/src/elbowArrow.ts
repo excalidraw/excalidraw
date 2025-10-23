@@ -17,7 +17,6 @@ import {
   BinaryHeap,
   invariant,
   isAnyTrue,
-  tupleToCoors,
   getSizeFromPoints,
   isDevEnv,
   arrayToMap,
@@ -30,7 +29,7 @@ import {
   FIXED_BINDING_DISTANCE,
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
-  getHoveredElementForBinding,
+  getFixedBindingDistance,
 } from "./binding";
 import { distanceToElement } from "./distance";
 import {
@@ -51,8 +50,8 @@ import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
 } from "./types";
-
 import { aabbForElement, pointInsideBounds } from "./bounds";
+import { getHoveredElementForBinding } from "./collision";
 
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
@@ -63,6 +62,7 @@ import type {
   FixedPointBinding,
   FixedSegment,
   NonDeletedExcalidrawElement,
+  Ordered,
 } from "./types";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
@@ -1217,19 +1217,9 @@ const getElbowArrowData = (
   if (options?.isDragging) {
     const elements = Array.from(elementsMap.values());
     hoveredStartElement =
-      getHoveredElement(
-        origStartGlobalPoint,
-        elementsMap,
-        elements,
-        options?.zoom,
-      ) || null;
+      getHoveredElement(origStartGlobalPoint, elementsMap, elements) || null;
     hoveredEndElement =
-      getHoveredElement(
-        origEndGlobalPoint,
-        elementsMap,
-        elements,
-        options?.zoom,
-      ) || null;
+      getHoveredElement(origEndGlobalPoint, elementsMap, elements) || null;
   } else {
     hoveredStartElement = arrow.startBinding
       ? getBindableElementForId(arrow.startBinding.elementId, elementsMap) ||
@@ -1301,8 +1291,8 @@ const getElbowArrowData = (
         offsetFromHeading(
           startHeading,
           arrow.startArrowhead
-            ? FIXED_BINDING_DISTANCE * 6
-            : FIXED_BINDING_DISTANCE * 2,
+            ? getFixedBindingDistance(hoveredStartElement) * 6
+            : getFixedBindingDistance(hoveredStartElement) * 2,
           1,
         ),
       )
@@ -1314,8 +1304,8 @@ const getElbowArrowData = (
         offsetFromHeading(
           endHeading,
           arrow.endArrowhead
-            ? FIXED_BINDING_DISTANCE * 6
-            : FIXED_BINDING_DISTANCE * 2,
+            ? getFixedBindingDistance(hoveredEndElement) * 6
+            : getFixedBindingDistance(hoveredEndElement) * 2,
           1,
         ),
       )
@@ -2262,16 +2252,13 @@ const getBindPointHeading = (
 const getHoveredElement = (
   origPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
-  zoom?: AppState["zoom"],
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
 ) => {
   return getHoveredElementForBinding(
-    tupleToCoors(origPoint),
+    origPoint,
     elements,
     elementsMap,
-    zoom,
-    true,
-    true,
+    (element) => getFixedBindingDistance(element) + 1,
   );
 };
 

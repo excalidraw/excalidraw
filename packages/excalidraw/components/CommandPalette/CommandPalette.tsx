@@ -1034,7 +1034,7 @@ const CommandItem = ({
             size="var(--icon-size, 1rem)"
             icon={
               typeof command.icon === "function"
-                ? command.icon(appState)
+                ? command.icon(appState, [])
                 : command.icon
             }
           />
