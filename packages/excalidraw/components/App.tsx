@@ -5180,6 +5180,40 @@ class App extends React.Component<AppProps, AppState> {
             isTextElement(selectedElement) ||
             isValidTextContainer(selectedElement)
           ) {
+            // let container;
+            // if (!isTextElement(selectedElement)) {
+            //   container = selectedElement as ExcalidrawTextContainer;
+            // }
+            // const midPoint = getContainerCenter(
+            //   selectedElement,
+            //   this.state,
+            //   this.scene.getNonDeletedElementsMap(),
+            // );
+            // const sceneX = midPoint.x;
+            // const sceneY = midPoint.y;
+            // this.startTextEditing({
+            //   sceneX,
+            //   sceneY,
+            //   container,
+            // });
+            // event.preventDefault();
+            // return;
+          } else if (isFrameLikeElement(selectedElement)) {
+            this.setState({
+              editingFrame: selectedElement.id,
+            });
+          }
+        }
+      }
+
+      if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+        if (selectedElements.length === 1) {
+          const selectedElement = selectedElements[0];
+          if (
+            isTextElement(selectedElement) ||
+            isValidTextContainer(selectedElement)
+          ) {
             let container;
             if (!isTextElement(selectedElement)) {
               container = selectedElement as ExcalidrawTextContainer;
@@ -5198,15 +5232,8 @@ class App extends React.Component<AppProps, AppState> {
             });
             event.preventDefault();
             return;
-          } else if (isFrameLikeElement(selectedElement)) {
-            this.setState({
-              editingFrame: selectedElement.id,
-            });
           }
         }
-      }
-
-      if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
         event.preventDefault();
