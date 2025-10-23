@@ -492,4 +492,30 @@
       color: $oc-black;
     }
   }
+
+  // Hex color validation error styles
+  .color-picker__input-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .color-picker__error-message {
+    font-size: 0.75rem;
+    color: #dc3545;
+    margin: 0.25rem 0.5rem 0;
+    padding: 0.25rem;
+    background-color: rgba(220, 53, 69, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+  }
+
+  .color-picker-input--error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 1px #dc3545 !important;
+  }
+
+  .color-picker__input-label--error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 1px #dc3545;
+  }
 }
