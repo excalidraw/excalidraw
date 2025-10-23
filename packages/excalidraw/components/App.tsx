@@ -4222,9 +4222,15 @@ class App extends React.Component<AppProps, AppState> {
 
         const arrowKeyPressed = isArrowKey(event.key);
 
-        if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed && !event.shiftKey) {
+        if (
+          event[KEYS.CTRL_OR_CMD] &&
+          (arrowKeyPressed || event.key === KEYS.ENTER) &&
+          !event.shiftKey
+        ) {
           event.preventDefault();
-
+          //添加了自己的逻辑,enter和右键相同逻辑
+          const directionKey =
+            event.key === KEYS.ENTER ? KEYS.ARROW_RIGHT : event.key;
           const selectedElements = getSelectedElements(
             this.scene.getNonDeletedElementsMap(),
             this.state,
@@ -4237,7 +4243,7 @@ class App extends React.Component<AppProps, AppState> {
             this.flowChartCreator.createNodes(
               selectedElements[0],
               this.state,
-              getLinkDirectionFromKey(event.key),
+              getLinkDirectionFromKey(directionKey),
               this.scene,
             );
           }
@@ -4528,24 +4534,19 @@ class App extends React.Component<AppProps, AppState> {
             isTextElement(selectedElement) ||
             isValidTextContainer(selectedElement)
           ) {
-            // let container;
-            // if (!isTextElement(selectedElement)) {
-            //   container = selectedElement as ExcalidrawTextContainer;
-            // }
-            // const midPoint = getContainerCenter(
-            //   selectedElement,
-            //   this.state,
-            //   this.scene.getNonDeletedElementsMap(),
-            // );
-            // const sceneX = midPoint.x;
-            // const sceneY = midPoint.y;
-            // this.startTextEditing({
-            //   sceneX,
-            //   sceneY,
-            //   container,
-            // });
-            // event.preventDefault();
-            // return;
+            //回车进入编辑模式,已移植到SPACE逻辑
+            //TODO添加一个节点,并且进入编辑模式
+            if (
+              selectedElements.length === 1 &&
+              isFlowchartNodeElement(selectedElements[0])
+            ) {
+              this.flowChartCreator.createNodes(
+                selectedElements[0],
+                this.state,
+                "right",
+                this.scene,
+              );
+            }
           } else if (isFrameLikeElement(selectedElement)) {
             this.setState({
               editingFrame: selectedElement.id,
