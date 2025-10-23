@@ -120,7 +120,7 @@ export const TrayMenu = ({
                   }
                 >
                   {!appState.viewModeEnabled && //zsviczian
-                    renderTopRightUI?.(true, appState)}
+                    renderTopRightUI?.(device.editor.isMobile, appState)}
                   {!appState.viewModeEnabled &&
                     appState.openDialog?.name !== "elementLinkSelector" && (
                       <DefaultSidebarTriggerTunnel.Out />
@@ -259,7 +259,11 @@ export const TrayMenu = ({
           !appState.viewModeEnabled &&
           appState.openDialog?.name !== "elementLinkSelector" &&
           showSelectedShapeActions(appState, elements) ? (
-            <Section className="App-tray-menu" heading="selectedShapeActions">
+            <Section
+              className="App-tray-menu"
+              heading="selectedShapeActions"
+              style={{ maxHeight: app.state.height * 0.8 }}
+            >
               <SelectedShapeActions
                 appState={appState}
                 elementsMap={app.scene.getNonDeletedElementsMap()}

@@ -69,8 +69,12 @@ export const MobileMenu = ({
     DefaultSidebarTriggerTunnel,
   } = useTunnels();
   const renderAppTopBar = () => {
-    const topRightUI = renderTopRightUI?.(true, appState) ?? (
-      <DefaultSidebarTriggerTunnel.Out />
+    const topRightUI = (
+      //zsvician (render both top right UI and default sidebar trigger)
+      <>
+        {renderTopRightUI?.(true, appState)}
+        <DefaultSidebarTriggerTunnel.Out />
+      </>
     );
 
     const topLeftUI = (

@@ -8,6 +8,7 @@ export const Section: React.FC<{
   heading: "canvasActions" | "selectedShapeActions" | "shapes";
   children?: React.ReactNode | ((heading: React.ReactNode) => React.ReactNode);
   className?: string;
+  style?: React.CSSProperties; //zsviczian
 }> = ({ heading, children, ...props }) => {
   const { id } = useExcalidrawContainer();
   const header = (

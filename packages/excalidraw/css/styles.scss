@@ -274,6 +274,7 @@ body.excalidraw-cursor-resize * {
       transform: none;
       justify-content: flex-start;
       align-items: flex-end;
+      max-width: 19rem;
     } //zsviczian
 
     > .Island {
@@ -303,7 +304,7 @@ body.excalidraw-cursor-resize * {
 
   .excalidraw-ui-top-left {
     display: flex;
-    align-items: center;
+    //align-items: center; //zsviczian
     gap: 0.5rem;
   }
 
@@ -345,7 +346,7 @@ body.excalidraw-cursor-resize * {
 
   .App-tray-menu {
     width: 100%;
-    overflow-x: visible;
+    overflow-x: hidden;
     overflow-y: auto;
     box-sizing: border-box;
     margin-bottom: var(--bar-padding);

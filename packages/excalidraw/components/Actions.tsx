@@ -222,16 +222,6 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeRoundness")}</>
       )}
 
-      {/* //zsviczian: add frame role toggle  */}
-      {showToggleFrameRoleAction && (
-        <fieldset>
-          <legend>{t2("COMP_FRAME")}</legend>
-          <div className="buttonList">
-            {renderAction("toggleFrameRole")}
-          </div>
-        </fieldset>
-      )}
-
       {(toolIsArrow(appState.activeTool.type) ||
         targetElements.some((element) => toolIsArrow(element.type))) && (
         <>{renderAction("changeArrowType")}</>
@@ -355,7 +345,7 @@ const CombinedShapeProperties = ({
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     );
-  
+
   // zsviczian
   const showToggleFrameRoleAction =
     (targetElements.length > 0 &&
@@ -435,6 +425,15 @@ const CombinedShapeProperties = ({
                   canChangeRoundness(element.type),
                 )) &&
                 renderAction("changeRoundness")}
+              {/* //zsviczian: add frame role toggle  */}
+              {showToggleFrameRoleAction && (
+                <fieldset>
+                  <legend>{t2("COMP_FRAME")}</legend>
+                  <div className="buttonList">
+                    {renderAction("toggleFrameRole")}
+                  </div>
+                </fieldset>
+              )}
               {renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>

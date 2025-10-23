@@ -5,7 +5,7 @@
     @include outlineButtonStyles;
     @include filledButtonOnCanvas;
 
-    width: auto;
+    //width: auto; //zsviczian caused the sidbar to shrink when pinning the library
     height: var(--lg-button-size);
 
     display: flex;

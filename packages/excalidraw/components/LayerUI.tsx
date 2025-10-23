@@ -434,10 +434,7 @@ const LayerUI = ({
               />
             )}
             {!appState.viewModeEnabled && //zsviczian
-              renderTopRightUI?.(
-                device.editor.isMobile || isTrayMode, //zsviczian added isTrayMode
-                appState,
-              )}
+              renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&
               appState.openDialog?.name !== "elementLinkSelector" &&
               // hide button when sidebar docked
@@ -649,7 +646,7 @@ const LayerUI = ({
               appState.openSidebar &&
               isSidebarDocked &&
               device.editor.canFitSidebar
-                ? { width: `calc(100% - var(--right-sidebar-width))` }
+                ? {} //width: `calc(100% - var(--right-sidebar-width))` } //zsviczian
                 : {}
             }
           >

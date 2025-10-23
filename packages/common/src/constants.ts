@@ -370,7 +370,7 @@ export const MQ_MAX_TABLET = 1400; // upper bound (excludes laptops/desktops)
 export const MQ_MIN_WIDTH_DESKTOP = 1440;
 
 // sidebar
-export const MQ_RIGHT_SIDEBAR_MIN_WIDTH = 1229;
+export const MQ_RIGHT_SIDEBAR_MIN_WIDTH = 800; //zsviczian was 1229;
 // -----------------------------------------------------------------------------
 
 export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
