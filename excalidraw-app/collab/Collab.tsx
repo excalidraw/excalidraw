@@ -39,7 +39,7 @@ import type {
   FileId,
   InitializedExcalidrawImageElement,
   OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
+} from "@excalidraw/element";
 import type {
   BinaryFileData,
   ExcalidrawImperativeAPI,
@@ -47,7 +47,7 @@ import type {
   Collaborator,
   Gesture,
 } from "@excalidraw/excalidraw/types";
-import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
+import type { Mutable, ValueOf } from "@excalidraw/common";
 
 import { appJotaiStore, atom } from "../app-jotai";
 import {
@@ -424,9 +424,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     forceFetchFiles?: boolean;
   }) => {
     const unfetchedImages = opts.elements
+      .filter(isInitializedImageElement)
       .filter((element) => {
         return (
-          isInitializedImageElement(element) &&
           !this.fileManager.isFileTracked(element.fileId) &&
           !element.isDeleted &&
           (opts.forceFetchFiles
@@ -435,7 +435,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             : element.status === "saved")
         );
       })
-      .map((element) => (element as InitializedExcalidrawImageElement).fileId);
+      .map((element) => element.fileId);
 
     return await this.fileManager.getFiles(unfetchedImages);
   };

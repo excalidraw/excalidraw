@@ -8,7 +8,7 @@ import React from "react";
 
 import { isDevEnv } from "@excalidraw/common";
 
-import type { Theme } from "@excalidraw/element/types";
+import type { Theme } from "@excalidraw/element";
 
 import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
