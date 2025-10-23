@@ -12,7 +12,7 @@
     "copyAsSvg": "Kopieer naar klembord als SVG",
     "copyText": "Kopieer naar klembord als tekst",
     "copySource": "",
-    "convertToCode": "",
+    "convertToCode": "Zet om naar code",
     "bringForward": "Breng naar voren",
     "sendToBack": "Stuur naar achtergrond",
     "bringToFront": "Breng naar voorgrond",
@@ -21,7 +21,9 @@
     "copyStyles": "Kopieer opmaak",
     "pasteStyles": "Plak opmaak",
     "stroke": "Lijn",
+    "changeStroke": "",
     "background": "Achtergrond",
+    "changeBackground": "",
     "fill": "Invulling",
     "strokeWidth": "Lijnbreedte",
     "strokeStyle": "Lijnstijl",
@@ -38,12 +40,20 @@
     "arrowhead_none": "Geen",
     "arrowhead_arrow": "Pijl",
     "arrowhead_bar": "Balk",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Rond",
+    "arrowhead_circle_outline": "Rond (omtrek)",
     "arrowhead_triangle": "Driehoek",
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowhead_crowfoot_many": "",
+    "arrowhead_crowfoot_one": "",
+    "arrowhead_crowfoot_one_or_many": "",
+    "more_options": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
     "addWatermark": "Voeg \"Gemaakt met Excalidraw\" toe",
@@ -51,7 +61,7 @@
     "normal": "Normaal",
     "code": "Code",
     "small": "Klein",
-    "medium": "Medium",
+    "medium": "",
     "large": "Groot",
     "veryLarge": "Zeer groot",
     "solid": "Ingekleurd",
@@ -72,6 +82,7 @@
     "canvasColors": "Gebruikt op canvas",
     "canvasBackground": "Canvas achtergrond",
     "drawingCanvas": "Canvas",
+    "clearCanvas": "",
     "layers": "Lagen",
     "actions": "Acties",
     "language": "Taal",
@@ -84,12 +95,13 @@
     "group": "Groeperen",
     "ungroup": "Groep opheffen",
     "collaborators": "Deelnemers",
-    "showGrid": "Raster weergeven",
+    "toggleGrid": "",
     "addToLibrary": "Voeg toe aan bibliotheek",
     "removeFromLibrary": "Verwijder uit bibliotheek",
     "libraryLoadingMessage": "Bibliotheek laden…",
     "libraries": "Blader door bibliotheken",
     "loadingScene": "Scène laden…",
+    "loadScene": "",
     "align": "Uitlijnen",
     "alignTop": "Boven uitlijnen",
     "alignBottom": "Onder uitlijnen",
@@ -105,7 +117,9 @@
     "share": "Deel",
     "showStroke": "Toon lijn kleur kiezer",
     "showBackground": "Toon achtergrondkleur kiezer",
-    "toggleTheme": "Thema aan/uit",
+    "showFonts": "",
+    "toggleTheme": "",
+    "theme": "",
     "personalLib": "Persoonlijke bibliotheek",
     "excalidrawLib": "Excalidraw bibliotheek",
     "decreaseFontSize": "Letters verkleinen",
@@ -115,16 +129,21 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Wijzig link",
-      "editEmbed": "Link bewerken & insluiten",
-      "create": "Maak link",
-      "createEmbed": "Link maken en insluiten",
+      "editEmbed": "",
+      "create": "",
       "label": "Link",
       "labelEmbed": "Link toevoegen & insluiten",
-      "empty": "Er is geen link ingesteld"
+      "empty": "Er is geen link ingesteld",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Bewerk regel",
-      "exit": "Verlaat regel-editor"
+      "editArrow": ""
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "Vergrendel",
@@ -138,12 +157,46 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "Volg ons",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": "",
+    "imageCropping": "",
+    "unCroppedDimension": "",
+    "copyElementLink": "",
+    "linkToElement": "",
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Nog geen items toegevoegd...",
     "hint_emptyLibrary": "Selecteer een item op het canvas om het hier toe te voegen of installeer een bibliotheek uit de openbare repository, hieronder.",
-    "hint_emptyPrivateLibrary": "Selecteer een item op het canvas om het hier toe te voegen."
+    "hint_emptyPrivateLibrary": "Selecteer een item op het canvas om het hier toe te voegen.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
+  },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
@@ -151,6 +204,7 @@
     "exportImage": "Exporteer afbeelding...",
     "export": "Sla op...",
     "copyToClipboard": "Kopieer",
+    "copyLink": "",
     "save": "Opslaan naar huidige bestand",
     "saveAs": "Opslaan als",
     "load": "Open",
@@ -171,14 +225,16 @@
     "fullScreen": "Volledig scherm",
     "darkMode": "Donkere modus",
     "lightMode": "Lichte modus",
+    "systemMode": "",
     "zenMode": "Zen modus",
     "objectsSnapMode": "",
     "exitZenMode": "Verlaat zen modus",
     "cancel": "Annuleren",
+    "saveLibNames": "",
     "clear": "Wissen",
     "remove": "Verwijderen",
     "embed": "Insluiten in-/uitschakelen",
-    "publishLibrary": "Publiceren",
+    "publishLibrary": "",
     "submit": "Versturen",
     "confirm": "Bevestigen",
     "embeddableInteractionButton": "Klik voor interactie"
@@ -204,7 +260,8 @@
     "resetLibrary": "Dit zal je bibliotheek wissen. Weet je het zeker?",
     "removeItemsFromsLibrary": "Verwijder {{count}} item(s) uit bibliotheek?",
     "invalidEncryptionKey": "Encryptiesleutel moet 22 tekens zijn. Live samenwerking is uitgeschakeld.",
-    "collabOfflineWarning": "Geen internetverbinding beschikbaar.\nJe wijzigingen worden niet opgeslagen!"
+    "collabOfflineWarning": "Geen internetverbinding beschikbaar.\nJe wijzigingen worden niet opgeslagen!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Niet-ondersteund bestandstype.",
@@ -212,9 +269,9 @@
     "fileTooBig": "Bestand is te groot. Maximale grootte is {{maxSize}}.",
     "svgImageInsertError": "Kon geen SVG-afbeelding invoegen. De SVG-opmaak ziet er niet geldig uit.",
     "failedToFetchImage": "",
-    "invalidSVGString": "Ongeldige SVG.",
     "cannotResolveCollabServer": "Kan geen verbinding maken met de collab server. Herlaad de pagina en probeer het opnieuw.",
     "importLibraryError": "Kon bibliotheek niet laden",
+    "saveLibraryError": "",
     "collabSaveFailed": "Kan niet opslaan in de backend database. Als de problemen blijven bestaan, moet u het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
     "collabSaveFailed_sizeExceeded": "Kan de backend database niet opslaan, het canvas lijkt te groot te zijn. U moet het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
     "imageToolNotSupported": "",
@@ -230,11 +287,12 @@
       "image": "Ondersteuning voor het toevoegen van afbeeldingen aan de bibliotheek komt binnenkort!"
     },
     "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnParse": "Kon niet plakken.",
+    "copyToSystemClipboardFailed": "Kon niet naar klembord kopiëren."
   },
   "toolBar": {
     "selection": "Selectie",
+    "lasso": "",
     "image": "Voeg afbeelding in",
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
@@ -246,16 +304,32 @@
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen",
     "penMode": "Pen modus - Blokkeer aanraken",
-    "link": "Link toevoegen / bijwerken voor een geselecteerde vorm",
+    "link": "",
     "eraser": "Gum",
-    "frame": "",
+    "frame": "Frame tool",
     "magicframe": "",
     "embeddable": "Web insluiten",
-    "laser": "",
+    "laser": "Laseraanwijzer",
     "hand": "",
-    "extraTools": "",
+    "extraTools": "Meer tools",
     "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "convertElementType": ""
+  },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "Canvasacties",
@@ -263,28 +337,33 @@
     "shapes": "Vormen"
   },
   "hints": {
-    "canvasPanning": "Om de canvas te verplaatsen, houd muiswiel of spatiebalk ingedrukt tijdens slepen, of gebruik het handgereedschap",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
+    "arrowTool": "",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
     "embeddable": "Klink-sleep om een website-insluiting te maken",
-    "text_selected": "Dubbelklik of druk op ENTER om tekst te bewerken",
-    "text_editing": "Druk op Escape of CtrlOrCmd+ENTER om het bewerken te voltooien",
-    "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
-    "lockAngle": "Je kunt de hoek beperken door SHIFT ingedrukt te houden",
-    "resize": "Houd tijdens het vergroten SHIFT ingedrukt om verhoudingen te behouden,\ngebruik ALT om vanuit het midden te vergroten/verkleinen",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
     "resizeImage": "",
-    "rotate": "Je kan hoeken beperken door SHIFT ingedrukt te houden wanneer je draait",
-    "lineEditor_info": "Houd CtrlOrCmd en Dubbelklik of druk op CtrlOrCmd + Enter om punten te bewerken",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
-    "placeImage": "",
     "publishLibrary": "Publiceer je eigen bibliotheek",
-    "bindTextToElement": "Druk op enter om tekst toe te voegen",
+    "bindTextToElement": "",
+    "createFlowchart": "",
     "deepBoxSelect": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan voorbeeld niet tonen",
@@ -299,9 +378,12 @@
     "openIssueMessage": "We waren voorzichtig om je scène-informatie niet in de fout toe te voegen. Als je scène niet privé is, overweeg dan alstublieft het opvolgen op onze <button>bugtracker.</button> Kopieer de informatie hieronder naar de GitHub issue.",
     "sceneContent": "Scène-inhoud:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Je kunt mensen uitnodigen om met je samen te werken.",
-    "desc_privacy": "Geen zorgen, de sessie gebruikt end-to-end encryptie, dus wat je tekent blijft privé. Zelfs onze server zal niet kunnen zien wat je tekent.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Start sessie",
     "button_stopSession": "Stop sessie",
     "desc_inProgressIntro": "De live-samenwerkingssessie is nu gestart.",
@@ -328,29 +410,33 @@
     "click": "klik",
     "deepSelect": "Deep selecteer",
     "deepBoxSelect": "",
+    "createFlowchart": "",
+    "navigateFlowchart": "",
     "curvedArrow": "Gebogen pijl",
     "curvedLine": "Kromme lijn",
     "documentation": "Documentatie",
     "doubleClick": "dubbelklikken",
     "drag": "slepen",
-    "editor": "Editor",
+    "editor": "",
     "editLineArrowPoints": "",
     "editText": "",
     "github": "Probleem gevonden? Verzenden",
     "howto": "Volg onze handleidingen",
     "or": "of",
     "preventBinding": "Pijlbinding voorkomen",
-    "tools": "Tools",
+    "tools": "",
     "shortcuts": "Sneltoetsen",
     "textFinish": "Voltooi het bewerken (teksteditor)",
     "textNewLine": "Nieuwe regel toevoegen (teksteditor)",
-    "title": "Help",
+    "title": "",
     "view": "Weergave",
     "zoomToFit": "Zoom in op alle elementen",
     "zoomToSelection": "Inzoomen op selectie",
     "toggleElementLock": "",
     "movePageUpDown": "Pagina omhoog/omlaag",
-    "movePageLeftRight": "Verplaats pagina links/rechts"
+    "movePageLeftRight": "Verplaats pagina links/rechts",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Wis canvas"
@@ -363,7 +449,7 @@
     "twitterUsername": "Twitter gebruikersnaam",
     "libraryName": "Naam bibliotheek",
     "libraryDesc": "Beschrijving van de bibliotheek",
-    "website": "Website",
+    "website": "",
     "placeholder": {
       "authorName": "Je naam of gebruikersnaam",
       "libraryName": "Naam van je bibliotheek",
@@ -394,24 +480,24 @@
   "imageExportDialog": {
     "header": "",
     "label": {
-      "withBackground": "",
+      "withBackground": "Achtergrond",
       "onlySelected": "",
-      "darkMode": "",
+      "darkMode": "Dark mode",
       "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "scale": "Schaal",
+      "padding": "Padding"
     },
     "tooltip": {
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exporteer naar PNG",
+      "exportToSvg": "Exporteer naar SVG",
+      "copyPngToClipboard": "Kopieer PNG naar klembord"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": ""
     }
   },
@@ -421,13 +507,15 @@
   },
   "stats": {
     "angle": "Hoek",
-    "element": "Element",
-    "elements": "Elementen",
+    "shapes": "",
     "height": "Hoogte",
     "scene": "Scene",
     "selected": "Geselecteerd",
     "storage": "Opslag",
-    "title": "Statistieken voor nerds",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "Totaal",
     "version": "Versie",
     "versionCopy": "Klik om te kopiëren",
@@ -439,20 +527,22 @@
     "copyStyles": "Stijlen gekopieerd.",
     "copyToClipboard": "Gekopieerd naar het klembord.",
     "copyToClipboardAsPng": "{{exportSelection}} naar klembord gekopieerd als PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Bestand opgeslagen.",
     "fileSavedToFilename": "Opgeslagen als {filename}",
     "canvas": "canvas",
     "selection": "selectie",
     "pasteAsSingleElement": "Gebruik {{shortcut}} om te plakken als een enkel element,\nof plak in een bestaande teksteditor",
     "unableToEmbed": "Het insluiten van deze url is momenteel niet toegestaan. Zet een probleem op GitHub om de URL op de whitelist te zetten",
-    "unrecognizedLinkFormat": "De link die u hebt ingesloten komt niet overeen met het verwachte formaat. Probeer de 'embed' string van de bronsite te plakken"
+    "unrecognizedLinkFormat": "De link die u hebt ingesloten komt niet overeen met het verwachte formaat. Probeer de 'embed' string van de bronsite te plakken",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparant",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
+    "black": "Zwart",
+    "white": "Wit",
+    "red": "Rood",
+    "pink": "Roze",
     "grape": "",
     "violet": "",
     "gray": "",
@@ -478,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "",
     "colors": "",
     "shades": "",
@@ -521,5 +612,53 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
+    },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
