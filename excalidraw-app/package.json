@@ -23,7 +23,7 @@
     ]
   },
   "engines": {
-    "node": "18.0.0 - 22.x.x"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@excalidraw/random-username": "1.0.0",
