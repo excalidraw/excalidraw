@@ -1,0 +1,11 @@
+{
+  "name": "eslint-plugin-excalidraw",
+  "version": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0"
+  }
+}

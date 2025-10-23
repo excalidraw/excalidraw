@@ -7,6 +7,7 @@ import {
   getFontString,
 } from "@excalidraw/common";
 import {
+  bindOrUnbindLinearElement,
   getOriginalContainerHeightFromCache,
   resetOriginalContainerCache,
   updateOriginalContainerCache,
@@ -36,6 +37,7 @@ import { newElement } from "@excalidraw/element";
 import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type {
+  ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextContainer,
@@ -270,7 +272,7 @@ export const actionWrapTextInContainer = register({
           ),
           groupIds: textElement.groupIds,
           frameId: textElement.frameId,
-        });
+        }) as ExcalidrawBindableElement;
 
         // update bindings
         if (textElement.boundElements?.length) {
@@ -281,26 +283,14 @@ export const actionWrapTextInContainer = register({
             linearElementIds.includes(ele.id),
           ) as ExcalidrawLinearElement[];
           linearElements.forEach((ele) => {
-            let startBinding = ele.startBinding;
-            let endBinding = ele.endBinding;
-
-            if (startBinding?.elementId === textElement.id) {
-              startBinding = {
-                ...startBinding,
-                elementId: container.id,
-              };
-            }
-
-            if (endBinding?.elementId === textElement.id) {
-              endBinding = { ...endBinding, elementId: container.id };
-            }
-
-            if (startBinding || endBinding) {
-              app.scene.mutateElement(ele, {
-                startBinding,
-                endBinding,
-              });
-            }
+            bindOrUnbindLinearElement(
+              ele,
+              ele.startBinding?.elementId === textElement.id
+                ? container
+                : "keep",
+              ele.endBinding?.elementId === textElement.id ? container : "keep",
+              app.scene,
+            );
           });
         }
 
