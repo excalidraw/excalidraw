@@ -4129,7 +4129,7 @@ class App extends React.Component<AppProps, AppState> {
         };
   };
 
-  // Input handling
+  // ji1输入按键逻辑Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
       // normalize `event.key` when CapsLock is pressed #2372
@@ -4224,14 +4224,14 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         const arrowKeyPressed = isArrowKey(event.key);
-
+        //ji2ctrl按键逻辑
         if (
           event[KEYS.CTRL_OR_CMD] &&
           (arrowKeyPressed || event.key === KEYS.ENTER) &&
           !event.shiftKey
         ) {
           event.preventDefault();
-          //添加了自己的逻辑,enter和右键相同逻辑
+          //ji5【自】enter和右键相同逻辑
           const directionKey =
             event.key === KEYS.ENTER ? KEYS.ARROW_RIGHT : event.key;
           const selectedElements = getSelectedElements(
@@ -4278,7 +4278,7 @@ class App extends React.Component<AppProps, AppState> {
 
           return;
         }
-
+        //ji2alt+方向键导航
         if (event.altKey) {
           const selectedElements = getSelectedElements(
             this.scene.getNonDeletedElementsMap(),
