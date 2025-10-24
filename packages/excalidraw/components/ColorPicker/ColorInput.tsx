@@ -97,40 +97,43 @@ export const ColorInput = ({
         }}
         placeholder={placeholder}
       />
-      {/* TODO reenable on mobile with a better UX */}
-      {!device.editor.isMobile && (
-        <>
-          <div
-            style={{
-              width: "1px",
-              height: "1.25rem",
-              backgroundColor: "var(--default-border-color)",
-            }}
-          />
-          <div
-            ref={eyeDropperTriggerRef}
-            className={clsx("excalidraw-eye-dropper-trigger", {
-              selected: eyeDropperState,
-            })}
-            onClick={() =>
-              setEyeDropperState((s) =>
-                s
-                  ? null
-                  : {
-                      keepOpenOnAlt: false,
-                      onSelect: (color) => onChange(color),
-                      colorPickerType,
-                    },
-              )
-            }
-            title={`${t(
-              "labels.eyeDropper",
-            )} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")} `}
-          >
-            {eyeDropperIcon}
-          </div>
-        </>
-      )}
+      <>
+        <div
+          style={{
+            width: "1px",
+            height: "1.25rem",
+            backgroundColor: "var(--default-border-color)",
+          }}
+        />
+        <div
+          ref={eyeDropperTriggerRef}
+          className={clsx("excalidraw-eye-dropper-trigger", {
+            selected: eyeDropperState,
+            "excalidraw-eye-dropper-trigger--mobile": device.editor.isMobile,
+          })}
+          onClick={() =>
+            setEyeDropperState((s) =>
+              s
+                ? null
+                : {
+                    keepOpenOnAlt: false,
+                    onSelect: (color) => onChange(color),
+                    colorPickerType,
+                  },
+            )
+          }
+          title={
+            device.editor.isMobile
+              ? t("labels.eyeDropper")
+              : `${t(
+                  "labels.eyeDropper",
+                )} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")} `
+          }
+          aria-label={t("labels.eyeDropper")}
+        >
+          {eyeDropperIcon}
+        </div>
+      </>
     </div>
   );
 };
