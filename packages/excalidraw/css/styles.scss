@@ -688,6 +688,7 @@ body.excalidraw-cursor-resize * {
     border-bottom-left-radius: var(--border-radius-lg);
     border-right: 0;
     overflow: hidden;
+    margin-right:3px; //zsviczian
 
     background-color: var(--island-bg-color);
 
@@ -713,7 +714,7 @@ body.excalidraw-cursor-resize * {
     border-bottom-left-radius: var(--border-radius-lg);
     border-right: 0;
     overflow: hidden;
-
+    margin-right: 3px;
     background-color: var(--island-bg-color);
 
     .ToolIcon__icon {

@@ -4449,7 +4449,7 @@ startLineEditor = (
               ...appState,
               // keep existing stylesPanelMode as it needs to be preserved
               // or set at startup
-              stylesPanelMode: this.state.stylesPanelMode,
+              //stylesPanelMode: this.state.stylesPanelMode, //zsviczian prevents switching to tray mode, seems unnecessary to me
             } as Pick<AppState, K> | null);
           }
         });
@@ -4458,7 +4458,7 @@ startLineEditor = (
           ...appState,
           // keep existing stylesPanelMode as it needs to be preserved
           // or set at startup
-          stylesPanelMode: this.state.stylesPanelMode,
+          //stylesPanelMode: this.state.stylesPanelMode, //zsviczian prevents switching to tray mode, seems unnecessary to me
         } as Pick<AppState, K> | null);
       }
 

@@ -38,7 +38,7 @@ export const TopPicks = ({
   }
 
   // this one can overwrite defaults
-  if (topPicks) {
+  if (topPicks && typeof topPicks === "object") { //zsviczian
     colors = topPicks;
   }
 

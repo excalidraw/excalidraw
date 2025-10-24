@@ -71,7 +71,7 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
     __test__defineOrigId(copy, element.id);
   }
 
-  copy.id = copy.type === "text" ? obsidianId() : randomId(); //zsviczian
+  copy.id = copy.type === "text" || copy.link ? obsidianId() : randomId(); //zsviczian
   copy.updated = getUpdatedTimestamp();
   if (randomizeSeed) {
     copy.seed = randomInteger();
