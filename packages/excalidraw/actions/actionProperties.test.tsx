@@ -11,6 +11,8 @@ import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { UI } from "../tests/helpers/ui";
 import { render } from "../tests/test-utils";
+import { getDiamondPoints } from "../../element/src/bounds";
+import { ROUNDNESS } from "../../common/src/constants";
 
 describe("element locking", () => {
   beforeEach(async () => {
@@ -169,5 +171,99 @@ describe("element locking", () => {
         "active",
       );
     });
+  });
+});
+
+describe("element roundness", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  const roundnessConfig = {
+    type: ROUNDNESS.CUSTOMIZED,
+    value: 4,
+    corners: {
+      topLeft: 32,
+      topRight: 32,
+      bottomLeft: 32,
+      bottomRight: 32
+    }
+  } 
+    
+  describe("corner values of rectangle", () => { 
+    it("should not have negative values", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        roundness: roundnessConfig,
+      });
+
+      expect(rect.roundness?.corners?.bottomLeft).toBeGreaterThanOrEqual(0);
+      expect(rect.roundness?.corners?.topLeft).toBeGreaterThanOrEqual(0);
+      expect(rect.roundness?.corners?.bottomRight).toBeGreaterThanOrEqual(0);
+      expect(rect.roundness?.corners?.topRight).toBeGreaterThanOrEqual(0);
+    });
+
+    it("should not be greater than half the minimum length of the width or height", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        roundness: roundnessConfig,
+        width: 100,
+        height: 100,
+      });
+
+      const halfMinLength = Math.min(rect.width, rect.height)/2;
+
+      expect(rect.roundness?.corners?.bottomLeft).not.toBeGreaterThan(halfMinLength);
+      expect(rect.roundness?.corners?.topLeft).not.toBeGreaterThanOrEqual(halfMinLength);
+      expect(rect.roundness?.corners?.bottomRight).not.toBeGreaterThanOrEqual(halfMinLength);
+      expect(rect.roundness?.corners?.topRight).not.toBeGreaterThanOrEqual(halfMinLength);
+    });
+
+    it("should have corner link set as true on default for customized mode",()=>{
+      const rect = API.createElement({
+        type: "rectangle",
+        roundness: roundnessConfig,  
+      });
+
+      expect(rect.roundness?.cornerLink).toBe(true);
+    }); 
+  });
+
+  describe("corner values of diamond", () => {
+    it("should not have negative values", () => {
+      const diamond = API.createElement({
+        type: "diamond",
+        roundness: roundnessConfig,
+      });
+
+      expect(diamond.roundness?.corners?.bottomLeft).toBeGreaterThanOrEqual(0);
+      expect(diamond.roundness?.corners?.topLeft).toBeGreaterThanOrEqual(0);
+      expect(diamond.roundness?.corners?.bottomRight).toBeGreaterThanOrEqual(0);
+      expect(diamond.roundness?.corners?.topRight).toBeGreaterThanOrEqual(0);
+    });
+
+    it("should not be greater than half the minimum length of the width or height", () => {
+      const diamond = API.createElement({
+        type: "diamond",
+        roundness: roundnessConfig,
+      });
+
+      const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] = getDiamondPoints(diamond);
+      
+      const halfMinimumLength = Math.hypot(rightX - topX, rightY - topY) / 2;
+      expect(diamond.roundness?.corners?.bottomLeft).not.toBeGreaterThan(halfMinimumLength);
+      expect(diamond.roundness?.corners?.topLeft).not.toBeGreaterThanOrEqual(halfMinimumLength);
+      expect(diamond.roundness?.corners?.bottomRight).not.toBeGreaterThanOrEqual(halfMinimumLength);
+      expect(diamond.roundness?.corners?.topRight).not.toBeGreaterThanOrEqual(halfMinimumLength);
+    });
+
+    it("should have corner link set as true on default for customized mode",()=>{
+      const diamond = API.createElement({
+        type: "diamond",
+        roundness: roundnessConfig,
+      });
+
+      expect(diamond.roundness?.cornerLink).toBe(true);
+    }); 
   });
 });
