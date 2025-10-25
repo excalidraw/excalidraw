@@ -40,6 +40,8 @@ export const PropertiesPopover = React.forwardRef<
     ref,
   ) => {
     const device = useDevice();
+    const isMobilePortrait =
+      device.editor.isMobile && !device.viewport.isLandscape;
 
     return (
       <Popover.Portal container={container}>
@@ -47,18 +49,11 @@ export const PropertiesPopover = React.forwardRef<
           ref={ref}
           className={clsx("focus-visible-none", className)}
           data-prevent-outside-click
-          side={
-            device.editor.isMobile && !device.viewport.isLandscape
-              ? "bottom"
-              : "right"
-          }
-          align={
-            device.editor.isMobile && !device.viewport.isLandscape
-              ? "center"
-              : "start"
-          }
+          side={isMobilePortrait ? "bottom" : "right"}
+          align={isMobilePortrait ? "center" : "start"}
           alignOffset={-16}
           sideOffset={20}
+          collisionBoundary={container ?? undefined}
           style={{
             zIndex: "var(--zIndex-ui-styles-popup)",
             marginLeft: device.editor.isMobile ? "0.5rem" : undefined,
