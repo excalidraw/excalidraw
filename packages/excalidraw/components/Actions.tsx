@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
+import React from "react";
 
 import {
   CLASSES,
@@ -138,6 +139,7 @@ export const SelectedShapeActions = ({
   renderAction: ActionManager["renderAction"];
   app: AppClassProperties;
 }) => {
+  const [collapsed, setCollapsed] = React.useState(false);
   const targetElements = getTargetElements(elementsMap, appState);
 
   let isSingleElementBoundContainer = false;
@@ -180,127 +182,157 @@ export const SelectedShapeActions = ({
     !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
 
   return (
-    <div className="selected-shape-actions">
-      <div>
-        {canChangeStrokeColor(appState, targetElements) &&
-          renderAction("changeStrokeColor")}
-      </div>
-      {canChangeBackgroundColor(appState, targetElements) && (
-        <div>{renderAction("changeBackgroundColor")}</div>
-      )}
-      {showFillIcons && renderAction("changeFillStyle")}
-
-      {(hasStrokeWidth(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeWidth(element.type))) &&
-        renderAction("changeStrokeWidth")}
-
-      {(appState.activeTool.type === "freedraw" ||
-        targetElements.some((element) => element.type === "freedraw")) &&
-        renderAction("changeStrokeShape")}
-
-      {(hasStrokeStyle(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeStyle(element.type))) && (
-        <>
-          {renderAction("changeStrokeStyle")}
-          {renderAction("changeSloppiness")}
-        </>
-      )}
-
-      {(canChangeRoundness(appState.activeTool.type) ||
-        targetElements.some((element) => canChangeRoundness(element.type))) && (
-        <>{renderAction("changeRoundness")}</>
-      )}
-
-      {(toolIsArrow(appState.activeTool.type) ||
-        targetElements.some((element) => toolIsArrow(element.type))) && (
-        <>{renderAction("changeArrowType")}</>
-      )}
-
-      {(appState.activeTool.type === "text" ||
-        targetElements.some(isTextElement)) && (
-        <>
-          {renderAction("changeFontFamily")}
-          {renderAction("changeFontSize")}
-          {(appState.activeTool.type === "text" ||
-            suppportsHorizontalAlign(targetElements, elementsMap)) &&
-            renderAction("changeTextAlign")}
-        </>
-      )}
-
-      {shouldAllowVerticalAlign(targetElements, elementsMap) &&
-        renderAction("changeVerticalAlign")}
-      {(canHaveArrowheads(appState.activeTool.type) ||
-        targetElements.some((element) => canHaveArrowheads(element.type))) && (
-        <>{renderAction("changeArrowhead")}</>
-      )}
-
-      {renderAction("changeOpacity")}
-
-      <fieldset>
-        <legend>{t("labels.layers")}</legend>
-        <div className="buttonList">
-          {renderAction("sendToBack")}
-          {renderAction("sendBackward")}
-          {renderAction("bringForward")}
-          {renderAction("bringToFront")}
-        </div>
-      </fieldset>
-
-      {showAlignActions && !isSingleElementBoundContainer && (
-        <fieldset>
-          <legend>{t("labels.align")}</legend>
-          <div className="buttonList">
-            {
-              // swap this order for RTL so the button positions always match their action
-              // (i.e. the leftmost button aligns left)
-            }
-            {isRTL ? (
-              <>
-                {renderAction("alignRight")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignLeft")}
-              </>
+    <div className={clsx("selected-shape-actions", { collapsed })}>
+      <div className="properties-header">
+        <button
+          className="properties-collapse-btn"
+          onClick={() => setCollapsed((prev) => !prev)}
+          aria-label={collapsed ? "Expand properties" : "Collapse properties"}
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {collapsed ? (
+              <polyline points="9 18 15 12 9 6" /> // right arrow
             ) : (
-              <>
-                {renderAction("alignLeft")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignRight")}
-              </>
+              <polyline points="15 18 9 12 15 6" /> // left arrow
             )}
-            {targetElements.length > 2 &&
-              renderAction("distributeHorizontally")}
-            {/* breaks the row ˇˇ */}
-            <div style={{ flexBasis: "100%", height: 0 }} />
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: ".5rem",
-                marginTop: "-0.5rem",
-              }}
-            >
-              {renderAction("alignTop")}
-              {renderAction("alignVerticallyCentered")}
-              {renderAction("alignBottom")}
-              {targetElements.length > 2 &&
-                renderAction("distributeVertically")}
+          </svg>
+        </button>
+      </div>
+
+      {!collapsed && (
+        <>
+          <div>
+            {canChangeStrokeColor(appState, targetElements) &&
+              renderAction("changeStrokeColor")}
+          </div>
+          {canChangeBackgroundColor(appState, targetElements) && (
+            <div>{renderAction("changeBackgroundColor")}</div>
+          )}
+          {showFillIcons && renderAction("changeFillStyle")}
+
+          {(hasStrokeWidth(appState.activeTool.type) ||
+            targetElements.some((element) => hasStrokeWidth(element.type))) &&
+            renderAction("changeStrokeWidth")}
+
+          {(appState.activeTool.type === "freedraw" ||
+            targetElements.some((element) => element.type === "freedraw")) &&
+            renderAction("changeStrokeShape")}
+
+          {(hasStrokeStyle(appState.activeTool.type) ||
+            targetElements.some((element) => hasStrokeStyle(element.type))) && (
+            <>
+              {renderAction("changeStrokeStyle")}
+              {renderAction("changeSloppiness")}
+            </>
+          )}
+
+          {(canChangeRoundness(appState.activeTool.type) ||
+            targetElements.some((element) =>
+              canChangeRoundness(element.type),
+            )) && <>{renderAction("changeRoundness")}</>}
+
+          {(toolIsArrow(appState.activeTool.type) ||
+            targetElements.some((element) => toolIsArrow(element.type))) && (
+            <>{renderAction("changeArrowType")}</>
+          )}
+
+          {(appState.activeTool.type === "text" ||
+            targetElements.some(isTextElement)) && (
+            <>
+              {renderAction("changeFontFamily")}
+              {renderAction("changeFontSize")}
+              {(appState.activeTool.type === "text" ||
+                suppportsHorizontalAlign(targetElements, elementsMap)) &&
+                renderAction("changeTextAlign")}
+            </>
+          )}
+
+          {shouldAllowVerticalAlign(targetElements, elementsMap) &&
+            renderAction("changeVerticalAlign")}
+          {(canHaveArrowheads(appState.activeTool.type) ||
+            targetElements.some((element) =>
+              canHaveArrowheads(element.type),
+            )) && <>{renderAction("changeArrowhead")}</>}
+
+          {renderAction("changeOpacity")}
+
+          <fieldset>
+            <legend>{t("labels.layers")}</legend>
+            <div className="buttonList">
+              {renderAction("sendToBack")}
+              {renderAction("sendBackward")}
+              {renderAction("bringForward")}
+              {renderAction("bringToFront")}
             </div>
-          </div>
-        </fieldset>
-      )}
-      {!isEditingTextOrNewElement && targetElements.length > 0 && (
-        <fieldset>
-          <legend>{t("labels.actions")}</legend>
-          <div className="buttonList">
-            {!device.editor.isMobile && renderAction("duplicateSelection")}
-            {!device.editor.isMobile && renderAction("deleteSelectedElements")}
-            {renderAction("group")}
-            {renderAction("ungroup")}
-            {showLinkIcon && renderAction("hyperlink")}
-            {showCropEditorAction && renderAction("cropEditor")}
-            {showLineEditorAction && renderAction("toggleLinearEditor")}
-          </div>
-        </fieldset>
+          </fieldset>
+
+          {showAlignActions && !isSingleElementBoundContainer && (
+            <fieldset>
+              <legend>{t("labels.align")}</legend>
+              <div className="buttonList">
+                {
+                  // swap this order for RTL so the button positions always match their action
+                  // (i.e. the leftmost button aligns left)
+                }
+                {isRTL ? (
+                  <>
+                    {renderAction("alignRight")}
+                    {renderAction("alignHorizontallyCentered")}
+                    {renderAction("alignLeft")}
+                  </>
+                ) : (
+                  <>
+                    {renderAction("alignLeft")}
+                    {renderAction("alignHorizontallyCentered")}
+                    {renderAction("alignRight")}
+                  </>
+                )}
+                {targetElements.length > 2 &&
+                  renderAction("distributeHorizontally")}
+                {/* breaks the row ˇˇ */}
+                <div style={{ flexBasis: "100%", height: 0 }} />
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: ".5rem",
+                    marginTop: "-0.5rem",
+                  }}
+                >
+                  {renderAction("alignTop")}
+                  {renderAction("alignVerticallyCentered")}
+                  {renderAction("alignBottom")}
+                  {targetElements.length > 2 &&
+                    renderAction("distributeVertically")}
+                </div>
+              </div>
+            </fieldset>
+          )}
+          {!isEditingTextOrNewElement && targetElements.length > 0 && (
+            <fieldset>
+              <legend>{t("labels.actions")}</legend>
+              <div className="buttonList">
+                {!device.editor.isMobile && renderAction("duplicateSelection")}
+                {!device.editor.isMobile &&
+                  renderAction("deleteSelectedElements")}
+                {renderAction("group")}
+                {renderAction("ungroup")}
+                {showLinkIcon && renderAction("hyperlink")}
+                {showCropEditorAction && renderAction("cropEditor")}
+                {showLineEditorAction && renderAction("toggleLinearEditor")}
+              </div>
+            </fieldset>
+          )}
+        </>
       )}
     </div>
   );
