@@ -206,3 +206,61 @@
   --button-hover-bg: #363541;
   --button-bg: var(--color-surface-high);
 }
+
+.properties-collapse-btn {
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  color: var(--color-primary);
+  font-size: 14px;
+  padding: 2px 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+
+  /* subtle blue hover like other Excalidraw tools */
+  &:hover {
+    background: rgba(var(--color-primary-rgb), 0.08);
+  }
+
+  /* blue outline rectangle on click */
+  &:active {
+    background: rgba(var(--color-primary-rgb), 0.12);
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+
+  /* keyboard accessibility outline (same style) */
+  &:focus-visible {
+    box-shadow: 0 0 0 1px var(--color-primary);
+    outline: none;
+  }
+}
+/* collapse the actual flex basis of the sidebar area */
+.selected-shape-actions.collapsed {
+  flex: 0 0 auto !important;
+  width: fit-content !important;
+  min-width: unset !important;
+  max-width: unset !important;
+  overflow: visible !important;
+}
+
+.selected-shape-actions.collapsed .properties-header {
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+
+.selected-shape-actions.collapsed .properties-collapse-btn {
+  margin: 0;
+}
+/* When the left menu contains a collapsed actions panel */
+.App-menu__left:has(.selected-shape-actions.collapsed) {
+  width: auto !important;
+  min-width: unset !important;
+  max-width: unset !important;
+  padding: 0.4rem !important;
+  overflow: visible !important;
+}
+
