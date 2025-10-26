@@ -26,7 +26,7 @@ const MainMenu = Object.assign(
        */
       onSelect?: (event: Event) => void;
     }) => {
-      const { MainMenuTunnel } = useTunnels();
+      const { MainMenuTunnel, FooterCenterTunnel } = useTunnels();
       const device = useDevice();
       const appState = useUIAppState();
       const setAppState = useExcalidrawSetAppState();
@@ -66,6 +66,7 @@ const MainMenu = Object.assign(
                   />
                 </fieldset>
               )}
+              {device.editor.isMobile && <FooterCenterTunnel.Out />}
             </DropdownMenu.Content>
           </DropdownMenu>
         </MainMenuTunnel.In>
