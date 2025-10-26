@@ -12,6 +12,8 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
+import { getLastUsedColor } from "@excalidraw/utils/LastUsedColor";
+
 import type { Radians } from "@excalidraw/math";
 
 import type { MarkOptional, Merge } from "@excalidraw/common/utility-types";
@@ -100,6 +102,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
+  strokeColor = getLastUsedColor(type) || strokeColor;
   // NOTE (mtolmacs): This is a temporary check to detect extremely large
   // element position or sizing
   if (

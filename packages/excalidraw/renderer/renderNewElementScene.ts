@@ -7,6 +7,8 @@ import {
   shouldApplyFrameClip,
 } from "@excalidraw/element";
 
+import { setLastUsedColor } from "../../utils/src/LastUsedColor";
+
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 
 import { frameClip } from "./staticScene";
@@ -77,6 +79,9 @@ const _renderNewElementScene = ({
         appState,
       );
     } else {
+      if (newElement) {
+        setLastUsedColor(newElement.type, newElement.strokeColor);
+      }
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
     }
 

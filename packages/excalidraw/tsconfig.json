@@ -3,6 +3,6 @@
   "compilerOptions": {
     "outDir": "./dist/types"
   },
-  "include": ["**/*"],
+  "include": ["**/*", "../utils/src/LastUsedColor.ts"],
   "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]
 }

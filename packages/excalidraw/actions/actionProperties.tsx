@@ -142,6 +142,11 @@ import {
   restoreCaretPosition,
 } from "../hooks/useTextEditorFocus";
 
+import {
+  getLastUsedColor,
+  setLastUsedColor,
+} from "../../utils/src/LastUsedColor";
+
 import { register } from "./register";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
@@ -342,9 +347,15 @@ export const actionChangeStrokeColor = register({
           (element) => element.strokeColor,
           true,
           (hasSelection) =>
-            !hasSelection ? appState.currentItemStrokeColor : null,
+            !hasSelection
+              ? getLastUsedColor(appState.activeTool.type) ||
+                appState.currentItemStrokeColor
+              : null,
         )}
-        onChange={(color) => updateData({ currentItemStrokeColor: color })}
+        onChange={(color) => {
+          updateData({ currentItemStrokeColor: color });
+          setLastUsedColor(appState.activeTool.type, color);
+        }}
         elements={elements}
         appState={appState}
         updateData={updateData}
