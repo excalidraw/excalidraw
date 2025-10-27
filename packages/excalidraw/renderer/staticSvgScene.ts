@@ -615,6 +615,17 @@ const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
+        
+        // Add background rectangle if element has backgroundColor
+        if (element.backgroundColor && element.backgroundColor !== "transparent") {
+          const backgroundRect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
+          backgroundRect.setAttribute("x", "0");
+          backgroundRect.setAttribute("y", "0");
+          backgroundRect.setAttribute("width", `${element.width}`);
+          backgroundRect.setAttribute("height", `${element.height}`);
+          backgroundRect.setAttribute("fill", element.backgroundColor);
+          node.appendChild(backgroundRect);
+        }
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeightPx = getLineHeightInPx(
           element.fontSize,

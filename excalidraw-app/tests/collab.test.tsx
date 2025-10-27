@@ -75,7 +75,7 @@ describe("collaboration", () => {
 
     await render(<ExcalidrawApp />);
 
-    h.store.onStoreIncrementEmitter.on((increment) => {
+    h.store.onStoreIncrementEmitter.on((increment: any) => {
       if (StoreIncrement.isDurable(increment)) {
         durableIncrements.push(increment);
       } else {
