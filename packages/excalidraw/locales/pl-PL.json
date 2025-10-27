@@ -170,8 +170,8 @@
     "copyElementLink": "Kopiuj link do obiektu",
     "linkToElement": "Link do obiektu",
     "wrapSelectionInFrame": "",
-    "tab": "",
-    "shapeSwitch": ""
+    "tab": "Tab",
+    "shapeSwitch": "Wybór kształtu"
   },
   "elementLink": {
     "title": "Link do obiektu",
@@ -183,10 +183,10 @@
     "hint_emptyLibrary": "Wybierz element na płótnie, aby go tutaj dodać, lub zainstaluj bibliotekę z poniższego publicznego repozytorium.",
     "hint_emptyPrivateLibrary": "Wybierz element, aby dodać go tutaj.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Szukaj w bibliotece",
+      "heading": "Znalezione w bibliotece",
+      "noResults": "Nie znaleziono pasujących elementów...",
+      "clearSearch": "Usuń historię wyszukiwania"
     }
   },
   "search": {
@@ -230,11 +230,11 @@
     "objectsSnapMode": "Przyciąganie do obiektów",
     "exitZenMode": "Wyjdź z trybu Zen",
     "cancel": "Anuluj",
-    "saveLibNames": "",
+    "saveLibNames": "Zapisz nazwę(-y) i wyjdź",
     "clear": "Wyczyść",
     "remove": "Usuń",
     "embed": "Przełącz osadzenie",
-    "publishLibrary": "",
+    "publishLibrary": "Zmień nazwę lub opublikuj",
     "submit": "Prześlij",
     "confirm": "Zatwierdź",
     "embeddableInteractionButton": "Kliknij, aby wejść w interakcję"
@@ -292,7 +292,7 @@
   },
   "toolBar": {
     "selection": "Zaznaczenie",
-    "lasso": "",
+    "lasso": "Wybór lassem",
     "image": "Wstaw obraz",
     "rectangle": "Prostokąt",
     "diamond": "Romb",
@@ -313,7 +313,7 @@
     "hand": "Ręka (narzędzie do przesuwania)",
     "extraTools": "Więcej narzędzi",
     "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "Przełącz typ kształtu"
   },
   "element": {
     "rectangle": "Prostokąt",
@@ -337,7 +337,7 @@
     "shapes": "Kształty"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "Naciśnij {{shortcut}}, aby odrzucić wyszukiwanie",
     "canvasPanning": "",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "arrowTool": "",
@@ -356,8 +356,8 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "publishLibrary": "Opublikuj własną bibliotekę",
-    "bindTextToElement": "",
-    "createFlowchart": "",
+    "bindTextToElement": "Naciśnij {{shortcut}}, aby dodać tekst",
+    "createFlowchart": "Naciśnij {{shortcut}}, aby utworzyć diagram",
     "deepBoxSelect": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "Ta funkcja może być włączona poprzez ustawienie flagi \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Aby zmienić flagi przeglądarki w Firefox, odwiedź stronę \"about:config\".",
@@ -568,7 +568,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Kolor",
     "mostUsedCustomColors": "Najczęściej używane kolory",
     "colors": "Kolory",
     "shades": "Odcienie",
@@ -650,15 +650,15 @@
     "shortcutHint": "Przywołaj paletę poleceń za pomocą {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Spacja",
+    "delete": "Del",
     "mmb": ""
   }
 }
