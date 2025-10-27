@@ -80,7 +80,7 @@ export const isTabletBreakpoint = (
   return minSide >= MQ_MIN_TABLET && maxSide <= MQ_MAX_TABLET;
 };
 
-export const isMobileOrTablet = (): boolean => {
+const isMobileOrTablet = (): boolean => {
   const ua = navigator.userAgent || "";
   const platform = navigator.platform || "";
   const uaData = (navigator as any).userAgentData as

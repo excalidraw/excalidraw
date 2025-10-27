@@ -189,20 +189,20 @@ export const withExcalidrawDimensions = async (
   dimensions: { width: number; height: number },
   cb: () => void,
 ) => {
+  const { h } = window;
+
   mockBoundingClientRect(dimensions);
   act(() => {
-    // @ts-ignore
     h.app.refreshEditorInterface();
-    window.h.app.refresh();
+    h.app.refresh();
   });
 
   await cb();
 
   restoreOriginalGetBoundingClientRect();
   act(() => {
-    // @ts-ignore
     h.app.refreshEditorInterface();
-    window.h.app.refresh();
+    h.app.refresh();
   });
 };
 

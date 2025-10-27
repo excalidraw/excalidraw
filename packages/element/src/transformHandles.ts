@@ -1,6 +1,5 @@
 import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
-  isMobileOrTablet,
   type EditorInterface,
 } from "@excalidraw/common";
 
@@ -329,6 +328,7 @@ export const getTransformHandles = (
 export const hasBoundingBox = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: InteractiveCanvasAppState,
+  editorInterface: EditorInterface,
 ) => {
   if (appState.selectedLinearElement?.isEditing) {
     return false;
@@ -347,5 +347,5 @@ export const hasBoundingBox = (
 
   // on mobile/tablet we currently don't show bbox because of resize issues
   // (also prob best for simplicity's sake)
-  return element.points.length > 2 && !isMobileOrTablet();
+  return element.points.length > 2 && !editorInterface.userAgent.isMobileDevice;
 };

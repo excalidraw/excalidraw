@@ -105,7 +105,6 @@ import {
   type StylesPanelMode,
   loadDesktopUIModePreference,
   setDesktopUIMode,
-  isMobileOrTablet,
 } from "@excalidraw/common";
 
 import {
@@ -701,19 +700,7 @@ class App extends React.Component<AppProps, AppState> {
       height: window.innerHeight,
     };
 
-    const storedDesktopUIMode = loadDesktopUIModePreference();
-    const userAgentDescriptor = createUserAgentDescriptor(
-      typeof navigator !== "undefined" ? navigator.userAgent : "",
-    );
-    // allow host app to control formFactor and desktopUIMode via props
-    this.editorInterface = updateObject(this.editorInterface, {
-      desktopUIMode:
-        props.UIOptions.desktopUIMode ??
-        storedDesktopUIMode ??
-        this.editorInterface.desktopUIMode,
-      formFactor: this.getFormFactor(),
-      userAgent: userAgentDescriptor,
-    });
+    this.refreshEditorInterface();
     this.stylesPanelMode = deriveStylesPanelMode(this.editorInterface);
 
     this.id = nanoid();
@@ -2455,14 +2442,14 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private getFormFactor = () => {
-    const { width, height } = this.state;
-    return this.props.UIOptions.formFactor ?? isTestEnv()
-      ? "desktop"
-      : getFormFactor(width, height);
+  private getFormFactor = (editorWidth: number, editorHeight: number) => {
+    return (
+      this.props.UIOptions.formFactor ??
+      getFormFactor(editorWidth, editorHeight)
+    );
   };
 
-  private refreshEditorInterface = () => {
+  public refreshEditorInterface = () => {
     const container = this.excalidrawContainerRef.current;
     if (!container) {
       return;
@@ -2471,22 +2458,28 @@ class App extends React.Component<AppProps, AppState> {
     const { width: editorWidth, height: editorHeight } =
       container.getBoundingClientRect();
 
+    const storedDesktopUIMode = loadDesktopUIModePreference();
+    const userAgentDescriptor = createUserAgentDescriptor(
+      typeof navigator !== "undefined" ? navigator.userAgent : "",
+    );
+    // allow host app to control formFactor and desktopUIMode via props
     const sidebarBreakpoint =
       this.props.UIOptions.dockedSidebarBreakpoint != null
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
-
     const nextEditorInterface = updateObject(this.editorInterface, {
-      formFactor: this.getFormFactor(),
+      desktopUIMode:
+        this.props.UIOptions.desktopUIMode ??
+        storedDesktopUIMode ??
+        this.editorInterface.desktopUIMode,
+      formFactor: this.getFormFactor(editorWidth, editorHeight),
+      userAgent: userAgentDescriptor,
       canFitSidebar: editorWidth > sidebarBreakpoint,
       isLandscape: editorWidth > editorHeight,
     });
-    const didChange = nextEditorInterface !== this.editorInterface;
-    if (didChange) {
-      this.editorInterface = nextEditorInterface;
-      this.reconcileStylesPanelMode(nextEditorInterface);
-    }
-    return didChange;
+
+    this.editorInterface = nextEditorInterface;
+    this.reconcileStylesPanelMode(nextEditorInterface);
   };
 
   private reconcileStylesPanelMode = (nextEditorInterface: EditorInterface) => {
@@ -2583,15 +2576,6 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.props.autoFocus && this.excalidrawContainerRef.current) {
       this.focusContainer();
-    }
-
-    if (
-      // bounding rects don't work in tests so updating
-      // the state on init would result in making the test enviro run
-      // in mobile breakpoint (0 width/height), making everything fail
-      !isTestEnv()
-    ) {
-      this.refreshEditorInterface();
     }
 
     if (supportsResizeObserver && this.excalidrawContainerRef.current) {
@@ -2808,13 +2792,6 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!this.state.showWelcomeScreen && !elements.length) {
       this.setState({ showWelcomeScreen: true });
-    }
-
-    if (
-      prevProps.UIOptions.dockedSidebarBreakpoint !==
-      this.props.UIOptions.dockedSidebarBreakpoint
-    ) {
-      this.refreshEditorInterface();
     }
 
     const hasFollowedPersonLeft =
@@ -5257,7 +5234,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       considerBoundingBox &&
       this.state.selectedElementIds[element.id] &&
-      hasBoundingBox([element], this.state)
+      hasBoundingBox([element], this.state, this.editorInterface)
     ) {
       // if hitting the bounding box, return early
       // but if not, we should check for other cases as well (e.g. frame name)
@@ -6165,7 +6142,8 @@ class App extends React.Component<AppProps, AppState> {
         // better way of showing them is found
         !(
           isLinearElement(selectedElements[0]) &&
-          (isMobileOrTablet() || selectedElements[0].points.length === 2)
+          (this.editorInterface.userAgent.isMobileDevice ||
+            selectedElements[0].points.length === 2)
         )
       ) {
         const elementWithTransformHandleType =
@@ -7290,7 +7268,8 @@ class App extends React.Component<AppProps, AppState> {
         !isElbowArrow(selectedElements[0]) &&
         !(
           isLinearElement(selectedElements[0]) &&
-          (isMobileOrTablet() || selectedElements[0].points.length === 2)
+          (this.editorInterface.userAgent.isMobileDevice ||
+            selectedElements[0].points.length === 2)
         ) &&
         !(
           this.state.selectedLinearElement &&
