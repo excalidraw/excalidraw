@@ -4,6 +4,9 @@ import {
   EXPORT_SCALES,
   THEME,
 } from "@excalidraw/common";
+import { exportToPDF } from "../data/exportToPDF";
+import { FileText } from "../components/icons";
+
 
 import { getNonDeletedElements } from "@excalidraw/element";
 
@@ -249,6 +252,36 @@ export const actionSaveFileToDisk = register({
     />
   ),
 });
+
+export const actionExportToPDF = register({
+  name: "exportToPDF",
+  label: "buttons.exportPDF",
+  icon: FileText,
+  trackEvent: { category: "export", action: "pdf" },
+  predicate: (elements, appState, props, app) => {
+    return !!app.props.UIOptions.canvasActions.export && !appState.viewModeEnabled;
+  },
+  perform: async (elements, appState, value, app) => {
+    try {
+      await exportToPDF([...elements], appState, app.files, app.getName());
+      return {
+        ...appState,
+        toast: { message: "Exported as PDF successfully!" },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    } catch (error: any) {
+      console.error("PDF export failed:", error);
+      return {
+        ...appState,
+        toast: { message: "Failed to export as PDF." },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    }
+  },
+  keyTest: (event) =>
+    event.key === "E" && event.shiftKey && event[KEYS.CTRL_OR_CMD], // Ctrl+Shift+E shortcut
+});
+
 
 export const actionLoadScene = register({
   name: "loadScene",
