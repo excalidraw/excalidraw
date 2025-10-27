@@ -157,3 +157,39 @@ export type ColorPickerType =
   | "canvasBackground"
   | "elementBackground"
   | "elementStroke";
+
+// Hex color validation utilities
+export const isValidHexColor = (hex: string): boolean => {
+  // Remove # if present
+  const cleanHex = hex.replace(/^#/, "");
+
+  // Check if it's a valid hex format (3, 4, 6, or 8 characters)
+  const validLengths = [3, 4, 6, 8];
+  if (!validLengths.includes(cleanHex.length)) {
+    return false;
+  }
+
+  // Check if all characters are valid hex digits
+  return /^[0-9a-fA-F]+$/.test(cleanHex);
+};
+
+export const getHexColorValidationError = (hex: string): string | null => {
+  if (!hex) {
+    return null;
+  }
+
+  const cleanHex = hex.replace(/^#/, "");
+
+  // Check length
+  const validLengths = [3, 4, 6, 8];
+  if (!validLengths.includes(cleanHex.length)) {
+    return "Hex code must be 3, 4, 6, or 8 characters (excluding #)";
+  }
+
+  // Check for invalid characters
+  if (!/^[0-9a-fA-F]+$/.test(cleanHex)) {
+    return "Invalid characters in hex code";
+  }
+
+  return null;
+};
