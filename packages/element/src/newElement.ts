@@ -247,6 +247,9 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     autoResize?: ExcalidrawTextElement["autoResize"];
+    bold?: boolean;
+    italic?: boolean;
+    underline?: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -255,7 +258,7 @@ export const newTextElement = (
   const text = normalizeText(opts.text);
   const metrics = measureText(
     text,
-    getFontString({ fontFamily, fontSize }),
+    getFontString({ fontFamily, fontSize, bold: opts.bold, italic: opts.italic }),
     lineHeight,
   );
   const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
@@ -280,6 +283,9 @@ export const newTextElement = (
     originalText: opts.originalText ?? text,
     autoResize: opts.autoResize ?? true,
     lineHeight,
+    bold: opts.bold ?? false,
+    italic: opts.italic ?? false,
+    underline: opts.underline ?? false,
   };
 
   const textElement: ExcalidrawTextElement = newElementWith(
@@ -300,9 +306,17 @@ const getAdjustedDimensions = (
   width: number;
   height: number;
 } => {
+  // Ensure empty text still has minimum dimensions
+  const textToMeasure = nextText.trim() === "" ? " " : nextText;
+  
   let { width: nextWidth, height: nextHeight } = measureText(
-    nextText,
-    getFontString(element),
+    textToMeasure,
+    getFontString({ 
+      fontFamily: element.fontFamily, 
+      fontSize: element.fontSize,
+      bold: element.bold,
+      italic: element.italic
+    }),
     element.lineHeight,
   );
 
@@ -322,7 +336,12 @@ const getAdjustedDimensions = (
   ) {
     const prevMetrics = measureText(
       element.text,
-      getFontString(element),
+      getFontString({ 
+        fontFamily: element.fontFamily, 
+        fontSize: element.fontSize,
+        bold: element.bold,
+        italic: element.italic
+      }),
       element.lineHeight,
     );
     const offsets = getTextElementPositionOffsets(element, {
@@ -429,7 +448,12 @@ export const refreshTextDimensions = (
   if (container || !textElement.autoResize) {
     text = wrapText(
       text,
-      getFontString(textElement),
+      getFontString({ 
+        fontFamily: textElement.fontFamily, 
+        fontSize: textElement.fontSize,
+        bold: textElement.bold,
+        italic: textElement.italic
+      }),
       container
         ? getBoundTextMaxWidth(container, textElement)
         : textElement.width,
