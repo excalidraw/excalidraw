@@ -142,8 +142,8 @@
       "editArrow": "Modifier la flèche"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Briser le polygone",
+      "convertToPolygon": "Convertir en polygone"
     },
     "elementLock": {
       "lock": "Verrouiller",
@@ -170,8 +170,8 @@
     "copyElementLink": "Copier le lien vers un objet",
     "linkToElement": "Lien vers un objet",
     "wrapSelectionInFrame": "Mettre la sélection dans un cadre",
-    "tab": "",
-    "shapeSwitch": ""
+    "tab": "Onglet",
+    "shapeSwitch": "Changer de forme"
   },
   "elementLink": {
     "title": "Lien vers un objet",
@@ -183,10 +183,10 @@
     "hint_emptyLibrary": "Sélectionnez un élément sur le canevas pour l'ajouter ici ou installez une bibliothèque depuis le dépôt public, ci-dessous.",
     "hint_emptyPrivateLibrary": "Sélectionnez un élément sur le canevas pour l'ajouter ici.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Rechercher dans la bibliothèque",
+      "heading": "Correspondance de la bibliothèque",
+      "noResults": "Aucun élément correspondant trouvé...",
+      "clearSearch": "Effacer la recherche"
     }
   },
   "search": {
@@ -195,8 +195,8 @@
     "singleResult": "résultat",
     "multipleResults": "résultats",
     "placeholder": "Rechercher du texte sur la toile...",
-    "frames": "",
-    "texts": ""
+    "frames": "Cadres",
+    "texts": "Textes"
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
@@ -230,11 +230,11 @@
     "objectsSnapMode": "Aimanter aux objets",
     "exitZenMode": "Quitter le mode zen",
     "cancel": "Annuler",
-    "saveLibNames": "",
+    "saveLibNames": "Enregistrez et quittez",
     "clear": "Effacer",
     "remove": "Supprimer",
     "embed": "Activer/Désactiver l'intégration",
-    "publishLibrary": "",
+    "publishLibrary": "Renommer ou publier",
     "submit": "Envoyer",
     "confirm": "Confirmer",
     "embeddableInteractionButton": "Cliquez pour interagir"
@@ -261,7 +261,7 @@
     "removeItemsFromsLibrary": "Supprimer {{count}} élément(s) de la bibliothèque ?",
     "invalidEncryptionKey": "La clé de chiffrement doit comporter 22 caractères. La collaboration en direct est désactivée.",
     "collabOfflineWarning": "Aucune connexion internet disponible.\nVos modifications ne seront pas enregistrées !",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Quota de stockage du navigateur dépassé. Les modifications ne seront pas enregistrées."
   },
   "errors": {
     "unsupportedFileType": "Type de fichier non supporté.",
@@ -292,7 +292,7 @@
   },
   "toolBar": {
     "selection": "Sélection",
-    "lasso": "",
+    "lasso": "Sélection lasso",
     "image": "Insérer une image",
     "rectangle": "Rectangle",
     "diamond": "Losange",
@@ -313,7 +313,7 @@
     "hand": "Mains (outil de déplacement de la vue)",
     "extraTools": "Plus d'outils",
     "mermaidToExcalidraw": "De Mermaid à Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "Basculer le type de forme"
   },
   "element": {
     "rectangle": "Rectangle",
@@ -337,33 +337,33 @@
     "shapes": "Formes"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} pour fermer la recherche",
+    "canvasPanning": "Pour déplacer le canevas, maintenez {{shortcut_1}} ou {{shortcut_2}} enfoncé tout en faisant glisser, ou utilisez l'outil main",
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
-    "arrowTool": "",
+    "arrowTool": "Cliquez pour démarrer plusieurs points, faites glisser pour une ligne unique. Appuyez à nouveau sur {{shortcut}} pour changer le type de flèche.",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
     "embeddable": "Cliquez et glissez pour créer une intégration de site web",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "text_selected": "Double-cliquez ou appuyez sur {{shortcut}} pour modifier le texte",
+    "text_editing": "Appuyez sur {{shortcut_1}} ou {{shortcut_2}} pour terminer la modification",
+    "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur {{shortcut_1}} ou {{shortcut_2}} pour terminer",
+    "lockAngle": "Vous pouvez limiter l'angle en maintenant la touche {{shortcut}} enfoncée",
+    "resize": "Vous pouvez contraindre les proportions en maintenant {{shortcut_1}} pendant le redimensionnement,\nmaintenez {{shortcut_2}} enfoncé pour redimensionner depuis le centre",
+    "resizeImage": "Vous pouvez redimensionner librement en maintenant {{shortcut_1}},\nmaintenez {{shortcut_2}} enfoncé pour redimensionner depuis le centre",
+    "rotate": "Vous pouvez contraindre les angles en maintenant {{shortcut}} enfoncé pendant la rotation",
+    "lineEditor_info": "Maintenez {{shortcut_1}} et Double-cliquez ou appuyez sur {{shortcut_2}} pour modifier les points",
+    "lineEditor_line_info": "Double-cliquez ou appuyez sur {{shortcut}} pour modifier le texte",
+    "lineEditor_pointSelected": "Appuyez sur {{shortcut_1}} pour supprimer le(s) point(s),\n{{shortcut_2}} pour dupliquer, ou faites glisser pour déplacer",
+    "lineEditor_nothingSelected": "Sélectionnez un point à éditer (maintenez {{shortcut_1}} enfoncé pour en sélectionner plusieurs),\nou maintenez {{shortcut_2}} et cliquez pour ajouter de nouveaux points",
     "publishLibrary": "Publier votre propre bibliothèque",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} pour ajouter du texte",
+    "createFlowchart": "{{shortcut}} pour créer un diagramme",
+    "deepBoxSelect": "Maintenez {{shortcut}} enfoncé pour sélectionner en profondeur, et pour éviter le glissement",
+    "eraserRevert": "Maintenez {{shortcut}} pour annuler les éléments marqués pour suppression",
     "firefox_clipboard_write": "Cette fonctionnalité devrait pouvoir être activée en définissant l'option \"dom.events.asyncClipboard.clipboard.clipboardItem\" à \"true\". Pour modifier les paramètres du navigateur dans Firefox, visitez la page \"about:config\".",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Maintenez {{shortcut}} pour désactiver l'accrochage",
+    "enterCropEditor": "Double-cliquez sur l'image ou appuyez sur {{shortcut}} pour recadrer l'image",
+    "leaveCropEditor": "Cliquez à l'extérieur de l'image ou appuyez sur {{shortcut_1}} ou {{shortcut_2}} pour terminer le recadrage"
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
@@ -568,7 +568,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Couleur ",
     "mostUsedCustomColors": "Couleurs personnalisées les plus fréquemment utilisées",
     "colors": "Couleurs",
     "shades": "Nuances",
@@ -650,15 +650,15 @@
     "shortcutHint": "Pour la palette de commandes, utilisez {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Échap",
+    "enter": "Entrée",
+    "shift": "Maj",
+    "spacebar": "Espace",
+    "delete": "Supprimer",
+    "mmb": "Clic molette"
   }
 }
