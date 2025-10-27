@@ -46,9 +46,9 @@
     "arrowhead_triangle_outline": "Trójkąt (pusty)",
     "arrowhead_diamond": "Romb",
     "arrowhead_diamond_outline": "Romb (pusty)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_crowfoot_many": "Notacja Martina (wiele)",
+    "arrowhead_crowfoot_one": "Notacja Martina (jeden)",
+    "arrowhead_crowfoot_one_or_many": "Notacja Martina (jeden lub wiele)",
     "more_options": "Więcej opcji",
     "arrowtypes": "Typ strzałki",
     "arrowtype_sharp": "Ostra strzałka",
@@ -142,8 +142,8 @@
       "editArrow": "Edytuj strzałkę"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Przerwij wielokąt",
+      "convertToPolygon": "Przekształć w wielokąt"
     },
     "elementLock": {
       "lock": "Zablokuj",
@@ -169,7 +169,7 @@
     "unCroppedDimension": "Nieprzycięty wymiar",
     "copyElementLink": "Kopiuj link do obiektu",
     "linkToElement": "Link do obiektu",
-    "wrapSelectionInFrame": "",
+    "wrapSelectionInFrame": "Owiń wybór w ramkę",
     "tab": "Tab",
     "shapeSwitch": "Wybór kształtu"
   },
@@ -195,8 +195,8 @@
     "singleResult": "wynik",
     "multipleResults": "wyniki",
     "placeholder": "Znajdź tekst na płótnie...",
-    "frames": "",
-    "texts": ""
+    "frames": "Ramki",
+    "texts": "Teksty"
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -261,7 +261,7 @@
     "removeItemsFromsLibrary": "Usunąć {{count}} element(ów) z biblioteki?",
     "invalidEncryptionKey": "Klucz szyfrowania musi składać się z 22 znaków. Współpraca na żywo jest wyłączona.",
     "collabOfflineWarning": "Brak połączenia z Internetem.\nTwoje zmiany nie zostaną zapisane!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Przekroczono limit pamięci przeglądarki. Zmiany nie zostaną zapisane."
   },
   "errors": {
     "unsupportedFileType": "Nieobsługiwany typ pliku.",
@@ -338,32 +338,32 @@
   },
   "hints": {
     "dismissSearch": "Naciśnij {{shortcut}}, aby odrzucić wyszukiwanie",
-    "canvasPanning": "",
+    "canvasPanning": "Aby przesunąć płótno, przytrzymaj {{shortcut_1}} lub {{shortcut_2}} podczas przeciągania, albo użyj narzędzia ręki",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
-    "arrowTool": "",
+    "arrowTool": "Kliknij, aby rozpocząć rysowanie wielu punktów; przeciągnij, aby narysować pojedynczą linię. Naciśnij ponownie {{shortcut}}, aby zmienić typ strzałki.",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
     "embeddable": "Kliknij i przeciągnij, aby stworzyć osadzenie strony",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "text_selected": "Kliknij dwukrotnie lub naciśnij {{shortcut}}, aby edytować tekst",
+    "text_editing": "Naciśnij {{shortcut_1}} lub {{shortcut_2}}, aby zakończyć edycję",
+    "linearElementMulti": "Kliknij ostatni punkt lub naciśnij {{shortcut_1}} lub {{shortcut_2}}, aby zakończyć",
+    "lockAngle": "Możesz ograniczyć kąt, przytrzymując {{shortcut}}",
+    "resize": "Możesz zachować proporcje, przytrzymując {{shortcut_1}} podczas zmiany rozmiaru;\nprzytrzymaj {{shortcut_2}}, aby zmienić rozmiar względem środka",
+    "resizeImage": "Możesz dowolnie zmieniać rozmiar, przytrzymując {{shortcut_1}};\nprzytrzymaj {{shortcut_2}}, aby zmienić rozmiar względem środka.",
+    "rotate": "Możesz ograniczyć kąty, przytrzymując {{shortcut}} podczas obracania",
+    "lineEditor_info": "Przytrzymaj {{shortcut_1}} i kliknij dwukrotnie lub naciśnij {{shortcut_2}}, aby edytować punkty",
+    "lineEditor_line_info": "Kliknij dwukrotnie lub naciśnij {{shortcut}}, aby edytować punkty",
+    "lineEditor_pointSelected": "Naciśnij {{shortcut_1}}, aby usunąć punkty,\n{{shortcut_2}}, aby je powielić, lub przeciągnij, aby je przenieść",
+    "lineEditor_nothingSelected": "Wybierz punkt do edycji (przytrzymaj {{shortcut_1}}, aby wybrać wiele punktów)\nlub przytrzymaj {{shortcut_2}} i kliknij myszą, aby dodać nowe punkty",
     "publishLibrary": "Opublikuj własną bibliotekę",
     "bindTextToElement": "Naciśnij {{shortcut}}, aby dodać tekst",
     "createFlowchart": "Naciśnij {{shortcut}}, aby utworzyć diagram",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "deepBoxSelect": "Przytrzymaj {{shortcut}}, aby wybrać w obrębie grupy i zapobiec przeciągnięciu",
+    "eraserRevert": "Przytrzymaj {{shortcut}}, aby przywrócić elementy oznaczone do usunięcia",
     "firefox_clipboard_write": "Ta funkcja może być włączona poprzez ustawienie flagi \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Aby zmienić flagi przeglądarki w Firefox, odwiedź stronę \"about:config\".",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Przytrzymaj {{shortcut}} aby wyłączyć przyciąganie",
+    "enterCropEditor": "Kliknij dwukrotnie obraz lub naciśnij {{shortcut}}, aby przyciąć obraz",
+    "leaveCropEditor": "Kliknij obszar poza obrazem albo naciśnij {{shortcut_1}} lub {{shortcut_2}}, aby zakończyć przycinanie"
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
@@ -659,6 +659,6 @@
     "shift": "Shift",
     "spacebar": "Spacja",
     "delete": "Del",
-    "mmb": ""
+    "mmb": "Kółko myszy"
   }
 }
