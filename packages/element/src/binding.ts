@@ -25,7 +25,6 @@ import {
   doBoundsIntersect,
   getCenterForBounds,
   getElementBounds,
-  pointInsideBounds,
 } from "./bounds";
 import {
   getAllHoveredElementAtPoint,
@@ -48,7 +47,6 @@ import {
   isBindableElement,
   isBoundToContainer,
   isElbowArrow,
-  isFrameLikeElement,
   isRectanguloidElement,
   isTextElement,
 } from "./typeChecks";
