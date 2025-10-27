@@ -10,6 +10,8 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { UI, Pointer, Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
 import { fireEvent, render } from "@excalidraw/excalidraw/tests/test-utils";
 
+import { LinearElementEditor } from "@excalidraw/element";
+
 import { getTransformHandles } from "../src/transformHandles";
 import {
   getTextEditor,
@@ -155,10 +157,10 @@ describe("element binding", () => {
       // NOTE this mouse down/up + await needs to be done in order to repro
       // the issue, due to https://github.com/excalidraw/excalidraw/blob/46bff3daceb602accf60c40a84610797260fca94/src/components/App.tsx#L740
       mouse.reset();
-      expect(h.state.editingLinearElement).not.toBe(null);
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
       mouse.down(0, 0);
       await new Promise((r) => setTimeout(r, 100));
-      expect(h.state.editingLinearElement).toBe(null);
+      expect(h.state.selectedLinearElement?.isEditing).toBe(false);
       expect(API.getSelectedElement().type).toBe("rectangle");
       mouse.up();
       expect(API.getSelectedElement().type).toBe("rectangle");
@@ -413,16 +415,12 @@ describe("element binding", () => {
     expect(arrow.endBinding?.elementId).toBe(rectRight.id);
 
     // Drag arrow off of bound rectangle range
-    const handles = getTransformHandles(
+    const [elX, elY] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
       arrow,
-      h.state.zoom,
-      arrayToMap(h.elements),
-      "mouse",
-    ).se!;
-
+      -1,
+      h.scene.getNonDeletedElementsMap(),
+    );
     Keyboard.keyDown(KEYS.CTRL_OR_CMD);
-    const elX = handles[0] + handles[2] / 2;
-    const elY = handles[1] + handles[3] / 2;
     mouse.downAt(elX, elY);
     mouse.moveTo(300, 400);
     mouse.up();

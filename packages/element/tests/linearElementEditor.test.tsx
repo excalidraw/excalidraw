@@ -136,7 +136,8 @@ describe("Test Linear Elements", () => {
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.ENTER);
     });
-    expect(h.state.editingLinearElement?.elementId).toEqual(line.id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(line.id);
   };
 
   const drag = (startPoint: GlobalPoint, endPoint: GlobalPoint) => {
@@ -253,75 +254,82 @@ describe("Test Linear Elements", () => {
     });
     fireEvent.click(queryByText(contextMenu as HTMLElement, "Edit line")!);
 
-    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
   it("should enter line editor via enter (line)", () => {
     createTwoPointerLinearElement("line");
-    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
     mouse.clickAt(midpoint[0], midpoint[1]);
     Keyboard.keyPress(KEYS.ENTER);
-    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
   // ctrl+enter alias (to align with arrows)
   it("should enter line editor via ctrl+enter (line)", () => {
     createTwoPointerLinearElement("line");
-    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
     mouse.clickAt(midpoint[0], midpoint[1]);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.ENTER);
     });
-    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
   it("should enter line editor via ctrl+enter (arrow)", () => {
     createTwoPointerLinearElement("arrow");
-    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
     mouse.clickAt(midpoint[0], midpoint[1]);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.ENTER);
     });
-    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
   it("should enter line editor on ctrl+dblclick (simple arrow)", () => {
     createTwoPointerLinearElement("arrow");
-    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       mouse.doubleClick();
     });
-    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
   it("should enter line editor on ctrl+dblclick (line)", () => {
     createTwoPointerLinearElement("line");
-    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       mouse.doubleClick();
     });
-    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
   it("should enter line editor on dblclick (line)", () => {
     createTwoPointerLinearElement("line");
-    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
     mouse.doubleClick();
-    expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
   it("should not enter line editor on dblclick (arrow)", async () => {
     createTwoPointerLinearElement("arrow");
-    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
 
     mouse.doubleClick();
-    expect(h.state.editingLinearElement).toEqual(null);
+    expect(h.state.selectedLinearElement).toBe(null);
     await getTextEditor();
   });
 
@@ -330,10 +338,12 @@ describe("Test Linear Elements", () => {
     const arrow = h.elements[0] as ExcalidrawLinearElement;
     enterLineEditingMode(arrow);
 
-    expect(h.state.editingLinearElement?.elementId).toEqual(arrow.id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(arrow.id);
 
     mouse.doubleClick();
-    expect(h.state.editingLinearElement?.elementId).toEqual(arrow.id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(arrow.id);
     expect(h.elements.length).toEqual(1);
 
     expect(document.querySelector(TEXT_EDITOR_SELECTOR)).toBe(null);
@@ -367,7 +377,7 @@ describe("Test Linear Elements", () => {
       // drag line from midpoint
       drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `12`,
+        `11`,
       );
       expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
@@ -469,7 +479,7 @@ describe("Test Linear Elements", () => {
       drag(startPoint, endPoint);
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `12`,
+        `11`,
       );
       expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -537,7 +547,7 @@ describe("Test Linear Elements", () => {
         );
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `16`,
+          `14`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -588,7 +598,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] - delta, hitCoords[1] - delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `12`,
+          `11`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
@@ -629,7 +639,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] + delta, hitCoords[1] + delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `12`,
+          `11`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
@@ -677,7 +687,7 @@ describe("Test Linear Elements", () => {
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `18`,
+          `17`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -735,7 +745,7 @@ describe("Test Linear Elements", () => {
           ),
         );
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `16`,
+          `14`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
         expect(line.points.length).toEqual(5);
@@ -833,7 +843,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] + delta, hitCoords[1] + delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `12`,
+          `11`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 

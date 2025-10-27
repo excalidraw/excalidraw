@@ -49,13 +49,16 @@ export const getDefaultAppState = (): Omit<
     newElement: null,
     editingTextElement: null,
     editingGroupId: null,
-    editingLinearElement: null,
     activeTool: {
       type: "selection",
       customType: null,
       locked: DEFAULT_ELEMENT_PROPS.locked,
       fromSelection: false,
       lastActiveTool: null,
+    },
+    preferredSelectionTool: {
+      type: "selection",
+      initialized: false,
     },
     penMode: false,
     penDetected: false,
@@ -125,6 +128,7 @@ export const getDefaultAppState = (): Omit<
     searchMatches: null,
     lockedMultiSelections: {},
     activeLockedId: null,
+    stylesPanelMode: "full",
   };
 };
 
@@ -181,8 +185,8 @@ const APP_STATE_STORAGE_CONF = (<
   newElement: { browser: false, export: false, server: false },
   editingTextElement: { browser: false, export: false, server: false },
   editingGroupId: { browser: true, export: false, server: false },
-  editingLinearElement: { browser: false, export: false, server: false },
   activeTool: { browser: true, export: false, server: false },
+  preferredSelectionTool: { browser: true, export: false, server: false },
   penMode: { browser: true, export: false, server: false },
   penDetected: { browser: true, export: false, server: false },
   errorMessage: { browser: false, export: false, server: false },
@@ -255,6 +259,7 @@ const APP_STATE_STORAGE_CONF = (<
   searchMatches: { browser: false, export: false, server: false },
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
+  stylesPanelMode: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

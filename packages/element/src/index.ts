@@ -29,6 +29,9 @@ export const hashElementsVersion = (elements: ElementsMapOrArray): number => {
 
 // string hash function (using djb2). Not cryptographically secure, use only
 // for versioning and such.
+// note: hashes individual code units (not code points),
+// but for hashing purposes this is fine as it iterates through every code unit
+// (as such, no need to encode to byte string first)
 export const hashString = (s: string): number => {
   let hash: number = 5381;
   for (let i = 0; i < s.length; i++) {
@@ -98,6 +101,7 @@ export * from "./image";
 export * from "./linearElementEditor";
 export * from "./mutateElement";
 export * from "./newElement";
+export * from "./positionElementsOnGrid";
 export * from "./renderElement";
 export * from "./resizeElements";
 export * from "./resizeTest";
