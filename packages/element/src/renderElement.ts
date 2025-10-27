@@ -1052,15 +1052,14 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
 
 export function getFreedrawOutlineAsSegments(
   element: ExcalidrawFreeDrawElement,
-  points: [number, number][],
-  elementsMap: ElementsMap,
+  points: readonly [number, number][],
 ) {
   const bounds = getElementBounds(
     {
       ...element,
       angle: 0 as Radians,
     },
-    elementsMap,
+    new Map(),
   );
   const center = pointFrom<GlobalPoint>(
     (bounds[0] + bounds[2]) / 2,
