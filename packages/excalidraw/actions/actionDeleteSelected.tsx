@@ -30,6 +30,8 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { TrashIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 
+import { useStylesPanelMode } from "..";
+
 import { register } from "./register";
 
 import type { AppClassProperties, AppState } from "../types";
@@ -320,22 +322,25 @@ export const actionDeleteSelected = register({
   keyTest: (event, appState, elements) =>
     (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
     !event[KEYS.CTRL_OR_CMD],
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <ToolButton
-      type="button"
-      icon={TrashIcon}
-      title={t("labels.delete")}
-      aria-label={t("labels.delete")}
-      onClick={() => updateData(null)}
-      disabled={
-        !isSomeElementSelected(getNonDeletedElements(elements), appState)
-      }
-      style={{
-        ...(appState.stylesPanelMode === "mobile" &&
-        appState.openPopup !== "compactOtherProperties"
-          ? MOBILE_ACTION_BUTTON_BG
-          : {}),
-      }}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const isMobile = useStylesPanelMode() === "mobile";
+
+    return (
+      <ToolButton
+        type="button"
+        icon={TrashIcon}
+        title={t("labels.delete")}
+        aria-label={t("labels.delete")}
+        onClick={() => updateData(null)}
+        disabled={
+          !isSomeElementSelected(getNonDeletedElements(elements), appState)
+        }
+        style={{
+          ...(isMobile && appState.openPopup !== "compactOtherProperties"
+            ? MOBILE_ACTION_BUTTON_BG
+            : {}),
+        }}
+      />
+    );
+  },
 });

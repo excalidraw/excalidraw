@@ -12,10 +12,10 @@ const MobileFooter = ({
   excalidrawAPI: ExcalidrawImperativeAPI;
   excalidrawLib: typeof TExcalidraw;
 }) => {
-  const { useDevice, Footer } = excalidrawLib;
+  const { useEditorInterface, Footer } = excalidrawLib;
 
-  const device = useDevice();
-  if (device.editor.isMobile) {
+  const editorInterface = useEditorInterface();
+  if (editorInterface.formFactor === "phone") {
     return (
       <Footer>
         <CustomFooter

@@ -285,7 +285,7 @@ export { Button } from "./components/Button";
 export { Footer };
 export { MainMenu };
 export { Ellipsify } from "./components/Ellipsify";
-export { useDevice } from "./components/App";
+export { useEditorInterface, useStylesPanelMode } from "./components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
 export { Stats } from "./components/Stats";

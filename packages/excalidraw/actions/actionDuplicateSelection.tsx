@@ -27,6 +27,8 @@ import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 import { getShortcutKey } from "../shortcut";
 
+import { useStylesPanelMode } from "..";
+
 import { register } from "./register";
 
 export const actionDuplicateSelection = register({
@@ -107,24 +109,27 @@ export const actionDuplicateSelection = register({
     };
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,
-  PanelComponent: ({ elements, appState, updateData }) => (
-    <ToolButton
-      type="button"
-      icon={DuplicateIcon}
-      title={`${t("labels.duplicateSelection")} — ${getShortcutKey(
-        "CtrlOrCmd+D",
-      )}`}
-      aria-label={t("labels.duplicateSelection")}
-      onClick={() => updateData(null)}
-      disabled={
-        !isSomeElementSelected(getNonDeletedElements(elements), appState)
-      }
-      style={{
-        ...(appState.stylesPanelMode === "mobile" &&
-        appState.openPopup !== "compactOtherProperties"
-          ? MOBILE_ACTION_BUTTON_BG
-          : {}),
-      }}
-    />
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const isMobile = useStylesPanelMode() === "mobile";
+
+    return (
+      <ToolButton
+        type="button"
+        icon={DuplicateIcon}
+        title={`${t("labels.duplicateSelection")} — ${getShortcutKey(
+          "CtrlOrCmd+D",
+        )}`}
+        aria-label={t("labels.duplicateSelection")}
+        onClick={() => updateData(null)}
+        disabled={
+          !isSomeElementSelected(getNonDeletedElements(elements), appState)
+        }
+        style={{
+          ...(isMobile && appState.openPopup !== "compactOtherProperties"
+            ? MOBILE_ACTION_BUTTON_BG
+            : {}),
+        }}
+      />
+    );
+  },
 });

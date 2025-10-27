@@ -4,7 +4,7 @@ import React, { type ReactNode } from "react";
 
 import { isInteractive } from "@excalidraw/common";
 
-import { useDevice } from "./App";
+import { useEditorInterface } from "./App";
 import { Island } from "./Island";
 
 interface PropertiesPopoverProps {
@@ -39,9 +39,9 @@ export const PropertiesPopover = React.forwardRef<
     },
     ref,
   ) => {
-    const device = useDevice();
+    const editorInterface = useEditorInterface();
     const isMobilePortrait =
-      device.editor.isMobile && !device.viewport.isLandscape;
+      editorInterface.formFactor === "phone" && !editorInterface.isLandscape;
 
     return (
       <Popover.Portal container={container}>
@@ -56,7 +56,8 @@ export const PropertiesPopover = React.forwardRef<
           collisionBoundary={container ?? undefined}
           style={{
             zIndex: "var(--zIndex-ui-styles-popup)",
-            marginLeft: device.editor.isMobile ? "0.5rem" : undefined,
+            marginLeft:
+              editorInterface.formFactor === "phone" ? "0.5rem" : undefined,
           }}
           onPointerLeave={onPointerLeave}
           onKeyDown={onKeyDown}
@@ -64,7 +65,7 @@ export const PropertiesPopover = React.forwardRef<
           onPointerDownOutside={onPointerDownOutside}
           onOpenAutoFocus={(e) => {
             // prevent auto-focus on touch devices to avoid keyboard popup
-            if (preventAutoFocusOnTouch && device.isTouchScreen) {
+            if (preventAutoFocusOnTouch && editorInterface.isTouchScreen) {
               e.preventDefault();
             }
           }}
