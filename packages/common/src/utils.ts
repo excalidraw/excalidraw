@@ -23,8 +23,6 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 
-import { isDarwin } from "./editorInterface";
-
 import type { MaybePromise, ResolutionType } from "./utility-types";
 
 import type { EVENT } from "./constants";
@@ -424,19 +422,6 @@ export const allowFullScreen = () =>
   document.documentElement.requestFullscreen();
 
 export const exitFullScreen = () => document.exitFullscreen();
-
-export const getShortcutKey = (shortcut: string): string => {
-  shortcut = shortcut
-    .replace(/\bAlt\b/i, "Alt")
-    .replace(/\bShift\b/i, "Shift")
-    .replace(/\b(Enter|Return)\b/i, "Enter");
-  if (isDarwin) {
-    return shortcut
-      .replace(/\bCtrlOrCmd\b/gi, "Cmd")
-      .replace(/\bAlt\b/i, "Option");
-  }
-  return shortcut.replace(/\bCtrlOrCmd\b/gi, "Ctrl");
-};
 
 export const viewportCoordsToSceneCoords = (
   { clientX, clientY }: { clientX: number; clientY: number },

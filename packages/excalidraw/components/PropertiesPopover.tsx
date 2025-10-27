@@ -40,6 +40,8 @@ export const PropertiesPopover = React.forwardRef<
     ref,
   ) => {
     const editorInterface = useEditorInterface();
+    const isMobilePortrait =
+      editorInterface.formFactor === "phone" && !editorInterface.isLandscape;
 
     return (
       <Popover.Portal container={container}>
@@ -47,20 +49,11 @@ export const PropertiesPopover = React.forwardRef<
           ref={ref}
           className={clsx("focus-visible-none", className)}
           data-prevent-outside-click
-          side={
-            editorInterface.formFactor === "phone" &&
-            !editorInterface.isLandscape
-              ? "bottom"
-              : "right"
-          }
-          align={
-            editorInterface.formFactor === "phone" &&
-            !editorInterface.isLandscape
-              ? "center"
-              : "start"
-          }
+          side={isMobilePortrait ? "bottom" : "right"}
+          align={isMobilePortrait ? "center" : "start"}
           alignOffset={-16}
           sideOffset={20}
+          collisionBoundary={container ?? undefined}
           style={{
             zIndex: "var(--zIndex-ui-styles-popup)",
             marginLeft:
