@@ -1,12 +1,29 @@
 import { LaserPointer, type Point } from "@excalidraw/laser-pointer";
 
-import { clamp, round, type LocalPoint } from "@excalidraw/math";
+import {
+  clamp,
+  lineSegment,
+  pointFrom,
+  pointRotateRads,
+  round,
+  type LocalPoint,
+} from "@excalidraw/math";
 
 import getStroke from "perfect-freehand";
 
+import { invariant } from "@excalidraw/common";
+
+import type { GlobalPoint, Radians } from "@excalidraw/math";
+
+import { getElementBounds } from "./bounds";
+
 import type { StrokeOptions } from "perfect-freehand";
 
-import type { ExcalidrawFreeDrawElement, PointerType } from "./types";
+import type {
+  ElementsMap,
+  ExcalidrawFreeDrawElement,
+  PointerType,
+} from "./types";
 
 export const STROKE_OPTIONS: Record<
   PointerType | "default",
@@ -276,3 +293,81 @@ const _legacy_getSvgPathFromStroke = (points: number[][]): string => {
     .join(" ")
     .replace(TO_FIXED_PRECISION, "$1");
 };
+
+export function getFreedrawOutlineAsSegments(
+  element: ExcalidrawFreeDrawElement,
+  points: [number, number][],
+  elementsMap: ElementsMap,
+) {
+  const bounds = getElementBounds(
+    {
+      ...element,
+      angle: 0 as Radians,
+    },
+    elementsMap,
+  );
+  const center = pointFrom<GlobalPoint>(
+    (bounds[0] + bounds[2]) / 2,
+    (bounds[1] + bounds[3]) / 2,
+  );
+
+  invariant(points.length >= 2, "Freepath outline must have at least 2 points");
+
+  return points.slice(2).reduce(
+    (acc, curr) => {
+      acc.push(
+        lineSegment<GlobalPoint>(
+          acc[acc.length - 1][1],
+          pointRotateRads(
+            pointFrom<GlobalPoint>(curr[0] + element.x, curr[1] + element.y),
+            center,
+            element.angle,
+          ),
+        ),
+      );
+      return acc;
+    },
+    [
+      lineSegment<GlobalPoint>(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            points[0][0] + element.x,
+            points[0][1] + element.y,
+          ),
+          center,
+          element.angle,
+        ),
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            points[1][0] + element.x,
+            points[1][1] + element.y,
+          ),
+          center,
+          element.angle,
+        ),
+      ),
+    ],
+  );
+}
+
+export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement) {
+  // If input points are empty (should they ever be?) return a dot
+  const inputPoints = element.simulatePressure
+    ? element.points
+    : element.points.length
+    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
+    : [[0, 0, 0.5]];
+
+  // Consider changing the options for simulated pressure vs real pressure
+  const options: StrokeOptions = {
+    simulatePressure: element.simulatePressure,
+    size: element.strokeWidth * 4.25,
+    thinning: 0.6,
+    smoothing: 0.5,
+    streamline: 0.5,
+    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
+    last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
+  };
+
+  return getStroke(inputPoints as number[][], options) as [number, number][];
+}

@@ -168,13 +168,13 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "backgroundColor": "transparent",
   "boundElements": [],
   "customData": undefined,
-  "drawingConfigs": {
+  "fillStyle": "solid",
+  "frameId": null,
+  "freedrawOptions": {
     "fixedStrokeWidth": true,
     "simplify": "0.10000",
     "streamline": "0.25000",
   },
-  "fillStyle": "solid",
-  "frameId": null,
   "groupIds": [],
   "height": 100,
   "id": "id-freedraw01",
