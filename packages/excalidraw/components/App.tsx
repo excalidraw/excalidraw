@@ -481,7 +481,7 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionName, ActionResult } from "../actions/types";
-import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode, isPanWithRightMouseEnabled, shouldDisableZoom } from "../obsidianUtils";
+import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode, isPanWithRightMouseEnabled, shouldDisableZoom, isContextMenuDisabled } from "../obsidianUtils";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
 
@@ -7689,6 +7689,9 @@ startLineEditor = (
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
     event: React.PointerEvent<HTMLElement>,
   ): void => {
+    if (isContextMenuDisabled()) {
+      return;
+    }
     // deal with opening context menu on touch devices
     if (event.pointerType === "touch") {
       invalidateContextMenu = false;
@@ -7703,7 +7706,8 @@ startLineEditor = (
         // if the touch is not moving
         touchTimeout = window.setTimeout(() => {
           touchTimeout = 0;
-          if (!invalidateContextMenu) {
+          if (!invalidateContextMenu && !this.state.isResizing) {
+            //zsviczian - avoid context menu during resizing on Mobiles
             this.handleCanvasContextMenu(event);
           }
         }, TOUCH_CTX_MENU_TIMEOUT);
@@ -11606,10 +11610,6 @@ startLineEditor = (
       this.state.activeTool.type !== this.state.preferredSelectionTool.type
     ) {
       return;
-    }
-
-    if (this.state.isResizing) {
-      return; //zsviczian - avoid context menu during resizing on Mobiles
     }
 
     const { x, y } = viewportCoordsToSceneCoords(event, this.state);

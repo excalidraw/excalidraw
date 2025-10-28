@@ -6,6 +6,8 @@ import {
   ZOOM_STEP,
   MAX_ZOOM,
   MIN_ZOOM,
+  TOUCH_CTX_MENU_TIMEOUT,
+  DRAGGING_THRESHOLD,
 } from "@excalidraw/common";
 
 import { FONT_METADATA } from "@excalidraw/common";
@@ -321,3 +323,7 @@ export const shouldDisableZoom = (appState: AppState): boolean => {
 
 export const isFullPanelMode = (appState: AppState): boolean => 
   appState.stylesPanelMode === "full" || appState.stylesPanelMode === "tray";
+
+export const isContextMenuDisabled = (): boolean => {
+  return getHostPlugin().settings.disableContextMenu ?? false;
+};
