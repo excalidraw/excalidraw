@@ -312,7 +312,11 @@ import {
   actionSelectAllElementsInFrame,
   actionWrapSelectionInFrame,
 } from "../actions/actionFrame";
-import { createRedoAction, createUndoAction } from "../actions/actionHistory";
+import {
+  createRedoAction,
+  createUndoAction,
+  createClearHistoryAction,
+} from "../actions/actionHistory";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { ActionManager } from "../actions/manager";
@@ -766,6 +770,7 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.registerAll(actions);
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
+    this.actionManager.registerAction(createClearHistoryAction(this.history));
   }
 
   updateEditorAtom = <Value, Args extends unknown[], Result>(
