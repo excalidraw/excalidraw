@@ -51,6 +51,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onScrollChange,
     onDuplicate,
     children,
+    scrollConstraints,
     validateEmbeddable,
     renderEmbeddable,
     aiEnabled,
@@ -124,7 +125,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
           langCode={langCode}
-          viewModeEnabled={viewModeEnabled}
+          viewModeEnabled={viewModeEnabled ?? !!scrollConstraints}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
           libraryReturnUrl={libraryReturnUrl}
@@ -143,6 +144,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
           onScrollChange={onScrollChange}
+          scrollConstraints={scrollConstraints}
           onDuplicate={onDuplicate}
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}

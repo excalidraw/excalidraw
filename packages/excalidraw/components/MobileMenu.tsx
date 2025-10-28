@@ -137,7 +137,8 @@ export const MobileMenu = ({
             renderToolbar()}
           {appState.scrolledOutside &&
             !appState.openMenu &&
-            !appState.openSidebar && (
+            !appState.openSidebar &&
+            !appState.scrollConstraints && (
               <button
                 type="button"
                 className="scroll-back-to-content"
