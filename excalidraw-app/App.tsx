@@ -134,7 +134,6 @@ import DebugCanvas, {
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
-import { FreedrawDebugSliders } from "./components/FreedrawDebugSliders";
 
 import "./index.scss";
 
