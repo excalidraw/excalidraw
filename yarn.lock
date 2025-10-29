@@ -1437,6 +1437,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@excalidraw/common@0.18.0-f0063e113":
+  version "0.18.0-f0063e113"
+  resolved "https://registry.yarnpkg.com/@excalidraw/common/-/common-0.18.0-f0063e113.tgz#47ea71127fe07a055af84ef2ab40562a3ce4b4f5"
+  integrity sha512-VS9aBg3vRYn8jrvuaAYVrM2Q3rokDO6gmx3bmYZ22fCr6rnnumhJpQvpQEv3fh7YrvnIrihhLgIt8eiCIfzXag==
+
 "@excalidraw/eslint-config@1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@excalidraw/eslint-config/-/eslint-config-1.0.3.tgz#2122ef7413ae77874ae9848ce0f1c6b3f0d8bbbd"
@@ -1451,6 +1456,13 @@
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@excalidraw/markdown-to-text/-/markdown-to-text-0.1.2.tgz#1703705e7da608cf478f17bfe96fb295f55a23eb"
   integrity sha512-1nDXBNAojfi3oSFwJswKREkFm5wrSjqay81QlyRv2pkITG/XYB5v+oChENVBQLcxQwX4IUATWvXM5BcaNhPiIg==
+
+"@excalidraw/math@0.18.0-f0063e113":
+  version "0.18.0-f0063e113"
+  resolved "https://registry.yarnpkg.com/@excalidraw/math/-/math-0.18.0-f0063e113.tgz#e5cfa0f9aeac62499a6c96ffa10b2ec2746b99b0"
+  integrity sha512-WLFqyqo2AcrRNmCpP0QG7kf98zAakAj2TadjlEVwUDQ4YwH8o90TC/phpx7xhTL5cJwMtNyAubNswR4aKCyPrQ==
+  dependencies:
+    "@excalidraw/common" "0.18.0-f0063e113"
 
 "@excalidraw/mermaid-to-excalidraw@1.1.3":
   version "1.1.3"
@@ -3468,6 +3480,11 @@ ansi-regex@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.1.tgz#082cb2c89c9fe8659a311a53bd6a4dc5301db304"
   integrity sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==
+
+ansi-regex@^6.0.1:
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-6.2.2.tgz#60216eea464d864597ce2832000738a0589650c1"
+  integrity sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg==
 
 ansi-styles@^3.2.1:
   version "3.2.1"
@@ -8909,12 +8926,19 @@ stringify-object@^3.3.0:
   dependencies:
     ansi-regex "^5.0.1"
 
-strip-ansi@6.0.1, strip-ansi@^6.0.0, strip-ansi@^6.0.1, strip-ansi@^7.0.1:
+strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
   dependencies:
     ansi-regex "^5.0.1"
+
+strip-ansi@^7.0.1:
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-7.1.2.tgz#132875abde678c7ea8d691533f2e7e22bb744dba"
+  integrity sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA==
+  dependencies:
+    ansi-regex "^6.0.1"
 
 strip-bom@^3.0.0:
   version "3.0.0"
