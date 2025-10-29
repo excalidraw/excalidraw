@@ -5,7 +5,7 @@ import { newElementWith } from "@excalidraw/element";
 import throttle from "lodash.throttle";
 
 import type { UserIdleState } from "@excalidraw/common";
-import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
+import type { OrderedExcalidrawElement } from "@excalidraw/element";
 import type {
   OnUserFollowedPayload,
   SocketId,
