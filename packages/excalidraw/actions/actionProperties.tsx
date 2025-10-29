@@ -43,6 +43,7 @@ import {
   isArrowElement,
   isBoundToContainer,
   isElbowArrow,
+  isFreeDrawElement,
   isLinearElement,
   isLineElement,
   isTextElement,
@@ -125,6 +126,9 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  strokeWidthFixedIcon,
+  strokeWidthVariableIcon,
+  StrokeWidthMediumIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -521,6 +525,33 @@ export const actionChangeFillStyle = register({
   },
 });
 
+const WIDTHS = [
+  {
+    value: STROKE_WIDTH.thin,
+    text: t("labels.thin"),
+    icon: StrokeWidthBaseIcon,
+    testId: "strokeWidth-thin",
+  },
+  {
+    value: STROKE_WIDTH.medium,
+    text: t("labels.medium"),
+    icon: StrokeWidthMediumIcon,
+    testId: "strokeWidth-medium",
+  },
+  {
+    value: STROKE_WIDTH.bold,
+    text: t("labels.bold"),
+    icon: StrokeWidthBoldIcon,
+    testId: "strokeWidth-bold",
+  },
+  {
+    value: STROKE_WIDTH.extraBold,
+    text: t("labels.extraBold"),
+    icon: StrokeWidthExtraBoldIcon,
+    testId: "strokeWidth-extraBold",
+  },
+];
+
 export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
   label: "labels.strokeWidth",
@@ -542,26 +573,7 @@ export const actionChangeStrokeWidth = register({
       <div className="buttonList">
         <RadioSelection
           group="stroke-width"
-          options={[
-            {
-              value: STROKE_WIDTH.thin,
-              text: t("labels.thin"),
-              icon: StrokeWidthBaseIcon,
-              testId: "strokeWidth-thin",
-            },
-            {
-              value: STROKE_WIDTH.bold,
-              text: t("labels.bold"),
-              icon: StrokeWidthBoldIcon,
-              testId: "strokeWidth-bold",
-            },
-            {
-              value: STROKE_WIDTH.extraBold,
-              text: t("labels.extraBold"),
-              icon: StrokeWidthExtraBoldIcon,
-              testId: "strokeWidth-extraBold",
-            },
-          ]}
+          options={WIDTHS}
           value={getFormValue(
             elements,
             app,
@@ -682,6 +694,70 @@ export const actionChangeStrokeStyle = register({
       </div>
     </fieldset>
   ),
+});
+
+export const actionChangePressureSensitivity = register({
+  name: "changeStrokeType",
+  label: "labels.strokeType",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    const updatedElements = changeProperty(elements, appState, (el) => {
+      if (isFreeDrawElement(el)) {
+        return newElementWith(el, {
+          freedrawOptions: {
+            ...el.freedrawOptions,
+            fixedStrokeWidth: value,
+          },
+        });
+      }
+      return el;
+    });
+
+    return {
+      elements: updatedElements,
+      appState: { ...appState, currentItemFixedStrokeWidth: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ app, appState, updateData }) => {
+    const selectedElements = app.scene.getSelectedElements(app.state);
+    const freedraws = selectedElements.filter(isFreeDrawElement);
+
+    const currentValue =
+      freedraws.length > 0
+        ? reduceToCommonValue(
+            freedraws,
+            (element) => element.freedrawOptions?.fixedStrokeWidth,
+          ) ?? null
+        : appState.currentItemFixedStrokeWidth;
+
+    return (
+      <fieldset>
+        <legend>{t("labels.strokeType")}</legend>
+        <div className="buttonList">
+          <RadioSelection
+            group="pressure-sensitivity"
+            options={[
+              {
+                value: true,
+                text: t("labels.strokeWidthFixed"),
+                icon: strokeWidthFixedIcon,
+                testId: "pressure-fixed",
+              },
+              {
+                value: false,
+                text: t("labels.strokeWidthVariable"),
+                icon: strokeWidthVariableIcon,
+                testId: "pressure-variable",
+              },
+            ]}
+            value={currentValue}
+            onChange={(value) => updateData(value)}
+          />
+        </div>
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeOpacity = register({
