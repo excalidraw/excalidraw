@@ -128,6 +128,7 @@ export const bindOrUnbindBindingElement = (
     appState,
     {
       ...opts,
+      finalize: true,
     },
   );
 
@@ -396,7 +397,7 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   globalBindMode: AppState["bindMode"],
   arrow: NonDeleted<ExcalidrawArrowElement>,
-  shiftKey?: boolean,
+  finalize?: boolean,
 ): { current: BindingStrategy; other: BindingStrategy } => {
   let current: BindingStrategy = { mode: undefined };
   let other: BindingStrategy = { mode: undefined };
@@ -461,7 +462,7 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
       // The opposite binding is on the binding gap of the same element
       if (oppositeBinding.mode === "orbit") {
         current = { element: hit, mode: "orbit", focusPoint: point };
-        other = { mode: null };
+        other = { mode: finalize ? null : undefined };
 
         return { current, other: isMultiPoint ? { mode: undefined } : other };
       }
@@ -517,6 +518,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
   opts?: {
     newArrow?: boolean;
     shiftKey?: boolean;
+    finalize?: boolean;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   const globalBindMode = appState.bindMode || "orbit";
@@ -600,7 +602,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
       elements,
       globalBindMode,
       arrow,
-      opts?.shiftKey,
+      opts?.finalize,
     );
 
     return { start: current, end: other };
@@ -623,7 +625,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
       elements,
       globalBindMode,
       arrow,
-      opts?.shiftKey,
+      opts?.finalize,
     );
 
     return { start: other, end: current };
