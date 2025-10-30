@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "Üçgen (anahat)",
     "arrowhead_diamond": "Elmas",
     "arrowhead_diamond_outline": "Elmas (anahat)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_many": "Karga ayak (çok)",
+    "arrowhead_crowfoot_one": "Karga ayak (bir)",
+    "arrowhead_crowfoot_one_or_many": "Karga ayak (bir veya çok sayıda)",
+    "more_options": "Daha fazla seçenek",
     "arrowtypes": "Ok şekli",
     "arrowtype_sharp": "Düz ok",
     "arrowtype_round": "Kavisli ok",
@@ -78,7 +78,7 @@
     "artist": "Sanatçı",
     "cartoonist": "Karikatürist",
     "fileTitle": "Dosya adı",
-    "colorPicker": "Renk seçici",
+    "colorPicker": "Renk seçicisi",
     "canvasColors": "Tuvalin üzerinde kullanıldı",
     "canvasBackground": "Tuval arka planı",
     "drawingCanvas": "Çizim tuvali",
@@ -89,13 +89,13 @@
     "liveCollaboration": "Canlı ortak çalışma alanı...",
     "duplicateSelection": "Çoğalt",
     "untitled": "Adsız",
-    "name": "İsim",
-    "yourName": "İsminiz",
+    "name": "Ad",
+    "yourName": "Adınız",
     "madeWithExcalidraw": "Excalidraw ile yapıldı",
     "group": "Seçimi grup yap",
     "ungroup": "Seçilen grubu dağıt",
     "collaborators": "Ortaklar",
-    "toggleGrid": "Izgarayı Aç/Kapa",
+    "toggleGrid": "Izgarayı aç/kapat",
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
     "libraryLoadingMessage": "Kütüphane yükleniyor…",
@@ -116,7 +116,7 @@
     "viewMode": "Görünüm modu",
     "share": "Paylaş",
     "showStroke": "Kontur için renk seçiciyi göster",
-    "showBackground": "Arkaplan için renk seçiciyi göster",
+    "showBackground": "Arka plan renk seçicisini göster",
     "showFonts": "Yazı tipi seçici",
     "toggleTheme": "Aydınlık/karanlık mod",
     "theme": "Tema",
@@ -129,21 +129,21 @@
     "createContainerFromText": "Metni bileşen içinde sar",
     "link": {
       "edit": "Bağlantıyı düzenle",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "Gömülebilir bağlantıyı düzenle",
+      "create": "Bağlantı ekle",
       "label": "Bağlantı",
-      "labelEmbed": "Bağlantı & yerleştirme",
+      "labelEmbed": "Bağlantıla ve göm",
       "empty": "Herhangi bir bağlantı oluşturulmadı",
-      "hint": "",
-      "goToElement": ""
+      "hint": "Bağlantınızı buraya yazın veya yapıştırın",
+      "goToElement": "Hedef öğeye git"
     },
     "lineEditor": {
       "edit": "Çizgiyi düzenle",
       "editArrow": "Oku düzenle"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Çokgeni kır",
+      "convertToPolygon": "Çokgene dönüştür"
     },
     "elementLock": {
       "lock": "Kilitle",
@@ -157,46 +157,46 @@
     "removeAllElementsFromFrame": "Çerçevedeki tüm bileşenleri sil",
     "eyeDropper": "Tuvalden renk seç",
     "textToDiagram": "Yazıdan diyagrama",
-    "prompt": "Prompt",
-    "followUs": "Bizi takip et",
+    "prompt": "İstem",
+    "followUs": "Bizi takip edin",
     "discordChat": "Discord sohbeti",
-    "zoomToFitViewport": "Görüntü alanına sığdırmak için yakınlaştır",
-    "zoomToFitSelection": "Seçime sığdırmak için yakınlaştır",
-    "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
+    "zoomToFitViewport": "Görüş alanına sığdırmak için yakınlaştırın",
+    "zoomToFitSelection": "Seçime sığdırmak için yakınlaştırın",
+    "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştırın",
     "installPWA": "Excalidraw'ı yerel olarak yükle (PWA)",
     "autoResize": "Metni otomatik yeniden boyutlandırmayı etkinleştir",
-    "imageCropping": "",
-    "unCroppedDimension": "",
-    "copyElementLink": "",
-    "linkToElement": "",
-    "wrapSelectionInFrame": "",
-    "tab": "",
-    "shapeSwitch": ""
+    "imageCropping": "Görsel kırpma",
+    "unCroppedDimension": "Kırpılmamış ölçüler",
+    "copyElementLink": "Bağlantıyı nesneye kopyala",
+    "linkToElement": "Nesneye bağlantıla",
+    "wrapSelectionInFrame": "Seçimi karede kaydır",
+    "tab": "Sekme",
+    "shapeSwitch": "Şekli başkasıyla değiştir"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "Nesneye bağlantıla",
+    "desc": "Tuvaldeki bir nesneye tıklayın veya bir bağlantıyı yapıştırın.",
+    "notFound": "Bağlantılanan nesne tuvalde bulunamadı."
   },
   "library": {
     "noItems": "Öğe eklenmedi...",
     "hint_emptyLibrary": "Öğelerden birini eklemek için öğeyi seçiniz veya aşağıdaki genel kütüphaneden öğeleri ekleyin.",
     "hint_emptyPrivateLibrary": "Tuvalden bir eleman seçerek sayfaya ekleyin.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Kütüphanede ara",
+      "heading": "Kütüphane eşleşmeleri",
+      "noResults": "Eşleşen öğe bulunamadı…",
+      "clearSearch": "Aramayı temizle"
     }
   },
   "search": {
-    "title": "Kanvas'ta bul",
+    "title": "Tuvalde bul",
     "noMatch": "Sonuç bulunamadı...",
     "singleResult": "sonuç",
     "multipleResults": "sonuç",
-    "placeholder": "Kanvas'ta metin bul...",
-    "frames": "",
-    "texts": ""
+    "placeholder": "Tuvalde metin bul…",
+    "frames": "Çerçeveler",
+    "texts": "Metinler"
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
@@ -230,11 +230,11 @@
     "objectsSnapMode": "Nesnelere hizala",
     "exitZenMode": "Zen modundan çık",
     "cancel": "İptal",
-    "saveLibNames": "",
+    "saveLibNames": "Adları kaydet ve çık",
     "clear": "Temizle",
     "remove": "Kaldır",
     "embed": "Yerleştirmeyi aç veya kapa",
-    "publishLibrary": "",
+    "publishLibrary": "Yeniden adlandır veya yayımla",
     "submit": "Gönder",
     "confirm": "Onayla",
     "embeddableInteractionButton": "Etkileşime girmek için tıkla"
@@ -261,7 +261,7 @@
     "removeItemsFromsLibrary": "{{count}} öğe(ler) kitaplıktan kaldırılsın mı?",
     "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı.",
     "collabOfflineWarning": "İnternet bağlantısı bulunamadı. Değişiklikleriniz kaydedilmeyecek!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Tarayıcı depolama kotası aşıldı. Değişiklikler kaydedilmeyecek."
   },
   "errors": {
     "unsupportedFileType": "Desteklenmeyen dosya türü.",
@@ -292,7 +292,7 @@
   },
   "toolBar": {
     "selection": "Seçme",
-    "lasso": "",
+    "lasso": "Serbest seçim",
     "image": "Görsel ekle",
     "rectangle": "Dikdörtgen",
     "diamond": "Elmas",
@@ -313,7 +313,7 @@
     "hand": "El (hareket aracı)",
     "extraTools": "Daha fazla araç",
     "mermaidToExcalidraw": "Mermaid'den Excalidraw'a",
-    "convertElementType": ""
+    "convertElementType": "Şekil türünü aç/kapat"
   },
   "element": {
     "rectangle": "Dikdörtgen",
@@ -337,17 +337,17 @@
     "shapes": "Şekiller"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "Aramayı kapatmak için {{shortcut}} kullanın",
+    "canvasPanning": "Tuvali taşımak için {{shortcut_1}} kısayolunu basılı tutun, sürüklerken {{shortcut_2}} kısayolunu veya el aracını kullanın",
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
-    "arrowTool": "",
+    "arrowTool": "Birden çok nokta başlatmak için tıklayın, tek bir çizgi için sürükleyin. Ok türünü değiştirmek için {{shortcut}} kısayoluna basın.",
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
     "embeddable": "Web sitesi yerleştirmek için sürükle bırak",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
+    "text_selected": "Metni düzenlemek için çift tıklayın veya {{shortcut}} kısayoluna basın",
+    "text_editing": "Düzenlemeyi bitirmek için {{shortcut_1}} veya {{shortcut_2}} kısayoluna basın",
+    "linearElementMulti": "Bitirmek için son noktaya tıklayın veya {{shortcut_1}} veya {{shortcut_2}} kısayolunu kullanın",
+    "lockAngle": "{{shortcut}} kısayolunu basılı tutarak açıyı kısıtlayabilirsiniz",
     "resize": "",
     "resizeImage": "",
     "rotate": "",
