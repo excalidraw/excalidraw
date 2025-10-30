@@ -2220,14 +2220,12 @@ const pointDraggingUpdates = (
   const startIsDraggingOverEndElement =
     element.endBinding &&
     nextArrow.startBinding &&
-    app.state.bindMode === "inside" &&
-    endIsDragged &&
+    startIsDragged &&
     nextArrow.startBinding.elementId === element.endBinding.elementId;
   const endIsDraggingOverStartElement =
     element.startBinding &&
     nextArrow.endBinding &&
-    app.state.bindMode === "inside" &&
-    startIsDragged &&
+    endIsDragged &&
     element.startBinding.elementId === nextArrow.endBinding.elementId;
 
   // We need to update the non-dragged point too if bound,
@@ -2238,17 +2236,20 @@ const pointDraggingUpdates = (
         nextArrow.endBinding.elementId,
       )! as ExcalidrawBindableElement)
     : null;
-  const endLocalPoint =
-    endBindable && !endIsDraggingOverStartElement
-      ? updateBoundPoint(
-          nextArrow,
-          "endBinding",
-          nextArrow.endBinding,
-          endBindable,
-          elementsMap,
-          customIntersector,
-        ) || nextArrow.points[nextArrow.points.length - 1]
-      : nextArrow.points[nextArrow.points.length - 1];
+  const endLocalPoint = startIsDraggingOverEndElement
+    ? nextArrow.points[nextArrow.points.length - 1]
+    : endIsDraggingOverStartElement && app.state.bindMode !== "inside"
+    ? nextArrow.points[0]
+    : endBindable
+    ? updateBoundPoint(
+        nextArrow,
+        "endBinding",
+        nextArrow.endBinding,
+        endBindable,
+        elementsMap,
+        customIntersector,
+      ) || nextArrow.points[nextArrow.points.length - 1]
+    : nextArrow.points[nextArrow.points.length - 1];
 
   // We need to keep the simulated next arrow up-to-date, because
   // updateBoundPoint looks at the opposite point
@@ -2263,17 +2264,20 @@ const pointDraggingUpdates = (
       )! as ExcalidrawBindableElement)
     : null;
 
-  const startLocalPoint =
-    startBindable && startIsDraggingOverEndElement
-      ? updateBoundPoint(
-          nextArrow,
-          "startBinding",
-          nextArrow.startBinding,
-          startBindable,
-          elementsMap,
-          customIntersector,
-        ) || nextArrow.points[0]
-      : nextArrow.points[0];
+  const startLocalPoint = endIsDraggingOverStartElement
+    ? nextArrow.points[0]
+    : startIsDraggingOverEndElement && app.state.bindMode !== "inside"
+    ? nextArrow.points[nextArrow.points.length - 1]
+    : startBindable
+    ? updateBoundPoint(
+        nextArrow,
+        "startBinding",
+        nextArrow.startBinding,
+        startBindable,
+        elementsMap,
+        customIntersector,
+      ) || nextArrow.points[0]
+    : nextArrow.points[0];
 
   const endChanged =
     pointDistance(

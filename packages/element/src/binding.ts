@@ -434,6 +434,10 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
           mode: "inside",
         }
       : { mode: null };
+    other =
+      finalize && hit && hit.id === oppositeBinding?.elementId
+        ? { mode: null }
+        : other;
 
     return { current, other };
   }
