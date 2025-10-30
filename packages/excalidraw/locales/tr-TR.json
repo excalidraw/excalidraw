@@ -180,7 +180,7 @@
   },
   "library": {
     "noItems": "Öğe eklenmedi...",
-    "hint_emptyLibrary": "Öğelerden birini eklemek için öğeyi seçiniz veya aşağıdaki genel kütüphaneden öğeleri ekleyin.",
+    "hint_emptyLibrary": "Öğelerden birini eklemek için öğeyi seçin veya aşağıdaki genel kütüphaneden öğeleri ekleyin.",
     "hint_emptyPrivateLibrary": "Tuvalden bir eleman seçerek sayfaya ekleyin.",
     "search": {
       "inputPlaceholder": "Kütüphanede ara",
@@ -273,7 +273,7 @@
     "importLibraryError": "Kütüphane yüklenemedi",
     "saveLibraryError": "Kitaplık depolama alanına kaydedilemedi. Değişikliklerinizi kaybetmediğinizden emin olmak için lütfen kitaplığınızı yerel olarak bir dosyaya kaydedin.",
     "collabSaveFailed": "Backend veritabanına kaydedilemedi. Eğer problem devam ederse, çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
-    "collabSaveFailed_sizeExceeded": "Backend veritabanına kaydedilemedi; tuval çok büyük. Çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
+    "collabSaveFailed_sizeExceeded": "Arka uç veritabanına kaydedilemedi; tuval çok büyük. Çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
     "imageToolNotSupported": "Görseller devre dışı.",
     "brave_measure_text_error": {
       "line1": "Görünüşe göre Brave tarayıcısını <bold>Agresif Olarak Parmak İzini Engelle</bold> ayarı etkin olarak kullanıyorsunuz.",
@@ -367,12 +367,12 @@
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
-    "canvasTooBig": "Kanvas çok büyük olabilir.",
+    "canvasTooBig": "Tuval pek büyük olabilir.",
     "canvasTooBigTip": "İpucu: En uzaktaki elemanları birbirine yakınlaştırmayı deneyin."
   },
   "errorSplash": {
     "headingMain": "Hata oluştu. Lütfen <button>sayfayı yenilemeyi deneyin.</button>",
-    "clearCanvasMessage": "Yenileme sonrası sorun devam ediyorsa, lütfen <button>çizim alanını temizlemeyi deneyin.</button>",
+    "clearCanvasMessage": "Yenileme sonrası sorun sürüyorsa lütfen <button>tuvali temizlemeyi</button> deneyin.",
     "clearCanvasCaveat": " Bu, yaptığınız değişiklikleri sıfırlayacak ",
     "trackedToSentry": "Tanımlayıcı ile ilgili hata {{eventId}} sistemimize yakalandı.",
     "openIssueMessage": "Sahne bilginizi hata mesajına yansıtmamak için oldukça dikkatli davrandık. Eğer sahneniz gizli değilse hatayı lütfen şuradan takip edin <button>hata takibi.</button> Lütfen aşağıya GitHub sorununa kopyalayarak ve yapıştırarak bilgi ekleyin.",
@@ -512,7 +512,7 @@
     "scene": "Sahne",
     "selected": "Seçili",
     "storage": "Depolama",
-    "fullTitle": "Kanvas ve Şekil özellikleri",
+    "fullTitle": "Tuval ve şekil özellikleri",
     "title": "Özellikler",
     "generalStats": "Genel",
     "elementProperties": "Şekil özellikleri",
