@@ -198,6 +198,11 @@
     "frames": "Frames",
     "texts": "Texts"
   },
+  "settings": {
+    "title": "Settings",
+    "experimental": "Experimental",
+    "binding": "Complex bindings"
+  },
   "buttons": {
     "clearReset": "Reset the canvas",
     "exportJSON": "Export to file",

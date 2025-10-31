@@ -1326,7 +1326,7 @@ type FEATURE_FLAGS = {
   COMPLEX_BINDINGS: boolean;
 };
 
-const FEATURE_FLAGS_STORAGE_KEY = "feature-flags";
+const FEATURE_FLAGS_STORAGE_KEY = "excalidraw-feature-flags";
 const DEFAULT_FEATURE_FLAGS: FEATURE_FLAGS = {
   COMPLEX_BINDINGS: false,
 };

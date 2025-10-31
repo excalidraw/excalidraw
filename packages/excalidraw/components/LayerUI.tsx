@@ -63,6 +63,7 @@ import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
+import { Settings } from "./Settings";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -548,6 +549,7 @@ const LayerUI = ({
         />
       )}
       <ActiveConfirmDialog />
+      <Settings />
       {appState.openDialog?.name === "elementLinkSelector" && (
         <ElementLinkDialog
           sourceElementId={appState.openDialog.sourceElementId}
