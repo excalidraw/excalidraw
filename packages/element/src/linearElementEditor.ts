@@ -21,6 +21,7 @@ import {
   getGridPoint,
   invariant,
   isShallowEqual,
+  getFeatureFlag,
 } from "@excalidraw/common";
 
 import {
@@ -2236,9 +2237,12 @@ const pointDraggingUpdates = (
         nextArrow.endBinding.elementId,
       )! as ExcalidrawBindableElement)
     : null;
+
   const endLocalPoint = startIsDraggingOverEndElement
     ? nextArrow.points[nextArrow.points.length - 1]
-    : endIsDraggingOverStartElement && app.state.bindMode !== "inside"
+    : endIsDraggingOverStartElement &&
+      app.state.bindMode !== "inside" &&
+      getFeatureFlag("COMPLEX_BINDINGS")
     ? nextArrow.points[0]
     : endBindable
     ? updateBoundPoint(
@@ -2266,7 +2270,9 @@ const pointDraggingUpdates = (
 
   const startLocalPoint = endIsDraggingOverStartElement
     ? nextArrow.points[0]
-    : startIsDraggingOverEndElement && app.state.bindMode !== "inside"
+    : startIsDraggingOverEndElement &&
+      app.state.bindMode !== "inside" &&
+      getFeatureFlag("COMPLEX_BINDINGS")
     ? nextArrow.points[nextArrow.points.length - 1]
     : startBindable
     ? updateBoundPoint(

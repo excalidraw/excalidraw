@@ -1,4 +1,10 @@
-import { KEYS, arrayToMap, invariant, isTransparent } from "@excalidraw/common";
+import {
+  KEYS,
+  arrayToMap,
+  getFeatureFlag,
+  invariant,
+  isTransparent,
+} from "@excalidraw/common";
 
 import {
   lineSegment,
@@ -31,6 +37,7 @@ import {
   getHoveredElementForBinding,
   intersectElementWithLineSegment,
   isBindableElementInsideOtherBindable,
+  isPointInElement,
 } from "./collision";
 import { distanceToElement } from "./distance";
 import {
@@ -514,6 +521,140 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
 };
 
 export const getBindingStrategyForDraggingBindingElementEndpoints = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  draggingPoints: PointsPositionUpdates,
+  elementsMap: NonDeletedSceneElementsMap,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  appState: AppState,
+  opts?: {
+    newArrow?: boolean;
+    shiftKey?: boolean;
+    finalize?: boolean;
+  },
+): { start: BindingStrategy; end: BindingStrategy } => {
+  if (getFeatureFlag("COMPLEX_BINDINGS")) {
+    return getBindingStrategyForDraggingBindingElementEndpoints_complex(
+      arrow,
+      draggingPoints,
+      elementsMap,
+      elements,
+      appState,
+      opts,
+    );
+  }
+
+  return getBindingStrategyForDraggingBindingElementEndpoints_simple(
+    arrow,
+    draggingPoints,
+    elementsMap,
+    elements,
+    appState,
+    opts,
+  );
+};
+
+const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  draggingPoints: PointsPositionUpdates,
+  elementsMap: NonDeletedSceneElementsMap,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  appState: AppState,
+  opts?: {
+    newArrow?: boolean;
+    shiftKey?: boolean;
+    finalize?: boolean;
+  },
+): { start: BindingStrategy; end: BindingStrategy } => {
+  const startIdx = 0;
+  const endIdx = arrow.points.length - 1;
+  const startDragged = draggingPoints.has(startIdx);
+  const endDragged = draggingPoints.has(endIdx);
+
+  let start: BindingStrategy = { mode: undefined };
+  let end: BindingStrategy = { mode: undefined };
+
+  invariant(
+    arrow.points.length > 1,
+    "Do not attempt to bind linear elements with a single point",
+  );
+
+  // If none of the ends are dragged, we don't change anything
+  if (!startDragged && !endDragged) {
+    return { start, end };
+  }
+
+  // If both ends are dragged, we don't bind to anything
+  // and break existing bindings
+  if (startDragged && endDragged) {
+    return { start: { mode: null }, end: { mode: null } };
+  }
+
+  // If binding is disabled and an endpoint is dragged,
+  // we actively break the end binding
+  if (!isBindingEnabled(appState)) {
+    start = startDragged ? { mode: null } : start;
+    end = endDragged ? { mode: null } : end;
+
+    return { start, end };
+  }
+
+  // Handle simpler elbow arrow binding
+  if (isElbowArrow(arrow)) {
+    return bindingStrategyForElbowArrowEndpointDragging(
+      arrow,
+      draggingPoints,
+      elementsMap,
+      elements,
+    );
+  }
+
+  const localPoint = draggingPoints.get(
+    startDragged ? startIdx : endIdx,
+  )?.point;
+  invariant(
+    localPoint,
+    `Local point must be defined for ${
+      startDragged ? "start" : "end"
+    } dragging`,
+  );
+  const globalPoint = LinearElementEditor.getPointGlobalCoordinates(
+    arrow,
+    localPoint,
+    elementsMap,
+  );
+  const hit = getHoveredElementForBinding(
+    globalPoint,
+    elements,
+    elementsMap,
+    (e) => 100, // TODO: Zoom-level
+  );
+  const current: BindingStrategy = hit
+    ? isPointInElement(globalPoint, hit, elementsMap)
+      ? {
+          mode: "inside",
+          element: hit,
+          focusPoint: globalPoint,
+        }
+      : {
+          mode: "orbit",
+          element: hit,
+          focusPoint: opts?.finalize
+            ? LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                arrow,
+                startDragged ? 0 : -1,
+                elementsMap,
+              )
+            : globalPoint,
+        }
+    : { mode: null };
+
+  return {
+    start: startDragged ? current : start,
+    end: endDragged ? current : end,
+  };
+};
+
+const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
   elementsMap: NonDeletedSceneElementsMap,

@@ -106,6 +106,7 @@ import {
   MQ_MAX_TABLET,
   MQ_MAX_HEIGHT_LANDSCAPE,
   MQ_MAX_WIDTH_LANDSCAPE,
+  getFeatureFlag,
 } from "@excalidraw/common";
 
 import {
@@ -4784,7 +4785,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // Handle Alt key for bind mode
-      if (event.key === KEYS.ALT) {
+      if (event.key === KEYS.ALT && getFeatureFlag("COMPLEX_BINDINGS")) {
         this.handleSkipBindMode();
       }
 
@@ -4797,7 +4798,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
-        this.resetDelayedBindMode();
+        if (getFeatureFlag("COMPLEX_BINDINGS")) {
+          this.resetDelayedBindMode();
+        }
+
         this.setState({ isBindingEnabled: false });
       }
 
@@ -5103,7 +5107,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
 
-          if (isBindingElement(element)) {
+          if (isBindingElement(element) && getFeatureFlag("COMPLEX_BINDINGS")) {
             this.handleDelayedBindModeChange(element, hoveredElement);
           }
         }
@@ -6542,7 +6546,9 @@ class App extends React.Component<AppProps, AppState> {
             elementsMap,
           );
 
-          this.handleDelayedBindModeChange(multiElement, hoveredElement);
+          if (getFeatureFlag("COMPLEX_BINDINGS")) {
+            this.handleDelayedBindModeChange(multiElement, hoveredElement);
+          }
         }
 
         invariant(
@@ -7348,7 +7354,10 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    this.resetDelayedBindMode();
+    if (getFeatureFlag("COMPLEX_BINDINGS")) {
+      this.resetDelayedBindMode();
+    }
+
     this.removePointer(event);
     this.lastPointerUpEvent = event;
 
@@ -8655,7 +8664,7 @@ class App extends React.Component<AppProps, AppState> {
         });
       });
 
-      if (isBindingElement(element)) {
+      if (isBindingElement(element) && getFeatureFlag("COMPLEX_BINDINGS")) {
         this.handleDelayedBindModeChange(element, boundElement);
       }
     }
@@ -9023,12 +9032,16 @@ class App extends React.Component<AppProps, AppState> {
               elementsMap,
             );
 
-            this.handleDelayedBindModeChange(element, hoveredElement);
+            if (getFeatureFlag("COMPLEX_BINDINGS")) {
+              this.handleDelayedBindModeChange(element, hoveredElement);
+            }
           }
 
           if (
             event.altKey &&
-            !this.state.selectedLinearElement?.initialState?.arrowStartIsInside
+            !this.state.selectedLinearElement?.initialState
+              ?.arrowStartIsInside &&
+            getFeatureFlag("COMPLEX_BINDINGS")
           ) {
             this.handleSkipBindMode();
           }
@@ -9784,7 +9797,9 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
-      this.resetDelayedBindMode();
+      if (getFeatureFlag("COMPLEX_BINDINGS")) {
+        this.resetDelayedBindMode();
+      }
 
       this.setState({
         selectedElementsAreBeingDragged: false,
