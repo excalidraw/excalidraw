@@ -97,6 +97,36 @@ export const bootstrapCanvas = ({
   return context;
 };
 
+export const strokeRectWithRotation_simple = (
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  cx: number,
+  cy: number,
+  angle: number,
+  fill: boolean = false,
+  /** should account for zoom */
+  radius: number = 0,
+) => {
+  context.save();
+  context.translate(cx, cy);
+  context.rotate(angle);
+  if (fill) {
+    context.fillRect(x - cx, y - cy, width, height);
+  }
+  if (radius && context.roundRect) {
+    context.beginPath();
+    context.roundRect(x - cx, y - cy, width, height, radius);
+    context.stroke();
+    context.closePath();
+  } else {
+    context.strokeRect(x - cx, y - cy, width, height);
+  }
+  context.restore();
+};
+
 function drawCatmullRomQuadraticApprox(
   ctx: CanvasRenderingContext2D,
   points: GlobalPoint[],
@@ -126,7 +156,7 @@ function drawCatmullRomCubicApprox(
   }
 }
 
-export const drawHighlightForRectWithRotation = (
+export const drawHighlightForRectWithRotation_simple = (
   context: CanvasRenderingContext2D,
   element: ExcalidrawRectanguloidElement,
   elementsMap: ElementsMap,
@@ -241,7 +271,7 @@ export const drawHighlightForRectWithRotation = (
   context.restore();
 };
 
-export const strokeEllipseWithRotation = (
+export const strokeEllipseWithRotation_simple = (
   context: CanvasRenderingContext2D,
   width: number,
   height: number,
@@ -254,37 +284,7 @@ export const strokeEllipseWithRotation = (
   context.stroke();
 };
 
-export const strokeRectWithRotation = (
-  context: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  cx: number,
-  cy: number,
-  angle: number,
-  fill: boolean = false,
-  /** should account for zoom */
-  radius: number = 0,
-) => {
-  context.save();
-  context.translate(cx, cy);
-  context.rotate(angle);
-  if (fill) {
-    context.fillRect(x - cx, y - cy, width, height);
-  }
-  if (radius && context.roundRect) {
-    context.beginPath();
-    context.roundRect(x - cx, y - cy, width, height, radius);
-    context.stroke();
-    context.closePath();
-  } else {
-    context.strokeRect(x - cx, y - cy, width, height);
-  }
-  context.restore();
-};
-
-export const drawHighlightForDiamondWithRotation = (
+export const drawHighlightForDiamondWithRotation_simple = (
   context: CanvasRenderingContext2D,
   padding: number,
   element: ExcalidrawDiamondElement,

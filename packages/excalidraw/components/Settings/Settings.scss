@@ -1,0 +1,59 @@
+.settings-dialog {
+  .Dialog__close {
+    margin-top: 30px;
+    margin-right: 20px;
+  }
+
+  .settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+  }
+
+  .settings-category {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+  }
+
+  .settings-category-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+  }
+
+  .settings-category-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .settings-item {
+    padding: 0.5rem 0 0.5rem 1rem;
+    color: var(--popup-text-color);
+    height: 2.5rem;
+    box-sizing: border-box;
+    border-radius: var(--border-radius-lg);
+
+    .Checkbox {
+      flex-direction: row-reverse;
+      justify-content: space-between;
+      margin-right: 0;
+
+      .Checkbox-box {
+        margin-right: 0;
+      }
+    }
+
+    label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+  }
+}
