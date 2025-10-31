@@ -104,9 +104,32 @@ export type BindingStrategy =
 
 export const FIXED_BINDING_DISTANCE = 5;
 
+export const BINDING_HIGHLIGHT_THICKNESS = 10;
+
 export const getFixedBindingDistance = (
   element: ExcalidrawBindableElement,
 ): number => FIXED_BINDING_DISTANCE + element.strokeWidth / 2;
+
+export const maxBindingGap_simple = (
+  element: ExcalidrawElement,
+  elementWidth: number,
+  elementHeight: number,
+  zoom?: AppState["zoom"],
+): number => {
+  const zoomValue = zoom?.value && zoom.value < 1 ? zoom.value : 1;
+
+  // Aligns diamonds with rectangles
+  const shapeRatio = element.type === "diamond" ? 1 / Math.sqrt(2) : 1;
+  const smallerDimension = shapeRatio * Math.min(elementWidth, elementHeight);
+
+  return Math.max(
+    16,
+    // bigger bindable boundary for bigger elements
+    Math.min(0.25 * smallerDimension, 32),
+    // keep in sync with the zoomed highlight
+    BINDING_HIGHLIGHT_THICKNESS / zoomValue + FIXED_BINDING_DISTANCE,
+  );
+};
 
 export const shouldEnableBindingForPointerEvent = (
   event: React.PointerEvent<HTMLElement>,
@@ -626,7 +649,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     globalPoint,
     elements,
     elementsMap,
-    (e) => 100, // TODO: Zoom-level
+    (e) => maxBindingGap_simple(e, e.width, e.height, appState.zoom),
   );
   const current: BindingStrategy = hit
     ? isPointInElement(globalPoint, hit, elementsMap)

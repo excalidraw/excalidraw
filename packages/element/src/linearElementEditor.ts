@@ -2126,7 +2126,11 @@ const pointDraggingUpdates = (
       ),
     };
 
-    if (startIsDragged) {
+    if (
+      startIsDragged &&
+      (updates.startBinding.mode === "orbit" ||
+        !getFeatureFlag("COMPLEX_BINDINGS"))
+    ) {
       updates.suggestedBinding = start.element;
     }
   } else if (startIsDragged) {
@@ -2148,7 +2152,11 @@ const pointDraggingUpdates = (
       ),
     };
 
-    if (endIsDragged && updates.endBinding.mode === "orbit") {
+    if (
+      endIsDragged &&
+      (updates.endBinding.mode === "orbit" ||
+        !getFeatureFlag("COMPLEX_BINDINGS"))
+    ) {
       updates.suggestedBinding = end.element;
     }
   } else if (endIsDragged) {

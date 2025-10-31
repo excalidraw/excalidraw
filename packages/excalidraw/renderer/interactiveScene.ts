@@ -13,6 +13,7 @@ import {
   BIND_MODE_TIMEOUT,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
+  getFeatureFlag,
   invariant,
   THEME,
   throttleRAF,
@@ -22,7 +23,9 @@ import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
   elementCenterPoint,
+  FIXED_BINDING_DISTANCE,
   LinearElementEditor,
+  maxBindingGap_simple,
 } from "@excalidraw/element";
 import {
   getOmitSidesForDevice,
@@ -85,9 +88,12 @@ import { getClientColor, renderRemoteCursors } from "../clients";
 
 import {
   bootstrapCanvas,
+  drawHighlightForDiamondWithRotation_simple,
+  drawHighlightForRectWithRotation_simple,
   fillCircle,
   getNormalizedCanvasDimensions,
-  strokeRectWithRotation,
+  strokeEllipseWithRotation_simple,
+  strokeRectWithRotation_simple,
 } from "./helpers";
 
 import type {
@@ -191,7 +197,66 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   );
 };
 
-const renderBindingHighlightForBindableElement = (
+const renderBindingHighlightForBindableElement_simple = (
+  context: CanvasRenderingContext2D,
+  element: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  zoom: InteractiveCanvasAppState["zoom"],
+) => {
+  const padding = maxBindingGap_simple(
+    element,
+    element.width,
+    element.height,
+    zoom,
+  );
+
+  context.fillStyle = "rgba(0,0,0,.05)";
+
+  switch (element.type) {
+    case "rectangle":
+    case "text":
+    case "image":
+    case "iframe":
+    case "embeddable":
+    case "frame":
+    case "magicframe":
+      drawHighlightForRectWithRotation_simple(
+        context,
+        element,
+        elementsMap,
+        padding,
+      );
+      break;
+    case "diamond":
+      drawHighlightForDiamondWithRotation_simple(
+        context,
+        padding,
+        element,
+        elementsMap,
+      );
+      break;
+    case "ellipse": {
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+      const width = x2 - x1;
+      const height = y2 - y1;
+
+      context.strokeStyle = "rgba(0,0,0,.05)";
+      context.lineWidth = padding - FIXED_BINDING_DISTANCE;
+
+      strokeEllipseWithRotation_simple(
+        context,
+        width + padding + FIXED_BINDING_DISTANCE,
+        height + padding + FIXED_BINDING_DISTANCE,
+        x1 + width / 2,
+        y1 + height / 2,
+        element.angle,
+      );
+      break;
+    }
+  }
+};
+
+const renderBindingHighlightForBindableElement_complex = (
   app: AppClassProperties,
   context: CanvasRenderingContext2D,
   element: ExcalidrawBindableElement,
@@ -458,6 +523,38 @@ const renderBindingHighlightForBindableElement = (
   };
 };
 
+const renderBindingHighlightForBindableElement = (
+  app: AppClassProperties,
+  context: CanvasRenderingContext2D,
+  element: ExcalidrawBindableElement,
+  allElementsMap: NonDeletedSceneElementsMap,
+  appState: InteractiveCanvasAppState,
+  deltaTime: number,
+  state?: { runtime: number },
+) => {
+  if (getFeatureFlag("COMPLEX_BINDINGS")) {
+    return renderBindingHighlightForBindableElement_complex(
+      app,
+      context,
+      element,
+      allElementsMap,
+      appState,
+      deltaTime,
+      state,
+    );
+  }
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+  renderBindingHighlightForBindableElement_simple(
+    context,
+    element,
+    allElementsMap,
+    appState.zoom,
+  );
+  context.restore();
+};
+
 type ElementSelectionBorder = {
   angle: number;
   x1: number;
@@ -513,7 +610,7 @@ const renderSelectionBorder = (
       ]);
     }
     context.lineDashOffset = (lineWidth + spaceWidth) * index;
-    strokeRectWithRotation(
+    strokeRectWithRotation_simple(
       context,
       x1 - linePadding,
       y1 - linePadding,
@@ -542,7 +639,7 @@ const renderFrameHighlight = (
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  strokeRectWithRotation(
+  strokeRectWithRotation_simple(
     context,
     x1,
     y1,
@@ -755,7 +852,7 @@ const renderTransformHandles = (
         context.fill();
         context.stroke();
       } else {
-        strokeRectWithRotation(
+        strokeRectWithRotation_simple(
           context,
           x,
           y,
@@ -1264,7 +1361,7 @@ const _renderInteractiveScene = ({
       const lineWidth = context.lineWidth;
       context.lineWidth = 1 / appState.zoom.value;
       context.strokeStyle = selectionColor;
-      strokeRectWithRotation(
+      strokeRectWithRotation_simple(
         context,
         x1 - dashedLinePadding,
         y1 - dashedLinePadding,
