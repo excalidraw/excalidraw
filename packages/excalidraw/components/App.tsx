@@ -104,6 +104,7 @@ import {
   MQ_MAX_TABLET,
   MQ_MAX_HEIGHT_LANDSCAPE,
   MQ_MAX_WIDTH_LANDSCAPE,
+  BOUND_TEXT_PADDING,
 } from "@excalidraw/common";
 
 import {
@@ -239,6 +240,7 @@ import {
   StoreDelta,
   type ApplyToOptions,
   positionElementsOnGrid,
+  isFlowchartType,
 } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -5412,8 +5414,13 @@ class App extends React.Component<AppProps, AppState> {
       const minWidth = getApproxMinLineWidth(
         getFontString(fontString),
         lineHeight,
+        container.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
       );
-      const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
+      const minHeight = getApproxMinLineHeight(
+        fontSize,
+        lineHeight,
+        container.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+      );
       const newHeight = Math.max(container.height, minHeight);
       const newWidth = Math.max(container.width, minWidth);
       this.scene.mutateElement(container, {
@@ -8155,6 +8162,9 @@ class App extends React.Component<AppProps, AppState> {
       roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      ...(isFlowchartType(elementType) && {
+        containerBehavior: this.state.currentItemContainerBehavior,
+      }),
     } as const;
 
     let element;

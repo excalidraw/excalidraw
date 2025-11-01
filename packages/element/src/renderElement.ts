@@ -329,16 +329,24 @@ const generateElementCanvas = (
     boundTextCanvasContext.translate(-shiftX, -shiftY);
     // Clear the bound text area
     boundTextCanvasContext.clearRect(
-      -(boundTextElement.width / 2 + BOUND_TEXT_PADDING) *
+      -(
+        boundTextElement.width / 2 +
+        (element.containerBehavior?.margin ?? BOUND_TEXT_PADDING)
+      ) *
         window.devicePixelRatio *
         scale,
-      -(boundTextElement.height / 2 + BOUND_TEXT_PADDING) *
+      -(
+        boundTextElement.height / 2 +
+        (element.containerBehavior?.margin ?? BOUND_TEXT_PADDING)
+      ) *
         window.devicePixelRatio *
         scale,
-      (boundTextElement.width + BOUND_TEXT_PADDING * 2) *
+      (boundTextElement.width +
+        (element.containerBehavior?.margin ?? BOUND_TEXT_PADDING) * 2) *
         window.devicePixelRatio *
         scale,
-      (boundTextElement.height + BOUND_TEXT_PADDING * 2) *
+      (boundTextElement.height +
+        (element.containerBehavior?.margin ?? BOUND_TEXT_PADDING) * 2) *
         window.devicePixelRatio *
         scale,
     );
