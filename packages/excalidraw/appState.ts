@@ -116,7 +116,6 @@ export const getDefaultAppState = (): Omit<
     viewModeEnabled: false,
     showHyperlinkPopup: false,
     linkOpacity: 1, //zsviczian
-    trayModeEnabled: false, //zsviczian
     colorPalette: undefined, //zsviczian
     allowPinchZoom: false, //zsviczian
     allowWheelZoom: false, //zsviczian
@@ -265,7 +264,6 @@ const APP_STATE_STORAGE_CONF = (<
   viewModeEnabled: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
   linkOpacity: { browser: false, export: false, server: false }, //zsviczian
-  trayModeEnabled: { browser: false, export: false, server: false }, //zsviczian
   colorPalette: { browser: false, export: false, server: false }, //zsviczian
   allowPinchZoom: { browser: false, export: false, server: false }, //zsviczian
   allowWheelZoom: { browser: false, export: false, server: false }, //zsviczian

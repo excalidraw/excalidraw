@@ -498,6 +498,7 @@ const deviceContextInitialValue = {
     canFitSidebar: false,
   },
   isTouchScreen: false,
+  isTrayMode: false, //zsviczian
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 DeviceContext.displayName = "DeviceContext";
@@ -741,6 +742,8 @@ class App extends React.Component<AppProps, AppState> {
         setForceRenderAllEmbeddables: this.setForceRenderAllEmbeddables, //zsviczian
         zoomToFit: this.zoomToFit, //zsviczian
         refreshEditorBreakpoints: this.refreshEditorBreakpoints, //zsviczian
+        setTrayModeEnabled: this.setTrayModeEnabled, //zsviczian
+        isTrayModeEnabled: this.isTrayModeEnabled, //zsviczian
         getColorAtScenePoint: this.getColorAtScenePoint, //zsviczian
         startLineEditor: this.startLineEditor, //zsviczian
         getSceneElements: this.getSceneElements,
@@ -2594,18 +2597,14 @@ class App extends React.Component<AppProps, AppState> {
       canFitSidebar: editorWidth > sidebarBreakpoint,
     });
 
-    const stylesPanelMode =
+    const stylesPanelMode = this.device.isTrayMode ? "tray" : //zsviczian
       // NOTE: we could also remove the isMobileOrTablet check here and
       // always switch to compact mode when the editor is narrow (e.g. < MQ_MIN_WIDTH_DESKTOP)
       // but not too narrow (> MQ_MAX_WIDTH_MOBILE)
-      this.isTabletBreakpoint(editorWidth, editorHeight) &&
-      isMobileOrTablet() &&
-      !this.state.trayModeEnabled //zsviczian
+      this.isTabletBreakpoint(editorWidth, editorHeight) && isMobileOrTablet()
         ? "compact"
         : this.isMobileBreakpoint(editorWidth, editorHeight)
         ? "mobile"
-        : this.state.trayModeEnabled //zsviczian
-        ? "tray"
         : "full";
 
     // also check if we need to update the app state
@@ -2627,6 +2626,36 @@ class App extends React.Component<AppProps, AppState> {
       return true;
     }
     return false;
+  };
+
+  //zsviczian
+  private setTrayModeEnabled = (enabled: boolean) => {
+    const container = this.excalidrawContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const { width: editorWidth, height: editorHeight } =
+      container.getBoundingClientRect();
+
+    if (
+      isMobileOrTablet() &&
+      this.isMobileBreakpoint(editorWidth, editorHeight)
+    ) {
+      enabled = false;
+    }
+
+    if (this.device.isTrayMode === enabled) {
+      return;
+    }
+
+    this.device = { ...this.device, isTrayMode: enabled };
+    this.forceUpdate();
+  };
+
+  //zsviczian
+  public isTrayModeEnabled = () => {
+    return this.device.isTrayMode;
   };
 
   private clearImageShapeCache(filesMap?: BinaryFiles) {
@@ -4449,7 +4478,7 @@ startLineEditor = (
               ...appState,
               // keep existing stylesPanelMode as it needs to be preserved
               // or set at startup
-              //stylesPanelMode: this.state.stylesPanelMode, //zsviczian prevents switching to tray mode, seems unnecessary to me
+              stylesPanelMode: this.state.stylesPanelMode,
             } as Pick<AppState, K> | null);
           }
         });
@@ -4458,7 +4487,7 @@ startLineEditor = (
           ...appState,
           // keep existing stylesPanelMode as it needs to be preserved
           // or set at startup
-          //stylesPanelMode: this.state.stylesPanelMode, //zsviczian prevents switching to tray mode, seems unnecessary to me
+          stylesPanelMode: this.state.stylesPanelMode,
         } as Pick<AppState, K> | null);
       }
 

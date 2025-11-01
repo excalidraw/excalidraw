@@ -434,7 +434,6 @@ export interface AppState {
       };
   showHyperlinkPopup: false | "info" | "editor";
   linkOpacity: number; //zsviczian
-  trayModeEnabled: boolean; //zsviczian
   colorPalette?: {
     canvasBackground: ColorPaletteCustom;
     elementBackground: ColorPaletteCustom;
@@ -907,6 +906,8 @@ export interface ExcalidrawImperativeAPI {
   setForceRenderAllEmbeddables: InstanceType<typeof App>["setForceRenderAllEmbeddables"]; //zsviczian
   zoomToFit: InstanceType<typeof App>["zoomToFit"]; //zsviczian
   refreshEditorBreakpoints: InstanceType<typeof App>["refreshEditorBreakpoints"]; //zsviczian
+  setTrayModeEnabled: InstanceType<typeof App>["setTrayModeEnabled"]; //zsviczian
+  isTrayModeEnabled: InstanceType<typeof App>["isTrayModeEnabled"]; //zsviczian
   getColorAtScenePoint: InstanceType<typeof App>["getColorAtScenePoint"]; //zsviczian
   startLineEditor: InstanceType<typeof App>["startLineEditor"]; //zsviczian
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
@@ -982,6 +983,7 @@ export type Device = Readonly<{
     canFitSidebar: boolean;
   };
   isTouchScreen: boolean;
+  isTrayMode: boolean; //zsviczian
 }>;
 
 export type FrameNameBounds = {

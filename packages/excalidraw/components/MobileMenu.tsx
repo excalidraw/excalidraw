@@ -18,6 +18,7 @@ import type {
   AppClassProperties,
   AppProps,
   AppState,
+  ExcalidrawProps,
   UIAppState,
 } from "../types";
 import type { JSX } from "react";
@@ -48,6 +49,7 @@ type MobileMenuProps = {
   renderWelcomeScreen: boolean;
   UIOptions: AppProps["UIOptions"];
   app: AppClassProperties;
+  renderCustomStats?: ExcalidrawProps["renderCustomStats"]; //zsviczian
 };
 
 export const MobileMenu = ({
@@ -62,6 +64,7 @@ export const MobileMenu = ({
   renderWelcomeScreen,
   UIOptions,
   app,
+  renderCustomStats, //zsviczian
 }: MobileMenuProps) => {
   const {
     WelcomeScreenCenterTunnel,
@@ -121,6 +124,11 @@ export const MobileMenu = ({
     );
   };
 
+  const shouldShowStats = //zsviczian
+    appState.stats.open &&
+    !appState.zenModeEnabled &&
+    !appState.viewModeEnabled;
+
   return (
     <>
       {renderSidebars()}
@@ -168,6 +176,24 @@ export const MobileMenu = ({
 
       <FixedSideContainer side="top" className="App-top-bar">
         {renderAppTopBar()}
+        <div //zsviczian
+          className={clsx("layer-ui__wrapper__top-right zen-mode-transition", {
+            "transition-right": appState.zenModeEnabled,
+          })}
+          style={{
+            marginRight: "4rem",
+          }}
+        >
+          {shouldShowStats && ( //zsviczian
+            <Stats
+              app={app}
+              onClose={() => {
+                actionManager.executeAction(actionToggleStats);
+              }}
+              renderCustomStats={renderCustomStats}
+            />
+          )}
+        </div>
       </FixedSideContainer>
     </>
   );

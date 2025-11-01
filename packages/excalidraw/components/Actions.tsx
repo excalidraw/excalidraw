@@ -1134,6 +1134,10 @@ export const ShapesSwitcher = ({
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
+  const showLassoTool =
+    app.state.stylesPanelMode === "full" ||
+    app.state.stylesPanelMode === "tray"; //zsviczian
+
   return (
     <>
       {getToolbarTools(app).map(
@@ -1347,7 +1351,7 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.laser")}
           </DropdownMenu.Item>
-          {app.state.stylesPanelMode === "full" && (
+          {showLassoTool && ( //zsviczian
             <DropdownMenu.Item
               onSelect={() => app.setActiveTool({ type: "lasso" })}
               icon={LassoIcon}
