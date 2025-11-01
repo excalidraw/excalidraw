@@ -17,16 +17,27 @@ import "./DropdownMenu.scss";
 const DropdownMenu = ({
   children,
   open,
+  placement,
 }: {
   children?: React.ReactNode;
   open: boolean;
+  placement?: "top" | "bottom";
 }) => {
   const MenuTriggerComp = getMenuTriggerComponent(children);
   const MenuContentComp = getMenuContentComponent(children);
+
+  // clone the MenuContentComp to pass the placement prop
+  const MenuContentCompWithPlacement =
+    MenuContentComp && React.isValidElement(MenuContentComp)
+      ? React.cloneElement(MenuContentComp as React.ReactElement<any>, {
+          placement,
+        })
+      : MenuContentComp;
+
   return (
     <>
       {MenuTriggerComp}
-      {open && MenuContentComp}
+      {open && MenuContentCompWithPlacement}
     </>
   );
 };

@@ -45,11 +45,7 @@ export {
 } from "./actionExport";
 
 export { actionCopyStyles, actionPasteStyles } from "./actionStyles";
-export {
-  actionToggleCanvasMenu,
-  actionToggleEditMenu,
-  actionShortcuts,
-} from "./actionMenu";
+export { actionShortcuts } from "./actionMenu";
 
 export { actionGroup, actionUngroup } from "./actionGroup";
 

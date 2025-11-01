@@ -9,11 +9,10 @@ import {
   isTextElement,
 } from "@excalidraw/element";
 
-import { getShortcutKey } from "@excalidraw/common";
-
 import { isNodeInFlowchart } from "@excalidraw/element";
 
 import { t } from "../i18n";
+import { getShortcutKey } from "../shortcut";
 import { isEraserActive } from "../appState";
 import { isGridModeEnabled } from "../snapping";
 
@@ -27,6 +26,11 @@ interface HintViewerProps {
   device: Device;
   app: AppClassProperties;
 }
+
+const getTaggedShortcutKey = (key: string | string[]) =>
+  Array.isArray(key)
+    ? `<kbd>${key.map(getShortcutKey).join(" + ")}</kbd>`
+    : `<kbd>${getShortcutKey(key)}</kbd>`;
 
 const getHints = ({
   appState,
@@ -42,7 +46,9 @@ const getHints = ({
     appState.openSidebar.tab === CANVAS_SEARCH_TAB &&
     appState.searchMatches?.matches.length
   ) {
-    return t("hints.dismissSearch");
+    return t("hints.dismissSearch", {
+      shortcut: getTaggedShortcutKey("Escape"),
+    });
   }
 
   if (appState.openSidebar && !device.editor.canFitSidebar) {
@@ -50,14 +56,21 @@ const getHints = ({
   }
 
   if (isEraserActive(appState)) {
-    return t("hints.eraserRevert");
+    return t("hints.eraserRevert", {
+      shortcut: getTaggedShortcutKey("Alt"),
+    });
   }
   if (activeTool.type === "arrow" || activeTool.type === "line") {
     if (multiMode) {
-      return t("hints.linearElementMulti");
+      return t("hints.linearElementMulti", {
+        shortcut_1: getTaggedShortcutKey("Escape"),
+        shortcut_2: getTaggedShortcutKey("Enter"),
+      });
     }
     if (activeTool.type === "arrow") {
-      return t("hints.arrowTool", { arrowShortcut: getShortcutKey("A") });
+      return t("hints.arrowTool", {
+        shortcut: getTaggedShortcutKey("A"),
+      });
     }
     return t("hints.linearElement");
   }
@@ -83,31 +96,51 @@ const getHints = ({
   ) {
     const targetElement = selectedElements[0];
     if (isLinearElement(targetElement) && targetElement.points.length === 2) {
-      return t("hints.lockAngle");
+      return t("hints.lockAngle", {
+        shortcut: getTaggedShortcutKey("Shift"),
+      });
     }
     return isImageElement(targetElement)
-      ? t("hints.resizeImage")
-      : t("hints.resize");
+      ? t("hints.resizeImage", {
+          shortcut_1: getTaggedShortcutKey("Shift"),
+          shortcut_2: getTaggedShortcutKey("Alt"),
+        })
+      : t("hints.resize", {
+          shortcut_1: getTaggedShortcutKey("Shift"),
+          shortcut_2: getTaggedShortcutKey("Alt"),
+        });
   }
 
   if (isRotating && lastPointerDownWith === "mouse") {
-    return t("hints.rotate");
+    return t("hints.rotate", {
+      shortcut: getTaggedShortcutKey("Shift"),
+    });
   }
 
   if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
-    return t("hints.text_selected");
+    return t("hints.text_selected", {
+      shortcut: getTaggedShortcutKey("Enter"),
+    });
   }
 
   if (appState.editingTextElement) {
-    return t("hints.text_editing");
+    return t("hints.text_editing", {
+      shortcut_1: getTaggedShortcutKey("Escape"),
+      shortcut_2: getTaggedShortcutKey(["CtrlOrCmd", "Enter"]),
+    });
   }
 
   if (appState.croppingElementId) {
-    return t("hints.leaveCropEditor");
+    return t("hints.leaveCropEditor", {
+      shortcut_1: getTaggedShortcutKey("Enter"),
+      shortcut_2: getTaggedShortcutKey("Escape"),
+    });
   }
 
   if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
-    return t("hints.enterCropEditor");
+    return t("hints.enterCropEditor", {
+      shortcut: getTaggedShortcutKey("Enter"),
+    });
   }
 
   if (activeTool.type === "selection") {
@@ -117,33 +150,57 @@ const getHints = ({
       !appState.editingTextElement &&
       !appState.selectedLinearElement?.isEditing
     ) {
-      return [t("hints.deepBoxSelect")];
+      return t("hints.deepBoxSelect", {
+        shortcut: getTaggedShortcutKey("CtrlOrCmd"),
+      });
     }
 
     if (isGridModeEnabled(app) && appState.selectedElementsAreBeingDragged) {
-      return t("hints.disableSnapping");
+      return t("hints.disableSnapping", {
+        shortcut: getTaggedShortcutKey("CtrlOrCmd"),
+      });
     }
 
     if (!selectedElements.length && !isMobile) {
-      return [t("hints.canvasPanning")];
+      return t("hints.canvasPanning", {
+        shortcut_1: getTaggedShortcutKey(t("keys.mmb")),
+        shortcut_2: getTaggedShortcutKey("Space"),
+      });
     }
 
     if (selectedElements.length === 1) {
       if (isLinearElement(selectedElements[0])) {
         if (appState.selectedLinearElement?.isEditing) {
           return appState.selectedLinearElement.selectedPointsIndices
-            ? t("hints.lineEditor_pointSelected")
-            : t("hints.lineEditor_nothingSelected");
+            ? t("hints.lineEditor_pointSelected", {
+                shortcut_1: getTaggedShortcutKey("Delete"),
+                shortcut_2: getTaggedShortcutKey(["CtrlOrCmd", "D"]),
+              })
+            : t("hints.lineEditor_nothingSelected", {
+                shortcut_1: getTaggedShortcutKey("Shift"),
+                shortcut_2: getTaggedShortcutKey("Alt"),
+              });
         }
         return isLineElement(selectedElements[0])
-          ? t("hints.lineEditor_line_info")
-          : t("hints.lineEditor_info");
+          ? t("hints.lineEditor_line_info", {
+              shortcut: getTaggedShortcutKey("Enter"),
+            })
+          : t("hints.lineEditor_info", {
+              shortcut_1: getTaggedShortcutKey("CtrlOrCmd"),
+              shortcut_2: getTaggedShortcutKey(["CtrlOrCmd", "Enter"]),
+            });
       }
       if (
         !appState.newElement &&
         !appState.selectedElementsAreBeingDragged &&
         isTextBindableContainer(selectedElements[0])
       ) {
+        const bindTextToElement = t("hints.bindTextToElement", {
+          shortcut: getTaggedShortcutKey("Enter"),
+        });
+        const createFlowchart = t("hints.createFlowchart", {
+          shortcut: getTaggedShortcutKey(["CtrlOrCmd", "↑↓"]),
+        });
         if (isFlowchartNodeElement(selectedElements[0])) {
           if (
             isNodeInFlowchart(
@@ -151,13 +208,13 @@ const getHints = ({
               app.scene.getNonDeletedElementsMap(),
             )
           ) {
-            return [t("hints.bindTextToElement"), t("hints.createFlowchart")];
+            return [bindTextToElement, createFlowchart];
           }
 
-          return [t("hints.bindTextToElement"), t("hints.createFlowchart")];
+          return [bindTextToElement, createFlowchart];
         }
 
-        return t("hints.bindTextToElement");
+        return bindTextToElement;
       }
     }
   }
@@ -183,16 +240,21 @@ export const HintViewer = ({
   }
 
   const hint = Array.isArray(hints)
-    ? hints
-        .map((hint) => {
-          return getShortcutKey(hint).replace(/\. ?$/, "");
-        })
-        .join(". ")
-    : getShortcutKey(hints);
+    ? hints.map((hint) => hint.replace(/\. ?$/, "")).join(", ")
+    : hints;
+
+  const hintJSX = hint.split(/(<kbd>[^<]+<\/kbd>)/g).map((part, index) => {
+    if (index % 2 === 1) {
+      const shortcutMatch =
+        part[0] === "<" && part.match(/^<kbd>([^<]+)<\/kbd>$/);
+      return <kbd key={index}>{shortcutMatch ? shortcutMatch[1] : part}</kbd>;
+    }
+    return part;
+  });
 
   return (
     <div className="HintViewer">
-      <span>{hint}</span>
+      <span>{hintJSX}</span>
     </div>
   );
 };
