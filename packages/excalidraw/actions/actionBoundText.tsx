@@ -236,6 +236,9 @@ export const actionWrapTextInContainer = register({
     let updatedElements: readonly ExcalidrawElement[] = elements.slice();
     const containerIds: Mutable<AppState["selectedElementIds"]> = {};
 
+    const boundTextPadding =
+      appState.currentItemContainerBehavior?.margin ?? BOUND_TEXT_PADDING;
+
     for (const textElement of selectedElements) {
       if (isTextElement(textElement) && !isBoundToContainer(textElement)) {
         const container = newElement({
@@ -261,15 +264,17 @@ export const actionWrapTextInContainer = register({
               : null,
           opacity: 100,
           locked: false,
-          x: textElement.x - BOUND_TEXT_PADDING,
-          y: textElement.y - BOUND_TEXT_PADDING,
+          x: textElement.x - boundTextPadding,
+          y: textElement.y - boundTextPadding,
           width: computeContainerDimensionForBoundText(
             textElement.width,
             "rectangle",
+            boundTextPadding,
           ),
           height: computeContainerDimensionForBoundText(
             textElement.height,
             "rectangle",
+            boundTextPadding,
           ),
           groupIds: textElement.groupIds,
           frameId: textElement.frameId,

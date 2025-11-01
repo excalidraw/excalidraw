@@ -1,4 +1,4 @@
-import { getLineHeight } from "@excalidraw/common";
+import { BOUND_TEXT_PADDING, getLineHeight } from "@excalidraw/common";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "@excalidraw/common";
@@ -63,9 +63,13 @@ describe("Test measureText", () => {
         type: "rectangle",
         ...params,
       });
-      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
-        160,
-      );
+      expect(
+        computeContainerDimensionForBoundText(
+          150,
+          element.type,
+          BOUND_TEXT_PADDING,
+        ),
+      ).toEqual(160);
     });
 
     it("should compute container height correctly for ellipse", () => {
@@ -73,9 +77,13 @@ describe("Test measureText", () => {
         type: "ellipse",
         ...params,
       });
-      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
-        226,
-      );
+      expect(
+        computeContainerDimensionForBoundText(
+          150,
+          element.type,
+          BOUND_TEXT_PADDING,
+        ),
+      ).toEqual(226);
     });
 
     it("should compute container height correctly for diamond", () => {
@@ -83,9 +91,13 @@ describe("Test measureText", () => {
         type: "diamond",
         ...params,
       });
-      expect(computeContainerDimensionForBoundText(150, element.type)).toEqual(
-        320,
-      );
+      expect(
+        computeContainerDimensionForBoundText(
+          150,
+          element.type,
+          BOUND_TEXT_PADDING,
+        ),
+      ).toEqual(320);
     });
   });
 

@@ -223,11 +223,10 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeRoundness")}</>
       )}
 
-      {hasContainerBehavior(appState.activeTool.type) ||
-        (targetElements.some(
-          (element) =>
-            isFlowchartNodeElement(element) && hasBoundTextElement(element),
-        ) && <>{renderAction("changeContainerBehavior")}</>)}
+      {(hasContainerBehavior(appState.activeTool.type) ||
+        targetElements.some((element) => isFlowchartNodeElement(element))) && (
+        <>{renderAction("changeContainerBehavior")}</>
+      )}
 
       {(toolIsArrow(appState.activeTool.type) ||
         targetElements.some((element) => toolIsArrow(element.type))) && (
@@ -419,12 +418,10 @@ const CombinedShapeProperties = ({
                   canChangeRoundness(element.type),
                 )) &&
                 renderAction("changeRoundness")}
-              {hasContainerBehavior(appState.activeTool.type) ||
-                (targetElements.some(
-                  (element) =>
-                    isFlowchartNodeElement(element) &&
-                    hasBoundTextElement(element),
-                ) && <>{renderAction("changeContainerBehavior")}</>)}
+              {(hasContainerBehavior(appState.activeTool.type) ||
+                targetElements.some((element) =>
+                  isFlowchartNodeElement(element),
+                )) && <>{renderAction("changeContainerBehavior")}</>}
               {renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>
@@ -831,24 +828,6 @@ export const CompactShapeActions = ({
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
   );
-
-  const textContainer =
-    targetElements.length === 1 && isTextElement(targetElements[0])
-      ? getContainerElement(targetElements[0], elementsMap)
-      : null;
-
-  const isStickyNoteContainer =
-    textContainer && isFlowchartNodeElement(textContainer);
-
-  const showFillIcons =
-    (hasBackground(appState.activeTool.type) &&
-      !isTransparent(appState.currentItemBackgroundColor)) ||
-    targetElements.some(
-      (element) =>
-        hasBackground(element.type) && !isTransparent(element.backgroundColor),
-    );
-
-  const showLinkIcon = targetElements.length === 1;
 
   const showLineEditorAction =
     !appState.selectedLinearElement?.isEditing &&

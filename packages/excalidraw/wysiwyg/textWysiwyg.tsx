@@ -8,6 +8,7 @@ import {
   getFontFamilyString,
   isTestEnv,
   MIME_TYPES,
+  BOUND_TEXT_PADDING,
 } from "@excalidraw/common";
 
 import {
@@ -248,7 +249,11 @@ export const textWysiwyg = ({
             // autogrow container height if text exceeds
             if (!isArrowElement(container) && height > maxHeight) {
               const targetContainerHeight =
-                computeContainerDimensionForBoundText(height, container.type);
+                computeContainerDimensionForBoundText(
+                  height,
+                  container.type,
+                  container.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+                );
 
               app.scene.mutateElement(container, {
                 height: targetContainerHeight,
@@ -262,7 +267,11 @@ export const textWysiwyg = ({
               height < maxHeight
             ) {
               const targetContainerHeight =
-                computeContainerDimensionForBoundText(height, container.type);
+                computeContainerDimensionForBoundText(
+                  height,
+                  container.type,
+                  container.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+                );
               app.scene.mutateElement(container, {
                 height: targetContainerHeight,
               });

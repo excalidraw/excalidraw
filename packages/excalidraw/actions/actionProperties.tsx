@@ -26,6 +26,7 @@ import {
 import {
   canBecomePolygon,
   getNonDeletedElements,
+  hasContainerBehavior,
   isFlowchartNodeElement,
 } from "@excalidraw/element";
 
@@ -132,6 +133,9 @@ import {
   ArrowheadCrowfootOneOrManyIcon,
   stickyNoteIcon,
   growingContainerIcon,
+  marginLargeIcon,
+  marginMediumIcon,
+  marginSmallIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -1518,6 +1522,35 @@ export const actionChangeRoundness = register({
   },
 });
 
+const getMargin = (value: "small" | "medium" | "large") => {
+  switch (value) {
+    case "small":
+      return BOUND_TEXT_PADDING;
+    case "medium":
+      return 15;
+    case "large":
+      return 25;
+    default:
+      return BOUND_TEXT_PADDING;
+  }
+};
+
+const getMarginValue = (margin: number | null) => {
+  if (margin === null) {
+    return null;
+  }
+  switch (margin) {
+    case BOUND_TEXT_PADDING:
+      return "small";
+    case 15:
+      return "medium";
+    case 25:
+      return "large";
+    default:
+      return null;
+  }
+};
+
 export const actionChangeContainerBehavior = register({
   name: "changeContainerBehavior",
   label: "labels.container",
@@ -1536,7 +1569,7 @@ export const actionChangeContainerBehavior = register({
 
     // collect directly selected eligible containers
     for (const el of selected) {
-      if (isFlowchartNodeElement(el) && getBoundTextElement(el, elementsMap)) {
+      if (isFlowchartNodeElement(el)) {
         containerIdsToUpdate.add(el.id);
       }
     }
@@ -1558,12 +1591,61 @@ export const actionChangeContainerBehavior = register({
       }
     }
 
-    if (containerIdsToUpdate.size === 0) {
-      // nothing to update
-      return false;
+    if (value.hasOwnProperty("margin")) {
+      if (containerIdsToUpdate.size === 0) {
+        return {
+          appState: {
+            ...appState,
+            currentItemContainerBehavior: {
+              textFlow:
+                appState.currentItemContainerBehavior?.textFlow ?? "growing",
+              margin: getMargin(value.margin as "small" | "medium" | "large"),
+            },
+          },
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        };
+      }
+
+      const nextElements = changeProperty(elements, appState, (el) =>
+        containerIdsToUpdate.has(el.id)
+          ? newElementWith(el, {
+              containerBehavior: {
+                textFlow: el.containerBehavior?.textFlow ?? "growing",
+                margin: getMargin(value.margin as "small" | "medium" | "large"),
+              },
+            })
+          : el,
+      );
+
+      // Invalidate containers to trigger re-render
+      containerIdsToUpdate.forEach((id) => {
+        const container = nextElements.find((el) => el.id === id);
+        if (container) {
+          const boundText = getBoundTextElement(
+            container,
+            arrayToMap(nextElements),
+          );
+          if (boundText) {
+            redrawTextBoundingBox(boundText, container, app.scene);
+          }
+        }
+      });
+
+      return {
+        elements: nextElements,
+        appState: {
+          ...appState,
+          currentItemContainerBehavior: {
+            textFlow:
+              appState.currentItemContainerBehavior?.textFlow ?? "growing",
+            margin: getMargin(value.margin as "small" | "medium" | "large"),
+          },
+        },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
     }
 
-    const nextElements = elements.map((el) =>
+    const nextElements = changeProperty(elements, appState, (el) =>
       containerIdsToUpdate.has(el.id)
         ? newElementWith(el, {
             containerBehavior: {
@@ -1615,29 +1697,39 @@ export const actionChangeContainerBehavior = register({
       }
     } else {
       // case 2: any eligible containers directly selected
-      targetContainers = selected.filter(
-        (el) =>
-          isFlowchartNodeElement(el) && getBoundTextElement(el, elementsMap),
-      );
+      targetContainers = selected.filter((el) => isFlowchartNodeElement(el));
     }
 
-    if (targetContainers.length === 0) {
+    if (
+      targetContainers.length === 0 &&
+      !hasContainerBehavior(appState.activeTool.type)
+    ) {
       return null;
     }
 
-    const value =
-      reduceToCommonValue(
-        targetContainers,
-        (el) => el.containerBehavior?.textFlow ?? "growing",
-      ) ??
-      // mixed selection -> show null so nothing appears selected
-      null;
+    const textFlow =
+      targetContainers.length === 0
+        ? appState.currentItemContainerBehavior?.textFlow ?? "growing"
+        : reduceToCommonValue(
+            targetContainers,
+            (el) => el.containerBehavior?.textFlow ?? "growing",
+          ) ??
+          // mixed selection -> show null so nothing appears selected
+          null;
+
+    const marginValue =
+      targetContainers.length === 0
+        ? appState.currentItemContainerBehavior?.margin ?? BOUND_TEXT_PADDING
+        : reduceToCommonValue(
+            targetContainers,
+            (el) => el.containerBehavior?.margin ?? BOUND_TEXT_PADDING,
+          ) ??
+          // mixed selection -> show null so nothing appears selected
+          null;
 
     return (
       <fieldset>
-        {appState.stylesPanelMode === "full" && (
-          <legend>{t("labels.container")}</legend>
-        )}
+        <legend>{t("labels.container")}</legend>
         <div className="buttonList">
           <RadioSelection
             group="container"
@@ -1654,12 +1746,42 @@ export const actionChangeContainerBehavior = register({
               },
             ]}
             value={
-              value ??
+              textFlow ??
               (targetContainers.length
                 ? null
                 : appState.currentItemContainerBehavior?.textFlow ?? "growing")
             }
-            onChange={(val) => updateData(val)}
+            onChange={(val) => updateData({ textFlow: val })}
+          />
+        </div>
+        <div className="buttonList">
+          <RadioSelection
+            group="container"
+            options={[
+              {
+                value: "small",
+                text: t("labels.container_margin_small"),
+                icon: marginSmallIcon,
+              },
+              {
+                value: "medium",
+                text: t("labels.container_margin_medium"),
+                icon: marginMediumIcon,
+              },
+              {
+                value: "large",
+                text: t("labels.container_margin_large"),
+                icon: marginLargeIcon,
+              },
+            ]}
+            value={getMarginValue(
+              marginValue ??
+                (targetContainers.length
+                  ? null
+                  : appState.currentItemContainerBehavior?.margin ??
+                    BOUND_TEXT_PADDING),
+            )}
+            onChange={(val) => updateData({ margin: val })}
           />
         </div>
       </fieldset>
