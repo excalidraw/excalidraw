@@ -446,6 +446,12 @@ export const STROKE_WIDTH = {
   extraBold: 4,
 } as const;
 
+export const HIGHLIGHTER_STROKE_WIDTH_OFFSET = 3;
+
+export const HIGHLIGHTER_OPACITY = 50;
+
+export const HIGHLIGHTER_DEFAULT_COLOR = "#FFDF20";
+
 export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: ExcalidrawElement["strokeColor"];
   backgroundColor: ExcalidrawElement["backgroundColor"];
@@ -490,6 +496,7 @@ export const TOOL_TYPE = {
   arrow: "arrow",
   line: "line",
   freedraw: "freedraw",
+  highlighter: "highlighter",
   text: "text",
   image: "image",
   eraser: "eraser",

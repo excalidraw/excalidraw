@@ -129,11 +129,11 @@ export const actionFinalize = register({
           elements:
             element.points.length < 2 || isInvisiblySmallElement(element)
               ? elements.map((el) => {
-                  if (el.id === element.id) {
-                    return newElementWith(el, { isDeleted: true });
-                  }
-                  return el;
-                })
+                if (el.id === element.id) {
+                  return newElementWith(el, { isDeleted: true });
+                }
+                return el;
+              })
               : undefined,
           appState: {
             ...appState,
@@ -278,8 +278,9 @@ export const actionFinalize = register({
         cursorButton: "up",
         activeTool:
           (appState.activeTool.locked ||
-            appState.activeTool.type === "freedraw") &&
-          element
+            appState.activeTool.type === "freedraw" ||
+            appState.activeTool.type === "highlighter") &&
+            element
             ? appState.activeTool
             : activeTool,
         activeEmbeddable: null,
@@ -291,12 +292,13 @@ export const actionFinalize = register({
         suggestedBindings: [],
         selectedElementIds:
           element &&
-          !appState.activeTool.locked &&
-          appState.activeTool.type !== "freedraw"
+            !appState.activeTool.locked &&
+            appState.activeTool.type !== "freedraw" &&
+            appState.activeTool.type !== "highlighter"
             ? {
-                ...appState.selectedElementIds,
-                [element.id]: true,
-              }
+              ...appState.selectedElementIds,
+              [element.id]: true,
+            }
             : appState.selectedElementIds,
         // To select the linear element when user has finished mutipoint editing
         selectedLinearElement:

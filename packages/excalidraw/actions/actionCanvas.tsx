@@ -10,6 +10,9 @@ import {
   updateActiveTool,
   CODES,
   KEYS,
+  HIGHLIGHTER_STROKE_WIDTH_OFFSET,
+  HIGHLIGHTER_OPACITY,
+  HIGHLIGHTER_DEFAULT_COLOR,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -24,12 +27,14 @@ import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
+  isHighlighterActive,
 } from "../appState";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
 import {
   handIcon,
+  HighlighterIcon,
   LassoIcon,
   MoonIcon,
   SunIcon,
@@ -49,7 +54,7 @@ import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
-import type { AppState, Offsets } from "../types";
+import type { AppState, Offsets, ToolType } from "../types";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -123,9 +128,9 @@ export const actionClearCanvas = register({
         activeTool:
           appState.activeTool.type === "image"
             ? {
-                ...appState.activeTool,
-                type: app.state.preferredSelectionTool.type,
-              }
+              ...appState.activeTool,
+              type: app.state.preferredSelectionTool.type,
+            }
             : appState.activeTool,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -602,4 +607,105 @@ export const actionToggleHandTool = register({
   },
   keyTest: (event) =>
     !event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.H,
+});
+
+export const getHighlighterStateUpdate = (
+  prevState: Pick<
+    AppState,
+    | "activeTool"
+    | "currentItemStrokeWidth"
+    | "currentItemOpacity"
+    | "currentItemStrokeColor"
+    | "savedStrokeWidth"
+    | "savedOpacity"
+    | "savedStrokeColor"
+    | "highlighterStrokeColor"
+  >,
+  nextActiveToolType: ToolType | "custom",
+): Partial<
+  Pick<
+    AppState,
+    | "currentItemStrokeWidth"
+    | "currentItemOpacity"
+    | "currentItemStrokeColor"
+    | "savedStrokeWidth"
+    | "savedOpacity"
+    | "savedStrokeColor"
+  >
+> => {
+  const isHighlighterActive = prevState.activeTool.type === "highlighter";
+  const isSwitchingToHighlighter = nextActiveToolType === "highlighter";
+
+  if (isSwitchingToHighlighter) {
+    return {
+      savedStrokeWidth: prevState.currentItemStrokeWidth,
+      savedOpacity: prevState.currentItemOpacity,
+      savedStrokeColor: prevState.currentItemStrokeColor,
+      currentItemStrokeWidth:
+        prevState.currentItemStrokeWidth + HIGHLIGHTER_STROKE_WIDTH_OFFSET,
+      currentItemOpacity: HIGHLIGHTER_OPACITY,
+      currentItemStrokeColor:
+        prevState.highlighterStrokeColor ?? HIGHLIGHTER_DEFAULT_COLOR,
+    };
+  }
+
+  if (isHighlighterActive && prevState.savedStrokeWidth !== null) {
+    return {
+      currentItemStrokeWidth: prevState.savedStrokeWidth,
+      currentItemOpacity: prevState.savedOpacity!,
+      currentItemStrokeColor: prevState.savedStrokeColor!,
+      savedStrokeWidth: null,
+      savedOpacity: null,
+      savedStrokeColor: null,
+    };
+  }
+
+  return {};
+};
+
+export const actionToggleHighlighterTool = register({
+  name: "toggleHighlighterTool",
+  label: "toolBar.highlighter",
+  trackEvent: { category: "toolbar" },
+  icon: HighlighterIcon,
+  viewMode: false,
+  perform: (elements, appState, _, app) => {
+    let activeTool: AppState["activeTool"];
+
+    if (isHighlighterActive(appState)) {
+      activeTool = updateActiveTool(appState, {
+        ...(appState.activeTool.lastActiveTool || {
+          type: "selection",
+        }),
+        lastActiveToolBeforeEraser: null,
+      });
+    } else {
+      activeTool = updateActiveTool(appState, {
+        type: "highlighter",
+        lastActiveToolBeforeEraser: appState.activeTool,
+      });
+    }
+
+    const highlighterState = getHighlighterStateUpdate(
+      appState,
+      activeTool.type,
+    );
+
+    return {
+      appState: {
+        ...appState,
+        ...highlighterState,
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        activeEmbeddable: null,
+        activeTool,
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  keyTest: (event) =>
+    !event.altKey &&
+    !event[KEYS.CTRL_OR_CMD] &&
+    !event.shiftKey &&
+    event.key === KEYS.Y,
 });

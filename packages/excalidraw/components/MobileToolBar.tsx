@@ -7,11 +7,12 @@ import { trackEvent } from "../analytics";
 
 import { t } from "../i18n";
 
-import { isHandToolActive } from "../appState";
+import { isHandToolActive, isHighlighterActive } from "../appState";
 
 import { useTunnels } from "../context/tunnels";
 
 import { HandButton } from "./HandButton";
+import { HighlighterButton } from "./HighlighterButton";
 import { ToolButton } from "./ToolButton";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { ToolPopover } from "./ToolPopover";
@@ -84,12 +85,14 @@ const LINEAR_ELEMENT_TOOLS = [
 type MobileToolBarProps = {
   app: AppClassProperties;
   onHandToolToggle: () => void;
+  onHighlighterToolToggle: () => void;
   setAppState: React.Component<any, UIAppState>["setState"];
 };
 
 export const MobileToolBar = ({
   app,
   onHandToolToggle,
+  onHighlighterToolToggle,
   setAppState,
 }: MobileToolBarProps) => {
   const activeTool = app.state.activeTool;
@@ -177,14 +180,14 @@ export const MobileToolBar = ({
     ? activeTool.type === "frame"
       ? frameToolIcon
       : activeTool.type === "embeddable"
-      ? EmbedIcon
-      : activeTool.type === "laser"
-      ? laserPointerToolIcon
-      : activeTool.type === "text"
-      ? TextIcon
-      : activeTool.type === "magicframe"
-      ? MagicIcon
-      : extraToolsIcon
+        ? EmbedIcon
+        : activeTool.type === "laser"
+          ? laserPointerToolIcon
+          : activeTool.type === "text"
+            ? TextIcon
+            : activeTool.type === "magicframe"
+              ? MagicIcon
+              : extraToolsIcon
     : extraToolsIcon;
 
   return (
@@ -194,6 +197,14 @@ export const MobileToolBar = ({
         checked={isHandToolActive(app.state)}
         onChange={onHandToolToggle}
         title={t("toolBar.hand")}
+        isMobile
+      />
+
+      {/* Highlighter Tool */}
+      <HighlighterButton
+        checked={isHighlighterActive(app.state)}
+        onChange={onHighlighterToolToggle}
+        title={t("toolBar.highlighter")}
         isMobile
       />
 
@@ -263,10 +274,10 @@ export const MobileToolBar = ({
             lastActiveGenericShape === "rectangle"
               ? "toolBar.rectangle"
               : lastActiveGenericShape === "diamond"
-              ? "toolBar.diamond"
-              : lastActiveGenericShape === "ellipse"
-              ? "toolBar.ellipse"
-              : "toolBar.rectangle",
+                ? "toolBar.diamond"
+                : lastActiveGenericShape === "ellipse"
+                  ? "toolBar.ellipse"
+                  : "toolBar.rectangle",
           ),
         )}
         data-testid="toolbar-rectangle"
