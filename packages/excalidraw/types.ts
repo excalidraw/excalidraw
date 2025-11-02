@@ -680,11 +680,6 @@ export type UIOptions = Partial<{
    */
   formFactor?: EditorInterface["formFactor"];
   desktopUIMode?: EditorInterface["desktopUIMode"];
-  /**
-   * Listener called when the editor interface is refreshed and
-   * form factor is not controlled by host.
-   */
-  onEditorInterfaceChange?: (editorInterface: EditorInterface) => void;
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
 }>;
