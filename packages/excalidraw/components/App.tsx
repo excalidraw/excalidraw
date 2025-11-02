@@ -749,7 +749,7 @@ class App extends React.Component<AppProps, AppState> {
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
-        getFormFactor: () => getFormFactor(this.state.width, this.state.height),
+        getEditorInterface: () => this.editorInterface,
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
         onChange: (cb) => this.onChangeEmitter.on(cb),
