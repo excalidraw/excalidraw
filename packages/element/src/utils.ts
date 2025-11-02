@@ -466,7 +466,7 @@ export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   ) {
     return x * DEFAULT_PROPORTIONAL_RADIUS;
   }
-
+  
   if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
     const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
 
@@ -475,7 +475,7 @@ export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
     if (x <= CUTOFF_SIZE) {
       return x * DEFAULT_PROPORTIONAL_RADIUS;
     }
-
+    
     return fixedRadiusSize;
   }
 
