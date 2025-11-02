@@ -394,6 +394,7 @@ import {
   setCursorForShape,
 } from "../cursor";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
+import { ElementCustomDataCheckboxes } from "../components/ElementCustomDataCheckboxes";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
@@ -1830,6 +1831,22 @@ class App extends React.Component<AppProps, AppState> {
                           onPointerDown={this.handleCanvasPointerDown}
                           onDoubleClick={this.handleCanvasDoubleClick}
                         />
+                        {/* Render checkboxes for elements with customData.checkboxes */}
+                        {visibleElements
+                          .filter(
+                            (element) =>
+                              element.customData?.checkboxes &&
+                              Array.isArray(element.customData.checkboxes) &&
+                              element.customData.checkboxes.length > 0,
+                          )
+                          .map((element) => (
+                            <ElementCustomDataCheckboxes
+                              key={element.id}
+                              element={element}
+                              elementsMap={elementsMap}
+                              scene={this.scene}
+                            />
+                          ))}
                         {this.state.userToFollow && (
                           <FollowMode
                             width={this.state.width}
