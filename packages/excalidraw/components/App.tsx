@@ -2601,7 +2601,10 @@ class App extends React.Component<AppProps, AppState> {
       // NOTE: we could also remove the isMobileOrTablet check here and
       // always switch to compact mode when the editor is narrow (e.g. < MQ_MIN_WIDTH_DESKTOP)
       // but not too narrow (> MQ_MAX_WIDTH_MOBILE)
-      this.isTabletBreakpoint(editorWidth, editorHeight) && isMobileOrTablet()
+      // zsviczian
+      // changed to !isMobileBreakpoint because from this.isTabletBreakpoint(editorWidth, editorHeight)
+      // because of issue on Tablets when multiple workspace leaves are open
+      !this.isMobileBreakpoint(editorWidth, editorHeight) && isMobileOrTablet() //zsviczian
         ? "compact"
         : this.isMobileBreakpoint(editorWidth, editorHeight)
         ? "mobile"

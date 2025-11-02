@@ -28,6 +28,7 @@ import {
 import type { MaybePromise, ResolutionType } from "./utility-types";
 
 import type { EVENT } from "./constants";
+import { getObsidianDeviceInfo } from "./commonObsidianUtils";
 
 let mockDateTime: string | null = null;
 
@@ -1274,6 +1275,11 @@ export const reduceToCommonValue = <T, R = T>(
 };
 
 export const isMobileOrTablet = (): boolean => {
+  //zsviczian
+  const device = getObsidianDeviceInfo();
+  if (device) {
+    return device.isMobile || device.isTablet;
+  }
   const ua = navigator.userAgent || "";
   const platform = navigator.platform || "";
   const uaData = (navigator as any).userAgentData as

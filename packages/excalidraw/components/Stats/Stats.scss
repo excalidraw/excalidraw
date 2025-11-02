@@ -1,14 +1,14 @@
 .exc-stats {
   width: 204px;
-  position: absolute;
+  position: fixed; //zsviczian
   top: 60px;
   font-size: 12px;
   z-index: var(--zIndex-layerUI);
   pointer-events: var(--ui-pointerEvents);
-  margin-right: 2em; //zsviczian
+  right: 3em; //zsviczian
 
   :root[dir="rtl"] & {
-    left: 12px;
+    left: 3em; //zsviczian
     right: initial;
   }
 
