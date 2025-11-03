@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { getFeatureFlag, setFeatureFlag } from "@excalidraw/common";
+import * as Sentry from "@sentry/browser";
 
 import { CheckboxItem } from "../CheckboxItem";
 import { Dialog } from "../Dialog";
@@ -42,7 +43,17 @@ export const Settings = () => {
       category: DEFAULT_SETTINGS_CATEGORIES.experimental,
       flagKey: "COMPLEX_BINDINGS",
       getValue: () => getFeatureFlag("COMPLEX_BINDINGS"),
-      setValue: (value: boolean) => setFeatureFlag("COMPLEX_BINDINGS", value),
+      setValue: (value: boolean) => {
+        const flagsIntegration =
+          Sentry.getClient()?.getIntegrationByName<Sentry.FeatureFlagsIntegration>(
+            "FeatureFlags",
+          );
+        if (flagsIntegration) {
+          flagsIntegration.addFeatureFlag("COMPLEX_BINDINGS", value);
+        }
+
+        setFeatureFlag("COMPLEX_BINDINGS", value);
+      },
     },
   ];
 

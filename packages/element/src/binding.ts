@@ -631,6 +631,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     );
   }
 
+  const otherBinding = startDragged ? arrow.endBinding : arrow.startBinding;
   const localPoint = draggingPoints.get(
     startDragged ? startIdx : endIdx,
   )?.point;
@@ -651,8 +652,31 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     elementsMap,
     (e) => maxBindingGap_simple(e, e.width, e.height, appState.zoom),
   );
+  const pointInElement = hit && isPointInElement(globalPoint, hit, elementsMap);
+
+  // Handle outside-outside binding with the same element
+  if (otherBinding && otherBinding.elementId === hit?.id && !pointInElement) {
+    const [startFixedPoint, endFixedPoint] = getGlobalFixedPoints(
+      arrow,
+      elementsMap,
+    );
+
+    return {
+      start: {
+        mode: "inside",
+        element: hit,
+        focusPoint: startDragged ? globalPoint : startFixedPoint,
+      },
+      end: {
+        mode: "inside",
+        element: hit,
+        focusPoint: endDragged ? globalPoint : endFixedPoint,
+      },
+    };
+  }
+
   const current: BindingStrategy = hit
-    ? isPointInElement(globalPoint, hit, elementsMap)
+    ? pointInElement
       ? {
           mode: "inside",
           element: hit,
