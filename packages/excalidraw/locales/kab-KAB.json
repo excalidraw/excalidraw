@@ -21,7 +21,9 @@
     "copyStyles": "Nɣel iɣunab",
     "pasteStyles": "Senṭeḍ iɣunab",
     "stroke": "Azizdew",
+    "changeStroke": "",
     "background": "Agilal",
+    "changeBackground": "",
     "fill": "Taččart",
     "strokeWidth": "Tehri n yizirig",
     "strokeStyle": "Aɣanib n tizirig",
@@ -44,6 +46,14 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowhead_crowfoot_many": "",
+    "arrowhead_crowfoot_one": "",
+    "arrowhead_crowfoot_one_or_many": "",
+    "more_options": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Tiddi n tsefsit",
     "fontFamily": "Tawacult n tsefsiyin",
     "addWatermark": "Seddu \"Yettwaxdem s Excalidraw\"",
@@ -72,6 +82,7 @@
     "canvasColors": "Yettwaseqdec di teɣzut n usuneɣ",
     "canvasBackground": "Agilal n teɣzut n usuneɣ",
     "drawingCanvas": "Taɣzut n usuneɣ",
+    "clearCanvas": "",
     "layers": "Tissiyin",
     "actions": "Tigawin",
     "language": "Tutlayt",
@@ -84,12 +95,13 @@
     "group": "Segrew tafrayt",
     "ungroup": "Kkess asegrew i tefrayt",
     "collaborators": "Imɛiwnen",
-    "showGrid": "Beqqeḍ aferrug",
+    "toggleGrid": "",
     "addToLibrary": "Rnu ɣer temkarḍit",
     "removeFromLibrary": "Kkes si temkarḍit",
     "libraryLoadingMessage": "Asali n temkarḍit…",
     "libraries": "Snirem timkarḍiyin",
     "loadingScene": "Asali n usayes…",
+    "loadScene": "",
     "align": "Reyyec",
     "alignTop": "Areyyec uksawen",
     "alignBottom": "Areyyec ukessar",
@@ -105,7 +117,9 @@
     "share": "Bḍu",
     "showStroke": "Beqqeḍ amelqaḍ n yini n yizirig",
     "showBackground": "Beqqeḍ amelqaḍ n yini n ugilal",
-    "toggleTheme": "Snifel asentel",
+    "showFonts": "",
+    "toggleTheme": "",
+    "theme": "Asentel",
     "personalLib": "Tamkarḍit tudmawant",
     "excalidrawLib": "Tamkarḍit n Excalidraw",
     "decreaseFontSize": "Senqes tiddi n tsefsit",
@@ -116,15 +130,20 @@
     "link": {
       "edit": "Ẓreg aseɣwen",
       "editEmbed": "",
-      "create": "Snulfu-d aseɣwen",
-      "createEmbed": "",
+      "create": "Rnu asaɣ",
       "label": "Aseɣwen",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Ẓreg izirig",
-      "exit": "Ffeɣ seg umaẓrag n yizirig"
+      "editArrow": ""
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "Sekkeṛ",
@@ -138,12 +157,46 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "Ḍfeṛ-aɣ-d",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": "",
+    "imageCropping": "",
+    "unCroppedDimension": "",
+    "copyElementLink": "",
+    "linkToElement": "",
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Ulac iferdisen yettwarnan yakan...",
     "hint_emptyLibrary": "Fren aferdis di teɣzut nusuneɣ akken at-ternuḍ dagi, neɣ sbedd tamkarḍit seg usarsay azayez, ukessar-agi.",
-    "hint_emptyPrivateLibrary": "Fren aferdis di teɣzut nusuneɣ akken at-ternuḍ dagi."
+    "hint_emptyPrivateLibrary": "Fren aferdis di teɣzut nusuneɣ akken at-ternuḍ dagi.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
+  },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
@@ -151,6 +204,7 @@
     "exportImage": "Sifeḍ tugna...",
     "export": "Sekles di...",
     "copyToClipboard": "Nɣel ɣer tecfawit",
+    "copyLink": "Nɣel asaɣ",
     "save": "Sekles deg ufaylu amiran",
     "saveAs": "Sekles am",
     "load": "Ldi",
@@ -171,14 +225,16 @@
     "fullScreen": "Agdil aččuran",
     "darkMode": "Askar imsulles",
     "lightMode": "Askar afaw",
+    "systemMode": "",
     "zenMode": "Askar Zen",
     "objectsSnapMode": "",
     "exitZenMode": "Ffeɣ seg uskar Zen",
     "cancel": "Sefsex",
+    "saveLibNames": "",
     "clear": "Sfeḍ",
     "remove": "Kkes",
     "embed": "",
-    "publishLibrary": "Ẓreg",
+    "publishLibrary": "",
     "submit": "Azen",
     "confirm": "Sentem",
     "embeddableInteractionButton": ""
@@ -204,7 +260,8 @@
     "resetLibrary": "Ayagi ad isfeḍ tamkarḍit-inek•m. Tetḥeqqeḍ?",
     "removeItemsFromsLibrary": "Ad tekkseḍ {{count}} n uferdis (en) si temkarḍit?",
     "invalidEncryptionKey": "Tasarut n uwgelhen isefk ad tesɛu 22 n yiekkilen. Amɛiwen srid yensa.",
-    "collabOfflineWarning": "Ulac tuqqna n internet.\nIbedilen-ik ur ttwaklasen ara!"
+    "collabOfflineWarning": "Ulac tuqqna n internet.\nIbedilen-ik ur ttwaklasen ara!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Anaw n ufaylu ur yettwasefrak ara.",
@@ -212,9 +269,9 @@
     "fileTooBig": "Afaylu meqqer aṭas. Tiddi tafellayt yurgen d {{maxSize}}.",
     "svgImageInsertError": "D awezɣi tugra n tugna SVG. Acraḍ SVG yettban-d d armeɣtu.",
     "failedToFetchImage": "",
-    "invalidSVGString": "SVG armeɣtu.",
     "cannotResolveCollabServer": "Ulamek tuqqna s aqeddac n umyalel. Ma ulac uɣilif ales asali n usebter sakin eɛreḍ tikkelt-nniḍen.",
     "importLibraryError": "Ur d-ssalay ara tamkarḍit",
+    "saveLibraryError": "",
     "collabSaveFailed": "Ulamek asekles deg uzadur n yisefka deg ugilal. Ma ikemmel wugur, isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
     "collabSaveFailed_sizeExceeded": "Ulamek asekles deg uzadur n yisefka deg ugilal, taɣzut n usuneɣ tettban-d temqer aṭas. Isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
     "imageToolNotSupported": "",
@@ -235,6 +292,7 @@
   },
   "toolBar": {
     "selection": "Tafrayt",
+    "lasso": "",
     "image": "Ger tugna",
     "rectangle": "Asrem",
     "diamond": "Ameɣṛun",
@@ -246,7 +304,7 @@
     "library": "Tamkarḍit",
     "lock": "Eǧǧ afecku n tefrayt yermed mbaɛd asuneɣ",
     "penMode": "Askar n yimru - gdel tanalit",
-    "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen",
+    "link": "",
     "eraser": "Sfeḍ",
     "frame": "",
     "magicframe": "",
@@ -255,7 +313,23 @@
     "hand": "Afus (afecku n usmutti n tmuɣli)",
     "extraTools": "",
     "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "convertElementType": ""
+  },
+  "element": {
+    "rectangle": "Asrem",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "Izirig",
+    "freedraw": "",
+    "text": "Aḍris",
+    "image": "Tugna",
+    "group": "Sigrew",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "Tigawin n teɣzut n usuneɣ",
@@ -263,28 +337,33 @@
     "shapes": "Talɣiwin"
   },
   "hints": {
-    "canvasPanning": "Akken ad tesmuttiḍ taɣzut n usuneɣ, ṭṭef ṛṛuda n umumed, neɣ seqdec afecku Afus",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Ssit akken ad tebduḍ aṭas n tenqiḍin, zuɣer i yiwen n yizirig",
+    "arrowTool": "",
     "freeDraw": "Ssit yerna zuɣer, serreḥ ticki tfukeḍ",
     "text": "Tixidest: tzemreḍ daɣen ad ternuḍ aḍris s usiti snat n tikkal anida tebɣiḍ s ufecku n tefrayt",
     "embeddable": "",
-    "text_selected": "Ssit snat n tikkal neɣ ssed taqeffalt Kcem akken ad tẓergeḍ aḍris",
-    "text_editing": "Ssit Escape neɣ CtrlOrCmd+ENTER akken ad tfakkeḍ asiẓreg",
-    "linearElementMulti": "Ssit ɣef tenqiḍt taneggarut neɣ ssed taqeffalt Escape neɣ taqeffalt Kcem akken ad tfakkeḍ",
-    "lockAngle": "Tzemreḍ ad tḥettmeḍ tiɣmert s tuṭṭfa n tqeffalt SHIFT",
-    "resize": "Tzemreḍ ad tḥettemeḍ assaɣ s tuṭṭfa n tqeffalt SHIFT mi ara tettbeddileḍ tiddi,\nma teṭṭfeḍ ALT abeddel n tiddi ad yili si tlemmast",
-    "resizeImage": "Tzemreḍ ad talseḍ tiddi s tilelli s tuṭṭfa n SHIFT,\nṭṭef ALT akken ad talseḍ tiddi si tlemmast",
-    "rotate": "Tzemreḍ ad tḥettemeḍ tiɣemmar s tuṭṭfa n SHIFT di tuzzya",
-    "lineEditor_info": "Ssed ɣef CtrlOrCmd yerna ssit snat n tikkal neɣ ssed ɣef CtrlOrCmd + Kcem akken ad tẓergeḍ tineqqiḍin",
-    "lineEditor_pointSelected": "Ssed taqeffalt kkes akken ad tekkseḍ tanqiḍ (tinqiḍin),\nCtrlOrCmd+D akken ad tsiselgeḍ, neɣ zuɣer akken ad tesmuttiḍ",
-    "lineEditor_nothingSelected": "Fren tanqiḍt akken ad tẓergeḍ (ṭṭef SHIFT akken ad tferneḍ aṭas),\nneɣ ṭṭef Alt akken ad ternuḍ tinqiḍin timaynutin",
-    "placeImage": "Ssit akken ad tserseḍ tugna, neɣ ssit u zuɣer akken ad tesbaduḍ tiddi-ines s ufus",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Siẓreg tamkarḍit-inek•inem",
-    "bindTextToElement": "Ssed ɣef kcem akken ad ternuḍ aḍris",
-    "deepBoxSelect": "Ṭṭef CtrlOrCmd akken ad tferneḍ s telqey, yerna ad trewleḍ i uzuɣer",
-    "eraserRevert": "Ssed Alt akken ad tsefsxeḍ iferdisen yettwacerḍen i tukksa",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Ulamek abeqqeḍ n teskant",
@@ -299,9 +378,12 @@
     "openIssueMessage": "Nḥuder aṭas akken ur nseddu ara talɣut n usayes-inek (m) di tuccḍa. Ma yella asayes-inek (m) mačči d amaẓlay, ttxil-k (m) xemmem ad ḍefreḍ <button>afecku n weḍfar n yibugen.</button> Ma ulac uɣilif seddu talɣut ukessar-agi s wenɣal akked usenṭeḍ di GitHub issue.",
     "sceneContent": "Agbur n usayes:"
   },
+  "shareDialog": {
+    "or": "Neɣ"
+  },
   "roomDialog": {
-    "desc_intro": "Tzemreḍ ad d-teɛerḍeḍ medden ɣer usayes-inek (m) amiran akken ad ttekkin yid-k.",
-    "desc_privacy": "Ur tqelliq ara, tiɣimit tsseqdac awgelhen ixef s ixef, dɣa ayen ara tsunɣeḍ ad iqqim d amaẓlay. Ula d aqeddac-nneɣ ur yezmir ara ad iwali acu txeddemeḍ.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Bdu tiɣimit",
     "button_stopSession": "Ḥbes tiɣimit",
     "desc_inProgressIntro": "Tiɣimit n umɛawen s srid tetteddu akka tura.",
@@ -328,6 +410,8 @@
     "click": "ssit",
     "deepSelect": "Afran s telqey",
     "deepBoxSelect": "Afran s telqey s tnaka, yerna ad tyrewleḍ i uzuɣer",
+    "createFlowchart": "",
+    "navigateFlowchart": "",
     "curvedArrow": "Taneccabt izelgen",
     "curvedLine": "Izirig izelgen",
     "documentation": "Tasemlit",
@@ -350,7 +434,9 @@
     "zoomToSelection": "Simɣur ɣer tefrayt",
     "toggleElementLock": "Sekkeṛ/kkes asekker i tefrayt",
     "movePageUpDown": "Smutti asebter d asawen/akessar",
-    "movePageLeftRight": "Smutti asebter s azelmaḍ/ayfus"
+    "movePageLeftRight": "Smutti asebter s azelmaḍ/ayfus",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Sfeḍ taɣzut n usuneɣ"
@@ -410,7 +496,7 @@
       "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "",
+      "exportToPng": "PNG",
       "exportToSvg": "",
       "copyPngToClipboard": ""
     }
@@ -421,13 +507,15 @@
   },
   "stats": {
     "angle": "Tiɣmeṛt",
-    "element": "Aferdis",
-    "elements": "Iferdisen",
+    "shapes": "",
     "height": "Tattayt",
     "scene": "Asayes",
     "selected": "Yettwafren",
     "storage": "Aḥraz",
+    "fullTitle": "",
     "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "Aɣrud",
     "version": "Alqem",
     "versionCopy": "Sit ad tneɣleḍ",
@@ -439,29 +527,31 @@
     "copyStyles": "Iɣunab yettwaneɣlen.",
     "copyToClipboard": "Yettwaɣel ɣer tecfawit.",
     "copyToClipboardAsPng": "{{exportSelection}} yettwanɣel ɣer tecfawit am PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Afaylu yettwasekles.",
     "fileSavedToFilename": "Yettwasekles di {filename}",
     "canvas": "taɣzut n usuneɣ",
     "selection": "tafrayt",
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Afrawan",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
+    "black": "Aberkan",
+    "white": "Amellal",
+    "red": "Azeggaɣ",
+    "pink": "Axuxi",
     "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
+    "violet": "Aṛzaz",
+    "gray": "Aɣiɣdi",
+    "blue": "Azegzaw",
     "cyan": "",
     "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
+    "green": "Adal",
+    "yellow": "Awraɣ",
+    "orange": "Ačinawi",
     "bronze": ""
   },
   "welcomeScreen": {
@@ -478,8 +568,9 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "",
-    "colors": "",
+    "colors": "Initen",
     "shades": "",
     "hexCode": "",
     "noShades": ""
@@ -492,12 +583,12 @@
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "Sekles ar uḍebsi",
+        "button": "Sekles ar uḍebsi",
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "",
         "description": ""
       }
@@ -521,5 +612,53 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
+    },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
