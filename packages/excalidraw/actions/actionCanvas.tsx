@@ -83,7 +83,6 @@ export const actionChangeViewBackgroundColor = register<Partial<AppState>>({
         elements={elements}
         appState={appState}
         updateData={updateData}
-        compactMode={appState.stylesPanelMode === "compact"}
       />
     );
   },

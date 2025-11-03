@@ -12,6 +12,8 @@ import {
 
 import { isNodeInFlowchart } from "@excalidraw/element";
 
+import type { EditorInterface } from "@excalidraw/common";
+
 import { t } from "../i18n";
 import { getShortcutKey } from "../shortcut";
 import { isEraserActive } from "../appState";
@@ -19,12 +21,12 @@ import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
 
-import type { AppClassProperties, Device, UIAppState } from "../types";
+import type { AppClassProperties, UIAppState } from "../types";
 
 interface HintViewerProps {
   appState: UIAppState;
   isMobile: boolean;
-  device: Device;
+  editorInterface: EditorInterface;
   app: AppClassProperties;
 }
 
@@ -36,7 +38,7 @@ const getTaggedShortcutKey = (key: string | string[]) =>
 const getHints = ({
   appState,
   isMobile,
-  device,
+  editorInterface,
   app,
 }: HintViewerProps): null | string | string[] => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
@@ -62,7 +64,7 @@ const getHints = ({
     });
   }
 
-  if (appState.openSidebar && !device.editor.canFitSidebar) {
+  if (appState.openSidebar && !editorInterface.canFitSidebar) {
     return null;
   }
 
@@ -236,13 +238,13 @@ const getHints = ({
 export const HintViewer = ({
   appState,
   isMobile,
-  device,
+  editorInterface,
   app,
 }: HintViewerProps) => {
   const hints = getHints({
     appState,
     isMobile,
-    device,
+    editorInterface,
     app,
   });
 

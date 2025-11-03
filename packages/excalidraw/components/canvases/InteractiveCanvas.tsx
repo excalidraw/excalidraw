@@ -4,6 +4,7 @@ import {
   CURSOR_TYPE,
   isShallowEqual,
   sceneCoordsToViewportCoords,
+  type EditorInterface,
 } from "@excalidraw/common";
 import { AnimationController } from "@excalidraw/excalidraw/renderer/animation";
 
@@ -25,7 +26,6 @@ import type {
 import type {
   AppClassProperties,
   AppState,
-  Device,
   InteractiveCanvasAppState,
 } from "../../types";
 import type { DOMAttributes } from "react";
@@ -42,7 +42,7 @@ type InteractiveCanvasProps = {
   scale: number;
   appState: InteractiveCanvasAppState;
   renderScrollbars: boolean;
-  device: Device;
+  editorInterface: EditorInterface;
   app: AppClassProperties;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
@@ -148,6 +148,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       allElementsMap: props.allElementsMap,
       scale: window.devicePixelRatio,
       appState: props.appState,
+      editorInterface: props.editorInterface,
       renderConfig: {
         remotePointerViewportCoords,
         remotePointerButton,
@@ -159,7 +160,6 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         // NOTE not memoized on so we don't rerender on cursor move
         lastViewportPosition: props.app.lastViewportPosition,
       },
-      device: props.device,
       callback: props.renderInteractiveSceneCallback,
       animationState: {
         bindingHighlight: undefined,

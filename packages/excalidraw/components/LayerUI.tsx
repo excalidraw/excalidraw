@@ -46,7 +46,7 @@ import Footer from "./footer/Footer";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
-import { useDevice } from "./App";
+import { useEditorInterface, useStylesPanelMode } from "./App";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
 import { LibraryIcon } from "./icons";
 import { DefaultSidebar } from "./DefaultSidebar";
@@ -162,27 +162,28 @@ const LayerUI = ({
   isCollaborating,
   generateLinkForSelection,
 }: LayerUIProps) => {
-  const device = useDevice();
+  const editorInterface = useEditorInterface();
+  const stylesPanelMode = useStylesPanelMode();
+  const isCompactStylesPanel = stylesPanelMode === "compact";
   const tunnels = useInitializeTunnels();
 
-  const spacing =
-    appState.stylesPanelMode === "compact"
-      ? {
-          menuTopGap: 4,
-          toolbarColGap: 4,
-          toolbarRowGap: 1,
-          toolbarInnerRowGap: 0.5,
-          islandPadding: 1,
-          collabMarginLeft: 8,
-        }
-      : {
-          menuTopGap: 6,
-          toolbarColGap: 4,
-          toolbarRowGap: 1,
-          toolbarInnerRowGap: 1,
-          islandPadding: 1,
-          collabMarginLeft: 8,
-        };
+  const spacing = isCompactStylesPanel
+    ? {
+        menuTopGap: 4,
+        toolbarColGap: 4,
+        toolbarRowGap: 1,
+        toolbarInnerRowGap: 0.5,
+        islandPadding: 1,
+        collabMarginLeft: 8,
+      }
+    : {
+        menuTopGap: 6,
+        toolbarColGap: 4,
+        toolbarRowGap: 1,
+        toolbarInnerRowGap: 1,
+        islandPadding: 1,
+        collabMarginLeft: 8,
+      };
 
   const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
@@ -237,7 +238,7 @@ const LayerUI = ({
   );
 
   const renderSelectedShapeActions = () => {
-    const isCompactMode = appState.stylesPanelMode === "compact";
+    const isCompactMode = isCompactStylesPanel;
 
     return (
       <Section
@@ -309,7 +310,7 @@ const LayerUI = ({
             <div
               className={clsx("selected-shape-actions-container", {
                 "selected-shape-actions-container--compact":
-                  appState.stylesPanelMode === "compact",
+                  isCompactStylesPanel,
               })}
             >
               {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
@@ -334,14 +335,13 @@ const LayerUI = ({
                           padding={spacing.islandPadding}
                           className={clsx("App-toolbar", {
                             "zen-mode": appState.zenModeEnabled,
-                            "App-toolbar--compact":
-                              appState.stylesPanelMode === "compact",
+                            "App-toolbar--compact": isCompactStylesPanel,
                           })}
                         >
                           <HintViewer
                             appState={appState}
-                            isMobile={device.editor.isMobile}
-                            device={device}
+                            isMobile={editorInterface.formFactor === "phone"}
+                            editorInterface={editorInterface}
                             app={app}
                           />
                           {heading}
@@ -407,8 +407,7 @@ const LayerUI = ({
               "layer-ui__wrapper__top-right zen-mode-transition",
               {
                 "transition-right": appState.zenModeEnabled,
-                "layer-ui__wrapper__top-right--compact":
-                  appState.stylesPanelMode === "compact",
+                "layer-ui__wrapper__top-right--compact": isCompactStylesPanel,
               },
             )}
           >
@@ -418,7 +417,10 @@ const LayerUI = ({
                 userToFollow={appState.userToFollow?.socketId || null}
               />
             )}
-            {renderTopRightUI?.(device.editor.isMobile, appState)}
+            {renderTopRightUI?.(
+              editorInterface.formFactor === "phone",
+              appState,
+            )}
             {!appState.viewModeEnabled &&
               appState.openDialog?.name !== "elementLinkSelector" &&
               // hide button when sidebar docked
@@ -449,7 +451,9 @@ const LayerUI = ({
           trackEvent(
             "sidebar",
             `toggleDock (${docked ? "dock" : "undock"})`,
-            `(${device.editor.isMobile ? "mobile" : "desktop"})`,
+            `(${
+              editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+            })`,
           );
         }}
       />
@@ -477,13 +481,15 @@ const LayerUI = ({
             trackEvent(
               "sidebar",
               `${DEFAULT_SIDEBAR.name} (open)`,
-              `button (${device.editor.isMobile ? "mobile" : "desktop"})`,
+              `button (${
+                editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+              })`,
             );
           }
         }}
         tab={DEFAULT_SIDEBAR.defaultTab}
       >
-        {appState.stylesPanelMode === "full" &&
+        {stylesPanelMode === "full" &&
           appState.width >= MQ_MIN_WIDTH_DESKTOP &&
           t("toolBar.library")}
       </DefaultSidebar.Trigger>
@@ -497,7 +503,7 @@ const LayerUI = ({
           {appState.errorMessage}
         </ErrorDialog>
       )}
-      {eyeDropperState && !device.editor.isMobile && (
+      {eyeDropperState && editorInterface.formFactor !== "phone" && (
         <EyeDropper
           colorPickerType={eyeDropperState.colorPickerType}
           onCancel={() => {
@@ -577,7 +583,7 @@ const LayerUI = ({
           }
         />
       )}
-      {device.editor.isMobile && (
+      {editorInterface.formFactor === "phone" && (
         <MobileMenu
           app={app}
           appState={appState}
@@ -595,14 +601,14 @@ const LayerUI = ({
           UIOptions={UIOptions}
         />
       )}
-      {!device.editor.isMobile && (
+      {editorInterface.formFactor !== "phone" && (
         <>
           <div
             className="layer-ui__wrapper"
             style={
               appState.openSidebar &&
               isSidebarDocked &&
-              device.editor.canFitSidebar
+              editorInterface.canFitSidebar
                 ? { width: `calc(100% - var(--right-sidebar-width))` }
                 : {}
             }

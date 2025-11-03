@@ -1,7 +1,13 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { FONT_FAMILY, CODES, KEYS, reseed } from "@excalidraw/common";
+import {
+  FONT_FAMILY,
+  CODES,
+  KEYS,
+  reseed,
+  MQ_MIN_WIDTH_DESKTOP,
+} from "@excalidraw/common";
 
 import { setDateTimeForTests } from "@excalidraw/common";
 
@@ -60,7 +66,7 @@ beforeEach(async () => {
   finger2.reset();
 
   await render(<Excalidraw handleKeyboardGlobally={true} />);
-  API.setAppState({ height: 768, width: 1024 });
+  API.setAppState({ height: 768, width: MQ_MIN_WIDTH_DESKTOP });
 });
 
 afterEach(() => {
