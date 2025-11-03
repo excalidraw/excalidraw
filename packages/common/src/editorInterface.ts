@@ -179,7 +179,6 @@ export const createUserAgentDescriptor = (
   }
 
   return {
-    raw: normalizedUA,
     isMobileDevice: isMobileOrTablet(),
     platform,
   } as const;
