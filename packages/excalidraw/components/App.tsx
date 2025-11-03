@@ -2501,6 +2501,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  /** TO BE USED LATER */
   private setDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
     const nextMode = setDesktopUIMode(mode);
     this.editorInterface = updateObject(this.editorInterface, {
