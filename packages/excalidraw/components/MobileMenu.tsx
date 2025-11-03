@@ -30,6 +30,7 @@ type MobileMenuProps = {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onHandToolToggle: () => void;
+  onHighlighterToolToggle: () => void;
   onPenModeToggle: AppClassProperties["togglePenMode"];
 
   renderTopRightUI?: (
@@ -52,6 +53,7 @@ export const MobileMenu = ({
   actionManager,
   setAppState,
   onHandToolToggle,
+  onHighlighterToolToggle,
   renderTopLeftUI,
   renderTopRightUI,
   renderSidebars,
@@ -103,6 +105,7 @@ export const MobileMenu = ({
       <MobileToolBar
         app={app}
         onHandToolToggle={onHandToolToggle}
+        onHighlighterToolToggle={onHighlighterToolToggle}
         setAppState={setAppState}
       />
     );

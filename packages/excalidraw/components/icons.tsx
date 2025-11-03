@@ -441,6 +441,23 @@ export const EraserIcon = createIcon(
   tablerIconProps,
 );
 
+export const HighlighterIcon = createIcon(
+  <g strokeWidth="1.25" fill="none">
+    <path
+      clipRule="evenodd"
+      d="m7.643 15.69 7.774-7.773a2.357 2.357 0 1 0-3.334-3.334L4.31 12.357a3.333 3.333 0 0 0-.977 2.357v1.953h1.953c.884 0 1.732-.352 2.357-.977Z"
+    />
+    <rect
+      x="3.81"
+      y="14.357"
+      width="2"
+      height="4"
+      transform="rotate(45 3.81 14.357)"
+    />
+  </g>,
+  modifiedTablerIconProps,
+);
+
 export const ZoomInIcon = createIcon(
   <path strokeWidth="1.25" d="M10 4.167v11.666M4.167 10h11.666" />,
   modifiedTablerIconProps,

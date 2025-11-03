@@ -21,7 +21,7 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { actionToggleStats } from "../actions";
 import { trackEvent } from "../analytics";
-import { isHandToolActive } from "../appState";
+import { isHandToolActive, isHighlighterActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
@@ -57,6 +57,7 @@ import { ErrorDialog } from "./ErrorDialog";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HandButton } from "./HandButton";
+import { HighlighterButton } from "./HighlighterButton";
 import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
@@ -88,6 +89,7 @@ interface LayerUIProps {
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
   onHandToolToggle: () => void;
+  onHighlighterToolToggle: () => void;
   onPenModeToggle: AppClassProperties["togglePenMode"];
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
@@ -148,6 +150,7 @@ const LayerUI = ({
   canvas,
   onLockToggle,
   onHandToolToggle,
+  onHighlighterToolToggle,
   onPenModeToggle,
   showExitZenModeBtn,
   renderTopLeftUI,
@@ -167,21 +170,21 @@ const LayerUI = ({
   const spacing =
     appState.stylesPanelMode === "compact"
       ? {
-          menuTopGap: 4,
-          toolbarColGap: 4,
-          toolbarRowGap: 1,
-          toolbarInnerRowGap: 0.5,
-          islandPadding: 1,
-          collabMarginLeft: 8,
-        }
+        menuTopGap: 4,
+        toolbarColGap: 4,
+        toolbarRowGap: 1,
+        toolbarInnerRowGap: 0.5,
+        islandPadding: 1,
+        collabMarginLeft: 8,
+      }
       : {
-          menuTopGap: 6,
-          toolbarColGap: 4,
-          toolbarRowGap: 1,
-          toolbarInnerRowGap: 1,
-          islandPadding: 1,
-          collabMarginLeft: 8,
-        };
+        menuTopGap: 6,
+        toolbarColGap: 4,
+        toolbarRowGap: 1,
+        toolbarInnerRowGap: 1,
+        islandPadding: 1,
+        collabMarginLeft: 8,
+      };
 
   const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
@@ -367,6 +370,13 @@ const LayerUI = ({
                               isMobile
                             />
 
+                            <HighlighterButton
+                              checked={isHighlighterActive(appState)}
+                              onChange={() => onHighlighterToolToggle()}
+                              title={t("toolBar.highlighter")}
+                              isMobile
+                            />
+
                             <ShapesSwitcher
                               setAppState={setAppState}
                               activeTool={appState.activeTool}
@@ -518,8 +528,8 @@ const LayerUI = ({
                       ? "strokeColor"
                       : "backgroundColor"
                     : colorPickerType === "elementBackground"
-                    ? "backgroundColor"
-                    : "strokeColor"]: color,
+                      ? "backgroundColor"
+                      : "strokeColor"]: color,
                 });
                 ShapeCache.delete(element);
               }
@@ -585,6 +595,7 @@ const LayerUI = ({
           renderImageExportDialog={renderImageExportDialog}
           setAppState={setAppState}
           onHandToolToggle={onHandToolToggle}
+          onHighlighterToolToggle={onHighlighterToolToggle}
           onPenModeToggle={onPenModeToggle}
           renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
@@ -599,8 +610,8 @@ const LayerUI = ({
             className="layer-ui__wrapper"
             style={
               appState.openSidebar &&
-              isSidebarDocked &&
-              device.editor.canFitSidebar
+                isSidebarDocked &&
+                device.editor.canFitSidebar
                 ? { width: `calc(100% - var(--right-sidebar-width))` }
                 : {}
             }
