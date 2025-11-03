@@ -906,6 +906,7 @@ export interface ExcalidrawImperativeAPI {
   setForceRenderAllEmbeddables: InstanceType<typeof App>["setForceRenderAllEmbeddables"]; //zsviczian
   zoomToFit: InstanceType<typeof App>["zoomToFit"]; //zsviczian
   refreshEditorBreakpoints: InstanceType<typeof App>["refreshEditorBreakpoints"]; //zsviczian
+  isTouchScreen: InstanceType<typeof App>["isTouchScreen"]; //zsviczian
   setTrayModeEnabled: InstanceType<typeof App>["setTrayModeEnabled"]; //zsviczian
   isTrayModeEnabled: InstanceType<typeof App>["isTrayModeEnabled"]; //zsviczian
   getColorAtScenePoint: InstanceType<typeof App>["getColorAtScenePoint"]; //zsviczian

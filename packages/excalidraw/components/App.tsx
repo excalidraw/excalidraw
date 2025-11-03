@@ -743,6 +743,7 @@ class App extends React.Component<AppProps, AppState> {
         zoomToFit: this.zoomToFit, //zsviczian
         refreshEditorBreakpoints: this.refreshEditorBreakpoints, //zsviczian
         setTrayModeEnabled: this.setTrayModeEnabled, //zsviczian
+        isTouchScreen: this.isTouchScreen, //zsviczian
         isTrayModeEnabled: this.isTrayModeEnabled, //zsviczian
         getColorAtScenePoint: this.getColorAtScenePoint, //zsviczian
         startLineEditor: this.startLineEditor, //zsviczian
@@ -2629,6 +2630,11 @@ class App extends React.Component<AppProps, AppState> {
       return true;
     }
     return false;
+  };
+
+  //
+  private isTouchScreen = () => {
+    return this.device.isTouchScreen;
   };
 
   //zsviczian
