@@ -18,6 +18,8 @@ import { HistoryChangedEvent } from "../history";
 import { useEmitter } from "../hooks/useEmitter";
 import { t } from "../i18n";
 
+import { useStylesPanelMode } from "..";
+
 import type { History } from "../history";
 import type { AppClassProperties, AppState } from "../types";
 import type { Action, ActionResult } from "./types";
@@ -73,7 +75,7 @@ export const createUndoAction: ActionCreator = (history) => ({
     ),
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && matchKey(event, KEYS.Z) && !event.shiftKey,
-  PanelComponent: ({ appState, updateData, data }) => {
+  PanelComponent: ({ appState, updateData, data, app }) => {
     const { isUndoStackEmpty } = useEmitter<HistoryChangedEvent>(
       history.onHistoryChangedEmitter,
       new HistoryChangedEvent(
@@ -81,6 +83,7 @@ export const createUndoAction: ActionCreator = (history) => ({
         history.isRedoStackEmpty,
       ),
     );
+    const isMobile = useStylesPanelMode() === "mobile";
 
     return (
       <ToolButton
@@ -92,9 +95,7 @@ export const createUndoAction: ActionCreator = (history) => ({
         disabled={isUndoStackEmpty}
         data-testid="button-undo"
         style={{
-          ...(appState.stylesPanelMode === "mobile"
-            ? MOBILE_ACTION_BUTTON_BG
-            : {}),
+          ...(isMobile ? MOBILE_ACTION_BUTTON_BG : {}),
         }}
       />
     );
@@ -114,7 +115,7 @@ export const createRedoAction: ActionCreator = (history) => ({
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] && event.shiftKey && matchKey(event, KEYS.Z)) ||
     (isWindows && event.ctrlKey && !event.shiftKey && matchKey(event, KEYS.Y)),
-  PanelComponent: ({ appState, updateData, data }) => {
+  PanelComponent: ({ appState, updateData, data, app }) => {
     const { isRedoStackEmpty } = useEmitter(
       history.onHistoryChangedEmitter,
       new HistoryChangedEvent(
@@ -122,6 +123,7 @@ export const createRedoAction: ActionCreator = (history) => ({
         history.isRedoStackEmpty,
       ),
     );
+    const isMobile = useStylesPanelMode() === "mobile";
 
     return (
       <ToolButton
@@ -133,9 +135,7 @@ export const createRedoAction: ActionCreator = (history) => ({
         disabled={isRedoStackEmpty}
         data-testid="button-redo"
         style={{
-          ...(appState.stylesPanelMode === "mobile"
-            ? MOBILE_ACTION_BUTTON_BG
-            : {}),
+          ...(isMobile ? MOBILE_ACTION_BUTTON_BG : {}),
         }}
       />
     );

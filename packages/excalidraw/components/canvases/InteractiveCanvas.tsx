@@ -4,6 +4,7 @@ import {
   CURSOR_TYPE,
   isShallowEqual,
   sceneCoordsToViewportCoords,
+  type EditorInterface,
 } from "@excalidraw/common";
 
 import type {
@@ -20,7 +21,7 @@ import type {
   RenderableElementsMap,
   RenderInteractiveSceneCallback,
 } from "../../scene/types";
-import type { AppState, Device, InteractiveCanvasAppState } from "../../types";
+import type { AppState, InteractiveCanvasAppState } from "../../types";
 import type { DOMAttributes } from "react";
 
 type InteractiveCanvasProps = {
@@ -35,7 +36,7 @@ type InteractiveCanvasProps = {
   scale: number;
   appState: InteractiveCanvasAppState;
   renderScrollbars: boolean;
-  device: Device;
+  editorInterface: EditorInterface;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
@@ -146,7 +147,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           selectionColor,
           renderScrollbars: props.renderScrollbars,
         },
-        device: props.device,
+        editorInterface: props.editorInterface,
         callback: props.renderInteractiveSceneCallback,
       },
       isRenderThrottlingEnabled(),

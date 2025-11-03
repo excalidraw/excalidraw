@@ -53,7 +53,11 @@ import { getToolbarTools } from "./shapes";
 
 import "./Actions.scss";
 
-import { useDevice, useExcalidrawContainer } from "./App";
+import {
+  useEditorInterface,
+  useStylesPanelMode,
+  useExcalidrawContainer,
+} from "./App";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { ToolPopover } from "./ToolPopover";
@@ -151,7 +155,7 @@ export const SelectedShapeActions = ({
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
   );
-  const device = useDevice();
+  const editorInterface = useEditorInterface();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
@@ -292,8 +296,10 @@ export const SelectedShapeActions = ({
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
-            {!device.editor.isMobile && renderAction("duplicateSelection")}
-            {!device.editor.isMobile && renderAction("deleteSelectedElements")}
+            {editorInterface.formFactor !== "phone" &&
+              renderAction("duplicateSelection")}
+            {editorInterface.formFactor !== "phone" &&
+              renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
             {showLinkIcon && renderAction("hyperlink")}
@@ -1041,6 +1047,9 @@ export const ShapesSwitcher = ({
   UIOptions: AppProps["UIOptions"];
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
+  const stylesPanelMode = useStylesPanelMode();
+  const isFullStylesPanel = stylesPanelMode === "full";
+  const isCompactStylesPanel = stylesPanelMode === "compact";
 
   const SELECTION_TOOLS = [
     {
@@ -1058,7 +1067,7 @@ export const ShapesSwitcher = ({
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const lassoToolSelected =
-    app.state.stylesPanelMode === "full" &&
+    isFullStylesPanel &&
     activeTool.type === "lasso" &&
     app.state.preferredSelectionTool.type !== "lasso";
 
@@ -1091,7 +1100,7 @@ export const ShapesSwitcher = ({
           // use a ToolPopover for selection/lasso toggle as well
           if (
             (value === "selection" || value === "lasso") &&
-            app.state.stylesPanelMode === "compact"
+            isCompactStylesPanel
           ) {
             return (
               <ToolPopover
@@ -1225,7 +1234,7 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.laser")}
           </DropdownMenu.Item>
-          {app.state.stylesPanelMode === "full" && (
+          {isFullStylesPanel && (
             <DropdownMenu.Item
               onSelect={() => app.setActiveTool({ type: "lasso" })}
               icon={LassoIcon}
