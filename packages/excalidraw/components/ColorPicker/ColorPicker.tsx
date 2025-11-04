@@ -100,7 +100,7 @@ const ColorPickerPopupContent = ({
 }) => {
   const { container } = useExcalidrawContainer();
   const stylesPanelMode = useStylesPanelMode();
-  const isCompactMode = stylesPanelMode !== "full";
+  const isCompactMode = !(stylesPanelMode === "full" || stylesPanelMode === "tray"); //zsviczian
   const isMobileMode = stylesPanelMode === "mobile";
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 

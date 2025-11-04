@@ -24,6 +24,8 @@ module.exports = {
   },
   resolve: {
     extensions: [".js", ".ts", ".tsx", ".css", ".scss"],
+    mainFields: ["source", "browser", "module", "main"],
+    mainFiles: ["index"],
     alias: {
       "@excalidraw/excalidraw": path.resolve(__dirname),
       "@excalidraw/utils": path.resolve(__dirname, "../utils/src"),
@@ -64,7 +66,7 @@ module.exports = {
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,
         exclude:
-          /node_modules[\\/](?!(browser-fs-access|canvas-roundrect-polyfill))/,
+          /node_modules[\\/](?!(browser-fs-access|canvas-roundrect-polyfil|@zsviczian[\\/]laser-pointer))/,
         use: [
           {
             loader: "import-meta-loader",

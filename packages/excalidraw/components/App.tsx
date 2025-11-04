@@ -2628,15 +2628,16 @@ class App extends React.Component<AppProps, AppState> {
     if (!container) {
       return;
     }
-    if(this.editorInterface.formFactor === "phone") {
+    if (this.editorInterface.formFactor === "phone") {
       enabled = false;
     }
 
-    if(this.editorInterface.isTrayMode === enabled) {
+    if (this.editorInterface.isTrayMode === enabled) {
       return;
     }
 
     this.refreshEditorInterface(enabled);
+    this.triggerRender();
   };
 
   //zsviczian

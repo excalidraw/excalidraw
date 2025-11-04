@@ -1090,7 +1090,6 @@ export const ShapesSwitcher = ({
   const [isImageMenuOpen, setIsImageMenuOpen] = useState(false); //zsviczian
   const stylesPanelMode = useStylesPanelMode();
   const isFullStylesPanel = stylesPanelMode === "full";
-  const isTrayStylesPanel = stylesPanelMode === "tray";
   const isCompactStylesPanel = stylesPanelMode === "compact";
 
   const SELECTION_TOOLS = [

@@ -3,6 +3,7 @@
   "version": "0.18.0-47",
   "main": "main.js",
   "module": "./dist/prod/index.js",
+  "source": "./index.tsx",
   "types": "types/excalidraw/index.d.ts",
   "exports": {
     "./common/*": {
