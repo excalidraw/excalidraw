@@ -11,7 +11,7 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { Theme } from "@excalidraw/element/types";
 
-import { useDevice } from "../components/App";
+import { useEditorInterface } from "../components/App";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { ProjectName } from "../components/ProjectName";
@@ -242,7 +242,7 @@ export const actionSaveFileToDisk = register({
       icon={saveAs}
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
-      showAriaLabel={useDevice().editor.isMobile}
+      showAriaLabel={useEditorInterface().formFactor === "phone"}
       hidden={!nativeFileSystemSupported}
       onClick={() => updateData(null)}
       data-testid="save-as-button"

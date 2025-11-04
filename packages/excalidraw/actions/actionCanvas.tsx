@@ -92,7 +92,6 @@ export const actionChangeViewBackgroundColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
-        compactMode={false /*appState.stylesPanelMode === "compact" //zsviczian*/}
       />
     );
   },
@@ -129,7 +128,6 @@ export const actionClearCanvas = register({
         gridModeEnabled: appState.gridModeEnabled,
         stats: appState.stats,
         pasteDialog: appState.pasteDialog,
-        stylesPanelMode: appState.stylesPanelMode, //zsviczian #10253
         activeTool:
           appState.activeTool.type === "image"
             ? {

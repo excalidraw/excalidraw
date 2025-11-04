@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { useDevice } from "../App";
-import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
+
+import { useEditorInterface } from "../App";
 
 const MenuTrigger = ({
   className = "",
@@ -14,17 +14,16 @@ const MenuTrigger = ({
   onToggle: () => void;
   title?: string;
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">) => {
-  const appState = useUIAppState();
-  const device = useDevice();
+  const editorInterface = useEditorInterface();
   const classNames = clsx(
     `dropdown-menu-button ${className}`,
     "zen-mode-transition",
     {
-      "dropdown-menu-button--mobile": device.editor.isMobile,
+      "dropdown-menu-button--mobile": editorInterface.formFactor === "phone",
     },
     {
       "dropdown-menu-button--tray":
-        !device.editor.isMobile && appState.stylesPanelMode === "tray", //zsviczian
+        editorInterface.formFactor !== "phone" && editorInterface.isTrayMode, //zsviczian
     },
   ).trim();
   return (

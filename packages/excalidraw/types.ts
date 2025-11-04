@@ -4,6 +4,7 @@ import type {
   throttleRAF,
   MIME_TYPES,
   ColorPaletteCustom,
+  EditorInterface,
 } from "@excalidraw/common";
 
 import type { SuggestedBinding } from "@excalidraw/element";
@@ -485,9 +486,6 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
-
-  /** properties sidebar mode - determines whether to show compact or complete sidebar */
-  stylesPanelMode: "compact" | "full" | "mobile" | "tray"; //zsviczian
 }
 
 export type SearchMatch = {
@@ -745,6 +743,12 @@ export type UIOptions = Partial<{
   tools: {
     image: boolean;
   };
+  /**
+   * Optionally control the editor form factor and desktop UI mode from the host app.
+   * If not provided, we will take care of it internally.
+   */
+  formFactor?: EditorInterface["formFactor"];
+  desktopUIMode?: EditorInterface["desktopUIMode"];
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
 }>;
@@ -784,7 +788,7 @@ export type AppClassProperties = {
     }
   >;
   files: BinaryFiles;
-  device: App["device"];
+  editorInterface: App["editorInterface"];
   scene: App["scene"];
   syncActionResult: App["syncActionResult"];
   fonts: App["fonts"];
@@ -905,7 +909,7 @@ export interface ExcalidrawImperativeAPI {
   };
   setForceRenderAllEmbeddables: InstanceType<typeof App>["setForceRenderAllEmbeddables"]; //zsviczian
   zoomToFit: InstanceType<typeof App>["zoomToFit"]; //zsviczian
-  refreshEditorBreakpoints: InstanceType<typeof App>["refreshEditorBreakpoints"]; //zsviczian
+  refreshEditorInterface: InstanceType<typeof App>["refreshEditorInterface"]; //zsviczian
   isTouchScreen: InstanceType<typeof App>["isTouchScreen"]; //zsviczian
   setTrayModeEnabled: InstanceType<typeof App>["setTrayModeEnabled"]; //zsviczian
   isTrayModeEnabled: InstanceType<typeof App>["isTrayModeEnabled"]; //zsviczian
@@ -930,12 +934,12 @@ export interface ExcalidrawImperativeAPI {
   bringForward: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   sendToBack: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   bringToFront: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
-  setMobileModeAllowed: (allow: boolean) => void; //zsviczian
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
   getHTMLIFrameElement: InstanceType<typeof App>["getHTMLIFrameElement"]; //zsviczian
+  getEditorInterface: () => EditorInterface;
   /**
    * Disables rendering of frames (including element clipping), but currently
    * the frames are still interactive in edit mode. As such, this API should be
@@ -973,19 +977,6 @@ export interface ExcalidrawImperativeAPI {
     callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
 }
-
-export type Device = Readonly<{
-  viewport: {
-    isMobile: boolean;
-    isLandscape: boolean;
-  };
-  editor: {
-    isMobile: boolean;
-    canFitSidebar: boolean;
-  };
-  isTouchScreen: boolean;
-  isTrayMode: boolean; //zsviczian
-}>;
 
 export type FrameNameBounds = {
   x: number;

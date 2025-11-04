@@ -25,7 +25,6 @@ import type {
   AppClassProperties,
   AppProps,
   AppState,
-  Device,
   ExcalidrawProps,
   UIAppState,
 } from "../types";
@@ -34,6 +33,7 @@ import clsx from "clsx";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 import { getNonDeletedElements } from "@excalidraw/element";
+import { EditorInterface } from "@excalidraw/common";
 
 type TrayMenuProps = {
   appState: UIAppState;
@@ -52,7 +52,7 @@ type TrayMenuProps = {
   ) => JSX.Element | null;
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderSidebars: () => JSX.Element | null;
-  device: Device;
+  editorInterface: EditorInterface;
   renderWelcomeScreen: boolean;
   UIOptions: AppProps["UIOptions"];
   app: AppClassProperties;
@@ -69,7 +69,7 @@ export const TrayMenu = ({
   renderTopRightUI,
   renderCustomStats,
   renderSidebars,
-  device,
+  editorInterface,
   renderWelcomeScreen,
   UIOptions,
   app,
@@ -120,7 +120,7 @@ export const TrayMenu = ({
                   }
                 >
                   {!appState.viewModeEnabled && //zsviczian
-                    renderTopRightUI?.(device.editor.isMobile, appState)}
+                    renderTopRightUI?.(editorInterface.formFactor === "phone", appState)}
                   {!appState.viewModeEnabled &&
                     appState.openDialog?.name !== "elementLinkSelector" && (
                       <DefaultSidebarTriggerTunnel.Out />
@@ -152,7 +152,7 @@ export const TrayMenu = ({
         <HintViewer
           appState={appState}
           isMobile={true}
-          device={device}
+          editorInterface={editorInterface}
           app={app}
         />
         <div //zsviczian
@@ -291,7 +291,7 @@ export const TrayMenu = ({
               )}
           </footer>
         </Island>
-        {appState.stylesPanelMode === "tray" ? ( //zsviczian display zoom menu in tray mode
+        {editorInterface.isTrayMode ? ( //zsviczian display zoom menu in tray mode
           <Island padding={1} style={{ marginLeft: `4px` }}>
             <ZoomActions
               renderAction={actionManager.renderAction}
