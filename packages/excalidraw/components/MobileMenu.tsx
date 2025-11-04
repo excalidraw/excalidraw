@@ -76,15 +76,18 @@ export const MobileMenu = ({
       return null;
     }
 
-    const topRightUI = (//zsvician (render BOTH top right UI and default sidebar trigger)
-      <div className="excalidraw-ui-top-right">
-        {renderTopRightUI?.(true, appState)}
-        {(!appState.viewModeEnabled && <DefaultSidebarTriggerTunnel.Out />)}
-        {appState.viewModeEnabled && (
-          <ExitViewModeButton actionManager={actionManager} />
-        )}
-      </div>
-    );
+    const topRightUI = //zsvician (render BOTH top right UI and default sidebar trigger)
+      (
+        <>
+          <div className="excalidraw-ui-top-right">
+            {renderTopRightUI?.(true, appState)}
+          </div>
+          {!appState.viewModeEnabled && <DefaultSidebarTriggerTunnel.Out />}
+          {appState.viewModeEnabled && (
+            <ExitViewModeButton actionManager={actionManager} />
+          )}
+        </>
+      );
 
     const topLeftUI = (
       <div className="excalidraw-ui-top-left">

@@ -63,7 +63,7 @@ const MenuContent = ({
   const classNames = clsx(`dropdown-menu ${className}`, {
     "dropdown-menu--mobile": editorInterface.formFactor === "phone",
     "dropdown-menu--tray":
-      editorInterface.formFactor !== "phone" && editorInterface.isTrayMode, //zsviczian
+      editorInterface.formFactor !== "phone" && editorInterface.preferTrayMode, //zsviczian
     "dropdown-menu--placement-top": placement === "top",
   }).trim();
 

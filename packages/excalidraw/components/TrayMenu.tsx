@@ -2,13 +2,20 @@ import React from "react";
 
 import { showSelectedShapeActions } from "@excalidraw/element";
 
+import clsx from "clsx";
+import { getNonDeletedElements } from "@excalidraw/element";
+
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
+import type { EditorInterface } from "@excalidraw/common";
 
 import { isHandToolActive } from "../appState";
 import { useTunnels } from "../context/tunnels";
 import { t } from "../i18n";
 import { calculateScrollCenter, isSomeElementSelected } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
+
+import { actionToggleStats } from "../actions";
 
 import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { FixedSideContainer } from "./FixedSideContainer";
@@ -20,6 +27,8 @@ import { PenModeButton } from "./PenModeButton";
 import { Section } from "./Section";
 import Stack from "./Stack";
 
+import { Stats } from "./Stats";
+
 import type { ActionManager } from "../actions/manager";
 import type {
   AppClassProperties,
@@ -29,11 +38,6 @@ import type {
   UIAppState,
 } from "../types";
 import type { JSX } from "react";
-import clsx from "clsx";
-import { Stats } from "./Stats";
-import { actionToggleStats } from "../actions";
-import { getNonDeletedElements } from "@excalidraw/element";
-import { EditorInterface } from "@excalidraw/common";
 
 type TrayMenuProps = {
   appState: UIAppState;
@@ -291,17 +295,13 @@ export const TrayMenu = ({
               )}
           </footer>
         </Island>
-        {editorInterface.isTrayMode ? ( //zsviczian display zoom menu in tray mode
-          <Island padding={1} style={{ marginLeft: `4px` }}>
-            <ZoomActions
-              renderAction={actionManager.renderAction}
-              zoom={appState.zoom}
-              trayMode={true}
-            />
-          </Island>
-        ) : (
-          ""
-        )}
+        <Island padding={1} style={{ marginLeft: `4px` }}>
+          <ZoomActions
+            renderAction={actionManager.renderAction}
+            zoom={appState.zoom}
+            trayMode={true}
+          />
+        </Island>
       </div>
     </>
   );

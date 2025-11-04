@@ -23,7 +23,8 @@ const MenuTrigger = ({
     },
     {
       "dropdown-menu-button--tray":
-        editorInterface.formFactor !== "phone" && editorInterface.isTrayMode, //zsviczian
+        editorInterface.formFactor !== "phone" &&
+        editorInterface.preferTrayMode, //zsviczian
     },
   ).trim();
   return (

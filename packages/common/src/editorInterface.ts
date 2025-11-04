@@ -12,7 +12,7 @@ export type EditorInterface = Readonly<{
   isTouchScreen: boolean;
   canFitSidebar: boolean;
   isLandscape: boolean;
-  isTrayMode: boolean; //zsviczian
+  preferTrayMode: boolean; //zsviczian
 }>;
 
 // storage key
@@ -167,7 +167,7 @@ export const deriveStylesPanelMode = (
   }
 
   if (editorInterface.formFactor === "tablet") {
-    return editorInterface.isTrayMode ? "tray" : "compact"; //zsviczian
+    return editorInterface.preferTrayMode ? "tray" : "compact"; //zsviczian
   }
 
   return editorInterface.desktopUIMode;
@@ -200,7 +200,7 @@ export const loadDesktopUIModePreference = () => {
 
   try {
     const stored = window.localStorage.getItem(DESKTOP_UI_MODE_STORAGE_KEY);
-    if (stored === "compact" || stored === "full") {
+    if (stored === "compact" || stored === "full" || stored === "tray") { //zsviczian
       return stored as EditorInterface["desktopUIMode"];
     }
   } catch (error) {
@@ -222,7 +222,7 @@ const persistDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
 };
 
 export const setDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
-  if (mode !== "compact" && mode !== "full") {
+  if (mode !== "compact" && mode !== "full" && mode !== "tray") { //zsviczian
     return;
   }
 

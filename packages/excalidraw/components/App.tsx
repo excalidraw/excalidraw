@@ -495,7 +495,7 @@ const editorInterfaceContextInitialValue: EditorInterface = {
     typeof navigator !== "undefined" ? navigator.userAgent : "",
   ),
   isTouchScreen: false,
-  isTrayMode: false, //zsviczian
+  preferTrayMode: false, //zsviczian
   canFitSidebar: false,
   isLandscape: true,
 };
@@ -753,6 +753,7 @@ class App extends React.Component<AppProps, AppState> {
         zoomToFit: this.zoomToFit, //zsviczian
         refreshEditorInterface: this.refreshEditorInterface, //zsviczian
         setTrayModeEnabled: this.setTrayModeEnabled, //zsviczian
+        setDesktopUIMode: this.setDesktopUIMode, //zsviczian
         isTouchScreen: this.isTouchScreen, //zsviczian
         isTrayModeEnabled: this.isTrayModeEnabled, //zsviczian
         getColorAtScenePoint: this.getColorAtScenePoint, //zsviczian
@@ -1652,7 +1653,7 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--tray":
             !(this.state.viewModeEnabled || this.state.zenModeEnabled) &&
             this.editorInterface.formFactor !== "phone" &&
-            this.editorInterface.isTrayMode //zsviczian
+            this.editorInterface.preferTrayMode, //zsviczian
         })}
         style={{
           //zsviczian
@@ -2555,7 +2556,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  public refreshEditorInterface = (isTrayMode?: boolean) => { //zsviczian
+  public refreshEditorInterface = (preferTrayMode?: boolean) => { //zsviczian
     const container = this.excalidrawContainerRef.current;
     if (!container) {
       return;
@@ -2574,7 +2575,7 @@ class App extends React.Component<AppProps, AppState> {
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
     const nextEditorInterface = updateObject(this.editorInterface, {
-      desktopUIMode:
+      desktopUIMode: preferTrayMode ? "tray" : //zsviczian
         this.props.UIOptions.desktopUIMode ??
         storedDesktopUIMode ??
         this.editorInterface.desktopUIMode,
@@ -2582,7 +2583,7 @@ class App extends React.Component<AppProps, AppState> {
       userAgent: userAgentDescriptor,
       canFitSidebar: editorWidth > sidebarBreakpoint,
       isLandscape: editorWidth > editorHeight,
-      isTrayMode: isTrayMode ?? this.editorInterface.isTrayMode,
+      preferTrayMode: preferTrayMode ?? this.editorInterface.preferTrayMode, //zsviczian
     });
 
     this.editorInterface = nextEditorInterface;
@@ -2598,7 +2599,10 @@ class App extends React.Component<AppProps, AppState> {
     const prevStylesPanelMode = this.stylesPanelMode;
     this.stylesPanelMode = nextStylesPanelMode;
 
-    if (prevStylesPanelMode !== "full" && nextStylesPanelMode === "full") {
+    if (
+      (prevStylesPanelMode !== "full" && nextStylesPanelMode === "full") ||
+      (prevStylesPanelMode !== "tray" && nextStylesPanelMode === "tray") //zsviczian
+    ) {
       this.setState((prevState) => ({
         preferredSelectionTool: {
           type: "selection",
@@ -2632,17 +2636,21 @@ class App extends React.Component<AppProps, AppState> {
       enabled = false;
     }
 
-    if (this.editorInterface.isTrayMode === enabled) {
+    if (
+      this.editorInterface.preferTrayMode === enabled &&
+      this.editorInterface.desktopUIMode === "tray"
+    ) {
       return;
     }
 
     this.refreshEditorInterface(enabled);
     this.triggerRender();
+    setDesktopUIMode(this.editorInterface.desktopUIMode);
   };
 
   //zsviczian
   public isTrayModeEnabled = () => {
-    return this.editorInterface.isTrayMode;
+    return this.editorInterface.preferTrayMode;
   };
 
   private clearImageShapeCache(filesMap?: BinaryFiles) {

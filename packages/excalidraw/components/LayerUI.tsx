@@ -462,8 +462,9 @@ const LayerUI = ({
   const isTrayMode =
     !(appState.viewModeEnabled || appState.zenModeEnabled) &&
     editorInterface.formFactor !== "phone" &&
-    editorInterface.isTrayMode; //zsviczian
-  const isTrayModeOrMobile = isTrayMode || editorInterface.formFactor === "phone"; //zsviczian
+    editorInterface.preferTrayMode; //zsviczian
+  const isTrayModeOrMobile =
+    isTrayMode || editorInterface.formFactor === "phone"; //zsviczian
 
   const renderSidebars = () => {
     return (
@@ -648,13 +649,13 @@ const LayerUI = ({
         <>
           <div
             className="layer-ui__wrapper"
-            style={
-              appState.openSidebar &&
-              isSidebarDocked &&
-              editorInterface.canFitSidebar
-                ? {} //width: `calc(100% - var(--right-sidebar-width))` } //zsviczian
-                : {}
-            }
+//            style={ //zsviczian remove (calc(100% - var(--right-sidebar-width))
+//              appState.openSidebar &&
+//              isSidebarDocked &&
+//              editorInterface.canFitSidebar
+//                ? {width: `calc(100% - var(--right-sidebar-width))` } //zsviczian
+//                : {}
+//            }
           >
             {renderWelcomeScreen && <tunnels.WelcomeScreenCenterTunnel.Out />}
             {renderFixedSideContainer()}

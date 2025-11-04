@@ -246,7 +246,7 @@ const ColorPickerTrigger = ({
   editingTextElement?: boolean;
 }) => {
   const stylesPanelMode = useStylesPanelMode();
-  const isCompactMode = stylesPanelMode !== "full";
+  const isCompactMode = !(stylesPanelMode === "full" || stylesPanelMode === "tray"); //zsviczian
   const isMobileMode = stylesPanelMode === "mobile";
   const handleClick = (e: React.MouseEvent) => {
     // use pointerdown so we run before outside-close logic
@@ -316,7 +316,7 @@ export const ColorPicker = ({
     openRef.current = appState.openPopup;
   }, [appState.openPopup]);
   const stylesPanelMode = useStylesPanelMode();
-  const isCompactMode = !(stylesPanelMode === "full" || stylesPanelMode === "compact"); //zsviczian
+  const isCompactMode = !(stylesPanelMode === "full" || stylesPanelMode === "tray"); //zsviczian
 
   return (
     <div>
