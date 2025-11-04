@@ -7,7 +7,7 @@ import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
-import { MobileShapeActions } from "./Actions";
+import { ExitViewModeButton, MobileShapeActions } from "./Actions";
 import { MobileToolBar } from "./MobileToolBar";
 import { FixedSideContainer } from "./FixedSideContainer";
 
@@ -65,8 +65,18 @@ export const MobileMenu = ({
     DefaultSidebarTriggerTunnel,
   } = useTunnels();
   const renderAppTopBar = () => {
-    const topRightUI = renderTopRightUI?.(true, appState) ?? (
-      <DefaultSidebarTriggerTunnel.Out />
+    if (appState.openDialog?.name === "elementLinkSelector") {
+      return null;
+    }
+
+    const topRightUI = (
+      <div className="excalidraw-ui-top-right">
+        {renderTopRightUI?.(true, appState) ??
+          (!appState.viewModeEnabled && <DefaultSidebarTriggerTunnel.Out />)}
+        {appState.viewModeEnabled && (
+          <ExitViewModeButton actionManager={actionManager} />
+        )}
+      </div>
     );
 
     const topLeftUI = (
@@ -75,13 +85,6 @@ export const MobileMenu = ({
         <MainMenuTunnel.Out />
       </div>
     );
-
-    if (
-      appState.viewModeEnabled ||
-      appState.openDialog?.name === "elementLinkSelector"
-    ) {
-      return <div className="App-toolbar-content">{topLeftUI}</div>;
-    }
 
     return (
       <div
@@ -117,41 +120,43 @@ export const MobileMenu = ({
         {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
       </div>
 
-      <div
-        className="App-bottom-bar"
-        style={{
-          marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN,
-        }}
-      >
-        <MobileShapeActions
-          appState={appState}
-          elementsMap={app.scene.getNonDeletedElementsMap()}
-          renderAction={actionManager.renderAction}
-          app={app}
-          setAppState={setAppState}
-        />
+      {!appState.viewModeEnabled && (
+        <div
+          className="App-bottom-bar"
+          style={{
+            marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN,
+          }}
+        >
+          <MobileShapeActions
+            appState={appState}
+            elementsMap={app.scene.getNonDeletedElementsMap()}
+            renderAction={actionManager.renderAction}
+            app={app}
+            setAppState={setAppState}
+          />
 
-        <Island className="App-toolbar">
-          {!appState.viewModeEnabled &&
-            appState.openDialog?.name !== "elementLinkSelector" &&
-            renderToolbar()}
-          {appState.scrolledOutside &&
-            !appState.openMenu &&
-            !appState.openSidebar && (
-              <button
-                type="button"
-                className="scroll-back-to-content"
-                onClick={() => {
-                  setAppState((appState) => ({
-                    ...calculateScrollCenter(elements, appState),
-                  }));
-                }}
-              >
-                {t("buttons.scrollBackToContent")}
-              </button>
-            )}
-        </Island>
-      </div>
+          <Island className="App-toolbar">
+            {!appState.viewModeEnabled &&
+              appState.openDialog?.name !== "elementLinkSelector" &&
+              renderToolbar()}
+            {appState.scrolledOutside &&
+              !appState.openMenu &&
+              !appState.openSidebar && (
+                <button
+                  type="button"
+                  className="scroll-back-to-content"
+                  onClick={() => {
+                    setAppState((appState) => ({
+                      ...calculateScrollCenter(elements, appState),
+                    }));
+                  }}
+                >
+                  {t("buttons.scrollBackToContent")}
+                </button>
+              )}
+          </Island>
+        </div>
+      )}
 
       <FixedSideContainer side="top" className="App-top-bar">
         {renderAppTopBar()}

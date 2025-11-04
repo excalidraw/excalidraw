@@ -852,7 +852,7 @@ const ExcalidrawWrapper = () => {
             return null;
           }
           return (
-            <div className="top-right-ui">
+            <div className="excalidraw-ui-top-right">
               {collabError.message && <CollabError collabError={collabError} />}
               <LiveCollaborationTrigger
                 isCollaborating={isCollaborating}

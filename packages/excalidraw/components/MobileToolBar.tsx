@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import clsx from "clsx";
 
 import { KEYS, capitalizeString } from "@excalidraw/common";
@@ -101,8 +101,6 @@ export const MobileToolBar = ({
     "arrow" | "line"
   >("arrow");
 
-  const toolbarRef = useRef<HTMLDivElement>(null);
-
   // keep lastActiveGenericShape in sync with active tool if user switches via other UI
   useEffect(() => {
     if (
@@ -143,8 +141,8 @@ export const MobileToolBar = ({
     }
   };
 
-  const toolbarWidth =
-    toolbarRef.current?.getBoundingClientRect()?.width ?? 0 - 8;
+  const [toolbarWidth, setToolbarWidth] = useState(0);
+
   const WIDTH = 36;
   const GAP = 4;
 
@@ -164,6 +162,9 @@ export const MobileToolBar = ({
     "laser",
     "magicframe",
   ].filter((tool) => {
+    if (showTextToolOutside && tool === "text") {
+      return false;
+    }
     if (showImageToolOutside && tool === "image") {
       return false;
     }
@@ -174,21 +175,30 @@ export const MobileToolBar = ({
   });
   const extraToolSelected = extraTools.includes(activeTool.type);
   const extraIcon = extraToolSelected
-    ? activeTool.type === "frame"
+    ? activeTool.type === "text"
+      ? TextIcon
+      : activeTool.type === "image"
+      ? ImageIcon
+      : activeTool.type === "frame"
       ? frameToolIcon
       : activeTool.type === "embeddable"
       ? EmbedIcon
       : activeTool.type === "laser"
       ? laserPointerToolIcon
-      : activeTool.type === "text"
-      ? TextIcon
       : activeTool.type === "magicframe"
       ? MagicIcon
       : extraToolsIcon
     : extraToolsIcon;
 
   return (
-    <div className="mobile-toolbar" ref={toolbarRef}>
+    <div
+      className="mobile-toolbar"
+      ref={(div) => {
+        if (div) {
+          setToolbarWidth(div.getBoundingClientRect().width);
+        }
+      }}
+    >
       {/* Hand Tool */}
       <HandButton
         checked={isHandToolActive(app.state)}

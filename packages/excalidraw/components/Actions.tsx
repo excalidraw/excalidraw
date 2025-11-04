@@ -49,6 +49,8 @@ import { getFormValue } from "../actions/actionProperties";
 
 import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
 
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+
 import { getToolbarTools } from "./shapes";
 
 import "./Actions.scss";
@@ -79,6 +81,7 @@ import {
   adjustmentsIcon,
   DotsHorizontalIcon,
   SelectionIcon,
+  pencilIcon,
 } from "./icons";
 
 import { Island } from "./Island";
@@ -1304,7 +1307,7 @@ export const UndoRedoActions = ({
   </div>
 );
 
-export const ExitZenModeAction = ({
+export const ExitZenModeButton = ({
   actionManager,
   showExitZenModeBtn,
 }: {
@@ -1319,5 +1322,19 @@ export const ExitZenModeAction = ({
     onClick={() => actionManager.executeAction(actionToggleZenMode)}
   >
     {t("buttons.exitZenMode")}
+  </button>
+);
+
+export const ExitViewModeButton = ({
+  actionManager,
+}: {
+  actionManager: ActionManager;
+}) => (
+  <button
+    type="button"
+    className="disable-view-mode"
+    onClick={() => actionManager.executeAction(actionToggleViewMode)}
+  >
+    {pencilIcon}
   </button>
 );
