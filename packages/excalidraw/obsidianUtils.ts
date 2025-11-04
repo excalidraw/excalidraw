@@ -8,6 +8,7 @@ import {
   MIN_ZOOM,
   TOUCH_CTX_MENU_TIMEOUT,
   DRAGGING_THRESHOLD,
+  deriveStylesPanelMode,
 } from "@excalidraw/common";
 
 import { FONT_METADATA } from "@excalidraw/common";
@@ -27,7 +28,7 @@ import type {
 import { Fonts } from "./fonts";
 import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
 
-import type { AppState } from "./types";
+import type { AppClassProperties, AppState } from "./types";
 
 import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
 
@@ -321,8 +322,10 @@ export const shouldDisableZoom = (appState: AppState): boolean => {
   return false;
 };
 
-export const isFullPanelMode = (appState: AppState): boolean => 
-  appState.stylesPanelMode === "full" || appState.stylesPanelMode === "tray";
+export const isFullPanelMode = (app: AppClassProperties): boolean => {
+  const stylesPanelMode = deriveStylesPanelMode(app.editorInterface);
+  return stylesPanelMode === "full" || stylesPanelMode === "tray";
+}
 
 export const isContextMenuDisabled = (): boolean => {
   return getHostPlugin().settings.disableContextMenu ?? false;

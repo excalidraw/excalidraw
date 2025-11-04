@@ -57,6 +57,8 @@ import {
   toggleLinePolygonState,
 } from "@excalidraw/element";
 
+import { deriveStylesPanelMode } from "@excalidraw/common";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import type {
@@ -81,9 +83,6 @@ import { RadioSelection } from "../components/RadioSelection";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { FontPicker } from "../components/FontPicker/FontPicker";
 import { IconPicker } from "../components/IconPicker";
-// TODO barnabasmolnar/editor-redesign
-// TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
-// ArrowHead icons
 import { Range } from "../components/Range";
 import {
   ArrowheadArrowIcon,
@@ -152,6 +151,15 @@ import { register } from "./register";
 import type { AppClassProperties, AppState, Primitive } from "../types";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
+
+const getStylesPanelInfo = (app: AppClassProperties) => {
+  const stylesPanelMode = deriveStylesPanelMode(app.editorInterface);
+  return {
+    stylesPanelMode,
+    isCompact: !(stylesPanelMode === "full" || stylesPanelMode === "tray"), //zsviczian
+    isMobile: stylesPanelMode === "mobile",
+  } as const;
+};
 
 export const changeProperty = (
   elements: readonly ExcalidrawElement[],
@@ -348,7 +356,7 @@ export const actionChangeStrokeColor = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <>
-      {isFullPanelMode(appState) && ( //zsviczian
+      {isFullPanelMode(app) && ( //zsviczian
         <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       )}
       <ColorPicker
@@ -371,15 +379,11 @@ export const actionChangeStrokeColor = register({
           true,
           (hasSelection) =>
             !hasSelection ? appState.currentItemStrokeColor : null,
-        )}
+          )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
         elements={elements}
         appState={appState}
         updateData={updateData}
-        compactMode={
-          appState.stylesPanelMode === "compact" ||
-          appState.stylesPanelMode === "mobile"
-        }
       />
     </>
   ),
@@ -439,7 +443,7 @@ export const actionChangeBackgroundColor = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => (
     <>
-      {isFullPanelMode(appState) && ( //zsviczian
+      {isFullPanelMode(app) && ( //zsviczian
         <h3 aria-hidden="true">{t("labels.background")}</h3>
       )}
       <ColorPicker
@@ -462,18 +466,16 @@ export const actionChangeBackgroundColor = register({
           true,
           (hasSelection) =>
             !hasSelection ? appState.currentItemBackgroundColor : null,
-        )}
-        onChange={(color) => updateData({ currentItemBackgroundColor: color })}
+          )}
+        onChange={(color) =>
+          updateData({ currentItemBackgroundColor: color })
+        }
         elements={elements}
         appState={appState}
         updateData={updateData}
-        compactMode={
-          appState.stylesPanelMode === "compact" ||
-          appState.stylesPanelMode === "mobile"
-        }
       />
     </>
-  ),
+  )
 });
 
 export const actionChangeFillStyle = register({
@@ -484,7 +486,9 @@ export const actionChangeFillStyle = register({
     trackEvent(
       "element",
       "changeFillStyle",
-      `${value} (${app.device.editor.isMobile ? "mobile" : "desktop"})`,
+      `${value} (${
+        app.editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+      })`,
     );
     return {
       elements: changeProperty(elements, appState, (el) =>
@@ -900,7 +904,7 @@ export const actionChangeFontSize = register({
     return changeFontSize(elements, appState, app, () => value, value);
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => {
-    //zsviczian
+    // zsviczian - start insert
     let selectedElements = getSelectedElements(elements, appState).filter(
       (el) => isTextElement(el),
     ) as ExcalidrawTextElement[];
@@ -921,8 +925,11 @@ export const actionChangeFontSize = register({
     const isMedium = idx === 1;
     const isLarge = idx === 2;
     const isVeryLarge = idx === 3;
+    // zsviczian - end insert
+
+    const { isCompact } = getStylesPanelInfo(app);
+
     return (
-    //zsviczian
       <fieldset>
         <legend>{t("labels.fontSize")}</legend>
         <div className="buttonList">
@@ -997,21 +1004,20 @@ export const actionChangeFontSize = register({
               useFibonacci = event.altKey;
               withCaretPositionPreservation(
                 () => updateData(getFontSize(value, appState.zoom.value)),
-                appState.stylesPanelMode === "compact"||
-                appState.stylesPanelMode === "mobile",
+                isCompact,
                 !!appState.editingTextElement,
                 data?.onPreventClose,
               );
             }}
-            /*onChange={(value) => {
-              withCaretPositionPreservation(
-                () => updateData(value),
-                appState.stylesPanelMode === "compact" ||
-                  appState.stylesPanelMode === "mobile",
-                !!appState.editingTextElement,
-                data?.onPreventClose,
-              );
-            }}*/ //zsviczian
+            /* onChange={(value) => {
+            withCaretPositionPreservation(
+              () => updateData(value),
+              appState.stylesPanelMode === "compact" ||
+                appState.stylesPanelMode === "mobile",
+              !!appState.editingTextElement,
+              data?.onPreventClose,
+            );
+          }}*/ //zsviczian
           />
         </div>
       </fieldset>
@@ -1278,6 +1284,7 @@ export const actionChangeFontFamily = register({
     // relying on state batching as multiple `FontPicker` handlers could be called in rapid succession and we want to combine them
     const [batchedData, setBatchedData] = useState<ChangeFontFamilyData>({});
     const isUnmounted = useRef(true);
+    const { stylesPanelMode, isCompact } = getStylesPanelInfo(app);
 
     const selectedFontFamily = useMemo(() => {
       const getFontFamily = (
@@ -1350,14 +1357,14 @@ export const actionChangeFontFamily = register({
 
     return (
       <>
-        {isFullPanelMode(appState) && ( //zsviczian
+        {isFullPanelMode(app) && ( //zsviczian
           <legend>{t("labels.fontFamily")}</legend>
         )}
         <FontPicker
           isOpened={appState.openPopup === "fontFamily"}
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
-          compactMode={!isFullPanelMode(appState) /*zsviczian*/}
+          compactMode={!isFullPanelMode(app) /*zsviczian*/}
           onSelect={(fontFamily) => {
             withCaretPositionPreservation(
               () => {
@@ -1369,8 +1376,7 @@ export const actionChangeFontFamily = register({
                 // defensive clear so immediate close won't abuse the cached elements
                 cachedElementsRef.current.clear();
               },
-              appState.stylesPanelMode === "compact" ||
-                appState.stylesPanelMode === "mobile",
+              isCompact,
               !!appState.editingTextElement,
             );
           }}
@@ -1445,11 +1451,7 @@ export const actionChangeFontFamily = register({
               cachedElementsRef.current.clear();
 
               // Refocus text editor when font picker closes if we were editing text
-              if (
-                (appState.stylesPanelMode === "compact" ||
-                  appState.stylesPanelMode === "mobile") &&
-                appState.editingTextElement
-              ) {
+              if (isCompact && appState.editingTextElement) {
                 restoreCaretPosition(null); // Just refocus without saved position
               }
             }
@@ -1496,6 +1498,7 @@ export const actionChangeTextAlign = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => {
     const elementsMap = app.scene.getNonDeletedElementsMap();
+    const { isCompact } = getStylesPanelInfo(app);
 
     return (
       <fieldset>
@@ -1548,8 +1551,7 @@ export const actionChangeTextAlign = register({
             onChange={(value) => {
               withCaretPositionPreservation(
                 () => updateData(value),
-                appState.stylesPanelMode === "compact" ||
-                  appState.stylesPanelMode === "mobile",
+                isCompact,
                 !!appState.editingTextElement,
                 data?.onPreventClose,
               );
@@ -1596,6 +1598,7 @@ export const actionChangeVerticalAlign = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const { isCompact } = getStylesPanelInfo(app);
     return (
       <fieldset>
         <div className="buttonList">
@@ -1648,8 +1651,7 @@ export const actionChangeVerticalAlign = register({
             onChange={(value) => {
               withCaretPositionPreservation(
                 () => updateData(value),
-                appState.stylesPanelMode === "compact" ||
-                  appState.stylesPanelMode === "mobile",
+                isCompact,
                 !!appState.editingTextElement,
                 data?.onPreventClose,
               );

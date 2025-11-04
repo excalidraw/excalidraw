@@ -49,11 +49,18 @@ import { getFormValue } from "../actions/actionProperties";
 
 import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
 
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+
 import { getToolbarTools } from "./shapes";
 
 import "./Actions.scss";
 
-import { useAppProps, useDevice, useExcalidrawContainer } from "./App";
+import {
+  useAppProps,
+  useEditorInterface,
+  useStylesPanelMode,
+  useExcalidrawContainer,
+} from "./App";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { ToolPopover } from "./ToolPopover";
@@ -79,6 +86,7 @@ import {
   adjustmentsIcon,
   DotsHorizontalIcon,
   SelectionIcon,
+  pencilIcon,
 } from "./icons";
 
 import { Island } from "./Island";
@@ -156,7 +164,7 @@ export const SelectedShapeActions = ({
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
   );
-  const device = useDevice();
+  const editorInterface = useEditorInterface();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
@@ -311,8 +319,10 @@ export const SelectedShapeActions = ({
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
-            {!device.editor.isMobile && renderAction("duplicateSelection")}
-            {!device.editor.isMobile && renderAction("deleteSelectedElements")}
+            {editorInterface.formFactor !== "phone" &&
+              renderAction("duplicateSelection")}
+            {editorInterface.formFactor !== "phone" &&
+              renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
             {showLinkIcon && renderAction("hyperlink")}
@@ -1078,6 +1088,10 @@ export const ShapesSwitcher = ({
   const { renderMermaid } = useAppProps(); //zsviczian
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
   const [isImageMenuOpen, setIsImageMenuOpen] = useState(false); //zsviczian
+  const stylesPanelMode = useStylesPanelMode();
+  const isFullStylesPanel = stylesPanelMode === "full";
+  const isTrayStylesPanel = stylesPanelMode === "tray";
+  const isCompactStylesPanel = stylesPanelMode === "compact";
 
   const SELECTION_TOOLS = [
     {
@@ -1095,7 +1109,7 @@ export const ShapesSwitcher = ({
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const lassoToolSelected =
-    app.state.stylesPanelMode === "full" &&
+    isFullStylesPanel &&
     activeTool.type === "lasso" &&
     app.state.preferredSelectionTool.type !== "lasso";
 
@@ -1103,9 +1117,7 @@ export const ShapesSwitcher = ({
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
-  const showLassoTool =
-    app.state.stylesPanelMode === "full" ||
-    app.state.stylesPanelMode === "tray"; //zsviczian
+  const showLassoTool = isFullStylesPanel || isCompactStylesPanel;
 
   return (
     <>
@@ -1132,7 +1144,7 @@ export const ShapesSwitcher = ({
           // use a ToolPopover for selection/lasso toggle as well
           if (
             (value === "selection" || value === "lasso") &&
-            app.state.stylesPanelMode === "compact"
+            isCompactStylesPanel
           ) {
             return (
               <ToolPopover
@@ -1399,7 +1411,7 @@ export const UndoRedoActions = ({
   </div>
 );
 
-export const ExitZenModeAction = ({
+export const ExitZenModeButton = ({
   actionManager,
   showExitZenModeBtn,
 }: {
@@ -1414,5 +1426,19 @@ export const ExitZenModeAction = ({
     onClick={() => actionManager.executeAction(actionToggleZenMode)}
   >
     {t("buttons.exitZenMode")}
+  </button>
+);
+
+export const ExitViewModeButton = ({
+  actionManager,
+}: {
+  actionManager: ActionManager;
+}) => (
+  <button
+    type="button"
+    className="disable-view-mode"
+    onClick={() => actionManager.executeAction(actionToggleViewMode)}
+  >
+    {pencilIcon}
   </button>
 );

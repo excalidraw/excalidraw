@@ -9,7 +9,7 @@ import { t } from "../i18n";
 
 import {
   useExcalidrawContainer,
-  useDevice,
+  useEditorInterface,
   useExcalidrawSetAppState,
   useExcalidrawAppState,
 } from "./App";
@@ -53,7 +53,7 @@ export const Dialog = (props: DialogProps) => {
   const [lastActiveElement] = useState(document.activeElement);
   const { id } = useExcalidrawContainer();
   const { dynamicStyle } = useExcalidrawAppState(); //zsviczian
-  const isFullscreen = useDevice().viewport.isMobile;
+  const isFullscreen = useEditorInterface().formFactor === "phone";
 
   useEffect(() => {
     if (!islandNode) {

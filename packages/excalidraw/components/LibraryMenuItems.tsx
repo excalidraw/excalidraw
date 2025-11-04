@@ -32,7 +32,7 @@ import "./LibraryMenuItems.scss";
 
 import { TextField } from "./TextField";
 
-import { useDevice } from "./App";
+import { useEditorInterface } from "./App";
 
 import { Button } from "./Button";
 
@@ -75,7 +75,7 @@ export default function LibraryMenuItems({
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
 }) {
-  const device = useDevice();
+  const editorInterface = useEditorInterface();
   const libraryContainerRef = useRef<HTMLDivElement>(null);
   const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
 
@@ -392,7 +392,7 @@ export default function LibraryMenuItems({
             ref={searchInputRef}
             type="search"
             className={clsx("library-menu-items-container__search", {
-              hideCancelButton: !device.editor.isMobile,
+              hideCancelButton: editorInterface.formFactor !== "phone",
             })}
             placeholder={t("library.search.inputPlaceholder")}
             value={searchInputValue}

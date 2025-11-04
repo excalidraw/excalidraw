@@ -1,8 +1,8 @@
 import { useState, useLayoutEffect } from "react";
 
-import { THEME } from "@excalidraw/common";
+import { isTransparent, THEME } from "@excalidraw/common";
 
-import { useDevice, useExcalidrawContainer } from "../components/App";
+import { useEditorInterface, useExcalidrawContainer } from "../components/App";
 import { useUIAppState } from "../context/ui-appState";
 
 export const useCreatePortalContainer = (opts?: {
@@ -12,8 +12,8 @@ export const useCreatePortalContainer = (opts?: {
 }) => {
   const [div, setDiv] = useState<HTMLDivElement | null>(null);
 
-  const device = useDevice();
-  const { theme, stylesPanelMode } = useUIAppState(); //zsviczian
+  const editorInterface = useEditorInterface();
+  const { theme } = useUIAppState();
 
   const { container: excalidrawContainer } = useExcalidrawContainer();
 
@@ -21,10 +21,13 @@ export const useCreatePortalContainer = (opts?: {
     if (div) {
       div.className = "";
       div.classList.add("excalidraw", ...(opts?.className?.split(/\s+/) || []));
-      div.classList.toggle("excalidraw--mobile", device.editor.isMobile);
+      div.classList.toggle(
+        "excalidraw--mobile",
+        editorInterface.formFactor === "phone",
+      );
       div.classList.toggle(
         "excalidraw--tray",
-        !device.editor.isMobile && stylesPanelMode === "tray",
+        editorInterface.formFactor !== "phone" && editorInterface.isTrayMode,
       ); //zsviczian
       div.classList.toggle("theme--dark", theme === THEME.DARK);
       if (opts?.style) {
@@ -36,14 +39,7 @@ export const useCreatePortalContainer = (opts?: {
         div.setAttribute("style", styleString);
       }
     }
-  }, [
-    div,
-    theme,
-    device.editor.isMobile,
-    opts?.className,
-    opts?.style,
-    stylesPanelMode,
-  ]); //zsviczian added opts?.style and stylesPanelMode
+  }, [div, theme, editorInterface.formFactor, editorInterface.isTrayMode, opts?.className]); //zsviczian
 
   useLayoutEffect(() => {
     const container = opts?.parentSelector

@@ -316,6 +316,10 @@ export {
   DEFAULT_LASER_COLOR,
   UserIdleState,
   normalizeLink,
+  sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
+  getFormFactor,
+  safelyParseJSON, //zsviczian
 } from "@excalidraw/common";
 
 export {
@@ -328,19 +332,13 @@ export { CaptureUpdateAction } from "@excalidraw/element";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 
-export {
-  sceneCoordsToViewportCoords,
-  viewportCoordsToSceneCoords,
-  safelyParseJSON, //zsviczian
-} from "@excalidraw/common";
-
 export { getEmbedLink } from "@excalidraw/element/embeddable"; //zsviczian - not sure if I use it any more
 export { Sidebar } from "./components/Sidebar/Sidebar";
 export { Button } from "./components/Button";
 export { Footer };
 export { MainMenu };
 export { Ellipsify } from "./components/Ellipsify";
-export { useDevice } from "./components/App";
+export { useEditorInterface, useStylesPanelMode } from "./components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
 export { Stats } from "./components/Stats";
