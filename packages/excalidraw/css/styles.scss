@@ -293,7 +293,8 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .excalidraw-ui-top-left {
+  .excalidraw-ui-top-left,
+  .excalidraw-ui-top-right {
     display: flex;
     align-items: center;
     gap: 0.5rem;
