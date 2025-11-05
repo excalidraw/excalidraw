@@ -23,23 +23,17 @@ import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
   elementCenterPoint,
-  FIXED_BINDING_DISTANCE,
-  LinearElementEditor,
-  maxBindingGap_simple,
-} from "@excalidraw/element";
-import {
   getOmitSidesForEditorInterface,
   getTransformHandles,
   getTransformHandlesFromCoords,
   hasBoundingBox,
-} from "@excalidraw/element";
-import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
   isLineElement,
   isTextElement,
+  LinearElementEditor,
 } from "@excalidraw/element";
 
 import { renderSelectionElement } from "@excalidraw/element";
@@ -88,11 +82,8 @@ import { getClientColor, renderRemoteCursors } from "../clients";
 
 import {
   bootstrapCanvas,
-  drawHighlightForDiamondWithRotation_simple,
-  drawHighlightForRectWithRotation_simple,
   fillCircle,
   getNormalizedCanvasDimensions,
-  strokeEllipseWithRotation_simple,
   strokeRectWithRotation_simple,
 } from "./helpers";
 
@@ -201,58 +192,181 @@ const renderBindingHighlightForBindableElement_simple = (
   context: CanvasRenderingContext2D,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
-  zoom: InteractiveCanvasAppState["zoom"],
+  appState: InteractiveCanvasAppState,
 ) => {
-  const padding = maxBindingGap_simple(
-    element,
-    element.width,
-    element.height,
-    zoom,
-  );
+  const enclosingFrame = element.frameId && elementsMap.get(element.frameId);
+  if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
+    context.translate(
+      enclosingFrame.x + appState.scrollX,
+      enclosingFrame.y + appState.scrollY,
+    );
 
-  context.fillStyle = "rgba(0,0,0,.05)";
+    context.beginPath();
+
+    if (FRAME_STYLE.radius && context.roundRect) {
+      context.roundRect(
+        -1,
+        -1,
+        enclosingFrame.width + 1,
+        enclosingFrame.height + 1,
+        FRAME_STYLE.radius / appState.zoom.value,
+      );
+    } else {
+      context.rect(-1, -1, enclosingFrame.width + 1, enclosingFrame.height + 1);
+    }
+
+    context.clip();
+
+    context.translate(
+      -(enclosingFrame.x + appState.scrollX),
+      -(enclosingFrame.y + appState.scrollY),
+    );
+  }
 
   switch (element.type) {
-    case "rectangle":
-    case "text":
-    case "image":
-    case "iframe":
-    case "embeddable":
-    case "frame":
     case "magicframe":
-      drawHighlightForRectWithRotation_simple(
-        context,
-        element,
-        elementsMap,
-        padding,
-      );
-      break;
-    case "diamond":
-      drawHighlightForDiamondWithRotation_simple(
-        context,
-        padding,
-        element,
-        elementsMap,
-      );
-      break;
-    case "ellipse": {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-      const width = x2 - x1;
-      const height = y2 - y1;
+    case "frame":
+      context.save();
 
-      context.strokeStyle = "rgba(0,0,0,.05)";
-      context.lineWidth = padding - FIXED_BINDING_DISTANCE;
-
-      strokeEllipseWithRotation_simple(
-        context,
-        width + padding + FIXED_BINDING_DISTANCE,
-        height + padding + FIXED_BINDING_DISTANCE,
-        x1 + width / 2,
-        y1 + height / 2,
-        element.angle,
+      context.translate(
+        element.x + appState.scrollX,
+        element.y + appState.scrollY,
       );
+
+      context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
+      context.strokeStyle =
+        appState.theme === THEME.DARK
+          ? `rgba(3, 93, 161, 1)`
+          : `rgba(106, 189, 252, 1)`;
+
+      if (FRAME_STYLE.radius && context.roundRect) {
+        context.beginPath();
+        context.roundRect(
+          0,
+          0,
+          element.width,
+          element.height,
+          FRAME_STYLE.radius / appState.zoom.value,
+        );
+        context.stroke();
+        context.closePath();
+      } else {
+        context.strokeRect(0, 0, element.width, element.height);
+      }
+
+      context.restore();
       break;
-    }
+    default:
+      context.save();
+
+      const center = elementCenterPoint(element, elementsMap);
+
+      context.translate(center[0], center[1]);
+      context.rotate(element.angle as Radians);
+      context.translate(-center[0], -center[1]);
+
+      context.translate(element.x, element.y);
+
+      context.lineWidth =
+        clamp(2.5, element.strokeWidth * 1.75, 4) /
+        Math.max(0.25, appState.zoom.value);
+      context.strokeStyle =
+        appState.theme === THEME.DARK
+          ? `rgba(3, 93, 161, 1)`
+          : `rgba(106, 189, 252, 1)`;
+
+      switch (element.type) {
+        case "ellipse":
+          context.beginPath();
+          context.ellipse(
+            element.width / 2,
+            element.height / 2,
+            element.width / 2,
+            element.height / 2,
+            0,
+            0,
+            2 * Math.PI,
+          );
+          context.closePath();
+          context.stroke();
+          break;
+        case "diamond":
+          {
+            const [segments, curves] = deconstructDiamondElement(element);
+
+            // Draw each line segment individually
+            segments.forEach((segment) => {
+              context.beginPath();
+              context.moveTo(
+                segment[0][0] - element.x,
+                segment[0][1] - element.y,
+              );
+              context.lineTo(
+                segment[1][0] - element.x,
+                segment[1][1] - element.y,
+              );
+              context.stroke();
+            });
+
+            // Draw each curve individually (for rounded corners)
+            curves.forEach((curve) => {
+              const [start, control1, control2, end] = curve;
+              context.beginPath();
+              context.moveTo(start[0] - element.x, start[1] - element.y);
+              context.bezierCurveTo(
+                control1[0] - element.x,
+                control1[1] - element.y,
+                control2[0] - element.x,
+                control2[1] - element.y,
+                end[0] - element.x,
+                end[1] - element.y,
+              );
+              context.stroke();
+            });
+          }
+
+          break;
+        default:
+          {
+            const [segments, curves] = deconstructRectanguloidElement(element);
+
+            // Draw each line segment individually
+            segments.forEach((segment) => {
+              context.beginPath();
+              context.moveTo(
+                segment[0][0] - element.x,
+                segment[0][1] - element.y,
+              );
+              context.lineTo(
+                segment[1][0] - element.x,
+                segment[1][1] - element.y,
+              );
+              context.stroke();
+            });
+
+            // Draw each curve individually (for rounded corners)
+            curves.forEach((curve) => {
+              const [start, control1, control2, end] = curve;
+              context.beginPath();
+              context.moveTo(start[0] - element.x, start[1] - element.y);
+              context.bezierCurveTo(
+                control1[0] - element.x,
+                control1[1] - element.y,
+                control2[0] - element.x,
+                control2[1] - element.y,
+                end[0] - element.x,
+                end[1] - element.y,
+              );
+              context.stroke();
+            });
+          }
+
+          break;
+      }
+
+      context.restore();
+
+      break;
   }
 };
 
@@ -550,7 +664,7 @@ const renderBindingHighlightForBindableElement = (
     context,
     element,
     allElementsMap,
-    appState.zoom,
+    appState,
   );
   context.restore();
 };
