@@ -697,10 +697,37 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
             ) || globalPoint,
         }
     : { mode: null };
+  const otherBindableElement = otherBinding
+    ? (elementsMap.get(
+        otherBinding.elementId,
+      ) as NonDeleted<ExcalidrawBindableElement>)
+    : undefined;
+  const otherPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startDragged ? -1 : 0,
+    elementsMap,
+  );
+  const other: BindingStrategy =
+    opts?.newArrow &&
+    otherBindableElement &&
+    !isPointInElement(otherPoint, otherBindableElement, elementsMap)
+      ? {
+          mode: "orbit",
+          element: otherBindableElement,
+          focusPoint:
+            projectFixedPointOntoDiagonal(
+              arrow,
+              otherPoint,
+              otherBindableElement,
+              startDragged ? "end" : "start",
+              elementsMap,
+            ) || otherPoint,
+        }
+      : { mode: undefined };
 
   return {
-    start: startDragged ? current : start,
-    end: endDragged ? current : end,
+    start: startDragged ? current : other,
+    end: endDragged ? current : other,
   };
 };
 
