@@ -1,6 +1,8 @@
 import {
   KEYS,
   arrayToMap,
+  debugDrawLine,
+  debugDrawPoint,
   getFeatureFlag,
   invariant,
   isTransparent,
@@ -19,6 +21,7 @@ import {
   vectorScale,
   vectorNormalize,
   PRECISION,
+  lineSegmentIntersectionPoints,
 } from "@excalidraw/math";
 
 import type { LineSegment, LocalPoint, Radians } from "@excalidraw/math";
@@ -54,6 +57,7 @@ import {
   isBindableElement,
   isBoundToContainer,
   isElbowArrow,
+  isRectangularElement,
   isRectanguloidElement,
   isTextElement,
 } from "./typeChecks";
@@ -685,13 +689,14 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       : {
           mode: "orbit",
           element: hit,
-          focusPoint: opts?.finalize
-            ? LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                arrow,
-                startDragged ? 0 : -1,
-                elementsMap,
-              )
-            : globalPoint,
+          focusPoint:
+            projectFixedPointOntoDiagonal(
+              arrow,
+              globalPoint,
+              hit,
+              startDragged ? "start" : "end",
+              elementsMap,
+            ) || globalPoint,
         }
     : { mode: null };
 
@@ -699,6 +704,105 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     start: startDragged ? current : start,
     end: endDragged ? current : end,
   };
+};
+
+const projectFixedPointOntoDiagonal = (
+  arrow: ExcalidrawArrowElement,
+  point: GlobalPoint,
+  element: ExcalidrawElement,
+  startOrEnd: "start" | "end",
+  elementsMap: ElementsMap,
+) => {
+  const center = elementCenterPoint(element, elementsMap);
+  const diagonalOne = isRectangularElement(element)
+    ? lineSegment<GlobalPoint>(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(element.x, element.y),
+          center,
+          element.angle,
+        ),
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            element.x + element.width,
+            element.y + element.height,
+          ),
+          center,
+          element.angle,
+        ),
+      )
+    : lineSegment<GlobalPoint>(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
+          center,
+          element.angle,
+        ),
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            element.x + element.width / 2,
+            element.y + element.height,
+          ),
+          center,
+          element.angle,
+        ),
+      );
+  const diagonalTwo = isRectangularElement(element)
+    ? lineSegment<GlobalPoint>(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(element.x + element.width, element.y),
+          center,
+          element.angle,
+        ),
+        pointRotateRads(
+          pointFrom<GlobalPoint>(element.x, element.y + element.height),
+          center,
+          element.angle,
+        ),
+      )
+    : lineSegment<GlobalPoint>(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
+          center,
+          element.angle,
+        ),
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            element.x + element.width,
+            element.y + element.height / 2,
+          ),
+          center,
+          element.angle,
+        ),
+      );
+
+  invariant(arrow.points.length >= 2, "Arrow must have at least two points");
+
+  const a = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startOrEnd === "start" ? 1 : arrow.points.length - 2,
+    elementsMap,
+  );
+  const b = pointFromVector<GlobalPoint>(
+    vectorScale(
+      vectorFromPoint(point, a),
+      2 * pointDistance(a, point) +
+        Math.max(
+          pointDistance(diagonalOne[0], diagonalOne[1]),
+          pointDistance(diagonalTwo[0], diagonalTwo[1]),
+        ),
+    ),
+    a,
+  );
+  const intersector = lineSegment<GlobalPoint>(a, b);
+  const p1 = lineSegmentIntersectionPoints(diagonalOne, intersector);
+  const p2 = lineSegmentIntersectionPoints(diagonalTwo, intersector);
+  const d1 = p1 && pointDistance(a, p1);
+  const d2 = p2 && pointDistance(a, p2);
+
+  if (d1 != null && d2 != null) {
+    return d1 < d2 ? p1 : p2;
+  }
+
+  return p1 || p2 || null;
 };
 
 const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
