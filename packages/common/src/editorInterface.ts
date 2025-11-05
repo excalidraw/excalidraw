@@ -1,4 +1,4 @@
-import { getObsidianDeviceInfo } from "./commonObsidianUtils";
+import { getDesktopUIMode, getObsidianDeviceInfo } from "./commonObsidianUtils";
 
 export type StylesPanelMode = "compact" | "full" | "mobile" | "tray"; //zsviczian
 
@@ -76,6 +76,13 @@ export const isTabletBreakpoint = (
   editorWidth: number,
   editorHeight: number,
 ) => {
+  if (getObsidianDeviceInfo()?.isDesktop) { //zsviczian
+    if (getDesktopUIMode() === "compact") {
+      return true;
+    }
+    return false;
+  }
+
   const minSide = Math.min(editorWidth, editorHeight);
   const maxSide = Math.max(editorWidth, editorHeight);
 
@@ -194,6 +201,7 @@ export const createUserAgentDescriptor = (
 };
 
 export const loadDesktopUIModePreference = () => {
+  return getDesktopUIMode(); //zsviczian
   if (typeof window === "undefined") {
     return null;
   }

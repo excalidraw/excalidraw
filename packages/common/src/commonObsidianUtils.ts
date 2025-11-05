@@ -26,3 +26,13 @@ export const getObsidianDeviceInfo = () => {
     ...(obsidianPlugin.getObsidianDevice() as ObsidianDeviceType),
   });
 };
+
+export const getDesktopUIMode = () => {
+  //@ts-ignore
+  const obsidianPlugin = app.plugins.plugins["obsidian-excalidraw-plugin"];
+  if (!obsidianPlugin) {
+    return "tray";
+  }
+  const desktopUIMode = obsidianPlugin.settings.desktopUIMode;
+  return ["tray", "full", "compact"].includes(desktopUIMode) ? desktopUIMode : "tray";
+};
