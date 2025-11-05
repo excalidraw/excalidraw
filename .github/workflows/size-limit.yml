@@ -1,8 +1,13 @@
 name: "Bundle Size check @excalidraw/excalidraw"
-on:
-  pull_request:
-    branches:
-      - master
+# on:
+#  pull_request:
+#    branches:
+#      - master
+
+# Now, this workflow will ONLY run if you manually click 
+# the "Run workflow" button in the Actions tab.
+on: workflow_dispatch
+
 jobs:
   size:
     runs-on: ubuntu-latest
