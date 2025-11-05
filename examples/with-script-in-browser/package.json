@@ -9,7 +9,7 @@
     "browser-fs-access": "0.29.1"
   },
   "devDependencies": {
-    "vite": "5.0.12",
+    "vite": "5.4.21",
     "typescript": "^5"
   },
   "scripts": {
