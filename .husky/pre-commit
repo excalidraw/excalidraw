@@ -1,2 +1,2 @@
 #!/bin/sh
-# yarn lint-staged
+bun lint-staged

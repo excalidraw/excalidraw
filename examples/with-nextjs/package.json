@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build:packages": "yarn --cwd ../../ build:packages",
-    "build:workspace": "yarn build:packages && yarn copy:assets",
+    "build:packages": "bun --cwd ../../ build:packages",
+    "build:workspace": "bun build:packages && bun copy:assets",
     "copy:assets": "cp -r ../../packages/excalidraw/dist/prod/fonts ./public",
-    "dev": "yarn build:workspace && next dev -p 3005",
-    "build": "yarn build:workspace && next build",
+    "dev": "bun build:workspace && next dev -p 3005",
+    "build": "bun build:workspace && next build",
     "start": "next start -p 3006",
     "lint": "next lint"
   },

@@ -11,14 +11,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: "Install Node"
-        uses: actions/setup-node@v2
+      - name: "Setup Bun"
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "18.x"
+          bun-version: latest
       - name: "Install Deps"
-        run: yarn install
+        run: bun install
       - name: "Test Coverage"
-        run: yarn test:coverage
+        run: bun test:coverage
       - name: "Report Coverage"
         if: always() # Also generate the report if tests are failing
         uses: davelosert/vitest-coverage-report-action@v2

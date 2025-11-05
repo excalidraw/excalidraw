@@ -1,12 +1,5 @@
 {
-  "private": true,
   "name": "excalidraw-monorepo",
-  "packageManager": "yarn@1.22.22",
-  "workspaces": [
-    "excalidraw-app",
-    "packages/*",
-    "examples/*"
-  ],
   "devDependencies": {
     "@babel/preset-env": "7.26.9",
     "@excalidraw/eslint-config": "1.0.3",
@@ -47,35 +40,40 @@
     "node": ">=18.0.0"
   },
   "homepage": ".",
+  "packageManager": "bun@latest",
   "prettier": "@excalidraw/prettier-config",
+  "private": true,
+  "resolutions": {
+    "strip-ansi": "6.0.1"
+  },
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
-    "build:app:docker": "yarn --cwd ./excalidraw-app build:app:docker",
-    "build:app": "yarn --cwd ./excalidraw-app build:app",
-    "build:common": "yarn --cwd ./packages/common build:esm",
-    "build:element": "yarn --cwd ./packages/element build:esm",
-    "build:excalidraw": "yarn --cwd ./packages/excalidraw build:esm",
-    "build:math": "yarn --cwd ./packages/math build:esm",
-    "build:packages": "yarn build:common && yarn build:math && yarn build:element && yarn build:excalidraw",
-    "build:version": "yarn --cwd ./excalidraw-app build:version",
-    "build": "yarn --cwd ./excalidraw-app build",
-    "build:preview": "yarn --cwd ./excalidraw-app build:preview",
-    "start": "yarn --cwd ./excalidraw-app start",
-    "start:production": "yarn --cwd ./excalidraw-app start:production",
-    "start:example": "yarn build:packages && yarn --cwd ./examples/with-script-in-browser start",
-    "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watch=false",
+    "build:app:docker": "bun --cwd ./excalidraw-app build:app:docker",
+    "build:app": "bun --cwd ./excalidraw-app build:app",
+    "build:common": "bun --cwd ./packages/common build:esm",
+    "build:element": "bun --cwd ./packages/element build:esm",
+    "build:excalidraw": "bun --cwd ./packages/excalidraw build:esm",
+    "build:math": "bun --cwd ./packages/math build:esm",
+    "build:packages": "bun build:common && bun build:math && bun build:element && bun build:excalidraw",
+    "build:version": "bun --cwd ./excalidraw-app build:version",
+    "build": "bun --cwd ./excalidraw-app build",
+    "build:preview": "bun --cwd ./excalidraw-app build:preview",
+    "start": "bun --cwd ./excalidraw-app start",
+    "start:production": "bun --cwd ./excalidraw-app start:production",
+    "start:example": "bun build:packages && bun --cwd ./examples/with-script-in-browser start",
+    "test:all": "bun test:typecheck && bun test:code && bun test:other && bun test:app --watch=false",
     "test:app": "vitest",
     "test:code": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
-    "test:other": "yarn prettier --list-different",
+    "test:other": "bun prettier --list-different",
     "test:typecheck": "tsc",
-    "test:update": "yarn test:app --update --watch=false",
-    "test": "yarn test:app",
+    "test:update": "bun test:app --update --watch=false",
+    "test": "bun test:app",
     "test:coverage": "vitest --coverage",
     "test:coverage:watch": "vitest --coverage --watch",
-    "test:ui": "yarn test --ui --coverage.enabled=true",
-    "fix:code": "yarn test:code --fix",
-    "fix:other": "yarn prettier --write",
-    "fix": "yarn fix:other && yarn fix:code",
+    "test:ui": "bun test --ui --coverage.enabled=true",
+    "fix:code": "bun test:code --fix",
+    "fix:other": "bun prettier --write",
+    "fix": "bun fix:other && bun fix:code",
     "locales-coverage": "node scripts/build-locales-coverage.js",
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prepare": "husky install",
@@ -86,9 +84,14 @@
     "release:latest": "node scripts/release.js --tag=latest",
     "rm:build": "rimraf --glob excalidraw-app/build excalidraw-app/dist excalidraw-app/dev-dist packages/*/dist packages/*/build examples/*/build examples/*/dist",
     "rm:node_modules": "rimraf --glob node_modules excalidraw-app/node_modules packages/*/node_modules",
-    "clean-install": "yarn rm:node_modules && yarn install"
+    "clean-install": "bun rm:node_modules && bun install"
   },
-  "resolutions": {
-    "strip-ansi": "6.0.1"
+  "workspaces": [
+    "excalidraw-app",
+    "packages/*",
+    "examples/*"
+  ],
+  "dependencies": {
+    "@actions/core": "1.11.1"
   }
 }

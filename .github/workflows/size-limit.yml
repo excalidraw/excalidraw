@@ -11,12 +11,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Node.js 18.x
-        uses: actions/setup-node@v3
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 18.x
+          bun-version: latest
       - name: Install in packages/excalidraw
-        run: yarn
+        run: bun install
         working-directory: packages/excalidraw
         env:
           CI: true

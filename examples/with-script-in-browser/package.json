@@ -16,7 +16,7 @@
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview --port 5002",
-    "build:preview": "yarn build && yarn preview",
-    "build:packages": "yarn --cwd ../../ build:packages"
+    "build:preview": "bun build && bun preview",
+    "build:packages": "bun --cwd ../../ build:packages"
   }
 }
