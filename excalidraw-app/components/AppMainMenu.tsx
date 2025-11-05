@@ -3,14 +3,17 @@ import {
   ExcalLogo,
   eyeIcon,
 } from "@excalidraw/excalidraw/components/icons";
+import DropdownMenuItemContentRadio from "@excalidraw/excalidraw/components/dropdownMenu/DropdownMenuItemContentRadio";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
 
 import { isDevEnv } from "@excalidraw/common";
 
 import type { Theme } from "@excalidraw/element/types";
-
-import { LanguageList } from "../app-language/LanguageList";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
+import { useSetAtom } from "../app-jotai";
+import { appLangCodeAtom } from "../app-language/language-state";
+// import { LanguageList } from "../app-language/LanguageList"; // replaced by radio-style toggle
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 import { saveDebugState } from "./DebugCanvas";
@@ -23,6 +26,9 @@ export const AppMainMenu: React.FC<{
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
 }> = React.memo((props) => {
+  const { t, langCode } = useI18n();
+  const setLangCode = useSetAtom(appLangCodeAtom);
+  const selectedLang = langCode === "zh-CN" ? "zh-CN" : "en";
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
@@ -83,7 +89,25 @@ export const AppMainMenu: React.FC<{
         onSelect={props.setTheme}
       />
       <MainMenu.ItemCustom>
-        <LanguageList style={{ width: "100%" }} />
+        <DropdownMenuItemContentRadio
+          name="language"
+          value={selectedLang}
+          onChange={(value: "en" | "zh-CN") => setLangCode(value)}
+          choices={[
+            {
+              value: "zh-CN",
+              label: "中文",
+              ariaLabel: `${t("buttons.selectLanguage")} - 中文`,
+            },
+            {
+              value: "en",
+              label: "EN",
+              ariaLabel: `${t("buttons.selectLanguage")} - English`,
+            },
+          ]}
+        >
+          {t("buttons.selectLanguage")}
+        </DropdownMenuItemContentRadio>
       </MainMenu.ItemCustom>
       <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>
