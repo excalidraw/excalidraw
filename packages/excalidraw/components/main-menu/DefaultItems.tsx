@@ -40,7 +40,6 @@ import {
   MoonIcon,
   save,
   searchIcon,
-  settingsIcon,
   SunIcon,
   TrashIcon,
   usersIcon,
@@ -170,26 +169,6 @@ export const SearchMenu = (opts?: { className?: string }) => {
   );
 };
 SearchMenu.displayName = "SearchMenu";
-
-export const SettingsMenu = (opts?: { className?: string }) => {
-  const { t } = useI18n();
-  const setAppState = useExcalidrawSetAppState();
-
-  return (
-    <DropdownMenuItem
-      icon={settingsIcon}
-      data-testid="settings-menu-button"
-      onSelect={() => {
-        setAppState({ openDialog: { name: "settings" } });
-      }}
-      aria-label={t("settings.title")}
-      className={opts?.className}
-    >
-      {t("settings.title")}
-    </DropdownMenuItem>
-  );
-};
-SettingsMenu.displayName = "SettingsMenu";
 
 export const Help = () => {
   const { t } = useI18n();
