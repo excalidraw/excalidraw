@@ -245,6 +245,8 @@ import {
   mutateElement,
   getElementBounds,
   doBoundsIntersect,
+  isPointInElement,
+  maxBindingGap_simple,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6541,6 +6543,27 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       return;
+    }
+
+    if (this.state.activeTool.type === "arrow") {
+      const hit = getHoveredElementForBinding(
+        pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+        this.scene.getNonDeletedElements(),
+        this.scene.getNonDeletedElementsMap(),
+        (el) => maxBindingGap_simple(el, el.width, el.height, this.state.zoom),
+      );
+      if (
+        hit &&
+        !isPointInElement(
+          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+          hit,
+          this.scene.getNonDeletedElementsMap(),
+        )
+      ) {
+        this.setState({
+          suggestedBinding: hit,
+        });
+      }
     }
 
     const hasDeselectedButton = Boolean(event.buttons);
