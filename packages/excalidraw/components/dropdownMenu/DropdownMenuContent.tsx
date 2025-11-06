@@ -34,8 +34,15 @@ const MenuContent = ({
 
   const callbacksRef = useStable({ onClickOutside });
 
-  useOutsideClick(menuRef, () => {
-    callbacksRef.onClickOutside?.();
+  useOutsideClick(menuRef, (event) => {
+    // prevents closing if clicking on the trigger button
+    if (
+      !menuRef.current
+        ?.closest(".dropdown-menu-container")
+        ?.contains(event.target)
+    ) {
+      callbacksRef.onClickOutside?.();
+    }
   });
 
   useEffect(() => {
