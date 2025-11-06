@@ -77,7 +77,6 @@ export const MobileMenu = ({
         {renderTopRightUI?.(true, appState) ??
           (!appState.viewModeEnabled && (
             <>
-              <DefaultSidebarTriggerTunnel.Out />
               <PenModeButton
                 checked={appState.penMode}
                 onChange={() => onPenModeToggle(null)}
@@ -85,6 +84,7 @@ export const MobileMenu = ({
                 isMobile
                 penDetected={appState.penDetected}
               />
+              <DefaultSidebarTriggerTunnel.Out />
             </>
           ))}
         {appState.viewModeEnabled && (
