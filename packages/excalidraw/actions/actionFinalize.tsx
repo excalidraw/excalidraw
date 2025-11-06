@@ -104,6 +104,7 @@ export const actionFinalize = register<FormData>({
 
         bindOrUnbindBindingElement(element, draggedPoints, scene, appState, {
           newArrow,
+          altKey: event.altKey,
         });
       } else if (isLineElement(element)) {
         if (

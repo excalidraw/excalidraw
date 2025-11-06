@@ -149,7 +149,8 @@ export const bindOrUnbindBindingElement = (
   scene: Scene,
   appState: AppState,
   opts?: {
-    newArrow: boolean;
+    newArrow?: boolean;
+    altKey?: boolean;
   },
 ) => {
   const { start, end } = getBindingStrategyForDraggingBindingElementEndpoints(
@@ -554,6 +555,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
   opts?: {
     newArrow?: boolean;
     shiftKey?: boolean;
+    altKey?: boolean;
     finalize?: boolean;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
@@ -587,6 +589,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   opts?: {
     newArrow?: boolean;
     shiftKey?: boolean;
+    altKey?: boolean;
     finalize?: boolean;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
@@ -687,14 +690,15 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       : {
           mode: "orbit",
           element: hit,
-          focusPoint:
-            projectFixedPointOntoDiagonal(
-              arrow,
-              globalPoint,
-              hit,
-              startDragged ? "start" : "end",
-              elementsMap,
-            ) || globalPoint,
+          focusPoint: opts?.altKey
+            ? globalPoint
+            : projectFixedPointOntoDiagonal(
+                arrow,
+                globalPoint,
+                hit,
+                startDragged ? "start" : "end",
+                elementsMap,
+              ) || globalPoint,
         }
     : { mode: null };
   const otherBindableElement = otherBinding
@@ -707,7 +711,9 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     startDragged ? -1 : 0,
     elementsMap,
   );
+
   const other: BindingStrategy =
+    !opts?.altKey &&
     opts?.newArrow &&
     otherBindableElement &&
     !isPointInElement(otherPoint, otherBindableElement, elementsMap)
