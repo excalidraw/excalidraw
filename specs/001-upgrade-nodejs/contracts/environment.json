@@ -1,0 +1,13 @@
+{
+  "upgradeNodeVersion": {
+    "description": "Upgrade all project environments to NodeJS v24",
+    "inputs": ["currentNodeVersion", "targetNodeVersion"],
+    "outputs": ["success", "errorDetails"],
+    "example": {
+      "currentNodeVersion": "18.19.0",
+      "targetNodeVersion": "24.0.0",
+      "success": true,
+      "errorDetails": null
+    }
+  }
+}

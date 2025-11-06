@@ -43,3 +43,10 @@
 ## Types
 
 - Always include `packages/math/src/types.ts` in the context when your write math related code and always use the Point type instead of { x, y}
+
+## Active Technologies
+- TypeScript (strict mode), Node.js >= 18, React 18+ + React, TypeScript, Vite, Sentry, Docusaurus (docs), Crowdin (i18n) (001-upgrade-nodejs)
+- Local-first (browser), optional external services (pluggable), persistent storage via external interfaces (001-upgrade-nodejs)
+
+## Recent Changes
+- 001-upgrade-nodejs: Added TypeScript (strict mode), Node.js >= 18, React 18+ + React, TypeScript, Vite, Sentry, Docusaurus (docs), Crowdin (i18n)
