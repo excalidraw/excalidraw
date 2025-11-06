@@ -24,7 +24,6 @@ const MenuTrigger = ({
   ).trim();
   return (
     <button
-      data-prevent-outside-click
       className={classNames}
       onClick={onToggle}
       type="button"
