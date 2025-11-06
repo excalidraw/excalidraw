@@ -650,7 +650,6 @@ const CombinedExtraActions = ({
   app,
   showDuplicate,
   showDelete,
-  showFinalizeMultiElement, //zsviczian
 }: {
   appState: UIAppState;
   targetElements: ExcalidrawElement[];
@@ -660,7 +659,6 @@ const CombinedExtraActions = ({
   app: AppClassProperties;
   showDuplicate?: boolean;
   showDelete?: boolean;
-  showFinalizeMultiElement?: boolean; //zsviczian
 }) => {
   const isEditingTextOrNewElement = Boolean(
     appState.editingTextElement || appState.newElement,
@@ -784,8 +782,6 @@ const CombinedExtraActions = ({
                   {renderAction("ungroup")}
                   {showLinkIcon && renderAction("hyperlink")}
                   {showCropEditorAction && renderAction("cropEditor")}
-                  {showFinalizeMultiElement &&
-                    renderAction("finalize") /*zsviczian*/}
                   {showDuplicate && renderAction("duplicateSelection")}
                   {showDelete && renderAction("deleteSelectedElements")}
                 </div>
@@ -920,6 +916,7 @@ export const CompactShapeActions = ({
           {renderAction("deleteSelectedElements")}
         </div>
       )}
+      {!!appState.multiElement && renderAction("finalize") /*zsviczian*/}
 
       <CombinedExtraActions
         appState={appState}
@@ -1054,7 +1051,6 @@ export const MobileShapeActions = ({
           app={app}
           showDuplicate={!showDuplicateOutside}
           showDelete={!showDeleteOutside}
-          showFinalizeMultiElement={showFinalizeMultiElement} //zsviczian
         />
       </div>
       <div
@@ -1066,6 +1062,7 @@ export const MobileShapeActions = ({
       >
         <div className="compact-action-item">{renderAction("undo")}</div>
         <div className="compact-action-item">{renderAction("redo")}</div>
+        {showFinalizeMultiElement && renderAction("finalize") /*zsviczian*/}
         {showDuplicateOutside && (
           <div className="compact-action-item">
             {renderAction("duplicateSelection")}

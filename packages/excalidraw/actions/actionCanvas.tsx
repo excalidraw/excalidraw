@@ -138,6 +138,7 @@ export const actionClearCanvas = register({
         colorPalette: appState.colorPalette, //zsviczian
         allowPinchZoom: appState.allowPinchZoom, //zsviczian
         allowWheelZoom: appState.allowWheelZoom, //zsviczian
+        disableContextMenu: appState.disableContextMenu, //zsviczian
         pinnedScripts: appState.pinnedScripts, //zsviczian
         customPens: appState.customPens, //zsviczian
       },

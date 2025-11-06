@@ -11580,6 +11580,9 @@ startLineEditor = (
     event: React.MouseEvent<HTMLElement | HTMLCanvasElement>,
   ) => {
     event.preventDefault();
+    if (this.state.disableContextMenu) { //zsviczian
+      return;
+    }
     //mfuria #329. if right-click pan is enabled, we suppress opening our custom menu too.
     if (isPanWithRightMouseEnabled()) {
       return;

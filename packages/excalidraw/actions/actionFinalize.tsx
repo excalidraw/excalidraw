@@ -329,7 +329,7 @@ export const actionFinalize = register({
       onClick={updateData}
       visible={appState.multiElement != null}
       size={data?.size || "medium"}
-      style={{ pointerEvents: "all" }}
+      style={{ pointerEvents: "all", margin: "auto" }} //zsviczian added margin auto to center the button
     />
   ),
 });

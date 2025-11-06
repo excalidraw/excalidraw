@@ -83,15 +83,18 @@ export const MobileMenu = ({
           <div className="excalidraw-ui-top-right">
             {renderTopRightUI?.(true, appState)}
           </div>
-          {!appState.viewModeEnabled && <DefaultSidebarTriggerTunnel.Out />}
-          {!appState.viewModeEnabled && (<PenModeButton //zsviczian
-            checked={appState.penMode}
-            onChange={() => onPenModeToggle(null)}
-            title={t("toolBar.penMode")}
-            isMobile
-            penDetected={appState.penDetected}
-            />)
-          }
+          {!appState.viewModeEnabled && ( //zsviczian added div class excalidraw-ui-top-right
+            <div className="excalidraw-ui-top-right">
+              <DefaultSidebarTriggerTunnel.Out />
+              <PenModeButton //zsviczian
+                checked={appState.penMode}
+                onChange={() => onPenModeToggle(null)}
+                title={t("toolBar.penMode")}
+                isMobile
+                penDetected={appState.penDetected}
+              />
+            </div>
+          )}
           {appState.viewModeEnabled && (
             <ExitViewModeButton actionManager={actionManager} />
           )}

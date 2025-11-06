@@ -447,6 +447,7 @@ export interface AppState {
   }; //zsviczian
   allowWheelZoom?: boolean; //zsviczian
   allowPinchZoom?: boolean; //zsviczian
+  disableContextMenu: boolean; //zsviczian
   pinnedScripts?: string[]; //zsviczian
   customPens?: any[]; //zsviczian
   currentStrokeOptions?: any; //zsviczian
