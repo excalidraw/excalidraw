@@ -25,7 +25,7 @@ import type { JSX } from "react";
 import clsx from "clsx";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
-import { getNonDeletedElements } from "@excalidraw/element";
+import { PenModeButton } from "./PenModeButton";
 
 type MobileMenuProps = {
   appState: UIAppState;
@@ -65,6 +65,7 @@ export const MobileMenu = ({
   UIOptions,
   app,
   renderCustomStats, //zsviczian
+  onPenModeToggle, //zsviczian
 }: MobileMenuProps) => {
   const {
     WelcomeScreenCenterTunnel,
@@ -83,6 +84,14 @@ export const MobileMenu = ({
             {renderTopRightUI?.(true, appState)}
           </div>
           {!appState.viewModeEnabled && <DefaultSidebarTriggerTunnel.Out />}
+          {!appState.viewModeEnabled && (<PenModeButton //zsviczian
+            checked={appState.penMode}
+            onChange={() => onPenModeToggle(null)}
+            title={t("toolBar.penMode")}
+            isMobile
+            penDetected={appState.penDetected}
+            />)
+          }
           {appState.viewModeEnabled && (
             <ExitViewModeButton actionManager={actionManager} />
           )}
