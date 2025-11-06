@@ -50,6 +50,11 @@ body.excalidraw-cursor-resize * {
   height: 100%;
   width: 100%;
 
+  button {
+    // browser default. Looks kinda good on low-dpi.
+    font-size: 0.8333rem;
+  }
+
   button,
   label {
     @include buttonNoHighlight;
@@ -707,6 +712,11 @@ body.excalidraw-cursor-resize * {
     .excalidraw__paragraph + .excalidraw__paragraph {
       margin-top: 0rem;
     }
+  }
+
+  .link-button {
+    display: flex;
+    text-decoration: none !important;
   }
 }
 

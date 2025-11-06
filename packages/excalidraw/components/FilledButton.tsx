@@ -20,7 +20,7 @@ export type ButtonColor =
 export type ButtonSize = "medium" | "large";
 
 export type FilledButtonProps = {
-  label: string;
+  label?: string;
 
   children?: React.ReactNode;
   onClick?: (event: React.MouseEvent) => void;
