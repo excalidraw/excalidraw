@@ -13,6 +13,8 @@ import { FixedSideContainer } from "./FixedSideContainer";
 
 import { Island } from "./Island";
 
+import { PenModeButton } from "./PenModeButton";
+
 import type { ActionManager } from "../actions/manager";
 import type {
   AppClassProperties,
@@ -58,6 +60,7 @@ export const MobileMenu = ({
   renderWelcomeScreen,
   UIOptions,
   app,
+  onPenModeToggle,
 }: MobileMenuProps) => {
   const {
     WelcomeScreenCenterTunnel,
@@ -72,7 +75,18 @@ export const MobileMenu = ({
     const topRightUI = (
       <div className="excalidraw-ui-top-right">
         {renderTopRightUI?.(true, appState) ??
-          (!appState.viewModeEnabled && <DefaultSidebarTriggerTunnel.Out />)}
+          (!appState.viewModeEnabled && (
+            <>
+              <PenModeButton
+                checked={appState.penMode}
+                onChange={() => onPenModeToggle(null)}
+                title={t("toolBar.penMode")}
+                isMobile
+                penDetected={appState.penDetected}
+              />
+              <DefaultSidebarTriggerTunnel.Out />
+            </>
+          ))}
         {appState.viewModeEnabled && (
           <ExitViewModeButton actionManager={actionManager} />
         )}
