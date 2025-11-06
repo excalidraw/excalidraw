@@ -30,11 +30,12 @@ export const useInviteAI = ({
   const [isInvitingAI, setIsInvitingAI] = useState(false);
   const [aiSyncStatus, setAiSyncStatus] = useState<'unknown' | 'synced'>('unknown');
   const invitedRoomRef = useRef<string | null>(null);
+  const accessRestrictedRef = useRef(false);
 
   const hasCollabAPI = Boolean(collabAPI);
 
   const inviteAI = useCallback(async () => {
-    if (!collabAPI || isInvitingAI) return;
+    if (!collabAPI || isInvitingAI || accessRestrictedRef.current) return;
 
     setIsInvitingAI(true);
     try {
@@ -114,7 +115,20 @@ export const useInviteAI = ({
         }
 
       } else {
-        throw new Error(`Failed to register AI bot: ${await resp.text()}`);
+        const responseText = await resp.text();
+        let parsed: { code?: string; error?: string } | undefined;
+        try {
+          parsed = JSON.parse(responseText);
+        } catch (_) {
+          parsed = undefined;
+        }
+
+        if (resp.status === 403 && parsed?.code === 'ACCESS_RESTRICTED') {
+          accessRestrictedRef.current = true;
+          throw new Error(parsed?.error || 'AI access restricted for this workspace');
+        }
+
+        throw new Error(parsed?.error || `Failed to register AI bot: ${responseText}`);
       }
     } catch (err) {
       if (isDev()) console.error('Failed to invite AI to collaboration:', err);
@@ -127,7 +141,7 @@ export const useInviteAI = ({
   // Auto-invite AI when chat opens (enhanced behavior)
   useEffect(() => {
     const autoInviteIfNeeded = async () => {
-      if (!isVisible || !collabAPI || aiInvited) return;
+      if (!isVisible || !collabAPI || aiInvited || accessRestrictedRef.current) return;
 
       // Auto-invite: start collaboration + invite AI when chat opens
       if (isDev()) console.log('Chat opened - auto-inviting AI with collaboration');

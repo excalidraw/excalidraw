@@ -3,7 +3,11 @@
 import { isDevEnv } from "@excalidraw/common";
 
 // small subset of categories at a given time.
-const ALLOWED_CATEGORIES_TO_TRACK = new Set(["command_palette", "export"]);
+const ALLOWED_CATEGORIES_TO_TRACK = new Set([
+  "command_palette",
+  "export",
+  "subscription",
+]);
 
 export const trackEvent = (
   category: string,

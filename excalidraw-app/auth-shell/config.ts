@@ -24,12 +24,14 @@ declare global {
   }
 }
 
+const DEFAULT_API_BASE_URL = "http://localhost:8787";
+
 const DEFAULTS: AuthShellConfig = {
   enabled: false,
   publishableKey: undefined,
   redirectUrl: typeof window !== "undefined" ? window.location.origin : "/",
-  apiBaseUrl: "",
-  sessionEndpoint: "/session",
+  apiBaseUrl: DEFAULT_API_BASE_URL,
+  sessionEndpoint: "/api/session",
   premiumCookieName: "embplus-auth",
 };
 
@@ -60,6 +62,42 @@ function stripTrailingSlash(value: string): string {
   }
 
   return value.endsWith("/") ? value.slice(0, -1) : value;
+}
+
+function isLocalHostname(hostname: string | undefined | null): boolean {
+  if (!hostname) {
+    return false;
+  }
+
+  const normalized = hostname.toLowerCase();
+  return (
+    normalized === "localhost" ||
+    normalized === "127.0.0.1" ||
+    normalized === "0.0.0.0"
+  );
+}
+
+function resolveApiBaseUrl(rawValue: string | undefined): string {
+  const trimmed = stripTrailingSlash(rawValue?.trim() ?? "");
+  const containsLocalHost =
+    trimmed.includes("localhost") || trimmed.includes("127.0.0.1");
+
+  if (trimmed && !containsLocalHost) {
+    return trimmed;
+  }
+
+  if (typeof window !== "undefined") {
+    const { origin, hostname, protocol } = window.location;
+    if (!isLocalHostname(hostname)) {
+      return stripTrailingSlash(origin);
+    }
+
+    if (!trimmed) {
+      return `${protocol}//localhost:8787`;
+    }
+  }
+
+  return trimmed || DEFAULT_API_BASE_URL;
 }
 
 function sanitizeRedirectUrl(value: string | undefined): string {
@@ -106,7 +144,7 @@ export function getAuthShellConfig(): AuthShellConfig {
     );
   }
 
-  const apiBaseUrl = stripTrailingSlash(rawConfig.apiBaseUrl?.trim() ?? "");
+  const apiBaseUrl = resolveApiBaseUrl(rawConfig.apiBaseUrl);
   const sessionEndpoint = ensureLeadingSlash(
     rawConfig.sessionEndpoint?.trim() ?? DEFAULTS.sessionEndpoint,
   );

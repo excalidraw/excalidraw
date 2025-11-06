@@ -2,6 +2,7 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
+  PlusPromoIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React, { useCallback } from "react";
@@ -89,16 +90,18 @@ export const AppMainMenu: React.FC<{
       >
         Excalidraw+
       </MainMenu.ItemLink>
-      <MainMenu.DefaultItems.Socials />
-      {authShell ? (
+      {authShell && authShell.hasActiveSubscription && (
         <MainMenu.Item
-          icon={loginIcon}
-          onSelect={handleSignOut}
-          className="highlighted"
+          icon={PlusPromoIcon}
+          onSelect={() => {
+            window.location.href = "/settings/billing";
+          }}
         >
-          Sign out
+          Account settings
         </MainMenu.Item>
-      ) : (
+      )}
+      <MainMenu.DefaultItems.Socials />
+      {!authShell && (
         <MainMenu.ItemLink
           icon={loginIcon}
           href={authHref}

@@ -5,6 +5,13 @@ export interface PremiumSession {
   premium: boolean;
   accessToken?: string;
   expiresAt?: string;
+  subscription?: {
+    status: string;
+    planId?: string;
+    variantId?: string;
+    renewsAt?: string;
+    endsAt?: string;
+  };
 }
 
 export interface SessionFetchOptions {
@@ -45,6 +52,10 @@ export function setPremiumCookie(
   }
 }
 
+export function hasActiveSubscription(session: PremiumSession | null): boolean {
+  return session?.subscription?.status === "active";
+}
+
 export async function fetchPremiumSession(
   config: AuthShellConfig,
   options: SessionFetchOptions = {},
@@ -62,27 +73,32 @@ export async function fetchPremiumSession(
     }
   }
 
-  const response = await fetch(
-    `${config.apiBaseUrl}${config.sessionEndpoint}`,
-    {
-      method: "GET",
-      headers,
-      credentials: "include",
-      signal: options.signal,
-    },
-  );
+  const response = await fetch(`${config.apiBaseUrl}${config.sessionEndpoint}`, {
+    method: "GET",
+    headers,
+    credentials: "include",
+    signal: options.signal,
+  });
 
-  if (response.status === 401) {
+  // 401 Unauthorized or 404 Not Found = no active subscription
+  if (response.status === 401 || response.status === 404) {
     return null;
   }
 
+  const body = await response.text();
+
   if (!response.ok) {
-    const text = await response.text();
     throw new Error(
-      `Session request failed (${response.status}): ${text || response.statusText}`,
+      `Session request failed (${response.status}): ${body || response.statusText}`,
     );
   }
 
-  const payload = (await response.json()) as PremiumSession;
-  return payload;
+  try {
+    const payload = JSON.parse(body) as PremiumSession;
+    return payload;
+  } catch {
+    throw new Error(
+      "Session response was not valid JSON. Check your API base URL configuration.",
+    );
+  }
 }
