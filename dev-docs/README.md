@@ -1,5 +1,9 @@
 # Website
 
+## Prerequisites
+
+**NodeJS v24.x.x (latest LTS) is required for development and CI/CD.**
+
 This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
 
 ### Installation

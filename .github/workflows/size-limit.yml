@@ -4,7 +4,7 @@ name: "Bundle Size check @excalidraw/excalidraw"
 #    branches:
 #      - master
 
-# Now, this workflow will ONLY run if you manually click 
+# Now, this workflow will ONLY run if you manually click
 # the "Run workflow" button in the Actions tab.
 on: workflow_dispatch
 
@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: 24.x
       - name: Install in packages/excalidraw
         run: yarn
         working-directory: packages/excalidraw

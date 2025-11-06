@@ -1,8 +1,6 @@
 # Specification Quality Checklist: Upgrade NodeJS to LTS v24
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: November 6, 2025
-**Feature**: [spec.md](../spec.md)
+**Purpose**: Validate specification completeness and quality before proceeding to planning **Created**: November 6, 2025 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
 

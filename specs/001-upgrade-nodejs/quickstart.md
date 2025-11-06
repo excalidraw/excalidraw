@@ -1,10 +1,12 @@
 # Quickstart: Upgrade NodeJS to LTS v24
 
 ## Prerequisites
+
 - NodeJS v24.x.x (latest LTS)
 - npm (bundled with NodeJS v24)
 
 ## Steps
+
 1. Install NodeJS v24 from [nodejs.org](https://nodejs.org/en/download/)
 2. Verify installation:
    ```bash
@@ -29,5 +31,6 @@
    - Rebuild image: `docker build -t excalidraw-app .`
 
 ## Notes
+
 - All contributors and CI/CD must use NodeJS v24
 - Update documentation and onboarding guides to reflect new version

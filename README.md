@@ -13,6 +13,11 @@
 </h4>
 
 <div align="center">
+
+## Prerequisites
+
+**NodeJS v24.x.x (latest LTS) is required for development and CI/CD.**
+
   <h2>
     An open source virtual hand-drawn style whiteboard. </br>
     Collaborative and end-to-end encrypted. </br>

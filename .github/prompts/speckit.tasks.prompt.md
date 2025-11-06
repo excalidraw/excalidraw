@@ -15,11 +15,13 @@ You **MUST** consider the user input before proceeding (if not empty).
 1. **Setup**: Run `.specify/scripts/bash/check-prerequisites.sh --json` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. **Load design documents**: Read from FEATURE_DIR:
+
    - **Required**: plan.md (tech stack, libraries, structure), spec.md (user stories with priorities)
    - **Optional**: data-model.md (entities), contracts/ (API endpoints), research.md (decisions), quickstart.md (test scenarios)
    - Note: Not all projects have all documents. Generate tasks based on what's available.
 
 3. **Execute task generation workflow**:
+
    - Load plan.md and extract tech stack, libraries, project structure
    - Load spec.md and extract user stories with their priorities (P1, P2, P3, etc.)
    - If data-model.md exists: Extract entities and map to user stories
@@ -31,6 +33,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Validate task completeness (each user story has all needed tasks, independently testable)
 
 4. **Generate tasks.md**: Use `.specify.specify/templates/tasks-template.md` as structure, fill with:
+
    - Correct feature name from plan.md
    - Phase 1: Setup tasks (project initialization)
    - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
@@ -77,7 +80,7 @@ Every task MUST strictly follow this format:
 4. **[Story] label**: REQUIRED for user story phase tasks only
    - Format: [US1], [US2], [US3], etc. (maps to user stories from spec.md)
    - Setup phase: NO story label
-   - Foundational phase: NO story label  
+   - Foundational phase: NO story label
    - User Story phases: MUST have story label
    - Polish phase: NO story label
 5. **Description**: Clear action with exact file path
@@ -96,6 +99,7 @@ Every task MUST strictly follow this format:
 ### Task Organization
 
 1. **From User Stories (spec.md)** - PRIMARY ORGANIZATION:
+
    - Each user story (P1, P2, P3...) gets its own phase
    - Map all related components to their story:
      - Models needed for that story
@@ -105,10 +109,12 @@ Every task MUST strictly follow this format:
    - Mark story dependencies (most stories should be independent)
 
 2. **From Contracts**:
+
    - Map each contract/endpoint → to the user story it serves
    - If tests requested: Each contract → contract test task [P] before implementation in that story's phase
 
 3. **From Data Model**:
+
    - Map each entity to the user story(ies) that need it
    - If entity serves multiple stories: Put in earliest story or Setup phase
    - Relationships → service layer tasks in appropriate story phase

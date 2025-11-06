@@ -1,11 +1,8 @@
 # Feature Specification: Upgrade NodeJS to LTS v24
 
-**Feature Branch**: `001-upgrade-nodejs`
-**Created**: November 6, 2025
-**Status**: Draft
-**Input**: User description: "Upgrade to the latest secure LTS version of NodeJS which is version 24."
+**Feature Branch**: `001-upgrade-nodejs` **Created**: November 6, 2025 **Status**: Draft **Input**: User description: "Upgrade to the latest secure LTS version of NodeJS which is version 24."
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - NodeJS Upgrade (Priority: P1)
 
@@ -50,7 +47,7 @@ As a release manager, I want CI/CD pipelines to use NodeJS v24 so that builds an
 
 ---
 
-### Edge Cases & Failure Modes *(mandatory)*
+### Edge Cases & Failure Modes _(mandatory)_
 
 - Security: Dependency vulnerabilities due to outdated NodeJS
 - Containerization: NodeJS version mismatch in Docker images
@@ -59,7 +56,7 @@ As a release manager, I want CI/CD pipelines to use NodeJS v24 so that builds an
 - Observability: Logging and error reporting must remain functional
 - Collaboration: Developers using different NodeJS versions
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -74,7 +71,7 @@ As a release manager, I want CI/CD pipelines to use NodeJS v24 so that builds an
 - **NodeJS Version**: The runtime environment for the project, referenced in documentation, Dockerfiles, and CI/CD configs
 - **Dependencies**: Project packages that may be affected by NodeJS version changes
 
-## Success Criteria *(mandatory, testable)*
+## Success Criteria _(mandatory, testable)_
 
 ### Measurable Outcomes
 
@@ -92,22 +89,25 @@ As a release manager, I want CI/CD pipelines to use NodeJS v24 so that builds an
 - **SC-009**: No environment drift between local and CI/CD
 - **SC-010**: Changelog includes upgrade notes
 
-## Security & Compliance *(mandatory)*
+## Security & Compliance _(mandatory)_
+
 - Threat model: Upgrading NodeJS reduces exposure to known vulnerabilities
 - Secrets/config management: No direct impact
 - CI vulnerability scan: Run after upgrade to confirm no new issues
 
-## Performance Goals *(mandatory)*
+## Performance Goals _(mandatory)_
+
 - No regressions in latency, memory, or startup time
 - CI enforces performance benchmarks after upgrade
 
-## Packaging & Deployability *(mandatory)*
+## Packaging & Deployability _(mandatory)_
+
 - Docker images use NodeJS v24
 - Health/readiness endpoints remain functional
 - Config via env/files unchanged
 
 ## Assumptions
+
 - All dependencies are compatible with NodeJS v24
 - Contributors can upgrade their local environments
 - CI/CD platform supports NodeJS v24
-

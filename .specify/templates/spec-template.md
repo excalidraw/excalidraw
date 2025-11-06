@@ -5,13 +5,13 @@
 **Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 <!--
   IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
   Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
   you should still have a viable MVP (Minimum Viable Product) that delivers value.
-  
+
   Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
   Think of each story as a standalone slice of functionality that can be:
   - Developed independently
@@ -65,7 +65,7 @@
 
 [Add more user stories as needed, each with an assigned priority]
 
-### Edge Cases & Failure Modes *(mandatory)*
+### Edge Cases & Failure Modes _(mandatory)_
 
 - Security: Unauthorized access, secrets exposure, dependency vulnerabilities
 - Containerization: Misconfiguration, missing env vars, health/readiness failures
@@ -74,7 +74,7 @@
 - Observability: Logging gaps, missing correlation IDs, incomplete changelogs
 - Collaboration: Merge conflicts, offline edits, sync failures
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 <!--
   ACTION REQUIRED: The content in this section represents placeholders.
@@ -84,22 +84,22 @@
 ### Functional Requirements
 
 - **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
+- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
 
-*Example of marking unclear requirements:*
+_Example of marking unclear requirements:_
 
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
 - **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
-### Key Entities *(include if feature involves data)*
+### Key Entities _(include if feature involves data)_
 
 - **[Entity 1]**: [What it represents, key attributes without implementation]
 - **[Entity 2]**: [What it represents, relationships to other entities]
 
-## Success Criteria *(mandatory, testable)*
+## Success Criteria _(mandatory, testable)_
 
 <!--
   ACTION REQUIRED: Define measurable success criteria.
@@ -122,16 +122,19 @@
 - **SC-009**: [Testable outcome, e.g., "Passes WCAG 2.1 AA tests, robust UX for merge/conflict"]
 - **SC-010**: [Testable outcome, e.g., "Structured logs present, changelog/migration notes included for breaking changes"]
 
-## Security & Compliance *(mandatory)*
+## Security & Compliance _(mandatory)_
+
 - Threat model for feature
 - Secrets/config management approach
 - CI vulnerability scan plan
 
-## Performance Goals *(mandatory)*
+## Performance Goals _(mandatory)_
+
 - Latency, memory, bundle size, startup time targets
 - CI enforcement plan
 
-## Packaging & Deployability *(mandatory)*
+## Packaging & Deployability _(mandatory)_
+
 - Single-container compatibility
 - Health/readiness endpoints
 - Config via env/files

@@ -9,9 +9,11 @@ The change should be grouped under one of the below section and must contain PR 
 - Refactor: For any refactoring.
 
 Please add the latest change on the top under the correct section.
--->
 
 ## Excalidraw Library
+
+## Chore
+- Upgraded project to NodeJS v24 LTS. Updated Dockerfile, CI/CD workflows, engines field, and all documentation to require NodeJS v24. Audited and upgraded dependencies for compatibility and security. [Speckit 001-upgrade-nodejs]
 
 ## 0.18.0 (2025-03-11)
 
