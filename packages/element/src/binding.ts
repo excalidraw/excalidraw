@@ -1,6 +1,7 @@
 import {
   KEYS,
   arrayToMap,
+  debugDrawLine,
   getFeatureFlag,
   invariant,
   isTransparent,
@@ -828,6 +829,10 @@ const projectFixedPointOntoDiagonal = (
   const p2 = lineSegmentIntersectionPoints(diagonalTwo, intersector);
   const d1 = p1 && pointDistance(a, p1);
   const d2 = p2 && pointDistance(a, p2);
+
+  debugDrawLine(diagonalOne, { color: "purple" });
+  debugDrawLine(diagonalTwo, { color: "purple" });
+  debugDrawLine(intersector, { color: "orange" });
 
   if (d1 != null && d2 != null) {
     return d1 < d2 ? p1 : p2;
