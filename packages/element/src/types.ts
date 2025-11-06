@@ -306,6 +306,7 @@ export type PointsPositionUpdates = Map<
 
 export type Arrowhead =
   | "arrow"
+  | "arrow_double"
   | "bar"
   | "dot" // legacy. Do not use for new elements.
   | "circle"

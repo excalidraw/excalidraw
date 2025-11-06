@@ -85,6 +85,7 @@ import { IconPicker } from "../components/IconPicker";
 import { Range } from "../components/Range";
 import {
   ArrowheadArrowIcon,
+  ArrowheadArrowDoubleIcon,
   ArrowheadBarIcon,
   ArrowheadCircleIcon,
   ArrowheadTriangleIcon,
@@ -1535,6 +1536,12 @@ const getArrowheadOptions = (flip: boolean) => {
       text: t("labels.arrowhead_arrow"),
       keyBinding: "w",
       icon: <ArrowheadArrowIcon flip={flip} />,
+    },
+    {
+      value: "arrow_double",
+      text: t("labels.arrowhead_arrow_double"),
+      keyBinding: "t",
+      icon: <ArrowheadArrowDoubleIcon flip={flip} />,
     },
     {
       value: "triangle",

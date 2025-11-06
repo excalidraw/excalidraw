@@ -722,6 +722,7 @@ const getFreeDrawElementAbsoluteCoords = (
 export const getArrowheadSize = (arrowhead: Arrowhead): number => {
   switch (arrowhead) {
     case "arrow":
+    case "arrow_double":
       return 25;
     case "diamond":
     case "diamond_outline":
@@ -741,6 +742,7 @@ export const getArrowheadAngle = (arrowhead: Arrowhead): Degrees => {
     case "bar":
       return 90 as Degrees;
     case "arrow":
+    case "arrow_double":
       return 20 as Degrees;
     default:
       return 25 as Degrees;

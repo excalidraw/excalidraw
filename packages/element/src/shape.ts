@@ -391,6 +391,7 @@ const getArrowheadShapes = (
       return generateCrowfootOne(arrowheadPoints, options);
     case "bar":
     case "arrow":
+    case "arrow_double":
     case "crowfoot_many":
     case "crowfoot_one_or_many":
     default: {
@@ -405,7 +406,8 @@ const getArrowheadShapes = (
         delete options.strokeLineDash;
       }
       options.roughness = Math.min(1, options.roughness || 0);
-      return [
+
+      const lines = [
         generator.line(x3, y3, x2, y2, options),
         generator.line(x4, y4, x2, y2, options),
         ...(arrowhead === "crowfoot_one_or_many"
@@ -415,6 +417,15 @@ const getArrowheadShapes = (
             )
           : []),
       ];
+
+      // Add middle line for double arrow
+      if (arrowhead === "arrow_double") {
+        const midX = (x3 + x4) / 2;
+        const midY = (y3 + y4) / 2;
+        lines.push(generator.line(midX, midY, x2, y2, options));
+      }
+
+      return lines;
     }
   }
 };

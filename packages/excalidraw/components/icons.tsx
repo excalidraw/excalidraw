@@ -1313,6 +1313,23 @@ export const ArrowheadArrowIcon = React.memo(
     ),
 );
 
+export const ArrowheadArrowDoubleIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+      >
+        <path d="M34 10H6M34 10L27 5M34 10L27 15M34 10L30.5 7.5M30.5 12.5L34 10" />
+        <path d="M27.5 5L34.5 10L27.5 15" />
+        <path d="M30.5 7.5L34.5 10L30.5 12.5" />
+      </g>,
+      { width: 40, height: 20 },
+    ),
+);
+
 export const ArrowheadCircleIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
