@@ -151,6 +151,7 @@ export const bindOrUnbindBindingElement = (
   opts?: {
     newArrow?: boolean;
     altKey?: boolean;
+    initialBinding?: boolean;
   },
 ) => {
   const { start, end } = getBindingStrategyForDraggingBindingElementEndpoints(
@@ -557,6 +558,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
     shiftKey?: boolean;
     altKey?: boolean;
     finalize?: boolean;
+    initialBinding?: boolean;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   if (getFeatureFlag("COMPLEX_BINDINGS")) {
@@ -591,6 +593,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     shiftKey?: boolean;
     altKey?: boolean;
     finalize?: boolean;
+    initialBinding?: boolean;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   const startIdx = 0;
@@ -658,28 +661,6 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     (e) => maxBindingGap_simple(e, e.width, e.height, appState.zoom),
   );
   const pointInElement = hit && isPointInElement(globalPoint, hit, elementsMap);
-
-  // Handle outside-outside binding with the same element
-  if (otherBinding && otherBinding.elementId === hit?.id && !pointInElement) {
-    const [startFixedPoint, endFixedPoint] = getGlobalFixedPoints(
-      arrow,
-      elementsMap,
-    );
-
-    return {
-      start: {
-        mode: "inside",
-        element: hit,
-        focusPoint: startDragged ? globalPoint : startFixedPoint,
-      },
-      end: {
-        mode: "inside",
-        element: hit,
-        focusPoint: endDragged ? globalPoint : endFixedPoint,
-      },
-    };
-  }
-
   const otherBindableElement = otherBinding
     ? (elementsMap.get(
         otherBinding.elementId,
@@ -702,6 +683,32 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     otherBindableElement &&
     otherFocusPoint &&
     isPointInElement(otherFocusPoint, otherBindableElement, elementsMap);
+
+  // Handle outside-outside binding with the same element
+  if (
+    otherBinding &&
+    otherBinding.elementId === hit?.id &&
+    !pointInElement &&
+    !otherFocusPointIsInElement
+  ) {
+    const [startFixedPoint, endFixedPoint] = getGlobalFixedPoints(
+      arrow,
+      elementsMap,
+    );
+
+    return {
+      start: {
+        mode: "inside",
+        element: hit,
+        focusPoint: startDragged ? globalPoint : startFixedPoint,
+      },
+      end: {
+        mode: "inside",
+        element: hit,
+        focusPoint: endDragged ? globalPoint : endFixedPoint,
+      },
+    };
+  }
 
   const current: BindingStrategy = hit
     ? pointInElement || opts?.altKey
@@ -736,13 +743,15 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
             mode: "orbit",
             element: otherBindableElement,
             focusPoint:
-              projectFixedPointOntoDiagonal(
-                arrow,
-                otherPoint,
-                otherBindableElement,
-                startDragged ? "end" : "start",
-                elementsMap,
-              ) || otherPoint,
+              otherFocusPointIsInElement && !opts?.initialBinding
+                ? otherFocusPoint
+                : projectFixedPointOntoDiagonal(
+                    arrow,
+                    otherPoint,
+                    otherBindableElement,
+                    startDragged ? "end" : "start",
+                    elementsMap,
+                  ) || otherPoint,
           }
       : { mode: undefined };
 
@@ -762,6 +771,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
     newArrow?: boolean;
     shiftKey?: boolean;
     finalize?: boolean;
+    initialBinding?: boolean;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   const globalBindMode = appState.bindMode || "orbit";

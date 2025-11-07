@@ -8616,7 +8616,7 @@ class App extends React.Component<AppProps, AppState> {
           ]),
           this.scene,
           this.state,
-          { newArrow: true, altKey: event.altKey },
+          { newArrow: true, altKey: event.altKey, initialBinding: true },
         );
       }
 
