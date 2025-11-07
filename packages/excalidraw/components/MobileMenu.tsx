@@ -13,6 +13,8 @@ import { FixedSideContainer } from "./FixedSideContainer";
 
 import { Island } from "./Island";
 
+import { PenModeButton } from "./PenModeButton";
+
 import type { ActionManager } from "../actions/manager";
 import type {
   AppClassProperties,
@@ -25,7 +27,6 @@ import type { JSX } from "react";
 import clsx from "clsx";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
-import { PenModeButton } from "./PenModeButton";
 
 type MobileMenuProps = {
   appState: UIAppState;
@@ -65,7 +66,7 @@ export const MobileMenu = ({
   UIOptions,
   app,
   renderCustomStats, //zsviczian
-  onPenModeToggle, //zsviczian
+  onPenModeToggle,
 }: MobileMenuProps) => {
   const {
     WelcomeScreenCenterTunnel,
@@ -77,29 +78,30 @@ export const MobileMenu = ({
       return null;
     }
 
-    const topRightUI = //zsvician (render BOTH top right UI and default sidebar trigger)
-      (
-        <>
-          <div className="excalidraw-ui-top-right">
-            {renderTopRightUI?.(true, appState)}
+    const topRightUI = (
+      <>
+        <div className="excalidraw-ui-top-right">
+          {renderTopRightUI?.(true, appState)}
+        </div>
+        {!appState.viewModeEnabled && (
+          <div className="excalidraw-ui-top-right library-and-pen">
+            <PenModeButton
+              checked={appState.penMode}
+              onChange={() => onPenModeToggle(null)}
+              title={t("toolBar.penMode")}
+              isMobile
+              penDetected={appState.penDetected}
+            />
+            <DefaultSidebarTriggerTunnel.Out />
           </div>
-          {!appState.viewModeEnabled && ( //zsviczian added div class excalidraw-ui-top-right
-            <div className="excalidraw-ui-top-right">
-              <DefaultSidebarTriggerTunnel.Out />
-              <PenModeButton //zsviczian
-                checked={appState.penMode}
-                onChange={() => onPenModeToggle(null)}
-                title={t("toolBar.penMode")}
-                isMobile
-                penDetected={appState.penDetected}
-              />
-            </div>
-          )}
+        )}
+        <div className="excalidraw-ui-top-right">
           {appState.viewModeEnabled && (
             <ExitViewModeButton actionManager={actionManager} />
           )}
-        </>
-      );
+        </div>
+      </>
+    );
 
     const topLeftUI = (
       <div className="excalidraw-ui-top-left">
