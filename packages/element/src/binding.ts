@@ -1,26 +1,24 @@
 import {
   KEYS,
   arrayToMap,
-  debugDrawLine,
   getFeatureFlag,
   invariant,
   isTransparent,
 } from "@excalidraw/common";
 
 import {
-  lineSegment,
-  pointFrom,
-  pointRotateRads,
-  type GlobalPoint,
-  vectorFromPoint,
-  pointDistanceSq,
-  clamp,
-  pointDistance,
-  pointFromVector,
-  vectorScale,
-  vectorNormalize,
   PRECISION,
-  lineSegmentIntersectionPoints,
+  clamp,
+  lineSegment,
+  pointDistance,
+  pointDistanceSq,
+  pointFrom,
+  pointFromVector,
+  pointRotateRads,
+  vectorFromPoint,
+  vectorNormalize,
+  vectorScale,
+  type GlobalPoint,
 } from "@excalidraw/math";
 
 import type { LineSegment, LocalPoint, Radians } from "@excalidraw/math";
@@ -56,33 +54,33 @@ import {
   isBindableElement,
   isBoundToContainer,
   isElbowArrow,
-  isRectangularElement,
   isRectanguloidElement,
   isTextElement,
 } from "./typeChecks";
 
 import { aabbForElement, elementCenterPoint } from "./bounds";
 import { updateElbowArrowPoints } from "./elbowArrow";
+import { projectFixedPointOntoDiagonal } from "./utils";
 
 import type { Scene } from "./Scene";
 
 import type { Bounds } from "./bounds";
 import type { ElementUpdate } from "./mutateElement";
 import type {
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  NonDeleted,
-  NonDeletedExcalidrawElement,
+  BindMode,
   ElementsMap,
-  NonDeletedSceneElementsMap,
-  ExcalidrawTextElement,
   ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
+  ExcalidrawElement,
+  ExcalidrawTextElement,
   FixedPoint,
   FixedPointBinding,
-  PointsPositionUpdates,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
   Ordered,
-  BindMode,
+  PointsPositionUpdates,
 } from "./types";
 
 export type BindingStrategy =
@@ -423,7 +421,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
   invariant(false, "New arrow creation should not reach here");
 };
 
-const bindingStrategyForSimpleArrowEndpointDragging = (
+const bindingStrategyForSimpleArrowEndpointDragging_complex = (
   point: GlobalPoint,
   currentBinding: FixedPointBinding | null,
   oppositeBinding: FixedPointBinding | null,
@@ -689,7 +687,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           focusPoint: globalPoint,
         }
       : {
-          mode: "orbit",
+          mode: opts?.altKey ? "inside" : "orbit",
           element: hit,
           focusPoint: opts?.altKey
             ? globalPoint
@@ -736,109 +734,6 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     start: startDragged ? current : other,
     end: endDragged ? current : other,
   };
-};
-
-const projectFixedPointOntoDiagonal = (
-  arrow: ExcalidrawArrowElement,
-  point: GlobalPoint,
-  element: ExcalidrawElement,
-  startOrEnd: "start" | "end",
-  elementsMap: ElementsMap,
-) => {
-  const center = elementCenterPoint(element, elementsMap);
-  const diagonalOne = isRectangularElement(element)
-    ? lineSegment<GlobalPoint>(
-        pointRotateRads(
-          pointFrom<GlobalPoint>(element.x, element.y),
-          center,
-          element.angle,
-        ),
-        pointRotateRads(
-          pointFrom<GlobalPoint>(
-            element.x + element.width,
-            element.y + element.height,
-          ),
-          center,
-          element.angle,
-        ),
-      )
-    : lineSegment<GlobalPoint>(
-        pointRotateRads(
-          pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
-          center,
-          element.angle,
-        ),
-        pointRotateRads(
-          pointFrom<GlobalPoint>(
-            element.x + element.width / 2,
-            element.y + element.height,
-          ),
-          center,
-          element.angle,
-        ),
-      );
-  const diagonalTwo = isRectangularElement(element)
-    ? lineSegment<GlobalPoint>(
-        pointRotateRads(
-          pointFrom<GlobalPoint>(element.x + element.width, element.y),
-          center,
-          element.angle,
-        ),
-        pointRotateRads(
-          pointFrom<GlobalPoint>(element.x, element.y + element.height),
-          center,
-          element.angle,
-        ),
-      )
-    : lineSegment<GlobalPoint>(
-        pointRotateRads(
-          pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
-          center,
-          element.angle,
-        ),
-        pointRotateRads(
-          pointFrom<GlobalPoint>(
-            element.x + element.width,
-            element.y + element.height / 2,
-          ),
-          center,
-          element.angle,
-        ),
-      );
-
-  invariant(arrow.points.length >= 2, "Arrow must have at least two points");
-
-  const a = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    arrow,
-    startOrEnd === "start" ? 1 : arrow.points.length - 2,
-    elementsMap,
-  );
-  const b = pointFromVector<GlobalPoint>(
-    vectorScale(
-      vectorFromPoint(point, a),
-      2 * pointDistance(a, point) +
-        Math.max(
-          pointDistance(diagonalOne[0], diagonalOne[1]),
-          pointDistance(diagonalTwo[0], diagonalTwo[1]),
-        ),
-    ),
-    a,
-  );
-  const intersector = lineSegment<GlobalPoint>(a, b);
-  const p1 = lineSegmentIntersectionPoints(diagonalOne, intersector);
-  const p2 = lineSegmentIntersectionPoints(diagonalTwo, intersector);
-  const d1 = p1 && pointDistance(a, p1);
-  const d2 = p2 && pointDistance(a, p2);
-
-  debugDrawLine(diagonalOne, { color: "purple" });
-  debugDrawLine(diagonalTwo, { color: "purple" });
-  debugDrawLine(intersector, { color: "orange" });
-
-  if (d1 != null && d2 != null) {
-    return d1 < d2 ? p1 : p2;
-  }
-
-  return p1 || p2 || null;
 };
 
 const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
@@ -926,16 +821,17 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
       elementsMap,
     );
 
-    const { current, other } = bindingStrategyForSimpleArrowEndpointDragging(
-      globalPoint,
-      arrow.startBinding,
-      arrow.endBinding,
-      elementsMap,
-      elements,
-      globalBindMode,
-      arrow,
-      opts?.finalize,
-    );
+    const { current, other } =
+      bindingStrategyForSimpleArrowEndpointDragging_complex(
+        globalPoint,
+        arrow.startBinding,
+        arrow.endBinding,
+        elementsMap,
+        elements,
+        globalBindMode,
+        arrow,
+        opts?.finalize,
+      );
 
     return { start: current, end: other };
   }
@@ -949,16 +845,17 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
       localPoint,
       elementsMap,
     );
-    const { current, other } = bindingStrategyForSimpleArrowEndpointDragging(
-      globalPoint,
-      arrow.endBinding,
-      arrow.startBinding,
-      elementsMap,
-      elements,
-      globalBindMode,
-      arrow,
-      opts?.finalize,
-    );
+    const { current, other } =
+      bindingStrategyForSimpleArrowEndpointDragging_complex(
+        globalPoint,
+        arrow.endBinding,
+        arrow.startBinding,
+        elementsMap,
+        elements,
+        globalBindMode,
+        arrow,
+        opts?.finalize,
+      );
 
     return { start: other, end: current };
   }
