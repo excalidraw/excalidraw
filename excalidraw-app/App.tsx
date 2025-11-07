@@ -52,6 +52,7 @@ import { restore, restoreAppState } from "@excalidraw/excalidraw/data/restore";
 import { newElementWith } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
 import clsx from "clsx";
+import { PaintingPlatformWrapper } from "./painting-platform/PaintingPlatformWrapper";
 import {
   parseLibraryTokensFromUrl,
   useHandleLibrary,
@@ -937,6 +938,7 @@ const ExcalidrawWrapper = () => {
         {excalidrawAPI && !isCollabDisabled && (
           <Collab excalidrawAPI={excalidrawAPI} />
         )}
+        {excalidrawAPI && <PaintingPlatformWrapper excalidrawAPI={excalidrawAPI} />}
 
         <ShareDialog
           collabAPI={collabAPI}

@@ -1,0 +1,135 @@
+.painting-platform {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  &__loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1000;
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 16px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    p {
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+
+  &__panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    z-index: 200;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &__toggle {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 64px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #64748b;
+    z-index: 199;
+    transition: all 0.2s;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      background: #f8fafc;
+      color: #1e293b;
+    }
+
+    &:active {
+      background: #f1f5f9;
+    }
+  }
+
+  &__statusbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 0 20px;
+    font-size: 13px;
+    z-index: 150;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.statusbar {
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__label {
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  &__value {
+    color: #1e293b;
+    font-weight: 600;
+
+    &--highlight {
+      color: #3b82f6;
+      background: #dbeafe;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .painting-platform {
+    &__panel {
+      width: 100%;
+      max-width: 320px;
+    }
+
+    &__statusbar {
+      flex-wrap: wrap;
+      height: auto;
+      padding: 8px 20px;
+      gap: 12px;
+    }
+  }
+}
