@@ -66,6 +66,8 @@
     justify-content: center;
     gap: 0.625rem;
     position: relative;
+    height: 5.5em; //zsviczian
+    flex-direction: column; //zsviczian
 
     &--at-bottom::before {
       content: "";
@@ -79,6 +81,7 @@
 
   .library-menu-browse-button {
     flex: 1;
+    width: 100%; //zsviczian
 
     height: var(--lg-button-size);
 

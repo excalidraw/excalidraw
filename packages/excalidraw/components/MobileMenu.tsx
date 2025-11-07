@@ -95,11 +95,11 @@ export const MobileMenu = ({
             <DefaultSidebarTriggerTunnel.Out />
           </div>
         )}
-        <div className="excalidraw-ui-top-right">
-          {appState.viewModeEnabled && (
+        {appState.viewModeEnabled && (
+          <div className="excalidraw-ui-top-right">
             <ExitViewModeButton actionManager={actionManager} />
-          )}
-        </div>
+          </div>
+        )}
       </>
     );
 
