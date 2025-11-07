@@ -1,6 +1,7 @@
 import {
   KEYS,
   arrayToMap,
+  debugDrawPoint,
   getFeatureFlag,
   invariant,
   isTransparent,
@@ -679,55 +680,70 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     };
   }
 
+  const otherBindableElement = otherBinding
+    ? (elementsMap.get(
+        otherBinding.elementId,
+      ) as NonDeleted<ExcalidrawBindableElement>)
+    : undefined;
+  const otherFocusPoint =
+    otherBinding &&
+    otherBindableElement &&
+    getGlobalFixedPointForBindableElement(
+      otherBinding.fixedPoint,
+      otherBindableElement,
+      elementsMap,
+    );
+  const otherPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startDragged ? -1 : 0,
+    elementsMap,
+  );
+  const otherFocusPointIsInElement =
+    otherBindableElement &&
+    otherFocusPoint &&
+    isPointInElement(otherFocusPoint, otherBindableElement, elementsMap);
+
   const current: BindingStrategy = hit
-    ? pointInElement
+    ? pointInElement || opts?.altKey
       ? {
           mode: "inside",
           element: hit,
           focusPoint: globalPoint,
         }
       : {
-          mode: opts?.altKey ? "inside" : "orbit",
-          element: hit,
-          focusPoint: opts?.altKey
-            ? globalPoint
-            : projectFixedPointOntoDiagonal(
-                arrow,
-                globalPoint,
-                hit,
-                startDragged ? "start" : "end",
-                elementsMap,
-              ) || globalPoint,
-        }
-    : { mode: null };
-  const otherBindableElement = otherBinding
-    ? (elementsMap.get(
-        otherBinding.elementId,
-      ) as NonDeleted<ExcalidrawBindableElement>)
-    : undefined;
-  const otherPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    arrow,
-    startDragged ? -1 : 0,
-    elementsMap,
-  );
-
-  const other: BindingStrategy =
-    !opts?.altKey &&
-    opts?.newArrow &&
-    otherBindableElement &&
-    !isPointInElement(otherPoint, otherBindableElement, elementsMap)
-      ? {
           mode: "orbit",
-          element: otherBindableElement,
+          element: hit,
           focusPoint:
             projectFixedPointOntoDiagonal(
               arrow,
-              otherPoint,
-              otherBindableElement,
-              startDragged ? "end" : "start",
+              globalPoint,
+              hit,
+              startDragged ? "start" : "end",
               elementsMap,
-            ) || otherPoint,
+            ) || globalPoint,
         }
+    : { mode: null };
+
+  const other: BindingStrategy =
+    !opts?.altKey && opts?.newArrow && otherBindableElement
+      ? otherBindableElement.id === hit?.id
+        ? {
+            mode: "inside",
+            element: otherBindableElement,
+            focusPoint: otherPoint,
+          }
+        : {
+            mode: "orbit",
+            element: otherBindableElement,
+            focusPoint:
+              projectFixedPointOntoDiagonal(
+                arrow,
+                otherPoint,
+                otherBindableElement,
+                startDragged ? "end" : "start",
+                elementsMap,
+              ) || otherPoint,
+          }
       : { mode: undefined };
 
   return {
