@@ -142,7 +142,8 @@ const isCommandPaletteToggleShortcut = (event: KeyboardEvent) => {
     !event.altKey &&
     event[KEYS.CTRL_OR_CMD] &&
     ((event.shiftKey && event.key.toLowerCase() === KEYS.P) ||
-      event.key === KEYS.SLASH)
+      event.key === KEYS.SLASH||
+      event.key.toLowerCase()==="k")
   );
 };
 
