@@ -31,6 +31,7 @@ import { elementCenterPoint, getDiamondPoints } from "./bounds";
 
 import { generateLinearCollisionShape } from "./shape";
 
+import { isPointInElement } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isRectangularElement } from "./typeChecks";
 
@@ -557,13 +558,16 @@ export const projectFixedPointOntoDiagonal = (
   element: ExcalidrawElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
-) => {
+): GlobalPoint | null => {
+  invariant(arrow.points.length >= 2, "Arrow must have at least two points");
+  if (arrow.width < 1 && arrow.height < 1) {
+    return null;
+  }
+
   const [diagonalOne, diagonalTwo] = getDiagonalsForBindableElement(
     element,
     elementsMap,
   );
-
-  invariant(arrow.points.length >= 2, "Arrow must have at least two points");
 
   const a = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     arrow,
@@ -587,9 +591,12 @@ export const projectFixedPointOntoDiagonal = (
   const d1 = p1 && pointDistance(a, p1);
   const d2 = p2 && pointDistance(a, p2);
 
+  let p = null;
   if (d1 != null && d2 != null) {
-    return d1 < d2 ? p1 : p2;
+    p = d1 < d2 ? p1 : p2;
+  } else {
+    p = p1 || p2 || null;
   }
 
-  return p1 || p2 || null;
+  return p && isPointInElement(p, element, elementsMap) ? p : null;
 };

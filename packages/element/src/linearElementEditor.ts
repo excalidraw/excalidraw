@@ -29,6 +29,7 @@ import {
   getHoveredElementForBinding,
   isPathALoop,
   moveArrowAboveBindable,
+  projectFixedPointOntoDiagonal,
   type Store,
 } from "@excalidraw/element";
 
@@ -139,6 +140,7 @@ export class LinearElementEditor {
       added: boolean;
     };
     arrowStartIsInside: boolean;
+    altFocusPoint: Readonly<GlobalPoint> | null;
   }>;
 
   /** whether you're dragging a point */
@@ -189,6 +191,7 @@ export class LinearElementEditor {
         added: false,
       },
       arrowStartIsInside: false,
+      altFocusPoint: null,
     };
     this.hoverPointIndex = -1;
     this.segmentMidPointHoveredCoords = null;
@@ -395,9 +398,28 @@ export class LinearElementEditor {
       return null;
     }
 
+    const startBindingElement =
+      isBindingElement(element) &&
+      element.startBinding &&
+      (elementsMap.get(
+        element.startBinding.elementId,
+      ) as ExcalidrawBindableElement | null);
     const newLinearElementEditor = {
       ...linearElementEditor,
       customLineAngle,
+      initialState: {
+        ...linearElementEditor.initialState,
+        altFocusPoint:
+          !linearElementEditor.initialState.altFocusPoint && startBindingElement
+            ? projectFixedPointOntoDiagonal(
+                element,
+                pointFrom<GlobalPoint>(element.x, element.y),
+                startBindingElement,
+                "start",
+                elementsMap,
+              )
+            : linearElementEditor.initialState.altFocusPoint,
+      },
     };
 
     return {
@@ -582,6 +604,12 @@ export class LinearElementEditor {
         : null;
 
     const newHoverPointIndex = newLastClickedPoint;
+    const startBindingElement =
+      isBindingElement(element) &&
+      element.startBinding &&
+      (elementsMap.get(
+        element.startBinding.elementId,
+      ) as ExcalidrawBindableElement | null);
 
     const newLinearElementEditor = {
       ...linearElementEditor,
@@ -589,6 +617,16 @@ export class LinearElementEditor {
       initialState: {
         ...linearElementEditor.initialState,
         lastClickedPoint: newLastClickedPoint,
+        altFocusPoint:
+          !linearElementEditor.initialState.altFocusPoint && startBindingElement
+            ? projectFixedPointOntoDiagonal(
+                element,
+                pointFrom<GlobalPoint>(element.x, element.y),
+                startBindingElement,
+                "start",
+                elementsMap,
+              )
+            : linearElementEditor.initialState.altFocusPoint,
       },
       segmentMidPointHoveredCoords: newSelectedMidPointHoveredCoords,
       hoverPointIndex: newHoverPointIndex,
@@ -959,6 +997,7 @@ export class LinearElementEditor {
       appState,
       elementsMap,
     );
+    const point = pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y);
     let segmentMidpointIndex = null;
 
     if (segmentMidpoint) {
@@ -990,7 +1029,7 @@ export class LinearElementEditor {
         initialState: {
           prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
           lastClickedPoint: -1,
-          origin: pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
+          origin: point,
           segmentMidpoint: {
             value: segmentMidpoint,
             index: segmentMidpointIndex,
@@ -999,6 +1038,7 @@ export class LinearElementEditor {
           arrowStartIsInside:
             !!app.state.newElement &&
             (app.state.bindMode === "inside" || app.state.bindMode === "skip"),
+          altFocusPoint: null,
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
@@ -1051,7 +1091,7 @@ export class LinearElementEditor {
       initialState: {
         prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
         lastClickedPoint: clickedPointIndex,
-        origin: pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
+        origin: point,
         segmentMidpoint: {
           value: segmentMidpoint,
           index: segmentMidpointIndex,
@@ -1060,6 +1100,7 @@ export class LinearElementEditor {
         arrowStartIsInside:
           !!app.state.newElement &&
           (app.state.bindMode === "inside" || app.state.bindMode === "skip"),
+        altFocusPoint: null,
       },
       selectedPointsIndices: nextSelectedPointsIndices,
       pointerOffset: targetPoint
@@ -2280,22 +2321,23 @@ const pointDraggingUpdates = (
       )! as ExcalidrawBindableElement)
     : null;
 
-  const startLocalPoint = endIsDraggingOverStartElement
-    ? nextArrow.points[0]
-    : startIsDraggingOverEndElement &&
-      app.state.bindMode !== "inside" &&
-      getFeatureFlag("COMPLEX_BINDINGS")
-    ? nextArrow.points[nextArrow.points.length - 1]
-    : startBindable
-    ? updateBoundPoint(
-        nextArrow,
-        "startBinding",
-        nextArrow.startBinding,
-        startBindable,
-        elementsMap,
-        customIntersector,
-      ) || nextArrow.points[0]
-    : nextArrow.points[0];
+  const startLocalPoint =
+    endIsDraggingOverStartElement && getFeatureFlag("COMPLEX_BINDINGS")
+      ? nextArrow.points[0]
+      : startIsDraggingOverEndElement &&
+        app.state.bindMode !== "inside" &&
+        getFeatureFlag("COMPLEX_BINDINGS")
+      ? nextArrow.points[nextArrow.points.length - 1]
+      : startBindable
+      ? updateBoundPoint(
+          nextArrow,
+          "startBinding",
+          nextArrow.startBinding,
+          startBindable,
+          elementsMap,
+          customIntersector,
+        ) || nextArrow.points[0]
+      : nextArrow.points[0];
 
   const endChanged =
     pointDistance(
@@ -2336,49 +2378,6 @@ const pointDraggingUpdates = (
     ),
   };
 };
-
-// const shouldAllowDraggingPoint = (
-//   element: ExcalidrawLinearElement,
-//   scenePointerX: number,
-//   scenePointerY: number,
-//   selectedPointsIndices: readonly number[],
-//   elementsMap: Readonly<NonDeletedSceneElementsMap>,
-//   app: AppClassProperties,
-// ) => {
-//   if (!isSimpleArrow(element)) {
-//     return true;
-//   }
-
-//   const scenePointer = pointFrom<GlobalPoint>(scenePointerX, scenePointerY);
-
-//   // Do not allow dragging the bound arrow closer to the shape than
-//   // the dragging threshold
-//   let allowDrag = true;
-
-//   if (selectedPointsIndices.includes(0) && element.startBinding) {
-//     const boundElement = elementsMap.get(
-//       element.startBinding.elementId,
-//     )! as ExcalidrawBindableElement;
-//     const dist = distanceToElement(boundElement, elementsMap, scenePointer);
-//     const inside = isPointInElement(scenePointer, boundElement, elementsMap);
-//     allowDrag =
-//       allowDrag && (dist > getFixedBindingDistance(boundElement) || inside);
-//   }
-//   if (
-//     selectedPointsIndices.includes(element.points.length - 1) &&
-//     element.endBinding
-//   ) {
-//     const boundElement = elementsMap.get(
-//       element.endBinding.elementId,
-//     )! as ExcalidrawBindableElement;
-//     const dist = distanceToElement(boundElement, elementsMap, scenePointer);
-//     const inside = isPointInElement(scenePointer, boundElement, elementsMap);
-//     allowDrag =
-//       allowDrag && (dist > getFixedBindingDistance(boundElement) || inside);
-//   }
-
-//   return allowDrag;
-// };
 
 const determineCustomLinearAngle = (
   pivotPoint: LocalPoint,

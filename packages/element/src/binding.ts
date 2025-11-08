@@ -665,41 +665,46 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
         otherBinding.elementId,
       ) as NonDeleted<ExcalidrawBindableElement>)
     : undefined;
-  const otherFocusPoint =
-    otherBinding &&
-    otherBindableElement &&
-    getGlobalFixedPointForBindableElement(
-      otherBinding.fixedPoint,
-      otherBindableElement,
-      elementsMap,
-    );
-  const otherPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    arrow,
-    startDragged ? -1 : 0,
-    elementsMap,
-  );
-  const otherFocusPointIsInElement =
-    otherBindableElement &&
-    otherFocusPoint &&
-    isPointInElement(otherFocusPoint, otherBindableElement, elementsMap);
+  // const otherFocusPoint =
+  //   otherBinding &&
+  //   otherBindableElement &&
+  //   getGlobalFixedPointForBindableElement(
+  //     otherBinding.fixedPoint,
+  //     otherBindableElement,
+  //     elementsMap,
+  //   );
+  // const otherPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+  //   arrow,
+  //   startDragged ? -1 : 0,
+  //   elementsMap,
+  // );
+  // const otherFocusPointIsInElement =
+  //   otherBindableElement &&
+  //   otherFocusPoint &&
+  //   isPointInElement(otherFocusPoint, otherBindableElement, elementsMap);
 
-  // Handle outside-outside binding with the same element
-  if (
-    otherBinding &&
-    otherBinding.elementId === hit?.id &&
-    !pointInElement &&
-    !otherFocusPointIsInElement
-  ) {
+  // Handle outside-outside binding to the same element
+  if (otherBinding && otherBinding.elementId === hit?.id) {
     const [startFixedPoint, endFixedPoint] = getGlobalFixedPoints(
       arrow,
       elementsMap,
+    );
+
+    invariant(
+      !opts?.newArrow || appState.selectedLinearElement?.initialState.origin,
+      "appState.selectedLinearElement.initialState.origin must be defined for new arrows",
     );
 
     return {
       start: {
         mode: "inside",
         element: hit,
-        focusPoint: startDragged ? globalPoint : startFixedPoint,
+        focusPoint: startDragged
+          ? globalPoint
+          : // NOTE: Can only affect the start point because new arrows always drag the end point
+          opts?.newArrow
+          ? appState.selectedLinearElement!.initialState.origin!
+          : startFixedPoint,
       },
       end: {
         mode: "inside",
@@ -709,8 +714,31 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     };
   }
 
+  // Handle special alt key case to inside bind no matter what
+  if (opts?.altKey) {
+    return {
+      start:
+        startDragged && hit
+          ? {
+              mode: "inside",
+              element: hit,
+              focusPoint: globalPoint,
+            }
+          : start,
+      end:
+        endDragged && hit
+          ? {
+              mode: "inside",
+              element: hit,
+              focusPoint: globalPoint,
+            }
+          : end,
+    };
+  }
+
+  // Handle normal cases
   const current: BindingStrategy = hit
-    ? pointInElement || opts?.altKey
+    ? pointInElement
       ? {
           mode: "inside",
           element: hit,
@@ -731,27 +759,13 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     : { mode: null };
 
   const other: BindingStrategy =
-    !opts?.altKey && opts?.newArrow && otherBindableElement
-      ? otherBindableElement.id === hit?.id
-        ? {
-            mode: "inside",
-            element: otherBindableElement,
-            focusPoint: otherPoint,
-          }
-        : {
-            mode: "orbit",
-            element: otherBindableElement,
-            focusPoint:
-              otherFocusPointIsInElement && !opts?.initialBinding
-                ? otherFocusPoint
-                : projectFixedPointOntoDiagonal(
-                    arrow,
-                    otherPoint,
-                    otherBindableElement,
-                    startDragged ? "end" : "start",
-                    elementsMap,
-                  ) || otherPoint,
-          }
+    otherBindableElement &&
+    appState.selectedLinearElement?.initialState.altFocusPoint
+      ? {
+          mode: "orbit",
+          element: otherBindableElement,
+          focusPoint: appState.selectedLinearElement.initialState.altFocusPoint,
+        }
       : { mode: undefined };
 
   return {
@@ -2128,7 +2142,7 @@ export class BindableElement {
 }
 
 export const getGlobalFixedPointForBindableElement = (
-  fixedPointRatio: [number, number],
+  fixedPointRatio: FixedPoint,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ): GlobalPoint => {
