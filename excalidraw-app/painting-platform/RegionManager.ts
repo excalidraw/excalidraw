@@ -366,6 +366,99 @@ export class RegionManager {
   }
 
   /**
+   * Generate exactly 3 regions with 33% each (for 3-user painting)
+   */
+  generateThreeEqualRegions(
+    canvasWidth: number,
+    canvasHeight: number,
+  ): CanvasRegion[] {
+    const regions: CanvasRegion[] = [];
+    const patterns = ['horizontal', 'vertical', 'diagonal'];
+    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1'];
+
+    if (pattern === 'horizontal') {
+      // Three horizontal strips
+      const stripHeight = canvasHeight / 3;
+      for (let i = 0; i < 3; i++) {
+        const y = i * stripHeight;
+        const points = [
+          { x: 0, y },
+          { x: canvasWidth, y },
+          { x: canvasWidth, y: y + stripHeight },
+          { x: 0, y: y + stripHeight },
+        ];
+
+        regions.push(this.createRegion(points, {
+          fillColor: colors[i],
+          strokeColor: "#ffffff",
+          opacity: 0.3,
+        }));
+      }
+    } else if (pattern === 'vertical') {
+      // Three vertical strips
+      const stripWidth = canvasWidth / 3;
+      for (let i = 0; i < 3; i++) {
+        const x = i * stripWidth;
+        const points = [
+          { x, y: 0 },
+          { x: x + stripWidth, y: 0 },
+          { x: x + stripWidth, y: canvasHeight },
+          { x, y: canvasHeight },
+        ];
+
+        regions.push(this.createRegion(points, {
+          fillColor: colors[i],
+          strokeColor: "#ffffff",
+          opacity: 0.3,
+        }));
+      }
+    } else {
+      // Diagonal pattern - three triangular/trapezoidal regions
+      const midY = canvasHeight / 2;
+
+      // Left region (trapezoid)
+      regions.push(this.createRegion([
+        { x: 0, y: 0 },
+        { x: canvasWidth * 0.4, y: 0 },
+        { x: canvasWidth * 0.3, y: canvasHeight },
+        { x: 0, y: canvasHeight },
+      ], {
+        fillColor: colors[0],
+        strokeColor: "#ffffff",
+        opacity: 0.3,
+      }));
+
+      // Center region (parallelogram)
+      regions.push(this.createRegion([
+        { x: canvasWidth * 0.4, y: 0 },
+        { x: canvasWidth * 0.7, y: 0 },
+        { x: canvasWidth * 0.6, y: canvasHeight },
+        { x: canvasWidth * 0.3, y: canvasHeight },
+      ], {
+        fillColor: colors[1],
+        strokeColor: "#ffffff",
+        opacity: 0.3,
+      }));
+
+      // Right region (trapezoid)
+      regions.push(this.createRegion([
+        { x: canvasWidth * 0.7, y: 0 },
+        { x: canvasWidth, y: 0 },
+        { x: canvasWidth, y: canvasHeight },
+        { x: canvasWidth * 0.6, y: canvasHeight },
+      ], {
+        fillColor: colors[2],
+        strokeColor: "#ffffff",
+        opacity: 0.3,
+      }));
+    }
+
+    return regions;
+  }
+
+  /**
    * Get a random pastel color for region styling
    */
   private getRandomColor(): string {

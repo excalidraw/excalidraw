@@ -34,18 +34,18 @@ export const PaintingPlatform: React.FC<PaintingPlatformProps> = ({
   const [session, setSession] = useState<PaintingSession | null>(
     initialSession || null,
   );
-  const [showPanel, setShowPanel] = useState(true);
+  const [showPanel, setShowPanel] = useState(false); // Hide panel by default
   const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
 
   const updateInterval = useRef<NodeJS.Timeout>();
 
-  // Initialize session
+  // Initialize session with 3 equal regions automatically
   useEffect(() => {
     if (!session) {
       // Create a new session
       const newSession = SessionManager.createSession(
         currentUserId,
-        "Collaborative Painting",
+        "3-User Painting",
         "collaborative",
       );
 
@@ -53,7 +53,14 @@ export const PaintingPlatform: React.FC<PaintingPlatformProps> = ({
       const manager = new SessionManager(newSession);
       manager.addUser(currentUserId, currentUsername);
 
-      setSession(newSession);
+      // Auto-generate 3 equal regions
+      const regionManager = manager.getRegionManager();
+      regionManager.generateThreeEqualRegions(canvasSize.width, canvasSize.height);
+
+      // Auto-start the session
+      manager.startSession();
+
+      setSession(manager.getSession());
       setSessionManager(manager);
     } else {
       const manager = new SessionManager(session);
@@ -192,8 +199,8 @@ export const PaintingPlatform: React.FC<PaintingPlatformProps> = ({
   }
 
   return (
-    <div className="painting-platform">
-      {/* Region Overlay */}
+    <div className="painting-platform painting-platform--minimal">
+      {/* Region Overlay - Only visible component */}
       <RegionOverlay
         regions={session.regions}
         users={session.users}
@@ -204,62 +211,8 @@ export const PaintingPlatform: React.FC<PaintingPlatformProps> = ({
         canvasWidth={canvasSize.width}
         canvasHeight={canvasSize.height}
         onRegionClick={handleRegionClick}
-        showLabels={true}
+        showLabels={false}
       />
-
-      {/* Session Panel */}
-      {showPanel && (
-        <div className="painting-platform__panel">
-          <SessionPanel
-            session={session}
-            currentUserId={currentUserId}
-            onClaimRegion={handleClaimRegion}
-            onReleaseRegion={handleReleaseRegion}
-            onStartSession={handleStartSession}
-            onCompleteSession={handleCompleteSession}
-            onToggleAI={handleToggleAI}
-            onInitializeRegions={handleInitializeRegions}
-          />
-        </div>
-      )}
-
-      {/* Toggle Panel Button */}
-      <button
-        className="painting-platform__toggle"
-        onClick={() => setShowPanel(!showPanel)}
-        title={showPanel ? "Hide panel" : "Show panel"}
-      >
-        {showPanel ? "◀" : "▶"}
-      </button>
-
-      {/* Session Status Bar */}
-      <div className="painting-platform__statusbar">
-        <div className="statusbar__item">
-          <span className="statusbar__label">Session:</span>
-          <span className="statusbar__value">{session.name}</span>
-        </div>
-        <div className="statusbar__item">
-          <span className="statusbar__label">Regions:</span>
-          <span className="statusbar__value">
-            {session.regions.filter((r) => r.claimedBy).length} /{" "}
-            {session.regions.length}
-          </span>
-        </div>
-        <div className="statusbar__item">
-          <span className="statusbar__label">Participants:</span>
-          <span className="statusbar__value">
-            {Object.keys(session.users).length}
-          </span>
-        </div>
-        {session.state === "active" && (
-          <div className="statusbar__item">
-            <span className="statusbar__label">Your Regions:</span>
-            <span className="statusbar__value statusbar__value--highlight">
-              {session.users[currentUserId]?.claimedRegions.length || 0}
-            </span>
-          </div>
-        )}
-      </div>
     </div>
   );
 };
