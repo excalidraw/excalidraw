@@ -1,5 +1,4 @@
 import {
-  debugDrawLine,
   DEFAULT_ADAPTIVE_RADIUS,
   DEFAULT_PROPORTIONAL_RADIUS,
   invariant,
@@ -32,9 +31,9 @@ import { elementCenterPoint, getDiamondPoints } from "./bounds";
 
 import { generateLinearCollisionShape } from "./shape";
 
+import { isPointInElement } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isRectangularElement } from "./typeChecks";
-import { isPointInElement } from "./collision";
 
 import type {
   ElementsMap,
@@ -599,9 +598,9 @@ export const projectFixedPointOntoDiagonal = (
     p = p1 || p2 || null;
   }
 
-  debugDrawLine(diagonalOne, { color: "purple", permanent: true });
-  debugDrawLine(diagonalTwo, { color: "purple", permanent: true });
-  debugDrawLine(intersector, { color: "orange", permanent: true });
+  // debugDrawLine(diagonalOne, { color: "purple", permanent: true });
+  // debugDrawLine(diagonalTwo, { color: "purple", permanent: true });
+  // debugDrawLine(intersector, { color: "orange", permanent: true });
 
   return p && isPointInElement(p, element, elementsMap) ? p : null;
 };

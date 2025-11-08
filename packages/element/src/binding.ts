@@ -685,10 +685,10 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
 
   // Handle outside-outside binding to the same element
   if (otherBinding && otherBinding.elementId === hit?.id) {
-    const [startFixedPoint, endFixedPoint] = getGlobalFixedPoints(
-      arrow,
-      elementsMap,
-    );
+    // const [startFixedPoint, endFixedPoint] = getGlobalFixedPoints(
+    //   arrow,
+    //   elementsMap,
+    // );
 
     invariant(
       !opts?.newArrow || appState.selectedLinearElement?.initialState.origin,
@@ -704,12 +704,22 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           : // NOTE: Can only affect the start point because new arrows always drag the end point
           opts?.newArrow
           ? appState.selectedLinearElement!.initialState.origin!
-          : startFixedPoint,
+          : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+              arrow,
+              0,
+              elementsMap,
+            ), // startFixedPoint,
       },
       end: {
         mode: "inside",
         element: hit,
-        focusPoint: endDragged ? globalPoint : endFixedPoint,
+        focusPoint: endDragged
+          ? globalPoint
+          : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+              arrow,
+              -1,
+              elementsMap,
+            ), // endFixedPoint
       },
     };
   }
