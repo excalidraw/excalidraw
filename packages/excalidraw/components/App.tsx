@@ -9077,7 +9077,9 @@ class App extends React.Component<AppProps, AppState> {
               newState.selectedLinearElement?.customLineAngle !==
                 this.state.selectedLinearElement?.customLineAngle ||
               this.state.selectedLinearElement.isDragging !==
-                newState.selectedLinearElement?.isDragging
+                newState.selectedLinearElement?.isDragging ||
+              this.state.selectedLinearElement?.initialState?.altFocusPoint !==
+                newState.selectedLinearElement?.initialState?.altFocusPoint
             ) {
               this.setState(newState);
             }
