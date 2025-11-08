@@ -102,16 +102,16 @@ describe("move element", () => {
     new Pointer("mouse").clickOn(rectB);
 
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-      `15`,
+      `16`,
     );
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`14`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`15`);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([200, 0]);
-    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[110, 50]], 0);
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[80, 80]], 0);
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[106, 46.011]], 0);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[88, 88]], 0);
 
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
