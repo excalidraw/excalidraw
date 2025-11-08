@@ -1,4 +1,5 @@
 import {
+  debugDrawLine,
   DEFAULT_ADAPTIVE_RADIUS,
   DEFAULT_PROPORTIONAL_RADIUS,
   invariant,
@@ -31,9 +32,9 @@ import { elementCenterPoint, getDiamondPoints } from "./bounds";
 
 import { generateLinearCollisionShape } from "./shape";
 
-import { isPointInElement } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isRectangularElement } from "./typeChecks";
+import { isPointInElement } from "./collision";
 
 import type {
   ElementsMap,
@@ -560,7 +561,7 @@ export const projectFixedPointOntoDiagonal = (
   elementsMap: ElementsMap,
 ): GlobalPoint | null => {
   invariant(arrow.points.length >= 2, "Arrow must have at least two points");
-  if (arrow.width < 1 && arrow.height < 1) {
+  if (arrow.width < 3 && arrow.height < 3) {
     return null;
   }
 
@@ -597,6 +598,10 @@ export const projectFixedPointOntoDiagonal = (
   } else {
     p = p1 || p2 || null;
   }
+
+  debugDrawLine(diagonalOne, { color: "purple", permanent: true });
+  debugDrawLine(diagonalTwo, { color: "purple", permanent: true });
+  debugDrawLine(intersector, { color: "orange", permanent: true });
 
   return p && isPointInElement(p, element, elementsMap) ? p : null;
 };
