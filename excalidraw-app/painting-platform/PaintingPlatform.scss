@@ -42,29 +42,28 @@
     top: 50%;
     right: 0;
     transform: translateY(-50%);
-    width: 32px;
-    height: 64px;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-right: none;
-    border-radius: 8px 0 0 8px;
+    width: 40px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px 0 0 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    color: #64748b;
+    font-size: 20px;
+    color: white;
     z-index: 199;
-    transition: all 0.2s;
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -4px 0 16px rgba(102, 126, 234, 0.4);
 
     &:hover {
-      background: #f8fafc;
-      color: #1e293b;
+      width: 48px;
+      box-shadow: -6px 0 24px rgba(102, 126, 234, 0.6);
     }
 
     &:active {
-      background: #f1f5f9;
+      transform: translateY(-50%) scale(0.95);
     }
   }
 
@@ -73,16 +72,17 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 40px;
-    background: white;
-    border-top: 1px solid #e2e8f0;
+    height: 48px;
+    background: linear-gradient(90deg, #ffffff 0%, #f8fafc 100%);
+    border-top: 2px solid #e2e8f0;
     display: flex;
     align-items: center;
-    gap: 24px;
-    padding: 0 20px;
+    gap: 28px;
+    padding: 0 24px;
     font-size: 13px;
     z-index: 150;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(10px);
   }
 }
 
@@ -90,23 +90,32 @@
   &__item {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    padding: 6px 12px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   }
 
   &__label {
     color: #64748b;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   &__value {
     color: #1e293b;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 14px;
 
     &--highlight {
-      color: #3b82f6;
-      background: #dbeafe;
-      padding: 2px 8px;
-      border-radius: 4px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
     }
   }
 }

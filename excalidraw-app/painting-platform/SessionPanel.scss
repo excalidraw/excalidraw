@@ -1,35 +1,58 @@
 .session-panel {
-  width: 320px;
+  width: 360px;
   height: 100%;
-  background: white;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   border-left: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.08);
 
   &__header {
-    padding: 20px;
+    padding: 24px 20px;
     border-bottom: 1px solid #e2e8f0;
-    background: #f8fafc;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
   }
 
   &__title {
     margin: 0 0 12px 0;
-    font-size: 20px;
-    font-weight: 600;
-    color: #1e293b;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 1;
   }
 
   &__status {
     display: inline-block;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
     color: white;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 1;
   }
 
   &__info {
@@ -152,27 +175,48 @@
 .user-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: #f8fafc;
-  border-radius: 8px;
-  transition: background 0.2s;
+  gap: 14px;
+  padding: 14px;
+  background: white;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
   &:hover {
-    background: #f1f5f9;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border-color: #667eea;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
+    transform: translateX(4px);
   }
 
   &__avatar {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-weight: 600;
-    font-size: 16px;
+    font-weight: 700;
+    font-size: 18px;
     flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+  }
+
+  &:hover &__avatar::after {
+    opacity: 1;
   }
 
   &__info {
@@ -215,27 +259,35 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  transition: all 0.2s;
+  padding: 12px 14px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
 
   &:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-color: #f59e0b;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+    transform: translateY(-2px);
   }
 
   &__info {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
 
   &__id {
-    font-family: monospace;
-    font-size: 12px;
-    color: #475569;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-size: 13px;
+    color: #1e293b;
+    font-weight: 600;
+    background: #f8fafc;
+    padding: 4px 8px;
+    border-radius: 6px;
   }
 
   &__more {
@@ -286,29 +338,52 @@
 }
 
 .btn {
-  padding: 8px 16px;
+  padding: 10px 18px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: inherit;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
 
   &:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+
+    &::before {
+      width: 300px;
+      height: 300px;
+    }
   }
 
   &:active {
     transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   &-primary {
-    background: #3b82f6;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
 
     &:hover {
-      background: #2563eb;
+      background: linear-gradient(135deg, #5568d3 0%, #6a3f8e 100%);
     }
   }
 
@@ -322,41 +397,43 @@
   }
 
   &-success {
-    background: #22c55e;
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
     color: white;
 
     &:hover {
-      background: #16a34a;
+      background: linear-gradient(135deg, #22c55e 0%, #059669 100%);
     }
   }
 
   &-warning {
-    background: #f59e0b;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
     color: white;
 
     &:hover {
-      background: #d97706;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     }
   }
 
   &-danger {
-    background: #ef4444;
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
     color: white;
 
     &:hover {
-      background: #dc2626;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     }
   }
 
   &-sm {
-    padding: 6px 12px;
+    padding: 7px 14px;
     font-size: 12px;
+    border-radius: 6px;
   }
 
   &-large {
     width: 100%;
-    padding: 12px 16px;
-    font-size: 15px;
-    font-weight: 600;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 10px;
   }
 }
