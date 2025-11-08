@@ -4,9 +4,10 @@
  * Integrates with Excalidraw's drawing system to restrict users to their claimed regions
  */
 
+import { RegionManager } from "./RegionManager";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState } from "@excalidraw/excalidraw/types";
-import { RegionManager } from "./RegionManager";
 import type { UserId } from "./types";
 
 /**

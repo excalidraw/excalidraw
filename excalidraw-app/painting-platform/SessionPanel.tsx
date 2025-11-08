@@ -3,7 +3,9 @@
  */
 
 import React, { useState } from "react";
+
 import type { PaintingSession, PaintingUser, CanvasRegion, UserId } from "./types";
+
 import "./SessionPanel.scss";
 
 interface SessionPanelProps {

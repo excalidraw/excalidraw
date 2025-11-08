@@ -3,11 +3,14 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+
 import { SessionManager } from "./SessionManager";
 import { SessionPanel } from "./SessionPanel";
 import { RegionOverlay } from "./RegionOverlay";
+
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import type { PaintingSession, UserId } from "./types";
+
 import "./PaintingPlatform.scss";
 
 interface PaintingPlatformProps {

@@ -5,10 +5,11 @@
  */
 
 import React, { useState, useEffect } from "react";
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+
 import { PaintingPlatform } from "./PaintingPlatform";
+
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import type { PaintingSession } from "./types";
-import { SessionManager } from "./SessionManager";
 
 interface PaintingPlatformWrapperProps {
   excalidrawAPI: ExcalidrawImperativeAPI;

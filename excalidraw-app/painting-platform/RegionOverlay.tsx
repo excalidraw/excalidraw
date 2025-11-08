@@ -3,6 +3,7 @@
  */
 
 import React from "react";
+
 import type { CanvasRegion, UserId, PaintingUser } from "./types";
 
 interface RegionOverlayProps {

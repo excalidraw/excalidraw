@@ -2,6 +2,8 @@
  * SessionManager - Manages painting sessions and user participation
  */
 
+import { RegionManager } from "./RegionManager";
+
 import type {
   PaintingSession,
   PaintingUser,
@@ -10,7 +12,6 @@ import type {
   PaintingSessionSettings,
   SessionResults,
 } from "./types";
-import { RegionManager } from "./RegionManager";
 
 /**
  * Default session settings
