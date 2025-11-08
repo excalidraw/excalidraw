@@ -66,6 +66,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   commandPalette: [
     getShortcutKey("CtrlOrCmd+/"),
     getShortcutKey("CtrlOrCmd+Shift+P"),
+    getShortcutKey("CtrlOrCmd+K"),
   ],
   cut: [getShortcutKey("CtrlOrCmd+X")],
   copy: [getShortcutKey("CtrlOrCmd+C")],
