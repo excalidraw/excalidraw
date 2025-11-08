@@ -196,7 +196,7 @@ const renderBindings = (
           zoom,
           dim,
           dim,
-          "red",
+          element.startBinding?.mode === "orbit" ? "red" : "black",
         );
       }
 
@@ -215,7 +215,7 @@ const renderBindings = (
           zoom,
           dim,
           dim,
-          "red",
+          element.endBinding?.mode === "orbit" ? "red" : "black",
         );
       }
     }
