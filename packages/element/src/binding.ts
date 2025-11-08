@@ -665,23 +665,23 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
         otherBinding.elementId,
       ) as NonDeleted<ExcalidrawBindableElement>)
     : undefined;
-  // const otherFocusPoint =
-  //   otherBinding &&
-  //   otherBindableElement &&
-  //   getGlobalFixedPointForBindableElement(
-  //     otherBinding.fixedPoint,
-  //     otherBindableElement,
-  //     elementsMap,
-  //   );
+  const otherFocusPoint =
+    otherBinding &&
+    otherBindableElement &&
+    getGlobalFixedPointForBindableElement(
+      otherBinding.fixedPoint,
+      otherBindableElement,
+      elementsMap,
+    );
   // const otherPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
   //   arrow,
   //   startDragged ? -1 : 0,
   //   elementsMap,
   // );
-  // const otherFocusPointIsInElement =
-  //   otherBindableElement &&
-  //   otherFocusPoint &&
-  //   isPointInElement(otherFocusPoint, otherBindableElement, elementsMap);
+  const otherFocusPointIsInElement =
+    otherBindableElement &&
+    otherFocusPoint &&
+    isPointInElement(otherFocusPoint, otherBindableElement, elementsMap);
 
   // Handle outside-outside binding to the same element
   if (otherBinding && otherBinding.elementId === hit?.id) {
@@ -760,6 +760,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
 
   const other: BindingStrategy =
     otherBindableElement &&
+    !otherFocusPointIsInElement &&
     appState.selectedLinearElement?.initialState.altFocusPoint
       ? {
           mode: "orbit",
