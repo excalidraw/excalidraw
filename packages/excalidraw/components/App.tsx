@@ -104,6 +104,7 @@ import {
   type StylesPanelMode,
   loadDesktopUIModePreference,
   setDesktopUIMode,
+  isMobileBreakpoint,
 } from "@excalidraw/common";
 
 import {
@@ -754,6 +755,7 @@ class App extends React.Component<AppProps, AppState> {
         refreshEditorInterface: this.refreshEditorInterface, //zsviczian
         setTrayModeEnabled: this.setTrayModeEnabled, //zsviczian
         setDesktopUIMode: this.setDesktopUIMode, //zsviczian
+        setMobileModeAllowed: this.setMobileModeAllowed, //zsviczian
         isTouchScreen: this.isTouchScreen, //zsviczian
         isTrayModeEnabled: this.isTrayModeEnabled, //zsviczian
         getColorAtScenePoint: this.getColorAtScenePoint, //zsviczian
@@ -2550,9 +2552,12 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private getFormFactor = (editorWidth: number, editorHeight: number) => {
+    if (this.props.UIOptions.formFactor === "phone" && !this.allowMobileMode) {
+      return getFormFactor(editorWidth, editorHeight, this.allowMobileMode) //zsviczian
+    }
     return (
       this.props.UIOptions.formFactor ??
-      getFormFactor(editorWidth, editorHeight)
+      getFormFactor(editorWidth, editorHeight, this.allowMobileMode) //zsviczian
     );
   };
 
@@ -4265,6 +4270,14 @@ startLineEditor = (
       this.addNewImagesToImageCache();
     },
   );
+
+  //zsviczian https://github.com/zsviczian/excalibrain/issues/9
+  public setMobileModeAllowed = (allow: boolean) => {
+    this.allowMobileMode = allow;
+    this.refreshEditorInterface();
+    this.triggerRender();
+    setDesktopUIMode(this.editorInterface.desktopUIMode);
+  };
 
   //zsviczian
   private debounceClearHighlightSearchResults: boolean = false;

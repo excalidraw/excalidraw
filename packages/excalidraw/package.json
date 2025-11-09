@@ -1,6 +1,6 @@
 {
   "name": "@zsviczian/excalidraw",
-  "version": "0.18.0-51",
+  "version": "0.18.0-52",
   "main": "main.js",
   "module": "./dist/prod/index.js",
   "source": "./index.tsx",

@@ -80,9 +80,11 @@ export const MobileMenu = ({
 
     const topRightUI = (
       <>
-        <div className="excalidraw-ui-top-right">
-          {renderTopRightUI?.(true, appState)}
-        </div>
+        {!appState.viewModeEnabled && ( //zsviczian
+          <div className="excalidraw-ui-top-right">
+            {renderTopRightUI?.(true, appState)}
+          </div>
+        )}
         {!appState.viewModeEnabled && (
           <div className="excalidraw-ui-top-right library-and-pen">
             <PenModeButton

@@ -914,6 +914,7 @@ export interface ExcalidrawImperativeAPI {
   isTouchScreen: InstanceType<typeof App>["isTouchScreen"]; //zsviczian
   setTrayModeEnabled: InstanceType<typeof App>["setTrayModeEnabled"]; //zsviczian
   setDesktopUIMode: InstanceType<typeof App>["setDesktopUIMode"]; //zsviczian
+  setMobileModeAllowed: InstanceType<typeof App>["setMobileModeAllowed"]; //zsviczian
   isTrayModeEnabled: InstanceType<typeof App>["isTrayModeEnabled"]; //zsviczian
   getColorAtScenePoint: InstanceType<typeof App>["getColorAtScenePoint"]; //zsviczian
   startLineEditor: InstanceType<typeof App>["startLineEditor"]; //zsviczian

@@ -65,8 +65,8 @@ export const isBrave = () =>
 //   /android|ios|ipod|blackberry|windows phone/i.test(navigator.platform);
 
 // utilities
-export const isMobileBreakpoint = (width: number, height: number) => {
-  return width !== 0 && ( //zsviczian changing tabs in Obsidian causes MobileMenu to be rendered
+export const isMobileBreakpoint = (width: number, height: number, allowMobile: boolean) => {
+  return width !== 0 && allowMobile && ( //zsviczian changing tabs in Obsidian causes MobileMenu to be rendered
     width <= MQ_MAX_MOBILE ||
     (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
   );
@@ -154,8 +154,9 @@ const isMobileOrTablet = (): boolean => {
 export const getFormFactor = (
   editorWidth: number,
   editorHeight: number,
+  allowMobile: boolean, //zsviczian
 ): EditorInterface["formFactor"] => {
-  if (isMobileBreakpoint(editorWidth, editorHeight)) {
+  if (isMobileBreakpoint(editorWidth, editorHeight, allowMobile)) { //zsviczian
     return "phone";
   }
 
