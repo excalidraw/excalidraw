@@ -57,6 +57,7 @@ import {
   isFreeDrawElement,
   isInitializedImageElement,
   isArrowElement,
+  isLineElement,
   hasBoundTextElement,
   isMagicFrameElement,
   isImageElement,
@@ -285,7 +286,7 @@ const generateElementCanvas = (
   const boundTextCanvas = document.createElement("canvas");
   const boundTextCanvasContext = boundTextCanvas.getContext("2d")!;
 
-  if (isArrowElement(element) && boundTextElement) {
+  if ((isArrowElement(element) || isLineElement(element)) && boundTextElement) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     // Take max dimensions of arrow canvas so that when canvas is rotated
     // the arrow doesn't get clipped
@@ -506,6 +507,13 @@ const drawElementOnCanvas = (
         }
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
+        
+        // Draw background if element has backgroundColor
+        if (element.backgroundColor && element.backgroundColor !== "transparent") {
+          context.fillStyle = element.backgroundColor;
+          context.fillRect(0, 0, element.width, element.height);
+        }
+        
         context.font = getFontString(element);
         context.fillStyle = element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
@@ -867,7 +875,7 @@ export const renderElement = (
         }
         const boundTextElement = getBoundTextElement(element, elementsMap);
 
-        if (isArrowElement(element) && boundTextElement) {
+        if ((isArrowElement(element) || isLineElement(element)) && boundTextElement) {
           const tempCanvas = document.createElement("canvas");
 
           const tempCanvasContext = tempCanvas.getContext("2d")!;

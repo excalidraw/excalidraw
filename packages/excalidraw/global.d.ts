@@ -8,6 +8,15 @@ interface Window {
   gtag: Function;
   sa_event: Function;
   fathom: { trackEvent: Function };
+  h: {
+    scene: any;
+    elements: readonly any[];
+    state: any;
+    setState: any;
+    app: any;
+    history: any;
+    store: any;
+  };
 }
 
 interface CanvasRenderingContext2D {
