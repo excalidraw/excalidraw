@@ -12,12 +12,12 @@ import {
 import {
   useCallback,
   useEffect,
-  useRef,
   useState,
   type CSSProperties,
   type ComponentType,
   type ReactElement,
   type ReactNode,
+  type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 
 import type { AuthShellConfig } from "./config";
@@ -30,6 +30,36 @@ import {
 import { AuthShellProvider } from "./AuthShellContext";
 import { SettingsPage } from "./settings/SettingsPage";
 import { trackEvent } from "../../packages/excalidraw/analytics";
+import {
+  CenteredContainer,
+  Card,
+  StatusIcon,
+  Button,
+  ActionButton,
+  Heading,
+  Text,
+  Badge,
+  Alert,
+  ButtonGroup,
+} from "./AuthShell.components";
+import {
+  resolveAPIBaseUrl,
+  resolveSuccessUrl,
+  createCheckout,
+  createCheckoutSession,
+  PaymentProviderUnavailableError,
+} from "./api-utils";
+import {
+  loadDodoPaymentsScript,
+  initializeDodoPayments,
+  openCheckout,
+  closeCheckout,
+  isRedirectEvent,
+  getRedirectUrl,
+  isErrorEvent,
+  getErrorMessage,
+  type DodoPaymentsEvent,
+} from "./dodopayments-utils";
 
 type SessionStatus =
   | { type: "loading" }
@@ -55,56 +85,18 @@ function Loader({ label }: { label: string }) {
   return <div style={loaderStyles}>{label}</div>;
 }
 
-const ClerkLoadedComponent =
-  ClerkLoaded as unknown as ComponentType<{ children?: ReactNode }>;
-const ClerkLoadingComponent =
-  ClerkLoading as unknown as ComponentType<{ children?: ReactNode }>;
-const SignedInComponent =
-  SignedIn as unknown as ComponentType<{ children?: ReactNode }>;
-const SignedOutComponent =
-  SignedOut as unknown as ComponentType<{ children?: ReactNode }>;
-
-const PADDLE_SCRIPT_SRC = "https://cdn.paddle.com/paddle/v2/paddle.js";
-const PADDLE_DROPIN_TARGET = "paddle-dropin";
-let paddleScriptPromise: Promise<void> | null = null;
-
-declare global {
-  interface Window {
-    Paddle?: PaddleNamespace;
-  }
-}
-
-interface PaddleNamespace {
-  Initialize(options: { token: string }): void;
-  Checkout: {
-    open(options: PaddleCheckoutOptions): void;
-    close?: () => void;
-  };
-  Environment?: {
-    set?: (environment: "sandbox" | "production") => void;
-  };
-}
-
-interface PaddleCheckoutOptions {
-  clientToken?: string;
-  items?: Array<{ priceId: string; quantity: number }>;
-  customer?: { email: string };
-  customData?: Record<string, unknown>;
-  settings?: {
-    displayMode?: "inline" | "overlay";
-    frameTarget?: string;
-    frameStyle?: string;
-    locale?: string;
-    theme?: "light" | "dark";
-    successUrl?: string;
-  };
-  eventCallback?: (event: PaddleEvent) => void;
-}
-
-interface PaddleEvent {
-  name: string;
-  data?: Record<string, unknown>;
-}
+const ClerkLoadedComponent = ClerkLoaded as unknown as ComponentType<{
+  children?: ReactNode;
+}>;
+const ClerkLoadingComponent = ClerkLoading as unknown as ComponentType<{
+  children?: ReactNode;
+}>;
+const SignedInComponent = SignedIn as unknown as ComponentType<{
+  children?: ReactNode;
+}>;
+const SignedOutComponent = SignedOut as unknown as ComponentType<{
+  children?: ReactNode;
+}>;
 
 function AuthScreen({ config }: { config: AuthShellConfig }) {
   return (
@@ -133,7 +125,7 @@ function AuthScreen({ config }: { config: AuthShellConfig }) {
   );
 }
 
-type BillingInterval = "month" | "year";
+type BillingInterval = "month";
 
 interface CheckoutResponse {
   priceId: string;
@@ -146,55 +138,12 @@ interface CheckoutResponse {
   };
   successUrl: string;
   cancelUrl: string;
+  pricePerPeriodCents: number;
+  pricePerPeriod: string;
+  currency: string;
 }
 
 type ProcessingStatus = "polling" | "success" | "timeout";
-
-const loadPaddleScript = async () => {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  if (window.Paddle) {
-    return;
-  }
-
-  if (!paddleScriptPromise) {
-    paddleScriptPromise = new Promise<void>((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = PADDLE_SCRIPT_SRC;
-      script.async = true;
-      script.onload = () => resolve();
-      script.onerror = (event) =>
-        reject(
-          event instanceof ErrorEvent
-            ? event.error
-            : new Error("Failed to load Paddle script"),
-        );
-      document.body.appendChild(script);
-    });
-  }
-
-  await paddleScriptPromise;
-};
-
-const getInitialPlanFromSearch = (): BillingInterval => {
-  if (typeof window === "undefined") {
-    return "month";
-  }
-  const params = new URLSearchParams(window.location.search);
-  return params.get("plan") === "year" ? "year" : "month";
-};
-
-const resolveSuccessUrl = (): string => {
-  if (typeof window === "undefined") {
-    return "";
-  }
-  return (
-    import.meta.env.VITE_CHECKOUT_SUCCESS_URL ||
-    `${window.location.origin}?subscribed=true`
-  );
-};
 
 function SubscriptionProcessing({
   config,
@@ -220,14 +169,22 @@ function SubscriptionProcessing({
 
     const checkSubscription = async () => {
       try {
-        console.log(`🔄 Polling subscription status (attempt ${pollCount + 1})...`);
+        console.log(
+          `🔄 Polling subscription status (attempt ${pollCount + 1})...`,
+        );
         const session = await fetchPremiumSession(config, {
           getToken: () => getToken({ skipCache: true }),
         });
 
         console.log("📊 Session response:", session);
-        console.log("📋 Subscription details:", JSON.stringify(session?.subscription, null, 2));
-        console.log("💳 Has active subscription:", hasActiveSubscription(session));
+        console.log(
+          "📋 Subscription details:",
+          JSON.stringify(session?.subscription, null, 2),
+        );
+        console.log(
+          "💳 Has active subscription:",
+          hasActiveSubscription(session),
+        );
 
         if (hasActiveSubscription(session)) {
           console.log("✅ Subscription found! Stopping polling.");
@@ -280,170 +237,40 @@ function SubscriptionProcessing({
 
   if (status === "success" || subscriptionActive) {
     return (
-      <div
-        style={{
-          alignItems: "center",
-          backgroundColor: "#f0fdf4",
-          display: "flex",
-          fontFamily: "Inter, system-ui, sans-serif",
-          height: "100vh",
-          justifyContent: "center",
-          padding: "2rem",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "#ffffff",
-            borderRadius: "1rem",
-            boxShadow: "0 1.5rem 4rem rgba(15, 23, 42, 0.15)",
-            maxWidth: "28rem",
-            padding: "2.5rem",
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "#10b981",
-              borderRadius: "50%",
-              color: "#ffffff",
-              fontSize: "2.5rem",
-              height: "4rem",
-              lineHeight: "4rem",
-              margin: "0 auto 1.5rem",
-              width: "4rem",
-            }}
-          >
-            ✓
-          </div>
-          <h1
-            style={{
-              color: "#111827",
-              fontSize: "1.75rem",
-              fontWeight: 700,
-              marginBottom: "1rem",
-            }}
-          >
-            Payment Complete!
-          </h1>
-          <p style={{ color: "#6b7280", fontSize: "1rem", lineHeight: "1.6" }}>
+      <CenteredContainer backgroundColor="#f0fdf4">
+        <Card>
+          <StatusIcon type="success" />
+          <Heading>Payment Complete!</Heading>
+          <Text>
             Your subscription is now active. Redirecting you to EmbraceBoard...
-          </p>
-        </div>
-      </div>
+          </Text>
+        </Card>
+      </CenteredContainer>
     );
   }
 
   if (status === "timeout") {
     return (
-      <div
-        style={{
-          alignItems: "center",
-          backgroundColor: "#f9fafb",
-          display: "flex",
-          fontFamily: "Inter, system-ui, sans-serif",
-          height: "100vh",
-          justifyContent: "center",
-          padding: "2rem",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "#ffffff",
-            borderRadius: "1rem",
-            boxShadow: "0 1.5rem 4rem rgba(15, 23, 42, 0.15)",
-            maxWidth: "28rem",
-            padding: "2.5rem",
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "#f59e0b",
-              borderRadius: "50%",
-              color: "#ffffff",
-              fontSize: "2rem",
-              height: "4rem",
-              lineHeight: "4rem",
-              margin: "0 auto 1.5rem",
-              width: "4rem",
-            }}
-          >
-            ⏱
-          </div>
-          <h1
-            style={{
-              color: "#111827",
-              fontSize: "1.75rem",
-              fontWeight: 700,
-              marginBottom: "1rem",
-            }}
-          >
-            Payment Processing
-          </h1>
-          <p
-            style={{
-              color: "#6b7280",
-              fontSize: "1rem",
-              lineHeight: "1.6",
-              marginBottom: "1.5rem",
-            }}
-          >
+      <CenteredContainer>
+        <Card>
+          <StatusIcon type="warning" />
+          <Heading>Payment Processing</Heading>
+          <Text marginBottom="1.5rem">
             Your payment is taking longer than expected to process. This can
             happen if the webhook is delayed.
-          </p>
-          <p
-            style={{
-              color: "#9ca3af",
-              fontSize: "0.875rem",
-              lineHeight: "1.6",
-              marginBottom: "2rem",
-            }}
-          >
+          </Text>
+          <Text fontSize="0.875rem" color="#9ca3af" marginBottom="2rem">
             Your subscription should activate within a few minutes. You can try
             refreshing the page or contact support if the issue persists.
-          </p>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.75rem",
-            }}
-          >
-            <button
-              type="button"
-              onClick={onRetry}
-              style={{
-                backgroundColor: "#111827",
-                border: "none",
-                borderRadius: "0.75rem",
-                color: "#ffffff",
-                cursor: "pointer",
-                fontSize: "1rem",
-                fontWeight: 600,
-                padding: "0.875rem 1.5rem",
-              }}
-            >
-              Refresh and Check Again
-            </button>
-            <button
-              type="button"
-              onClick={onSignOut}
-              style={{
-                backgroundColor: "#ffffff",
-                border: "1px solid #d0d5dd",
-                borderRadius: "0.75rem",
-                color: "#111827",
-                cursor: "pointer",
-                fontSize: "1rem",
-                fontWeight: 600,
-                padding: "0.875rem 1.5rem",
-              }}
-            >
+          </Text>
+          <ButtonGroup>
+            <Button onClick={onRetry}>Refresh and Check Again</Button>
+            <Button onClick={onSignOut} variant="secondary">
               Sign Out
-            </button>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </ButtonGroup>
+        </Card>
+      </CenteredContainer>
     );
   }
 
@@ -453,688 +280,19 @@ function SubscriptionProcessing({
   const seconds = elapsedSeconds % 60;
 
   return (
-    <div
-      style={{
-        alignItems: "center",
-        backgroundColor: "#f9fafb",
-        display: "flex",
-        fontFamily: "Inter, system-ui, sans-serif",
-        height: "100vh",
-        justifyContent: "center",
-        padding: "2rem",
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: "#ffffff",
-          borderRadius: "1rem",
-          boxShadow: "0 1.5rem 4rem rgba(15, 23, 42, 0.15)",
-          maxWidth: "28rem",
-          padding: "2.5rem",
-          textAlign: "center",
-        }}
-      >
-        <div
-          style={{
-            animation: "spin 1s linear infinite",
-            border: "4px solid #e5e7eb",
-            borderRadius: "50%",
-            borderTopColor: "#3b82f6",
-            height: "4rem",
-            margin: "0 auto 1.5rem",
-            width: "4rem",
-          }}
-        />
-        <style>
-          {`
-            @keyframes spin {
-              to { transform: rotate(360deg); }
-            }
-          `}
-        </style>
-        <h1
-          style={{
-            color: "#111827",
-            fontSize: "1.75rem",
-            fontWeight: 700,
-            marginBottom: "1rem",
-          }}
-        >
-          Processing Payment...
-        </h1>
-        <p
-          style={{
-            color: "#6b7280",
-            fontSize: "1rem",
-            lineHeight: "1.6",
-            marginBottom: "1rem",
-          }}
-        >
+    <CenteredContainer>
+      <Card>
+        <StatusIcon type="loading" />
+        <Heading>Processing Payment...</Heading>
+        <Text marginBottom="1rem">
           We're confirming your subscription. This usually takes a few seconds.
-        </p>
-        <p style={{ color: "#9ca3af", fontSize: "0.875rem" }}>
+        </Text>
+        <Text fontSize="0.875rem" color="#9ca3af">
           Checking... ({minutes > 0 ? `${minutes}m ` : ""}
           {seconds}s elapsed)
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function SubscriptionManagement({
-  config,
-  onSignOut,
-}: {
-  config: AuthShellConfig;
-  onSignOut: () => void;
-}) {
-  const { getToken } = useAuth();
-  const { user } = useUser();
-  const [subscription, setSubscription] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [updating, setUpdating] = useState(false);
-  const [canceling, setCanceling] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [invoices, setInvoices] = useState<any[]>([]);
-  const [showInvoices, setShowInvoices] = useState(false);
-  const [loadingInvoices, setLoadingInvoices] = useState(false);
-
-  useEffect(() => {
-    const fetchSubscription = async () => {
-      try {
-        const token = await getToken();
-        if (!token) {
-          throw new Error("Not authenticated");
-        }
-
-        const apiUrl =
-          config.apiBaseUrl ||
-          (typeof window !== "undefined" ? window.location.origin : "http://localhost:8787");
-        const response = await fetch(`${apiUrl}/api/subscription`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch subscription");
-        }
-
-        const data = await response.json();
-        setSubscription(data.subscription);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load subscription");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSubscription();
-  }, [config.apiBaseUrl, getToken]);
-
-  const handleUpdateBillingInterval = async (newInterval: BillingInterval) => {
-    if (subscription.billingInterval === newInterval) {
-      return;
-    }
-
-    try {
-      setUpdating(true);
-      setError(null);
-      setSuccessMessage(null);
-
-      const token = await getToken();
-      if (!token) {
-        throw new Error("Not authenticated");
-      }
-
-      const apiUrl =
-        config.apiBaseUrl ||
-        (typeof window !== "undefined" ? window.location.origin : "http://localhost:8787");
-      const response = await fetch(`${apiUrl}/api/subscription/update`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ billingInterval: newInterval }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update subscription");
-      }
-
-      const data = await response.json();
-      setSuccessMessage(data.message || "Subscription updated successfully");
-      
-      // Refresh subscription data
-      const subResponse = await fetch(`${apiUrl}/api/subscription`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (subResponse.ok) {
-        const subData = await subResponse.json();
-        setSubscription(subData.subscription);
-      }
-
-      trackEvent("subscription", "billing_interval_updated", newInterval);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update subscription");
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const handleCancel = async () => {
-    if (!confirm("Are you sure you want to cancel your subscription? It will remain active until the end of the current billing period.")) {
-      return;
-    }
-
-    try {
-      setCanceling(true);
-      setError(null);
-      setSuccessMessage(null);
-
-      const token = await getToken();
-      if (!token) {
-        throw new Error("Not authenticated");
-      }
-
-      const apiUrl =
-        config.apiBaseUrl ||
-        (typeof window !== "undefined" ? window.location.origin : "http://localhost:8787");
-      const response = await fetch(`${apiUrl}/api/subscription/cancel`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to cancel subscription");
-      }
-
-      const data = await response.json();
-      setSuccessMessage(data.message || "Subscription will be canceled at the end of the billing period");
-      
-      // Refresh subscription data
-      const subResponse = await fetch(`${apiUrl}/api/subscription`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (subResponse.ok) {
-        const subData = await subResponse.json();
-        setSubscription(subData.subscription);
-      }
-
-      trackEvent("subscription", "canceled");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to cancel subscription");
-    } finally {
-      setCanceling(false);
-    }
-  };
-
-  const handleOpenPortal = async () => {
-    try {
-      setError(null);
-      const token = await getToken();
-      if (!token) {
-        throw new Error("Not authenticated");
-      }
-
-      const apiUrl =
-        config.apiBaseUrl ||
-        (typeof window !== "undefined" ? window.location.origin : "http://localhost:8787");
-      const response = await fetch(`${apiUrl}/api/subscription/portal`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      if (data.portalUrl) {
-        // Portal available - open it
-        window.open(data.portalUrl, "_blank");
-        trackEvent("subscription", "portal_opened");
-      } else if (data.canViewInvoices) {
-        // Portal not available but invoices can be viewed
-        setError(data.message || "Portal not available. Use 'View Invoices' to see your payment history.");
-      } else {
-        throw new Error(data.message || "Failed to get portal URL");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to open customer portal");
-    }
-  };
-
-  const handleViewInvoices = async () => {
-    if (showInvoices) {
-      // Just hide the invoices
-      setShowInvoices(false);
-      return;
-    }
-
-    try {
-      setError(null);
-      setLoadingInvoices(true);
-      const token = await getToken();
-      if (!token) {
-        throw new Error("Not authenticated");
-      }
-
-      const apiUrl =
-        config.apiBaseUrl ||
-        (typeof window !== "undefined" ? window.location.origin : "http://localhost:8787");
-      const response = await fetch(`${apiUrl}/api/subscription/invoices`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: "Failed to fetch invoices" }));
-        throw new Error(errorData.message || "Failed to fetch invoices");
-      }
-
-      const data = await response.json();
-      setInvoices(data.transactions || []);
-      setShowInvoices(true);
-      trackEvent("subscription", "invoices_viewed");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load invoices");
-    } finally {
-      setLoadingInvoices(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div
-        style={{
-          alignItems: "center",
-          backgroundColor: "#f9fafb",
-          display: "flex",
-          fontFamily: "Inter, system-ui, sans-serif",
-          height: "100vh",
-          justifyContent: "center",
-          padding: "1rem",
-        }}
-      >
-        <div style={{ textAlign: "center" }}>
-          <p style={{ color: "#6b7280", fontSize: "1rem" }}>Loading subscription...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error && !subscription) {
-    return (
-      <div
-        style={{
-          alignItems: "center",
-          backgroundColor: "#f9fafb",
-          display: "flex",
-          fontFamily: "Inter, system-ui, sans-serif",
-          height: "100vh",
-          justifyContent: "center",
-          padding: "1rem",
-        }}
-      >
-        <div style={{ maxWidth: "32rem", textAlign: "center" }}>
-          <div
-            style={{
-              backgroundColor: "#fef2f2",
-              border: "1px solid #fecaca",
-              borderRadius: "0.75rem",
-              color: "#991b1b",
-              marginBottom: "1rem",
-              padding: "1rem",
-            }}
-          >
-            {error}
-          </div>
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              backgroundColor: "#111827",
-              border: "none",
-              borderRadius: "0.5rem",
-              color: "#ffffff",
-              cursor: "pointer",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              padding: "0.75rem 1.5rem",
-            }}
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const currentPeriodEnd = subscription?.currentPeriodEnd
-    ? new Date(subscription.currentPeriodEnd)
-    : null;
-  const isCanceled = subscription?.cancelAtPeriodEnd === true;
-
-  return (
-    <div
-      style={{
-        alignItems: "center",
-        backgroundColor: "#f9fafb",
-        display: "flex",
-        fontFamily: "Inter, system-ui, sans-serif",
-        minHeight: "100vh",
-        justifyContent: "center",
-        padding: "1rem",
-      }}
-    >
-      <div style={{ maxWidth: "48rem", width: "100%" }}>
-        <div style={{ marginBottom: "1.5rem", textAlign: "center" }}>
-          <h1
-            style={{
-              color: "#111827",
-              fontSize: "1.75rem",
-              fontWeight: 700,
-              marginBottom: "0.5rem",
-            }}
-          >
-            Subscription Management
-          </h1>
-          {user?.primaryEmailAddress && (
-            <p style={{ color: "#9ca3af", fontSize: "0.875rem" }}>
-              {user.primaryEmailAddress.emailAddress}
-            </p>
-          )}
-        </div>
-
-        {error && (
-          <div
-            style={{
-              backgroundColor: "#fef2f2",
-              border: "1px solid #fecaca",
-              borderRadius: "0.75rem",
-              color: "#991b1b",
-              marginBottom: "1rem",
-              padding: "1rem",
-            }}
-          >
-            {error}
-          </div>
-        )}
-
-        {successMessage && (
-          <div
-            style={{
-              backgroundColor: "#f0fdf4",
-              border: "1px solid #86efac",
-              borderRadius: "0.75rem",
-              color: "#166534",
-              marginBottom: "1rem",
-              padding: "1rem",
-            }}
-          >
-            {successMessage}
-          </div>
-        )}
-
-        {subscription && (
-          <div
-            style={{
-              backgroundColor: "#ffffff",
-              border: "1px solid #e5e7eb",
-              borderRadius: "0.75rem",
-              marginBottom: "1rem",
-              padding: "1.5rem",
-            }}
-          >
-            <div style={{ marginBottom: "1.5rem" }}>
-              <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between", marginBottom: "0.75rem" }}>
-                <h2 style={{ color: "#111827", fontSize: "1.25rem", fontWeight: 600 }}>
-                  Current Plan
-                </h2>
-                {isCanceled && (
-                  <span
-                    style={{
-                      backgroundColor: "#fef2f2",
-                      borderRadius: "0.375rem",
-                      color: "#991b1b",
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                      padding: "0.25rem 0.75rem",
-                    }}
-                  >
-                    Canceling
-                  </span>
-                )}
-              </div>
-              <div style={{ marginBottom: "0.5rem" }}>
-                <span style={{ color: "#111827", fontSize: "1.5rem", fontWeight: 700 }}>
-                  {subscription.pricePerPeriod}
-                </span>
-                <span style={{ color: "#6b7280", marginLeft: "0.5rem" }}>
-                  /{subscription.billingInterval === "month" ? "month" : "year"}
-                </span>
-              </div>
-              {currentPeriodEnd && (
-                <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-                  {isCanceled ? "Access until" : "Next billing"} {currentPeriodEnd.toLocaleDateString()}
-                </p>
-              )}
-            </div>
-
-            <div style={{ borderTop: "1px solid #e5e7eb", paddingTop: "1.5rem" }}>
-              <h3 style={{ color: "#111827", fontSize: "1rem", fontWeight: 600, marginBottom: "1rem" }}>
-                Change Billing Interval
-              </h3>
-              <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1rem" }}>
-                <button
-                  onClick={() => handleUpdateBillingInterval("month")}
-                  disabled={updating || subscription.billingInterval === "month"}
-                  style={{
-                    backgroundColor: subscription.billingInterval === "month" ? "#e5e7eb" : "#ffffff",
-                    border: `2px solid ${subscription.billingInterval === "month" ? "#111827" : "#e5e7eb"}`,
-                    borderRadius: "0.5rem",
-                    color: "#111827",
-                    cursor: updating || subscription.billingInterval === "month" ? "not-allowed" : "pointer",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                    opacity: updating ? 0.6 : 1,
-                    padding: "0.75rem 1.25rem",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  Monthly ($19/month)
-                </button>
-                <button
-                  onClick={() => handleUpdateBillingInterval("year")}
-                  disabled={updating || subscription.billingInterval === "year"}
-                  style={{
-                    backgroundColor: subscription.billingInterval === "year" ? "#e5e7eb" : "#ffffff",
-                    border: `2px solid ${subscription.billingInterval === "year" ? "#111827" : "#e5e7eb"}`,
-                    borderRadius: "0.5rem",
-                    color: "#111827",
-                    cursor: updating || subscription.billingInterval === "year" ? "not-allowed" : "pointer",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                    opacity: updating ? 0.6 : 1,
-                    padding: "0.75rem 1.25rem",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  Yearly ($190/year)
-                </button>
-              </div>
-              {updating && (
-                <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-                  Updating subscription...
-                </p>
-              )}
-            </div>
-
-            <div style={{ borderTop: "1px solid #e5e7eb", marginTop: "1.5rem", paddingTop: "1.5rem" }}>
-              <h3 style={{ color: "#111827", fontSize: "1rem", fontWeight: 600, marginBottom: "0.75rem" }}>
-                Payment & Billing
-              </h3>
-              <p style={{ color: "#6b7280", fontSize: "0.875rem", marginBottom: "1rem" }}>
-                {isCanceled 
-                  ? "Customer portal is not available for canceled subscriptions. You can view your invoices and payment history below."
-                  : "Update payment method, view invoices, and update billing address"}
-              </p>
-              <button
-                onClick={handleOpenPortal}
-                disabled={isCanceled}
-                style={{
-                  backgroundColor: isCanceled ? "#f3f4f6" : "#ffffff",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.5rem",
-                  color: isCanceled ? "#9ca3af" : "#111827",
-                  cursor: isCanceled ? "not-allowed" : "pointer",
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  marginBottom: "0.75rem",
-                  padding: "0.75rem 1.25rem",
-                  width: "100%",
-                  opacity: isCanceled ? 0.6 : 1,
-                }}
-              >
-                {isCanceled ? "Not Available (Canceled)" : "Update Payment Method"}
-              </button>
-              <button
-                onClick={handleViewInvoices}
-                disabled={loadingInvoices}
-                style={{
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.5rem",
-                  color: "#111827",
-                  cursor: loadingInvoices ? "not-allowed" : "pointer",
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  marginBottom: "0.75rem",
-                  padding: "0.75rem 1.25rem",
-                  width: "100%",
-                  opacity: loadingInvoices ? 0.6 : 1,
-                }}
-              >
-                {loadingInvoices ? "Loading..." : showInvoices ? "Hide Invoices" : "View Invoices"}
-              </button>
-              {showInvoices && invoices.length > 0 && (
-                <div style={{ marginTop: "1rem" }}>
-                  <h4 style={{ color: "#111827", fontSize: "0.875rem", fontWeight: 600, marginBottom: "0.75rem" }}>
-                    Payment History
-                  </h4>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    {invoices.map((invoice: any) => (
-                      <div
-                        key={invoice.id}
-                        style={{
-                          backgroundColor: "#f9fafb",
-                          border: "1px solid #e5e7eb",
-                          borderRadius: "0.5rem",
-                          padding: "0.75rem",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <div>
-                          <div style={{ color: "#111827", fontSize: "0.875rem", fontWeight: 600 }}>
-                            {invoice.invoiceNumber || invoice.id}
-                          </div>
-                          <div style={{ color: "#6b7280", fontSize: "0.75rem", marginTop: "0.25rem" }}>
-                            {invoice.billedAt 
-                              ? new Date(invoice.billedAt).toLocaleDateString()
-                              : invoice.createdAt 
-                              ? new Date(invoice.createdAt).toLocaleDateString()
-                              : "N/A"}
-                          </div>
-                        </div>
-                        <div style={{ textAlign: "right" }}>
-                          <div style={{ color: "#111827", fontSize: "0.875rem", fontWeight: 600 }}>
-                            {invoice.total ? `${invoice.currencyCode || "USD"} $${(invoice.total / 100).toFixed(2)}` : "N/A"}
-                          </div>
-                          <div style={{ color: "#6b7280", fontSize: "0.75rem", marginTop: "0.25rem" }}>
-                            {invoice.status || "unknown"}
-                          </div>
-                        </div>
-                        {(invoice.invoiceUrl || invoice.receiptUrl) && (
-                          <button
-                            onClick={() => window.open(invoice.invoiceUrl || invoice.receiptUrl, "_blank")}
-                            style={{
-                              backgroundColor: "#ffffff",
-                              border: "1px solid #d1d5db",
-                              borderRadius: "0.375rem",
-                              color: "#111827",
-                              cursor: "pointer",
-                              fontSize: "0.75rem",
-                              fontWeight: 600,
-                              padding: "0.375rem 0.75rem",
-                              marginLeft: "0.75rem",
-                            }}
-                          >
-                            {invoice.invoiceUrl ? "Invoice" : "Receipt"}
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {showInvoices && invoices.length === 0 && (
-                <div style={{ marginTop: "1rem", color: "#6b7280", fontSize: "0.875rem", textAlign: "center" }}>
-                  No invoices found.
-                </div>
-              )}
-              <button
-                onClick={handleCancel}
-                disabled={canceling || isCanceled}
-                style={{
-                  backgroundColor: isCanceled ? "#f3f4f6" : "#ffffff",
-                  border: "1px solid #fecaca",
-                  borderRadius: "0.5rem",
-                  color: isCanceled ? "#9ca3af" : "#991b1b",
-                  cursor: canceling || isCanceled ? "not-allowed" : "pointer",
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  opacity: canceling ? 0.6 : 1,
-                  padding: "0.75rem 1.25rem",
-                  width: "100%",
-                  marginTop: "0.75rem",
-                }}
-              >
-                {canceling ? "Canceling..." : isCanceled ? "Already Canceled" : "Cancel Subscription"}
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div style={{ textAlign: "center" }}>
-          <button
-            onClick={onSignOut}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#6b7280",
-              cursor: "pointer",
-              fontSize: "0.875rem",
-              padding: "0.5rem 1rem",
-              textDecoration: "underline",
-            }}
-          >
-            Sign out
-          </button>
-        </div>
-      </div>
-    </div>
+        </Text>
+      </Card>
+    </CenteredContainer>
   );
 }
 
@@ -1147,209 +305,199 @@ export function SubscribeScreen({
 }) {
   const { getToken } = useAuth();
   const { user } = useUser();
-  const dropInRef = useRef<HTMLDivElement>(null);
-  const [selectedPlan, setSelectedPlan] = useState<BillingInterval>(
-    () => getInitialPlanFromSearch(),
-  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [dropInReady, setDropInReady] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [checkoutData, setCheckoutData] = useState<CheckoutResponse | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [checkoutData, setCheckoutData] = useState<CheckoutResponse | null>(
+    null,
+  );
+  const [paymentProviderUnavailable, setPaymentProviderUnavailable] =
+    useState(false);
+  const [price, setPrice] = useState<string | null>(null);
+  const planFeatures = [
+    "$10 in AI credits included monthly",
+  ];
 
-  const loadCheckout = useCallback(async (billingInterval: BillingInterval) => {
-    try {
-      setError(null);
-      setLoading(true);
-      setStatusMessage("Loading checkout…");
-      setDropInReady(false);
+  const handlePlanActivate = () => {
+    if (loading) {
+      return;
+    }
+    loadCheckout("month");
+  };
 
-      trackEvent("subscription", "checkout_started", billingInterval);
+  const handlePlanKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handlePlanActivate();
+    }
+  };
 
-      const token = await getToken();
-      if (!token) {
-        throw new Error("Not authenticated");
-      }
+  const loadCheckout = useCallback(
+    async (billingInterval: BillingInterval) => {
+      try {
+        setError(null);
+        setLoading(true);
+        setStatusMessage("Loading checkout…");
 
-      const customerEmail =
-        user?.primaryEmailAddress?.emailAddress ??
-        user?.emailAddresses?.[0]?.emailAddress ??
-        undefined;
+        trackEvent("subscription", "checkout_started", billingInterval);
 
-      const apiUrl =
-        config.apiBaseUrl ||
-        (typeof window !== "undefined" ? window.location.origin : "http://localhost:8787");
-      const response = await fetch(`${apiUrl}/api/subscription/checkout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+        const token = await getToken();
+        if (!token) {
+          throw new Error("Not authenticated");
+        }
+
+        const customerEmail =
+          user?.primaryEmailAddress?.emailAddress ??
+          user?.emailAddresses?.[0]?.emailAddress ??
+          undefined;
+
+        // Create checkout
+        const data: CheckoutResponse = await createCheckout(config, token, {
           billingInterval,
           customerEmail,
-        }),
-      });
+        });
+        setCheckoutData(data);
+        // Set price from API response
+        setPrice(data.pricePerPeriod);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create checkout");
+        // Create checkout session
+        const { checkoutUrl } = await createCheckoutSession(config, token, {
+          productId: data.priceId,
+          billingInterval,
+          customerEmail: data.customerEmail,
+          customData: data.customData,
+        });
+
+        // Open checkout overlay
+        openCheckout(checkoutUrl);
+
+        trackEvent("subscription", "checkout_opened", billingInterval);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        setError(message);
+        setLoading(false);
+        setStatusMessage(null);
+        console.error("Checkout error:", err);
+
+        // Check if payment provider is unavailable
+        if (err instanceof PaymentProviderUnavailableError) {
+          setPaymentProviderUnavailable(true);
+        }
       }
+    },
+    [config, getToken, user],
+  );
 
-      const data: CheckoutResponse = await response.json();
-      setCheckoutData(data);
-
-      if (!window.Paddle) {
-        throw new Error("Paddle checkout is unavailable");
-      }
-
-      // Ensure the target element exists before opening checkout
-      const targetElement = document.querySelector<HTMLElement>(
-        `.${PADDLE_DROPIN_TARGET}`,
-      );
-      if (!targetElement) {
-        throw new Error("Paddle checkout container not found in DOM");
-      }
-
-      window.Paddle.Checkout.close?.();
-      // Open checkout with items directly (no backend client token needed)
-      window.Paddle.Checkout.open({
-        items: [
-          {
-            priceId: data.priceId,
-            quantity: 1,
-          },
-        ],
-        customer: {
-          email: data.customerEmail,
-        },
-        customData: data.customData,
-        settings: {
-          displayMode: "inline",
-          frameTarget: PADDLE_DROPIN_TARGET,
-          frameStyle: "width:100%;min-height:320px;border:0;",
-          successUrl: data.successUrl,
-          theme: "light",
-        },
-        eventCallback: (event: PaddleEvent) => {
-          console.log("🔔 Paddle event:", event.name, event.data);
-          switch (event.name) {
-            case "checkout.loaded":
-              setDropInReady(true);
-              setLoading(false);
-              setStatusMessage(null);
-              break;
-            case "checkout.customer.created":
-              trackEvent("subscription", "checkout_confirm_clicked", billingInterval);
-              break;
-            case "checkout.payment.initiated":
-              // Check if 3DS challenge is required
-              if (event.data?.requires_authentication) {
-                trackEvent("subscription", "checkout_3ds_challenge", billingInterval);
-              }
-              break;
-            case "checkout.completed":
-              console.log("✅ Checkout completed! Transaction:", event.data);
-              setStatusMessage("Payment confirmed. Finalizing your workspace…");
-              window.Paddle?.Checkout?.close?.();
-              // Redirect to success URL which will trigger polling
-              window.location.assign(data.successUrl || resolveSuccessUrl());
-              break;
-            case "checkout.closed":
-              setStatusMessage(null);
-              break;
-            case "checkout.payment_failed":
-            case "checkout.error":
-              console.error("❌ Checkout error:", event.data);
-              trackEvent("subscription", "checkout_inline_error", billingInterval);
-              setError("Payment failed. Please try again.");
-              setLoading(false);
-              break;
-            default:
-              console.log("⚠️ Unhandled Paddle event:", event.name);
-              break;
-          }
-        },
-      });
-
-      trackEvent("subscription", "checkout_opened", billingInterval);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      setError(message);
-      setLoading(false);
-      setStatusMessage(null);
-      console.error("Checkout error:", err);
-    }
-  }, [config.apiBaseUrl, getToken, user]);
-
-  // Load Paddle script and initialize on mount
+  // Load DodoPayments script and initialize on mount
   useEffect(() => {
     trackEvent("subscription", "paywall_shown");
 
-    const initPaddle = async () => {
+    const init = async () => {
       try {
-        await loadPaddleScript();
+        await loadDodoPaymentsScript();
 
-        if (!window.Paddle) {
-          throw new Error("Paddle script loaded but Paddle object not available");
-        }
+        initializeDodoPayments((event: DodoPaymentsEvent) => {
+          console.log("🔔 DodoPayments event:", event.event_type, event.data);
 
-        // Get Paddle environment from config
-        const envConfig = import.meta.env.VITE_PADDLE_ENVIRONMENT;
-        const paddleEnv: "sandbox" | "production" =
-          envConfig === "production" ? "production" : "sandbox";
+          switch (event.event_type) {
+            case "checkout.opened":
+              setLoading(false);
+              setStatusMessage(null);
+              break;
 
-        // Set sandbox/production environment (required for inline checkout)
-        window.Paddle.Environment?.set?.(paddleEnv);
-        console.log(`✓ Paddle.js loaded (${paddleEnv})`);
+            case "checkout.customer_details_submitted":
+              trackEvent("subscription", "checkout_confirm_clicked", "month");
+              break;
+
+            case "checkout.payment_page_opened":
+              trackEvent(
+                "subscription",
+                "checkout_payment_page_opened",
+                "month",
+              );
+              break;
+
+            case "checkout.redirect":
+              console.log("✅ Checkout redirecting:", event.data);
+              setStatusMessage("Payment confirmed. Finalizing your workspace…");
+              closeCheckout();
+
+              // Redirect to success URL which will trigger polling
+              const redirectUrl =
+                getRedirectUrl(event) ||
+                checkoutData?.successUrl ||
+                resolveSuccessUrl();
+
+              if (redirectUrl) {
+                window.location.assign(redirectUrl);
+              } else {
+                console.error("Invalid redirect URL:", redirectUrl);
+                setError("Invalid redirect URL. Please refresh the page.");
+              }
+              break;
+
+            case "checkout.closed":
+              setStatusMessage(null);
+              break;
+
+            case "checkout.error":
+              console.error("❌ Checkout error:", event.data);
+              trackEvent("subscription", "checkout_inline_error", "month");
+              setError(getErrorMessage(event));
+              setLoading(false);
+              break;
+
+            default:
+              console.log("⚠️ Unhandled DodoPayments event:", event.event_type);
+              break;
+          }
+        });
       } catch (err) {
-        console.error("Failed to initialize Paddle:", err);
+        console.error("Failed to initialize DodoPayments:", err);
         setError("Unable to load payment form. Please try again later.");
       }
     };
 
-    initPaddle();
-  }, []);
+    init();
+  }, [checkoutData]);
 
-  // Initialize checkout when component mounts and Paddle script loads
+  // Fetch price on mount
   useEffect(() => {
-    if (!isInitialized) {
-      const initialPlan = getInitialPlanFromSearch();
+    const fetchPrice = async () => {
+      try {
+        const token = await getToken();
+        if (!token) {
+          console.warn("No token available for price fetch");
+          return;
+        }
 
-      // Wait for both Paddle script and DOM to be ready
-      const initCheckout = async () => {
-        await loadPaddleScript();
+        const customerEmail =
+          user?.primaryEmailAddress?.emailAddress ??
+          user?.emailAddresses?.[0]?.emailAddress ??
+          undefined;
 
-        // Poll for the element to exist (max 10 attempts)
-        let attempts = 0;
-        const checkElement = () => {
-          const element = document.querySelector(`.${PADDLE_DROPIN_TARGET}`);
-          if (element) {
-            setIsInitialized(true);
-            loadCheckout(initialPlan);
-          } else if (attempts < 10) {
-            attempts++;
-            setTimeout(checkElement, 100);
-          } else {
-            setError("Unable to initialize checkout form. Please refresh the page.");
-          }
-        };
+        const data: CheckoutResponse = await createCheckout(config, token, {
+          billingInterval: "month",
+          customerEmail,
+        });
+        
+        console.log("Price fetched:", data.pricePerPeriod);
+        
+        if (data.pricePerPeriod) {
+          setPrice(data.pricePerPeriod);
+        } else {
+          console.error("Price is missing from API response:", data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch price:", err);
+        // Don't set price if fetch fails - let it remain null so price section is hidden
+      }
+    };
 
-        checkElement();
-      };
-
-      initCheckout();
+    if (user) {
+      fetchPrice();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handlePlanChange = (plan: BillingInterval) => {
-    if (plan !== selectedPlan) {
-      setSelectedPlan(plan);
-      loadCheckout(plan);
-    }
-  };
+  }, [config, getToken, user]);
 
   return (
     <div
@@ -1364,220 +512,228 @@ export function SubscribeScreen({
       }}
     >
       <div style={{ maxWidth: "64rem", width: "100%" }}>
-        <div style={{ marginBottom: "1rem", textAlign: "center" }}>
-          <h1
-            style={{
-              color: "#111827",
-              fontSize: "1.5rem",
-              fontWeight: 700,
-              marginBottom: "0.375rem",
-            }}
-          >
-            Choose Your Plan
-          </h1>
-          <p
-            style={{
-              color: "#6b7280",
-              fontSize: "0.875rem",
-              marginBottom: "0.5rem",
-            }}
-          >
-            Select a plan to start using EmbraceBoard
-          </p>
-          {user?.primaryEmailAddress && (
+        {user?.primaryEmailAddress && (
+          <div style={{ marginBottom: "1rem", textAlign: "center" }}>
             <p style={{ color: "#9ca3af", fontSize: "0.875rem" }}>
               Subscribing as{" "}
               <strong style={{ color: "#6b7280" }}>
                 {user.primaryEmailAddress.emailAddress}
               </strong>
             </p>
-          )}
-        </div>
-
-        {error && (
-          <div
-            style={{
-              backgroundColor: "#fef2f2",
-              border: "1px solid #fecaca",
-              borderRadius: "0.75rem",
-              color: "#991b1b",
-              marginBottom: "1.5rem",
-              padding: "1rem",
-              textAlign: "center",
-            }}
-          >
-            {error}
           </div>
         )}
 
+        {paymentProviderUnavailable && (
+          <Alert variant="warning">
+            <strong>Payments Temporarily Offline</strong>
+            <p style={{ margin: "0.5rem 0 0 0", fontSize: "0.875rem" }}>
+              Our payment system is currently unavailable. Your payment may have
+              succeeded, but provisioning failed. Please contact support with
+              your checkout session ID if you completed a payment.
+            </p>
+            <p style={{ margin: "0.5rem 0 0 0", fontSize: "0.875rem" }}>
+              <a
+                href="mailto:support@embraceboard.com"
+                style={{ color: "#92400e", textDecoration: "underline" }}
+              >
+                Contact Support
+              </a>
+            </p>
+          </Alert>
+        )}
+
+        {error && !paymentProviderUnavailable && (
+          <Alert variant="error">{error}</Alert>
+        )}
+
+        {/* Subscription Card CTA */}
         <div
+          role="button"
+          tabIndex={paymentProviderUnavailable ? -1 : 0}
+          onClick={paymentProviderUnavailable ? undefined : handlePlanActivate}
+          onKeyDown={paymentProviderUnavailable ? undefined : handlePlanKeyDown}
           style={{
-            display: "flex",
-            gap: "0.75rem",
-            justifyContent: "center",
-            marginBottom: "1rem",
+            backgroundColor: paymentProviderUnavailable ? "#9ca3af" : "#111827",
+            border: "1px solid #1f2937",
+            borderRadius: "0.75rem",
+            color: "#f9fafb",
+            margin: "0 auto 1.5rem",
+            cursor: paymentProviderUnavailable
+              ? "not-allowed"
+              : loading
+              ? "progress"
+              : "pointer",
+            opacity: paymentProviderUnavailable ? 0.6 : loading ? 0.85 : 1,
+            maxWidth: "28rem",
+            padding: "1.75rem",
+            transition: "transform 0.2s",
+            boxShadow: "0 25px 50px -12px rgba(30, 64, 175, 0.35)",
           }}
         >
-          {/* Monthly Plan */}
           <div
-            onClick={() => handlePlanChange("month")}
             style={{
-              backgroundColor: "#ffffff",
-              border: `2px solid ${selectedPlan === "month" ? "#111827" : "#e5e7eb"}`,
-              borderRadius: "0.75rem",
-              padding: "0.75rem 1.25rem",
-              transition: "all 0.2s",
-              cursor: "pointer",
-              opacity: loading && selectedPlan === "month" ? 0.7 : 1,
-              flex: "0 1 auto",
+              marginBottom: "1rem",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-              <div>
-                <div style={{ fontSize: "1.125rem", fontWeight: 600, color: "#111827", marginBottom: "0.25rem" }}>
-                  1 Month
-                </div>
-                <div style={{ display: "flex", alignItems: "baseline", gap: "0.25rem" }}>
-                  <span style={{ color: "#111827", fontSize: "1.5rem", fontWeight: 700 }}>
-                    $19
-                  </span>
-                  <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-                    /month
-                  </span>
-                </div>
-              </div>
-              {selectedPlan === "month" && (
-                <div
-                  style={{
-                    backgroundColor: "#10b981",
-                    borderRadius: "0.375rem",
-                    color: "#ffffff",
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    padding: "0.375rem 0.75rem",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  ✓ Selected
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Yearly Plan */}
-          <div
-            onClick={() => handlePlanChange("year")}
-            style={{
-              backgroundColor: "#ffffff",
-              border: `2px solid ${selectedPlan === "year" ? "#3b82f6" : "#e5e7eb"}`,
-              borderRadius: "0.75rem",
-              padding: "0.75rem 1.25rem",
-              position: "relative",
-              transition: "all 0.2s",
-              cursor: "pointer",
-              opacity: loading && selectedPlan === "year" ? 0.7 : 1,
-              flex: "0 1 auto",
-            }}
-          >
-            <div
+            <span
               style={{
-                backgroundColor: "#3b82f6",
-                borderRadius: "0.25rem",
-                color: "#ffffff",
-                fontSize: "0.625rem",
-                fontWeight: 600,
-                padding: "0.125rem 0.5rem",
-                position: "absolute",
-                right: "0.75rem",
-                top: "0.5rem",
+                backgroundColor: "#22c55e",
+                borderRadius: "9999px",
+                color: "#052e16",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                padding: "0.25rem 0.75rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
               }}
             >
-              SAVE 17%
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-              <div style={{ paddingTop: "0.75rem" }}>
-                <div style={{ fontSize: "1.125rem", fontWeight: 600, color: "#111827", marginBottom: "0.25rem" }}>
-                  1 Year
-                </div>
-                <div style={{ display: "flex", alignItems: "baseline", gap: "0.25rem" }}>
-                  <span style={{ color: "#111827", fontSize: "1.5rem", fontWeight: 700 }}>
-                    $190
-                  </span>
-                  <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-                    /year
-                  </span>
-                </div>
-                <div style={{ color: "#6b7280", fontSize: "0.75rem", marginTop: "0.125rem" }}>
-                  $15.83/month
-                </div>
-              </div>
-              {selectedPlan === "year" && (
-                <div
-                  style={{
-                    backgroundColor: "#3b82f6",
-                    borderRadius: "0.375rem",
-                    color: "#ffffff",
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    padding: "0.375rem 0.75rem",
-                    whiteSpace: "nowrap",
-                    marginTop: "0.75rem",
-                  }}
-                >
-                  ✓ Selected
-                </div>
-              )}
-            </div>
+              AI
+            </span>
           </div>
-        </div>
 
-        {/* Payment Form - Always Visible */}
-        <div
-          style={{
-            backgroundColor: "#ffffff",
-            border: "1px solid #e5e7eb",
-            borderRadius: "0.5rem",
-            marginBottom: "0.5rem",
-            padding: "0.75rem",
-          }}
-        >
-          <div
-            ref={dropInRef}
-            id={PADDLE_DROPIN_TARGET}
-            className={PADDLE_DROPIN_TARGET}
+          <p
             style={{
-              minHeight: "320px",
-            }}
-          />
-          {!dropInReady && (
-            <p style={{ color: "#6b7280", marginTop: "0.5rem", fontSize: "0.75rem" }}>
-              Loading secure payment form…
-            </p>
-          )}
-        </div>
-
-      {statusMessage && (
-        <p
-          style={{
-            color: "#2563eb",
-            fontSize: "0.95rem",
-            marginBottom: "1rem",
-            textAlign: "center",
-          }}
-        >
-          {statusMessage}
-        </p>
-      )}
-
-      <div style={{ textAlign: "center" }}>
-        <p
-          style={{
-            color: "#9ca3af",
-            fontSize: "0.875rem",
-            marginBottom: "1rem",
+              fontSize: "0.9375rem",
+              color: "#d1d5db",
+              lineHeight: "1.6",
+              marginBottom: "1.25rem",
+              fontWeight: 400,
             }}
           >
-            Secure checkout processed by Paddle
+            A chat with a canvas that understands your ideas.
+          </p>
+
+          <ul
+            style={{
+              listStyle: "none",
+              padding: 0,
+              margin: 0,
+              display: "grid",
+              gap: "0.65rem",
+              marginBottom: "1.5rem",
+            }}
+          >
+            {planFeatures.map((feature) => (
+              <li
+                key={feature}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.625rem",
+                  fontSize: "0.875rem",
+                  color: "#e5e7eb",
+                  lineHeight: "1.5",
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  style={{
+                    backgroundColor: "#22c55e",
+                    color: "#052e16",
+                    borderRadius: "9999px",
+                    width: "1.25rem",
+                    height: "1.25rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    flexShrink: 0,
+                  }}
+                >
+                  ✓
+                </span>
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          {price && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "baseline",
+                gap: "0.5rem",
+                marginBottom: "1.5rem",
+              }}
+            >
+              <span style={{ fontSize: "1.5rem", fontWeight: 600 }}>
+                {price}
+              </span>
+              <span style={{ fontSize: "0.875rem", color: "#9ca3af", fontWeight: 400 }}>
+                /month
+              </span>
+              <span style={{ fontSize: "0.75rem", color: "#6b7280", marginLeft: "0.25rem" }}>
+                (tax included)
+              </span>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              handlePlanActivate();
+            }}
+            disabled={loading}
+            style={{
+              backgroundColor: "#6366f1",
+              border: "none",
+              borderRadius: "0.5rem",
+              color: "#ffffff",
+              cursor: loading ? "not-allowed" : "pointer",
+              fontSize: "1rem",
+              fontWeight: 600,
+              padding: "0.85rem 1.75rem",
+              width: "100%",
+              opacity: loading ? 0.7 : 1,
+              transition: "background-color 0.2s",
+            }}
+            onMouseEnter={(event) => {
+              if (!loading) {
+                event.currentTarget.style.backgroundColor = "#4f46e5";
+              }
+            }}
+            onMouseLeave={(event) => {
+              event.currentTarget.style.backgroundColor = "#6366f1";
+            }}
+          >
+            {loading ? "Connecting to DodoPayments…" : "Upgrade now"}
+          </button>
+
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.8rem",
+              marginTop: "0.75rem",
+            }}
+          >
+            No charge is made until you confirm the secure checkout overlay.
+          </p>
+        </div>
+
+        {statusMessage && (
+          <p
+            style={{
+              color: "#2563eb",
+              fontSize: "0.95rem",
+              marginBottom: "1rem",
+              textAlign: "center",
+            }}
+          >
+            {statusMessage}
+          </p>
+        )}
+
+        <div style={{ textAlign: "center" }}>
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.875rem",
+              marginBottom: "1rem",
+            }}
+          >
+            Secure checkout processed by DodoPayments
           </p>
           <button
             type="button"
@@ -1664,7 +820,11 @@ function SessionGuard({
         const hasSubscription = hasActiveSubscription(session);
         ensurePremiumCookie(premium);
         setSessionData(session);
-        setStatus({ type: "ready", premium, hasActiveSubscription: hasSubscription });
+        setStatus({
+          type: "ready",
+          premium,
+          hasActiveSubscription: hasSubscription,
+        });
         if (hasSubscription) {
           setShowProcessing(false);
         }
@@ -1751,87 +911,44 @@ function SessionGuard({
     if (typeof window !== "undefined") {
       window.location.href = config.redirectUrl;
     }
-  }, [config.apiBaseUrl, config.redirectUrl, ensurePremiumCookie, getToken, signOut, user]);
+  }, [
+    config.apiBaseUrl,
+    config.redirectUrl,
+    ensurePremiumCookie,
+    getToken,
+    signOut,
+    user,
+  ]);
 
   if (status.type === "loading") {
-    return <Loader label="Verifying subscription…" />;
+    return <Loader label="Loading EmbraceBoard…" />;
   }
 
   if (status.type === "error") {
     return (
-      <div
-        style={{
-          alignItems: "center",
-          display: "flex",
-          height: "100vh",
-          justifyContent: "center",
-          padding: "2rem",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "#ffffff",
-            borderRadius: "1rem",
-            boxShadow: "0 1.5rem 4rem rgba(15, 23, 42, 0.15)",
-            maxWidth: "26rem",
-            padding: "2rem",
-            textAlign: "center",
-            width: "100%",
-          }}
-        >
-          <h1 style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>
-            Unable to load your workspace
-          </h1>
-          <p style={{ color: "#475467", marginBottom: "1.5rem" }}>
+      <CenteredContainer>
+        <Card maxWidth="26rem" padding="2rem">
+          <Heading level={1}>Unable to load your workspace</Heading>
+          <Text color="#475467" marginBottom="1.5rem">
             {status.message}
-          </p>
-          <div
-            style={{
-              display: "flex",
-              gap: "0.75rem",
-              justifyContent: "center",
-            }}
-          >
-            <button
-              type="button"
-              onClick={handleRetry}
-              style={{
-                backgroundColor: "#111827",
-                border: "none",
-                borderRadius: "0.75rem",
-                color: "#ffffff",
-                cursor: "pointer",
-                fontSize: "0.95rem",
-                fontWeight: 600,
-                padding: "0.65rem 1.5rem",
-              }}
-            >
-              Retry
-            </button>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              style={{
-                backgroundColor: "#ffffff",
-                border: "1px solid #d0d5dd",
-                borderRadius: "0.75rem",
-                color: "#111827",
-                cursor: "pointer",
-                fontSize: "0.95rem",
-                fontWeight: 600,
-                padding: "0.65rem 1.5rem",
-              }}
-            >
+          </Text>
+          <ButtonGroup direction="row">
+            <Button onClick={handleRetry}>Retry</Button>
+            <Button onClick={handleSignOut} variant="secondary">
               Sign out
-            </button>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </ButtonGroup>
+        </Card>
+      </CenteredContainer>
     );
   }
 
   // Check if user is returning from checkout and waiting for webhook
-  if (status.type === "ready" && !status.hasActiveSubscription && showProcessing) {
+  if (
+    status.type === "ready" &&
+    !status.hasActiveSubscription &&
+    showProcessing
+  ) {
     return (
       <SubscriptionProcessing
         config={config}
@@ -1844,9 +961,16 @@ function SessionGuard({
   // Check if user is accessing settings page
   const pathname = window.location.pathname;
   // Precise check: match /settings or /settings/* but not unrelated routes like /integrations/settings-guide
-  const isSettingsPage = pathname === "/settings" || pathname.endsWith("/settings") || /\/settings\//.test(pathname);
+  const isSettingsPage =
+    pathname === "/settings" ||
+    pathname.endsWith("/settings") ||
+    /\/settings\//.test(pathname);
 
-  if (status.type === "ready" && status.hasActiveSubscription && isSettingsPage) {
+  if (
+    status.type === "ready" &&
+    status.hasActiveSubscription &&
+    isSettingsPage
+  ) {
     return (
       <SettingsPage
         onSignOut={handleSignOut}
@@ -1868,7 +992,8 @@ function SessionGuard({
       value={{
         signOut: handleSignOut,
         getToken,
-        hasActiveSubscription: status.type === "ready" ? status.hasActiveSubscription : false,
+        hasActiveSubscription:
+          status.type === "ready" ? status.hasActiveSubscription : false,
         subscriptionStatus: sessionData?.subscription?.status,
         subscriptionTier: sessionData?.subscription?.planId ? "pro" : undefined,
       }}

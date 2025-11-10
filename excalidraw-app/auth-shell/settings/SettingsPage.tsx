@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { SettingsSidebar } from "./SettingsSidebar";
-import { BillingPage } from "./BillingPage";
 import { ManageSubscriptionPage } from "./ManageSubscriptionPage";
 import { ProfilePage } from "./ProfilePage";
 import { trackEvent } from "../../../packages/excalidraw/analytics";
@@ -22,7 +21,7 @@ interface SettingsPageProps {
   user: ClerkUser | null | undefined;
 }
 
-type SettingsView = "billing" | "manage" | "profile";
+type SettingsView = "manage" | "profile";
 
 /**
  * Extract settings page from pathname
@@ -37,9 +36,9 @@ function getSettingsPageFromPath(pathname: string): SettingsView | null {
   }
 
   const page = settingsMatch[1]; // undefined for /settings, or the page name
-  if (page === "manage") return "manage";
   if (page === "profile") return "profile";
-  return "billing"; // Default to billing for /settings or /settings/billing
+  // Treat /settings, /settings/manage, and legacy /settings/billing as manage
+  return "manage";
 }
 
 export function SettingsPage({
@@ -49,7 +48,7 @@ export function SettingsPage({
   getToken,
   user,
 }: SettingsPageProps) {
-  const [currentPage, setCurrentPage] = useState<SettingsView>("billing");
+  const [currentPage, setCurrentPage] = useState<SettingsView>("manage");
 
   // Read initial page from URL
   useEffect(() => {
@@ -75,11 +74,10 @@ export function SettingsPage({
     const pathname = window.location.pathname;
     const settingsIndex = pathname.indexOf("/settings");
     const basePath = settingsIndex > 0 ? pathname.substring(0, settingsIndex) : "";
-    const newPath = page === "billing"
-      ? `${basePath}/settings/billing`
-      : page === "manage"
-      ? `${basePath}/settings/manage`
-      : `${basePath}/settings/profile`;
+    const newPath =
+      page === "manage"
+        ? `${basePath}/settings/manage`
+        : `${basePath}/settings/profile`;
 
     window.history.pushState({}, "", newPath);
   };
@@ -117,7 +115,6 @@ export function SettingsPage({
           backgroundColor: "#1a1a1a",
         }}
       >
-        {currentPage === "billing" && <BillingPage apiBaseUrl={apiBaseUrl} getToken={getToken} />}
         {currentPage === "manage" && <ManageSubscriptionPage apiBaseUrl={apiBaseUrl} getToken={getToken} />}
         {currentPage === "profile" && (
           <ProfilePage onSignOut={onSignOut} onDeleteAccount={onDeleteAccount} user={user} />

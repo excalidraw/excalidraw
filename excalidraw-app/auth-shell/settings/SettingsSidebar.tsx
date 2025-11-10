@@ -1,6 +1,6 @@
 interface SettingsSidebarProps {
-  currentPage: "billing" | "manage" | "profile";
-  onNavigate: (page: "billing" | "manage" | "profile") => void;
+  currentPage: "manage" | "profile";
+  onNavigate: (page: "manage" | "profile") => void;
 }
 
 export function SettingsSidebar({ currentPage, onNavigate }: SettingsSidebarProps) {
@@ -58,22 +58,6 @@ export function SettingsSidebar({ currentPage, onNavigate }: SettingsSidebarProp
       <nav style={{ flex: 1, overflowY: "auto" }}>
         {/* Subscription Section */}
         <div style={sectionTitleStyle}>Subscription</div>
-        <button
-          onClick={() => onNavigate("billing")}
-          style={navItemStyle(currentPage === "billing")}
-          onMouseEnter={(e) => {
-            if (currentPage !== "billing") {
-              e.currentTarget.style.backgroundColor = "#2c2c2c";
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (currentPage !== "billing") {
-              e.currentTarget.style.backgroundColor = "transparent";
-            }
-          }}
-        >
-          Billing
-        </button>
         <button
           onClick={() => onNavigate("manage")}
           style={navItemStyle(currentPage === "manage")}
