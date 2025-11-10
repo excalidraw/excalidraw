@@ -44,7 +44,7 @@ const getTransChildren = (
         // tagStartMatch[1] = "link" and props contain "link" then it will be
         // pushed to stack.
         const name = tagStartMatch[1];
-        if (props.hasOwnProperty(name)) {
+        if (Object.prototype.hasOwnProperty.call(props, name)) {
           stack.push({
             name,
             children: [],
@@ -86,7 +86,7 @@ const getTransChildren = (
         // value will be pushed to "name"'s children so it's rendered on DOM as
         // "Hello Excalidraw"
         const name = keyMatch[1];
-        if (props.hasOwnProperty(name)) {
+        if (Object.prototype.hasOwnProperty.call(props, name)) {
           stack[stack.length - 1].children.push(props[name] as React.ReactNode);
         } else {
           console.warn(

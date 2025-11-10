@@ -1,5 +1,5 @@
-@import "open-color/open-color.scss";
-@import "../css/variables.module.scss";
+@use "open-color/open-color.scss";
+@use "../css/variables.module.scss";
 
 .excalidraw {
   .App-toolbar {
@@ -27,7 +27,7 @@
       background-color: var(--default-border-color);
       margin: 0 0.25rem;
 
-      @include isMobile {
+      @include variables.isMobile {
         margin: 0;
       }
     }

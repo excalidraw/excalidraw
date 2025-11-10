@@ -1,4 +1,4 @@
-@import "../../packages/excalidraw/css/variables.module.scss";
+@use "../../packages/excalidraw/css/variables.module.scss";
 
 .excalidraw {
   .ShareDialog {
@@ -6,7 +6,7 @@
     flex-direction: column;
     gap: 1.5rem;
 
-    @include isMobile {
+    @include variables.isMobile {
       height: calc(100vh - 5rem);
     }
 
@@ -124,7 +124,7 @@
       &__share {
         display: none !important;
 
-        @include isMobile {
+        @include variables.isMobile {
           display: flex !important;
         }
       }

@@ -1,5 +1,6 @@
-@import "./variables.module.scss";
-@import "./theme";
+@use "variables.module.scss";
+@use "theme";
+@use "open-color/open-color";
 
 :root {
   --zIndex-canvas: 1;
@@ -35,8 +36,9 @@ body.excalidraw-cursor-resize * {
 }
 
 .excalidraw {
-  --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
-    Roboto, Helvetica, Arial, sans-serif;
+  --ui-font:
+    Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto,
+    Helvetica, Arial, sans-serif;
   font-family: var(--ui-font);
 
   position: relative;
@@ -57,7 +59,7 @@ body.excalidraw-cursor-resize * {
 
   button,
   label {
-    @include buttonNoHighlight;
+    @include variables.buttonNoHighlight;
   }
 
   button {
@@ -217,7 +219,7 @@ body.excalidraw-cursor-resize * {
 
   .divider {
     width: 1px;
-    background-color: $oc-gray-2;
+    background-color: open-color.$oc-gray-2;
     margin: 1px;
   }
 
@@ -243,7 +245,7 @@ body.excalidraw-cursor-resize * {
     label,
     button,
     .zIndexButton {
-      @include outlineButtonIconStyles;
+      @include variables.outlineButtonIconStyles;
     }
   }
 
@@ -439,13 +441,19 @@ body.excalidraw-cursor-resize * {
     appearance: none;
     background-image: var(--dropdown-icon);
     background-repeat: no-repeat;
-    background-position: right 0.7rem top 50%, 0 0;
+    background-position:
+      right 0.7rem top 50%,
+      0 0;
 
     :root[dir="rtl"] & {
-      background-position: left 0.7rem top 50%, 0 0;
+      background-position:
+        left 0.7rem top 50%,
+        0 0;
     }
 
-    background-size: 0.65em auto, 100%;
+    background-size:
+      0.65em auto,
+      100%;
 
     &:focus {
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
@@ -495,8 +503,8 @@ body.excalidraw-cursor-resize * {
   }
 
   .help-icon {
-    @include outlineButtonStyles;
-    @include filledButtonOnCanvas;
+    @include variables.outlineButtonStyles;
+    @include variables.filledButtonOnCanvas;
 
     width: var(--lg-button-size);
     height: var(--lg-button-size);
@@ -529,7 +537,7 @@ body.excalidraw-cursor-resize * {
     margin-inline-start: 0.6em;
   }
 
-  @include isMobile {
+  @include variables.isMobile {
     aside {
       display: none;
     }
@@ -678,7 +686,7 @@ body.excalidraw-cursor-resize * {
   }
 
   .main-menu-trigger {
-    @include filledButtonOnCanvas;
+    @include variables.filledButtonOnCanvas;
   }
 
   .App-mobile-menu,
@@ -736,8 +744,8 @@ body.excalidraw-cursor-resize * {
     justify-content: center;
 
     padding: 40px;
-    background-color: $oc-red-1;
-    border: 3px solid $oc-red-9;
+    background-color: open-color.$oc-red-1;
+    border: 3px solid open-color.$oc-red-9;
   }
 
   .ErrorSplash-paragraph {

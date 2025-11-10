@@ -307,10 +307,10 @@ export class LinearElementEditor {
 
     const selectedPointsIndices = isElbowArrow(element)
       ? [
-          !!linearElementEditor.selectedPointsIndices?.includes(0)
+          linearElementEditor.selectedPointsIndices?.includes(0)
             ? 0
             : undefined,
-          !!linearElementEditor.selectedPointsIndices?.find((idx) => idx > 0)
+          linearElementEditor.selectedPointsIndices?.find((idx) => idx > 0)
             ? element.points.length - 1
             : undefined,
         ].filter((idx): idx is number => idx !== undefined)
@@ -604,8 +604,8 @@ export class LinearElementEditor {
               )
             : selectedPointsIndices
           : selectedPointsIndices?.includes(pointerDownState.lastClickedPoint)
-          ? [pointerDownState.lastClickedPoint]
-          : selectedPointsIndices,
+            ? [pointerDownState.lastClickedPoint]
+            : selectedPointsIndices,
       isDragging: false,
       pointerOffset: { x: 0, y: 0 },
       customLineAngle: null,
@@ -855,7 +855,7 @@ export class LinearElementEditor {
     const elementsMap = scene.getNonDeletedElementsMap();
     const elements = scene.getNonDeletedElements();
 
-    const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
+    const ret: ReturnType<(typeof LinearElementEditor)["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
       linearElementEditor: null,

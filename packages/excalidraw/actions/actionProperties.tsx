@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import { pointFrom } from "@excalidraw/math";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -298,7 +299,7 @@ const changeFontSize = (
       currentItemFontSize:
         newFontSizes.size === 1
           ? [...newFontSizes][0]
-          : fallbackValue ?? appState.currentItemFontSize,
+          : (fallbackValue ?? appState.currentItemFontSize),
     },
     captureUpdate: CaptureUpdateAction.IMMEDIATELY,
   };
@@ -330,7 +331,7 @@ export const actionChangeStrokeColor = register({
         ...appState,
         ...value,
       },
-      captureUpdate: !!value.currentItemStrokeColor
+      captureUpdate: value.currentItemStrokeColor
         ? CaptureUpdateAction.IMMEDIATELY
         : CaptureUpdateAction.EVENTUALLY,
     };
@@ -1506,8 +1507,8 @@ export const actionChangeRoundness = register({
                 hasLegacyRoundness
                   ? null
                   : element.roundness
-                  ? "round"
-                  : "sharp",
+                    ? "round"
+                    : "sharp",
               (element) =>
                 !isArrowElement(element) && element.hasOwnProperty("roundness"),
               (hasSelection) =>
@@ -1878,8 +1879,8 @@ export const actionChangeArrowType = register({
                   return element.elbowed
                     ? ARROW_TYPE.elbow
                     : element.roundness
-                    ? ARROW_TYPE.round
-                    : ARROW_TYPE.sharp;
+                      ? ARROW_TYPE.round
+                      : ARROW_TYPE.sharp;
                 }
 
                 return null;

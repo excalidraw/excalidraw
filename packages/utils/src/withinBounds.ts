@@ -197,8 +197,8 @@ export const elementsOverlappingBBox = ({
       type === "overlap"
         ? elementPartiallyOverlapsWithOrContainsBBox(element, adjustedBBox)
         : type === "inside"
-        ? isElementInsideBBox(element, adjustedBBox)
-        : isElementInsideBBox(element, adjustedBBox, true);
+          ? isElementInsideBBox(element, adjustedBBox)
+          : isElementInsideBBox(element, adjustedBBox, true);
 
     if (isOverlaping) {
       includedElementSet.add(element.id);

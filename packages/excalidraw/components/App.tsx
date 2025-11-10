@@ -799,7 +799,9 @@ class App extends React.Component<AppProps, AppState> {
     let data = null;
     try {
       data = JSON.parse(event.data);
-    } catch (e) {}
+    } catch {
+      // ignore parse errors
+    }
     if (!data) {
       return;
     }
@@ -1286,7 +1288,7 @@ class App extends React.Component<AppProps, AppState> {
                           : undefined
                       }
                       src={
-                        src?.type !== "document" ? src?.link ?? "" : undefined
+                        src?.type !== "document" ? (src?.link ?? "") : undefined
                       }
                       // https://stackoverflow.com/q/18470015
                       scrolling="no"
@@ -2526,6 +2528,7 @@ class App extends React.Component<AppProps, AppState> {
       this.excalidrawContainerRef.current;
 
     if (isTestEnv() || isDevEnv()) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
         state: {
@@ -3308,14 +3311,14 @@ class App extends React.Component<AppProps, AppState> {
       typeof opts.position === "object"
         ? opts.position.clientX
         : opts.position === "cursor"
-        ? this.lastViewportPosition.x
-        : this.state.width / 2 + this.state.offsetLeft;
+          ? this.lastViewportPosition.x
+          : this.state.width / 2 + this.state.offsetLeft;
     const clientY =
       typeof opts.position === "object"
         ? opts.position.clientY
         : opts.position === "cursor"
-        ? this.lastViewportPosition.y
-        : this.state.height / 2 + this.state.offsetTop;
+          ? this.lastViewportPosition.y
+          : this.state.height / 2 + this.state.offsetTop;
 
     const { x, y } = viewportCoordsToSceneCoords(
       { clientX, clientY },
@@ -4576,8 +4579,8 @@ class App extends React.Component<AppProps, AppState> {
                 prevState.currentItemArrowType === ARROW_TYPE.sharp
                   ? ARROW_TYPE.round
                   : prevState.currentItemArrowType === ARROW_TYPE.round
-                  ? ARROW_TYPE.elbow
-                  : ARROW_TYPE.sharp,
+                    ? ARROW_TYPE.elbow
+                    : ARROW_TYPE.sharp,
             }));
           }
           this.setActiveTool({ type: shape });
@@ -7027,7 +7030,7 @@ class App extends React.Component<AppProps, AppState> {
 
     let nextPastePrevented = false;
     const isLinux =
-      typeof window === undefined
+      typeof window === "undefined"
         ? false
         : /Linux/.test(window.navigator.platform);
 
@@ -7151,12 +7154,13 @@ class App extends React.Component<AppProps, AppState> {
       ),
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
-      originalElements: this.scene
-        .getNonDeletedElements()
-        .reduce((acc, element) => {
+      originalElements: this.scene.getNonDeletedElements().reduce(
+        (acc, element) => {
           acc.set(element.id, deepCopyElement(element));
           return acc;
-        }, new Map() as PointerDownState["originalElements"]),
+        },
+        new Map() as PointerDownState["originalElements"],
+      ),
       resize: {
         handleType: false,
         isResizing: false,
@@ -10160,60 +10164,62 @@ class App extends React.Component<AppProps, AppState> {
       this.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
-      async (resolve, reject) => {
-        try {
-          let initializedImageElement = this.getLatestInitializedImageElement(
-            placeholderImageElement,
-            fileId,
-          );
-
-          this.addMissingFiles([
-            {
-              mimeType,
-              id: fileId,
-              dataURL,
-              created: Date.now(),
-              lastRetrieved: Date.now(),
-            },
-          ]);
-
-          if (!this.imageCache.get(fileId)) {
-            this.addNewImagesToImageCache();
-
-            const { erroredFiles } = await this.updateImageCache([
-              initializedImageElement,
-            ]);
-
-            if (erroredFiles.size) {
-              throw new Error("Image cache update resulted with an error.");
-            }
-          }
-
-          const imageHTML = await this.imageCache.get(fileId)?.image;
-
-          if (
-            imageHTML &&
-            this.state.newElement?.id !== initializedImageElement.id
-          ) {
-            initializedImageElement = this.getLatestInitializedImageElement(
+      (resolve, reject) => {
+        (async () => {
+          try {
+            let initializedImageElement = this.getLatestInitializedImageElement(
               placeholderImageElement,
               fileId,
             );
 
-            const naturalDimensions = this.getImageNaturalDimensions(
-              initializedImageElement,
-              imageHTML,
-            );
+            this.addMissingFiles([
+              {
+                mimeType,
+                id: fileId,
+                dataURL,
+                created: Date.now(),
+                lastRetrieved: Date.now(),
+              },
+            ]);
 
-            // no need to create a new instance anymore, just assign the natural dimensions
-            Object.assign(initializedImageElement, naturalDimensions);
+            if (!this.imageCache.get(fileId)) {
+              this.addNewImagesToImageCache();
+
+              const { erroredFiles } = await this.updateImageCache([
+                initializedImageElement,
+              ]);
+
+              if (erroredFiles.size) {
+                throw new Error("Image cache update resulted with an error.");
+              }
+            }
+
+            const imageHTML = await this.imageCache.get(fileId)?.image;
+
+            if (
+              imageHTML &&
+              this.state.newElement?.id !== initializedImageElement.id
+            ) {
+              initializedImageElement = this.getLatestInitializedImageElement(
+                placeholderImageElement,
+                fileId,
+              );
+
+              const naturalDimensions = this.getImageNaturalDimensions(
+                initializedImageElement,
+                imageHTML,
+              );
+
+              // no need to create a new instance anymore, just assign the natural dimensions
+              Object.assign(initializedImageElement, naturalDimensions);
+            }
+
+            resolve(initializedImageElement);
+          } catch (error: any) {
+            console.error(error);
+            reject(new Error(t("errors.imageInsertError")));
           }
-
-          resolve(initializedImageElement);
-        } catch (error: any) {
-          console.error(error);
-          reject(new Error(t("errors.imageInsertError")));
-        }
+        })();
       },
     );
   };
@@ -11456,6 +11462,8 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 declare global {
   interface Window {
+    // @ts-expect-error - TypeScript 5.6+ incorrectly flags this as a type mismatch due to
+    // monorepo dual-import issues (same types imported from dist/types and source paths)
     h: {
       scene: Scene;
       elements: readonly ExcalidrawElement[];
@@ -11479,9 +11487,7 @@ export const createTestHook = () => {
           return this.app?.scene.getElementsIncludingDeleted();
         },
         set(elements: ExcalidrawElement[]) {
-          return this.app?.scene.replaceAllElements(
-            syncInvalidIndices(elements),
-          );
+          this.app?.scene.replaceAllElements(syncInvalidIndices(elements));
         },
       },
       scene: {

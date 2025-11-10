@@ -1,5 +1,5 @@
-@import "open-color/open-color";
-@import "../../css/variables.module.scss";
+@use "open-color/open-color";
+@use "../../css/variables.module.scss";
 
 .excalidraw {
   .sidebar {
@@ -68,7 +68,7 @@
     margin-left: auto;
 
     button {
-      @include outlineButtonStyles;
+      @include variables.outlineButtonStyles;
       --button-bg: transparent;
       border: 0 !important;
 

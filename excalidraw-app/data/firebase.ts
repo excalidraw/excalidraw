@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { reconcileElements } from "@excalidraw/excalidraw";
 import { MIME_TYPES } from "@excalidraw/common";
 import { decompressData } from "@excalidraw/excalidraw/data/encode";

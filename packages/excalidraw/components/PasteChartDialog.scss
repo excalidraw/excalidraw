@@ -1,8 +1,9 @@
-@import "../css/variables.module.scss";
+@use "../css/variables.module.scss";
+@use "open-color/open-color";
 
 .excalidraw {
   .PasteChartDialog {
-    @include isMobile {
+    @include variables.isMobile {
       .Island {
         display: flex;
         flex-direction: column;
@@ -13,7 +14,7 @@
       align-items: center;
       justify-content: space-around;
       flex-wrap: wrap;
-      @include isMobile {
+      @include variables.isMobile {
         flex-direction: column;
         justify-content: center;
       }
@@ -25,7 +26,7 @@
       height: 128px;
       border-radius: 2px;
       padding: 1px;
-      border: 1px solid $oc-gray-4;
+      border: 1px solid open-color.$oc-gray-4;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -39,7 +40,7 @@
       }
       &:hover {
         padding: 0;
-        border: 2px solid $oc-blue-5;
+        border: 2px solid open-color.$oc-blue-5;
       }
     }
   }

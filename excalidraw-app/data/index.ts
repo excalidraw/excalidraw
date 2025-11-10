@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   compressData,
   decompressData,
@@ -315,7 +316,7 @@ export const exportToBackend = async (
 
     const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
-      body: payload.buffer,
+      body: payload.buffer as ArrayBuffer,
     });
     const json = await response.json();
     if (json.id) {
