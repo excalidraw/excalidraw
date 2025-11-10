@@ -45,7 +45,7 @@
     "typescript": "5.9.3",
     "typescript-eslint": "^8.46.3",
     "vite": "5.0.12",
-    "vite-plugin-checker": "0.7.2",
+    "vite-plugin-checker": "0.11.0",
     "vite-plugin-ejs": "1.7.0",
     "vite-plugin-pwa": "0.21.1",
     "vite-plugin-svgr": "4.2.0",
