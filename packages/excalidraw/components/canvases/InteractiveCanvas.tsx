@@ -9,6 +9,14 @@ import {
 import { AnimationController } from "@excalidraw/excalidraw/renderer/animation";
 
 import type {
+  InteractiveCanvasRenderConfig,
+  InteractiveSceneRenderAnimationState,
+  InteractiveSceneRenderConfig,
+  RenderableElementsMap,
+  RenderInteractiveSceneCallback,
+} from "@excalidraw/excalidraw/scene/types";
+
+import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
@@ -16,13 +24,6 @@ import type {
 import { t } from "../../i18n";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
-import type {
-  InteractiveCanvasRenderConfig,
-  InteractiveSceneRenderAnimationState,
-  InteractiveSceneRenderConfig,
-  RenderableElementsMap,
-  RenderInteractiveSceneCallback,
-} from "../../scene/types";
 import type {
   AppClassProperties,
   AppState,
@@ -148,7 +149,6 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       allElementsMap: props.allElementsMap,
       scale: window.devicePixelRatio,
       appState: props.appState,
-      editorInterface: props.editorInterface,
       renderConfig: {
         remotePointerViewportCoords,
         remotePointerButton,
@@ -160,6 +160,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         // NOTE not memoized on so we don't rerender on cursor move
         lastViewportPosition: props.app.lastViewportPosition,
       },
+      editorInterface: props.editorInterface,
       callback: props.renderInteractiveSceneCallback,
       animationState: {
         bindingHighlight: undefined,
@@ -171,14 +172,11 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       AnimationController.start<InteractiveSceneRenderAnimationState>(
         INTERACTIVE_SCENE_ANIMATION_KEY,
         ({ deltaTime, state }) => {
-          const nextAnimationState = renderInteractiveScene(
-            {
-              ...rendererParams.current!,
-              deltaTime,
-              animationState: state,
-            },
-            false,
-          ).animationState;
+          const nextAnimationState = renderInteractiveScene({
+            ...rendererParams.current!,
+            deltaTime,
+            animationState: state,
+          }).animationState;
 
           if (nextAnimationState) {
             for (const key in nextAnimationState) {
