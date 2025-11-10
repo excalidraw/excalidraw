@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import { isMobileOrTablet, MQ_MIN_WIDTH_DESKTOP } from "@excalidraw/common";
+import { MQ_MIN_WIDTH_DESKTOP, type EditorInterface } from "@excalidraw/common";
 
 import { t } from "../../i18n";
 import { Button } from "../Button";
@@ -12,15 +12,18 @@ import "./LiveCollaborationTrigger.scss";
 const LiveCollaborationTrigger = ({
   isCollaborating,
   onSelect,
+  editorInterface,
   ...rest
 }: {
   isCollaborating: boolean;
   onSelect: () => void;
+  editorInterface?: EditorInterface;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   const appState = useUIAppState();
 
   const showIconOnly =
-    isMobileOrTablet() || appState.width < MQ_MIN_WIDTH_DESKTOP;
+    editorInterface?.formFactor !== "desktop" ||
+    appState.width < MQ_MIN_WIDTH_DESKTOP;
 
   return (
     <Button
