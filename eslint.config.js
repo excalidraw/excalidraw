@@ -77,15 +77,6 @@ export default [
           "ts-check": false,
         },
       ],
-      "@typescript-eslint/ban-types": [
-        "error",
-        {
-          types: {
-            "{}": false,
-          },
-          extendDefaults: true,
-        },
-      ],
       "@typescript-eslint/no-restricted-imports": [
         "error",
         {
