@@ -410,7 +410,9 @@ export class LinearElementEditor {
       initialState: {
         ...linearElementEditor.initialState,
         altFocusPoint:
-          !linearElementEditor.initialState.altFocusPoint && startBindingElement
+          !linearElementEditor.initialState.altFocusPoint &&
+          startBindingElement &&
+          updates?.suggestedBinding?.id !== startBindingElement.id
             ? projectFixedPointOntoDiagonal(
                 element,
                 pointFrom<GlobalPoint>(element.x, element.y),
@@ -610,6 +612,22 @@ export class LinearElementEditor {
       (elementsMap.get(
         element.startBinding.elementId,
       ) as ExcalidrawBindableElement | null);
+    const endBindingElement =
+      isBindingElement(element) &&
+      element.endBinding &&
+      (elementsMap.get(
+        element.endBinding.elementId,
+      ) as ExcalidrawBindableElement | null);
+    const altFocusPointBindableElement =
+      endIsSelected && // The "other" end (i.e. "end") is dragged
+      startBindingElement &&
+      updates?.suggestedBinding?.id !== startBindingElement.id // The end point is not hovering the start bindable + it's binding gap
+        ? startBindingElement
+        : startIsSelected && // The "other" end (i.e. "start") is dragged
+          endBindingElement &&
+          updates?.suggestedBinding?.id !== endBindingElement.id // The start point is not hovering the end bindable + it's binding gap
+        ? endBindingElement
+        : null;
 
     const newLinearElementEditor = {
       ...linearElementEditor,
@@ -618,11 +636,13 @@ export class LinearElementEditor {
         ...linearElementEditor.initialState,
         lastClickedPoint: newLastClickedPoint,
         altFocusPoint:
-          !linearElementEditor.initialState.altFocusPoint && startBindingElement
+          !linearElementEditor.initialState.altFocusPoint && // We only set it once per arrow drag
+          isBindingElement(element) &&
+          altFocusPointBindableElement
             ? projectFixedPointOntoDiagonal(
                 element,
                 pointFrom<GlobalPoint>(element.x, element.y),
-                startBindingElement,
+                altFocusPointBindableElement,
                 "start",
                 elementsMap,
               )
