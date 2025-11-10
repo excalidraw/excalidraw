@@ -81,7 +81,7 @@ export const base64urlToString = (str: string) => {
 };
 
 // -----------------------------------------------------------------------------
-// text encoding
+// tEXT encoding/decoding
 // -----------------------------------------------------------------------------
 
 type EncodedData = {
@@ -141,6 +141,113 @@ export const decode = (data: EncodedData): string => {
   }
 
   return decoded;
+};
+
+// -----------------------------------------------------------------------------
+// iTXt encoding/decoding
+// -----------------------------------------------------------------------------
+
+// Based on PNG spec: http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html
+// and iTXt chunk structure: https://www.w3.org/TR/PNG/#11iTXt
+
+export const encodeITXtChunk = ({
+  keyword,
+  text,
+  compressionFlag = true,
+  compressionMethod = 0,
+  languageTag = "",
+  translatedKeyword = "",
+}: {
+  keyword: string;
+  text: string;
+  compressionFlag?: boolean;
+  compressionMethod?: number;
+  languageTag?: string;
+  translatedKeyword?: string;
+}): Uint8Array => {
+  const keywordBytes = new TextEncoder().encode(keyword);
+  const languageTagBytes = new TextEncoder().encode(languageTag);
+  const translatedKeywordBytes = new TextEncoder().encode(translatedKeyword);
+  const textBytes = new TextEncoder().encode(text);
+
+  const totalSize =
+    keywordBytes.length +
+    1 + // null separator after keyword
+    1 + // compression flag
+    1 + // compression method
+    languageTagBytes.length +
+    1 + // null separator after language tag
+    translatedKeywordBytes.length +
+    1 + // null separator after translated keyword
+    (compressionFlag ? deflate(textBytes).length : textBytes.length);
+
+  const output = new Uint8Array(totalSize);
+  let offset = 0;
+
+  output.set(keywordBytes, offset);
+  offset += keywordBytes.length;
+  output[offset++] = 0; // null separator
+
+  output[offset++] = compressionFlag ? 1 : 0;
+
+  output[offset++] = compressionMethod;
+
+  output.set(languageTagBytes, offset);
+  offset += languageTagBytes.length;
+  output[offset++] = 0; // null separator
+
+  output.set(translatedKeywordBytes, offset);
+  offset += translatedKeywordBytes.length;
+  output[offset++] = 0; // null separator
+
+  const finalTextBytes = compressionFlag ? deflate(textBytes) : textBytes;
+  output.set(finalTextBytes, offset);
+
+  return output;
+};
+
+export const decodeITXtChunk = (data: Uint8Array): {
+  keyword: string;
+  text: string;
+  compressed: boolean;
+  compressedMethod: number;
+  language: string;
+  translated: string;
+} => {
+  let offset = 0;
+
+  const keywordEnd = data.indexOf(0, offset);
+  if (keywordEnd === -1) throw new Error("Invalid iTXt chunk: missing keyword");
+  const keyword = new TextDecoder().decode(data.slice(offset, keywordEnd));
+  offset = keywordEnd + 1;
+
+  const compressionFlag = data[offset++] === 1;
+
+  const compressionMethod = data[offset++];
+
+  const languageEnd = data.indexOf(0, offset);
+  if (languageEnd === -1) throw new Error("Invalid iTXt chunk: missing language tag");
+  const language = new TextDecoder().decode(data.slice(offset, languageEnd));
+  offset = languageEnd + 1;
+
+  const translatedEnd = data.indexOf(0, offset);
+  if (translatedEnd === -1) throw new Error("Invalid iTXt chunk: missing translated keyword");
+  const translated = new TextDecoder().decode(data.slice(offset, translatedEnd));
+  offset = translatedEnd + 1;
+
+  const textBytes = data.slice(offset);
+  const text = compressionFlag
+    ? new TextDecoder().decode(inflate(textBytes))
+    : new TextDecoder().decode(textBytes);
+
+  return {
+    keyword,
+    text,
+    compressed: compressionFlag,
+    compressedMethod: compressionMethod,
+    language,
+    translated,
+  };
 };
 
 // -----------------------------------------------------------------------------
