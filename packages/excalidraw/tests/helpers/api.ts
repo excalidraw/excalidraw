@@ -296,7 +296,7 @@ export class API {
           ...base,
         });
         break;
-      case "text":
+      case "text": {
         const fontSize = rest.fontSize ?? appState.currentItemFontSize;
         const fontFamily = rest.fontFamily ?? appState.currentItemFontFamily;
         element = newTextElement({
@@ -311,6 +311,7 @@ export class API {
         element.width = width;
         element.height = height;
         break;
+      }
       case "freedraw":
         element = newFreeDrawElement({
           type: type as "freedraw",

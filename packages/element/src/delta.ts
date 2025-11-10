@@ -801,7 +801,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
 
             break;
           }
-          case "editingGroupId":
+          case "editingGroupId": {
             const editingGroupId = nextAppState[key];
 
             if (!editingGroupId) {
@@ -816,7 +816,8 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
 
             break;
-          case "selectedLinearElement":
+          }
+          case "selectedLinearElement": {
             const nextLinearElement = nextAppState[key];
 
             if (!nextLinearElement) {
@@ -835,7 +836,8 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             }
 
             break;
-          case "lockedMultiSelections":
+          }
+          case "lockedMultiSelections": {
             const prevLockedUnits = prevAppState[key] || {};
             const nextLockedUnits = nextAppState[key] || {};
 
@@ -846,7 +848,8 @@ export class AppStateDelta implements DeltaContainer<AppState> {
               visibleDifferenceFlag.value = true;
             }
             break;
-          case "activeLockedId":
+          }
+          case "activeLockedId": {
             const prevHitLockedId = prevAppState[key] || null;
             const nextHitLockedId = nextAppState[key] || null;
 
@@ -857,6 +860,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
               visibleDifferenceFlag.value = true;
             }
             break;
+          }
           default:
             assertNever(
               key,
