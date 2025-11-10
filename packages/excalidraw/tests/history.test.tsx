@@ -1593,7 +1593,7 @@ describe("history", () => {
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          fixedPoint: expect.arrayContaining([0, 0.5001]),
+          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
           mode: "orbit",
         });
         expect(rect1.boundElements).toStrictEqual([
@@ -1611,12 +1611,12 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([1, 0.5001]),
+          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          fixedPoint: expect.arrayContaining([0, 0.5001]),
+          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
           mode: "orbit",
         });
         expect(h.elements).toEqual([
@@ -1634,12 +1634,12 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([1, 0.5001]),
+          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          fixedPoint: expect.arrayContaining([0, 0.5001]),
+          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
           mode: "orbit",
         });
         expect(h.elements).toEqual([
@@ -1665,12 +1665,12 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([1, 0.5001]),
+          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          fixedPoint: expect.arrayContaining([0, 0.5001]),
+          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
           mode: "orbit",
         });
         expect(h.elements).toEqual([
@@ -1688,12 +1688,12 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([1, 0.5001]),
+          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          fixedPoint: expect.arrayContaining([0, 0.5001]),
+          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
           mode: "orbit",
         });
         expect(h.elements).toEqual([
@@ -4764,13 +4764,13 @@ describe("history", () => {
                 id: arrowId,
                 startBinding: expect.objectContaining({
                   elementId: rect1.id,
-                  fixedPoint: [1, 0.6],
+                  fixedPoint: [0.6363636363636364, 0.6363636363636364],
                   mode: "orbit",
                 }),
                 // rebound with previous rectangle
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-                  fixedPoint: [0, 0.6],
+                  fixedPoint: [0.4106696643494561, 0.5893303356505437],
                   mode: "orbit",
                 }),
               }),
@@ -5047,11 +5047,11 @@ describe("history", () => {
               id: arrowId,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                fixedPoint: expect.arrayContaining([1, 0.5001]),
+                fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                fixedPoint: expect.arrayContaining([0, 0.5001]),
+                fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
               }),
               isDeleted: true,
             }),
