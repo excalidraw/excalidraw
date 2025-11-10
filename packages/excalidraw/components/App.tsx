@@ -8865,7 +8865,7 @@ class App extends React.Component<AppProps, AppState> {
               }));
 
               this.scene.replaceAllElements(elementsWithIndices);
-              elementsWithIndices.forEach((element) => {
+              selectedElements.forEach((element) => {
                 if (
                   isBindableElement(element) &&
                   element.boundElements?.some((other) => other.type === "arrow")
