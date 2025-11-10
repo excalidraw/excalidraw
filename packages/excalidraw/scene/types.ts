@@ -87,7 +87,12 @@ export type StaticSceneRenderConfig = {
   renderConfig: StaticCanvasRenderConfig;
 };
 
+export type InteractiveSceneRenderAnimationState = {
+  bindingHighlight: { runtime: number } | undefined;
+};
+
 export type InteractiveSceneRenderConfig = {
+  app: AppClassProperties;
   canvas: HTMLCanvasElement | null;
   elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
@@ -98,6 +103,8 @@ export type InteractiveSceneRenderConfig = {
   renderConfig: InteractiveCanvasRenderConfig;
   editorInterface: EditorInterface;
   callback: (data: RenderInteractiveSceneCallback) => void;
+  animationState?: InteractiveSceneRenderAnimationState;
+  deltaTime: number;
 };
 
 export type NewElementSceneRenderConfig = {
