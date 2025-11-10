@@ -1,6 +1,7 @@
 import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "@excalidraw/common";
 
 import {
+  isArrowElement,
   isFlowchartNodeElement,
   isImageElement,
   isLinearElement,
@@ -42,6 +43,16 @@ const getHints = ({
 }: HintViewerProps): null | string | string[] => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
+
+  if (
+    appState.selectedLinearElement?.isDragging ||
+    isArrowElement(appState.newElement)
+  ) {
+    return t("hints.arrowBindModifiers", {
+      shortcut_1: getTaggedShortcutKey("Alt"),
+      shortcut_2: getTaggedShortcutKey("CtrlOrCmd"),
+    });
+  }
 
   if (
     appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&

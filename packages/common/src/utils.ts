@@ -1,10 +1,6 @@
 import { average } from "@excalidraw/math";
 
-import type {
-  ExcalidrawBindableElement,
-  FontFamilyValues,
-  FontString,
-} from "@excalidraw/element/types";
+import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
 
 import type {
   ActiveTool,
@@ -557,9 +553,6 @@ export const isTransparent = (color: string) => {
     color === COLOR_PALETTE.transparent
   );
 };
-
-export const isBindingFallthroughEnabled = (el: ExcalidrawBindableElement) =>
-  el.fillStyle !== "solid" || isTransparent(el.backgroundColor);
 
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined]
@@ -1269,4 +1262,48 @@ export const reduceToCommonValue = <T, R = T>(
   }
 
   return commonValue;
+};
+
+type FEATURE_FLAGS = {
+  COMPLEX_BINDINGS: boolean;
+};
+
+const FEATURE_FLAGS_STORAGE_KEY = "excalidraw-feature-flags";
+const DEFAULT_FEATURE_FLAGS: FEATURE_FLAGS = {
+  COMPLEX_BINDINGS: false,
+};
+let featureFlags: FEATURE_FLAGS | null = null;
+
+export const getFeatureFlag = <F extends keyof FEATURE_FLAGS>(
+  flag: F,
+): FEATURE_FLAGS[F] => {
+  if (!featureFlags) {
+    try {
+      const serializedFlags = localStorage.getItem(FEATURE_FLAGS_STORAGE_KEY);
+      if (serializedFlags) {
+        const flags = JSON.parse(serializedFlags);
+        featureFlags = flags ?? DEFAULT_FEATURE_FLAGS;
+      }
+    } catch {}
+  }
+
+  return (featureFlags || DEFAULT_FEATURE_FLAGS)[flag];
+};
+
+export const setFeatureFlag = <F extends keyof FEATURE_FLAGS>(
+  flag: F,
+  value: FEATURE_FLAGS[F],
+) => {
+  try {
+    featureFlags = {
+      ...(featureFlags || DEFAULT_FEATURE_FLAGS),
+      [flag]: value,
+    };
+    localStorage.setItem(
+      FEATURE_FLAGS_STORAGE_KEY,
+      JSON.stringify(featureFlags),
+    );
+  } catch (e) {
+    console.error("unable to set feature flag", e);
+  }
 };

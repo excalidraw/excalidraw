@@ -1,6 +1,8 @@
 import {
+  debugDrawLine,
   DEFAULT_ADAPTIVE_RADIUS,
   DEFAULT_PROPORTIONAL_RADIUS,
+  invariant,
   LINE_CONFIRM_THRESHOLD,
   ROUNDNESS,
 } from "@excalidraw/common";
@@ -10,10 +12,15 @@ import {
   curveCatmullRomCubicApproxPoints,
   curveOffsetPoints,
   lineSegment,
+  lineSegmentIntersectionPoints,
   pointDistance,
   pointFrom,
   pointFromArray,
+  pointFromVector,
+  pointRotateRads,
   rectangle,
+  vectorFromPoint,
+  vectorScale,
   type GlobalPoint,
 } from "@excalidraw/math";
 
@@ -21,11 +28,17 @@ import type { Curve, LineSegment, LocalPoint } from "@excalidraw/math";
 
 import type { NormalizedZoomValue, Zoom } from "@excalidraw/excalidraw/types";
 
-import { getDiamondPoints } from "./bounds";
+import { elementCenterPoint, getDiamondPoints } from "./bounds";
 
 import { generateLinearCollisionShape } from "./shape";
 
+import { isPointInElement } from "./collision";
+import { LinearElementEditor } from "./linearElementEditor";
+import { isRectangularElement } from "./typeChecks";
+
 import type {
+  ElementsMap,
+  ExcalidrawArrowElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
@@ -400,20 +413,10 @@ export function deconstructDiamondElement(
     ), // TOP
   ];
 
-  const corners =
-    offset > 0
-      ? baseCorners.map(
-          (corner) =>
-            curveCatmullRomCubicApproxPoints(
-              curveOffsetPoints(corner, offset),
-            )!,
-        )
-      : [
-          [baseCorners[0]],
-          [baseCorners[1]],
-          [baseCorners[2]],
-          [baseCorners[3]],
-        ];
+  const corners = baseCorners.map(
+    (corner) =>
+      curveCatmullRomCubicApproxPoints(curveOffsetPoints(corner, offset))!,
+  );
 
   const sides = [
     lineSegment<GlobalPoint>(
@@ -480,4 +483,125 @@ export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   }
 
   return 0;
+};
+
+const getDiagonalsForBindableElement = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+) => {
+  const center = elementCenterPoint(element, elementsMap);
+  const diagonalOne = isRectangularElement(element)
+    ? lineSegment<GlobalPoint>(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(element.x, element.y),
+          center,
+          element.angle,
+        ),
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            element.x + element.width,
+            element.y + element.height,
+          ),
+          center,
+          element.angle,
+        ),
+      )
+    : lineSegment<GlobalPoint>(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
+          center,
+          element.angle,
+        ),
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            element.x + element.width / 2,
+            element.y + element.height,
+          ),
+          center,
+          element.angle,
+        ),
+      );
+  const diagonalTwo = isRectangularElement(element)
+    ? lineSegment<GlobalPoint>(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(element.x + element.width, element.y),
+          center,
+          element.angle,
+        ),
+        pointRotateRads(
+          pointFrom<GlobalPoint>(element.x, element.y + element.height),
+          center,
+          element.angle,
+        ),
+      )
+    : lineSegment<GlobalPoint>(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
+          center,
+          element.angle,
+        ),
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            element.x + element.width,
+            element.y + element.height / 2,
+          ),
+          center,
+          element.angle,
+        ),
+      );
+
+  return [diagonalOne, diagonalTwo];
+};
+
+export const projectFixedPointOntoDiagonal = (
+  arrow: ExcalidrawArrowElement,
+  point: GlobalPoint,
+  element: ExcalidrawElement,
+  startOrEnd: "start" | "end",
+  elementsMap: ElementsMap,
+): GlobalPoint | null => {
+  invariant(arrow.points.length >= 2, "Arrow must have at least two points");
+  if (arrow.width < 3 && arrow.height < 3) {
+    return null;
+  }
+
+  const [diagonalOne, diagonalTwo] = getDiagonalsForBindableElement(
+    element,
+    elementsMap,
+  );
+
+  const a = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startOrEnd === "start" ? 1 : arrow.points.length - 2,
+    elementsMap,
+  );
+  const b = pointFromVector<GlobalPoint>(
+    vectorScale(
+      vectorFromPoint(point, a),
+      2 * pointDistance(a, point) +
+        Math.max(
+          pointDistance(diagonalOne[0], diagonalOne[1]),
+          pointDistance(diagonalTwo[0], diagonalTwo[1]),
+        ),
+    ),
+    a,
+  );
+  const intersector = lineSegment<GlobalPoint>(point, b);
+  const p1 = lineSegmentIntersectionPoints(diagonalOne, intersector);
+  const p2 = lineSegmentIntersectionPoints(diagonalTwo, intersector);
+  const d1 = p1 && pointDistance(a, p1);
+  const d2 = p2 && pointDistance(a, p2);
+
+  let p = null;
+  if (d1 != null && d2 != null) {
+    p = d1 < d2 ? p1 : p2;
+  } else {
+    p = p1 || p2 || null;
+  }
+
+  debugDrawLine(diagonalOne, { color: "purple", permanent: false });
+  debugDrawLine(diagonalTwo, { color: "purple", permanent: false });
+  debugDrawLine(intersector, { color: "orange", permanent: false });
+
+  return p && isPointInElement(p, element, elementsMap) ? p : null;
 };
