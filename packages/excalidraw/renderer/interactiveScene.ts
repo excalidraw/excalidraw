@@ -18,10 +18,10 @@ import {
 import { FIXED_BINDING_DISTANCE, maxBindingGap } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
 import {
-  getOmitSidesForDevice,
+  getOmitSidesForEditorInterface,
   getTransformHandles,
   getTransformHandlesFromCoords,
-  shouldShowBoundingBox,
+  hasBoundingBox,
 } from "@excalidraw/element";
 import {
   isElbowArrow,
@@ -733,7 +733,7 @@ const _renderInteractiveScene = ({
   scale,
   appState,
   renderConfig,
-  device,
+  editorInterface,
   animationState,
   deltaTime,
 }: InteractiveSceneRenderConfig): {
@@ -900,7 +900,11 @@ const _renderInteractiveScene = ({
 
   // Paint selected elements
   if (!appState.multiElement && !appState.selectedLinearElement?.isEditing) {
-    const showBoundingBox = shouldShowBoundingBox(selectedElements, appState);
+    const showBoundingBox = hasBoundingBox(
+      selectedElements,
+      appState,
+      editorInterface,
+    );
 
     const isSingleLinearElementSelected =
       selectedElements.length === 1 && isLinearElement(selectedElements[0]);
@@ -1032,7 +1036,7 @@ const _renderInteractiveScene = ({
         appState.zoom,
         elementsMap,
         "mouse", // when we render we don't know which pointer type so use mouse,
-        getOmitSidesForDevice(device),
+        getOmitSidesForEditorInterface(editorInterface),
       );
       if (
         !appState.viewModeEnabled &&
@@ -1096,8 +1100,11 @@ const _renderInteractiveScene = ({
         appState.zoom,
         "mouse",
         isFrameSelected
-          ? { ...getOmitSidesForDevice(device), rotation: true }
-          : getOmitSidesForDevice(device),
+          ? {
+              ...getOmitSidesForEditorInterface(editorInterface),
+              rotation: true,
+            }
+          : getOmitSidesForEditorInterface(editorInterface),
       );
       if (selectedElements.some((element) => !element.locked)) {
         renderTransformHandles(

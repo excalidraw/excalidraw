@@ -7,11 +7,12 @@ import {
   EVENT,
   KEYS,
   capitalizeString,
-  getShortcutKey,
   isWritableElement,
 } from "@excalidraw/common";
 
 import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionToggleShapeSwitch";
+
+import { getShortcutKey } from "@excalidraw/excalidraw/shortcut";
 
 import type { MarkRequired } from "@excalidraw/common/utility-types";
 
@@ -902,7 +903,7 @@ function CommandPaletteInner({
         ref={inputRef}
       />
 
-      {!app.device.viewport.isMobile && (
+      {app.editorInterface.formFactor !== "phone" && (
         <div className="shortcuts-wrapper">
           <CommandShortcutHint shortcut="↑↓">
             {t("commandPalette.shortcuts.select")}
@@ -936,7 +937,7 @@ function CommandPaletteInner({
               onClick={(event) => executeCommand(lastUsed, event)}
               disabled={!isCommandAvailable(lastUsed)}
               onMouseMove={() => setCurrentCommand(lastUsed)}
-              showShortcut={!app.device.viewport.isMobile}
+              showShortcut={app.editorInterface.formFactor !== "phone"}
               appState={uiAppState}
             />
           </div>
@@ -954,7 +955,7 @@ function CommandPaletteInner({
                     isSelected={command.label === currentCommand?.label}
                     onClick={(event) => executeCommand(command, event)}
                     onMouseMove={() => setCurrentCommand(command)}
-                    showShortcut={!app.device.viewport.isMobile}
+                    showShortcut={app.editorInterface.formFactor !== "phone"}
                     appState={uiAppState}
                     size={category === "Library" ? "large" : "small"}
                   />
