@@ -170,14 +170,11 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       AnimationController.start<InteractiveSceneRenderAnimationState>(
         INTERACTIVE_SCENE_ANIMATION_KEY,
         ({ deltaTime, state }) => {
-          const nextAnimationState = renderInteractiveScene(
-            {
-              ...rendererParams.current!,
-              deltaTime,
-              animationState: state,
-            },
-            false,
-          ).animationState;
+          const nextAnimationState = renderInteractiveScene({
+            ...rendererParams.current!,
+            deltaTime,
+            animationState: state,
+          }).animationState;
 
           if (nextAnimationState) {
             for (const key in nextAnimationState) {

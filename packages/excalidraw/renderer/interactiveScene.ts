@@ -13,7 +13,6 @@ import {
   FRAME_STYLE,
   invariant,
   THEME,
-  throttleRAF,
 } from "@excalidraw/common";
 
 import { FIXED_BINDING_DISTANCE, maxBindingGap } from "@excalidraw/element";
@@ -1204,31 +1203,16 @@ const _renderInteractiveScene = ({
   };
 };
 
-/** throttled to animation framerate */
-export const renderInteractiveSceneThrottled = throttleRAF(
-  (config: InteractiveSceneRenderConfig) => {
-    const ret = _renderInteractiveScene(config);
-    config.callback?.(ret);
-  },
-  { trailing: true },
-);
-
 /**
  * Interactive scene is the ui-canvas where we render bounding boxes, selections
  * and other ui stuff.
  */
 export const renderInteractiveScene = <
   U extends typeof _renderInteractiveScene,
-  T extends boolean = false,
 >(
   renderConfig: InteractiveSceneRenderConfig,
-  throttle?: T,
-): T extends true ? void : ReturnType<U> => {
-  if (throttle) {
-    renderInteractiveSceneThrottled(renderConfig);
-    return undefined as T extends true ? void : ReturnType<U>;
-  }
+): ReturnType<U> => {
   const ret = _renderInteractiveScene(renderConfig);
   renderConfig.callback(ret);
-  return ret as T extends true ? void : ReturnType<U>;
+  return ret as ReturnType<U>;
 };
