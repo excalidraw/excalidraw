@@ -42,7 +42,7 @@ const renderLine = (
   context: CanvasRenderingContext2D,
   zoom: number,
   segment: LineSegment<GlobalPoint>,
-  color: string
+  color: string,
 ) => {
   context.save();
   context.strokeStyle = color;
@@ -57,7 +57,7 @@ const renderCubicBezier = (
   context: CanvasRenderingContext2D,
   zoom: number,
   [start, control1, control2, end]: Curve<GlobalPoint>,
-  color: string
+  color: string,
 ) => {
   context.save();
   context.strokeStyle = color;
@@ -69,7 +69,7 @@ const renderCubicBezier = (
     control2[0] * zoom,
     control2[1] * zoom,
     end[0] * zoom,
-    end[1] * zoom
+    end[1] * zoom,
   );
   context.stroke();
   context.restore();
@@ -94,7 +94,7 @@ const _renderBinding = (
   zoom: number,
   width: number,
   height: number,
-  color: string
+  color: string,
 ) => {
   if (!binding.fixedPoint) {
     console.warn("Binding must have a fixedPoint");
@@ -102,12 +102,12 @@ const _renderBinding = (
   }
 
   const bindable = elementsMap.get(
-    binding.elementId
+    binding.elementId,
   ) as ExcalidrawBindableElement;
   const [x, y] = getGlobalFixedPointForBindableElement(
     binding.fixedPoint,
     bindable,
-    elementsMap
+    elementsMap,
   );
 
   context.save();
@@ -121,7 +121,7 @@ const _renderBinding = (
     x * zoom - width,
     y * zoom + height,
     x * zoom,
-    y * zoom
+    y * zoom,
   );
   context.stroke();
   context.restore();
@@ -134,10 +134,10 @@ const _renderBindableBinding = (
   zoom: number,
   width: number,
   height: number,
-  color: string
+  color: string,
 ) => {
   const bindable = elementsMap.get(
-    binding.elementId
+    binding.elementId,
   ) as ExcalidrawBindableElement;
   if (!binding.fixedPoint) {
     console.warn("Binding must have a fixedPoint");
@@ -147,7 +147,7 @@ const _renderBindableBinding = (
   const [x, y] = getGlobalFixedPointForBindableElement(
     binding.fixedPoint,
     bindable,
-    elementsMap
+    elementsMap,
   );
 
   context.save();
@@ -161,7 +161,7 @@ const _renderBindableBinding = (
     x * zoom + width,
     y * zoom - height,
     x * zoom,
-    y * zoom
+    y * zoom,
   );
   context.stroke();
   context.restore();
@@ -170,7 +170,7 @@ const _renderBindableBinding = (
 const renderBindings = (
   context: CanvasRenderingContext2D,
   elements: readonly OrderedExcalidrawElement[],
-  zoom: number
+  zoom: number,
 ) => {
   const elementsMap = arrayToMap(elements);
   const dim = 16;
@@ -196,7 +196,7 @@ const renderBindings = (
           zoom,
           dim,
           dim,
-          element.startBinding?.mode === "orbit" ? "red" : "black"
+          element.startBinding?.mode === "orbit" ? "red" : "black",
         );
       }
 
@@ -215,7 +215,7 @@ const renderBindings = (
           zoom,
           dim,
           dim,
-          element.endBinding?.mode === "orbit" ? "red" : "black"
+          element.endBinding?.mode === "orbit" ? "red" : "black",
         );
       }
     }
@@ -227,7 +227,7 @@ const renderBindings = (
         }
 
         const arrow = elementsMap.get(
-          boundElement.id
+          boundElement.id,
         ) as ExcalidrawArrowElement;
 
         if (arrow && arrow.startBinding?.elementId === element.id) {
@@ -238,7 +238,7 @@ const renderBindings = (
             zoom,
             dim,
             dim,
-            "green"
+            "green",
           );
         }
         if (arrow && arrow.endBinding?.elementId === element.id) {
@@ -249,7 +249,7 @@ const renderBindings = (
             zoom,
             dim,
             dim,
-            "green"
+            "green",
           );
         }
       });
@@ -260,7 +260,7 @@ const renderBindings = (
 const render = (
   frame: DebugElement[],
   context: CanvasRenderingContext2D,
-  appState: AppState
+  appState: AppState,
 ) => {
   frame.forEach((el: DebugElement) => {
     switch (true) {
@@ -269,7 +269,7 @@ const render = (
           context,
           appState.zoom.value,
           el.data as LineSegment<GlobalPoint>,
-          el.color
+          el.color,
         );
         break;
       case isCurve(el.data):
@@ -277,7 +277,7 @@ const render = (
           context,
           appState.zoom.value,
           el.data as Curve<GlobalPoint>,
-          el.color
+          el.color,
         );
         break;
       default:
@@ -290,11 +290,11 @@ const _debugRenderer = (
   canvas: HTMLCanvasElement,
   appState: AppState,
   elements: readonly OrderedExcalidrawElement[],
-  scale: number
+  scale: number,
 ) => {
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,
-    scale
+    scale,
   );
 
   const context = bootstrapCanvas({
@@ -309,7 +309,7 @@ const _debugRenderer = (
   context.save();
   context.translate(
     appState.scrollX * appState.zoom.value,
-    appState.scrollY * appState.zoom.value
+    appState.scrollY * appState.zoom.value,
   );
 
   renderOrigin(context, appState.zoom.value);
@@ -334,7 +334,7 @@ const _debugRenderer = (
   if (window.visualDebug) {
     window.visualDebug!.data =
       window.visualDebug?.data.map((frame) =>
-        frame.filter((el) => el.permanent)
+        frame.filter((el) => el.permanent),
       ) ?? [];
   }
 };
@@ -354,7 +354,7 @@ export const saveDebugState = (debug: { enabled: boolean }) => {
   try {
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_DEBUG,
-      JSON.stringify(debug)
+      JSON.stringify(debug),
     );
   } catch (error: any) {
     console.error(error);
@@ -366,18 +366,18 @@ export const debugRenderer = throttleRAF(
     canvas: HTMLCanvasElement,
     appState: AppState,
     elements: readonly OrderedExcalidrawElement[],
-    scale: number
+    scale: number,
   ) => {
     _debugRenderer(canvas, appState, elements, scale);
   },
-  { trailing: true }
+  { trailing: true },
 );
 
 export const loadSavedDebugState = () => {
   let debug;
   try {
     const savedDebugState = localStorage.getItem(
-      STORAGE_KEYS.LOCAL_STORAGE_DEBUG
+      STORAGE_KEYS.LOCAL_STORAGE_DEBUG,
     );
     if (savedDebugState) {
       debug = JSON.parse(savedDebugState) as { enabled: boolean };
@@ -517,7 +517,7 @@ const DebugCanvas = React.forwardRef<HTMLCanvasElement, DebugCanvasProps>(
         Debug Canvas
       </canvas>
     );
-  }
+  },
 );
 
 export default DebugCanvas;

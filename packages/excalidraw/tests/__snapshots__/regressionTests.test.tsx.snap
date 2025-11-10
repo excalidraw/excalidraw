@@ -6305,6 +6305,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
     "elementId": "id20",
     "hoverPointIndex": -1,
     "initialState": {
+      "altFocusPoint": null,
       "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,
@@ -8769,6 +8770,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
     "elementId": "id0",
     "hoverPointIndex": -1,
     "initialState": {
+      "altFocusPoint": null,
       "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,
@@ -9001,6 +9003,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
     "elementId": "id0",
     "hoverPointIndex": -1,
     "initialState": {
+      "altFocusPoint": null,
       "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,
@@ -9426,6 +9429,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
     "elementId": "id0",
     "hoverPointIndex": -1,
     "initialState": {
+      "altFocusPoint": null,
       "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,
@@ -9841,6 +9845,7 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
     "elementId": "id0",
     "hoverPointIndex": -1,
     "initialState": {
+      "altFocusPoint": null,
       "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,
