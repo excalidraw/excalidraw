@@ -2142,7 +2142,7 @@ const pointDraggingUpdates = (
   );
 
   // Linear elements have no special logic
-  if (!isArrowElement(element) || isElbowArrow(element)) {
+  if (!isArrowElement(element)) {
     return {
       positions: naiveDraggingPoints,
     };
@@ -2152,12 +2152,6 @@ const pointDraggingUpdates = (
   const endIsDragged = selectedPointsIndices.includes(
     element.points.length - 1,
   );
-
-  if (startIsDragged === endIsDragged) {
-    return {
-      positions: naiveDraggingPoints,
-    };
-  }
 
   const { start, end } = getBindingStrategyForDraggingBindingElementEndpoints(
     element,
@@ -2171,6 +2165,25 @@ const pointDraggingUpdates = (
       altKey,
     },
   );
+
+  if (isElbowArrow(element)) {
+    return {
+      positions: naiveDraggingPoints,
+      updates: {
+        suggestedBinding: startIsDragged
+          ? start.element
+          : endIsDragged
+          ? end.element
+          : null,
+      },
+    };
+  }
+
+  if (startIsDragged === endIsDragged) {
+    return {
+      positions: naiveDraggingPoints,
+    };
+  }
 
   // Generate the next bindings for the arrow
   const updates: PointMoveOtherUpdates = {

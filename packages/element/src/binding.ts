@@ -223,6 +223,7 @@ const bindingStrategyForElbowArrowEndpointDragging = (
   draggingPoints: PointsPositionUpdates,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  zoom?: AppState["zoom"],
 ): {
   start: BindingStrategy;
   end: BindingStrategy;
@@ -242,7 +243,13 @@ const bindingStrategyForElbowArrowEndpointDragging = (
     point,
     elementsMap,
   );
-  const hit = getHoveredElementForBinding(globalPoint, elements, elementsMap);
+  const hit = getHoveredElementForBinding(
+    globalPoint,
+    elements,
+    elementsMap,
+    (element) =>
+      maxBindingGap_simple(element, element.width, element.height, zoom),
+  );
 
   const current = hit
     ? {
@@ -558,6 +565,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
     altKey?: boolean;
     finalize?: boolean;
     initialBinding?: boolean;
+    zoom?: AppState["zoom"];
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   if (getFeatureFlag("COMPLEX_BINDINGS")) {
@@ -593,6 +601,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     altKey?: boolean;
     finalize?: boolean;
     initialBinding?: boolean;
+    zoom?: AppState["zoom"];
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   const startIdx = 0;
@@ -635,6 +644,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       draggingPoints,
       elementsMap,
       elements,
+      opts?.zoom,
     );
   }
 
@@ -1156,6 +1166,7 @@ export const getHeadingForElbowArrowSnap = (
   aabb: Bounds | undefined | null,
   origPoint: GlobalPoint,
   elementsMap: ElementsMap,
+  zoom?: AppState["zoom"],
 ): Heading => {
   const otherPointHeading = vectorToHeading(vectorFromPoint(otherPoint, p));
 
@@ -1163,9 +1174,12 @@ export const getHeadingForElbowArrowSnap = (
     return otherPointHeading;
   }
 
-  const d = distanceToElement(bindableElement, elementsMap, origPoint);
-
-  const distance = d > 0 ? null : d;
+  const distance = getDistanceForBinding(
+    origPoint,
+    bindableElement,
+    elementsMap,
+    zoom,
+  );
 
   if (!distance) {
     return vectorToHeading(
@@ -1174,6 +1188,23 @@ export const getHeadingForElbowArrowSnap = (
   }
 
   return headingForPointFromElement(bindableElement, aabb, p);
+};
+
+const getDistanceForBinding = (
+  point: Readonly<GlobalPoint>,
+  bindableElement: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  zoom?: AppState["zoom"],
+) => {
+  const distance = distanceToElement(bindableElement, elementsMap, point);
+  const bindDistance = maxBindingGap_simple(
+    bindableElement,
+    bindableElement.width,
+    bindableElement.height,
+    zoom,
+  );
+
+  return distance > bindDistance ? null : distance;
 };
 
 export const bindPointToSnapToElementOutline = (

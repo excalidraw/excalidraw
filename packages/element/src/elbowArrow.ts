@@ -30,6 +30,7 @@ import {
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
   getFixedBindingDistance,
+  maxBindingGap_simple,
 } from "./binding";
 import { distanceToElement } from "./distance";
 import {
@@ -1217,9 +1218,19 @@ const getElbowArrowData = (
   if (options?.isDragging) {
     const elements = Array.from(elementsMap.values());
     hoveredStartElement =
-      getHoveredElement(origStartGlobalPoint, elementsMap, elements) || null;
+      getHoveredElement(
+        origStartGlobalPoint,
+        elementsMap,
+        elements,
+        options?.zoom,
+      ) || null;
     hoveredEndElement =
-      getHoveredElement(origEndGlobalPoint, elementsMap, elements) || null;
+      getHoveredElement(
+        origEndGlobalPoint,
+        elementsMap,
+        elements,
+        options?.zoom,
+      ) || null;
   } else {
     hoveredStartElement = arrow.startBinding
       ? getBindableElementForId(arrow.startBinding.elementId, elementsMap) ||
@@ -1264,6 +1275,7 @@ const getElbowArrowData = (
     hoveredStartElement,
     origStartGlobalPoint,
     elementsMap,
+    options?.zoom,
   );
   const endHeading = getBindPointHeading(
     endGlobalPoint,
@@ -1271,6 +1283,7 @@ const getElbowArrowData = (
     hoveredEndElement,
     origEndGlobalPoint,
     elementsMap,
+    options?.zoom,
   );
   const startPointBounds = [
     startGlobalPoint[0] - 2,
@@ -2229,6 +2242,7 @@ const getBindPointHeading = (
   hoveredElement: ExcalidrawBindableElement | null | undefined,
   origPoint: GlobalPoint,
   elementsMap: ElementsMap,
+  zoom?: AppState["zoom"],
 ): Heading =>
   getHeadingForElbowArrowSnap(
     p,
@@ -2247,18 +2261,21 @@ const getBindPointHeading = (
       ),
     origPoint,
     elementsMap,
+    zoom,
   );
 
 const getHoveredElement = (
   origPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  zoom?: AppState["zoom"],
 ) => {
   return getHoveredElementForBinding(
     origPoint,
     elements,
     elementsMap,
-    (element) => getFixedBindingDistance(element) + 1,
+    (element) =>
+      maxBindingGap_simple(element, element.width, element.height, zoom),
   );
 };
 
