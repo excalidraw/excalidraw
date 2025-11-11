@@ -279,14 +279,14 @@
       "line1": "Semblatz utilizar lo navegador Brave amb lo paramètre <bold>Blocatge agressiu de las emprentas numericas</bold> activat.",
       "line2": "Aquò pòt menar a copar <bold>l’element Tèxte</bold> de vòstres dessenhs.",
       "line3": "Recomandam fòrt de desactivar aqueste paramètre. Podètz seguir <link>aquestas etapas</link> per veire cossí o far.",
-      "line4": ""
+      "line4": "Se la desactivacion d'aqueste paramètre corregís pas l'afichatge dels elements de tèxt, vos convidam a dobrir un <issueLink>tiquet</issueLink> sus nòstre GitHub, o a nos escriure sus <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "iframe": "",
-      "image": ""
+      "embeddable": "Los elements integrats se pòdon pas apondre a la bibliotèca.",
+      "iframe": "Los elements d’IFrame se pòdon pas apondre a la bibliotèca.",
+      "image": "La foncionalitat d'apondre d'imatges a la bibliotèca arribarà lèu !"
     },
-    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnRead": "Empegatge impossible (lectura impossibla a partir del quichapapièrs).",
     "asyncPasteFailedOnParse": "Empegatge impossible.",
     "copyToSystemClipboardFailed": "Còpia impossibla al quichapapièrs."
   },
@@ -318,14 +318,14 @@
   "element": {
     "rectangle": "Rectangle",
     "diamond": "",
-    "ellipse": "",
+    "ellipse": "Ellipsa",
     "arrow": "Sageta",
     "line": "Linha",
     "freedraw": "",
     "text": "Tèxt",
     "image": "Imatge",
     "group": "Grop",
-    "frame": "",
+    "frame": "Quadre",
     "magicframe": "",
     "embeddable": "",
     "selection": "Seleccion",
@@ -507,15 +507,15 @@
   },
   "stats": {
     "angle": "Angle",
-    "shapes": "",
+    "shapes": "Fòrmas",
     "height": "Nautor",
     "scene": "Scèna",
     "selected": "Seleccionat",
     "storage": "Emmagazinatge",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "Proprietats de canabàs e de fòrmas",
+    "title": "Propietats",
+    "generalStats": "General",
+    "elementProperties": "Proprietats de fòrma",
     "total": "Total",
     "version": "Version",
     "versionCopy": "Clicar per copiar",
@@ -535,7 +535,7 @@
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Copiats al quichapapièrs"
   },
   "colors": {
     "transparent": "Transparéncia",
@@ -568,7 +568,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Color",
     "mostUsedCustomColors": "Colors personalizadas mai utilizadas",
     "colors": "Colors",
     "shades": "Nuanças",
@@ -597,35 +597,35 @@
       "loadFromFile": {
         "title": "Cargar d’un fichièr",
         "button": "Cargar d’un fichièr",
-        "description": ""
+        "description": "Lo cargament dempuèi un fichièr <bold>remplaçarà vòstre contengut actual</bold>.<br></br>Podètz d'en primièr far una còpia de seguretat de vòstre dessenh en utilizant una de las opcions çaijós."
       },
       "shareableLink": {
         "title": "Cargar d’un ligam",
         "button": "Remplaçar mon contengut",
-        "description": ""
+        "description": "Lo cargament d'un dessenh extèrne <bold>remplaçarà vòstre contengut existent</bold>.<br></br>Podètz d'en primièr far una còpia de seguretat de vòstre dessenh en utilizant una de las opcions çaijós."
       }
     }
   },
   "mermaid": {
     "title": "De Mermaid cap a Excalidraw",
     "button": "Inserir",
-    "description": "",
+    "description": "Actualament, sonque los diagramas <flowchartLink>logics</flowchartLink>,<sequenceLink> de sequéncia</sequenceLink> e <classLink>de classa </classLink>son preses en carga. Los autres tipes seràn afichats coma imatge dins Excalidraw.",
     "syntax": "Sintaxi Mermaid",
     "preview": "Apercebut"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Recèrca rapida"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "ancian"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "Dins aquesta scèna",
+    "availableFonts": "Polissas disponiblas",
+    "empty": "Cap de polissa pas trobada"
   },
   "userList": {
-    "empty": "",
+    "empty": "Cap d’utilizaire pas trobat",
     "hint": {
       "text": "Clicar l’utilizaire per lo seguir",
       "followStatus": "Seguissètz actualament aqueste utilizaire",
@@ -650,15 +650,15 @@
     "shortcutHint": "Per contrarotlar la paleta, utilizatz {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Opcion",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Entrada",
+    "shift": "Maj",
+    "spacebar": "Espaci",
+    "delete": "Suprimir",
+    "mmb": "Clic rodeta"
   }
 }
