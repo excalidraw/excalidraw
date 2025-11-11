@@ -103,32 +103,25 @@ export type BindingStrategy =
       focusPoint?: undefined;
     };
 
-export const FIXED_BINDING_DISTANCE = 5;
+/** excludes element strokeWidth */
+export const BASE_BINDING_GAP = 10;
+/** scaled based on zoom when < 1 */
+const BASE_BINDING_DISTANCE = Math.max(BASE_BINDING_GAP, 15);
 
 export const BINDING_HIGHLIGHT_THICKNESS = 10;
 
-export const getFixedBindingDistance = (
+export const getFixedBindingGap = (
   element: ExcalidrawBindableElement,
-): number => FIXED_BINDING_DISTANCE + element.strokeWidth / 2;
+): number => BASE_BINDING_GAP + element.strokeWidth / 2;
 
-export const maxBindingGap_simple = (
-  element: ExcalidrawElement,
-  elementWidth: number,
-  elementHeight: number,
-  zoom?: AppState["zoom"],
-): number => {
+export const maxBindingDistance_simple = (zoom?: AppState["zoom"]): number => {
   const zoomValue = zoom?.value && zoom.value < 1 ? zoom.value : 1;
-
-  // Aligns diamonds with rectangles
-  const shapeRatio = element.type === "diamond" ? 1 / Math.sqrt(2) : 1;
-  const smallerDimension = shapeRatio * Math.min(elementWidth, elementHeight);
-
-  return Math.max(
-    16,
-    // bigger bindable boundary for bigger elements
-    Math.min(0.25 * smallerDimension, 32),
-    // keep in sync with the zoomed highlight
-    BINDING_HIGHLIGHT_THICKNESS / zoomValue + FIXED_BINDING_DISTANCE,
+  return clamp(
+    // reducing zoom impact so that the diff between binding distance and
+    // binding gap is kept to minimum when possible
+    BASE_BINDING_DISTANCE / (zoomValue * 1.5),
+    BASE_BINDING_DISTANCE,
+    BASE_BINDING_DISTANCE * 2,
   );
 };
 
@@ -247,8 +240,7 @@ const bindingStrategyForElbowArrowEndpointDragging = (
     globalPoint,
     elements,
     elementsMap,
-    (element) =>
-      maxBindingGap_simple(element, element.width, element.height, zoom),
+    (element) => maxBindingDistance_simple(zoom),
   );
 
   const current = hit
@@ -667,7 +659,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     globalPoint,
     elements,
     elementsMap,
-    (e) => maxBindingGap_simple(e, e.width, e.height, appState.zoom),
+    (e) => maxBindingDistance_simple(appState.zoom),
   );
   const pointInElement = hit && isPointInElement(globalPoint, hit, elementsMap);
   const otherBindableElement = otherBinding
@@ -1197,12 +1189,7 @@ const getDistanceForBinding = (
   zoom?: AppState["zoom"],
 ) => {
   const distance = distanceToElement(bindableElement, elementsMap, point);
-  const bindDistance = maxBindingGap_simple(
-    bindableElement,
-    bindableElement.width,
-    bindableElement.height,
-    zoom,
-  );
+  const bindDistance = maxBindingDistance_simple(zoom);
 
   return distance > bindDistance ? null : distance;
 };
@@ -1272,7 +1259,7 @@ export const bindPointToSnapToElementOutline = (
       bindableElement,
       elementsMap,
       intersector,
-      getFixedBindingDistance(bindableElement),
+      getFixedBindingGap(bindableElement),
     ).sort(pointDistanceSq)[0];
 
     if (!intersection) {
@@ -1294,7 +1281,7 @@ export const bindPointToSnapToElementOutline = (
         bindableElement,
         elementsMap,
         anotherIntersector,
-        FIXED_BINDING_DISTANCE,
+        BASE_BINDING_GAP,
       ).sort(pointDistanceSq)[0];
     }
   } else {
@@ -1302,7 +1289,7 @@ export const bindPointToSnapToElementOutline = (
       vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
       pointDistance(edgePoint, adjacentPoint) +
         Math.max(bindableElement.width, bindableElement.height) +
-        getFixedBindingDistance(bindableElement) * 2,
+        getFixedBindingGap(bindableElement) * 2,
     );
     const intersector =
       customIntersector ??
@@ -1317,7 +1304,7 @@ export const bindPointToSnapToElementOutline = (
             bindableElement,
             elementsMap,
             intersector,
-            getFixedBindingDistance(bindableElement),
+            getFixedBindingGap(bindableElement),
           ).sort(
             (g, h) =>
               pointDistanceSq(g, adjacentPoint) -
@@ -1346,15 +1333,15 @@ export const avoidRectangularCorner = (
 
   if (nonRotatedPoint[0] < element.x && nonRotatedPoint[1] < element.y) {
     // Top left
-    if (nonRotatedPoint[1] - element.y > -getFixedBindingDistance(element)) {
+    if (nonRotatedPoint[1] - element.y > -getFixedBindingGap(element)) {
       return pointRotateRads<GlobalPoint>(
-        pointFrom(element.x - getFixedBindingDistance(element), element.y),
+        pointFrom(element.x - getFixedBindingGap(element), element.y),
         center,
         element.angle,
       );
     }
     return pointRotateRads(
-      pointFrom(element.x, element.y - getFixedBindingDistance(element)),
+      pointFrom(element.x, element.y - getFixedBindingGap(element)),
       center,
       element.angle,
     );
@@ -1363,11 +1350,11 @@ export const avoidRectangularCorner = (
     nonRotatedPoint[1] > element.y + element.height
   ) {
     // Bottom left
-    if (nonRotatedPoint[0] - element.x > -getFixedBindingDistance(element)) {
+    if (nonRotatedPoint[0] - element.x > -getFixedBindingGap(element)) {
       return pointRotateRads(
         pointFrom(
           element.x,
-          element.y + element.height + getFixedBindingDistance(element),
+          element.y + element.height + getFixedBindingGap(element),
         ),
         center,
         element.angle,
@@ -1375,7 +1362,7 @@ export const avoidRectangularCorner = (
     }
     return pointRotateRads(
       pointFrom(
-        element.x - getFixedBindingDistance(element),
+        element.x - getFixedBindingGap(element),
         element.y + element.height,
       ),
       center,
@@ -1388,12 +1375,12 @@ export const avoidRectangularCorner = (
     // Bottom right
     if (
       nonRotatedPoint[0] - element.x <
-      element.width + getFixedBindingDistance(element)
+      element.width + getFixedBindingGap(element)
     ) {
       return pointRotateRads(
         pointFrom(
           element.x + element.width,
-          element.y + element.height + getFixedBindingDistance(element),
+          element.y + element.height + getFixedBindingGap(element),
         ),
         center,
         element.angle,
@@ -1401,7 +1388,7 @@ export const avoidRectangularCorner = (
     }
     return pointRotateRads(
       pointFrom(
-        element.x + element.width + getFixedBindingDistance(element),
+        element.x + element.width + getFixedBindingGap(element),
         element.y + element.height,
       ),
       center,
@@ -1414,12 +1401,12 @@ export const avoidRectangularCorner = (
     // Top right
     if (
       nonRotatedPoint[0] - element.x <
-      element.width + getFixedBindingDistance(element)
+      element.width + getFixedBindingGap(element)
     ) {
       return pointRotateRads(
         pointFrom(
           element.x + element.width,
-          element.y - getFixedBindingDistance(element),
+          element.y - getFixedBindingGap(element),
         ),
         center,
         element.angle,
@@ -1427,7 +1414,7 @@ export const avoidRectangularCorner = (
     }
     return pointRotateRads(
       pointFrom(
-        element.x + element.width + getFixedBindingDistance(element),
+        element.x + element.width + getFixedBindingGap(element),
         element.y,
       ),
       center,
@@ -1454,7 +1441,7 @@ const snapToMid = (
   const horizontalThreshold = clamp(tolerance * width, 5, 80);
 
   // Too close to the center makes it hard to resolve direction precisely
-  if (pointDistance(center, nonRotated) < getFixedBindingDistance(element)) {
+  if (pointDistance(center, nonRotated) < getFixedBindingGap(element)) {
     return p;
   }
 
@@ -1465,7 +1452,7 @@ const snapToMid = (
   ) {
     // LEFT
     return pointRotateRads<GlobalPoint>(
-      pointFrom(x - getFixedBindingDistance(element), center[1]),
+      pointFrom(x - getFixedBindingGap(element), center[1]),
       center,
       angle,
     );
@@ -1476,7 +1463,7 @@ const snapToMid = (
   ) {
     // TOP
     return pointRotateRads(
-      pointFrom(center[0], y - getFixedBindingDistance(element)),
+      pointFrom(center[0], y - getFixedBindingGap(element)),
       center,
       angle,
     );
@@ -1487,7 +1474,7 @@ const snapToMid = (
   ) {
     // RIGHT
     return pointRotateRads(
-      pointFrom(x + width + getFixedBindingDistance(element), center[1]),
+      pointFrom(x + width + getFixedBindingGap(element), center[1]),
       center,
       angle,
     );
@@ -1498,12 +1485,12 @@ const snapToMid = (
   ) {
     // DOWN
     return pointRotateRads(
-      pointFrom(center[0], y + height + getFixedBindingDistance(element)),
+      pointFrom(center[0], y + height + getFixedBindingGap(element)),
       center,
       angle,
     );
   } else if (element.type === "diamond") {
-    const distance = getFixedBindingDistance(element);
+    const distance = getFixedBindingGap(element);
     const topLeft = pointFrom<GlobalPoint>(
       x + width / 4 - distance,
       y + height / 4 - distance,

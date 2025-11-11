@@ -268,7 +268,7 @@ const renderBindingHighlightForBindableElement_simple = (
       context.translate(element.x, element.y);
 
       context.lineWidth =
-        clamp(2.5, element.strokeWidth * 1.75, 4) /
+        clamp(1.75, element.strokeWidth, 4) /
         Math.max(0.25, appState.zoom.value);
       context.strokeStyle =
         appState.theme === THEME.DARK

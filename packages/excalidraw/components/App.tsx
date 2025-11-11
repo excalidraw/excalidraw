@@ -246,7 +246,7 @@ import {
   getElementBounds,
   doBoundsIntersect,
   isPointInElement,
-  maxBindingGap_simple,
+  maxBindingDistance_simple,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6550,7 +6550,7 @@ class App extends React.Component<AppProps, AppState> {
         pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
-        (el) => maxBindingGap_simple(el, el.width, el.height, this.state.zoom),
+        (el) => maxBindingDistance_simple(this.state.zoom),
       );
       if (
         hit &&

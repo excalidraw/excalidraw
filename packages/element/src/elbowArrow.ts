@@ -26,11 +26,11 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import {
   bindPointToSnapToElementOutline,
-  FIXED_BINDING_DISTANCE,
+  BASE_BINDING_GAP,
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
-  getFixedBindingDistance,
-  maxBindingGap_simple,
+  getFixedBindingGap,
+  maxBindingDistance_simple,
 } from "./binding";
 import { distanceToElement } from "./distance";
 import {
@@ -1304,8 +1304,8 @@ const getElbowArrowData = (
         offsetFromHeading(
           startHeading,
           arrow.startArrowhead
-            ? getFixedBindingDistance(hoveredStartElement) * 6
-            : getFixedBindingDistance(hoveredStartElement) * 2,
+            ? getFixedBindingGap(hoveredStartElement) * 6
+            : getFixedBindingGap(hoveredStartElement) * 2,
           1,
         ),
       )
@@ -1317,8 +1317,8 @@ const getElbowArrowData = (
         offsetFromHeading(
           endHeading,
           arrow.endArrowhead
-            ? getFixedBindingDistance(hoveredEndElement) * 6
-            : getFixedBindingDistance(hoveredEndElement) * 2,
+            ? getFixedBindingGap(hoveredEndElement) * 6
+            : getFixedBindingGap(hoveredEndElement) * 2,
           1,
         ),
       )
@@ -1365,8 +1365,8 @@ const getElbowArrowData = (
             ? 0
             : BASE_PADDING -
                 (arrow.startArrowhead
-                  ? FIXED_BINDING_DISTANCE * 6
-                  : FIXED_BINDING_DISTANCE * 2),
+                  ? BASE_BINDING_GAP * 6
+                  : BASE_BINDING_GAP * 2),
           BASE_PADDING,
         ),
     boundsOverlap
@@ -1381,8 +1381,8 @@ const getElbowArrowData = (
             ? 0
             : BASE_PADDING -
                 (arrow.endArrowhead
-                  ? FIXED_BINDING_DISTANCE * 6
-                  : FIXED_BINDING_DISTANCE * 2),
+                  ? BASE_BINDING_GAP * 6
+                  : BASE_BINDING_GAP * 2),
           BASE_PADDING,
         ),
     boundsOverlap,
@@ -2274,8 +2274,7 @@ const getHoveredElement = (
     origPoint,
     elements,
     elementsMap,
-    (element) =>
-      maxBindingGap_simple(element, element.width, element.height, zoom),
+    (element) => maxBindingDistance_simple(zoom),
   );
 };
 
