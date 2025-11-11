@@ -124,6 +124,8 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  snapShapeEnabledIcon,
+  snapShapeDisabledIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -1894,4 +1896,44 @@ export const actionChangeArrowType = register({
       </fieldset>
     );
   },
+});
+
+export const actionToggleConvertToShape = register({
+  name: "toggleConvertToShape",
+  label: "Toggle Convert to Shape",
+  trackEvent: false,
+  perform: (elements, appState) => {
+    return {
+      elements,
+      appState: {
+        ...appState,
+        isConvertToShapeEnabled: !appState.isConvertToShapeEnabled,
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.convertToShape")}</legend>
+      <div className="buttonList">
+        <RadioSelection
+          group="button"
+          options={[
+            {
+              value: false,
+              text: t("labels.convertToShapeDisable"),
+              icon: snapShapeDisabledIcon,
+            },
+            {
+              value: true,
+              text: t("labels.convertToShapeEnable"),
+              icon: snapShapeEnabledIcon,
+            },
+          ]}
+          value={appState.isConvertToShapeEnabled}
+          onChange={(value) => updateData(value)}
+        />
+      </div>
+    </fieldset>
+  ),
 });
