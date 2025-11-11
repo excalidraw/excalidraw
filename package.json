@@ -107,6 +107,8 @@
     "browser-fs-access": "0.38.0",
     "clsx": "2.1.1",
     "cross-env": "10.1.0",
+    "esbuild": "0.27.0",
+    "esbuild-sass-plugin": "3.3.1",
     "eslint-plugin-react": "7.37.5",
     "fake-indexeddb": "6.2.5",
     "fonteditor-core": "2.6.3",
