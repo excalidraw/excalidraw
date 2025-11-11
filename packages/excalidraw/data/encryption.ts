@@ -71,7 +71,7 @@ export const encryptData = async (
       iv,
     },
     importedKey,
-    buffer as ArrayBuffer | Uint8Array,
+    buffer as any,
   );
 
   return { encryptedBuffer, iv };
@@ -86,9 +86,9 @@ export const decryptData = async (
   return window.crypto.subtle.decrypt(
     {
       name: "AES-GCM",
-      iv,
+      iv: iv as any,
     },
     key,
-    encrypted,
+    encrypted as any,
   );
 };
