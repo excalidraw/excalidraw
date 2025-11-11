@@ -105,11 +105,13 @@
     "autoprefixer": "10.4.22",
     "clsx": "2.1.1",
     "eslint-plugin-react": "^7.37.5",
+    "fonteditor-core": "2.6.3",
     "idb-keyval": "6.2.2",
     "jotai": "2.15.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "sass": "1.94.0",
-    "vite-plugin-sitemap": "0.8.2"
+    "vite-plugin-sitemap": "0.8.2",
+    "which": "6.0.0"
   }
 }
