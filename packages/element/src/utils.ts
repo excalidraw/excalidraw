@@ -10,6 +10,7 @@ import {
   curveCatmullRomCubicApproxPoints,
   curveOffsetPoints,
   lineSegment,
+  perpendicularDistance,
   pointDistance,
   pointFrom,
   pointFromArray,
@@ -481,3 +482,24 @@ export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
 
   return 0;
 };
+
+export function shouldSkipFreedrawPoint(
+  points: readonly LocalPoint[],
+  dx: number,
+  dy: number,
+  epsilon: number = 0.5,
+) {
+  const lastPoint = points.length > 0 && points[points.length - 1];
+  const nextToLastPoint = points.length > 1 && points[points.length - 2];
+  return (
+    (lastPoint && lastPoint[0] === dx && lastPoint[1] === dy) ||
+    // NOTE: Apply a simplification algorithm to reduce number of points
+    (nextToLastPoint && lastPoint
+      ? perpendicularDistance(
+          pointFrom<LocalPoint>(dx, dy),
+          lineSegment(nextToLastPoint, lastPoint),
+        ) < epsilon
+      : !points[0] ||
+        pointDistance(points[0], pointFrom<LocalPoint>(dx, dy)) < epsilon)
+  );
+}
