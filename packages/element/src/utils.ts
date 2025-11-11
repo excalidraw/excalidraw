@@ -489,66 +489,82 @@ const getDiagonalsForBindableElement = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
 ) => {
+  // for rectangles, shrink the diagonals a bit because there's something
+  // going on with the focus points around the corners. Ask Mark for details.
+  const OFFSET_PX = element.type === "rectangle" ? 15 : 0;
+  const shrinkSegment = (seg: LineSegment<GlobalPoint>) => {
+    const v = vectorNormalize(vectorFromPoint(seg[1], seg[0]));
+    const offset = vectorScale(v, OFFSET_PX);
+    return lineSegment<GlobalPoint>(
+      pointTranslate(seg[0], offset),
+      pointTranslate(seg[1], vectorScale(offset, -1)),
+    );
+  };
+
   const center = elementCenterPoint(element, elementsMap);
-  const diagonalOne = isRectangularElement(element)
-    ? lineSegment<GlobalPoint>(
-        pointRotateRads(
-          pointFrom<GlobalPoint>(element.x, element.y),
-          center,
-          element.angle,
-        ),
-        pointRotateRads(
-          pointFrom<GlobalPoint>(
-            element.x + element.width,
-            element.y + element.height,
+  const diagonalOne = shrinkSegment(
+    isRectangularElement(element)
+      ? lineSegment<GlobalPoint>(
+          pointRotateRads(
+            pointFrom<GlobalPoint>(element.x, element.y),
+            center,
+            element.angle,
           ),
-          center,
-          element.angle,
-        ),
-      )
-    : lineSegment<GlobalPoint>(
-        pointRotateRads(
-          pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
-          center,
-          element.angle,
-        ),
-        pointRotateRads(
-          pointFrom<GlobalPoint>(
-            element.x + element.width / 2,
-            element.y + element.height,
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              element.x + element.width,
+              element.y + element.height,
+            ),
+            center,
+            element.angle,
           ),
-          center,
-          element.angle,
-        ),
-      );
-  const diagonalTwo = isRectangularElement(element)
-    ? lineSegment<GlobalPoint>(
-        pointRotateRads(
-          pointFrom<GlobalPoint>(element.x + element.width, element.y),
-          center,
-          element.angle,
-        ),
-        pointRotateRads(
-          pointFrom<GlobalPoint>(element.x, element.y + element.height),
-          center,
-          element.angle,
-        ),
-      )
-    : lineSegment<GlobalPoint>(
-        pointRotateRads(
-          pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
-          center,
-          element.angle,
-        ),
-        pointRotateRads(
-          pointFrom<GlobalPoint>(
-            element.x + element.width,
-            element.y + element.height / 2,
+        )
+      : lineSegment<GlobalPoint>(
+          pointRotateRads(
+            pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
+            center,
+            element.angle,
           ),
-          center,
-          element.angle,
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              element.x + element.width / 2,
+              element.y + element.height,
+            ),
+            center,
+            element.angle,
+          ),
         ),
-      );
+  );
+  const diagonalTwo = shrinkSegment(
+    isRectangularElement(element)
+      ? lineSegment<GlobalPoint>(
+          pointRotateRads(
+            pointFrom<GlobalPoint>(element.x + element.width, element.y),
+            center,
+            element.angle,
+          ),
+          pointRotateRads(
+            pointFrom<GlobalPoint>(element.x, element.y + element.height),
+            center,
+            element.angle,
+          ),
+        )
+      : lineSegment<GlobalPoint>(
+          pointRotateRads(
+            pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
+            center,
+            element.angle,
+          ),
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              element.x + element.width,
+              element.y + element.height / 2,
+            ),
+            center,
+            element.angle,
+          ),
+        ),
+  );
 
   return [diagonalOne, diagonalTwo];
 };
