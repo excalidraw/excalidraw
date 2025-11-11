@@ -27,16 +27,17 @@
   },
   "dependencies": {
     "@excalidraw/random-username": "1.2.0",
-    "@sentry/browser": "10.23.0",
+    "@sentry/browser": "10.25.0",
     "callsites": "4.2.0",
-    "firebase": "11.10.0",
-    "i18next-browser-languagedetector": "6.1.4",
-    "idb-keyval": "6.0.3",
-    "jotai": "2.11.0",
+    "firebase": "12.5.0",
+    "i18next-browser-languagedetector": "8.2.0",
+    "idb-keyval": "6.2.2",
+    "jotai": "2.15.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "socket.io-client": "4.8.1",
-    "vite-plugin-html": "3.2.2"
+    "vite-plugin-html": "3.2.2",
+    "vite-plugin-sitemap": "0.8.2"
   },
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
