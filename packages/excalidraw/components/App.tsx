@@ -11472,6 +11472,9 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 declare global {
   interface Window {
+    // @ts-ignore - TypeScript 5.6+ incorrectly flags this as duplicate with different types due to
+    // monorepo dual-import issues (same types imported from dist/types and source paths).
+    // Using @ts-ignore instead of @ts-expect-error since this error only appears in certain build contexts.
     h: {
       scene: Scene;
       elements: readonly ExcalidrawElement[];
