@@ -26,11 +26,11 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import {
   bindPointToSnapToElementOutline,
-  BASE_BINDING_GAP,
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
-  getFixedBindingGap,
+  getBindingGap,
   maxBindingDistance_simple,
+  BASE_BINDING_GAP,
 } from "./binding";
 import { distanceToElement } from "./distance";
 import {
@@ -1304,8 +1304,8 @@ const getElbowArrowData = (
         offsetFromHeading(
           startHeading,
           arrow.startArrowhead
-            ? getFixedBindingGap(hoveredStartElement) * 6
-            : getFixedBindingGap(hoveredStartElement) * 2,
+            ? getBindingGap(hoveredStartElement) * 6
+            : getBindingGap(hoveredStartElement) * 2,
           1,
         ),
       )
@@ -1317,8 +1317,8 @@ const getElbowArrowData = (
         offsetFromHeading(
           endHeading,
           arrow.endArrowhead
-            ? getFixedBindingGap(hoveredEndElement) * 6
-            : getFixedBindingGap(hoveredEndElement) * 2,
+            ? getBindingGap(hoveredEndElement) * 6
+            : getBindingGap(hoveredEndElement) * 2,
           1,
         ),
       )
