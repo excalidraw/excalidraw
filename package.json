@@ -111,6 +111,7 @@
     "esbuild-sass-plugin": "3.3.1",
     "eslint-plugin-react": "7.37.5",
     "fake-indexeddb": "6.2.5",
+    "firebase": "12.5.0",
     "fonteditor-core": "2.6.3",
     "harfbuzzjs": "0.4.13",
     "i18next-browser-languagedetector": "8.2.0",
