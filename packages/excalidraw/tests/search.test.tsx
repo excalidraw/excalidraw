@@ -23,7 +23,7 @@ const { h } = window;
 
 const querySearchInput = async () => {
   const input =
-    h.app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
+    (h.app.excalidrawContainerValue.container as HTMLElement)?.querySelector<HTMLInputElement>(
       `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
     )!;
   await waitFor(() => expect(input).not.toBeNull());
@@ -58,7 +58,7 @@ describe("search", () => {
     });
 
     const searchInput =
-      h.app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
+      (h.app.excalidrawContainerValue.container as HTMLElement)?.querySelector<HTMLInputElement>(
         `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
       );
 

@@ -335,11 +335,11 @@ describe("elbow arrow ui", () => {
     expect(arrow.endBinding).not.toBe(null);
 
     act(() => {
-      h.app.actionManager.executeAction(actionSelectAll);
+      h.app.actionManager.executeAction(actionSelectAll as any);
     });
 
     act(() => {
-      h.app.actionManager.executeAction(actionDuplicateSelection);
+      h.app.actionManager.executeAction(actionDuplicateSelection as any);
     });
 
     expect(h.elements.length).toEqual(6);
@@ -393,7 +393,7 @@ describe("elbow arrow ui", () => {
     expect(arrow.endBinding).not.toBe(null);
 
     act(() => {
-      h.app.actionManager.executeAction(actionDuplicateSelection);
+      h.app.actionManager.executeAction(actionDuplicateSelection as any);
     });
 
     expect(h.elements.length).toEqual(4);

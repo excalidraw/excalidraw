@@ -33,7 +33,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([frame]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -55,7 +55,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([frame]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -83,7 +83,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([frame, rectangle]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -117,7 +117,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([rectangle, frame]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -154,7 +154,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([rectangle]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -175,7 +175,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([rectangle]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -202,7 +202,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([text]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -229,7 +229,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([rectangle]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -251,7 +251,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([text]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -275,7 +275,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([rectangle]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -319,7 +319,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([frame1, frame2]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -362,7 +362,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([frame1, ellipse, frame2]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -388,7 +388,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([arrow]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -407,7 +407,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([text]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -439,7 +439,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([frame, ellipse]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -474,7 +474,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([frame, ellipse]);
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [
@@ -517,7 +517,7 @@ describe("actionDuplicateSelection", () => {
       API.setSelectedElements([ellipse], "B");
 
       act(() => {
-        h.app.actionManager.executeAction(actionDuplicateSelection);
+        h.app.actionManager.executeAction(actionDuplicateSelection as any);
       });
 
       assertElements(h.elements, [

@@ -122,7 +122,7 @@ const populateElements = (
       ),
       ...appState,
       selectedElementIds,
-    } as AppState);
+    } as any);
   });
 
   return selectedElementIds;

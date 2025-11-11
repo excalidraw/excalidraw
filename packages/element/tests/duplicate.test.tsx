@@ -432,7 +432,7 @@ describe("group-related duplication", () => {
     API.setSelectedElements([rectangle2], "group1");
 
     act(() => {
-      h.app.actionManager.executeAction(actionDuplicateSelection);
+      h.app.actionManager.executeAction(actionDuplicateSelection as any);
     });
 
     assertElements(h.elements, [
@@ -544,7 +544,7 @@ describe("duplication z-order", () => {
     API.setSelectedElements([rectangle1]);
 
     act(() => {
-      h.app.actionManager.executeAction(actionDuplicateSelection);
+      h.app.actionManager.executeAction(actionDuplicateSelection as any);
     });
 
     assertElements(h.elements, [
@@ -576,7 +576,7 @@ describe("duplication z-order", () => {
     API.setSelectedElements([rectangle3]);
 
     act(() => {
-      h.app.actionManager.executeAction(actionDuplicateSelection);
+      h.app.actionManager.executeAction(actionDuplicateSelection as any);
     });
 
     assertElements(h.elements, [

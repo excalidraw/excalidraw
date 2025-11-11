@@ -28,7 +28,7 @@ describe("deleting selected elements when frame selected should keep children + 
     API.setSelectedElements([f1]);
 
     act(() => {
-      h.app.actionManager.executeAction(actionDeleteSelected);
+      h.app.actionManager.executeAction(actionDeleteSelected as any);
     });
 
     assertElements(h.elements, [
@@ -65,7 +65,7 @@ describe("deleting selected elements when frame selected should keep children + 
     API.setSelectedElements([f1]);
 
     act(() => {
-      h.app.actionManager.executeAction(actionDeleteSelected);
+      h.app.actionManager.executeAction(actionDeleteSelected as any);
     });
 
     assertElements(h.elements, [
@@ -103,7 +103,7 @@ describe("deleting selected elements when frame selected should keep children + 
     API.setSelectedElements([f1]);
 
     act(() => {
-      h.app.actionManager.executeAction(actionDeleteSelected);
+      h.app.actionManager.executeAction(actionDeleteSelected as any);
     });
 
     assertElements(h.elements, [
@@ -141,7 +141,7 @@ describe("deleting selected elements when frame selected should keep children + 
     API.setSelectedElements([f1, t1]);
 
     act(() => {
-      h.app.actionManager.executeAction(actionDeleteSelected);
+      h.app.actionManager.executeAction(actionDeleteSelected as any);
     });
 
     assertElements(h.elements, [
@@ -179,7 +179,7 @@ describe("deleting selected elements when frame selected should keep children + 
     API.setSelectedElements([f1, t1]);
 
     act(() => {
-      h.app.actionManager.executeAction(actionDeleteSelected);
+      h.app.actionManager.executeAction(actionDeleteSelected as any);
     });
 
     assertElements(h.elements, [
@@ -202,7 +202,7 @@ describe("deleting selected elements when frame selected should keep children + 
     API.setSelectedElements([f1, r1]);
 
     act(() => {
-      h.app.actionManager.executeAction(actionDeleteSelected);
+      h.app.actionManager.executeAction(actionDeleteSelected as any);
     });
 
     assertElements(h.elements, [

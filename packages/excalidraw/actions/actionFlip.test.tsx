@@ -67,10 +67,10 @@ describe("flipping re-centers selection", () => {
 
     expect(Object.keys(h.state.selectedElementIds).length).toBe(3);
 
-    API.executeAction(actionFlipHorizontal);
-    API.executeAction(actionFlipHorizontal);
-    API.executeAction(actionFlipHorizontal);
-    API.executeAction(actionFlipHorizontal);
+    API.executeAction(actionFlipHorizontal as any);
+    API.executeAction(actionFlipHorizontal as any);
+    API.executeAction(actionFlipHorizontal as any);
+    API.executeAction(actionFlipHorizontal as any);
 
     const rec1 = h.elements.find((el) => el.id === "rec1")!;
     expect(rec1.x).toBeCloseTo(100, 0);
@@ -110,15 +110,15 @@ describe("flipping arrowheads", () => {
     expect(API.getElement(arrow).startArrowhead).toBe("arrow");
     expect(API.getElement(arrow).endArrowhead).toBe(null);
 
-    API.executeAction(actionFlipHorizontal);
+    API.executeAction(actionFlipHorizontal as any);
     expect(API.getElement(arrow).startArrowhead).toBe(null);
     expect(API.getElement(arrow).endArrowhead).toBe("arrow");
 
-    API.executeAction(actionFlipHorizontal);
+    API.executeAction(actionFlipHorizontal as any);
     expect(API.getElement(arrow).startArrowhead).toBe("arrow");
     expect(API.getElement(arrow).endArrowhead).toBe(null);
 
-    API.executeAction(actionFlipVertical);
+    API.executeAction(actionFlipVertical as any);
     expect(API.getElement(arrow).startArrowhead).toBe(null);
     expect(API.getElement(arrow).endArrowhead).toBe("arrow");
   });
@@ -155,11 +155,11 @@ describe("flipping arrowheads", () => {
     expect(API.getElement(arrow).startArrowhead).toBe("arrow");
     expect(API.getElement(arrow).endArrowhead).toBe("circle");
 
-    API.executeAction(actionFlipHorizontal);
+    API.executeAction(actionFlipHorizontal as any);
     expect(API.getElement(arrow).startArrowhead).toBe("circle");
     expect(API.getElement(arrow).endArrowhead).toBe("arrow");
 
-    API.executeAction(actionFlipVertical);
+    API.executeAction(actionFlipVertical as any);
     expect(API.getElement(arrow).startArrowhead).toBe("arrow");
     expect(API.getElement(arrow).endArrowhead).toBe("circle");
   });
@@ -178,7 +178,7 @@ describe("flipping arrowheads", () => {
     expect(API.getElement(arrow).startArrowhead).toBe("arrow");
     expect(API.getElement(arrow).endArrowhead).toBe("circle");
 
-    API.executeAction(actionFlipHorizontal);
+    API.executeAction(actionFlipHorizontal as any);
     expect(API.getElement(arrow).startArrowhead).toBe("arrow");
     expect(API.getElement(arrow).endArrowhead).toBe("circle");
   });
@@ -206,7 +206,7 @@ describe("flipping arrowheads", () => {
     expect(API.getElement(arrow).startArrowhead).toBe("arrow");
     expect(API.getElement(arrow).endArrowhead).toBe(null);
 
-    API.executeAction(actionFlipHorizontal);
+    API.executeAction(actionFlipHorizontal as any);
     expect(API.getElement(arrow).startArrowhead).toBe("arrow");
     expect(API.getElement(arrow).endArrowhead).toBe(null);
   });
