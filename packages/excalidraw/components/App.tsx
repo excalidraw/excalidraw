@@ -11463,7 +11463,7 @@ declare global {
       elements: readonly ExcalidrawElement[];
       state: AppState;
       setState: React.Component<any, AppState>["setState"];
-      app: InstanceType<typeof App>;
+      app: InstanceType<typeof App> | any;
       history: History;
       store: Store;
     };
