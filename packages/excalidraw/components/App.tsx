@@ -788,30 +788,6 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.registerAction(createRedoAction(this.history));
   }
 
-  // setState: React.Component<AppProps, AppState>["setState"] = (
-  //   state,
-  //   callback?,
-  // ) => {
-  //   let newState: Parameters<typeof this.setState>[0] = null;
-  //   if (typeof state === "function") {
-  //     newState = state(this.state, this.props) as Pick<
-  //       AppState,
-  //       keyof AppState
-  //     >;
-  //   } else {
-  //     newState = state as Pick<AppState, keyof AppState>;
-  //   }
-
-  //   if (newState && Object.hasOwn(newState, "selectedLinearElement")) {
-  //     //console.trace(!!newState.selectedLinearElement);
-  //     if (!newState.selectedLinearElement?.selectedPointsIndices?.length) {
-  //       console.trace(newState.selectedLinearElement?.selectedPointsIndices);
-  //     }
-  //   }
-
-  //   super.setState(newState, callback);
-  // };
-
   updateEditorAtom = <Value, Args extends unknown[], Result>(
     atom: WritableAtom<Value, Args, Result>,
     ...args: Args
@@ -3267,15 +3243,6 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.editingTextElement?.isDeleted) {
       this.setState({ editingTextElement: null });
     }
-
-    // if (
-    //   this.state.selectedLinearElement &&
-    //   !this.state.selectedElementIds[this.state.selectedLinearElement.elementId]
-    // ) {
-    //   // To make sure `selectedLinearElement` is in sync with `selectedElementIds`, however this shouldn't be needed once
-    //   // we have a single API to update `selectedElementIds`
-    //   this.setState({ selectedLinearElement: null });
-    // }
 
     this.store.commit(elementsMap, this.state);
 
