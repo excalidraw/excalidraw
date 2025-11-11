@@ -172,6 +172,9 @@
     "wrapSelectionInFrame": "Wrap selection in frame",
     "tab": "Tab",
     "shapeSwitch": "Switch shape"
+    ,
+    "importFonts": "Import local fonts",
+    "importFontsSuccess": "{{count}} font(s) loaded"
   },
   "elementLink": {
     "title": "Link to object",
