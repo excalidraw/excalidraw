@@ -125,7 +125,7 @@ export default defineConfig(({ mode }) => {
           envVars.VITE_APP_ENABLE_ESLINT === "false"
             ? undefined
             : {
-                lintCommand: 'eslint --config eslint.config.js "./**/*.{js,ts,tsx}"',
+                lintCommand: 'eslint --config eslint.config.mjs "./**/*.{js,ts,tsx}"',
                 useFlatConfig: true,
               },
         overlay: {
