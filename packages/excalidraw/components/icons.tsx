@@ -118,6 +118,21 @@ export const DotsIcon = createIcon(
   tablerIconProps,
 );
 
+//icon for file-pdf saving
+export const FileText = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    {/* outline of file with folded corner */}
+    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+    <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" />
+    {/* stylised “PDF” lettering inside */}
+    <path d="M9 17h1.5l1-3.5H12l-1 3.5H9z" />
+    <path d="M13 17v-3.5h1.25c0.75 0 1.25 0.5 1.25 1.25S14 17 13.25 17H13z" />
+    <path d="M16.5 17h-1.5l-.5-3.5h1.5l.5 3.5z" />
+  </g>,
+  tablerIconProps,
+);
+
 // tabler-icons: dots-horizontal (horizontal equivalent of dots-vertical)
 export const DotsHorizontalIcon = createIcon(
   <g strokeWidth="1.5">
