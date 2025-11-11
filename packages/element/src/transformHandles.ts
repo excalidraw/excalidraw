@@ -140,8 +140,8 @@ export const getTransformHandlesFromCoords = (
   spacing = DEFAULT_TRANSFORM_HANDLE_SPACING,
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
-  const handleWidth = size / zoom.value;
-  const handleHeight = size / zoom.value;
+  const handleWidth = (size) / zoom.value;
+  const handleHeight = (size) / zoom.value;
 
   const handleMarginX = size / zoom.value;
   const handleMarginY = size / zoom.value;
@@ -199,14 +199,10 @@ export const getTransformHandlesFromCoords = (
     rotation: omitSides.rotation
       ? undefined
       : generateTransformHandle(
-          x1 + width / 2 - handleWidth / 2,
-          y1 -
-            dashedLineMargin -
-            handleMarginY +
-            centeringOffset -
-            ROTATION_RESIZE_HANDLE_GAP / zoom.value,
-          handleWidth,
-          handleHeight,
+          (x1 + width / 2 - handleWidth / 2) - handleWidth,
+          (y1 - dashedLineMargin - handleMarginY + centeringOffset - ROTATION_RESIZE_HANDLE_GAP / zoom.value) - handleHeight,
+          handleWidth * 2,
+          handleHeight * 2,
           cx,
           cy,
           angle,
