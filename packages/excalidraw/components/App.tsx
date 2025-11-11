@@ -1815,6 +1815,7 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         <InteractiveCanvas
+                          app={this}
                           containerRef={this.excalidrawContainerRef}
                           canvas={this.interactiveCanvas}
                           elementsMap={elementsMap}
@@ -8850,6 +8851,15 @@ class App extends React.Component<AppProps, AppState> {
               }));
 
               this.scene.replaceAllElements(elementsWithIndices);
+              selectedElements.forEach((element) => {
+                if (
+                  isBindableElement(element) &&
+                  element.boundElements?.some((other) => other.type === "arrow")
+                ) {
+                  updateBoundElements(element, this.scene);
+                }
+              });
+
               this.maybeCacheVisibleGaps(event, selectedElements, true);
               this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
             });
