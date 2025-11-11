@@ -39,7 +39,7 @@ const checkpoint = (name: string) => {
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
   );
 
-  checkpointHistory(h.history, name);
+  checkpointHistory(h.history as any, name);
 };
 
 const mouse = new Pointer("mouse");

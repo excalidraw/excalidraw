@@ -60,7 +60,7 @@ const { h } = window;
 export class API {
   static updateScene: InstanceType<typeof App>["updateScene"] = (...args) => {
     act(() => {
-      h.app.updateScene(...args);
+      (h.app.updateScene as any)(...args);
     });
   };
   static setAppState: React.Component<any, AppState>["setState"] = (
@@ -68,7 +68,7 @@ export class API {
     cb,
   ) => {
     act(() => {
-      h.setState(state, cb);
+      h.setState(state as any, cb);
     });
   };
 
@@ -91,7 +91,7 @@ export class API {
         },
         elements,
         h.state,
-        h.app,
+        h.app as any,
         )
       });
     });
@@ -474,7 +474,7 @@ export class API {
 
   static loadFile = async (filepath: string) => {
     const { base, ext } = path.parse(filepath);
-    return new File([await API.readFile(filepath, null)], base, {
+    return new File([await API.readFile(filepath, null) as any], base, {
       type: getMimeType(ext),
     });
   };
@@ -530,7 +530,7 @@ export class API {
 
   static executeAction = (action: Action) => {
     act(() => {
-      h.app.actionManager.executeAction(action);
+      h.app.actionManager.executeAction(action as any);
     });
   };
 }

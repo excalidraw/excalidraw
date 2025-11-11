@@ -105,7 +105,7 @@ const checkpoint = (name: string) => {
       expect(element).toMatchSnapshot(`[${name}] element ${i}`),
     );
 
-  checkpointHistory(h.history, name);
+  checkpointHistory(h.history as any, name);
 };
 
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
@@ -169,7 +169,7 @@ describe("history", () => {
           () =>
             h.history.undo(
               arrayToMap(h.elements) as SceneElementsMap,
-              appState,
+              appState as any,
             ) as any,
         );
       } catch (e) {
@@ -189,7 +189,7 @@ describe("history", () => {
           () =>
             h.history.redo(
               arrayToMap(h.elements) as SceneElementsMap,
-              appState,
+              appState as any,
             ) as any,
         );
       } catch (e) {
@@ -517,8 +517,8 @@ describe("history", () => {
         expect(h.history.isUndoStackEmpty).toBeTruthy();
       });
 
-      const undoAction = createUndoAction(h.history);
-      const redoAction = createRedoAction(h.history);
+      const undoAction = createUndoAction(h.history as any);
+      const redoAction = createRedoAction(h.history as any);
       // noop
       API.executeAction(undoAction);
       expect(h.elements).toEqual([
@@ -597,8 +597,8 @@ describe("history", () => {
         expect.objectContaining({ id: "B", isDeleted: false }),
       ]);
 
-      const undoAction = createUndoAction(h.history);
-      const redoAction = createRedoAction(h.history);
+      const undoAction = createUndoAction(h.history as any);
+      const redoAction = createRedoAction(h.history as any);
       API.executeAction(undoAction);
 
       expect(API.getSnapshot()).toEqual([
@@ -1965,8 +1965,8 @@ describe("history", () => {
         />,
       );
 
-      const undoAction = createUndoAction(h.history);
-      const redoAction = createRedoAction(h.history);
+      const undoAction = createUndoAction(h.history as any);
+      const redoAction = createRedoAction(h.history as any);
 
       await waitFor(() => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
@@ -2015,7 +2015,7 @@ describe("history", () => {
         />,
       );
 
-      const undoAction = createUndoAction(h.history);
+      const undoAction = createUndoAction(h.history as any);
 
       await waitFor(() => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);

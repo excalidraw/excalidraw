@@ -55,7 +55,7 @@ describe("export", () => {
     const pngBlob = await API.loadFile("./fixtures/smiley.png");
     const pngBlobEmbedded = await encodePngMetadata({
       blob: pngBlob,
-      metadata: serializeAsJSON(testElements, h.state, {}, "local"),
+      metadata: serializeAsJSON(testElements, h.state as any, {}, "local"),
     });
     await API.drop([{ kind: "file", file: pngBlobEmbedded }]);
 
@@ -71,7 +71,7 @@ describe("export", () => {
 
     encodeSvgBase64Payload({
       metadataElement,
-      payload: serializeAsJSON(testElements, h.state, {}, "local"),
+      payload: serializeAsJSON(testElements, h.state as any, {}, "local"),
     });
 
     const decoded = JSON.parse(
