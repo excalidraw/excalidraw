@@ -142,8 +142,8 @@
       "editArrow": "Redigera pil"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Dela polygon",
+      "convertToPolygon": "Konvertera till polygon"
     },
     "elementLock": {
       "lock": "Lås",
@@ -170,7 +170,7 @@
     "copyElementLink": "Kopiera länk till objektet",
     "linkToElement": "Länk till objektet",
     "wrapSelectionInFrame": "Omslut urvaled i ram",
-    "tab": "",
+    "tab": "Flik",
     "shapeSwitch": ""
   },
   "elementLink": {
