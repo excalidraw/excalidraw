@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
     "@excalidraw/excalidraw": "*",
-    "browser-fs-access": "0.29.1"
+    "browser-fs-access": "0.38.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "vite": "7.2.2"
   },
   "devDependencies": {
-    "vite": "5.0.12",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "5.0.12"
   },
   "scripts": {
     "start": "vite",

@@ -7,6 +7,8 @@
  * In the future consider separating common utils into a separate shared chunk.
  */
 
+/* eslint-disable no-restricted-globals */ // self is valid in worker context
+
 import { Commands, subsetToBinary } from "./subset-shared.chunk";
 
 /**
@@ -29,7 +31,7 @@ if (typeof window === "undefined" && typeof self !== "undefined") {
     };
   }) => {
     switch (e.data.command) {
-      case Commands.Subset:
+      case Commands.Subset: {
         const buffer = await subsetToBinary(
           e.data.arrayBuffer,
           e.data.codePoints,
@@ -37,6 +39,7 @@ if (typeof window === "undefined" && typeof self !== "undefined") {
 
         self.postMessage(buffer, { transfer: [buffer] });
         break;
+      }
     }
   };
 }

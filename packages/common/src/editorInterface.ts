@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export type StylesPanelMode = "compact" | "full" | "mobile";
 
 export type EditorInterface = Readonly<{

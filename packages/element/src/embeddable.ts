@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   FONT_FAMILY,
   VERTICAL_ALIGN,

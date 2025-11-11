@@ -91,10 +91,13 @@ export class LassoTrail extends AnimatedTrail {
 
   selectElementsFromIds = (ids: string[]) => {
     this.app.setState((prevState) => {
-      const nextSelectedElementIds = ids.reduce((acc, id) => {
-        acc[id] = true;
-        return acc;
-      }, {} as Record<ExcalidrawElement["id"], true>);
+      const nextSelectedElementIds = ids.reduce(
+        (acc, id) => {
+          acc[id] = true;
+          return acc;
+        },
+        {} as Record<ExcalidrawElement["id"], true>,
+      );
 
       if (this.keepPreviousSelection) {
         for (const id of Object.keys(prevState.selectedElementIds)) {

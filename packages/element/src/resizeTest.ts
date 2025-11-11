@@ -137,22 +137,28 @@ export const getElementWithTransformHandleType = (
   elementsMap: ElementsMap,
   editorInterface: EditorInterface,
 ) => {
-  return elements.reduce((result, element) => {
-    if (result) {
-      return result;
-    }
-    const transformHandleType = resizeTest(
-      element,
-      elementsMap,
-      appState,
-      scenePointerX,
-      scenePointerY,
-      zoom,
-      pointerType,
-      editorInterface,
-    );
-    return transformHandleType ? { element, transformHandleType } : null;
-  }, null as { element: NonDeletedExcalidrawElement; transformHandleType: MaybeTransformHandleType } | null);
+  return elements.reduce(
+    (result, element) => {
+      if (result) {
+        return result;
+      }
+      const transformHandleType = resizeTest(
+        element,
+        elementsMap,
+        appState,
+        scenePointerX,
+        scenePointerY,
+        zoom,
+        pointerType,
+        editorInterface,
+      );
+      return transformHandleType ? { element, transformHandleType } : null;
+    },
+    null as {
+      element: NonDeletedExcalidrawElement;
+      transformHandleType: MaybeTransformHandleType;
+    } | null,
+  );
 };
 
 export const getTransformHandleTypeFromCoords = <

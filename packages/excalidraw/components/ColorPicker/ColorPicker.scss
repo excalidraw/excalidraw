@@ -1,4 +1,6 @@
-@import "../../css/variables.module.scss";
+@use "sass:color";
+@use "open-color/open-color.scss";
+@use "../../css/variables.module.scss";
 
 .excalidraw {
   .focus-visible-none {
@@ -25,7 +27,7 @@
     padding: 0.25rem 0px;
     align-items: center;
 
-    @include isMobile {
+    @include variables.isMobile {
       max-width: 11rem;
     }
 
@@ -185,8 +187,8 @@
 
   .color-picker {
     background: var(--popup-bg-color);
-    border: 0 solid transparentize($oc-white, 0.75);
-    box-shadow: transparentize($oc-black, 0.75) 0 1px 4px;
+    border: 0 solid color.adjust(open-color.$oc-white, $alpha: -0.75);
+    box-shadow: color.adjust(open-color.$oc-black, $alpha: -0.75) 0 1px 4px;
     border-radius: 4px;
     position: absolute;
 
@@ -243,7 +245,8 @@
   }
 
   .color-picker-triangle-shadow {
-    border-color: transparent transparent transparentize($oc-black, 0.9);
+    border-color: transparent transparent
+      color.adjust(open-color.$oc-black, $alpha: -0.9);
 
     :root[dir="ltr"] & {
       left: -14px;
@@ -280,7 +283,7 @@
     padding: 0.25rem;
 
     &-title {
-      color: $oc-gray-6;
+      color: open-color.$oc-gray-6;
       font-size: 12px;
       padding: 0 0.25rem;
     }
@@ -319,7 +322,7 @@
 
   .color-picker-transparent {
     border-radius: 4px;
-    box-shadow: transparentize($oc-black, 0.9) 0 0 0 1px inset;
+    box-shadow: color.adjust(open-color.$oc-black, $alpha: -0.9) 0 0 0 1px inset;
     position: absolute;
     top: 0;
     right: 0;
@@ -432,7 +435,7 @@
   }
 
   .color-picker-label-swatch {
-    @include outlineButtonStyles;
+    @include variables.outlineButtonStyles;
     background-color: var(--swatch-color) !important;
     overflow: hidden;
     position: relative;
@@ -463,7 +466,7 @@
       left: 2px;
     }
 
-    @include isMobile {
+    @include variables.isMobile {
       display: none;
     }
   }
@@ -473,7 +476,7 @@
   }
 
   .color-picker-type-elementBackground .color-picker-keybinding {
-    color: $oc-white;
+    color: open-color.$oc-white;
   }
 
   .color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
@@ -486,10 +489,10 @@
 
   &.theme--dark {
     .color-picker-type-elementBackground .color-picker-keybinding {
-      color: $oc-black;
+      color: open-color.$oc-black;
     }
     .color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
-      color: $oc-black;
+      color: open-color.$oc-black;
     }
   }
 }

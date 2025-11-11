@@ -178,16 +178,16 @@ export const MobileToolBar = ({
     ? activeTool.type === "text"
       ? TextIcon
       : activeTool.type === "image"
-      ? ImageIcon
-      : activeTool.type === "frame"
-      ? frameToolIcon
-      : activeTool.type === "embeddable"
-      ? EmbedIcon
-      : activeTool.type === "laser"
-      ? laserPointerToolIcon
-      : activeTool.type === "magicframe"
-      ? MagicIcon
-      : extraToolsIcon
+        ? ImageIcon
+        : activeTool.type === "frame"
+          ? frameToolIcon
+          : activeTool.type === "embeddable"
+            ? EmbedIcon
+            : activeTool.type === "laser"
+              ? laserPointerToolIcon
+              : activeTool.type === "magicframe"
+                ? MagicIcon
+                : extraToolsIcon
     : extraToolsIcon;
 
   return (
@@ -273,10 +273,10 @@ export const MobileToolBar = ({
             lastActiveGenericShape === "rectangle"
               ? "toolBar.rectangle"
               : lastActiveGenericShape === "diamond"
-              ? "toolBar.diamond"
-              : lastActiveGenericShape === "ellipse"
-              ? "toolBar.ellipse"
-              : "toolBar.rectangle",
+                ? "toolBar.diamond"
+                : lastActiveGenericShape === "ellipse"
+                  ? "toolBar.ellipse"
+                  : "toolBar.rectangle",
           ),
         )}
         data-testid="toolbar-rectangle"
