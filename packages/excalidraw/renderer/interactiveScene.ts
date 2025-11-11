@@ -1140,6 +1140,8 @@ const _renderInteractiveScene = ({
 
   const nextAnimationState = animationState;
 
+  const nextAnimationState = animationState;
+
   const context = bootstrapCanvas({
     canvas,
     scale,
