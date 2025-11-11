@@ -12,7 +12,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "14.1",
+    "@types/node": "24.10.0",
+    "@types/react": "19.2.3",
+    "next": "16.0.1",
+    "path2d-polyfill": "3.2.1",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },
