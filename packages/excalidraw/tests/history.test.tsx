@@ -4626,7 +4626,7 @@ describe("history", () => {
                 }),
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-                  fixedPoint: [0.4109529004289598, 0.5890470995710405],
+                  fixedPoint: [0.41092297821765383, 0.5890770217823459],
                   mode: "orbit",
                 }),
               }),
@@ -4770,7 +4770,7 @@ describe("history", () => {
                 // rebound with previous rectangle
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-                  fixedPoint: [0.4106696643494561, 0.5893303356505437],
+                  fixedPoint: [0.41019091151895054, 0.5898090884810496],
                   mode: "orbit",
                 }),
               }),

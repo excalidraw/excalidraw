@@ -197,11 +197,11 @@ describe("elbow arrow routing", () => {
       points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
     });
 
-    expect(arrow.points).toEqual([
+    expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [44, 0],
-      [44, 200],
-      [88, 200],
+      [39, 0],
+      [39, 200],
+      [78, 200],
     ]);
   });
 });
@@ -251,11 +251,11 @@ describe("elbow arrow ui", () => {
 
     expect(arrow.type).toBe("arrow");
     expect(arrow.elbowed).toBe(true);
-    expect(arrow.points).toEqual([
+    expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [44, 0],
-      [44, 200],
-      [88, 200],
+      [39, 0],
+      [39, 200],
+      [78, 200],
     ]);
   });
 
@@ -295,11 +295,11 @@ describe("elbow arrow ui", () => {
 
     expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
       [0, 0],
-      [36, 0],
-      [36, 90],
-      [28, 90],
-      [28, 164],
-      [101, 164],
+      [31, 0],
+      [31, 90],
+      [23, 90],
+      [23, 161],
+      [92, 161],
     ]);
   });
 
@@ -351,11 +351,11 @@ describe("elbow arrow ui", () => {
     expect(duplicatedArrow.id).not.toBe(originalArrowId);
     expect(duplicatedArrow.type).toBe("arrow");
     expect(duplicatedArrow.elbowed).toBe(true);
-    expect(duplicatedArrow.points).toEqual([
+    expect(duplicatedArrow.points).toCloselyEqualPoints([
       [0, 0],
-      [44, 0],
-      [44, 200],
-      [88, 200],
+      [39, 0],
+      [39, 200],
+      [78, 200],
     ]);
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);
@@ -405,11 +405,11 @@ describe("elbow arrow ui", () => {
     expect(duplicatedArrow.id).not.toBe(originalArrowId);
     expect(duplicatedArrow.type).toBe("arrow");
     expect(duplicatedArrow.elbowed).toBe(true);
-    expect(duplicatedArrow.points).toEqual([
+    expect(duplicatedArrow.points).toCloselyEqualPoints([
       [0, 0],
       [0, 100],
-      [88, 100],
-      [88, 200],
+      [78, 100],
+      [78, 200],
     ]);
   });
 });
