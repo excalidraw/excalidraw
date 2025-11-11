@@ -36,8 +36,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "socket.io-client": "4.8.1",
-    "vite-plugin-html": "3.2.2",
-    "vite-plugin-sitemap": "0.8.2"
+    "vite-plugin-html": "3.2.2"
   },
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
@@ -52,6 +51,6 @@
     "build:preview": "yarn build && vite preview --port 5000"
   },
   "devDependencies": {
-    "vite-plugin-sitemap": "0.7.1"
+    "vite-plugin-sitemap": "0.8.2"
   }
 }

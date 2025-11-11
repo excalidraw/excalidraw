@@ -36,6 +36,7 @@
     "jsdom": "27.1.0",
     "lint-staged": "16.2.6",
     "pepjs": "0.5.3",
+    "postcss": "^8.4.0",
     "prettier": "3.6.2",
     "rewire": "9.0.1",
     "rimraf": "6.1.0",
