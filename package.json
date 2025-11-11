@@ -14,7 +14,7 @@
     "@types/chai": "5.2.3",
     "@types/jest": "30.0.0",
     "@types/lodash.throttle": "4.1.9",
-    "@types/react": "19.2.2",
+    "@types/react": "19.2.3",
     "@types/react-dom": "19.2.2",
     "@types/socket.io-client": "3.0.0",
     "@vitejs/plugin-react": "5.1.0",
@@ -98,10 +98,11 @@
   },
   "dependencies": {
     "@excalidraw/excalidraw": "0.18.0",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "8.46.4",
+    "@typescript-eslint/parser": "8.46.4",
     "eslint-plugin-react": "^7.37.5",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "sass": "1.94.0"
   }
 }
