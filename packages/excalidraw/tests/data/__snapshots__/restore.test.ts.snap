@@ -170,6 +170,11 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
+  "freedrawOptions": {
+    "fixedStrokeWidth": true,
+    "simplify": "0.10000",
+    "streamline": "0.25000",
+  },
   "groupIds": [],
   "height": 100,
   "id": "id-freedraw01",

@@ -145,26 +145,27 @@ describe("element locking", () => {
         queryByTestId(document.body, `strokeWidth-thin`),
       ).not.toBeChecked();
       expect(
-        queryByTestId(document.body, `strokeWidth-bold`),
+        queryByTestId(document.body, `strokeWidth-medium`),
       ).not.toBeChecked();
       expect(
-        queryByTestId(document.body, `strokeWidth-extraBold`),
+        queryByTestId(document.body, `strokeWidth-bold`),
       ).not.toBeChecked();
     });
 
     it("should show properties of different element types when selected", () => {
       const rect = API.createElement({
         type: "rectangle",
-        strokeWidth: STROKE_WIDTH.bold,
+        strokeWidth: STROKE_WIDTH.medium,
       });
       const text = API.createElement({
         type: "text",
         fontFamily: FONT_FAMILY["Comic Shanns"],
+        strokeWidth: undefined,
       });
       API.setElements([rect, text]);
       API.setSelectedElements([rect, text]);
 
-      expect(queryByTestId(document.body, `strokeWidth-bold`)).toBeChecked();
+      expect(queryByTestId(document.body, `strokeWidth-medium`)).toBeChecked();
       expect(queryByTestId(document.body, `font-family-code`)).toHaveClass(
         "active",
       );

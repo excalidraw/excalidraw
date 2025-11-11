@@ -334,6 +334,7 @@ export interface AppState {
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemOpacity: number;
+  currentItemFixedStrokeWidth: boolean;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;

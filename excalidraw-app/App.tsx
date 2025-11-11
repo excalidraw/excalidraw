@@ -1159,6 +1159,7 @@ const ExcalidrawWrapper = () => {
             ref={debugCanvasRef}
           />
         )}
+        {/* <FreedrawDebugSliders /> */}
       </Excalidraw>
     </div>
   );
