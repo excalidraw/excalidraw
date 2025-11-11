@@ -57,11 +57,11 @@ Fixed all TypeScript errors and ESLint violations that appeared after ESLint 9 m
 ## Phase 3: Dependency Updates ✅ COMPLETED
 
 **Branch:** `chore/dependency-updates`
-**Status:** Pushed (12 commits total)
+**Status:** Ready for PR (14 commits total)
 **Strategy:** Systematic workspace-by-workspace updates with build verification
 
 ### Summary
-Successfully updated all core and workspace dependencies across the monorepo. Only browser-fs-access@0.29.1 remains in @excalidraw/excalidraw due to breaking TypeScript changes in 0.38.0.
+Successfully updated all core and workspace dependencies across the monorepo. Only browser-fs-access@0.29.1 remains in @excalidraw/excalidraw due to breaking TypeScript changes in 0.38.0. All resolvable warnings addressed.
 
 ### All Updates Completed
 
@@ -71,6 +71,7 @@ Successfully updated all core and workspace dependencies across the monorepo. On
 - @typescript-eslint/eslint-plugin: 8.46.3 → 8.46.4
 - @typescript-eslint/parser: 8.46.3 → 8.46.4
 - sass: 1.93.3 → 1.94.0
+- postcss: Added ^8.4.0 (peer dependency for autoprefixer)
 
 **Minor Updates:**
 - @sentry/browser: 10.23.0 → 10.25.0
@@ -126,7 +127,7 @@ Successfully updated all core and workspace dependencies across the monorepo. On
 - i18next-browser-languagedetector: 6.1.4 → 8.2.0
 - idb-keyval: 6.0.3 → 6.2.2
 - jotai: 2.11.0 → 2.15.1
-- vite-plugin-sitemap: 0.7.1 → 0.8.2
+- vite-plugin-sitemap: 0.7.1 → 0.8.2 (moved to devDependencies only)
 
 #### Workspace: packages/utils ✅
 - browser-fs-access: 0.29.1 → 0.38.0
@@ -146,29 +147,40 @@ Successfully updated all core and workspace dependencies across the monorepo. On
 - browser-fs-access: 0.29.1 → 0.38.0
 - vite: 5.0.12 → 7.2.2 (major version)
 
+### Dependency Warning Fixes ✅
+- Fixed vite-plugin-sitemap collision (moved to devDependencies only in excalidraw-app)
+- Added postcss@^8.4.0 peer dependency for autoprefixer
+- Resolved all actionable dependency warnings before PR
+
 ### Final Status
 - ✅ All core dependencies updated
 - ✅ All workspace dependencies updated
 - ✅ All example app dependencies updated
-- ✅ 12 commits pushed to `chore/dependency-updates`
+- ✅ 14 commits pushed to `chore/dependency-updates`
 - ✅ All builds passing (`yarn build:packages`)
+- ✅ Dev server starts successfully (`yarn start`)
+- ✅ All resolvable warnings addressed
+- ✅ Ready for PR submission
 - ⚠️  browser-fs-access@0.29.1 intentionally kept in @excalidraw/excalidraw (0.38.0 has breaking changes)
 
 ### Known Issues
 - browser-fs-access@0.38.0 has breaking TypeScript type changes
 - Firebase v12 should be tested with collaboration features
-- Some peer dependency warnings for @babel/core (cosmetic, non-blocking)
+- Remaining warnings are cosmetic/non-blocking:
+  - @babel/core peer dependencies (Vite handles transpilation)
+  - Sass deprecation warnings (upstream open-color package)
+  - Optional peer dependencies (size-limit, sass-embedded, workbox)
+  - Engine field warnings (@excalidraw/laser-pointer, bare packages)
 
 ## Future Work
 
 ### Potential Improvements
-- [ ] Address unmet peer dependency warnings for @babel/core
-- [ ] Consider updating autoprefixer in excalidraw package (currently 10.4.7, root is 10.4.22)
-- [ ] Evaluate clsx update in excalidraw package (currently 1.1.1, root is 2.1.1)
-- [ ] Review and address Sass deprecation warnings (map-get → map.get)
+- [ ] Address browser-fs-access@0.38.0 breaking changes (requires ~50 lines of refactoring)
+- [ ] Review and address Sass deprecation warnings (map-get → map.get in upstream packages)
+- [ ] Test Firebase v12 collaboration features after PR merge
 - [ ] Remove package-lock.json if not needed (yarn.lock should be sufficient)
 
 ### Technical Debt
-- [ ] Investigate monorepo TypeScript dual-import issues causing @ts-ignore workarounds
+- [ ] Investigate monorepo TypeScript dual-import issues causing @ts-expect-error workarounds
 - [ ] Review and possibly remove unused eslint-disable directives
 - [ ] Consider stricter TypeScript configuration after dependency stabilization
