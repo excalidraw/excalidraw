@@ -1161,23 +1161,62 @@ export const StrokeWidthBaseIcon = createIcon(
 );
 
 export const StrokeWidthBoldIcon = createIcon(
-  <path
-    d="M5 10h10"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
+  <circle
+    cx="10"
+    cy="10"
+    r="5.5"
+    fill="currentColor"
   />,
   modifiedTablerIconProps,
 );
 
 export const StrokeWidthExtraBoldIcon = createIcon(
-  <path
-    d="M5 10h10"
-    stroke="currentColor"
-    strokeWidth="3.75"
-    strokeLinecap="round"
-    strokeLinejoin="round"
+  <circle
+    cx="10"
+    cy="10"
+    r="7"
+    fill="currentColor"
+  />,
+  modifiedTablerIconProps,
+);
+
+// Dot-based stroke width icons
+export const StrokeWidthExtraThinIcon = createIcon(
+  <circle
+    cx="10"
+    cy="10"
+    r="1.5"
+    fill="currentColor"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const StrokeWidthThinIcon = createIcon(
+  <circle
+    cx="10"
+    cy="10"
+    r="2.5"
+    fill="currentColor"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const StrokeWidthNormalIcon = createIcon(
+  <circle
+    cx="10"
+    cy="10"
+    r="3.5"
+    fill="currentColor"
+  />,
+  modifiedTablerIconProps,
+);
+
+export const StrokeWidthMediumIcon = createIcon(
+  <circle
+    cx="10"
+    cy="10"
+    r="4.5"
+    fill="currentColor"
   />,
   modifiedTablerIconProps,
 );

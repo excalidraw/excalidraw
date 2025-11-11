@@ -101,6 +101,10 @@ import {
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
   StrokeWidthBaseIcon,
+  StrokeWidthExtraThinIcon,
+  StrokeWidthThinIcon,
+  StrokeWidthNormalIcon,
+  StrokeWidthMediumIcon,
   StrokeWidthBoldIcon,
   StrokeWidthExtraBoldIcon,
   FontSizeSmallIcon,
@@ -556,10 +560,28 @@ export const actionChangeStrokeWidth = register({
           group="stroke-width"
           options={[
             {
+              value: STROKE_WIDTH.extraThin,
+              text: t("labels.extraThin"),
+              icon: StrokeWidthExtraThinIcon,
+              testId: "strokeWidth-extraThin",
+            },
+            {
               value: STROKE_WIDTH.thin,
               text: t("labels.thin"),
-              icon: StrokeWidthBaseIcon,
+              icon: StrokeWidthThinIcon,
               testId: "strokeWidth-thin",
+            },
+            {
+              value: STROKE_WIDTH.normal,
+              text: t("labels.normal"),
+              icon: StrokeWidthNormalIcon,
+              testId: "strokeWidth-normal",
+            },
+            {
+              value: STROKE_WIDTH.medium,
+              text: t("labels.medium"),
+              icon: StrokeWidthMediumIcon,
+              testId: "strokeWidth-medium",
             },
             {
               value: STROKE_WIDTH.bold,
