@@ -98,11 +98,17 @@
   },
   "dependencies": {
     "@excalidraw/excalidraw": "0.18.0",
+    "@excalidraw/random-username": "1.2.0",
+    "@sentry/browser": "10.25.0",
     "@typescript-eslint/eslint-plugin": "8.46.4",
     "@typescript-eslint/parser": "8.46.4",
+    "autoprefixer": "10.4.22",
     "eslint-plugin-react": "^7.37.5",
+    "idb-keyval": "6.2.2",
+    "jotai": "2.15.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "sass": "1.94.0"
+    "sass": "1.94.0",
+    "vite-plugin-sitemap": "0.8.2"
   }
 }

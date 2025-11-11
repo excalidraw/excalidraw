@@ -2512,12 +2512,26 @@
   dependencies:
     "@sentry/core" "10.23.0"
 
+"@sentry-internal/browser-utils@10.25.0":
+  version "10.25.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/browser-utils/-/browser-utils-10.25.0.tgz#3ef1c2e6044fdf80dba75a9ce18c8133184e57da"
+  integrity sha512-wzg1ITZxrRtQouHPCgpt3tl1GiNAWFVy2RYK2KstFEhpYBAOUn9BAdP7KU9UyHBFKqbAvV4oGtAT8H2/Y4+leA==
+  dependencies:
+    "@sentry/core" "10.25.0"
+
 "@sentry-internal/feedback@10.23.0":
   version "10.23.0"
   resolved "https://registry.npmjs.org/@sentry-internal/feedback/-/feedback-10.23.0.tgz"
   integrity sha512-+HWC9VTPICsFX/lIPoBU9GxTaJZVXJcukP+qGxj+j/8q/Dy1w22JHDWcJbZiaW4kWWlz7VbA0KVKS3grD+e9aA==
   dependencies:
     "@sentry/core" "10.23.0"
+
+"@sentry-internal/feedback@10.25.0":
+  version "10.25.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/feedback/-/feedback-10.25.0.tgz#9a335f11bada42bde307e3fa58b0aaf764aea40e"
+  integrity sha512-qlbT4tOd+WRyKpLdsbi26rkynGBoVabnY8/9rFnTxZ0WIUG5EFhJFqEeRLMyv+uk0uRFF3H0I9+u+qP/BKxIcQ==
+  dependencies:
+    "@sentry/core" "10.25.0"
 
 "@sentry-internal/replay-canvas@10.23.0":
   version "10.23.0"
@@ -2527,6 +2541,14 @@
     "@sentry-internal/replay" "10.23.0"
     "@sentry/core" "10.23.0"
 
+"@sentry-internal/replay-canvas@10.25.0":
+  version "10.25.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/replay-canvas/-/replay-canvas-10.25.0.tgz#cd3a5f953b9b3cbc1fc3fbdfb6ac0bdbfa1f7cc3"
+  integrity sha512-zuj5jVNswZ/aA1nPPbU+VIFkQG0695lbyIfS1Skq+5o2FdRIS3MGnBXw1abI9h4pft8GLQWcKiBxISM7UpSz6w==
+  dependencies:
+    "@sentry-internal/replay" "10.25.0"
+    "@sentry/core" "10.25.0"
+
 "@sentry-internal/replay@10.23.0":
   version "10.23.0"
   resolved "https://registry.npmjs.org/@sentry-internal/replay/-/replay-10.23.0.tgz"
@@ -2534,6 +2556,14 @@
   dependencies:
     "@sentry-internal/browser-utils" "10.23.0"
     "@sentry/core" "10.23.0"
+
+"@sentry-internal/replay@10.25.0":
+  version "10.25.0"
+  resolved "https://registry.yarnpkg.com/@sentry-internal/replay/-/replay-10.25.0.tgz#5aa936c551bcac5ce0825550ec382e83e9774142"
+  integrity sha512-V/kKQn9T46HBTiP0bIThmpVr94K4vXwYM3/EHVpGSq4P9RynX06cgps8GLHq94+A0kX/DbK9igEMZmIuzS1q3A==
+  dependencies:
+    "@sentry-internal/browser-utils" "10.25.0"
+    "@sentry/core" "10.25.0"
 
 "@sentry/browser@10.23.0":
   version "10.23.0"
@@ -2546,10 +2576,26 @@
     "@sentry-internal/replay-canvas" "10.23.0"
     "@sentry/core" "10.23.0"
 
+"@sentry/browser@10.25.0":
+  version "10.25.0"
+  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-10.25.0.tgz#d97fffc53f955ed75369f781bf458d0a47d286ac"
+  integrity sha512-UgSVT3RTM3vsK914TPuHVJQsjq5ooXVmjMtsWP3Ep+6f7N+1UVX4ZXsyyj5lDOcWdc79FgproD+MrEf9Cj6uBg==
+  dependencies:
+    "@sentry-internal/browser-utils" "10.25.0"
+    "@sentry-internal/feedback" "10.25.0"
+    "@sentry-internal/replay" "10.25.0"
+    "@sentry-internal/replay-canvas" "10.25.0"
+    "@sentry/core" "10.25.0"
+
 "@sentry/core@10.23.0":
   version "10.23.0"
   resolved "https://registry.npmjs.org/@sentry/core/-/core-10.23.0.tgz"
   integrity sha512-4aZwu6VnSHWDplY5eFORcVymhfvS/P6BRfK81TPnG/ReELaeoykKjDwR+wC4lO7S0307Vib9JGpszjsEZw245g==
+
+"@sentry/core@10.25.0":
+  version "10.25.0"
+  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-10.25.0.tgz#99e5253a1a5e52f7e8972c89dcf3e710700e4059"
+  integrity sha512-mGi4BYIPwZjWdOXHrPoXz1AW4/cQbFoiuW/m+OOATmtSoGTDnWYwP+qZU7VLlL+v8ZEzxfPi2C1NPfJtPj7QWA==
 
 "@sinclair/typebox@^0.27.8":
   version "0.27.8"
@@ -3658,6 +3704,18 @@ at-least-node@^1.0.0:
   resolved "https://registry.npmjs.org/at-least-node/-/at-least-node-1.0.0.tgz"
   integrity sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==
 
+autoprefixer@10.4.22:
+  version "10.4.22"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-10.4.22.tgz#90b27ab55ec0cf0684210d1f056f7d65dac55f16"
+  integrity sha512-ARe0v/t9gO28Bznv6GgqARmVqcWOV3mfgUPn9becPHMiD3o9BwlRgaeccZnwTpZ7Zwqrm+c1sUSsMxIzQzc8Xg==
+  dependencies:
+    browserslist "^4.27.0"
+    caniuse-lite "^1.0.30001754"
+    fraction.js "^5.3.4"
+    normalize-range "^0.1.2"
+    picocolors "^1.1.1"
+    postcss-value-parser "^4.2.0"
+
 autoprefixer@10.4.7:
   version "10.4.7"
   resolved "https://registry.npmjs.org/autoprefixer/-/autoprefixer-10.4.7.tgz"
@@ -3731,6 +3789,11 @@ baseline-browser-mapping@^2.8.19:
   resolved "https://registry.npmjs.org/baseline-browser-mapping/-/baseline-browser-mapping-2.8.25.tgz"
   integrity sha512-2NovHVesVF5TXefsGX1yzx1xgr7+m9JQenvz6FQY3qd+YXkKkYiv+vTCc7OriP9mcDZpTC5mAOYN4ocd29+erA==
 
+baseline-browser-mapping@^2.8.25:
+  version "2.8.26"
+  resolved "https://registry.yarnpkg.com/baseline-browser-mapping/-/baseline-browser-mapping-2.8.26.tgz#2c7e2f840f0ae4d83782bdfe795229a43dfc3e59"
+  integrity sha512-73lC1ugzwoaWCLJ1LvOgrR5xsMLTqSKIEoMHVtL9E/HNk0PXtTM76ZIm84856/SF7Nv8mPZxKoBsgpm0tR1u1Q==
+
 basic-auth@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/basic-auth/-/basic-auth-2.0.1.tgz"
@@ -3800,6 +3863,17 @@ browserslist@^4.20.3, browserslist@^4.24.0, browserslist@^4.26.3:
     caniuse-lite "^1.0.30001751"
     electron-to-chromium "^1.5.238"
     node-releases "^2.0.26"
+    update-browserslist-db "^1.1.4"
+
+browserslist@^4.27.0:
+  version "4.28.0"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.28.0.tgz#9cefece0a386a17a3cd3d22ebf67b9deca1b5929"
+  integrity sha512-tbydkR/CxfMwelN0vwdP/pLkDwyAASZ+VfWm4EOwlB6SWhx1sYnWLqo8N5j0rAzPfzfRaxt0mM/4wPU/Su84RQ==
+  dependencies:
+    baseline-browser-mapping "^2.8.25"
+    caniuse-lite "^1.0.30001754"
+    electron-to-chromium "^1.5.249"
+    node-releases "^2.0.27"
     update-browserslist-db "^1.1.4"
 
 buffer-crc32@~0.2.3:
@@ -3889,7 +3963,7 @@ camelcase@^6.2.0:
   resolved "https://registry.npmjs.org/camelcase/-/camelcase-6.3.0.tgz"
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
-caniuse-lite@^1.0.30001335, caniuse-lite@^1.0.30001579, caniuse-lite@^1.0.30001751:
+caniuse-lite@^1.0.30001335, caniuse-lite@^1.0.30001579, caniuse-lite@^1.0.30001751, caniuse-lite@^1.0.30001754:
   version "1.0.30001754"
   resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001754.tgz"
   integrity sha512-x6OeBXueoAceOmotzx3PO4Zpt4rzpeIFsSr6AAePTZxSkXiYDUmpypEl7e2+8NCd9bD7bXjqyef8CJYPC1jfxg==
@@ -4787,6 +4861,11 @@ electron-to-chromium@^1.5.238:
   version "1.5.249"
   resolved "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.249.tgz"
   integrity sha512-5vcfL3BBe++qZ5kuFhD/p8WOM1N9m3nwvJPULJx+4xf2usSlZFJ0qoNYO2fOX4hi3ocuDcmDobtA+5SFr4OmBg==
+
+electron-to-chromium@^1.5.249:
+  version "1.5.250"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.250.tgz#0b40436fa41ae7cbac3d2f60ef0411a698eb72a7"
+  integrity sha512-/5UMj9IiGDMOFBnN4i7/Ry5onJrAGSbOGo3s9FEKmwobGq6xw832ccET0CE3CkkMBZ8GJSlUIesZofpyurqDXw==
 
 elkjs@^0.9.0:
   version "0.9.3"
@@ -5758,6 +5837,11 @@ fraction.js@^4.2.0:
   resolved "https://registry.npmjs.org/fraction.js/-/fraction.js-4.3.7.tgz"
   integrity sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==
 
+fraction.js@^5.3.4:
+  version "5.3.4"
+  resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-5.3.4.tgz#8c0fcc6a9908262df4ed197427bdeef563e0699a"
+  integrity sha512-1X1NTtiJphryn/uLQz3whtY6jK3fTqoE3ohKs0tT+Ujr1W59oopxmoEh7Lu5p6vBaPbgoM0bzveAW4Qi5RyWDQ==
+
 fractional-indexing@3.2.0:
   version "3.2.0"
   resolved "https://registry.npmjs.org/fractional-indexing/-/fractional-indexing-3.2.0.tgz"
@@ -6176,6 +6260,11 @@ idb-keyval@6.0.3:
   integrity sha512-yh8V7CnE6EQMu9YDwQXhRxwZh4nv+8xm/HV4ZqK4IiYFJBWYGjJuykADJbSP+F/GDXUBwCSSNn/14IpGL81TuA==
   dependencies:
     safari-14-idb-fix "^3.0.0"
+
+idb-keyval@6.2.2:
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/idb-keyval/-/idb-keyval-6.2.2.tgz#b0171b5f73944854a3291a5cdba8e12768c4854a"
+  integrity sha512-yjD9nARJ/jb1g+CvD0tlhUHOrJ9Sy0P8T9MF3YaLlHnSRpwPfpTX0XIvpmw3gAJUmEu3FiICLBDPXVwyEvrleg==
 
 idb@7.1.1, idb@^7.0.1:
   version "7.1.1"
@@ -6677,6 +6766,11 @@ jotai@2.15.0:
   version "2.15.0"
   resolved "https://registry.yarnpkg.com/jotai/-/jotai-2.15.0.tgz#2a697924b7dcfff71847e83c7493c92e3b731e88"
   integrity sha512-nbp/6jN2Ftxgw0VwoVnOg0m5qYM1rVcfvij+MZx99Z5IK13eGve9FJoCwGv+17JvVthTjhSmNtT5e1coJnr6aw==
+
+jotai@2.15.1:
+  version "2.15.1"
+  resolved "https://registry.yarnpkg.com/jotai/-/jotai-2.15.1.tgz#fdeed68fb45515a8cdc42bba77dfcba70bb1b623"
+  integrity sha512-yHT1HAZ3ba2Q8wgaUQ+xfBzEtcS8ie687I8XVCBinfg4bNniyqLIN+utPXWKQE93LMF5fPbQSVRZqgpcN5yd6Q==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
@@ -7522,7 +7616,7 @@ node-html-parser@^5.3.3:
     css-select "^4.2.1"
     he "1.2.0"
 
-node-releases@^2.0.26:
+node-releases@^2.0.26, node-releases@^2.0.27:
   version "2.0.27"
   resolved "https://registry.npmjs.org/node-releases/-/node-releases-2.0.27.tgz"
   integrity sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA==
@@ -9543,6 +9637,11 @@ vite-plugin-sitemap@0.7.1:
   version "0.7.1"
   resolved "https://registry.npmjs.org/vite-plugin-sitemap/-/vite-plugin-sitemap-0.7.1.tgz"
   integrity sha512-4NRTkiWytLuAmcikckrLcLl9iYA20+5v6l8XshcOrzxH1WR8H0O3S6sTQYfjMrE8su/LG6Y0cTodvOdcOIxaLw==
+
+vite-plugin-sitemap@0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/vite-plugin-sitemap/-/vite-plugin-sitemap-0.8.2.tgz#4121168d331df1054bc4b2cff9de8f21cc0bd7af"
+  integrity sha512-bqIw6NVOXg6je81lzX8Lm0vjf8/QSAp8di8fYQzZ3ZdVicOm8+6idBGALJiy1R1FiXNIK8rgORO6HBqXyHW+iQ==
 
 vite-plugin-svgr@4.5.0:
   version "4.5.0"
