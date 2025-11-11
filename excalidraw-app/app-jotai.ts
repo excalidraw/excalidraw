@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-restricted-imports
 import {
   atom,
   Provider,
@@ -25,7 +24,7 @@ export const useAtomWithInitialValue = <
 
   useLayoutEffect(() => {
     if (typeof initialValue === "function") {
-      // @ts-ignore
+      // @ts-expect-error - TypeScript can't narrow the type inside the function check
       setValue(initialValue());
     } else {
       setValue(initialValue);

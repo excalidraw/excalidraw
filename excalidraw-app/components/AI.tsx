@@ -92,7 +92,7 @@ export const AIComponents = ({
             return {
               html,
             };
-          } catch (_error: any) {
+          } catch {
             throw new Error("Generation failed (invalid response)");
           }
         }}
@@ -150,7 +150,7 @@ export const AIComponents = ({
             }
 
             return { generatedResponse, rateLimit, rateLimitRemaining };
-          } catch (err: any) {
+          } catch {
             throw new Error("Request failed");
           }
         }}

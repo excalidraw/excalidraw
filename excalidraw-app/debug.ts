@@ -103,9 +103,10 @@ export class Debug {
     Debug.TIMES_AVG[name].t = now;
   };
 
+  /* eslint-disable no-unused-vars */
   private static logWrapper =
-    (type: "logTime" | "logTimeAverage") =>
-    <T extends any[], R>(fn: (...args: T) => R, name = "default") => {
+    (_type: "logTime" | "logTimeAverage") =>
+    <T extends any[], R>(fn: (..._args: T) => R, name = "default") => {
       return (...args: T) => {
         const t0 = performance.now();
         const ret = fn(...args);
@@ -113,12 +114,14 @@ export class Debug {
         return ret;
       };
     };
+  /* eslint-enable no-unused-vars */
 
   public static logTimeWrap = Debug.logWrapper("logTime");
   public static logTimeAverageWrap = Debug.logWrapper("logTimeAverage");
 
   public static perfWrap = <T extends any[], R>(
-    fn: (...args: T) => R,
+    // eslint-disable-next-line no-unused-vars -- parameter name for documentation
+    fn: (..._args: T) => R,
     name = "default",
   ) => {
     return (...args: T) => {
@@ -131,5 +134,5 @@ export class Debug {
     };
   };
 }
-//@ts-ignore
+// @ts-expect-error - Adding debug object to window for development
 window.debug = Debug;

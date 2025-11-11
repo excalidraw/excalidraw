@@ -162,6 +162,7 @@ declare global {
   }
 }
 
+// eslint-disable-next-line no-undef -- Type declared in global scope above
 let pwaEvent: BeforeInstallPromptEvent | null = null;
 
 // Adding a listener outside of the component as it may (?) need to be
@@ -171,6 +172,7 @@ let pwaEvent: BeforeInstallPromptEvent | null = null;
 // used the app for some time, etc.)
 window.addEventListener(
   "beforeinstallprompt",
+  // eslint-disable-next-line no-undef -- Type declared in global scope above
   (event: BeforeInstallPromptEvent) => {
     // prevent Chrome <= 67 from automatically showing the prompt
     event.preventDefault();
@@ -188,7 +190,7 @@ if (window.self !== window.top) {
     if (parentUrl.origin === currentUrl.origin) {
       isSelfEmbedding = true;
     }
-  } catch (_error) {
+  } catch {
     // ignore
   }
 }
@@ -280,7 +282,7 @@ const initializeScene = async (opts: {
       ) {
         return { scene: data, isExternalScene };
       }
-    } catch (error: any) {
+    } catch {
       return {
         scene: {
           appState: {
@@ -325,7 +327,8 @@ const initializeScene = async (opts: {
       id: roomLinkData.roomId,
       key: roomLinkData.roomKey,
     };
-  } else if (scene) {
+  }
+  if (scene) {
     return isExternalScene && jsonBackendMatch
       ? {
           scene,

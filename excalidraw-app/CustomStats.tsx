@@ -21,7 +21,8 @@ type StorageSizes = { scene: number; total: number };
 
 const STORAGE_SIZE_TIMEOUT = 500;
 
-const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
+// eslint-disable-next-line no-unused-vars -- Parameter name for documentation
+const getStorageSizes = debounce((cb: (_sizes: StorageSizes) => void) => {
   cb({
     scene: getElementsStorageSize(),
     total: getTotalStorageSize(),
@@ -29,7 +30,8 @@ const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
 }, STORAGE_SIZE_TIMEOUT);
 
 type Props = {
-  setToast: (message: string) => void;
+  // eslint-disable-next-line no-unused-vars -- Parameter name for documentation
+  setToast: (_message: string) => void;
   elements: readonly NonDeletedExcalidrawElement[];
   appState: UIAppState;
 };
@@ -66,7 +68,9 @@ const CustomStats = (props: Props) => {
           try {
             await copyTextToSystemClipboard(getVersion());
             props.setToast(t("toast.copyToClipboard"));
-          } catch {}
+          } catch {
+            // Ignore clipboard errors
+          }
         }}
         title={t("stats.versionCopy")}
       >

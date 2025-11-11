@@ -20,7 +20,8 @@ export const AppMainMenu: React.FC<{
   isCollaborating: boolean;
   isCollabEnabled: boolean;
   theme: Theme | "system";
-  setTheme: (theme: Theme | "system") => void;
+  // eslint-disable-next-line no-unused-vars -- Parameter name for documentation
+  setTheme: (_theme: Theme | "system") => void;
   refresh: () => void;
 }> = React.memo((props) => {
   return (

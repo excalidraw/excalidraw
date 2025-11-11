@@ -108,7 +108,8 @@ const _debugRenderer = (
   canvas: HTMLCanvasElement,
   appState: AppState,
   scale: number,
-  refresh: () => void,
+  // eslint-disable-next-line no-unused-vars -- Parameter required by interface
+  _refresh: () => void,
 ) => {
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,

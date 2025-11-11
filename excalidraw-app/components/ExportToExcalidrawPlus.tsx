@@ -46,6 +46,7 @@ export const exportToExcalidrawPlus = async (
   );
 
   const blob = new Blob(
+    // eslint-disable-next-line no-undef -- BlobPart is a TypeScript DOM type
     [encryptedData.iv, encryptedData.encryptedBuffer] as BlobPart[],
     {
       type: MIME_TYPES.binary,
@@ -92,7 +93,8 @@ export const ExportToExcalidrawPlus: React.FC<{
   appState: Partial<AppState>;
   files: BinaryFiles;
   name: string;
-  onError: (error: Error) => void;
+  // eslint-disable-next-line no-unused-vars -- Parameter name for documentation
+  onError: (_error: Error) => void;
   onSuccess: () => void;
 }> = ({ elements, appState, files, name, onError, onSuccess }) => {
   const { t } = useI18n();

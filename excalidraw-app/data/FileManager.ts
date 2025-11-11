@@ -45,11 +45,13 @@ export class FileManager {
     getFiles,
     saveFiles,
   }: {
-    getFiles: (fileIds: FileId[]) => Promise<{
+    // eslint-disable-next-line no-unused-vars -- Parameter name for documentation
+    getFiles: (_fileIds: FileId[]) => Promise<{
       loadedFiles: BinaryFileData[];
       erroredFiles: Map<FileId, true>;
     }>;
-    saveFiles: (data: { addedFiles: Map<FileId, BinaryFileData> }) => Promise<{
+    // eslint-disable-next-line no-unused-vars -- Parameter name for documentation
+    saveFiles: (_data: { addedFiles: Map<FileId, BinaryFileData> }) => Promise<{
       savedFiles: Map<FileId, BinaryFileData>;
       erroredFiles: Map<FileId, BinaryFileData>;
     }>;

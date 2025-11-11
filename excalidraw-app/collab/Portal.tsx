@@ -46,7 +46,7 @@ class Portal {
         trackEvent("share", "room joined");
       }
     });
-    this.socket.on("new-user", async (_socketId: string) => {
+    this.socket.on("new-user", async () => {
       this.broadcastScene(
         WS_SUBTYPES.INIT,
         this.collab.getSceneElementsIncludingDeleted(),

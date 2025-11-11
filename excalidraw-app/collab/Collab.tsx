@@ -602,7 +602,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
             const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
               decryptedData.payload.socketId ||
-              // @ts-ignore legacy, see #2094 (#2097)
+              // @ts-expect-error - legacy, see #2094 (#2097)
               decryptedData.payload.socketID;
 
             this.updateCollaborator(socketId, {

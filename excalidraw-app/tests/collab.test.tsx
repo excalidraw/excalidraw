@@ -83,7 +83,6 @@ describe("collaboration", () => {
       }
     });
 
-    // eslint-disable-next-line dot-notation
     expect(h.store["scheduledMicroActions"].length).toBe(0);
     expect(durableIncrements.length).toBe(0);
     expect(ephemeralIncrements.length).toBe(0);
@@ -122,7 +121,6 @@ describe("collaboration", () => {
 
       // we scheduled two micro actions,
       // which confirms they are going to be executed as part of one batched component update
-      // eslint-disable-next-line dot-notation
       expect(h.store["scheduledMicroActions"].length).toBe(2);
     });
 
@@ -137,7 +135,6 @@ describe("collaboration", () => {
       expect(ephemeralIncrements[1].change.elements.A).toEqual(
         expect.objectContaining({ x: 200 }),
       );
-      // eslint-disable-next-line dot-notation
       expect(h.store["scheduledMicroActions"].length).toBe(0);
     });
   });

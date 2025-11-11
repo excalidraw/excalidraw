@@ -3041,7 +3041,7 @@ class App extends React.Component<AppProps, AppState> {
         this.lassoTrail.endPath();
         this.deselectElements();
 
-        // @ts-ignore
+        // @ts-expect-error - Partial touch event passed to double click handler
         this.handleCanvasDoubleClick({
           clientX: touch.clientX,
           clientY: touch.clientY,

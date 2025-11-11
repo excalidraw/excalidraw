@@ -20,6 +20,8 @@ export const WS_EVENTS = {
   USER_FOLLOW_ROOM_CHANGE: "user-follow-room-change",
 } as const;
 
+// Enum values used as types in data/index.ts
+/* eslint-disable no-unused-vars */
 export enum WS_SUBTYPES {
   INVALID_RESPONSE = "INVALID_RESPONSE",
   INIT = "SCENE_INIT",
@@ -28,6 +30,7 @@ export enum WS_SUBTYPES {
   IDLE_STATUS = "IDLE_STATUS",
   USER_VISIBLE_SCENE_BOUNDS = "USER_VISIBLE_SCENE_BOUNDS",
 }
+/* eslint-enable no-unused-vars */
 
 export const FIREBASE_STORAGE_PREFIXES = {
   shareLinkFiles: `/files/shareLinks`,
