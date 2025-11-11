@@ -87,7 +87,7 @@
     "@excalidraw/random-username": "1.2.0",
     "@radix-ui/react-popover": "1.1.15",
     "@radix-ui/react-tabs": "1.1.13",
-    "browser-fs-access": "0.29.1",
+    "browser-fs-access": "0.38.0",
     "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",
     "cross-env": "7.0.3",

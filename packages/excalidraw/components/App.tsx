@@ -11472,7 +11472,7 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 declare global {
   interface Window {
-    // @ts-expect-error - TypeScript 5.6+ incorrectly flags this as a type mismatch due to
+    // @ts-ignore - TypeScript 5.6+ incorrectly flags this as a type mismatch due to
     // monorepo dual-import issues (same types imported from dist/types and source paths)
     h: {
       scene: Scene;

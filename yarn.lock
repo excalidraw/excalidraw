@@ -3784,6 +3784,11 @@ browser-fs-access@0.29.1:
   resolved "https://registry.npmjs.org/browser-fs-access/-/browser-fs-access-0.29.1.tgz"
   integrity sha512-LSvVX5e21LRrXqVMhqtAwj5xPgDb+fXAIH80NsnCQ9xuZPs2xWsOREi24RKgZa1XOiQRbcmVrv87+ulOKsgjxw==
 
+browser-fs-access@0.38.0:
+  version "0.38.0"
+  resolved "https://registry.yarnpkg.com/browser-fs-access/-/browser-fs-access-0.38.0.tgz#9024c5bf3d962287a08d14beebb86cb819cbb838"
+  integrity sha512-JveqW2w6pEZqFEEfMgCszXzYpE89dG+nPsmOdcs741mFFAROeL+iqjGEpR07RI+s0YY0EFr+4KnOoACprJTpOw==
+
 browserslist@^4.20.3, browserslist@^4.24.0, browserslist@^4.26.3:
   version "4.27.0"
   resolved "https://registry.npmjs.org/browserslist/-/browserslist-4.27.0.tgz"
