@@ -28,7 +28,7 @@ export class TopErrorBoundary extends React.Component<
     for (const [key, value] of Object.entries({ ...localStorage })) {
       try {
         _localStorage[key] = JSON.parse(value);
-      } catch (error: any) {
+      } catch (_error: any) {
         _localStorage[key] = value;
       }
     }
@@ -61,8 +61,8 @@ export class TopErrorBoundary extends React.Component<
         )
       ).default;
       body = encodeURIComponent(templateStrFn(this.state.sentryEventId));
-    } catch (error: any) {
-      console.error(error);
+    } catch (_error: any) {
+      console.error(_error);
     }
 
     window.open(
@@ -93,8 +93,8 @@ export class TopErrorBoundary extends React.Component<
                     try {
                       localStorage.clear();
                       window.location.reload();
-                    } catch (error: any) {
-                      console.error(error);
+                    } catch (_error: any) {
+                      console.error(_error);
                     }
                   }}
                 >

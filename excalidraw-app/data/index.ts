@@ -228,10 +228,10 @@ const importFromBackend = async (
         elements: data.elements || null,
         appState: data.appState || null,
       };
-    } catch (error: any) {
+    } catch (_error: any) {
       console.warn(
         "error when decoding shareLink data using the new format:",
-        error,
+        _error,
       );
       return legacy_decodeFromBackend({ buffer, decryptionKey });
     }

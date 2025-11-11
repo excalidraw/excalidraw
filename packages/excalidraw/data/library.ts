@@ -266,18 +266,20 @@ class Library {
    * @returns latest cloned libraryItems. Awaits all in-progress updates first.
    */
   getLatestLibrary = (): Promise<LibraryItems> => {
-    return new Promise(async (resolve) => {
-      try {
-        const libraryItems = await (this.getLastUpdateTask() ||
-          this.currLibraryItems);
-        if (this.updateQueue.length > 0) {
-          resolve(this.getLatestLibrary());
-        } else {
-          resolve(cloneLibraryItems(libraryItems));
+    return new Promise((resolve) => {
+      (async () => {
+        try {
+          const libraryItems = await (this.getLastUpdateTask() ||
+            this.currLibraryItems);
+          if (this.updateQueue.length > 0) {
+            resolve(this.getLatestLibrary());
+          } else {
+            resolve(cloneLibraryItems(libraryItems));
+          }
+        } catch (error) {
+          return resolve(this.currLibraryItems);
         }
-      } catch (error) {
-        return resolve(this.currLibraryItems);
-      }
+      })();
     });
   };
 
@@ -304,46 +306,48 @@ class Library {
     }
 
     return this.setLibrary(() => {
-      return new Promise<LibraryItems>(async (resolve, reject) => {
-        try {
-          const source = await (typeof libraryItems === "function" &&
-          !(libraryItems instanceof Blob)
-            ? libraryItems(this.currLibraryItems)
-            : libraryItems);
+      return new Promise<LibraryItems>((resolve, reject) => {
+        (async () => {
+          try {
+            const source = await (typeof libraryItems === "function" &&
+            !(libraryItems instanceof Blob)
+              ? libraryItems(this.currLibraryItems)
+              : libraryItems);
 
-          let nextItems;
+            let nextItems;
 
-          if (source instanceof Blob) {
-            nextItems = await loadLibraryFromBlob(source, defaultStatus);
-          } else {
-            nextItems = restoreLibraryItems(source, defaultStatus);
-          }
-          if (
-            !prompt ||
-            window.confirm(
-              t("alerts.confirmAddLibrary", {
-                numShapes: nextItems.length,
-              }),
-            )
-          ) {
-            if (prompt) {
-              // focus container if we've prompted. We focus conditionally
-              // lest `props.autoFocus` is disabled (in which case we should
-              // focus only on user action such as prompt confirm)
-              this.app.focusContainer();
-            }
-
-            if (merge) {
-              resolve(mergeLibraryItems(this.currLibraryItems, nextItems));
+            if (source instanceof Blob) {
+              nextItems = await loadLibraryFromBlob(source, defaultStatus);
             } else {
-              resolve(nextItems);
+              nextItems = restoreLibraryItems(source, defaultStatus);
             }
-          } else {
-            reject(new AbortError());
+            if (
+              !prompt ||
+              window.confirm(
+                t("alerts.confirmAddLibrary", {
+                  numShapes: nextItems.length,
+                }),
+              )
+            ) {
+              if (prompt) {
+                // focus container if we've prompted. We focus conditionally
+                // lest `props.autoFocus` is disabled (in which case we should
+                // focus only on user action such as prompt confirm)
+                this.app.focusContainer();
+              }
+
+              if (merge) {
+                resolve(mergeLibraryItems(this.currLibraryItems, nextItems));
+              } else {
+                resolve(nextItems);
+              }
+            } else {
+              reject(new AbortError());
+            }
+          } catch (error: any) {
+            reject(error);
           }
-        } catch (error: any) {
-          reject(error);
-        }
+        })();
       });
     });
   };
@@ -366,20 +370,22 @@ class Library {
           latestLibraryItems: LibraryItems,
         ) => LibraryItems | Promise<LibraryItems>),
   ): Promise<LibraryItems> => {
-    const task = new Promise<LibraryItems>(async (resolve, reject) => {
-      try {
-        await this.getLastUpdateTask();
+    const task = new Promise<LibraryItems>((resolve, reject) => {
+      (async () => {
+        try {
+          await this.getLastUpdateTask();
 
-        if (typeof libraryItems === "function") {
-          libraryItems = libraryItems(this.currLibraryItems);
+          if (typeof libraryItems === "function") {
+            libraryItems = libraryItems(this.currLibraryItems);
+          }
+
+          this.currLibraryItems = cloneLibraryItems(await libraryItems);
+
+          resolve(this.currLibraryItems);
+        } catch (error: any) {
+          reject(error);
         }
-
-        this.currLibraryItems = cloneLibraryItems(await libraryItems);
-
-        resolve(this.currLibraryItems);
-      } catch (error: any) {
-        reject(error);
-      }
+      })();
     })
       .catch((error) => {
         if (error.name === "AbortError") {
@@ -551,13 +557,15 @@ class AdapterTransaction {
     _queue = true,
   ): Promise<LibraryItems> {
     const task = () =>
-      new Promise<LibraryItems>(async (resolve, reject) => {
-        try {
-          const data = await adapter.load({ source });
-          resolve(restoreLibraryItems(data?.libraryItems || [], "published"));
-        } catch (error: any) {
-          reject(error);
-        }
+      new Promise<LibraryItems>((resolve, reject) => {
+        (async () => {
+          try {
+            const data = await adapter.load({ source });
+            resolve(restoreLibraryItems(data?.libraryItems || [], "published"));
+          } catch (error: any) {
+            reject(error);
+          }
+        })();
       });
 
     if (_queue) {
@@ -722,20 +730,22 @@ export const useHandleLibrary = (
       libraryUrl: string;
       idToken: string | null;
     }) => {
-      const libraryPromise = new Promise<Blob>(async (resolve, reject) => {
-        try {
-          libraryUrl = decodeURIComponent(libraryUrl);
+      const libraryPromise = new Promise<Blob>((resolve, reject) => {
+        (async () => {
+          try {
+            libraryUrl = decodeURIComponent(libraryUrl);
 
-          libraryUrl = toValidURL(libraryUrl);
+            libraryUrl = toValidURL(libraryUrl);
 
-          validateLibraryUrl(libraryUrl, optsRef.current.validateLibraryUrl);
+            validateLibraryUrl(libraryUrl, optsRef.current.validateLibraryUrl);
 
-          const request = await fetch(libraryUrl);
-          const blob = await request.blob();
-          resolve(blob);
-        } catch (error: any) {
-          reject(error);
-        }
+            const request = await fetch(libraryUrl);
+            const blob = await request.blob();
+            resolve(blob);
+          } catch (error: any) {
+            reject(error);
+          }
+        })();
       });
 
       const shouldPrompt = idToken !== excalidrawAPI.id;

@@ -122,9 +122,9 @@ export const ExportToExcalidrawPlus: React.FC<{
             trackEvent("export", "eplus", `ui (${getFrame()})`);
             await exportToExcalidrawPlus(elements, appState, files, name);
             onSuccess();
-          } catch (error: any) {
-            console.error(error);
-            if (error.name !== "AbortError") {
+          } catch (_error: any) {
+            console.error(_error);
+            if (_error.name !== "AbortError") {
               onError(new Error(t("exportDialog.excalidrawplus_exportError")));
             }
           }

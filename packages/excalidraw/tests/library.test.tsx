@@ -26,14 +26,16 @@ const libraryJSONPromise = API.readFile(
   "utf8",
 );
 
-const mockLibraryFilePromise = new Promise<Blob>(async (resolve, reject) => {
-  try {
-    resolve(
-      new Blob([await libraryJSONPromise], { type: MIME_TYPES.excalidrawlib }),
-    );
-  } catch (error) {
-    reject(error);
-  }
+const mockLibraryFilePromise = new Promise<Blob>((resolve, reject) => {
+  (async () => {
+    try {
+      resolve(
+        new Blob([await libraryJSONPromise], { type: MIME_TYPES.excalidrawlib }),
+      );
+    } catch (error) {
+      reject(error);
+    }
+  })();
 });
 
 vi.mock("../data/filesystem.ts", async (importOriginal) => {

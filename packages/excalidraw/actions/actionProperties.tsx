@@ -512,7 +512,7 @@ export const actionChangeFillStyle = register({
               elements,
               app,
               (element) => element.fillStyle,
-              (element) => element.hasOwnProperty("fillStyle"),
+              (element) => Object.prototype.hasOwnProperty.call(element, "fillStyle"),
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemFillStyle,
             )}
@@ -578,7 +578,7 @@ export const actionChangeStrokeWidth = register({
             elements,
             app,
             (element) => element.strokeWidth,
-            (element) => element.hasOwnProperty("strokeWidth"),
+            (element) => Object.prototype.hasOwnProperty.call(element, "strokeWidth"),
             (hasSelection) =>
               hasSelection ? null : appState.currentItemStrokeWidth,
           )}
@@ -632,7 +632,7 @@ export const actionChangeSloppiness = register({
             elements,
             app,
             (element) => element.roughness,
-            (element) => element.hasOwnProperty("roughness"),
+            (element) => Object.prototype.hasOwnProperty.call(element, "roughness"),
             (hasSelection) =>
               hasSelection ? null : appState.currentItemRoughness,
           )}
@@ -685,7 +685,7 @@ export const actionChangeStrokeStyle = register({
             elements,
             app,
             (element) => element.strokeStyle,
-            (element) => element.hasOwnProperty("strokeStyle"),
+            (element) => Object.prototype.hasOwnProperty.call(element, "strokeStyle"),
             (hasSelection) =>
               hasSelection ? null : appState.currentItemStrokeStyle,
           )}
@@ -1509,7 +1509,7 @@ export const actionChangeRoundness = register({
                   ? "round"
                   : "sharp",
               (element) =>
-                !isArrowElement(element) && element.hasOwnProperty("roundness"),
+                !isArrowElement(element) && Object.prototype.hasOwnProperty.call(element, "roundness"),
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemRoundness,
             )}

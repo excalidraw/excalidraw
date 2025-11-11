@@ -188,7 +188,7 @@ if (window.self !== window.top) {
     if (parentUrl.origin === currentUrl.origin) {
       isSelfEmbedding = true;
     }
-  } catch (error) {
+  } catch (_error) {
     // ignore
   }
 }
