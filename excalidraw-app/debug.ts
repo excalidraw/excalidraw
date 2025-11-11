@@ -134,5 +134,4 @@ export class Debug {
     };
   };
 }
-// @ts-expect-error - Adding debug object to window for development
 window.debug = Debug;
