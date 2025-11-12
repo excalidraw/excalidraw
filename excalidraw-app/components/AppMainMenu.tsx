@@ -81,15 +81,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
-      <MainMenu.ItemLink
-        icon={ExcalLogo}
-        href={`${
-          import.meta.env.VITE_APP_PLUS_LP
-        }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
-        className=""
-      >
-        Excalidraw+
-      </MainMenu.ItemLink>
+
       {authShell && authShell.hasActiveSubscription && (
         <MainMenu.Item
           icon={PlusPromoIcon}
@@ -100,7 +92,6 @@ export const AppMainMenu: React.FC<{
           Account settings
         </MainMenu.Item>
       )}
-      <MainMenu.DefaultItems.Socials />
       {!authShell && (
         <MainMenu.ItemLink
           icon={loginIcon}
