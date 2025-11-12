@@ -394,13 +394,17 @@ describe("binding for simple arrows", () => {
         width: 200,
         height: 500,
       });
-      const arrow = UI.createElement("arrow", {
-        x: 190,
-        y: 250,
-        width: 220,
-        height: 1,
-        points: [pointFrom(0, 0), pointFrom(110, 0), pointFrom(220, 1)],
-      });
+      UI.clickTool("arrow");
+      mouse.reset();
+      mouse.clickAt(190, 250);
+      mouse.moveTo(220, 200);
+      mouse.moveTo(300, 200);
+      mouse.clickAt(300, 200);
+      mouse.moveTo(340, 251);
+      mouse.moveTo(410, 251);
+      mouse.clickAt(410, 251);
+      const arrow = h.elements[h.elements.length - 1] as any;
+
       expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
       expect(arrow.endBinding?.elementId).toBe(rectRight.id);
 
@@ -437,8 +441,10 @@ describe("binding for simple arrows", () => {
       UI.clickTool("arrow");
       mouse.reset();
       mouse.clickAt(190, 250);
+      mouse.moveTo(220, 200);
       mouse.moveTo(300, 200);
       mouse.clickAt(300, 200);
+      mouse.moveTo(350, 251);
       mouse.moveTo(410, 251);
       mouse.clickAt(410, 251);
 
