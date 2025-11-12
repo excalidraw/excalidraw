@@ -23,7 +23,7 @@
     ]
   },
   "engines": {
-    "node": "18.0.0 - 22.x.x"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.10.0",
