@@ -330,7 +330,10 @@ export const hasBoundingBox = (
   appState: InteractiveCanvasAppState,
   editorInterface: EditorInterface,
 ) => {
-  if (appState.selectedLinearElement?.isEditing) {
+  if (
+    appState.selectedLinearElement?.isEditing ||
+    appState.selectedLinearElement?.isDragging
+  ) {
     return false;
   }
   if (elements.length > 1) {
