@@ -630,7 +630,7 @@ export class LinearElementEditor {
         ? endBindingElement
         : null;
 
-    const newLinearElementEditor = {
+    const newLinearElementEditor: LinearElementEditor = {
       ...linearElementEditor,
       selectedPointsIndices: newSelectedPointsIndices,
       initialState: {

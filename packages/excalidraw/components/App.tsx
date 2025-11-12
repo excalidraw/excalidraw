@@ -8911,6 +8911,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           selectedLinearElement: {
             ...this.state.selectedLinearElement,
+            isDragging: true,
             segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
             initialState: ret.initialState,
           },

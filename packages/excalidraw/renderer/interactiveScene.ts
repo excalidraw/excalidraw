@@ -1278,15 +1278,17 @@ const _renderInteractiveScene = ({
       (el) => el.id === editor.elementId, // Don't forget bound text elements!
     );
 
-    if (editor.segmentMidPointHoveredCoords) {
-      renderElbowArrowMidPointHighlight(context, appState);
-    } else if (
-      isElbowArrow(firstSelectedLinear)
-        ? editor.hoverPointIndex === 0 ||
-          editor.hoverPointIndex === firstSelectedLinear.points.length - 1
-        : editor.hoverPointIndex >= 0
-    ) {
-      renderLinearElementPointHighlight(context, appState, elementsMap);
+    if (!appState.selectedLinearElement.isDragging) {
+      if (editor.segmentMidPointHoveredCoords) {
+        renderElbowArrowMidPointHighlight(context, appState);
+      } else if (
+        isElbowArrow(firstSelectedLinear)
+          ? editor.hoverPointIndex === 0 ||
+            editor.hoverPointIndex === firstSelectedLinear.points.length - 1
+          : editor.hoverPointIndex >= 0
+      ) {
+        renderLinearElementPointHighlight(context, appState, elementsMap);
+      }
     }
   }
 
