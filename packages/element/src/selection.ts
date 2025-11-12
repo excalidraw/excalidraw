@@ -83,14 +83,19 @@ export const getElementsWithinSelection = (
       elementY2 = Math.min(fy2, elementY2);
     }
 
+    // Check if the element's bounding box intersects the selection box
+    const overlaps = !(
+      elementX2 < selectionX1 ||
+      elementX1 > selectionX2 ||
+      elementY2 < selectionY1 ||
+      elementY1 > selectionY2
+    );
+
     return (
       element.locked === false &&
       element.type !== "selection" &&
       !isBoundToContainer(element) &&
-      selectionX1 <= elementX1 &&
-      selectionY1 <= elementY1 &&
-      selectionX2 >= elementX2 &&
-      selectionY2 >= elementY2
+      overlaps
     );
   });
 
