@@ -392,6 +392,7 @@ export class LinearElementEditor {
     // PERF: Avoid state updates if not absolutely necessary
     if (
       app.state.selectedLinearElement?.customLineAngle === customLineAngle &&
+      linearElementEditor.initialState.altFocusPoint &&
       (!suggestedBinding ||
         isShallowEqual(app.state.suggestedBinding ?? [], suggestedBinding))
     ) {

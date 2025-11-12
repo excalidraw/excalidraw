@@ -671,11 +671,6 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       otherBindableElement,
       elementsMap,
     );
-  // const otherPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-  //   arrow,
-  //   startDragged ? -1 : 0,
-  //   elementsMap,
-  // );
   const otherFocusPointIsInElement =
     otherBindableElement &&
     otherFocusPoint &&
@@ -683,11 +678,6 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
 
   // Handle outside-outside binding to the same element
   if (otherBinding && otherBinding.elementId === hit?.id) {
-    // const [startFixedPoint, endFixedPoint] = getGlobalFixedPoints(
-    //   arrow,
-    //   elementsMap,
-    // );
-
     invariant(
       !opts?.newArrow || appState.selectedLinearElement?.initialState.origin,
       "appState.selectedLinearElement.initialState.origin must be defined for new arrows",
