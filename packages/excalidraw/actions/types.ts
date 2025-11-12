@@ -99,6 +99,7 @@ export type ActionName =
   | "toggleShortcuts"
   | "group"
   | "ungroup"
+  | "vennDiagram"
   | "goToCollaborator"
   | "addToLibrary"
   | "changeRoundness"

@@ -101,6 +101,7 @@
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint-plugin-react": "^7.37.5",
+    "polygon-clipping": "0.15.7",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   }

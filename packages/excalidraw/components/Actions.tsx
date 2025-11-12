@@ -305,6 +305,7 @@ export const SelectedShapeActions = ({
               renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
+            {renderAction("vennDiagram")}
             {showLinkIcon && renderAction("hyperlink")}
             {showCropEditorAction && renderAction("cropEditor")}
             {showLineEditorAction && renderAction("toggleLinearEditor")}
@@ -744,6 +745,7 @@ const CombinedExtraActions = ({
                 <div className="buttonList">
                   {renderAction("group")}
                   {renderAction("ungroup")}
+                  {renderAction("vennDiagram")}
                   {showLinkIcon && renderAction("hyperlink")}
                   {showCropEditorAction && renderAction("cropEditor")}
                   {showDuplicate && renderAction("duplicateSelection")}

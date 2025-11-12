@@ -7931,6 +7931,14 @@ points-on-path@^0.2.1:
     path-data-parser "0.1.0"
     points-on-curve "0.2.0"
 
+polygon-clipping@0.15.7:
+  version "0.15.7"
+  resolved "https://registry.yarnpkg.com/polygon-clipping/-/polygon-clipping-0.15.7.tgz#3823ca1e372566f350795ce9dd9a7b19e97bdaad"
+  integrity sha512-nhfdr83ECBg6xtqOAJab1tbksbBAOMUltN60bU+llHVOL0e5Onm1WpAXXWXVB39L8AJFssoIhEVuy/S90MmotA==
+  dependencies:
+    robust-predicates "^3.0.2"
+    splaytree "^3.1.0"
+
 portfinder@^1.0.28:
   version "1.0.33"
   resolved "https://registry.npmjs.org/portfinder/-/portfinder-1.0.33.tgz"
@@ -8763,6 +8771,11 @@ sourcemap-codec@^1.4.8:
   version "1.4.8"
   resolved "https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz"
   integrity sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==
+
+splaytree@^3.1.0:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/splaytree/-/splaytree-3.1.2.tgz#d1db2691665a3c69d630de98d55145a6546dc166"
+  integrity sha512-4OM2BJgC5UzrhVnnJA4BkHKGtjXNzzUfpQjCO8I05xYPsfS/VuQDwjCGGMi8rYQilHEV4j8NBqTFbls/PZEE7A==
 
 split.js@^1.6.0:
   version "1.6.5"
