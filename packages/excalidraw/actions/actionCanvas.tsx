@@ -7,7 +7,6 @@ import {
   MIN_ZOOM,
   THEME,
   ZOOM_STEP,
-  getShortcutKey,
   updateActiveTool,
   CODES,
   KEYS,
@@ -46,6 +45,7 @@ import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
@@ -83,7 +83,6 @@ export const actionChangeViewBackgroundColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
-        compactMode={appState.stylesPanelMode === "compact"}
       />
     );
   },

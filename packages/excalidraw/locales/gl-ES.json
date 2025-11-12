@@ -11,8 +11,8 @@
     "copyAsPng": "Copiar no portapapeis como PNG",
     "copyAsSvg": "Copiar no portapapeis como SVG",
     "copyText": "Copia no portapapeis como texto",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Copiar fonte ao portapapeis",
+    "convertToCode": "Converter a código",
     "bringForward": "Traer cara adiante",
     "sendToBack": "Enviar cara atrás",
     "bringToFront": "Traer á fronte",
@@ -21,7 +21,9 @@
     "copyStyles": "Copiar estilo",
     "pasteStyles": "Pegar estilo",
     "stroke": "Trazo",
+    "changeStroke": "",
     "background": "Fondo",
+    "changeBackground": "",
     "fill": "Recheo",
     "strokeWidth": "Largo do trazo",
     "strokeStyle": "Estilo do trazo",
@@ -38,12 +40,20 @@
     "arrowhead_none": "Ningunha",
     "arrowhead_arrow": "Frecha",
     "arrowhead_bar": "Barra",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Círculo",
+    "arrowhead_circle_outline": "Círculo (contorno)",
     "arrowhead_triangle": "Triángulo",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Triángulo (contorno)",
+    "arrowhead_diamond": "Diamante",
+    "arrowhead_diamond_outline": "Diamante (contorno)",
+    "arrowhead_crowfoot_many": "",
+    "arrowhead_crowfoot_one": "",
+    "arrowhead_crowfoot_one_or_many": "",
+    "more_options": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Tamaño da fonte",
     "fontFamily": "Tipo de fonte",
     "addWatermark": "Engadir \"Feito con Excalidraw\"",
@@ -72,6 +82,7 @@
     "canvasColors": "Usado en lenzo",
     "canvasBackground": "Fondo do lenzo",
     "drawingCanvas": "Lenzo de debuxo",
+    "clearCanvas": "",
     "layers": "Capas",
     "actions": "Accións",
     "language": "Idioma",
@@ -84,12 +95,13 @@
     "group": "Agrupar selección",
     "ungroup": "Desagrupar selección",
     "collaborators": "Colaboradores",
-    "showGrid": "Mostrar cuadrícula",
+    "toggleGrid": "",
     "addToLibrary": "Engadir á biblioteca",
     "removeFromLibrary": "Eliminar da biblioteca",
     "libraryLoadingMessage": "Cargando biblioteca…",
     "libraries": "Explorar bibliotecas",
     "loadingScene": "Cargando escena…",
+    "loadScene": "",
     "align": "Aliñamento",
     "alignTop": "Aliñamento superior",
     "alignBottom": "Aliñamento inferior",
@@ -105,7 +117,9 @@
     "share": "Compartir",
     "showStroke": "Mostrar selector de cores do trazo",
     "showBackground": "Mostrar selector de cores do fondo",
-    "toggleTheme": "Alternar tema",
+    "showFonts": "",
+    "toggleTheme": "",
+    "theme": "",
     "personalLib": "Biblioteca Persoal",
     "excalidrawLib": "Biblioteca Excalidraw",
     "decreaseFontSize": "Diminuír tamaño da fonte",
@@ -116,15 +130,20 @@
     "link": {
       "edit": "Editar ligazón",
       "editEmbed": "",
-      "create": "Crear ligazón",
-      "createEmbed": "",
+      "create": "",
       "label": "Ligazón",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "Non se estableceu un enlace",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Editar liña",
-      "exit": "Saír do editor de liñas"
+      "editArrow": ""
+    },
+    "polygon": {
+      "breakPolygon": "",
+      "convertToPolygon": ""
     },
     "elementLock": {
       "lock": "Bloquear",
@@ -137,13 +156,47 @@
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "Texto a diagrama",
+    "prompt": "",
+    "followUs": "Síguenos",
+    "discordChat": "Chat de Discord",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": "",
+    "imageCropping": "",
+    "unCroppedDimension": "",
+    "copyElementLink": "",
+    "linkToElement": "",
+    "wrapSelectionInFrame": "",
+    "tab": "",
+    "shapeSwitch": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Aínda non hai elementos engadidos...",
     "hint_emptyLibrary": "Seleccione un elemento no lenzo para engadilo aquí, ou instale unha biblioteca dende o repositorio público, como se detalla a continuación.",
-    "hint_emptyPrivateLibrary": "Seleccione un elemento do lenzo para engadilo aquí."
+    "hint_emptyPrivateLibrary": "Seleccione un elemento do lenzo para engadilo aquí.",
+    "search": {
+      "inputPlaceholder": "",
+      "heading": "",
+      "noResults": "",
+      "clearSearch": ""
+    }
+  },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": "",
+    "frames": "",
+    "texts": ""
   },
   "buttons": {
     "clearReset": "Limpar o lenzo",
@@ -151,6 +204,7 @@
     "exportImage": "Exportar imaxe...",
     "export": "Gardar en...",
     "copyToClipboard": "Copiar ao portapapeis",
+    "copyLink": "",
     "save": "Gardar no ficheiro actual",
     "saveAs": "Gardar como",
     "load": "Abrir",
@@ -171,14 +225,16 @@
     "fullScreen": "Pantalla completa",
     "darkMode": "Modo escuro",
     "lightMode": "Modo claro",
+    "systemMode": "",
     "zenMode": "Modo zen",
     "objectsSnapMode": "",
     "exitZenMode": "Saír do modo zen",
     "cancel": "Cancelar",
+    "saveLibNames": "",
     "clear": "Limpar",
     "remove": "Eliminar",
     "embed": "",
-    "publishLibrary": "Publicar",
+    "publishLibrary": "",
     "submit": "Enviar",
     "confirm": "Confirmar",
     "embeddableInteractionButton": "Faga clic para interactuar"
@@ -204,20 +260,21 @@
     "resetLibrary": "Isto limpará a súa biblioteca. Está seguro?",
     "removeItemsFromsLibrary": "Eliminar {{count}} elemento(s) da biblioteca?",
     "invalidEncryptionKey": "A clave de cifrado debe ter 22 caracteres. A colaboración en directo está desactivada.",
-    "collabOfflineWarning": "Non hai conexión a Internet dispoñible.\nOs teus cambios non serán gardados!"
+    "collabOfflineWarning": "Non hai conexión a Internet dispoñible.\nOs teus cambios non serán gardados!",
+    "localStorageQuotaExceeded": ""
   },
   "errors": {
     "unsupportedFileType": "Tipo de ficheiro non soportado.",
     "imageInsertError": "Non se puido inserir a imaxe. Probe de novo máis tarde...",
     "fileTooBig": "O ficheiro é demasiado grande. O tamaño máximo permitido é {{maxSize}}.",
     "svgImageInsertError": "Non se puido inserir como imaxe SVG. O marcado SVG semella inválido.",
-    "failedToFetchImage": "",
-    "invalidSVGString": "SVG inválido.",
+    "failedToFetchImage": "Non se puido obter a imaxe.",
     "cannotResolveCollabServer": "Non se puido conectar ao servidor de colaboración. Por favor recargue a páxina e probe de novo.",
     "importLibraryError": "Non se puido cargar a biblioteca",
+    "saveLibraryError": "",
     "collabSaveFailed": "Non se puido gardar na base de datos. Se o problema persiste, deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
     "collabSaveFailed_sizeExceeded": "Non se puido gardar na base de datos, o lenzo semella demasiado grande. Deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "As imaxes están desactivadas.",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -230,11 +287,12 @@
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnParse": "Non se puido copiar.",
+    "copyToSystemClipboardFailed": "Non se puido copiar ao portapapeis."
   },
   "toolBar": {
     "selection": "Selección",
+    "lasso": "",
     "image": "Inserir imaxe",
     "rectangle": "Rectángulo",
     "diamond": "Diamante",
@@ -246,7 +304,7 @@
     "library": "Biblioteca",
     "lock": "Manter a ferramenta seleccionada activa despois de debuxar",
     "penMode": "Modo lapis - evitar o contacto",
-    "link": "Engadir/ Actualizar ligazón para a forma seleccionada",
+    "link": "",
     "eraser": "Goma de borrar",
     "frame": "",
     "magicframe": "",
@@ -255,7 +313,23 @@
     "hand": "Man (ferramenta de desprazamento)",
     "extraTools": "Máis ferramentas",
     "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "convertElementType": ""
+  },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "Accións do lenzo",
@@ -263,28 +337,33 @@
     "shapes": "Formas"
   },
   "hints": {
-    "canvasPanning": "Para mover o lenzo, manteña pulsada a roda do rato ou a barra de espazo mentres arrastra, ou utilice a ferramenta da man",
+    "dismissSearch": "",
+    "canvasPanning": "",
     "linearElement": "Faga clic para iniciar varios puntos, arrastre para unha sola liña",
+    "arrowTool": "",
     "freeDraw": "Fai clic e arrastra, solta cando acabes",
     "text": "Consello: tamén podes engadir texto facendo dobre-clic en calquera lugar coa ferramenta de selección",
     "embeddable": "Faga clic e arrastre para crear un sitio web embebido",
-    "text_selected": "Dobre-clic ou prema ENTER para editar o texto",
-    "text_editing": "Prema Escape ou CtrlOrCmd+ENTER para finalizar a edición",
-    "linearElementMulti": "Faga clic no último punto ou prema Escape ou Enter para rematar",
-    "lockAngle": "Pode reducir o ángulo mantendo SHIFT",
-    "resize": "Pode reducir as proporcións mantendo SHIFT mentres axusta o tamaño,\nmanteña ALT para axustalo dende o centro",
-    "resizeImage": "Pode axustar o tamaño libremente mantendo SHIFT,\nmanteña ALT para axustalo dende o centro",
-    "rotate": "Podes reducir os ángulos mantendo SHIFT mentres os rotas",
-    "lineEditor_info": "Manteña pulsado CtrlOrCmd e faga dobre clic ou prema CtrlOrCmd + Enter para editar puntos",
-    "lineEditor_pointSelected": "Prema Suprimir para eliminar o(s) punto(s)\nCtrlOrCmd+D para duplicalos, ou arrastre para movelos",
-    "lineEditor_nothingSelected": "Seleccione un punto para editar (manteña pulsado SHIFT para selección múltiple),\nou manteña pulsado Alt e faga clic para engadir novos puntos",
-    "placeImage": "Faga clic para colocar a imaxe, ou faga clic e arrastre para establecer o seu tamaño manualmente",
+    "text_selected": "",
+    "text_editing": "",
+    "linearElementMulti": "",
+    "lockAngle": "",
+    "resize": "",
+    "resizeImage": "",
+    "rotate": "",
+    "lineEditor_info": "",
+    "lineEditor_line_info": "",
+    "lineEditor_pointSelected": "",
+    "lineEditor_nothingSelected": "",
     "publishLibrary": "Publica a túa propia biblioteca",
-    "bindTextToElement": "Prema a tecla enter para engadir texto",
-    "deepBoxSelect": "Manteña pulsado CtrlOrCmd para seleccionar en profundidade e evitar o arrastre",
-    "eraserRevert": "Manteña pulsado Alt para reverter os elementos marcados para a súa eliminación",
+    "bindTextToElement": "",
+    "createFlowchart": "",
+    "deepBoxSelect": "",
+    "eraserRevert": "",
     "firefox_clipboard_write": "Esta función pódese activar establecendo a opción \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar as opcións do navegador en Firefox, visita a páxina \"about:config\".",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Non se pode mostrar a vista previa",
@@ -299,9 +378,12 @@
     "openIssueMessage": "Fomos moi cautelosos de non incluír a información da súa escena no erro. Se a súa escena non é privada, por favor, considere o seguimento do noso <button>rastrexador de erros.</button> Por favor inclúa a seguinte información copiándoa e pegándoa na issue de Github.",
     "sceneContent": "Contido da escena:"
   },
+  "shareDialog": {
+    "or": "Ou"
+  },
   "roomDialog": {
-    "desc_intro": "Podes invitar xente a colaborar contigo na túa escena actual.",
-    "desc_privacy": "Non te preocupes, a sesión usa cifrado de punto a punto, polo que calquera cousa que debuxes mantense privada. Nin tan sequera o noso servidor será capaz de ver o que fas.",
+    "desc_intro": "Invita xente a colaborar no teu diagrama.",
+    "desc_privacy": "",
     "button_startSession": "Comezar sesión",
     "button_stopSession": "Rematar sesión",
     "desc_inProgressIntro": "A sesión de colaboración en directo está agora en progreso.",
@@ -328,6 +410,8 @@
     "click": "clic",
     "deepSelect": "Selección en profundidade",
     "deepBoxSelect": "Selección en profundidade dentro da caixa, evitando o arrastre",
+    "createFlowchart": "",
+    "navigateFlowchart": "",
     "curvedArrow": "Frecha curva",
     "curvedLine": "Liña curva",
     "documentation": "Documentación",
@@ -350,7 +434,9 @@
     "zoomToSelection": "Zoom á selección",
     "toggleElementLock": "Bloquear/desbloquear selección",
     "movePageUpDown": "Mover páxina cara enriba/abaixo",
-    "movePageLeftRight": "Mover páxina cara a esquerda/dereita"
+    "movePageLeftRight": "Mover páxina cara a esquerda/dereita",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Limpar lenzo"
@@ -395,14 +481,14 @@
     "header": "Exportar imaxe",
     "label": {
       "withBackground": "Fondo",
-      "onlySelected": "",
+      "onlySelected": "Só seleccionados",
       "darkMode": "Modo escuro",
       "embedScene": "",
       "scale": "",
       "padding": ""
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Os datos da escena serán gardados no ficheiro PNG/SVG exportado polo que a escena poderá ser restaurada dende el. Isto aumentará o tamaño do ficheiro exportado."
     },
     "title": {
       "exportToPng": "Exportar a PNG",
@@ -421,13 +507,15 @@
   },
   "stats": {
     "angle": "Ángulo",
-    "element": "Elemento",
-    "elements": "Elementos",
+    "shapes": "",
     "height": "Alto",
     "scene": "Escena",
     "selected": "Seleccionado",
     "storage": "Almacenamento",
-    "title": "Estadísticas para nerds",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "Total",
     "version": "Versión",
     "versionCopy": "Faga clic para copiar",
@@ -439,13 +527,15 @@
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado ao portapapeis.",
     "copyToClipboardAsPng": "Copiar {{exportSelection}} ao portapapeis como PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Ficheiro gardado.",
     "fileSavedToFilename": "Gardado en {filename}",
     "canvas": "lenzo",
     "selection": "selección",
     "pasteAsSingleElement": "Usa {{shortcut}} para pegar como un único elemento\nou pega nun editor de texto existente",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparente",
@@ -478,6 +568,7 @@
     }
   },
   "colorPicker": {
+    "color": "",
     "mostUsedCustomColors": "",
     "colors": "Cores",
     "shades": "",
@@ -517,9 +608,57 @@
   },
   "mermaid": {
     "title": "",
-    "button": "",
+    "button": "Inserir",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "Vista previa"
+  },
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
+    },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
+    "hint": {
+      "text": "Fai clic no usuario para seguilo",
+      "followStatus": "Xa estás a seguir a este usuario",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
+  },
+  "keys": {
+    "ctrl": "",
+    "option": "",
+    "cmd": "",
+    "alt": "",
+    "escape": "",
+    "enter": "",
+    "shift": "",
+    "spacebar": "",
+    "delete": "",
+    "mmb": ""
   }
 }
