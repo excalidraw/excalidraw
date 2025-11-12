@@ -715,22 +715,24 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   // Handle special alt key case to inside bind no matter what
   if (opts?.altKey) {
     return {
-      start:
-        startDragged && hit
+      start: startDragged
+        ? hit
           ? {
               mode: "inside",
               element: hit,
               focusPoint: globalPoint,
             }
-          : start,
-      end:
-        endDragged && hit
+          : { mode: null }
+        : start,
+      end: endDragged
+        ? hit
           ? {
               mode: "inside",
               element: hit,
               focusPoint: globalPoint,
             }
-          : end,
+          : { mode: null }
+        : end,
     };
   }
 
