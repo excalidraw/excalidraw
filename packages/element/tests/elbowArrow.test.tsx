@@ -295,11 +295,11 @@ describe("elbow arrow ui", () => {
 
     expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
       [0, 0],
-      [31, 0],
-      [31, 90],
-      [23, 90],
-      [23, 161],
-      [92, 161],
+      [36, 0],
+      [36, 90],
+      [28, 90],
+      [28, 164],
+      [101, 164],
     ]);
   });
 

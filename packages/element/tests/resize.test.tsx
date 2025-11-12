@@ -510,12 +510,12 @@ describe("arrow element", () => {
       h.state,
     )[0] as ExcalidrawElbowArrowElement;
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.115);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.06);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
 
     UI.resize(rectangle, "se", [-200, -150]);
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.115);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.06);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
   });
 
@@ -538,11 +538,11 @@ describe("arrow element", () => {
       h.state,
     )[0] as ExcalidrawElbowArrowElement;
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.115);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.06);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
 
     UI.resize([rectangle, arrow], "nw", [300, 350]);
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.115);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.06);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.25);
   });
 });

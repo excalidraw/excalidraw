@@ -103,11 +103,23 @@ export type BindingStrategy =
       focusPoint?: undefined;
     };
 
-/** excludes element strokeWidth */
+/**
+ * gaps exclude element strokeWidth
+ *
+ * IMPORTANT: currently must be > 0 (this also applies to the computed gap)
+ */
 export const BASE_BINDING_GAP = 10;
+export const BASE_BINDING_GAP_ELBOW = 5;
 
-export const getBindingGap = (element: ExcalidrawBindableElement): number =>
-  BASE_BINDING_GAP + element.strokeWidth / 2;
+export const getBindingGap = (
+  bindTarget: ExcalidrawBindableElement,
+  opts: Pick<ExcalidrawArrowElement, "elbowed">,
+): number => {
+  return (
+    (opts.elbowed ? BASE_BINDING_GAP_ELBOW : BASE_BINDING_GAP) +
+    bindTarget.strokeWidth / 2
+  );
+};
 
 export const maxBindingDistance_simple = (zoom?: AppState["zoom"]): number => {
   const BASE_BINDING_DISTANCE = Math.max(BASE_BINDING_GAP, 15);
@@ -1183,7 +1195,7 @@ const getDistanceForBinding = (
 };
 
 export const bindPointToSnapToElementOutline = (
-  linearElement: ExcalidrawArrowElement,
+  arrowElement: ExcalidrawArrowElement,
   bindableElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
@@ -1192,41 +1204,48 @@ export const bindPointToSnapToElementOutline = (
 ): GlobalPoint => {
   const aabb = aabbForElement(bindableElement, elementsMap);
   const localPoint =
-    linearElement.points[
-      startOrEnd === "start" ? 0 : linearElement.points.length - 1
+    arrowElement.points[
+      startOrEnd === "start" ? 0 : arrowElement.points.length - 1
     ];
   const point = pointFrom<GlobalPoint>(
-    linearElement.x + localPoint[0],
-    linearElement.y + localPoint[1],
+    arrowElement.x + localPoint[0],
+    arrowElement.y + localPoint[1],
   );
 
-  if (linearElement.points.length < 2) {
+  if (arrowElement.points.length < 2) {
     // New arrow creation, so no snapping
     return point;
   }
 
   const edgePoint = isRectanguloidElement(bindableElement)
-    ? avoidRectangularCorner(bindableElement, elementsMap, point)
+    ? avoidRectangularCorner(arrowElement, bindableElement, elementsMap, point)
     : point;
-  const elbowed = isElbowArrow(linearElement);
+  const elbowed = isElbowArrow(arrowElement);
   const center = getCenterForBounds(aabb);
   const adjacentPointIdx =
-    startOrEnd === "start" ? 1 : linearElement.points.length - 2;
+    startOrEnd === "start" ? 1 : arrowElement.points.length - 2;
   const adjacentPoint = pointRotateRads(
     pointFrom<GlobalPoint>(
-      linearElement.x + linearElement.points[adjacentPointIdx][0],
-      linearElement.y + linearElement.points[adjacentPointIdx][1],
+      arrowElement.x + arrowElement.points[adjacentPointIdx][0],
+      arrowElement.y + arrowElement.points[adjacentPointIdx][1],
     ),
     center,
-    linearElement.angle ?? 0,
+    arrowElement.angle ?? 0,
   );
+
+  const bindingGap = getBindingGap(bindableElement, arrowElement);
 
   let intersection: GlobalPoint | null = null;
   if (elbowed) {
     const isHorizontal = headingIsHorizontal(
       headingForPointFromElement(bindableElement, aabb, point),
     );
-    const snapPoint = snapToMid(bindableElement, elementsMap, edgePoint);
+    const snapPoint = snapToMid(
+      arrowElement,
+      bindableElement,
+      elementsMap,
+      edgePoint,
+    );
     const otherPoint = pointFrom<GlobalPoint>(
       isHorizontal ? center[0] : snapPoint[0],
       !isHorizontal ? center[1] : snapPoint[1],
@@ -1247,7 +1266,7 @@ export const bindPointToSnapToElementOutline = (
       bindableElement,
       elementsMap,
       intersector,
-      getBindingGap(bindableElement),
+      bindingGap,
     ).sort(pointDistanceSq)[0];
 
     if (!intersection) {
@@ -1269,7 +1288,7 @@ export const bindPointToSnapToElementOutline = (
         bindableElement,
         elementsMap,
         anotherIntersector,
-        BASE_BINDING_GAP,
+        BASE_BINDING_GAP_ELBOW,
       ).sort(pointDistanceSq)[0];
     }
   } else {
@@ -1277,7 +1296,7 @@ export const bindPointToSnapToElementOutline = (
       vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
       pointDistance(edgePoint, adjacentPoint) +
         Math.max(bindableElement.width, bindableElement.height) +
-        getBindingGap(bindableElement) * 2,
+        bindingGap * 2,
     );
     const intersector =
       customIntersector ??
@@ -1293,7 +1312,7 @@ export const bindPointToSnapToElementOutline = (
             bindableElement,
             elementsMap,
             intersector,
-            getBindingGap(bindableElement),
+            bindingGap,
           ).sort(
             (g, h) =>
               pointDistanceSq(g, adjacentPoint) -
@@ -1313,95 +1332,90 @@ export const bindPointToSnapToElementOutline = (
 };
 
 export const avoidRectangularCorner = (
-  element: ExcalidrawBindableElement,
+  arrowElement: ExcalidrawArrowElement,
+  bindTarget: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   p: GlobalPoint,
 ): GlobalPoint => {
-  const center = elementCenterPoint(element, elementsMap);
-  const nonRotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
+  const center = elementCenterPoint(bindTarget, elementsMap);
+  const nonRotatedPoint = pointRotateRads(
+    p,
+    center,
+    -bindTarget.angle as Radians,
+  );
 
-  if (nonRotatedPoint[0] < element.x && nonRotatedPoint[1] < element.y) {
+  const bindingGap = getBindingGap(bindTarget, arrowElement);
+
+  if (nonRotatedPoint[0] < bindTarget.x && nonRotatedPoint[1] < bindTarget.y) {
     // Top left
-    if (nonRotatedPoint[1] - element.y > -getBindingGap(element)) {
+    if (nonRotatedPoint[1] - bindTarget.y > -bindingGap) {
       return pointRotateRads<GlobalPoint>(
-        pointFrom(element.x - getBindingGap(element), element.y),
+        pointFrom(bindTarget.x - bindingGap, bindTarget.y),
         center,
-        element.angle,
+        bindTarget.angle,
       );
     }
     return pointRotateRads(
-      pointFrom(element.x, element.y - getBindingGap(element)),
+      pointFrom(bindTarget.x, bindTarget.y - bindingGap),
       center,
-      element.angle,
+      bindTarget.angle,
     );
   } else if (
-    nonRotatedPoint[0] < element.x &&
-    nonRotatedPoint[1] > element.y + element.height
+    nonRotatedPoint[0] < bindTarget.x &&
+    nonRotatedPoint[1] > bindTarget.y + bindTarget.height
   ) {
     // Bottom left
-    if (nonRotatedPoint[0] - element.x > -getBindingGap(element)) {
+    if (nonRotatedPoint[0] - bindTarget.x > -bindingGap) {
       return pointRotateRads(
-        pointFrom(
-          element.x,
-          element.y + element.height + getBindingGap(element),
-        ),
+        pointFrom(bindTarget.x, bindTarget.y + bindTarget.height + bindingGap),
         center,
-        element.angle,
+        bindTarget.angle,
       );
     }
     return pointRotateRads(
-      pointFrom(element.x - getBindingGap(element), element.y + element.height),
+      pointFrom(bindTarget.x - bindingGap, bindTarget.y + bindTarget.height),
       center,
-      element.angle,
+      bindTarget.angle,
     );
   } else if (
-    nonRotatedPoint[0] > element.x + element.width &&
-    nonRotatedPoint[1] > element.y + element.height
+    nonRotatedPoint[0] > bindTarget.x + bindTarget.width &&
+    nonRotatedPoint[1] > bindTarget.y + bindTarget.height
   ) {
     // Bottom right
-    if (
-      nonRotatedPoint[0] - element.x <
-      element.width + getBindingGap(element)
-    ) {
+    if (nonRotatedPoint[0] - bindTarget.x < bindTarget.width + bindingGap) {
       return pointRotateRads(
         pointFrom(
-          element.x + element.width,
-          element.y + element.height + getBindingGap(element),
+          bindTarget.x + bindTarget.width,
+          bindTarget.y + bindTarget.height + bindingGap,
         ),
         center,
-        element.angle,
+        bindTarget.angle,
       );
     }
     return pointRotateRads(
       pointFrom(
-        element.x + element.width + getBindingGap(element),
-        element.y + element.height,
+        bindTarget.x + bindTarget.width + bindingGap,
+        bindTarget.y + bindTarget.height,
       ),
       center,
-      element.angle,
+      bindTarget.angle,
     );
   } else if (
-    nonRotatedPoint[0] > element.x + element.width &&
-    nonRotatedPoint[1] < element.y
+    nonRotatedPoint[0] > bindTarget.x + bindTarget.width &&
+    nonRotatedPoint[1] < bindTarget.y
   ) {
     // Top right
-    if (
-      nonRotatedPoint[0] - element.x <
-      element.width + getBindingGap(element)
-    ) {
+    if (nonRotatedPoint[0] - bindTarget.x < bindTarget.width + bindingGap) {
       return pointRotateRads(
-        pointFrom(
-          element.x + element.width,
-          element.y - getBindingGap(element),
-        ),
+        pointFrom(bindTarget.x + bindTarget.width, bindTarget.y - bindingGap),
         center,
-        element.angle,
+        bindTarget.angle,
       );
     }
     return pointRotateRads(
-      pointFrom(element.x + element.width + getBindingGap(element), element.y),
+      pointFrom(bindTarget.x + bindTarget.width + bindingGap, bindTarget.y),
       center,
-      element.angle,
+      bindTarget.angle,
     );
   }
 
@@ -1409,14 +1423,17 @@ export const avoidRectangularCorner = (
 };
 
 const snapToMid = (
-  element: ExcalidrawBindableElement,
+  arrowElement: ExcalidrawArrowElement,
+  bindTarget: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   p: GlobalPoint,
   tolerance: number = 0.05,
 ): GlobalPoint => {
-  const { x, y, width, height, angle } = element;
-  const center = elementCenterPoint(element, elementsMap, -0.1, -0.1);
+  const { x, y, width, height, angle } = bindTarget;
+  const center = elementCenterPoint(bindTarget, elementsMap, -0.1, -0.1);
   const nonRotated = pointRotateRads(p, center, -angle as Radians);
+
+  const bindingGap = getBindingGap(bindTarget, arrowElement);
 
   // snap-to-center point is adaptive to element size, but we don't want to go
   // above and below certain px distance
@@ -1424,7 +1441,7 @@ const snapToMid = (
   const horizontalThreshold = clamp(tolerance * width, 5, 80);
 
   // Too close to the center makes it hard to resolve direction precisely
-  if (pointDistance(center, nonRotated) < getBindingGap(element)) {
+  if (pointDistance(center, nonRotated) < bindingGap) {
     return p;
   }
 
@@ -1435,7 +1452,7 @@ const snapToMid = (
   ) {
     // LEFT
     return pointRotateRads<GlobalPoint>(
-      pointFrom(x - getBindingGap(element), center[1]),
+      pointFrom(x - bindingGap, center[1]),
       center,
       angle,
     );
@@ -1445,11 +1462,7 @@ const snapToMid = (
     nonRotated[0] < center[0] + horizontalThreshold
   ) {
     // TOP
-    return pointRotateRads(
-      pointFrom(center[0], y - getBindingGap(element)),
-      center,
-      angle,
-    );
+    return pointRotateRads(pointFrom(center[0], y - bindingGap), center, angle);
   } else if (
     nonRotated[0] >= x + width / 2 &&
     nonRotated[1] > center[1] - verticalThreshold &&
@@ -1457,7 +1470,7 @@ const snapToMid = (
   ) {
     // RIGHT
     return pointRotateRads(
-      pointFrom(x + width + getBindingGap(element), center[1]),
+      pointFrom(x + width + bindingGap, center[1]),
       center,
       angle,
     );
@@ -1468,12 +1481,12 @@ const snapToMid = (
   ) {
     // DOWN
     return pointRotateRads(
-      pointFrom(center[0], y + height + getBindingGap(element)),
+      pointFrom(center[0], y + height + bindingGap),
       center,
       angle,
     );
-  } else if (element.type === "diamond") {
-    const distance = getBindingGap(element);
+  } else if (bindTarget.type === "diamond") {
+    const distance = bindingGap;
     const topLeft = pointFrom<GlobalPoint>(
       x + width / 4 - distance,
       y + height / 4 - distance,
