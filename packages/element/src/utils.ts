@@ -18,8 +18,10 @@ import {
   pointFromArray,
   pointFromVector,
   pointRotateRads,
+  pointTranslate,
   rectangle,
   vectorFromPoint,
+  vectorNormalize,
   vectorScale,
   type GlobalPoint,
 } from "@excalidraw/math";

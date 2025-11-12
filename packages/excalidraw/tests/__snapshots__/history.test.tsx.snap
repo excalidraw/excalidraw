@@ -123,12 +123,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id4",
-      "type": "arrow",
-    },
-  ],
+  "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -147,7 +142,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 7,
+  "version": 13,
   "width": 100,
   "x": -100,
   "y": -50,
@@ -158,12 +153,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id4",
-      "type": "arrow",
-    },
-  ],
+  "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -182,7 +172,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 6,
+  "version": 9,
   "width": 100,
   "x": 100,
   "y": -50,
@@ -198,17 +188,17 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id1",
+    "elementId": "id15",
     "fixedPoint": [
-      "0.41019",
-      "0.58981",
+      "0.50000",
+      1,
     ],
     "mode": "orbit",
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "2.03061",
+  "height": "106.79573",
   "id": "id4",
   "index": "a2",
   "isDeleted": false,
@@ -222,8 +212,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      "78.00000",
-      "-2.03061",
+      "89.00000",
+      "106.79573",
     ],
   ],
   "roughness": 1,
@@ -231,23 +221,16 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     "type": 2,
   },
   "startArrowhead": null,
-  "startBinding": {
-    "elementId": "id0",
-    "fixedPoint": [
-      "0.63636",
-      "0.63636",
-    ],
-    "mode": "orbit",
-  },
+  "startBinding": null,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 19,
-  "width": "78.00000",
-  "x": 11,
-  "y": "12.36576",
+  "version": 34,
+  "width": "89.00000",
+  "x": 0,
+  "y": 0,
 }
 `;
 
@@ -255,7 +238,12 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [],
+  "boundElements": [
+    {
+      "id": "id4",
+      "type": "arrow",
+    },
+  ],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -274,7 +262,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 4,
+  "version": 10,
   "width": 50,
   "x": 100,
   "y": 100,
@@ -283,9 +271,214 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of elements 1`] = `4`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of renders 1`] = `16`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of renders 1`] = `22`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] redo stack 1`] = `[]`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] redo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "version": 12,
+          },
+          "inserted": {
+            "version": 11,
+          },
+        },
+        "id1": {
+          "deleted": {
+            "boundElements": [],
+            "version": 9,
+          },
+          "inserted": {
+            "boundElements": [
+              {
+                "id": "id4",
+                "type": "arrow",
+              },
+            ],
+            "version": 8,
+          },
+        },
+        "id15": {
+          "deleted": {
+            "boundElements": [
+              {
+                "id": "id4",
+                "type": "arrow",
+              },
+            ],
+            "version": 9,
+          },
+          "inserted": {
+            "boundElements": [],
+            "version": 8,
+          },
+        },
+        "id4": {
+          "deleted": {
+            "endBinding": {
+              "elementId": "id15",
+              "fixedPoint": [
+                "0.50000",
+                1,
+              ],
+              "mode": "orbit",
+            },
+            "height": "66.30324",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                "78.47830",
+                "66.30324",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "0.63636",
+                "0.63636",
+              ],
+              "mode": "orbit",
+            },
+            "version": 33,
+            "width": "78.47830",
+            "y": "53.20079",
+          },
+          "inserted": {
+            "endBinding": {
+              "elementId": "id1",
+              "fixedPoint": [
+                "0.41019",
+                "0.58981",
+              ],
+              "mode": "orbit",
+            },
+            "height": "2.04467",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                "78.00000",
+                "-2.04467",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "0.63636",
+                "0.63636",
+              ],
+              "mode": "orbit",
+            },
+            "version": 30,
+            "width": "78.00000",
+            "y": "12.38727",
+          },
+        },
+      },
+    },
+    "id": "id22",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "boundElements": [],
+            "version": 13,
+          },
+          "inserted": {
+            "boundElements": [
+              {
+                "id": "id4",
+                "type": "arrow",
+              },
+            ],
+            "version": 12,
+          },
+        },
+        "id15": {
+          "deleted": {
+            "version": 10,
+          },
+          "inserted": {
+            "version": 9,
+          },
+        },
+        "id4": {
+          "deleted": {
+            "height": "106.79573",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                "89.00000",
+                "106.79573",
+              ],
+            ],
+            "startBinding": null,
+            "version": 34,
+            "width": "89.00000",
+            "x": 0,
+            "y": 0,
+          },
+          "inserted": {
+            "height": "66.30324",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                "78.47830",
+                "66.30324",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "0.63636",
+                "0.63636",
+              ],
+              "mode": "orbit",
+            },
+            "version": 33,
+            "width": "78.47830",
+            "x": "10.52170",
+            "y": "53.20079",
+          },
+        },
+      },
+    },
+    "id": "id23",
+  },
+]
+`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] undo stack 1`] = `
 [
@@ -440,208 +633,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     },
     "id": "id6",
   },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {},
-        "inserted": {},
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {
-        "id0": {
-          "deleted": {
-            "boundElements": [
-              {
-                "id": "id4",
-                "type": "arrow",
-              },
-            ],
-            "version": 6,
-          },
-          "inserted": {
-            "boundElements": [],
-            "version": 5,
-          },
-        },
-        "id15": {
-          "deleted": {
-            "version": 3,
-          },
-          "inserted": {
-            "version": 2,
-          },
-        },
-        "id4": {
-          "deleted": {
-            "height": "57.11798",
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                78,
-                "57.11798",
-              ],
-            ],
-            "startBinding": {
-              "elementId": "id0",
-              "fixedPoint": [
-                "0.63636",
-                "0.63636",
-              ],
-              "mode": "orbit",
-            },
-            "version": 16,
-            "width": 78,
-            "x": 11,
-            "y": "48.31989",
-          },
-          "inserted": {
-            "height": 0,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                100,
-                0,
-              ],
-            ],
-            "startBinding": null,
-            "version": 13,
-            "width": 100,
-            "x": 0,
-            "y": 0,
-          },
-        },
-      },
-    },
-    "id": "id16",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {},
-        "inserted": {},
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {
-        "id0": {
-          "deleted": {
-            "version": 7,
-          },
-          "inserted": {
-            "version": 6,
-          },
-        },
-        "id1": {
-          "deleted": {
-            "boundElements": [
-              {
-                "id": "id4",
-                "type": "arrow",
-              },
-            ],
-            "version": 6,
-          },
-          "inserted": {
-            "boundElements": [],
-            "version": 5,
-          },
-        },
-        "id15": {
-          "deleted": {
-            "boundElements": [],
-            "version": 4,
-          },
-          "inserted": {
-            "boundElements": [
-              {
-                "id": "id4",
-                "type": "arrow",
-              },
-            ],
-            "version": 3,
-          },
-        },
-        "id4": {
-          "deleted": {
-            "endBinding": {
-              "elementId": "id1",
-              "fixedPoint": [
-                "0.41019",
-                "0.58981",
-              ],
-              "mode": "orbit",
-            },
-            "height": "2.03061",
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                "78.00000",
-                "-2.03061",
-              ],
-            ],
-            "startBinding": {
-              "elementId": "id0",
-              "fixedPoint": [
-                "0.63636",
-                "0.63636",
-              ],
-              "mode": "orbit",
-            },
-            "version": 19,
-            "width": "78.00000",
-            "y": "12.36576",
-          },
-          "inserted": {
-            "endBinding": {
-              "elementId": "id15",
-              "fixedPoint": [
-                "0.50000",
-                1,
-              ],
-              "mode": "orbit",
-            },
-            "height": "57.11798",
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                78,
-                "57.11798",
-              ],
-            ],
-            "startBinding": {
-              "elementId": "id0",
-              "fixedPoint": [
-                "0.63636",
-                "0.63636",
-              ],
-              "mode": "orbit",
-            },
-            "version": 16,
-            "width": 78,
-            "y": "48.31989",
-          },
-        },
-      },
-    },
-    "id": "id17",
-  },
 ]
 `;
 
@@ -768,12 +759,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id4",
-      "type": "arrow",
-    },
-  ],
+  "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -792,7 +778,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 8,
+  "version": 14,
   "width": 100,
   "x": 150,
   "y": -50,
@@ -803,12 +789,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id4",
-      "type": "arrow",
-    },
-  ],
+  "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -827,7 +808,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 6,
+  "version": 9,
   "width": 100,
   "x": 150,
   "y": -50,
@@ -842,18 +823,11 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "customData": undefined,
   "elbowed": false,
   "endArrowhead": "arrow",
-  "endBinding": {
-    "elementId": "id1",
-    "fixedPoint": [
-      "0.41092",
-      "0.58908",
-    ],
-    "mode": "orbit",
-  },
+  "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "10.92646",
+  "height": 0,
   "id": "id4",
   "index": "a2",
   "isDeleted": false,
@@ -867,8 +841,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      "52.09230",
-      "10.92646",
+      100,
+      0,
     ],
   ],
   "roughness": 1,
@@ -876,31 +850,199 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     "type": 2,
   },
   "startArrowhead": null,
-  "startBinding": {
-    "elementId": "id0",
-    "fixedPoint": [
-      "0.63636",
-      "0.63636",
-    ],
-    "mode": "orbit",
-  },
+  "startBinding": null,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 20,
-  "width": "52.09230",
-  "x": 139,
-  "y": "-2.01876",
+  "version": 28,
+  "width": 100,
+  "x": 150,
+  "y": 0,
 }
 `;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of renders 1`] = `18`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of renders 1`] = `24`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] redo stack 1`] = `[]`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] redo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "version": 13,
+          },
+          "inserted": {
+            "version": 12,
+          },
+        },
+        "id1": {
+          "deleted": {
+            "boundElements": [],
+            "version": 9,
+          },
+          "inserted": {
+            "boundElements": [
+              {
+                "id": "id4",
+                "type": "arrow",
+              },
+            ],
+            "version": 8,
+          },
+        },
+        "id4": {
+          "deleted": {
+            "endBinding": null,
+            "height": "4.68000",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                -39,
+                "-4.68000",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "0.63636",
+                "0.63636",
+              ],
+              "mode": "orbit",
+            },
+            "version": 27,
+            "width": 39,
+            "y": "4.68000",
+          },
+          "inserted": {
+            "endBinding": {
+              "elementId": "id1",
+              "fixedPoint": [
+                "0.41092",
+                "0.58908",
+              ],
+              "mode": "orbit",
+            },
+            "height": "10.92646",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                "52.09230",
+                "10.92646",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "0.63636",
+                "0.63636",
+              ],
+              "mode": "orbit",
+            },
+            "version": 26,
+            "width": "52.09230",
+            "y": "-2.01876",
+          },
+        },
+      },
+    },
+    "id": "id21",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "boundElements": [],
+            "version": 14,
+          },
+          "inserted": {
+            "boundElements": [
+              {
+                "id": "id4",
+                "type": "arrow",
+              },
+            ],
+            "version": 13,
+          },
+        },
+        "id4": {
+          "deleted": {
+            "height": 0,
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                100,
+                0,
+              ],
+            ],
+            "startBinding": null,
+            "version": 28,
+            "width": 100,
+            "x": 150,
+            "y": 0,
+          },
+          "inserted": {
+            "height": "4.68000",
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                -39,
+                "-4.68000",
+              ],
+            ],
+            "startBinding": {
+              "elementId": "id0",
+              "fixedPoint": [
+                "0.63636",
+                "0.63636",
+              ],
+              "mode": "orbit",
+            },
+            "version": 27,
+            "width": 39,
+            "x": 139,
+            "y": "4.68000",
+          },
+        },
+      },
+    },
+    "id": "id22",
+  },
+]
+`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] undo stack 1`] = `
 [
@@ -1054,178 +1196,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "updated": {},
     },
     "id": "id6",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {},
-        "inserted": {},
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {
-        "id0": {
-          "deleted": {
-            "boundElements": [
-              {
-                "id": "id4",
-                "type": "arrow",
-              },
-            ],
-            "version": 7,
-          },
-          "inserted": {
-            "boundElements": [],
-            "version": 6,
-          },
-        },
-        "id4": {
-          "deleted": {
-            "height": "4.68000",
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                -39,
-                "-4.68000",
-              ],
-            ],
-            "startBinding": {
-              "elementId": "id0",
-              "fixedPoint": [
-                "0.63636",
-                "0.63636",
-              ],
-              "mode": "orbit",
-            },
-            "version": 17,
-            "width": 39,
-            "x": 139,
-            "y": "4.68000",
-          },
-          "inserted": {
-            "height": 0,
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                100,
-                0,
-              ],
-            ],
-            "startBinding": null,
-            "version": 15,
-            "width": 100,
-            "x": 150,
-            "y": 0,
-          },
-        },
-      },
-    },
-    "id": "id15",
-  },
-  {
-    "appState": AppStateDelta {
-      "delta": Delta {
-        "deleted": {},
-        "inserted": {},
-      },
-    },
-    "elements": {
-      "added": {},
-      "removed": {},
-      "updated": {
-        "id0": {
-          "deleted": {
-            "version": 8,
-          },
-          "inserted": {
-            "version": 7,
-          },
-        },
-        "id1": {
-          "deleted": {
-            "boundElements": [
-              {
-                "id": "id4",
-                "type": "arrow",
-              },
-            ],
-            "version": 6,
-          },
-          "inserted": {
-            "boundElements": [],
-            "version": 5,
-          },
-        },
-        "id4": {
-          "deleted": {
-            "endBinding": {
-              "elementId": "id1",
-              "fixedPoint": [
-                "0.41092",
-                "0.58908",
-              ],
-              "mode": "orbit",
-            },
-            "height": "10.92646",
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                "52.09230",
-                "10.92646",
-              ],
-            ],
-            "startBinding": {
-              "elementId": "id0",
-              "fixedPoint": [
-                "0.63636",
-                "0.63636",
-              ],
-              "mode": "orbit",
-            },
-            "version": 20,
-            "width": "52.09230",
-            "y": "-2.01876",
-          },
-          "inserted": {
-            "endBinding": null,
-            "height": "4.68000",
-            "points": [
-              [
-                0,
-                0,
-              ],
-              [
-                -39,
-                "-4.68000",
-              ],
-            ],
-            "startBinding": {
-              "elementId": "id0",
-              "fixedPoint": [
-                "0.63636",
-                "0.63636",
-              ],
-              "mode": "orbit",
-            },
-            "version": 17,
-            "width": 39,
-            "y": "4.68000",
-          },
-        },
-      },
-    },
-    "id": "id16",
   },
 ]
 `;
