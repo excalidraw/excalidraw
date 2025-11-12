@@ -6399,10 +6399,36 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElementsMap(),
           (el) => maxBindingDistance_simple(this.state.zoom),
         );
-
-        if (
-          // Finalize arrow if we're inside the commit zone
-          hoveredElement ||
+        if (hoveredElement) {
+          this.actionManager.executeAction(actionFinalize, "ui", {
+            event: event.nativeEvent,
+            sceneCoords: {
+              x: scenePointerX,
+              y: scenePointerY,
+            },
+          });
+          this.setState({ suggestedBinding: null, startBoundElement: null });
+          if (!this.state.activeTool.locked) {
+            resetCursor(this.interactiveCanvas);
+            this.setState((prevState) => ({
+              newElement: null,
+              activeTool: updateActiveTool(this.state, {
+                type: this.state.preferredSelectionTool.type,
+              }),
+              selectedElementIds: makeNextSelectedElementIds(
+                {
+                  ...prevState.selectedElementIds,
+                  [multiElement.id]: true,
+                },
+                prevState,
+              ),
+              selectedLinearElement: new LinearElementEditor(
+                multiElement,
+                this.scene.getNonDeletedElementsMap(),
+              ),
+            }));
+          }
+        } else if (
           // if we haven't yet created a temp point and we're beyond commit-zone
           // threshold, add a point
           pointDistance(
