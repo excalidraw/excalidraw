@@ -1270,3 +1270,36 @@ export const reduceToCommonValue = <T, R = T>(
 
   return commonValue;
 };
+
+/**
+ * Formats a number as a percentage according to the user's locale.
+ * Uses Intl.NumberFormat with percent style to ensure proper formatting
+ * for different locales (e.g., %100 for Turkish, 100 % for European languages).
+ *
+ * @param value - The decimal value to format (e.g., 1 for 100%, 0.5 for 50%)
+ * @param locale - Optional locale string (defaults to user's browser locale)
+ * @param options - Optional Intl.NumberFormat options
+ * @returns Formatted percentage string
+ *
+ * @example
+ * formatPercent(1) // "100%" in English, "%100" in Turkish, "100 %" in French
+ * formatPercent(0.75, "tr-TR") // "%75"
+ * formatPercent(0.5, "fr-FR") // "50 %"
+ */
+export const formatPercent = (
+  value: number,
+  locale?: string | string[],
+  options?: Intl.NumberFormatOptions,
+): string => {
+  try {
+    const formatter = new Intl.NumberFormat(locale, {
+      style: "percent",
+      maximumFractionDigits: 0,
+      ...options,
+    });
+    return formatter.format(value);
+  } catch {
+    // Fallback for environments without Intl support
+    return `${Math.round(value * 100)}%`;
+  }
+};
