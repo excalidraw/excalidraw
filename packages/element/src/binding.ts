@@ -1293,6 +1293,7 @@ export const bindPointToSnapToElementOutline = (
         pointFromVector(halfVector, adjacentPoint),
         pointFromVector(vectorScale(halfVector, -1), adjacentPoint),
       );
+
     intersection =
       pointDistance(edgePoint, adjacentPoint) < 1
         ? edgePoint
@@ -1583,7 +1584,8 @@ export const updateBoundPoint = (
     !isOverlapping &&
     arrow.startBinding &&
     arrow.endBinding &&
-    otherBindableElement
+    otherBindableElement &&
+    arrow.points.length === 2
   ) {
     const startFocusPoint = getGlobalFixedPointForBindableElement(
       arrow.startBinding.fixedPoint,
