@@ -1582,9 +1582,9 @@ const newBoundElements = (
   nextBoundElements.push(
     ...elementsToAdd.map(
       (x) =>
-        ({ id: x.id, type: x.type } as
+        ({ id: x.id, type: x.type }) as
           | ExcalidrawArrowElement
-          | ExcalidrawTextElement),
+          | ExcalidrawTextElement,
     ),
   );
 
@@ -1895,16 +1895,16 @@ const determineFocusPoint = (
       ? candidates[1]
       : candidates[0]
     : selected[1]
-    ? focus > 0
-      ? candidates[2]
-      : candidates[1]
-    : selected[2]
-    ? focus > 0
-      ? candidates[3]
-      : candidates[2]
-    : focus > 0
-    ? candidates[0]
-    : candidates[3];
+      ? focus > 0
+        ? candidates[2]
+        : candidates[1]
+      : selected[2]
+        ? focus > 0
+          ? candidates[3]
+          : candidates[2]
+        : focus > 0
+          ? candidates[0]
+          : candidates[3];
 
   return focusPoint;
 };

@@ -7,6 +7,8 @@
  * In the future consider separating common utils into a separate shared chunk.
  */
 
+/* eslint-disable no-async-promise-executor */
+
 import bindings from "./harfbuzz-bindings";
 import binary from "./harfbuzz-wasm";
 

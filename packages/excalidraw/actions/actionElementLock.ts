@@ -120,8 +120,8 @@ export const actionToggleElementLock = register({
       ? newGroupId
         ? newGroupId
         : isAGroup
-        ? selectedElements[0].groupIds.at(-1)!
-        : selectedElements[0].id
+          ? selectedElements[0].groupIds.at(-1)!
+          : selectedElements[0].id
       : null;
 
     return {

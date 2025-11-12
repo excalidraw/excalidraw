@@ -1,13 +1,20 @@
 import { MIME_TYPES } from "@excalidraw/common";
+// TODO: These imports violate package independence - should be refactored to common package
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
   copyToClipboard,
 } from "@excalidraw/excalidraw/clipboard";
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { restore } from "@excalidraw/excalidraw/data/restore";
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import {
   exportToCanvas as _exportToCanvas,
   exportToSvg as _exportToSvg,
@@ -73,7 +80,7 @@ export const exportToCanvas = ({
         const scale =
           maxWidthOrHeight < max
             ? maxWidthOrHeight / max
-            : appState?.exportScale ?? 1;
+            : (appState?.exportScale ?? 1);
 
         canvas.width = width * scale;
         canvas.height = height * scale;

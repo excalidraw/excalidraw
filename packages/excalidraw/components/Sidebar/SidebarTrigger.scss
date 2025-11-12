@@ -1,9 +1,9 @@
-@import "../../css/variables.module.scss";
+@use "../../css/variables.module.scss";
 
 .excalidraw {
   .sidebar-trigger {
-    @include outlineButtonStyles;
-    @include filledButtonOnCanvas;
+    @include variables.outlineButtonStyles;
+    @include variables.filledButtonOnCanvas;
 
     width: auto;
     height: var(--lg-button-size);

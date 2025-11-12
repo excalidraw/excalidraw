@@ -16,8 +16,8 @@ export const toByteString = (data: string | Uint8Array | ArrayBuffer) => {
     typeof data === "string"
       ? new TextEncoder().encode(data)
       : data instanceof Uint8Array
-      ? data
-      : new Uint8Array(data);
+        ? data
+        : new Uint8Array(data);
   let bstring = "";
   for (const byte of bytes) {
     bstring += String.fromCharCode(byte);
@@ -360,9 +360,8 @@ const _decryptAndDecompress = async (
   decryptionKey: string,
   isCompressed: boolean,
 ) => {
-  decryptedBuffer = new Uint8Array(
-    await decryptData(iv, decryptedBuffer, decryptionKey),
-  );
+  const decrypted = await decryptData(iv, decryptedBuffer, decryptionKey);
+  decryptedBuffer = new Uint8Array(decrypted);
 
   if (isCompressed) {
     return inflate(decryptedBuffer);

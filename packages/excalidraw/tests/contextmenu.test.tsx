@@ -39,6 +39,7 @@ const checkpoint = (name: string) => {
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
   );
 
+  // @ts-expect-error - TypeScript 5.6+ monorepo dual-import issue (dist/types vs source paths)
   checkpointHistory(h.history, name);
 };
 

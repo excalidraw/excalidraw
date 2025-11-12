@@ -1,10 +1,12 @@
-@import "../css/variables.module.scss";
+@use "sass:color";
+@use "../css/variables.module.scss";
+@use "open-color/open-color";
 
 .excalidraw {
   .picker {
     padding: 0.5rem;
     background: var(--popup-bg-color);
-    border: 0 solid transparentize($oc-white, 0.75);
+    border: 0 solid color.adjust(open-color.$oc-white, $alpha: -0.75);
     box-shadow: var(--shadow-island);
     border-radius: 4px;
     position: absolute;
@@ -77,7 +79,7 @@
     :root[dir="rtl"] & {
       left: 2px;
     }
-    @include isMobile {
+    @include variables.isMobile {
       display: none;
     }
   }
@@ -87,7 +89,7 @@
   }
 
   .picker-type-elementBackground .picker-keybinding {
-    color: $oc-white;
+    color: open-color.$oc-white;
   }
 
   .picker-swatch[aria-label="transparent"] .picker-keybinding {
@@ -100,10 +102,10 @@
 
   &.theme--dark {
     .picker-type-elementBackground .picker-keybinding {
-      color: $oc-black;
+      color: open-color.$oc-black;
     }
     .picker-swatch[aria-label="transparent"] .picker-keybinding {
-      color: $oc-black;
+      color: open-color.$oc-black;
     }
   }
 }

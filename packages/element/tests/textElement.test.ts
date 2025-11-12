@@ -1,3 +1,4 @@
+/* eslint-disable no-loss-of-precision */
 import { getLineHeight } from "@excalidraw/common";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 

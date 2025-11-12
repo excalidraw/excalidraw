@@ -1,4 +1,6 @@
-@import "../css/variables.module.scss";
+@use "sass:color";
+@use "../css/variables.module.scss";
+@use "open-color/open-color";
 
 .excalidraw {
   .context-menu-popover {
@@ -8,7 +10,7 @@
   .context-menu {
     position: relative;
     border-radius: 4px;
-    box-shadow: 0 3px 10px transparentize($oc-black, 0.8);
+    box-shadow: 0 3px 10px color.adjust(open-color.$oc-black, $alpha: -0.8);
     padding: 0;
     list-style: none;
     user-select: none;
@@ -49,7 +51,7 @@
 
     &.dangerous {
       .context-menu-item__label {
-        color: $oc-red-7;
+        color: open-color.$oc-red-7;
       }
     }
 
@@ -73,7 +75,7 @@
       .context-menu-item__label {
         color: var(--popup-bg-color);
       }
-      background-color: $oc-red-6;
+      background-color: open-color.$oc-red-6;
     }
   }
 
@@ -81,7 +83,7 @@
     z-index: 1;
   }
 
-  @include isMobile {
+  @include variables.isMobile {
     .context-menu-item {
       display: block;
 
@@ -97,6 +99,6 @@
 
   .context-menu-item-separator {
     border: none;
-    border-top: 1px solid $oc-gray-5;
+    border-top: 1px solid open-color.$oc-gray-5;
   }
 }

@@ -1,4 +1,5 @@
-@import "../css/variables.module.scss";
+@use "../css/variables.module.scss";
+@use "open-color/open-color";
 
 .excalidraw {
   .ElementLinkDialog {
@@ -17,7 +18,7 @@
     box-shadow: var(--shadow-island);
     background-color: var(--island-bg-color);
 
-    @include isMobile {
+    @include variables.isMobile {
       left: 0;
       margin-left: 0.5rem;
       margin-right: 0.5rem;
@@ -31,7 +32,7 @@
         margin-top: 0;
         margin-bottom: 0.5rem;
 
-        @include isMobile {
+        @include variables.isMobile {
           font-size: 1.25rem;
         }
       }
@@ -39,14 +40,14 @@
       p {
         margin: 0;
 
-        @include isMobile {
+        @include variables.isMobile {
           font-size: 0.875rem;
         }
       }
 
       margin-bottom: 1.5rem;
 
-      @include isMobile {
+      @include variables.isMobile {
         margin-bottom: 1rem;
       }
     }
@@ -59,7 +60,7 @@
       }
 
       .ElementLinkDialog__remove {
-        color: $oc-red-9;
+        color: open-color.$oc-red-9;
         margin-left: 1rem;
 
         .ToolIcon__icon {
@@ -68,7 +69,7 @@
         }
 
         .ToolIcon__icon svg {
-          color: $oc-red-6;
+          color: open-color.$oc-red-6;
         }
       }
     }
@@ -78,7 +79,7 @@
       justify-content: flex-end;
       margin-top: 1.5rem;
 
-      @include isMobile {
+      @include variables.isMobile {
         font-size: 0.875rem;
         margin-top: 1rem;
       }
