@@ -10,6 +10,7 @@ import {
   updateActiveTool,
   CODES,
   KEYS,
+  formatPercent,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -248,7 +249,7 @@ export const actionResetZoom = register({
           updateData(null);
         }}
       >
-        {(appState.zoom.value * 100).toFixed(0)}%
+        {formatPercent(appState.zoom.value)}
       </ToolButton>
     </Tooltip>
   ),
