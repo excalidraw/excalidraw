@@ -52,6 +52,7 @@ interface ConvertMermaidToExcalidrawFormatProps {
     elements: readonly NonDeletedExcalidrawElement[];
     files: BinaryFiles | null;
   }>;
+  useElbow?: boolean;
 }
 
 export const convertMermaidToExcalidraw = async ({
@@ -60,6 +61,7 @@ export const convertMermaidToExcalidraw = async ({
   mermaidDefinition,
   setError,
   data,
+  useElbow = false,
 }: ConvertMermaidToExcalidrawFormatProps) => {
   const canvasNode = canvasRef.current;
   const parent = canvasNode?.parentElement;
@@ -87,9 +89,11 @@ export const convertMermaidToExcalidraw = async ({
     const { elements, files } = ret;
     setError(null);
 
+    // Store the converted elements (which now include adjusted elbow arrow points)
     data.current = {
       elements: convertToExcalidrawElements(elements, {
         regenerateIds: true,
+        useElbow,
       }),
       files,
     };
