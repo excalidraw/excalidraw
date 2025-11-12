@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { average } from "@excalidraw/math";
 
 import type {
@@ -473,6 +474,7 @@ const RS_LTR_CHARS =
   "A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF" +
   "\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF";
 const RS_RTL_CHARS = "\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC";
+// eslint-disable-next-line no-misleading-character-class
 const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
 /**
  * Checks whether first directional character is RTL. Meaning whether it starts
@@ -681,10 +683,13 @@ export const arrayToMap = <T extends { id: string } | string>(
   if (items instanceof Map) {
     return items;
   }
-  return items.reduce((acc: Map<string, T>, element) => {
-    acc.set(typeof element === "string" ? element : element.id, element);
-    return acc;
-  }, new Map() as Map<string, T>);
+  return items.reduce(
+    (acc: Map<string, T>, element) => {
+      acc.set(typeof element === "string" ? element : element.id, element);
+      return acc;
+    },
+    new Map() as Map<string, T>,
+  );
 };
 
 export const arrayToMapWithIndex = <T extends { id: string }>(
@@ -702,10 +707,13 @@ export const arrayToObject = <T>(
   array: readonly T[],
   groupBy?: (value: T) => string | number,
 ) =>
-  array.reduce((acc, value, idx) => {
-    acc[groupBy ? groupBy(value) : idx] = value;
-    return acc;
-  }, {} as { [key: string]: T });
+  array.reduce(
+    (acc, value, idx) => {
+      acc[groupBy ? groupBy(value) : idx] = value;
+      return acc;
+    },
+    {} as { [key: string]: T },
+  );
 
 /** Doubly linked node */
 export type Node<T> = T & {
@@ -1033,8 +1041,8 @@ export const isMemberOf = <T extends string>(
   return collection instanceof Set || collection instanceof Map
     ? collection.has(value as T)
     : "includes" in collection
-    ? collection.includes(value as T)
-    : collection.hasOwnProperty(value);
+      ? collection.includes(value as T)
+      : Object.prototype.hasOwnProperty.call(collection, value);
 };
 
 export const cloneJSON = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
@@ -1161,26 +1169,26 @@ export const normalizeEOL = (str: string) => {
 
 // -----------------------------------------------------------------------------
 type HasBrand<T> = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   [K in keyof T]: K extends `~brand${infer _}` ? true : never;
 }[keyof T];
 
-type RemoveAllBrands<T> = HasBrand<T> extends true
-  ? {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      [K in keyof T as K extends `~brand~${infer _}` ? never : K]: T[K];
-    }
-  : never;
+type RemoveAllBrands<T> =
+  HasBrand<T> extends true
+    ? {
+        [K in keyof T as K extends `~brand~${infer _}` ? never : K]: T[K];
+      }
+    : never;
 
 // adapted from https://github.com/colinhacks/zod/discussions/1994#discussioncomment-6068940
 // currently does not cover all types (e.g. tuples, promises...)
-type Unbrand<T> = T extends Map<infer E, infer F>
-  ? Map<E, F>
-  : T extends Set<infer E>
-  ? Set<E>
-  : T extends Array<infer E>
-  ? Array<E>
-  : RemoveAllBrands<T>;
+type Unbrand<T> =
+  T extends Map<infer E, infer F>
+    ? Map<E, F>
+    : T extends Set<infer E>
+      ? Set<E>
+      : T extends Array<infer E>
+        ? Array<E>
+        : RemoveAllBrands<T>;
 
 /**
  * Makes type into a branded type, ensuring that value is assignable to
@@ -1243,8 +1251,8 @@ export const sizeOf = (
   return isReadonlyArray(value)
     ? value.length
     : value instanceof Map || value instanceof Set
-    ? value.size
-    : Object.keys(value).length;
+      ? value.size
+      : Object.keys(value).length;
 };
 
 export const reduceToCommonValue = <T, R = T>(

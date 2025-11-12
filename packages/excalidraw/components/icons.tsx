@@ -1045,6 +1045,68 @@ export const UngroupIcon = React.memo(({ theme }: { theme: Theme }) =>
   ),
 );
 
+export const VennIcon = React.memo(({ theme }: { theme: Theme }) =>
+  createIcon(
+    <>
+      {/* Three overlapping circles - outlines */}
+      <circle
+        cx="8"
+        cy="8"
+        r="5.5"
+        fill="none"
+        stroke={iconFillColor(theme)}
+        strokeWidth="1"
+      />
+      <circle
+        cx="16"
+        cy="8"
+        r="5.5"
+        fill="none"
+        stroke={iconFillColor(theme)}
+        strokeWidth="1"
+      />
+      <circle
+        cx="12"
+        cy="14"
+        r="5.5"
+        fill="none"
+        stroke={iconFillColor(theme)}
+        strokeWidth="1"
+      />
+      {/* Subtle indication of intersections */}
+      <circle
+        cx="12"
+        cy="8"
+        r="1"
+        fill={iconFillColor(theme)}
+        opacity="0.4"
+      />
+      <circle
+        cx="10"
+        cy="11"
+        r="1"
+        fill={iconFillColor(theme)}
+        opacity="0.4"
+      />
+      <circle
+        cx="14"
+        cy="11"
+        r="1"
+        fill={iconFillColor(theme)}
+        opacity="0.4"
+      />
+      <circle
+        cx="12"
+        cy="10.5"
+        r="0.7"
+        fill={iconFillColor(theme)}
+        opacity="0.6"
+      />
+    </>,
+    { width: 24, height: 24 },
+  ),
+);
+
 export const FillZigZagIcon = createIcon(
   <g strokeWidth={1.25}>
     <path d="M5.879 2.625h8.242a3.27 3.27 0 0 1 3.254 3.254v8.242a3.27 3.27 0 0 1-3.254 3.254H5.88a3.27 3.27 0 0 1-3.254-3.254V5.88A3.27 3.27 0 0 1 5.88 2.626l-.001-.001ZM4.518 16.118l7.608-12.83m.198 13.934 5.051-9.897M2.778 9.675l9.348-6.387m-7.608 12.83 12.857-8.793" />

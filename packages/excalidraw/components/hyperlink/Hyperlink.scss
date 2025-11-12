@@ -1,4 +1,5 @@
-@import "../../css/variables.module.scss";
+@use "open-color/open-color.scss";
+@use "../../css/variables.module.scss";
 
 .excalidraw-hyperlinkContainer {
   display: flex;
@@ -47,16 +48,16 @@
   }
 
   button {
-    color: $oc-blue-6;
+    color: open-color.$oc-blue-6;
     background-color: transparent !important;
     font-weight: 500;
     &.excalidraw-hyperlinkContainer--remove {
-      color: $oc-red-9;
+      color: open-color.$oc-red-9;
     }
   }
 
   &--remove .ToolIcon__icon svg {
-    color: $oc-red-6;
+    color: open-color.$oc-red-6;
   }
 
   .ToolIcon__icon {

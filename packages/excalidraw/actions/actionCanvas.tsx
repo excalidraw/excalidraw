@@ -64,7 +64,7 @@ export const actionChangeViewBackgroundColor = register({
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
-      captureUpdate: !!value.viewBackgroundColor
+      captureUpdate: value.viewBackgroundColor
         ? CaptureUpdateAction.IMMEDIATELY
         : CaptureUpdateAction.EVENTUALLY,
     };

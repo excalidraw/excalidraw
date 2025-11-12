@@ -58,7 +58,6 @@ export const subsetWoff2GlyphsByCodepoints = async (
             e instanceof WorkerInTheMainChunkError)
         )
       ) {
-        // eslint-disable-next-line no-console
         console.error(
           "Failed to use workers for subsetting, falling back to the main thread.",
           e,

@@ -1,3 +1,4 @@
+/* eslint-disable no-irregular-whitespace */
 import { wrapText, parseTokens } from "../src/textWrapping";
 
 import type { FontString } from "../src/types";

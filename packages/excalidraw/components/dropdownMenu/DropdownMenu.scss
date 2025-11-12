@@ -1,4 +1,4 @@
-@import "../../css/variables.module.scss";
+@use "../../css/variables.module.scss";
 
 .excalidraw {
   .dropdown-menu {
@@ -201,7 +201,7 @@
   }
 
   .dropdown-menu-button {
-    @include outlineButtonStyles;
+    @include variables.outlineButtonStyles;
     width: var(--lg-button-size);
     height: var(--lg-button-size);
 

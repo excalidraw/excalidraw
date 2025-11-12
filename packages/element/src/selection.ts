@@ -223,10 +223,10 @@ export const getTargetElements = (
   appState.editingTextElement
     ? [appState.editingTextElement]
     : appState.newElement
-    ? [appState.newElement]
-    : getSelectedElements(elements, appState, {
-        includeBoundTextElement: true,
-      });
+      ? [appState.newElement]
+      : getSelectedElements(elements, appState, {
+          includeBoundTextElement: true,
+        });
 
 /**
  * returns prevState's selectedElementids if no change from previous, so as to

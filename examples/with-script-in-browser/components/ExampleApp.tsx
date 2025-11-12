@@ -238,6 +238,7 @@ export default function ExampleApp({
             left: "50%",
             transform: "translateX(-50%)",
             bottom: "20px",
+            // eslint-disable-next-line no-loss-of-precision
             zIndex: 9999999999999999,
           }}
         >

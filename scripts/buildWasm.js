@@ -23,14 +23,9 @@ for (const { pkg, src, dest } of wasmModules) {
   const sourcePath = path.resolve(__dirname, src);
   const destPath = path.resolve(__dirname, dest);
 
-  const {
-    name,
-    version,
-    author,
-    license,
-    authors,
-    licenses,
-  } = require(packagePath);
+  const { name, version, author, license, authors, licenses } = require(
+    packagePath,
+  );
 
   const licenseContent = fs.readFileSync(licensePath, "utf-8") || "";
   const base64 = fs.readFileSync(sourcePath, "base64");

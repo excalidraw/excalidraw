@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { isTextElement } from "@excalidraw/element";
 import { getTextFromElements } from "@excalidraw/element";
 
