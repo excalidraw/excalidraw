@@ -6369,6 +6369,7 @@ class App extends React.Component<AppProps, AppState> {
           pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
           this.scene.getNonDeletedElements(),
           this.scene.getNonDeletedElementsMap(),
+          (el) => maxBindingDistance_simple(this.state.zoom),
         );
         if (hoveredElement) {
           this.setState({
@@ -6392,9 +6393,18 @@ class App extends React.Component<AppProps, AppState> {
       setCursorForShape(this.interactiveCanvas, this.state);
 
       if (lastPoint === lastCommittedPoint) {
-        // if we haven't yet created a temp point and we're beyond commit-zone
-        // threshold, add a point
+        const hoveredElement = getHoveredElementForBinding(
+          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+          this.scene.getNonDeletedElements(),
+          this.scene.getNonDeletedElementsMap(),
+          (el) => maxBindingDistance_simple(this.state.zoom),
+        );
+
         if (
+          // Finalize arrow if we're inside the commit zone
+          hoveredElement ||
+          // if we haven't yet created a temp point and we're beyond commit-zone
+          // threshold, add a point
           pointDistance(
             pointFrom(scenePointerX - rx, scenePointerY - ry),
             lastPoint,
@@ -6414,19 +6424,17 @@ class App extends React.Component<AppProps, AppState> {
             this.state.selectedLinearElement?.initialState,
             "initialState must be set",
           );
-          if (this.state.selectedLinearElement.initialState) {
-            this.setState({
-              selectedLinearElement: {
-                ...this.state.selectedLinearElement,
-                lastCommittedPoint: points[points.length - 1],
-                selectedPointsIndices: [multiElement.points.length - 1],
-                initialState: {
-                  ...this.state.selectedLinearElement.initialState,
-                  lastClickedPoint: multiElement.points.length - 1,
-                },
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              lastCommittedPoint: points[points.length - 1],
+              selectedPointsIndices: [multiElement.points.length - 1],
+              initialState: {
+                ...this.state.selectedLinearElement.initialState,
+                lastClickedPoint: multiElement.points.length - 1,
               },
-            });
-          }
+            },
+          });
         } else {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
           // in this branch, we're inside the commit zone, and no uncommitted
