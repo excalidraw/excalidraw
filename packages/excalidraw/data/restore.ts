@@ -1,4 +1,4 @@
-import { isFiniteNumber, pointFrom } from "@excalidraw/math";
+import { isFiniteNumber, pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import {
   DEFAULT_FONT_FAMILY,
@@ -20,6 +20,7 @@ import {
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
+  elementCenterPoint,
   getNonDeletedElements,
   isPointInElement,
   isValidPolygon,
@@ -392,17 +393,33 @@ export const restoreElement = (
         ...getSizeFromPoints(points),
       });
     case "arrow": {
-      const { startArrowhead = null, endArrowhead = "arrow" } = element;
-      let x: number | undefined = element.x;
-      let y: number | undefined = element.y;
+      const {
+        startArrowhead = null,
+        endArrowhead = "arrow",
+        angle = 0,
+      } = element;
+      const x: number | undefined = element.x;
+      const y: number | undefined = element.y;
       let points: readonly LocalPoint[] | undefined = // migrate old arrow model to new one
         !Array.isArray(element.points) || element.points.length < 2
           ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
           : element.points;
 
-      if (points[0][0] !== 0 || points[0][1] !== 0) {
-        ({ points, x, y } =
-          LinearElementEditor.getNormalizeElementPointsAndCoords(element));
+      if (angle !== 0) {
+        points = LinearElementEditor.getPointsGlobalCoordinates(
+          element,
+          elementsMap,
+        ).map((point) =>
+          LinearElementEditor.pointFromAbsoluteCoords(
+            element as ExcalidrawArrowElement,
+            pointRotateRads(
+              point,
+              elementCenterPoint(element, elementsMap),
+              angle,
+            ),
+            elementsMap,
+          ),
+        );
       }
 
       const base = {
@@ -426,10 +443,11 @@ export const restoreElement = (
         y,
         elbowed: (element as ExcalidrawArrowElement).elbowed,
         ...getSizeFromPoints(points),
-      } as const;
+        angle: 0 as Radians,
+      };
 
       // TODO: Separate arrow from linear element
-      return isElbowArrow(element)
+      const restoredElement = isElbowArrow(element)
         ? restoreElementWithProperties(element as ExcalidrawElbowArrowElement, {
             ...base,
             elbowed: true,
@@ -441,6 +459,13 @@ export const restoreElement = (
             endIsSpecial: element.endIsSpecial,
           })
         : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
+
+      return {
+        ...restoredElement,
+        ...LinearElementEditor.getNormalizeElementPointsAndCoords(
+          restoredElement,
+        ),
+      };
     }
 
     // generic elements
