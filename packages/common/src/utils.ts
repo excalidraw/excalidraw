@@ -378,6 +378,10 @@ export const removeSelection = () => {
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
 
+export const isSelectionLikeTool = (type: ToolType | "custom") => {
+  return type === "selection" || type === "lasso";
+};
+
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: ((

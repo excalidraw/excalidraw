@@ -108,6 +108,7 @@ import {
   type StylesPanelMode,
   loadDesktopUIModePreference,
   setDesktopUIMode,
+  isSelectionLikeTool,
 } from "@excalidraw/common";
 
 import {
@@ -5001,10 +5002,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.openDialog?.name === "elementLinkSelector"
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-      } else if (
-        this.state.activeTool.type === "selection" ||
-        this.state.activeTool.type === "lasso"
-      ) {
+      } else if (isSelectionLikeTool(this.state.activeTool.type)) {
         resetCursor(this.interactiveCanvas);
       } else {
         setCursorForShape(this.interactiveCanvas, this.state);
@@ -5215,6 +5213,9 @@ class App extends React.Component<AppProps, AppState> {
         snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
         originSnapOffset: null,
         activeEmbeddable: null,
+        selectedLinearElement: isSelectionLikeTool(nextActiveTool.type)
+          ? prevState.selectedLinearElement
+          : null,
       } as const;
 
       if (nextActiveTool.type === "freedraw") {
@@ -5224,6 +5225,7 @@ class App extends React.Component<AppProps, AppState> {
       if (nextActiveTool.type === "lasso") {
         return {
           ...prevState,
+          ...commonResets,
           activeTool: nextActiveTool,
           ...(keepSelection
             ? {}
@@ -5233,23 +5235,22 @@ class App extends React.Component<AppProps, AppState> {
                 editingGroupId: null,
                 multiElement: null,
               }),
-          ...commonResets,
         };
       } else if (nextActiveTool.type !== "selection") {
         return {
           ...prevState,
+          ...commonResets,
           activeTool: nextActiveTool,
           selectedElementIds: makeNextSelectedElementIds({}, prevState),
           selectedGroupIds: makeNextSelectedElementIds({}, prevState),
           editingGroupId: null,
           multiElement: null,
-          ...commonResets,
         };
       }
       return {
         ...prevState,
-        activeTool: nextActiveTool,
         ...commonResets,
+        activeTool: nextActiveTool,
       };
     });
   };
@@ -7713,10 +7714,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private clearSelectionIfNotUsingSelection = (): void => {
-    if (
-      this.state.activeTool.type !== "selection" &&
-      this.state.activeTool.type !== "lasso"
-    ) {
+    if (!isSelectionLikeTool(this.state.activeTool.type)) {
       this.setState({
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
         selectedGroupIds: {},
@@ -7733,10 +7731,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
-    if (
-      this.state.activeTool.type === "selection" ||
-      this.state.activeTool.type === "lasso"
-    ) {
+    if (isSelectionLikeTool(this.state.activeTool.type)) {
       const elements = this.scene.getNonDeletedElements();
       const elementsMap = this.scene.getNonDeletedElementsMap();
       const selectedElements = this.scene.getSelectedElements(this.state);
