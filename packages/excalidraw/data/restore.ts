@@ -55,6 +55,7 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
+  ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
@@ -128,7 +129,7 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 const repairBinding = <T extends ExcalidrawArrowElement>(
   element: T,
   binding: FixedPointBinding | null,
-  elements: readonly ExcalidrawElement[],
+  elementsMap: Readonly<ElementsMap>,
   startOrEnd: "start" | "end",
 ): FixedPointBinding | null => {
   if (!binding) {
@@ -148,19 +149,17 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
   }
 
   const boundElement =
-    (elements.find(
-      (el) => el.id === binding.elementId,
-    ) as ExcalidrawBindableElement) || undefined;
+    (elementsMap.get(binding.elementId) as ExcalidrawBindableElement) ||
+    undefined;
   if (boundElement) {
     if (binding.mode) {
       return {
         elementId: binding.elementId,
         mode: binding.mode || "orbit",
-        fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.51, 0.51]),
+        fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.5, 0.5]),
       } as FixedPointBinding | null;
     }
 
-    const elementsMap = arrayToMap(elements);
     const p = LinearElementEditor.getPointAtIndexGlobalCoordinates(
       element,
       startOrEnd === "start" ? 0 : element.points.length - 1,
@@ -285,7 +284,7 @@ const restoreElementWithProperties = <
 
 export const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-  elements: readonly ExcalidrawElement[],
+  elementsMap: Readonly<ElementsMap>,
   opts?: {
     deleteInvisibleElements?: boolean;
   },
@@ -411,13 +410,13 @@ export const restoreElement = (
         startBinding: repairBinding(
           element as ExcalidrawArrowElement,
           element.startBinding,
-          elements,
+          elementsMap,
           "start",
         ),
         endBinding: repairBinding(
           element as ExcalidrawArrowElement,
           element.endBinding,
-          elements,
+          elementsMap,
           "end",
         ),
         startArrowhead,
@@ -572,7 +571,7 @@ const repairFrameMembership = (
 };
 
 export const restoreElements = (
-  elements: ImportedDataState["elements"],
+  targetElements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
   opts?:
@@ -585,9 +584,10 @@ export const restoreElements = (
 ): OrderedExcalidrawElement[] => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
+  const elementsMap = arrayToMap(targetElements || []);
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
   const restoredElements = syncInvalidIndices(
-    (elements || []).reduce((elements, element) => {
+    (targetElements || []).reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
       if (element.type === "selection") {
@@ -596,7 +596,7 @@ export const restoreElements = (
 
       let migratedElement: ExcalidrawElement | null = restoreElement(
         element,
-        elements,
+        elementsMap,
         {
           deleteInvisibleElements: opts?.deleteInvisibleElements,
         },
