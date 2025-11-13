@@ -18,7 +18,13 @@ import {
   normalizeLink,
   getLineHeight,
 } from "@excalidraw/common";
-import { getNonDeletedElements, isValidPolygon } from "@excalidraw/element";
+import {
+  calculateFixedPointForNonElbowArrowBinding,
+  getNonDeletedElements,
+  isPointInElement,
+  isValidPolygon,
+  projectFixedPointOntoDiagonal,
+} from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
 import {
   updateElbowArrowPoints,
@@ -50,9 +56,9 @@ import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
   ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
-  ExcalidrawElementType,
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
@@ -119,9 +125,11 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
-const repairBinding = <T extends ExcalidrawLinearElement>(
+const repairBinding = <T extends ExcalidrawArrowElement>(
   element: T,
   binding: FixedPointBinding | null,
+  elements: readonly ExcalidrawElement[],
+  startOrEnd: "start" | "end",
 ): FixedPointBinding | null => {
   if (!binding) {
     return null;
@@ -139,11 +147,54 @@ const repairBinding = <T extends ExcalidrawLinearElement>(
     return fixedPointBinding;
   }
 
-  return {
-    elementId: binding.elementId,
-    mode: binding.mode || "orbit",
-    fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.51, 0.51]),
-  } as FixedPointBinding | null;
+  const boundElement =
+    (elements.find(
+      (el) => el.id === binding.elementId,
+    ) as ExcalidrawBindableElement) || undefined;
+  if (boundElement) {
+    if (binding.mode) {
+      return {
+        elementId: binding.elementId,
+        mode: binding.mode || "orbit",
+        fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.51, 0.51]),
+      } as FixedPointBinding | null;
+    }
+
+    const elementsMap = arrayToMap(elements);
+    const p = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      element,
+      startOrEnd === "start" ? 0 : element.points.length - 1,
+      elementsMap,
+    );
+    const mode = isPointInElement(p, boundElement, elementsMap)
+      ? "inside"
+      : "orbit";
+    const focusPoint =
+      mode === "inside"
+        ? p
+        : projectFixedPointOntoDiagonal(
+            element,
+            p,
+            boundElement,
+            startOrEnd,
+            elementsMap,
+          ) || p;
+    const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
+      element,
+      boundElement,
+      startOrEnd,
+      elementsMap,
+      focusPoint,
+    );
+
+    return {
+      mode,
+      elementId: binding.elementId,
+      fixedPoint,
+    };
+  }
+
+  return null;
 };
 
 const restoreElementWithProperties = <
@@ -234,7 +285,10 @@ const restoreElementWithProperties = <
 
 export const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-  opts?: { deleteInvisibleElements?: boolean },
+  elements: readonly ExcalidrawElement[],
+  opts?: {
+    deleteInvisibleElements?: boolean;
+  },
 ): typeof element | null => {
   element = { ...element };
 
@@ -321,12 +375,9 @@ export const restoreElement = (
       }
 
       return restoreElementWithProperties(element, {
-        type:
-          (element.type as ExcalidrawElementType | "draw") === "draw"
-            ? "line"
-            : element.type,
-        startBinding: repairBinding(element, element.startBinding),
-        endBinding: repairBinding(element, element.endBinding),
+        type: "line",
+        startBinding: null,
+        endBinding: null,
         startArrowhead,
         endArrowhead,
         points,
@@ -357,8 +408,18 @@ export const restoreElement = (
 
       const base = {
         type: element.type,
-        startBinding: repairBinding(element, element.startBinding),
-        endBinding: repairBinding(element, element.endBinding),
+        startBinding: repairBinding(
+          element as ExcalidrawArrowElement,
+          element.startBinding,
+          elements,
+          "start",
+        ),
+        endBinding: repairBinding(
+          element as ExcalidrawArrowElement,
+          element.endBinding,
+          elements,
+          "end",
+        ),
         startArrowhead,
         endArrowhead,
         points,
@@ -373,8 +434,6 @@ export const restoreElement = (
         ? restoreElementWithProperties(element as ExcalidrawElbowArrowElement, {
             ...base,
             elbowed: true,
-            startBinding: repairBinding(element, element.startBinding),
-            endBinding: repairBinding(element, element.endBinding),
             fixedSegments:
               element.fixedSegments?.length && base.points.length >= 4
                 ? element.fixedSegments
@@ -535,9 +594,13 @@ export const restoreElements = (
         return elements;
       }
 
-      let migratedElement: ExcalidrawElement | null = restoreElement(element, {
-        deleteInvisibleElements: opts?.deleteInvisibleElements,
-      });
+      let migratedElement: ExcalidrawElement | null = restoreElement(
+        element,
+        elements,
+        {
+          deleteInvisibleElements: opts?.deleteInvisibleElements,
+        },
+      );
       if (migratedElement) {
         const localElement = localElementsMap?.get(element.id);
 
