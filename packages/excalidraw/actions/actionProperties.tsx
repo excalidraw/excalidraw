@@ -1,5 +1,5 @@
 import { pointFrom } from "@excalidraw/math";
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
@@ -104,6 +104,7 @@ import {
   SloppinessCartoonistIcon,
   StrokeWidthBaseIcon,
   StrokeWidthBoldIcon,
+  ArrowDownIcon,
   StrokeWidthExtraBoldIcon,
   FontSizeSmallIcon,
   FontSizeMediumIcon,
@@ -527,53 +528,134 @@ export const actionChangeStrokeWidth = register({
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          strokeWidth: value,
-        }),
+        newElementWith(el, { strokeWidth: value }),
       ),
       appState: { ...appState, currentItemStrokeWidth: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => (
-    <fieldset>
-      <legend>{t("labels.strokeWidth")}</legend>
-      <div className="buttonList">
-        <RadioSelection
-          group="stroke-width"
-          options={[
-            {
-              value: STROKE_WIDTH.thin,
-              text: t("labels.thin"),
-              icon: StrokeWidthBaseIcon,
-              testId: "strokeWidth-thin",
-            },
-            {
-              value: STROKE_WIDTH.bold,
-              text: t("labels.bold"),
-              icon: StrokeWidthBoldIcon,
-              testId: "strokeWidth-bold",
-            },
-            {
-              value: STROKE_WIDTH.extraBold,
-              text: t("labels.extraBold"),
-              icon: StrokeWidthExtraBoldIcon,
-              testId: "strokeWidth-extraBold",
-            },
-          ]}
-          value={getFormValue(
-            elements,
-            app,
-            (element) => element.strokeWidth,
-            (element) => element.hasOwnProperty("strokeWidth"),
-            (hasSelection) =>
-              hasSelection ? null : appState.currentItemStrokeWidth,
-          )}
-          onChange={(value) => updateData(value)}
-        />
-      </div>
-    </fieldset>
-  ),
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const [showRange, setShowRange] = React.useState(false);
+
+    const selectedElements = app.scene.getSelectedElements(appState);
+    let hasCommonStrokeWidth = true;
+    const firstElement = selectedElements.at(0);
+    const leastCommonStrokeWidth = selectedElements.reduce((acc, element) => {
+      if (acc != null && acc !== element.strokeWidth) {
+        hasCommonStrokeWidth = false;
+      }
+      if (acc == null || acc > element.strokeWidth) {
+        return element.strokeWidth;
+      }
+      return acc;
+    }, firstElement?.strokeWidth ?? null);
+
+    const value = leastCommonStrokeWidth ?? appState.currentItemStrokeWidth;
+    const rangeRef = React.useRef<HTMLInputElement>(null);
+    const valueRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+      if (rangeRef.current && valueRef.current) {
+        const rangeElement = rangeRef.current;
+        const valueElement = valueRef.current;
+        const inputWidth = rangeElement.offsetWidth;
+        const thumbWidth = 15;
+        const normalizedValue = (value / 20) * 100;
+        const position =
+          (normalizedValue / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
+        valueElement.style.left = `${position}px`;
+        rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${normalizedValue}%, var(--button-bg) ${normalizedValue}%, var(--button-bg) 100%)`;
+      }
+    }, [value]);
+
+    return (
+      <fieldset>
+        <legend>{t("labels.strokeWidth")}</legend>
+
+        <div className="buttonList">
+          <RadioSelection
+            group="stroke-width"
+            options={[
+              {
+                value: STROKE_WIDTH.thin,
+                text: t("labels.thin"),
+                icon: StrokeWidthBaseIcon,
+                testId: "strokeWidth-thin",
+              },
+              {
+                value: STROKE_WIDTH.bold,
+                text: t("labels.bold"),
+                icon: StrokeWidthBoldIcon,
+                testId: "strokeWidth-bold",
+              },
+              {
+                value: STROKE_WIDTH.extraBold,
+                text: t("labels.extraBold"),
+                icon: StrokeWidthExtraBoldIcon,
+                testId: "strokeWidth-extraBold",
+              },
+              {
+                value: "more",
+                text: "More",
+                icon: ArrowDownIcon,
+                testId: "strokeWidth-more",
+              },
+            ]}
+            value={
+              showRange
+                ? "more"
+                : getFormValue(
+                    elements,
+                    app,
+                    (element) => element.strokeWidth,
+                    (element) => element.hasOwnProperty("strokeWidth"),
+                    (hasSelection) =>
+                      hasSelection ? null : appState.currentItemStrokeWidth,
+                  )
+            }
+            onChange={(val) => {
+              if (val === "more") {
+                setShowRange((prev) => !prev);
+              } else {
+                setShowRange(false);
+                updateData(val);
+              }
+            }}
+          />
+        </div>
+
+        {showRange && (
+          <div className="range-wrapper" style={{ marginTop: "0.75rem" }}>
+            <label className="control-label">
+              {t("labels.sloppiness")}
+              <div className="range-wrapper">
+                <input
+                  ref={rangeRef}
+                  type="range"
+                  min="1"
+                  max="20"
+                  step="1"
+                  style={{
+                    ["--color-slider-track" as string]: hasCommonStrokeWidth
+                      ? undefined
+                      : "var(--button-bg)",
+                  }}
+                  value={value}
+                  onChange={(e) => updateData(+e.target.value)}
+                  className="range-input"
+                  data-testid="stroke-width-range"
+                />
+                <div className="value-bubble" ref={valueRef}>
+                  {value}
+                </div>
+                <div className="zero-label">1</div>
+              </div>
+            </label>
+          </div>
+        )}
+      </fieldset>
+    );
+  },
 });
 
 export const actionChangeSloppiness = register({
