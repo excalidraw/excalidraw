@@ -1,5 +1,4 @@
 import {
-  debugDrawLine,
   DEFAULT_ADAPTIVE_RADIUS,
   DEFAULT_PROPORTIONAL_RADIUS,
   invariant,
@@ -616,10 +615,6 @@ export const projectFixedPointOntoDiagonal = (
   } else {
     p = p1 || p2 || null;
   }
-
-  debugDrawLine(diagonalOne, { color: "purple", permanent: false });
-  debugDrawLine(diagonalTwo, { color: "purple", permanent: false });
-  debugDrawLine(intersector, { color: "orange", permanent: false });
 
   return p && isPointInElement(p, element, elementsMap) ? p : null;
 };
