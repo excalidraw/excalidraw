@@ -48,6 +48,7 @@ import {
   isArrowElement,
   isBoundToContainer,
   isElbowArrow,
+  isFrameElement,
   isFrameLikeElement,
   isFreeDrawElement,
   isImageElement,
@@ -75,6 +76,8 @@ import type {
   ElementsMap,
   ExcalidrawElbowArrowElement,
 } from "./types";
+import { getFrameChildren } from "./frame";
+import SnappingManager from "./SnappingManager";
 
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (
@@ -579,6 +582,7 @@ const getResizedOrigin = (
   shouldMaintainAspectRatio: boolean,
   shouldResizeFromCenter: boolean,
 ): { x: number; y: number } => {
+  // console.log("resizing element here");
   const anchor = getResizeAnchor(
     handleDirection,
     shouldMaintainAspectRatio,
@@ -694,6 +698,7 @@ export const resizeSingleElement = (
     shouldInformMutation?: boolean;
   } = {},
 ) => {
+  // console.log("%cINSIDE RESIZE_SINGLE_ELEMENT", "color: yellow");
   if (isTextElement(latestElement) && isTextElement(origElement)) {
     return resizeSingleTextElement(
       origElement,
@@ -779,6 +784,32 @@ export const resizeSingleElement = (
     shouldMaintainAspectRatio!!,
     shouldResizeFromCenter!!,
   );
+  // this code handles snapping of frame elements to the inner children elements
+
+  if (isFrameElement(origElement)) {
+    const children = getFrameChildren(elementsMap, origElement.id);
+    const snappingManager = SnappingManager.getInstance();
+    for (let i = 0; i < children.length; i++) {
+      snappingManager.setObjAtribs(
+        newOrigin.x,
+        newOrigin.y,
+        nextWidth,
+        nextHeight,
+      );
+
+      snappingManager.setChildAtribs(
+        children[i].x,
+        children[i].y,
+        children[i].width,
+        children[i].height,
+      );
+      const snappingResult = snappingManager.snap();
+      nextWidth = snappingResult.width ? snappingResult.width : nextWidth;
+      nextHeight = snappingResult.height ? snappingResult.height : nextHeight;
+      newOrigin.x = snappingResult.x ? snappingResult.x : newOrigin.x;
+      newOrigin.y = snappingResult.y ? snappingResult.y : newOrigin.y;
+    }
+  }
 
   if (isLinearElement(origElement) && rescaledPoints.points) {
     const offsetX = origElement.x - previousOrigin[0];
