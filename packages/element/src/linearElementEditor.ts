@@ -2243,44 +2243,36 @@ const pointDraggingUpdates = (
   }
 
   // Simulate the updated arrow for the bind point calculation
-  const originalStartGlobalPoint =
-    LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      element,
-      0,
-      elementsMap,
-    );
-  const offsetStartGlobalPoint = startIsDragged
-    ? pointFrom<GlobalPoint>(
-        originalStartGlobalPoint[0] + deltaX,
-        originalStartGlobalPoint[1] + deltaY,
-      )
-    : originalStartGlobalPoint;
-  const offsetStartLocalPoint = LinearElementEditor.pointFromAbsoluteCoords(
-    element,
-    offsetStartGlobalPoint,
-    elementsMap,
+  const updatedPoints = element.points.map((p, idx) => {
+    const update = naiveDraggingPoints.get(idx);
+    return update ? update.point : p;
+  });
+
+  const offsetX = updatedPoints[0][0];
+  const offsetY = updatedPoints[0][1];
+  const normalizedPoints = updatedPoints.map((p) =>
+    pointFrom<LocalPoint>(p[0] - offsetX, p[1] - offsetY),
   );
-  const offsetEndLocalPoint = endIsDragged
-    ? pointFrom<LocalPoint>(
-        element.points[element.points.length - 1][0] + deltaX,
-        element.points[element.points.length - 1][1] + deltaY,
-      )
-    : element.points[element.points.length - 1];
+
+  const nextCoords = getElementPointsCoords(element, normalizedPoints);
+  const prevCoords = getElementPointsCoords(element, element.points);
+  const nextCenterX = (nextCoords[0] + nextCoords[2]) / 2;
+  const nextCenterY = (nextCoords[1] + nextCoords[3]) / 2;
+  const prevCenterX = (prevCoords[0] + prevCoords[2]) / 2;
+  const prevCenterY = (prevCoords[1] + prevCoords[3]) / 2;
+  const dX = prevCenterX - nextCenterX;
+  const dY = prevCenterY - nextCenterY;
+  const rotatedOffset = pointRotateRads(
+    pointFrom(offsetX, offsetY),
+    pointFrom(dX, dY),
+    element.angle,
+  );
 
   const nextArrow = {
     ...element,
-    points: [
-      offsetStartLocalPoint,
-      ...element.points
-        .slice(1, -1)
-        .map((p) =>
-          pointFrom<LocalPoint>(
-            p[0] + element.x - offsetStartGlobalPoint[0],
-            p[1] + element.y - offsetStartGlobalPoint[1],
-          ),
-        ),
-      offsetEndLocalPoint,
-    ],
+    points: normalizedPoints,
+    x: element.x + rotatedOffset[0],
+    y: element.y + rotatedOffset[1],
     startBinding:
       updates.startBinding === undefined
         ? element.startBinding
@@ -2373,6 +2365,16 @@ const pointDraggingUpdates = (
         ) || nextArrow.points[0]
       : nextArrow.points[0];
 
+  const startOffset = pointFrom<LocalPoint>(offsetX, offsetY);
+  const startLocalPointAbsolute = pointFrom<LocalPoint>(
+    startLocalPoint[0] + startOffset[0],
+    startLocalPoint[1] + startOffset[1],
+  );
+  const endLocalPointAbsolute = pointFrom<LocalPoint>(
+    endLocalPoint[0] + startOffset[0],
+    endLocalPoint[1] + startOffset[1],
+  );
+
   const endChanged =
     pointDistance(
       endLocalPoint,
@@ -2403,9 +2405,9 @@ const pointDraggingUpdates = (
         return [
           idx,
           idx === 0
-            ? { point: startLocalPoint, isDragging: true }
+            ? { point: startLocalPointAbsolute, isDragging: true }
             : idx === element.points.length - 1
-            ? { point: endLocalPoint, isDragging: true }
+            ? { point: endLocalPointAbsolute, isDragging: true }
             : naiveDraggingPoints.get(idx)!,
         ];
       }),
