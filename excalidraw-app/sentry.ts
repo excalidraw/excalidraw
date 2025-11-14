@@ -1,3 +1,4 @@
+import { getFeatureFlag } from "@excalidraw/common";
 import * as Sentry from "@sentry/browser";
 import callsites from "callsites";
 
@@ -33,6 +34,7 @@ Sentry.init({
     Sentry.captureConsoleIntegration({
       levels: ["error"],
     }),
+    Sentry.featureFlagsIntegration(),
   ],
   beforeSend(event) {
     if (event.request?.url) {
@@ -79,3 +81,14 @@ Sentry.init({
     return event;
   },
 });
+
+const flagsIntegration =
+  Sentry.getClient()?.getIntegrationByName<Sentry.FeatureFlagsIntegration>(
+    "FeatureFlags",
+  );
+if (flagsIntegration) {
+  flagsIntegration.addFeatureFlag(
+    "COMPLEX_BINDINGS",
+    getFeatureFlag("COMPLEX_BINDINGS"),
+  );
+}
