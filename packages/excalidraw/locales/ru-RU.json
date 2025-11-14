@@ -357,13 +357,13 @@
     "lineEditor_nothingSelected": "Выберите точку для редактирования (удерживайте {{shortcut_1}}, чтобы выбрать несколько),\nили удерживайте {{shortcut_2}} и щёлкните, чтобы добавить новые точки",
     "publishLibrary": "Опубликовать свою собственную библиотеку",
     "bindTextToElement": "{{shortcut}} — добавить текст",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "createFlowchart": "{{shortcut}} — создать блок-схему",
+    "deepBoxSelect": "Удерживайте {{shortcut}} для глубокого выделения и предотвращения перетаскивания",
+    "eraserRevert": "Удерживайте {{shortcut}}, чтобы восстановить элементы, помеченные для удаления",
     "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага «dom.events.asyncClipboard.clipboardItem» на «true». Чтобы изменить флаги браузера в Firefox, зайдите на страницу «about:config».",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Удерживайте {{shortcut}}, чтобы отключить привязку",
+    "enterCropEditor": "Дважды щёлкните по изображению или нажмите {{shortcut}}, чтобы обрезать изображение",
+    "leaveCropEditor": "Щёлкните за пределами изображения или нажмите {{shortcut_1}} или {{shortcut_2}}, чтобы завершить кадрирование"
   },
   "canvasError": {
     "cannotShowPreview": "Не удалось отобразить предпросмотр",
@@ -568,7 +568,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Цвет",
     "mostUsedCustomColors": "Часто используемые пользовательские цвета",
     "colors": "Цвета",
     "shades": "Оттенки",
@@ -650,15 +650,15 @@
     "shortcutHint": "Используйте {{shortcut}} для командной палитры"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Пробел",
+    "delete": "Delete",
+    "mmb": "Колёсико мыши"
   }
 }
