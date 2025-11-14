@@ -20,10 +20,7 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import {
-  copyBlobToClipboardAsPng,
-  copyTextToSystemClipboard,
-} from "../clipboard";
+import { copyBlobToClipboard } from "../clipboard";
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
@@ -150,9 +147,11 @@ export const exportCanvas = async (
         },
       );
     } else if (type === "clipboard-svg") {
-      const svg = await svgPromise.then((svg) => svg.outerHTML);
+      const blob = svgPromise.then(
+        (svg) => new Blob([svg.outerHTML], { type: MIME_TYPES.text }),
+      );
       try {
-        await copyTextToSystemClipboard(svg);
+        await copyBlobToClipboard(blob, MIME_TYPES.text);
       } catch (e) {
         throw new Error(t("errors.copyToSystemClipboardFailed"));
       }
@@ -191,7 +190,7 @@ export const exportCanvas = async (
   } else if (type === "clipboard") {
     try {
       const blob = canvasToBlob(tempCanvas);
-      await copyBlobToClipboardAsPng(blob);
+      await copyBlobToClipboard(blob, MIME_TYPES.png);
     } catch (error: any) {
       console.warn(error);
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
