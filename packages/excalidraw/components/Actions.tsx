@@ -1152,6 +1152,7 @@ export const ShapesSwitcher = ({
                   app.togglePenMode(true);
                 }
 
+                // special handling for selection - can press again to switch between lasso and selection
                 if (value === "selection") {
                   if (app.state.activeTool.type === "selection") {
                     app.setActiveTool({ type: "lasso" });
@@ -1160,15 +1161,12 @@ export const ShapesSwitcher = ({
                   }
                 }
               }}
-              onChange={({ pointerType }) => {
+              onChange={() => {
                 if (app.state.activeTool.type !== value) {
                   trackEvent("toolbar", value, "ui");
                 }
-                if (value === "image") {
-                  app.setActiveTool({
-                    type: value,
-                  });
-                } else {
+                // For selection, need to avoid onPointerDown and onChange interfering with each other
+                if (value !== "selection") {
                   app.setActiveTool({ type: value });
                 }
               }}
