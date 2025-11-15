@@ -1,17 +1,27 @@
+# enable BuildKit features (mounts, platform args)
+# syntax=docker/dockerfile:1.4
+
+ARG BUILDPLATFORM
+ARG TARGETPLATFORM
+ARG TARGETARCH
 FROM --platform=${BUILDPLATFORM} node:18 AS build
 
 WORKDIR /opt/node_app
 
 COPY . .
 
-# do not ignore optional dependencies:
-# Error: Cannot find module @rollup/rollup-linux-x64-gnu
+# Ensure optional, platform-specific native rollup packages are installed for the
+# target platform (example package: @rollup/rollup-linux-x64-gnu).
+# npm/yarn consult npm_config_platform and npm_config_arch when resolving
+# optionalDependencies during install.
 RUN --mount=type=cache,target=/root/.cache/yarn \
-    npm_config_target_arch=${TARGETARCH} yarn --network-timeout 600000
+    npm_config_platform=linux npm_config_arch=${TARGETARCH} yarn --network-timeout 600000
 
 ARG NODE_ENV=production
 
-RUN npm_config_target_arch=${TARGETARCH} yarn build:app:docker
+# Build with the same platform/arch override so any native modules used at
+# build-time match the target architecture.
+RUN npm_config_platform=linux npm_config_arch=${TARGETARCH} yarn build:app:docker
 
 FROM --platform=${TARGETPLATFORM} nginx:1.27-alpine
 
