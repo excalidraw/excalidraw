@@ -45,6 +45,7 @@ import {
   isElbowArrow,
   isLinearElement,
   isLineElement,
+  isOpenLine,
   isTextElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
@@ -394,11 +395,15 @@ export const actionChangeBackgroundColor = register({
         return el;
       });
     } else {
-      nextElements = changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
+      nextElements = changeProperty(elements, appState, (el) => {
+        // Prevent applying non-transparent background to open lines
+        if (isOpenLine(el) && !isTransparent(value.currentItemBackgroundColor)) {
+          return el; // Don't change open lines
+        }
+        return newElementWith(el, {
           backgroundColor: value.currentItemBackgroundColor,
-        }),
-      );
+        });
+      });
     }
 
     return {
@@ -410,35 +415,44 @@ export const actionChangeBackgroundColor = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => (
-    <>
-      {appState.stylesPanelMode === "full" && (
-        <h3 aria-hidden="true">{t("labels.background")}</h3>
-      )}
-      <ColorPicker
-        topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
-        palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
-        type="elementBackground"
-        label={t("labels.background")}
-        color={getFormValue(
-          elements,
-          app,
-          (element) => element.backgroundColor,
-          true,
-          (hasSelection) =>
-            !hasSelection ? appState.currentItemBackgroundColor : null,
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
+    const isSingleOpenLineSelected =
+      selectedElements.length === 1 && isOpenLine(selectedElements[0]);
+
+    return (
+      <>
+        {appState.stylesPanelMode === "full" && (
+          <h3 aria-hidden="true">{t("labels.background")}</h3>
         )}
-        onChange={(color) => updateData({ currentItemBackgroundColor: color })}
-        elements={elements}
-        appState={appState}
-        updateData={updateData}
-        compactMode={
-          appState.stylesPanelMode === "compact" ||
-          appState.stylesPanelMode === "mobile"
-        }
-      />
-    </>
-  ),
+        <ColorPicker
+          topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
+          palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
+          type="elementBackground"
+          label={t("labels.background")}
+          color={getFormValue(
+            elements,
+            app,
+            (element) => element.backgroundColor,
+            true,
+            (hasSelection) =>
+              !hasSelection ? appState.currentItemBackgroundColor : null,
+          )}
+          onChange={(color) =>
+            updateData({ currentItemBackgroundColor: color })
+          }
+          elements={elements}
+          appState={appState}
+          updateData={updateData}
+          compactMode={
+            appState.stylesPanelMode === "compact" ||
+            appState.stylesPanelMode === "mobile"
+          }
+          disabled={isSingleOpenLineSelected}
+        />
+      </>
+    );
+  },
 });
 
 export const actionChangeFillStyle = register({

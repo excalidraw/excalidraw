@@ -74,6 +74,7 @@ interface ColorPickerProps {
   topPicks?: ColorTuple;
   updateData: (formData?: any) => void;
   compactMode?: boolean;
+  disabled?: boolean;
 }
 
 const ColorPickerPopupContent = ({
@@ -239,6 +240,7 @@ const ColorPickerTrigger = ({
   mode = "background",
   onToggle,
   editingTextElement,
+  disabled = false,
 }: {
   color: string | null;
   label: string;
@@ -247,6 +249,7 @@ const ColorPickerTrigger = ({
   mode?: "background" | "stroke";
   onToggle: () => void;
   editingTextElement?: boolean;
+  disabled?: boolean;
 }) => {
   const handleClick = (e: React.MouseEvent) => {
     // use pointerdown so we run before outside-close logic
@@ -273,6 +276,8 @@ const ColorPickerTrigger = ({
         "mobile-border": stylesPanelMode === "mobile",
       })}
       aria-label={label}
+      aria-disabled={disabled}
+      disabled={disabled}
       style={color ? { "--swatch-color": color } : undefined}
       title={
         type === "elementStroke"
@@ -313,6 +318,7 @@ export const ColorPicker = ({
   topPicks,
   updateData,
   appState,
+  disabled = false,
 }: ColorPickerProps) => {
   const openRef = useRef(appState.openPopup);
   useEffect(() => {
@@ -357,6 +363,7 @@ export const ColorPicker = ({
             stylesPanelMode={appState.stylesPanelMode}
             mode={type === "elementStroke" ? "stroke" : "background"}
             editingTextElement={!!appState.editingTextElement}
+            disabled={disabled}
             onToggle={() => {
               // atomic switch: if another popup is open, close it first, then open this one next tick
               if (appState.openPopup === type) {

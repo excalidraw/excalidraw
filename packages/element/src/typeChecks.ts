@@ -413,3 +413,13 @@ export const canBecomePolygon = (
     (points.length === 3 && !pointsEqual(points[0], points[points.length - 1]))
   );
 };
+
+/**
+ * Checks if an element is an open line (line element without polygon closure).
+ * Returns true only for line elements that are not closed polygons or arrows.
+ */
+export const isOpenLine = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawLineElement => {
+  return isLineElement(element) && !element.polygon;
+};
