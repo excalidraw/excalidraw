@@ -35,10 +35,16 @@ const DropdownMenu = ({
       : MenuContentComp;
 
   return (
-    <>
+    <div
+      className="dropdown-menu-container"
+      style={{
+        // remove this div from box layout
+        display: "contents",
+      }}
+    >
       {MenuTriggerComp}
       {open && MenuContentCompWithPlacement}
-    </>
+    </div>
   );
 };
 

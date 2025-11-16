@@ -1,14 +1,10 @@
+@import "../packages/excalidraw/css/variables.module.scss";
+
 .excalidraw {
   --color-primary-contrast-offset: #625ee0; // to offset Chubb illusion
 
   &.theme--dark {
     --color-primary-contrast-offset: #726dff; // to offset Chubb illusion
-  }
-
-  .top-right-ui {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
   }
 
   .footer-center {
@@ -90,21 +86,30 @@
   }
 }
 
-.plus-button {
+.plus-banner {
   display: flex;
   justify-content: center;
   cursor: pointer;
   align-items: center;
   border: 1px solid var(--color-primary);
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.875rem;
   border-radius: var(--border-radius-lg);
   background-color: var(--island-bg-color);
-  color: var(--color-primary) !important;
   text-decoration: none !important;
 
-  font-size: 0.75rem;
+  font-family: var(--ui-font);
+  font-size: 0.8333rem;
   box-sizing: border-box;
   height: var(--lg-button-size);
+
+  border: none;
+  box-shadow: 0 0 0 1px var(--color-surface-lowest);
+  background-color: var(--color-surface-low);
+  color: var(--button-color, var(--color-on-surface)) !important;
+
+  &:active {
+    box-shadow: 0 0 0 1px var(--color-brand-active);
+  }
 
   &:hover {
     background-color: var(--color-primary);
@@ -117,7 +122,7 @@
 }
 
 .theme--dark {
-  .plus-button {
+  .plus-banner {
     &:hover {
       color: black !important;
     }
