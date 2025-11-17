@@ -4,6 +4,7 @@ import {
   eyeIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
+import { useApp } from "@excalidraw/excalidraw";
 import React from "react";
 
 import { isDevEnv } from "@excalidraw/common";
@@ -23,6 +24,7 @@ export const AppMainMenu: React.FC<{
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
 }> = React.memo((props) => {
+  const app = useApp();
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
@@ -39,6 +41,21 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
+      <MainMenu.Separator />
+      <MainMenu.Group title="Tools">
+        <MainMenu.ItemCustom>
+          <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <input
+              type="checkbox"
+              checked={app.state.eraserPenOnlyMode}
+              onChange={(e) => {
+                app.setState({ eraserPenOnlyMode: e.target.checked });
+              }}
+            />
+            Eraser: Pen strokes only
+          </label>
+        </MainMenu.ItemCustom>
+      </MainMenu.Group>
       <MainMenu.Separator />
       <MainMenu.ItemLink
         icon={ExcalLogo}
