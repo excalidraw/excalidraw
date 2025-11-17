@@ -1,4 +1,4 @@
-import { pointCenter, pointFrom, pointRotateRads } from "@excalidraw/math";
+import { pointCenter, pointFrom } from "@excalidraw/math";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
 import { vi } from "vitest";
 
@@ -24,13 +24,12 @@ import {
   unmountComponent,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
-import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
 import { wrapText } from "../src";
 import * as textElementUtils from "../src/textElement";
 import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
 import { LinearElementEditor } from "../src";
-import { elementCenterPoint } from "../src/bounds";
 import { newArrowElement } from "../src";
 
 import {
@@ -60,7 +59,7 @@ describe("Test Linear Elements", () => {
 
   beforeEach(async () => {
     unmountComponent();
-    //localStorage.clear();
+    localStorage.clear();
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
     reseed(7);
@@ -954,62 +953,6 @@ describe("Test Linear Elements", () => {
           ],
         ]
       `);
-    });
-
-    it("keeps rotated arrow start point aligned with pointer while dragging", () => {
-      const arrow = createThreePointerLinearElement("arrow");
-      const angle = 1.2;
-      h.app.scene.mutateElement(arrow, { angle: angle as Radians });
-
-      const elementsMap = h.app.scene.getNonDeletedElementsMap();
-      const center = elementCenterPoint(arrow, elementsMap);
-      const expectedStart = pointRotateRads(
-        pointFrom<GlobalPoint>(
-          arrow.x + arrow.points[0][0],
-          arrow.y + arrow.points[0][1],
-        ),
-        center,
-        angle as Radians,
-      );
-      const actualStart = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-        arrow,
-        0,
-        elementsMap,
-      );
-
-      const initialOffset = {
-        x: expectedStart[0] - actualStart[0],
-        y: expectedStart[1] - actualStart[1],
-      };
-      expect(Math.hypot(initialOffset.x, initialOffset.y)).toBeGreaterThan(0);
-
-      API.setSelectedElements([arrow]);
-      enterLineEditingMode(arrow, true);
-
-      const dragOffset = { x: 25, y: -15 };
-      const dragTarget = pointFrom<GlobalPoint>(
-        expectedStart[0] + dragOffset.x,
-        expectedStart[1] + dragOffset.y,
-      );
-
-      mouse.downAt(expectedStart[0], expectedStart[1]);
-      mouse.moveTo(dragTarget[0], dragTarget[1]);
-      mouse.upAt(dragTarget[0], dragTarget[1]);
-
-      const updatedMap = h.app.scene.getNonDeletedElementsMap();
-      const movedStart = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-        arrow,
-        0,
-        updatedMap,
-      );
-
-      const finalOffset = {
-        x: dragTarget[0] - movedStart[0],
-        y: dragTarget[1] - movedStart[1],
-      };
-
-      expect(finalOffset.x).toBeCloseTo(initialOffset.x, 6);
-      expect(finalOffset.y).toBeCloseTo(initialOffset.y, 6);
     });
   });
 

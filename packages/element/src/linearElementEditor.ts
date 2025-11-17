@@ -1272,19 +1272,18 @@ export class LinearElementEditor {
       indexMaybeFromEnd < 0
         ? element.points.length + indexMaybeFromEnd
         : indexMaybeFromEnd;
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-    const cx = (x1 + x2) / 2;
-    const cy = (y1 + y2) / 2;
+    const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
+    const center = pointFrom<GlobalPoint>(cx, cy);
     const p = element.points[index];
     const { x, y } = element;
 
     return p
       ? pointRotateRads(
-          pointFrom(x + p[0], y + p[1]),
-          pointFrom(cx, cy),
+          pointFrom<GlobalPoint>(x + p[0], y + p[1]),
+          center,
           element.angle,
         )
-      : pointRotateRads(pointFrom(x, y), pointFrom(cx, cy), element.angle);
+      : pointRotateRads(pointFrom<GlobalPoint>(x, y), center, element.angle);
   }
 
   static pointFromAbsoluteCoords(
@@ -1586,7 +1585,7 @@ export class LinearElementEditor {
             idx !== points.length - 1 &&
             !pointUpdates.has(idx)
           ) {
-            return pointFrom<LocalPoint>(current[0], current[1]);
+            return current;
           }
 
           return pointFrom<LocalPoint>(
@@ -1950,51 +1949,27 @@ export class LinearElementEditor {
     elementsMap: ElementsMap,
     includeBoundText: boolean = false,
   ): [number, number, number, number, number, number] => {
-    let coords: [number, number, number, number, number, number];
-    let x1;
-    let y1;
-    let x2;
-    let y2;
-    if (element.points.length < 2 || !ShapeCache.get(element)) {
-      // XXX this is just a poor estimate and not very useful
-      const { minX, minY, maxX, maxY } = element.points.reduce(
-        (limits, [x, y]) => {
-          limits.minY = Math.min(limits.minY, y);
-          limits.minX = Math.min(limits.minX, x);
+    const shape = ShapeCache.generateElementShape(element, {
+      isExporting: true,
+      canvasBackgroundColor: "traansparent",
+      embedsValidationStatus: new Map(),
+    });
 
-          limits.maxX = Math.max(limits.maxX, x);
-          limits.maxY = Math.max(limits.maxY, y);
+    // first element is always the curve
+    const ops = getCurvePathOps(shape[0]);
 
-          return limits;
-        },
-        { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
-      );
-      x1 = minX + element.x;
-      y1 = minY + element.y;
-      x2 = maxX + element.x;
-      y2 = maxY + element.y;
-    } else {
-      const shape = ShapeCache.generateElementShape(element, null);
-
-      // first element is always the curve
-      const ops = getCurvePathOps(shape[0]);
-
-      const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
-      x1 = minX + element.x;
-      y1 = minY + element.y;
-      x2 = maxX + element.x;
-      y2 = maxY + element.y;
-    }
+    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+    const x1 = minX + element.x;
+    const y1 = minY + element.y;
+    const x2 = maxX + element.x;
+    const y2 = maxY + element.y;
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
-    coords = [x1, y1, x2, y2, cx, cy];
 
-    if (!includeBoundText) {
-      return coords;
-    }
-    const boundTextElement = getBoundTextElement(element, elementsMap);
+    const boundTextElement =
+      includeBoundText && getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
-      coords = LinearElementEditor.getMinMaxXYWithBoundText(
+      return LinearElementEditor.getMinMaxXYWithBoundText(
         element,
         elementsMap,
         [x1, y1, x2, y2],
@@ -2002,7 +1977,7 @@ export class LinearElementEditor {
       );
     }
 
-    return coords;
+    return [x1, y1, x2, y2, cx, cy];
   };
 
   static moveFixedSegment(
@@ -2243,36 +2218,25 @@ const pointDraggingUpdates = (
   }
 
   // Simulate the updated arrow for the bind point calculation
-  const updatedPoints = element.points.map((p, idx) => {
-    const update = naiveDraggingPoints.get(idx);
-    return update ? update.point : p;
-  });
-
-  const offsetX = updatedPoints[0][0];
-  const offsetY = updatedPoints[0][1];
-  const normalizedPoints = updatedPoints.map((p) =>
-    pointFrom<LocalPoint>(p[0] - offsetX, p[1] - offsetY),
-  );
-
-  const nextCoords = getElementPointsCoords(element, normalizedPoints);
-  const prevCoords = getElementPointsCoords(element, element.points);
-  const nextCenterX = (nextCoords[0] + nextCoords[2]) / 2;
-  const nextCenterY = (nextCoords[1] + nextCoords[3]) / 2;
-  const prevCenterX = (prevCoords[0] + prevCoords[2]) / 2;
-  const prevCenterY = (prevCoords[1] + prevCoords[3]) / 2;
-  const dX = prevCenterX - nextCenterX;
-  const dY = prevCenterY - nextCenterY;
-  const rotatedOffset = pointRotateRads(
-    pointFrom(offsetX, offsetY),
-    pointFrom(dX, dY),
-    element.angle,
-  );
-
+  const offsetStartLocalPoint = startIsDragged
+    ? pointFrom<LocalPoint>(
+        element.points[0][0] + deltaX,
+        element.points[0][1] + deltaY,
+      )
+    : element.points[0];
+  const offsetEndLocalPoint = endIsDragged
+    ? pointFrom<LocalPoint>(
+        element.points[element.points.length - 1][0] + deltaX,
+        element.points[element.points.length - 1][1] + deltaY,
+      )
+    : element.points[element.points.length - 1];
   const nextArrow = {
     ...element,
-    points: normalizedPoints,
-    x: element.x + rotatedOffset[0],
-    y: element.y + rotatedOffset[1],
+    points: [
+      offsetStartLocalPoint,
+      ...element.points.slice(1, -1),
+      offsetEndLocalPoint,
+    ],
     startBinding:
       updates.startBinding === undefined
         ? element.startBinding
@@ -2325,7 +2289,7 @@ const pointDraggingUpdates = (
     ? nextArrow.points[0]
     : endBindable
     ? updateBoundPoint(
-        nextArrow,
+        element,
         "endBinding",
         nextArrow.endBinding,
         endBindable,
@@ -2356,7 +2320,7 @@ const pointDraggingUpdates = (
       ? nextArrow.points[nextArrow.points.length - 1]
       : startBindable
       ? updateBoundPoint(
-          nextArrow,
+          element,
           "startBinding",
           nextArrow.startBinding,
           startBindable,
@@ -2364,16 +2328,6 @@ const pointDraggingUpdates = (
           customIntersector,
         ) || nextArrow.points[0]
       : nextArrow.points[0];
-
-  const startOffset = pointFrom<LocalPoint>(offsetX, offsetY);
-  const startLocalPointAbsolute = pointFrom<LocalPoint>(
-    startLocalPoint[0] + startOffset[0],
-    startLocalPoint[1] + startOffset[1],
-  );
-  const endLocalPointAbsolute = pointFrom<LocalPoint>(
-    endLocalPoint[0] + startOffset[0],
-    endLocalPoint[1] + startOffset[1],
-  );
 
   const endChanged =
     pointDistance(
@@ -2405,9 +2359,15 @@ const pointDraggingUpdates = (
         return [
           idx,
           idx === 0
-            ? { point: startLocalPointAbsolute, isDragging: true }
+            ? {
+                point: startLocalPoint,
+                isDragging: true,
+              }
             : idx === element.points.length - 1
-            ? { point: endLocalPointAbsolute, isDragging: true }
+            ? {
+                point: endLocalPoint,
+                isDragging: true,
+              }
             : naiveDraggingPoints.get(idx)!,
         ];
       }),

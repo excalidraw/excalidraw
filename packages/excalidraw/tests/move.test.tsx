@@ -110,8 +110,11 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([200, 0]);
-    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[111, 51.0098]], 0);
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[78, 78]], 0);
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[110, -4.576537]], 0);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints(
+      [[79, 132.89433]],
+      0,
+    );
 
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
@@ -129,8 +132,11 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
-    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[111, 51]], 0);
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[79, 80]], 0);
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[111, 6.1499]], 0);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints(
+      [[79, 124.1678]],
+      0,
+    );
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });

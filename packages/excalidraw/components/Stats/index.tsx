@@ -4,7 +4,7 @@ import throttle from "lodash.throttle";
 import { useEffect, useMemo, useState, memo } from "react";
 
 import { STATS_PANELS } from "@excalidraw/common";
-import { getCommonBounds, isBindingElement } from "@excalidraw/element";
+import { getCommonBounds } from "@excalidraw/element";
 import { getUncroppedWidthAndHeight } from "@excalidraw/element";
 import { isImageElement } from "@excalidraw/element";
 
@@ -333,16 +333,14 @@ export const StatsInner = memo(
                           appState={appState}
                         />
                       </StatsRow>
-                      {!isBindingElement(singleElement) && (
-                        <StatsRow>
-                          <Angle
-                            property="angle"
-                            element={singleElement}
-                            scene={scene}
-                            appState={appState}
-                          />
-                        </StatsRow>
-                      )}
+                      <StatsRow>
+                        <Angle
+                          property="angle"
+                          element={singleElement}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      </StatsRow>
                       <StatsRow>
                         <FontSize
                           property="fontSize"

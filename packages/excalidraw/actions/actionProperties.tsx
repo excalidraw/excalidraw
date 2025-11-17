@@ -61,7 +61,7 @@ import {
 
 import { deriveStylesPanelMode } from "@excalidraw/common";
 
-import type { LocalPoint } from "@excalidraw/math";
+import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
   Arrowhead,
@@ -1738,7 +1738,20 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
       if (!isArrowElement(el)) {
         return el;
       }
+      const elementsMap = app.scene.getNonDeletedElementsMap();
+      const startPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        el,
+        0,
+        elementsMap,
+      );
+      const endPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        el,
+        -1,
+        elementsMap,
+      );
       let newElement = newElementWith(el, {
+        x: value === ARROW_TYPE.elbow ? startPoint[0] : el.x,
+        y: value === ARROW_TYPE.elbow ? startPoint[1] : el.y,
         roundness:
           value === ARROW_TYPE.round
             ? {
@@ -1746,9 +1759,31 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
               }
             : null,
         elbowed: value === ARROW_TYPE.elbow,
+        angle: value === ARROW_TYPE.elbow ? (0 as Radians) : el.angle,
         points:
           value === ARROW_TYPE.elbow || el.elbowed
-            ? [el.points[0], el.points[el.points.length - 1]]
+            ? [
+                LinearElementEditor.pointFromAbsoluteCoords(
+                  {
+                    ...el,
+                    x: startPoint[0],
+                    y: startPoint[1],
+                    angle: 0 as Radians,
+                  },
+                  startPoint,
+                  elementsMap,
+                ),
+                LinearElementEditor.pointFromAbsoluteCoords(
+                  {
+                    ...el,
+                    x: startPoint[0],
+                    y: startPoint[1],
+                    angle: 0 as Radians,
+                  },
+                  endPoint,
+                  elementsMap,
+                ),
+              ]
             : el.points,
       });
 

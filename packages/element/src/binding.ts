@@ -1200,17 +1200,16 @@ export const bindPointToSnapToElementOutline = (
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
   customIntersector?: LineSegment<GlobalPoint>,
-  ignoreFrameCutouts?: boolean,
 ): GlobalPoint => {
-  const aabb = aabbForElement(bindableElement, elementsMap);
-  const localPoint =
-    arrowElement.points[
-      startOrEnd === "start" ? 0 : arrowElement.points.length - 1
-    ];
-  const point = pointFrom<GlobalPoint>(
-    arrowElement.x + localPoint[0],
-    arrowElement.y + localPoint[1],
-  );
+  const elbowed = isElbowArrow(arrowElement);
+  const point =
+    customIntersector && !elbowed
+      ? customIntersector[0]
+      : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          arrowElement,
+          startOrEnd === "start" ? 0 : -1,
+          elementsMap,
+        );
 
   if (arrowElement.points.length < 2) {
     // New arrow creation, so no snapping
@@ -1220,20 +1219,17 @@ export const bindPointToSnapToElementOutline = (
   const edgePoint = isRectanguloidElement(bindableElement)
     ? avoidRectangularCorner(arrowElement, bindableElement, elementsMap, point)
     : point;
-  const elbowed = isElbowArrow(arrowElement);
-  const center = getCenterForBounds(aabb);
-  const adjacentPointIdx =
-    startOrEnd === "start" ? 1 : arrowElement.points.length - 2;
-  const adjacentPoint = pointRotateRads(
-    pointFrom<GlobalPoint>(
-      arrowElement.x + arrowElement.points[adjacentPointIdx][0],
-      arrowElement.y + arrowElement.points[adjacentPointIdx][1],
-    ),
-    center,
-    arrowElement.angle ?? 0,
-  );
-
+  const adjacentPoint =
+    customIntersector && !elbowed
+      ? customIntersector[1]
+      : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          arrowElement,
+          startOrEnd === "start" ? 1 : -2,
+          elementsMap,
+        );
   const bindingGap = getBindingGap(bindableElement, arrowElement);
+  const aabb = aabbForElement(bindableElement, elementsMap);
+  const bindableCenter = getCenterForBounds(aabb);
 
   let intersection: GlobalPoint | null = null;
   if (elbowed) {
@@ -1247,8 +1243,8 @@ export const bindPointToSnapToElementOutline = (
       edgePoint,
     );
     const otherPoint = pointFrom<GlobalPoint>(
-      isHorizontal ? center[0] : snapPoint[0],
-      !isHorizontal ? center[1] : snapPoint[1],
+      isHorizontal ? bindableCenter[0] : snapPoint[0],
+      !isHorizontal ? bindableCenter[1] : snapPoint[1],
     );
     const intersector =
       customIntersector ??
@@ -1271,8 +1267,8 @@ export const bindPointToSnapToElementOutline = (
 
     if (!intersection) {
       const anotherPoint = pointFrom<GlobalPoint>(
-        !isHorizontal ? center[0] : snapPoint[0],
-        isHorizontal ? center[1] : snapPoint[1],
+        !isHorizontal ? bindableCenter[0] : snapPoint[0],
+        isHorizontal ? bindableCenter[1] : snapPoint[1],
       );
       const anotherIntersector = lineSegment(
         anotherPoint,
@@ -1292,18 +1288,21 @@ export const bindPointToSnapToElementOutline = (
       ).sort(pointDistanceSq)[0];
     }
   } else {
-    const halfVector = vectorScale(
-      vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
-      pointDistance(edgePoint, adjacentPoint) +
-        Math.max(bindableElement.width, bindableElement.height) +
-        bindingGap * 2,
-    );
-    const intersector =
-      customIntersector ??
-      lineSegment(
-        pointFromVector(halfVector, adjacentPoint),
-        pointFromVector(vectorScale(halfVector, -1), adjacentPoint),
+    let intersector = customIntersector;
+    if (!intersector) {
+      const halfVector = vectorScale(
+        vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
+        pointDistance(edgePoint, adjacentPoint) +
+          Math.max(bindableElement.width, bindableElement.height) +
+          bindingGap * 2,
       );
+      intersector =
+        customIntersector ??
+        lineSegment(
+          pointFromVector(halfVector, adjacentPoint),
+          pointFromVector(vectorScale(halfVector, -1), adjacentPoint),
+        );
+    }
 
     intersection =
       pointDistance(edgePoint, adjacentPoint) < 1
@@ -1561,7 +1560,7 @@ export const updateBoundPoint = (
   );
   const pointIndex =
     startOrEnd === "startBinding" ? 0 : arrow.points.length - 1;
-
+  const elbowed = isElbowArrow(arrow);
   const otherBinding =
     startOrEnd === "startBinding" ? arrow.endBinding : arrow.startBinding;
   const otherBindableElement =
@@ -1587,6 +1586,7 @@ export const updateBoundPoint = (
   let arrowTooShort = false;
   if (
     !isOverlapping &&
+    !elbowed &&
     arrow.startBinding &&
     arrow.endBinding &&
     otherBindableElement &&
@@ -1625,6 +1625,39 @@ export const updateBoundPoint = (
 
   const isNested = (arrowTooShort || isOverlapping) && isLargerThanOther;
 
+  let _customIntersector = customIntersector;
+  if (!elbowed && !_customIntersector) {
+    const [x1, y1, x2, y2] = LinearElementEditor.getElementAbsoluteCoords(
+      arrow,
+      elementsMap,
+    );
+    const center = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
+    const edgePoint = isRectanguloidElement(bindableElement)
+      ? avoidRectangularCorner(arrow, bindableElement, elementsMap, global)
+      : global;
+    const adjacentPoint = pointRotateRads(
+      pointFrom<GlobalPoint>(
+        arrow.x +
+          arrow.points[pointIndex === 0 ? 1 : arrow.points.length - 2][0],
+        arrow.y +
+          arrow.points[pointIndex === 0 ? 1 : arrow.points.length - 2][1],
+      ),
+      center,
+      arrow.angle as Radians,
+    );
+    const bindingGap = getBindingGap(bindableElement, arrow);
+    const halfVector = vectorScale(
+      vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
+      pointDistance(edgePoint, adjacentPoint) +
+        Math.max(bindableElement.width, bindableElement.height) +
+        bindingGap * 2,
+    );
+    _customIntersector = lineSegment(
+      pointFromVector(halfVector, adjacentPoint),
+      pointFromVector(vectorScale(halfVector, -1), adjacentPoint),
+    );
+  }
+
   const maybeOutlineGlobal =
     binding.mode === "orbit" && bindableElement
       ? isNested
@@ -1632,40 +1665,41 @@ export const updateBoundPoint = (
         : bindPointToSnapToElementOutline(
             {
               ...arrow,
-              x: pointIndex === 0 ? global[0] : arrow.x,
-              y: pointIndex === 0 ? global[1] : arrow.y,
-              points:
+              points: [
                 pointIndex === 0
-                  ? [
-                      pointFrom<LocalPoint>(0, 0),
-                      ...arrow.points
-                        .slice(1)
-                        .map((p) =>
-                          pointFrom<LocalPoint>(
-                            p[0] - (global[0] - arrow.x),
-                            p[1] - (global[1] - arrow.y),
-                          ),
-                        ),
-                    ]
-                  : [
-                      ...arrow.points.slice(0, -1),
-                      pointFrom<LocalPoint>(
-                        global[0] - arrow.x,
-                        global[1] - arrow.y,
-                      ),
-                    ],
+                  ? LinearElementEditor.createPointAt(
+                      arrow,
+                      elementsMap,
+                      global[0],
+                      global[1],
+                      null,
+                    )
+                  : arrow.points[0],
+                ...arrow.points.slice(1, -1),
+                pointIndex === arrow.points.length - 1
+                  ? LinearElementEditor.createPointAt(
+                      arrow,
+                      elementsMap,
+                      global[0],
+                      global[1],
+                      null,
+                    )
+                  : arrow.points[arrow.points.length - 1],
+              ],
             },
             bindableElement,
             pointIndex === 0 ? "start" : "end",
             elementsMap,
-            customIntersector,
+            _customIntersector,
           )
       : global;
 
-  return LinearElementEditor.pointFromAbsoluteCoords(
+  return LinearElementEditor.createPointAt(
     arrow,
-    maybeOutlineGlobal,
     elementsMap,
+    maybeOutlineGlobal[0],
+    maybeOutlineGlobal[1],
+    null,
   );
 };
 

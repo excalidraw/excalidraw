@@ -1244,6 +1244,7 @@ const getElbowArrowData = (
   const startGlobalPoint = getGlobalPoint(
     {
       ...arrow,
+      angle: 0,
       type: "arrow",
       elbowed: true,
       points: nextPoints,
@@ -1258,6 +1259,7 @@ const getElbowArrowData = (
   const endGlobalPoint = getGlobalPoint(
     {
       ...arrow,
+      angle: 0,
       type: "arrow",
       elbowed: true,
       points: nextPoints,

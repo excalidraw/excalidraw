@@ -1,4 +1,4 @@
-import { isFiniteNumber, pointFrom, pointRotateRads } from "@excalidraw/math";
+import { isFiniteNumber, pointFrom } from "@excalidraw/math";
 
 import {
   DEFAULT_FONT_FAMILY,
@@ -20,7 +20,6 @@ import {
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
-  elementCenterPoint,
   getNonDeletedElements,
   isPointInElement,
   isValidPolygon,

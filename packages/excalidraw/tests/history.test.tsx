@@ -1580,15 +1580,18 @@ describe("history", () => {
 
         // bind arrow to rect1 and rect2
         UI.clickTool("arrow");
-        mouse.down(0, 0);
-        mouse.up(100, 0);
+        mouse.down(3, 0);
+        mouse.moveTo(50, 0);
+        mouse.up(47, 0);
 
         arrow = h.elements[3] as ExcalidrawLinearElement;
 
         expect(API.getUndoStack().length).toBe(5);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+          fixedPoint: expect.arrayContaining([
+            0.5379561888991137, 0.5379561888991137,
+          ]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -1611,7 +1614,9 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+          fixedPoint: expect.arrayContaining([
+            0.5379561888991137, 0.5379561888991137,
+          ]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -1634,7 +1639,9 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+          fixedPoint: expect.arrayContaining([
+            0.5379561888991137, 0.5379561888991137,
+          ]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -1665,7 +1672,9 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+          fixedPoint: expect.arrayContaining([
+            0.5379561888991137, 0.5379561888991137,
+          ]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -1688,7 +1697,9 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+          fixedPoint: expect.arrayContaining([
+            0.5379561888991137, 0.5379561888991137,
+          ]),
           mode: "orbit",
         });
         expect(arrow.endBinding).toEqual({
@@ -4626,7 +4637,7 @@ describe("history", () => {
                 }),
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-                  fixedPoint: [0.4109229782176541, 0.5890770217823459],
+                  fixedPoint: [0.41019091151895054, 0.5898090884810495],
                   mode: "orbit",
                 }),
               }),
@@ -4736,7 +4747,7 @@ describe("history", () => {
             newElementWith(h.elements[2] as ExcalidrawElbowArrowElement, {
               endBinding: {
                 elementId: remoteContainer.id,
-                fixedPoint: [0.5, 1],
+                fixedPoint: [0.5001, 1],
                 mode: "orbit",
               },
             }),
@@ -4770,7 +4781,7 @@ describe("history", () => {
                 // rebound with previous rectangle
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-                  fixedPoint: [0.41019091151895054, 0.5898090884810495],
+                  fixedPoint: [0.39511653718091, 0.6048834628190899],
                   mode: "orbit",
                 }),
               }),
@@ -4801,7 +4812,7 @@ describe("history", () => {
                 endBinding: expect.objectContaining({
                   // now we are back in the previous state!
                   elementId: remoteContainer.id,
-                  fixedPoint: [0.5, 1],
+                  fixedPoint: [0.5001, 1],
                   mode: "orbit",
                 }),
               }),
@@ -5029,11 +5040,13 @@ describe("history", () => {
         // bind arrow to rect1 and rect2
         UI.clickTool("arrow");
         mouse.down(0, 0);
-        mouse.up(100, 0);
+        mouse.moveTo(50, 0);
+        mouse.up(50, 0);
 
         const arrowId = h.elements[2].id;
 
         Keyboard.undo();
+
         expect(API.getUndoStack().length).toBe(1);
         expect(API.getRedoStack().length).toBe(1);
         expect(h.elements).toEqual(
@@ -5047,7 +5060,9 @@ describe("history", () => {
               id: arrowId,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
+                fixedPoint: expect.arrayContaining([
+                  0.548442798411514, 0.548442798411514,
+                ]),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
