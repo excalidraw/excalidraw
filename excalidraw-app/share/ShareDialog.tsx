@@ -32,17 +32,13 @@ export const shareDialogStateAtom = atom<
   { isOpen: false } | { isOpen: true; type: ShareDialogType }
 >({ isOpen: false });
 
-const getShareIcon = () => {
-  const navigator = window.navigator as any;
-  const isAppleBrowser = /Apple/.test(navigator.vendor);
-  const isWindowsBrowser = navigator.appVersion.indexOf("Win") !== -1;
-
-  if (isAppleBrowser) {
+export const getShareIcon = () => {
+  const platform = window.navigator.platform;
+  if (platform.includes("Mac") || platform.includes("iPhone")) {
     return shareIOS;
-  } else if (isWindowsBrowser) {
+  } else if (platform.includes("Win")) {
     return shareWindows;
   }
-
   return share;
 };
 
