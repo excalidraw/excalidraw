@@ -1476,6 +1476,7 @@ class App extends React.Component<AppProps, AppState> {
       return (
         <div
           id={this.getFrameNameDOMId(f)}
+          className={CLASSES.FRAME_NAME}
           key={f.id}
           style={{
             position: "absolute",
@@ -11252,18 +11253,13 @@ class App extends React.Component<AppProps, AppState> {
     (
       event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
     ) => {
-            // Check if event target is a frame title div (allows wheel events from frame titles
-      // to be passed through for canvas panning, e.g., two-finger trackpad gestures on macOS)
-      const target = event.target as HTMLElement;
-      const isFrameTitle =
-        target.id?.includes("-frame-name-") ||
-        target.closest?.('[id*="-frame-name-"]') !== null;
-        // if not scrolling on canvas/wysiwyg/frame-title, ignore
       if (
         !(
           event.target instanceof HTMLCanvasElement ||
           event.target instanceof HTMLTextAreaElement ||
-          event.target instanceof HTMLIFrameElement || isFrameTitle
+          event.target instanceof HTMLIFrameElement ||
+          (event.target instanceof HTMLElement &&
+            event.target.classList.contains(CLASSES.FRAME_NAME))
         )
       ) {
         // prevent zooming the browser (but allow scrolling DOM)
