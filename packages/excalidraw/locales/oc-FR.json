@@ -21,9 +21,9 @@
     "copyStyles": "Copiar los estiles",
     "pasteStyles": "Pegar los estils",
     "stroke": "Contorn",
-    "changeStroke": "",
+    "changeStroke": "Modificar la color d’emplenament",
     "background": "Rèireplan",
-    "changeBackground": "",
+    "changeBackground": "Modificar la color de rèireplan",
     "fill": "Empliment",
     "strokeWidth": "Largor de contorn",
     "strokeStyle": "Estil de contorn",
@@ -101,7 +101,7 @@
     "libraryLoadingMessage": "Cargament de la bibliotèca…",
     "libraries": "Percórrer las bibliotècas",
     "loadingScene": "Cargament de la scèna…",
-    "loadScene": "",
+    "loadScene": "Cargar una scèna d’un fichièr",
     "align": "Alinhament",
     "alignTop": "Alinhar ennaut",
     "alignBottom": "Alinhar enbàs",
@@ -117,7 +117,7 @@
     "share": "Partejar",
     "showStroke": "Mostrar lo selector de color de contorn",
     "showBackground": "Mostrar lo selector de color de fons",
-    "showFonts": "",
+    "showFonts": "Mostrar lo selector de polissa",
     "toggleTheme": "",
     "theme": "Tèma",
     "personalLib": "Bibliotèca personala",
@@ -130,7 +130,7 @@
     "link": {
       "edit": "Modificar lo ligam",
       "editEmbed": "",
-      "create": "",
+      "create": "Apondre un ligam",
       "label": "Ligam",
       "labelEmbed": "Ligam e integracion",
       "empty": "Cap de ligam pas definit",
@@ -165,12 +165,12 @@
     "zoomToFit": "",
     "installPWA": "",
     "autoResize": "",
-    "imageCropping": "",
+    "imageCropping": "Talhatge d’imatge",
     "unCroppedDimension": "",
-    "copyElementLink": "",
-    "linkToElement": "",
+    "copyElementLink": "Copiar lo ligam cap a l’objècte",
+    "linkToElement": "Ligam cap a l’objècte",
     "wrapSelectionInFrame": "",
-    "tab": "",
+    "tab": "Onglet",
     "shapeSwitch": ""
   },
   "elementLink": {
@@ -183,20 +183,20 @@
     "hint_emptyLibrary": "Seleccionatz un element d’apondre aquí, o installatz una bibliotèca del depaus public, çai-jos.",
     "hint_emptyPrivateLibrary": "Seleccionatz un element d’apondre aquí pel canabàs.",
     "search": {
-      "inputPlaceholder": "",
+      "inputPlaceholder": "Cercar dins la bibliotèca",
       "heading": "",
       "noResults": "",
-      "clearSearch": ""
+      "clearSearch": "Escafar la recèrca"
     }
   },
   "search": {
     "title": "",
     "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
+    "singleResult": "resultat",
+    "multipleResults": "resultats",
     "placeholder": "",
     "frames": "",
-    "texts": ""
+    "texts": "Tèxtes"
   },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
@@ -204,7 +204,7 @@
     "exportImage": "Exportar imatges...",
     "export": "Enregistrar dins...",
     "copyToClipboard": "Copiar al quichapapièrs",
-    "copyLink": "",
+    "copyLink": "Copiar ligam",
     "save": "Salvar al fichièr actual",
     "saveAs": "Enregistrar jos",
     "load": "Dobrir",
@@ -356,7 +356,7 @@
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "publishLibrary": "Publicar vòstra pròpria bibliotèca",
-    "bindTextToElement": "",
+    "bindTextToElement": "{{shortcut}} per apondre un tèxt",
     "createFlowchart": "",
     "deepBoxSelect": "",
     "eraserRevert": "",
@@ -379,7 +379,7 @@
     "sceneContent": "Contengut de la scèna :"
   },
   "shareDialog": {
-    "or": ""
+    "or": "O"
   },
   "roomDialog": {
     "desc_intro": "",
@@ -418,8 +418,8 @@
     "doubleClick": "doble clic",
     "drag": "lisar",
     "editor": "Editor",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Modificar los ponches de linha/sageta",
+    "editText": "Modificar tèxt / apondre etiqueta",
     "github": "Problèma trobat ? Senhalatz-lo",
     "howto": "Seguissètz nòstras guidas",
     "or": "o",
@@ -629,8 +629,8 @@
     "hint": {
       "text": "Clicar l’utilizaire per lo seguir",
       "followStatus": "Seguissètz actualament aqueste utilizaire",
-      "inCall": "",
-      "micMuted": "",
+      "inCall": "L’utilizaire es en conversacion vocala",
+      "micMuted": "Lo microfòn de l’utilizaire es mut",
       "isSpeaking": "La persona parla"
     }
   },
