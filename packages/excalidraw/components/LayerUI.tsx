@@ -615,7 +615,8 @@ const LayerUI = ({
               showExitZenModeBtn={showExitZenModeBtn}
               renderWelcomeScreen={renderWelcomeScreen}
             />
-            {(appState.toast || appState.scrolledOutside) && (
+            {(appState.toast ||
+              (appState.scrolledOutside && !appState.scrollConstraints)) && (
               <div className="floating-status-stack">
                 {appState.toast && (
                   <Toast
@@ -625,19 +626,21 @@ const LayerUI = ({
                     closable={appState.toast.closable}
                   />
                 )}
-                {!appState.toast && appState.scrolledOutside && (
-                  <button
-                    type="button"
-                    className="scroll-back-to-content"
-                    onClick={() => {
-                      setAppState((appState) => ({
-                        ...calculateScrollCenter(elements, appState),
-                      }));
-                    }}
-                  >
-                    {t("buttons.scrollBackToContent")}
-                  </button>
-                )}
+                {!appState.toast &&
+                  appState.scrolledOutside &&
+                  !appState.scrollConstraints && (
+                    <button
+                      type="button"
+                      className="scroll-back-to-content"
+                      onClick={() => {
+                        setAppState((appState) => ({
+                          ...calculateScrollCenter(elements, appState),
+                        }));
+                      }}
+                    >
+                      {t("buttons.scrollBackToContent")}
+                    </button>
+                  )}
               </div>
             )}
           </div>

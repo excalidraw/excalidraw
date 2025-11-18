@@ -68,6 +68,7 @@ const canvas = exportToCanvas({
       ...getDefaultAppState(),
       width: 0,
       height: 0,
+      scrollConstraints: null,
     },
     files: {}, // files
   },

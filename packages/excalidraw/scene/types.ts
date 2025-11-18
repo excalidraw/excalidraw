@@ -158,6 +158,11 @@ export type ScrollBars = {
   } | null;
 };
 
+export type ConstrainedScrollValues = Pick<
+  AppState,
+  "scrollX" | "scrollY" | "zoom"
+> | null;
+
 export type SVGPathString = string & { __brand: "SVGPathString" };
 
 export type ElementShape =
