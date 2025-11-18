@@ -19,7 +19,7 @@ export {
   actionChangeTextAlign,
   actionChangeVerticalAlign,
   actionChangeArrowProperties,
-  actionChangeEraserType
+  actionChangeEraserType,
 } from "./actionProperties";
 
 export {
