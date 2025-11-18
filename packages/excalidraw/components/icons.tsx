@@ -2336,6 +2336,22 @@ export const pencilIcon = createIcon(
   tablerIconProps,
 );
 
+export const MetadataIcon = createIcon(
+  <g strokeWidth="1.5" fill="none" stroke="currentColor">
+    <path d="M9 4c-2 0-3 1-3 3v2c0 1-1 2-2 2c1 0 2 1 2 2v2c0 2 1 3 3 3" strokeLinecap="round" />
+    <path d="M15 4c2 0 3 1 3 3v2c0 1 1 2 2 2c-1 0-2 1-2 2v2c0 2-1 3-3 3" strokeLinecap="round" />
+  </g>,
+  {
+    width: 20,
+    height: 20,
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.5,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+  },
+);
+
 export const chevronLeftIcon = createIcon(
   <g strokeWidth={1}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />

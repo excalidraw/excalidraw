@@ -368,6 +368,8 @@ import { fileOpen } from "../data/filesystem";
 import {
   showHyperlinkTooltip,
   hideHyperlinkToolip,
+  showMetadataTooltip,
+  hideMetadataTooltip,
   Hyperlink,
 } from "../components/hyperlink/Hyperlink";
 
@@ -6226,8 +6228,26 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
         this.scene.getNonDeletedElementsMap(),
       );
+      hideMetadataTooltip();
     } else {
       hideHyperlinkToolip();
+      // Show metadata tooltip if element has customData
+      if (
+        hitElement &&
+        hitElement.customData &&
+        Object.keys(hitElement.customData).length > 0 &&
+        !this.state.selectedElementIds[hitElement.id] &&
+        !this.state.contextMenu
+      ) {
+        showMetadataTooltip(
+          hitElement,
+          this.state,
+          this.scene.getNonDeletedElementsMap(),
+          { clientX: event.clientX, clientY: event.clientY },
+        );
+      } else {
+        hideMetadataTooltip();
+      }
       if (
         hitElement &&
         (hitElement.link || isEmbeddableElement(hitElement)) &&

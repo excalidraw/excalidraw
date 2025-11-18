@@ -134,6 +134,8 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
+import { MetadataIcon } from "../components/icons";
+import { ToolButton } from "../components/ToolButton";
 
 import {
   withCaretPositionPreservation,
@@ -1892,6 +1894,82 @@ export const actionChangeArrowType = register({
           />
         </div>
       </fieldset>
+    );
+  },
+});
+
+export const actionChangeMetadata = register({
+  name: "changeMetadata",
+  label: "Change metadata",
+  icon: MetadataIcon,
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    // Toggle metadata editor
+    if (value === null) {
+      return {
+        elements,
+        appState: {
+          ...appState,
+          openPopup: appState.openPopup === "metadataEditor" ? null : "metadataEditor",
+        },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    }
+
+    // Save metadata
+    if (value?.customData !== undefined) {
+      const selectedElementIds = arrayToMap(
+        getSelectedElements(elements, appState, {
+          includeBoundTextElement: false,
+        }),
+      );
+
+      return {
+        elements: elements.map((element) => {
+          if (selectedElementIds.has(element.id)) {
+            return newElementWith(element, {
+              customData: value.customData,
+            });
+          }
+          return element;
+        }),
+        appState: {
+          ...appState,
+          openPopup: null,
+        },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
+    }
+
+    return false;
+  },
+  predicate: (elements, appState) => {
+    const selectedElements = getSelectedElements(elements, appState, {
+      includeBoundTextElement: false,
+    });
+    return selectedElements.length === 1;
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const selectedElements = getSelectedElements(elements, appState, {
+      includeBoundTextElement: false,
+    });
+
+    if (selectedElements.length !== 1) {
+      return null;
+    }
+
+    const selectedElement = selectedElements[0];
+    const isOpen = appState.openPopup === "metadataEditor";
+    const hasMetadata = selectedElement.customData && Object.keys(selectedElement.customData).length > 0;
+
+    return (
+      <ToolButton
+        type="button"
+        icon={MetadataIcon}
+        aria-label="Metadata"
+        title="Metadata"
+        onClick={() => updateData(null)}
+      />
     );
   },
 });

@@ -356,6 +356,7 @@ export interface AppState {
     | "canvasBackground"
     | "elementBackground"
     | "elementStroke"
+    | "metadataEditor"
     | "fontFamily"
     | "compactTextProperties"
     | "compactStrokeStyles"
