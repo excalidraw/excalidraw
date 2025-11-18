@@ -20,6 +20,7 @@ import {
   isArrowElement,
   hasStrokeColor,
   toolIsArrow,
+  toolIsEraser
 } from "@excalidraw/element";
 
 import type {
@@ -223,6 +224,12 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeArrowType")}</>
       )}
 
+      {(toolIsEraser(appState.activeTool.type) || 
+        targetElements.some((element) => toolIsEraser(element.type))) && (
+        <>{renderAction("changeEraserType")}</>
+      )}
+
+
       {(appState.activeTool.type === "text" ||
         targetElements.some(isTextElement)) && (
         <>
@@ -339,7 +346,7 @@ const CombinedShapeProperties = ({
   const shouldShowCombinedProperties =
     targetElements.length > 0 ||
     (appState.activeTool.type !== "selection" &&
-      appState.activeTool.type !== "eraser" &&
+      // appState.activeTool.type !== "eraser" &&
       appState.activeTool.type !== "hand" &&
       appState.activeTool.type !== "laser" &&
       appState.activeTool.type !== "lasso");

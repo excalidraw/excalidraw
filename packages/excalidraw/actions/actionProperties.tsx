@@ -1702,6 +1702,26 @@ export const actionChangeArrowProperties = register({
   },
 });
 
+export const actionChangeEraserType = register({
+  name: "changeEraserType",
+  label: 'Change eraser type',
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    return {
+      appState: appState,
+      elements: elements,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY
+    }
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    return (
+      <>
+        <button>Regular</button>
+        <button>Pen only</button>
+      </>
+    )}
+})
+
 export const actionChangeArrowType = register({
   name: "changeArrowType",
   label: "Change arrow types",
