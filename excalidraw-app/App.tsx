@@ -1192,7 +1192,7 @@ const ExcalidrawWrapper = () => {
             </div>
           );
         }}
-        scrollConstraints={constraints.enabled ? constraints : undefined}
+        // scrollConstraints={constraints.enabled ? constraints : undefined}
         onLinkOpen={(element, event) => {
           if (element.link && isElementLink(element.link)) {
             event.preventDefault();
@@ -1200,12 +1200,12 @@ const ExcalidrawWrapper = () => {
           }
         }}
       >
-        {excalidrawAPI && !isTestEnv() && (
+        {/* {excalidrawAPI && !isTestEnv() && (
           <ConstraintsSettings
             excalidrawAPI={excalidrawAPI}
             initialConstraints={constraints}
           />
-        )}
+        )} */}
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
           isCollaborating={isCollaborating}

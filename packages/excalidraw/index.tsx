@@ -125,7 +125,10 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
           langCode={langCode}
-          viewModeEnabled={viewModeEnabled ?? !!scrollConstraints}
+          viewModeEnabled={
+            viewModeEnabled ??
+            (scrollConstraints != null ? !!scrollConstraints : undefined)
+          }
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
           libraryReturnUrl={libraryReturnUrl}
