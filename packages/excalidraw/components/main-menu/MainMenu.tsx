@@ -5,7 +5,7 @@ import { composeEventHandlers } from "@excalidraw/common";
 import { useTunnels } from "../../context/tunnels";
 import { useUIAppState } from "../../context/ui-appState";
 import { t } from "../../i18n";
-import { useDevice, useExcalidrawSetAppState } from "../App";
+import { useEditorInterface, useExcalidrawSetAppState } from "../App";
 import { UserList } from "../UserList";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 import { withInternalFallback } from "../hoc/withInternalFallback";
@@ -27,7 +27,7 @@ const MainMenu = Object.assign(
       onSelect?: (event: Event) => void;
     }) => {
       const { MainMenuTunnel } = useTunnels();
-      const device = useDevice();
+      const editorInterface = useEditorInterface();
       const appState = useUIAppState();
       const setAppState = useExcalidrawSetAppState();
 
@@ -53,19 +53,24 @@ const MainMenu = Object.assign(
                 setAppState({ openMenu: null });
               })}
               placement="bottom"
-              className={device.editor.isMobile ? "main-menu-dropdown" : ""}
+              className={
+                editorInterface.formFactor === "phone"
+                  ? "main-menu-dropdown"
+                  : ""
+              }
             >
               {children}
-              {device.editor.isMobile && appState.collaborators.size > 0 && (
-                <fieldset className="UserList-Wrapper">
-                  <legend>{t("labels.collaborators")}</legend>
-                  <UserList
-                    mobile={true}
-                    collaborators={appState.collaborators}
-                    userToFollow={appState.userToFollow?.socketId || null}
-                  />
-                </fieldset>
-              )}
+              {editorInterface.formFactor === "phone" &&
+                appState.collaborators.size > 0 && (
+                  <fieldset className="UserList-Wrapper">
+                    <legend>{t("labels.collaborators")}</legend>
+                    <UserList
+                      mobile={true}
+                      collaborators={appState.collaborators}
+                      userToFollow={appState.userToFollow?.socketId || null}
+                    />
+                  </fieldset>
+                )}
             </DropdownMenu.Content>
           </DropdownMenu>
         </MainMenuTunnel.In>

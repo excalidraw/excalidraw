@@ -5,6 +5,7 @@ import {
   CaptureUpdateAction,
   reconcileElements,
   getCommonBounds,
+  useEditorInterface,
 } from "@excalidraw/excalidraw";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
@@ -150,6 +151,9 @@ import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
 import "./index.scss";
+
+import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
+import { AppSidebar } from "./components/AppSidebar";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -634,6 +638,8 @@ const ExcalidrawWrapper = () => {
 
   const [langCode, setLangCode] = useAppLangCode();
 
+  const editorInterface = useEditorInterface();
+
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -955,8 +961,8 @@ const ExcalidrawWrapper = () => {
       debugRenderer(
         debugCanvasRef.current,
         appState,
+        elements,
         window.devicePixelRatio,
-        () => forceRefresh((prev) => !prev),
       );
     }
   };
@@ -1166,14 +1172,22 @@ const ExcalidrawWrapper = () => {
           if (isMobile || !collabAPI || isCollabDisabled) {
             return null;
           }
+
           return (
-            <div className="top-right-ui">
+            <div className="excalidraw-ui-top-right">
+              {excalidrawAPI?.getEditorInterface().formFactor === "desktop" && (
+                <ExcalidrawPlusPromoBanner
+                  isSignedIn={isExcalidrawPlusSignedUser}
+                />
+              )}
+
               {collabError.message && <CollabError collabError={collabError} />}
               <LiveCollaborationTrigger
                 isCollaborating={isCollaborating}
                 onSelect={() =>
                   setShareDialogState({ isOpen: true, type: "share" })
                 }
+                editorInterface={editorInterface}
               />
             </div>
           );
@@ -1265,6 +1279,8 @@ const ExcalidrawWrapper = () => {
             }
           }}
         />
+
+        <AppSidebar />
 
         {errorMessage && (
           <ErrorDialog onClose={() => setErrorMessage("")}>

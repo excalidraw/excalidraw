@@ -13,13 +13,12 @@ import {
   FRAME_STYLE,
   invariant,
   THEME,
-  throttleRAF,
 } from "@excalidraw/common";
 
 import { FIXED_BINDING_DISTANCE, maxBindingGap } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
 import {
-  getOmitSidesForDevice,
+  getOmitSidesForEditorInterface,
   getTransformHandles,
   getTransformHandlesFromCoords,
   hasBoundingBox,
@@ -734,8 +733,15 @@ const _renderInteractiveScene = ({
   scale,
   appState,
   renderConfig,
-  device,
-}: InteractiveSceneRenderConfig) => {
+  editorInterface,
+  animationState,
+  deltaTime,
+}: InteractiveSceneRenderConfig): {
+  scrollBars?: ReturnType<typeof getScrollBars>;
+  atLeastOneVisibleElement: boolean;
+  elementsMap: RenderableElementsMap;
+  animationState?: typeof animationState;
+} => {
   if (canvas === null) {
     return { atLeastOneVisibleElement: false, elementsMap };
   }
@@ -744,6 +750,8 @@ const _renderInteractiveScene = ({
     canvas,
     scale,
   );
+
+  const nextAnimationState = animationState;
 
   const context = bootstrapCanvas({
     canvas,
@@ -892,7 +900,11 @@ const _renderInteractiveScene = ({
 
   // Paint selected elements
   if (!appState.multiElement && !appState.selectedLinearElement?.isEditing) {
-    const showBoundingBox = hasBoundingBox(selectedElements, appState);
+    const showBoundingBox = hasBoundingBox(
+      selectedElements,
+      appState,
+      editorInterface,
+    );
 
     const isSingleLinearElementSelected =
       selectedElements.length === 1 && isLinearElement(selectedElements[0]);
@@ -1024,7 +1036,7 @@ const _renderInteractiveScene = ({
         appState.zoom,
         elementsMap,
         "mouse", // when we render we don't know which pointer type so use mouse,
-        getOmitSidesForDevice(device),
+        getOmitSidesForEditorInterface(editorInterface),
       );
       if (
         !appState.viewModeEnabled &&
@@ -1088,8 +1100,11 @@ const _renderInteractiveScene = ({
         appState.zoom,
         "mouse",
         isFrameSelected
-          ? { ...getOmitSidesForDevice(device), rotation: true }
-          : getOmitSidesForDevice(device),
+          ? {
+              ...getOmitSidesForEditorInterface(editorInterface),
+              rotation: true,
+            }
+          : getOmitSidesForEditorInterface(editorInterface),
       );
       if (selectedElements.some((element) => !element.locked)) {
         renderTransformHandles(
@@ -1191,17 +1206,9 @@ const _renderInteractiveScene = ({
     scrollBars,
     atLeastOneVisibleElement: visibleElements.length > 0,
     elementsMap,
+    animationState: nextAnimationState,
   };
 };
-
-/** throttled to animation framerate */
-export const renderInteractiveSceneThrottled = throttleRAF(
-  (config: InteractiveSceneRenderConfig) => {
-    const ret = _renderInteractiveScene(config);
-    config.callback?.(ret);
-  },
-  { trailing: true },
-);
 
 /**
  * Interactive scene is the ui-canvas where we render bounding boxes, selections
@@ -1209,16 +1216,10 @@ export const renderInteractiveSceneThrottled = throttleRAF(
  */
 export const renderInteractiveScene = <
   U extends typeof _renderInteractiveScene,
-  T extends boolean = false,
 >(
   renderConfig: InteractiveSceneRenderConfig,
-  throttle?: T,
-): T extends true ? void : ReturnType<U> => {
-  if (throttle) {
-    renderInteractiveSceneThrottled(renderConfig);
-    return undefined as T extends true ? void : ReturnType<U>;
-  }
+): ReturnType<U> => {
   const ret = _renderInteractiveScene(renderConfig);
   renderConfig.callback(ret);
-  return ret as T extends true ? void : ReturnType<U>;
+  return ret as ReturnType<U>;
 };
