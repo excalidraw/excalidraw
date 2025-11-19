@@ -60,4 +60,11 @@ export interface StreamingState {
   currentToolName?: string;
   eventSource?: EventSource;
   streamId?: string;
+  toolRuns?: Array<{
+    name: string;
+    startTime: number;
+    endTime?: number;
+    durationMs?: number;
+    summary?: string;
+  }>;
 }

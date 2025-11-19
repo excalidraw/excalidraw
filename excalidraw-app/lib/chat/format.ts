@@ -17,26 +17,35 @@ export const formatDuration = (ms?: number): string => {
   return `${s}s`;
 };
 
-export const getExecutionInfoLines = (info?: ChatMessage['executionInfo']): string[] => {
-  if (!info) return [];
+export const getExecutionInfoLines = (
+  info?: ChatMessage['executionInfo'],
+  usage?: ChatMessage['usage']
+): string[] => {
+  if (!info && !usage) return [];
   const lines: string[] = [];
-  if (info.tools && info.tools.length > 0) {
+  if (info?.tools && info.tools.length > 0) {
     lines.push(`tools: [${info.tools.join(', ')}]`);
   }
-  if (typeof info.useRAG === 'boolean') {
+  if (info && typeof info.useRAG === 'boolean') {
     lines.push(`useRAG: ${info.useRAG}`);
   }
-  if (typeof info.needsSnapshot === 'boolean') {
+  if (info && typeof info.needsSnapshot === 'boolean') {
     lines.push(`needsSnapshot: ${info.needsSnapshot}`);
   }
-  if (typeof info.planningDurationMs === 'number') {
+  if (info && typeof info.planningDurationMs === 'number') {
     lines.push(`planning: ${formatDuration(info.planningDurationMs)}`);
   }
-  if (typeof info.executionDurationMs === 'number') {
+  if (info && typeof info.executionDurationMs === 'number') {
     lines.push(`execution: ${formatDuration(info.executionDurationMs)}`);
   }
-  if (typeof info.totalDurationMs === 'number') {
+  if (info && typeof info.totalDurationMs === 'number') {
     lines.push(`total: ${formatDuration(info.totalDurationMs)}`);
+  }
+  if (usage?.total_tokens != null) {
+    const inTok = usage.input_tokens ?? 0;
+    const outTok = usage.output_tokens ?? 0;
+    const reasoningTok = usage.reasoning_tokens ?? 0;
+    lines.push(`tokens: total=${usage.total_tokens} (in=${inTok}, out=${outTok}${reasoningTok ? `, reasoning=${reasoningTok}` : ''})`);
   }
   return lines;
 };

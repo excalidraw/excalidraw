@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import type { ChatMessage, StreamingState } from '../lib/chat/types';
-import { getLLMBaseURL, getStreamingFeatureFlag, isStreamingSupported, isDev } from '../lib/chat/config';
+import { getLLMBaseURL, isStreamingSupported, isDev } from '../lib/chat/config';
 import { getCollaborationLinkData } from '../data';
 import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types';
 
@@ -10,6 +10,7 @@ export interface UseChatStreamProps {
   onError: (error: string | null) => void;
   generateSnapshots: (needsSnapshot?: boolean) => Promise<{ fullCanvas?: string; selection?: string; thumbnail?: string; thumbnailHash?: string }>;
   getToken?: () => Promise<string | null>;
+  collabAPI?: any;
 }
 
 export interface UseChatStreamResult {
@@ -25,7 +26,8 @@ export const useChatStream = ({
   onMessagesUpdate,
   onError,
   generateSnapshots,
-  getToken
+  getToken,
+  collabAPI
 }: UseChatStreamProps): UseChatStreamResult => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingPhase, setLoadingPhase] = useState<'idle' | 'planning' | 'executing'>('idle');
@@ -33,7 +35,8 @@ export const useChatStream = ({
     isActive: false,
     phase: 'idle',
     currentMessage: undefined,
-    currentToolName: undefined
+    currentToolName: undefined,
+    toolRuns: []
   });
 
   // Refs for cleanup and state management
@@ -43,9 +46,22 @@ export const useChatStream = ({
   const responseGenTimerRef = useRef<number | undefined>(undefined);
   const activeAssistantMessageIdRef = useRef<string | null>(null);
   const planningAbortControllerRef = useRef<AbortController | null>(null);
+  const toolRunsRef = useRef<Array<{ name: string; startTime: number; endTime?: number; durationMs?: number; summary?: string }>>([]);
 
   const LLM_BASE_URL = getLLMBaseURL();
-  const streamingEnabled = getStreamingFeatureFlag();
+
+  const getRoomInfo = useCallback((): { roomId?: string; roomKey?: string } => {
+    try {
+      const activeLink = collabAPI?.getActiveRoomLink?.() || window.location.href;
+      const linkData = getCollaborationLinkData(activeLink);
+      if (linkData) {
+        return { roomId: linkData.roomId, roomKey: linkData.roomKey };
+      }
+    } catch (err) {
+      if (isDev()) console.warn('Could not resolve room info:', err);
+    }
+    return {};
+  }, [collabAPI]);
 
   const normalizeUsageForMessage = (usage: any | undefined) => {
     if (!usage || typeof usage !== 'object') {
@@ -81,6 +97,32 @@ export const useChatStream = ({
         summary: typeof tc.summary === 'string' ? tc.summary : undefined
       } as ToolCall;
     });
+  };
+
+  const mapToolRunsToToolCalls = () =>
+    toolRunsRef.current.map((run, index): ToolCall => ({
+      id: `${run.name}-${run.startTime}-${index}`,
+      toolName: run.name,
+      status: run.endTime ? 'completed' : 'executing',
+      duration: run.durationMs,
+      summary: run.summary,
+    }));
+
+  const syncToolRunsToAssistantMessage = () => {
+    const targetId = activeAssistantMessageIdRef.current;
+    if (!targetId) return;
+    const toolCalls = mapToolRunsToToolCalls();
+    onMessagesUpdate((prev) =>
+      prev.map((msg) => (msg.id === targetId ? { ...msg, toolCalls } : msg)),
+    );
+  };
+
+  const updateAssistantMessage = (updater: (msg: ChatMessage) => ChatMessage) => {
+    const targetId = activeAssistantMessageIdRef.current;
+    if (!targetId) return;
+    onMessagesUpdate((prev) =>
+      prev.map((msg) => (msg.id === targetId ? updater(msg) : msg)),
+    );
   };
 
   const requestPlanData = useCallback(async (message: string) => {
@@ -127,11 +169,11 @@ export const useChatStream = ({
 
     streamClosedRef.current = true;
 
-    setStreamingState(prev => {
-      if (prev.eventSource && !skipClose) {
-        if (isDev()) {
-          console.log('🔄 Streaming cleanup initiated', {
-            streamId: prev.streamId,
+      setStreamingState(prev => {
+        if (prev.eventSource && !skipClose) {
+          if (isDev()) {
+            console.log('🔄 Streaming cleanup initiated', {
+              streamId: prev.streamId,
             phase: prev.phase,
             timestamp: new Date().toISOString()
           });
@@ -170,6 +212,7 @@ export const useChatStream = ({
         phase: 'idle',
         currentMessage: undefined,
         currentToolName: undefined,
+        toolRuns: toolRunsRef.current,
         eventSource: undefined,
         streamId: undefined
       } satisfies StreamingState;
@@ -181,6 +224,9 @@ export const useChatStream = ({
 
   const sendStreamingMessage = useCallback(async (userMessage: ChatMessage) => {
     const startTs = performance.now ? performance.now() : Date.now();
+    let planningStartTs = startTs;
+    let planningEndTs: number | undefined;
+    let executionStartTs: number | undefined;
     let assistantMessageId: string | null = null;
     let eventSourceRefLocal: EventSource | null = null;
     const assignAssistantMessageId = (incomingId?: string | null) => {
@@ -197,12 +243,14 @@ export const useChatStream = ({
         isActive: true,
         phase: 'planning',
         currentMessage: undefined,
-        currentToolName: undefined
+        currentToolName: undefined,
+        toolRuns: toolRunsRef.current
       });
 
       let planData: any;
       try {
         planData = await requestPlanData(userMessage.content);
+        planningEndTs = performance.now ? performance.now() : Date.now();
       } catch (err: any) {
         const planError = err?.message || 'Planning failed';
         onError(planError);
@@ -213,6 +261,7 @@ export const useChatStream = ({
       }
 
       const planPayload = planData.plan;
+      executionStartTs = performance.now ? performance.now() : Date.now();
       setLoadingPhase('executing');
 
       // Phase 1: Initialize streaming context
@@ -220,7 +269,8 @@ export const useChatStream = ({
         isActive: true,
         phase: 'initializing',
         currentMessage: undefined,
-        currentToolName: undefined
+        currentToolName: undefined,
+        toolRuns: toolRunsRef.current
       });
 
       // Build request body (similar to non-streaming version)
@@ -235,16 +285,7 @@ export const useChatStream = ({
         }
       };
 
-      let roomId, roomKey;
-      try {
-        const linkData = getCollaborationLinkData(window.location.href);
-        if (linkData) {
-          roomId = linkData.roomId;
-          roomKey = linkData.roomKey;
-        }
-      } catch (err) {
-        if (isDev()) console.warn('Could not extract room info for streaming:', err);
-      }
+      const { roomId, roomKey } = getRoomInfo();
 
       // Generate snapshots (simplified for streaming)
       const snapshots = await generateSnapshots(planPayload?.needsSnapshot);
@@ -289,6 +330,8 @@ export const useChatStream = ({
         : `${LLM_BASE_URL}/v1/chat/exec/stream/${encodeURIComponent(streamId)}`;
       const eventSource = new EventSource(eventSourceUrl);
       eventSourceRefLocal = eventSource;
+      toolRunsRef.current = [];
+      setStreamingState(prev => ({ ...prev, toolRuns: [] }));
 
       setStreamingState(prev => ({
         ...prev,
@@ -316,7 +359,8 @@ export const useChatStream = ({
               role: 'assistant',
               content: data.content || '',
               timestamp: new Date().toISOString(),
-              isStreaming: true
+              isStreaming: true,
+              toolCalls: mapToolRunsToToolCalls(),
             };
             onMessagesUpdate(prev => [...prev, assistantMessage]);
           } else {
@@ -325,17 +369,133 @@ export const useChatStream = ({
                 ? { ...msg, content: msg.content + (data.content || '') }
                 : msg
             ));
+            syncToolRunsToAssistantMessage();
           }
         } catch (err) {
           if (isDev()) console.warn('Failed to parse token event:', err);
         }
       });
 
+      eventSource.addEventListener('toolCallStart', (event) => {
+        if (streamClosedRef.current) return;
+        try {
+          const data = JSON.parse((event as MessageEvent).data);
+          const now = Date.now();
+          toolRunsRef.current = [...toolRunsRef.current, { name: data.toolName, startTime: now }];
+          setStreamingState(prev => ({
+            ...prev,
+            phase: 'toolExecution',
+            currentToolName: data.toolName,
+            toolRuns: toolRunsRef.current,
+          }));
+          syncToolRunsToAssistantMessage();
+        } catch (err) {
+          if (isDev()) console.warn('Failed to parse toolCallStart:', err);
+        }
+      });
+
+      eventSource.addEventListener('toolCallResult', (event) => {
+        if (streamClosedRef.current) return;
+        try {
+          const data = JSON.parse((event as MessageEvent).data);
+          const now = Date.now();
+          // If we never saw a start event (backend only emits result), seed a run entry.
+          const existingIdx = toolRunsRef.current.findIndex(
+            (run) => !run.endTime && run.name === data.toolName
+          );
+          if (existingIdx === -1) {
+            toolRunsRef.current = [
+              ...toolRunsRef.current,
+              { name: data.toolName, startTime: now },
+            ];
+          }
+          toolRunsRef.current = toolRunsRef.current.map((run) => {
+            if (run.endTime || run.name !== data.toolName) return run;
+            const durationMs = Math.max(0, now - run.startTime);
+            const summary =
+              typeof data.result?.count === 'number'
+                ? `count=${data.result.count}`
+                : undefined;
+            return { ...run, endTime: now, durationMs, summary };
+          });
+          setStreamingState(prev => ({
+            ...prev,
+            currentToolName: undefined,
+            toolRuns: toolRunsRef.current,
+            phase: prev.phase === 'toolExecution' ? 'responseGeneration' : prev.phase,
+          }));
+          syncToolRunsToAssistantMessage();
+        } catch (err) {
+          if (isDev()) console.warn('Failed to parse toolCallResult:', err);
+        }
+      });
+
+      eventSource.addEventListener('usage', (event) => {
+        if (streamClosedRef.current) return;
+        try {
+          const data = JSON.parse((event as MessageEvent).data);
+          const usage = normalizeUsageForMessage(data?.usage || data);
+          const responseId = data?.responseId;
+          const ensureAssistantId = () => {
+            if (!assistantMessageId) {
+              const resolvedId = assignAssistantMessageId(null);
+              const assistantMessage: ChatMessage = {
+                id: resolvedId,
+                role: 'assistant',
+                content: '',
+                timestamp: new Date().toISOString(),
+                isStreaming: true,
+                toolCalls: mapToolRunsToToolCalls(),
+              };
+              onMessagesUpdate((prev) => [...prev, assistantMessage]);
+              return resolvedId;
+            }
+            return assistantMessageId;
+          };
+          if (usage) {
+            const targetId = ensureAssistantId();
+            onMessagesUpdate((prev) =>
+              prev.map((msg) =>
+                msg.id === targetId ? { ...msg, usage } : msg
+              ),
+            );
+          }
+          if (responseId) {
+            // Track responseId on the assistant message if provided
+            const targetId = assistantMessageId || activeAssistantMessageIdRef.current;
+            if (targetId) {
+              onMessagesUpdate((prev) =>
+                prev.map((msg) =>
+                  msg.id === targetId ? { ...msg, responseId } : msg
+                ),
+              );
+            }
+          }
+        } catch (err) {
+          if (isDev()) console.warn('Failed to parse usage event:', err);
+        }
+      });
+
       eventSource.addEventListener('done', () => {
         if (streamClosedRef.current) return;
+        syncToolRunsToAssistantMessage();
+
+        // Calculate timing information
+        const endTs = performance.now ? performance.now() : Date.now();
+        const totalDurationMs = Math.round(endTs - startTs);
+        const planningDurationMs = planningEndTs ? Math.round(planningEndTs - planningStartTs) : undefined;
+        const executionDurationMs = executionStartTs ? Math.round(endTs - executionStartTs) : undefined;
+
         if (assistantMessageId) {
           onMessagesUpdate(prev => prev.map(msg =>
-            msg.id === assistantMessageId ? { ...msg, isStreaming: false } : msg
+            msg.id === assistantMessageId ? {
+              ...msg,
+              isStreaming: false,
+              durationMs: totalDurationMs,
+              planningDurationMs,
+              executionDurationMs,
+              toolCalls: mapToolRunsToToolCalls()
+            } : msg
           ));
         }
         setStreamingState(prev => ({ ...prev, isActive: false, phase: 'idle' }));
@@ -397,128 +557,14 @@ export const useChatStream = ({
     }
   }, [LLM_BASE_URL, excalidrawAPI, generateSnapshots, onError, onMessagesUpdate, cleanupStreaming]);
 
-  const sendNonStreamingMessage = useCallback(async (userMessage: ChatMessage) => {
-    let planPayload: any = null;
-    let planUseRAGValue: boolean | undefined;
-    let planNeedsSnapshotValue: boolean | undefined;
-    let planDurationMs: number | undefined;
-    let executionDurationMs: number | undefined;
-    let executionStartTs: number | undefined;
-    const hasPerformanceNow = typeof performance !== 'undefined' && typeof performance.now === 'function';
-    const getNow = () => hasPerformanceNow ? performance.now() : Date.now();
-    const startTs = getNow();
-
-    try {
-      const planData = await requestPlanData(userMessage.content);
-
-      planPayload = planData.plan;
-      const planEndTs = getNow();
-      if (typeof planData.durationMs === 'number' && Number.isFinite(planData.durationMs)) {
-        planDurationMs = Math.max(0, Math.round(planData.durationMs));
-      } else {
-        planDurationMs = Math.max(0, Math.round(planEndTs - startTs));
-      }
-
-      const resolvedUseRAG = typeof planData.useRAG === 'boolean' ? planData.useRAG : planPayload?.useRAG;
-      const resolvedNeedsSnapshot = typeof planData.needsSnapshot === 'boolean' ? planData.needsSnapshot : planPayload?.needsSnapshot;
-      planUseRAGValue = typeof resolvedUseRAG === 'boolean' ? resolvedUseRAG : undefined;
-      planNeedsSnapshotValue = typeof resolvedNeedsSnapshot === 'boolean' ? resolvedNeedsSnapshot : undefined;
-
-      setLoadingPhase('executing');
-      if (isDev()) {
-        console.log('Planning result', { plan: planPayload });
-      }
-
-      executionStartTs = getNow();
-
-      // Get canvas context for AI (after planning completes)
-      const elements = excalidrawAPI.getSceneElements();
-      const appState = excalidrawAPI.getAppState();
-
-      const canvasContext = {
-        elements: elements.length > 0 ? elements.slice(0, 50) : [],
-        selection: {
-          selectedElementIds: appState.selectedElementIds,
-          count: Object.keys(appState.selectedElementIds).length
-        }
-      };
-
-      // Get current collaboration room info for LLM service
-      let roomId, roomKey;
-      try {
-        const linkData = getCollaborationLinkData(window.location.href);
-        if (linkData) {
-          roomId = linkData.roomId;
-          roomKey = linkData.roomKey;
-        }
-      } catch (err) {
-        if (isDev()) console.warn('Could not extract room info:', err);
-      }
-
-      // Generate snapshots if needed
-      const snapshots = await generateSnapshots(planNeedsSnapshotValue);
-
-      // Send request to LLM service
-      const requestBody = {
-        plan: planPayload,
-        message: userMessage.content,
-        sessionId: 'default',
-        canvasContext,
-        snapshots,
-        ...(roomId && roomKey ? { roomId, roomKey } : {})
-      };
-
-      const token = (await getToken?.()) || undefined;
-      const response = await fetch(`${LLM_BASE_URL}/v1/chat/execute`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || `Request failed with status ${response.status}`);
-      }
-
-      const executionEndTs = getNow();
-      if (typeof data.durationMs === 'number' && Number.isFinite(data.durationMs)) {
-        executionDurationMs = Math.max(0, Math.round(data.durationMs));
-      } else {
-        executionDurationMs = Math.max(0, Math.round(executionEndTs - executionStartTs!));
-      }
-
-      // Create assistant response
-      const assistantMessage: ChatMessage = {
-        id: `assistant-${Date.now()}`,
-        role: 'assistant',
-        content: data.response || 'Response completed.',
-        timestamp: new Date().toISOString(),
-        durationMs: Math.round(getNow() - startTs),
-        planningDurationMs: planDurationMs,
-        executionDurationMs
-      };
-
-      onMessagesUpdate(prev => [...prev, assistantMessage]);
-
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        if (isDev()) console.log('🛑 Non-streaming request aborted');
-        return;
-      }
-      onError(err.message || 'Failed to send message');
-      if (isDev()) console.error('Non-streaming error:', err);
-    } finally {
-      setIsLoading(false);
-      setLoadingPhase('idle');
-    }
-  }, [LLM_BASE_URL, excalidrawAPI, generateSnapshots, onError, onMessagesUpdate, getToken]);
-
   const sendMessage = useCallback(async (inputMessage: string) => {
     if (!inputMessage.trim() || isLoading) return;
+
+    // Check streaming support upfront
+    if (!isStreamingSupported()) {
+      onError('Streaming is not supported in your browser. Please upgrade to a modern browser.');
+      return;
+    }
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -531,16 +577,8 @@ export const useChatStream = ({
     setIsLoading(true);
     setLoadingPhase('planning');
 
-    // Use streaming if enabled and supported
-    if (streamingEnabled && isStreamingSupported()) {
-      await sendStreamingMessage(userMessage);
-    } else {
-      if (streamingEnabled && !isStreamingSupported()) {
-        console.warn('Streaming is enabled but EventSource is not available. Falling back to non-streaming execution.');
-      }
-      await sendNonStreamingMessage(userMessage);
-    }
-  }, [isLoading, streamingEnabled, onMessagesUpdate, sendStreamingMessage, sendNonStreamingMessage]);
+    await sendStreamingMessage(userMessage);
+  }, [isLoading, onMessagesUpdate, sendStreamingMessage, onError]);
 
   return {
     streamingState,

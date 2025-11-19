@@ -21,7 +21,7 @@ export const ExcalidrawPlusPromoBanner = ({
       rel="noopener"
       className="plus-banner"
     >
-      EmbraceBoard
+      AI
     </a>
   );
 };

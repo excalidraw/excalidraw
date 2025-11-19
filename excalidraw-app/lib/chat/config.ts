@@ -1,12 +1,4 @@
-// Environment configuration and feature flags
-export const getStreamingFeatureFlag = (): boolean => {
-  return String(
-    import.meta.env.VITE_CHAT_EXEC_STREAMING_ENABLED ??
-    (window as any)?.__CHAT_EXEC_STREAMING_ENABLED ??
-    'false'
-  ).toLowerCase() === 'true';
-};
-
+// Environment configuration
 // LLM service base URL configuration
 export const getLLMBaseURL = (): string => (
   import.meta.env?.VITE_LLM_SERVICE_URL ??
