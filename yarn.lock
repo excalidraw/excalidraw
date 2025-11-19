@@ -3802,6 +3802,11 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.3.0.tgz#f6e14a97858d327252200242d4ccfe522c445522"
   integrity sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==
 
+binary-parser@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/binary-parser/-/binary-parser-2.2.1.tgz#4edc6da2dc56db73fa5ba450dfe6382ede8294ce"
+  integrity sha512-5ATpz/uPDgq5GgEDxTB4ouXCde7q2lqAQlSdBRQVl/AJnxmQmhIfyxJx+0MGu//D5rHQifkfGbWWlaysG0o9NA==
+
 bl@^4.0.3:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/bl/-/bl-4.1.0.tgz#451535264182bec2fbbc83a62ab98cf11d9f7b3a"
@@ -7838,6 +7843,13 @@ pkg-dir@4.2.0:
   integrity sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==
   dependencies:
     find-up "^4.0.0"
+
+png-chunk-itxt@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/png-chunk-itxt/-/png-chunk-itxt-1.0.0.tgz#4652547b7c88d512337599e422b7431f2c234355"
+  integrity sha512-/1gTTBlIBUL47FS1wXI5oW5zidHge1Lwn+w4WNsnTc6wu1i82l63hwz0mgw1x2eYFH4iYkHkmKH0FHoHYMmjig==
+  dependencies:
+    binary-parser "^2.2.1"
 
 png-chunk-text@1.0.0:
   version "1.0.0"
