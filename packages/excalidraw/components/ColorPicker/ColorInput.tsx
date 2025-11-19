@@ -1,5 +1,7 @@
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
+const [isInvalid, setIsInvalid] = useState(false);
+
 
 import { KEYS } from "@excalidraw/common";
 
@@ -40,18 +42,24 @@ export const ColorInput = ({
     setInnerValue(color);
   }, [color]);
 
-  const changeColor = useCallback(
-    (inputValue: string) => {
-      const value = inputValue.toLowerCase();
-      const color = getColor(value);
+const changeColor = useCallback(
+  (value: string) => {
+    const clean = value.replace(/^#/, "");
+    const valid = getColor(clean);
 
-      if (color) {
-        onChange(color);
-      }
+    if (!valid) {
+      setIsInvalid(true);
       setInnerValue(value);
-    },
-    [onChange],
-  );
+      return;
+    }
+
+    setIsInvalid(false);
+    setInnerValue(value);
+    onChange(valid);
+  },
+  [onChange],
+);
+
 
   const inputRef = useRef<HTMLInputElement>(null);
   const eyeDropperTriggerRef = useRef<HTMLDivElement>(null);
@@ -98,6 +106,14 @@ export const ColorInput = ({
         }}
         placeholder={placeholder}
       />
+
+      {isInvalid && (
+        <div style={{ color: "red", fontSize: "12px", marginTop: 4 }}>
+        Invalid color code. Use #RGB or #RRGGBB.
+        </div>
+      )}
+
+
       {/* TODO reenable on mobile with a better UX */}
       {editorInterface.formFactor !== "phone" && (
         <>
