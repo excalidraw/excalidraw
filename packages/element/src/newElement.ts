@@ -25,6 +25,7 @@ import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 
+
 import { isLineElement } from "./typeChecks";
 
 import type {
@@ -48,6 +49,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
+  FileId,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -536,14 +538,19 @@ export const newImageElement = (
     crop?: ExcalidrawImageElement["crop"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawImageElement> => {
+  const fileId: FileId = opts.fileId ?? (randomId() as FileId);
+  const status: ExcalidrawImageElement["status"] = opts.status ?? "saved";
+  const scale = opts.scale ?? [1, 1];
+  const crop = opts.crop ?? null;
+  const { fileId: _ignoredFileId, status: _ignoredStatus, ...rest } = opts;
+  const base = _newElementBase<ExcalidrawImageElement>("image", rest);
   return {
-    ..._newElementBase<ExcalidrawImageElement>("image", opts),
-    // in the future we'll support changing stroke color for some SVG elements,
-    // and `transparent` will likely mean "use original colors of the image"
+    ...base,
     strokeColor: "transparent",
-    status: opts.status ?? "pending",
-    fileId: opts.fileId ?? null,
-    scale: opts.scale ?? [1, 1],
-    crop: opts.crop ?? null,
+    fileId,
+    status,
+    scale,
+    crop,
   };
 };
+
