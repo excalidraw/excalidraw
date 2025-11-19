@@ -2,9 +2,9 @@ import {
   curvePointDistance,
   distanceToLineSegment,
   pointRotateRads,
+  ellipse,
+  ellipseDistanceFromPoint,
 } from "@excalidraw/math";
-
-import { ellipse, ellipseDistanceFromPoint } from "@excalidraw/math/ellipse";
 
 import type { GlobalPoint, Radians } from "@excalidraw/math";
 
