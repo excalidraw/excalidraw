@@ -82,7 +82,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
     onMessagesUpdate: setMessages,
     onError: setError,
     generateSnapshots,
-    getToken
+    getToken,
+    collabAPI: premiumCollabAPI
   });
 
   const isStreamingMessageActive = messages.some((msg) => msg.isStreaming);
@@ -167,7 +168,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const buildCopyText = (message: ChatMessage): string => {
     let text = message.content;
     if (message.role === 'assistant') {
-      const metaLines = getExecutionInfoLines(message.executionInfo);
+      const metaLines = getExecutionInfoLines(message.executionInfo, message.usage);
       if (metaLines.length > 0) {
         text += `\n\n[Execution]\n${metaLines.join('\n')}`;
       }
@@ -213,7 +214,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   }
 
   return (
-    <div ref={chatPanelRef} style={panelContainerStyle}>
+    <div ref={chatPanelRef} style={panelContainerStyle} data-testid="chat-panel">
       <ChatHeader
         isConnected={isConnected}
         streamingState={streamingState}

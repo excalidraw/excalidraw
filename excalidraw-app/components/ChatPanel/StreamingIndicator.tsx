@@ -8,12 +8,28 @@ export interface StreamingIndicatorProps {
   isCompact?: boolean;
 }
 
+// Inject a minimal keyframes definition once per page load so the spinner animates
+let spinnerStylesInjected = false;
+const ensureSpinnerStyles = () => {
+  if (spinnerStylesInjected) return;
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes chatPanelSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
+  spinnerStylesInjected = true;
+};
+
 export const StreamingIndicator: React.FC<StreamingIndicatorProps> = ({
   phase,
   currentToolName,
   currentMessage,
   isCompact = false
 }) => {
+  ensureSpinnerStyles();
   // Determine label based on phase and context
   const getLabel = (): string => {
     if (phase === 'toolExecution' && currentToolName) {
@@ -28,7 +44,7 @@ export const StreamingIndicator: React.FC<StreamingIndicatorProps> = ({
       case 'planning':
         return 'Planning...';
       case 'initializing':
-        return 'Initializing stream...';
+        return 'Preparing the response...';
       case 'ragRetrieval':
         return 'Retrieving context...';
       case 'toolExecution':
