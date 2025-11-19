@@ -1,6 +1,7 @@
 import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
 import { useRef, useEffect } from "react";
+import { isValidHexColor } from "@excalidraw/common";
 
 import {
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
@@ -106,18 +107,29 @@ const ColorPickerPopupContent = ({
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
 
+  const isInvalid = color ? !isValidHexColor(color) : false;
+  const errorStyle = isInvalid 
+    ? { border: "2px solid red", borderRadius: "var(--border-radius-lg)" } 
+    : {};
+
   const colorInputJSX = (
     <div>
       <PickerHeading>{t("colorPicker.hexCode")}</PickerHeading>
-      <ColorInput
-        color={color || ""}
-        label={label}
-        onChange={(color) => {
-          onChange(color);
-        }}
-        colorPickerType={type}
-        placeholder={t("colorPicker.color")}
-      />
+      <div 
+        style={errorStyle} 
+        data-testid="hex-input-wrapper" 
+        aria-invalid={isInvalid ? "true" : undefined}
+      >
+        <ColorInput
+          color={color || ""}
+          label={label}
+          onChange={(color) => {
+            onChange(color);
+          }}
+          colorPickerType={type}
+          placeholder={t("colorPicker.hexCode")}
+        />
+      </div>
     </div>
   );
 
