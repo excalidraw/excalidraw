@@ -2,11 +2,17 @@ import { pointFrom } from "@excalidraw/math";
 
 import { arrayToMap, ROUNDNESS } from "@excalidraw/common";
 
-import type { LocalPoint } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
-import { getElementAbsoluteCoords, getElementBounds } from "../src/bounds";
+import {
+  getElementAbsoluteCoords,
+  getElementBounds,
+  getMinMaxXYFromCurvePathOps,
+} from "../src/bounds";
 
 import type { ExcalidrawElement, ExcalidrawLinearElement } from "../src/types";
+
+import type { Op } from "roughjs/bin/core";
 
 const _ce = ({
   x,
@@ -139,5 +145,118 @@ describe("getElementBounds", () => {
     expect(y1).toEqual(185.90654264413516);
     expect(x2).toEqual(480.87005902729743);
     expect(y2).toEqual(320.4751269334226);
+  });
+});
+
+describe("getMinMaxXYFromCurvePathOps", () => {
+  it("should calculate bounds for lineTo operations", () => {
+    const ops: Op[] = [
+      { op: "move", data: [0, 0] },
+      { op: "lineTo", data: [100, 50] },
+      { op: "lineTo", data: [50, 100] },
+    ];
+
+    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+
+    expect(minX).toEqual(0);
+    expect(minY).toEqual(0);
+    expect(maxX).toEqual(100);
+    expect(maxY).toEqual(100);
+  });
+
+  it("should calculate bounds for simple qcurveTo", () => {
+    const ops: Op[] = [
+      { op: "move", data: [0, 0] },
+      { op: "qcurveTo", data: [50, 50, 100, 100] },
+    ];
+
+    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+
+    expect(minX).toEqual(0);
+    expect(minY).toEqual(0);
+    expect(maxX).toEqual(100);
+    expect(maxY).toEqual(100);
+  });
+
+  it("should calculate bounds for qcurveTo with local extremes", () => {
+    const ops: Op[] = [
+      { op: "move", data: [0, 0] },
+      { op: "qcurveTo", data: [50, 100, 100, 0] },
+    ];
+
+    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+
+    expect(minX).toEqual(0);
+    expect(minY).toEqual(0);
+    expect(maxX).toEqual(100);
+    expect(maxY).toEqual(50);
+  });
+
+  it("should apply transformXY to lineTo operations", () => {
+    const transform: (p: GlobalPoint) => GlobalPoint = (p: GlobalPoint) =>
+      pointFrom(p[0] + 10, p[1] + 10);
+
+    const ops: Op[] = [
+      { op: "move", data: [0, 0] },
+      { op: "lineTo", data: [50, 50] },
+    ];
+
+    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(
+      ops,
+      transform,
+    );
+
+    expect(minX).toEqual(10);
+    expect(minY).toEqual(10);
+    expect(maxX).toEqual(60);
+    expect(maxY).toEqual(60);
+  });
+
+  it("should apply transformXY to qcurveTo operations", () => {
+    const transform: (p: GlobalPoint) => GlobalPoint = (p: GlobalPoint) =>
+      pointFrom(p[0] + 10, p[1] + 10);
+
+    const ops: Op[] = [
+      { op: "move", data: [0, 0] },
+      { op: "qcurveTo", data: [50, 100, 100, 0] },
+    ];
+
+    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(
+      ops,
+      transform,
+    );
+
+    expect(minX).toEqual(10);
+    expect(minY).toEqual(10);
+    expect(maxX).toEqual(110);
+    expect(maxY).toEqual(60);
+  });
+});
+
+describe("getElementBounds with Sharp Lines (lineTo)", () => {
+  it("sharp polyline should use lineTo logic", () => {
+    const element = {
+      ..._ce({
+        t: "line",
+        x: 100,
+        y: 100,
+        w: 100,
+        h: 100,
+        a: 0,
+      }),
+      roundness: null,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(50, 100),
+        pointFrom<LocalPoint>(100, 0),
+      ],
+    } as ExcalidrawLinearElement;
+
+    const [x1, y1, x2, y2] = getElementBounds(element, arrayToMap([element]));
+
+    expect(x1).toEqual(100);
+    expect(y1).toEqual(100);
+    expect(x2).toEqual(200);
+    expect(y2).toEqual(200);
   });
 });
