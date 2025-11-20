@@ -637,10 +637,13 @@ export const getCubicBezierCurveBound = (
 };
 
 export const getMinMaxXYFromCurvePathOps = (
-  ops: Array<Op | {
-    op: 'qcurveTo';
-    data: number[];
-  }>,
+  ops: Array<
+    | Op
+    | {
+        op: "qcurveTo";
+        data: number[];
+      }
+  >,
   transformXY?: (p: GlobalPoint) => GlobalPoint,
 ): Bounds => {
   let currentP: GlobalPoint = pointFrom(0, 0);

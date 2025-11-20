@@ -213,7 +213,5 @@ describe("getMinMaxXYFromCurvePathOps", () => {
     expect(y1).toEqual(100);
     expect(x2).toEqual(200);
     expect(y2).toEqual(200);
-});
-
-
+  });
 });
