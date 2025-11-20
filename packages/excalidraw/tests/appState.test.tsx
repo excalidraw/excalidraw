@@ -85,4 +85,31 @@ describe("appState", () => {
 
     expect((h.elements[0] as ExcalidrawTextElement).fontSize).toBe(16);
   });
+
+  it("changing fontSize to veryLarge and XXL with text tool selected", async () => {
+    const { container } = await render(<Excalidraw />, {});
+
+    UI.clickTool("text");
+
+    // veryLarge (36)
+    fireEvent.click(queryByTestId(container, "fontSize-veryLarge")!);
+    expect(h.state.currentItemFontSize).toBe(36);
+    const mouse1 = new Pointer("mouse");
+    mouse1.clickAt(150, 120);
+    {
+      const lastElement = h.elements.at(-1) as ExcalidrawTextElement;
+      expect(lastElement.fontSize).toBe(36);
+    }
+
+    // switch back to text tool to set XXL before creating another element
+    UI.clickTool("text");
+    fireEvent.click(queryByTestId(container, "fontSize-xxl")!);
+    expect(h.state.currentItemFontSize).toBe(48);
+    const mouse2 = new Pointer("mouse");
+    mouse2.clickAt(220, 180);
+    {
+      const lastElement = h.elements.at(-1) as ExcalidrawTextElement;
+      expect(lastElement.fontSize).toBe(48);
+    }
+  });
 });

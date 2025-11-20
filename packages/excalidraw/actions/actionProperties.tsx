@@ -107,6 +107,7 @@ import {
   FontSizeMediumIcon,
   FontSizeLargeIcon,
   FontSizeExtraLargeIcon,
+  FontSizeXXLIcon,
   EdgeSharpIcon,
   EdgeRoundIcon,
   TextAlignLeftIcon,
@@ -760,6 +761,12 @@ export const actionChangeFontSize = register({
                 text: t("labels.veryLarge"),
                 icon: FontSizeExtraLargeIcon,
                 testId: "fontSize-veryLarge",
+              },
+              {
+                value: 48,
+                text: t("labels.xxl"),
+                icon: FontSizeXXLIcon,
+                testId: "fontSize-xxl",
               },
             ]}
             value={getFormValue(
@@ -1557,8 +1564,8 @@ const getArrowheadOptions = (flip: boolean) => {
     {
       value: "circle_outline",
       text: t("labels.arrowhead_circle_outline"),
-      keyBinding: "s",
       icon: <ArrowheadCircleOutlineIcon flip={flip} />,
+      keyBinding: "s",
     },
     {
       value: "diamond",
