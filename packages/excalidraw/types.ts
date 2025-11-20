@@ -348,7 +348,7 @@ export interface AppState {
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string | null;
-  isResizing: boolean;
+  isScaling: boolean;
   isRotating: boolean;
   zoom: Zoom;
   openMenu: "canvas" | null;
