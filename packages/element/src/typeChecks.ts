@@ -4,6 +4,8 @@ import { pointsEqual } from "@excalidraw/math";
 
 import type { ElementOrToolType } from "@excalidraw/excalidraw/types";
 
+import { isPathALoop } from "./utils";
+
 import type { MarkNonNullable } from "@excalidraw/common/utility-types";
 
 import type { Bounds } from "./bounds";
@@ -422,4 +424,15 @@ export const isOpenLine = (
   element?: ExcalidrawElement | null,
 ): element is ExcalidrawLineElement => {
   return isLineElement(element) && !element.polygon;
+};
+
+/**
+ * Checks if an element is an open freedraw (freedraw element without loop closure).
+ * Returns true only for freedraw elements where the first and last points are not connected.
+ * Uses isPathALoop() to detect if the freedraw forms a closed loop (distance <= 8px).
+ */
+export const isOpenFreedraw = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawFreeDrawElement => {
+  return isFreeDrawElement(element) && !isPathALoop(element.points);
 };

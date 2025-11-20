@@ -46,6 +46,7 @@ import {
   isLinearElement,
   isLineElement,
   isOpenLine,
+  isOpenFreedraw,
   isTextElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
@@ -380,7 +381,7 @@ export const actionChangeBackgroundColor = register({
     const shouldEnablePolygon =
       !isTransparent(value.currentItemBackgroundColor) &&
       selectedElements.every(
-        (el) => isLineElement(el) && canBecomePolygon(el.points),
+        (el) => isLineElement(el) && canBecomePolygon(el.points) && !isOpenLine(el),
       );
 
     if (shouldEnablePolygon) {
@@ -396,9 +397,9 @@ export const actionChangeBackgroundColor = register({
       });
     } else {
       nextElements = changeProperty(elements, appState, (el) => {
-        // Prevent applying non-transparent background to open lines
-        if (isOpenLine(el) && !isTransparent(value.currentItemBackgroundColor)) {
-          return el; // Don't change open lines
+        // Prevent applying non-transparent background to open lines and open freedraw
+        if ((isOpenLine(el) || isOpenFreedraw(el)) && !isTransparent(value.currentItemBackgroundColor)) {
+          return el; // Don't change open lines or open freedraw
         }
         return newElementWith(el, {
           backgroundColor: value.currentItemBackgroundColor,
@@ -417,8 +418,9 @@ export const actionChangeBackgroundColor = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => {
     const selectedElements = app.scene.getSelectedElements(appState);
-    const isSingleOpenLineSelected =
-      selectedElements.length === 1 && isOpenLine(selectedElements[0]);
+    const isSingleOpenFreedrawSelected =
+      selectedElements.length === 1 && 
+      (isOpenLine(selectedElements[0]) || isOpenFreedraw(selectedElements[0]));
 
     return (
       <>
@@ -448,7 +450,7 @@ export const actionChangeBackgroundColor = register({
             appState.stylesPanelMode === "compact" ||
             appState.stylesPanelMode === "mobile"
           }
-          disabled={isSingleOpenLineSelected}
+          disabled={isSingleOpenFreedrawSelected}
         />
       </>
     );

@@ -1,16 +1,12 @@
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import { hasBoundTextElement, isOpenLine } from "../src/typeChecks";
+import { hasBoundTextElement, isOpenLine, isOpenFreedraw } from "../src/typeChecks";
 
 describe("Test TypeChecks", () => {
   describe("Test isOpenLine", () => {
     it("should return true for open line elements", () => {
       const openLine = API.createElement({
         type: "line",
-        points: [
-          [0, 0],
-          [100, 100],
-        ],
       });
 
       expect(isOpenLine(openLine)).toBe(true);
@@ -27,13 +23,6 @@ describe("Test TypeChecks", () => {
     it("should return false for closed polygon (line with polygon flag)", () => {
       const closedLine = API.createElement({
         type: "line",
-        points: [
-          [0, 0],
-          [100, 0],
-          [100, 100],
-          [0, 100],
-          [0, 0],
-        ],
       });
       // Manually set polygon to true to simulate a closed shape
       (closedLine as any).polygon = true;
@@ -44,10 +33,6 @@ describe("Test TypeChecks", () => {
     it("should return false for arrow elements", () => {
       const arrow = API.createElement({
         type: "arrow",
-        points: [
-          [0, 0],
-          [100, 100],
-        ],
       });
 
       expect(isOpenLine(arrow)).toBe(false);
@@ -67,6 +52,57 @@ describe("Test TypeChecks", () => {
       expect(isOpenLine(openLineExplicit)).toBe(true);
     });
   });
+
+  describe("Test isOpenFreedraw", () => {
+    it("should return true for open freedraw elements", () => {
+      const openFreedraw = API.createElement({
+        type: "freedraw",
+      });
+
+      expect(isOpenFreedraw(openFreedraw)).toBe(true);
+    });
+
+    it("should return false for non-freedraw elements", () => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+      });
+
+      expect(isOpenFreedraw(rectangle)).toBe(false);
+    });
+
+    it("should return false for closed freedraw (loop)", () => {
+      // We'll simulate a closed freedraw by creating one and manually
+      // checking that isOpenFreedraw returns false when isPathALoop would return true
+      const closedFreedraw = API.createElement({
+        type: "freedraw",
+      });
+      
+      // Manually set points that form a loop (first and last very close)
+      (closedFreedraw as any).points = [
+        [0, 0],
+        [100, 0],
+        [100, 100],
+        [0, 100],
+        [2, 2], // Very close to [0, 0], creating a loop
+      ];
+
+      expect(isOpenFreedraw(closedFreedraw)).toBe(false);
+    });
+
+    it("should return false for line elements", () => {
+      const line = API.createElement({
+        type: "line",
+      });
+
+      expect(isOpenFreedraw(line)).toBe(false);
+    });
+
+    it("should return false for null or undefined", () => {
+      expect(isOpenFreedraw(null)).toBe(false);
+      expect(isOpenFreedraw(undefined)).toBe(false);
+    });
+  });
+
   describe("Test hasBoundTextElement", () => {
     it("should return true for text bindable containers with bound text", () => {
       expect(
