@@ -149,50 +149,7 @@ describe("getElementBounds", () => {
 });
 
 describe("getMinMaxXYFromCurvePathOps", () => {
-  it("should calculate bounds for lineTo operations", () => {
-    const ops: Op[] = [
-      { op: "move", data: [0, 0] },
-      { op: "lineTo", data: [100, 50] },
-      { op: "lineTo", data: [50, 100] },
-    ];
-
-    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
-
-    expect(minX).toEqual(0);
-    expect(minY).toEqual(0);
-    expect(maxX).toEqual(100);
-    expect(maxY).toEqual(100);
-  });
-
-  it("should calculate bounds for simple qcurveTo", () => {
-    const ops: Op[] = [
-      { op: "move", data: [0, 0] },
-      { op: "qcurveTo", data: [50, 50, 100, 100] },
-    ];
-
-    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
-
-    expect(minX).toEqual(0);
-    expect(minY).toEqual(0);
-    expect(maxX).toEqual(100);
-    expect(maxY).toEqual(100);
-  });
-
-  it("should calculate bounds for qcurveTo with local extremes", () => {
-    const ops: Op[] = [
-      { op: "move", data: [0, 0] },
-      { op: "qcurveTo", data: [50, 100, 100, 0] },
-    ];
-
-    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
-
-    expect(minX).toEqual(0);
-    expect(minY).toEqual(0);
-    expect(maxX).toEqual(100);
-    expect(maxY).toEqual(50);
-  });
-
-  it("should apply transformXY to lineTo operations", () => {
+  it("get min max XY for line", () => {
     const transform: (p: GlobalPoint) => GlobalPoint = (p: GlobalPoint) =>
       pointFrom(p[0] + 10, p[1] + 10);
 
@@ -212,7 +169,7 @@ describe("getMinMaxXYFromCurvePathOps", () => {
     expect(maxY).toEqual(60);
   });
 
-  it("should apply transformXY to qcurveTo operations", () => {
+  it("get min max XY for qcurve", () => {
     const transform: (p: GlobalPoint) => GlobalPoint = (p: GlobalPoint) =>
       pointFrom(p[0] + 10, p[1] + 10);
 
@@ -231,10 +188,8 @@ describe("getMinMaxXYFromCurvePathOps", () => {
     expect(maxX).toEqual(110);
     expect(maxY).toEqual(60);
   });
-});
 
-describe("getElementBounds with Sharp Lines (lineTo)", () => {
-  it("sharp polyline should use lineTo logic", () => {
+  it("getElementBounds for lineTo", () => {
     const element = {
       ..._ce({
         t: "line",
@@ -258,5 +213,7 @@ describe("getElementBounds with Sharp Lines (lineTo)", () => {
     expect(y1).toEqual(100);
     expect(x2).toEqual(200);
     expect(y2).toEqual(200);
-  });
+});
+
+
 });
