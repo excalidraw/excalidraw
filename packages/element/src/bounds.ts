@@ -679,10 +679,10 @@ export const getMinMaxXYFromCurvePathOps = (
         limits.maxY = Math.max(limits.maxY, maxY);
       } else if (op === "lineTo") {
         const _p1 = pointFrom<GlobalPoint>(data[0], data[1]);
-        
+
         const p1 = transformXY ? transformXY(_p1) : _p1;
         const p0 = transformXY ? transformXY(currentP) : currentP;
-        
+
         currentP = _p1;
 
         limits.minX = Math.min(limits.minX, p0[0], p1[0]);
@@ -702,7 +702,7 @@ export const getMinMaxXYFromCurvePathOps = (
         const [minX, minY, maxX, maxY] = getQuadraticBezierCurveBound(
           p0,
           p1,
-          p2
+          p2,
         );
 
         limits.minX = Math.min(limits.minX, minX);
@@ -720,22 +720,20 @@ export const getMinMaxXYFromCurvePathOps = (
 const getQuadraticBezierCurveBound = (
   p0: GlobalPoint,
   p1: GlobalPoint,
-  p2: GlobalPoint
+  p2: GlobalPoint,
 ): Bounds => {
   const calculateBound = (v0: number, v1: number, v2: number) => {
     let min = Math.min(v0, v2);
     let max = Math.max(v0, v2);
 
     const denominator = v0 - 2 * v1 + v2;
-    
+
     if (denominator !== 0) {
       const t = (v0 - v1) / denominator;
       if (t > 0 && t < 1) {
         const vAtT =
-          Math.pow(1 - t, 2) * v0 + 
-          2 * (1 - t) * t * v1 + 
-          Math.pow(t, 2) * v2;
-        
+          Math.pow(1 - t, 2) * v0 + 2 * (1 - t) * t * v1 + Math.pow(t, 2) * v2;
+
         min = Math.min(min, vAtT);
         max = Math.max(max, vAtT);
       }
