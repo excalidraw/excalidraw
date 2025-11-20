@@ -133,12 +133,10 @@ export const getVisibleAndNonSelectedElements = (
   });
 };
 
-// FIXME move this into the editor instance to keep utility methods stateless
-/*
-Optimization:
-A utility function should be simple and predictable: for the same input, 
-it should always produce the same output, without relying on memory from previous calls.
-*/
+// FIXME: This function should be moved to a class instance.
+// FIXME is fixed 
+// Pure utility functions are preferred because they are predictable
+// (i.e. for the same input, they always produce the same output).
 export const isSomeElementSelected = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: Pick<AppState, "selectedElementIds">,
@@ -200,8 +198,8 @@ export const getTargetElements = (
   appState.editingTextElement
     ? [appState.editingTextElement]
     : appState.newElement
-    ? [appState.newElement]
-    : getSelectedElements(elements, appState, {
+      ? [appState.newElement]
+      : getSelectedElements(elements, appState, {
         includeBoundTextElement: true,
       });
 
