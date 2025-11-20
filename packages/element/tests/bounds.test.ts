@@ -173,10 +173,13 @@ describe("getMinMaxXYFromCurvePathOps", () => {
     const transform: (p: GlobalPoint) => GlobalPoint = (p: GlobalPoint) =>
       pointFrom(p[0] + 10, p[1] + 10);
 
-    const ops: Array<Op | {
-        op: "qcurveTo";
-        data: number[];
-      }> = [
+    const ops: Array<
+      | Op
+      | {
+          op: "qcurveTo";
+          data: number[];
+        }
+    > = [
       { op: "move", data: [0, 0] },
       { op: "qcurveTo", data: [50, 100, 100, 0] },
     ];
