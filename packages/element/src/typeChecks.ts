@@ -367,15 +367,6 @@ export const isFixedPointBinding = (
   );
 };
 
-// TODO: Move this to @excalidraw/math
-export const isBounds = (box: unknown): box is Bounds =>
-  Array.isArray(box) &&
-  box.length === 4 &&
-  typeof box[0] === "number" &&
-  typeof box[1] === "number" &&
-  typeof box[2] === "number" &&
-  typeof box[3] === "number";
-
 export const getLinearElementSubType = (
   element: ExcalidrawLinearElement,
 ): ExcalidrawLinearElementSubType => {
