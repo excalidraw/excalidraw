@@ -30,6 +30,7 @@ import {
   vectorAdd,
   vectorFromPoint,
   vectorScale,
+  MIN_ELLIPSE_AXIS_LENGTH,
   type GlobalPoint,
   type LocalPoint,
 } from "@excalidraw/math";
@@ -75,6 +76,9 @@ export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
   halfWidth: number;
   halfHeight: number;
 };
+
+const clampEllipseAxis = (value: number) =>
+  Math.max(Math.abs(value), MIN_ELLIPSE_AXIS_LENGTH);
 
 export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
   | {
@@ -404,8 +408,14 @@ const distanceToEllipse = <Point extends LocalPoint | GlobalPoint>(
   ellipse: Ellipse<Point>,
 ) => {
   const { angle, halfWidth, halfHeight, center } = ellipse;
-  const a = halfWidth;
-  const b = halfHeight;
+  
+  // Handle degenerate case: zero-sized ellipse is treated as a point
+  if (Math.abs(halfWidth) < MIN_ELLIPSE_AXIS_LENGTH && Math.abs(halfHeight) < MIN_ELLIPSE_AXIS_LENGTH) {
+    return pointDistance(p, center);
+  }
+  
+  const a = clampEllipseAxis(halfWidth);
+  const b = clampEllipseAxis(halfHeight);
   const translatedPoint = vectorAdd(
     vectorFromPoint(p),
     vectorScale(vectorFromPoint(center), -1),
@@ -469,6 +479,12 @@ export const pointInEllipse = <Point extends LocalPoint | GlobalPoint>(
   ellipse: Ellipse<Point>,
 ) => {
   const { center, angle, halfWidth, halfHeight } = ellipse;
+  
+  // Handle degenerate case: zero-sized ellipse is treated as a point
+  if (Math.abs(halfWidth) < MIN_ELLIPSE_AXIS_LENGTH && Math.abs(halfHeight) < MIN_ELLIPSE_AXIS_LENGTH) {
+    return p[0] === center[0] && p[1] === center[1];
+  }
+  
   const translatedPoint = vectorAdd(
     vectorFromPoint(p),
     vectorScale(vectorFromPoint(center), -1),
@@ -479,9 +495,12 @@ export const pointInEllipse = <Point extends LocalPoint | GlobalPoint>(
     -angle as Radians,
   );
 
+  const safeHalfWidth = clampEllipseAxis(halfWidth);
+  const safeHalfHeight = clampEllipseAxis(halfHeight);
+
   return (
-    (rotatedPointX / halfWidth) * (rotatedPointX / halfWidth) +
-      (rotatedPointY / halfHeight) * (rotatedPointY / halfHeight) <=
+    (rotatedPointX / safeHalfWidth) * (rotatedPointX / safeHalfWidth) +
+      (rotatedPointY / safeHalfHeight) * (rotatedPointY / safeHalfHeight) <=
     1
   );
 };

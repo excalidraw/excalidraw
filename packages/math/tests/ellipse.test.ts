@@ -4,6 +4,7 @@ import {
   ellipseIncludesPoint,
   ellipseTouchesPoint,
   ellipseLineIntersectionPoints,
+  ellipseDistanceFromPoint,
 } from "../src/ellipse";
 import { line } from "../src/line";
 import { pointFrom } from "../src/point";
@@ -57,6 +58,22 @@ describe("point and ellipse", () => {
 
     expect(ellipseIncludesPoint(pointFrom(-1, 1), target)).toBe(false);
     expect(ellipseIncludesPoint(pointFrom(-1.4, 0.8), target)).toBe(false);
+  });
+
+  it("handles zero-sized axes without throwing", () => {
+    const degenerate = ellipse(pointFrom(0, 0), 0, 0);
+
+    expect(() => ellipseIncludesPoint(pointFrom(0, 0), degenerate)).not.toThrow();
+    expect(ellipseIncludesPoint(pointFrom(0, 0), degenerate)).toBe(true);
+    expect(ellipseIncludesPoint(pointFrom(1, 0), degenerate)).toBe(false);
+
+    expect(() =>
+      ellipseTouchesPoint(pointFrom(0, 0), degenerate),
+    ).not.toThrow();
+    expect(ellipseTouchesPoint(pointFrom(0, 0), degenerate)).toBe(true);
+    expect(
+      Number.isFinite(ellipseDistanceFromPoint(pointFrom(2, 0), degenerate)),
+    ).toBe(true);
   });
 });
 
