@@ -29,7 +29,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { actionToggleZenMode, actionChangeMetadata } from "../actions";
+import { actionToggleZenMode } from "../actions";
 
 import { alignActionsPredicate } from "../actions/actionAlign";
 import { trackEvent } from "../analytics";
@@ -311,182 +311,14 @@ export const SelectedShapeActions = ({
             {renderAction("group")}
             {renderAction("ungroup")}
             {showLinkIcon && renderAction("hyperlink")}
-            {targetElements.length === 1 && renderAction("changeMetadata")}
-            {showCropEditorAction && renderAction("cropEditor")}
-            {showLineEditorAction && renderAction("toggleLinearEditor")}
-          </div>
-        </fieldset>
-      )}
-      {targetElements.length === 1 &&
-        appState.openPopup === "metadataEditor" &&
-        !isEditingTextOrNewElement &&
-        setAppState &&
-        actionManager && (
-          <MetadataEditor
-            element={targetElements[0]}
-            app={app}
-            setAppState={setAppState}
-            updateData={(data) => {
-              actionManager.executeAction(actionChangeMetadata, "ui", data);
-            }}
-          />
-        )}
+      {targetElements.length === 1 && renderAction("changeMetadata")}
+      {showCropEditorAction && renderAction("cropEditor")}
+      {showLineEditorAction && renderAction("toggleLinearEditor")}
     </div>
-  );
-};
-
-const MetadataEditor = ({
-  element,
-  app,
-  setAppState,
-  updateData,
-}: {
-  element: NonDeletedExcalidrawElement;
-  app: AppClassProperties;
-  setAppState: React.Component<any, AppState>["setState"];
-  updateData: (data: { customData: Record<string, any> }) => void;
-}) => {
-  const [metadataText, setMetadataText] = useState(() => {
-    try {
-      return JSON.stringify(element.customData ?? {}, null, 2);
-    } catch {
-      return "{}";
-    }
-  });
-  const [error, setError] = useState<string | null>(null);
-
-  // Update metadata text when element changes
-  useEffect(() => {
-    try {
-      const currentElement = app.scene.getElement(element.id);
-      if (currentElement) {
-        setMetadataText(
-          JSON.stringify(currentElement.customData ?? {}, null, 2),
-        );
-        setError(null);
-      }
-    } catch {
-      setMetadataText("{}");
-      setError(null);
-    }
-  }, [element.id, element.customData, app]);
-
-  const handleChange = (value: string) => {
-    setMetadataText(value);
-
-    // Validate JSON in real-time
-    if (value.trim() === "") {
-      setError(null);
-      return;
-    }
-
-    try {
-      JSON.parse(value);
-      setError(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Invalid JSON");
-    }
-  };
-
-  const handleSave = () => {
-    try {
-      const parsed = metadataText.trim() === "" ? {} : JSON.parse(metadataText);
-      updateData({ customData: parsed });
-      setError(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Invalid JSON");
-    }
-  };
-
-  const handleCancel = () => {
-    setAppState({ openPopup: null });
-  };
-
-  return (
-    <div
-      style={{
-        marginTop: "0.75rem",
-        padding: "0.75rem",
-        backgroundColor: "var(--popup-bg-color)",
-        borderRadius: "8px",
-        border: "1px solid var(--default-border-color)",
-      }}
-    >
-      <textarea
-        value={metadataText}
-        onChange={(e) => handleChange(e.target.value)}
-        style={{
-          width: "100%",
-          minHeight: "120px",
-          fontFamily: "monospace",
-          fontSize: "10px",
-          lineHeight: "1.4",
-          padding: "0.5rem",
-          boxSizing: "border-box",
-          border: error ? "1px solid red" : "1px solid var(--default-border-color)",
-          borderRadius: "4px",
-          backgroundColor: "var(--color-surface-primary-container)",
-          color: "var(--text-primary-color)",
-          resize: "vertical",
-          marginBottom: "0.5rem",
-        }}
-        spellCheck={false}
-      />
-      {error && (
-        <div
-          style={{
-            color: "red",
-            fontSize: "12px",
-            marginBottom: "0.5rem",
-          }}
-        >
-          {error}
-        </div>
-      )}
-      <div
-        style={{
-          display: "flex",
-          gap: "0.5rem",
-          justifyContent: "flex-end",
-        }}
-      >
-        <button
-          type="button"
-          onClick={handleCancel}
-          style={{
-            padding: "0.5rem 1rem",
-            borderRadius: "4px",
-            border: "1px solid var(--default-border-color)",
-            backgroundColor: "var(--popup-bg-color)",
-            color: "var(--text-primary-color)",
-            cursor: "pointer",
-            fontSize: "14px",
-          }}
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={!!error}
-          style={{
-            padding: "0.5rem 1rem",
-            borderRadius: "4px",
-            border: "none",
-            backgroundColor: error
-              ? "var(--color-surface-secondary)"
-              : "var(--color-primary)",
-            color: "white",
-            cursor: error ? "not-allowed" : "pointer",
-            fontSize: "14px",
-            opacity: error ? 0.5 : 1,
-          }}
-        >
-          Save
-        </button>
-      </div>
-    </div>
-  );
+  </fieldset>
+)}
+</div>
+);
 };
 
 const CombinedShapeProperties = ({
@@ -1017,14 +849,14 @@ export const CompactShapeActions = ({
         container={container}
         app={app}
       />
-      {/* Linear Editor */}
+      {/* Linear Element Editor trigger. */}
       {showLineEditorAction && (
         <div className="compact-action-item">
           {renderAction("toggleLinearEditor")}
         </div>
       )}
 
-      {/* Text Properties */}
+      {/* Text Element Properties. */}
       {(appState.activeTool.type === "text" ||
         targetElements.some(isTextElement)) && (
         <>
@@ -1042,21 +874,21 @@ export const CompactShapeActions = ({
         </>
       )}
 
-      {/* Dedicated Copy Button */}
+      {/* Duplicate Selection trigger. */}
       {!isEditingTextOrNewElement && targetElements.length > 0 && (
         <div className="compact-action-item">
           {renderAction("duplicateSelection")}
         </div>
       )}
 
-      {/* Dedicated Delete Button */}
+      {/* Delete Selection trigger. */}
       {!isEditingTextOrNewElement && targetElements.length > 0 && (
         <div className="compact-action-item">
           {renderAction("deleteSelectedElements")}
         </div>
       )}
 
-      {/* Metadata button for single element */}
+      {/* Trigger for Metadata Modal (single element only). */}
       {!isEditingTextOrNewElement && targetElements.length === 1 && (
         <div className="compact-action-item">
           {renderAction("changeMetadata")}
@@ -1072,43 +904,7 @@ export const CompactShapeActions = ({
         app={app}
       />
 
-      {/* Metadata editor for compact view */}
-      {targetElements.length === 1 &&
-        appState.openPopup === "metadataEditor" &&
-        !isEditingTextOrNewElement && (
-          <div style={{ marginTop: "0.75rem", padding: "0 0.5rem" }}>
-            <MetadataEditor
-              element={targetElements[0]}
-              app={app}
-              setAppState={setAppState}
-              updateData={(data) => {
-                // In compact view, execute the action's perform function directly
-                const elements = app.scene.getElementsIncludingDeleted();
-                // Convert UIAppState to AppState by providing default values for missing properties
-                const fullAppState: AppState = {
-                  ...appState,
-                  startBoundElement: null,
-                  suggestedBindings: [],
-                  scrollX: 0,
-                  scrollY: 0,
-                  cursorButton: "up" as const
-                };
-                const actionResult = actionChangeMetadata.perform(
-                  elements,
-                  fullAppState,
-                  data,
-                  app,
-                );
-                if (actionResult !== false && actionResult.elements) {
-                  app.scene.replaceAllElements(actionResult.elements);
-                  if (actionResult.appState) {
-                    setAppState(actionResult.appState);
-                  }
-                }
-              }}
-            />
-          </div>
-        )}
+
     </div>
   );
 };

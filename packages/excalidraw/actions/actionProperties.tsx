@@ -1904,19 +1904,20 @@ export const actionChangeMetadata = register({
   icon: MetadataIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    // Toggle metadata editor
+    /** Opens the metadata modal dialog. */
     if (value === null) {
       return {
         elements,
         appState: {
           ...appState,
-          openPopup: appState.openPopup === "metadataEditor" ? null : "metadataEditor",
+          openDialog: { name: "metadata" },
+          openPopup: null,
         },
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
 
-    // Save metadata
+    /** Updates element customData with new values. */
     if (value?.customData !== undefined) {
       const selectedElementIds = arrayToMap(
         getSelectedElements(elements, appState, {
