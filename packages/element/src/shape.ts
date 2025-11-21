@@ -70,6 +70,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ElementsMap,
   ExcalidrawLineElement,
+  ExcalidrawSprayElement,
 } from "./types";
 
 import type { Drawable, Options } from "roughjs/bin/core";
@@ -225,7 +226,8 @@ export const generateRoughOptions = (
       return options;
     }
     case "line":
-    case "freedraw": {
+    case "freedraw":
+    case "spray": {
       if (isPathALoop(element.points)) {
         options.fillStyle = element.fillStyle;
         options.fill =
@@ -420,7 +422,10 @@ const getArrowheadShapes = (
 };
 
 export const generateLinearCollisionShape = (
-  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  element:
+    | ExcalidrawLinearElement
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawSprayElement,
 ) => {
   const generator = new RoughGenerator();
   const options: Options = {
@@ -527,7 +532,8 @@ export const generateLinearCollisionShape = (
           };
         });
     }
-    case "freedraw": {
+    case "freedraw":
+    case "spray": {
       if (element.points.length < 2) {
         return [];
       }
@@ -801,7 +807,8 @@ const generateElementShape = (
       }
       return shape;
     }
-    case "freedraw": {
+    case "freedraw":
+    case "spray": {
       let shape: ElementShapes[typeof element.type];
       generateFreeDrawShape(element);
 
@@ -949,10 +956,11 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
     case "ellipse":
       return getEllipseShape(element);
 
-    case "freedraw": {
+    case "freedraw":
+    case "spray": {
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
       return getFreedrawShape(
-        element,
+        element as ExcalidrawFreeDrawElement,
         pointFrom(cx, cy),
         shouldTestInside(element),
       );

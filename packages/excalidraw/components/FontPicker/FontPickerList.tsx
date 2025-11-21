@@ -72,6 +72,7 @@ const getFontFamilyIcon = (fontFamily: FontFamilyValues): JSX.Element => {
     case FONT_FAMILY.Virgil:
       return FreedrawIcon;
     case FONT_FAMILY.Nunito:
+    case FONT_FAMILY.Poppins:
     case FONT_FAMILY.Helvetica:
       return FontFamilyNormalIcon;
     case FONT_FAMILY["Lilita One"]:

@@ -11,6 +11,7 @@ import {
   TextIcon,
   ImageIcon,
   EraserIcon,
+  SprayIcon,
 } from "./icons";
 
 import type { AppClassProperties } from "../types";
@@ -77,6 +78,13 @@ export const SHAPES = [
     value: "image",
     key: null,
     numericKey: KEYS["9"],
+    fillable: false,
+  },
+  {
+    icon: SprayIcon,
+    value: "spray",
+    key: KEYS.S,
+    numericKey: null,
     fillable: false,
   },
   {

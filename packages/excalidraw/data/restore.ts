@@ -97,6 +97,7 @@ export const AllowedExcalidrawActiveTools: Record<
   image: true,
   arrow: true,
   freedraw: true,
+  spray: true,
   eraser: false,
   custom: true,
   frame: true,

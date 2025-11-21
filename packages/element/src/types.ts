@@ -193,6 +193,7 @@ export type ExcalidrawRectanguloidElement =
   | ExcalidrawImageElement
   | ExcalidrawTextElement
   | ExcalidrawFreeDrawElement
+  | ExcalidrawSprayElement
   | ExcalidrawIframeLikeElement
   | ExcalidrawFrameLikeElement
   | ExcalidrawEmbeddableElement
@@ -209,6 +210,7 @@ export type ExcalidrawElement =
   | ExcalidrawLinearElement
   | ExcalidrawArrowElement
   | ExcalidrawFreeDrawElement
+  | ExcalidrawSprayElement
   | ExcalidrawImageElement
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement
@@ -379,6 +381,13 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     points: readonly LocalPoint[];
     pressures: readonly number[];
     simulatePressure: boolean;
+    lastCommittedPoint: LocalPoint | null;
+  }>;
+
+export type ExcalidrawSprayElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "spray";
+    points: readonly LocalPoint[];
     lastCommittedPoint: LocalPoint | null;
   }>;
 

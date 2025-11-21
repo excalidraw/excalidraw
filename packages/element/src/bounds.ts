@@ -41,6 +41,7 @@ import {
   isArrowElement,
   isBoundToContainer,
   isFreeDrawElement,
+  isSprayElement,
   isLinearElement,
   isLineElement,
   isTextElement,
@@ -64,6 +65,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
+  ExcalidrawSprayElement,
   ExcalidrawTextElementWithContainer,
   NonDeleted,
 } from "./types";
@@ -167,7 +169,7 @@ export class ElementBounds {
       element,
       elementsMap,
     );
-    if (isFreeDrawElement(element)) {
+    if (isFreeDrawElement(element) || isSprayElement(element)) {
       const [minX, minY, maxX, maxY] = getBoundsFromPoints(
         element.points.map(([x, y]) =>
           pointRotateRads(
@@ -261,7 +263,7 @@ export const getElementAbsoluteCoords = (
   elementsMap: ElementsMap,
   includeBoundText: boolean = false,
 ): [number, number, number, number, number, number] => {
-  if (isFreeDrawElement(element)) {
+  if (isFreeDrawElement(element) || isSprayElement(element)) {
     return getFreeDrawElementAbsoluteCoords(element);
   } else if (isLinearElement(element)) {
     return LinearElementEditor.getElementAbsoluteCoords(
@@ -708,7 +710,7 @@ export const getBoundsFromPoints = (
 };
 
 const getFreeDrawElementAbsoluteCoords = (
-  element: ExcalidrawFreeDrawElement,
+  element: ExcalidrawFreeDrawElement | ExcalidrawSprayElement,
 ): [number, number, number, number, number, number] => {
   const [minX, minY, maxX, maxY] = getBoundsFromPoints(element.points);
   const x1 = minX + element.x;
@@ -1044,7 +1046,13 @@ export const getResizedElementAbsoluteCoords = (
   nextHeight: number,
   normalizePoints: boolean,
 ): Bounds => {
-  if (!(isLinearElement(element) || isFreeDrawElement(element))) {
+  if (
+    !(
+      isLinearElement(element) ||
+      isFreeDrawElement(element) ||
+      isSprayElement(element)
+    )
+  ) {
     return [
       element.x,
       element.y,
@@ -1062,7 +1070,7 @@ export const getResizedElementAbsoluteCoords = (
 
   let bounds: Bounds;
 
-  if (isFreeDrawElement(element)) {
+  if (isFreeDrawElement(element) || isSprayElement(element)) {
     // Free Draw
     bounds = getBoundsFromPoints(points);
   } else {

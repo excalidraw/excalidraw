@@ -32,6 +32,7 @@ import type {
   FixedPointBinding,
   ExcalidrawFlowchartNodeElement,
   ExcalidrawLinearElementSubType,
+  ExcalidrawSprayElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -97,6 +98,12 @@ export const isFreeDrawElement = (
   element?: ExcalidrawElement | null,
 ): element is ExcalidrawFreeDrawElement => {
   return element != null && isFreeDrawElementType(element.type);
+};
+
+export const isSprayElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawSprayElement => {
+  return element != null && element.type === "spray";
 };
 
 export const isFreeDrawElementType = (
@@ -226,7 +233,8 @@ export const isRectangularElement = (
       element.type === "embeddable" ||
       element.type === "frame" ||
       element.type === "magicframe" ||
-      element.type === "freedraw")
+      element.type === "freedraw" ||
+      element.type === "spray")
   );
 };
 
@@ -260,6 +268,7 @@ export const isExcalidrawElement = (
     case "ellipse":
     case "arrow":
     case "freedraw":
+    case "spray":
     case "line":
     case "frame":
     case "magicframe":

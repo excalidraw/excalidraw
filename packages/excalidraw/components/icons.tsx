@@ -2362,6 +2362,24 @@ export const messageCircleIcon = createIcon(
   tablerIconProps,
 );
 
+export const SprayIcon = createIcon(
+  <g strokeWidth={1.25}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4 10a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+    <path d="M6 10v10" />
+    <path d="M4 16h4" />
+    <path d="M6 4v4" />
+    <path d="M4 4l4 0" />
+    <path d="M13 5l1 1" />
+    <path d="M16 7l1 1" />
+    <path d="M19 9l1 1" />
+    <path d="M13 9l1 -1" />
+    <path d="M16 11l1 -1" />
+    <path d="M19 13l1 -1" />
+  </g>,
+  modifiedTablerIconProps,
+);
+
 export const presentationIcon = createIcon(
   <g strokeWidth="1.25">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />

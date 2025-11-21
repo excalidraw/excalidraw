@@ -55,6 +55,7 @@ import {
   isTextElement,
   isLinearElement,
   isFreeDrawElement,
+  isSprayElement,
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
@@ -76,6 +77,7 @@ import type {
   ExcalidrawFrameLikeElement,
   NonDeletedSceneElementsMap,
   ElementsMap,
+  ExcalidrawSprayElement,
 } from "./types";
 
 import type { StrokeOptions } from "perfect-freehand";
@@ -111,6 +113,7 @@ const shouldResetImageFilter = (
 const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
     case "freedraw":
+    case "spray":
       return element.strokeWidth * 12;
     case "text":
       return element.fontSize / 2;
@@ -188,11 +191,11 @@ const cappedElementCanvasSize = (
 
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const elementWidth =
-    isLinearElement(element) || isFreeDrawElement(element)
+    isLinearElement(element) || isFreeDrawElement(element) || isSprayElement(element)
       ? distance(x1, x2)
       : element.width;
   const elementHeight =
-    isLinearElement(element) || isFreeDrawElement(element)
+    isLinearElement(element) || isFreeDrawElement(element) || isSprayElement(element)
       ? distance(y1, y2)
       : element.height;
 
@@ -247,7 +250,7 @@ const generateElementCanvas = (
   let canvasOffsetX = -100;
   let canvasOffsetY = 0;
 
-  if (isLinearElement(element) || isFreeDrawElement(element)) {
+  if (isLinearElement(element) || isFreeDrawElement(element) || isSprayElement(element)) {
     const [x1, y1] = getElementAbsoluteCoords(element, elementsMap);
 
     canvasOffsetX =
@@ -407,6 +410,25 @@ const drawImagePlaceholder = (
   );
 };
 
+const sprayPatternCache = new Map<string, CanvasPattern>();
+
+const getSprayPattern = (color: string, context: CanvasRenderingContext2D) => {
+  if (sprayPatternCache.has(color)) {
+    return sprayPatternCache.get(color)!;
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = 20;
+  canvas.height = 20;
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = color;
+  for (let i = 0; i < 80; i++) {
+    ctx.fillRect(Math.random() * 20, Math.random() * 20, 1.5, 1.5);
+  }
+  const pattern = context.createPattern(canvas, "repeat")!;
+  sprayPatternCache.set(color, pattern);
+  return pattern;
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -435,19 +457,32 @@ const drawElementOnCanvas = (
       });
       break;
     }
-    case "freedraw": {
+    case "freedraw":
+    case "spray": {
       // Draw directly to canvas
       context.save();
-      context.fillStyle = element.strokeColor;
+      if (element.type === "spray") {
+        context.fillStyle = getSprayPattern(element.strokeColor, context);
+      } else {
+        context.fillStyle = element.strokeColor;
+      }
 
       const path = getFreeDrawPath2D(element) as Path2D;
       const fillShape = ShapeCache.get(element);
 
       if (fillShape) {
-        rc.draw(fillShape);
+        if (Array.isArray(fillShape)) {
+          fillShape.forEach((shape) => rc.draw(shape));
+        } else {
+          rc.draw(fillShape);
+        }
       }
 
-      context.fillStyle = element.strokeColor;
+      if (element.type === "spray") {
+        context.fillStyle = getSprayPattern(element.strokeColor, context);
+      } else {
+        context.fillStyle = element.strokeColor;
+      }
       context.fill(path);
 
       context.restore();
@@ -787,7 +822,8 @@ export const renderElement = (
       }
       break;
     }
-    case "freedraw": {
+    case "freedraw":
+    case "spray": {
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)
       // rely on existing shapes
@@ -1033,25 +1069,25 @@ export const renderElement = (
   context.globalAlpha = 1;
 };
 
-export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);
+export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement | ExcalidrawSprayElement, Path2D>([]);
 
-export function generateFreeDrawShape(element: ExcalidrawFreeDrawElement) {
+export function generateFreeDrawShape(element: ExcalidrawFreeDrawElement | ExcalidrawSprayElement) {
   const svgPathData = getFreeDrawSvgPath(element);
   const path = new Path2D(svgPathData);
   pathsCache.set(element, path);
   return path;
 }
 
-export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
+export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement | ExcalidrawSprayElement) {
   return pathsCache.get(element);
 }
 
-export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
+export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement | ExcalidrawSprayElement) {
   return getSvgPathFromStroke(getFreedrawOutlinePoints(element));
 }
 
 export function getFreedrawOutlineAsSegments(
-  element: ExcalidrawFreeDrawElement,
+  element: ExcalidrawFreeDrawElement | ExcalidrawSprayElement,
   points: [number, number][],
   elementsMap: ElementsMap,
 ) {
@@ -1106,24 +1142,41 @@ export function getFreedrawOutlineAsSegments(
   );
 }
 
-export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement) {
+export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement | ExcalidrawSprayElement) {
   // If input points are empty (should they ever be?) return a dot
-  const inputPoints = element.simulatePressure
-    ? element.points
-    : element.points.length
-    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
-    : [[0, 0, 0.5]];
+  const inputPoints =
+    element.type === "freedraw" && element.simulatePressure
+      ? element.points
+      : element.points.length
+      ? element.points.map(([x, y], i) => [
+          x,
+          y,
+          element.type === "freedraw" ? element.pressures[i] : 0.5,
+        ])
+      : [[0, 0, 0.5]];
 
   // Consider changing the options for simulated pressure vs real pressure
   const options: StrokeOptions = {
-    simulatePressure: element.simulatePressure,
+    simulatePressure:
+      element.type === "freedraw" ? element.simulatePressure : false,
     size: element.strokeWidth * 4.25,
     thinning: 0.6,
     smoothing: 0.5,
     streamline: 0.5,
     easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
+    last:
+      element.type === "freedraw"
+        ? !!element.lastCommittedPoint
+        : false, // LastCommittedPoint is added on pointerup
   };
+
+  if (element.type === "spray") {
+    options.size = element.strokeWidth * 15;
+    options.thinning = 0;
+    options.smoothing = 0;
+    options.streamline = 0;
+    options.simulatePressure = false;
+  }
 
   return getStroke(inputPoints as number[][], options) as [number, number][];
 }

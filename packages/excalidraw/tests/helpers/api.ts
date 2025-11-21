@@ -17,6 +17,7 @@ import {
   newLinearElement,
   newMagicFrameElement,
   newTextElement,
+  newSprayElement,
 } from "@excalidraw/element";
 
 import { isLinearElementType } from "@excalidraw/element";
@@ -37,6 +38,7 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
   FixedSegment,
+  ExcalidrawSprayElement,
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
@@ -198,7 +200,7 @@ export class API {
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
       : never;
-    points?: T extends "arrow" | "line" | "freedraw" ? readonly LocalPoint[] : never;
+    points?: T extends "arrow" | "line" | "freedraw" | "spray" ? readonly LocalPoint[] : never;
     locked?: boolean;
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
@@ -221,6 +223,8 @@ export class API {
     ? ExcalidrawLinearElement
     : T extends "freedraw"
     ? ExcalidrawFreeDrawElement
+    : T extends "spray"
+    ? ExcalidrawSprayElement
     : T extends "text"
     ? ExcalidrawTextElement
     : T extends "image"
@@ -315,6 +319,13 @@ export class API {
         element = newFreeDrawElement({
           type: type as "freedraw",
           simulatePressure: true,
+          points: rest.points,
+          ...base,
+        });
+        break;
+      case "spray":
+        element = newSprayElement({
+          type: type as "spray",
           points: rest.points,
           ...base,
         });

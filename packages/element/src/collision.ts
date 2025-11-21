@@ -64,6 +64,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
+  ExcalidrawSprayElement,
 } from "./types";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
@@ -81,7 +82,7 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
     return isDraggableFromInside && isPathALoop(element.points);
   }
 
-  if (element.type === "freedraw") {
+  if (element.type === "freedraw" || element.type === "spray") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
 
@@ -256,6 +257,7 @@ export const intersectElementWithLineSegment = (
       );
     case "line":
     case "freedraw":
+    case "spray":
     case "arrow":
       return intersectLinearOrFreeDrawWithLineSegment(element, line, onlyFirst);
   }
@@ -322,7 +324,10 @@ const lineIntersections = (
 };
 
 const intersectLinearOrFreeDrawWithLineSegment = (
-  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  element:
+    | ExcalidrawLinearElement
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawSprayElement,
   segment: LineSegment<GlobalPoint>,
   onlyFirst = false,
 ): GlobalPoint[] => {
@@ -524,7 +529,9 @@ export const isPointInElement = (
   elementsMap: ElementsMap,
 ) => {
   if (
-    (isLinearElement(element) || isFreeDrawElement(element)) &&
+    (isLinearElement(element) ||
+      isFreeDrawElement(element) ||
+      element.type === "spray") &&
     !isPathALoop(element.points)
   ) {
     // There isn't any "inside" for a non-looping path
