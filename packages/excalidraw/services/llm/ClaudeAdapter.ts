@@ -103,7 +103,13 @@ class AWSSignatureV4 {
   ): Promise<Record<string, string>> {
     const urlObj = new URL(url);
     const host = urlObj.hostname;
-    const path = urlObj.pathname;
+    // AWS expects the path to be URL-encoded in the canonical request
+    // pathname is decoded, so we need to encode it properly
+    // Encode everything except forward slashes
+    const path = urlObj.pathname
+      .split('/')
+      .map(segment => encodeURIComponent(segment))
+      .join('/');
     const service = "bedrock";
 
     // Create timestamp
@@ -189,6 +195,7 @@ export class ClaudeAdapter implements LLMProviderAdapter {
       // We'll use a minimal request to Claude 3 Haiku (cheapest model)
       const modelId = "anthropic.claude-3-haiku-20240307-v1:0";
       const endpoint = this.getBedrockEndpoint(credentials.awsRegion);
+      // Don't encode the colon in the model ID for the URL
       const url = `${endpoint}/model/${modelId}/invoke`;
 
       const body = JSON.stringify({
