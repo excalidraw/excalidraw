@@ -63,7 +63,8 @@ export {
   imageToMermaidDialogOpenAtom,
   conversionProgressAtom,
   conversionResultAtom,
+  conversionStatusAtom,
   conversionErrorAtom,
   processingImageAtom,
   showConfigPromptAtom,
-} from "../../excalidraw-app/app-jotai";
+} from "./editor-jotai";

@@ -18,24 +18,38 @@ const GEMINI_API_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta';
 
 const GEMINI_MODELS: ModelInfo[] = [
   {
-    id: 'gemini-pro-vision',
-    name: 'Gemini Pro Vision',
-    description: 'Multimodal model for vision tasks',
-    capabilities: ['vision', 'code'],
-    contextWindow: 30720,
-  },
-  {
-    id: 'gemini-1.5-pro',
-    name: 'Gemini 1.5 Pro',
-    description: 'Advanced multimodal model with large context',
-    capabilities: ['vision', 'code', 'large-context'],
+    id: 'gemini-2.5-flash',
+    name: 'Gemini 2.5 Flash',
+    description: 'Balanced price/performance model',
+    capabilities: ['vision', 'code', 'fast'],
     contextWindow: 1000000,
   },
   {
-    id: 'gemini-1.5-flash',
-    name: 'Gemini 1.5 Flash',
-    description: 'Fast and efficient multimodal model',
+    id: 'gemini-2.5-pro',
+    name: 'Gemini 2.5 Pro',
+    description: 'Flagship Pro model with advanced capabilities',
+    capabilities: ['vision', 'code', 'large-context'],
+    contextWindow: 2000000,
+  },
+  {
+    id: 'gemini-2.5-flash-lite',
+    name: 'Gemini 2.5 Flash Lite',
+    description: 'Lower-cost / high throughput version',
+    capabilities: ['vision', 'code', 'fast', 'cost-efficient'],
+    contextWindow: 1000000,
+  },
+  {
+    id: 'gemini-2.0-flash',
+    name: 'Gemini 2.0 Flash',
+    description: 'Previous generation flash model (still available)',
     capabilities: ['vision', 'code', 'fast'],
+    contextWindow: 1000000,
+  },
+  {
+    id: 'gemini-2.0-flash-lite',
+    name: 'Gemini 2.0 Flash Lite',
+    description: 'Cost-efficient variant of 2.0 Flash',
+    capabilities: ['vision', 'code', 'fast', 'cost-efficient'],
     contextWindow: 1000000,
   },
 ];
@@ -107,7 +121,7 @@ export class GeminiAdapter implements LLMProviderAdapter {
       const mimeType = imageDataUrl.split(';')[0].split(':')[1];
 
       const response = await fetch(
-        `${GEMINI_API_ENDPOINT}/models/gemini-1.5-flash:generateContent?key=${credentials.geminiApiKey}`,
+        `${GEMINI_API_ENDPOINT}/models/gemini-2.5-pro:generateContent?key=${credentials.geminiApiKey}`,
         {
           method: 'POST',
           headers: {
@@ -129,7 +143,7 @@ export class GeminiAdapter implements LLMProviderAdapter {
             ],
             generationConfig: {
               temperature,
-              maxOutputTokens: options?.maxTokens || 2000,
+              maxOutputTokens: options?.maxTokens || 16000,
             },
           }),
         },
@@ -152,7 +166,30 @@ export class GeminiAdapter implements LLMProviderAdapter {
         );
       }
 
-      const mermaidCode = data.candidates[0].content.parts[0].text.trim();
+      const candidate = data.candidates[0];
+      
+      // Check for MAX_TOKENS finish reason
+      if (candidate.finishReason === 'MAX_TOKENS') {
+        throw new LLMProviderError(
+          'Response was truncated due to token limit. Try with a smaller image or simpler diagram.',
+          'gemini',
+          undefined,
+        );
+      }
+
+      // Check if parts and text exist
+      if (
+        !candidate.content.parts ||
+        !candidate.content.parts[0] ||
+        !candidate.content.parts[0].text
+      ) {
+        throw new InvalidResponseError(
+          'gemini',
+          `No text in API response. Finish reason: ${candidate.finishReason || 'unknown'}`,
+        );
+      }
+
+      const mermaidCode = candidate.content.parts[0].text.trim();
       const processingTime = Date.now() - startTime;
 
       return {

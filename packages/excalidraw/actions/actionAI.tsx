@@ -5,7 +5,8 @@
 import { register } from "./register";
 import { KEYS } from "@excalidraw/common";
 import { CaptureUpdateAction } from "@excalidraw/element";
-import { aiConfigDialogOpenAtom, imageToMermaidDialogOpenAtom, appJotaiStore } from "../../../excalidraw-app/app-jotai";
+import { aiConfigDialogOpenAtom, imageToMermaidDialogOpenAtom } from "../editor-jotai";
+import { editorJotaiStore } from "../editor-jotai";
 
 /**
  * Action to open AI Configuration Dialog
@@ -16,7 +17,7 @@ export const actionConfigureAI = register({
   trackEvent: { category: "menu", action: "configure" },
   perform: (_elements, appState) => {
     // Open AI configuration dialog
-    appJotaiStore.set(aiConfigDialogOpenAtom, true);
+    editorJotaiStore.set(aiConfigDialogOpenAtom, true);
 
     return {
       appState,
@@ -36,7 +37,7 @@ export const actionImportImage = register({
   trackEvent: { category: "menu", action: "import-image" },
   perform: (_elements, appState) => {
     // Open image import dialog
-    appJotaiStore.set(imageToMermaidDialogOpenAtom, true);
+    editorJotaiStore.set(imageToMermaidDialogOpenAtom, true);
 
     return {
       appState,
