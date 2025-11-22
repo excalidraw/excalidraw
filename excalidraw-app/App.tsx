@@ -77,7 +77,6 @@ import type { ResolvablePromise } from "@excalidraw/common/utils";
 
 import { AIConfigurationDialog } from "../packages/excalidraw/components/AIConfigurationDialog";
 import { ImageToMermaidDialog } from "../packages/excalidraw/components/ImageToMermaidDialog";
-import { mermaidToExcalidraw } from "./data/mermaidToExcalidraw";
 
 import CustomStats from "./CustomStats";
 import {
@@ -1174,12 +1173,14 @@ const ExcalidrawWrapper = () => {
             try {
               // Clean up the Mermaid code first - remove markdown code fences
               let cleanCode = mermaidCode.trim();
-              cleanCode = cleanCode.replace(/^```mermaid\s*/i, '');
-              cleanCode = cleanCode.replace(/^```\s*/m, '');
-              cleanCode = cleanCode.replace(/```\s*$/m, '');
+              cleanCode = cleanCode.replace(/^```mermaid\s*/i, "");
+              cleanCode = cleanCode.replace(/^```\s*/m, "");
+              cleanCode = cleanCode.replace(/```\s*$/m, "");
               cleanCode = cleanCode.trim();
-              
-              console.log("Converting Mermaid to Excalidraw using built-in converter...");
+
+              console.log(
+                "Converting Mermaid to Excalidraw using built-in converter...",
+              );
               console.log("Original code:", mermaidCode);
               console.log("Cleaned code:", cleanCode);
               
