@@ -1,6 +1,6 @@
 /**
  * ImageProcessingService
- * 
+ *
  * Handles image input from multiple sources and preprocessing for LLM analysis.
  * Supports clipboard paste, file upload, and drag & drop.
  */
@@ -17,7 +17,7 @@ export interface ProcessedImage {
 export interface ImageMetadata {
   fileName?: string;
   lastModified?: Date;
-  source: 'clipboard' | 'upload' | 'dragdrop';
+  source: "clipboard" | "upload" | "dragdrop";
 }
 
 export interface ValidationResult {
@@ -30,7 +30,13 @@ export interface OptimizedImage extends ProcessedImage {
   compressionRatio: number;
 }
 
-const SUPPORTED_FORMATS = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'];
+const SUPPORTED_FORMATS = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+  "image/gif",
+];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_DIMENSION = 4096; // Max width or height
 const TARGET_MAX_DIMENSION = 2048; // Target for optimization
@@ -43,18 +49,18 @@ export class ImageProcessingService {
     clipboardData: DataTransfer,
   ): Promise<ProcessedImage> {
     const items = Array.from(clipboardData.items);
-    const imageItem = items.find((item) => item.type.startsWith('image/'));
+    const imageItem = items.find((item) => item.type.startsWith("image/"));
 
     if (!imageItem) {
-      throw new Error('No image found in clipboard');
+      throw new Error("No image found in clipboard");
     }
 
     const file = imageItem.getAsFile();
     if (!file) {
-      throw new Error('Failed to get image from clipboard');
+      throw new Error("Failed to get image from clipboard");
     }
 
-    return this.processFile(file, 'clipboard');
+    return this.processFile(file, "clipboard");
   }
 
   /**
@@ -63,15 +69,15 @@ export class ImageProcessingService {
   async processUploadedFiles(files: FileList): Promise<ProcessedImage[]> {
     const fileArray = Array.from(files);
     const imageFiles = fileArray.filter((file) =>
-      file.type.startsWith('image/'),
+      file.type.startsWith("image/"),
     );
 
     if (imageFiles.length === 0) {
-      throw new Error('No image files selected');
+      throw new Error("No image files selected");
     }
 
     return Promise.all(
-      imageFiles.map((file) => this.processFile(file, 'upload')),
+      imageFiles.map((file) => this.processFile(file, "upload")),
     );
   }
 
@@ -82,14 +88,14 @@ export class ImageProcessingService {
     dragData: DataTransfer,
   ): Promise<ProcessedImage[]> {
     const files = Array.from(dragData.files);
-    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
 
     if (imageFiles.length === 0) {
-      throw new Error('No image files found in drop');
+      throw new Error("No image files found in drop");
     }
 
     return Promise.all(
-      imageFiles.map((file) => this.processFile(file, 'dragdrop')),
+      imageFiles.map((file) => this.processFile(file, "dragdrop")),
     );
   }
 
@@ -109,7 +115,9 @@ export class ImageProcessingService {
     if (blob.size > MAX_FILE_SIZE) {
       return {
         isValid: false,
-        error: `File too large: ${this.formatSize(blob.size)}. Maximum size: ${this.formatSize(MAX_FILE_SIZE)}`,
+        error: `File too large: ${this.formatSize(
+          blob.size,
+        )}. Maximum size: ${this.formatSize(MAX_FILE_SIZE)}`,
       };
     }
 
@@ -128,7 +136,7 @@ export class ImageProcessingService {
     } catch (error) {
       return {
         isValid: false,
-        error: 'Failed to read image dimensions',
+        error: "Failed to read image dimensions",
       };
     }
 
@@ -139,9 +147,7 @@ export class ImageProcessingService {
    * Optimize image for LLM analysis
    * Resizes large images and compresses to reduce API costs
    */
-  async optimizeForAnalysis(
-    image: ProcessedImage,
-  ): Promise<OptimizedImage> {
+  async optimizeForAnalysis(image: ProcessedImage): Promise<OptimizedImage> {
     const { width, height } = image.dimensions;
 
     // Check if optimization is needed
@@ -162,13 +168,13 @@ export class ImageProcessingService {
     const newHeight = Math.floor(height * scale);
 
     // Create canvas and resize
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.width = newWidth;
     canvas.height = newHeight;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) {
-      throw new Error('Failed to get canvas context');
+      throw new Error("Failed to get canvas context");
     }
 
     // Load image
@@ -184,10 +190,10 @@ export class ImageProcessingService {
           if (blob) {
             resolve(blob);
           } else {
-            reject(new Error('Failed to create blob'));
+            reject(new Error("Failed to create blob"));
           }
         },
-        'image/jpeg',
+        "image/jpeg",
         0.85, // Quality
       );
     });
@@ -198,7 +204,7 @@ export class ImageProcessingService {
     return {
       blob: optimizedBlob,
       dataUrl: optimizedDataUrl,
-      format: 'image/jpeg',
+      format: "image/jpeg",
       dimensions: { width: newWidth, height: newHeight },
       size: optimizedBlob.size,
       metadata: image.metadata,
@@ -212,7 +218,7 @@ export class ImageProcessingService {
    */
   private async processFile(
     file: File,
-    source: ImageMetadata['source'],
+    source: ImageMetadata["source"],
   ): Promise<ProcessedImage> {
     // Validate
     const validation = await this.validateImage(file);

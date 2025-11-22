@@ -36,6 +36,7 @@ interface ProviderFormData {
   awsClientId?: string;
   awsClientSecret?: string;
   awsRegion?: string;
+  awsBearerToken?: string;
   // Ollama
   ollamaEndpoint?: string;
 }
@@ -316,6 +317,31 @@ export const AIConfigurationDialog: React.FC = () => {
         {provider === "claude" && (
           <>
             <div className="form-group">
+              <label>AWS Bearer Token (Recommended)</label>
+              <textarea
+                value={data.awsBearerToken || ""}
+                onChange={(e) =>
+                  handleInputChange(provider, "awsBearerToken", e.target.value)
+                }
+                placeholder="bedrock-api-key-..."
+                rows={3}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  border: "1px solid var(--color-gray-30)",
+                  borderRadius: "4px",
+                  fontFamily: "monospace",
+                  fontSize: "12px",
+                }}
+              />
+              <small>Temporary credentials from AWS CLI or Console</small>
+            </div>
+
+            <div style={{ margin: "20px 0", textAlign: "center", color: "var(--color-gray-50)" }}>
+              — OR —
+            </div>
+
+            <div className="form-group">
               <label>AWS Client ID (Access Key)</label>
               <input
                 type="text"
@@ -332,6 +358,7 @@ export const AIConfigurationDialog: React.FC = () => {
                 }}
               />
             </div>
+
             <div className="form-group">
               <label>AWS Client Secret (Secret Key)</label>
               <input
@@ -349,6 +376,7 @@ export const AIConfigurationDialog: React.FC = () => {
                 }}
               />
             </div>
+
             <div className="form-group">
               <label>AWS Region</label>
               <select
@@ -364,8 +392,9 @@ export const AIConfigurationDialog: React.FC = () => {
                 <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
               </select>
             </div>
+
             <small>
-              Claude is accessed through AWS Bedrock. Get credentials from{" "}
+              Use either Bearer Token OR IAM credentials. Get credentials from{" "}
               <a
                 href="https://console.aws.amazon.com/iam/"
                 target="_blank"

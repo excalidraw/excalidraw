@@ -1,6 +1,6 @@
 /**
  * AI Features Export
- * 
+ *
  * Central export for all AI-related features.
  * Import this file to add AI capabilities to Excalidraw.
  */
@@ -9,7 +9,10 @@
 export { AIConfigurationDialog } from "./components/AIConfigurationDialog";
 export { ImageToMermaidDialog } from "./components/ImageToMermaidDialog";
 export { AIFeatureIntegration } from "./components/AIFeatureIntegration";
-export { AIConfigButton, ImageImportButton } from "./components/AIToolbarButtons";
+export {
+  AIConfigButton,
+  ImageImportButton,
+} from "./components/AIToolbarButtons";
 
 // Services
 export { aiConfigService } from "./services/AIConfigurationService";

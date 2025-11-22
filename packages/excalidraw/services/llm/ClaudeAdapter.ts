@@ -25,47 +25,39 @@ import type {
 } from "./LLMProviderAdapter";
 
 const CLAUDE_MODELS: ModelInfo[] = [
-  // Claude 3.5 Models (Latest Generation)
+  // Claude Inference Profiles available in your AWS Bedrock
   {
-    id: "anthropic.claude-3-5-sonnet-20241022-v2:0",
-    name: "Claude 3.5 Sonnet V2 (Latest)",
-    description: "Most advanced Claude model with improved reasoning and coding",
+    id: "us.anthropic.claude-opus-4-1-20250805-v1:0",
+    name: "Claude Opus 4.1",
+    description: "Most capable Claude model for complex tasks",
+    capabilities: ["vision", "code", "reasoning", "analysis", "complex-tasks"],
+    contextWindow: 200000,
+  },
+  {
+    id: "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    name: "Claude Sonnet 4.5",
+    description: "Enhanced Claude 4.5 model with improved capabilities",
     capabilities: ["vision", "code", "reasoning", "fast", "analysis"],
     contextWindow: 200000,
   },
   {
-    id: "anthropic.claude-3-5-sonnet-20240620-v1:0",
-    name: "Claude 3.5 Sonnet V1",
-    description: "Previous generation 3.5 Sonnet",
+    id: "us.anthropic.claude-sonnet-4-20250514-v1:0",
+    name: "Claude Sonnet 4",
+    description: "Balanced Claude 4 model with superior reasoning",
+    capabilities: ["vision", "code", "reasoning", "fast", "analysis"],
+    contextWindow: 200000,
+  },
+  {
+    id: "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+    name: "Claude 3.7 Sonnet",
+    description: "Advanced Claude 3.7 model",
     capabilities: ["vision", "code", "reasoning", "fast"],
     contextWindow: 200000,
   },
   {
-    id: "anthropic.claude-3-5-haiku-20241022-v1:0",
-    name: "Claude 3.5 Haiku (Latest)",
-    description: "Fastest and most affordable Claude 3.5 model",
-    capabilities: ["vision", "code", "fast", "affordable"],
-    contextWindow: 200000,
-  },
-  // Claude 3 Models
-  {
-    id: "anthropic.claude-3-opus-20240229-v1:0",
-    name: "Claude 3 Opus",
-    description: "Most capable Claude 3 model for complex tasks",
-    capabilities: ["vision", "code", "reasoning", "analysis"],
-    contextWindow: 200000,
-  },
-  {
-    id: "anthropic.claude-3-sonnet-20240229-v1:0",
-    name: "Claude 3 Sonnet",
-    description: "Balanced Claude 3 model",
-    capabilities: ["vision", "code", "fast"],
-    contextWindow: 200000,
-  },
-  {
-    id: "anthropic.claude-3-haiku-20240307-v1:0",
-    name: "Claude 3 Haiku",
-    description: "Fastest Claude 3 model",
+    id: "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    name: "Claude Haiku 4.5",
+    description: "Fastest and most affordable Claude model",
     capabilities: ["vision", "code", "fast", "affordable"],
     contextWindow: 200000,
   },
@@ -120,11 +112,15 @@ class AWSSignatureV4 {
     const urlObj = new URL(url);
     const host = urlObj.hostname;
     // AWS expects the path to be URL-encoded in the canonical request
-    // pathname is decoded, so we need to encode it properly
-    // Encode everything except forward slashes
+    // For Bedrock, we need to encode colons in model IDs
+    // Split by / and encode each segment, preserving the slashes
     const path = urlObj.pathname
       .split('/')
-      .map(segment => encodeURIComponent(segment))
+      .map(segment => {
+        // Encode the segment but preserve unreserved characters
+        // AWS uses RFC 3986 encoding
+        return encodeURIComponent(segment).replace(/%2F/g, '/');
+      })
       .join('/');
     const service = "bedrock";
 
@@ -151,6 +147,10 @@ class AWSSignatureV4 {
       payloadHash,
     ].join("\n");
 
+    // Debug logging
+    console.log("Canonical Request:", canonicalRequest);
+    console.log("Canonical Request Hash:", this.bufferToHex(await this.sha256(canonicalRequest)));
+
     // Create string to sign
     const algorithm = "AWS4-HMAC-SHA256";
     const credentialScope = `${dateStamp}/${credentials.region}/${service}/aws4_request`;
@@ -164,6 +164,9 @@ class AWSSignatureV4 {
       credentialScope,
       canonicalRequestHash,
     ].join("\n");
+
+    // Debug logging
+    console.log("String to Sign:", stringToSign);
 
     // Calculate signature
     const kDate = await this.hmac(
@@ -195,24 +198,32 @@ export class ClaudeAdapter implements LLMProviderAdapter {
     credentials: ProviderCredentials["credentials"],
   ): Promise<ConnectionTestResult> {
     try {
-      if (
-        !credentials.awsClientId ||
-        !credentials.awsClientSecret ||
-        !credentials.awsRegion
-      ) {
+      // Check authentication method: Bearer Token, API Key, or IAM credentials
+      const useBearerToken = !!credentials.awsBearerToken;
+      const useApiKey = !!credentials.apiKey;
+      const useIAM = !!(credentials.awsClientId && credentials.awsClientSecret && credentials.awsRegion);
+      
+      if (!useBearerToken && !useApiKey && !useIAM) {
         return {
           success: false,
           message: "Missing credentials",
-          error: "AWS Client ID, Secret, and Region are required",
+          error: "Either Bearer Token, API Key, or AWS IAM credentials are required",
+        };
+      }
+
+      if ((useBearerToken || useApiKey) && !credentials.awsRegion) {
+        return {
+          success: false,
+          message: "Missing region",
+          error: "AWS Region is required",
         };
       }
 
       // Test with a simple invoke request to verify credentials
-      // We'll use a minimal request to Claude 3 Haiku (cheapest model)
-      const modelId = "anthropic.claude-3-haiku-20240307-v1:0";
-      const endpoint = this.getBedrockEndpoint(credentials.awsRegion);
-      // Don't encode the colon in the model ID for the URL
-      const url = `${endpoint}/model/${modelId}/invoke`;
+      // Use the inference profile ID for on-demand throughput
+      const inferenceProfileId = "us.anthropic.claude-sonnet-4-20250514-v1:0";
+      const endpoint = this.getBedrockEndpoint(credentials.awsRegion!);
+      const url = `${endpoint}/model/${inferenceProfileId}/invoke`;
 
       const body = JSON.stringify({
         anthropic_version: "bedrock-2023-05-31",
@@ -225,26 +236,47 @@ export class ClaudeAdapter implements LLMProviderAdapter {
         ],
       });
 
-      const signedHeaders = await AWSSignatureV4.sign("POST", url, {
-        "Content-Type": "application/json",
-      }, body, {
-        accessKeyId: credentials.awsClientId,
-        secretAccessKey: credentials.awsClientSecret,
-        region: credentials.awsRegion,
-      });
+      let headers: Record<string, string>;
+
+      if (useBearerToken) {
+        // Use bearer token authentication
+        headers = {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${credentials.awsBearerToken}`,
+        };
+      } else if (useApiKey) {
+        // Use API key authentication
+        headers = {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${credentials.apiKey}`,
+          "X-Api-Key": credentials.apiKey!,
+        };
+      } else {
+        // Use AWS Signature V4 authentication
+        headers = await AWSSignatureV4.sign("POST", url, {
+          "Content-Type": "application/json",
+        }, body, {
+          accessKeyId: credentials.awsClientId!,
+          secretAccessKey: credentials.awsClientSecret!,
+          region: credentials.awsRegion!,
+        });
+      }
 
       const response = await fetch(url, {
         method: "POST",
-        headers: signedHeaders,
+        headers,
         body,
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("AWS Bedrock error:", errorText);
+        
         if (response.status === 403) {
           return {
             success: false,
             message: "Invalid credentials",
-            error: "Authentication failed. Please check your AWS credentials.",
+            error: "Authentication failed. Please check your credentials.",
           };
         }
         return {
@@ -285,11 +317,16 @@ export class ClaudeAdapter implements LLMProviderAdapter {
     const startTime = Date.now();
 
     try {
-      if (
-        !credentials.awsClientId ||
-        !credentials.awsClientSecret ||
-        !credentials.awsRegion
-      ) {
+      // Check authentication method: Bearer Token, API Key, or IAM credentials
+      const useBearerToken = !!credentials.awsBearerToken;
+      const useApiKey = !!credentials.apiKey;
+      const useIAM = !!(credentials.awsClientId && credentials.awsClientSecret && credentials.awsRegion);
+      
+      if (!useBearerToken && !useApiKey && !useIAM) {
+        throw new AuthenticationError("claude");
+      }
+
+      if ((useBearerToken || useApiKey) && !credentials.awsRegion) {
         throw new AuthenticationError("claude");
       }
 
@@ -301,10 +338,10 @@ export class ClaudeAdapter implements LLMProviderAdapter {
       const [mediaTypePart, base64Data] = imageDataUrl.split(",");
       const mediaType = mediaTypePart.split(":")[1].split(";")[0];
 
-      // Use Claude 3.5 Sonnet by default (best vision model)
-      const modelId = "anthropic.claude-3-5-sonnet-20240620-v1:0";
-      const endpoint = this.getBedrockEndpoint(credentials.awsRegion);
-      const url = `${endpoint}/model/${modelId}/invoke`;
+      // Use the inference profile ID for on-demand throughput
+      const inferenceProfileId = "us.anthropic.claude-sonnet-4-20250514-v1:0";
+      const endpoint = this.getBedrockEndpoint(credentials.awsRegion!);
+      const url = `${endpoint}/model/${inferenceProfileId}/invoke`;
 
       const requestBody = JSON.stringify({
         anthropic_version: "bedrock-2023-05-31",
@@ -331,21 +368,39 @@ export class ClaudeAdapter implements LLMProviderAdapter {
         ],
       });
 
-      const signedHeaders = await AWSSignatureV4.sign(
-        "POST",
-        url,
-        {},
-        requestBody,
-        {
-          accessKeyId: credentials.awsClientId,
-          secretAccessKey: credentials.awsClientSecret,
-          region: credentials.awsRegion,
-        },
-      );
+      let headers: Record<string, string>;
+
+      if (useBearerToken) {
+        // Use bearer token authentication
+        headers = {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${credentials.awsBearerToken}`,
+        };
+      } else if (useApiKey) {
+        // Use API key authentication
+        headers = {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${credentials.apiKey}`,
+          "X-Api-Key": credentials.apiKey!,
+        };
+      } else {
+        // Use AWS Signature V4 authentication
+        headers = await AWSSignatureV4.sign(
+          "POST",
+          url,
+          {},
+          requestBody,
+          {
+            accessKeyId: credentials.awsClientId!,
+            secretAccessKey: credentials.awsClientSecret!,
+            region: credentials.awsRegion!,
+          },
+        );
+      }
 
       const response = await fetch(url, {
         method: "POST",
-        headers: signedHeaders,
+        headers,
         body: requestBody,
       });
 

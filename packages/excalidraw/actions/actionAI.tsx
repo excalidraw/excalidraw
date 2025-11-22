@@ -2,11 +2,16 @@
  * AI-related actions for image-to-diagram conversion
  */
 
-import { register } from "./register";
 import { KEYS } from "@excalidraw/common";
 import { CaptureUpdateAction } from "@excalidraw/element";
-import { aiConfigDialogOpenAtom, imageToMermaidDialogOpenAtom } from "../editor-jotai";
+
+import {
+  aiConfigDialogOpenAtom,
+  imageToMermaidDialogOpenAtom,
+} from "../editor-jotai";
 import { editorJotaiStore } from "../editor-jotai";
+
+import { register } from "./register";
 
 /**
  * Action to open AI Configuration Dialog

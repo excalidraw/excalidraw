@@ -1,22 +1,24 @@
 /**
  * LLMVisionService
- * 
+ *
  * Orchestrates LLM provider adapters for image analysis.
  * Routes requests to the appropriate provider based on configuration.
  */
 
-import type { LLMProvider } from './AIConfigurationService';
-import { aiConfigService } from './AIConfigurationService';
+import { aiConfigService } from "./AIConfigurationService";
+
+import { LLMProviderError } from "./llm/LLMProviderAdapter";
+import { OpenAIAdapter } from "./llm/OpenAIAdapter";
+import { GeminiAdapter } from "./llm/GeminiAdapter";
+import { ClaudeAdapter } from "./llm/ClaudeAdapter";
+import { OllamaAdapter } from "./llm/OllamaAdapter";
+
 import type {
   AnalysisOptions,
   AnalysisResult,
   LLMProviderAdapter,
-} from './llm/LLMProviderAdapter';
-import { LLMProviderError } from './llm/LLMProviderAdapter';
-import { OpenAIAdapter } from './llm/OpenAIAdapter';
-import { GeminiAdapter } from './llm/GeminiAdapter';
-import { ClaudeAdapter } from './llm/ClaudeAdapter';
-import { OllamaAdapter } from './llm/OllamaAdapter';
+} from "./llm/LLMProviderAdapter";
+import type { LLMProvider } from "./AIConfigurationService";
 
 export interface RateLimitInfo {
   remaining: number;
@@ -29,10 +31,10 @@ export class LLMVisionService {
 
   constructor() {
     this.adapters = new Map<LLMProvider, LLMProviderAdapter>();
-    this.adapters.set('openai', new OpenAIAdapter());
-    this.adapters.set('gemini', new GeminiAdapter());
-    this.adapters.set('claude', new ClaudeAdapter());
-    this.adapters.set('ollama', new OllamaAdapter());
+    this.adapters.set("openai", new OpenAIAdapter());
+    this.adapters.set("gemini", new GeminiAdapter());
+    this.adapters.set("claude", new ClaudeAdapter());
+    this.adapters.set("ollama", new OllamaAdapter());
   }
 
   /**
@@ -46,8 +48,8 @@ export class LLMVisionService {
 
     if (!provider) {
       throw new LLMProviderError(
-        'No AI provider configured. Please configure a provider first.',
-        'none',
+        "No AI provider configured. Please configure a provider first.",
+        "none",
       );
     }
 
@@ -130,8 +132,8 @@ export class LLMVisionService {
     if (!credentials) {
       return {
         success: false,
-        message: 'No credentials found',
-        error: 'Please configure credentials first',
+        message: "No credentials found",
+        error: "Please configure credentials first",
       };
     }
 
@@ -140,7 +142,7 @@ export class LLMVisionService {
     if (!adapter) {
       return {
         success: false,
-        message: 'Unsupported provider',
+        message: "Unsupported provider",
         error: `Provider ${provider} is not supported`,
       };
     }
@@ -157,8 +159,8 @@ export class LLMVisionService {
     } catch (error) {
       return {
         success: false,
-        message: 'Connection test failed',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: "Connection test failed",
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -177,7 +179,7 @@ export class LLMVisionService {
       try {
         return await this.analyzeImage(imageDataUrl, options);
       } catch (error) {
-        lastError = error instanceof Error ? error : new Error('Unknown error');
+        lastError = error instanceof Error ? error : new Error("Unknown error");
 
         // Don't retry on authentication errors
         if (error instanceof LLMProviderError && error.statusCode === 401) {
@@ -192,7 +194,7 @@ export class LLMVisionService {
       }
     }
 
-    throw lastError || new Error('Failed to analyze image after retries');
+    throw lastError || new Error("Failed to analyze image after retries");
   }
 }
 

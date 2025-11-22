@@ -6,11 +6,14 @@ import {
   newArrowElement,
   syncInvalidIndices,
 } from "@excalidraw/element";
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { pointFrom } from "@excalidraw/math";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { parseMermaidFlowchart } from "./mermaidParser";
 import { calculateLayout } from "./mermaidLayout";
+
 import type { LayoutNode } from "./mermaidLayout";
 
 /**
@@ -55,8 +58,8 @@ export function mermaidToExcalidraw(
           node.shape === "rounded"
             ? { type: 3, value: 16 }
             : node.shape === "circle"
-              ? { type: 3, value: node.width / 2 }
-              : null,
+            ? { type: 3, value: node.width / 2 }
+            : null,
       });
 
       elements.push(rect);

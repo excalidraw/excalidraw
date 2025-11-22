@@ -1,15 +1,22 @@
 /**
  * AIFeatureIntegration
- * 
+ *
  * Integration component for AI features.
  * Renders dialogs and handles mermaid-to-excalidraw conversion.
  */
 
 import React from "react";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import {
+  convertMermaidToElements,
+  insertElementsIntoCanvas,
+} from "../utils/mermaidToExcalidraw";
+
 import { AIConfigurationDialog } from "./AIConfigurationDialog";
 import { ImageToMermaidDialog } from "./ImageToMermaidDialog";
-import { convertMermaidToElements, insertElementsIntoCanvas } from "../utils/mermaidToExcalidraw";
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import type { AppState } from "../types";
 
 interface AIFeatureIntegrationProps {
@@ -40,7 +47,9 @@ export const AIFeatureIntegration: React.FC<AIFeatureIntegrationProps> = ({
     } catch (error) {
       console.error("Failed to insert mermaid diagram:", error);
       alert(
-        `Failed to insert diagram: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Failed to insert diagram: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
       );
     }
   };

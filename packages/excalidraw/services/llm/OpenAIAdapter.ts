@@ -1,55 +1,64 @@
 /**
  * OpenAIAdapter
- * 
+ *
  * Adapter for OpenAI GPT-4 Vision API
  */
 
-import type { ProviderCredentials, ConnectionTestResult, ModelInfo } from '../AIConfigurationService';
-import type { AnalysisOptions, AnalysisResult, LLMProviderAdapter } from './LLMProviderAdapter';
 import {
   DEFAULT_MERMAID_PROMPT,
   LLMProviderError,
   RateLimitError,
   AuthenticationError,
   InvalidResponseError,
-} from './LLMProviderAdapter';
+} from "./LLMProviderAdapter";
 
-const OPENAI_API_ENDPOINT = 'https://api.openai.com/v1';
+import type {
+  ProviderCredentials,
+  ConnectionTestResult,
+  ModelInfo,
+} from "../AIConfigurationService";
+import type {
+  AnalysisOptions,
+  AnalysisResult,
+  LLMProviderAdapter,
+} from "./LLMProviderAdapter";
+
+const OPENAI_API_ENDPOINT = "https://api.openai.com/v1";
 
 const OPENAI_MODELS: ModelInfo[] = [
   {
-    id: 'gpt-4-vision-preview',
-    name: 'GPT-4 Vision',
-    description: 'Most capable vision model',
-    capabilities: ['vision', 'code', 'reasoning'],
+    id: "gpt-4-vision-preview",
+    name: "GPT-4 Vision",
+    description: "Most capable vision model",
+    capabilities: ["vision", "code", "reasoning"],
     contextWindow: 128000,
   },
   {
-    id: 'gpt-4o',
-    name: 'GPT-4 Omni',
-    description: 'Fast and capable multimodal model',
-    capabilities: ['vision', 'code', 'fast'],
+    id: "gpt-4o",
+    name: "GPT-4 Omni",
+    description: "Fast and capable multimodal model",
+    capabilities: ["vision", "code", "fast"],
     contextWindow: 128000,
   },
   {
-    id: 'gpt-4o-mini',
-    name: 'GPT-4 Omni Mini',
-    description: 'Affordable and fast vision model',
-    capabilities: ['vision', 'code', 'fast', 'affordable'],
+    id: "gpt-4o-mini",
+    name: "GPT-4 Omni Mini",
+    description: "Affordable and fast vision model",
+    capabilities: ["vision", "code", "fast", "affordable"],
     contextWindow: 128000,
   },
 ];
 
 export class OpenAIAdapter implements LLMProviderAdapter {
   async testConnection(
-    credentials: ProviderCredentials['credentials'],
+    credentials: ProviderCredentials["credentials"],
   ): Promise<ConnectionTestResult> {
     try {
       const response = await fetch(`${OPENAI_API_ENDPOINT}/models`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${credentials.apiKey}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${credentials.apiKey}`,
+          "Content-Type": "application/json",
         },
       });
 
@@ -57,13 +66,13 @@ export class OpenAIAdapter implements LLMProviderAdapter {
         if (response.status === 401) {
           return {
             success: false,
-            message: 'Invalid API key',
-            error: 'Authentication failed. Please check your API key.',
+            message: "Invalid API key",
+            error: "Authentication failed. Please check your API key.",
           };
         }
         return {
           success: false,
-          message: 'Connection failed',
+          message: "Connection failed",
           error: `HTTP ${response.status}: ${response.statusText}`,
         };
       }
@@ -72,20 +81,20 @@ export class OpenAIAdapter implements LLMProviderAdapter {
 
       return {
         success: true,
-        message: 'Connected successfully',
+        message: "Connected successfully",
         availableModels: models,
       };
     } catch (error) {
       return {
         success: false,
-        message: 'Connection failed',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: "Connection failed",
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
 
   async fetchModels(
-    credentials: ProviderCredentials['credentials'],
+    credentials: ProviderCredentials["credentials"],
   ): Promise<ModelInfo[]> {
     // OpenAI models are predefined
     // We could fetch from API, but the vision models are known
@@ -93,7 +102,7 @@ export class OpenAIAdapter implements LLMProviderAdapter {
   }
 
   async analyzeImage(
-    credentials: ProviderCredentials['credentials'],
+    credentials: ProviderCredentials["credentials"],
     imageDataUrl: string,
     options?: AnalysisOptions,
   ): Promise<AnalysisResult> {
@@ -105,23 +114,23 @@ export class OpenAIAdapter implements LLMProviderAdapter {
       const temperature = options?.temperature ?? 0.1;
 
       const response = await fetch(`${OPENAI_API_ENDPOINT}/chat/completions`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${credentials.apiKey}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${credentials.apiKey}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: 'gpt-4o', // Default to gpt-4o for vision
+          model: "gpt-4o", // Default to gpt-4o for vision
           messages: [
             {
-              role: 'user',
+              role: "user",
               content: [
                 {
-                  type: 'text',
+                  type: "text",
                   text: prompt,
                 },
                 {
-                  type: 'image_url',
+                  type: "image_url",
                   image_url: {
                     url: imageDataUrl,
                   },
@@ -142,8 +151,8 @@ export class OpenAIAdapter implements LLMProviderAdapter {
 
       if (!data.choices || !data.choices[0] || !data.choices[0].message) {
         throw new InvalidResponseError(
-          'openai',
-          'No response content in API response',
+          "openai",
+          "No response content in API response",
         );
       }
 
@@ -160,8 +169,8 @@ export class OpenAIAdapter implements LLMProviderAdapter {
         throw error;
       }
       throw new LLMProviderError(
-        'Failed to analyze image',
-        'openai',
+        "Failed to analyze image",
+        "openai",
         undefined,
         error instanceof Error ? error : undefined,
       );
@@ -172,13 +181,13 @@ export class OpenAIAdapter implements LLMProviderAdapter {
     const status = response.status;
 
     if (status === 401) {
-      throw new AuthenticationError('openai');
+      throw new AuthenticationError("openai");
     }
 
     if (status === 429) {
-      const retryAfter = response.headers.get('retry-after');
+      const retryAfter = response.headers.get("retry-after");
       throw new RateLimitError(
-        'openai',
+        "openai",
         retryAfter ? parseInt(retryAfter, 10) : undefined,
       );
     }
@@ -193,6 +202,6 @@ export class OpenAIAdapter implements LLMProviderAdapter {
       // Ignore JSON parse errors
     }
 
-    throw new LLMProviderError(errorMessage, 'openai', status);
+    throw new LLMProviderError(errorMessage, "openai", status);
   }
 }

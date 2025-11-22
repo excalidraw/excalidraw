@@ -1,6 +1,6 @@
 /**
  * MermaidValidationService
- * 
+ *
  * Validates and refines generated mermaid code.
  * Provides syntax checking and auto-correction capabilities.
  */
@@ -9,7 +9,7 @@ export interface ValidationError {
   line: number;
   column: number;
   message: string;
-  severity: 'error' | 'warning';
+  severity: "error" | "warning";
 }
 
 export interface ValidationWarning {
@@ -51,12 +51,12 @@ export class MermaidValidationService {
   async validateSyntax(mermaidCode: string): Promise<ValidationResult> {
     const errors: ValidationError[] = [];
     const warnings: ValidationWarning[] = [];
-    let diagramType = 'unknown';
+    let diagramType = "unknown";
 
     try {
       // Clean the code
       const cleanedCode = this.cleanMermaidCode(mermaidCode);
-      const lines = cleanedCode.split('\n');
+      const lines = cleanedCode.split("\n");
 
       // Detect diagram type
       diagramType = this.detectDiagramType(cleanedCode);
@@ -64,7 +64,7 @@ export class MermaidValidationService {
       // Basic syntax validation
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
-        if (!line || line.startsWith('%%')) {
+        if (!line || line.startsWith("%%")) {
           continue; // Skip empty lines and comments
         }
 
@@ -76,7 +76,7 @@ export class MermaidValidationService {
               line: i + 1,
               column: 0,
               message: `Invalid diagram type: ${line}`,
-              severity: 'error',
+              severity: "error",
             });
           }
         } else {
@@ -85,8 +85,8 @@ export class MermaidValidationService {
             errors.push({
               line: i + 1,
               column: 0,
-              message: 'Unmatched brackets',
-              severity: 'error',
+              message: "Unmatched brackets",
+              severity: "error",
             });
           }
 
@@ -94,7 +94,7 @@ export class MermaidValidationService {
           if (this.hasInvalidArrows(line)) {
             warnings.push({
               line: i + 1,
-              message: 'Potentially invalid arrow syntax',
+              message: "Potentially invalid arrow syntax",
             });
           }
         }
@@ -114,8 +114,8 @@ export class MermaidValidationService {
             line: 0,
             column: 0,
             message:
-              error instanceof Error ? error.message : 'Validation failed',
-            severity: 'error',
+              error instanceof Error ? error.message : "Validation failed",
+            severity: "error",
           },
         ],
         warnings,
@@ -134,21 +134,21 @@ export class MermaidValidationService {
     const suggestions: string[] = [];
 
     for (const error of errors) {
-      if (error.message.includes('Invalid diagram type')) {
+      if (error.message.includes("Invalid diagram type")) {
         suggestions.push(
-          'Try using a valid diagram type: flowchart, sequenceDiagram, classDiagram, stateDiagram, etc.',
+          "Try using a valid diagram type: flowchart, sequenceDiagram, classDiagram, stateDiagram, etc.",
         );
       }
 
-      if (error.message.includes('Unmatched brackets')) {
+      if (error.message.includes("Unmatched brackets")) {
         suggestions.push(
-          'Check that all brackets [], (), {} are properly closed',
+          "Check that all brackets [], (), {} are properly closed",
         );
       }
 
-      if (error.message.includes('arrow')) {
+      if (error.message.includes("arrow")) {
         suggestions.push(
-          'Use valid arrow syntax: -->, --->, -.-> for flowcharts',
+          "Use valid arrow syntax: -->, --->, -.-> for flowcharts",
         );
       }
     }
@@ -168,7 +168,7 @@ export class MermaidValidationService {
     correctedCode = this.cleanMermaidCode(correctedCode);
 
     // Fix common issues
-    const lines = correctedCode.split('\n');
+    const lines = correctedCode.split("\n");
     const correctedLines: string[] = [];
 
     for (let i = 0; i < lines.length; i++) {
@@ -176,38 +176,38 @@ export class MermaidValidationService {
       const originalLine = line;
 
       // Remove markdown code block markers
-      if (line.trim().startsWith('```')) {
+      if (line.trim().startsWith("```")) {
         changes.push({
           line: i + 1,
           original: line,
-          corrected: '',
-          reason: 'Removed markdown code block marker',
+          corrected: "",
+          reason: "Removed markdown code block marker",
         });
         confidence *= 0.95;
         continue;
       }
 
       // Fix common arrow syntax issues
-      if (line.includes('->') && !line.includes('-->')) {
-        line = line.replace(/->/g, '-->');
+      if (line.includes("->") && !line.includes("-->")) {
+        line = line.replace(/->/g, "-->");
         if (line !== originalLine) {
           changes.push({
             line: i + 1,
             original: originalLine,
             corrected: line,
-            reason: 'Fixed arrow syntax',
+            reason: "Fixed arrow syntax",
           });
           confidence *= 0.9;
         }
       }
 
       // Fix spacing issues
-      line = line.replace(/\s+/g, ' ').trim();
+      line = line.replace(/\s+/g, " ").trim();
 
       correctedLines.push(line);
     }
 
-    correctedCode = correctedLines.filter((l) => l.length > 0).join('\n');
+    correctedCode = correctedLines.filter((l) => l.length > 0).join("\n");
 
     return {
       correctedCode,
@@ -224,24 +224,28 @@ export class MermaidValidationService {
     const type = this.detectDiagramType(cleanedCode);
 
     // Count nodes and edges (simplified)
-    const lines = cleanedCode.split('\n');
+    const lines = cleanedCode.split("\n");
     let nodeCount = 0;
     let edgeCount = 0;
     let hasLabels = false;
 
     for (const line of lines) {
       // Count arrows (edges)
-      if (line.includes('-->') || line.includes('---') || line.includes('-.-')) {
+      if (
+        line.includes("-->") ||
+        line.includes("---") ||
+        line.includes("-.-")
+      ) {
         edgeCount++;
       }
 
       // Count nodes (simplified - lines with brackets or parentheses)
-      if (line.includes('[') || line.includes('(') || line.includes('{')) {
+      if (line.includes("[") || line.includes("(") || line.includes("{")) {
         nodeCount++;
       }
 
       // Check for labels
-      if (line.includes('|') && line.includes('|')) {
+      if (line.includes("|") && line.includes("|")) {
         hasLabels = true;
       }
     }
@@ -259,14 +263,14 @@ export class MermaidValidationService {
    */
   private cleanMermaidCode(code: string): string {
     // Remove markdown code blocks
-    let cleaned = code.replace(/```mermaid\n?/g, '').replace(/```\n?/g, '');
+    let cleaned = code.replace(/```mermaid\n?/g, "").replace(/```\n?/g, "");
 
     // Remove extra whitespace
     cleaned = cleaned
-      .split('\n')
+      .split("\n")
       .map((line) => line.trim())
       .filter((line) => line.length > 0)
-      .join('\n');
+      .join("\n");
 
     return cleaned;
   }
@@ -275,31 +279,31 @@ export class MermaidValidationService {
    * Detect diagram type from code
    */
   private detectDiagramType(code: string): string {
-    const firstLine = code.split('\n')[0].trim().toLowerCase();
+    const firstLine = code.split("\n")[0].trim().toLowerCase();
 
-    if (firstLine.startsWith('flowchart') || firstLine.startsWith('graph')) {
-      return 'flowchart';
+    if (firstLine.startsWith("flowchart") || firstLine.startsWith("graph")) {
+      return "flowchart";
     }
-    if (firstLine.startsWith('sequencediagram')) {
-      return 'sequence';
+    if (firstLine.startsWith("sequencediagram")) {
+      return "sequence";
     }
-    if (firstLine.startsWith('classdiagram')) {
-      return 'class';
+    if (firstLine.startsWith("classdiagram")) {
+      return "class";
     }
-    if (firstLine.startsWith('statediagram')) {
-      return 'state';
+    if (firstLine.startsWith("statediagram")) {
+      return "state";
     }
-    if (firstLine.startsWith('erdiagram')) {
-      return 'er';
+    if (firstLine.startsWith("erdiagram")) {
+      return "er";
     }
-    if (firstLine.startsWith('gantt')) {
-      return 'gantt';
+    if (firstLine.startsWith("gantt")) {
+      return "gantt";
     }
-    if (firstLine.startsWith('pie')) {
-      return 'pie';
+    if (firstLine.startsWith("pie")) {
+      return "pie";
     }
 
-    return 'unknown';
+    return "unknown";
   }
 
   /**
@@ -307,16 +311,16 @@ export class MermaidValidationService {
    */
   private isValidDiagramType(line: string): boolean {
     const validTypes = [
-      'flowchart',
-      'graph',
-      'sequencediagram',
-      'classdiagram',
-      'statediagram',
-      'erdiagram',
-      'gantt',
-      'pie',
-      'journey',
-      'gitgraph',
+      "flowchart",
+      "graph",
+      "sequencediagram",
+      "classdiagram",
+      "statediagram",
+      "erdiagram",
+      "gantt",
+      "pie",
+      "journey",
+      "gitgraph",
     ];
 
     const lowerLine = line.toLowerCase();
@@ -327,7 +331,7 @@ export class MermaidValidationService {
    * Check for unmatched brackets
    */
   private hasUnmatchedBrackets(line: string): boolean {
-    const brackets = { '[': ']', '(': ')', '{': '}' };
+    const brackets = { "[": "]", "(": ")", "{": "}" };
     const stack: string[] = [];
 
     for (const char of line) {

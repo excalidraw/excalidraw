@@ -1,6 +1,6 @@
 /**
  * LLMProviderAdapter
- * 
+ *
  * Base interface for LLM provider adapters.
  * Each provider (OpenAI, Gemini, Claude, Ollama) implements this interface.
  */
@@ -9,7 +9,7 @@ import type {
   ProviderCredentials,
   ConnectionTestResult,
   ModelInfo,
-} from '../AIConfigurationService';
+} from "../AIConfigurationService";
 
 export interface AnalysisOptions {
   prompt?: string;
@@ -30,21 +30,21 @@ export interface LLMProviderAdapter {
    * Test connection to the provider with given credentials
    */
   testConnection(
-    credentials: ProviderCredentials['credentials'],
+    credentials: ProviderCredentials["credentials"],
   ): Promise<ConnectionTestResult>;
 
   /**
    * Fetch available models from the provider
    */
   fetchModels(
-    credentials: ProviderCredentials['credentials'],
+    credentials: ProviderCredentials["credentials"],
   ): Promise<ModelInfo[]>;
 
   /**
    * Analyze image and generate mermaid diagram code
    */
   analyzeImage(
-    credentials: ProviderCredentials['credentials'],
+    credentials: ProviderCredentials["credentials"],
     imageDataUrl: string,
     options?: AnalysisOptions,
   ): Promise<AnalysisResult>;
@@ -76,7 +76,7 @@ export class LLMProviderError extends Error {
     public originalError?: Error,
   ) {
     super(message);
-    this.name = 'LLMProviderError';
+    this.name = "LLMProviderError";
   }
 }
 
@@ -86,11 +86,13 @@ export class LLMProviderError extends Error {
 export class RateLimitError extends LLMProviderError {
   constructor(provider: string, retryAfter?: number) {
     super(
-      `Rate limit exceeded for ${provider}${retryAfter ? `. Retry after ${retryAfter}s` : ''}`,
+      `Rate limit exceeded for ${provider}${
+        retryAfter ? `. Retry after ${retryAfter}s` : ""
+      }`,
       provider,
       429,
     );
-    this.name = 'RateLimitError';
+    this.name = "RateLimitError";
   }
 }
 
@@ -100,7 +102,7 @@ export class RateLimitError extends LLMProviderError {
 export class AuthenticationError extends LLMProviderError {
   constructor(provider: string) {
     super(`Authentication failed for ${provider}`, provider, 401);
-    this.name = 'AuthenticationError';
+    this.name = "AuthenticationError";
   }
 }
 
@@ -110,6 +112,6 @@ export class AuthenticationError extends LLMProviderError {
 export class InvalidResponseError extends LLMProviderError {
   constructor(provider: string, message: string) {
     super(`Invalid response from ${provider}: ${message}`, provider);
-    this.name = 'InvalidResponseError';
+    this.name = "InvalidResponseError";
   }
 }

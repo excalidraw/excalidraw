@@ -4,6 +4,7 @@
  */
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import type { AppState } from "../types";
 
 /**
@@ -25,7 +26,9 @@ export const convertMermaidToElements = async (
   } catch (error) {
     console.error("Failed to convert mermaid to excalidraw:", error);
     throw new Error(
-      `Failed to convert diagram: ${error instanceof Error ? error.message : "Unknown error"}`,
+      `Failed to convert diagram: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
     );
   }
 };
@@ -78,13 +81,10 @@ export const insertElementsIntoCanvas = (
   const allElements = [...existingElements, ...positionedElements];
 
   // Select newly inserted elements
-  const selectedElementIds = positionedElements.reduce(
-    (acc, element) => {
-      acc[element.id] = true;
-      return acc;
-    },
-    {} as Record<string, true>,
-  );
+  const selectedElementIds = positionedElements.reduce((acc, element) => {
+    acc[element.id] = true;
+    return acc;
+  }, {} as Record<string, true>);
 
   return {
     elements: allElements,

@@ -89,7 +89,8 @@ export function calculateLayout(graph: MermaidGraph): LayoutNode[] {
 
       level.forEach((nodeId, nodeIndex) => {
         const node = nodes.find((n) => n.id === nodeId)!;
-        const totalWidth = level.length * NODE_WIDTH + (level.length - 1) * HORIZONTAL_SPACING;
+        const totalWidth =
+          level.length * NODE_WIDTH + (level.length - 1) * HORIZONTAL_SPACING;
         const startX = -totalWidth / 2;
         const x = startX + nodeIndex * (NODE_WIDTH + HORIZONTAL_SPACING);
 
@@ -108,11 +109,13 @@ export function calculateLayout(graph: MermaidGraph): LayoutNode[] {
       const x =
         direction === "LR"
           ? levelIndex * (NODE_WIDTH + HORIZONTAL_SPACING)
-          : (levels.length - 1 - levelIndex) * (NODE_WIDTH + HORIZONTAL_SPACING);
+          : (levels.length - 1 - levelIndex) *
+            (NODE_WIDTH + HORIZONTAL_SPACING);
 
       level.forEach((nodeId, nodeIndex) => {
         const node = nodes.find((n) => n.id === nodeId)!;
-        const totalHeight = level.length * NODE_HEIGHT + (level.length - 1) * VERTICAL_SPACING;
+        const totalHeight =
+          level.length * NODE_HEIGHT + (level.length - 1) * VERTICAL_SPACING;
         const startY = -totalHeight / 2;
         const y = startY + nodeIndex * (NODE_HEIGHT + VERTICAL_SPACING);
 

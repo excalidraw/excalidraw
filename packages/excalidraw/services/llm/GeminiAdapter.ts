@@ -1,69 +1,78 @@
 /**
  * GeminiAdapter
- * 
+ *
  * Adapter for Google Gemini Vision API
  */
 
-import type { ProviderCredentials, ConnectionTestResult, ModelInfo } from '../AIConfigurationService';
-import type { AnalysisOptions, AnalysisResult, LLMProviderAdapter } from './LLMProviderAdapter';
 import {
   DEFAULT_MERMAID_PROMPT,
   LLMProviderError,
   RateLimitError,
   AuthenticationError,
   InvalidResponseError,
-} from './LLMProviderAdapter';
+} from "./LLMProviderAdapter";
 
-const GEMINI_API_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta';
+import type {
+  ProviderCredentials,
+  ConnectionTestResult,
+  ModelInfo,
+} from "../AIConfigurationService";
+import type {
+  AnalysisOptions,
+  AnalysisResult,
+  LLMProviderAdapter,
+} from "./LLMProviderAdapter";
+
+const GEMINI_API_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta";
 
 const GEMINI_MODELS: ModelInfo[] = [
   {
-    id: 'gemini-2.5-flash',
-    name: 'Gemini 2.5 Flash',
-    description: 'Balanced price/performance model',
-    capabilities: ['vision', 'code', 'fast'],
+    id: "gemini-2.5-flash",
+    name: "Gemini 2.5 Flash",
+    description: "Balanced price/performance model",
+    capabilities: ["vision", "code", "fast"],
     contextWindow: 1000000,
   },
   {
-    id: 'gemini-2.5-pro',
-    name: 'Gemini 2.5 Pro',
-    description: 'Flagship Pro model with advanced capabilities',
-    capabilities: ['vision', 'code', 'large-context'],
+    id: "gemini-2.5-pro",
+    name: "Gemini 2.5 Pro",
+    description: "Flagship Pro model with advanced capabilities",
+    capabilities: ["vision", "code", "large-context"],
     contextWindow: 2000000,
   },
   {
-    id: 'gemini-2.5-flash-lite',
-    name: 'Gemini 2.5 Flash Lite',
-    description: 'Lower-cost / high throughput version',
-    capabilities: ['vision', 'code', 'fast', 'cost-efficient'],
+    id: "gemini-2.5-flash-lite",
+    name: "Gemini 2.5 Flash Lite",
+    description: "Lower-cost / high throughput version",
+    capabilities: ["vision", "code", "fast", "cost-efficient"],
     contextWindow: 1000000,
   },
   {
-    id: 'gemini-2.0-flash',
-    name: 'Gemini 2.0 Flash',
-    description: 'Previous generation flash model (still available)',
-    capabilities: ['vision', 'code', 'fast'],
+    id: "gemini-2.0-flash",
+    name: "Gemini 2.0 Flash",
+    description: "Previous generation flash model (still available)",
+    capabilities: ["vision", "code", "fast"],
     contextWindow: 1000000,
   },
   {
-    id: 'gemini-2.0-flash-lite',
-    name: 'Gemini 2.0 Flash Lite',
-    description: 'Cost-efficient variant of 2.0 Flash',
-    capabilities: ['vision', 'code', 'fast', 'cost-efficient'],
+    id: "gemini-2.0-flash-lite",
+    name: "Gemini 2.0 Flash Lite",
+    description: "Cost-efficient variant of 2.0 Flash",
+    capabilities: ["vision", "code", "fast", "cost-efficient"],
     contextWindow: 1000000,
   },
 ];
 
 export class GeminiAdapter implements LLMProviderAdapter {
   async testConnection(
-    credentials: ProviderCredentials['credentials'],
+    credentials: ProviderCredentials["credentials"],
   ): Promise<ConnectionTestResult> {
     try {
       // Test with a simple model list request
       const response = await fetch(
         `${GEMINI_API_ENDPOINT}/models?key=${credentials.geminiApiKey}`,
         {
-          method: 'GET',
+          method: "GET",
         },
       );
 
@@ -71,13 +80,13 @@ export class GeminiAdapter implements LLMProviderAdapter {
         if (response.status === 401 || response.status === 403) {
           return {
             success: false,
-            message: 'Invalid API key',
-            error: 'Authentication failed. Please check your API key.',
+            message: "Invalid API key",
+            error: "Authentication failed. Please check your API key.",
           };
         }
         return {
           success: false,
-          message: 'Connection failed',
+          message: "Connection failed",
           error: `HTTP ${response.status}: ${response.statusText}`,
         };
       }
@@ -86,27 +95,27 @@ export class GeminiAdapter implements LLMProviderAdapter {
 
       return {
         success: true,
-        message: 'Connected successfully',
+        message: "Connected successfully",
         availableModels: models,
       };
     } catch (error) {
       return {
         success: false,
-        message: 'Connection failed',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: "Connection failed",
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
 
   async fetchModels(
-    credentials: ProviderCredentials['credentials'],
+    credentials: ProviderCredentials["credentials"],
   ): Promise<ModelInfo[]> {
     // Return predefined Gemini models
     return GEMINI_MODELS;
   }
 
   async analyzeImage(
-    credentials: ProviderCredentials['credentials'],
+    credentials: ProviderCredentials["credentials"],
     imageDataUrl: string,
     options?: AnalysisOptions,
   ): Promise<AnalysisResult> {
@@ -117,15 +126,15 @@ export class GeminiAdapter implements LLMProviderAdapter {
       const temperature = options?.temperature ?? 0.1;
 
       // Extract base64 data from data URL
-      const base64Data = imageDataUrl.split(',')[1];
-      const mimeType = imageDataUrl.split(';')[0].split(':')[1];
+      const base64Data = imageDataUrl.split(",")[1];
+      const mimeType = imageDataUrl.split(";")[0].split(":")[1];
 
       const response = await fetch(
         `${GEMINI_API_ENDPOINT}/models/gemini-2.5-pro:generateContent?key=${credentials.geminiApiKey}`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             contents: [
@@ -161,18 +170,18 @@ export class GeminiAdapter implements LLMProviderAdapter {
         !data.candidates[0].content
       ) {
         throw new InvalidResponseError(
-          'gemini',
-          'No response content in API response',
+          "gemini",
+          "No response content in API response",
         );
       }
 
       const candidate = data.candidates[0];
-      
+
       // Check for MAX_TOKENS finish reason
-      if (candidate.finishReason === 'MAX_TOKENS') {
+      if (candidate.finishReason === "MAX_TOKENS") {
         throw new LLMProviderError(
-          'Response was truncated due to token limit. Try with a smaller image or simpler diagram.',
-          'gemini',
+          "Response was truncated due to token limit. Try with a smaller image or simpler diagram.",
+          "gemini",
           undefined,
         );
       }
@@ -184,8 +193,10 @@ export class GeminiAdapter implements LLMProviderAdapter {
         !candidate.content.parts[0].text
       ) {
         throw new InvalidResponseError(
-          'gemini',
-          `No text in API response. Finish reason: ${candidate.finishReason || 'unknown'}`,
+          "gemini",
+          `No text in API response. Finish reason: ${
+            candidate.finishReason || "unknown"
+          }`,
         );
       }
 
@@ -201,8 +212,8 @@ export class GeminiAdapter implements LLMProviderAdapter {
         throw error;
       }
       throw new LLMProviderError(
-        'Failed to analyze image',
-        'gemini',
+        "Failed to analyze image",
+        "gemini",
         undefined,
         error instanceof Error ? error : undefined,
       );
@@ -213,11 +224,11 @@ export class GeminiAdapter implements LLMProviderAdapter {
     const status = response.status;
 
     if (status === 401 || status === 403) {
-      throw new AuthenticationError('gemini');
+      throw new AuthenticationError("gemini");
     }
 
     if (status === 429) {
-      throw new RateLimitError('gemini');
+      throw new RateLimitError("gemini");
     }
 
     let errorMessage = `HTTP ${status}: ${response.statusText}`;
@@ -230,6 +241,6 @@ export class GeminiAdapter implements LLMProviderAdapter {
       // Ignore JSON parse errors
     }
 
-    throw new LLMProviderError(errorMessage, 'gemini', status);
+    throw new LLMProviderError(errorMessage, "gemini", status);
   }
 }
