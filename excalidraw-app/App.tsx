@@ -1178,33 +1178,27 @@ const ExcalidrawWrapper = () => {
               cleanCode = cleanCode.replace(/```\s*$/m, "");
               cleanCode = cleanCode.trim();
 
-              console.log(
-                "Converting Mermaid to Excalidraw using built-in converter...",
-              );
-              console.log("Original code:", mermaidCode);
-              console.log("Cleaned code:", cleanCode);
-              
               // Use Excalidraw's built-in Mermaid-to-Excalidraw converter!
-              const { parseMermaidToExcalidraw } = await import("@excalidraw/mermaid-to-excalidraw");
-              
+              const { parseMermaidToExcalidraw } = await import(
+                "@excalidraw/mermaid-to-excalidraw"
+              );
+
               // Convert Mermaid to Excalidraw elements using the official converter
-              const { elements, files } = await parseMermaidToExcalidraw(cleanCode);
-              
-              console.log("Conversion successful! Elements:", elements.length);
-              
+              const { elements } = await parseMermaidToExcalidraw(cleanCode);
+
               // Convert to Excalidraw elements with regenerated IDs
-              const { convertToExcalidrawElements } = await import("@excalidraw/excalidraw");
+              const { convertToExcalidrawElements } = await import(
+                "@excalidraw/excalidraw"
+              );
               const newElements = convertToExcalidrawElements(elements, {
                 regenerateIds: true,
               });
-              
+
               // Add elements to canvas
               const existingElements = excalidrawAPI.getSceneElements();
               excalidrawAPI.updateScene({
                 elements: [...existingElements, ...newElements],
               });
-              
-              console.log("Diagram inserted successfully!");
             } catch (error) {
               console.error("Failed to convert Mermaid diagram:", error);
 
