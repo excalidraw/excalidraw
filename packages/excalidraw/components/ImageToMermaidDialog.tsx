@@ -1,16 +1,23 @@
 /**
  * ImageToMermaidDialog
- * 
+ *
  * Main dialog for image-to-diagram conversion workflow.
  */
 
 import React, { useState } from "react";
-import { Dialog } from "./Dialog";
-import { useAtom } from "../../../excalidraw-app/app-jotai";
-import { imageToMermaidDialogOpenAtom, conversionProgressAtom, conversionResultAtom, showConfigPromptAtom, aiConfigDialogOpenAtom } from "../../../excalidraw-app/app-jotai";
+import { useAtom } from "jotai";
+import {
+  imageToMermaidDialogOpenAtom,
+  conversionProgressAtom,
+  conversionResultAtom,
+  showConfigPromptAtom,
+  aiConfigDialogOpenAtom,
+} from "../editor-jotai";
 import { imageProcessingService } from "../services/ImageProcessingService";
 import { conversionOrchestrationService } from "../services/ConversionOrchestrationService";
 import { aiConfigService } from "../services/AIConfigurationService";
+
+import { Dialog } from "./Dialog";
 import "./ImageToMermaidDialog.scss";
 
 export const ImageToMermaidDialog: React.FC<{
@@ -27,31 +34,43 @@ export const ImageToMermaidDialog: React.FC<{
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || files.length === 0) return;
+    if (!files || files.length === 0) {
+      return;
+    }
 
     try {
-      const processed = await imageProcessingService.processUploadedFiles(files);
+      const processed = await imageProcessingService.processUploadedFiles(
+        files,
+      );
       if (processed.length > 0) {
         setImagePreview(processed[0].dataUrl);
         setError(null);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to process image');
+      setError(err instanceof Error ? err.message : "Failed to process image");
     }
   };
 
   const handlePaste = async (e: React.ClipboardEvent) => {
     try {
-      const processed = await imageProcessingService.processClipboardImage(e.clipboardData);
+      const processed = await imageProcessingService.processClipboardImage(
+        e.clipboardData,
+      );
       setImagePreview(processed.dataUrl);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to process clipboard image');
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to process clipboard image",
+      );
     }
   };
 
   const handleConvert = async () => {
-    if (!imagePreview) return;
+    if (!imagePreview) {
+      return;
+    }
 
     // Check if configured
     const isConfigured = await aiConfigService.isConfigured();
@@ -63,7 +82,7 @@ export const ImageToMermaidDialog: React.FC<{
 
     try {
       setError(null);
-      
+
       // Create processed image object
       const response = await fetch(imagePreview);
       const blob = await response.blob();
@@ -73,7 +92,7 @@ export const ImageToMermaidDialog: React.FC<{
         format: blob.type,
         dimensions: { width: 0, height: 0 },
         size: blob.size,
-        metadata: { source: 'upload' as const },
+        metadata: { source: "upload" as const },
       };
 
       const mermaidCode = await conversionOrchestrationService.startConversion(
@@ -85,7 +104,7 @@ export const ImageToMermaidDialog: React.FC<{
 
       setResult(mermaidCode);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Conversion failed');
+      setError(err instanceof Error ? err.message : "Conversion failed");
     }
   };
 
@@ -104,7 +123,9 @@ export const ImageToMermaidDialog: React.FC<{
     setError(null);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <Dialog
@@ -120,16 +141,14 @@ export const ImageToMermaidDialog: React.FC<{
               accept="image/*"
               onChange={handleFileSelect}
               id="image-upload"
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
             />
             <label htmlFor="image-upload" className="upload-label">
               <div className="upload-icon">📷</div>
               <div className="upload-text">
                 <strong>Click to upload</strong> or paste image (Ctrl+V)
               </div>
-              <div className="upload-hint">
-                Supports PNG, JPEG, WebP, GIF
-              </div>
+              <div className="upload-hint">Supports PNG, JPEG, WebP, GIF</div>
             </label>
           </div>
         )}
@@ -140,7 +159,10 @@ export const ImageToMermaidDialog: React.FC<{
             {progress && (
               <div className="progress-overlay">
                 <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${progress.progress}%` }} />
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${progress.progress}%` }}
+                  />
                 </div>
                 <div className="progress-message">{progress.message}</div>
               </div>
@@ -178,12 +200,15 @@ export const ImageToMermaidDialog: React.FC<{
             onClick={handleConvert}
             disabled={!!progress}
           >
-            {progress ? 'Converting...' : 'Convert to Diagram'}
+            {progress ? "Converting..." : "Convert to Diagram"}
           </button>
         )}
         {result && (
           <>
-            <button className="btn btn-secondary" onClick={() => setResult(null)}>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setResult(null)}
+            >
               Try Again
             </button>
             <button className="btn btn-primary" onClick={handleInsert}>

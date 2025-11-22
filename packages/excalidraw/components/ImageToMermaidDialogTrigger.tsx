@@ -8,8 +8,10 @@ import { ImageIcon } from "./icons";
 
 import type { JSX, ReactNode } from "react";
 
-// eslint-disable-next-line no-restricted-imports
-import type { createStore } from "jotai";
+interface JotaiStore {
+  set: (atom: any, value: any) => void;
+  get: (atom: any) => any;
+}
 
 export const ImageToMermaidDialogTrigger = ({
   children,
@@ -18,7 +20,7 @@ export const ImageToMermaidDialogTrigger = ({
 }: {
   children?: ReactNode;
   icon?: JSX.Element;
-  jotaiStore?: ReturnType<typeof createStore>;
+  jotaiStore?: JotaiStore;
 }) => {
   const { ImageToMermaidDialogTriggerTunnel } = useTunnels();
 
