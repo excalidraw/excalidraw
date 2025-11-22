@@ -3,6 +3,7 @@ import {
   DEFAULT_EXPORT_PADDING,
   EXPORT_SCALES,
   THEME,
+  getDateTime,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -158,21 +159,23 @@ export const actionSaveToActiveFile = register({
   },
   perform: async (elements, appState, value, app) => {
     const fileHandleExists = !!appState.fileHandle;
-
+    const newName = `${t("labels.untitled")}-${getDateTime()}`;
+    const newAppState = { ...appState, name: newName };
     try {
       const { fileHandle } = isImageFileHandle(appState.fileHandle)
         ? await resaveAsImageWithScene(
             elements,
-            appState,
+            newAppState,
             app.files,
-            app.getName(),
+            newName,
           )
-        : await saveAsJSON(elements, appState, app.files, app.getName());
+        : await saveAsJSON(elements, newAppState, app.files, newName);
 
       return {
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
-          ...appState,
+          ...newAppState,
+          name: newName,
           fileHandle,
           toast: fileHandleExists
             ? {
@@ -207,19 +210,23 @@ export const actionSaveFileToDisk = register({
   trackEvent: { category: "export" },
   perform: async (elements, appState, value, app) => {
     try {
+      const newName = `${t("labels.untitled")}-${getDateTime()}`;
+      const newAppState = {
+        ...appState,
+        name: newName,
+        fileHandle: null,
+      };
+
       const { fileHandle } = await saveAsJSON(
         elements,
-        {
-          ...appState,
-          fileHandle: null,
-        },
+        newAppState,
         app.files,
-        app.getName(),
+        newName,
       );
       return {
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
-          ...appState,
+          ...newAppState,
           openDialog: null,
           fileHandle,
           toast: { message: t("toast.fileSaved") },
