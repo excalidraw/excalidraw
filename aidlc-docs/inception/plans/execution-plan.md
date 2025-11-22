@@ -113,7 +113,9 @@ flowchart TD
     - ImageProcessingService, MermaidValidationService, ConversionOrchestrationService
   - **Phase 2: State Management** ✅ COMPLETED
     - Jotai atoms for AI configuration and conversion state
-  - **Phase 3: UI Components** 🔄 IN PROGRESS
+  - **Phase 3: UI Components** ✅ COMPLETED (Core dialogs)
+    - AIConfigurationDialog with all 4 providers
+    - ImageToMermaidDialog with upload/paste/convert workflow
   - **Phase 4: Actions & Integration** ⏳ PENDING
   - **Phase 5: Mermaid Integration** ⏳ PENDING
   - **Phase 6: Error Handling & Polish** ⏳ PENDING
