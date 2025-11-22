@@ -19,9 +19,7 @@ export const convertMermaidToElements = async (
     );
 
     // Parse mermaid code
-    const { elements } = await parseMermaidToExcalidraw(mermaidCode, {
-      fontSize: 16,
-    });
+    const { elements } = await parseMermaidToExcalidraw(mermaidCode);
 
     return elements as ExcalidrawElement[];
   } catch (error) {

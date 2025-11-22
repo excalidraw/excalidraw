@@ -7,7 +7,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Dialog } from "./Dialog";
-import { TextField } from "./TextField";
 import { useAtom } from "../../../excalidraw-app/app-jotai";
 import { aiConfigDialogOpenAtom, aiConfiguredProvidersAtom, aiSelectedProviderAtom, aiSelectedModelAtom, aiAvailableModelsAtom } from "../../../excalidraw-app/app-jotai";
 import { aiConfigService } from "../services/AIConfigurationService";
@@ -226,11 +225,12 @@ export const AIConfigurationDialog: React.FC = () => {
           <>
             <div className="form-group">
               <label>OpenAI API Key</label>
-              <TextField
+              <input
                 type="password"
                 value={data.apiKey || ''}
-                onChange={(value) => handleInputChange(provider, 'apiKey', value)}
+                onChange={(e) => handleInputChange(provider, 'apiKey', e.target.value)}
                 placeholder="sk-..."
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-gray-30)', borderRadius: '4px' }}
               />
               <small>Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">OpenAI Platform</a></small>
             </div>
@@ -241,11 +241,12 @@ export const AIConfigurationDialog: React.FC = () => {
           <>
             <div className="form-group">
               <label>Gemini API Key</label>
-              <TextField
+              <input
                 type="password"
                 value={data.geminiApiKey || ''}
-                onChange={(value) => handleInputChange(provider, 'geminiApiKey', value)}
+                onChange={(e) => handleInputChange(provider, 'geminiApiKey', e.target.value)}
                 placeholder="AIza..."
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-gray-30)', borderRadius: '4px' }}
               />
               <small>Get your API key from <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a></small>
             </div>
@@ -256,20 +257,22 @@ export const AIConfigurationDialog: React.FC = () => {
           <>
             <div className="form-group">
               <label>AWS Client ID (Access Key)</label>
-              <TextField
+              <input
                 type="text"
                 value={data.awsClientId || ''}
-                onChange={(value) => handleInputChange(provider, 'awsClientId', value)}
+                onChange={(e) => handleInputChange(provider, 'awsClientId', e.target.value)}
                 placeholder="AKIA..."
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-gray-30)', borderRadius: '4px' }}
               />
             </div>
             <div className="form-group">
               <label>AWS Client Secret (Secret Key)</label>
-              <TextField
+              <input
                 type="password"
                 value={data.awsClientSecret || ''}
-                onChange={(value) => handleInputChange(provider, 'awsClientSecret', value)}
+                onChange={(e) => handleInputChange(provider, 'awsClientSecret', e.target.value)}
                 placeholder="..."
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-gray-30)', borderRadius: '4px' }}
               />
             </div>
             <div className="form-group">
@@ -293,11 +296,12 @@ export const AIConfigurationDialog: React.FC = () => {
           <>
             <div className="form-group">
               <label>Ollama Endpoint</label>
-              <TextField
+              <input
                 type="text"
                 value={data.ollamaEndpoint || ''}
-                onChange={(value) => handleInputChange(provider, 'ollamaEndpoint', value)}
+                onChange={(e) => handleInputChange(provider, 'ollamaEndpoint', e.target.value)}
                 placeholder="http://localhost:11434"
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid var(--color-gray-30)', borderRadius: '4px' }}
               />
               <small>Make sure Ollama is running locally with a vision model installed (e.g., llava)</small>
             </div>

@@ -66,4 +66,4 @@ export {
   conversionErrorAtom,
   processingImageAtom,
   showConfigPromptAtom,
-} from "../excalidraw-app/app-jotai";
+} from "../../excalidraw-app/app-jotai";

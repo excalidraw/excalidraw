@@ -13,7 +13,7 @@ import { aiConfigDialogOpenAtom, imageToMermaidDialogOpenAtom, appJotaiStore } f
 export const actionConfigureAI = register({
   name: "configureAI",
   label: "Configure AI",
-  trackEvent: { category: "ai", action: "configure" },
+  trackEvent: { category: "menu", action: "configure" },
   perform: (_elements, appState) => {
     // Open AI configuration dialog
     appJotaiStore.set(aiConfigDialogOpenAtom, true);
@@ -33,7 +33,7 @@ export const actionConfigureAI = register({
 export const actionImportImage = register({
   name: "importImage",
   label: "Import Image to Diagram",
-  trackEvent: { category: "ai", action: "import-image" },
+  trackEvent: { category: "menu", action: "import-image" },
   perform: (_elements, appState) => {
     // Open image import dialog
     appJotaiStore.set(imageToMermaidDialogOpenAtom, true);

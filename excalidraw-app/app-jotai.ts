@@ -37,7 +37,11 @@ export const useAtomWithInitialValue = <
 };
 
 // AI Configuration Atoms
-import type { LLMProvider, ModelInfo, ConfigurationStatus } from "../packages/excalidraw/services/AIConfigurationService";
+import type {
+  LLMProvider,
+  ModelInfo,
+  ConfigurationStatus,
+} from "../packages/excalidraw/services/AIConfigurationService";
 import type { ConversionStatus } from "../packages/excalidraw/services/ConversionOrchestrationService";
 
 /**

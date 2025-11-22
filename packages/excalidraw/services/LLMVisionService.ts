@@ -28,12 +28,11 @@ export class LLMVisionService {
   private adapters: Map<LLMProvider, LLMProviderAdapter>;
 
   constructor() {
-    this.adapters = new Map([
-      ['openai', new OpenAIAdapter()],
-      ['gemini', new GeminiAdapter()],
-      ['claude', new ClaudeAdapter()],
-      ['ollama', new OllamaAdapter()],
-    ]);
+    this.adapters = new Map<LLMProvider, LLMProviderAdapter>();
+    this.adapters.set('openai', new OpenAIAdapter());
+    this.adapters.set('gemini', new GeminiAdapter());
+    this.adapters.set('claude', new ClaudeAdapter());
+    this.adapters.set('ollama', new OllamaAdapter());
   }
 
   /**

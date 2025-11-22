@@ -242,18 +242,11 @@ export class ConversionOrchestrationService {
     image: ProcessedImage,
     options?: RetryOptions,
   ): Promise<string> {
-    // Get previous status
-    const previousStatus = this.activeSessions.get(sessionId);
-
     // Start new conversion with refined options
     const conversionOptions: Partial<ConversionOptions> = {
       maxRetries: 3,
       validationLevel: 'lenient',
     };
-
-    if (previousStatus?.progressCallback) {
-      conversionOptions.progressCallback = previousStatus.progressCallback;
-    }
 
     return this.startConversion(image, conversionOptions);
   }
