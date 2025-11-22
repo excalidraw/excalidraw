@@ -172,9 +172,10 @@ export const AIConfigurationDialog: React.FC = () => {
       if (modelId) {
         await aiConfigService.setSelectedModel(provider, modelId);
         setSelectedProvider(provider);
-        setSelectedModel(modelId);
-
+        
         const models = testResults[provider].models || [];
+        const selectedModelInfo = models.find(m => m.id === modelId) || null;
+        setSelectedModel(selectedModelInfo);
         setAvailableModels(models);
       }
 
