@@ -1,0 +1,221 @@
+.ai-configuration-dialog {
+  .ai-config-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--color-gray-30);
+
+    .tab {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-gray-60);
+      transition: all 0.2s;
+
+      &:hover {
+        color: var(--color-primary);
+        background: var(--color-gray-10);
+      }
+
+      &.active {
+        color: var(--color-primary);
+        border-bottom-color: var(--color-primary);
+      }
+    }
+  }
+
+  .ai-config-content {
+    min-height: 300px;
+    padding: 20px 0;
+  }
+
+  .ai-config-form {
+    .form-group {
+      margin-bottom: 20px;
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--color-gray-80);
+      }
+
+      input,
+      .form-select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--color-gray-30);
+        border-radius: 4px;
+        font-size: 14px;
+        background: var(--color-surface-primary);
+        color: var(--color-text-primary);
+
+        &:focus {
+          outline: none;
+          border-color: var(--color-primary);
+          box-shadow: 0 0 0 2px var(--color-primary-light);
+        }
+      }
+
+      small {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--color-gray-60);
+
+        a {
+          color: var(--color-primary);
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &.btn-primary {
+          background: var(--color-primary);
+          color: white;
+
+          &:hover:not(:disabled) {
+            background: var(--color-primary-dark);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+
+        &.btn-danger {
+          background: var(--color-danger);
+          color: white;
+
+          &:hover {
+            background: var(--color-danger-dark);
+          }
+        }
+      }
+    }
+
+    .test-result {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      margin-top: 16px;
+      border-radius: 4px;
+      font-size: 14px;
+
+      .icon {
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      &.success {
+        background: var(--color-success-light);
+        color: var(--color-success-dark);
+        border: 1px solid var(--color-success);
+      }
+
+      &.error {
+        background: var(--color-danger-light);
+        color: var(--color-danger-dark);
+        border: 1px solid var(--color-danger);
+      }
+    }
+
+    .model-selection {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--color-gray-20);
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--color-gray-80);
+      }
+
+      .form-select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--color-gray-30);
+        border-radius: 4px;
+        font-size: 14px;
+        background: var(--color-surface-primary);
+        color: var(--color-text-primary);
+        cursor: pointer;
+
+        &:focus {
+          outline: none;
+          border-color: var(--color-primary);
+          box-shadow: 0 0 0 2px var(--color-primary-light);
+        }
+      }
+    }
+  }
+
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-gray-20);
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.btn-secondary {
+        background: var(--color-gray-20);
+        color: var(--color-gray-80);
+
+        &:hover {
+          background: var(--color-gray-30);
+        }
+      }
+
+      &.btn-primary {
+        background: var(--color-primary);
+        color: white;
+
+        &:hover:not(:disabled) {
+          background: var(--color-primary-dark);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
