@@ -2,6 +2,7 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
+  DotsIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
@@ -12,6 +13,10 @@ import type { Theme } from "@excalidraw/element/types";
 
 import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
+import {
+  aiConfigDialogOpenAtom,
+  appJotaiStore,
+} from "../app-jotai";
 
 import { saveDebugState } from "./DebugCanvas";
 
@@ -39,6 +44,15 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
+      <MainMenu.Separator />
+      <MainMenu.Item
+        icon={DotsIcon}
+        onClick={() => {
+          appJotaiStore.set(aiConfigDialogOpenAtom, true);
+        }}
+      >
+        Configure AI
+      </MainMenu.Item>
       <MainMenu.Separator />
       <MainMenu.ItemLink
         icon={ExcalLogo}
