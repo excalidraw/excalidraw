@@ -107,7 +107,7 @@ flowchart TD
   - **Rationale**: No new infrastructure needed, uses existing browser APIs and external LLM services
 - [x] Code Planning (COMPLETED) - Depth: Standard
   - **Rationale**: Implementation approach defined with 34 steps across 8 phases
-- [ ] Code Generation (IN PROGRESS) - Depth: Standard
+- [x] Code Generation (COMPLETED) - Depth: Standard
   - **Phase 1: Core Services** ✅ COMPLETED
     - AIConfigurationService, all 4 LLM adapters, LLMVisionService
     - ImageProcessingService, MermaidValidationService, ConversionOrchestrationService
@@ -116,11 +116,25 @@ flowchart TD
   - **Phase 3: UI Components** ✅ COMPLETED (Core dialogs)
     - AIConfigurationDialog with all 4 providers
     - ImageToMermaidDialog with upload/paste/convert workflow
-  - **Phase 4: Actions & Integration** ⏳ PENDING
-  - **Phase 5: Mermaid Integration** ⏳ PENDING
-  - **Phase 6: Error Handling & Polish** ⏳ PENDING
-  - **Phase 7: Documentation** ⏳ PENDING
-  - **Phase 8: Testing** ⏳ PENDING
+  - **Phase 4: Actions & Integration** ✅ COMPLETED
+    - AI actions (actionConfigureAI, actionImportImage)
+    - Toolbar buttons (AIConfigButton, ImageImportButton)
+    - Integration component (AIFeatureIntegration)
+  - **Phase 5: Mermaid Integration** ✅ COMPLETED
+    - Mermaid-to-Excalidraw conversion utility
+    - Element insertion with positioning
+  - **Phase 6: Error Handling & Polish** ✅ COMPLETED
+    - Error boundaries in dialogs
+    - Loading states and progress tracking
+    - User feedback messages
+  - **Phase 7: Documentation** ✅ COMPLETED
+    - Comprehensive integration guide (AI_FEATURES_README.md)
+    - Implementation summary
+    - JSDoc comments in all services
+  - **Phase 8: Testing** ⏳ READY FOR MANUAL TESTING
+    - Unit tests: To be added
+    - Integration tests: To be added
+    - Manual testing: Ready to begin
 - [ ] Build and Test - PENDING
   - **Rationale**: Build, test, and verification needed after code generation
 
