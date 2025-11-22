@@ -143,7 +143,7 @@
     },
     "polygon": {
       "breakPolygon": "",
-      "convertToPolygon": ""
+      "convertToPolygon": "Converti in poligono"
     },
     "elementLock": {
       "lock": "Blocca",
@@ -171,7 +171,7 @@
     "linkToElement": "Link all'oggetto",
     "wrapSelectionInFrame": "Avvolgi la selezione nella cornice",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "Cambia forma"
   },
   "elementLink": {
     "title": "Link all'oggetto",
@@ -185,8 +185,8 @@
     "search": {
       "inputPlaceholder": "",
       "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "noResults": "Nessun articolo corrispondente trovato...",
+      "clearSearch": "Pulisci ricerca"
     }
   },
   "search": {
@@ -196,7 +196,7 @@
     "multipleResults": "risultati",
     "placeholder": "Trova testo sulla tela...",
     "frames": "",
-    "texts": ""
+    "texts": "Testi"
   },
   "buttons": {
     "clearReset": "Svuota la tela",
@@ -234,7 +234,7 @@
     "clear": "Cancella",
     "remove": "Rimuovi",
     "embed": "Attiva/disattiva incorporamento",
-    "publishLibrary": "",
+    "publishLibrary": "Rinomina o pubblica",
     "submit": "Invia",
     "confirm": "Conferma",
     "embeddableInteractionButton": "Clicca per interagire"
@@ -568,7 +568,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Colore",
     "mostUsedCustomColors": "Colori personalizzati più utilizzati",
     "colors": "Colori",
     "shades": "Sfumature",
@@ -650,15 +650,15 @@
     "shortcutHint": "Per i comandi della tavolozza, usa {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
+    "ctrl": "Ctrl",
+    "option": "Opzione",
+    "cmd": "Cmd",
     "alt": "",
     "escape": "",
     "enter": "",
     "shift": "",
     "spacebar": "",
-    "delete": "",
+    "delete": "Elimina",
     "mmb": ""
   }
 }
