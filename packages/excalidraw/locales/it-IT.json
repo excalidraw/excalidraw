@@ -338,7 +338,7 @@
   },
   "hints": {
     "dismissSearch": "",
-    "canvasPanning": "",
+    "canvasPanning": "Per spostare la tela, tieni premuto {{shortcut_1}} o {{shortcut_2}} durante il trascinamento, oppure usa lo strumento della mano",
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "arrowTool": "",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
@@ -653,11 +653,11 @@
     "ctrl": "Ctrl",
     "option": "Opzione",
     "cmd": "Cmd",
-    "alt": "",
-    "escape": "",
+    "alt": "Alt",
+    "escape": "Esc",
     "enter": "",
-    "shift": "",
-    "spacebar": "",
+    "shift": "Shift",
+    "spacebar": "Spazio",
     "delete": "Elimina",
     "mmb": ""
   }
