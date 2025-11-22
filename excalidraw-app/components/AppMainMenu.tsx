@@ -13,10 +13,7 @@ import type { Theme } from "@excalidraw/element/types";
 
 import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
-import {
-  aiConfigDialogOpenAtom,
-  appJotaiStore,
-} from "../app-jotai";
+import { aiConfigDialogOpenAtom, appJotaiStore } from "../app-jotai";
 
 import { saveDebugState } from "./DebugCanvas";
 

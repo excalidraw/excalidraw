@@ -1,11 +1,15 @@
 import { trackEvent } from "../analytics";
 import { useTunnels } from "../context/tunnels";
+
+import { imageToMermaidDialogOpenAtom } from "../editor-jotai";
+
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { ImageIcon } from "./icons";
-import { imageToMermaidDialogOpenAtom } from "../editor-jotai";
-import type { Store } from "jotai";
 
 import type { JSX, ReactNode } from "react";
+
+// eslint-disable-next-line no-restricted-imports
+import type { createStore } from "jotai";
 
 export const ImageToMermaidDialogTrigger = ({
   children,
@@ -14,7 +18,7 @@ export const ImageToMermaidDialogTrigger = ({
 }: {
   children?: ReactNode;
   icon?: JSX.Element;
-  jotaiStore?: Store;
+  jotaiStore?: ReturnType<typeof createStore>;
 }) => {
   const { ImageToMermaidDialogTriggerTunnel } = useTunnels();
 
