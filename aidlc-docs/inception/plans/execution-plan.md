@@ -92,25 +92,35 @@ flowchart TD
 - [x] Reverse Engineering (COMPLETED) 
 - [x] Requirements Analysis (COMPLETED) - Depth: Standard
 - [x] User Stories (SKIPPED) - Single feature addition, clear requirements
-- [x] Workflow Planning (IN PROGRESS)
-- [ ] Application Design - EXECUTE - Depth: Standard
-  - **Rationale**: Need to design component architecture, UI integration, and LLM service abstraction
+- [x] Workflow Planning (COMPLETED)
+- [x] Application Design (COMPLETED) - Depth: Standard
+  - **Rationale**: Component architecture, UI integration, and LLM service abstraction designed
 
 ### 🟢 CONSTRUCTION PHASE
-- [ ] Functional Design - SKIP
-  - **Rationale**: Application Design will cover component design sufficiently
-- [ ] NFR Requirements Assessment - SKIP
+- [x] Functional Design - SKIP
+  - **Rationale**: Application Design covered component design sufficiently
+- [x] NFR Requirements Assessment - SKIP
   - **Rationale**: NFR requirements already captured in requirements document
-- [ ] NFR Design - SKIP
+- [x] NFR Design - SKIP
   - **Rationale**: Performance and security patterns are straightforward for this feature
-- [ ] Infrastructure Design - SKIP
+- [x] Infrastructure Design - SKIP
   - **Rationale**: No new infrastructure needed, uses existing browser APIs and external LLM services
-- [ ] Code Planning - EXECUTE (ALWAYS) - Depth: Standard
-  - **Rationale**: Implementation approach needed for complex feature with multiple integration points
-- [ ] Code Generation - EXECUTE (ALWAYS) - Depth: Standard
-  - **Rationale**: Code implementation needed for new feature
-- [ ] Build and Test - EXECUTE (ALWAYS)
-  - **Rationale**: Build, test, and verification needed
+- [x] Code Planning (COMPLETED) - Depth: Standard
+  - **Rationale**: Implementation approach defined with 34 steps across 8 phases
+- [ ] Code Generation (IN PROGRESS) - Depth: Standard
+  - **Phase 1: Core Services** ✅ COMPLETED
+    - AIConfigurationService, all 4 LLM adapters, LLMVisionService
+    - ImageProcessingService, MermaidValidationService, ConversionOrchestrationService
+  - **Phase 2: State Management** ✅ COMPLETED
+    - Jotai atoms for AI configuration and conversion state
+  - **Phase 3: UI Components** 🔄 IN PROGRESS
+  - **Phase 4: Actions & Integration** ⏳ PENDING
+  - **Phase 5: Mermaid Integration** ⏳ PENDING
+  - **Phase 6: Error Handling & Polish** ⏳ PENDING
+  - **Phase 7: Documentation** ⏳ PENDING
+  - **Phase 8: Testing** ⏳ PENDING
+- [ ] Build and Test - PENDING
+  - **Rationale**: Build, test, and verification needed after code generation
 
 ### 🟡 OPERATIONS PHASE
 - [ ] Operations - PLACEHOLDER
