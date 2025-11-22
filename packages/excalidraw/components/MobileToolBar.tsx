@@ -99,6 +99,8 @@ export const MobileToolBar = ({
   const activeTool = app.state.activeTool;
   const [isOtherShapesMenuOpen, setIsOtherShapesMenuOpen] = useState(false);
   const [isImageMenuOpen, setIsImageMenuOpen] = useState(false); //zsviczian
+  const [isImageMenuInOtherShapes, setIsImageMenuInOtherShapes] =
+    useState(false); //zsviczian
   const [lastActiveGenericShape, setLastActiveGenericShape] = useState<
     "rectangle" | "diamond" | "ellipse"
   >("rectangle");
@@ -195,6 +197,40 @@ export const MobileToolBar = ({
       : extraToolsIcon
     : extraToolsIcon;
 
+  /*zsviczian - shoImageToolMenu start*/
+  const renderImageToolMenuItems = () => (
+    <>
+      <DropdownMenu.Item
+        onSelect={() => app.setActiveTool({ type: "image" })}
+        icon={ImageIcon}
+        data-testid="toolbar-image-import"
+      >
+        {t2("COMP_IMG_FROM_SYSTEM")}
+      </DropdownMenu.Item>
+      <DropdownMenu.Item
+        onSelect={() => runAction("anyFile")}
+        icon={InsertAnyFileIcon}
+        data-testid="toolbar-any-file"
+      >
+        {t2("COMP_IMG_ANY_FILE")}
+      </DropdownMenu.Item>
+      <DropdownMenu.Item
+        onSelect={() => runAction("card")}
+        icon={Card}
+        data-testid="toolbar-card"
+      >
+        {t2("INSERT_CARD")}
+      </DropdownMenu.Item>
+      <DropdownMenu.Item
+        onSelect={() => runAction("LaTeX")}
+        icon={LaTeXIcon}
+        data-testid="toolbar-latex"
+      >
+        {t2("COMP_IMG_LaTeX")}
+      </DropdownMenu.Item>
+    </>
+  );
+
   const showImageToolMenu = () => {
     if (!showImageToolOutside) {
       return null;
@@ -219,38 +255,50 @@ export const MobileToolBar = ({
           onSelect={() => setIsImageMenuOpen(false)}
           className="App-toolbar__extra-tools-dropdown"
         >
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "image" })}
-            icon={ImageIcon}
-            data-testid="toolbar-image-import"
-          >
-            {t2("COMP_IMG_FROM_SYSTEM")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => runAction("anyFile")}
-            icon={InsertAnyFileIcon}
-            data-testid="toolbar-any-file"
-          >
-            {t2("COMP_IMG_ANY_FILE")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => runAction("card")}
-            icon={Card}
-            data-testid="toolbar-card"
-          >
-            {t2("INSERT_CARD")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => runAction("LaTeX")}
-            icon={LaTeXIcon}
-            data-testid="toolbar-latex"
-          >
-            {t2("COMP_IMG_LaTeX")}
-          </DropdownMenu.Item>
+          {renderImageToolMenuItems()}
         </DropdownMenu.Content>
       </DropdownMenu>
     );
   };
+
+  const showImageToolMenuInOtherShapes = () => {
+    if (showImageToolOutside || !isImageMenuInOtherShapes) {
+      return null;
+    }
+
+    return (
+      <>
+        <DropdownMenu.Item
+          onSelect={(event) => {
+            event.preventDefault();
+            setIsImageMenuInOtherShapes(false);
+          }}
+          icon={extraToolsIcon}
+        >
+          {t("toolBar.extraTools")}
+        </DropdownMenu.Item>
+        {renderImageToolMenuItems()}
+      </>
+    );
+  };
+
+  const handleOtherShapesClose = () => {
+    setIsOtherShapesMenuOpen(false);
+    setIsImageMenuInOtherShapes(false);
+  };
+
+  const handleOtherShapesSelect = (event?: any) => {
+    if (
+      event?.defaultPrevented ||
+      event?.detail?.originalEvent?.defaultPrevented
+    ) {
+      return;
+    }
+    handleOtherShapesClose();
+  };
+
+  const imageMenuInsideOtherShapes = showImageToolMenuInOtherShapes();
+  /*zsviczian - shoImageToolMenu end*/
 
   // zsviczian: added excalidraw- prefix due to Obsidian style conflict
   return (
@@ -464,81 +512,89 @@ export const MobileToolBar = ({
           {extraIcon}
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
-          onClickOutside={() => setIsOtherShapesMenuOpen(false)}
-          onSelect={() => setIsOtherShapesMenuOpen(false)}
+          onClickOutside={handleOtherShapesClose /*zsviczian*/}
+          onSelect={handleOtherShapesSelect /*zsviczian*/}
           className="App-toolbar__extra-tools-dropdown"
         >
-          {!showTextToolOutside && (
-            <DropdownMenu.Item
-              onSelect={() => app.setActiveTool({ type: "text" })}
-              icon={TextIcon}
-              shortcut={KEYS.T.toLocaleUpperCase()}
-              data-testid="toolbar-text"
-              selected={activeTool.type === "text"}
-            >
-              {t("toolBar.text")}
-            </DropdownMenu.Item>
-          )}
-
-          {!showImageToolOutside && (
-            <DropdownMenu.Item
-              onSelect={() => app.setActiveTool({ type: "image" })}
-              icon={ImageIcon}
-              data-testid="toolbar-image"
-              selected={activeTool.type === "image"}
-            >
-              {t("toolBar.image")}
-            </DropdownMenu.Item>
-          )}
-          {!showFrameToolOutside && (
-            <DropdownMenu.Item
-              onSelect={() => app.setActiveTool({ type: "frame" })}
-              icon={frameToolIcon}
-              shortcut={KEYS.F.toLocaleUpperCase()}
-              data-testid="toolbar-frame"
-              selected={frameToolSelected}
-            >
-              {t("toolBar.frame")}
-            </DropdownMenu.Item>
-          )}
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "embeddable" })}
-            icon={EmbedIcon}
-            data-testid="toolbar-embeddable"
-            selected={embeddableToolSelected}
-          >
-            {t("toolBar.embeddable")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "laser" })}
-            icon={laserPointerToolIcon}
-            data-testid="toolbar-laser"
-            selected={laserToolSelected}
-            shortcut={KEYS.K.toLocaleUpperCase()}
-          >
-            {t("toolBar.laser")}
-          </DropdownMenu.Item>
-          <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
-            Generate
-          </div>
-          {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
-          <DropdownMenu.Item
-            onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
-            icon={mermaidLogoIcon}
-            data-testid="toolbar-embeddable"
-          >
-            {t("toolBar.mermaidToExcalidraw")}
-          </DropdownMenu.Item>
-          {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
+          {imageMenuInsideOtherShapes ?? ( //zsviczian
             <>
+              {!showTextToolOutside && (
+                <DropdownMenu.Item
+                  onSelect={() => app.setActiveTool({ type: "text" })}
+                  icon={TextIcon}
+                  shortcut={KEYS.T.toLocaleUpperCase()}
+                  data-testid="toolbar-text"
+                  selected={activeTool.type === "text"}
+                >
+                  {t("toolBar.text")}
+                </DropdownMenu.Item>
+              )}
+
+              {!showImageToolOutside && (
+                <DropdownMenu.Item
+                  onSelect={(event) => {
+                    //zsviczian replaced app.setActiveTool({ type: "image" })
+                    event.preventDefault();
+                    setIsImageMenuInOtherShapes(true);
+                  }}
+                  icon={ImageIcon}
+                  data-testid="toolbar-image"
+                  selected={activeTool.type === "image"}
+                >
+                  {t("toolBar.image")}
+                </DropdownMenu.Item>
+              )}
+              {!showFrameToolOutside && (
+                <DropdownMenu.Item
+                  onSelect={() => app.setActiveTool({ type: "frame" })}
+                  icon={frameToolIcon}
+                  shortcut={KEYS.F.toLocaleUpperCase()}
+                  data-testid="toolbar-frame"
+                  selected={frameToolSelected}
+                >
+                  {t("toolBar.frame")}
+                </DropdownMenu.Item>
+              )}
               <DropdownMenu.Item
-                onSelect={() => app.onMagicframeToolSelect()}
-                icon={MagicIcon}
-                data-testid="toolbar-magicframe"
+                onSelect={() => app.setActiveTool({ type: "embeddable" })}
+                icon={EmbedIcon}
+                data-testid="toolbar-embeddable"
+                selected={embeddableToolSelected}
               >
-                {t("toolBar.magicframe")}
-                <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
+                {t("toolBar.embeddable")}
               </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onSelect={() => app.setActiveTool({ type: "laser" })}
+                icon={laserPointerToolIcon}
+                data-testid="toolbar-laser"
+                selected={laserToolSelected}
+                shortcut={KEYS.K.toLocaleUpperCase()}
+              >
+                {t("toolBar.laser")}
+              </DropdownMenu.Item>
+              <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
+                Generate
+              </div>
+              {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
+              <DropdownMenu.Item
+                onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
+                icon={mermaidLogoIcon}
+                data-testid="toolbar-embeddable"
+              >
+                {t("toolBar.mermaidToExcalidraw")}
+              </DropdownMenu.Item>
+              {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
+                <>
+                  <DropdownMenu.Item
+                    onSelect={() => app.onMagicframeToolSelect()}
+                    icon={MagicIcon}
+                    data-testid="toolbar-magicframe"
+                  >
+                    {t("toolBar.magicframe")}
+                    <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
+                  </DropdownMenu.Item>
+                </>
+              )}
             </>
           )}
         </DropdownMenu.Content>
