@@ -1575,7 +1575,8 @@ class App extends React.Component<AppProps, AppState> {
 
     return (
       <div
-        className={clsx("excalidraw excalidraw-container", {
+        translate="no"
+        className={clsx("excalidraw excalidraw-container notranslate", {
           "excalidraw--view-mode":
             this.state.viewModeEnabled ||
             this.state.openDialog?.name === "elementLinkSelector",
