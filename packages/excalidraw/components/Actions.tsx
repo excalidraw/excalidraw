@@ -1076,7 +1076,7 @@ export const ShapesSwitcher = ({
 
   const embeddableToolSelected = activeTool.type === "embeddable";
 
-  const { TTDDialogTriggerTunnel } = useTunnels();
+  const { TTDDialogTriggerTunnel, ImageToMermaidDialogTriggerTunnel } = useTunnels();
 
   return (
     <>
@@ -1258,6 +1258,7 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.mermaidToExcalidraw")}
           </DropdownMenu.Item>
+          {app.props.aiEnabled !== false && <ImageToMermaidDialogTriggerTunnel.Out />}
           {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
             <DropdownMenu.Item
               onSelect={() => app.onMagicframeToolSelect()}
