@@ -2,9 +2,9 @@
 
 ## Build System
 
-**Primary**: Yarn workspaces monorepo with custom build scripts
-**Package Manager**: Yarn 1.22.22 (specified in packageManager field)
-**Node Version**: 18.0.0 - 22.x.x
+- **Primary**: Yarn workspaces monorepo with custom build scripts
+- **Package Manager**: Yarn 1.22.22 (specified in packageManager field)
+- **Node Version**: 18.0.0 - 22.x.x
 
 ## Core Technologies
 

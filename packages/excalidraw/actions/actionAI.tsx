@@ -5,8 +5,7 @@
 import { register } from "./register";
 import { KEYS } from "@excalidraw/common";
 import { CaptureUpdateAction } from "@excalidraw/element";
-import { aiConfigDialogOpenAtom, imageToMermaidDialogOpenAtom } from "../../excalidraw-app/app-jotai";
-import { appJotaiStore } from "../../excalidraw-app/app-jotai";
+import { aiConfigDialogOpenAtom, imageToMermaidDialogOpenAtom, appJotaiStore } from "../../../excalidraw-app/app-jotai";
 
 /**
  * Action to open AI Configuration Dialog

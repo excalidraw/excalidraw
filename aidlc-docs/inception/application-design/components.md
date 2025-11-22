@@ -6,21 +6,74 @@ The image-to-diagram conversion feature will integrate with Excalidraw's existin
 
 ## New Components
 
+### AIConfigurationDialog
+**Purpose**: UI for configuring LLM provider credentials and selecting models
+**Responsibilities**:
+- Provide forms for entering credentials for each provider (OpenAI, Gemini, Claude, Ollama)
+- Test credential validity with provider APIs
+- Display available models after successful connection
+- Allow users to select preferred model
+- Manage credential storage and updates
+- Show connection status for each configured provider
+
+**Interfaces**:
+```typescript
+interface AIConfigurationDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfigurationSaved: () => void;
+}
+
+interface ProviderConfigForm {
+  provider: LLMProvider;
+  credentials: ProviderCredentials;
+  testStatus: 'idle' | 'testing' | 'success' | 'error';
+  availableModels: ModelInfo[];
+  selectedModel?: string;
+}
+```
+
+**Component Structure**:
+- Provider selection tabs (OpenAI, Gemini, Claude, Ollama)
+- Credential input forms (provider-specific fields)
+- Test connection button with status indicator
+- Model selection dropdown (populated after successful test)
+- Save/Cancel buttons
+- Delete credentials option for configured providers
+
+### AIConfigurationButton
+**Purpose**: Toolbar button to open AI configuration dialog
+**Responsibilities**:
+- Display configuration status (configured/not configured)
+- Open AIConfigurationDialog when clicked
+- Show visual indicator when no provider is configured
+- Integrate with existing toolbar
+
+**Interfaces**:
+```typescript
+interface AIConfigurationButtonProps {
+  isConfigured: boolean;
+  onClick: () => void;
+}
+```
+
 ### ImageToMermaidConverter
 **Purpose**: Core component that orchestrates the image-to-mermaid conversion pipeline
 **Responsibilities**:
+- Check if AI provider is configured before starting conversion
 - Manage image input from multiple sources (paste, upload, drag & drop)
-- Interface with configurable LLM services
+- Interface with configured LLM services via AIConfigurationService
 - Handle mermaid code generation and validation
 - Manage conversion state and error handling
 - Coordinate with existing mermaid-to-excalidraw integration
+- Prompt user to configure AI if no provider is set up
 
 **Interfaces**:
 ```typescript
 interface ImageToMermaidConverterProps {
   onConversionComplete: (mermaidCode: string) => void;
   onError: (error: Error) => void;
-  config: LLMServiceConfig;
+  onConfigurationRequired: () => void; // Opens AI configuration dialog
 }
 ```
 
@@ -163,24 +216,34 @@ interface AppState {
 
 ```mermaid
 graph TD
-    A[ImageToMermaidDialog] --> B[ImageInputHandler]
-    A --> C[ImageToMermaidConverter]
-    A --> D[ConversionPreviewPanel]
+    TB[Toolbar] --> ACB[AIConfigurationButton]
+    TB --> IIB[ImageImportButton]
     
-    C --> E[LLMServiceManager]
-    C --> F[MermaidValidator]
-    C --> G[ExistingMermaidToExcalidraw]
+    ACB --> ACD[AIConfigurationDialog]
+    IIB --> ITMD[ImageToMermaidDialog]
     
-    B --> H[FileAPI]
-    B --> I[ClipboardAPI]
-    B --> J[DragDropAPI]
+    ACD --> ACS[AIConfigurationService]
+    ACS --> LS[LocalStorage]
+    ACS --> PA[Provider APIs]
     
-    E --> K[OpenAIService]
-    E --> L[OllamaService]
-    E --> M[CustomLLMService]
+    ITMD --> IIH[ImageInputHandler]
+    ITMD --> ITMC[ImageToMermaidConverter]
+    ITMD --> CPP[ConversionPreviewPanel]
     
-    A --> N[ExistingTTDDialog]
-    A --> O[ExistingActionSystem]
+    ITMC --> ACS
+    ITMC --> LLMS[LLMServiceManager]
+    ITMC --> MV[MermaidValidator]
+    ITMC --> ME[ExistingMermaidToExcalidraw]
+    
+    IIH --> FA[FileAPI]
+    IIH --> CA[ClipboardAPI]
+    IIH --> DDA[DragDropAPI]
+    
+    LLMS --> ACS
+    LLMS --> OAI[OpenAIService]
+    LLMS --> GEM[GeminiService]
+    LLMS --> CLA[ClaudeService]
+    LLMS --> OLL[OllamaService]
 ```
 
 ## Integration Points

@@ -6,22 +6,103 @@ The image-to-diagram conversion feature requires several services to handle diff
 
 ## Core Services
 
+### AIConfigurationService
+**Purpose**: Manage LLM provider credentials and model selection
+**Responsibilities**:
+- Store and retrieve LLM provider credentials securely in browser local storage
+- Support multiple providers: OpenAI, GCP Gemini, AWS Claude, Ollama
+- Test credential validity with provider APIs
+- Fetch and display available models for configured providers
+- Manage user's selected model preferences
+- Provide credential encryption/decryption for local storage
+- Handle credential updates and deletion
+
+**Service Interface**:
+```typescript
+interface AIConfigurationService {
+  // Credential Management
+  saveCredentials(provider: LLMProvider, credentials: ProviderCredentials): Promise<void>;
+  getCredentials(provider: LLMProvider): Promise<ProviderCredentials | null>;
+  deleteCredentials(provider: LLMProvider): Promise<void>;
+  listConfiguredProviders(): Promise<LLMProvider[]>;
+  
+  // Model Management
+  testConnection(provider: LLMProvider): Promise<ConnectionTestResult>;
+  fetchAvailableModels(provider: LLMProvider): Promise<ModelInfo[]>;
+  setSelectedModel(provider: LLMProvider, modelId: string): Promise<void>;
+  getSelectedModel(provider: LLMProvider): Promise<string | null>;
+  
+  // Configuration Status
+  isConfigured(): Promise<boolean>;
+  getConfigurationStatus(): Promise<ConfigurationStatus>;
+}
+
+interface ProviderCredentials {
+  provider: LLMProvider;
+  credentials: {
+    // OpenAI
+    apiKey?: string;
+    // GCP Gemini
+    geminiApiKey?: string;
+    // AWS Claude
+    awsClientId?: string;
+    awsClientSecret?: string;
+    awsRegion?: string;
+    // Ollama
+    ollamaEndpoint?: string;
+  };
+}
+
+interface ConnectionTestResult {
+  success: boolean;
+  message: string;
+  availableModels?: ModelInfo[];
+  error?: string;
+}
+
+interface ModelInfo {
+  id: string;
+  name: string;
+  description?: string;
+  capabilities: string[];
+  contextWindow?: number;
+}
+
+interface ConfigurationStatus {
+  hasAnyProvider: boolean;
+  configuredProviders: LLMProvider[];
+  selectedProvider?: LLMProvider;
+  selectedModel?: string;
+  lastTested?: Date;
+}
+
+type LLMProvider = 'openai' | 'gemini' | 'aws' | 'claude' | 'ollama';
+```
+
+**Service Orchestration**:
+- Encrypt sensitive credentials before storing in local storage
+- Validate credential format before saving
+- Implement secure credential retrieval with decryption
+- Cache model lists to reduce API calls
+- Provide credential migration for schema updates
+
 ### LLMVisionService
 **Purpose**: Interface with various LLM vision models for image analysis
 **Responsibilities**:
-- Manage connections to different LLM providers (OpenAI, Ollama, custom endpoints)
-- Handle authentication and API key management
+- Interface with configured LLM providers (OpenAI, GCP Gemini, AWS Claude, Ollama)
+- Retrieve credentials from AIConfigurationService
 - Process images and generate mermaid diagram descriptions
 - Manage rate limiting and quota tracking
 - Provide fallback mechanisms for service failures
+- Support provider-specific API formats and requirements
 
 **Service Interface**:
 ```typescript
 interface LLMVisionService {
-  configure(config: LLMServiceConfig): Promise<void>;
   analyzeImage(image: ImageBlob, options?: AnalysisOptions): Promise<AnalysisResult>;
-  validateConnection(): Promise<boolean>;
-  getRateLimitStatus(): Promise<RateLimitInfo>;
+  validateConnection(provider: LLMProvider): Promise<boolean>;
+  getRateLimitStatus(provider: LLMProvider): Promise<RateLimitInfo>;
+  getActiveProvider(): Promise<LLMProvider | null>;
 }
 
 interface AnalysisOptions {
@@ -162,18 +243,54 @@ interface ConversionStatus {
 
 ## Service Interactions
 
+### AI Configuration Flow
+```mermaid
+sequenceDiagram
+    participant UI as Configuration UI
+    participant AC as AIConfigurationService
+    participant LLM as LLM Provider API
+    participant LS as Local Storage
+    
+    UI->>AC: saveCredentials(provider, credentials)
+    AC->>AC: validateCredentials(credentials)
+    AC->>AC: encryptCredentials(credentials)
+    AC->>LS: store(encryptedCredentials)
+    LS-->>AC: success
+    
+    AC->>LLM: testConnection(credentials)
+    LLM-->>AC: ConnectionTestResult
+    
+    alt connection successful
+        AC->>LLM: fetchAvailableModels()
+        LLM-->>AC: ModelInfo[]
+        AC->>LS: store(models)
+        AC-->>UI: success + models
+    else connection failed
+        AC-->>UI: error + message
+    end
+```
+
 ### Conversion Pipeline Flow
 ```mermaid
 sequenceDiagram
     participant UI as User Interface
     participant CO as ConversionOrchestrationService
+    participant AC as AIConfigurationService
     participant IP as ImageProcessingService
     participant LLM as LLMVisionService
     participant MV as MermaidValidationService
     participant ME as MermaidToExcalidraw
     
     UI->>CO: startConversion(image, options)
-    CO->>IP: processImage(image)
+    CO->>AC: isConfigured()
+    AC-->>CO: true/false
+    
+    alt not configured
+        CO-->>UI: Error: No AI provider configured
+    else configured
+        CO->>AC: getSelectedModel()
+        AC-->>CO: provider + model
+        CO->>IP: processImage(image)
     IP-->>CO: ProcessedImage
     
     CO->>LLM: analyzeImage(processedImage)
@@ -221,40 +338,89 @@ sequenceDiagram
 
 ## Service Configuration
 
+### Credential Storage Strategy
+
+All LLM provider credentials are stored in browser local storage with encryption:
+
+```typescript
+// Storage key format
+const STORAGE_KEYS = {
+  CREDENTIALS: 'excalidraw_ai_credentials',
+  SELECTED_PROVIDER: 'excalidraw_ai_selected_provider',
+  SELECTED_MODEL: 'excalidraw_ai_selected_model',
+  MODEL_CACHE: 'excalidraw_ai_model_cache'
+};
+
+// Encrypted storage format
+interface StoredCredentials {
+  version: string;
+  providers: {
+    [key in LLMProvider]?: {
+      encrypted: string; // Encrypted credential data
+      lastUpdated: string;
+      lastTested?: string;
+    };
+  };
+}
+```
+
 ### LLM Service Providers
 
-#### OpenAI GPT-4 Vision
+#### OpenAI Configuration
 ```typescript
-const openAIConfig: LLMServiceConfig = {
-  provider: 'openai',
-  apiKey: process.env.OPENAI_API_KEY,
-  model: 'gpt-4-vision-preview',
-  endpoint: 'https://api.openai.com/v1/chat/completions',
-  maxTokens: 1000,
-  temperature: 0.1
-};
+interface OpenAICredentials {
+  provider: 'openai';
+  apiKey: string;
+  endpoint?: string; // Optional custom endpoint
+}
+
+// Default models
+const OPENAI_MODELS = [
+  { id: 'gpt-4-vision-preview', name: 'GPT-4 Vision', capabilities: ['vision', 'code'] },
+  { id: 'gpt-4o', name: 'GPT-4 Omni', capabilities: ['vision', 'code', 'fast'] }
+];
 ```
 
-#### Ollama Local Model
+#### GCP Gemini Configuration
 ```typescript
-const ollamaConfig: LLMServiceConfig = {
-  provider: 'ollama',
-  endpoint: 'http://localhost:11434/api/generate',
-  model: 'llava:latest',
-  offline: true
-};
+interface GeminiCredentials {
+  provider: 'gemini';
+  apiKey: string;
+  projectId?: string;
+}
+
+// Default models
+const GEMINI_MODELS = [
+  { id: 'gemini-pro-vision', name: 'Gemini Pro Vision', capabilities: ['vision', 'code'] },
+  { id: 'gemini-2.5-pro', name: 'Gemini 2.0 Pro', capabilities: ['vision', 'code', 'large-context'] }
+];
 ```
 
-#### Custom LLM Service
+#### AWS Claude Configuration
 ```typescript
-const customConfig: LLMServiceConfig = {
-  provider: 'custom',
-  endpoint: 'https://custom-llm-api.example.com/analyze',
-  apiKey: 'custom-api-key',
-  headers: {
-    'Custom-Header': 'value'
-  }
-};
+interface ClaudeCredentials {
+  provider: 'claude';
+  awsClientId: string;
+  awsClientSecret: string;
+  awsRegion: string;
+}
+
+// Default models
+const CLAUDE_MODELS = [
+  { id: 'claude-3-opus', name: 'Claude 3 Opus', capabilities: ['vision', 'code', 'reasoning'] },
+  { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet', capabilities: ['vision', 'code', 'fast'] }
+];
+```
+
+#### Ollama Local Configuration
+```typescript
+interface OllamaCredentials {
+  provider: 'ollama';
+  endpoint: string; // e.g., http://localhost:11434
+}
+
+// Models fetched dynamically from Ollama instance
+// Common models: llava, bakllava, llava-phi3
 ```
 
 ### Service Registry

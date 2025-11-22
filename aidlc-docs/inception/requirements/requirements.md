@@ -38,10 +38,43 @@
 **Acceptance Criteria**:
 - Show best attempt when LLM fails to generate valid code after multiple tries
 - Provide user options to accept partial results or retry with different settings
+
+### FR5: AI Configuration Management
+**Description**: Users shall be able to configure and manage LLM service credentials
+**Acceptance Criteria**:
+- Provide "Configure AI" button in UI for credential setup
+- Support multiple LLM providers:
+  - OpenAI (API key)
+  - GCP Gemini (API key)
+  - AWS Claude (client ID and secret)
+  - Ollama (local model endpoint)
+- Store credentials securely in browser local storage (no backend database)
+- Allow users to update or remove stored credentials
+- Validate credentials before saving
+
+### FR6: Model Testing and Selection
+**Description**: System shall test configured credentials and display available models
+**Acceptance Criteria**:
+- Run test API call after credential configuration
+- Display list of available models based on user's configuration
+- Allow users to select preferred model for conversions
+- Show connection status (connected/disconnected) for each provider
+- Persist selected model preference in local storage
+
+### FR7: Image Upload UI
+**Description**: System shall provide intuitive UI for image upload
+**Acceptance Criteria**:
+- Add toolbar button for "Import Image to Diagram" feature
+- Support three input methods from single button:
+  - Copy/paste from clipboard
+  - Drag and drop onto canvas
+  - File selection dialog
+- Show upload progress indicator during processing
+- Display preview of uploaded image before conversion
 - Allow manual editing of generated Mermaid code before conversion
 - Maintain user's original image for reference during error recovery
 
-### FR5: User Interface Integration
+### FR8: User Interface Integration
 **Description**: Feature shall be accessible through intuitive UI controls
 **Acceptance Criteria**:
 - Add new "Import Image" button in main toolbar
@@ -49,7 +82,7 @@
 - Provide visual feedback during processing (loading states, progress indicators)
 - Support keyboard shortcuts for common operations
 
-### FR6: Preview and Conversion Workflow
+### FR9: Preview and Conversion Workflow
 **Description**: System shall provide configurable preview options before final conversion
 **Acceptance Criteria**:
 - Allow users to choose between preview mode and direct conversion
@@ -58,7 +91,7 @@
 - Provide "Accept", "Retry", and "Edit" options in preview interface
 - Convert to Excalidraw elements using existing `@excalidraw/mermaid-to-excalidraw` package
 
-### FR7: Configuration Management
+### FR10: Configuration Management
 **Description**: Users shall be able to configure feature behavior and preferences
 **Acceptance Criteria**:
 - Settings for preferred LLM service and API configuration

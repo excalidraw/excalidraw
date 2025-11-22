@@ -6,8 +6,8 @@
 
 import React, { useState } from "react";
 import { Dialog } from "./Dialog";
-import { useAtom } from "../app-jotai";
-import { imageToMermaidDialogOpenAtom, conversionProgressAtom, conversionResultAtom, showConfigPromptAtom, aiConfigDialogOpenAtom } from "../../excalidraw-app/app-jotai";
+import { useAtom } from "../../../excalidraw-app/app-jotai";
+import { imageToMermaidDialogOpenAtom, conversionProgressAtom, conversionResultAtom, showConfigPromptAtom, aiConfigDialogOpenAtom } from "../../../excalidraw-app/app-jotai";
 import { imageProcessingService } from "../services/ImageProcessingService";
 import { conversionOrchestrationService } from "../services/ConversionOrchestrationService";
 import { aiConfigService } from "../services/AIConfigurationService";

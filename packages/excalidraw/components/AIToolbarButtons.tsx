@@ -7,8 +7,8 @@
 import React, { useEffect, useState } from "react";
 import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
-import { useAtom } from "../app-jotai";
-import { aiConfigDialogOpenAtom, imageToMermaidDialogOpenAtom } from "../../excalidraw-app/app-jotai";
+import { useAtom } from "../../../excalidraw-app/app-jotai";
+import { aiConfigDialogOpenAtom, imageToMermaidDialogOpenAtom } from "../../../excalidraw-app/app-jotai";
 import { aiConfigService } from "../services/AIConfigurationService";
 
 // Simple SVG icons

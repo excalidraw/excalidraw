@@ -8,8 +8,8 @@
 import React, { useState, useEffect } from "react";
 import { Dialog } from "./Dialog";
 import { TextField } from "./TextField";
-import { useAtom } from "../app-jotai";
-import { aiConfigDialogOpenAtom, aiConfiguredProvidersAtom, aiSelectedProviderAtom, aiSelectedModelAtom, aiAvailableModelsAtom } from "../../excalidraw-app/app-jotai";
+import { useAtom } from "../../../excalidraw-app/app-jotai";
+import { aiConfigDialogOpenAtom, aiConfiguredProvidersAtom, aiSelectedProviderAtom, aiSelectedModelAtom, aiAvailableModelsAtom } from "../../../excalidraw-app/app-jotai";
 import { aiConfigService } from "../services/AIConfigurationService";
 import type { LLMProvider, ModelInfo, ProviderCredentials } from "../services/AIConfigurationService";
 import { llmVisionService } from "../services/LLMVisionService";
