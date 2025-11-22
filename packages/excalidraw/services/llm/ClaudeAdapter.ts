@@ -25,32 +25,48 @@ import type {
 } from "./LLMProviderAdapter";
 
 const CLAUDE_MODELS: ModelInfo[] = [
+  // Claude 3.5 Models (Latest Generation)
+  {
+    id: "anthropic.claude-3-5-sonnet-20241022-v2:0",
+    name: "Claude 3.5 Sonnet V2 (Latest)",
+    description: "Most advanced Claude model with improved reasoning and coding",
+    capabilities: ["vision", "code", "reasoning", "fast", "analysis"],
+    contextWindow: 200000,
+  },
+  {
+    id: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+    name: "Claude 3.5 Sonnet V1",
+    description: "Previous generation 3.5 Sonnet",
+    capabilities: ["vision", "code", "reasoning", "fast"],
+    contextWindow: 200000,
+  },
+  {
+    id: "anthropic.claude-3-5-haiku-20241022-v1:0",
+    name: "Claude 3.5 Haiku (Latest)",
+    description: "Fastest and most affordable Claude 3.5 model",
+    capabilities: ["vision", "code", "fast", "affordable"],
+    contextWindow: 200000,
+  },
+  // Claude 3 Models
   {
     id: "anthropic.claude-3-opus-20240229-v1:0",
     name: "Claude 3 Opus",
-    description: "Most capable Claude model for complex tasks",
+    description: "Most capable Claude 3 model for complex tasks",
     capabilities: ["vision", "code", "reasoning", "analysis"],
     contextWindow: 200000,
   },
   {
     id: "anthropic.claude-3-sonnet-20240229-v1:0",
     name: "Claude 3 Sonnet",
-    description: "Balanced performance and speed",
+    description: "Balanced Claude 3 model",
     capabilities: ["vision", "code", "fast"],
     contextWindow: 200000,
   },
   {
     id: "anthropic.claude-3-haiku-20240307-v1:0",
     name: "Claude 3 Haiku",
-    description: "Fastest Claude model",
+    description: "Fastest Claude 3 model",
     capabilities: ["vision", "code", "fast", "affordable"],
-    contextWindow: 200000,
-  },
-  {
-    id: "anthropic.claude-3-5-sonnet-20240620-v1:0",
-    name: "Claude 3.5 Sonnet",
-    description: "Latest and most capable Sonnet model",
-    capabilities: ["vision", "code", "reasoning", "fast"],
     contextWindow: 200000,
   },
 ];
