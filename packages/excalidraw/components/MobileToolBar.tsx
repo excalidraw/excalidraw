@@ -195,7 +195,65 @@ export const MobileToolBar = ({
       : extraToolsIcon
     : extraToolsIcon;
 
-  return (// added excalidraw- prefix due to Obsidian style conflict
+  const showImageToolMenu = () => {
+    if (!showImageToolOutside) {
+      return null;
+    }
+
+    return (
+      <DropdownMenu open={isImageMenuOpen} placement="top">
+        <DropdownMenu.Trigger
+          className={clsx("App-toolbar__extra-tools-trigger")}
+          onToggle={() => {
+            if (!isImageMenuOpen) {
+              setIsOtherShapesMenuOpen(false);
+            }
+            setIsImageMenuOpen(!isImageMenuOpen);
+          }}
+          title={t2("COMP_IMG")}
+        >
+          {ImageIcon}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
+          onClickOutside={() => setIsImageMenuOpen(false)}
+          onSelect={() => setIsImageMenuOpen(false)}
+          className="App-toolbar__extra-tools-dropdown"
+        >
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "image" })}
+            icon={ImageIcon}
+            data-testid="toolbar-image-import"
+          >
+            {t2("COMP_IMG_FROM_SYSTEM")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => runAction("anyFile")}
+            icon={InsertAnyFileIcon}
+            data-testid="toolbar-any-file"
+          >
+            {t2("COMP_IMG_ANY_FILE")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => runAction("card")}
+            icon={Card}
+            data-testid="toolbar-card"
+          >
+            {t2("INSERT_CARD")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => runAction("LaTeX")}
+            icon={LaTeXIcon}
+            data-testid="toolbar-latex"
+          >
+            {t2("COMP_IMG_LaTeX")}
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
+    );
+  };
+
+  // zsviczian: added excalidraw- prefix due to Obsidian style conflict
+  return (
     <div
       className="excalidraw-mobile-toolbar"
       ref={(div) => {
@@ -348,60 +406,6 @@ export const MobileToolBar = ({
       )}
 
       {/* Image */}
-      {/*zsviczian - image dropdown begin*/}
-      {
-        showImageToolOutside && (
-          <DropdownMenu open={isImageMenuOpen} placement="top">
-            <DropdownMenu.Trigger
-              className={clsx("App-toolbar__extra-tools-trigger")}
-              onToggle={() => {
-                if (!isImageMenuOpen) {
-                  setIsOtherShapesMenuOpen(false);
-                }
-                setIsImageMenuOpen(!isImageMenuOpen);
-              }}
-              title={t2("COMP_IMG")}
-            >
-              {ImageIcon}
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content
-              onClickOutside={() => setIsImageMenuOpen(false)}
-              onSelect={() => setIsImageMenuOpen(false)}
-              className="App-toolbar__extra-tools-dropdown"
-            >
-              <DropdownMenu.Item
-                onSelect={() => app.setActiveTool({ type: "image" })}
-                icon={ImageIcon}
-                data-testid="toolbar-image-import"
-              >
-                {t2("COMP_IMG_FROM_SYSTEM")}
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
-                onSelect={() => runAction("anyFile")}
-                icon={InsertAnyFileIcon}
-                data-testid="toolbar-any-file"
-              >
-                {t2("COMP_IMG_ANY_FILE")}
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
-                onSelect={() => runAction("card")}
-                icon={Card}
-                data-testid="toolbar-card"
-              >
-                {t2("INSERT_CARD")}
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
-                onSelect={() => runAction("LaTeX")}
-                icon={LaTeXIcon}
-                data-testid="toolbar-latex"
-              >
-                {t2("COMP_IMG_LaTeX")}
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu>
-        ) /*zsviczian - image dropdown end*/
-      }
-
       {/*showImageToolOutside && (
         <ToolButton
           className={clsx({
@@ -417,6 +421,7 @@ export const MobileToolBar = ({
           onChange={() => handleToolChange("image")}
         />
       ) //zsviczian*/}
+      {showImageToolMenu() /*zsviczian*/}
 
       {/* Frame Tool */}
       {showFrameToolOutside && (
