@@ -2327,6 +2327,15 @@ export const strokeIcon = createIcon(
   tablerIconProps,
 );
 
+export const BoldIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M7 5h6a3.5 3.5 0 0 1 0 7h-6z" />
+    <path d="M13 12h1a3.5 3.5 0 0 1 0 7h-7v-7" />
+  </g>,
+  tablerIconProps,
+);
+
 export const pencilIcon = createIcon(
   <g strokeWidth={1.25}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -2354,10 +2363,29 @@ export const sidebarRightIcon = createIcon(
   tablerIconProps,
 );
 
+export const ItalicIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="11" y1="5" x2="17" y2="5" />
+    <line x1="7" y1="19" x2="13" y2="19" />
+    <line x1="14" y1="5" x2="10" y2="19" />
+  </g>,
+  tablerIconProps,
+);
+
 export const messageCircleIcon = createIcon(
   <g strokeWidth="1.25">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M3 20l1.3 -3.9c-2.324 -3.437 -1.426 -7.872 2.1 -10.374c3.526 -2.501 8.59 -2.296 11.845 .48c3.255 2.777 3.695 7.266 1.029 10.501c-2.666 3.235 -7.615 4.215 -11.574 2.293l-4.7 1" />
+  </g>,
+  tablerIconProps,
+);
+
+export const UnderlineIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M7 5v5a5 5 0 0 0 10 0v-5" />
+    <path d="M5 19h14" />
   </g>,
   tablerIconProps,
 );
@@ -2370,35 +2398,6 @@ export const presentationIcon = createIcon(
     <path d="M12 16l0 4" />
     <path d="M9 20l6 0" />
     <path d="M8 12l3 -3l2 2l3 -3" />
-  </g>,
-  tablerIconProps,
-);
-
-// Text formatting icons
-export const BoldIcon = createIcon(
-  <g strokeWidth="1.25">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M7 5h6a3.5 3.5 0 0 1 0 7h-6z" />
-    <path d="M13 12h1a3.5 3.5 0 0 1 0 7h-7v-7" />
-  </g>,
-  tablerIconProps,
-);
-
-export const ItalicIcon = createIcon(
-  <g strokeWidth="1.25">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <line x1="11" y1="5" x2="17" y2="5" />
-    <line x1="7" y1="19" x2="13" y2="19" />
-    <line x1="14" y1="5" x2="10" y2="19" />
-  </g>,
-  tablerIconProps,
-);
-
-export const UnderlineIcon = createIcon(
-  <g strokeWidth="1.25">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M7 5v5a5 5 0 0 0 10 0v-5" />
-    <path d="M5 19h14" />
   </g>,
   tablerIconProps,
 );
