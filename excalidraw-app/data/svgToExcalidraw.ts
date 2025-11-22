@@ -11,29 +11,6 @@ import { pointFrom } from "@excalidraw/math";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-interface SVGRect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  fill?: string;
-  stroke?: string;
-  rx?: number; // border radius
-}
-
-interface SVGText {
-  x: number;
-  y: number;
-  text: string;
-  fontSize?: number;
-}
-
-interface SVGPath {
-  d: string; // path data
-  stroke?: string;
-  fill?: string;
-}
-
 /**
  * Parse Mermaid SVG and convert to Excalidraw elements
  * Handles Mermaid-specific SVG structure with proper validation
@@ -75,7 +52,6 @@ export function svgToExcalidraw(
 
     // Extract Mermaid nodes (rectangles and other shapes)
     const nodes = svgElement.querySelectorAll("g.node");
-    console.log("Processing", nodes.length, "nodes");
 
     nodes.forEach((node, nodeIndex) => {
       try {
@@ -91,9 +67,6 @@ export function svgToExcalidraw(
           if (translateMatch) {
             translateX = parseFloat(translateMatch[1]);
             translateY = parseFloat(translateMatch[2]);
-            console.log(
-              `Node ${nodeIndex} transform: translate(${translateX}, ${translateY})`,
-            );
           }
         }
 
@@ -170,15 +143,11 @@ export function svgToExcalidraw(
 
         // Extract text label - look for all text elements in the node
         const textElements = node.querySelectorAll("text, tspan");
-        console.log(
-          `Node ${nodeIndex}: Found ${textElements.length} text elements`,
-        );
 
         if (textElements.length > 0) {
           const textParts: string[] = [];
           textElements.forEach((te, idx) => {
             const content = te.textContent?.trim();
-            console.log(`  Text element ${idx}: "${content}"`);
             if (content) {
               textParts.push(content);
             }
@@ -191,15 +160,8 @@ export function svgToExcalidraw(
           const allText = node.textContent?.trim();
           if (allText) {
             label = allText;
-            console.log(`  Using node.textContent: "${label}"`);
           }
         }
-
-        console.log(
-          `Node ${nodeIndex}: "${label}" at (${Math.round(x)}, ${Math.round(
-            y,
-          )}) size ${Math.round(width)}x${Math.round(height)}`,
-        );
 
         // Validate dimensions
         if (
@@ -210,7 +172,6 @@ export function svgToExcalidraw(
           width <= 0 ||
           height <= 0
         ) {
-          console.warn("Invalid element dimensions, skipping");
           return;
         }
 
@@ -256,14 +217,13 @@ export function svgToExcalidraw(
           }
         }
       } catch (error) {
-        console.warn("Failed to create node element:", error);
+        // Skip failed elements
       }
     });
 
     // Extract Mermaid edges (arrows)
     // Mermaid v10+ uses different class names, try multiple selectors
     const edges = svgElement.querySelectorAll("g.edge");
-    console.log("Edge selector 'g.edge' found:", edges.length);
 
     // Try alternative selectors if no edges found
     if (edges.length === 0) {
@@ -271,7 +231,6 @@ export function svgToExcalidraw(
       const edgePaths = svgElement.querySelectorAll(
         "path.edge-path, path[class*='edge'], path[class*='flowchart-link']",
       );
-      console.log("Alternative edge paths found:", edgePaths.length);
 
       // If we found edge paths, wrap them in a structure similar to g.edge
       if (edgePaths.length > 0) {
@@ -326,7 +285,7 @@ export function svgToExcalidraw(
               }
             }
           } catch (error) {
-            console.warn("Failed to create arrow from path:", error);
+            // Skip failed arrows
           }
         });
       }
@@ -362,7 +321,6 @@ export function svgToExcalidraw(
 
               // Validate coordinates
               if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
-                console.warn("Invalid arrow coordinates, skipping");
                 return;
               }
 
@@ -417,7 +375,7 @@ export function svgToExcalidraw(
           }
         }
       } catch (error) {
-        console.warn("Failed to create edge element:", error);
+        // Skip failed edges
       }
     });
 
@@ -459,26 +417,6 @@ export function svgToExcalidraw(
 
     // CRITICAL: Sync fractional indices before returning
     const validElements = syncInvalidIndices(elements);
-
-    console.log("=== SVG to Excalidraw Conversion ===");
-    console.log("Total elements created:", validElements.length);
-    console.log(
-      "Element types:",
-      validElements.map((e) => `${e.type} (${e.id.substring(0, 8)})`),
-    );
-    console.log("Nodes found:", nodes.length);
-    console.log("Edges found:", edges.length);
-
-    // Log element positions for debugging
-    validElements.forEach((el, idx) => {
-      if (el.type !== "text") {
-        console.log(
-          `Element ${idx}: ${el.type} at (${Math.round(el.x)}, ${Math.round(
-            el.y,
-          )}) size ${Math.round(el.width)}x${Math.round(el.height)}`,
-        );
-      }
-    });
 
     return validElements;
   } catch (error) {

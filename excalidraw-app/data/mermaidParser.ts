@@ -83,7 +83,7 @@ export function parseMermaidFlowchart(mermaidCode: string): MermaidGraph {
     }
 
     // Parse node definition: A[Label] or A(Label) or A{Label} or A[/Label/]
-    const nodeMatch = line.match(/(\w+)([\[\(\{\/])([^\]\)\}]+)([\]\)\}\/])/);
+    const nodeMatch = line.match(/(\w+)([[({/])([^\])}]+)([\])}/])/);
     if (nodeMatch) {
       const [, id, openBracket, label] = nodeMatch;
       let shape: MermaidNode["shape"] = "rectangle";

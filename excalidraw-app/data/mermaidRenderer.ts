@@ -28,8 +28,6 @@ export async function renderMermaidToSVG(mermaidCode: string): Promise<string> {
     // Ensure proper line breaks (Mermaid needs them)
     // If the code is all on one line, try to add line breaks
     if (!cleanCode.includes("\n")) {
-      console.log("Mermaid code has no line breaks, reformatting...");
-
       // More aggressive line break insertion
       // 1. Add line break after graph type declaration
       cleanCode = cleanCode.replace(/^(graph\s+\w+)/, "$1\n");
@@ -44,7 +42,6 @@ export async function renderMermaidToSVG(mermaidCode: string): Promise<string> {
       cleanCode = cleanCode.replace(/\n\n+/g, "\n");
 
       cleanCode = cleanCode.trim();
-      console.log("Reformatted Mermaid code:", cleanCode);
     }
 
     // Generate unique ID for this diagram
@@ -54,31 +51,6 @@ export async function renderMermaidToSVG(mermaidCode: string): Promise<string> {
 
     // Render Mermaid code to SVG
     const { svg } = await mermaid.render(id, cleanCode);
-
-    console.log("=== Mermaid Rendering ===");
-    console.log("Input code:", cleanCode);
-    console.log("SVG length:", svg.length);
-    console.log("SVG preview:", svg.substring(0, 500));
-
-    // Log SVG structure for debugging
-    const parser = new DOMParser();
-    const svgDoc = parser.parseFromString(svg, "image/svg+xml");
-    const svgEl = svgDoc.querySelector("svg");
-    if (svgEl) {
-      console.log("SVG structure:");
-      console.log("- g elements:", svgEl.querySelectorAll("g").length);
-      console.log(
-        "- g.node elements:",
-        svgEl.querySelectorAll("g.node").length,
-      );
-      console.log(
-        "- g.edge elements:",
-        svgEl.querySelectorAll("g.edge").length,
-      );
-      console.log("- path elements:", svgEl.querySelectorAll("path").length);
-      console.log("- rect elements:", svgEl.querySelectorAll("rect").length);
-      console.log("- text elements:", svgEl.querySelectorAll("text").length);
-    }
 
     return svg;
   } catch (error) {
