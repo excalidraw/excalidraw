@@ -1094,6 +1094,7 @@ export const ShapesSwitcher = ({
   const [isImageMenuOpen, setIsImageMenuOpen] = useState(false); //zsviczian
   const stylesPanelMode = useStylesPanelMode();
   const isFullStylesPanel = stylesPanelMode === "full";
+  const isTrayModePanel = stylesPanelMode === "tray"; //zsviczian
   const isCompactStylesPanel = stylesPanelMode === "compact";
 
   const SELECTION_TOOLS = [
@@ -1120,7 +1121,8 @@ export const ShapesSwitcher = ({
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
-  const showLassoTool = isFullStylesPanel || isCompactStylesPanel;
+  const showLassoTool =
+    isFullStylesPanel || isCompactStylesPanel || isTrayModePanel; //zsviczian
 
   return (
     <>

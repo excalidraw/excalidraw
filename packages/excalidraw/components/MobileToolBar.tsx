@@ -34,12 +34,16 @@ import {
   LassoIcon,
   mermaidLogoIcon,
   MagicIcon,
+  LaTeXIcon,
+  Card,
+  InsertAnyFileIcon,
 } from "./icons";
 
 import "./ToolIcon.scss";
 import "./MobileToolBar.scss";
 
 import type { AppClassProperties, ToolType, UIAppState } from "../types";
+import { runAction, t2 } from "../obsidianUtils";
 
 const SHAPE_TOOLS = [
   {
@@ -94,6 +98,7 @@ export const MobileToolBar = ({
 }: MobileToolBarProps) => {
   const activeTool = app.state.activeTool;
   const [isOtherShapesMenuOpen, setIsOtherShapesMenuOpen] = useState(false);
+  const [isImageMenuOpen, setIsImageMenuOpen] = useState(false); //zsviczian
   const [lastActiveGenericShape, setLastActiveGenericShape] = useState<
     "rectangle" | "diamond" | "ellipse"
   >("rectangle");
@@ -343,7 +348,61 @@ export const MobileToolBar = ({
       )}
 
       {/* Image */}
-      {showImageToolOutside && (
+      {/*zsviczian - image dropdown begin*/}
+      {
+        showImageToolOutside && (
+          <DropdownMenu open={isImageMenuOpen} placement="top">
+            <DropdownMenu.Trigger
+              className={clsx("App-toolbar__extra-tools-trigger")}
+              onToggle={() => {
+                if (!isImageMenuOpen) {
+                  setIsOtherShapesMenuOpen(false);
+                }
+                setIsImageMenuOpen(!isImageMenuOpen);
+              }}
+              title={t2("COMP_IMG")}
+            >
+              {ImageIcon}
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content
+              onClickOutside={() => setIsImageMenuOpen(false)}
+              onSelect={() => setIsImageMenuOpen(false)}
+              className="App-toolbar__extra-tools-dropdown"
+            >
+              <DropdownMenu.Item
+                onSelect={() => app.setActiveTool({ type: "image" })}
+                icon={ImageIcon}
+                data-testid="toolbar-image-import"
+              >
+                {t2("COMP_IMG_FROM_SYSTEM")}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onSelect={() => runAction("anyFile")}
+                icon={InsertAnyFileIcon}
+                data-testid="toolbar-any-file"
+              >
+                {t2("COMP_IMG_ANY_FILE")}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onSelect={() => runAction("card")}
+                icon={Card}
+                data-testid="toolbar-card"
+              >
+                {t2("INSERT_CARD")}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onSelect={() => runAction("LaTeX")}
+                icon={LaTeXIcon}
+                data-testid="toolbar-latex"
+              >
+                {t2("COMP_IMG_LaTeX")}
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu>
+        ) /*zsviczian - image dropdown end*/
+      }
+
+      {/*showImageToolOutside && (
         <ToolButton
           className={clsx({
             active: activeTool.type === "image",
@@ -357,7 +416,7 @@ export const MobileToolBar = ({
           data-testid="toolbar-image"
           onChange={() => handleToolChange("image")}
         />
-      )}
+      ) //zsviczian*/}
 
       {/* Frame Tool */}
       {showFrameToolOutside && (
