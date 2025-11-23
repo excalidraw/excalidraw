@@ -15,6 +15,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
+import { getShortcutKey } from "../../shortcut";
 import { useExcalidrawContainer, useStylesPanelMode } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
@@ -275,8 +276,8 @@ const ColorPickerTrigger = ({
       style={color ? { "--swatch-color": color } : undefined}
       title={
         type === "elementStroke"
-          ? t("labels.showStroke")
-          : t("labels.showBackground")
+          ? `${t("labels.showStroke")} — ${getShortcutKey("S")}`
+          : `${t("labels.showBackground")} — ${getShortcutKey("G")}`
       }
       data-openpopup={type}
       onClick={handleClick}
