@@ -1,0 +1,18 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .tool-popover-content {
+    display: flex;
+    flex-direction: row;
+    gap: 0.25rem;
+    border-radius: 0.5rem;
+    background: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
+    padding: 0.5rem;
+    z-index: var(--zIndex-layerUI);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}

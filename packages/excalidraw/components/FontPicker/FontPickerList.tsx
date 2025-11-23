@@ -20,7 +20,12 @@ import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import { Fonts } from "../../fonts";
 import { t } from "../../i18n";
-import { useApp, useAppProps, useExcalidrawContainer } from "../App";
+import {
+  useApp,
+  useAppProps,
+  useExcalidrawContainer,
+  useStylesPanelMode,
+} from "../App";
 import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
 import { ScrollableList } from "../ScrollableList";
@@ -93,6 +98,7 @@ export const FontPickerList = React.memo(
     const app = useApp();
     const { fonts } = app;
     const { showDeprecatedFonts } = useAppProps();
+    const stylesPanelMode = useStylesPanelMode();
 
     const [searchTerm, setSearchTerm] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
@@ -338,11 +344,13 @@ export const FontPickerList = React.memo(
         onKeyDown={onKeyDown}
         preventAutoFocusOnTouch={!!app.state.editingTextElement}
       >
-        <QuickSearch
-          ref={inputRef}
-          placeholder={t("quickSearch.placeholder")}
-          onChange={debounce(setSearchTerm, 20)}
-        />
+        {stylesPanelMode === "full" && (
+          <QuickSearch
+            ref={inputRef}
+            placeholder={t("quickSearch.placeholder")}
+            onChange={debounce(setSearchTerm, 20)}
+          />
+        )}
         <ScrollableList
           className="dropdown-menu fonts manual-hover"
           placeholder={t("fontList.empty")}

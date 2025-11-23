@@ -55,6 +55,10 @@ export const getDefaultAppState = (): Omit<
       fromSelection: false,
       lastActiveTool: null,
     },
+    preferredSelectionTool: {
+      type: "selection",
+      initialized: false,
+    },
     penMode: false,
     penDetected: false,
     errorMessage: null,
@@ -123,7 +127,6 @@ export const getDefaultAppState = (): Omit<
     searchMatches: null,
     lockedMultiSelections: {},
     activeLockedId: null,
-    stylesPanelMode: "full",
   };
 };
 
@@ -176,6 +179,7 @@ const APP_STATE_STORAGE_CONF = (<
   editingTextElement: { browser: false, export: false, server: false },
   editingGroupId: { browser: true, export: false, server: false },
   activeTool: { browser: true, export: false, server: false },
+  preferredSelectionTool: { browser: true, export: false, server: false },
   penMode: { browser: true, export: false, server: false },
   penDetected: { browser: true, export: false, server: false },
   errorMessage: { browser: false, export: false, server: false },
@@ -248,7 +252,6 @@ const APP_STATE_STORAGE_CONF = (<
   searchMatches: { browser: false, export: false, server: false },
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
-  stylesPanelMode: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

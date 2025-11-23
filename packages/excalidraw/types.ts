@@ -3,6 +3,7 @@ import type {
   UserIdleState,
   throttleRAF,
   MIME_TYPES,
+  EditorInterface,
 } from "@excalidraw/common";
 
 import type { SuggestedBinding } from "@excalidraw/element";
@@ -316,6 +317,10 @@ export interface AppState {
     // indicates if the current tool is temporarily switched on from the selection tool
     fromSelection: boolean;
   } & ActiveTool;
+  preferredSelectionTool: {
+    type: "selection" | "lasso";
+    initialized: boolean;
+  };
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
@@ -346,7 +351,7 @@ export interface AppState {
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
-  openMenu: "canvas" | "shape" | null;
+  openMenu: "canvas" | null;
   openPopup:
     | "canvasBackground"
     | "elementBackground"
@@ -364,7 +369,6 @@ export interface AppState {
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" }
     | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
-
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -446,9 +450,6 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
-
-  /** properties sidebar mode - determines whether to show compact or complete sidebar */
-  stylesPanelMode: "compact" | "full";
 }
 
 export type SearchMatch = {
@@ -571,6 +572,10 @@ export interface ExcalidrawProps {
     /** excludes the duplicated elements */
     prevElements: readonly ExcalidrawElement[],
   ) => ExcalidrawElement[] | void;
+  renderTopLeftUI?: (
+    isMobile: boolean,
+    appState: UIAppState,
+  ) => JSX.Element | null;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -669,6 +674,12 @@ export type UIOptions = Partial<{
   tools: {
     image: boolean;
   };
+  /**
+   * Optionally control the editor form factor and desktop UI mode from the host app.
+   * If not provided, we will take care of it internally.
+   */
+  formFactor?: EditorInterface["formFactor"];
+  desktopUIMode?: EditorInterface["desktopUIMode"];
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
 }>;
@@ -708,7 +719,7 @@ export type AppClassProperties = {
     }
   >;
   files: BinaryFiles;
-  device: App["device"];
+  editorInterface: App["editorInterface"];
   scene: App["scene"];
   syncActionResult: App["syncActionResult"];
   fonts: App["fonts"];
@@ -738,8 +749,7 @@ export type AppClassProperties = {
 
   onPointerUpEmitter: App["onPointerUpEmitter"];
   updateEditorAtom: App["updateEditorAtom"];
-
-  defaultSelectionTool: "selection" | "lasso";
+  onPointerDownEmitter: App["onPointerDownEmitter"];
 };
 
 export type PointerDownState = Readonly<{
@@ -841,6 +851,7 @@ export interface ExcalidrawImperativeAPI {
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
+  getEditorInterface: () => EditorInterface;
   /**
    * Disables rendering of frames (including element clipping), but currently
    * the frames are still interactive in edit mode. As such, this API should be
@@ -878,18 +889,6 @@ export interface ExcalidrawImperativeAPI {
     callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
 }
-
-export type Device = Readonly<{
-  viewport: {
-    isMobile: boolean;
-    isLandscape: boolean;
-  };
-  editor: {
-    isMobile: boolean;
-    canFitSidebar: boolean;
-  };
-  isTouchScreen: boolean;
-}>;
 
 export type FrameNameBounds = {
   x: number;

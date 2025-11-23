@@ -7,7 +7,6 @@ import {
   MIN_ZOOM,
   THEME,
   ZOOM_STEP,
-  getShortcutKey,
   updateActiveTool,
   CODES,
   KEYS,
@@ -46,6 +45,7 @@ import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
@@ -83,7 +83,6 @@ export const actionChangeViewBackgroundColor = register({
         elements={elements}
         appState={appState}
         updateData={updateData}
-        compactMode={appState.stylesPanelMode === "compact"}
       />
     );
   },
@@ -122,7 +121,10 @@ export const actionClearCanvas = register({
         pasteDialog: appState.pasteDialog,
         activeTool:
           appState.activeTool.type === "image"
-            ? { ...appState.activeTool, type: app.defaultSelectionTool }
+            ? {
+                ...appState.activeTool,
+                type: app.state.preferredSelectionTool.type,
+              }
             : appState.activeTool,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -501,7 +503,7 @@ export const actionToggleEraserTool = register({
     if (isEraserActive(appState)) {
       activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveTool || {
-          type: app.defaultSelectionTool,
+          type: app.state.preferredSelectionTool.type,
         }),
         lastActiveToolBeforeEraser: null,
       });
@@ -532,7 +534,7 @@ export const actionToggleLassoTool = register({
   icon: LassoIcon,
   trackEvent: { category: "toolbar" },
   predicate: (elements, appState, props, app) => {
-    return app.defaultSelectionTool !== "lasso";
+    return app.state.preferredSelectionTool.type !== "lasso";
   },
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
