@@ -4624,6 +4624,81 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        !event.altKey &&
+        !event[KEYS.CTRL_OR_CMD] &&
+        event.shiftKey &&
+        event.key.toLowerCase() === KEYS.A
+      ) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+        if (
+          this.state.activeTool.type === "selection" &&
+          !selectedElements.length
+        ) {
+          return;
+        }
+
+        if (
+          this.state.activeTool.type === "arrow" ||
+          selectedElements.some((element) => isArrowElement(element))
+        ) {
+          this.setState({ openPopup: "compactArrowProperties" });
+          event.stopPropagation();
+        }
+      }
+
+      if (
+        !event.altKey &&
+        !event[KEYS.CTRL_OR_CMD] &&
+        event.shiftKey &&
+        event.key.toLowerCase() === KEYS.Q
+      ) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+        if (
+          this.state.activeTool.type === "selection" &&
+          !selectedElements.length
+        ) {
+          return;
+        }
+
+        if (
+          this.state.activeTool.type === "arrow" ||
+          selectedElements.some((element) => isArrowElement(element))
+        ) {
+          this.setState({
+            openPopup: "compactArrowProperties",
+            focusedArrowheadPicker: "start",
+          });
+          event.stopPropagation();
+        }
+      }
+
+      if (
+        !event.altKey &&
+        !event[KEYS.CTRL_OR_CMD] &&
+        event.shiftKey &&
+        event.key.toLowerCase() === KEYS.W
+      ) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+        if (
+          this.state.activeTool.type === "selection" &&
+          !selectedElements.length
+        ) {
+          return;
+        }
+
+        if (
+          this.state.activeTool.type === "arrow" ||
+          selectedElements.some((element) => isArrowElement(element))
+        ) {
+          this.setState({
+            openPopup: "compactArrowProperties",
+            focusedArrowheadPicker: "end",
+          });
+          event.stopPropagation();
+        }
+      }
+
+      if (
         !event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
         event.key.toLowerCase() === KEYS.F
