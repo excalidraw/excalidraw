@@ -142,7 +142,7 @@
       "editArrow": "Modifica freccia"
     },
     "polygon": {
-      "breakPolygon": "",
+      "breakPolygon": "Interrompi poligono",
       "convertToPolygon": "Converti in poligono"
     },
     "elementLock": {
@@ -170,7 +170,7 @@
     "copyElementLink": "Copia il link all'oggetto",
     "linkToElement": "Link all'oggetto",
     "wrapSelectionInFrame": "Avvolgi la selezione nella cornice",
-    "tab": "",
+    "tab": "Scheda",
     "shapeSwitch": "Cambia forma"
   },
   "elementLink": {
@@ -195,7 +195,7 @@
     "singleResult": "risultato",
     "multipleResults": "risultati",
     "placeholder": "Trova testo sulla tela...",
-    "frames": "",
+    "frames": "Fotogrammi",
     "texts": "Testi"
   },
   "buttons": {
@@ -292,7 +292,7 @@
   },
   "toolBar": {
     "selection": "Selezione",
-    "lasso": "",
+    "lasso": "Selezione a lazo",
     "image": "Inserisci immagine",
     "rectangle": "Rettangolo",
     "diamond": "Rombo",
@@ -659,6 +659,6 @@
     "shift": "Shift",
     "spacebar": "Spazio",
     "delete": "Elimina",
-    "mmb": ""
+    "mmb": "Rotella di scorrimento"
   }
 }
