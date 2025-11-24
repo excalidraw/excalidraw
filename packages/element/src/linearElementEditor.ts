@@ -1949,11 +1949,7 @@ export class LinearElementEditor {
     elementsMap: ElementsMap,
     includeBoundText: boolean = false,
   ): [number, number, number, number, number, number] => {
-    const shape = ShapeCache.generateElementShape(element, {
-      isExporting: true,
-      canvasBackgroundColor: "traansparent",
-      embedsValidationStatus: new Map(),
-    });
+    const shape = ShapeCache.generateElementShape(element, null);
 
     // first element is always the curve
     const ops = getCurvePathOps(shape[0]);
